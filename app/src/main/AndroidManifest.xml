@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="ch.berta.fabio.qwittig" >
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name="ch.berta.fabio.qwittig.BuyerListActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTop" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="ch.berta.fabio.qwittig.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName="ch.berta.fabio.qwittig.BuyerListActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.berta.fabio.qwittig.BuyerListActivity" />
+        </activity>
+        <activity
+            android:name="ch.berta.fabio.qwittig.PurchaseListActivity"
+            android:label="@string/title_activity_purchase_list"
+            android:launchMode="singleTop"
+            android:parentActivityName="ch.berta.fabio.qwittig.BuyerListActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.berta.fabio.qwittig.BuyerListActivity" />
+        </activity>
+        <activity
+            android:name="ch.berta.fabio.qwittig.PurchaseDetailListActivity"
+            android:label="@string/title_activity_purchase_detail_list"
+            android:launchMode="singleTop"
+            android:parentActivityName="ch.berta.fabio.qwittig.PurchaseListActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.berta.fabio.qwittig.PurchaseListActivity" />
+        </activity>
+        <activity
+            android:name=".AddPurchaseManuallyActivity"
+            android:label="@string/title_activity_add_purchase_manually"
+            android:launchMode="singleTop"
+            android:parentActivityName="ch.berta.fabio.qwittig.BuyerListActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.berta.fabio.qwittig.BuyerListActivity" />
+        </activity>
+
+        <provider
+            android:name="ch.berta.fabio.qwittig.data.WgProvider"
+            android:authorities="ch.berta.fabio.qwittig"
+            android:exported="false" />
+    </application>
+
+</manifest>

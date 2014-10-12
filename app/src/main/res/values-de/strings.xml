@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Qwittig</string>
+    <string name="title_activity_purchase_list">Letzte Einkäufe</string>
+    <string name="title_activity_purchase_detail_list">Details Einkauf</string>
+    <string name="in_the_black">Im Plus</string>
+    <string name="in_the_red">Im Minus</string>
+    <string name="title_activity_settings">Einstellungen</string>
+    <string name="action_profile">Mein Profil</string>
+    <string name="action_help_feedback">Hilfe und Feedback</string>
+    <string name="action_balance">Konto ausgleichen</string>
+    <string name="action_settings">Einstellungen</string>
+    <string name="add_purchase">Neuen Einkauf hinzufügen</string>
+    <string name="title_activity_add_purchase_manually">Neuer Einkauf</string>
+    <string name="button_add">Hinzufügen</string>
+    <string name="button_discard">Verwerfen</string>
+    <string name="header_date_and_store">Datum und Laden</string>
+    <string name="header_items">Artikel</string>
+    <string name="hint_item_name">Artikelname</string>
+    <string name="hint_item_price">Preis</string>
+    <string name="hint_item_count">Stk.</string>
+    <string name="ibt_add_item">Artikel hinzufügen</string>
+    <string name="toast_purchase_added">Neuer Einkauf hinzugefügt</string>
+    <string name="toast_purchase_discarded">Einkauf verworfen</string>
+
+</resources>
