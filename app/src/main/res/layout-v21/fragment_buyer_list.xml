@@ -16,7 +16,8 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/list_avatar_with_three_line_text"
             android:paddingStart="@dimen/key_line_1"
-            android:paddingEnd="@dimen/key_line_1">
+            android:paddingEnd="@dimen/key_line_1"
+            android:elevation="@dimen/button_elevation">
 
             <TextView
                 android:id="@+id/tv_owner_balance_positive"
@@ -61,6 +62,9 @@
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="@dimen/content_padding_normal"
         android:layout_marginBottom="@dimen/content_padding_normal"
-        android:src="@drawable/ic_action_content_new"/>
+        android:background="@drawable/fab_home"
+        android:src="@drawable/ic_action_content_new"
+        android:stateListAnimator="@anim/button_elevation"
+        android:elevation="@dimen/button_elevation"/>
 
 </FrameLayout>
