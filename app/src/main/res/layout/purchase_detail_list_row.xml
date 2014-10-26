@@ -11,14 +11,19 @@
 
     <TextView
         android:id="@+id/list_item_name"
-        style="@style/ListRowItem"
+        style="@style/ListRowAvatarOneLineText"
         android:layout_width="0dp"
         android:layout_weight="1"
         tools:text="Gipfeli"/>
 
     <TextView
         android:id="@+id/list_item_price"
-        style="@style/ListRowItem"
+        style="@style/ListRowAvatarOneLineText"
         tools:text="34.50"/>
+
+    <TextView
+        android:id="@+id/list_item_count"
+        style="@style/ListRowAvatarOneLineText"
+        tools:text="2"/>
 
 </LinearLayout>

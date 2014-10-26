@@ -15,14 +15,14 @@
 
     <TextView
         android:id="@+id/list_name"
-        style="@style/ListRowItem"
+        style="@style/ListRowAvatarOneLineText"
         android:layout_width="0dp"
         android:layout_weight="1"
         tools:text="Vera"/>
 
     <TextView
         android:id="@+id/list_balance"
-        style="@style/ListRowItem"
+        style="@style/ListRowAvatarOneLineText"
         tools:text="123.50"/>
 
 </LinearLayout>

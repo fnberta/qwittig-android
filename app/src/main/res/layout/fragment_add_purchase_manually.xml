@@ -24,7 +24,6 @@
 
         <Button
             android:id="@+id/bt_date"
-            style="@android:style/Widget.Material.Button.Borderless"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.5"

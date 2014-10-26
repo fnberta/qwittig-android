@@ -16,20 +16,26 @@
         <item name="android:layout_gravity">center_vertical</item>
     </style>
 
-    <style name="ListRowItem">
+    <style name="ListRowAvatarOneLineText" parent="@style/TextAppearance.AppCompat.Subhead">
         <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_height">@dimen/list_avatar_with_text</item>
         <item name="android:gravity">center_vertical</item>
-        <item name="android:fontFamily">@string/font_fontFamily_regular</item>
-        <item name="android:textSize">@dimen/text_size_avatar_with_text</item>
     </style>
 
     <style name="ListSectionHeader">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">@dimen/sub_header_height</item>
+        <item name="android:layout_height">@dimen/subheader_height</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:fontFamily">@string/font_fontFamily_medium</item>
-        <item name="android:textSize">@dimen/text_size_sub_head</item>
+        <item name="android:textSize">@dimen/text_size_subheader</item>
+    </style>
+
+    <style name="EditText">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">@dimen/edit_text_height</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:fontFamily">@string/font_fontFamily_regular</item>
+        <item name="android:textSize">@dimen/text_size_edit_text</item>
     </style>
 
 </resources>

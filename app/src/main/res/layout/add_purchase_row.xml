@@ -6,24 +6,24 @@
 
     <EditText
         android:id="@+id/et_item_name"
+        style="@style/EditText"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
         android:layout_weight="0.5"
         android:inputType="text"
         android:hint="@string/hint_item_name"/>
 
     <EditText
         android:id="@+id/et_item_price"
+        style="@style/EditText"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
         android:layout_weight="0.3"
         android:inputType="numberDecimal"
         android:hint="@string/hint_item_price"/>
 
     <EditText
         android:id="@+id/et_item_count"
+        style="@style/EditText"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
         android:layout_weight="0.2"
         android:inputType="number"
         android:hint="@string/hint_item_count"/>
