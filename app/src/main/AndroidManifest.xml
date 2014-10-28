@@ -10,9 +10,9 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
-        android:name="ch.berta.fabio.qwittig.ParseApplication">
+        android:name=".ui.ParseApplication">
         <activity
-            android:name="ch.berta.fabio.qwittig.BuyerListActivity"
+            android:name=".ui.BuyerListActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop" >
             <intent-filter>
@@ -22,36 +22,36 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="ch.berta.fabio.qwittig.SettingsActivity"
+            android:name=".ui.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName="ch.berta.fabio.qwittig.BuyerListActivity" >
+            android:parentActivityName=".ui.BuyerListActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.berta.fabio.qwittig.BuyerListActivity" />
         </activity>
         <activity
-            android:name="ch.berta.fabio.qwittig.PurchaseListActivity"
+            android:name=".ui.PurchaseListActivity"
             android:label="@string/title_activity_purchase_list"
             android:launchMode="singleTop"
-            android:parentActivityName="ch.berta.fabio.qwittig.BuyerListActivity" >
+            android:parentActivityName=".ui.BuyerListActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.berta.fabio.qwittig.BuyerListActivity" />
         </activity>
         <activity
-            android:name="ch.berta.fabio.qwittig.PurchaseDetailListActivity"
+            android:name=".ui.ItemListActivity"
             android:label="@string/title_activity_purchase_detail_list"
             android:launchMode="singleTop"
-            android:parentActivityName="ch.berta.fabio.qwittig.PurchaseListActivity" >
+            android:parentActivityName=".ui.PurchaseListActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.berta.fabio.qwittig.PurchaseListActivity" />
         </activity>
         <activity
-            android:name=".AddPurchaseManuallyActivity"
+            android:name=".ui.AddPurchaseManuallyActivity"
             android:label="@string/title_activity_add_purchase_manually"
             android:launchMode="singleTop"
-            android:parentActivityName="ch.berta.fabio.qwittig.BuyerListActivity" >
+            android:parentActivityName=".ui.BuyerListActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.berta.fabio.qwittig.BuyerListActivity" />

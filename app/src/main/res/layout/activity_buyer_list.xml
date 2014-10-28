@@ -4,9 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="ch.berta.fabio.qwittig.BuyerListActivity">
+    tools:context="ch.berta.fabio.qwittig.ui.BuyerListActivity">
 
-    <include layout="@layout/toolbar"/>
+    <include layout="@layout/toolbar_extended"/>
 
     <FrameLayout
         android:id="@+id/container"
@@ -15,6 +15,3 @@
         tools:ignore="MergeRootFrame" />
 
 </LinearLayout>
-
-
-

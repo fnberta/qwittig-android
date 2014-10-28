@@ -5,7 +5,7 @@
     android:id="@+id/fragment_purchase_list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ch.berta.fabio.qwittig.PurchaseDetailListFragment">
+    tools:context="ch.berta.fabio.qwittig.ui.ItemListFragment">
 
     <ListView
         android:id="@android:id/list"

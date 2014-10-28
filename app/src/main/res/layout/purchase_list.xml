@@ -4,17 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ch.berta.fabio.qwittig.ui.ItemListFragment">
+    tools:context="ch.berta.fabio.qwittig.ui.BuyerListFragment">
 
     <ListView
-        android:id="@android:id/list"
+        android:id="@+id/lv_purchase_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:headerDividersEnabled="false"
         android:paddingBottom="@dimen/element_spacing_normal"/>
 
     <TextView
-        android:id="@android:id/empty"
+        android:id="@+id/lv_purchase_list_empty"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"/>

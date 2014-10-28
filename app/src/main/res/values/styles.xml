@@ -37,5 +37,4 @@
         <item name="android:fontFamily">@string/font_fontFamily_regular</item>
         <item name="android:textSize">@dimen/text_size_edit_text</item>
     </style>
-
 </resources>

@@ -3,6 +3,8 @@
     <string name="app_name">Qwittig</string>
     <string name="title_activity_purchase_list">Letzte Einkäufe</string>
     <string name="title_activity_purchase_detail_list">Details Einkauf</string>
+    <string name="tab_purchases">Einkäufe</string>
+    <string name="tab_users">Benutzer</string>
     <string name="in_the_black">Im Plus</string>
     <string name="in_the_red">Im Minus</string>
     <string name="title_activity_settings">Einstellungen</string>
@@ -22,5 +24,7 @@
     <string name="ibt_add_item">Artikel hinzufügen</string>
     <string name="toast_purchase_added">Neuer Einkauf hinzugefügt</string>
     <string name="toast_purchase_discarded">Einkauf verworfen</string>
+    <string name="header_user">Personen</string>
+    <string name="title_dialog_user_involved">Betroffene Nutzer</string>
 
 </resources>

@@ -6,24 +6,23 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="@dimen/list_avatar_with_text"
-    android:paddingStart="@dimen/key_line_1"
     android:paddingEnd="@dimen/key_line_1">
 
+    <ImageView
+        android:id="@+id/list_avatar"
+        style="@style/ListAvatarItem"
+        android:contentDescription="Avatar"/>
+
     <TextView
-        android:id="@+id/list_item_name"
+        android:id="@+id/list_name"
         style="@style/ListRowAvatarOneLineText"
         android:layout_width="0dp"
         android:layout_weight="1"
-        tools:text="Gipfeli"/>
+        tools:text="Vera"/>
 
     <TextView
-        android:id="@+id/list_item_price"
+        android:id="@+id/list_saldo"
         style="@style/ListRowAvatarOneLineText"
-        tools:text="34.50"/>
-
-    <TextView
-        android:id="@+id/list_item_count"
-        style="@style/ListRowAvatarOneLineText"
-        tools:text="2"/>
+        tools:text="123.50"/>
 
 </LinearLayout>

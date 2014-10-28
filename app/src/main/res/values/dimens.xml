@@ -5,6 +5,7 @@
     <dimen name="text_size_avatar_with_text">16sp</dimen>
     <dimen name="text_size_subheader">14sp</dimen>
     <dimen name="text_size_edit_text">16sp</dimen>
+    <dimen name="text_size_tab">14sp</dimen>
 
     <!--Various standard stuff-->
     <dimen name="key_line_1">16dp</dimen>
@@ -14,6 +15,7 @@
     <dimen name="content_padding_normal">16dp</dimen>
     <dimen name="avatar_size">40dp</dimen>
     <dimen name="toolbar_extended_height">128dp</dimen>
+    <dimen name="toolbar_elevation">4dp</dimen>
 
     <!--List tile heights-->
     <dimen name="list_avatar_with_text">56dp</dimen>
@@ -29,6 +31,9 @@
 
     <!--EditText-->
     <dimen name="edit_text_height">48dp</dimen>
+
+    <!--Tab-->
+    <dimen name="tab_height">48dp</dimen>
 
     <!--Holo stuff-->
     <dimen name="activity_horizontal_margin">16dp</dimen>
