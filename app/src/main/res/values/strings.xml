@@ -6,6 +6,8 @@
     <string name="title_activity_purchase_list">Last Purchases</string>
     <string name="title_activity_purchase_detail_list">Purchase Details</string>
     <string name="title_activity_add_purchase_manually">New Purchase</string>
+    <string name="tab_purchases">Purchases</string>
+    <string name="tab_users">User</string>
     <string name="action_balance">Balance Account</string>
     <string name="action_profile">My Profile</string>
     <string name="action_settings">Settings</string>
@@ -23,5 +25,17 @@
     <string name="ibt_add_item">Add Item</string>
     <string name="toast_purchase_added">Added new purchase</string>
     <string name="toast_purchase_discarded">Purchase discarded</string>
+    <string name="header_user">User</string>
+    <string name="title_dialog_user_involved">User involved</string>
+    <string name="title_activity_login">Log in</string>
+    <string name="hint_user_name">Username</string>
+    <string name="hint_password">Password</string>
+    <string name="hint_email">E-mail</string>
+    <string name="action_logout">Log out</string>
+    <string name="login_button_log_in">Log in</string>
+    <string name="login_button_sign_up">Sign up</string>
+    <string name="login_button_tryout">Try out without login</string>
+    <string name="no_purchases">No purchases available.</string>
+    <string name="no_user">No user available.</string>
 
 </resources>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.Toolbar
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/toolbar_extended"
+    android:layout_height="@dimen/toolbar_height_x2"
+    android:layout_width="match_parent"
+    android:minHeight="?attr/actionBarSize"
+    android:background="?attr/colorPrimary"
+    app:contentInsetStart="@dimen/key_line_2"
+    android:gravity="bottom">
+
+<!--    <RelativeLayout
+        android:id="@+id/rl_owner_top"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/list_avatar_with_three_line_text"
+        android:gravity="bottom">
+
+        <TextView
+            android:id="@+id/tv_owner_balance_positive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:layout_alignParentStart="true"
+            android:layout_centerInParent="true"
+            android:textAllCaps="true"
+            tools:text="Im Plus!"/>
+
+        <TextView
+            android:id="@+id/tv_owner_balance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display2"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            tools:text="-123.50"/>
+    </RelativeLayout>-->
+
+</android.support.v7.widget.Toolbar>

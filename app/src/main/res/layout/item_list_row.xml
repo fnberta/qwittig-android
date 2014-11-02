@@ -13,17 +13,21 @@
         android:id="@+id/list_item_name"
         style="@style/ListRowAvatarOneLineText"
         android:layout_width="0dp"
-        android:layout_weight="1"
+        android:layout_weight="0.5"
         tools:text="Gipfeli"/>
 
     <TextView
-        android:id="@+id/list_item_price"
+        android:id="@+id/list_item_quantity"
         style="@style/ListRowAvatarOneLineText"
-        tools:text="34.50"/>
+        android:layout_width="0dp"
+        android:layout_weight="0.25"
+        tools:text="2"/>
 
     <TextView
-        android:id="@+id/list_item_count"
+        android:id="@+id/list_item_final_price"
         style="@style/ListRowAvatarOneLineText"
-        tools:text="2"/>
+        android:layout_width="0dp"
+        android:layout_weight="0.25"
+        tools:text="34.50"/>
 
 </LinearLayout>
