@@ -3,6 +3,8 @@
     <string name="app_name">Qwittig</string>
     <string name="title_activity_purchase_list">Letzte Einkäufe</string>
     <string name="title_activity_purchase_detail_list">Details Einkauf</string>
+    <string name="tab_purchases">Einkäufe</string>
+    <string name="tab_users">Benutzer</string>
     <string name="in_the_black">Im Plus</string>
     <string name="in_the_red">Im Minus</string>
     <string name="title_activity_settings">Einstellungen</string>
@@ -22,5 +24,17 @@
     <string name="ibt_add_item">Artikel hinzufügen</string>
     <string name="toast_purchase_added">Neuer Einkauf hinzugefügt</string>
     <string name="toast_purchase_discarded">Einkauf verworfen</string>
+    <string name="header_user">Personen</string>
+    <string name="title_dialog_user_involved">Betroffene Nutzer</string>
+    <string name="hint_user_name">Benutzername</string>
+    <string name="hint_password">Passwort</string>
+    <string name="hint_email">E-Mail</string>
+    <string name="action_logout">Abmelden</string>
+    <string name="title_activity_login">Anmelden</string>
+    <string name="login_button_log_in">Anmelden</string>
+    <string name="login_button_sign_up">Neuer Account</string>
+    <string name="login_button_tryout">Ohne anmelden fortfahren</string>
+    <string name="no_purchases">Noch keine Einkäufe vorhanden.</string>
+    <string name="no_user">Noch keine Benutzer vorhanden.</string>
 
 </resources>

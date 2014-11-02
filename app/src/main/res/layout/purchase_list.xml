@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ch.berta.fabio.qwittig.ui.widgets.MultiSwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/srl_purchase"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="ch.berta.fabio.qwittig.ui.HomeFragment">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ListView
+            android:id="@+id/lv_purchase_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:headerDividersEnabled="false"
+            android:paddingBottom="@dimen/element_spacing_normal"/>
+
+        <TextView
+            android:id="@+id/lv_purchase_list_empty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/no_purchases"/>
+
+    </FrameLayout>
+</ch.berta.fabio.qwittig.ui.widgets.MultiSwipeRefreshLayout>

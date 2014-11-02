@@ -7,6 +7,6 @@
 
     <dimen name="list_avatar_with_text">64dp</dimen>
     <dimen name="list_avatar_with_two_line_text">88dp</dimen>
-    <dimen name="sub_header_height">56dp</dimen>
+    <dimen name="subheader_height">56dp</dimen>
 
 </resources>

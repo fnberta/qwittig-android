@@ -4,13 +4,29 @@
     android:layout_height="match_parent"
     android:paddingStart="@dimen/key_line_1"
     android:paddingEnd="@dimen/key_line_1"
-    tools:context="ch.berta.fabio.qwittig.AddPurchaseManuallyFragment">
+    tools:context="ch.berta.fabio.qwittig.ui.AddPurchaseManuallyFragment">
+
+    <TextView
+        android:id="@+id/tv_header_user"
+        style="@style/ListSectionHeader"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:text="@string/header_user"
+        tools:text="User"/>
+
+    <Button
+        android:id="@+id/bt_user"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Choose User"
+        android:layout_below="@+id/tv_header_user"
+        android:layout_alignParentStart="true"/>
 
     <TextView
         android:id="@+id/tv_header_date_store"
         style="@style/ListSectionHeader"
-        android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
+        android:layout_below="@+id/bt_user"
         android:text="@string/header_date_and_store"
         tools:text="Date and Store"/>
 
@@ -24,7 +40,6 @@
 
         <Button
             android:id="@+id/bt_date"
-            style="@android:style/Widget.Material.Button.Borderless"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.5"
@@ -76,6 +91,7 @@
                 android:layout_below="@+id/ll_items"
                 android:text="@string/ibt_add_item"
                 tools:text="Add item"/>
+
         </RelativeLayout>
     </ScrollView>
 
