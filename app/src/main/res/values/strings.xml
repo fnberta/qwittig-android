@@ -37,5 +37,6 @@
     <string name="login_button_tryout">Try out without login</string>
     <string name="no_purchases">No purchases available.</string>
     <string name="no_user">No user available.</string>
+    <string name="pref_current_wg">Current group</string>
 
 </resources>

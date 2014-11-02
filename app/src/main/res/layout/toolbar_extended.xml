@@ -6,6 +6,7 @@
     android:id="@+id/toolbar_extended"
     android:layout_height="@dimen/toolbar_height_x2"
     android:layout_width="match_parent"
+    android:paddingBottom="@dimen/content_padding_normal"
     android:minHeight="?attr/actionBarSize"
     android:background="?attr/colorPrimary"
     app:contentInsetStart="@dimen/key_line_2"
