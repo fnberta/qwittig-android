@@ -14,7 +14,9 @@
     <dimen name="element_spacing_normal">8dp</dimen>
     <dimen name="content_padding_normal">16dp</dimen>
     <dimen name="avatar_size">40dp</dimen>
-    <dimen name="toolbar_extended_height">128dp</dimen>
+
+    <!--Toolbar-->
+    <dimen name="toolbar_height_x2">128dp</dimen>
     <dimen name="toolbar_elevation">4dp</dimen>
 
     <!--List tile heights-->
@@ -26,7 +28,7 @@
 
     <!--FAB-->
     <dimen name="fab_size">56dp</dimen>
-    <dimen name="button_elevation">2dp</dimen>
+    <dimen name="button_elevation">8dp</dimen>
     <dimen name="button_press_elevation">4dp</dimen>
 
     <!--EditText-->

@@ -5,14 +5,19 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
     <application
+        android:name="ch.berta.fabio.qwittig.ui.ParseApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:name=".ui.ParseApplication">
+        android:theme="@style/AppTheme" >
         <activity
-            android:name=".ui.BuyerListActivity"
+            android:name=".ui.HomeActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop" >
             <intent-filter>
@@ -22,36 +27,36 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.SettingsActivity"
+            android:name="ch.berta.fabio.qwittig.ui.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".ui.BuyerListActivity" >
+            android:parentActivityName=".ui.HomeActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.berta.fabio.qwittig.BuyerListActivity" />
         </activity>
         <activity
-            android:name=".ui.PurchaseListActivity"
+            android:name="ch.berta.fabio.qwittig.ui.PurchaseListActivity"
             android:label="@string/title_activity_purchase_list"
             android:launchMode="singleTop"
-            android:parentActivityName=".ui.BuyerListActivity" >
+            android:parentActivityName=".ui.HomeActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.berta.fabio.qwittig.BuyerListActivity" />
         </activity>
         <activity
-            android:name=".ui.ItemListActivity"
+            android:name="ch.berta.fabio.qwittig.ui.ItemListActivity"
             android:label="@string/title_activity_purchase_detail_list"
             android:launchMode="singleTop"
-            android:parentActivityName=".ui.PurchaseListActivity" >
+            android:parentActivityName="ch.berta.fabio.qwittig.ui.PurchaseListActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.berta.fabio.qwittig.PurchaseListActivity" />
         </activity>
         <activity
-            android:name=".ui.AddPurchaseManuallyActivity"
+            android:name="ch.berta.fabio.qwittig.ui.AddPurchaseManuallyActivity"
             android:label="@string/title_activity_add_purchase_manually"
             android:launchMode="singleTop"
-            android:parentActivityName=".ui.BuyerListActivity" >
+            android:parentActivityName=".ui.HomeActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.berta.fabio.qwittig.BuyerListActivity" />
@@ -61,6 +66,15 @@
             android:name="ch.berta.fabio.qwittig.data.WgProvider"
             android:authorities="ch.berta.fabio.qwittig"
             android:exported="false" />
+
+        <activity
+            android:name=".ui.LoginActivity"
+            android:label="@string/title_activity_login"
+            android:parentActivityName=".ui.HomeActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.berta.fabio.qwittig.ui.BuyerListActivity" />
+        </activity>
     </application>
 
 </manifest>

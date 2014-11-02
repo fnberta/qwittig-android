@@ -26,5 +26,15 @@
     <string name="toast_purchase_discarded">Einkauf verworfen</string>
     <string name="header_user">Personen</string>
     <string name="title_dialog_user_involved">Betroffene Nutzer</string>
+    <string name="hint_user_name">Benutzername</string>
+    <string name="hint_password">Passwort</string>
+    <string name="hint_email">E-Mail</string>
+    <string name="action_logout">Abmelden</string>
+    <string name="title_activity_login">Anmelden</string>
+    <string name="login_button_log_in">Anmelden</string>
+    <string name="login_button_sign_up">Neuer Account</string>
+    <string name="login_button_tryout">Ohne anmelden fortfahren</string>
+    <string name="no_purchases">Noch keine Einkäufe vorhanden.</string>
+    <string name="no_user">Noch keine Benutzer vorhanden.</string>
 
 </resources>

@@ -21,7 +21,7 @@
         tools:text="Vera"/>
 
     <TextView
-        android:id="@+id/list_saldo"
+        android:id="@+id/list_balance"
         style="@style/ListRowAvatarOneLineText"
         tools:text="123.50"/>
 

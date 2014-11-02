@@ -4,13 +4,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/toolbar_extended"
-    android:layout_height="@dimen/toolbar_extended_height"
+    android:layout_height="@dimen/toolbar_height_x2"
     android:layout_width="match_parent"
     android:minHeight="?attr/actionBarSize"
-    android:background="?attr/colorPrimary">
+    android:background="?attr/colorPrimary"
+    app:contentInsetStart="@dimen/key_line_2"
+    android:gravity="bottom">
 
-
-    <RelativeLayout
+<!--    <RelativeLayout
         android:id="@+id/rl_owner_top"
         android:layout_width="match_parent"
         android:layout_height="@dimen/list_avatar_with_three_line_text"
@@ -34,6 +35,6 @@
             android:layout_alignParentEnd="true"
             android:layout_centerInParent="true"
             tools:text="-123.50"/>
-    </RelativeLayout>
+    </RelativeLayout>-->
 
 </android.support.v7.widget.Toolbar>

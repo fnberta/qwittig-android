@@ -1,0 +1,57 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/key_line_1"
+    tools:context="ch.berta.fabio.qwittig.ui.LoginFragment">
+
+    <EditText
+        android:id="@+id/et_login_username"
+        style="@style/EditText"
+        android:layout_width="match_parent"
+        android:inputType="textPersonName"
+        android:hint="@string/hint_user_name"/>
+
+    <EditText
+        android:id="@+id/et_login_password"
+        style="@style/EditText"
+        android:layout_width="match_parent"
+        android:inputType="textPassword"
+        android:hint="@string/hint_password"/>
+
+    <EditText
+        android:id="@+id/et_login_email"
+        style="@style/EditText"
+        android:layout_width="match_parent"
+        android:inputType="textEmailAddress"
+        android:hint="@string/hint_email"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/bt_login_login"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:text="@string/login_button_log_in"/>
+
+        <Button
+            android:id="@+id/bt_login_signup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:text="@string/login_button_sign_up"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/bt_login_tryout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/login_button_tryout"/>
+
+</LinearLayout>
