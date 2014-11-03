@@ -37,5 +37,6 @@
     <string name="no_purchases">Noch keine Einkäufe vorhanden.</string>
     <string name="no_user">Noch keine Benutzer vorhanden.</string>
     <string name="pref_current_wg">Aktive WG</string>
+    <string name="action_fake_data">Fake-Daten hinzufügen</string>
 
 </resources>
