@@ -2,11 +2,20 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <ListPreference
-        android:key="PREF_CURRENT_GROUP"
-        android:title="@string/pref_current_wg"/>
+        android:key="pref_group_current"
+        android:title="@string/pref_group_current"/>
+    <EditTextPreference
+        android:key="pref_group_name"
+        android:title="@string/pref_group_name"/>
+    <EditTextPreference
+        android:key="pref_group_add_user"
+        android:title="@string/pref_group_add_user"/>
+    <EditTextPreference
+        android:key="pref_group_create_new"
+        android:title="@string/pref_group_create_new"/>
     <CheckBoxPreference
         android:key="PREF_EXAMPLE"
         android:title="Example Title"
         android:summary="Example summary"
-        android:defaultValue="false" />
+        android:defaultValue="false"/>
 </PreferenceScreen>
