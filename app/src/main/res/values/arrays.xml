@@ -8,4 +8,18 @@
         <item>Migros</item>
         <item>Volg</item>
     </string-array>
+
+    <string-array name="currency_entries">
+        <item>Schweizer Franken (CHF)</item>
+        <item>Euro (EUR)</item>
+        <item>United States Dollar (USD)</item>
+        <item>Great British Pounds (GBP)</item>
+    </string-array>
+
+    <string-array name="currency_values">
+        <item>CHF</item>
+        <item>EUR</item>
+        <item>USD</item>
+        <item>GBP</item>
+    </string-array>
 </resources>

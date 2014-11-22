@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:layout_marginEnd="@dimen/content_padding_normal">
+
+    <ImageView
+        android:id="@+id/user_avatar"
+        android:layout_width="@dimen/avatar_size"
+        android:layout_height="@dimen/avatar_size"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="4dp"
+        android:contentDescription="@string/user_avatar"
+        tools:src="@drawable/mario"/>
+
+    <TextView
+        android:id="@+id/user_name"
+        style="@style/TextAppearance.AppCompat.Caption"
+        android:layout_width="@dimen/avatar_size"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal"
+        android:ellipsize="end"
+        tools:text="Vera"/>
+
+</LinearLayout>

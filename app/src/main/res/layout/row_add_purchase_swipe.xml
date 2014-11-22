@@ -1,0 +1,47 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_add_purchase_row"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/element_spacing_normal">
+
+    <CheckBox
+        android:id="@+id/cb_item_enabled"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/key_line_1"
+        android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+        android:layout_gravity="center_vertical"
+        android:checked="true"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/et_item_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:inputType="text"
+            android:hint="@string/hint_item_name"/>
+
+        <EditText
+            android:id="@+id/et_item_count"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:inputType="number"
+            android:hint="@string/hint_item_count"/>
+
+        <EditText
+            android:id="@+id/et_item_price"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:layout_marginEnd="@dimen/content_padding_normal"
+            android:inputType="numberDecimal"
+            android:hint="@string/hint_item_price"/>
+
+    </LinearLayout>
+</LinearLayout>

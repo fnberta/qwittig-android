@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/list_avatar_with_text">
+    
+    <ImageView
+        android:layout_width="@dimen/icon_size"
+        android:layout_height="@dimen/icon_size"
+        android:layout_marginStart="@dimen/content_padding_normal"
+        android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+        android:contentDescription="@string/hint_enabled"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/list_item_name"
+            style="@style/ListRowAvatarOneLineText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:gravity="center_vertical"
+            tools:text="Gipfeli"/>
+
+        <TextView
+            android:id="@+id/list_item_quantity"
+            style="@style/ListRowAvatarOneLineText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.2"
+            android:gravity="end|center_vertical"
+            tools:text="2"/>
+
+        <TextView
+            android:id="@+id/list_item_final_price"
+            style="@style/ListRowAvatarOneLineText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.3"
+            android:gravity="end|center_vertical"
+            android:layout_marginEnd="@dimen/key_line_1"
+            tools:text="34.50"/>
+    </LinearLayout>
+
+</LinearLayout>

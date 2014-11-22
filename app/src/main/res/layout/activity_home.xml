@@ -6,12 +6,12 @@
     android:orientation="vertical"
     tools:context="ch.berta.fabio.qwittig.ui.HomeActivity">
 
-    <include layout="@layout/toolbar_extended"/>
+    <include layout="@layout/include_toolbar_home"/>
 
     <FrameLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:ignore="MergeRootFrame" />
+        tools:ignore="MergeRootFrame"/>
 
 </LinearLayout>

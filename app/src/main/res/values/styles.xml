@@ -10,31 +10,21 @@
         <item name="colorAccent">@color/accent</item>
     </style>
 
-    <style name="ListAvatarItem">
-        <item name="android:layout_width">@dimen/key_line_2</item>
-        <item name="android:layout_height">@dimen/avatar_size</item>
-        <item name="android:layout_gravity">center_vertical</item>
-    </style>
-
     <style name="ListRowAvatarOneLineText" parent="@style/TextAppearance.AppCompat.Subhead">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">@dimen/list_avatar_with_text</item>
-        <item name="android:gravity">center_vertical</item>
     </style>
 
-    <style name="ListSectionHeader">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">@dimen/subheader_height</item>
-        <item name="android:gravity">center_vertical</item>
+    <style name="Subheader">
         <item name="android:fontFamily">@string/font_fontFamily_medium</item>
         <item name="android:textSize">@dimen/text_size_subheader</item>
     </style>
 
     <style name="EditText">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">@dimen/edit_text_height</item>
-        <item name="android:gravity">center_vertical</item>
         <item name="android:fontFamily">@string/font_fontFamily_regular</item>
         <item name="android:textSize">@dimen/text_size_edit_text</item>
     </style>
+
+    <style name="FAB">
+        <item name="android:background">@drawable/fab_background</item>
+    </style>
+
 </resources>

@@ -4,13 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="@dimen/key_line_1"
+    android:paddingStart="@dimen/key_line_1"
+    android:paddingEnd="@dimen/key_line_1"
+    android:paddingTop="@dimen/element_spacing_normal"
+    android:paddingBottom="@dimen/element_spacing_normal"
     tools:context="ch.berta.fabio.qwittig.ui.LoginFragment">
 
     <EditText
         android:id="@+id/et_login_username"
         style="@style/EditText"
         android:layout_width="match_parent"
+        android:layout_height="@dimen/edit_text_height"
         android:inputType="textPersonName"
         android:hint="@string/hint_user_name"/>
 
@@ -18,6 +22,7 @@
         android:id="@+id/et_login_password"
         style="@style/EditText"
         android:layout_width="match_parent"
+        android:layout_height="@dimen/edit_text_height"
         android:inputType="textPassword"
         android:hint="@string/hint_password"/>
 
@@ -25,13 +30,15 @@
         android:id="@+id/et_login_email"
         style="@style/EditText"
         android:layout_width="match_parent"
+        android:layout_height="@dimen/edit_text_height"
         android:inputType="textEmailAddress"
         android:hint="@string/hint_email"/>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:elevation="2dp">
 
         <Button
             android:id="@+id/bt_login_login"

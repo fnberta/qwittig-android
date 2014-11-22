@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.Toolbar
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/toolbar"
+    android:layout_height="@dimen/toolbar_height_x3"
+    android:layout_width="match_parent"
+    android:paddingBottom="@dimen/content_padding_normal"
+    android:minHeight="?attr/actionBarSize"
+    android:background="?attr/colorPrimary"
+    app:contentInsetStart="@dimen/key_line_2"
+    android:gravity="bottom"
+    android:elevation="4dp">
+
+</android.support.v7.widget.Toolbar>

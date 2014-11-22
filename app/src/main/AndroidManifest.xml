@@ -30,7 +30,7 @@
                 android:value="ch.berta.fabio.qwittig.ui.HomeActivity" />
         </activity>
         <activity
-            android:name="ch.berta.fabio.qwittig.ui.ItemListActivity"
+            android:name="ch.berta.fabio.qwittig.ui.ItemsActivity"
             android:label="@string/title_activity_purchase_detail_list"
             android:launchMode="singleTop"
             android:parentActivityName="ch.berta.fabio.qwittig.ui.HomeActivity" >
@@ -42,14 +42,44 @@
             android:name="ch.berta.fabio.qwittig.ui.AddPurchaseActivity"
             android:label="@string/title_activity_add_purchase_manually"
             android:launchMode="singleTop"
-            android:parentActivityName="ch.berta.fabio.qwittig.ui.HomeActivity" >
+            android:parentActivityName="ch.berta.fabio.qwittig.ui.HomeActivity"
+            android:windowSoftInputMode="adjustResize|stateUnchanged" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.berta.fabio.qwittig.ui.HomeActivity" />
         </activity>
         <activity
             android:name="ch.berta.fabio.qwittig.ui.LoginActivity"
-            android:label="@string/title_activity_login"/>
+            android:label="@string/title_activity_login" />
+        <activity
+            android:name="ch.berta.fabio.qwittig.ui.SettingsGroupNewActivity"
+            android:label="@string/title_activity_settings_group_new"
+            android:parentActivityName="ch.berta.fabio.qwittig.ui.SettingsActivity"
+            android:windowSoftInputMode="adjustResize|stateUnchanged" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.berta.fabio.qwittig.ui.SettingsActivity" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.SettingsUserInviteActivity"
+            android:label="@string/title_activity_settings_user_invite"
+            android:windowSoftInputMode="stateUnchanged"
+            android:parentActivityName="ch.berta.fabio.qwittig.ui.SettingsActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.berta.fabio.qwittig.ui.SettingsActivity" />
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

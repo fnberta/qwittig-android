@@ -1,43 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!--Text sizes-->
+    <!-- Text sizes -->
     <dimen name="text_size_avatar_with_text">16sp</dimen>
     <dimen name="text_size_subheader">14sp</dimen>
     <dimen name="text_size_edit_text">16sp</dimen>
     <dimen name="text_size_tab">14sp</dimen>
 
-    <!--Various standard stuff-->
+    <!-- Various standard stuff -->
     <dimen name="key_line_1">16dp</dimen>
     <dimen name="key_line_2">72dp</dimen>
     <dimen name="touch_target_min">48dp</dimen>
     <dimen name="element_spacing_normal">8dp</dimen>
     <dimen name="content_padding_normal">16dp</dimen>
+    <dimen name="icon_size">24dp</dimen>
     <dimen name="avatar_size">40dp</dimen>
+    <dimen name="avatar_size_1.5x">60dp</dimen>
+    <dimen name="key_line_2_minus_key_line_1_minus_avatar_size">16dp</dimen>
+    <dimen name="key_line_2_minus_key_line_1_minus_icon_size">32dp</dimen>
 
-    <!--Toolbar-->
-    <dimen name="toolbar_height_x2">128dp</dimen>
+    <!-- Toolbar -->
+    <dimen name="toolbar_height_extended">128dp</dimen>
+    <dimen name="toolbar_height_x2">112dp</dimen>
+    <dimen name="toolbar_height_x3">168dp</dimen>
     <dimen name="toolbar_elevation">4dp</dimen>
 
-    <!--List tile heights-->
+    <!-- List tile heights -->
     <dimen name="list_avatar_with_text">56dp</dimen>
     <dimen name="list_avatar_with_text_double">112dp</dimen>
     <dimen name="list_avatar_with_two_line_text">72dp</dimen>
     <dimen name="list_avatar_with_three_line_text">88dp</dimen>
+    <dimen name="avatar_plus_caption">58dp</dimen>
     <dimen name="subheader_height">48dp</dimen>
 
-    <!--FAB-->
-    <dimen name="fab_size">56dp</dimen>
-    <dimen name="button_elevation">8dp</dimen>
-    <dimen name="button_press_elevation">4dp</dimen>
+    <!-- Icons -->
+    <item name="icon_alpha_on_light_background" format="float" type="dimen">0.54</item>
 
-    <!--EditText-->
+    <!-- FAB -->
+    <dimen name="fab_elevation">8dp</dimen>
+    <dimen name="fab_press_translation_z">8dp</dimen>
+    <dimen name="fab_size">56dp</dimen>
+    <dimen name="toolbar_extended_minus_fab_size_half">100dp</dimen>
+    <dimen name="toolbar_x2_minus_fab_size_half">84dp</dimen>
+    <dimen name="fab_size_small">40dp</dimen>
+    <dimen name="toolbar_extended_minus_fab_size_small_half">108dp</dimen>
+    <dimen name="toolbar_x2_minus_fab_size_small_half">92dp</dimen>
+    <dimen name="toolbar_x3_minus_fab_size_small_half">148dp</dimen>
+
+    <!-- EditText -->
     <dimen name="edit_text_height">48dp</dimen>
 
-    <!--Tab-->
+    <!-- Tab -->
     <dimen name="tab_height">48dp</dimen>
-
-    <!--Holo stuff-->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 

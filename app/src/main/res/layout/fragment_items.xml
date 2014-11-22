@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="ch.berta.fabio.qwittig.ui.ItemsFragment">
+
+    <TextView
+        style="@style/Subheader"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/subheader_height"
+        android:gravity="center_vertical"
+        android:text="@string/header_user"
+        android:paddingStart="@dimen/key_line_1"
+        android:paddingEnd="@dimen/key_line_1"
+        tools:text="Items"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="@dimen/icon_size"
+            android:layout_height="@dimen/icon_size"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="@dimen/key_line_1"
+            android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+            android:contentDescription="@string/hint_group_name"
+            android:src="@drawable/ic_group_black_24dp"
+            android:alpha="@dimen/icon_alpha_on_light_background"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_users_involved"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/avatar_plus_caption"/>
+
+    </LinearLayout>
+
+    <TextView
+        style="@style/Subheader"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/subheader_height"
+        android:gravity="center_vertical"
+        android:text="@string/header_items"
+        android:paddingStart="@dimen/key_line_1"
+        android:paddingEnd="@dimen/key_line_1"
+        tools:text="Items"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_items"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/element_spacing_normal"/>
+
+</LinearLayout>

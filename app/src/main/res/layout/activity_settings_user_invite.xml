@@ -1,0 +1,68 @@
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="ch.berta.fabio.qwittig.ui.SettingsUserInviteActivity">
+
+    <include layout="@layout/include_toolbar_x3"/>
+
+    <ImageButton
+        android:id="@+id/fab"
+        style="@style/FAB"
+        android:contentDescription="@string/pref_group_add_new"
+        android:layout_height="@dimen/fab_size_small"
+        android:layout_width="@dimen/fab_size_small"
+        android:layout_gravity="top|start"
+        android:layout_marginTop="@dimen/toolbar_x3_minus_fab_size_small_half"
+        android:layout_marginStart="@dimen/key_line_1"
+        android:src="@drawable/ic_person_add_black_24dp"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/toolbar_height_x3">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/Base.TextAppearance.AppCompat.Subhead"
+                android:text="@string/desc_user_invite"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/key_line_2"
+                android:layout_marginEnd="@dimen/key_line_1"
+                android:layout_marginTop="@dimen/element_spacing_normal"
+                android:layout_marginBottom="@dimen/element_spacing_normal"/>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/element_spacing_normal"
+                android:layout_marginBottom="@dimen/element_spacing_normal">
+
+                <ImageView
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="@dimen/key_line_1"
+                    android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+                    android:contentDescription="@string/title_dialog_user_involved"
+                    android:src="@drawable/ic_email_black_24dp"
+                    android:alpha="@dimen/icon_alpha_on_light_background"/>
+
+                <EditText
+                    android:id="@+id/et_settings_user_invite_email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/key_line_1"
+                    android:inputType="textEmailAddress"
+                    android:hint="@string/hint_user_invite_email"/>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>
