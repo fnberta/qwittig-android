@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tv_header"
+    style="@style/Subheader"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/subheader_height"
+    android:gravity="center_vertical"
+    android:paddingStart="@dimen/key_line_1"
+    android:paddingEnd="@dimen/key_line_1"
+    tools:text="Items"/>

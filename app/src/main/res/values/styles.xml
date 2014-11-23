@@ -16,6 +16,7 @@
     <style name="Subheader">
         <item name="android:fontFamily">@string/font_fontFamily_medium</item>
         <item name="android:textSize">@dimen/text_size_subheader</item>
+        <item name="android:textColor">@color/primary</item>
     </style>
 
     <style name="EditText">
