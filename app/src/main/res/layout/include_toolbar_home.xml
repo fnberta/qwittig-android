@@ -10,7 +10,8 @@
     android:background="?attr/colorPrimary"
     android:paddingBottom="@dimen/content_padding_normal"
     android:gravity="bottom"
-    app:contentInsetStart="@dimen/key_line_2">
+    app:contentInsetStart="@dimen/key_line_2"
+    app:theme="@style/ThemeOverlay.AppCompat.ActionBar">
 
     <LinearLayout
         android:id="@+id/rl_owner_top"

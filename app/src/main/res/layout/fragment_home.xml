@@ -17,6 +17,6 @@
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="@dimen/content_padding_normal"
         android:layout_marginBottom="@dimen/content_padding_normal"
-        android:src="@drawable/ic_add_black_24dp"/>
+        android:src="@drawable/ic_add"/>
 
 </FrameLayout>

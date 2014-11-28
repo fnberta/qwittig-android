@@ -2,22 +2,22 @@
 
 <selector
     xmlns:android="http://schemas.android.com/apk/res/android">
-
     <item
         android:state_enabled="true"
         android:state_pressed="true">
         <objectAnimator
             android:duration="@android:integer/config_shortAnimTime"
             android:propertyName="translationZ"
-            android:valueTo="@dimen/fab_press_translation_z"
+            android:valueFrom="@dimen/fab_elevation"
+            android:valueTo="@dimen/fab_elevation_press"
             android:valueType="floatType" />
     </item>
-
     <item>
         <objectAnimator
             android:duration="@android:integer/config_shortAnimTime"
             android:propertyName="translationZ"
-            android:valueTo="0"
+            android:valueFrom="@dimen/fab_elevation_press"
+            android:valueTo="@dimen/fab_elevation"
             android:valueType="floatType" />
     </item>
 

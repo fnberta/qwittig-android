@@ -16,7 +16,7 @@
         android:layout_gravity="top|start"
         android:layout_marginTop="@dimen/toolbar_x2_minus_fab_size_small_half"
         android:layout_marginStart="@dimen/key_line_1"
-        android:src="@drawable/ic_group_add_black_24dp"/>
+        android:src="@drawable/ic_group_add"/>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -52,8 +52,7 @@
                     android:layout_marginStart="@dimen/key_line_1"
                     android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
                     android:contentDescription="@string/title_dialog_user_involved"
-                    android:src="@drawable/ic_group_black_24dp"
-                    android:alpha="@dimen/icon_alpha_on_light_background"/>
+                    android:src="@drawable/ic_group"/>
 
                 <EditText
                     android:id="@+id/et_settings_group_add_new_name"
@@ -78,8 +77,7 @@
                     android:layout_marginStart="@dimen/key_line_1"
                     android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
                     android:contentDescription="@string/hint_group_currency"
-                    android:src="@drawable/ic_attach_money_black_24dp"
-                    android:alpha="@dimen/icon_alpha_on_light_background"/>
+                    android:src="@drawable/ic_attach_money"/>
 
                 <Spinner
                     android:id="@+id/sp_settings_group_add_new_currency"

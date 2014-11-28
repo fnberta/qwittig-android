@@ -9,6 +9,7 @@
     android:minHeight="?attr/actionBarSize"
     android:background="?attr/colorPrimary"
     app:contentInsetStart="@dimen/key_line_2"
-    android:gravity="bottom">
+    android:gravity="bottom"
+    app:theme="@style/ThemeOverlay.AppCompat.ActionBar">
 
 </android.support.v7.widget.Toolbar>

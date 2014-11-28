@@ -53,8 +53,7 @@
             android:layout_height="@dimen/touch_target_min"
             android:padding="@dimen/icon_size"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_clear_black_24dp"
-            android:alpha="@dimen/icon_alpha_on_light_background"
+            android:src="@drawable/ic_clear"
             android:contentDescription="@string/ibt_add_item"/>
 
     </LinearLayout>

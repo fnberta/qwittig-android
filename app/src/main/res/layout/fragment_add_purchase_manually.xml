@@ -1,157 +1,152 @@
-<org.lucasr.dspec.DesignSpecFrameLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:designSpec="@raw/my_spec">
+    android:fillViewport="true"
+    android:paddingTop="@dimen/element_spacing_normal"
+    android:clipToPadding="false"
+    tools:context="ch.berta.fabio.qwittig.ui.AddPurchaseManuallyFragment">
 
-    <ScrollView
-
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true"
-        android:paddingTop="@dimen/element_spacing_normal"
-        android:paddingBottom="@dimen/element_spacing_normal"
-        android:clipToPadding="false"
-        tools:context="ch.berta.fabio.qwittig.ui.AddPurchaseManuallyFragment">
+        android:layout_height="wrap_content">
 
-        <RelativeLayout
+        <LinearLayout
+            android:id="@+id/ll_user"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginEnd="@dimen/element_spacing_normal"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="@dimen/icon_size"
+                android:layout_height="@dimen/icon_size"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="@dimen/key_line_1"
+                android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+                android:contentDescription="@string/hint_users"
+                android:src="@drawable/ic_group"/>
+
+            <Button
+                android:id="@+id/bt_user"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/key_line_1"
+                android:text="Select User"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/ll_user"
+            android:layout_marginTop="@dimen/element_spacing_normal"
+            android:layout_marginEnd="@dimen/element_spacing_normal"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="@dimen/icon_size"
+                android:layout_height="@dimen/icon_size"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="@dimen/key_line_1"
+                android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+                android:contentDescription="@string/hint_date"
+                android:src="@drawable/ic_access_time"/>
+
+            <Button
+                android:id="@+id/bt_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/key_line_1"
+                tools:text="27. November 2014"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_store"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/ll_date"
+            android:layout_marginTop="@dimen/element_spacing_normal"
+            android:layout_marginEnd="@dimen/element_spacing_normal"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="@dimen/icon_size"
+                android:layout_height="@dimen/icon_size"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="@dimen/key_line_1"
+                android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+                android:contentDescription="@string/hint_store"
+                android:src="@drawable/ic_local_grocery_store"/>
+
+            <Spinner
+                android:id="@+id/sp_store"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/touch_target_min"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="@dimen/key_line_1"
+                android:gravity="start|center_vertical"/>
+
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/tv_header_articles"
+            style="@style/Subheader"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/subheader_height"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/ll_store"
+            android:paddingStart="@dimen/key_line_1"
+            android:paddingEnd="@dimen/key_line_1"
+            android:gravity="center_vertical"
+            android:text="@string/header_items"
+            tools:text="Items"/>
+
+        <LinearLayout
+            android:id="@+id/ll_items"
+            android:orientation="vertical"
+            android:layout_below="@id/tv_header_articles"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+        </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/ll_user"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginEnd="@dimen/element_spacing_normal"
-                android:orientation="horizontal">
+        <Button
+            android:id="@+id/bt_item_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ll_items"
+            android:layout_marginStart="@dimen/key_line_2"
+            android:layout_marginEnd="@dimen/key_line_1"
+            android:layout_marginBottom="@dimen/content_padding_normal"
+            android:text="@string/ibt_add_item"
+            tools:text="Add item"/>
 
-                <ImageView
-                    android:layout_width="@dimen/icon_size"
-                    android:layout_height="@dimen/icon_size"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="@dimen/key_line_1"
-                    android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
-                    android:contentDescription="@string/hint_users"
-                    android:src="@drawable/ic_group_black_24dp"
-                    android:alpha="@dimen/icon_alpha_on_light_background"/>
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@id/bt_item_add"
+            android:layout_marginStart="@dimen/key_line_2"
+            android:layout_marginEnd="@dimen/key_line_1"
+            android:background="?android:attr/listDivider"/>
 
-                <TextView
-                    android:id="@+id/tv_user"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/touch_target_min"
-                    android:layout_marginEnd="@dimen/key_line_1"
-                    android:gravity="start|center_vertical"
-                    android:text="Choose User"/>
+        <include
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/divider"
+            android:layout_marginTop="@dimen/content_padding_normal"
+            android:layout_marginBottom="@dimen/element_spacing_normal"
+            layout="@layout/row_purchase_total"/>
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/ll_date"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_below="@id/ll_user"
-                android:layout_marginTop="@dimen/element_spacing_normal"
-                android:layout_marginEnd="@dimen/element_spacing_normal"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="@dimen/icon_size"
-                    android:layout_height="@dimen/icon_size"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="@dimen/key_line_1"
-                    android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
-                    android:contentDescription="@string/hint_date"
-                    android:src="@drawable/ic_access_time_black_24dp"
-                    android:alpha="@dimen/icon_alpha_on_light_background"/>
-
-                <TextView
-                    android:id="@+id/tv_date"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/touch_target_min"
-                    android:layout_marginEnd="@dimen/key_line_1"
-                    android:gravity="start|center_vertical"
-                    tools:text="Choose date"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/ll_store"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_below="@id/ll_date"
-                android:layout_marginTop="@dimen/element_spacing_normal"
-                android:layout_marginEnd="@dimen/element_spacing_normal"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="@dimen/icon_size"
-                    android:layout_height="@dimen/icon_size"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="@dimen/key_line_1"
-                    android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
-                    android:contentDescription="@string/hint_store"
-                    android:src="@drawable/ic_local_grocery_store_black_24dp"
-                    android:alpha="@dimen/icon_alpha_on_light_background"/>
-
-                <Spinner
-                    android:id="@+id/sp_store"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/touch_target_min"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginEnd="@dimen/key_line_1"
-                    android:gravity="start|center_vertical"/>
-
-            </LinearLayout>
-
-
-            <TextView
-                android:id="@+id/tv_header_articles"
-                style="@style/Subheader"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/subheader_height"
-                android:layout_alignParentStart="true"
-                android:layout_below="@id/ll_store"
-                android:paddingStart="@dimen/key_line_1"
-                android:paddingEnd="@dimen/key_line_1"
-                android:gravity="center_vertical"
-                android:text="@string/header_items"
-                tools:text="Items"/>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_below="@id/tv_header_articles"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:id="@+id/ll_items"
-                    android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                </LinearLayout>
-
-                <Button
-                    android:id="@+id/bt_item_add"
-                    style="?android:borderlessButtonStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_below="@+id/ll_items"
-                    android:layout_marginStart="@dimen/key_line_2"
-                    android:layout_marginEnd="@dimen/key_line_1"
-                    android:layout_marginTop="@dimen/element_spacing_normal"
-                    android:text="@string/ibt_add_item"
-                    tools:text="Add item"/>
-
-            </RelativeLayout>
-        </RelativeLayout>
-    </ScrollView>
-</org.lucasr.dspec.DesignSpecFrameLayout>
+    </RelativeLayout>
+</ScrollView>
 

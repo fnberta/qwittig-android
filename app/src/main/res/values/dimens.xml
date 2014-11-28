@@ -26,19 +26,24 @@
     <dimen name="toolbar_elevation">4dp</dimen>
 
     <!-- List tile heights -->
+    <dimen name="list_with_text">48dp</dimen>
     <dimen name="list_avatar_with_text">56dp</dimen>
     <dimen name="list_avatar_with_text_double">112dp</dimen>
     <dimen name="list_avatar_with_two_line_text">72dp</dimen>
     <dimen name="list_avatar_with_three_line_text">88dp</dimen>
-    <dimen name="avatar_plus_caption">58dp</dimen>
+    <dimen name="avatar_plus_caption_plus_padding">76dp</dimen>
     <dimen name="subheader_height">48dp</dimen>
 
-    <!-- Icons -->
-    <item name="icon_alpha_on_light_background" format="float" type="dimen">0.54</item>
+    <!-- Button -->
+    <dimen name="raised_button_elevation">2dp</dimen>
+    <dimen name="raised_button_elevation_press">8dp</dimen>
+
+    <!-- Dialog -->
+    <dimen name="dialog_padding">24dp</dimen>
 
     <!-- FAB -->
     <dimen name="fab_elevation">8dp</dimen>
-    <dimen name="fab_press_translation_z">8dp</dimen>
+    <dimen name="fab_elevation_press">14dp</dimen>
     <dimen name="fab_size">56dp</dimen>
     <dimen name="toolbar_extended_minus_fab_size_half">100dp</dimen>
     <dimen name="toolbar_x2_minus_fab_size_half">84dp</dimen>

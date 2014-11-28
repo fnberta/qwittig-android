@@ -33,8 +33,7 @@
     <string name="hint_email">E-mail</string>
     <string name="action_logout">Log out</string>
     <string name="login_button_log_in">Log in</string>
-    <string name="login_button_sign_up">Sign up</string>
-    <string name="login_button_tryout">Try out without login</string>
+    <string name="login_button_sign_up">Create new account</string>
     <string name="no_purchases">No purchases available.</string>
     <string name="no_user">No user available.</string>
     <string name="action_fake_data">Add fake data</string>
@@ -59,10 +58,10 @@
     <string name="hint_users">User</string>
     <string name="title_activity_settings_user_invite">Invite new user</string>
     <string name="hello_world">Hello world!</string>
-    <string name="desc_user_invite">To invite a new user, simply enter an email address. The user will receive an invitation to join your group</string>
+    <string name="desc_user_invite">To invite a new user, simply enter an email address. The recipient will receive an invitation to join your group</string>
     <string name="hint_user_invite_email">E-mail</string>
     <string name="error_group_name">Group name cannot be empty.</string>
-    <string name="error_user_email">Please enter a valid email address.</string>
+    <string name="error_email">Please enter a valid email address.</string>
     <string name="error_item_name">Please enter an article name.</string>
     <string name="error_item_price">Please enter a valid price.</string>
     <string name="pref_group_leave_group">Leave current group</string>
@@ -72,5 +71,19 @@
     <string name="action_purchase_add">Save</string>
     <string name="title_activity_edit_purchase">Edit purchase</string>
     <string name="toast_purchase_changes_saved">Changes saved</string>
+    <string name="action_purchase_show_receipt">Show receipt</string>
+    <string name="toast_purchase_changes_discarded">Changes discarded</string>
+    <string name="login_button_tryout">Start without account</string>
+    <string name="login_text_forgot_credentials">Forgot your password?</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hint_nickname">Nickname</string>
+    <string name="hint_password_repeat">Repeat password</string>
+    <string name="error_login_signup_nickname">Please enter a nickname.</string>
+    <string name="error_login_password">Please enter a password.</string>
+    <string name="error_login_signup_password_nomatch">Passwords do not match.</string>
+    <string name="purchase_total">Total:</string>
+    <string name="toast_reset_password_link">You have received an email with a link to reset your password.</string>
+    <string name="dialog_login_reset_password_title">Reset password</string>
+    <string name="dialog_login_reset_password_message">Please enter your email address to reset your password.</string>
 
 </resources>

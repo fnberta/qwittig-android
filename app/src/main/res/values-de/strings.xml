@@ -32,8 +32,8 @@
     <string name="action_logout">Abmelden</string>
     <string name="title_activity_login">Anmelden</string>
     <string name="login_button_log_in">Anmelden</string>
-    <string name="login_button_sign_up">Neuer Account</string>
-    <string name="login_button_tryout">Ohne anmelden fortfahren</string>
+    <string name="login_button_sign_up">Neuen Account erstellen</string>
+    <string name="login_button_tryout">Ohne Account loslegen</string>
     <string name="no_purchases">Noch keine Einkäufe vorhanden.</string>
     <string name="no_user">Noch keine Benutzer vorhanden.</string>
     <string name="pref_group_current">Aktive Gruppe</string>
@@ -56,11 +56,11 @@
     <string name="hint_date">Datum</string>
     <string name="hint_store">Laden</string>
     <string name="hint_users">Nutzer</string>
-    <string name="desc_user_invite">Um einen neuen Nutzer einzuladen, gib einfach eine Email Adresse an. Der Nutzer erhält dann eine Einladung um deiner Gruppe beizutreten.</string>
+    <string name="desc_user_invite">Um einen neuen Nutzer einzuladen, gib einfach eine Email Adresse an. Der Empfänger erhält dann eine Einladung um deiner Gruppe beizutreten.</string>
     <string name="hint_user_invite_email">E-Mail</string>
     <string name="title_activity_settings_user_invite">Neuen Nutzer einladen</string>
     <string name="error_group_name">Der Gruppenname darf nicht leer sein.</string>
-    <string name="error_user_email">Bitte gib eine gültige Email Adresse ein.</string>
+    <string name="error_email">Bitte gib eine gültige Email Adresse ein.</string>
     <string name="error_item_name">Bitte gib einen Artikelnamen an.</string>
     <string name="error_item_price">Bitte gib einen gültigen Preis an.</string>
     <string name="pref_group_leave_group">Aktuelle Gruppe verlassen</string>
@@ -69,6 +69,18 @@
     <string name="no_groups_available">Noch keine Gruppen verfügbar</string>
     <string name="action_purchase_add">Speichern</string>
     <string name="title_activity_edit_purchase">Einkauf bearbeiten</string>
-    <string name="toast_purchase_changes_saved">Änderungen wurden gespeichert</string>
+    <string name="toast_purchase_changes_saved">Änderungen gespeichert</string>
+    <string name="action_purchase_show_receipt">Quittung anzeigen</string>
+    <string name="toast_purchase_changes_discarded">Änderungen verworfen</string>
+    <string name="login_text_forgot_credentials">Passwort vergessen?</string>
+    <string name="hint_nickname">Spitzname</string>
+    <string name="hint_password_repeat">Passwort wiederholen</string>
+    <string name="error_login_signup_nickname">Bitte gib einen Spitznamen an.</string>
+    <string name="error_login_password">Bitte gib ein Passwort ein.</string>
+    <string name="error_login_signup_password_nomatch">Passwörter stimmen nicht überein.</string>
+    <string name="purchase_total">Total:</string>
+    <string name="toast_reset_password_link">Du hast ein Email erhalten mit einem Link, um dein Passwort zurückzusetzen.</string>
+    <string name="dialog_login_reset_password_title">Passwort zurücksetzen</string>
+    <string name="dialog_login_reset_password_message">Gib bitte deine Email Adresse ein um dein Passwort zurückzusetzen.</string>
 
 </resources>

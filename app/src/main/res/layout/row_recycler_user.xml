@@ -6,4 +6,4 @@
     android:paddingEnd="@dimen/key_line_1"
     android:clipToPadding="false"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/avatar_plus_caption"/>
+    android:layout_height="@dimen/avatar_plus_caption_plus_padding"/>
