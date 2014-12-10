@@ -86,5 +86,7 @@
     <string name="title_activity_settings_profile">Mein Profil</string>
     <string name="push_purchase_new_alert">Ein neuer Einkauf wurde hinzugefügt von</string>
     <string name="push_purchase_new_title">Neuer Einkauf</string>
+    <string name="toast_login_failed_credentials">Login fehlgeschlagen. Bitte überprüfe deine Email Adresse und dein Passwort.</string>
+    <string name="toast_login_failed_no_network">Kein Netzwerk verfügbar, bitte versuche es später noch einmal.</string>
 
 </resources>

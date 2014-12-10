@@ -89,5 +89,7 @@
     <string name="pref_profile">My profile</string>
     <string name="push_purchase_new_alert">A new purchase was added by</string>
     <string name="push_purchase_new_title">New purchase</string>
+    <string name="toast_login_failed_credentials">Login failed. Please check your email address an your password.</string>
+    <string name="toast_login_failed_no_network">No network available, please try again later.</string>
 
 </resources>
