@@ -3,7 +3,7 @@
     <dimen name="key_line_1">24dp</dimen>
     <dimen name="key_line_2">80dp</dimen>
 
-    <dimen name="content_padding_normal">24dp</dimen>
+    <dimen name="normal_space">24dp</dimen>
 
     <dimen name="list_avatar_with_text">64dp</dimen>
     <dimen name="list_avatar_with_two_line_text">88dp</dimen>

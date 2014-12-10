@@ -3,7 +3,7 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/element_spacing_normal">
+    android:layout_marginBottom="@dimen/small_space">
 
     <CheckBox
         android:id="@+id/cb_item_enabled"
@@ -16,14 +16,16 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
         <EditText
             android:id="@+id/et_item_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:inputType="text"
+            android:inputType="text|textCapSentences"
+            android:imeOptions="actionNext"
             android:hint="@string/hint_item_name"/>
 
         <EditText
@@ -31,8 +33,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.2"
-            android:inputType="number"
             android:gravity="end"
+            android:inputType="number"
+            android:imeOptions="actionNext"
             android:hint="@string/hint_item_count"/>
 
         <EditText
@@ -40,7 +43,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.3"
-            android:layout_marginEnd="@dimen/content_padding_normal"
+            android:layout_marginEnd="@dimen/normal_space"
             android:inputType="numberDecimal"
             android:gravity="end"
             android:hint="@string/hint_item_price"/>

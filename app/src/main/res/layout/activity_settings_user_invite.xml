@@ -35,15 +35,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/key_line_2"
                 android:layout_marginEnd="@dimen/key_line_1"
-                android:layout_marginTop="@dimen/element_spacing_normal"
-                android:layout_marginBottom="@dimen/element_spacing_normal"/>
+                android:layout_marginTop="@dimen/small_space"
+                android:layout_marginBottom="@dimen/small_space"/>
 
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/element_spacing_normal"
-                android:layout_marginBottom="@dimen/element_spacing_normal">
+                android:layout_marginTop="@dimen/small_space"
+                android:layout_marginBottom="@dimen/small_space">
 
                 <ImageView
                     android:layout_width="@dimen/icon_size"
@@ -51,7 +51,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="@dimen/key_line_1"
                     android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
-                    android:contentDescription="@string/title_dialog_user_involved"
+                    android:contentDescription="@string/hint_email"
                     android:src="@drawable/ic_email"/>
 
                 <EditText

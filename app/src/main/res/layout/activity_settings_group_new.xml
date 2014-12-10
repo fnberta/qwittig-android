@@ -35,15 +35,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/key_line_2"
                 android:layout_marginEnd="@dimen/key_line_1"
-                android:layout_marginTop="@dimen/element_spacing_normal"
-                android:layout_marginBottom="@dimen/element_spacing_normal"/>
+                android:layout_marginTop="@dimen/small_space"
+                android:layout_marginBottom="@dimen/small_space"/>
 
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/element_spacing_normal"
-                android:layout_marginBottom="@dimen/element_spacing_normal">
+                android:layout_marginTop="@dimen/small_space"
+                android:layout_marginBottom="@dimen/small_space">
 
                 <ImageView
                     android:layout_width="@dimen/icon_size"
@@ -67,8 +67,8 @@
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/element_spacing_normal"
-                android:layout_marginBottom="@dimen/element_spacing_normal">
+                android:layout_marginTop="@dimen/small_space"
+                android:layout_marginBottom="@dimen/small_space">
 
                 <ImageView
                     android:layout_width="@dimen/icon_size"

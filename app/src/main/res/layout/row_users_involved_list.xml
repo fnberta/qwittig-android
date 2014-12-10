@@ -6,9 +6,9 @@
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    android:layout_marginTop="@dimen/element_spacing_normal"
-    android:layout_marginBottom="@dimen/element_spacing_normal"
-    android:layout_marginEnd="@dimen/content_padding_normal">
+    android:layout_marginTop="@dimen/small_space"
+    android:layout_marginBottom="@dimen/small_space"
+    android:layout_marginEnd="@dimen/normal_space">
 
     <ImageView
         android:id="@+id/user_avatar"
@@ -17,7 +17,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="4dp"
         android:contentDescription="@string/user_avatar"
-        tools:src="@drawable/mario"/>
+        tools:src="@drawable/ic_avatar_40dp"/>
 
     <TextView
         android:id="@+id/user_name"
@@ -26,7 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:gravity="center_horizontal"
-        android:ellipsize="end"
+        android:ellipsize="marquee"
         tools:text="Vera"/>
 
 </LinearLayout>

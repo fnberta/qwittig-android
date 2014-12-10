@@ -8,10 +8,11 @@
     android:layout_width="match_parent"
     android:minHeight="?attr/actionBarSize"
     android:background="?attr/colorPrimary"
-    android:paddingBottom="@dimen/content_padding_normal"
+    android:paddingBottom="@dimen/normal_space"
     android:gravity="bottom"
     app:contentInsetStart="@dimen/key_line_2"
-    app:theme="@style/ThemeOverlay.AppCompat.ActionBar">
+    app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+    app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
     <LinearLayout
         android:id="@+id/rl_owner_top"

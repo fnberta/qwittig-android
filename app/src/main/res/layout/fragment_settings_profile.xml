@@ -1,0 +1,88 @@
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:context="ch.berta.fabio.qwittig.ui.SettingsProfileFragment">
+
+        <ImageView
+            android:id="@+id/iv_avatar"
+            android:layout_width="@dimen/avatar_size_3x"
+            android:layout_height="@dimen/avatar_size_3x"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/normal_space"
+            android:layout_marginBottom="@dimen/small_space"
+            android:contentDescription="@string/user_avatar"
+            tools:src="@drawable/ic_avatar_80dp"/>
+
+        <TextView
+            android:id="@+id/user_name"
+            style="@style/TextAppearance.AppCompat.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="@dimen/small_space"
+            android:gravity="center_horizontal"
+            android:text="@string/user_avatar"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/small_space"
+            android:layout_marginBottom="@dimen/small_space">
+
+            <ImageView
+                android:id="@+id/iv_nickname"
+                android:layout_width="@dimen/icon_size"
+                android:layout_height="@dimen/icon_size"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="@dimen/key_line_1"
+                android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+                android:contentDescription="@string/hint_nickname"
+                android:src="@drawable/ic_account_box"/>
+
+            <EditText
+                android:id="@+id/et_nickname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/key_line_1"
+                android:inputType="textPersonName"
+                android:hint="@string/hint_nickname"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/small_space">
+
+            <ImageView
+                android:id="@+id/iv_email"
+                android:layout_width="@dimen/icon_size"
+                android:layout_height="@dimen/icon_size"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="@dimen/key_line_1"
+                android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+                android:contentDescription="@string/hint_email"
+                android:src="@drawable/ic_email"/>
+
+            <EditText
+                android:id="@+id/et_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/key_line_1"
+                android:inputType="textEmailAddress"
+                android:hint="@string/hint_email"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>
+

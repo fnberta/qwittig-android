@@ -11,11 +11,13 @@
     <dimen name="key_line_1">16dp</dimen>
     <dimen name="key_line_2">72dp</dimen>
     <dimen name="touch_target_min">48dp</dimen>
-    <dimen name="element_spacing_normal">8dp</dimen>
-    <dimen name="content_padding_normal">16dp</dimen>
+    <dimen name="min_space">4dp</dimen>
+    <dimen name="small_space">8dp</dimen>
+    <dimen name="normal_space">16dp</dimen>
     <dimen name="icon_size">24dp</dimen>
     <dimen name="avatar_size">40dp</dimen>
     <dimen name="avatar_size_1.5x">60dp</dimen>
+    <dimen name="avatar_size_3x">120dp</dimen>
     <dimen name="key_line_2_minus_key_line_1_minus_avatar_size">16dp</dimen>
     <dimen name="key_line_2_minus_key_line_1_minus_icon_size">32dp</dimen>
 
@@ -23,6 +25,7 @@
     <dimen name="toolbar_height_extended">128dp</dimen>
     <dimen name="toolbar_height_x2">112dp</dimen>
     <dimen name="toolbar_height_x3">168dp</dimen>
+    <dimen name="toolbar_height_x4">224dp</dimen>
     <dimen name="toolbar_elevation">4dp</dimen>
 
     <!-- List tile heights -->

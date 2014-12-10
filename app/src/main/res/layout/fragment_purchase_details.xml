@@ -4,4 +4,5 @@
     android:id="@+id/rv_items"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/element_spacing_normal"/>
+    android:paddingBottom="@dimen/small_space"
+    android:clipToPadding="false"/>

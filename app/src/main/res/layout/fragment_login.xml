@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:paddingTop="@dimen/element_spacing_normal"
+    android:paddingTop="@dimen/small_space"
     android:clipToPadding="false">
 
     <RelativeLayout
@@ -19,8 +19,8 @@
             android:layout_marginStart="@dimen/key_line_1"
             android:layout_marginEnd="@dimen/key_line_1"
             android:layout_alignParentTop="true"
-            android:layout_marginTop="@dimen/element_spacing_normal"
-            android:layout_marginBottom="@dimen/element_spacing_normal"
+            android:layout_marginTop="@dimen/small_space"
+            android:layout_marginBottom="@dimen/small_space"
             android:inputType="textEmailAddress"
             android:hint="@string/hint_email" />
 
@@ -31,7 +31,7 @@
             android:layout_marginStart="@dimen/key_line_1"
             android:layout_marginEnd="@dimen/key_line_1"
             android:layout_below="@id/et_login_email"
-            android:layout_marginBottom="@dimen/element_spacing_normal"
+            android:layout_marginBottom="@dimen/small_space"
             android:inputType="textPassword"
             android:hint="@string/hint_password" />
 
@@ -71,7 +71,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/key_line_1"
             android:layout_marginEnd="@dimen/key_line_1"
-            android:layout_marginBottom="@dimen/element_spacing_normal"
+            android:layout_marginBottom="@dimen/small_space"
             android:layout_alignParentBottom="true"
             android:text="@string/login_button_tryout" />
 

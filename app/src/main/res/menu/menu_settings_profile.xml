@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="ch.berta.fabio.qwittig.ui.SettingsProfileActivity">
+    <item android:id="@+id/action_settings_profile_save"
+          android:title="@string/action_purchase_add"
+          android:orderInCategory="1"
+          app:showAsAction="always"/>
+</menu>

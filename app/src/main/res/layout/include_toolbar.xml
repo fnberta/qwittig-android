@@ -7,4 +7,6 @@
     android:layout_width="match_parent"
     android:minHeight="?attr/actionBarSize"
     android:background="?attr/colorPrimary"
-    app:contentInsetStart="@dimen/key_line_2"/>
+    app:contentInsetStart="@dimen/key_line_2"
+    app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>

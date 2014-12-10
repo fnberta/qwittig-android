@@ -2,9 +2,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingTop="@dimen/element_spacing_normal"
-    android:clipToPadding="false">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,22 +12,32 @@
         android:layout_marginEnd="@dimen/key_line_1"
         tools:context="ch.berta.fabio.qwittig.ui.LoginSignUpFragment">
 
-        <ImageButton
+        <ImageView
             android:id="@+id/ibt_login_signup_avatar"
-            android:layout_width="96dp"
-            android:layout_height="96dp"
+            android:layout_width="@dimen/avatar_size_3x"
+            android:layout_height="@dimen/avatar_size_3x"
             android:layout_gravity="center_horizontal"
-            android:padding="16dp"
-            android:layout_marginBottom="@dimen/element_spacing_normal"
+            android:layout_marginTop="@dimen/normal_space"
+            android:layout_marginBottom="@dimen/small_space"
             android:contentDescription="@string/user_avatar"
             android:src="@drawable/ic_avatar_80dp"/>
+
+        <TextView
+            android:id="@+id/user_name"
+            style="@style/TextAppearance.AppCompat.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="@dimen/small_space"
+            android:gravity="center_horizontal"
+            android:text="@string/user_avatar"/>
 
         <EditText
             android:id="@+id/et_login_signup_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/element_spacing_normal"
-            android:layout_marginBottom="@dimen/element_spacing_normal"
+            android:layout_marginTop="@dimen/small_space"
+            android:layout_marginBottom="@dimen/small_space"
             android:inputType="textEmailAddress"
             android:hint="@string/hint_email" />
 
@@ -37,7 +45,7 @@
             android:id="@+id/et_login_signup_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/element_spacing_normal"
+            android:layout_marginBottom="@dimen/small_space"
             android:inputType="textPassword"
             android:hint="@string/hint_password" />
 
@@ -45,7 +53,7 @@
             android:id="@+id/et_login_signup_password_repeat"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/element_spacing_normal"
+            android:layout_marginBottom="@dimen/small_space"
             android:inputType="textPassword"
             android:hint="@string/hint_password_repeat" />
 
@@ -53,7 +61,7 @@
             android:id="@+id/et_login_signup_nickname"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/element_spacing_normal"
+            android:layout_marginBottom="@dimen/small_space"
             android:inputType="textPersonName"
             android:hint="@string/hint_nickname" />
 

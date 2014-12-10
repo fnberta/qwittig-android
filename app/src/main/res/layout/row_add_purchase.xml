@@ -3,8 +3,8 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/element_spacing_normal"
-    android:layout_marginBottom="@dimen/element_spacing_normal">
+    android:layout_marginTop="@dimen/small_space"
+    android:layout_marginBottom="@dimen/small_space">
 
     <CheckBox
         android:id="@+id/cb_item_enabled"

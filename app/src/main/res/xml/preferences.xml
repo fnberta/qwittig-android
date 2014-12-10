@@ -3,6 +3,13 @@
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <PreferenceScreen
+        android:title="@string/pref_profile">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="ch.berta.fabio.qwittig"
+            android:targetClass="ch.berta.fabio.qwittig.ui.SettingsProfileActivity" />
+    </PreferenceScreen>
     <ListPreference
         android:key="pref_group_current"
         android:title="@string/pref_group_current"/>
