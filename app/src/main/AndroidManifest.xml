@@ -107,7 +107,7 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name="ch.berta.fabio.qwittig.PushBroadcastReceiver"
+            android:name=".PushBroadcastReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.parse.push.intent.RECEIVE" />
