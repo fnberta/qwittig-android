@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ch.berta.fabio.qwittig.ui.UserListFragment">
+    tools:context="ch.berta.fabio.qwittig.ui.UsersFragment">
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/srl_users"
