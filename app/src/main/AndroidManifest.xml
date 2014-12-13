@@ -53,8 +53,13 @@
                 android:value="ch.berta.fabio.qwittig.ui.HomeActivity" />
         </activity>
         <activity
-            android:name="ch.berta.fabio.qwittig.ui.AddPurchaseActivity"
+            android:name=".ui.PurchaseAddActivity"
             android:label="@string/title_activity_add_purchase_manually"
+            android:windowSoftInputMode="stateUnchanged" >
+        </activity>
+        <activity
+            android:name="ch.berta.fabio.qwittig.ui.PurchaseEditActivity"
+            android:label="@string/title_activity_edit_purchase"
             android:windowSoftInputMode="stateUnchanged" >
         </activity>
         <activity

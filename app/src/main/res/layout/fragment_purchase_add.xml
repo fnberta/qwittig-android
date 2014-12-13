@@ -7,7 +7,7 @@
     android:paddingTop="@dimen/small_space"
     android:paddingBottom="@dimen/small_space"
     android:clipToPadding="false"
-    tools:context="ch.berta.fabio.qwittig.ui.AddPurchaseFragment">
+    tools:context="ch.berta.fabio.qwittig.ui.PurchaseAddFragment">
 
     <RelativeLayout
         android:layout_width="match_parent"
