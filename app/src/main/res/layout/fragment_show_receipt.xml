@@ -10,7 +10,7 @@
         android:orientation="vertical"
         android:layout_marginStart="@dimen/key_line_1"
         android:layout_marginEnd="@dimen/key_line_1"
-        tools:context="ch.berta.fabio.qwittig.ui.ShowReceiptFragment">
+        tools:context="ch.berta.fabio.qwittig.ui.PurchaseReceiptFragment">
 
         <ImageView
             android:id="@+id/iv_receipt"

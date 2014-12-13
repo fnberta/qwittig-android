@@ -66,7 +66,7 @@
     <string name="dialog_group_leave_title">Gruppe verlassen</string>
     <string name="dialog_group_leave_message">Willst du die aktuelle Gruppe wirklich verlassen?</string>
     <string name="no_groups_available">Noch keine Gruppen verfügbar</string>
-    <string name="action_purchase_add">Speichern</string>
+    <string name="action_purchase_save">Speichern</string>
     <string name="title_activity_edit_purchase">Einkauf bearbeiten</string>
     <string name="toast_changes_saved">Änderungen gespeichert</string>
     <string name="action_purchase_show_receipt">Quittung anzeigen</string>
@@ -91,5 +91,8 @@
     <string name="action_purchase_add_receipt">Quittung hinzufügen</string>
     <string name="action_purchase_add_receipt_show">Quittung anzeigen</string>
     <string name="purchase_receipt">Quittung</string>
+    <string name="action_purchase_edit_receipt_edit">Quittung bearbeiten</string>
+    <string name="toast_receipt_added">Quittung hinzugefügt</string>
+    <string name="toast_receipt_changed">Quittung geändert</string>
 
 </resources>
