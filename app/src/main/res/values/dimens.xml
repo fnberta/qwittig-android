@@ -21,6 +21,10 @@
     <dimen name="key_line_2_minus_key_line_1_minus_avatar_size">16dp</dimen>
     <dimen name="key_line_2_minus_key_line_1_minus_icon_size">32dp</dimen>
 
+    <!-- Checkbox special margins -->
+    <dimen name="key_line_1_minus_checkbox_margin">12dp</dimen>
+    <dimen name="key_line_2_minus_key_line_1_minus_checkbox">28dp</dimen>
+
     <!-- Toolbar -->
     <dimen name="toolbar_height_extended">128dp</dimen>
     <dimen name="toolbar_height_x2">112dp</dimen>
@@ -48,19 +52,19 @@
     <dimen name="fab_elevation">8dp</dimen>
     <dimen name="fab_elevation_press">14dp</dimen>
     <dimen name="fab_size">56dp</dimen>
-    <dimen name="toolbar_extended_minus_fab_size_half">100dp</dimen>
-    <dimen name="toolbar_x2_minus_fab_size_half">84dp</dimen>
     <dimen name="fab_size_small">40dp</dimen>
+    <dimen name="toolbar_extended_minus_fab_size_half">100dp</dimen>
     <dimen name="toolbar_extended_minus_fab_size_small_half">108dp</dimen>
+    <dimen name="toolbar_x2_minus_fab_size_half">84dp</dimen>
     <dimen name="toolbar_x2_minus_fab_size_small_half">92dp</dimen>
     <dimen name="toolbar_x3_minus_fab_size_small_half">148dp</dimen>
+    <dimen name="fab_margin_bottom_auto">88dp</dimen>
+    <dimen name="fab_margin_bottom_manual">160dp</dimen>
 
     <!-- EditText -->
     <dimen name="edit_text_height">48dp</dimen>
 
     <!-- Tab -->
     <dimen name="tab_height">48dp</dimen>
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
 
 </resources>

@@ -88,5 +88,8 @@
     <string name="push_purchase_new_title">Neuer Einkauf</string>
     <string name="toast_login_failed_credentials">Login fehlgeschlagen. Bitte überprüfe deine Email Adresse und dein Passwort.</string>
     <string name="toast_login_failed_no_network">Kein Netzwerk verfügbar, bitte versuche es später noch einmal.</string>
+    <string name="action_purchase_add_receipt">Quittung hinzufügen</string>
+    <string name="action_purchase_add_receipt_show">Quittung anzeigen</string>
+    <string name="purchase_receipt">Quittung</string>
 
 </resources>

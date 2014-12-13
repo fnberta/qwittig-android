@@ -14,6 +14,11 @@
         android:protectionLevel="signature"
         android:name="ch.berta.fabio.qwittig.permission.C2D_MESSAGE" />
     <uses-permission android:name="ch.berta.fabio.qwittig.permission.C2D_MESSAGE" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
+
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <application
         android:name="ch.berta.fabio.qwittig.Qwittig"
@@ -50,7 +55,6 @@
         <activity
             android:name="ch.berta.fabio.qwittig.ui.AddPurchaseActivity"
             android:label="@string/title_activity_add_purchase_manually"
-            android:launchMode="singleTop"
             android:windowSoftInputMode="stateUnchanged" >
         </activity>
         <activity

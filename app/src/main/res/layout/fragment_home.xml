@@ -9,6 +9,30 @@
     <include layout="@layout/include_sliding_tabs"/>
 
     <ImageButton
+        android:id="@+id/fab_auto"
+        style="@style/FAB"
+        android:contentDescription="@string/add_purchase"
+        android:layout_height="@dimen/fab_size"
+        android:layout_width="@dimen/fab_size"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="@dimen/normal_space"
+        android:layout_marginBottom="@dimen/fab_margin_bottom_auto"
+        android:visibility="gone"
+        android:src="@drawable/ic_photo_camera"/>
+
+    <ImageButton
+        android:id="@+id/fab_manual"
+        style="@style/FAB"
+        android:contentDescription="@string/add_purchase"
+        android:layout_height="@dimen/fab_size"
+        android:layout_width="@dimen/fab_size"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="@dimen/normal_space"
+        android:layout_marginBottom="@dimen/fab_margin_bottom_manual"
+        android:visibility="gone"
+        android:src="@drawable/ic_create"/>
+
+    <ImageButton
         android:id="@+id/fab"
         style="@style/FAB"
         android:contentDescription="@string/add_purchase"
