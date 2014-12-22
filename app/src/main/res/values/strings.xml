@@ -97,5 +97,8 @@
     <string name="action_purchase_edit_receipt_edit">Edit receipt</string>
     <string name="toast_receipt_added">Added receipt</string>
     <string name="toast_receipt_changed">Changed receipt</string>
+    <string name="error_nickname_length">Nickname is too long.</string>
+    <string name="title_activity_account_balance">Balance Account</string>
+    <string name="hint_password_new">New password</string>
 
 </resources>

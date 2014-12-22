@@ -119,6 +119,7 @@
             android:layout_below="@id/tv_header_articles"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+            <!--android:animateLayoutChanges="true"-->
         </LinearLayout>
 
         <Button

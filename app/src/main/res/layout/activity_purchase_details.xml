@@ -6,7 +6,7 @@
     android:orientation="vertical"
     tools:context="ch.berta.fabio.qwittig.ui.PurchaseDetailsActivity">
 
-    <include layout="@layout/include_toolbar_x2"/>
+    <include layout="@layout/include_toolbar_details"/>
 
     <FrameLayout
         android:id="@+id/container"

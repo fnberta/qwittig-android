@@ -16,7 +16,7 @@
         android:layout_width="@dimen/fab_size"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="@dimen/normal_space"
-        android:layout_marginBottom="@dimen/fab_margin_bottom_auto"
+        android:layout_marginBottom="@dimen/normal_space"
         android:visibility="gone"
         android:src="@drawable/ic_photo_camera"/>
 
@@ -28,7 +28,7 @@
         android:layout_width="@dimen/fab_size"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="@dimen/normal_space"
-        android:layout_marginBottom="@dimen/fab_margin_bottom_manual"
+        android:layout_marginBottom="@dimen/normal_space"
         android:visibility="gone"
         android:src="@drawable/ic_create"/>
 

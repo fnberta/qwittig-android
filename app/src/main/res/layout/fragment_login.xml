@@ -12,8 +12,9 @@
         android:layout_height="wrap_content"
         tools:context="ch.berta.fabio.qwittig.ui.LoginFragment">
 
-        <EditText
+        <com.rengwuxian.materialedittext.MaterialEditText
             android:id="@+id/et_login_email"
+            style="@style/EditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/key_line_1"
@@ -22,10 +23,11 @@
             android:layout_marginTop="@dimen/small_space"
             android:layout_marginBottom="@dimen/small_space"
             android:inputType="textEmailAddress"
-            android:hint="@string/hint_email" />
+            android:hint="@string/hint_email"/>
 
-        <EditText
+        <com.rengwuxian.materialedittext.MaterialEditText
             android:id="@+id/et_login_password"
+            style="@style/EditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/key_line_1"
@@ -33,7 +35,7 @@
             android:layout_below="@id/et_login_email"
             android:layout_marginBottom="@dimen/small_space"
             android:inputType="textPassword"
-            android:hint="@string/hint_password" />
+            android:hint="@string/hint_password"/>
 
         <Button
             android:id="@+id/bt_login_login"

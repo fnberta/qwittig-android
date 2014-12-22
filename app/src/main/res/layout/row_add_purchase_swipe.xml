@@ -1,9 +1,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/ll_add_purchase_row"
-    android:orientation="horizontal"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/small_space">
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:id="@+id/ll_add_purchase_row"
+              android:orientation="horizontal"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_marginBottom="@dimen/small_space">
 
     <CheckBox
         android:id="@+id/cb_item_enabled"
@@ -19,8 +20,10 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <EditText
+        <com.rengwuxian.materialedittext.MaterialEditText
             android:id="@+id/et_item_name"
+            style="@style/EditText"
+            app:floatingLabel="none"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
@@ -28,8 +31,10 @@
             android:imeOptions="actionNext"
             android:hint="@string/hint_item_name"/>
 
-        <EditText
+        <com.rengwuxian.materialedittext.MaterialEditText
             android:id="@+id/et_item_count"
+            style="@style/EditText"
+            app:floatingLabel="none"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.2"
@@ -38,8 +43,10 @@
             android:imeOptions="actionNext"
             android:hint="@string/hint_item_count"/>
 
-        <EditText
+        <com.rengwuxian.materialedittext.MaterialEditText
             android:id="@+id/et_item_price"
+            style="@style/EditText"
+            app:floatingLabel="none"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.3"

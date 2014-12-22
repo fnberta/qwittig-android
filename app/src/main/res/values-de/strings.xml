@@ -43,7 +43,7 @@
     <string name="action_purchase_delete">Einkauf löschen</string>
     <string name="title_activity_settings_group_new">Neue Gruppe erstellen</string>
     <string name="toast_purchase_deleted">Einkauf gelöscht</string>
-    <string name="desc_group_add_new">Um eine neue Gruppe hinzufügen, gib einfach einen Namen und eine Währung ein. Alle Einkäufe werden in der ausgewählten Währung angezeigt werden. Wenn du einen einen Einkauf hinzufügst, werden die Preise automatisch in diese Stadard-Währung umgerechnet. Du kannst diese Einstellungen jederzeit ändern.</string>
+    <string name="desc_group_add_new">Um eine neue Gruppe hinzufügen, gib einfach einen Namen und eine Währung ein. Alle Einkäufe werden in der ausgewählten Währung angezeigt werden. Wenn du einen Einkauf hinzufügst, werden die Preise automatisch in diese Stadard-Währung umgerechnet. Du kannst diese Einstellungen jederzeit ändern.</string>
     <string name="hint_group_name">Gruppenname</string>
     <string name="toast_no_connection">Kein Netzwerk verfügbar</string>
     <string name="pref_group_currency">Währung</string>
@@ -94,5 +94,8 @@
     <string name="action_purchase_edit_receipt_edit">Quittung bearbeiten</string>
     <string name="toast_receipt_added">Quittung hinzugefügt</string>
     <string name="toast_receipt_changed">Quittung geändert</string>
+    <string name="error_nickname_length">Spitzname ist zu lang.</string>
+    <string name="title_activity_account_balance">Kontoausgleich</string>
+    <string name="hint_password_new">Neues Passwort</string>
 
 </resources>

@@ -4,36 +4,49 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/toolbar"
-    android:layout_height="@dimen/toolbar_height_extended"
+    android:layout_height="@dimen/toolbar_height_x2"
     android:layout_width="match_parent"
-    android:minHeight="?attr/actionBarSize"
+    android:minHeight="0dp"
+    android:gravity="bottom"
     android:background="?attr/colorPrimary"
     android:paddingBottom="@dimen/normal_space"
-    android:gravity="bottom"
-    app:contentInsetStart="@dimen/key_line_2"
+    app:contentInsetStart="@dimen/key_line_1"
     app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
     app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/rl_owner_top"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/iv_avatar"
+            android:layout_width="@dimen/avatar_size"
+            android:layout_height="@dimen/avatar_size"
+            android:layout_alignParentStart="true"
+            android:contentDescription="@string/user_avatar"
+            android:src="@drawable/ic_avatar_40dp"/>
 
         <TextView
             style="@style/Base.TextAppearance.AppCompat.Title"
-            android:id="@+id/tv_owner_balance_positive"
+            android:id="@+id/tv_buyer"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAllCaps="true"
-            tools:text="Im Plus!"/>
+            android:layout_height="@dimen/avatar_size"
+            android:gravity="center_vertical"
+            android:layout_marginStart="@dimen/key_line_2_minus_key_line_1_minus_avatar_size"
+            android:layout_toEndOf="@id/iv_avatar"
+            tools:text="beeezn"/>
 
         <TextView
-            style="@style/Base.TextAppearance.AppCompat.Title"
-            android:id="@+id/tv_owner_balance"
+            style="@style/Base.TextAppearance.AppCompat.Headline"
+            android:id="@+id/tv_balance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/normal_space"
+            android:layout_marginStart="@dimen/key_line_2_minus_key_line_1"
+            android:layout_below="@id/tv_buyer"
+            android:layout_gravity="center_vertical"
             tools:text="-123.50"/>
-    </LinearLayout>
+    </RelativeLayout>
 
 </android.support.v7.widget.Toolbar>

@@ -25,8 +25,8 @@
     </style>
 
     <style name="EditText">
-        <item name="android:fontFamily">@string/font_fontFamily_regular</item>
-        <item name="android:textSize">@dimen/text_size_edit_text</item>
+        <item name="ch.berta.fabio.qwittig:floatingLabel">highlight</item>
+        <item name="ch.berta.fabio.qwittig:primaryColor">@color/accent</item>
     </style>
 
     <style name="FAB">

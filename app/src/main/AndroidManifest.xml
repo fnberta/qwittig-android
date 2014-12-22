@@ -10,44 +10,49 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
     <permission
-        android:protectionLevel="signature"
-        android:name="ch.berta.fabio.qwittig.permission.C2D_MESSAGE" />
+        android:name="ch.berta.fabio.qwittig.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
     <uses-permission android:name="ch.berta.fabio.qwittig.permission.C2D_MESSAGE" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="18" />
 
-    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
 
     <application
-        android:name="ch.berta.fabio.qwittig.Qwittig"
+        android:name=".Qwittig"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="ch.berta.fabio.qwittig.ui.HomeActivity"
+            android:name=".ui.HomeActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name="ch.berta.fabio.qwittig.ui.SettingsActivity"
+            android:name=".ui.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName="ch.berta.fabio.qwittig.ui.HomeActivity" >
+            android:parentActivityName=".ui.HomeActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.berta.fabio.qwittig.ui.HomeActivity" />
         </activity>
         <activity
-            android:name="ch.berta.fabio.qwittig.ui.PurchaseDetailsActivity"
+            android:name=".ui.PurchaseDetailsActivity"
             android:label="@string/title_activity_purchase_details"
             android:launchMode="singleTop"
-            android:parentActivityName="ch.berta.fabio.qwittig.ui.HomeActivity" >
+            android:parentActivityName=".ui.HomeActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.berta.fabio.qwittig.ui.HomeActivity" />
@@ -58,18 +63,18 @@
             android:windowSoftInputMode="stateUnchanged" >
         </activity>
         <activity
-            android:name="ch.berta.fabio.qwittig.ui.PurchaseEditActivity"
+            android:name=".ui.PurchaseEditActivity"
             android:label="@string/title_activity_edit_purchase"
             android:windowSoftInputMode="stateUnchanged" >
         </activity>
         <activity
-            android:name="ch.berta.fabio.qwittig.ui.LoginActivity"
+            android:name=".ui.LoginActivity"
             android:label="@string/title_activity_login"
             android:windowSoftInputMode="stateUnchanged" />
         <activity
-            android:name="ch.berta.fabio.qwittig.ui.SettingsGroupNewActivity"
+            android:name=".ui.SettingsGroupNewActivity"
             android:label="@string/title_activity_settings_group_new"
-            android:parentActivityName="ch.berta.fabio.qwittig.ui.SettingsActivity"
+            android:parentActivityName=".ui.SettingsActivity"
             android:windowSoftInputMode="stateUnchanged" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -82,9 +87,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="ch.berta.fabio.qwittig.ui.SettingsUserInviteActivity"
+            android:name=".ui.SettingsUserInviteActivity"
             android:label="@string/title_activity_settings_user_invite"
-            android:parentActivityName="ch.berta.fabio.qwittig.ui.SettingsActivity"
+            android:parentActivityName=".ui.SettingsActivity"
             android:windowSoftInputMode="stateUnchanged" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -97,9 +102,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="ch.berta.fabio.qwittig.ui.SettingsProfileActivity"
+            android:name=".ui.SettingsProfileActivity"
             android:label="@string/title_activity_settings_profile"
-            android:parentActivityName="ch.berta.fabio.qwittig.ui.SettingsActivity"
+            android:parentActivityName=".ui.SettingsActivity"
             android:windowSoftInputMode="stateUnchanged" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -107,17 +112,20 @@
         </activity>
 
         <service android:name="com.parse.PushService" />
-        <receiver android:name="com.parse.GcmBroadcastReceiver"
-                  android:permission="com.google.android.c2dm.permission.SEND">
+
+        <receiver
+            android:name="com.parse.GcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+
                 <category android:name="ch.berta.fabio.qwittig" />
             </intent-filter>
         </receiver>
         <receiver
             android:name=".PushBroadcastReceiver"
-            android:exported="false">
+            android:exported="false" >
             <intent-filter>
                 <action android:name="com.parse.push.intent.RECEIVE" />
                 <action android:name="com.parse.push.intent.DELETE" />
@@ -127,8 +135,16 @@
 
         <meta-data
             android:name="com.parse.push.notification_icon"
-            android:resource="@drawable/ic_launcher"/>
+            android:resource="@drawable/ic_launcher" />
 
+        <activity
+            android:name=".ui.AccountBalanceActivity"
+            android:label="@string/title_activity_account_balance"
+            android:parentActivityName=".ui.HomeActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.berta.fabio.qwittig.ui.HomeActivity" />
+        </activity>
     </application>
 
 </manifest>

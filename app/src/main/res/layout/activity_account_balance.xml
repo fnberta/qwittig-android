@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="ch.berta.fabio.qwittig.ui.PurchaseListActivity">
+    tools:context="ch.berta.fabio.qwittig.ui.AccountBalanceActivity">
 
     <include layout="@layout/include_toolbar"/>
 

@@ -16,10 +16,11 @@
     <dimen name="normal_space">16dp</dimen>
     <dimen name="icon_size">24dp</dimen>
     <dimen name="avatar_size">40dp</dimen>
-    <dimen name="avatar_size_1.5x">60dp</dimen>
+    <dimen name="avatar_size_2x">80dp</dimen>
     <dimen name="avatar_size_3x">120dp</dimen>
     <dimen name="key_line_2_minus_key_line_1_minus_avatar_size">16dp</dimen>
     <dimen name="key_line_2_minus_key_line_1_minus_icon_size">32dp</dimen>
+    <dimen name="key_line_2_minus_key_line_1">56dp</dimen>
 
     <!-- Checkbox special margins -->
     <dimen name="key_line_1_minus_checkbox_margin">12dp</dimen>
@@ -58,13 +59,15 @@
     <dimen name="toolbar_x2_minus_fab_size_half">84dp</dimen>
     <dimen name="toolbar_x2_minus_fab_size_small_half">92dp</dimen>
     <dimen name="toolbar_x3_minus_fab_size_small_half">148dp</dimen>
-    <dimen name="fab_margin_bottom_auto">88dp</dimen>
-    <dimen name="fab_margin_bottom_manual">160dp</dimen>
+    <dimen name="fab_translationY_auto">-72dp</dimen>
+    <dimen name="fab_translationY_manual">-144dp</dimen>
 
     <!-- EditText -->
     <dimen name="edit_text_height">48dp</dimen>
 
     <!-- Tab -->
     <dimen name="tab_height">48dp</dimen>
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
 
 </resources>

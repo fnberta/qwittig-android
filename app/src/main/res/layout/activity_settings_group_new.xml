@@ -54,8 +54,9 @@
                     android:contentDescription="@string/title_dialog_user_involved"
                     android:src="@drawable/ic_group"/>
 
-                <EditText
+                <com.rengwuxian.materialedittext.MaterialEditText
                     android:id="@+id/et_settings_group_add_new_name"
+                    style="@style/EditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/key_line_1"
