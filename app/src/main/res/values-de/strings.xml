@@ -101,5 +101,7 @@
     <string name="balance_owe_you">schuldet dir</string>
     <string name="button_done">Erledigt</string>
     <string name="button_remind">Nutzer erinnern</string>
+    <string name="balance_gets">erhält</string>
+    <string name="balance_from_you">von dir</string>
 
 </resources>

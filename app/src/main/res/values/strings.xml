@@ -104,5 +104,7 @@
     <string name="balance_owe_you">owes you </string>
     <string name="button_done">Done</string>
     <string name="button_remind">Remind user</string>
+    <string name="balance_gets">gets</string>
+    <string name="balance_from_you">from you</string>
 
 </resources>
