@@ -54,7 +54,7 @@
             android:padding="@dimen/icon_size"
             android:layout_gravity="center_vertical"
             android:src="@drawable/ic_clear"
-            android:contentDescription="@string/ibt_add_item"/>
+            android:contentDescription="@string/button_add_item"/>
 
     </LinearLayout>
 </LinearLayout>

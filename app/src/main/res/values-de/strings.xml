@@ -20,7 +20,7 @@
     <string name="hint_item_name">Artikelname</string>
     <string name="hint_item_price">Preis</string>
     <string name="hint_item_count">#</string>
-    <string name="ibt_add_item">Artikel hinzufügen</string>
+    <string name="button_add_item">Artikel hinzufügen</string>
     <string name="toast_purchase_added">Neuer Einkauf hinzugefügt</string>
     <string name="toast_purchase_discarded">Einkauf verworfen</string>
     <string name="header_user">Personen</string>
@@ -58,7 +58,7 @@
     <string name="desc_user_invite">Um einen neuen Nutzer einzuladen, gib einfach eine Email Adresse an. Der Empfänger erhält dann eine Einladung um deiner Gruppe beizutreten.</string>
     <string name="hint_user_invite_email">E-Mail</string>
     <string name="title_activity_settings_user_invite">Neuen Nutzer einladen</string>
-    <string name="error_group_name">Der Gruppenname darf nicht leer sein.</string>
+    <string name="error_group_name">Bitte gib einen Gruppennamen an.</string>
     <string name="error_email">Bitte gib eine gültige Email Adresse ein.</string>
     <string name="error_item_name">Bitte gib einen Artikelnamen an.</string>
     <string name="error_item_price">Bitte gib einen gültigen Preis an.</string>
@@ -97,5 +97,9 @@
     <string name="error_nickname_length">Spitzname ist zu lang.</string>
     <string name="title_activity_account_balance">Kontoausgleich</string>
     <string name="hint_password_new">Neues Passwort</string>
+    <string name="add_compensation">Neue Abrechnung</string>
+    <string name="balance_owe_you">schuldet dir</string>
+    <string name="button_done">Erledigt</string>
+    <string name="button_remind">Nutzer erinnern</string>
 
 </resources>

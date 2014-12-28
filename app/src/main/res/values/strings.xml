@@ -21,7 +21,7 @@
     <string name="hint_item_name">Item name</string>
     <string name="hint_item_price">Price</string>
     <string name="hint_item_count">#</string>
-    <string name="ibt_add_item">Add Item</string>
+    <string name="button_add_item">Add Item</string>
     <string name="toast_purchase_added">Added new purchase</string>
     <string name="toast_purchase_discarded">Purchase discarded</string>
     <string name="header_user">User</string>
@@ -59,7 +59,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="desc_user_invite">To invite a new user, simply enter an email address. The recipient will receive an invitation to join your group</string>
     <string name="hint_user_invite_email">E-mail</string>
-    <string name="error_group_name">Group name cannot be empty.</string>
+    <string name="error_group_name">Please enter a group name.</string>
     <string name="error_email">Please enter a valid email address.</string>
     <string name="error_item_name">Please enter an article name.</string>
     <string name="error_item_price">Please enter a valid price.</string>
@@ -100,5 +100,9 @@
     <string name="error_nickname_length">Nickname is too long.</string>
     <string name="title_activity_account_balance">Balance Account</string>
     <string name="hint_password_new">New password</string>
+    <string name="add_compensation">New compensation</string>
+    <string name="balance_owe_you">owes you </string>
+    <string name="button_done">Done</string>
+    <string name="button_remind">Remind user</string>
 
 </resources>
