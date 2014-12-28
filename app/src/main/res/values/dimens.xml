@@ -62,8 +62,9 @@
     <dimen name="fab_translationY_auto">-72dp</dimen>
     <dimen name="fab_translationY_manual">-144dp</dimen>
 
-    <!-- EditText -->
-    <dimen name="edit_text_height">48dp</dimen>
+    <!-- CardView -->
+    <dimen name="card_elevation">2dp</dimen>
+    <dimen name="card_corner_radius">2dp</dimen>
 
     <!-- Tab -->
     <dimen name="tab_height">48dp</dimen>
