@@ -107,5 +107,6 @@
     <string name="balance_gets">gets</string>
     <string name="balance_from_you">from you</string>
     <string name="button_remind_payed">Remind user you payed</string>
+    <string name="error_required">Required</string>
 
 </resources>

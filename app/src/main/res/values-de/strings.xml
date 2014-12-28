@@ -104,5 +104,6 @@
     <string name="balance_gets">erhält</string>
     <string name="balance_from_you">von dir</string>
     <string name="button_remind_payed">Erinnere Nutzer, dass bezahlt</string>
+    <string name="error_required">Erforderlich</string>
 
 </resources>

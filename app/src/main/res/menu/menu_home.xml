@@ -4,7 +4,7 @@
       tools:context=".BuyerListActivity">
     <item android:id="@+id/action_balance"
           android:title="@string/action_balance"
-          android:icon="@drawable/ic_account_balance_wallet"
+          android:icon="@drawable/ic_action_account_balance_wallet"
           android:orderInCategory="1"
           app:showAsAction="ifRoom"/>
     <item android:id="@+id/action_settings"
