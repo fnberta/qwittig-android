@@ -42,6 +42,7 @@
             android:gravity="end"
             android:inputType="number"
             android:imeOptions="actionNext"
+            android:maxLength="3"
             android:hint="@string/hint_item_count"/>
 
         <com.rengwuxian.materialedittext.MaterialEditText

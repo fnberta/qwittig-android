@@ -2,24 +2,35 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/small_space"
+    android:clipToPadding="false"
+    tools:context="ch.berta.fabio.qwittig.ui.PurchaseReceiptFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginStart="@dimen/key_line_1"
-        android:layout_marginEnd="@dimen/key_line_1"
-        tools:context="ch.berta.fabio.qwittig.ui.PurchaseReceiptFragment">
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/Subheader"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/subheader_height"
+            android:paddingStart="@dimen/key_line_1"
+            android:paddingEnd="@dimen/key_line_1"
+            android:gravity="center_vertical"
+            android:text="@string/header_receipt"
+            tools:text="Receipt"/>
 
         <ImageView
             android:id="@+id/iv_receipt"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_marginTop="@dimen/normal_space"
-            android:layout_marginBottom="@dimen/small_space"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/key_line_1"
+            android:layout_marginEnd="@dimen/key_line_1"
+            android:layout_gravity="center_horizontal"
             android:contentDescription="@string/purchase_receipt"/>
     </LinearLayout>
+
 </ScrollView>
 
