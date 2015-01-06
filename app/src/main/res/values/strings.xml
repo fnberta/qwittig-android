@@ -6,7 +6,7 @@
     <string name="title_activity_purchase_details">Purchase Details</string>
     <string name="title_activity_add_purchase_manually">New Purchase</string>
     <string name="tab_purchases">Purchases</string>
-    <string name="tab_users">User</string>
+    <string name="tab_users">Users</string>
     <string name="action_balance">Balance Account</string>
     <string name="action_profile">My Profile</string>
     <string name="action_settings">Settings</string>
@@ -87,14 +87,14 @@
     <string name="toast_email_address_taken">This email address is already taken. Please enter another one.</string>
     <string name="title_activity_settings_profile">My profile</string>
     <string name="pref_profile">My profile</string>
-    <string name="push_purchase_new_alert">A new purchase was added by</string>
+    <string name="push_purchase_new_alert">New purchase from</string>
     <string name="push_purchase_new_title">New purchase</string>
     <string name="toast_login_failed_credentials">Login failed. Please check your email address an your password.</string>
     <string name="toast_login_failed_no_network">No network available, please try again later.</string>
     <string name="action_purchase_add_receipt">Add receipt</string>
     <string name="action_purchase_add_receipt_show">Show receipt</string>
     <string name="purchase_receipt">Receipt</string>
-    <string name="action_purchase_edit_receipt_edit">Edit receipt</string>
+    <string name="action_purchase_edit_receipt_edit">Add/replace receipt</string>
     <string name="toast_receipt_added">Added receipt</string>
     <string name="toast_receipt_changed">Changed receipt</string>
     <string name="error_nickname_length">Nickname is too long.</string>
@@ -108,5 +108,6 @@
     <string name="balance_from_you">from you</string>
     <string name="button_remind_payed">Remind user you payed</string>
     <string name="error_required">Required</string>
+    <string name="header_receipt">Receipt</string>
 
 </resources>

@@ -84,14 +84,14 @@
     <string name="toast_email_address_taken">Diese Email Adresse ist bereits vergeben. Bitte gib eine andere ein.</string>
     <string name="pref_profile">Mein Profil</string>
     <string name="title_activity_settings_profile">Mein Profil</string>
-    <string name="push_purchase_new_alert">Ein neuer Einkauf wurde hinzugefügt von</string>
+    <string name="push_purchase_new_alert">Neuer Einkauf von</string>
     <string name="push_purchase_new_title">Neuer Einkauf</string>
     <string name="toast_login_failed_credentials">Login fehlgeschlagen. Bitte überprüfe deine Email Adresse und dein Passwort.</string>
     <string name="toast_login_failed_no_network">Kein Netzwerk verfügbar, bitte versuche es später noch einmal.</string>
     <string name="action_purchase_add_receipt">Quittung hinzufügen</string>
     <string name="action_purchase_add_receipt_show">Quittung anzeigen</string>
     <string name="purchase_receipt">Quittung</string>
-    <string name="action_purchase_edit_receipt_edit">Quittung bearbeiten</string>
+    <string name="action_purchase_edit_receipt_edit">Quittung hinzufügen/ersetzen</string>
     <string name="toast_receipt_added">Quittung hinzugefügt</string>
     <string name="toast_receipt_changed">Quittung geändert</string>
     <string name="error_nickname_length">Spitzname ist zu lang.</string>
@@ -105,5 +105,6 @@
     <string name="balance_from_you">von dir</string>
     <string name="button_remind_payed">Erinnere Nutzer, dass bezahlt</string>
     <string name="error_required">Erforderlich</string>
+    <string name="header_receipt">Quittung</string>
 
 </resources>
