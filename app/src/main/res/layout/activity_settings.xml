@@ -3,8 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="ch.berta.fabio.qwittig.ui.SettingsActivity">
+    android:orientation="vertical">
 
     <include layout="@layout/include_toolbar"/>
 
@@ -12,9 +11,10 @@
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:ignore="MergeRootFrame" />
+        tools:ignore="MergeRootFrame"/>
 
 </LinearLayout>
+
 
 
 

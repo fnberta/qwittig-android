@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/navdrawer_chosen_account_height"
+    android:layout_marginBottom="@dimen/small_space"
+    android:background="@drawable/navdrawer_background">
+
+    <ImageView
+        android:id="@+id/iv_drawer_avatar"
+        android:layout_width="@dimen/avatar_size"
+        android:layout_height="@dimen/avatar_size"
+        android:layout_marginStart="@dimen/key_line_1"
+        android:layout_marginEnd="@dimen/key_line_1"
+        android:layout_marginTop="@dimen/navdrawer_status_bar_plus_normal_space"
+        android:layout_marginBottom="@dimen/small_space"
+        android:contentDescription="@string/user_avatar"
+        tools:src="@drawable/ic_avatar_40dp"/>
+
+
+    <TextView
+        android:id="@+id/tv_drawer_nickname"
+        style="@style/Base.TextAppearance.AppCompat.Body2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/key_line_1"
+        android:layout_marginEnd="@dimen/key_line_1"
+        android:layout_below="@id/iv_drawer_avatar"
+        android:textColor="@android:color/white"
+        tools:text="beeeezn"/>
+
+    <TextView
+        android:id="@+id/tv_drawer_email"
+        style="@style/Base.TextAppearance.AppCompat.Body1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/key_line_1"
+        android:layout_marginEnd="@dimen/key_line_1"
+        android:layout_below="@id/tv_drawer_nickname"
+        android:textColor="@android:color/white"
+        tools:text="fnberta@gmail.com"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="@dimen/small_space"
+        android:layout_alignParentBottom="true"
+        android:background="?android:attr/listDivider"/>
+</RelativeLayout>

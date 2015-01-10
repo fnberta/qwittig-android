@@ -109,5 +109,9 @@
     <string name="button_remind_payed">Remind user you payed</string>
     <string name="error_required">Required</string>
     <string name="header_receipt">Receipt</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="title_activity_my_receipts">My receipts</string>
+    <string name="title_activity_home">Overview</string>
 
 </resources>
