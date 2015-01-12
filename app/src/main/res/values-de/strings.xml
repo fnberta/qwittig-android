@@ -78,7 +78,7 @@
     <string name="error_login_password">Bitte gib ein Passwort ein.</string>
     <string name="error_login_signup_password_nomatch">Passwörter stimmen nicht überein.</string>
     <string name="purchase_total">Total:</string>
-    <string name="toast_reset_password_link">Du hast ein Email erhalten mit einem Link, um dein Passwort zurückzusetzen.</string>
+    <string name="toast_reset_password_link">Du hast ein Email erhalten mit einem Link, um dein Passwort zurückzusetzen</string>
     <string name="dialog_login_reset_password_title">Passwort zurücksetzen</string>
     <string name="dialog_login_reset_password_message">Gib bitte deine Email Adresse ein um dein Passwort zurückzusetzen.</string>
     <string name="toast_email_address_taken">Diese Email Adresse ist bereits vergeben. Bitte gib eine andere ein.</string>
@@ -87,7 +87,7 @@
     <string name="push_purchase_new_alert">Neuer Einkauf von</string>
     <string name="push_purchase_new_title">Neuer Einkauf</string>
     <string name="toast_login_failed_credentials">Login fehlgeschlagen. Bitte überprüfe deine Email Adresse und dein Passwort.</string>
-    <string name="toast_login_failed_no_network">Kein Netzwerk verfügbar, bitte versuche es später noch einmal.</string>
+    <string name="toast_login_failed_no_network">Kein Netzwerk verfügbar, bitte versuche es später noch einmal</string>
     <string name="action_purchase_add_receipt">Quittung hinzufügen</string>
     <string name="action_purchase_add_receipt_show">Quittung anzeigen</string>
     <string name="purchase_receipt">Quittung</string>
@@ -97,7 +97,7 @@
     <string name="error_nickname_length">Spitzname ist zu lang.</string>
     <string name="title_activity_account_balance">Kontoausgleich</string>
     <string name="hint_password_new">Neues Passwort</string>
-    <string name="add_compensation">Neue Abrechnung</string>
+    <string name="add_compensation">Neue Abrechnung starten</string>
     <string name="balance_owe_you">schuldet dir</string>
     <string name="button_done">Erledigt</string>
     <string name="button_remind">Nutzer erinnern</string>
@@ -110,5 +110,11 @@
     <string name="drawer_close">Navigationsleiste schliessen</string>
     <string name="title_activity_my_receipts">Meine Quittungen</string>
     <string name="title_activity_home">Übersicht</string>
+    <string name="toast_compensation_finish_old">Du must zuerst die bestehenden Ausgleiche erledigen bevor du einen neuen anlegen kannst</string>
+    <string name="no_compensations">Gratuliere, du hast all deine Schulden bezahlt und niemand schuldet dir Geld!</string>
+    <string name="action_compensation_add_manual">Manuelle Zahlung hinzufügen</string>
+    <string name="title_activity_account_balance_add_manual">Manuelle Zahlung</string>
+    <string name="hint_recipient">Empfänger</string>
+    <string name="hint_amount">Betrag</string>
 
 </resources>

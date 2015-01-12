@@ -1,0 +1,115 @@
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:context="ch.berta.fabio.qwittig.ui.AccountBalanceAddManualFragment">
+
+        <TextView
+            style="@style/Subheader"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/subheader_height"
+            android:paddingStart="@dimen/key_line_1"
+            android:paddingEnd="@dimen/key_line_1"
+            android:gravity="center_vertical"
+            android:text="@string/hint_date"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="@dimen/icon_size"
+                android:layout_height="@dimen/icon_size"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="@dimen/key_line_1"
+                android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+                android:contentDescription="@string/hint_date"
+                android:src="@drawable/ic_event"/>
+
+            <TextView
+                android:id="@+id/bt_date"
+                style="@style/Widget.AppCompat.Spinner"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/touch_target_min"
+                android:layout_marginEnd="@dimen/key_line_1"
+                tools:text="27. November 2014"/>
+
+        </LinearLayout>
+
+        <TextView
+            style="@style/Subheader"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/subheader_height"
+            android:paddingStart="@dimen/key_line_1"
+            android:paddingEnd="@dimen/key_line_1"
+            android:gravity="center_vertical"
+            android:text="@string/hint_recipient"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="@dimen/icon_size"
+                android:layout_height="@dimen/icon_size"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="@dimen/key_line_1"
+                android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+                android:contentDescription="@string/hint_recipient"
+                android:src="@drawable/ic_person"/>
+
+            <Spinner
+                android:id="@+id/sp_recipient"
+                style="@style/Widget.AppCompat.Spinner"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/touch_target_min"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="@dimen/key_line_1"/>
+
+        </LinearLayout>
+
+        <TextView
+            style="@style/Subheader"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/subheader_height"
+            android:paddingStart="@dimen/key_line_1"
+            android:paddingEnd="@dimen/key_line_1"
+            android:gravity="center_vertical"
+            android:text="@string/hint_amount"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="@dimen/icon_size"
+                android:layout_height="@dimen/icon_size"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="@dimen/key_line_1"
+                android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+                android:contentDescription="@string/hint_amount"
+                android:src="@drawable/ic_attach_money"/>
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/et_amount"
+                style="@style/EditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/key_line_1"
+                android:inputType="numberDecimal"
+                android:hint="@string/hint_amount"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>
+

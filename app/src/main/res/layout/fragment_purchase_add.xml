@@ -110,8 +110,7 @@
             android:paddingStart="@dimen/key_line_1"
             android:paddingEnd="@dimen/key_line_1"
             android:gravity="center_vertical"
-            android:text="@string/header_items"
-            tools:text="Items"/>
+            android:text="@string/header_items"/>
 
         <LinearLayout
             android:id="@+id/ll_items"

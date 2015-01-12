@@ -31,10 +31,11 @@
         <activity
             android:name=".ui.HomeActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.WithNavDrawer"
-            android:launchMode="singleTop" >
+            android:launchMode="singleTop"
+            android:theme="@style/AppTheme.WithNavDrawer" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -49,15 +50,19 @@
         <activity
             android:name=".ui.PurchaseDetailsActivity"
             android:label="@string/title_activity_purchase_details"
-            android:theme="@style/AppTheme.WithNavDrawer"
             android:launchMode="singleTop"
-            android:parentActivityName=".ui.HomeActivity" >
+            android:parentActivityName=".ui.HomeActivity"
+            android:theme="@style/AppTheme.WithNavDrawer" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:scheme="qwittig"
-                      android:host="qwittig.fabio.berta.ch"/>
+
+                <data
+                    android:host="qwittig.fabio.berta.ch"
+                    android:scheme="qwittig" />
             </intent-filter>
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.berta.fabio.qwittig.ui.HomeActivity" />
@@ -102,6 +107,7 @@
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -117,8 +123,8 @@
         <activity
             android:name=".ui.AccountBalanceActivity"
             android:label="@string/title_activity_account_balance"
-            android:theme="@style/AppTheme.WithNavDrawer"
-            android:parentActivityName=".ui.HomeActivity" >
+            android:parentActivityName=".ui.HomeActivity"
+            android:theme="@style/AppTheme.WithNavDrawer" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.berta.fabio.qwittig.ui.HomeActivity" />
@@ -150,6 +156,14 @@
             android:name="com.parse.push.notification_icon"
             android:resource="@drawable/ic_launcher" />
 
+        <activity
+            android:name=".ui.AccountBalanceAddManualActivity"
+            android:label="@string/title_activity_account_balance_add_manual"
+            android:parentActivityName=".ui.AccountBalanceActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.berta.fabio.qwittig.ui.AccountBalanceActivity" />
+        </activity>
     </application>
 
 </manifest>
