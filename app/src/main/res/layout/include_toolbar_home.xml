@@ -2,6 +2,7 @@
 <android.support.v7.widget.Toolbar
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/toolbar"
     android:layout_height="@dimen/toolbar_height_x2"
     android:layout_width="match_parent"
@@ -12,5 +13,14 @@
     app:contentInsetStart="@dimen/key_line_2"
     app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
     app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+    <TextView
+        android:id="@+id/tv_balance"
+        style="@style/Base.TextAppearance.AppCompat.Display2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@android:color/white"
+        tools:text="-123.40"/>
 
 </android.support.v7.widget.Toolbar>

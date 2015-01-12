@@ -4,9 +4,13 @@
     <color name="primary_dark">#0288D1</color>
     <color name="accent">#ffc400</color>
 
-    <color name="red">#F44336</color>
-    <color name="green">#388E3C</color>
+    <color name="blue_light">#E3F2FD</color>
 
-    <color name="light_green">#E8F5E9</color>
-    <color name="light_red">#FFEBEE</color>
+    <color name="red">#F44336</color>
+    <color name="red_dark">#D32F2F</color>
+    <color name="red_light">#FFEBEE</color>
+
+    <color name="green">#4CAF50</color>
+    <color name="green_dark">#388E3C</color>
+    <color name="green_light">#E8F5E9</color>
 </resources>
