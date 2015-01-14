@@ -84,8 +84,8 @@
     <string name="toast_email_address_taken">Diese Email Adresse ist bereits vergeben. Bitte gib eine andere ein.</string>
     <string name="pref_profile">Mein Profil</string>
     <string name="title_activity_settings_profile">Mein Profil</string>
-    <string name="push_purchase_new_alert">Neuer Einkauf von</string>
-    <string name="push_purchase_new_title">Neuer Einkauf</string>
+    <string name="push_purchase_new_alert">Geschäft:</string>
+    <string name="push_purchase_new_title">Neuer Einkauf von</string>
     <string name="toast_login_failed_credentials">Login fehlgeschlagen. Bitte überprüfe deine Email Adresse und dein Passwort.</string>
     <string name="toast_login_failed_no_network">Kein Netzwerk verfügbar, bitte versuche es später noch einmal</string>
     <string name="action_purchase_add_receipt">Quittung hinzufügen</string>
@@ -116,5 +116,10 @@
     <string name="title_activity_account_balance_add_manual">Manuelle Zahlung</string>
     <string name="hint_recipient">Empfänger</string>
     <string name="hint_amount">Betrag</string>
+    <string name="action_compensation_not_now">Nicht jetzt</string>
+    <string name="push_compensation_remind_title">Bezahle deine Schulden</string>
+    <string name="push_compensation_remind_alert">Du schuldest</string>
+    <string name="push_compensation_remind_payed_title">hat bezahlt</string>
+    <string name="push_compensation_remind_payed_alert">Bestätige Erhalt von</string>
 
 </resources>

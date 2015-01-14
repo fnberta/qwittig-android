@@ -20,14 +20,27 @@
 
         <include layout="@layout/include_compensation_avatar"/>
 
-        <include layout="@layout/include_compensation_header"/>
+        <FrameLayout
+            android:id="@+id/fl_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/iv_avatar">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/tb_card_neg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <include layout="@layout/include_compensation_header"/>
+
+        </FrameLayout>
 
         <Button
             android:id="@+id/bt_remind_payed"
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/ll_header"
+            android:layout_below="@id/fl_header"
             android:layout_toEndOf="@id/iv_avatar"
             android:textColor="@color/accent"
             android:text="@string/button_remind_payed"/>
