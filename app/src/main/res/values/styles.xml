@@ -22,6 +22,8 @@
     </style>
 
     <style name="ListRowAvatarOneLineText" parent="@style/TextAppearance.AppCompat.Subhead">
+        <item name="android:lines">1</item>
+        <item name="android:ellipsize">end</item>
     </style>
 
     <style name="Subheader">
