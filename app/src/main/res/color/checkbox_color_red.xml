@@ -5,7 +5,6 @@
     <item android:state_checked="true"
           android:color="@color/red" />
     <item android:state_checked="false"
-          android:color="?attr/colorControlNormal" />
-
+          android:color="@color/defaultGray" />
 
 </selector>
