@@ -9,12 +9,12 @@
 
     <ch.berta.fabio.qwittig.ui.widgets.CircleDisplay
         android:id="@+id/list_item_percentage"
-        android:layout_width="@dimen/avatar_size"
-        android:layout_height="@dimen/avatar_size"
+        android:layout_width="@dimen/icon_size"
+        android:layout_height="@dimen/icon_size"
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
         android:layout_marginStart="@dimen/key_line_1"
-        android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_avatar_size"/>
+        android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"/>
 
     <TextView
         android:id="@+id/list_item_name"

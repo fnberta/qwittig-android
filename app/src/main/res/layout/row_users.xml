@@ -20,7 +20,7 @@
         android:id="@+id/list_name"
         style="@style/ListRowAvatarOneLineText"
         android:layout_width="0dp"
-        android:layout_height="@dimen/list_avatar_with_text"
+        android:layout_height="match_parent"
         android:layout_weight="1"
         android:gravity="center_vertical"
         tools:text="Vera"/>
@@ -29,7 +29,7 @@
         android:id="@+id/list_balance"
         style="@style/ListRowAvatarOneLineText"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/list_avatar_with_text"
+        android:layout_height="match_parent"
         android:layout_marginEnd="@dimen/key_line_1"
         android:gravity="center_vertical"
         tools:text="123.50"/>
