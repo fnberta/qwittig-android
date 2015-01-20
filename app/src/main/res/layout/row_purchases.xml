@@ -51,7 +51,6 @@
         android:layout_marginStart="@dimen/normal_space"
         android:layout_marginEnd="@dimen/key_line_1"
         android:gravity="center"
-        android:scaleType="fitCenter"
         tools:text="-50"
         tools:background="@color/green"/>
 
