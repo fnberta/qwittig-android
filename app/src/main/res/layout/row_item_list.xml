@@ -7,17 +7,14 @@
     android:layout_height="@dimen/list_with_text"
     android:layout_marginEnd="@dimen/key_line_1">
 
-    <TextView
-        android:id="@+id/list_item_quantity"
-        style="@style/ListRowAvatarOneLineText"
-        android:layout_width="@dimen/key_line_2"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
+    <ch.berta.fabio.qwittig.ui.widgets.CircleDisplay
+        android:id="@+id/list_item_percentage"
+        android:layout_width="@dimen/avatar_size"
+        android:layout_height="@dimen/avatar_size"
         android:layout_alignParentStart="true"
-        android:paddingStart="@dimen/key_line_1"
-        android:paddingEnd="@dimen/normal_space"
-        android:gravity="center_vertical"
-        tools:text="2"/>
+        android:layout_centerVertical="true"
+        android:layout_marginStart="@dimen/key_line_1"
+        android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_avatar_size"/>
 
     <TextView
         android:id="@+id/list_item_name"
@@ -25,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_toEndOf="@id/list_item_quantity"
+        android:layout_toEndOf="@id/list_item_percentage"
         android:layout_toStartOf="@+id/list_item_final_price"
         android:gravity="center_vertical"
         tools:text="Gipfeli"/>
