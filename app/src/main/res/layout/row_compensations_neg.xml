@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/fl_header"
             android:layout_toEndOf="@id/iv_avatar"
-            android:textColor="@color/accent"
+            android:textColor="?attr/colorAccent"
             android:text="@string/button_remind_payed"/>
 
     </RelativeLayout>
