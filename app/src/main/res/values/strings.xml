@@ -101,10 +101,10 @@
     <string name="add_compensation">Start new settlement</string>
     <string name="balance_owe_you">owes you </string>
     <string name="button_done">Done</string>
-    <string name="button_remind">Remind user</string>
+    <string name="button_remind">Remind</string>
     <string name="balance_gets">gets</string>
     <string name="balance_from_you">from you</string>
-    <string name="button_remind_payed">Remind user you paid</string>
+    <string name="button_remind_payed">you paid</string>
     <string name="error_required">Required</string>
     <string name="header_receipt">Receipt</string>
     <string name="drawer_open">Open navigation drawer</string>

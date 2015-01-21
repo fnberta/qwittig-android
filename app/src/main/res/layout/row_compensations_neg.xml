@@ -3,6 +3,7 @@
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -43,7 +44,7 @@
             android:layout_below="@id/fl_header"
             android:layout_toEndOf="@id/iv_avatar"
             android:textColor="?attr/colorAccent"
-            android:text="@string/button_remind_payed"/>
+            tools:text="@string/button_remind_payed"/>
 
     </RelativeLayout>
 </android.support.v7.widget.CardView>

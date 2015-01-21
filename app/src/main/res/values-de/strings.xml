@@ -100,10 +100,10 @@
     <string name="add_compensation">Neue Abrechnung starten</string>
     <string name="balance_owe_you">schuldet dir</string>
     <string name="button_done">Erledigt</string>
-    <string name="button_remind">Nutzer erinnern</string>
+    <string name="button_remind">Erinnere</string>
     <string name="balance_gets">erhält</string>
     <string name="balance_from_you">von dir</string>
-    <string name="button_remind_payed">Erinnere Nutzer, dass bezahlt</string>
+    <string name="button_remind_payed">an Zahlung</string>
     <string name="error_required">Erforderlich</string>
     <string name="header_receipt">Quittung</string>
     <string name="drawer_open">Navigationsleiste öffnen</string>
