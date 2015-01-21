@@ -21,6 +21,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:textColor="@android:color/white"
+        android:lines="1"
+        android:ellipsize="end"
         tools:text="-123.40"/>
 
 </android.support.v7.widget.Toolbar>

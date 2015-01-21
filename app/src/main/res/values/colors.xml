@@ -14,5 +14,6 @@
     <color name="green_dark">#388E3C</color>
     <color name="green_light">#E8F5E9</color>
 
-    <color name="defaultGray">#6d6d6d</color>
+    <color name="grey_default_control_control_normal">#6d6d6d</color>
+    <color name="grey_light">#E0E0E0</color>
 </resources>
