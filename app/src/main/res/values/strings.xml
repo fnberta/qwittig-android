@@ -122,5 +122,9 @@
     <string name="push_compensation_remind_alert">You owe</string>
     <string name="push_compensation_remind_payed_title">has payed</string>
     <string name="push_compensation_remind_payed_alert">Confirm receipt of</string>
+    <string name="push_compensation_not_now_title">Not now</string>
+    <string name="push_compensation_not_now_alert">will not pay you now</string>
+    <string name="toast_compensation_reminded_user">was reminded to pay his debts</string>
+    <string name="toast_compensation_reminded_user_payed">was reminded that you have payed your debts</string>
 
 </resources>

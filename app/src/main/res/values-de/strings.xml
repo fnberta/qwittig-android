@@ -121,5 +121,9 @@
     <string name="push_compensation_remind_alert">Du schuldest</string>
     <string name="push_compensation_remind_payed_title">hat bezahlt</string>
     <string name="push_compensation_remind_payed_alert">Bestätige Erhalt von</string>
+    <string name="push_compensation_not_now_title">Nicht jetzt</string>
+    <string name="push_compensation_not_now_alert">wird dich nicht jetzt bezahlen</string>
+    <string name="toast_compensation_reminded_user">wurde erinnert, seine Schulden zu bezahlen</string>
+    <string name="toast_compensation_reminded_user_payed">wurde erinnert, dass du deine Schulden bezahlt hast</string>
 
 </resources>
