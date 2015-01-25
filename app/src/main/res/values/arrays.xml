@@ -9,6 +9,13 @@
         <item>Volg</item>
     </string-array>
 
+    <string-array name="currencies">
+        <item>Schweizer Franken</item>
+        <item>Euro</item>
+        <item>United States Dollar</item>
+        <item>Great British Pounds</item>
+    </string-array>
+
     <string-array name="currency_entries">
         <item>Schweizer Franken (CHF)</item>
         <item>Euro (EUR)</item>
