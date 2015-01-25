@@ -46,6 +46,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/touch_target_min"
                 android:layout_marginEnd="@dimen/key_line_1"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                 tools:text="27. November 2014"/>
 
         </LinearLayout>

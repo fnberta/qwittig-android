@@ -2,7 +2,7 @@
 <TextView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@android:id/text1"
-    style="@style/TextAppearance.AppCompat.Body1"
+    style="@style/TextAppearance.AppCompat.Subhead"
     android:layout_width="match_parent"
     android:layout_height="@dimen/touch_target_min"
     android:gravity="center_vertical"
