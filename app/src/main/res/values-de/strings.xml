@@ -45,7 +45,7 @@
     <string name="toast_purchase_deleted">Einkauf gelöscht</string>
     <string name="desc_group_add_new">Um eine neue Gruppe hinzufügen, gib einfach einen Namen und eine Währung ein. Alle Einkäufe werden in der ausgewählten Währung angezeigt werden. Wenn du einen Einkauf hinzufügst, werden die Preise automatisch in diese Stadard-Währung umgerechnet. Du kannst diese Einstellungen jederzeit ändern.</string>
     <string name="hint_group_name">Gruppenname</string>
-    <string name="toast_no_connection">Kein Netzwerk verfügbar</string>
+    <string name="toast_no_connection">Kein Netzwerk verfügbar, bitte versuche es später noch einmal</string>
     <string name="pref_group_currency">Währung</string>
     <string name="toast_group_added">Neue Gruppe hinzugefügt</string>
     <string name="hint_group_currency">Währung</string>
@@ -87,7 +87,6 @@
     <string name="push_purchase_new_alert">Geschäft:</string>
     <string name="push_purchase_new_title">Neuer Einkauf von</string>
     <string name="toast_login_failed_credentials">Login fehlgeschlagen. Bitte überprüfe deine Email Adresse und dein Passwort.</string>
-    <string name="toast_login_failed_no_network">Kein Netzwerk verfügbar, bitte versuche es später noch einmal</string>
     <string name="action_purchase_add_receipt">Quittung hinzufügen</string>
     <string name="action_purchase_add_receipt_show">Quittung anzeigen</string>
     <string name="purchase_receipt">Quittung</string>
@@ -111,7 +110,7 @@
     <string name="title_activity_my_receipts">Meine Quittungen</string>
     <string name="title_activity_home">Übersicht</string>
     <string name="toast_compensation_finish_old">Du must zuerst die bestehenden Ausgleiche erledigen bevor du einen neuen anlegen kannst</string>
-    <string name="no_compensations">Gratuliere, du hast all deine Schulden bezahlt und niemand schuldet dir Geld!</string>
+    <string name="no_compensations">Momentan stehen keine Ausgleichszahlungen an. Um einen neue Abrechnung zu starten, klicke auf den Button!</string>
     <string name="action_compensation_add_manual">Manuelle Zahlung hinzufügen</string>
     <string name="title_activity_account_balance_add_manual">Manuelle Zahlung</string>
     <string name="hint_recipient">Empfänger</string>
@@ -125,5 +124,6 @@
     <string name="push_compensation_not_now_alert">wird dich nicht jetzt bezahlen</string>
     <string name="toast_compensation_reminded_user">wurde erinnert, seine Schulden zu bezahlen</string>
     <string name="toast_compensation_reminded_user_payed">wurde erinnert, dass du deine Schulden bezahlt hast</string>
+    <string name="toast_unknown_error">Ein unbekannter Fehler ist aufgetreten, bitte versuche es später noch einmal</string>
 
 </resources>

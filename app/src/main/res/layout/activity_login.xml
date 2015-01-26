@@ -6,7 +6,9 @@
     android:orientation="vertical"
     tools:context="ch.berta.fabio.qwittig.ui.LoginActivity">
 
-    <include layout="@layout/include_toolbar"/>
+    <include layout="@layout/include_toolbar_login"/>
+
+    <include layout="@layout/include_progress_horizontal"/>
 
     <FrameLayout
         android:id="@+id/container"

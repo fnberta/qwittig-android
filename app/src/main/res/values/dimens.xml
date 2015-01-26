@@ -70,6 +70,9 @@
     <!-- Dialog -->
     <dimen name="dialog_padding">24dp</dimen>
 
+    <!-- ProgressBar -->
+    <dimen name="progress_bar_minus_margin">-6dp</dimen>
+
     <!-- FAB -->
     <dimen name="fab_elevation">8dp</dimen>
     <dimen name="fab_elevation_press">14dp</dimen>

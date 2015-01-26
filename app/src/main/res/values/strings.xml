@@ -45,7 +45,7 @@
     <string name="title_activity_settings_group_new">Add new group</string>
     <string name="desc_group_add_new">To add a new group, simply enter a name and a currency. All purchases will be displayed in this currency. If you add a new purchase with another currency, the prices will automatically be converted to the group\'s default currency. You can always change these settings later.</string>
     <string name="hint_group_name">Group name</string>
-    <string name="toast_no_connection">No network available</string>
+    <string name="toast_no_connection">No network available, please try again later</string>
     <string name="pref_group_currency">Currency</string>
     <string name="toast_group_added">Added new group</string>
     <string name="hint_group_currency">Currency</string>
@@ -88,7 +88,6 @@
     <string name="push_purchase_new_alert">Store:</string>
     <string name="push_purchase_new_title">New purchase from</string>
     <string name="toast_login_failed_credentials">Login failed. Please check your email address an your password.</string>
-    <string name="toast_login_failed_no_network">No network available, please try again later</string>
     <string name="action_purchase_add_receipt">Add receipt</string>
     <string name="action_purchase_add_receipt_show">Show receipt</string>
     <string name="purchase_receipt">Receipt</string>
@@ -112,7 +111,7 @@
     <string name="title_activity_my_receipts">My receipts</string>
     <string name="title_activity_home">Overview</string>
     <string name="toast_compensation_finish_old">You must finish all existing compensations before you can create a new one.</string>
-    <string name="no_compensations">Congratulations, you have paid all your debts and nobody ows you money!</string>
+    <string name="no_compensations">At the moment, no compensation payments are scheduled. To start a new settlement, click on the button!</string>
     <string name="action_compensation_add_manual">Add manual payment</string>
     <string name="title_activity_account_balance_add_manual">Manual payment</string>
     <string name="hint_recipient">Recipient</string>
@@ -120,11 +119,12 @@
     <string name="action_compensation_not_now">Not now</string>
     <string name="push_compensation_remind_title">Pay your debts</string>
     <string name="push_compensation_remind_alert">You owe</string>
-    <string name="push_compensation_remind_payed_title">has payed</string>
+    <string name="push_compensation_remind_payed_title">has paid</string>
     <string name="push_compensation_remind_payed_alert">Confirm receipt of</string>
     <string name="push_compensation_not_now_title">Not now</string>
     <string name="push_compensation_not_now_alert">will not pay you now</string>
     <string name="toast_compensation_reminded_user">was reminded to pay his debts</string>
-    <string name="toast_compensation_reminded_user_payed">was reminded that you have payed your debts</string>
+    <string name="toast_compensation_reminded_user_payed">was reminded that you have paid your debts</string>
+    <string name="toast_unknown_error">An unknown error has occured, please try again later</string>
 
 </resources>
