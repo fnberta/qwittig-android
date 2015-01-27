@@ -85,7 +85,7 @@
     <string name="toast_email_address_taken">This email address is already taken. Please enter another one.</string>
     <string name="title_activity_settings_profile">My profile</string>
     <string name="pref_profile">My profile</string>
-    <string name="push_purchase_new_alert">Store:</string>
+    <string name="push_purchase_new_alert">for</string>
     <string name="push_purchase_new_title">New purchase from</string>
     <string name="toast_login_failed_credentials">Login failed. Please check your email address an your password.</string>
     <string name="action_purchase_add_receipt">Add receipt</string>
@@ -126,5 +126,9 @@
     <string name="toast_compensation_reminded_user">was reminded to pay his debts</string>
     <string name="toast_compensation_reminded_user_payed">was reminded that you have paid your debts</string>
     <string name="toast_unknown_error">An unknown error has occured, please try again later</string>
+    <string name="push_compensation_payment_done_title">Payment done</string>
+    <string name="push_compensation_payment_done_alert">accepts your payment of</string>
+    <string name="push_account_balance_new_title">started a new settlement</string>
+    <string name="push_account_balance_new_alert">Check if you get or owe money</string>
 
 </resources>
