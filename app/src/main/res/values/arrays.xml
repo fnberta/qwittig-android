@@ -1,14 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="stores">
-        <item>Aldi</item>
-        <item>Coop</item>
-        <item>Denner</item>
-        <item>Lidl</item>
-        <item>Migros</item>
-        <item>Volg</item>
-    </string-array>
-
     <string-array name="currencies">
         <item>Schweizer Franken</item>
         <item>Euro</item>
