@@ -35,6 +35,7 @@
             android:theme="@style/AppTheme.WithNavDrawer" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -123,7 +124,6 @@
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-
                 <category android:name="ch.berta.fabio.qwittig" />
             </intent-filter>
         </receiver>
@@ -148,6 +148,18 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.berta.fabio.qwittig.ui.AccountBalanceActivity" />
+        </activity>
+        <activity
+            android:name=".ui.SettingsStoresActivity"
+            android:label="@string/title_activity_settings_stores"
+            android:parentActivityName=".ui.SettingsActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.berta.fabio.qwittig.ui.SettingsActivity" />
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
     </application>
 

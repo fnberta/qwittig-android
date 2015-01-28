@@ -28,7 +28,6 @@
             android:layout_alignParentStart="true"
             android:layout_below="@id/ll_user"
             android:layout_marginTop="@dimen/small_space"
-            android:layout_marginEnd="@dimen/small_space"
             android:orientation="horizontal">
 
             <ImageView
@@ -42,11 +41,12 @@
 
             <TextView
                 android:id="@+id/bt_date"
-                style="@style/Widget.AppCompat.Spinner"
+                style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/touch_target_min"
-                android:layout_marginEnd="@dimen/key_line_1"
-                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                android:paddingEnd="@dimen/key_line_1"
+                android:gravity="center_vertical"
+                android:background="?android:attr/selectableItemBackground"
                 tools:text="27. November 2014"/>
 
         </LinearLayout>
@@ -58,7 +58,6 @@
             android:layout_alignParentStart="true"
             android:layout_below="@id/ll_date"
             android:layout_marginTop="@dimen/small_space"
-            android:layout_marginEnd="@dimen/small_space"
             android:orientation="horizontal">
 
             <ImageView
@@ -70,13 +69,15 @@
                 android:contentDescription="@string/hint_store"
                 android:src="@drawable/ic_local_grocery_store"/>
 
-            <Spinner
-                android:id="@+id/sp_store"
+            <TextView
+                android:id="@+id/tv_store"
+                style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/touch_target_min"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="@dimen/key_line_1"
-                android:gravity="start|center_vertical"/>
+                android:paddingEnd="@dimen/key_line_1"
+                android:gravity="center_vertical"
+                android:background="?android:attr/selectableItemBackground"
+                tools:text="Denner"/>
 
         </LinearLayout>
 

@@ -3,41 +3,56 @@
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceScreen
-        android:title="@string/pref_profile">
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:targetPackage="ch.berta.fabio.qwittig"
-            android:targetClass="ch.berta.fabio.qwittig.ui.SettingsProfileActivity" />
-    </PreferenceScreen>
-    <ListPreference
-        android:key="pref_group_current"
-        android:title="@string/pref_group_current"/>
-    <EditTextPreference
-        android:key="pref_group_name"
-        android:title="@string/pref_group_name"/>
-<!--    <ListPreference
-        android:key="pref_group_currency"
-        android:title="@string/pref_group_currency"
-        android:entries="@array/currency_entries"
-        android:entryValues="@array/currency_values"/>-->
-    <PreferenceScreen
-        android:title="@string/pref_group_add_user">
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:targetPackage="ch.berta.fabio.qwittig"
-            android:targetClass="ch.berta.fabio.qwittig.ui.SettingsUserInviteActivity" />
+    <PreferenceCategory
+        android:title="@string/pref_category_me">
+        <PreferenceScreen
+            android:title="@string/pref_profile">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:targetPackage="ch.berta.fabio.qwittig"
+                android:targetClass="ch.berta.fabio.qwittig.ui.SettingsProfileActivity" />
         </PreferenceScreen>
-    <Preference
-        android:key="pref_group_leave"
-        android:title="@string/pref_group_leave_group">
-    </Preference>
-    <PreferenceScreen
-        android:title="@string/pref_group_add_new">
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:targetPackage="ch.berta.fabio.qwittig"
-            android:targetClass="ch.berta.fabio.qwittig.ui.SettingsGroupNewActivity" />
-    </PreferenceScreen>
+        <PreferenceScreen
+            android:title="@string/pref_stores">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:targetPackage="ch.berta.fabio.qwittig"
+                android:targetClass="ch.berta.fabio.qwittig.ui.SettingsStoresActivity" />
+        </PreferenceScreen>
+        <ListPreference
+            android:key="pref_group_current"
+            android:title="@string/pref_group_current"/>
+        <PreferenceScreen
+            android:title="@string/pref_group_add_new">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:targetPackage="ch.berta.fabio.qwittig"
+                android:targetClass="ch.berta.fabio.qwittig.ui.SettingsGroupNewActivity" />
+        </PreferenceScreen>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_category_current_group"
+        android:key="pref_category_current_group">
+        <EditTextPreference
+            android:key="pref_group_name"
+            android:title="@string/pref_group_name"/>
+<!--        <ListPreference
+            android:key="pref_group_currency"
+            android:title="@string/pref_group_currency"
+            android:entries="@array/currency_entries"
+            android:entryValues="@array/currency_values"/>-->
+        <PreferenceScreen
+            android:title="@string/pref_group_add_user">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:targetPackage="ch.berta.fabio.qwittig"
+                android:targetClass="ch.berta.fabio.qwittig.ui.SettingsUserInviteActivity" />
+            </PreferenceScreen>
+        <Preference
+            android:key="pref_group_leave"
+            android:title="@string/pref_group_leave_group">
+        </Preference>
+    </PreferenceCategory>
 
 </PreferenceScreen>
