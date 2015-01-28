@@ -130,5 +130,6 @@
     <string name="push_compensation_payment_done_alert">accepts your payment of</string>
     <string name="push_account_balance_new_title">started a new settlement</string>
     <string name="push_account_balance_new_alert">Check if you get or owe money</string>
+    <string name="dialog_min_one_user">Please select at least one user.</string>
 
 </resources>

@@ -129,5 +129,6 @@
     <string name="push_compensation_payment_done_alert">akzeptiert deine Zahlung über</string>
     <string name="push_account_balance_new_title">hat eine neue Abrechnung gestartet</string>
     <string name="push_account_balance_new_alert">Schau ob du Geld bekommst oder schuldest</string>
+    <string name="dialog_min_one_user">Bitte wähle mindestens einen Nutzer an.</string>
 
 </resources>
