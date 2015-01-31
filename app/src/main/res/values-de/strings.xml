@@ -136,5 +136,9 @@
     <string name="pref_category_me">Ich</string>
     <string name="pref_category_current_group">Aktuelle Gruppe</string>
     <string name="title_activity_settings_stores">Geschäfte</string>
+    <string name="dialog_group_balance_not_zero_message">Dein Kontostand muss auf null sein um diese Gruppe verlassen zu können. Möchtest du eine neue Abrechnung starten?</string>
+    <string name="dialog_positive_start_new">Starten</string>
+    <string name="dialog_positive_leave">Verlassen</string>
+    <string name="dialog_positive_reset">Zurücksetzen</string>
 
 </resources>

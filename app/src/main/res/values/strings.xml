@@ -138,5 +138,9 @@
     <string name="pref_category_current_group">Current group</string>
     <string name="title_activity_settings_stores">Stores</string>
     <string name="hello_world">Hello world!</string>
+    <string name="dialog_group_balance_not_zero_message">Your balance needs to be zero in order to be able to leave this group. Do you want to start a new settlement?</string>
+    <string name="dialog_positive_start_new">Start new</string>
+    <string name="dialog_positive_leave">Leave</string>
+    <string name="dialog_positive_reset">Reset</string>
 
 </resources>
