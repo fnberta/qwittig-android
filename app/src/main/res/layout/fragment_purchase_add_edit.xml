@@ -1,0 +1,14 @@
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:paddingTop="@dimen/small_space"
+    android:paddingBottom="@dimen/small_space"
+    android:clipToPadding="false"
+    tools:context="ch.berta.fabio.qwittig.ui.PurchaseAddFragment">
+
+    <include layout="@layout/include_purchase_add_edit"/>
+</ScrollView>
+
