@@ -5,7 +5,16 @@
     android:layout_height="match_parent"
     tools:context="ch.berta.fabio.qwittig.ui.SettingsGroupNewActivity">
 
-    <include layout="@layout/include_toolbar_x2"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <include layout="@layout/include_toolbar_x2"/>
+
+        <include layout="@layout/include_progress_horizontal"/>
+
+    </LinearLayout>
 
     <ImageButton
         android:id="@+id/fab"
