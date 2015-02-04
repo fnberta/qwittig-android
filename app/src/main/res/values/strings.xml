@@ -142,5 +142,15 @@
     <string name="dialog_positive_start_new">Start new</string>
     <string name="dialog_positive_leave">Leave</string>
     <string name="dialog_positive_reset">Reset</string>
+    <string name="push_user_invite_title">Join group %1$s</string>
+    <string name="push_user_invite_alert">%1$s invited you</string>
+    <string name="toast_user_invited">%1$s was invited to join your group</string>
+    <string name="dialog_group_join_title">Join %1$s?</string>
+    <string name="dialog_group_join_message">%1$s invited you to join %2$s. By accepting the invitation your current group will change to the new one.</string>
+    <string name="dialog_positive_join">Join</string>
+    <string name="dialog_negative_discard_invitation">Discard </string>
+    <string name="dialog_neutral_decide_later">Later</string>
+    <string name="toast_already_in_group">%1$s is already in your group</string>
+    <string name="toast_already_invited">%1$s was already invited to your group</string>
 
 </resources>
