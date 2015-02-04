@@ -5,7 +5,17 @@
     android:layout_height="match_parent"
     tools:context="ch.berta.fabio.qwittig.ui.SettingsUserInviteActivity">
 
-    <include layout="@layout/include_toolbar_x3"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <include layout="@layout/include_toolbar_x3"/>
+
+        <include layout="@layout/include_progress_horizontal"/>
+
+    </LinearLayout>
+
 
     <ImageButton
         android:id="@+id/fab"

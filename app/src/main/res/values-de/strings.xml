@@ -140,5 +140,15 @@
     <string name="dialog_positive_start_new">Starten</string>
     <string name="dialog_positive_leave">Verlassen</string>
     <string name="dialog_positive_reset">Zurücksetzen</string>
+    <string name="push_user_invite_title">Trete jetzt %1$s bei</string>
+    <string name="push_user_invite_alert">%1$s hat dich eingeladen</string>
+    <string name="toast_user_invited">%1$s wurde eingeladen, deiner Gruppe beizutreten</string>
+    <string name="dialog_group_join_title">%1$s beitreten?</string>
+    <string name="dialog_group_join_message">%1$s hat dich eingeladen %2$s beizutreten. Wenn du die Einladung annimmst, wird deine aktive Gruppe auf die neue gewechselt.</string>
+    <string name="dialog_positive_join">Beitreten</string>
+    <string name="dialog_negative_discard_invitation">Verwerfen</string>
+    <string name="dialog_neutral_decide_later">Später</string>
+    <string name="toast_already_in_group">%1$s ist bereits in deiner Gruppe</string>
+    <string name="toast_already_invited">%1$s wurde bereits in deine Gruppe eingeladen</string>
 
 </resources>
