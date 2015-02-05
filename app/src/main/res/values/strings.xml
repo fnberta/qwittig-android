@@ -47,7 +47,7 @@
     <string name="hint_group_name">Group name</string>
     <string name="toast_no_connection">No network available, please try again later</string>
     <string name="pref_group_currency">Currency</string>
-    <string name="toast_group_added">Added new group</string>
+    <string name="toast_group_added">Added and switched to new group</string>
     <string name="hint_group_currency">Currency</string>
     <string name="user_avatar">Profile picture</string>
     <string name="hint_enabled">Enabled</string>
