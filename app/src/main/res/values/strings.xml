@@ -123,8 +123,8 @@
     <string name="push_compensation_remind_payed_alert">Confirm receipt of %1$s</string>
     <string name="push_compensation_not_now_title">Not now</string>
     <string name="push_compensation_not_now_alert">%1$s will not pay you now</string>
-    <string name="toast_compensation_reminded_user">was reminded to pay his debts</string>
-    <string name="toast_compensation_reminded_user_payed">was reminded that you have paid your debts</string>
+    <string name="toast_compensation_reminded_user">Reminded %1$s to pay his debts</string>
+    <string name="toast_compensation_reminded_user_payed">Reminded %1$s that you have paid your debts</string>
     <string name="toast_unknown_error">An unknown error has occured, please try again later</string>
     <string name="push_compensation_payment_done_title">Payment done</string>
     <string name="push_compensation_payment_done_alert">%1$s accepted your payment of %2$s</string>

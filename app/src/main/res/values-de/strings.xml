@@ -15,7 +15,7 @@
     <string name="title_activity_add_purchase_manually">Neuer Einkauf</string>
     <string name="button_add">Hinzufügen</string>
     <string name="action_purchase_discard">Einkauf verwerfen</string>
-    <string name="header_date_and_store">Datum und Laden</string>
+    <string name="header_date_and_store">Datum und Geschäft</string>
     <string name="header_items">Artikel</string>
     <string name="hint_item_name">Artikelname</string>
     <string name="hint_item_price">Preis</string>
@@ -122,8 +122,8 @@
     <string name="push_compensation_remind_payed_alert">Bestätige Erhalt von %1$s</string>
     <string name="push_compensation_not_now_title">Nicht jetzt</string>
     <string name="push_compensation_not_now_alert">%1$s wird dich nicht jetzt bezahlen</string>
-    <string name="toast_compensation_reminded_user">wurde erinnert, seine Schulden zu bezahlen</string>
-    <string name="toast_compensation_reminded_user_payed">wurde erinnert, dass du deine Schulden bezahlt hast</string>
+    <string name="toast_compensation_reminded_user">%1$s wurde erinnert, seine Schulden zu bezahlen</string>
+    <string name="toast_compensation_reminded_user_payed">%1$s wurde erinnert, dass du deine Schulden bezahlt hast</string>
     <string name="toast_unknown_error">Ein unbekannter Fehler ist aufgetreten, bitte versuche es später noch einmal</string>
     <string name="push_compensation_payment_done_title">Bezahlung erledigt</string>
     <string name="push_compensation_payment_done_alert">%1$s hat deine Zahlung über %2$s akzeptiert</string>
