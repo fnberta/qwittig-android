@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/small_space"
     android:clipToPadding="false"
-    tools:context="ch.berta.fabio.qwittig.ui.PurchaseReceiptFragment">
+    tools:context="ch.berta.fabio.qwittig.ui.PurchaseDetailsReceiptFragment">
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -150,5 +150,7 @@
     <string name="dialog_neutral_decide_later">Später</string>
     <string name="toast_already_in_group">%1$s ist bereits in deiner Gruppe</string>
     <string name="toast_already_invited">%1$s wurde bereits in deine Gruppe eingeladen</string>
+    <string name="cab_title_selected">%1$d ausgewählt</string>
+    <string name="action_stores_delete_selected">Angewählte Geschäfte löschen</string>
 
 </resources>
