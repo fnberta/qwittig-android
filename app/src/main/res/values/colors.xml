@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#03A9F4</color>
-    <color name="primary_dark">#0288D1</color>
-    <color name="accent">#ffc400</color>
+    <color name="primary">#9E9E9E</color> <!-- Grey 500 -->
+    <color name="primary_dark">#616161</color> <!-- Grey 700 -->
+    <color name="accent">#FFAB00</color> <!-- Amber A400 -->
 
-    <color name="blue_light">#E3F2FD</color>
-
-    <color name="red">#F44336</color>
-    <color name="red_dark">#D32F2F</color>
-    <color name="red_light">#FFEBEE</color>
+    <color name="red">#F44336</color> <!-- Red 500 -->
+    <color name="red_dark">#D32F2F</color> <!-- Red 700 -->
+    <color name="red_light">#FFEBEE</color> <!-- Red 50 -->
     <color name="red_error">#e7492E</color>
 
-    <color name="green">#4CAF50</color>
-    <color name="green_dark">#388E3C</color>
-    <color name="green_light">#E8F5E9</color>
+    <color name="green">#4CAF50</color> <!-- Green 500 -->
+    <color name="green_dark">#388E3C</color> <!-- Green 700 -->
+    <color name="green_light">#E8F5E9</color> <!-- Green 50 -->
 
     <color name="grey_default_control_control_normal">#6d6d6d</color>
-    <color name="grey_light">#E0E0E0</color>
+    <color name="grey_light">#E0E0E0</color> <!-- Grey 300 -->
 </resources>

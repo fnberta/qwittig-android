@@ -4,7 +4,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
-        android:title="@string/pref_category_me">
+        android:title="@string/pref_category_me"
+        android:key="pref_category_me">
         <PreferenceScreen
             android:title="@string/pref_profile">
             <intent
@@ -52,6 +53,10 @@
         <Preference
             android:key="pref_group_leave"
             android:title="@string/pref_group_leave_group">
+        </Preference>
+        <Preference
+            android:key="pref_group_delete"
+            android:title="@string/pref_group_delete_group">
         </Preference>
     </PreferenceCategory>
 

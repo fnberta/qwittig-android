@@ -152,5 +152,9 @@
     <string name="toast_already_invited">%1$s wurde bereits in deine Gruppe eingeladen</string>
     <string name="cab_title_selected">%1$d ausgewählt</string>
     <string name="action_stores_delete_selected">Angewählte Geschäfte löschen</string>
+    <string name="action_account_delete">Account löschen</string>
+    <string name="pref_group_delete_group">%1$s löschen</string>
+    <string name="dialog_group_delete_message">Willst du diese Gruppe wirklich verlassen und löschen?</string>
+    <string name="dialog_positive_delete">Löschen</string>
 
 </resources>
