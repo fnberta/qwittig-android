@@ -93,8 +93,7 @@
                     android:id="@+id/sp_settings_group_add_new_currency"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/touch_target_min"
-                    android:layout_marginEnd="@dimen/key_line_1"
-                    android:entries="@array/currency_entries"/>
+                    android:layout_marginEnd="@dimen/key_line_1"/>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

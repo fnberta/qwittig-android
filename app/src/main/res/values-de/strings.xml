@@ -156,5 +156,13 @@
     <string name="pref_group_delete_group">%1$s löschen</string>
     <string name="dialog_group_delete_message">Willst du diese Gruppe wirklich verlassen und löschen?</string>
     <string name="dialog_positive_delete">Löschen</string>
+    <string name="header_help">Hilfe</string>
+    <string name="help_contact_support">Support kontaktieren</string>
+    <string name="help_feedback">Feedback geben</string>
+    <string name="help_recommend">Empfehle Qwittig weiter</string>
+    <string name="help_rate">Bewerte uns im Play Store</string>
+    <string name="email_support_message">Bitte beschreibe das Problem. Wir helfen dir so schnell wie möglich.</string>
+    <string name="email_recommend_subject">Hole dir noch heute Qwittig!</string>
+    <string name="email_recommend_message">Hole dir Qwittig für iOS und Android. Mehr Informationen unter www.qwittig.ch</string>
 
 </resources>

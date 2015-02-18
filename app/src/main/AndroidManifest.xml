@@ -39,27 +39,29 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
-                    android:scheme="http"
                     android:host="192.168.0.49"
+                    android:pathPrefix="/invitation"
                     android:port="3000"
-                    android:pathPrefix="/invitation" />
+                    android:scheme="http" />
                 <data
-                    android:scheme="http"
                     android:host="qwittig.ch"
-                    android:pathPrefix="/invitation" />
+                    android:pathPrefix="/invitation"
+                    android:scheme="http" />
                 <data
-                    android:scheme="http"
                     android:host="www.qwittig.ch"
-                    android:pathPrefix="/invitation" />
+                    android:pathPrefix="/invitation"
+                    android:scheme="http" />
             </intent-filter>
         </activity>
         <activity
             android:name=".ui.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".ui.HomeActivity" >
+            android:parentActivityName=".ui.HomeActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.berta.fabio.qwittig.ui.HomeActivity" />
@@ -76,12 +78,20 @@
         <activity
             android:name=".ui.PurchaseAddActivity"
             android:label="@string/title_activity_add_purchase_manually"
+            android:parentActivityName=".ui.HomeActivity"
             android:windowSoftInputMode="stateUnchanged" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.berta.fabio.qwittig.ui.HomeActivity" />
         </activity>
         <activity
             android:name=".ui.PurchaseEditActivity"
             android:label="@string/title_activity_edit_purchase"
+            android:parentActivityName=".ui.PurchaseDetailsActivity"
             android:windowSoftInputMode="stateUnchanged" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.berta.fabio.qwittig.ui.PurchaseDetailsActivity" />
         </activity>
         <activity
             android:name=".ui.LoginActivity"
@@ -95,8 +105,10 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.berta.fabio.qwittig.ui.SettingsActivity" />
+
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -108,8 +120,10 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.berta.fabio.qwittig.ui.SettingsActivity" />
+
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -140,6 +154,7 @@
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+
                 <category android:name="ch.berta.fabio.qwittig" />
             </intent-filter>
         </receiver>
@@ -172,10 +187,20 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.berta.fabio.qwittig.ui.SettingsActivity" />
+
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.HelpFeedbackActivity"
+            android:label="@string/title_activity_help_feedback"
+            android:parentActivityName=".ui.HomeActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.berta.fabio.qwittig.ui.HomeActivity" />
         </activity>
     </application>
 

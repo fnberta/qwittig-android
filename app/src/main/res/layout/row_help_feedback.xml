@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ll_help"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/list_icon_with_text"
+    android:orientation="horizontal"
+    android:background="?android:attr/selectableItemBackground"
+    android:clickable="true">
+
+    <ImageView
+        android:id="@+id/iv_help_icon"
+        android:layout_width="@dimen/icon_size"
+        android:layout_height="@dimen/icon_size"
+        android:layout_marginStart="@dimen/key_line_1"
+        android:layout_marginEnd="@dimen/normal_space"
+        android:layout_gravity="center_vertical"
+        tools:src="@drawable/ic_event"/>
+
+    <TextView
+        android:id="@+id/tv_help_title"
+        style="@style/ListTextView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="@dimen/key_line_1"
+        android:layout_marginEnd="@dimen/key_line_1"
+        android:gravity="center_vertical"
+        tools:text="Send Feedback"/>
+</LinearLayout>

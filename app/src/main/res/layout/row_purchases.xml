@@ -27,7 +27,7 @@
 
     <TextView
         android:id="@+id/list_buyer"
-        style="@style/ListRowAvatarOneLineText"
+        style="@style/ListTextView"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
@@ -37,7 +37,7 @@
 
     <TextView
         android:id="@+id/list_store"
-        style="@style/ListRowAvatarOneLineText"
+        style="@style/ListTextView"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
@@ -47,7 +47,7 @@
 
     <TextView
         android:id="@id/list_balance_change"
-        style="@style/ListRowAvatarOneLineText"
+        style="@style/ListTextView"
         android:layout_width="@dimen/balance_change_length"
         android:layout_height="@dimen/balance_change_height"
         android:layout_alignParentEnd="true"

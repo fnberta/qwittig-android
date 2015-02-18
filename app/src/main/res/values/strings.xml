@@ -137,7 +137,6 @@
     <string name="pref_category_me">Me</string>
     <string name="pref_category_current_group">Current group</string>
     <string name="title_activity_settings_stores">Stores</string>
-    <string name="hello_world">Hello world!</string>
     <string name="dialog_group_balance_not_zero_message">Your balance needs to be zero in order to be able to leave this group. Do you want to start a new settlement?</string>
     <string name="dialog_positive_start_new">Start new</string>
     <string name="dialog_positive_leave">Leave</string>
@@ -158,5 +157,18 @@
     <string name="pref_group_delete_group">Delete %1$s</string>
     <string name="dialog_group_delete_message">Do you really want to leave and delete this group?</string>
     <string name="dialog_positive_delete">Delete</string>
+    <string name="title_activity_help_feedback">Help and Feedback</string>
+    <string name="header_help">Help</string>
+    <string name="header_feedback" translatable="false">Feedback</string>
+    <string name="help_faq" translatable="false">FAQ</string>
+    <string name="help_contact_support">Contact support</string>
+    <string name="help_feedback">Give feedback</string>
+    <string name="help_recommend">Recommend Qwittig to a friend</string>
+    <string name="help_rate">Rate us in the Play Store</string>
+    <string name="email_support_subject" translatable="false">Qwittig Support</string>
+    <string name="email_support_message">Please describe your problem. We will get back to you as soon as possible.</string>
+    <string name="email_feedback_subject" translatable="false">Qwittig Feedback</string>
+    <string name="email_recommend_subject">Download Qwittig today!</string>
+    <string name="email_recommend_message">Download Qwittig for iOS and Android. More information at www.qwittig.ch</string>
 
 </resources>

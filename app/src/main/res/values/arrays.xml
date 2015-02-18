@@ -7,13 +7,6 @@
         <item>Great British Pounds</item>
     </string-array>
 
-    <string-array name="currency_entries">
-        <item>Schweizer Franken (CHF)</item>
-        <item>Euro (EUR)</item>
-        <item>United States Dollar (USD)</item>
-        <item>Great British Pounds (GBP)</item>
-    </string-array>
-
     <string-array name="currency_values">
         <item>CHF</item>
         <item>EUR</item>
