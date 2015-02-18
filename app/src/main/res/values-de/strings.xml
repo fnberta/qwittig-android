@@ -164,5 +164,6 @@
     <string name="email_support_message">Bitte beschreibe das Problem. Wir helfen dir so schnell wie möglich.</string>
     <string name="email_recommend_subject">Hole dir noch heute Qwittig!</string>
     <string name="email_recommend_message">Hole dir Qwittig für iOS und Android. Mehr Informationen unter www.qwittig.ch</string>
+    <string name="title_activity_help_feedback">Hilfe und Feedback</string>
 
 </resources>
