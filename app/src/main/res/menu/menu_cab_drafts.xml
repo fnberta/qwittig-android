@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="ch.berta.fabio.qwittig.ui.PurchaseDraftsFragment">
+    <item
+        android:id="@+id/action_draft_delete"
+        android:title="@string/action_drafts_delete_selected"
+        android:icon="@drawable/ic_action_delete"
+        android:orderInCategory="1"
+        app:showAsAction="always"/>
+</menu>

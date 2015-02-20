@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/list_avatar_with_text"
+    android:background="@drawable/state_selector_selectable_lists"
+    android:clickable="true">
+
+    <TextView
+        android:id="@+id/list_date"
+        style="@style/TextAppearance.AppCompat.Caption"
+        android:layout_width="@dimen/avatar_size"
+        android:layout_height="@dimen/avatar_size"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="@dimen/key_line_1"
+        android:layout_marginEnd="@dimen/normal_space"
+        android:paddingStart="@dimen/min_space"
+        android:paddingEnd="@dimen/min_space"
+        android:gravity="center"
+        android:lines="2"
+        android:textAllCaps="true"
+        android:background="@color/grey_light"
+        tools:text="FEB\n24"/>
+
+    <TextView
+        android:id="@+id/list_buyer"
+        style="@style/ListTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@id/list_date"
+        android:gravity="center_vertical"
+        tools:text="Vera"/>
+
+    <TextView
+        android:id="@+id/list_store"
+        style="@style/ListTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_toStartOf="@+id/list_balance_change"
+        android:gravity="center_vertical"
+        tools:text="Denner"/>
+
+    <TextView
+        android:id="@id/list_balance_change"
+        style="@style/ListTextView"
+        android:layout_width="@dimen/balance_change_length"
+        android:layout_height="@dimen/balance_change_height"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="@dimen/normal_space"
+        android:layout_marginEnd="@dimen/key_line_1"
+        android:paddingStart="@dimen/small_space"
+        android:paddingEnd="@dimen/small_space"
+        android:gravity="center"
+        tools:text="-50"
+        tools:background="@color/green"/>
+
+</RelativeLayout>

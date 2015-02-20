@@ -170,5 +170,10 @@
     <string name="email_feedback_subject" translatable="false">Qwittig Feedback</string>
     <string name="email_recommend_subject">Download Qwittig today!</string>
     <string name="email_recommend_message">Download Qwittig for iOS and Android. More information at www.qwittig.ch</string>
+    <string name="toast_purchase_added_draft">Purchase saved as a draft</string>
+    <string name="title_activity_purchase_drafts">Drafts</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_purchase_save_draft">Save as draft</string>
+    <string name="action_drafts_delete_selected">Delete selected Drafts</string>
 
 </resources>
