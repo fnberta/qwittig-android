@@ -44,7 +44,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="192.168.0.49"
+                    android:host="192.168.192.40"
                     android:pathPrefix="/invitation"
                     android:port="3000"
                     android:scheme="http" />
@@ -61,7 +61,7 @@
         <activity
             android:name=".ui.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".ui.HomeActivity">
+            android:parentActivityName=".ui.HomeActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.berta.fabio.qwittig.ui.HomeActivity" />
@@ -197,10 +197,15 @@
         <activity
             android:name=".ui.HelpFeedbackActivity"
             android:label="@string/title_activity_help_feedback"
-            android:parentActivityName=".ui.HomeActivity">
+            android:parentActivityName=".ui.HomeActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.berta.fabio.qwittig.ui.HomeActivity" />
+        </activity>
+        <activity
+            android:name=".ui.PurchaseDraftsActivity"
+            android:label="@string/title_activity_purchase_drafts"
+            android:theme="@style/AppTheme.WithNavDrawer">
         </activity>
     </application>
 
