@@ -155,7 +155,7 @@
     <string name="action_stores_delete_selected">Delete selected stores</string>
     <string name="action_account_delete">Delete account</string>
     <string name="pref_group_delete_group">Delete %1$s</string>
-    <string name="dialog_group_delete_message">Do you really want to leave and delete this group?</string>
+    <string name="dialog_group_delete_message">Do you really want to delete this group?</string>
     <string name="dialog_positive_delete">Delete</string>
     <string name="title_activity_help_feedback">Help and Feedback</string>
     <string name="header_help">Help</string>
@@ -175,5 +175,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_purchase_save_draft">Save as draft</string>
     <string name="action_drafts_delete_selected">Delete selected Drafts</string>
+    <string name="dialog_account_delete_message">Do you really want to delete your account? You cannot undo this!</string>
 
 </resources>

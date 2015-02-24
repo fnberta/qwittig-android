@@ -44,7 +44,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="192.168.192.40"
+                    android:host="192.168.0.95"
                     android:pathPrefix="/invitation"
                     android:port="3000"
                     android:scheme="http" />

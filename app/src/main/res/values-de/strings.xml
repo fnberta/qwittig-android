@@ -154,7 +154,7 @@
     <string name="action_stores_delete_selected">Ausgewählte Geschäfte löschen</string>
     <string name="action_account_delete">Account löschen</string>
     <string name="pref_group_delete_group">%1$s löschen</string>
-    <string name="dialog_group_delete_message">Willst du diese Gruppe wirklich verlassen und löschen?</string>
+    <string name="dialog_group_delete_message">Willst du diese Gruppe wirklich löschen?</string>
     <string name="dialog_positive_delete">Löschen</string>
     <string name="header_help">Hilfe</string>
     <string name="help_contact_support">Support kontaktieren</string>
@@ -169,5 +169,6 @@
     <string name="title_activity_purchase_drafts">Entwürfe</string>
     <string name="action_purchase_save_draft">Als Entwurf speichern</string>
     <string name="action_drafts_delete_selected">Ausgewählte Entwürfe löschen</string>
+    <string name="dialog_account_delete_message">Willst du deinen Account wirklich löschen? Du kannst das nicht rückgängig machen!</string>
 
 </resources>
