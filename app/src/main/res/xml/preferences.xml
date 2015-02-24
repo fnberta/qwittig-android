@@ -38,11 +38,6 @@
         <EditTextPreference
             android:key="pref_group_name"
             android:title="@string/pref_group_name"/>
-<!--        <ListPreference
-            android:key="pref_group_currency"
-            android:title="@string/pref_group_currency"
-            android:entries="@array/currency_entries"
-            android:entryValues="@array/currency_values"/>-->
         <PreferenceScreen
             android:title="@string/pref_group_add_user">
             <intent

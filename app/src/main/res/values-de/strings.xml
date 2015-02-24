@@ -46,7 +46,6 @@
     <string name="desc_group_add_new">Um eine neue Gruppe hinzufügen, gib einfach einen Namen und eine Währung ein. Alle Einkäufe werden in der ausgewählten Währung angezeigt werden. Wenn du einen Einkauf hinzufügst, werden die Preise automatisch in diese Stadard-Währung umgerechnet. Du kannst diese Einstellungen jederzeit ändern.</string>
     <string name="hint_group_name">Gruppenname</string>
     <string name="toast_no_connection">Kein Netzwerk verfügbar, bitte versuche es später noch einmal</string>
-    <string name="pref_group_currency">Währung</string>
     <string name="toast_group_added">Neue Gruppe hinzugefügt und zu ihr gewechslet</string>
     <string name="hint_group_currency">Währung</string>
     <string name="user_avatar">Profilbild</string>
