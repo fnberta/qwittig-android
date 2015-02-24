@@ -175,5 +175,6 @@
     <string name="dialog_positive_add">Hinzufügen</string>
     <string name="dialog_group_create">Du musst in einer Gruppe sein um Einkäufe hinzufügen zu können. Möchtest du eine neue Gruppe erstellen?</string>
     <string name="dialog_positive_create">Erstellen</string>
+    <string name="nickname_me">Ich</string>
 
 </resources>

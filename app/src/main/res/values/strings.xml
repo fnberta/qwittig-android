@@ -181,5 +181,6 @@
     <string name="dialog_positive_add">Add</string>
     <string name="dialog_group_create">You have to be in a group to add purchases. Would you like to a create a new group?</string>
     <string name="dialog_positive_create">Create</string>
+    <string name="nickname_me">Me</string>
 
 </resources>
