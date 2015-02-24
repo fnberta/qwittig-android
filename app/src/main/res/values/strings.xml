@@ -175,5 +175,9 @@
     <string name="action_purchase_save_draft">Save as draft</string>
     <string name="action_drafts_delete_selected">Delete selected Drafts</string>
     <string name="dialog_account_delete_message">Do you really want to delete your account? You cannot undo this!</string>
+    <string name="dialog_group_delete_must_be_empty_message">You can only delete a group when you are the only one in it.</string>
+    <string name="deleted">DELETED</string>
+    <string name="add_store">Add store</string>
+    <string name="dialog_positive_add">Add</string>
 
 </resources>

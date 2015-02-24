@@ -169,5 +169,9 @@
     <string name="action_purchase_save_draft">Als Entwurf speichern</string>
     <string name="action_drafts_delete_selected">Ausgewählte Entwürfe löschen</string>
     <string name="dialog_account_delete_message">Willst du deinen Account wirklich löschen? Du kannst das nicht rückgängig machen!</string>
+    <string name="dialog_group_delete_must_be_empty_message">Du kannst eine Gruppe erst löschen, wenn niemand ausser dir Mitglied ist.</string>
+    <string name="deleted">GELÖSCHT</string>
+    <string name="add_store">Geschäft hinzufügen</string>
+    <string name="dialog_positive_add">Hinzufügen</string>
 
 </resources>
