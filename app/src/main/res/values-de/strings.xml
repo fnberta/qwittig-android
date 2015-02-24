@@ -173,5 +173,7 @@
     <string name="deleted">GELÖSCHT</string>
     <string name="add_store">Geschäft hinzufügen</string>
     <string name="dialog_positive_add">Hinzufügen</string>
+    <string name="dialog_group_create">Du musst in einer Gruppe sein um Einkäufe hinzufügen zu können. Möchtest du eine neue Gruppe erstellen?</string>
+    <string name="dialog_positive_create">Erstellen</string>
 
 </resources>
