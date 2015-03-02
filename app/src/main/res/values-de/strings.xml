@@ -170,11 +170,14 @@
     <string name="action_drafts_delete_selected">Ausgewählte Entwürfe löschen</string>
     <string name="dialog_account_delete_message">Willst du deinen Account wirklich löschen? Du kannst das nicht rückgängig machen!</string>
     <string name="dialog_group_delete_must_be_empty_message">Du kannst eine Gruppe erst löschen, wenn niemand ausser dir Mitglied ist.</string>
-    <string name="deleted">GELÖSCHT</string>
+    <string name="user_deleted">GELÖSCHT</string>
     <string name="add_store">Geschäft hinzufügen</string>
     <string name="dialog_positive_add">Hinzufügen</string>
     <string name="dialog_group_create">Du musst in einer Gruppe sein um Einkäufe hinzufügen zu können. Möchtest du eine neue Gruppe erstellen?</string>
     <string name="dialog_positive_create">Erstellen</string>
     <string name="nickname_me">Ich</string>
+    <string name="progress_account_delete">Lösche Account...</string>
+    <string name="push_user_deleted_alert">Ausstehende Schulden or Guthaben wurde automatisch abgerechnet.</string>
+    <string name="push_user_deleted_title">%1$s hat seinen Account gelöscht</string>
 
 </resources>
