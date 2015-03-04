@@ -22,29 +22,30 @@
 
     <LinearLayout
         android:id="@+id/ll_empty_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_marginStart="@dimen/key_line_1"
         android:layout_marginEnd="@dimen/key_line_1"
         android:orientation="vertical"
-        android:layout_gravity="center"
+        android:gravity="center"
         android:visibility="gone">
 
         <TextView
             style="@style/Base.TextAppearance.AppCompat.Subhead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="@dimen/normal_space"
+            android:layout_marginBottom="@dimen/small_space"
             android:gravity="center_horizontal"
             android:text="@string/no_compensations"/>
 
-        <Button
-            android:id="@+id/bt_new_account_balance"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="@string/add_compensation"/>
+        <ImageButton
+            android:id="@+id/fab_new_account_balance"
+            style="@style/FAB"
+            android:contentDescription="@string/add_compensation"
+            android:layout_height="@dimen/fab_size"
+            android:layout_width="@dimen/fab_size"
+            android:layout_marginTop="@dimen/small_space"
+            android:src="@drawable/ic_swap_horiz"/>
     </LinearLayout>
 
 </FrameLayout>
