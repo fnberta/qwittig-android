@@ -1,14 +1,30 @@
-<ScrollView
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:paddingTop="@dimen/small_space"
-    android:paddingBottom="@dimen/small_space"
-    android:clipToPadding="false"
-    tools:context="ch.berta.fabio.qwittig.ui.PurchaseAddFragment">
+    android:layout_height="match_parent">
 
-    <include layout="@layout/include_purchase_add_edit"/>
-</ScrollView>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:paddingTop="@dimen/small_space"
+        android:paddingBottom="@dimen/small_space"
+        android:clipToPadding="false"
+        tools:context="ch.berta.fabio.qwittig.ui.PurchaseAddFragment">
 
+        <include layout="@layout/include_purchase_add_edit"/>
+    </ScrollView>
+
+    <ImageButton
+        android:id="@+id/fab_purchase_save"
+        style="@style/FAB"
+        android:contentDescription="@string/add_purchase"
+        android:layout_height="@dimen/fab_size"
+        android:layout_width="@dimen/fab_size"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="@dimen/normal_space"
+        android:layout_marginBottom="@dimen/normal_space"
+        android:src="@drawable/ic_save"/>
+
+</FrameLayout>

@@ -3,12 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="ch.berta.fabio.qwittig.ui.PurchaseEditActivity">
     <item
-        android:id="@+id/action_purchase_save"
-        android:title="@string/action_purchase_save"
-        android:icon="@drawable/ic_action_save"
-        android:orderInCategory="1"
-        app:showAsAction="ifRoom|withText"/>
-    <item
         android:id="@+id/action_purchase_edit_receipt_edit"
         android:title="@string/action_purchase_edit_receipt_edit"
         android:orderInCategory="1"

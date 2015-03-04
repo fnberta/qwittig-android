@@ -190,5 +190,8 @@
     <string name="progress_settings_invite">inviting %1$s...</string>
     <string name="progress_settings_group_new">creating %1$s...</string>
     <string name="progress_compensation_done">accepting payment...</string>
+    <string name="dialog_purchase_discard">Discard</string>
+    <string name="dialog_purchase_discard_message">Do you want to discard or save the purchase as a draft?</string>
+    <string name="dialog_positive_save_draft">Save draft</string>
 
 </resources>
