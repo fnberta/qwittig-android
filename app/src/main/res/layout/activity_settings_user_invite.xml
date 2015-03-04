@@ -6,11 +6,6 @@
     tools:context="ch.berta.fabio.qwittig.ui.SettingsUserInviteActivity">
 
     <include layout="@layout/include_toolbar_x3"/>
-    <include
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/progress_bar_under_toolbar_x3_margin"
-        layout="@layout/include_progress_horizontal"/>
 
     <ImageButton
         android:id="@+id/fab"

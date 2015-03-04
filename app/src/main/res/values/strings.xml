@@ -176,7 +176,7 @@
     <string name="action_drafts_delete_selected">Delete selected Drafts</string>
     <string name="dialog_account_delete_message">Do you really want to delete your account? You cannot undo this!</string>
     <string name="dialog_group_delete_must_be_empty_message">You can only delete a group when you are the only one in it.</string>
-    <string name="user_deleted">DELETED</string>
+    <string name="user_deleted" translatable="false">n/a</string>
     <string name="add_store">Add store</string>
     <string name="dialog_positive_add">Add</string>
     <string name="dialog_group_create">You have to be in a group to add purchases. Would you like to a create a new group?</string>
@@ -185,5 +185,10 @@
     <string name="progress_account_delete">Deleting account...</string>
     <string name="push_user_deleted_alert">Outstanding debts or credits have automatically been cleared.</string>
     <string name="push_user_deleted_title">%1$s deleted his account</string>
+    <string name="progress_login">logging in...</string>
+    <string name="progress_purchase_save">saving purchase...</string>
+    <string name="progress_settings_invite">inviting %1$s...</string>
+    <string name="progress_settings_group_new">creating %1$s...</string>
+    <string name="progress_compensation_done">accepting payment...</string>
 
 </resources>
