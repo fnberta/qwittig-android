@@ -106,10 +106,18 @@
         tools:text="Add item"/>
 
     <include
+        android:id="@+id/total"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/bt_item_add"
         layout="@layout/row_purchase_total"/>
+
+    <include
+        android:id="@+id/my_share"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/total"
+        layout="@layout/row_purchase_my_share"/>
 
 </RelativeLayout>
 

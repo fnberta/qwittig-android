@@ -186,5 +186,6 @@
     <string name="dialog_purchase_discard">Verwerfen</string>
     <string name="dialog_purchase_discard_message">Möchtest du den Einkauf verwerfen oder als Entwurf speichern?</string>
     <string name="dialog_positive_save_draft">Entwurf speichern</string>
+    <string name="purchase_my_share">Mein Anteil:</string>
 
 </resources>

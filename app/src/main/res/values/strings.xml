@@ -193,5 +193,6 @@
     <string name="dialog_purchase_discard">Discard</string>
     <string name="dialog_purchase_discard_message">Do you want to discard or save the purchase as a draft?</string>
     <string name="dialog_positive_save_draft">Save draft</string>
+    <string name="purchase_my_share">My share:</string>
 
 </resources>
