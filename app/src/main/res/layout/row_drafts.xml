@@ -9,7 +9,7 @@
     android:clickable="true">
 
     <TextView
-        android:id="@+id/list_date"
+        android:id="@+id/tv_date"
         style="@style/TextAppearance.AppCompat.Caption"
         android:layout_width="@dimen/avatar_size"
         android:layout_height="@dimen/avatar_size"
@@ -26,27 +26,17 @@
         tools:text="FEB\n24"/>
 
     <TextView
-        android:id="@+id/list_buyer"
+        android:id="@+id/tv_store"
         style="@style/ListTextView"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_toEndOf="@id/list_date"
-        android:gravity="center_vertical"
-        tools:text="Vera"/>
-
-    <TextView
-        android:id="@+id/list_store"
-        style="@style/ListTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_toStartOf="@+id/list_balance_change"
+        android:layout_toEndOf="@id/tv_date"
         android:gravity="center_vertical"
         tools:text="Denner"/>
 
     <TextView
-        android:id="@id/list_balance_change"
+        android:id="@+id/tv_total_value"
         style="@style/ListTextView"
         android:layout_width="@dimen/balance_change_length"
         android:layout_height="@dimen/balance_change_height"
@@ -57,7 +47,7 @@
         android:paddingStart="@dimen/small_space"
         android:paddingEnd="@dimen/small_space"
         android:gravity="center"
-        tools:text="-50"
-        tools:background="@color/green"/>
+        android:background="@color/grey_light"
+        tools:text="-50"/>
 
 </RelativeLayout>
