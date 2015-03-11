@@ -38,7 +38,7 @@
     <string name="action_fake_data">Add fake data</string>
     <string name="pref_group_current">Current group</string>
     <string name="pref_group_add_new">Add new group</string>
-    <string name="pref_group_name">Group name</string>
+    <string name="pref_group_name">Change group name</string>
     <string name="pref_group_add_user">Invite new user</string>
     <string name="action_purchase_delete">Delete purchase</string>
     <string name="toast_purchase_deleted">Purchase deleted</string>
@@ -185,14 +185,16 @@
     <string name="progress_account_delete">Deleting account...</string>
     <string name="push_user_deleted_alert">Outstanding debts or credits have automatically been cleared.</string>
     <string name="push_user_deleted_title">%1$s deleted his account</string>
-    <string name="progress_login">logging in...</string>
-    <string name="progress_purchase_save">saving purchase...</string>
-    <string name="progress_settings_invite">inviting %1$s...</string>
-    <string name="progress_settings_group_new">creating %1$s...</string>
-    <string name="progress_compensation_done">accepting payment...</string>
+    <string name="progress_login">Logging in...</string>
+    <string name="progress_purchase_save">Saving purchase...</string>
+    <string name="progress_settings_invite">Inviting %1$s...</string>
+    <string name="progress_settings_group_new">Creating %1$s...</string>
+    <string name="progress_compensation_done">Accepting payment...</string>
     <string name="dialog_purchase_discard">Discard</string>
     <string name="dialog_purchase_discard_message">Do you want to discard or save the purchase as a draft?</string>
     <string name="dialog_positive_save_draft">Save draft</string>
     <string name="purchase_my_share">My share:</string>
+    <string name="progress_switch_groups">Switching group...</string>
+    <string name="pref_group_name_hint">New group name</string>
 
 </resources>

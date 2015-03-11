@@ -38,7 +38,7 @@
     <string name="pref_group_current">Aktive Gruppe</string>
     <string name="action_fake_data">Fake-Daten hinzufügen</string>
     <string name="pref_group_add_new">Neue Gruppe erstellen</string>
-    <string name="pref_group_name">Gruppenname</string>
+    <string name="pref_group_name">Gruppennamen ändern</string>
     <string name="pref_group_add_user">Neuen Nutzer einladen</string>
     <string name="action_purchase_delete">Einkauf löschen</string>
     <string name="title_activity_settings_group_new">Neue Gruppe erstellen</string>
@@ -178,14 +178,16 @@
     <string name="progress_account_delete">Lösche Account...</string>
     <string name="push_user_deleted_alert">Ausstehende Schulden or Guthaben wurde automatisch abgerechnet.</string>
     <string name="push_user_deleted_title">%1$s hat seinen Account gelöscht</string>
-    <string name="progress_login">anmelden...</string>
-    <string name="progress_purchase_save">speichere Einkauf...</string>
-    <string name="progress_settings_invite">lade %1$s ein...</string>
-    <string name="progress_settings_group_new">erstelle %1$s...</string>
-    <string name="progress_compensation_done">akzeptiere Zahlung...</string>
+    <string name="progress_login">Anmelden...</string>
+    <string name="progress_purchase_save">Speichere Einkauf...</string>
+    <string name="progress_settings_invite">Lade %1$s ein...</string>
+    <string name="progress_settings_group_new">Erstelle %1$s...</string>
+    <string name="progress_compensation_done">Akzeptiere Zahlung...</string>
     <string name="dialog_purchase_discard">Verwerfen</string>
     <string name="dialog_purchase_discard_message">Möchtest du den Einkauf verwerfen oder als Entwurf speichern?</string>
     <string name="dialog_positive_save_draft">Entwurf speichern</string>
     <string name="purchase_my_share">Mein Anteil:</string>
+    <string name="progress_switch_groups">Wechsle Gruppe...</string>
+    <string name="pref_group_name_hint">Neuer Gruppenname</string>
 
 </resources>
