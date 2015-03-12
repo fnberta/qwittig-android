@@ -128,7 +128,7 @@
     <string name="push_compensation_payment_done_alert">%1$s hat deine Zahlung über %2$s akzeptiert</string>
     <string name="push_account_balance_new_title">%1$s hat eine neue Abrechnung gestartet</string>
     <string name="push_account_balance_new_alert">Schau ob du Geld bekommst oder schuldest</string>
-    <string name="dialog_min_one_user">Bitte wähle mindestens einen Nutzer an.</string>
+    <string name="toast_min_one_user">Bitte wähle mindestens einen Nutzer an.</string>
     <string name="toast_min_one_item">Füge mindestens einen Artikel hinzu</string>
     <string name="dialog_store_selector">Wähle ein Geschäft aus der Liste aus oder füge manuell eine Eintrag hinzu.</string>
     <string name="pref_stores">Geschäftsliste</string>

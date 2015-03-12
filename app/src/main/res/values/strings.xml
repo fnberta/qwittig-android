@@ -129,7 +129,7 @@
     <string name="push_compensation_payment_done_alert">%1$s accepted your payment of %2$s</string>
     <string name="push_account_balance_new_title">%1$s started a new settlement</string>
     <string name="push_account_balance_new_alert">Check if you get or owe money</string>
-    <string name="dialog_min_one_user">Please select at least one user.</string>
+    <string name="toast_min_one_user">Please select at least one user.</string>
     <string name="toast_min_one_item">Add at least one item</string>
     <string name="dialog_store_selector">Choose a store from the list or add your own entry.</string>
     <string name="pref_stores">Store list</string>
