@@ -110,7 +110,7 @@
     <string name="title_activity_my_receipts">My receipts</string>
     <string name="title_activity_home">Overview</string>
     <string name="toast_compensation_finish_old">You must finish all existing compensations before you can create a new one.</string>
-    <string name="no_compensations">No compensation payments.</string>
+    <string name="no_compensations">No compensation payments</string>
     <string name="action_compensation_add_manual">Add manual payment</string>
     <string name="title_activity_account_balance_add_manual">Manual payment</string>
     <string name="hint_recipient">Recipient</string>
@@ -171,7 +171,6 @@
     <string name="email_recommend_message">Download Qwittig for iOS and Android. More information at www.qwittig.ch</string>
     <string name="toast_purchase_added_draft">Purchase saved as a draft</string>
     <string name="title_activity_purchase_drafts">Drafts</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_purchase_save_draft">Save as draft</string>
     <string name="action_drafts_delete_selected">Delete selected Drafts</string>
     <string name="dialog_account_delete_message">Do you really want to delete your account? You cannot undo this!</string>
@@ -182,22 +181,22 @@
     <string name="dialog_group_create">You have to be in a group to add purchases. Would you like to a create a new group?</string>
     <string name="dialog_positive_create">Create</string>
     <string name="nickname_me">Me</string>
-    <string name="progress_account_delete">Deleting account...</string>
+    <string name="progress_account_delete">Deleting account…</string>
     <string name="push_user_deleted_alert">Outstanding debts or credits have automatically been cleared.</string>
     <string name="push_user_deleted_title">%1$s deleted his account</string>
-    <string name="progress_login">Logging in...</string>
-    <string name="progress_purchase_save">Saving purchase...</string>
-    <string name="progress_settings_invite">Inviting %1$s...</string>
-    <string name="progress_settings_group_new">Creating %1$s...</string>
-    <string name="progress_compensation_done">Accepting payment...</string>
+    <string name="progress_login">Logging in…</string>
+    <string name="progress_purchase_save">Saving purchase…</string>
+    <string name="progress_settings_invite">Inviting %1$s…</string>
+    <string name="progress_settings_group_new">Creating %1$s…</string>
+    <string name="progress_compensation_done">Accepting payment…</string>
     <string name="dialog_purchase_discard">Discard</string>
     <string name="dialog_purchase_discard_message">Do you want to discard or save the purchase as a draft?</string>
     <string name="dialog_positive_save_draft">Save draft</string>
     <string name="purchase_my_share">My share:</string>
-    <string name="progress_switch_groups">Switching group...</string>
+    <string name="progress_switch_groups">Switching group…</string>
     <string name="pref_group_name_hint">New group name</string>
     <string name="toast_create_image_file_failed">Failed to open camera. Maybe your disk space is full?</string>
     <string name="no_drafts">You have no open drafts.</string>
-    <string name="no_compensations_subhead">To start a new settlement, click on the button.</string>
+    <string name="no_compensations_subhead">To start a new settlement, click on the button!</string>
 
 </resources>
