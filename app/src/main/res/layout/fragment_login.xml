@@ -39,7 +39,7 @@
 
         <Button
             android:id="@+id/bt_login_login"
-            style="@style/RaisedButton"
+            style="@style/RaisedButtonColored"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/key_line_1"
@@ -61,6 +61,7 @@
 
         <Button
             android:id="@+id/bt_login_signup"
+            style="@style/RaisedButtonWhite"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/key_line_1"
@@ -70,6 +71,7 @@
 
         <Button
             android:id="@id/bt_login_tryout"
+            style="@style/RaisedButtonWhite"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/key_line_1"

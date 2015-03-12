@@ -16,4 +16,13 @@
         <item name="android:elevation">@dimen/fab_elevation</item>
         <item name="android:stateListAnimator">@animator/fab_anim</item>
     </style>
+
+    <style name="RaisedButtonColored" parent="RaisedButtonColoredBase">
+        <item name="android:background">@drawable/raised_button_background</item>
+    </style>
+
+    <style name="RaisedButtonWhite" parent="RaisedButtonWhiteBase">
+        <item name="android:background">@drawable/raised_button_background_white</item>
+    </style>
+
 </resources>

@@ -73,6 +73,7 @@
 
         <Button
             android:id="@+id/bt_login_signup"
+            style="@style/RaisedButtonColored"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/login_button_sign_up" />

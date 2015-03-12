@@ -28,7 +28,7 @@
         <item name="android:ellipsize">end</item>
     </style>
 
-    <style name="Subheader">
+    <style name="SubHeader">
         <item name="android:fontFamily">@string/font_fontFamily_medium</item>
         <item name="android:textSize">@dimen/text_size_subheader</item>
         <item name="android:textColor">?attr/colorPrimary</item>
@@ -43,8 +43,20 @@
         <item name="android:background">@drawable/fab_background</item>
     </style>
 
-    <style name="RaisedButton" parent="Widget.AppCompat.Button">
-        <item name="android:background">@drawable/raised_button_background</item>
+    <style name="RaisedButtonColoredBase" parent="Widget.AppCompat.Button">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="RaisedButtonColored" parent="RaisedButtonColoredBase">
+        <item name="android:background">@drawable/button_shape_accent</item>
+    </style>
+
+    <style name="RaisedButtonWhiteBase" parent="Widget.AppCompat.Button">
+        <!--<item name="android:textColor">?attr/colorAccent</item>-->
+    </style>
+
+    <style name="RaisedButtonWhite" parent="RaisedButtonWhiteBase">
+        <item name="android:background">@drawable/button_shape_white</item>
     </style>
 
 </resources>

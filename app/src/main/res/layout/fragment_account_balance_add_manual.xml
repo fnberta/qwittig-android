@@ -11,7 +11,7 @@
         tools:context="ch.berta.fabio.qwittig.ui.AccountBalanceAddManualFragment">
 
         <TextView
-            style="@style/Subheader"
+            style="@style/SubHeader"
             android:layout_width="match_parent"
             android:layout_height="@dimen/subheader_height"
             android:paddingStart="@dimen/key_line_1"
@@ -44,7 +44,7 @@
         </LinearLayout>
 
         <TextView
-            style="@style/Subheader"
+            style="@style/SubHeader"
             android:layout_width="match_parent"
             android:layout_height="@dimen/subheader_height"
             android:paddingStart="@dimen/key_line_1"
@@ -77,7 +77,7 @@
         </LinearLayout>
 
         <TextView
-            style="@style/Subheader"
+            style="@style/SubHeader"
             android:layout_width="match_parent"
             android:layout_height="@dimen/subheader_height"
             android:paddingStart="@dimen/key_line_1"
