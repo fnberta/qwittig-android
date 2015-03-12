@@ -189,5 +189,6 @@
     <string name="purchase_my_share">Mein Anteil:</string>
     <string name="progress_switch_groups">Wechsle Gruppe...</string>
     <string name="pref_group_name_hint">Neuer Gruppenname</string>
+    <string name="toast_create_image_file_failed">Öffnen der Kamera fehlgeschlagen. Vielleicht ist der Speicher voll?</string>
 
 </resources>
