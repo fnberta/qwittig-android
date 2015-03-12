@@ -109,7 +109,7 @@
     <string name="title_activity_my_receipts">Meine Quittungen</string>
     <string name="title_activity_home">Übersicht</string>
     <string name="toast_compensation_finish_old">Du must zuerst die bestehenden Ausgleiche erledigen bevor du einen neuen anlegen kannst</string>
-    <string name="no_compensations">Momentan stehen keine Ausgleichszahlungen an. Um einen neue Abrechnung zu starten, klicke auf den Button!</string>
+    <string name="no_compensations">Keine Ausgleichszahlungen.</string>
     <string name="action_compensation_add_manual">Manuelle Zahlung hinzufügen</string>
     <string name="title_activity_account_balance_add_manual">Manuelle Zahlung</string>
     <string name="hint_recipient">Empfänger</string>
@@ -190,5 +190,7 @@
     <string name="progress_switch_groups">Wechsle Gruppe...</string>
     <string name="pref_group_name_hint">Neuer Gruppenname</string>
     <string name="toast_create_image_file_failed">Öffnen der Kamera fehlgeschlagen. Vielleicht ist der Speicher voll?</string>
+    <string name="no_drafts">Du hast keine offene Entwürfe.</string>
+    <string name="no_compensations_subhead">Um einen neue Abrechnung zu starten, klicke auf den Button!</string>
 
 </resources>

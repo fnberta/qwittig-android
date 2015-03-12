@@ -110,7 +110,7 @@
     <string name="title_activity_my_receipts">My receipts</string>
     <string name="title_activity_home">Overview</string>
     <string name="toast_compensation_finish_old">You must finish all existing compensations before you can create a new one.</string>
-    <string name="no_compensations">At the moment, no compensation payments are scheduled. To start a new settlement, click on the button!</string>
+    <string name="no_compensations">No compensation payments.</string>
     <string name="action_compensation_add_manual">Add manual payment</string>
     <string name="title_activity_account_balance_add_manual">Manual payment</string>
     <string name="hint_recipient">Recipient</string>
@@ -197,5 +197,7 @@
     <string name="progress_switch_groups">Switching group...</string>
     <string name="pref_group_name_hint">New group name</string>
     <string name="toast_create_image_file_failed">Failed to open camera. Maybe your disk space is full?</string>
+    <string name="no_drafts">You have no open drafts.</string>
+    <string name="no_compensations_subhead">To start a new settlement, click on the button.</string>
 
 </resources>
