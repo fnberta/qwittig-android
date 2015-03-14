@@ -198,5 +198,6 @@
     <string name="toast_create_image_file_failed">Failed to open camera. Maybe your disk space is full?</string>
     <string name="no_drafts">You have no open drafts.</string>
     <string name="no_compensations_subhead">To start a new settlement, click on the button!</string>
+    <string name="dialog_account_create">Please create an account to make any changes.</string>
 
 </resources>

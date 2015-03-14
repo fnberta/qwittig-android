@@ -192,5 +192,6 @@
     <string name="toast_create_image_file_failed">Öffnen der Kamera fehlgeschlagen. Vielleicht ist der Speicher voll?</string>
     <string name="no_drafts">Du hast keine offene Entwürfe.</string>
     <string name="no_compensations_subhead">Um einen neue Abrechnung zu starten, klicke auf den Button!</string>
+    <string name="dialog_account_create">Bitte erstelle einen Account um Änderungen vornehmen zu können.</string>
 
 </resources>
