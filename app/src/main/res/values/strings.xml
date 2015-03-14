@@ -70,7 +70,7 @@
     <string name="toast_changes_saved">Changes saved</string>
     <string name="action_purchase_show_receipt">Show receipt</string>
     <string name="toast_changes_discarded">Changes discarded</string>
-    <string name="login_button_tryout">Start without account</string>
+    <string name="login_button_tryout">Test without account</string>
     <string name="login_text_forgot_credentials">Forgot your password?</string>
     <string name="hint_nickname">Nickname</string>
     <string name="hint_password_repeat">Repeat password</string>

@@ -32,7 +32,7 @@
     <string name="title_activity_login">Anmelden</string>
     <string name="login_button_log_in">Anmelden</string>
     <string name="login_button_sign_up">Neuen Account erstellen</string>
-    <string name="login_button_tryout">Ohne Account loslegen</string>
+    <string name="login_button_tryout">Ohne Account testen</string>
     <string name="no_purchases">Noch keine Einkäufe vorhanden</string>
     <string name="no_user">Noch keine Benutzer vorhanden</string>
     <string name="pref_group_current">Aktive Gruppe</string>
