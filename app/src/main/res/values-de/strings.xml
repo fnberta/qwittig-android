@@ -196,5 +196,6 @@
     <string name="progress_compensation_remind">Erinnere %1$s…</string>
     <string name="header_stores_own">Manuell hinzugefügt</string>
     <string name="header_stores_default">Standard</string>
+    <string name="toast_store_already_in_list">Geschäft ist bereits in deiner Liste</string>
 
 </resources>
