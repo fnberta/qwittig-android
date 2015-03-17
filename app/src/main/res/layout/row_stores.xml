@@ -6,28 +6,35 @@
     android:id="@+id/rl_store"
     android:layout_width="match_parent"
     android:layout_height="@dimen/list_with_text"
-    android:background="@drawable/state_selector_selectable_lists"
-    android:clickable="true">
+    android:background="@drawable/state_selector_selectable_lists">
+
+    <ImageView
+        android:id="@+id/iv_store_icon"
+        android:layout_width="@dimen/avatar_size"
+        android:layout_height="@dimen/avatar_size"
+        android:layout_marginStart="@dimen/key_line_1"
+        android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_avatar_size"
+        android:layout_gravity="center_vertical"
+        android:contentDescription="@string/hint_store"
+        tools:src="@drawable/ic_avatar_40dp"/>
 
     <TextView
         android:id="@+id/tv_store_name"
         style="@style/ListTextView"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_marginStart="@dimen/key_line_1"
         android:layout_marginEnd="@dimen/normal_space"
-        android:layout_alignParentStart="true"
+        android:layout_toEndOf="@id/iv_store_icon"
         android:gravity="center_vertical"
         tools:text="Denner"/>
 
-    <ImageView
-        android:id="@+id/iv_drag_handler"
-        android:layout_width="16dp"
-        android:layout_height="match_parent"
+    <CheckBox
+        android:id="@+id/cb_store_favorite"
+        style="?android:attr/starStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/key_line_1"
-        android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:src="@drawable/drag_handler"
-        android:scaleType="fitXY"
-        android:visibility="gone"/>
+        android:layout_centerVertical="true"
+        android:focusable="false"/>
 </RelativeLayout>

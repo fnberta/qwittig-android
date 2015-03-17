@@ -200,5 +200,7 @@
     <string name="no_compensations_subhead">To start a new settlement, click on the button!</string>
     <string name="dialog_account_create">Please create an account to make any changes.</string>
     <string name="progress_compensation_remind">Reminding %1$s…</string>
+    <string name="header_stores_own">Manually added</string>
+    <string name="header_stores_default">Default</string>
 
 </resources>

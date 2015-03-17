@@ -194,5 +194,7 @@
     <string name="no_compensations_subhead">Um einen neue Abrechnung zu starten, klicke auf den Button!</string>
     <string name="dialog_account_create">Bitte erstelle einen Account um Änderungen vornehmen zu können.</string>
     <string name="progress_compensation_remind">Erinnere %1$s…</string>
+    <string name="header_stores_own">Manuell hinzugefügt</string>
+    <string name="header_stores_default">Standard</string>
 
 </resources>
