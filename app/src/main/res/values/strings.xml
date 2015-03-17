@@ -203,5 +203,6 @@
     <string name="header_stores_own">Manually added</string>
     <string name="header_stores_default">Default</string>
     <string name="toast_store_already_in_list">Store is already in your list</string>
+    <string name="toast_group_already_in_list">Group already exists</string>
 
 </resources>

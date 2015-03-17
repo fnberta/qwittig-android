@@ -60,7 +60,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/key_line_1"
-                    android:inputType="textPersonName"
+                    android:inputType="text|textCapSentences"
                     android:hint="@string/hint_group_name"/>
             </LinearLayout>
 
