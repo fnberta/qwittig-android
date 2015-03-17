@@ -6,8 +6,7 @@
     android:id="@+id/rl_store"
     android:layout_width="match_parent"
     android:layout_height="@dimen/list_with_text"
-    android:background="@drawable/state_selector_selectable_lists"
-    android:clickable="true">
+    android:background="@drawable/state_selector_selectable_lists">
 
     <TextView
         android:id="@+id/tv_store_name"
@@ -20,14 +19,13 @@
         android:gravity="center_vertical"
         tools:text="Denner"/>
 
-    <ImageView
-        android:id="@+id/iv_drag_handler"
-        android:layout_width="16dp"
-        android:layout_height="match_parent"
+    <CheckBox
+        android:id="@+id/cb_store_favorite"
+        style="?android:attr/starStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/key_line_1"
-        android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:src="@drawable/drag_handler"
-        android:scaleType="fitXY"
-        android:visibility="gone"/>
+        android:layout_centerVertical="true"
+        android:focusable="false"/>
 </RelativeLayout>
