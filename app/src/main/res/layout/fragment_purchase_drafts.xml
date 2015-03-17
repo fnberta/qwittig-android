@@ -3,14 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <org.lucasr.twowayview.widget.TwoWayView
-        android:id="@+id/rv_drafts"
+    <ListView
+        android:id="@+id/lv_drafts"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingBottom="@dimen/small_space"
         android:clipToPadding="false"
-        android:scrollbars="vertical"
-        android:orientation="vertical"/>
+        android:divider="@null"/>
 
     <LinearLayout
         android:id="@+id/ll_empty_view"

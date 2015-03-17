@@ -5,8 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/list_avatar_with_text"
-    android:background="@drawable/state_selector_selectable_lists"
-    android:clickable="true">
+    android:background="@drawable/state_selector_selectable_lists">
 
     <TextView
         android:id="@+id/tv_date"
