@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         tools:context="ch.berta.fabio.qwittig.ui.LoginFragment">
 
-        <com.rengwuxian.materialedittext.MaterialEditText
+        <com.rengwuxian.materialedittext.MaterialAutoCompleteTextView
             android:id="@+id/et_login_email"
             style="@style/EditText"
             android:layout_width="match_parent"
