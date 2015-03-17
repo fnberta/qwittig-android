@@ -8,23 +8,14 @@
     android:layout_height="@dimen/list_with_text"
     android:background="@drawable/state_selector_selectable_lists">
 
-    <ImageView
-        android:id="@+id/iv_store_icon"
-        android:layout_width="@dimen/avatar_size"
-        android:layout_height="@dimen/avatar_size"
-        android:layout_marginStart="@dimen/key_line_1"
-        android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_avatar_size"
-        android:layout_gravity="center_vertical"
-        android:contentDescription="@string/hint_store"
-        tools:src="@drawable/ic_avatar_40dp"/>
-
     <TextView
         android:id="@+id/tv_store_name"
         style="@style/ListTextView"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:layout_marginStart="@dimen/key_line_1"
         android:layout_marginEnd="@dimen/normal_space"
-        android:layout_toEndOf="@id/iv_store_icon"
+        android:layout_alignParentStart="true"
         android:gravity="center_vertical"
         tools:text="Denner"/>
 
