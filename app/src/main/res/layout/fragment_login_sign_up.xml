@@ -33,7 +33,7 @@
             android:gravity="center_horizontal"
             android:text="@string/user_avatar"/>
 
-        <com.rengwuxian.materialedittext.MaterialEditText
+        <com.rengwuxian.materialedittext.MaterialAutoCompleteTextView
             android:id="@+id/et_login_signup_email"
             style="@style/EditText"
             android:layout_width="match_parent"
