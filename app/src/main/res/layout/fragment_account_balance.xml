@@ -53,7 +53,8 @@
             android:layout_height="@dimen/fab_size"
             android:layout_width="@dimen/fab_size"
             android:layout_marginTop="@dimen/small_space"
-            android:src="@drawable/ic_swap_horiz"/>
+            android:src="@drawable/ic_swap_horiz"
+            android:visibility="invisible"/>
     </LinearLayout>
 
 </FrameLayout>

@@ -16,7 +16,8 @@
         android:layout_gravity="top|start"
         android:layout_marginTop="@dimen/toolbar_x2_minus_fab_size_small_half"
         android:layout_marginStart="@dimen/key_line_1"
-        android:src="@drawable/ic_group_add"/>
+        android:src="@drawable/ic_group_add"
+        android:visibility="invisible"/>
 
     <ScrollView
         android:layout_width="match_parent"

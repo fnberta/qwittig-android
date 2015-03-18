@@ -25,6 +25,7 @@
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="@dimen/normal_space"
         android:layout_marginBottom="@dimen/normal_space"
-        android:src="@drawable/ic_save"/>
+        android:src="@drawable/ic_save"
+        android:visibility="invisible"/>
 
 </FrameLayout>
