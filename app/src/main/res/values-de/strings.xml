@@ -198,5 +198,6 @@
     <string name="header_stores_default">Standard</string>
     <string name="toast_store_already_in_list">Geschäft ist bereits in deiner Liste</string>
     <string name="toast_group_already_in_list">Diese Gruppe existiert bereits</string>
+    <string name="dialog_group_leave_delete_message">Du bist das letzte Mitglied dieser Gruppe. Wenn du sie verlässt, werden die Gruppe und alle dazugehörigen Einkäufe gelöscht!</string>
 
 </resources>
