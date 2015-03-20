@@ -57,10 +57,10 @@
     <string name="desc_user_invite">Um einen neuen Nutzer einzuladen, gib einfach eine Email Adresse an. Der Empfänger erhält dann eine Einladung um deiner Gruppe beizutreten.</string>
     <string name="hint_user_invite_email">E-Mail</string>
     <string name="title_activity_settings_user_invite">Neuen Nutzer einladen</string>
-    <string name="error_group_name">Bitte gib einen Gruppennamen an.</string>
-    <string name="error_email">Bitte gib eine gültige Email Adresse ein.</string>
-    <string name="error_item_name">Bitte gib einen Artikelnamen an.</string>
-    <string name="error_item_price">Bitte gib einen gültigen Preis an.</string>
+    <string name="error_group_name">Bitte gib einen Gruppennamen an</string>
+    <string name="error_email">Bitte gib eine gültige Email Adresse ein</string>
+    <string name="error_item_name">Bitte gib einen Artikelnamen an</string>
+    <string name="error_item_price">Bitte gib einen gültigen Preis an</string>
     <string name="pref_group_leave_group">%1$s verlassen</string>
     <string name="dialog_group_leave_title">Gruppe verlassen</string>
     <string name="dialog_group_leave_message">Willst du diese Gruppe wirklich verlassen?</string>
@@ -73,9 +73,9 @@
     <string name="login_text_forgot_credentials">Passwort vergessen?</string>
     <string name="hint_nickname">Spitzname</string>
     <string name="hint_password_repeat">Passwort wiederholen</string>
-    <string name="error_nickname">Bitte gib einen Spitznamen an.</string>
-    <string name="error_login_password">Bitte gib ein Passwort ein.</string>
-    <string name="error_login_signup_password_nomatch">Passwörter stimmen nicht überein.</string>
+    <string name="error_nickname">Bitte gib einen Spitznamen an</string>
+    <string name="error_login_password">Bitte gib ein Passwort ein</string>
+    <string name="error_login_signup_password_nomatch">Passwörter stimmen nicht überein</string>
     <string name="purchase_total">Total:</string>
     <string name="toast_reset_password_link">Du hast ein Email erhalten mit einem Link, um dein Passwort zurückzusetzen</string>
     <string name="dialog_login_reset_password_title">Passwort zurücksetzen</string>
@@ -92,7 +92,7 @@
     <string name="action_purchase_edit_receipt_edit">Quittung hinzufügen/ersetzen</string>
     <string name="toast_receipt_added">Quittung hinzugefügt</string>
     <string name="toast_receipt_changed">Quittung geändert</string>
-    <string name="error_nickname_length">Spitzname ist zu lang.</string>
+    <string name="error_nickname_length">Spitzname ist zu lang</string>
     <string name="title_activity_account_balance">Kontoausgleich</string>
     <string name="hint_password_new">Neues Passwort</string>
     <string name="add_compensation">Neue Abrechnung starten</string>
@@ -199,5 +199,10 @@
     <string name="toast_store_already_in_list">Geschäft ist bereits in deiner Liste</string>
     <string name="toast_group_already_in_list">Diese Gruppe existiert bereits</string>
     <string name="dialog_group_leave_delete_message">Du bist das letzte Mitglied dieser Gruppe. Wenn du sie verlässt, werden die Gruppe und alle dazugehörigen Einkäufe gelöscht!</string>
+    <string name="dialog_compensation_manual_title">Manuelle Zahlung</string>
+    <string name="progress_compensation_single_save">Speichere Zahlung…</string>
+    <string name="error_item_amount">Bitte gib einen gültigen Betrag an</string>
+    <string name="dialog_positive_pay">Bezahlen</string>
+    <string name="toast_payment_saved">Zahlung an %1$s ausgeführt</string>
 
 </resources>

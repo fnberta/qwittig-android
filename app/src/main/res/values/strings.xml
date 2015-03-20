@@ -57,10 +57,10 @@
     <string name="title_activity_settings_user_invite">Invite new user</string>
     <string name="desc_user_invite">To invite a new user, simply enter an email address. The recipient will receive an invitation to join your group</string>
     <string name="hint_user_invite_email">E-mail</string>
-    <string name="error_group_name">Please enter a group name.</string>
-    <string name="error_email">Please enter a valid email address.</string>
-    <string name="error_item_name">Please enter an article name.</string>
-    <string name="error_item_price">Please enter a valid price.</string>
+    <string name="error_group_name">Please enter a group name</string>
+    <string name="error_email">Please enter a valid email address</string>
+    <string name="error_item_name">Please enter an article name</string>
+    <string name="error_item_price">Please enter a valid price</string>
     <string name="pref_group_leave_group">Leave %1$s</string>
     <string name="dialog_group_leave_title">Leave group</string>
     <string name="dialog_group_leave_message">Do you really want to leave this group?</string>
@@ -74,9 +74,9 @@
     <string name="login_text_forgot_credentials">Forgot your password?</string>
     <string name="hint_nickname">Nickname</string>
     <string name="hint_password_repeat">Repeat password</string>
-    <string name="error_nickname">Please enter a nickname.</string>
-    <string name="error_login_password">Please enter a password.</string>
-    <string name="error_login_signup_password_nomatch">Passwords do not match.</string>
+    <string name="error_nickname">Please enter a nickname</string>
+    <string name="error_login_password">Please enter a password</string>
+    <string name="error_login_signup_password_nomatch">Passwords do not match</string>
     <string name="purchase_total">Total:</string>
     <string name="toast_reset_password_link">You have received an email with a link to reset your password</string>
     <string name="dialog_login_reset_password_title">Reset password</string>
@@ -93,7 +93,7 @@
     <string name="action_purchase_edit_receipt_edit">Add/replace receipt</string>
     <string name="toast_receipt_added">Added receipt</string>
     <string name="toast_receipt_changed">Changed receipt</string>
-    <string name="error_nickname_length">Nickname is too long.</string>
+    <string name="error_nickname_length">Nickname is too long</string>
     <string name="title_activity_account_balance">Balance account</string>
     <string name="hint_password_new">New password</string>
     <string name="add_compensation">Start new settlement</string>
@@ -205,5 +205,10 @@
     <string name="toast_store_already_in_list">Store is already in your list</string>
     <string name="toast_group_already_in_list">Group already exists</string>
     <string name="dialog_group_leave_delete_message">You are the last member of this group. Leaving it will delete the group and all its purchases!</string>
+    <string name="dialog_compensation_manual_title">Manual payment</string>
+    <string name="progress_compensation_single_save">Saving payment…</string>
+    <string name="error_item_amount">Please enter a valid amount</string>
+    <string name="dialog_positive_pay">Pay</string>
+    <string name="toast_payment_saved">Payment to %1$s saved</string>
 
 </resources>

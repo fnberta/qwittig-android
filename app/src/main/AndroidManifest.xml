@@ -136,14 +136,6 @@
                 android:value="ch.berta.fabio.qwittig.ui.HomeActivity" />
         </activity>
         <activity
-            android:name=".ui.AccountBalanceAddManualActivity"
-            android:label="@string/title_activity_account_balance_add_manual"
-            android:parentActivityName=".ui.AccountBalanceActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="ch.berta.fabio.qwittig.ui.AccountBalanceActivity" />
-        </activity>
-        <activity
             android:name=".ui.SettingsStoresActivity"
             android:label="@string/title_activity_settings_stores"
             android:parentActivityName=".ui.SettingsActivity" >
