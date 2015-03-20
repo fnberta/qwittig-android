@@ -46,7 +46,7 @@
     <string name="desc_group_add_new">To add a new group, simply enter a name and a currency. All purchases will be displayed in this currency. If you add a new purchase with another currency, the prices will automatically be converted to the group\'s default currency. You can always change these settings later.</string>
     <string name="hint_group_name">Group name</string>
     <string name="toast_no_connection">No network available, please try again later</string>
-    <string name="toast_group_added">Added and switched to new group</string>
+    <string name="toast_group_added">Added and switched to %1$s</string>
     <string name="hint_group_currency">Currency</string>
     <string name="user_avatar">Profile picture</string>
     <string name="hint_enabled">Enabled</string>
@@ -81,7 +81,7 @@
     <string name="toast_reset_password_link">You have received an email with a link to reset your password</string>
     <string name="dialog_login_reset_password_title">Reset password</string>
     <string name="dialog_login_reset_password_message">Please enter your email address to reset your password.</string>
-    <string name="toast_email_address_taken">This email address is already taken. Please enter another one.</string>
+    <string name="toast_email_address_taken">Email address already taken, please enter another one</string>
     <string name="title_activity_settings_profile">My profile</string>
     <string name="pref_profile">My profile</string>
     <string name="push_purchase_new_alert">%1$s for %2$s</string>
@@ -109,7 +109,7 @@
     <string name="drawer_close">Close navigation drawer</string>
     <string name="title_activity_my_receipts">My receipts</string>
     <string name="title_activity_home">Overview</string>
-    <string name="toast_compensation_finish_old">You must finish all existing compensations before you can create a new one.</string>
+    <string name="toast_compensation_finish_old">All members of the group must haved settled their debts first</string>
     <string name="no_compensations">No compensation payments</string>
     <string name="action_compensation_add_manual">Add manual payment</string>
     <string name="title_activity_account_balance_add_manual">Manual payment</string>
@@ -124,7 +124,7 @@
     <string name="push_compensation_not_now_alert">%1$s will not pay you now</string>
     <string name="toast_compensation_reminded_user">Reminded %1$s to pay his debts</string>
     <string name="toast_compensation_reminded_user_payed">Reminded %1$s that you have paid your debts</string>
-    <string name="toast_unknown_error">An unknown error has occurred, please try again later</string>
+    <string name="toast_unknown_error">Unknown error has occurred, please try again later</string>
     <string name="push_compensation_payment_done_title">Payment done</string>
     <string name="push_compensation_payment_done_alert">%1$s accepted your payment of %2$s</string>
     <string name="push_account_balance_new_title">%1$s started a new settlement</string>

@@ -46,7 +46,7 @@
     <string name="desc_group_add_new">Um eine neue Gruppe hinzufügen, gib einfach einen Namen und eine Währung ein. Alle Einkäufe werden in der ausgewählten Währung angezeigt werden. Wenn du einen Einkauf hinzufügst, werden die Preise automatisch in diese Stadard-Währung umgerechnet. Du kannst diese Einstellungen jederzeit ändern.</string>
     <string name="hint_group_name">Gruppenname</string>
     <string name="toast_no_connection">Kein Netzwerk verfügbar, bitte versuche es später noch einmal</string>
-    <string name="toast_group_added">Neue Gruppe hinzugefügt und zu ihr gewechslet</string>
+    <string name="toast_group_added"> %1$s hinzugefügt und zu ihr gewechslet</string>
     <string name="hint_group_currency">Währung</string>
     <string name="user_avatar">Profilbild</string>
     <string name="hint_enabled">Aktiviert</string>
@@ -80,7 +80,7 @@
     <string name="toast_reset_password_link">Du hast ein Email erhalten mit einem Link, um dein Passwort zurückzusetzen</string>
     <string name="dialog_login_reset_password_title">Passwort zurücksetzen</string>
     <string name="dialog_login_reset_password_message">Gib bitte deine Email Adresse ein um dein Passwort zurückzusetzen.</string>
-    <string name="toast_email_address_taken">Diese Email Adresse ist bereits vergeben. Bitte gib eine andere ein.</string>
+    <string name="toast_email_address_taken">Email Adresse bereits vergeben, btte gib eine andere ein</string>
     <string name="pref_profile">Mein Profil</string>
     <string name="title_activity_settings_profile">Mein Profil</string>
     <string name="push_purchase_new_alert">%1$s für %2$s</string>
@@ -108,7 +108,7 @@
     <string name="drawer_close">Navigationsleiste schliessen</string>
     <string name="title_activity_my_receipts">Meine Quittungen</string>
     <string name="title_activity_home">Übersicht</string>
-    <string name="toast_compensation_finish_old">Du must zuerst die bestehenden Ausgleiche erledigen bevor du einen neuen anlegen kannst</string>
+    <string name="toast_compensation_finish_old">Alle Mitglieder der Gruppe müssen zuerst ihre Schulden begleichen haben</string>
     <string name="no_compensations">Keine Ausgleichszahlungen</string>
     <string name="action_compensation_add_manual">Manuelle Zahlung hinzufügen</string>
     <string name="title_activity_account_balance_add_manual">Manuelle Zahlung</string>
@@ -123,7 +123,7 @@
     <string name="push_compensation_not_now_alert">%1$s wird dich nicht jetzt bezahlen</string>
     <string name="toast_compensation_reminded_user">%1$s wurde erinnert, seine Schulden zu bezahlen</string>
     <string name="toast_compensation_reminded_user_payed">%1$s wurde erinnert, dass du deine Schulden bezahlt hast</string>
-    <string name="toast_unknown_error">Ein unbekannter Fehler ist aufgetreten, bitte versuche es später noch einmal</string>
+    <string name="toast_unknown_error">Unbekannter Fehler ist aufgetreten, bitte versuche es später noch einmal</string>
     <string name="push_compensation_payment_done_title">Bezahlung erledigt</string>
     <string name="push_compensation_payment_done_alert">%1$s hat deine Zahlung über %2$s akzeptiert</string>
     <string name="push_account_balance_new_title">%1$s hat eine neue Abrechnung gestartet</string>

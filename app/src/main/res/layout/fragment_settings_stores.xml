@@ -13,7 +13,7 @@
         android:clipToPadding="false"
         android:divider="@null"/>
 
-    <ImageButton
+    <ch.berta.fabio.qwittig.ui.widgets.FloatingActionButton
         android:id="@+id/fab_add_store"
         style="@style/FAB"
         android:contentDescription="@string/add_store"
