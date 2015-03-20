@@ -108,7 +108,7 @@
     <string name="drawer_close">Navigationsleiste schliessen</string>
     <string name="title_activity_my_receipts">Meine Quittungen</string>
     <string name="title_activity_home">Übersicht</string>
-    <string name="toast_compensation_finish_old">Du must zuerst die bestehenden Ausgleiche erledigen bevor du einen neuen anlegen kannst</string>
+    <string name="toast_compensation_finish_old">Alle Mitglieder der Gruppe müssen zuerst ihre Schulden begleichen haben</string>
     <string name="no_compensations">Keine Ausgleichszahlungen</string>
     <string name="action_compensation_add_manual">Manuelle Zahlung hinzufügen</string>
     <string name="title_activity_account_balance_add_manual">Manuelle Zahlung</string>

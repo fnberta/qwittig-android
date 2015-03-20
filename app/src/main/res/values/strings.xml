@@ -109,7 +109,7 @@
     <string name="drawer_close">Close navigation drawer</string>
     <string name="title_activity_my_receipts">My receipts</string>
     <string name="title_activity_home">Overview</string>
-    <string name="toast_compensation_finish_old">You must finish all existing compensations before you can create a new one.</string>
+    <string name="toast_compensation_finish_old">All members of the group must haved settled their debts first</string>
     <string name="no_compensations">No compensation payments</string>
     <string name="action_compensation_add_manual">Add manual payment</string>
     <string name="title_activity_account_balance_add_manual">Manual payment</string>
