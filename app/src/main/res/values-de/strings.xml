@@ -190,7 +190,7 @@
     <string name="progress_switch_groups">Wechsle Gruppe…</string>
     <string name="pref_group_name_hint">Neuer Gruppenname</string>
     <string name="toast_create_image_file_failed">Öffnen der Kamera fehlgeschlagen. Vielleicht ist der Speicher voll?</string>
-    <string name="no_drafts">Du hast keine offene Entwürfe.</string>
+    <string name="no_drafts">Keine offenen Entwürfe</string>
     <string name="no_compensations_subhead">Um einen neue Abrechnung zu starten, klicke auf den Button!</string>
     <string name="dialog_account_create">Bitte erstelle einen Account um Änderungen vornehmen zu können.</string>
     <string name="progress_compensation_remind">Erinnere %1$s…</string>
