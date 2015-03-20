@@ -1,17 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ListView
-        android:id="@+id/lv_users"
+    <TextView
+        style="@style/SubHeader"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/subheader_height"
+        android:layout_marginTop="@dimen/small_space"
+        android:paddingStart="@dimen/dialog_padding"
+        android:paddingEnd="@dimen/dialog_padding"
+        android:gravity="center_vertical"
+        android:text="@string/hint_recipient"/>
+
+    <Spinner
+        android:id="@+id/sp_users"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:divider="@null"
-        android:paddingBottom="@dimen/dialog_padding"
-        android:clipToPadding="false"
-        android:layout_marginTop="@dimen/normal_space"/>
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="@dimen/dialog_padding"
+        android:layout_marginEnd="@dimen/dialog_padding"/>
+
+    <TextView
+        style="@style/SubHeader"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/subheader_height"
+        android:paddingStart="@dimen/dialog_padding"
+        android:paddingEnd="@dimen/dialog_padding"
+        android:gravity="center_vertical"
+        android:text="@string/hint_amount"/>
+
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:id="@+id/et_amount"
+        style="@style/EditText"
+        app:floatingLabel="none"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dialog_padding"
+        android:layout_marginEnd="@dimen/dialog_padding"
+        android:inputType="numberDecimal"
+        android:hint="@string/hint_amount"/>
 
 </LinearLayout>
