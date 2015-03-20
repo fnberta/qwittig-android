@@ -4,44 +4,28 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
-        android:title="@string/pref_category_me"
-        android:key="pref_category_me">
-        <PreferenceScreen
-            android:title="@string/pref_profile">
-            <intent
-                android:action="android.intent.action.VIEW"
-                android:targetPackage="ch.berta.fabio.qwittig"
-                android:targetClass="ch.berta.fabio.qwittig.ui.SettingsProfileActivity" />
-        </PreferenceScreen>
-        <PreferenceScreen
-            android:title="@string/pref_stores">
-            <intent
-                android:action="android.intent.action.VIEW"
-                android:targetPackage="ch.berta.fabio.qwittig"
-                android:targetClass="ch.berta.fabio.qwittig.ui.SettingsStoresActivity" />
-        </PreferenceScreen>
+        android:key="pref_category_me"
+        android:title="@string/pref_category_me">
+        <Preference
+            android:key="pref_profile"
+            android:title="@string/pref_profile"/>
+        <Preference
+            android:key="pref_stores"
+            android:title="@string/pref_stores"/>
         <ListPreference
             android:key="pref_group_current"
             android:title="@string/pref_group_current"/>
-        <PreferenceScreen
-            android:title="@string/pref_group_add_new">
-            <intent
-                android:action="android.intent.action.VIEW"
-                android:targetPackage="ch.berta.fabio.qwittig"
-                android:targetClass="ch.berta.fabio.qwittig.ui.SettingsGroupNewActivity" />
-        </PreferenceScreen>
+        <Preference
+            android:key="pref_group_add_new"
+            android:title="@string/pref_group_add_new"/>
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="@string/pref_category_current_group"
-        android:key="pref_category_current_group">
-        <PreferenceScreen
-            android:title="@string/pref_group_add_user">
-            <intent
-                android:action="android.intent.action.VIEW"
-                android:targetPackage="ch.berta.fabio.qwittig"
-                android:targetClass="ch.berta.fabio.qwittig.ui.SettingsUserInviteActivity" />
-        </PreferenceScreen>
+        android:key="pref_category_current_group"
+        android:title="@string/pref_category_current_group">
+        <Preference
+            android:key="pref_group_add_user"
+            android:title="@string/pref_group_add_user"/>
         <EditTextPreference
             android:key="pref_group_name"
             android:title="@string/pref_group_name"

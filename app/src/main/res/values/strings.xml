@@ -46,7 +46,7 @@
     <string name="desc_group_add_new">To add a new group, simply enter a name and a currency. All purchases will be displayed in this currency. If you add a new purchase with another currency, the prices will automatically be converted to the group\'s default currency. You can always change these settings later.</string>
     <string name="hint_group_name">Group name</string>
     <string name="toast_no_connection">No network available, please try again later</string>
-    <string name="toast_group_added">Added and switched to new group</string>
+    <string name="toast_group_added">Added and switched to %1$s</string>
     <string name="hint_group_currency">Currency</string>
     <string name="user_avatar">Profile picture</string>
     <string name="hint_enabled">Enabled</string>
