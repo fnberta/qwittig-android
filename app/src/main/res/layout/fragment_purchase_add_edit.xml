@@ -16,7 +16,7 @@
         <include layout="@layout/include_purchase_add_edit"/>
     </ScrollView>
 
-    <ImageButton
+    <ch.berta.fabio.qwittig.ui.widgets.FloatingActionButton
         android:id="@+id/fab_purchase_save"
         style="@style/FAB"
         android:contentDescription="@string/add_purchase"
