@@ -41,6 +41,7 @@
             android:layout_marginTop="@dimen/small_space"
             android:layout_marginBottom="@dimen/small_space"
             android:inputType="textEmailAddress"
+            android:imeOptions="actionNext"
             android:hint="@string/hint_email" />
 
         <com.rengwuxian.materialedittext.MaterialEditText
