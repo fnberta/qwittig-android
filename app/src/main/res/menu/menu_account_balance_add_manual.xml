@@ -3,7 +3,7 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="ch.berta.fabio.qwittig.ui.AccountBalanceAddManualActivity">
     <item
-        android:id="@+id/action_purchase_save"
+        android:id="@+id/action_compensation_save"
         android:title="@string/action_purchase_save"
         android:orderInCategory="1"
         app:showAsAction="ifRoom"/>
