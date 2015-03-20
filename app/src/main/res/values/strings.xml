@@ -81,7 +81,7 @@
     <string name="toast_reset_password_link">You have received an email with a link to reset your password</string>
     <string name="dialog_login_reset_password_title">Reset password</string>
     <string name="dialog_login_reset_password_message">Please enter your email address to reset your password.</string>
-    <string name="toast_email_address_taken">This email address is already taken. Please enter another one.</string>
+    <string name="toast_email_address_taken">Email address already taken, please enter another one</string>
     <string name="title_activity_settings_profile">My profile</string>
     <string name="pref_profile">My profile</string>
     <string name="push_purchase_new_alert">%1$s for %2$s</string>
@@ -124,7 +124,7 @@
     <string name="push_compensation_not_now_alert">%1$s will not pay you now</string>
     <string name="toast_compensation_reminded_user">Reminded %1$s to pay his debts</string>
     <string name="toast_compensation_reminded_user_payed">Reminded %1$s that you have paid your debts</string>
-    <string name="toast_unknown_error">An unknown error has occurred, please try again later</string>
+    <string name="toast_unknown_error">Unknown error has occurred, please try again later</string>
     <string name="push_compensation_payment_done_title">Payment done</string>
     <string name="push_compensation_payment_done_alert">%1$s accepted your payment of %2$s</string>
     <string name="push_account_balance_new_title">%1$s started a new settlement</string>
