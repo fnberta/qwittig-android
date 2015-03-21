@@ -211,4 +211,10 @@
     <string name="dialog_positive_pay">Pay</string>
     <string name="toast_payment_saved">Payment to %1$s saved</string>
 
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="tab_compensations_new">Current</string>
+    <string name="tab_compensations_history">Past</string>
+    <string name="progress_account_balance_new">Calculating new settlement…</string>
+
 </resources>
