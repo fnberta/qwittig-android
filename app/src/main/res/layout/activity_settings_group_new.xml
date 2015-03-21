@@ -83,9 +83,8 @@
 
                 <Spinner
                     android:id="@+id/sp_settings_group_add_new_currency"
-                    style="@style/Widget.AppCompat.Spinner"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/touch_target_min"
+                    android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/key_line_1"/>
             </LinearLayout>
         </LinearLayout>
