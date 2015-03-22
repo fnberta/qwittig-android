@@ -5,6 +5,5 @@
     style="?android:attr/progressBarStyleHorizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/progress_bar_under_toolbar_margin"
     android:visibility="invisible"
     android:indeterminate="true"/>

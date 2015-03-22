@@ -7,21 +7,15 @@
     android:fitsSystemWindows="true"
     tools:context="ch.berta.fabio.qwittig.ui.AccountBalanceActivity">
 
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <include layout="@layout/include_toolbar"/>
-        <include layout="@layout/include_progress_horizontal"/>
+        <include layout="@layout/include_toolbar_account_balance"/>
+        <include layout="@layout/include_sliding_tabs"/>
 
-        <FrameLayout
-            android:id="@+id/container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="?attr/actionBarSize"
-            tools:ignore="MergeRootFrame"/>
-
-    </FrameLayout>
+    </LinearLayout>
 
     <include layout="@layout/include_navdrawer"/>
 
