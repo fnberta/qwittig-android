@@ -11,7 +11,8 @@
         android:layout_height="match_parent"
         android:paddingBottom="@dimen/small_space"
         android:clipToPadding="false"
-        android:divider="@null"/>
+        android:divider="@null"
+        android:transitionGroup="true"/>
 
     <ch.berta.fabio.qwittig.ui.widgets.FloatingActionButton
         android:id="@+id/fab_add_store"
