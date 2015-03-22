@@ -43,7 +43,7 @@
     <string name="action_purchase_delete">Einkauf löschen</string>
     <string name="title_activity_settings_group_new">Neue Gruppe erstellen</string>
     <string name="toast_purchase_deleted">Einkauf gelöscht</string>
-    <string name="desc_group_add_new">Um eine neue Gruppe hinzufügen, gib einfach einen Namen und eine Währung ein. Alle Einkäufe werden in der ausgewählten Währung angezeigt werden. Wenn du einen Einkauf hinzufügst, werden die Preise automatisch in diese Stadard-Währung umgerechnet. Du kannst diese Einstellungen jederzeit ändern.</string>
+    <string name="desc_group_add_new">Um eine neue Gruppe hinzufügen, gib einfach einen Namen und eine Währung ein. Alle Einkäufe werden in der ausgewählten Währung angezeigt werden. Wenn du einen Einkauf hinzufügst, werden die Preise automatisch in diese Standard-Währung umgerechnet. Beachte, dass die Standard-Währung einer Gruppe nachträglich nicht mehr ändern kannst.</string>
     <string name="hint_group_name">Gruppenname</string>
     <string name="toast_no_connection">Kein Netzwerk verfügbar, bitte versuche es später noch einmal</string>
     <string name="toast_group_added"> %1$s hinzugefügt und zu ihr gewechslet</string>
@@ -112,7 +112,7 @@
     <string name="no_compensations">Keine Ausgleichszahlungen</string>
     <string name="action_compensation_add_manual">Manuelle Zahlung hinzufügen</string>
     <string name="title_activity_account_balance_add_manual">Manuelle Zahlung</string>
-    <string name="hint_recipient">Empfänger</string>
+    <string name="header_recipient_amount">Empfänger und Betrag</string>
     <string name="hint_amount">Betrag</string>
     <string name="action_compensation_not_now">Nicht jetzt</string>
     <string name="push_compensation_remind_title">Bezahle deine Schulden</string>
@@ -130,7 +130,7 @@
     <string name="push_account_balance_new_alert">Schau ob du Geld bekommst oder schuldest</string>
     <string name="toast_min_one_user">Bitte wähle mindestens einen Nutzer an.</string>
     <string name="toast_min_one_item">Füge mindestens einen Artikel hinzu</string>
-    <string name="dialog_store_selector">Wähle ein Geschäft aus der Liste aus oder füge manuell eine Eintrag hinzu.</string>
+    <string name="dialog_store_selector">Wähle ein Geschäft aus der Liste aus oder füge manuell ein neues hinzu.</string>
     <string name="pref_stores">Geschäftsliste</string>
     <string name="pref_category_me">Ich</string>
     <string name="pref_category_current_group">Aktuelle Gruppe</string>
@@ -210,5 +210,6 @@
     <string name="header_users_invited">Bereits eingeladen</string>
     <string name="hint_clear">Entfernen</string>
     <string name="no_invitations">Keine offenen Einladungen</string>
+    <string name="hint_store_new">Neues Geschäft</string>
 
 </resources>

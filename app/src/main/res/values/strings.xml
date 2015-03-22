@@ -43,7 +43,7 @@
     <string name="action_purchase_delete">Delete purchase</string>
     <string name="toast_purchase_deleted">Purchase deleted</string>
     <string name="title_activity_settings_group_new">Add new group</string>
-    <string name="desc_group_add_new">To add a new group, simply enter a name and a currency. All purchases will be displayed in this currency. If you add a new purchase with another currency, the prices will automatically be converted to the group\'s default currency. You can always change these settings later.</string>
+    <string name="desc_group_add_new">To add a new group, simply enter a name and a currency. All purchases will be displayed in this currency. If you add a new purchase with another currency, the prices will automatically be converted to the group\'s default currency. Note that you cannot change the default currency of a group later.</string>
     <string name="hint_group_name">Group name</string>
     <string name="toast_no_connection">No network available, please try again later</string>
     <string name="toast_group_added">Added and switched to %1$s</string>
@@ -113,7 +113,7 @@
     <string name="no_compensations">No compensation payments</string>
     <string name="action_compensation_add_manual">Add manual payment</string>
     <string name="title_activity_account_balance_add_manual">Manual payment</string>
-    <string name="hint_recipient">Recipient</string>
+    <string name="header_recipient_amount">Recipient and amount</string>
     <string name="hint_amount">Amount</string>
     <string name="action_compensation_not_now">Not now</string>
     <string name="push_compensation_remind_title">Pay your debts</string>
@@ -219,5 +219,6 @@
     <string name="tab_compensations_new">Current</string>
     <string name="tab_compensations_history">Past</string>
     <string name="progress_account_balance_new">Calculating new settlement…</string>
+    <string name="hint_store_new">New store</string>
 
 </resources>
