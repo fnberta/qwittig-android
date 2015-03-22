@@ -18,7 +18,7 @@
         android:contentDescription="@string/hint_users"/>
 
     <TextView
-        android:id="@+id/tv_invite_user"
+        android:id="@+id/tv_invited_user"
         style="@style/TextAppearance.AppCompat.Subhead"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
@@ -27,7 +27,7 @@
         tools:text="fabio@qwittig.ch"/>
 
     <ImageView
-        android:id="@+id/iv_clear"
+        android:id="@+id/iv_clear_invite"
         android:layout_width="@dimen/touch_target_min"
         android:layout_height="match_parent"
         android:padding="12dp"
