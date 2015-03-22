@@ -210,5 +210,7 @@
     <string name="error_item_amount">Please enter a valid amount</string>
     <string name="dialog_positive_pay">Pay</string>
     <string name="toast_payment_saved">Payment to %1$s saved</string>
+    <string name="header_users_invited">Already invited</string>
+    <string name="hint_clear">Remove</string>
 
 </resources>

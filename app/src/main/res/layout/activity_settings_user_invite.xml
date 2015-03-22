@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     tools:context="ch.berta.fabio.qwittig.ui.SettingsUserInviteActivity">
 
-    <include layout="@layout/include_toolbar_x3"/>
+    <include layout="@layout/include_toolbar_x2"/>
 
     <ImageButton
         android:id="@+id/fab"
@@ -14,56 +14,16 @@
         android:layout_height="@dimen/fab_size_small"
         android:layout_width="@dimen/fab_size_small"
         android:layout_gravity="top|start"
-        android:layout_marginTop="@dimen/toolbar_x3_minus_fab_size_small_half"
+        android:layout_marginTop="@dimen/toolbar_x2_minus_fab_size_small_half"
         android:layout_marginStart="@dimen/key_line_1"
         android:src="@drawable/ic_person_add"
         android:visibility="invisible"/>
 
-    <ScrollView
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_settings_user_invite"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/toolbar_height_x3">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                style="@style/Base.TextAppearance.AppCompat.Subhead"
-                android:text="@string/desc_user_invite"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/key_line_2"
-                android:layout_marginEnd="@dimen/key_line_1"
-                android:layout_marginTop="@dimen/small_space"
-                android:layout_marginBottom="@dimen/small_space"/>
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/small_space"
-                android:layout_marginBottom="@dimen/small_space">
-
-                <ImageView
-                    android:layout_width="@dimen/icon_size"
-                    android:layout_height="@dimen/icon_size"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="@dimen/key_line_1"
-                    android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
-                    android:contentDescription="@string/hint_email"
-                    android:src="@drawable/ic_email"/>
-
-                <com.rengwuxian.materialedittext.MaterialEditText
-                    android:id="@+id/et_settings_user_invite_email"
-                    style="@style/EditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/key_line_1"
-                    android:inputType="textEmailAddress"
-                    android:hint="@string/hint_user_invite_email"/>
-            </LinearLayout>
-        </LinearLayout>
-    </ScrollView>
+        android:layout_marginTop="@dimen/toolbar_height_x2"
+        android:paddingBottom="@dimen/small_space"
+        android:clipToPadding="false"/>
 </FrameLayout>

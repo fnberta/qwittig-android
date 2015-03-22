@@ -204,5 +204,7 @@
     <string name="error_item_amount">Bitte gib einen gültigen Betrag an</string>
     <string name="dialog_positive_pay">Bezahlen</string>
     <string name="toast_payment_saved">Zahlung an %1$s ausgeführt</string>
+    <string name="header_users_invited">Bereits eingeladen</string>
+    <string name="hint_clear">Entfernen</string>
 
 </resources>
