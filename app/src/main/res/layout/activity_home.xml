@@ -7,13 +7,10 @@
     android:fitsSystemWindows="true"
     tools:context="ch.berta.fabio.qwittig.ui.HomeActivity">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:transitionGroup="true">
-
-        <include layout="@layout/include_toolbar_home"/>
 
         <FrameLayout
             android:id="@+id/container"
@@ -21,7 +18,9 @@
             android:layout_height="match_parent"
             tools:ignore="MergeRootFrame"/>
 
-    </LinearLayout>
+        <include layout="@layout/include_toolbar_home"/>
+
+    </FrameLayout>
 
     <include layout="@layout/include_navdrawer"/>
 

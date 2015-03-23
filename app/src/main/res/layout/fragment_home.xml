@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context="ch.berta.fabio.qwittig.ui.HomeFragment">
 
-    <include layout="@layout/include_sliding_tabs"/>
+    <include layout="@layout/include_sliding_tabs_x2"/>
 
     <ch.berta.fabio.qwittig.ui.widgets.FloatingActionButton
         android:id="@+id/fab_auto"
