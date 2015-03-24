@@ -4,13 +4,31 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <include
+    <LinearLayout
         android:id="@+id/ll_user"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
-        layout="@layout/row_recycler_user"/>
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="@dimen/icon_size"
+            android:layout_height="@dimen/icon_size"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="@dimen/key_line_1"
+            android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+            android:contentDescription="@string/hint_users"
+            android:src="@drawable/ic_group"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_users_involved"
+            android:clipToPadding="false"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/avatar_plus_caption_plus_padding"
+            android:layout_marginEnd="@dimen/key_line_2"/>
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/ll_date"
