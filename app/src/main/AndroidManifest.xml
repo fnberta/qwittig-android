@@ -79,7 +79,7 @@
         </activity>
         <activity
             android:name=".ui.PurchaseAddActivity"
-            android:label="@string/title_activity_add_purchase_manually"
+            android:label="@string/title_activity_add_purchase"
             android:parentActivityName=".ui.HomeActivity"
             android:windowSoftInputMode="stateUnchanged" >
             <meta-data

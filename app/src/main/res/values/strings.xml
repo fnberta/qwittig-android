@@ -4,7 +4,7 @@
     <string name="app_name">Qwittig</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_purchase_details">Purchase details</string>
-    <string name="title_activity_add_purchase_manually">New purchase</string>
+    <string name="title_activity_add_purchase">New purchase</string>
     <string name="tab_purchases">Purchases</string>
     <string name="tab_users">Users</string>
     <string name="action_balance">Balance Account</string>

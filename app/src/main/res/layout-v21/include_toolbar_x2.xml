@@ -2,15 +2,15 @@
 <android.support.v7.widget.Toolbar
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/toolbar"
     android:layout_height="@dimen/toolbar_height_x2"
     android:layout_width="match_parent"
     android:paddingBottom="@dimen/normal_space"
-    android:minHeight="?attr/actionBarSize"
+    android:minHeight="0dp"
     android:background="?attr/colorPrimary"
-    android:elevation="@dimen/toolbar_elevation"
     android:gravity="bottom"
+    android:elevation="@dimen/toolbar_elevation"
+    app:titleTextAppearance="@style/Base.TextAppearance.AppCompat.Title"
     app:contentInsetStart="@dimen/key_line_2"
     app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
     app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>

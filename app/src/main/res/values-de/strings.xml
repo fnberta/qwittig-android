@@ -12,7 +12,7 @@
     <string name="action_balance">Konto ausgleichen</string>
     <string name="action_settings">Einstellungen</string>
     <string name="add_purchase">Neuen Einkauf hinzufügen</string>
-    <string name="title_activity_add_purchase_manually">Neuer Einkauf</string>
+    <string name="title_activity_add_purchase">Neuer Einkauf</string>
     <string name="button_add">Hinzufügen</string>
     <string name="action_purchase_discard">Einkauf verwerfen</string>
     <string name="header_date_and_store">Datum und Geschäft</string>

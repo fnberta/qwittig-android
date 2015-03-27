@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Toolbar -->
+    <dimen name="toolbar_height_x2">96dp</dimen>
+    <dimen name="toolbar_height_x2_plus_tabs">144dp</dimen>
+    <dimen name="toolbar_x2_minus_fab_size_half">68dp</dimen>
+    <dimen name="toolbar_x2_minus_fab_size_small_half">76dp</dimen>
+
+</resources>

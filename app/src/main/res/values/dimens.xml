@@ -33,17 +33,11 @@
     <dimen name="key_line_2_minus_key_line_1_minus_checkbox">28dp</dimen>
 
     <!-- Toolbar -->
-    <dimen name="toolbar_height_extended">128dp</dimen>
     <dimen name="toolbar_height_x2">112dp</dimen>
     <dimen name="toolbar_height_x2_plus_tabs">160dp</dimen>
-    <dimen name="toolbar_height_x3">168dp</dimen>
-    <dimen name="toolbar_height_x4">224dp</dimen>
     <dimen name="toolbar_elevation">4dp</dimen>
-    <dimen name="toolbar_extended_minus_fab_size_half">100dp</dimen>
-    <dimen name="toolbar_extended_minus_fab_size_small_half">108dp</dimen>
     <dimen name="toolbar_x2_minus_fab_size_half">84dp</dimen>
     <dimen name="toolbar_x2_minus_fab_size_small_half">92dp</dimen>
-    <dimen name="toolbar_x3_minus_fab_size_small_half">148dp</dimen>
 
     <!-- NavDrawer -->
     <dimen name="navdrawer_elevation">12dp</dimen>
