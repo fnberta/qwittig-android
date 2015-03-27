@@ -40,10 +40,12 @@
     <dimen name="toolbar_x2_minus_fab_size_small_half">92dp</dimen>
 
     <!-- NavDrawer -->
-    <dimen name="navdrawer_elevation">12dp</dimen>
-    <dimen name="navdrawer_chosen_account_height">140dp</dimen>
     <dimen name="navdrawer_width">304dp</dimen>
+    <dimen name="navdrawer_max_width">320dp</dimen>
     <dimen name="navdrawer_status_bar_plus_normal_space">40dp</dimen>
+    <dimen name="navdrawer_elevation">12dp</dimen>
+    <dimen name="navdrawer_chosen_account_height">164dp</dimen>
+    <dimen name="navdrawer_profile_avatar_size">64dp</dimen>
 
     <!-- List tile heights -->
     <dimen name="list_with_text">48dp</dimen>
