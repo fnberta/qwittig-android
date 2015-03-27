@@ -23,9 +23,7 @@
 
     <!-- Avatar and Icons-->
     <dimen name="avatar_size">40dp</dimen>
-    <dimen name="avatar_size_1.5x">60dp</dimen>
     <dimen name="avatar_size_2x">80dp</dimen>
-    <dimen name="avatar_size_3x">120dp</dimen>
     <dimen name="icon_size">24dp</dimen>
 
     <!-- Checkbox special margins -->
@@ -40,7 +38,6 @@
     <dimen name="toolbar_x2_minus_fab_size_small_half">92dp</dimen>
 
     <!-- NavDrawer -->
-    <dimen name="navdrawer_width">304dp</dimen>
     <dimen name="navdrawer_max_width">320dp</dimen>
     <dimen name="navdrawer_status_bar_plus_normal_space">40dp</dimen>
     <dimen name="navdrawer_elevation">12dp</dimen>
@@ -68,11 +65,6 @@
     <!-- Dialog -->
     <dimen name="dialog_padding">24dp</dimen>
 
-    <!-- ProgressBar -->
-    <dimen name="progress_bar_under_toolbar_margin">50dp</dimen>
-    <dimen name="progress_bar_under_toolbar_x2_margin">106dp</dimen>
-    <dimen name="progress_bar_under_toolbar_x3_margin">162dp</dimen>
-
     <!-- FAB -->
     <dimen name="fab_elevation">8dp</dimen>
     <dimen name="fab_elevation_press">14dp</dimen>
@@ -87,8 +79,6 @@
 
     <!-- Tab -->
     <dimen name="tab_height">48dp</dimen>
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
 
     <!-- Swipe Refresh Layout -->
     <dimen name="srl_length">72dp</dimen>
