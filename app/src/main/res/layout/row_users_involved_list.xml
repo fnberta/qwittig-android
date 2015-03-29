@@ -6,16 +6,14 @@
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    android:layout_marginTop="@dimen/small_space"
-    android:layout_marginBottom="@dimen/small_space"
-    android:layout_marginEnd="@dimen/normal_space">
+    android:layout_marginEnd="@dimen/normal_space"
+    android:gravity="center">
 
     <ImageView
         android:id="@+id/user_avatar"
         android:layout_width="@dimen/avatar_size"
         android:layout_height="@dimen/avatar_size"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="4dp"
+        android:layout_marginBottom="@dimen/min_space"
         android:contentDescription="@string/user_avatar"
         tools:src="@drawable/ic_avatar_40dp"/>
 
@@ -24,7 +22,6 @@
         style="@style/TextAppearance.AppCompat.Caption"
         android:layout_width="@dimen/avatar_size"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
         android:gravity="center_horizontal"
         android:ellipsize="marquee"
         tools:text="Vera"/>

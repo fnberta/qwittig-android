@@ -14,26 +14,16 @@
         android:clipToPadding="false"
         android:divider="@null"/>
 
-    <LinearLayout
-        android:id="@+id/ll_empty_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:visibility="gone">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/small_space"
-            android:src="@drawable/ic_folder_open"
-            android:contentDescription="@string/no_drafts"/>
-
-        <TextView
-            style="@style/Base.TextAppearance.AppCompat.Title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/no_drafts"/>
-    </LinearLayout>
+    <TextView
+        android:id="@+id/tv_empty_view"
+        style="@style/Base.TextAppearance.AppCompat.Title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:drawableTop="@drawable/ic_folder_open"
+        android:drawablePadding="@dimen/small_space"
+        android:visibility="gone"
+        android:text="@string/no_drafts"
+        tools:visibility="visible"/>
 
 </FrameLayout>

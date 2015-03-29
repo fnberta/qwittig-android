@@ -51,7 +51,7 @@
     <dimen name="list_avatar_with_text_double">112dp</dimen>
     <dimen name="list_avatar_with_two_line_text">72dp</dimen>
     <dimen name="list_avatar_with_three_line_text">88dp</dimen>
-    <dimen name="avatar_plus_caption_plus_padding">76dp</dimen>
+    <dimen name="avatar_plus_caption_plus_padding">72dp</dimen>
     <dimen name="subheader_height">48dp</dimen>
 
     <!-- Button -->

@@ -30,66 +30,37 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/ll_date"
+    <TextView
+        android:id="@+id/bt_date"
+        style="@style/TextAppearance.AppCompat.Subhead"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/touch_target_min"
         android:layout_alignParentStart="true"
         android:layout_below="@id/ll_user"
         android:layout_marginTop="@dimen/small_space"
-        android:orientation="horizontal">
+        android:paddingStart="@dimen/key_line_1"
+        android:paddingEnd="@dimen/key_line_1"
+        android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground"
+        android:drawableStart="@drawable/ic_event"
+        android:drawablePadding="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+        tools:text="27. November 2014"/>
 
-        <ImageView
-            android:layout_width="@dimen/icon_size"
-            android:layout_height="@dimen/icon_size"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="@dimen/key_line_1"
-            android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
-            android:contentDescription="@string/hint_date"
-            android:src="@drawable/ic_event"/>
-
-        <TextView
-            android:id="@+id/bt_date"
-            style="@style/TextAppearance.AppCompat.Subhead"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/touch_target_min"
-            android:paddingEnd="@dimen/key_line_1"
-            android:gravity="center_vertical"
-            android:background="?android:attr/selectableItemBackground"
-            tools:text="27. November 2014"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/ll_store"
+    <TextView
+        android:id="@+id/tv_store"
+        style="@style/TextAppearance.AppCompat.Subhead"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/touch_target_min"
         android:layout_alignParentStart="true"
-        android:layout_below="@id/ll_date"
+        android:layout_below="@id/bt_date"
         android:layout_marginTop="@dimen/small_space"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:layout_width="@dimen/icon_size"
-            android:layout_height="@dimen/icon_size"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="@dimen/key_line_1"
-            android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
-            android:contentDescription="@string/hint_store"
-            android:src="@drawable/ic_local_grocery_store"/>
-
-        <TextView
-            android:id="@+id/tv_store"
-            style="@style/TextAppearance.AppCompat.Subhead"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/touch_target_min"
-            android:paddingEnd="@dimen/key_line_1"
-            android:gravity="center_vertical"
-            android:background="?android:attr/selectableItemBackground"
-            tools:text="Denner"/>
-
-    </LinearLayout>
-
+        android:paddingStart="@dimen/key_line_1"
+        android:paddingEnd="@dimen/key_line_1"
+        android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground"
+        android:drawableStart="@drawable/ic_local_grocery_store"
+        android:drawablePadding="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+        tools:text="Denner"/>
 
     <TextView
         android:id="@+id/tv_header_articles"
@@ -97,7 +68,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/subheader_height"
         android:layout_alignParentStart="true"
-        android:layout_below="@id/ll_store"
+        android:layout_below="@id/tv_store"
         android:paddingStart="@dimen/key_line_1"
         android:paddingEnd="@dimen/key_line_1"
         android:gravity="center_vertical"
