@@ -211,5 +211,6 @@
     <string name="hint_clear">Entfernen</string>
     <string name="no_invitations">Keine offenen Einladungen</string>
     <string name="hint_store_new">Neues Geschäft</string>
+    <string name="header_purchase">Einkauf</string>
 
 </resources>
