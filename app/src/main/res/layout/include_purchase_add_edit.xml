@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_below="@id/tv_header_purchase"
-        layout="@layout/row_recycler_user"gi/>
+        layout="@layout/row_recycler_user"/>
 
     <TextView
         android:id="@+id/bt_date"
