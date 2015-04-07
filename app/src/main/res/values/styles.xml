@@ -35,8 +35,8 @@
     </style>
 
     <style name="EditText">
-        <item name="ch.berta.fabio.qwittig:floatingLabel">highlight</item>
-        <item name="ch.berta.fabio.qwittig:primaryColor">?attr/colorAccent</item>
+        <item name="ch.berta.fabio.qwittig:met_floatingLabel">highlight</item>
+        <item name="ch.berta.fabio.qwittig:met_primaryColor">?attr/colorAccent</item>
     </style>
 
     <style name="FAB">

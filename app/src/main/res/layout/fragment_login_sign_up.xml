@@ -70,7 +70,7 @@
             android:layout_marginBottom="@dimen/small_space"
             android:inputType="textPersonName"
             android:hint="@string/hint_nickname"
-            app:maxCharacters="10"/>
+            app:met_maxCharacters="10"/>
 
         <Button
             android:id="@+id/bt_login_signup"

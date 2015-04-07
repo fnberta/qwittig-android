@@ -27,7 +27,7 @@
     <com.rengwuxian.materialedittext.MaterialEditText
         android:id="@+id/et_amount"
         style="@style/EditText"
-        app:floatingLabel="none"
+        app:met_floatingLabel="none"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/small_space"

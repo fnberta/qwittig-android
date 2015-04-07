@@ -24,7 +24,7 @@
         <com.rengwuxian.materialedittext.MaterialEditText
             android:id="@+id/et_item_name"
             style="@style/EditText"
-            app:floatingLabel="none"
+            app:met_floatingLabel="none"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.7"
@@ -35,7 +35,7 @@
         <com.rengwuxian.materialedittext.MaterialEditText
             android:id="@+id/et_item_price"
             style="@style/EditText"
-            app:floatingLabel="none"
+            app:met_floatingLabel="none"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.3"
