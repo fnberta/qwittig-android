@@ -221,5 +221,7 @@
     <string name="progress_account_balance_new">Calculating new settlement…</string>
     <string name="hint_store_new">New store</string>
     <string name="header_purchase">Purchase</string>
+    <string name="action_purchase_edit_save_changes_draft">Save changes in draft</string>
+    <string name="toast_changes_saved_as_draft">Changes saved in draft</string>
 
 </resources>
