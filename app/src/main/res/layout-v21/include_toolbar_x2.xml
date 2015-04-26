@@ -12,5 +12,5 @@
     android:elevation="@dimen/toolbar_elevation"
     app:titleTextAppearance="@style/Base.TextAppearance.AppCompat.Title"
     app:contentInsetStart="@dimen/key_line_2"
-    app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
     app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
