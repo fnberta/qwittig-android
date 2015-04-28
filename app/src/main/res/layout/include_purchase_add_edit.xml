@@ -88,19 +88,70 @@
         android:text="@string/button_add_item"
         tools:text="Add item"/>
 
-    <include
-        android:id="@+id/total"
+    <View
+        android:id="@+id/divider"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="1dp"
         android:layout_below="@id/bt_item_add"
-        layout="@layout/row_purchase_total"/>
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="@dimen/small_space"
+        android:layout_marginStart="@dimen/key_line_2"
+        android:layout_marginEnd="@dimen/key_line_1"
+        android:background="?android:attr/listDivider"/>
 
-    <include
-        android:id="@+id/my_share"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/tv_total_text"
+        style="@style/Base.TextAppearance.AppCompat.Title"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/touch_target_min"
+        android:gravity="center_vertical"
+        android:layout_below="@id/divider"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="@dimen/normal_space"
+        android:layout_marginStart="@dimen/key_line_2"
+        android:text="@string/purchase_total"/>
+
+    <TextView
+        android:id="@+id/tv_total_value"
+        style="@style/Base.TextAppearance.AppCompat.Title"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/touch_target_min"
+        android:gravity="center_vertical"
+        android:layout_below="@id/divider"
+        android:layout_toStartOf="@+id/sp_currency"
+        android:layout_marginTop="@dimen/normal_space"
+        tools:text="124.50"/>
+
+    <Spinner
+        android:id="@id/sp_currency"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/touch_target_min"
+        android:layout_below="@id/divider"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="@dimen/normal_space"
+        android:layout_marginStart="@dimen/min_space"
+        android:layout_marginEnd="@dimen/key_line_1">
+    </Spinner>
+
+    <TextView
+        style="@style/Base.TextAppearance.AppCompat.Title"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/total"
-        layout="@layout/row_purchase_my_share"/>
+        android:layout_below="@id/tv_total_text"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="@dimen/key_line_2"
+        android:textColor="?attr/colorAccent"
+        android:text="@string/purchase_my_share"/>
+
+    <TextView
+        android:id="@+id/tv_my_share_value"
+        style="@style/Base.TextAppearance.AppCompat.Title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_total_value"
+        android:layout_alignStart="@id/tv_total_value"
+        android:textColor="?attr/colorAccent"
+        tools:text="124.50"/>
 
 </RelativeLayout>
 
