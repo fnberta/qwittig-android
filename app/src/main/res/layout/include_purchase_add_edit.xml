@@ -149,9 +149,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_total_value"
-        android:layout_alignStart="@id/tv_total_value"
+        android:layout_alignEnd="@id/tv_total_value"
         android:textColor="?attr/colorAccent"
         tools:text="124.50"/>
+
+    <TextView
+        android:id="@+id/tv_my_share_currency"
+        style="@style/Base.TextAppearance.AppCompat.Title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_total_value"
+        android:layout_alignStart="@id/sp_currency"
+        android:textColor="?attr/colorAccent"
+        tools:text="CHF"/>
 
 </RelativeLayout>
 
