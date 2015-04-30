@@ -146,7 +146,7 @@
     <string name="dialog_group_join_title">Join %1$s?</string>
     <string name="dialog_group_join_message">%1$s invited you to join %2$s. By accepting the invitation your current group will change to the new one.</string>
     <string name="dialog_positive_join">Join</string>
-    <string name="dialog_negative_discard_invitation">Discard </string>
+    <string name="dialog_negative_discard">Discard </string>
     <string name="dialog_neutral_decide_later">Later</string>
     <string name="toast_already_in_group">%1$s is already in your group</string>
     <string name="toast_already_invited">%1$s was already invited to your group</string>
@@ -223,5 +223,6 @@
     <string name="header_purchase">Purchase</string>
     <string name="action_purchase_edit_save_changes_draft">Save changes in draft</string>
     <string name="toast_changes_saved_as_draft">Changes saved in draft</string>
+    <string name="dialog_discard_changes_message">Discard changes?</string>
 
 </resources>

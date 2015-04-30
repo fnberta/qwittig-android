@@ -145,7 +145,7 @@
     <string name="dialog_group_join_title">%1$s beitreten?</string>
     <string name="dialog_group_join_message">%1$s hat dich eingeladen %2$s beizutreten. Wenn du die Einladung annimmst, wird deine aktive Gruppe auf die neue gewechselt.</string>
     <string name="dialog_positive_join">Beitreten</string>
-    <string name="dialog_negative_discard_invitation">Verwerfen</string>
+    <string name="dialog_negative_discard">Verwerfen</string>
     <string name="dialog_neutral_decide_later">Später</string>
     <string name="toast_already_in_group">%1$s ist bereits in deiner Gruppe</string>
     <string name="toast_already_invited">%1$s wurde bereits in deine Gruppe eingeladen</string>
@@ -215,5 +215,6 @@
     <string name="action_purchase_edit_save_changes_draft">Speichere Änderungen im Entwurf</string>
     <string name="hello_blank_fragment"></string>
     <string name="toast_changes_saved_as_draft">Änderungen im Entwurf gespeichert</string>
+    <string name="dialog_discard_changes_message">Änderungen verwerfen?</string>
 
 </resources>
