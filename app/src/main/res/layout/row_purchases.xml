@@ -57,6 +57,7 @@
         android:paddingStart="@dimen/small_space"
         android:paddingEnd="@dimen/small_space"
         android:gravity="center"
+        android:textColor="@android:color/white"
         tools:text="-50"
         tools:background="@color/green"/>
 
