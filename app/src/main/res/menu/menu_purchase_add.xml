@@ -11,12 +11,5 @@
         android:id="@+id/action_purchase_add_receipt_add"
         android:title="@string/action_purchase_add_receipt"
         android:orderInCategory="2"
-        android:visible="false"
-        app:showAsAction="never"/>
-    <item
-        android:id="@+id/action_purchase_add_receipt_show"
-        android:title="@string/action_purchase_add_receipt_show"
-        android:orderInCategory="3"
-        android:visible="false"
         app:showAsAction="never"/>
 </menu>
