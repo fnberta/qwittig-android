@@ -5,6 +5,7 @@
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
+        <item name="colorButtonNormal">@android:color/white</item>
 
         <item name="windowActionModeOverlay">true</item>
     </style>
@@ -34,6 +35,10 @@
         <item name="android:textColor">?attr/colorPrimary</item>
     </style>
 
+    <style name="HomeToolbarTitle">
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Display1</item>
+    </style>
+
     <style name="EditText">
         <item name="ch.berta.fabio.qwittig:met_floatingLabel">highlight</item>
         <item name="ch.berta.fabio.qwittig:met_primaryColor">?attr/colorAccent</item>
@@ -43,20 +48,9 @@
         <item name="android:background">@drawable/fab_background</item>
     </style>
 
-    <style name="RaisedButtonColoredBase" parent="Widget.AppCompat.Button">
+    <style name="ColoredRaisedButton" parent="Widget.AppCompat.Button">
         <item name="android:textColor">@android:color/white</item>
-    </style>
-
-    <style name="RaisedButtonColored" parent="RaisedButtonColoredBase">
-        <item name="android:background">@drawable/button_shape_accent</item>
-    </style>
-
-    <style name="RaisedButtonWhiteBase" parent="Widget.AppCompat.Button">
-        <!--<item name="android:textColor">?attr/colorAccent</item>-->
-    </style>
-
-    <style name="RaisedButtonWhite" parent="RaisedButtonWhiteBase">
-        <item name="android:background">@drawable/button_shape_white</item>
+        <item name="colorButtonNormal">@color/accent</item>
     </style>
 
 </resources>
