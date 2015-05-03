@@ -1,0 +1,5 @@
+<resources>
+    <style name="HomeToolbarTitle">
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Display2</item>
+    </style>
+</resources>
