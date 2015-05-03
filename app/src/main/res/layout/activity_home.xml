@@ -35,13 +35,13 @@
 
             <TextView
                 android:id="@+id/tv_balance"
-                style="@style/Base.TextAppearance.AppCompat.Display2"
+                style="@style/HomeToolbarTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:textColor="@android:color/white"
                 android:lines="1"
-                android:ellipsize="end"
+                android:ellipsize="middle"
                 tools:text="-123.40"/>
 
         </android.support.v7.widget.Toolbar>
