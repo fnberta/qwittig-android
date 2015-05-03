@@ -7,6 +7,13 @@
     android:transitionGroup="true"
     tools:context="ch.berta.fabio.qwittig.ui.PurchaseAddActivity">
 
+    <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/toolbar_height_x2"
+        tools:ignore="MergeRootFrame" />
+
     <include layout="@layout/include_toolbar_x2"/>
 
     <ch.berta.fabio.qwittig.ui.widgets.FloatingActionButton
@@ -21,13 +28,6 @@
         android:contentDescription="@string/add_purchase"
         android:visibility="invisible"
         tools:visibility="visible"/>
-
-    <FrameLayout
-        android:id="@+id/container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/toolbar_height_x2"
-        tools:ignore="MergeRootFrame" />
 
 </FrameLayout>
 

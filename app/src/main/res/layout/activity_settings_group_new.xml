@@ -5,20 +5,6 @@
     android:layout_height="match_parent"
     tools:context="ch.berta.fabio.qwittig.ui.SettingsGroupNewActivity">
 
-    <include layout="@layout/include_toolbar_x2"/>
-
-    <ImageButton
-        android:id="@+id/fab"
-        style="@style/FAB"
-        android:contentDescription="@string/pref_group_add_new"
-        android:layout_height="@dimen/fab_size_small"
-        android:layout_width="@dimen/fab_size_small"
-        android:layout_gravity="top|start"
-        android:layout_marginTop="@dimen/toolbar_x2_minus_fab_size_small_half"
-        android:layout_marginStart="@dimen/key_line_1"
-        android:src="@drawable/ic_group_add"
-        android:visibility="invisible"/>
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -89,4 +75,18 @@
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
+
+    <include layout="@layout/include_toolbar_x2"/>
+
+    <ImageButton
+        android:id="@+id/fab"
+        style="@style/FAB"
+        android:contentDescription="@string/pref_group_add_new"
+        android:layout_height="@dimen/fab_size_small"
+        android:layout_width="@dimen/fab_size_small"
+        android:layout_gravity="top|start"
+        android:layout_marginTop="@dimen/toolbar_x2_minus_fab_size_small_half"
+        android:layout_marginStart="@dimen/key_line_1"
+        android:src="@drawable/ic_group_add"
+        android:visibility="invisible"/>
 </FrameLayout>
