@@ -128,8 +128,8 @@
                 android:value="ch.berta.fabio.qwittig.ui.SettingsActivity" />
         </activity>
         <activity
-            android:name=".ui.AccountBalanceActivity"
-            android:label="@string/title_activity_account_balance"
+            android:name=".ui.SettlementActivity"
+            android:label="@string/title_activity_settlement"
             android:parentActivityName=".ui.HomeActivity"
             android:theme="@style/AppTheme.WithNavDrawer" >
             <meta-data

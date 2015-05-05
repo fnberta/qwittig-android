@@ -94,7 +94,7 @@
     <string name="toast_receipt_added">Added receipt</string>
     <string name="toast_receipt_changed">Changed receipt</string>
     <string name="error_nickname_length">Nickname is too long</string>
-    <string name="title_activity_account_balance">Balance account</string>
+    <string name="title_activity_settlement">Settlements</string>
     <string name="hint_password_new">New password</string>
     <string name="add_compensation">Start new settlement</string>
     <string name="balance_owe_you">owes you %1$s</string>
@@ -112,7 +112,6 @@
     <string name="toast_compensation_finish_old">All members of the group must haved settled their debts first</string>
     <string name="no_compensations">No compensation payments</string>
     <string name="action_compensation_add_manual">Add manual payment</string>
-    <string name="title_activity_account_balance_add_manual">Manual payment</string>
     <string name="header_recipient_amount">Recipient and amount</string>
     <string name="hint_amount">Amount</string>
     <string name="action_compensation_not_now">Not now</string>
@@ -127,8 +126,8 @@
     <string name="toast_unknown_error">Unknown error has occurred, please try again later</string>
     <string name="push_compensation_payment_done_title">Payment done</string>
     <string name="push_compensation_payment_done_alert">%1$s accepted your payment of %2$s</string>
-    <string name="push_account_balance_new_title">%1$s started a new settlement</string>
-    <string name="push_account_balance_new_alert">Check if you get or owe money</string>
+    <string name="push_settlement_new_title">%1$s started a new settlement</string>
+    <string name="push_settlement_new_alert">Check if you get or owe money</string>
     <string name="toast_min_one_user">Please select at least one user.</string>
     <string name="toast_min_one_item">Add at least one item</string>
     <string name="dialog_store_selector">Choose a store from the list or add your own entry.</string>
@@ -215,7 +214,7 @@
     <string name="no_invitations">No open invitations</string>
     <string name="tab_compensations_new">Current</string>
     <string name="tab_compensations_history">Past</string>
-    <string name="progress_account_balance_new">Calculating new settlement…</string>
+    <string name="progress_settlement_new">Calculating new settlement…</string>
     <string name="hint_store_new">New store</string>
     <string name="header_purchase">Purchase</string>
     <string name="action_purchase_edit_save_changes_draft">Save changes in draft</string>

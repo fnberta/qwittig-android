@@ -93,7 +93,7 @@
     <string name="toast_receipt_added">Quittung hinzugefügt</string>
     <string name="toast_receipt_changed">Quittung geändert</string>
     <string name="error_nickname_length">Spitzname ist zu lang</string>
-    <string name="title_activity_account_balance">Kontoausgleich</string>
+    <string name="title_activity_settlement">Kontoausgleich</string>
     <string name="hint_password_new">Neues Passwort</string>
     <string name="add_compensation">Neue Abrechnung starten</string>
     <string name="balance_owe_you">schuldet dir %1$s</string>
@@ -126,8 +126,8 @@
     <string name="toast_unknown_error">Unbekannter Fehler ist aufgetreten, bitte versuche es später noch einmal</string>
     <string name="push_compensation_payment_done_title">Bezahlung erledigt</string>
     <string name="push_compensation_payment_done_alert">%1$s hat deine Zahlung über %2$s akzeptiert</string>
-    <string name="push_account_balance_new_title">%1$s hat eine neue Abrechnung gestartet</string>
-    <string name="push_account_balance_new_alert">Schau ob du Geld bekommst oder schuldest</string>
+    <string name="push_settlement_new_title">%1$s hat eine neue Abrechnung gestartet</string>
+    <string name="push_settlement_new_alert">Schau ob du Geld bekommst oder schuldest</string>
     <string name="toast_min_one_user">Bitte wähle mindestens einen Nutzer an.</string>
     <string name="toast_min_one_item">Füge mindestens einen Artikel hinzu</string>
     <string name="dialog_store_selector">Wähle ein Geschäft aus der Liste aus oder füge manuell ein neues hinzu.</string>
@@ -206,7 +206,7 @@
     <string name="toast_payment_saved">Zahlung an %1$s ausgeführt</string>
     <string name="tab_compensations_history">Vergangen</string>
     <string name="tab_compensations_new">Aktuell</string>
-    <string name="progress_account_balance_new">Berechne neuen Ausgleich…</string>
+    <string name="progress_settlement_new">Berechne neuen Ausgleich…</string>
     <string name="header_users_invited">Bereits eingeladen</string>
     <string name="hint_clear">Entfernen</string>
     <string name="no_invitations">Keine offenen Einladungen</string>
