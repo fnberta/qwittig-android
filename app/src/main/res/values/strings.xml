@@ -224,5 +224,7 @@
     <string name="push_user_joined_alert">%1$s has joined</string>
     <string name="push_user_left_title">%1$s left</string>
     <string name="push_user_left_alert">%1$s has left %2$s</string>
+    <string name="no_compensations_subhead_group_has">All members of the group must have settled their debts first before you can start a new settlement.</string>
+    <string name="no_compensations_history">No previous compensations</string>
 
 </resources>

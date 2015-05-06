@@ -40,12 +40,13 @@
             android:text="@string/no_compensations"/>
 
         <TextView
+            android:id="@+id/tv_empty_view_subtitle"
             style="@style/Base.TextAppearance.AppCompat.Subhead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/small_space"
             android:gravity="center_horizontal"
-            android:text="@string/no_compensations_subhead"/>
+            tools:text="@string/no_compensations_subhead"/>
 
         <ImageButton
             android:id="@+id/fab_new_account_balance"
