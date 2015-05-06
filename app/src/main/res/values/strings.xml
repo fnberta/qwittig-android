@@ -220,5 +220,11 @@
     <string name="action_purchase_edit_save_changes_draft">Save changes in draft</string>
     <string name="toast_changes_saved_as_draft">Changes saved in draft</string>
     <string name="dialog_discard_changes_message">Discard changes?</string>
+    <string name="push_user_joined_title">New member in %1$s</string>
+    <string name="push_user_joined_alert">%1$s has joined</string>
+    <string name="push_user_left_title">%1$s left</string>
+    <string name="push_user_left_alert">%1$s has left %2$s</string>
+    <string name="no_compensations_subhead_group_has">All members of the group must have settled their debts first before you can start a new settlement.</string>
+    <string name="no_compensations_history">No previous compensations</string>
 
 </resources>

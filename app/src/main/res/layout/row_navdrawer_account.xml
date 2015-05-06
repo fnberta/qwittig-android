@@ -30,16 +30,14 @@
         android:textColor="@android:color/white"
         tools:text="beeeezn"/>
 
-    <TextView
-        android:id="@+id/tv_drawer_email"
-        style="@style/Base.TextAppearance.AppCompat.Body1"
+    <Spinner
+        android:id="@+id/sp_drawer_group"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/key_line_1"
         android:layout_marginEnd="@dimen/key_line_1"
         android:layout_below="@id/tv_drawer_nickname"
-        android:textColor="@android:color/white"
-        tools:text="fnberta@gmail.com"/>
+        android:backgroundTint="@android:color/white"/> <!--TODO: implement for <21-->
 
     <View
         android:layout_width="match_parent"
