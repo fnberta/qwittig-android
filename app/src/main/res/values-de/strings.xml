@@ -111,7 +111,6 @@
     <string name="toast_compensation_finish_old">Alle Mitglieder der Gruppe müssen zuerst ihre Schulden begleichen haben</string>
     <string name="no_compensations">Keine Ausgleichszahlungen</string>
     <string name="action_compensation_add_manual">Manuelle Zahlung hinzufügen</string>
-    <string name="title_activity_account_balance_add_manual">Manuelle Zahlung</string>
     <string name="header_recipient_amount">Empfänger und Betrag</string>
     <string name="hint_amount">Betrag</string>
     <string name="action_compensation_not_now">Nicht jetzt</string>
@@ -215,5 +214,9 @@
     <string name="action_purchase_edit_save_changes_draft">Speichere Änderungen im Entwurf</string>
     <string name="toast_changes_saved_as_draft">Änderungen im Entwurf gespeichert</string>
     <string name="dialog_discard_changes_message">Änderungen verwerfen?</string>
+    <string name="push_user_joined_title">Neues Mitglied in %1$s</string>
+    <string name="push_user_joined_alert">%1$s ist beigetreten</string>
+    <string name="push_user_left_title">%1$s</string>
+    <string name="push_user_left_alert">%1$s hat %2$s verlassen</string>
 
 </resources>
