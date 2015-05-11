@@ -220,5 +220,6 @@
     <string name="push_user_left_alert">%1$s hat %2$s verlassen</string>
     <string name="no_compensations_subhead_group_has">Alle Mitglieder der Gruppe müssen zuerst ihre Schulden begleichen haben bevor du einen neuen Ausgleich starten kannst.</string>
     <string name="no_compensations_history">Keine vergangenen Ausgleiche</string>
+    <string name="progress_logout">Abmelden…</string>
 
 </resources>
