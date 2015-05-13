@@ -7,9 +7,4 @@
         android:title="@string/action_purchase_save_draft"
         android:orderInCategory="1"
         app:showAsAction="never"/>
-    <item
-        android:id="@+id/action_purchase_add_receipt_add"
-        android:title="@string/action_purchase_add_receipt"
-        android:orderInCategory="2"
-        app:showAsAction="never"/>
 </menu>
