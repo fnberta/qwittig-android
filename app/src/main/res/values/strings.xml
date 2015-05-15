@@ -228,5 +228,7 @@
     <string name="action_purchase_add_edit_receipt_delete">Delete receipt</string>
     <string name="action_purchase_add_edit_receipt_add">Add receipt</string>
     <string name="toast_receipt_deleted">Deleted receipt</string>
+    <string name="help_facebook">Find Qwittig on Facebook</string>
+    <string name="help_twitter">Find Qwittig on Twitter</string>
 
 </resources>

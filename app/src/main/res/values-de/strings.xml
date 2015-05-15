@@ -222,5 +222,7 @@
     <string name="action_purchase_add_edit_receipt_delete">Quittung löschen</string>
     <string name="action_purchase_add_edit_receipt_add">Quittung hinzufügen</string>
     <string name="toast_receipt_deleted">Quittung gelöscht</string>
+    <string name="help_facebook">Finde Qwittig auf Facebook</string>
+    <string name="help_twitter">Finde Qwittig auf Twitter</string>
 
 </resources>
