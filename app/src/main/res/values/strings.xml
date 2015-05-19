@@ -230,5 +230,9 @@
     <string name="toast_receipt_deleted">Deleted receipt</string>
     <string name="help_facebook">Find Qwittig on Facebook</string>
     <string name="help_twitter">Find Qwittig on Twitter</string>
+    <string name="push_action_confirm">Confirm</string>
+    <string name="push_purchase_new_multiple_title">new purchases</string>
+    <string name="push_purchase_new_multiple_new">new ones</string>
+    <string name="push_purchase_new_multiple_more">more</string>
 
 </resources>
