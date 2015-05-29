@@ -34,7 +34,7 @@
         android:layout_alignParentEnd="true"
         android:clickable="true"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/ic_clear_black"
+        android:src="@drawable/ic_clear"
         android:contentDescription="@string/hint_clear"/>
 
 </RelativeLayout>

@@ -224,5 +224,9 @@
     <string name="toast_receipt_deleted">Quittung gelöscht</string>
     <string name="help_facebook">Finde Qwittig auf Facebook</string>
     <string name="help_twitter">Finde Qwittig auf Twitter</string>
+    <string name="push_action_confirm">Bestätigen</string>
+    <string name="push_purchase_new_multiple_title">neue Einkäufe</string>
+    <string name="push_purchase_new_multiple_new">neue</string>
+    <string name="push_purchase_new_multiple_more">weitere</string>
 
 </resources>
