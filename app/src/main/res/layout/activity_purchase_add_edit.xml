@@ -3,9 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:transitionGroup="true"
-    tools:context="ch.berta.fabio.qwittig.ui.PurchaseAddActivity">
+    tools:context="ch.berta.fabio.qwittig.ui.PurchaseBaseActivity">
 
     <FrameLayout
         android:id="@+id/container"
@@ -16,18 +15,15 @@
 
     <include layout="@layout/include_toolbar_x2"/>
 
-    <ch.berta.fabio.qwittig.ui.widgets.FloatingActionButton
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_purchase_save"
-        style="@style/FAB"
-        android:layout_height="@dimen/fab_size"
-        android:layout_width="@dimen/fab_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="top|end"
         android:layout_marginTop="@dimen/toolbar_x2_minus_fab_size_half"
         android:layout_marginEnd="@dimen/key_line_1"
         android:src="@drawable/ic_save"
-        android:contentDescription="@string/add_purchase"
         android:visibility="invisible"
         tools:visibility="visible"/>
-
 </FrameLayout>
 

@@ -45,7 +45,7 @@
     <string name="toast_purchase_deleted">Einkauf gelöscht</string>
     <string name="desc_group_add_new">Um eine neue Gruppe hinzufügen, gib einfach einen Namen und eine Währung ein. Alle Einkäufe werden in der ausgewählten Währung angezeigt werden. Wenn du einen Einkauf hinzufügst, werden die Preise automatisch in diese Standard-Währung umgerechnet. Beachte, dass die Standard-Währung einer Gruppe nachträglich nicht mehr ändern kannst.</string>
     <string name="hint_group_name">Gruppenname</string>
-    <string name="toast_no_connection">Kein Netzwerk verfügbar, bitte versuche es später noch einmal</string>
+    <string name="toast_no_connection">Kein Netzwerk verfügbar</string>
     <string name="toast_group_added"> %1$s hinzugefügt und zu ihr gewechslet</string>
     <string name="hint_group_currency">Währung</string>
     <string name="user_avatar">Profilbild</string>
@@ -118,9 +118,9 @@
     <string name="push_compensation_remind_payed_alert">Bestätige Erhalt von %1$s</string>
     <string name="push_compensation_not_now_title">Nicht jetzt</string>
     <string name="push_compensation_not_now_alert">%1$s wird dich nicht jetzt bezahlen</string>
-    <string name="toast_compensation_reminded_user">%1$s wurde erinnert, seine Schulden zu bezahlen</string>
+    <string name="toast_compensation_reminded_user">%1$s wurde erinnert, die Schulden zu bezahlen</string>
     <string name="toast_compensation_reminded_user_payed">%1$s wurde erinnert, dass du deine Schulden bezahlt hast</string>
-    <string name="toast_unknown_error">Unbekannter Fehler ist aufgetreten, bitte versuche es später noch einmal</string>
+    <string name="toast_unknown_error">Unbekannter Fehler ist aufgetreten</string>
     <string name="push_compensation_payment_done_title">Bezahlung erledigt</string>
     <string name="push_compensation_payment_done_alert">%1$s hat deine Zahlung über %2$s akzeptiert</string>
     <string name="push_settlement_new_title">%1$s hat eine neue Abrechnung gestartet</string>
@@ -174,7 +174,7 @@
     <string name="nickname_me">Ich</string>
     <string name="progress_account_delete">Lösche Account…</string>
     <string name="push_user_deleted_alert">Ausstehende Schulden or Guthaben wurde automatisch abgerechnet.</string>
-    <string name="push_user_deleted_title">%1$s hat seinen Account gelöscht</string>
+    <string name="push_user_deleted_title">%1$s hat den Account gelöscht</string>
     <string name="progress_login">Anmelden…</string>
     <string name="progress_purchase_save">Speichere Einkauf…</string>
     <string name="progress_settings_invite">Lade %1$s ein…</string>
@@ -228,5 +228,6 @@
     <string name="push_purchase_new_multiple_title">neue Einkäufe</string>
     <string name="push_purchase_new_multiple_new">neue</string>
     <string name="push_purchase_new_multiple_more">weitere</string>
+    <string name="action_retry">Wiederholen</string>
 
 </resources>

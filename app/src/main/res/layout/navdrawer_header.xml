@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/navdrawer_chosen_account_height"
-    android:layout_marginBottom="@dimen/small_space"
     android:background="@drawable/navdrawer_background">
 
     <ImageView
@@ -17,7 +16,6 @@
         android:layout_marginBottom="@dimen/small_space"
         android:contentDescription="@string/user_avatar"
         tools:src="@drawable/ic_avatar_40dp"/>
-
 
     <TextView
         android:id="@+id/tv_drawer_nickname"
@@ -38,11 +36,4 @@
         android:layout_marginEnd="@dimen/key_line_1"
         android:layout_below="@id/tv_drawer_nickname"
         android:backgroundTint="@android:color/white"/> <!--TODO: implement for <21-->
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="@dimen/small_space"
-        android:layout_alignParentBottom="true"
-        android:background="?android:attr/listDivider"/>
 </RelativeLayout>
