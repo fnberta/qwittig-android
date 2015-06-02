@@ -40,7 +40,8 @@
                     android:layout_marginStart="@dimen/key_line_1"
                     android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
                     android:contentDescription="@string/dialog_users_involved_title"
-                    android:src="@drawable/ic_group"/>
+                    android:src="@drawable/ic_group_black_24dp"
+                    android:alpha="@dimen/icon_black_alpha"/>
 
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/til_settings_group_add_new_name"
@@ -73,7 +74,8 @@
                     android:layout_marginStart="@dimen/key_line_1"
                     android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
                     android:contentDescription="@string/hint_group_currency"
-                    android:src="@drawable/ic_attach_money"/>
+                    android:src="@drawable/ic_attach_money_black_24dp"
+                    android:alpha="@dimen/icon_black_alpha"/>
 
                 <Spinner
                     android:id="@+id/sp_settings_group_add_new_currency"
@@ -93,7 +95,7 @@
         android:layout_gravity="top|start"
         android:layout_marginTop="@dimen/toolbar_x2_minus_fab_size_small_half"
         android:layout_marginStart="@dimen/key_line_1"
-        android:src="@drawable/ic_group_add"
+        android:src="@drawable/ic_group_add_black_24dp"
         app:fabSize="mini"
         android:visibility="invisible"
         tools:visibility="visible"/>

@@ -63,7 +63,7 @@
             android:layout_gravity="end|bottom"
             android:layout_margin="@dimen/normal_space"
             android:visibility="gone"
-            android:src="@drawable/ic_photo_camera" />
+            android:src="@drawable/ic_camera_alt_black_24dp" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_manual"
@@ -72,7 +72,7 @@
             android:layout_gravity="end|bottom"
             android:layout_margin="@dimen/normal_space"
             android:visibility="gone"
-            android:src="@drawable/ic_create" />
+            android:src="@drawable/ic_create_black_24dp" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
@@ -80,7 +80,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"
             android:layout_margin="@dimen/normal_space"
-            android:src="@drawable/ic_add_shopping_cart"
+            android:src="@drawable/ic_add_shopping_cart_black_24dp"
             android:visibility="invisible"
             tools:visibility="visible"/>
 

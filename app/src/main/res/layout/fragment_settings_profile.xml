@@ -18,7 +18,8 @@
             android:layout_marginTop="@dimen/normal_space"
             android:layout_marginBottom="@dimen/small_space"
             android:contentDescription="@string/user_avatar"
-            tools:src="@drawable/ic_avatar_80dp"/>
+            android:alpha="@dimen/icon_black_alpha"
+            tools:src="@drawable/ic_account_circle_black_48dp"/>
 
         <TextView
             android:id="@+id/user_name"
@@ -45,7 +46,8 @@
                 android:layout_marginStart="@dimen/key_line_1"
                 android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
                 android:contentDescription="@string/hint_nickname"
-                android:src="@drawable/ic_account_box"/>
+                android:src="@drawable/ic_account_box_black_24dp"
+                android:alpha="@dimen/icon_black_alpha"/>
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/til_nickname"
@@ -78,7 +80,8 @@
                 android:layout_marginStart="@dimen/key_line_1"
                 android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
                 android:contentDescription="@string/hint_email"
-                android:src="@drawable/ic_email"/>
+                android:src="@drawable/ic_email_black_24dp"
+                android:alpha="@dimen/icon_black_alpha"/>
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/til_email"
@@ -111,7 +114,8 @@
                 android:layout_marginStart="@dimen/key_line_1"
                 android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
                 android:contentDescription="@string/hint_email"
-                android:src="@drawable/ic_security"/>
+                android:src="@drawable/ic_security_black_24dp"
+                android:alpha="@dimen/icon_black_alpha"/>
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/til_password"

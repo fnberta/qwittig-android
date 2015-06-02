@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/normal_space"
-        android:src="@drawable/ic_add"
+        android:src="@drawable/ic_add_black_24dp"
         android:visibility="invisible"
         tools:visibility="visible"/>
 </FrameLayout>
