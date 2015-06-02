@@ -25,6 +25,7 @@
     <dimen name="avatar_size">40dp</dimen>
     <dimen name="avatar_size_2x">80dp</dimen>
     <dimen name="icon_size">24dp</dimen>
+    <item name="icon_black_alpha" type="dimen" format="float">0.54</item>
 
     <!-- Checkbox special margins -->
     <dimen name="key_line_1_minus_checkbox_margin">12dp</dimen>
@@ -66,21 +67,11 @@
     <dimen name="dialog_padding">24dp</dimen>
 
     <!-- FAB -->
-    <dimen name="fab_elevation">8dp</dimen>
-    <dimen name="fab_elevation_press">14dp</dimen>
-    <dimen name="fab_size">56dp</dimen>
-    <dimen name="fab_size_small">40dp</dimen>
     <dimen name="fab_translationY_auto">-72dp</dimen>
     <dimen name="fab_translationY_manual">-144dp</dimen>
 
     <!-- CardView -->
     <dimen name="card_elevation">2dp</dimen>
     <dimen name="card_corner_radius">2dp</dimen>
-
-    <!-- Tab -->
-    <dimen name="tab_height">48dp</dimen>
-
-    <!-- Swipe Refresh Layout -->
-    <dimen name="srl_length">72dp</dimen>
 
 </resources>

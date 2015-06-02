@@ -45,7 +45,7 @@
     <string name="title_activity_settings_group_new">Add new group</string>
     <string name="desc_group_add_new">To add a new group, simply enter a name and a currency. All purchases will be displayed in this currency. If you add a new purchase with another currency, the prices will automatically be converted to the group\'s default currency. Note that you cannot change the default currency of a group later.</string>
     <string name="hint_group_name">Group name</string>
-    <string name="toast_no_connection">No network available, please try again later</string>
+    <string name="toast_no_connection">No network available</string>
     <string name="toast_group_added">Added and switched to %1$s</string>
     <string name="hint_group_currency">Currency</string>
     <string name="user_avatar">Profile picture</string>
@@ -119,9 +119,9 @@
     <string name="push_compensation_remind_payed_alert">Confirm receipt of %1$s</string>
     <string name="push_compensation_not_now_title">Not now</string>
     <string name="push_compensation_not_now_alert">%1$s will not pay you now</string>
-    <string name="toast_compensation_reminded_user">Reminded %1$s to pay his debts</string>
+    <string name="toast_compensation_reminded_user">Reminded %1$s to pay the debts</string>
     <string name="toast_compensation_reminded_user_payed">Reminded %1$s that you have paid your debts</string>
-    <string name="toast_unknown_error">Unknown error has occurred, please try again later</string>
+    <string name="toast_unknown_error">Unknown error has occurred</string>
     <string name="push_compensation_payment_done_title">Payment done</string>
     <string name="push_compensation_payment_done_alert">%1$s accepted your payment of %2$s</string>
     <string name="push_settlement_new_title">%1$s started a new settlement</string>
@@ -180,7 +180,7 @@
     <string name="nickname_me">Me</string>
     <string name="progress_account_delete">Deleting account…</string>
     <string name="push_user_deleted_alert">Outstanding debts or credits have automatically been cleared.</string>
-    <string name="push_user_deleted_title">%1$s deleted his account</string>
+    <string name="push_user_deleted_title">%1$s deleted the account</string>
     <string name="progress_login">Logging in…</string>
     <string name="progress_purchase_save">Saving purchase…</string>
     <string name="progress_settings_invite">Inviting %1$s…</string>
@@ -234,5 +234,6 @@
     <string name="push_purchase_new_multiple_title">new purchases</string>
     <string name="push_purchase_new_multiple_new">new ones</string>
     <string name="push_purchase_new_multiple_more">more</string>
+    <string name="action_retry">Retry</string>
 
 </resources>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group
+        android:id="@+id/nav_group_main"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:checked="true"
+            android:icon="@drawable/ic_local_grocery_store_black_24dp"
+            android:title="@string/title_activity_home" />
+        <item
+            android:id="@+id/nav_settlement"
+            android:icon="@drawable/ic_account_balance_wallet_black_24dp"
+            android:title="@string/title_activity_settlement" />
+        <item
+            android:id="@+id/nav_drafts"
+            android:icon="@drawable/ic_receipt_black_24dp"
+            android:title="@string/title_activity_purchase_drafts" />
+    </group>
+
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@drawable/ic_settings_black_24dp"
+        android:title="@string/title_activity_settings" />
+    <item
+        android:id="@+id/nav_help_feedback"
+        android:icon="@drawable/ic_help_black_24dp"
+        android:title="@string/action_help_feedback" />
+
+</menu>

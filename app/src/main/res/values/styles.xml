@@ -39,18 +39,8 @@
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.Display1</item>
     </style>
 
-    <style name="EditText">
-        <item name="ch.berta.fabio.qwittig:met_floatingLabel">highlight</item>
-        <item name="ch.berta.fabio.qwittig:met_primaryColor">?attr/colorAccent</item>
-    </style>
-
-    <style name="FAB">
-        <item name="android:background">@drawable/fab_background</item>
-    </style>
-
     <style name="ColoredRaisedButton" parent="Widget.AppCompat.Button">
         <item name="android:textColor">@android:color/white</item>
         <item name="colorButtonNormal">@color/accent</item>
     </style>
-
 </resources>

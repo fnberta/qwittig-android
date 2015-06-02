@@ -14,16 +14,13 @@
         android:divider="@null"
         android:transitionGroup="true"/>
 
-    <ch.berta.fabio.qwittig.ui.widgets.FloatingActionButton
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_add_store"
-        style="@style/FAB"
-        android:contentDescription="@string/add_store"
-        android:layout_height="@dimen/fab_size"
-        android:layout_width="@dimen/fab_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_marginEnd="@dimen/normal_space"
-        android:layout_marginBottom="@dimen/normal_space"
-        android:src="@drawable/ic_add"
-        android:visibility="invisible"/>
-
+        android:layout_margin="@dimen/normal_space"
+        android:src="@drawable/ic_add_black_24dp"
+        android:visibility="invisible"
+        tools:visibility="visible"/>
 </FrameLayout>

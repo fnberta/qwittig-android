@@ -48,15 +48,14 @@
             android:gravity="center_horizontal"
             tools:text="@string/no_compensations_subhead"/>
 
-        <ImageButton
+        <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_new_account_balance"
-            style="@style/FAB"
-            android:contentDescription="@string/add_compensation"
-            android:layout_height="@dimen/fab_size"
-            android:layout_width="@dimen/fab_size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/small_space"
-            android:src="@drawable/ic_swap_horiz"
-            android:visibility="invisible"/>
+            android:src="@drawable/ic_swap_horiz_black_24dp"
+            android:visibility="invisible"
+            tools:visibility="visible"/>
     </LinearLayout>
 
 </FrameLayout>

@@ -6,12 +6,12 @@
         android:id="@+id/action_purchase_edit_receipt_edit"
         android:title="@string/action_purchase_add_edit_receipt_edit"
         android:orderInCategory="1"
-        android:icon="@drawable/ic_action_edit"
+        android:icon="@drawable/ic_create_white_24dp"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/action_purchase_edit_receipt_delete"
         android:title="@string/action_purchase_add_edit_receipt_delete"
         android:orderInCategory="2"
-        android:icon="@drawable/ic_action_delete"
+        android:icon="@drawable/ic_delete_white_24dp"
         app:showAsAction="ifRoom"/>
 </menu>
