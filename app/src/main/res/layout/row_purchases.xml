@@ -40,12 +40,13 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_toStartOf="@+id/tv_balance_change"
-        android:gravity="center_vertical"
+        android:layout_toEndOf="@id/tv_user"
+        android:layout_toStartOf="@+id/tv_my_share"
+        android:gravity="center_vertical|end"
         tools:text="Denner"/>
 
     <TextView
-        android:id="@id/tv_balance_change"
+        android:id="@id/tv_my_share"
         style="@style/ListTextView"
         android:layout_width="@dimen/balance_change_length"
         android:layout_height="@dimen/balance_change_height"
@@ -56,8 +57,7 @@
         android:paddingStart="@dimen/small_space"
         android:paddingEnd="@dimen/small_space"
         android:gravity="center"
-        android:textColor="@android:color/white"
-        tools:text="-50"
-        tools:background="@color/green"/>
-
+        android:background="@color/grey_light"
+        android:textColor="?android:textColorSecondary"
+        tools:text="45"/>
 </RelativeLayout>
