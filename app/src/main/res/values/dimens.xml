@@ -34,9 +34,6 @@
     <!-- Toolbar -->
     <dimen name="toolbar_height_x2">112dp</dimen>
     <dimen name="toolbar_height_x2_plus_tabs">160dp</dimen>
-    <dimen name="toolbar_elevation">4dp</dimen>
-    <dimen name="toolbar_x2_minus_fab_size_half">84dp</dimen>
-    <dimen name="toolbar_x2_minus_fab_size_small_half">92dp</dimen>
 
     <!-- NavDrawer -->
     <dimen name="navdrawer_max_width">320dp</dimen>
@@ -54,10 +51,6 @@
     <dimen name="list_avatar_with_three_line_text">88dp</dimen>
     <dimen name="avatar_plus_caption_plus_padding">72dp</dimen>
     <dimen name="subheader_height">48dp</dimen>
-
-    <!-- Button -->
-    <dimen name="raised_button_elevation">2dp</dimen>
-    <dimen name="raised_button_elevation_press">8dp</dimen>
 
     <!-- TextView -->
     <dimen name="balance_change_length">90dp</dimen>

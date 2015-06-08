@@ -19,6 +19,7 @@
         android:gravity="bottom"
         app:titleTextAppearance="@style/Base.TextAppearance.AppCompat.Title"
         app:contentInsetStart="@dimen/key_line_2"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:borderWidth="0dp"/>
 
 </android.support.design.widget.AppBarLayout>

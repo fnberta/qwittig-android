@@ -7,7 +7,7 @@
     tools:context="ch.berta.fabio.qwittig.ui.SettingsProfileActivity"
     tools:ignore="MergeRootFrame">
 
-    <include layout="@layout/include_toolbar"/>
+    <include layout="@layout/include_appbar"/>
 
     <FrameLayout
         android:id="@+id/container"
