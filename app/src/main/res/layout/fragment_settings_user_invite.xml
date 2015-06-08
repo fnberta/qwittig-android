@@ -1,0 +1,84 @@
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="ch.berta.fabio.qwittig.ui.SettingsUserInviteFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/Base.TextAppearance.AppCompat.Subhead"
+            android:text="@string/desc_user_invite"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/key_line_2"
+            android:layout_marginEnd="@dimen/key_line_1"
+            android:layout_marginTop="@dimen/small_space"/>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/small_space"
+            android:layout_marginBottom="@dimen/small_space">
+
+            <ImageView
+                android:layout_width="@dimen/icon_size"
+                android:layout_height="@dimen/icon_size"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="@dimen/key_line_1"
+                android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+                android:contentDescription="@string/hint_email"
+                android:src="@drawable/ic_email_black_24dp"
+                android:alpha="@dimen/icon_black_alpha"/>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/til_settings_user_invite_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/key_line_1"
+                android:transitionGroup="true">
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textEmailAddress"
+                    android:hint="@string/hint_user_invite_email"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_users_invited"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:animateLayoutChanges="true">
+
+            <TextView
+                android:id="@+id/tv_header_users_invited"
+                style="@style/SubHeader"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/subheader_height"
+                android:paddingStart="@dimen/key_line_1"
+                android:paddingEnd="@dimen/key_line_1"
+                android:gravity="center_vertical"
+                android:text="@string/header_users_invited"/>
+
+            <TextView
+                android:id="@+id/tv_no_open_invitations"
+                style="@style/Base.TextAppearance.AppCompat.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/no_invitations"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

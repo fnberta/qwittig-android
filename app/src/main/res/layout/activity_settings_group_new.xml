@@ -6,85 +6,12 @@
     android:layout_height="match_parent"
     tools:context="ch.berta.fabio.qwittig.ui.SettingsGroupNewActivity">
 
-    <ScrollView
+    <FrameLayout
+        android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/toolbar_height_x2">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                style="@style/Base.TextAppearance.AppCompat.Subhead"
-                android:text="@string/desc_group_add_new"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/key_line_2"
-                android:layout_marginEnd="@dimen/key_line_1"
-                android:layout_marginTop="@dimen/small_space"
-                android:layout_marginBottom="@dimen/small_space"/>
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/small_space"
-                android:layout_marginBottom="@dimen/small_space">
-
-                <ImageView
-                    android:layout_width="@dimen/icon_size"
-                    android:layout_height="@dimen/icon_size"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="@dimen/key_line_1"
-                    android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
-                    android:contentDescription="@string/dialog_users_involved_title"
-                    android:src="@drawable/ic_group_black_24dp"
-                    android:alpha="@dimen/icon_black_alpha"/>
-
-                <android.support.design.widget.TextInputLayout
-                    android:id="@+id/til_settings_group_add_new_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/key_line_1"
-                    android:transitionGroup="true">
-
-                    <EditText
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="text|textCapSentences"
-                        android:hint="@string/hint_group_name"/>
-
-                </android.support.design.widget.TextInputLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/small_space"
-                android:layout_marginBottom="@dimen/small_space">
-
-                <ImageView
-                    android:layout_width="@dimen/icon_size"
-                    android:layout_height="@dimen/icon_size"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="@dimen/key_line_1"
-                    android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
-                    android:contentDescription="@string/hint_group_currency"
-                    android:src="@drawable/ic_attach_money_black_24dp"
-                    android:alpha="@dimen/icon_black_alpha"/>
-
-                <Spinner
-                    android:id="@+id/sp_settings_group_add_new_currency"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/key_line_1"/>
-            </LinearLayout>
-        </LinearLayout>
-    </ScrollView>
+        android:layout_marginTop="@dimen/toolbar_height_x2"
+        tools:ignore="MergeRootFrame"/>
 
     <include layout="@layout/include_appbar_x2"/>
 
