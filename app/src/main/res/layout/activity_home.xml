@@ -55,22 +55,24 @@
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-        <android.support.design.widget.FloatingActionButton
+        <ch.berta.fabio.qwittig.ui.widgets.FabSpeedDial
             android:id="@+id/fab_auto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"
             android:layout_margin="@dimen/normal_space"
             android:visibility="gone"
+            app:borderWidth="0dp"
             android:src="@drawable/ic_camera_alt_black_24dp" />
 
-        <android.support.design.widget.FloatingActionButton
+        <ch.berta.fabio.qwittig.ui.widgets.FabSpeedDial
             android:id="@+id/fab_manual"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"
             android:layout_margin="@dimen/normal_space"
             android:visibility="gone"
+            app:borderWidth="0dp"
             android:src="@drawable/ic_create_black_24dp" />
 
         <android.support.design.widget.FloatingActionButton
@@ -81,6 +83,7 @@
             android:layout_margin="@dimen/normal_space"
             android:src="@drawable/ic_add_shopping_cart_black_24dp"
             android:visibility="invisible"
+            app:borderWidth="0dp"
             tools:visibility="visible"/>
 
     </android.support.design.widget.CoordinatorLayout>
