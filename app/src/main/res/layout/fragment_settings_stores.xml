@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="ch.berta.fabio.qwittig.ui.SettingsStoresFragment">
 
     <ListView
@@ -22,5 +23,6 @@
         android:layout_margin="@dimen/normal_space"
         android:src="@drawable/ic_add_black_24dp"
         android:visibility="invisible"
+        app:borderWidth="0dp"
         tools:visibility="visible"/>
 </FrameLayout>
