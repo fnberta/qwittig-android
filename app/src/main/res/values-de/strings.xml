@@ -99,7 +99,7 @@
     <string name="button_remind">Erinnere %1$s</string>
     <string name="balance_gets_from_you">erhält %1$s von dir</string>
     <string name="balance_from_you">von dir</string>
-    <string name="button_remind_payed">Erinnere %1$s an Zahlung</string>
+    <string name="button_remind_paid">Erinnere %1$s an Zahlung</string>
     <string name="error_required">Erforderlich</string>
     <string name="header_receipt">Quittung</string>
     <string name="drawer_open">Navigationsleiste öffnen</string>
@@ -114,12 +114,12 @@
     <string name="action_compensation_not_now">Nicht jetzt</string>
     <string name="push_compensation_remind_title">Bezahle deine Schulden</string>
     <string name="push_compensation_remind_alert">Du schuldest %1$s %2$s</string>
-    <string name="push_compensation_remind_payed_title">%1$s hat bezahlt</string>
-    <string name="push_compensation_remind_payed_alert">Bestätige Erhalt von %1$s</string>
+    <string name="push_compensation_remind_paid_title">%1$s hat bezahlt</string>
+    <string name="push_compensation_remind_paid_alert">Bestätige Erhalt von %1$s</string>
     <string name="push_compensation_not_now_title">Nicht jetzt</string>
     <string name="push_compensation_not_now_alert">%1$s wird dich nicht jetzt bezahlen</string>
     <string name="toast_compensation_reminded_user">%1$s wurde erinnert, die Schulden zu bezahlen</string>
-    <string name="toast_compensation_reminded_user_payed">%1$s wurde erinnert, dass du deine Schulden bezahlt hast</string>
+    <string name="toast_compensation_reminded_user_paid">%1$s wurde erinnert, dass du deine Schulden bezahlt hast</string>
     <string name="toast_unknown_error">Unbekannter Fehler ist aufgetreten</string>
     <string name="push_compensation_payment_done_title">Bezahlung erledigt</string>
     <string name="push_compensation_payment_done_alert">%1$s hat deine Zahlung über %2$s akzeptiert</string>

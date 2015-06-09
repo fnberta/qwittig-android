@@ -100,7 +100,7 @@
     <string name="button_remind">Remind %1$s</string>
     <string name="balance_gets_from_you">gets %1$s from you</string>
     <string name="balance_from_you">from you</string>
-    <string name="button_remind_payed">Remind %1$s you paid</string>
+    <string name="button_remind_paid">Remind %1$s you paid</string>
     <string name="error_required">Required</string>
     <string name="header_receipt">Receipt</string>
     <string name="drawer_open">Open navigation drawer</string>
@@ -115,12 +115,12 @@
     <string name="action_compensation_not_now">Not now</string>
     <string name="push_compensation_remind_title">Pay your debts</string>
     <string name="push_compensation_remind_alert">You owe %1$s %2$s</string>
-    <string name="push_compensation_remind_payed_title">%1$s has paid</string>
-    <string name="push_compensation_remind_payed_alert">Confirm receipt of %1$s</string>
+    <string name="push_compensation_remind_paid_title">%1$s has paid</string>
+    <string name="push_compensation_remind_paid_alert">Confirm receipt of %1$s</string>
     <string name="push_compensation_not_now_title">Not now</string>
     <string name="push_compensation_not_now_alert">%1$s will not pay you now</string>
     <string name="toast_compensation_reminded_user">Reminded %1$s to pay the debts</string>
-    <string name="toast_compensation_reminded_user_payed">Reminded %1$s that you have paid your debts</string>
+    <string name="toast_compensation_reminded_user_paid">Reminded %1$s that you have paid your debts</string>
     <string name="toast_unknown_error">Unknown error has occurred</string>
     <string name="push_compensation_payment_done_title">Payment done</string>
     <string name="push_compensation_payment_done_alert">%1$s accepted your payment of %2$s</string>
