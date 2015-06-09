@@ -229,5 +229,9 @@
     <string name="push_purchase_new_multiple_new">neue</string>
     <string name="push_purchase_new_multiple_more">weitere</string>
     <string name="action_retry">Wiederholen</string>
+    <string name="toast_emails_no_match">Eingeladene Email Adresse stimmt nicht mit eingeloggter überein</string>
+    <string name="dialog_group_join_message_no_initiator">Du wurdest eingeladen %1$s beizutreten. Wenn du die Einladung annimmst, wird deine aktive Gruppe auf die neue gewechselt.</string>
+    <string name="toast_group_invite_not_valid">Deine Einladung ist nicht mehr gültig</string>
+    <string name="toast_invitation_discarded">Einladung verworfen</string>
 
 </resources>

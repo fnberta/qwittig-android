@@ -238,5 +238,9 @@
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="toast_emails_no_match">Invited email does not match logged in email</string>
+    <string name="dialog_group_join_message_no_initiator">Your were invited to join %1$s. By accepting the invitiation your current group will change to the new one.</string>
+    <string name="toast_group_invite_not_valid">Your invitation is no longer valid</string>
+    <string name="toast_invitation_discarded">Invitation discarded</string>
 
 </resources>
