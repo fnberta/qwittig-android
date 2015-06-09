@@ -43,7 +43,7 @@
     <string name="action_purchase_delete">Delete purchase</string>
     <string name="toast_purchase_deleted">Purchase deleted</string>
     <string name="title_activity_settings_group_new">Add new group</string>
-    <string name="desc_group_add_new">To add a new group, simply enter a name and a currency. All purchases will be displayed in this currency. If you add a new purchase with another currency, the prices will automatically be converted to the group\'s default currency. Note that you cannot change the default currency of a group later.</string>
+    <string name="desc_group_add_new">All purchases in the new group will be displayed in the chosen currency. If you add a new purchase with another currency, the prices will automatically be converted to this default currency. Note that you cannot change a group\'s default currency later.</string>
     <string name="hint_group_name">Group name</string>
     <string name="toast_no_connection">No network available</string>
     <string name="toast_group_added">Added and switched to %1$s</string>
@@ -55,7 +55,7 @@
     <string name="hint_store">Store</string>
     <string name="hint_users">User</string>
     <string name="title_activity_settings_user_invite">Invite users</string>
-    <string name="desc_user_invite">To invite a new user, simply enter an email address. The recipient will receive an invitation to join your group</string>
+    <string name="desc_user_invite">Emails will be sent to the addresses entered below with an invitation to join your group</string>
     <string name="hint_user_invite_email">E-mail</string>
     <string name="error_group_name">Please enter a group name</string>
     <string name="error_email">Please enter a valid email address</string>
