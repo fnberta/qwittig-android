@@ -4,6 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingBottom="@dimen/small_space"
+    android:clipToPadding="false"
     tools:context="ch.berta.fabio.qwittig.ui.SettingsGroupNewFragment">
 
     <LinearLayout
@@ -46,6 +48,7 @@
                 android:transitionGroup="true">
 
                 <EditText
+                    android:id="@+id/et_settings_group_add_new_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="text|textCapSentences"
@@ -58,8 +61,7 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/small_space"
-            android:layout_marginBottom="@dimen/small_space">
+            android:layout_marginTop="@dimen/small_space">
 
             <ImageView
                 android:layout_width="@dimen/icon_size"
@@ -77,5 +79,30 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/key_line_1"/>
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_header_invite_users"
+            style="@style/SubHeader"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/subheader_height"
+            android:paddingStart="@dimen/key_line_1"
+            android:paddingEnd="@dimen/key_line_1"
+            android:gravity="center_vertical"
+            android:text="@string/header_invite_users"/>
+
+        <LinearLayout
+            android:id="@+id/ll_users"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:id="@+id/bt_user_add"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/key_line_2"
+            android:layout_marginEnd="@dimen/key_line_1"
+            android:text="@string/button_add_user"/>
     </LinearLayout>
 </ScrollView>

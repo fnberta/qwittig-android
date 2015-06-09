@@ -233,5 +233,7 @@
     <string name="dialog_group_join_message_no_initiator">Du wurdest eingeladen %1$s beizutreten. Wenn du die Einladung annimmst, wird deine aktive Gruppe auf die neue gewechselt.</string>
     <string name="toast_group_invite_not_valid">Deine Einladung ist nicht mehr gültig</string>
     <string name="toast_invitation_discarded">Einladung verworfen</string>
+    <string name="header_invite_users">Nutzer einladen</string>
+    <string name="button_add_user">Neuer Nutzer</string>
 
 </resources>
