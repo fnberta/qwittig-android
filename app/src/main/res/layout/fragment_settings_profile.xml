@@ -56,6 +56,7 @@
                 android:transitionGroup="true">
 
                 <EditText
+                    android:id="@+id/et_nickname"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPersonName"
@@ -90,6 +91,7 @@
                 android:transitionGroup="true">
 
                 <EditText
+                    android:id="@+id/et_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textEmailAddress"
@@ -124,6 +126,7 @@
                 android:transitionGroup="true">
 
                 <EditText
+                    android:id="@+id/et_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
@@ -143,6 +146,7 @@
             android:transitionGroup="true">
 
             <EditText
+                android:id="@+id/et_password_repeat"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"

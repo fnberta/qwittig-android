@@ -9,5 +9,5 @@
     android:layout_alignParentTop="true"
     android:contentDescription="@string/user_avatar"
     android:scaleType="centerCrop"
-    tools:src="@drawable/ic_avatar_80dp"/>
+    tools:src="@drawable/ic_account_circle_black_80dp"/>
 

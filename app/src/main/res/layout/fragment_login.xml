@@ -23,6 +23,7 @@
             android:layout_marginBottom="@dimen/small_space">
 
             <AutoCompleteTextView
+                android:id="@+id/et_login_email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
@@ -41,6 +42,7 @@
             android:layout_marginBottom="@dimen/small_space">
 
             <EditText
+                android:id="@+id/et_login_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
