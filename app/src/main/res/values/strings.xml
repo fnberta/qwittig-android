@@ -139,7 +139,7 @@
     <string name="dialog_positive_reset">Reset</string>
     <string name="push_user_invite_title">Join group %1$s</string>
     <string name="push_user_invite_alert">%1$s invited you</string>
-    <string name="toast_user_invited">%1$s was invited to join your group</string>
+    <string name="toast_user_invited">Users were invited to join your group</string>
     <string name="dialog_group_join_title">Join %1$s?</string>
     <string name="dialog_group_join_message">%1$s invited you to join %2$s. By accepting the invitation your current group will change to the new one.</string>
     <string name="dialog_positive_join">Join</string>
@@ -183,7 +183,7 @@
     <string name="push_user_deleted_title">%1$s deleted the account</string>
     <string name="progress_login">Logging in…</string>
     <string name="progress_purchase_save">Saving purchase…</string>
-    <string name="progress_settings_invite">Inviting %1$s…</string>
+    <string name="progress_settings_invite">Inviting users…</string>
     <string name="progress_settings_group_new">Creating %1$s…</string>
     <string name="progress_compensation_done">Accepting payment…</string>
     <string name="dialog_purchase_discard">Discard</string>
