@@ -4,7 +4,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/list_avatar_with_text">
+    android:layout_height="@dimen/list_avatar_with_text"
+    android:background="?android:attr/activatedBackgroundIndicator">
 
     <TextView
         android:id="@+id/tv_date"
@@ -30,11 +31,12 @@
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:layout_toEndOf="@id/tv_date"
+        android:layout_toStartOf="@+id/tv_total_value"
         android:gravity="center_vertical"
         tools:text="Denner"/>
 
     <TextView
-        android:id="@+id/tv_total_value"
+        android:id="@id/tv_total_value"
         style="@style/ListTextView"
         android:layout_width="@dimen/balance_change_length"
         android:layout_height="@dimen/balance_change_height"
