@@ -235,5 +235,7 @@
     <string name="toast_invitation_discarded">Einladung verworfen</string>
     <string name="header_invite_users">Nutzer einladen</string>
     <string name="button_add_user">Neuer Nutzer</string>
+    <string name="toast_draft_deleted">Entwurf gelöscht</string>
+    <string name="action_draft_delete">Entwurf löschen</string>
 
 </resources>

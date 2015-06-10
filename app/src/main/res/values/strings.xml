@@ -241,5 +241,7 @@
     <string name="toast_invitation_discarded">Invitation discarded</string>
     <string name="header_invite_users">Invite users</string>
     <string name="button_add_user">Add user</string>
+    <string name="toast_draft_deleted">Draft deleted</string>
+    <string name="action_draft_delete">Delete draft</string>
 
 </resources>

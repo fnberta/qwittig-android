@@ -5,6 +5,12 @@
     <item
         android:id="@+id/action_purchase_edit_save_changes_draft"
         android:title="@string/action_purchase_edit_save_changes_draft"
-        android:orderInCategory="1"
+        android:orderInCategory="2"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_purchase_edit_draft_delete"
+        android:title="@string/action_draft_delete"
+        android:orderInCategory="3"
         app:showAsAction="never"/>
 </menu>
