@@ -59,6 +59,9 @@
                     android:host="www.qwittig.ch"
                     android:pathPrefix="/invitation"
                     android:scheme="http" />
+
+                <data
+                    android:scheme="qwittig"/>
             </intent-filter>
         </activity>
         <activity
