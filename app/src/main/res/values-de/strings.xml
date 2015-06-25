@@ -119,7 +119,7 @@
     <string name="push_compensation_not_now_title">Nicht jetzt</string>
     <string name="push_compensation_not_now_alert">%1$s wird dich nicht jetzt bezahlen</string>
     <string name="toast_compensation_reminded_user">%1$s wurde erinnert, die Schulden zu bezahlen</string>
-    <string name="toast_compensation_reminded_user_paid">%1$s wurde erinnert, dass du deine Schulden bezahlt hast</string>
+    <string name="toast_compensation_reminded_user_paid">%1$s wurde erinnert, dass du die Schulden bezahlt hast</string>
     <string name="toast_unknown_error">Unbekannter Fehler ist aufgetreten</string>
     <string name="push_compensation_payment_done_title">Bezahlung erledigt</string>
     <string name="push_compensation_payment_done_alert">%1$s hat deine Zahlung über %2$s akzeptiert</string>
@@ -237,5 +237,9 @@
     <string name="button_add_user">Neuer Nutzer</string>
     <string name="toast_draft_deleted">Entwurf gelöscht</string>
     <string name="action_draft_delete">Entwurf löschen</string>
+    <string name="go_premium">Premium werden</string>
+    <string name="toast_not_supported">Nicht unterstützt auf Ihrem Gerät</string>
+    <string name="dialog_go_premium">Du musst Premium sein, um automatisch Quittungen scannen zu können.</string>
+    <string name="toast_free_purchases_left">Noch %1$d automatische Einkäufe gratis.</string>
 
 </resources>

@@ -28,4 +28,10 @@
         android:icon="@drawable/ic_help_black_24dp"
         android:title="@string/action_help_feedback" />
 
+    <item
+        android:id="@+id/nav_go_premium"
+        android:icon="@drawable/ic_flight_takeoff_black_24dp"
+        android:title="@string/go_premium"
+        android:visible="false" />
+
 </menu>

@@ -243,5 +243,9 @@
     <string name="button_add_user">Add user</string>
     <string name="toast_draft_deleted">Draft deleted</string>
     <string name="action_draft_delete">Delete draft</string>
+    <string name="go_premium">Go premium</string>
+    <string name="toast_not_supported">Not supported on your device</string>
+    <string name="dialog_go_premium">You need to go premium to be able to automatically scan receipts.</string>
+    <string name="toast_free_purchases_left">%1$d free auto purchases left.</string>
 
 </resources>
