@@ -120,7 +120,7 @@
     <string name="push_compensation_not_now_title">Not now</string>
     <string name="push_compensation_not_now_alert">%1$s will not pay you now</string>
     <string name="toast_compensation_reminded_user">Reminded %1$s to pay the debts</string>
-    <string name="toast_compensation_reminded_user_paid">Reminded %1$s that you have paid your debts</string>
+    <string name="toast_compensation_reminded_user_paid">Reminded %1$s about your payment</string>
     <string name="toast_unknown_error">Unknown error has occurred</string>
     <string name="push_compensation_payment_done_title">Payment done</string>
     <string name="push_compensation_payment_done_alert">%1$s accepted your payment of %2$s</string>
@@ -206,7 +206,7 @@
     <string name="progress_compensation_single_save">Saving payment…</string>
     <string name="error_item_amount">Please enter a valid amount</string>
     <string name="dialog_positive_pay">Pay</string>
-    <string name="toast_payment_saved">Payment to %1$s saved</string>
+    <string name="toast_payment_saved">Payment to %1$s added</string>
     <string name="header_users_invited">Already invited</string>
     <string name="hint_clear">Remove</string>
     <string name="no_invitations">No open invitations</string>
@@ -247,5 +247,7 @@
     <string name="toast_not_supported">Not supported on your device</string>
     <string name="dialog_go_premium">You need to go premium to be able to automatically scan receipts.</string>
     <string name="toast_free_purchases_left">%1$d free auto purchases left.</string>
+    <string name="toast_new_settlement">Calculated new Settlement</string>
+    <string name="toast_not_now_done">Payment to %1$s deleted</string>
 
 </resources>

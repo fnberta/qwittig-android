@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    tools:context="ch.berta.fabio.qwittig.ui.SettlementUnpaidFragment">
+    tools:context="ch.berta.fabio.qwittig.ui.CompensationsUnpaidFragment">
     
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/srl_compensations"
@@ -31,7 +31,9 @@
         android:layout_marginEnd="@dimen/key_line_1"
         android:orientation="vertical"
         android:gravity="center"
-        android:visibility="gone">
+        android:visibility="invisible"
+        android:clipChildren="false"
+        tools:visibility="visible">
 
         <TextView
             style="@style/Base.TextAppearance.AppCompat.Title"
@@ -46,19 +48,28 @@
             style="@style/Base.TextAppearance.AppCompat.Subhead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/small_space"
+            android:layout_marginBottom="@dimen/normal_space"
             android:gravity="center_horizontal"
             tools:text="@string/no_compensations_subhead"/>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_new_account_balance"
+        <com.github.jorgecastilloprz.FABProgressCircle
+            android:id="@+id/fab_new_account_balance_circle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/small_space"
-            android:src="@drawable/ic_swap_horiz_black_24dp"
-            android:visibility="invisible"
-            app:borderWidth="0dp"
-            tools:visibility="visible"/>
+            app:reusable="true"
+            app:finalIcon="@drawable/ic_done_black_24dp"
+            app:arcColor="@color/green">
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab_new_account_balance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_swap_horiz_black_24dp"
+                android:visibility="invisible"
+                app:borderWidth="0dp"
+                tools:visibility="visible"/>
+
+        </com.github.jorgecastilloprz.FABProgressCircle>
     </LinearLayout>
 
 </FrameLayout>

@@ -21,6 +21,8 @@
 
         <include layout="@layout/include_compensation_avatar"/>
 
+        <include layout="@layout/include_compensation_progress"/>
+
         <FrameLayout
             android:id="@+id/fl_header"
             android:layout_width="match_parent"

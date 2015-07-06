@@ -9,6 +9,4 @@
     <dimen name="list_avatar_with_two_line_text">88dp</dimen>
     <dimen name="subheader_height">56dp</dimen>
 
-    <dimen name="navdrawer_max_width">400dp</dimen>
-
 </resources>

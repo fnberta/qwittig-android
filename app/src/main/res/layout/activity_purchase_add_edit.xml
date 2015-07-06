@@ -16,16 +16,25 @@
 
     <include layout="@layout/include_appbar_x2"/>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_purchase_save"
+    <com.github.jorgecastilloprz.FABProgressCircle
+        android:id="@+id/fab_purchase_save_circle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/normal_space"
-        android:src="@drawable/ic_save_black_24dp"
-        android:visibility="invisible"
         app:layout_anchor="@id/appbar"
         app:layout_anchorGravity="bottom|end"
-        app:borderWidth="0dp"
-        tools:visibility="visible"/>
+        app:finalIcon="@drawable/ic_done_black_24dp"
+        app:arcColor="@color/green">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_purchase_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/normal_space"
+            android:src="@drawable/ic_save_black_24dp"
+            android:visibility="invisible"
+            app:borderWidth="0dp"
+            tools:visibility="visible"/>
+    </com.github.jorgecastilloprz.FABProgressCircle>
+
 </android.support.design.widget.CoordinatorLayout>
 
