@@ -132,7 +132,7 @@
                 android:value="ch.berta.fabio.qwittig.ui.SettingsActivity" />
         </activity>
         <activity
-            android:name=".ui.SettlementActivity"
+            android:name=".ui.CompensationsActivity"
             android:label="@string/title_activity_settlement"
             android:parentActivityName=".ui.HomeActivity"
             android:theme="@style/AppTheme.WithNavDrawer" >
