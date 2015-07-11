@@ -127,7 +127,7 @@
     <string name="push_settlement_new_alert">Schau ob du Geld bekommst oder schuldest</string>
     <string name="toast_min_one_user">Bitte wähle mindestens einen Nutzer an.</string>
     <string name="toast_min_one_item">Füge mindestens einen Artikel hinzu</string>
-    <string name="dialog_store_selector">Wähle ein Geschäft aus der Liste aus oder füge manuell ein neues hinzu.</string>
+    <string name="dialog_store_selector">Wähle ein Geschäft aus der Liste oder %1$s um ein neues hinzuzufügen.</string>
     <string name="pref_stores">Geschäftsliste</string>
     <string name="pref_category_me">Ich</string>
     <string name="pref_category_current_group">Aktuelle Gruppe</string>
@@ -243,5 +243,7 @@
     <string name="toast_free_purchases_left">Noch %1$d automatische Einkäufe gratis.</string>
     <string name="toast_new_settlement">Neuer Ausgleich berechnet</string>
     <string name="toast_not_now_done">Zahlung an %1$s gelöscht</string>
+    <string name="dialog_store_other">Anderes…</string>
+    <string name="error_store">Bitte gib einen gültigen Namen an</string>
 
 </resources>

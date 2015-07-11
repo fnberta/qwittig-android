@@ -128,7 +128,7 @@
     <string name="push_settlement_new_alert">Check if you get or owe money</string>
     <string name="toast_min_one_user">Please select at least one user.</string>
     <string name="toast_min_one_item">Add at least one item</string>
-    <string name="dialog_store_selector">Choose a store from the list or add your own entry.</string>
+    <string name="dialog_store_selector">Choose a store from the list or %1$s to add a new one.</string>
     <string name="pref_stores">Store list</string>
     <string name="pref_category_me">Me</string>
     <string name="pref_category_current_group">Current group</string>
@@ -249,5 +249,7 @@
     <string name="toast_free_purchases_left">%1$d free auto purchases left.</string>
     <string name="toast_new_settlement">Calculated new Settlement</string>
     <string name="toast_not_now_done">Payment to %1$s deleted</string>
+    <string name="dialog_store_other">Other…</string>
+    <string name="error_store">Please enter a valid name</string>
 
 </resources>
