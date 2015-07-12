@@ -251,5 +251,6 @@
     <string name="toast_not_now_done">Payment to %1$s deleted</string>
     <string name="dialog_store_other">Other…</string>
     <string name="error_store">Please enter a valid name</string>
+    <string name="push_action_join">Join</string>
 
 </resources>

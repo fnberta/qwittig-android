@@ -245,5 +245,6 @@
     <string name="toast_not_now_done">Zahlung an %1$s gelöscht</string>
     <string name="dialog_store_other">Anderes…</string>
     <string name="error_store">Bitte gib einen gültigen Namen an</string>
+    <string name="push_action_join">Beitreten</string>
 
 </resources>
