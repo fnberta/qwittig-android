@@ -1,4 +1,4 @@
-<FrameLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,29 +7,19 @@
     android:transitionGroup="true"
     tools:context="ch.berta.fabio.qwittig.ui.LoginActivity">
 
-    <android.support.design.widget.AppBarLayout
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/appbar"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/tv_app_title"
+        style="@style/Base.TextAppearance.AppCompat.Display4"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_height="?attr/actionBarSize"
-            android:layout_width="match_parent"
-            android:background="?attr/colorPrimary"
-            app:contentInsetStart="@dimen/key_line_1"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
-
-    </android.support.design.widget.AppBarLayout>
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/small_space"
+        android:text="@string/app_name"/>
 
     <FrameLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize"
         tools:ignore="MergeRootFrame" />
 
     <LinearLayout
@@ -57,4 +47,4 @@
 
     </LinearLayout>
 
-</FrameLayout>
+</LinearLayout>

@@ -69,92 +69,62 @@
             android:name=".ui.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".ui.HomeActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="ch.berta.fabio.qwittig.ui.HomeActivity" />
         </activity>
         <activity
             android:name=".ui.PurchaseDetailsActivity"
             android:label="@string/title_activity_purchase_details"
             android:parentActivityName=".ui.HomeActivity"
             android:theme="@style/AppTheme.WithNavDrawer" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="ch.berta.fabio.qwittig.ui.HomeActivity" />
         </activity>
         <activity
             android:name=".ui.PurchaseAddActivity"
             android:label="@string/title_activity_add_purchase"
             android:parentActivityName=".ui.HomeActivity"
             android:windowSoftInputMode="stateUnchanged" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="ch.berta.fabio.qwittig.ui.HomeActivity" />
         </activity>
         <activity
             android:name=".ui.PurchaseEditActivity"
             android:label="@string/title_activity_edit_purchase"
             android:parentActivityName=".ui.PurchaseDetailsActivity"
             android:windowSoftInputMode="stateUnchanged" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="ch.berta.fabio.qwittig.ui.PurchaseDetailsActivity" />
         </activity>
         <activity
             android:name=".ui.LoginActivity"
             android:label="@string/title_activity_login"
-            android:windowSoftInputMode="stateUnchanged" />
+            android:windowSoftInputMode="stateUnchanged|adjustPan" />
         <activity
             android:name=".ui.SettingsGroupNewActivity"
             android:label="@string/title_activity_settings_group_new"
             android:parentActivityName=".ui.SettingsActivity"
             android:windowSoftInputMode="stateUnchanged" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="ch.berta.fabio.qwittig.ui.SettingsActivity" />
         </activity>
         <activity
             android:name=".ui.SettingsUserInviteActivity"
             android:label="@string/title_activity_settings_user_invite"
             android:parentActivityName=".ui.SettingsActivity"
             android:windowSoftInputMode="stateUnchanged" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="ch.berta.fabio.qwittig.ui.SettingsActivity" />
         </activity>
         <activity
             android:name=".ui.SettingsProfileActivity"
             android:label="@string/title_activity_settings_profile"
             android:parentActivityName=".ui.SettingsActivity"
             android:windowSoftInputMode="stateUnchanged" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="ch.berta.fabio.qwittig.ui.SettingsActivity" />
         </activity>
         <activity
             android:name=".ui.CompensationsActivity"
             android:label="@string/title_activity_settlement"
             android:parentActivityName=".ui.HomeActivity"
             android:theme="@style/AppTheme.WithNavDrawer" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="ch.berta.fabio.qwittig.ui.HomeActivity" />
         </activity>
         <activity
             android:name=".ui.SettingsStoresActivity"
             android:label="@string/title_activity_settings_stores"
             android:parentActivityName=".ui.SettingsActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="ch.berta.fabio.qwittig.ui.SettingsActivity" />
         </activity>
         <activity
             android:name=".ui.HelpFeedbackActivity"
             android:label="@string/title_activity_help_feedback"
             android:parentActivityName=".ui.HomeActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="ch.berta.fabio.qwittig.ui.HomeActivity" />
         </activity>
         <activity
             android:name=".ui.PurchaseDraftsActivity"
