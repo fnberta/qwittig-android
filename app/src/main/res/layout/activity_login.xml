@@ -53,7 +53,7 @@
             android:id="@+id/tv_progress_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:text="@string/progress_login"/>
+            android:text="@string/progress_login"/>
 
     </LinearLayout>
 
