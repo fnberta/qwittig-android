@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#9E9E9E</color> <!-- Grey 500 -->
-    <color name="primary_dark">#616161</color> <!-- Grey 700 -->
+    <color name="primary">#2196F3</color> <!-- Teal 500 -->
+    <color name="primary_dark">#1976D2</color> <!-- Teal 700 -->
     <color name="accent">#FFAB00</color> <!-- Amber A400 -->
 
     <color name="red">#F44336</color> <!-- Red 500 -->
