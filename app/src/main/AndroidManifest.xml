@@ -91,7 +91,8 @@
         <activity
             android:name=".ui.LoginActivity"
             android:label="@string/title_activity_login"
-            android:windowSoftInputMode="stateUnchanged|adjustPan" />
+            android:windowSoftInputMode="stateUnchanged|adjustPan"
+            android:theme="@style/AppTheme.WithNavDrawer.Login"/>
         <activity
             android:name=".ui.SettingsGroupNewActivity"
             android:label="@string/title_activity_settings_group_new"
