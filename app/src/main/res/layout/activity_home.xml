@@ -63,6 +63,7 @@
             android:layout_margin="@dimen/normal_space"
             android:visibility="gone"
             app:borderWidth="0dp"
+            app:showTranslationY="@dimen/fab_translationY_auto"
             android:src="@drawable/ic_camera_alt_black_24dp" />
 
         <ch.berta.fabio.qwittig.ui.widgets.FabSpeedDial
@@ -73,6 +74,7 @@
             android:layout_margin="@dimen/normal_space"
             android:visibility="gone"
             app:borderWidth="0dp"
+            app:showTranslationY="@dimen/fab_translationY_manual"
             android:src="@drawable/ic_create_black_24dp" />
 
         <android.support.design.widget.FloatingActionButton

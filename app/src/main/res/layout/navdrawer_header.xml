@@ -15,7 +15,7 @@
         android:layout_marginTop="@dimen/navdrawer_status_bar_plus_normal_space"
         android:layout_marginBottom="@dimen/small_space"
         android:contentDescription="@string/user_avatar"
-        tools:src="@drawable/ic_avatar_40dp"/>
+        tools:src="@drawable/ic_account_circle_black_80dp"/>
 
     <TextView
         android:id="@+id/tv_drawer_nickname"

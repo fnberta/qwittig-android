@@ -36,9 +36,7 @@
     <dimen name="toolbar_height_x2_plus_tabs">160dp</dimen>
 
     <!-- NavDrawer -->
-    <dimen name="navdrawer_max_width">320dp</dimen>
     <dimen name="navdrawer_status_bar_plus_normal_space">40dp</dimen>
-    <dimen name="navdrawer_elevation">12dp</dimen>
     <dimen name="navdrawer_chosen_account_height">164dp</dimen>
     <dimen name="navdrawer_profile_avatar_size">64dp</dimen>
 
