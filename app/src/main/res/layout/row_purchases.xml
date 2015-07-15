@@ -58,6 +58,6 @@
         android:paddingEnd="@dimen/small_space"
         android:gravity="center"
         android:background="@color/grey_light"
-        android:textColor="?android:textColorSecondary"
+        tools:textColor="@color/green"
         tools:text="45"/>
 </RelativeLayout>
