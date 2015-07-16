@@ -246,5 +246,10 @@
     <string name="dialog_store_other">Anderes…</string>
     <string name="error_store">Bitte gib einen gültigen Namen an</string>
     <string name="push_action_join">Beitreten</string>
+    <string name="title_activity_stats">Statistiken</string>
+    <string name="tab_stats_spending">Ausgaben</string>
+    <string name="tab_stats_stores">Geschäfte</string>
+    <string name="period_month">Monat</string>
+    <string name="period_year">Jahr</string>
 
 </resources>

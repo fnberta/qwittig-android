@@ -17,6 +17,11 @@
             android:id="@+id/nav_drafts"
             android:icon="@drawable/ic_receipt_black_24dp"
             android:title="@string/title_activity_purchase_drafts" />
+
+        <item
+            android:id="@+id/nav_stats"
+            android:icon="@drawable/ic_assessment_black_24dp"
+            android:title="@string/title_activity_stats" />
     </group>
 
     <item

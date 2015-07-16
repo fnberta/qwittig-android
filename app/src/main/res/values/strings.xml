@@ -252,5 +252,10 @@
     <string name="dialog_store_other">Other…</string>
     <string name="error_store">Please enter a valid name</string>
     <string name="push_action_join">Join</string>
+    <string name="title_activity_stats">Stats</string>
+    <string name="tab_stats_spending">Spending</string>
+    <string name="tab_stats_stores">Stores</string>
+    <string name="period_year">Year</string>
+    <string name="period_month">Month</string>
 
 </resources>

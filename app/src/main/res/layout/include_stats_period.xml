@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/small_space"
+    android:layout_marginStart="@dimen/key_line_1"
+    android:layout_marginEnd="@dimen/key_line_1"
+    android:layout_marginBottom="@dimen/small_space"
+    android:gravity="center_horizontal"
+    android:orientation="horizontal">
+
+    <Spinner
+        android:id="@+id/sp_period"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/small_space"/>
+
+    <Spinner
+        android:id="@+id/sp_year"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/small_space"/>
+
+    <Spinner
+        android:id="@+id/sp_month"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
+
+
+</LinearLayout>

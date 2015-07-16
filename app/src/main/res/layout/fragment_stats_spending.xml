@@ -1,0 +1,29 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="ch.berta.fabio.qwittig.ui.StatsSpendingFragment">
+
+    <include layout="@layout/include_stats_period"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true">
+
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/bc_costs"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/key_line_1"
+            android:layout_marginEnd="@dimen/key_line_1"
+            android:paddingBottom="@dimen/small_space"
+            android:clipToPadding="false"
+            android:visibility="gone"/>
+
+        <include layout="@layout/include_progress"/>
+    </FrameLayout>
+
+</LinearLayout>

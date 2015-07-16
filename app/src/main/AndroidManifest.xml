@@ -17,6 +17,7 @@
     <permission
         android:name="ch.berta.fabio.qwittig.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
+
     <uses-permission android:name="ch.berta.fabio.qwittig.permission.C2D_MESSAGE" />
 
     <uses-feature
@@ -60,9 +61,7 @@
                     android:host="www.qwittig.ch"
                     android:pathPrefix="/invitation"
                     android:scheme="http" />
-
-                <data
-                    android:scheme="qwittig"/>
+                <data android:scheme="qwittig" />
             </intent-filter>
         </activity>
         <activity
@@ -91,8 +90,8 @@
         <activity
             android:name=".ui.LoginActivity"
             android:label="@string/title_activity_login"
-            android:windowSoftInputMode="stateUnchanged|adjustPan"
-            android:theme="@style/AppTheme.WithNavDrawer.Login"/>
+            android:theme="@style/AppTheme.WithNavDrawer.Login"
+            android:windowSoftInputMode="stateUnchanged|adjustPan" />
         <activity
             android:name=".ui.SettingsGroupNewActivity"
             android:label="@string/title_activity_settings_group_new"
@@ -130,10 +129,16 @@
         <activity
             android:name=".ui.PurchaseDraftsActivity"
             android:label="@string/title_activity_purchase_drafts"
+            android:theme="@style/AppTheme.WithNavDrawer" >
+        </activity>
+        <activity
+            android:name=".ui.StatsActivity"
+            android:label="@string/title_activity_stats"
             android:theme="@style/AppTheme.WithNavDrawer">
         </activity>
 
         <service android:name="com.parse.PushService" />
+
         <receiver
             android:name="com.parse.GcmBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND" >
@@ -159,6 +164,7 @@
         <meta-data
             android:name="com.parse.push.notification_icon"
             android:resource="@mipmap/ic_launcher" />
+
     </application>
 
 </manifest>
