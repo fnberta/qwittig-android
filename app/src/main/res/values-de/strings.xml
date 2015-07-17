@@ -251,8 +251,9 @@
     <string name="tab_stats_stores">Geschäfte</string>
     <string name="period_month">Monat</string>
     <string name="period_year">Jahr</string>
-    <string name="action_sory_by_user">Nach Nutzer sortieren</string>
+    <string name="action_sort_by_user">Nach Nutzer sortieren</string>
     <string name="no_stats_data">"Keine Daten für diese Periode"</string>
     <string name="tab_stats_currencies">Währungen</string>
+    <string name="action_show_average">Zeige Durchschnittswerte</string>
 
 </resources>

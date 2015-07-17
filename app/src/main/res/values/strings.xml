@@ -257,8 +257,9 @@
     <string name="tab_stats_stores">Stores</string>
     <string name="period_year">Year</string>
     <string name="period_month">Month</string>
-    <string name="action_sory_by_user">Sort by user</string>
+    <string name="action_sort_by_user">Sort by user</string>
     <string name="no_stats_data">"No data for this period"</string>
     <string name="tab_stats_currencies">Currencies</string>
+    <string name="action_show_average">Show average numbers</string>
 
 </resources>
