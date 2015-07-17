@@ -68,4 +68,7 @@
     <!-- ProgressBar -->
     <dimen name="pb_top_negative_margin">-7dp</dimen>
 
+    <!-- Charts -->
+    <dimen name="pc_multiple_size">345dp</dimen>
+
 </resources>

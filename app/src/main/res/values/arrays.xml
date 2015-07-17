@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="stats_periods">
+        <item>@string/period_year</item>
+        <item>@string/period_month</item>
+    </string-array>
+</resources>

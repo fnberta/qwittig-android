@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ch.berta.fabio.qwittig.ui.widgets.PieChart
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/pc_stores_user"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/pc_multiple_size"
+    android:layout_marginStart="@dimen/key_line_1"
+    android:layout_marginEnd="@dimen/key_line_1"
+    android:layout_marginBottom="@dimen/normal_space"
+    android:clipToPadding="false"/>
