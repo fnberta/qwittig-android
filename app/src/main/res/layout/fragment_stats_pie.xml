@@ -3,8 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginStart="@dimen/key_line_1"
-    android:layout_marginEnd="@dimen/key_line_1"
     android:orientation="vertical"
     tools:context="ch.berta.fabio.qwittig.ui.StatsStoresFragment">
 
@@ -15,18 +13,28 @@
         android:layout_height="match_parent"
         android:animateLayoutChanges="true">
 
-        <com.github.mikephil.charting.charts.PieChart
+        <ch.berta.fabio.qwittig.ui.widgets.PieChart
             android:id="@+id/pc_stores"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingTop="@dimen/small_space"
-            android:paddingBottom="@dimen/small_space"
-            android:clipToPadding="false"
+            android:layout_marginStart="@dimen/key_line_1"
+            android:layout_marginEnd="@dimen/key_line_1"
+            android:layout_marginTop="@dimen/small_space"
+            android:layout_marginBottom="@dimen/small_space"
             android:visibility="gone"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_stats_stores"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="@dimen/small_space"
+            android:clipToPadding="false"
+            android:scrollbars="vertical"
+            android:visibility="gone"/>
+
+        <include layout="@layout/include_stats_empty_view"/>
 
         <include layout="@layout/include_progress"/>
     </FrameLayout>
-
-
 
 </LinearLayout>

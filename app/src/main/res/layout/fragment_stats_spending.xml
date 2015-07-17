@@ -13,15 +13,17 @@
         android:layout_height="match_parent"
         android:animateLayoutChanges="true">
 
-        <com.github.mikephil.charting.charts.BarChart
+        <ch.berta.fabio.qwittig.ui.widgets.BarChart
             android:id="@+id/bc_costs"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginStart="@dimen/key_line_1"
             android:layout_marginEnd="@dimen/key_line_1"
-            android:paddingBottom="@dimen/small_space"
-            android:clipToPadding="false"
+            android:layout_marginTop="@dimen/small_space"
+            android:layout_marginBottom="@dimen/small_space"
             android:visibility="gone"/>
+
+        <include layout="@layout/include_stats_empty_view"/>
 
         <include layout="@layout/include_progress"/>
     </FrameLayout>

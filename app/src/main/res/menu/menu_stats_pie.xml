@@ -1,0 +1,13 @@
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="ch.berta.fabio.qwittig.ui.StatsActivity">
+
+    <item android:id="@+id/action_sort_by_user"
+          android:title="@string/action_sory_by_user"
+          android:orderInCategory="100"
+          android:checkable="true"
+          android:checked="false"
+          app:showAsAction="never"/>
+</menu>
