@@ -4,9 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="ch.berta.fabio.qwittig.ui.StatsSpendingFragment">
 
+    <item android:id="@+id/action_show_group"
+          android:title="@string/action_show_group"
+          android:orderInCategory="1"
+          android:checkable="true"
+          android:checked="false"
+          app:showAsAction="never"/>
+
     <item android:id="@+id/action_show_average"
           android:title="@string/action_show_average"
-          android:orderInCategory="100"
+          android:orderInCategory="2"
           android:checkable="true"
           android:checked="false"
           app:showAsAction="never"/>

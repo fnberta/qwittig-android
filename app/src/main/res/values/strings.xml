@@ -261,5 +261,6 @@
     <string name="no_stats_data">"No data for this period"</string>
     <string name="tab_stats_currencies">Currencies</string>
     <string name="action_show_average">Show average numbers</string>
+    <string name="action_show_group">Show group numbers</string>
 
 </resources>

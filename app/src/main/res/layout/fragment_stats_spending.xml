@@ -14,7 +14,7 @@
         android:animateLayoutChanges="true">
 
         <ch.berta.fabio.qwittig.ui.widgets.BarChart
-            android:id="@+id/bc_costs"
+            android:id="@+id/bc_spending"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginStart="@dimen/key_line_1"
