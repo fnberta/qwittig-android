@@ -32,7 +32,6 @@
             android:layout_margin="@dimen/normal_space"
             android:src="@drawable/ic_save_black_24dp"
             android:visibility="invisible"
-            app:borderWidth="0dp"
             tools:visibility="visible"/>
     </com.github.jorgecastilloprz.FABProgressCircle>
 

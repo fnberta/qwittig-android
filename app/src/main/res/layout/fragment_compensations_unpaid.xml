@@ -67,7 +67,6 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_swap_horiz_black_24dp"
                 android:visibility="invisible"
-                app:borderWidth="0dp"
                 tools:visibility="visible"/>
 
         </com.github.jorgecastilloprz.FABProgressCircle>

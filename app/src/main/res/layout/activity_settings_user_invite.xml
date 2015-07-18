@@ -33,7 +33,6 @@
             android:src="@drawable/ic_person_add_black_24dp"
             android:visibility="invisible"
             app:fabSize="mini"
-            app:borderWidth="0dp"
             tools:visibility="visible"/>
 
     </com.github.jorgecastilloprz.FABProgressCircle>

@@ -25,7 +25,6 @@
         android:visibility="invisible"
         app:layout_anchor="@id/appbar"
         app:layout_anchorGravity="bottom|end"
-        app:borderWidth="0dp"
         tools:visibility="visible"/>
 
 </android.support.design.widget.CoordinatorLayout>
