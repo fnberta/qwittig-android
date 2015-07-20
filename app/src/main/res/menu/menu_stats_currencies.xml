@@ -6,7 +6,7 @@
 
     <item android:id="@+id/action_sort_by_user"
           android:title="@string/action_sort_by_user"
-          android:orderInCategory="100"
+          android:orderInCategory="1"
           android:checkable="true"
           android:checked="false"
           app:showAsAction="never"/>

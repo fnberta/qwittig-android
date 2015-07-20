@@ -262,5 +262,6 @@
     <string name="tab_stats_currencies">Currencies</string>
     <string name="action_show_average">Show averageGroup numbers</string>
     <string name="action_show_group">Show group numbers</string>
+    <string name="action_show_percent">Show percent Values</string>
 
 </resources>

@@ -256,5 +256,6 @@
     <string name="tab_stats_currencies">Währungen</string>
     <string name="action_show_average">Zeige Durchschnittswerte</string>
     <string name="action_show_group">Zeige Gruppenwerte</string>
+    <string name="action_show_percent">Zeige Prozentwerte</string>
 
 </resources>
