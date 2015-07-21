@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="ch.berta.fabio.qwittig.ui.CompensationsActivity">
+    tools:context="ch.giantific.qwittig.ui.CompensationsActivity">
 
     <android.support.design.widget.CoordinatorLayout
         xmlns:android="http://schemas.android.com/apk/res/android"

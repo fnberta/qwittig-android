@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="ch.berta.fabio.qwittig.ui.HomeActivity">
+    tools:context="ch.giantific.qwittig.ui.HomeActivity">
 
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
@@ -55,7 +55,7 @@
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-        <ch.berta.fabio.qwittig.ui.widgets.FabSpeedDial
+        <ch.giantific.qwittig.ui.widgets.FabSpeedDial
             android:id="@+id/fab_auto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -65,7 +65,7 @@
             app:showTranslationY="@dimen/fab_translationY_auto"
             android:src="@drawable/ic_camera_alt_black_24dp" />
 
-        <ch.berta.fabio.qwittig.ui.widgets.FabSpeedDial
+        <ch.giantific.qwittig.ui.widgets.FabSpeedDial
             android:id="@+id/fab_manual"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

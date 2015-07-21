@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
-      tools:context="ch.berta.fabio.qwittig.ui.CompensationsActivity">
+      tools:context="ch.giantific.qwittig.ui.CompensationsActivity">
     <item android:id="@+id/action_compensation_add_manual"
           android:title="@string/action_compensation_add_manual"
           android:orderInCategory="100"

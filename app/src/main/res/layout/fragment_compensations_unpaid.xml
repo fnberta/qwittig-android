@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    tools:context="ch.berta.fabio.qwittig.ui.CompensationsUnpaidFragment">
+    tools:context="ch.giantific.qwittig.ui.CompensationsUnpaidFragment">
     
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/srl_compensations"
