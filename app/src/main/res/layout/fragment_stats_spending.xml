@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="ch.berta.fabio.qwittig.ui.StatsSpendingFragment">
+    tools:context="ch.giantific.qwittig.ui.StatsSpendingFragment">
 
     <include layout="@layout/include_stats_period"/>
 
@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:animateLayoutChanges="true">
 
-        <ch.berta.fabio.qwittig.ui.widgets.BarChart
+        <ch.giantific.qwittig.ui.widgets.BarChart
             android:id="@+id/bc_spending"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

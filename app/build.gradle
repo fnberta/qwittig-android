@@ -7,7 +7,7 @@ android {
     buildToolsVersion '22.0.1'
 
     defaultConfig {
-        applicationId 'ch.berta.fabio.qwittig'
+        applicationId 'ch.giantific.qwittig'
         minSdkVersion 17
         targetSdkVersion 22
         versionCode 1

@@ -11,7 +11,7 @@
         android:orientation="vertical"
         android:layout_marginStart="@dimen/key_line_1"
         android:layout_marginEnd="@dimen/key_line_1"
-        tools:context="ch.berta.fabio.qwittig.ui.LoginSignUpFragment">
+        tools:context="ch.giantific.qwittig.ui.LoginSignUpFragment">
 
         <ImageView
             android:id="@+id/ibt_login_signup_avatar"
