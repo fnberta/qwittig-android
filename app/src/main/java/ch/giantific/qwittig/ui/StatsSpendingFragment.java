@@ -2,6 +2,7 @@ package ch.giantific.qwittig.ui;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -215,13 +216,17 @@ public class StatsSpendingFragment extends StatsBaseFragment {
 
         for (Stats.Unit unit : units) {
             float value = mShowAverage ? unit.getAverage() : unit.getTotal();
-            BarEntry barEntry = new BarEntry(value, Integer.parseInt(unit.getIdentifier()));
+            int identifier = Integer.parseInt(unit.getIdentifier());
+            if (mPeriodType == PERIOD_MONTH) {
+                identifier--; // month identifier starts at 1, but x-Axis position starts at 0
+            }
+
+            BarEntry barEntry = new BarEntry(value, identifier);
+            barEntries.add(barEntry);
 
             if (value > 0) {
                 mHasNoData = false;
             }
-
-            barEntries.add(barEntry);
         }
 
         return barEntries;
