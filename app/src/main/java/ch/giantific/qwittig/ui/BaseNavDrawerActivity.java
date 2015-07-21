@@ -53,7 +53,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
 
     static final String URI_INVITED_EMAIL = "email";
     private static final int NAVDRAWER_ITEM_INVALID = -1;
-    private static final String SKU_PREMIUM = "ch.berta.fabio.qwittig.iab.premium";
+    private static final String SKU_PREMIUM = "ch.giantific.qwittig.iab.premium";
     private static final int RC_REQUEST = 10001;
     private static final String LOG_TAG = BaseNavDrawerActivity.class.getSimpleName();
 

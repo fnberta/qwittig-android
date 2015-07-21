@@ -86,8 +86,8 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     private static final String TYPE_USER_LEFT = "userLeft";
     private static final String TYPE_USER_DELETED = "userDeleted";
 
-    private static final String ACTION_PUSH_BUTTON_ACCEPT = "ch.berta.fabio.qwittig.push.intent.ACCEPT";
-    private static final String ACTION_PUSH_BUTTON_DISCARD = "ch.berta.fabio.qwittig.push.intent.DISCARD";
+    private static final String ACTION_PUSH_BUTTON_ACCEPT = "ch.giantific.qwittig.push.intent.ACCEPT";
+    private static final String ACTION_PUSH_BUTTON_DISCARD = "ch.giantific.qwittig.push.intent.DISCARD";
     private static final String NOTIFICATION_ID = "notification_id";
     private static final int NEW_PURCHASE_NOTIFICATION_ID = 1;
     private static final String STORED_PURCHASE_NOTIFICATIONS = "stored_purchase_notifications_";

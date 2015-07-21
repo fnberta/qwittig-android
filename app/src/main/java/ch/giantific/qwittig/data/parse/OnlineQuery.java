@@ -34,7 +34,7 @@ public class OnlineQuery {
     public static final int QUERY_ITEMS_PER_PAGE = 15;
     public static final String DATE_CREATED = "createdAt";
     public static final String DATE_UPDATED = "updatedAt";
-    public static final String INTENT_FILTER_DATA_NEW = "ch.berta.fabio.qwittig.push.DATA_NEW";
+    public static final String INTENT_FILTER_DATA_NEW = "ch.giantific.qwittig.push.DATA_NEW";
     public static final String INTENT_DATA_TYPE = "intent_data_type";
     public static final String INTENT_COMPENSATION_PAID = "intent_compensation_paid";
 
