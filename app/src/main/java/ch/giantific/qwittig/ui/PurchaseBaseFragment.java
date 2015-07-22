@@ -80,7 +80,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     String mStoreSelected;
     int mItemRowCount;
     List<ParseObject> mItems = new ArrayList<>();
-    double mTotalPrice = 0;
+    double mTotalPrice;
     List<ParseUser> mUsersAvailableParse = new ArrayList<>();
     List<Boolean> mPurchaseUsersInvolved;
     ArrayList<ItemUsersChecked> mItemsUsersChecked;
@@ -834,6 +834,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
             return false;
         }
 
+        mTotalPrice = 0;
         boolean itemsAreComplete = true;
 
         for (int i = 0, mItemsSize = mItems.size(); i < mItemsSize; i++) {
