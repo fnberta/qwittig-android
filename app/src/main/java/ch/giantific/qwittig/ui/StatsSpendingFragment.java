@@ -217,10 +217,6 @@ public class StatsSpendingFragment extends StatsBaseFragment {
         for (Stats.Unit unit : units) {
             float value = mShowAverage ? unit.getAverage() : unit.getTotal();
             int identifier = Integer.parseInt(unit.getIdentifier());
-            if (mPeriodType == PERIOD_MONTH) {
-                identifier--; // month identifier starts at 1, but x-Axis position starts at 0
-            }
-
             BarEntry barEntry = new BarEntry(value, identifier);
             barEntries.add(barEntry);
 
