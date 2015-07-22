@@ -9,6 +9,9 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.utils.PercentFormatter;
+
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.parse.CloudCode;
 
@@ -72,5 +75,12 @@ public class StatsCurrenciesFragment extends StatsPieBaseFragment {
         } else {
             mRecyclerAdapter.showPercentValues(true);
         }
+    }
+
+    @Override
+    void setDataSetOptions(PieDataSet pieDataSet) {
+        super.setDataSetOptions(pieDataSet);
+
+        pieDataSet.setValueFormatter(new PercentFormatter());
     }
 }

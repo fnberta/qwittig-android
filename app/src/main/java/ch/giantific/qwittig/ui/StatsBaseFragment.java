@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
+import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -29,6 +30,8 @@ import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.data.stats.models.Stats;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
+import ch.giantific.qwittig.utils.ParseUtils;
+import ch.giantific.qwittig.utils.Utils;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -247,6 +250,12 @@ public abstract class StatsBaseFragment extends BaseFragment implements
 
     @CallSuper
     void calcStats(String year, int month) {
+        if (!Utils.isConnected(getActivity())) {
+            showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(),
+                    ParseUtils.getNoConnectionException()));
+            return;
+        }
+
         mIsLoading = true;
         toggleProgressBarVisibility();
     }
@@ -301,48 +310,36 @@ public abstract class StatsBaseFragment extends BaseFragment implements
     }
 
     final int getColor(int position) {
-        Resources res = getResources();
-
-        if (position == 0) {
-            return res.getColor(R.color.red_500);
-        } else if (position == 1) {
-            return res.getColor(R.color.indigo_500);
-        } else if (position == 2) {
-            return res.getColor(R.color.cyan_700);
-        } else if (position == 3) {
-            return res.getColor(R.color.purple_500);
-        } else if (position == 4) {
-            return res.getColor(R.color.green_700);
-        } else if (position == 5) {
-            return res.getColor(R.color.brown_500);
-        } else if (position == 6) {
-            return res.getColor(R.color.deep_orange_500);
-        } else if (position == 7) {
-            return res.getColor(R.color.light_blue_700);
-        } else if (position == 8) {
-            return res.getColor(R.color.deep_purple_500);
-        } else if (position == 9) {
-            return res.getColor(R.color.teal_700);
-        } else if (position == 10) {
-            return res.getColor(R.color.blue_500);
-        } else if (position == 11) {
-            return res.getColor(R.color.blue_grey_500);
-        } else if (position > 11){
+        int[] colors = getResources().getIntArray(R.array.stats_colors);
+        if (position >= 0 && position <= 11) {
+            return colors[position];
+        } else if (position > 11) {
             return getColor(position - 12);
         }
 
         return -1;
     }
 
-    Stats parseJson(String json) {
+    final Stats parseJson(String json) {
         Gson gson = new Gson();
         return gson.fromJson(json, Stats.class);
     }
 
     @Override
     public void onCloudFunctionError(ParseException e) {
-        MessageUtils.showBasicSnackbar(mSpinnerPeriod, ParseErrorHandler.getErrorMessage(
-                getActivity(), e));
+        mIsLoading = false;
+        showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
+    }
+
+    private void showErrorSnackbar(String message) {
+        Snackbar snackbar = MessageUtils.getBasicSnackbar(mSpinnerPeriod, message);
+        snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reloadData();
+            }
+        });
+        snackbar.show();
     }
 
     @Override

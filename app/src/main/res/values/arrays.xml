@@ -4,4 +4,19 @@
         <item>@string/period_year</item>
         <item>@string/period_month</item>
     </string-array>
+    
+    <integer-array name="stats_colors">
+        <item>@color/red_500</item>
+        <item>@color/indigo_500</item>
+        <item>@color/cyan_700</item>
+        <item>@color/purple_500</item>
+        <item>@color/green_700</item>
+        <item>@color/brown_500</item>
+        <item>@color/deep_orange_500</item>
+        <item>@color/light_blue_700</item>
+        <item>@color/deep_purple_500</item>
+        <item>@color/teal_700</item>
+        <item>@color/blue_500</item>
+        <item>@color/blue_grey_500</item>
+    </integer-array>
 </resources>
