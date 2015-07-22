@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
@@ -25,6 +26,7 @@ import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.utils.MessageUtils;
+import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
@@ -123,8 +125,8 @@ public abstract class HomeBaseFragment extends BaseFragment implements
     }
 
     @Override
-    public void onCloudFunctionError(String errorMessage) {
-        disableLoadingAndShowError(errorMessage);
+    public void onCloudFunctionError(ParseException e) {
+        disableLoadingAndShowError(ParseErrorHandler.getErrorMessage(getActivity(), e));
     }
 
     private void disableLoadingAndShowError(String errorMessage) {

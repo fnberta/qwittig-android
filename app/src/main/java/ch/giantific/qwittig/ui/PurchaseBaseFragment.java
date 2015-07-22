@@ -3,6 +3,7 @@ package ch.giantific.qwittig.ui;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -79,7 +80,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     String mStoreSelected;
     int mItemRowCount;
     List<ParseObject> mItems = new ArrayList<>();
-    double mTotalPrice = 0;
+    double mTotalPrice;
     List<ParseUser> mUsersAvailableParse = new ArrayList<>();
     List<Boolean> mPurchaseUsersInvolved;
     ArrayList<ItemUsersChecked> mItemsUsersChecked;
@@ -314,7 +315,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      * @return the newly created Item Object
      */
     final ParseObject addNewItemRow(int idCounter) {
-        View itemRow = getActivity().getLayoutInflater() // TODO: somehow getActivity() returns null when rotating the device while auto receipt analysis
+        View itemRow = getActivity().getLayoutInflater()
                 .inflate(R.layout.row_add_purchase, mLayoutTotalItemRow, false);
         itemRow.setTag(idCounter - 1); // tag will be used in the ClickListener to get the position of the row, -1 because List index starts at 0
         mItemRows.add(itemRow);
@@ -809,7 +810,8 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
                 } else if (ParseUtils.isTestUser(mCurrentUser)) {
                     mListener.showAccountCreateDialog();
                 } else if (!Utils.isConnected(getActivity())) {
-                    MessageUtils.showBasicSnackbar(mButtonAddRow, getString(R.string.toast_no_connection));
+                    showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(),
+                            ParseUtils.getNoConnectionException()));
                 } else {
                     mIsSaving = true;
                     mListener.progressCircleShow();
@@ -832,6 +834,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
             return false;
         }
 
+        mTotalPrice = 0;
         boolean itemsAreComplete = true;
 
         for (int i = 0, mItemsSize = mItems.size(); i < mItemsSize; i++) {
@@ -866,10 +869,13 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      * Saves purchase in Parse database.
      */
     final void savePurchaseInParse() {
+        convertPrices(true);
+
         mPurchase.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if (e != null) {
+                    convertPrices(false);
                     onParseError(e);
                     return;
                 }
@@ -877,6 +883,21 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
                 onSaveSucceeded();
             }
         });
+    }
+
+    private void convertPrices(boolean toGroupCurrency) {
+        double exchangeRate = mPurchase.getExchangeRate();
+        if (exchangeRate == 1) {
+            return;
+        }
+
+        List<ParseObject> items = mPurchase.getItems();
+        for (ParseObject parseObject : items) {
+            Item item = (Item) parseObject;
+            item.convertPrice(exchangeRate, toGroupCurrency);
+        }
+
+        mPurchase.convertTotalPrice(toGroupCurrency);
     }
 
     @CallSuper

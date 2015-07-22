@@ -405,8 +405,8 @@ public class SettingsActivity extends BaseActivity implements
     }
 
     @Override
-    public void onCloudFunctionError(String errorMessage) {
-        onParseError(errorMessage);
+    public void onCloudFunctionError(ParseException e) {
+        onParseError(ParseErrorHandler.getErrorMessage(this, e));
     }
 
     @Override

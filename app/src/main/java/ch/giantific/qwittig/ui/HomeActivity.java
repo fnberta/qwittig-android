@@ -266,8 +266,8 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onCloudFunctionError(String errorMessage) {
-        MessageUtils.showBasicSnackbar(mFabAddPurchase, errorMessage);
+    public void onCloudFunctionError(ParseException e) {
+        MessageUtils.showBasicSnackbar(mFabAddPurchase, ParseErrorHandler.getErrorMessage(this, e));
     }
 
     @Override

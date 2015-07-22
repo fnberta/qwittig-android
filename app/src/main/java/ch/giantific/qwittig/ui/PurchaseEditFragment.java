@@ -25,6 +25,8 @@ import ch.giantific.qwittig.data.rates.models.CurrencyRates;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
+import ch.giantific.qwittig.utils.ParseUtils;
+import ch.giantific.qwittig.utils.Utils;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -42,6 +44,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     private static final String STATE_OLD_STORE = "old_store";
     private static final String STATE_OLD_DATE = "old_date";
     private static final String STATE_OLD_CURRENCY = "old_currency";
+    private static final String STATE_OLD_EXCHANGE_RATE = "old_exchange_rate";
 
     private static final String LOG_TAG = PurchaseEditFragment.class.getSimpleName();
     String mEditPurchaseId;
@@ -53,6 +56,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     private String mOldStore;
     private Date mOldDate;
     private String mOldCurrency;
+    private double mOldExchangeRate;
 
     public PurchaseEditFragment() {
     }
@@ -81,6 +85,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
             mOldStore = savedInstanceState.getString(STATE_OLD_STORE);
             mOldDate = DateUtils.parseLongToDate(savedInstanceState.getLong(STATE_OLD_DATE));
             mOldCurrency = savedInstanceState.getString(STATE_OLD_CURRENCY);
+            mOldExchangeRate = savedInstanceState.getDouble(STATE_OLD_EXCHANGE_RATE);
         } else {
             mOldValuesAreSet = false;
             mOldItemIds = new ArrayList<>();
@@ -134,6 +139,9 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
             // set currency from original purchase
             mOldCurrency = mPurchase.getCurrency();
             setCurrency(mOldCurrency);
+
+            // get original exchangeRate to convert prices
+            mOldExchangeRate = mPurchase.getExchangeRate();
         }
     }
 
@@ -178,7 +186,8 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
             final Item itemOld = (Item) mOldItems.get(i);
             final Item itemNew = (Item) addNewItemRow(i + 1);
             itemNew.setEditTextName(itemOld.getName());
-            String price = MoneyUtils.formatMoneyNoSymbol(itemOld.getPrice(), mCurrencySelected);
+            String price = MoneyUtils.formatMoneyNoSymbol(itemOld.getPriceForeign(mOldExchangeRate),
+                    mCurrencySelected);
             itemNew.setEditTextPrice(price);
             itemsNew.add(itemNew);
 
@@ -223,8 +232,8 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     @Override
     protected void setPurchase() {
         replacePurchaseData();
-        updateExchangeRate();
         resetReadBy();
+        updateExchangeRate();
     }
 
     final void replacePurchaseData() {
@@ -244,6 +253,10 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
         mPurchase.setCurrency(mCurrencySelected);
     }
 
+    private void resetReadBy() {
+        mPurchase.resetReadBy();
+    }
+
     private void updateExchangeRate() {
         if (mCurrencySelected.equals(mCurrentGroupCurrency)) {
             mPurchase.setExchangeRate(1);
@@ -261,8 +274,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
 
                 @Override
                 public void failure(RetrofitError error) {
-                    onParseError(new ParseException(ParseException.CONNECTION_FAILED,
-                            error.toString()));
+                    onParseError(ParseUtils.getNoConnectionException(error.toString()));
                 }
             });
         }
@@ -293,9 +305,8 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     }
 
     @Override
-    public void onCloudFunctionError(String errorMessage) {
-        mListener.progressCircleHide();
-        MessageUtils.showBasicSnackbar(getView(), errorMessage);
+    public void onCloudFunctionError(ParseException e) {
+        onParseError(e);
     }
 
     @Override
@@ -327,10 +338,6 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
 
     void onReceiptFileSaved() {
         savePurchaseInParse();
-    }
-
-    private void resetReadBy() {
-        mPurchase.resetReadBy();
     }
 
     @Override
@@ -369,7 +376,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
             Item itemOld = (Item) mOldItems.get(i);
             Item itemNew = (Item) mItems.get(i);
             if (!itemOld.getName().equals(itemNew.getName()) ||
-                    itemOld.getPrice() != itemNew.getPrice()) {
+                    itemOld.getPriceForeign(mOldExchangeRate) != itemNew.getPrice()) {
                 return true;
             }
 

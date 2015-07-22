@@ -110,7 +110,8 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
 
                 @Override
                 public void failure(RetrofitError error) {
-                    savePurchaseAsDraft();
+                    // TODO: check if safe to do (i.e. purchase safe needs to fail now)
+                    createNewPurchase(1);
                 }
             });
         }
@@ -146,7 +147,12 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
         snackbar.setAction(R.string.action_purchase_save_draft, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                pinPurchaseAsDraft();
+                if (mPurchase != null) {
+                    pinPurchaseAsDraft();
+                } else {
+                    // if we failed fast because of no network, purchase will not yet be created
+                    savePurchaseAsDraft();
+                }
             }
         });
         snackbar.show();

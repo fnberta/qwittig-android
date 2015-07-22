@@ -165,8 +165,8 @@ public abstract class SettingsBaseInviteFragment extends BaseFragment implements
 
     @Override
     @CallSuper
-    public void onCloudFunctionError(String errorMessage) {
-        onParseError(errorMessage);
+    public void onCloudFunctionError(ParseException e) {
+        onParseError(ParseErrorHandler.getErrorMessage(getActivity(), e));
     }
 
     final void removeInvitations(Group group) {

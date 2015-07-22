@@ -13,6 +13,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.parse.ParseException;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.data.stats.models.Stats;
 import ch.giantific.qwittig.utils.MessageUtils;
+import ch.giantific.qwittig.utils.ParseErrorHandler;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -338,8 +340,9 @@ public abstract class StatsBaseFragment extends BaseFragment implements
     }
 
     @Override
-    public void onCloudFunctionError(String errorMessage) {
-        MessageUtils.showBasicSnackbar(mSpinnerPeriod, errorMessage);
+    public void onCloudFunctionError(ParseException e) {
+        MessageUtils.showBasicSnackbar(mSpinnerPeriod, ParseErrorHandler.getErrorMessage(
+                getActivity(), e));
     }
 
     @Override

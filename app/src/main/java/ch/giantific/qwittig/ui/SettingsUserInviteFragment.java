@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.parse.ParseException;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
@@ -219,8 +220,8 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
     }
 
     @Override
-    public void onCloudFunctionError(String errorMessage) {
-        super.onCloudFunctionError(errorMessage);
+    public void onCloudFunctionError(ParseException e) {
+        super.onCloudFunctionError(e);
 
         removeInvitations(mCurrentGroup);
     }
