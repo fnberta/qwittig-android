@@ -810,7 +810,6 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
                 } else if (ParseUtils.isTestUser(mCurrentUser)) {
                     mListener.showAccountCreateDialog();
                 } else if (!Utils.isConnected(getActivity())) {
-                    // TODO: purchase will be null or the old one if user clicks on save as draft
                     showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(),
                             ParseUtils.getNoConnectionException()));
                 } else {
