@@ -315,7 +315,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      * @return the newly created Item Object
      */
     final ParseObject addNewItemRow(int idCounter) {
-        View itemRow = getActivity().getLayoutInflater() // TODO: somehow getActivity() returns null when rotating the device while auto receipt analysis
+        View itemRow = getActivity().getLayoutInflater()
                 .inflate(R.layout.row_add_purchase, mLayoutTotalItemRow, false);
         itemRow.setTag(idCounter - 1); // tag will be used in the ClickListener to get the position of the row, -1 because List index starts at 0
         mItemRows.add(itemRow);
