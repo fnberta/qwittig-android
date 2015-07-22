@@ -95,8 +95,6 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        double exchangeRate = mPurchase.getExchangeRate();
-
         switch (getItemViewType(position)) {
             case TYPE_ITEM: {
                 ItemRow itemRow = (ItemRow) viewHolder;
@@ -105,7 +103,7 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
 
                 itemRow.mTextViewName.setText(item.getName());
 
-                double price = item.getPrice() * exchangeRate;
+                double price = item.getPrice();
                 itemRow.mTextViewPrice.setText(
                         MoneyUtils.formatMoney(price, mCurrentGroupCurrency));
 
@@ -145,14 +143,14 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
                 TotalRow totalRow = (TotalRow) viewHolder;
 
                 totalRow.mTextViewTotalValue.setText(MoneyUtils.formatMoney(
-                        mPurchase.getTotalPriceAdjusted(), mCurrentGroupCurrency));
+                        mPurchase.getTotalPrice(), mCurrentGroupCurrency));
                 break;
             }
             case TYPE_MY_SHARE: {
                 MyShareRow myShareRow = (MyShareRow) viewHolder;
 
                 double myShare = Utils.calculateMyShare(mPurchase);
-                if (myShare != mPurchase.getTotalPriceAdjusted()) {
+                if (myShare != mPurchase.getTotalPrice()) {
                     myShareRow.mTextViewMyShareValue.setText(MoneyUtils.formatMoney(myShare,
                             mCurrentGroupCurrency));
                 } else {

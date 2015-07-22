@@ -49,11 +49,26 @@ public class Item extends ParseObject {
         put(NAME, name);
     }
 
+    public double getPriceForeign(double exchangeRate) {
+        double price = getPrice();
+        if (exchangeRate == 1) {
+            return price;
+        }
+
+        return price / exchangeRate;
+    }
+
     public double getPrice() {
         return getDouble(PRICE);
     }
 
-    public void setPrice(BigDecimal finalPrice) {
+    public void convertPrice(double exchangeRate, boolean toGroupCurrency) {
+        double price = getPrice();
+        double priceConverted = toGroupCurrency ? price * exchangeRate : price / exchangeRate;
+        setPrice(priceConverted);
+    }
+
+    public void setPrice(Number finalPrice) {
         put(PRICE, finalPrice);
     }
 

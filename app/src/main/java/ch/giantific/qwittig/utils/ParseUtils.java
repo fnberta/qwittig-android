@@ -1,7 +1,10 @@
 package ch.giantific.qwittig.utils;
 
+import android.support.annotation.NonNull;
+
 import com.parse.ParseACL;
 import com.parse.ParseConfig;
+import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
@@ -79,5 +82,15 @@ public class ParseUtils {
         ParseConfig config = ParseConfig.getCurrentConfig();
 
         return config.getList(Config.SUPPORTED_CURRENCIES);
+    }
+
+    @NonNull
+    public static ParseException getNoConnectionException() {
+        return getNoConnectionException("");
+    }
+
+    @NonNull
+    public static ParseException getNoConnectionException(String message) {
+        return new ParseException(ParseException.CONNECTION_FAILED, message);
     }
 }

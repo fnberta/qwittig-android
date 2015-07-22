@@ -72,7 +72,7 @@ public class DraftsAdapter extends BaseAdapter {
         viewHolder.tvDate.setText(DateUtils.formatMonthDayLineSeparated(draft.getDate()));
         viewHolder.tvStore.setText(draft.getStore());
 
-        double totalPrice = draft.getTotalPriceAdjusted();
+        double totalPrice = draft.getTotalPrice();
         viewHolder.tvTotal.setText(MoneyUtils.formatMoneyNoSymbol(totalPrice, mCurrentGroupCurrency));
 
         return convertView;

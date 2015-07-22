@@ -110,7 +110,8 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
 
                 @Override
                 public void failure(RetrofitError error) {
-                    savePurchaseAsDraft();
+                    // TODO: check if safe to do (i.e. purchase safe needs to fail now)
+                    createNewPurchase(1);
                 }
             });
         }

@@ -270,19 +270,29 @@ public class Purchase extends ParseObject {
         remove(DRAFT_ID);
     }
 
+    public void convertTotalPrice(boolean toGroupCurrency) {
+        double totalPrice = getTotalPrice();
+        double exchangeRate = getExchangeRate();
+        double totalPriceConverted = toGroupCurrency ? totalPrice * exchangeRate : totalPrice / exchangeRate;
+        setTotalPrice(totalPriceConverted);
+    }
+
     public void setTotalPrice(double totalPrice) {
         put(TOTAL_PRICE, totalPrice);
     }
 
-    public double getTotalPrice() {
-        return getDouble(TOTAL_PRICE);
-    }
-
-    public double getTotalPriceAdjusted() {
+    public double getTotalPriceForeign() {
         double totalPrice = getTotalPrice();
         double exchangeRate = getExchangeRate();
+        if (exchangeRate == 1) {
+            return totalPrice;
+        }
 
-        return totalPrice * exchangeRate;
+        return totalPrice / getExchangeRate();
+    }
+
+    public double getTotalPrice() {
+        return getDouble(TOTAL_PRICE);
     }
 
     public void setCurrency(String currency) {

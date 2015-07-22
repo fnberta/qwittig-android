@@ -3,6 +3,7 @@ package ch.giantific.qwittig.ui;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -809,7 +810,9 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
                 } else if (ParseUtils.isTestUser(mCurrentUser)) {
                     mListener.showAccountCreateDialog();
                 } else if (!Utils.isConnected(getActivity())) {
-                    MessageUtils.showBasicSnackbar(mButtonAddRow, getString(R.string.toast_no_connection));
+                    // TODO: purchase will be null or the old one if user clicks on save as draft
+                    showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(),
+                            ParseUtils.getNoConnectionException()));
                 } else {
                     mIsSaving = true;
                     mListener.progressCircleShow();
@@ -866,10 +869,13 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      * Saves purchase in Parse database.
      */
     final void savePurchaseInParse() {
+        convertPrices(true);
+
         mPurchase.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if (e != null) {
+                    convertPrices(false);
                     onParseError(e);
                     return;
                 }
@@ -877,6 +883,21 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
                 onSaveSucceeded();
             }
         });
+    }
+
+    private void convertPrices(boolean toGroupCurrency) {
+        double exchangeRate = mPurchase.getExchangeRate();
+        if (exchangeRate == 1) {
+            return;
+        }
+
+        List<ParseObject> items = mPurchase.getItems();
+        for (ParseObject parseObject : items) {
+            Item item = (Item) parseObject;
+            item.convertPrice(exchangeRate, toGroupCurrency);
+        }
+
+        mPurchase.convertTotalPrice(toGroupCurrency);
     }
 
     @CallSuper

@@ -56,7 +56,7 @@ public class CloudCode {
                 if (e != null) {
                     ParseErrorHandler.handleParseError(context, e);
                     if (listener != null) {
-                        listener.onCloudFunctionError(ParseErrorHandler.getErrorMessage(context, e));
+                        listener.onCloudFunctionError(e);
                     }
                     return;
                 }
@@ -79,7 +79,7 @@ public class CloudCode {
                 if (e != null) {
                     ParseErrorHandler.handleParseError(context, e);
                     if (listener != null) {
-                        listener.onCloudFunctionError(ParseErrorHandler.getErrorMessage(context, e));
+                        listener.onCloudFunctionError(e);
                     }
                     return;
                 }
@@ -102,7 +102,7 @@ public class CloudCode {
                 if (e != null) {
                     ParseErrorHandler.handleParseError(context, e);
                     if (listener != null) {
-                        listener.onCloudFunctionError(ParseErrorHandler.getErrorMessage(context, e));
+                        listener.onCloudFunctionError(e);
                     }
                     return;
                 }
@@ -133,7 +133,7 @@ public class CloudCode {
                 if (e != null) {
                     ParseErrorHandler.handleParseError(context, e);
                     if (listener != null) {
-                        listener.onCloudFunctionError(ParseErrorHandler.getErrorMessage(context, e));
+                        listener.onCloudFunctionError(e);
                     }
                     return;
                 }
@@ -160,7 +160,7 @@ public class CloudCode {
                 if (e != null) {
                     ParseErrorHandler.handleParseError(context, e);
                     if (listener != null) {
-                        listener.onCloudFunctionError(ParseErrorHandler.getErrorMessage(context, e));
+                        listener.onCloudFunctionError(e);
                     }
                     return;
                 }
@@ -190,7 +190,7 @@ public class CloudCode {
                 if (e != null) {
                     ParseErrorHandler.handleParseError(context, e);
                     if (listener != null) {
-                        listener.onCloudFunctionError(ParseErrorHandler.getErrorMessage(context, e));
+                        listener.onCloudFunctionError(e);
                     }
                     return;
                 }
@@ -212,7 +212,7 @@ public class CloudCode {
                 if (e != null) {
                     ParseErrorHandler.handleParseError(context, e);
                     if (listener != null) {
-                        listener.onCloudFunctionError(ParseErrorHandler.getErrorMessage(context, e));
+                        listener.onCloudFunctionError(e);
                     }
                     return;
                 }
@@ -234,7 +234,7 @@ public class CloudCode {
                 if (e != null) {
                     ParseErrorHandler.handleParseError(context, e);
                     if (listener != null) {
-                        listener.onCloudFunctionError(ParseErrorHandler.getErrorMessage(context, e));
+                        listener.onCloudFunctionError(e);
                     }
                     return;
                 }
@@ -256,7 +256,7 @@ public class CloudCode {
                 if (e != null) {
                     ParseErrorHandler.handleParseError(context, e);
                     if (listener != null) {
-                        listener.onCloudFunctionError(ParseErrorHandler.getErrorMessage(context, e));
+                        listener.onCloudFunctionError(e);
                     }
                     return;
                 }
@@ -278,7 +278,7 @@ public class CloudCode {
                 if (e != null) {
                     ParseErrorHandler.handleParseError(context, e);
                     if (listener != null) {
-                        listener.onCloudFunctionError(ParseErrorHandler.getErrorMessage(context, e));
+                        listener.onCloudFunctionError(e);
                     }
                     return;
                 }
@@ -302,7 +302,7 @@ public class CloudCode {
     }
 
     public interface CloudFunctionListener {
-        void onCloudFunctionError(String errorMessage);
+        void onCloudFunctionError(ParseException e);
         void onCloudFunctionReturned(String cloudFunction, Object o);
     }
 }

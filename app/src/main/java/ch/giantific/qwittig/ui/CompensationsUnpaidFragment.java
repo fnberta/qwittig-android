@@ -255,9 +255,9 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
     }
 
     @Override
-    public void onCloudFunctionError(String errorMessage) {
+    public void onCloudFunctionError(ParseException e) {
         mFabProgressCircle.hide();
-        MessageUtils.showBasicSnackbar(mFabNew, errorMessage);
+        MessageUtils.showBasicSnackbar(mFabNew, ParseErrorHandler.getErrorMessage(getActivity(), e));
 
         if (!mLoadingCompensations.isEmpty()) {
             for (Iterator<String> iterator = mLoadingCompensations.iterator(); iterator.hasNext(); ) {

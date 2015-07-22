@@ -171,8 +171,8 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
     }
 
     @Override
-    public void onCloudFunctionError(String errorMessage) {
-        super.onCloudFunctionError(errorMessage);
+    public void onCloudFunctionError(ParseException e) {
+        super.onCloudFunctionError(e);
 
         removeInvitations(mGroupNew);
     }
