@@ -2,6 +2,7 @@ package ch.giantific.qwittig.ui;
 
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -31,6 +32,8 @@ import retrofit.client.Response;
  * A placeholder fragment containing a simple view.
  */
 public class PurchaseAddFragment extends PurchaseBaseFragment {
+
+    private static final String LOG_TAG = PurchaseAddFragment.class.getSimpleName();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
