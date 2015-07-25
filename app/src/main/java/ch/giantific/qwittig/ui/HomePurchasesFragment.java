@@ -46,7 +46,7 @@ public class HomePurchasesFragment extends HomeBaseFragment implements
         super.onViewCreated(view, savedInstanceState);
 
         mRecyclerAdapter = new PurchasesRecyclerAdapter(getActivity(),
-                R.layout.row_purchases, mPurchases, mUsers, this);
+                R.layout.row_purchases, mPurchases, this);
         mRecyclerView.setAdapter(mRecyclerAdapter);
         mScrollListener = new InfiniteScrollListener(mLayoutManager, mRecyclerView) {
             @Override
@@ -66,8 +66,8 @@ public class HomePurchasesFragment extends HomeBaseFragment implements
     }
 
     @Override
-    public void onUsersLocalQueried(List<ParseUser> users) {
-        super.onUsersLocalQueried(users);
+    public void updateAdapter() {
+        super.updateAdapter();
 
         LocalQuery.queryPurchases(this);
     }

@@ -34,12 +34,10 @@ import ch.giantific.qwittig.utils.Utils;
  */
 public abstract class HomeBaseFragment extends BaseFragment implements
         CloudCode.CloudFunctionListener,
-        LocalQuery.UserLocalQueryListener,
         LocalQuery.ObjectLocalFetchListener {
 
     User mCurrentUser;
     Group mCurrentGroup;
-    List<ParseUser> mUsers = new ArrayList<>();
     FragmentInteractionListener mListener;
     RecyclerView mRecyclerView;
     SwipeRefreshLayout mSwipeRefreshLayout;
@@ -167,28 +165,12 @@ public abstract class HomeBaseFragment extends BaseFragment implements
     @CallSuper
     public void updateAdapter() {
         updateCurrentUserGroup();
-        if (mCurrentUser != null) {
-            LocalQuery.queryUsers(this);
-        }
     }
 
     private void updateCurrentUserGroup() {
         mCurrentUser = (User) ParseUser.getCurrentUser();
         if (mCurrentUser != null) {
             mCurrentGroup = mCurrentUser.getCurrentGroup();
-        }
-    }
-
-    @Override
-    public void onUsersLocalQueried(List<ParseUser> users) {
-        mUsers.clear();
-
-        if (!users.isEmpty()) {
-            for (ParseUser user : users) {
-                if (!user.getObjectId().equals(mCurrentUser.getObjectId())) {
-                    mUsers.add(user);
-                }
-            }
         }
     }
 

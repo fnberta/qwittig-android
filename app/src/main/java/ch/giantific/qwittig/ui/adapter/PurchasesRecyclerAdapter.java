@@ -35,18 +35,16 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
     private int mPurchasesViewResource;
     private Context mContext;
     private List<ParseObject> mPurchases;
-    private List<ParseUser> mUsers;
     private String mCurrentGroupCurrency;
 
     public PurchasesRecyclerAdapter(Context context, int viewResource, List<ParseObject> purchases,
-                                    List<ParseUser> users, AdapterInteractionListener listener) {
+                                    AdapterInteractionListener listener) {
         super();
 
         mListener = listener;
         mContext = context;
         mPurchasesViewResource = viewResource;
         mPurchases = purchases;
-        mUsers = users;
     }
 
     @Override
@@ -91,7 +89,8 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
                 User buyer = (User) purchase.getBuyer();
                 User currentUser = (User) ParseUser.getCurrentUser();
                 String nickname;
-                if (mUsers.contains(buyer) || buyer.getObjectId().equals(currentUser.getObjectId())) {
+                if (buyer.getGroupIds().contains(currentUser.getCurrentGroup().getObjectId()) ||
+                buyer.getObjectId().equals(currentUser.getObjectId())) {
                     nickname = buyer.getNicknameOrMe(mContext);
                 } else {
                     nickname = mContext.getString(R.string.user_deleted);
