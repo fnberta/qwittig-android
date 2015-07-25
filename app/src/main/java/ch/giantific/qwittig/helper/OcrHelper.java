@@ -4,24 +4,36 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
+
+import com.parse.GetCallback;
+import com.parse.Parse;
+import com.parse.ParseException;
+import com.parse.ParseSession;
 
 import java.io.File;
 
 import ch.giantific.qwittig.data.ocr.RestClient;
 import ch.giantific.qwittig.data.ocr.models.PurchaseRest;
+import ch.giantific.qwittig.utils.ParseErrorHandler;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 import retrofit.mime.TypedFile;
+import retrofit.mime.TypedString;
 
 /**
  * Created by fabio on 10.12.14.
  */
 public class OcrHelper extends Fragment {
 
+    private static final String LOG_TAG = OcrHelper.class.getSimpleName();
     private static final String BUNDLE_RECEIPT = "receipt";
+    private static final int MAX_RETRIES = 2;
     private HelperInteractionListener mListener;
+    private String mReceiptPath;
+    private int mRetries;
 
     public OcrHelper() {
         // empty default constructor
@@ -53,23 +65,44 @@ public class OcrHelper extends Fragment {
         // Retain this fragment across configuration changes.
         setRetainInstance(true);
 
-        String receiptPath = "";
         Bundle args = getArguments();
         if (args != null) {
-            receiptPath = args.getString(BUNDLE_RECEIPT);
+            mReceiptPath = args.getString(BUNDLE_RECEIPT);
+            if (TextUtils.isEmpty(mReceiptPath)) {
+                return;
+            }
         }
-        
-        if (!TextUtils.isEmpty(receiptPath)) {
-            doReceiptOcr(receiptPath);
-        }
+
+        getSessionToken();
     }
 
-    private void doReceiptOcr(String receiptPath) {
+    private void getSessionToken() {
+        ParseSession.getCurrentSessionInBackground(new GetCallback<ParseSession>() {
+            @Override
+            public void done(ParseSession parseSession, ParseException e) {
+                if (e != null) {
+                    if (mListener != null) {
+                        ParseErrorHandler.handleParseError(getActivity(), e);
+                        mListener.onOcrFailed(ParseErrorHandler.getErrorMessage(getActivity(), e));
+                    }
+
+                    return;
+                }
+
+                String sessionToken = parseSession.getSessionToken();
+                doReceiptOcr(sessionToken);
+            }
+        });
+    }
+
+    private void doReceiptOcr(String sessionToken) {
         String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("jpg");
-        RestClient.getService().uploadReceipt(new TypedFile(mimeType, new File(receiptPath)),
+        RestClient.getService().uploadReceipt(new TypedString(sessionToken),
+                new TypedFile(mimeType, new File(mReceiptPath)),
                 new Callback<PurchaseRest>() {
                     @Override
                     public void success(PurchaseRest purchaseRest, Response response) {
+                        mRetries = 0;
                         if (mListener != null) {
                             mListener.onOcrSuccessful(purchaseRest);
                         }
@@ -77,8 +110,13 @@ public class OcrHelper extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
-                        if (mListener != null) {
-                            mListener.onOcrFailed(error);
+                        Log.e(LOG_TAG, "retrofit error " + error.toString() + " retry " + mRetries);
+
+                        if (mRetries < MAX_RETRIES) {
+                            getSessionToken();
+                            mRetries++;
+                        } else if (mListener != null) {
+                            mListener.onOcrFailed(error.getLocalizedMessage());
                         }
                     }
                 });
@@ -92,6 +130,6 @@ public class OcrHelper extends Fragment {
 
     public interface HelperInteractionListener {
         void onOcrSuccessful(PurchaseRest purchaseRest);
-        void onOcrFailed(RetrofitError error);
+        void onOcrFailed(String errorMessage);
     }
 }

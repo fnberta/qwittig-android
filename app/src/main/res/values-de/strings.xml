@@ -257,5 +257,6 @@
     <string name="action_show_average">Zeige Durchschnittswerte</string>
     <string name="action_show_group">Zeige Gruppenwerte</string>
     <string name="action_show_percent">Zeige Prozentwerte</string>
+    <string name="progress_purchase_auto">Hochladen und verarbeiten….</string>
 
 </resources>
