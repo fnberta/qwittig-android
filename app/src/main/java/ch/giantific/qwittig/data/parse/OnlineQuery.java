@@ -239,6 +239,30 @@ public class OnlineQuery {
         });
     }
 
+    public static void updateCurrentUser(final Context context, final UserPinListener listener) {
+        User currentUser = (User) ParseUser.getCurrentUser();
+        if (currentUser == null) {
+            return;
+        }
+
+        currentUser.fetchInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseObject, ParseException e) {
+                if (e != null) {
+                    ParseErrorHandler.handleParseError(context, e);
+                    if (listener != null) {
+                        listener.onUsersPinFailed(ParseErrorHandler.getErrorMessage(context, e));
+                    }
+                    return;
+                }
+
+                if (listener != null) {
+                    listener.onUsersPinned();
+                }
+            }
+        });
+    }
+
     public static void queryCompensations(final Context context,
                                           final CompensationPinListener listener) {
         List<ParseObject> groups = getCurrentUserGroups();
