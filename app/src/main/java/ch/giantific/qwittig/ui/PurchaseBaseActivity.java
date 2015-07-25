@@ -15,6 +15,7 @@ import android.provider.MediaStore;
 import android.support.annotation.IntDef;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.view.ViewCompat;
 import android.transition.Transition;
 import android.util.Log;
 import android.view.Menu;
@@ -146,14 +147,12 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         });
     }
 
-    private void showFab() {
-        showFab(false);
-    }
-
     @Override
-    public void showFab(boolean needsLayoutListener) {
+    public void showFab() {
         if (Utils.isRunningLollipopAndHigher()) {
-            if (needsLayoutListener) {
+            if (ViewCompat.isLaidOut(mFabPurchaseSave)) {
+                circularRevealFab();
+            } else {
                 mFabPurchaseSave.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
                     @Override
                     public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
@@ -161,8 +160,6 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
                         circularRevealFab();
                     }
                 });
-            } else {
-                circularRevealFab();
             }
         } else {
             mFabPurchaseSave.setVisibility(View.VISIBLE);
