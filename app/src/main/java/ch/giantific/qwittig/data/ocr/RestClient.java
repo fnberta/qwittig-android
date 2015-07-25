@@ -12,6 +12,7 @@ import retrofit.http.Multipart;
 import retrofit.http.POST;
 import retrofit.http.Part;
 import retrofit.mime.TypedFile;
+import retrofit.mime.TypedString;
 
 /**
  * Created by fabio on 01.02.15.
@@ -42,6 +43,8 @@ public class RestClient {
     public interface ReceiptOcr {
         @Multipart
         @POST("/api/receipt")
-        void uploadReceipt(@Part("receipt") TypedFile receipt, Callback<PurchaseRest> callback);
+        void uploadReceipt(@Part("sessionToken") TypedString sessionToken,
+                           @Part("receipt") TypedFile receipt,
+                           Callback<PurchaseRest> callback);
     }
 }

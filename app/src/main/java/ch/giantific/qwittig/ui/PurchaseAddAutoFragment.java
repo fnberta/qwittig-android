@@ -27,7 +27,7 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
 
     private static final String STATE_ITEMS_SET = "items_set";
     private static final String LOG_TAG = PurchaseAddAutoFragment.class.getSimpleName();
-    private ProgressBar mProgressBarLoad;
+    private View mProgressView;
     private View mMainView;
     private boolean mOcrValuesAreSet;
     private boolean mInTrialMode;
@@ -79,7 +79,7 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
     void findViews(View rootView) {
         super.findViews(rootView);
 
-        mProgressBarLoad = (ProgressBar) rootView.findViewById(R.id.pb_purchase_add_auto);
+        mProgressView = rootView.findViewById(R.id.ll_progress);
         mMainView = rootView.findViewById(R.id.view_add);
     }
 
@@ -148,7 +148,7 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
     }
 
     public void showMainScreen() {
-        mProgressBarLoad.setVisibility(View.GONE);
+        mProgressView.setVisibility(View.GONE);
         mMainView.setVisibility(View.VISIBLE);
         getActivity().invalidateOptionsMenu();
     }

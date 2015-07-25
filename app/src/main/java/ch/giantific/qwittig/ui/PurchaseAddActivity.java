@@ -15,6 +15,9 @@ import ch.giantific.qwittig.data.ocr.models.PurchaseRest;
 import ch.giantific.qwittig.helper.OcrHelper;
 import ch.giantific.qwittig.ui.dialogs.PurchaseDiscardDialogFragment;
 import ch.giantific.qwittig.utils.MessageUtils;
+import ch.giantific.qwittig.utils.ParseErrorHandler;
+import ch.giantific.qwittig.utils.ParseUtils;
+import ch.giantific.qwittig.utils.Utils;
 import retrofit.RetrofitError;
 
 
@@ -86,6 +89,11 @@ public class PurchaseAddActivity extends PurchaseBaseActivity implements
     }
 
     private void doReceiptOcrWithHelper() {
+        if (!Utils.isConnected(this)) {
+            onOcrFailed(getString(R.string.toast_no_connection));
+            return;
+        }
+
         FragmentManager fragmentManager = getFragmentManager();
         OcrHelper ocrHelper = (OcrHelper) fragmentManager.findFragmentByTag(OCR_HELPER);
 
@@ -107,10 +115,10 @@ public class PurchaseAddActivity extends PurchaseBaseActivity implements
     }
 
     @Override
-    public void onOcrFailed(RetrofitError error) {
-        MessageUtils.showBasicSnackbar(mToolbar, error.getLocalizedMessage());
+    public void onOcrFailed(String errorMessage) {
+        MessageUtils.showBasicSnackbar(mToolbar, errorMessage);
         ((PurchaseAddAutoFragment) mPurchaseFragment).showMainScreen();
-        showFab(false);
+        showFab(true);
     }
 
     @Override

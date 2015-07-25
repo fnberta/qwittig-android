@@ -263,5 +263,6 @@
     <string name="action_show_average">Show averageGroup numbers</string>
     <string name="action_show_group">Show group numbers</string>
     <string name="action_show_percent">Show percent Values</string>
+    <string name="progress_purchase_auto">Uploading and processing image…</string>
 
 </resources>
