@@ -111,14 +111,14 @@ public class PurchaseAddActivity extends PurchaseBaseActivity implements
     @Override
     public void onOcrSuccessful(PurchaseRest purchaseRest) {
         ((PurchaseAddAutoFragment) mPurchaseFragment).setValuesFromOcr(purchaseRest);
-        showFab(false);
+        showFab();
     }
 
     @Override
     public void onOcrFailed(String errorMessage) {
         MessageUtils.showBasicSnackbar(mToolbar, errorMessage);
         ((PurchaseAddAutoFragment) mPurchaseFragment).showMainScreen();
-        showFab(true);
+        showFab();
     }
 
     @Override

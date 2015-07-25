@@ -253,7 +253,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     void revealFab() {
-        mListener.showFab(true);
+        mListener.showFab();
     }
 
     /**
@@ -1016,7 +1016,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
 
         void finishPurchase();
 
-        void showFab(boolean needsLayoutListener);
+        void showFab();
 
         void showReceiptFragment();
 
