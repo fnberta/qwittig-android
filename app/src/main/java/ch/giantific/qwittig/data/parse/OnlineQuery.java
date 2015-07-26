@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.IntDef;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
@@ -38,12 +39,13 @@ public class OnlineQuery {
     public static final String INTENT_DATA_TYPE = "intent_data_type";
     public static final String INTENT_COMPENSATION_PAID = "intent_compensation_paid";
 
-    @IntDef({DATA_TYPE_PURCHASE, DATA_TYPE_USER, DATA_TYPE_COMPENSATION})
+    @IntDef({DATA_TYPE_PURCHASE, DATA_TYPE_USER, DATA_TYPE_COMPENSATION, DATA_TYPE_GROUP})
     @Retention(RetentionPolicy.SOURCE)
     public @interface DataType {}
     public static final int DATA_TYPE_PURCHASE = 1;
     public static final int DATA_TYPE_USER = 2;
     public static final int DATA_TYPE_COMPENSATION = 3;
+    public static final int DATA_TYPE_GROUP = 4;
 
     private static final String LOG_TAG = OnlineQuery.class.getSimpleName();
 
@@ -235,30 +237,6 @@ public class OnlineQuery {
                         });
                     }
                 });
-            }
-        });
-    }
-
-    public static void updateCurrentUser(final Context context, final UserPinListener listener) {
-        User currentUser = (User) ParseUser.getCurrentUser();
-        if (currentUser == null) {
-            return;
-        }
-
-        currentUser.fetchInBackground(new GetCallback<ParseObject>() {
-            @Override
-            public void done(ParseObject parseObject, ParseException e) {
-                if (e != null) {
-                    ParseErrorHandler.handleParseError(context, e);
-                    if (listener != null) {
-                        listener.onUsersPinFailed(ParseErrorHandler.getErrorMessage(context, e));
-                    }
-                    return;
-                }
-
-                if (listener != null) {
-                    listener.onUsersPinned();
-                }
             }
         });
     }
@@ -503,7 +481,7 @@ public class OnlineQuery {
                     return;
                 }
 
-                listener.onGroupQueried(parseObject);
+                notifyGroupChange(context, listener, parseObject);
             }
         });
     }
@@ -548,6 +526,15 @@ public class OnlineQuery {
             listener.onCompensationsPinned(isPaid);
         } else {
             sendLocalBroadcastCompensation(context, isPaid);
+        }
+    }
+
+    public static void notifyGroupChange(Context context, GroupQueryListener listener,
+                                         ParseObject group) {
+        if (listener != null) {
+            listener.onGroupQueried(group);
+        } else {
+            sendLocalBroadcast(context, DATA_TYPE_GROUP);
         }
     }
 

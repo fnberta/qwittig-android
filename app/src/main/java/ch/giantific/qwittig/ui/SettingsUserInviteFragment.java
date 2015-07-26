@@ -220,13 +220,6 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
     }
 
     @Override
-    public void onCloudFunctionError(ParseException e) {
-        super.onCloudFunctionError(e);
-
-        removeInvitations(mCurrentGroup);
-    }
-
-    @Override
     public void onCloudFunctionReturned(String cloudFunction, Object o) {
         mListener.progressCircleStartFinal();
     }
