@@ -132,23 +132,8 @@ public abstract class SettingsBaseInviteFragment extends BaseFragment implements
         return allEmailsAreValid;
     }
 
-    final void inviteUsers(final Group group) {
-        group.addUsersInvited(mUsersToInviteEmails);
-        group.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e != null) {
-                    group.removeUsersInvited(mUsersToInviteEmails);
-
-                    ParseErrorHandler.handleParseError(getActivity(), e);
-                    onParseError(ParseErrorHandler.getErrorMessage(getActivity(), e));
-
-                    return;
-                }
-
-                sendUserInvitation(group.getName());
-            }
-        });
+    final void inviteUsers(Group group) {
+        CloudCode.inviteUsers(getActivity(), mUsersToInviteEmails, group.getName(), this);
     }
 
     @CallSuper
@@ -159,18 +144,9 @@ public abstract class SettingsBaseInviteFragment extends BaseFragment implements
 
     protected abstract void hideProgressCircle();
 
-    private void sendUserInvitation(String groupName) {
-        CloudCode.inviteUsers(getActivity(), mUsersToInviteEmails, groupName, this);
-    }
-
     @Override
     @CallSuper
     public void onCloudFunctionError(ParseException e) {
         onParseError(ParseErrorHandler.getErrorMessage(getActivity(), e));
-    }
-
-    final void removeInvitations(Group group) {
-        group.removeUsersInvited(mUsersToInviteEmails);
-        group.saveEventually();
     }
 }

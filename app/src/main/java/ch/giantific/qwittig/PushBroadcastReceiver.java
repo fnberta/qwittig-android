@@ -59,6 +59,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     public static final String PUSH_PARAM_INITIATOR = "initiator";
     public static final String PUSH_PARAM_GROUP_NAME = "groupName";
     public static final String PUSH_PARAM_CURRENCY_CODE = "currencyCode";
+    public static final String PUSH_PARAM_INVITED_EMAIL = "invitedEmail";
 
     public static final String INTENT_ACTION_INVITATION = "intent_action_invitation";
     public static final int ACTION_INVITATION_ACCEPTED = 1;
@@ -68,7 +69,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
             TYPE_SETTLEMENT_NEW, TYPE_COMPENSATION_NEW_PAID, TYPE_COMPENSATION_NEW_UNPAID,
             TYPE_COMPENSATION_REMIND_USER, TYPE_COMPENSATION_REMIND_USER_HAS_PAID,
             TYPE_COMPENSATION_EXISTING_NOT_NOW, TYPE_COMPENSATION_EXISTING_PAID, TYPE_USER_INVITED,
-            TYPE_USER_JOINED, TYPE_USER_LEFT, TYPE_USER_DELETED})
+            TYPE_USER_JOINED, TYPE_USER_LEFT, TYPE_USER_DELETED, TYPE_GROUP_USERS_INVITED_CHANGED})
     @Retention(RetentionPolicy.SOURCE)
     public @interface NotificationType {}
     public static final String TYPE_USER_INVITED = "userInvited";
@@ -85,6 +86,8 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     private static final String TYPE_USER_JOINED = "userJoined";
     private static final String TYPE_USER_LEFT = "userLeft";
     private static final String TYPE_USER_DELETED = "userDeleted";
+    private static final String TYPE_GROUP_NAME_CHANGED = "groupNameChanged";
+    private static final String TYPE_GROUP_USERS_INVITED_CHANGED = "groupUsersInvitedChanged";
 
     private static final String ACTION_PUSH_BUTTON_ACCEPT = "ch.giantific.qwittig.push.intent.ACCEPT";
     private static final String ACTION_PUSH_BUTTON_DISCARD = "ch.giantific.qwittig.push.intent.DISCARD";
@@ -193,6 +196,8 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
 
     @Override
     protected void onPushReceive(Context context, Intent intent) {
+        Log.e(LOG_TAG, "onPushReceive");
+
         JSONObject jsonExtras = null;
         try {
             jsonExtras = getData(intent);
@@ -332,6 +337,13 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 OnlineQuery.queryUsers(context, null);
                 break;
             }
+            case TYPE_GROUP_NAME_CHANGED:
+                // fall through
+            case TYPE_GROUP_USERS_INVITED_CHANGED: {
+                String groupId = jsonExtras.optString(PUSH_PARAM_GROUP);
+                OnlineQuery.queryGroup(context, groupId, null);
+                break;
+            }
         }
 
         // get the notification and display it the data contains a title and/or an alert
@@ -358,7 +370,9 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     }
 
     private boolean isSilentNotification(String type) {
-        return type.equals(TYPE_PURCHASE_EDIT) || type.equals(TYPE_PURCHASE_DELETE) || type.equals(TYPE_COMPENSATION_NEW_PAID) || type.equals(TYPE_COMPENSATION_NEW_UNPAID);
+        return type.equals(TYPE_PURCHASE_EDIT) || type.equals(TYPE_PURCHASE_DELETE) ||
+                type.equals(TYPE_COMPENSATION_NEW_PAID) || type.equals(TYPE_COMPENSATION_NEW_UNPAID) ||
+                type.equals(TYPE_GROUP_NAME_CHANGED) || type.equals(TYPE_GROUP_USERS_INVITED_CHANGED);
     }
 
     private String getNotificationType(Intent intent) {

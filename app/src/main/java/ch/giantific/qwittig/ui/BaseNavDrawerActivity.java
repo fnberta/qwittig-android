@@ -28,6 +28,7 @@ import com.parse.ParseConfig;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
@@ -69,6 +70,9 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
     private int mSelectedNavDrawerItem;
     private int mFetchCounter = 0;
     private int mGroupsCount;
+    private Spinner mGroupSpinner;
+    private NavHeaderGroupsArrayAdapter mGroupSpinnerAdapter;
+    private List<ParseObject> mGroups = new ArrayList<>();
 
     private BroadcastReceiver mLocalBroadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -84,6 +88,9 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
                 case OnlineQuery.DATA_TYPE_COMPENSATION:
                     boolean isPaid = intent.getBooleanExtra(OnlineQuery.INTENT_COMPENSATION_PAID, false);
                     onCompensationsPinned(isPaid);
+                    break;
+                case OnlineQuery.DATA_TYPE_GROUP:
+                    onGroupQueried();
                     break;
             }
         }
@@ -145,6 +152,11 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
     @CallSuper
     public void onCompensationsPinned(boolean isPaid) {
         setLoading(false);
+    }
+
+    @CallSuper
+    public void onGroupQueried() {
+        updateGroupSpinnerList();
     }
 
     @CallSuper
@@ -315,14 +327,12 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
         setupNavDrawerHeaderGroupSpinner();
     }
 
-    final void setupNavDrawerHeaderGroupSpinner() {
-        User currentUser = (User) ParseUser.getCurrentUser();
-        Spinner navDrawerGroupSpinner = (Spinner) findViewById(R.id.sp_drawer_group);
-        NavHeaderGroupsArrayAdapter navDrawerGroupSpinnerAdapter = new NavHeaderGroupsArrayAdapter(this,
-                R.layout.spinner_item_nav, android.R.layout.simple_spinner_dropdown_item,
-                currentUser.getGroups());
-        navDrawerGroupSpinner.setAdapter(navDrawerGroupSpinnerAdapter);
-        navDrawerGroupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+    private void setupNavDrawerHeaderGroupSpinner() {
+        mGroupSpinner = (Spinner) findViewById(R.id.sp_drawer_group);
+        mGroupSpinnerAdapter = new NavHeaderGroupsArrayAdapter(this,
+                R.layout.spinner_item_nav, android.R.layout.simple_spinner_dropdown_item, mGroups);
+        mGroupSpinner.setAdapter(mGroupSpinnerAdapter);
+        mGroupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Group groupSelected = (Group) parent.getItemAtPosition(position);
@@ -334,8 +344,33 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
 
             }
         });
-        int position = navDrawerGroupSpinnerAdapter.getPosition(currentUser.getCurrentGroup());
-        navDrawerGroupSpinner.setSelection(position);
+
+        updateGroupSpinner();
+    }
+
+    private void updateGroupSpinner() {
+        updateGroupSpinnerList();
+        updateGroupSpinnerPosition();
+    }
+
+    final void updateGroupSpinnerPosition() {
+        User currentUser = (User) ParseUser.getCurrentUser();
+        int position = mGroupSpinnerAdapter.getPosition(currentUser.getCurrentGroup());
+        mGroupSpinner.setSelection(position);
+    }
+
+    final void updateGroupSpinnerList() {
+        mGroups.clear();
+
+        User currentUser = (User) ParseUser.getCurrentUser();
+        List<ParseObject> groups = currentUser.getGroups();
+        if (!groups.isEmpty()) {
+            for (ParseObject group : groups) {
+                mGroups.add(group);
+            }
+        }
+
+        mGroupSpinnerAdapter.notifyDataSetChanged();
     }
 
     private void onGroupChanged(ParseObject group) {
@@ -474,7 +509,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
                             finish();
                             break;
                         case SettingsActivity.RESULT_GROUP_CHANGED:
-                            setupNavDrawerHeaderGroupSpinner();
+                            updateGroupSpinner();
                             break;
                     }
                     break;
