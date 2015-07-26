@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/navdrawer_chosen_account_height"
-    android:background="@drawable/navdrawer_background">
+    android:background="@color/primary">
 
     <ImageView
         android:id="@+id/iv_drawer_avatar"
