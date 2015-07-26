@@ -557,7 +557,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
                                 getString(R.string.toast_purchase_deleted));
                         break;
                     case PurchaseDetailsActivity.RESULT_GROUP_CHANGED:
-                        setupNavDrawerHeaderGroupSpinner();
+                        updateGroupSpinnerPosition();
                         break;
                 }
                 break;
