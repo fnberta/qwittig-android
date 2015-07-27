@@ -32,6 +32,7 @@ public class CloudCode {
     public static final String STATS_SPENDING = "statsSpending";
     public static final String STATS_STORES = "statsStores";
     public static final String STATS_CURRENCIES = "statsCurrencies";
+    public static final String DELETE_ACCOUNT = "deleteAccount";
 
     private static final String LOG_TAG = CloudCode.class.getSimpleName();
     private static final String PARAM_SETTLEMENT_SINGLE_USER = "singleUser";
@@ -299,6 +300,26 @@ public class CloudCode {
             params.put(PARAM_MONTH, month - 1);
         }
         return params;
+    }
+
+    public static void deleteAccount(final Context context, final CloudFunctionListener listener) {
+        Map<String, Object> params = new HashMap<>();
+        ParseCloud.callFunctionInBackground(DELETE_ACCOUNT, params, new FunctionCallback<Object>() {
+            @Override
+            public void done(Object o, ParseException e) {
+                if (e != null) {
+                    ParseErrorHandler.handleParseError(context, e);
+                    if (listener != null) {
+                        listener.onCloudFunctionError(e);
+                    }
+                    return;
+                }
+
+                if (listener != null) {
+                    listener.onCloudFunctionReturned(DELETE_ACCOUNT, o);
+                }
+            }
+        });
     }
 
     public interface CloudFunctionListener {

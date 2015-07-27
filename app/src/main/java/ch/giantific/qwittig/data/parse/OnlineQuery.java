@@ -433,40 +433,6 @@ public class OnlineQuery {
         });
     }
 
-    public static void queryCompensationsForGroups(final Context context, List<ParseObject> groups,
-                                                   final CompensationQueryListener listener) {
-        ParseQuery<ParseObject> payerQuery = ParseQuery.getQuery(Compensation.CLASS);
-        payerQuery.whereEqualTo(Compensation.PAYER, ParseUser.getCurrentUser());
-
-        ParseQuery<ParseObject> beneficiaryQuery = ParseQuery.getQuery(Compensation.CLASS);
-        beneficiaryQuery.whereEqualTo(Compensation.BENEFICIARY, ParseUser.getCurrentUser());
-
-        List<ParseQuery<ParseObject>> queries = new ArrayList<>();
-        queries.add(payerQuery);
-        queries.add(beneficiaryQuery);
-
-        ParseQuery<ParseObject> query = ParseQuery.or(queries);
-        query.whereContainedIn(Compensation.GROUP, groups);
-        query.whereEqualTo(Compensation.IS_PAID, false);
-        query.orderByDescending(DATE_CREATED);
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> parseObjects, ParseException e) {
-                if (e != null) {
-                    ParseErrorHandler.handleParseError(context, e);
-                    if (listener != null) {
-                        listener.onCompensationsQueryFailed(ParseErrorHandler.getErrorMessage(context, e));
-                    }
-                    return;
-                }
-
-                if (listener != null) {
-                    listener.onCompensationsQueried(parseObjects);
-                }
-            }
-        });
-    }
-
     public static void queryGroup(final Context context, String groupId,
                                   final GroupQueryListener listener) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Group.CLASS);

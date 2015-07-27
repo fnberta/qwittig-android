@@ -6,10 +6,10 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.parse.DeleteCallback;
 import com.parse.LogOutCallback;
 import com.parse.ParseException;
 import com.parse.ParseInstallation;
@@ -20,13 +20,11 @@ import com.parse.SaveCallback;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.parse.CloudCode;
 import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.data.parse.OnlineQuery;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.Installation;
 import ch.giantific.qwittig.data.parse.models.User;
@@ -45,7 +43,6 @@ public class SettingsActivity extends BaseActivity implements
         GroupLeaveBalanceNotZeroDialogFragment.FragmentInteractionListener,
         AccountDeleteDialogFragment.DialogInteractionListener,
         CloudCode.CloudFunctionListener,
-        OnlineQuery.CompensationQueryListener,
         LocalQuery.UserLocalQueryListener {
 
     public static final String PREF_CATEGORY_ME = "pref_category_me";
@@ -68,9 +65,7 @@ public class SettingsActivity extends BaseActivity implements
     private SettingsFragment mSettingsFragment;
     private User mCurrentUser;
     private Group mCurrentGroup;
-    private List<ParseObject> mGroupsBalanceNotZeroOnDelete = new ArrayList<>();
-    private int mSettlementsDoneCounter = 0;
-    private boolean mDeleteGroup = false;
+    private boolean mDeleteGroup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -295,19 +290,27 @@ public class SettingsActivity extends BaseActivity implements
     }
 
     private void logOutUser() {
+        if (!Utils.isConnected(this)) {
+            MessageUtils.showBasicSnackbar(mToolbar, getString(R.string.toast_no_connection));
+            return;
+        }
+
         showProgressDialog(getString(R.string.progress_logout));
 
-        resetInstallation();
-        logOut();
-    }
-
-    /**
-     * Unsubscribes from all notification channels and remove currentUser from installation
-     * object, so that the device does not keep receiving push notifications.
-     */
-    private void resetInstallation() {
+        // Unsubscribe from all notification channels and remove currentUser from installation
+        // object, so that the device does not keep receiving push notifications.
         ParseInstallation installation = Installation.getResetInstallation();
-        installation.saveEventually();
+        installation.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    onParseError(ParseErrorHandler.getErrorMessage(mContext, e));
+                    return;
+                }
+
+                logOut();
+            }
+        });
     }
 
     private void logOut() {
@@ -338,7 +341,7 @@ public class SettingsActivity extends BaseActivity implements
      * Called from account delete confirmation dialog to start AccountDeletion process.
      */
     @Override
-    public void startAccountDeletion() {
+    public void deleteAccount() {
         if (ParseUtils.isTestUser(mCurrentUser)) {
             showAccountCreateDialog();
             return;
@@ -350,31 +353,12 @@ public class SettingsActivity extends BaseActivity implements
         }
 
         showProgressDialog(getString(R.string.progress_account_delete));
-        handleGroups();
-    }
-
-    private void handleGroups() {
-        mGroupsBalanceNotZeroOnDelete.clear();
-
-        List<ParseObject> userGroups = mCurrentUser.getGroups();
-        if (userGroups != null && !userGroups.isEmpty()) {
-            for (ParseObject group : userGroups) {
-                if (!balanceIsZero(group)) {
-                    mGroupsBalanceNotZeroOnDelete.add(group);
-                }
-            }
-        }
-
-        if (mGroupsBalanceNotZeroOnDelete.isEmpty()) {
-            deleteAccount();
-        } else {
-            OnlineQuery.queryCompensationsForGroups(this, mGroupsBalanceNotZeroOnDelete, this);
-        }
+        CloudCode.deleteAccount(this, this);
     }
 
     @Override
-    public void onCompensationsQueryFailed(String errorMessage) {
-        onParseError(errorMessage);
+    public void onCloudFunctionError(ParseException e) {
+        onParseError(ParseErrorHandler.getErrorMessage(this, e));
     }
 
     private void onParseError(String errorMessage) {
@@ -383,47 +367,15 @@ public class SettingsActivity extends BaseActivity implements
     }
 
     @Override
-    public void onCompensationsQueried(List<ParseObject> compensations) {
-        ParseObject.deleteAllInBackground(compensations, new DeleteCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e != null) {
-                    ParseErrorHandler.handleParseError(mContext, e);
-                    onParseError(ParseErrorHandler.getErrorMessage(mContext, e));
-                    return;
-                }
-
-                for (ParseObject group : mGroupsBalanceNotZeroOnDelete) {
-                    balanceAccount(group);
-                }
-            }
-        });
-    }
-
-    private void balanceAccount(ParseObject group) {
-        CloudCode.startNewSettlement(this, group, true, this);
-    }
-
-    @Override
-    public void onCloudFunctionError(ParseException e) {
-        onParseError(ParseErrorHandler.getErrorMessage(this, e));
-    }
-
-    @Override
     public void onCloudFunctionReturned(String cloudFunction, Object o) {
         switch (cloudFunction) {
-            case CloudCode.SETTLEMENT_NEW:
-                mSettlementsDoneCounter++;
-
-                if (mSettlementsDoneCounter == mGroupsBalanceNotZeroOnDelete.size()) {
-                    deleteAccount();
-                    mSettlementsDoneCounter = 0;
-                }
+            case CloudCode.DELETE_ACCOUNT:
+                setUserDeleted();
                 break;
         }
     }
 
-    private void deleteAccount() {
+    private void setUserDeleted() {
         ParseInstallation installation = Installation.getResetInstallation();
         installation.saveInBackground(new SaveCallback() {
             @Override
