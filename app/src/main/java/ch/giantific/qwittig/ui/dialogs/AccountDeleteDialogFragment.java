@@ -34,7 +34,7 @@ public class AccountDeleteDialogFragment extends DialogFragment {
         dialogBuilder.setMessage(R.string.dialog_account_delete_message)
                 .setPositiveButton(R.string.dialog_positive_delete, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mListener.startAccountDeletion();
+                        mListener.deleteAccount();
                         dismiss();
                     }
                 })
@@ -43,6 +43,6 @@ public class AccountDeleteDialogFragment extends DialogFragment {
     }
 
     public interface DialogInteractionListener {
-        public void startAccountDeletion();
+        public void deleteAccount();
     }
 }

@@ -90,7 +90,7 @@ public class User extends ParseUser {
         if (this == ParseUser.getCurrentUser()) {
             nickname = context.getString(R.string.nickname_me);
         } else {
-            nickname = getString(NICKNAME);
+            nickname = getNickname();
         }
         return nickname;
     }
