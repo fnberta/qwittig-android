@@ -1,14 +1,20 @@
 package ch.giantific.qwittig.ui;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.RippleDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -40,6 +46,7 @@ import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.ui.adapter.NavHeaderGroupsArrayAdapter;
 import ch.giantific.qwittig.utils.MessageUtils;
+import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.inappbilling.IabHelper;
 import ch.giantific.qwittig.utils.inappbilling.IabKey;
 import ch.giantific.qwittig.utils.inappbilling.IabResult;
@@ -322,9 +329,28 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
 
         byte[] avatarByteArray = currentUser.getAvatar();
         Drawable avatar = ImageAvatar.getRoundedAvatar(this, avatarByteArray, false);
-        ivAvatar.setImageDrawable(avatar);
+        if (Utils.isRunningLollipopAndHigher()) {
+            RippleDrawable rippleAvatar = createRippleDrawable(avatar);
+            ivAvatar.setImageDrawable(rippleAvatar);
+        } else {
+            ivAvatar.setImageDrawable(avatar);
+        }
+        ivAvatar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, SettingsProfileActivity.class);
+                startActivityForResult(intent, SettingsActivity.INTENT_REQUEST_SETTINGS_PROFILE);
+            }
+        });
 
         setupNavDrawerHeaderGroupSpinner();
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @NonNull
+    private RippleDrawable createRippleDrawable(Drawable drawable) {
+        return new RippleDrawable(ColorStateList.valueOf(getResources()
+                .getColor(R.color.primary)), drawable, null);
     }
 
     private void setupNavDrawerHeaderGroupSpinner() {
@@ -490,30 +516,43 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (mIabHelper == null || !mIabHelper.handleActivityResult(requestCode, resultCode, data)) {
-            super.onActivityResult(requestCode, resultCode, data);
+        if (mIabHelper != null && mIabHelper.handleActivityResult(requestCode, resultCode, data)) {
+            return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
 
-            switch (requestCode) {
-                case INTENT_REQUEST_LOGIN:
-                    if (resultCode == RESULT_OK) {
-                        afterLoginSetup();
-                    } else {
+        switch (requestCode) {
+            case INTENT_REQUEST_LOGIN:
+                if (resultCode == RESULT_OK) {
+                    afterLoginSetup();
+                } else {
+                    finish();
+                }
+                break;
+            case INTENT_REQUEST_SETTINGS:
+                switch (resultCode) {
+                    case SettingsActivity.RESULT_LOGOUT:
+                        Intent intent = new Intent(this, HomeActivity.class);
+                        startActivity(intent);
                         finish();
-                    }
-                    break;
-                case INTENT_REQUEST_SETTINGS:
-                    switch (resultCode) {
-                        case SettingsActivity.RESULT_LOGOUT:
-                            Intent intent = new Intent(this, HomeActivity.class);
-                            startActivity(intent);
-                            finish();
-                            break;
-                        case SettingsActivity.RESULT_GROUP_CHANGED:
-                            updateGroupSpinner();
-                            break;
-                    }
-                    break;
-            }
+                        break;
+                    case SettingsActivity.RESULT_GROUP_CHANGED:
+                        updateGroupSpinner();
+                        break;
+                }
+                break;
+            case SettingsActivity.INTENT_REQUEST_SETTINGS_PROFILE:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        MessageUtils.showBasicSnackbar(mGroupSpinner,
+                                getString(R.string.toast_changes_saved));
+                        break;
+                    case SettingsProfileActivity.RESULT_CHANGES_DISCARDED:
+                        MessageUtils.showBasicSnackbar(mGroupSpinner,
+                                getString(R.string.toast_changes_discarded));
+                        break;
+                }
+                break;
         }
     }
 
