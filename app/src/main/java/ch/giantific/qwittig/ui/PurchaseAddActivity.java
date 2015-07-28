@@ -10,6 +10,8 @@ import android.transition.Transition;
 import android.view.Gravity;
 import android.view.MenuItem;
 
+import java.util.Map;
+
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.ocr.models.PurchaseRest;
 import ch.giantific.qwittig.helper.OcrHelper;
@@ -119,6 +121,16 @@ public class PurchaseAddActivity extends PurchaseBaseActivity implements
         MessageUtils.showBasicSnackbar(mToolbar, errorMessage);
         ((PurchaseAddAutoFragment) mPurchaseFragment).showMainScreen();
         showFab();
+    }
+
+    @Override
+    public void onRatesFetchSuccessful(Map<String, Double> exchangeRates) {
+        ((PurchaseAddFragment) mPurchaseFragment).onRatesFetchSuccessful(exchangeRates);
+    }
+
+    @Override
+    public void onRatesFetchFailed(String errorMessage) {
+        ((PurchaseAddFragment) mPurchaseFragment).onRatesFetchFailed(errorMessage);
     }
 
     @Override
