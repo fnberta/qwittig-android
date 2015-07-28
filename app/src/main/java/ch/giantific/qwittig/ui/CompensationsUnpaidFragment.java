@@ -286,7 +286,7 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
 
                 String nickname = "";
                 if (compensation != null) {
-                    User payer = (User) compensation.getPayer();
+                    User payer = compensation.getPayer();
                     nickname = payer.getNickname();
                 }
                 MessageUtils.showBasicSnackbar(mRecyclerView,
@@ -299,7 +299,7 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
 
                 String nickname = "";
                 if (compensation != null) {
-                    User beneficiary = (User) compensation.getBeneficiary();
+                    User beneficiary = compensation.getBeneficiary();
                     nickname = beneficiary.getNickname();
                 }
                 MessageUtils.showBasicSnackbar(mRecyclerView,
@@ -447,7 +447,7 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
         }
 
         Compensation compensation = (Compensation) mCompensations.get(position);
-        User beneficiary = (User) compensation.getBeneficiary();
+        User beneficiary = compensation.getBeneficiary();
         String beneficiaryName = beneficiary.getNickname();
         compensation.deleteEventually();
         removeItemFromList(position);

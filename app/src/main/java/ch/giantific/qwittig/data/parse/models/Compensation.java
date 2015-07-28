@@ -44,7 +44,7 @@ public class Compensation extends ParseObject {
         setAccessRights(getCurrentGroup());
     }
 
-    private ParseObject getCurrentGroup() {
+    private Group getCurrentGroup() {
         User currentUser = (User) ParseUser.getCurrentUser();
         return currentUser.getCurrentGroup();
     }
@@ -62,16 +62,16 @@ public class Compensation extends ParseObject {
         put(GROUP, group);
     }
 
-    public ParseUser getPayer() {
-        return getParseUser(PAYER);
+    public User getPayer() {
+        return (User) getParseUser(PAYER);
     }
 
     public void setPayer(ParseUser payer) {
         put(PAYER, payer);
     }
 
-    public ParseUser getBeneficiary() {
-        return getParseUser(BENEFICIARY);
+    public User getBeneficiary() {
+        return (User) getParseUser(BENEFICIARY);
     }
 
     public void setBeneficiary(ParseUser beneficiary) {

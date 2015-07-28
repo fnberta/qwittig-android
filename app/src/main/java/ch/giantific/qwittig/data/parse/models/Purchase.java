@@ -90,16 +90,16 @@ public class Purchase extends ParseObject {
         setACL(acl);
     }
 
-    public ParseObject getGroup() {
-        return getParseObject(GROUP);
+    public Group getGroup() {
+        return (Group) getParseObject(GROUP);
     }
 
     public void setGroup(Group group) {
         put(GROUP, group);
     }
 
-    public ParseUser getBuyer() {
-        return getParseUser(BUYER);
+    public User getBuyer() {
+        return (User) getParseUser(BUYER);
     }
 
     public void setBuyer(ParseUser buyer) {

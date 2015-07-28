@@ -108,7 +108,7 @@ public class Item extends ParseObject {
         setACL(acl);
     }
 
-    private ParseObject getCurrentGroup() {
+    private Group getCurrentGroup() {
         User currentUser = (User) ParseUser.getCurrentUser();
         return currentUser.getCurrentGroup();
     }

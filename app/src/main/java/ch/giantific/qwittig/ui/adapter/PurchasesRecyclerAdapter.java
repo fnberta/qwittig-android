@@ -88,7 +88,7 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
                 purchaseRow.mTextViewDate.setText(DateUtils.formatMonthDayLineSeparated(purchase.getDate()));
                 purchaseRow.mTextViewStore.setText(purchase.getStore());
 
-                User buyer = (User) purchase.getBuyer();
+                User buyer = purchase.getBuyer();
                 User currentUser = (User) ParseUser.getCurrentUser();
                 String nickname;
                 if (mUsers.contains(buyer) || buyer.getObjectId().equals(currentUser.getObjectId())) {
