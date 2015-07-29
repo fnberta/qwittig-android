@@ -47,8 +47,8 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
         CompensationChangeAmountDialogFragment.FragmentInteractionListener {
 
     public static final String INTENT_AUTO_START_NEW = "intent_auto_start_new";
-    private static final String ACCOUNT_BALANCE_NEW_FRAGMENT = "account_balance_new_fragment";
-    private static final String ACCOUNT_BALANCE_HISTORY_FRAGMENT = "account_balance_history_fragment";
+    private static final String COMPENSATIONS_UNPAID_FRAGMENT = "compensations_unpaid_fragment";
+    private static final String COMPENSATIONS_PAID_FRAGMENT = "compensations_paid_fragment";
     @IntDef({FRAGMENT_ADAPTER_BOTH, FRAGMENT_ADAPTER_UNPAID, FRAGMENT_ADAPTER_PAID})
     @Retention(RetentionPolicy.SOURCE)
     public @interface AdapterType {}
@@ -58,8 +58,8 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
 
     private static final String LOG_TAG = CompensationsActivity.class.getSimpleName();
 
-    private CompensationsUnpaidFragment mSettlementUnpaidFragment;
-    private CompensationsPaidFragment mSettlementPaidFragment;
+    private CompensationsUnpaidFragment mCompensationsUnpaidFragment;
+    private CompensationsPaidFragment mCompensationsPaidFragment;
     private String mCurrentGroupCurrency;
     private List<ParseUser> mSinglePaymentUsers;
     private ArrayList<ItemUserPicker> mSinglePaymentRecipients = new ArrayList<>();
@@ -76,10 +76,10 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
             if (savedInstanceState == null) {
                 addViewPagerFragments();
             } else {
-                mSettlementUnpaidFragment = (CompensationsUnpaidFragment) getFragmentManager()
-                        .getFragment(savedInstanceState, ACCOUNT_BALANCE_NEW_FRAGMENT);
-                mSettlementPaidFragment = (CompensationsPaidFragment) getFragmentManager()
-                        .getFragment(savedInstanceState, ACCOUNT_BALANCE_HISTORY_FRAGMENT);
+                mCompensationsUnpaidFragment = (CompensationsUnpaidFragment) getFragmentManager()
+                        .getFragment(savedInstanceState, COMPENSATIONS_UNPAID_FRAGMENT);
+                mCompensationsPaidFragment = (CompensationsPaidFragment) getFragmentManager()
+                        .getFragment(savedInstanceState, COMPENSATIONS_PAID_FRAGMENT);
                 setupTabs();
             }
         }
@@ -89,8 +89,8 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
         Intent intent = getIntent();
         boolean autoStartNew = intent.getBooleanExtra(INTENT_AUTO_START_NEW, false);
 
-        mSettlementUnpaidFragment = CompensationsUnpaidFragment.newInstance(autoStartNew);
-        mSettlementPaidFragment = new CompensationsPaidFragment();
+        mCompensationsUnpaidFragment = CompensationsUnpaidFragment.newInstance(autoStartNew);
+        mCompensationsPaidFragment = new CompensationsPaidFragment();
 
         setupTabs();
     }
@@ -98,8 +98,8 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
     private void setupTabs() {
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         TabsAdapter tabsAdapter = new TabsAdapter(getFragmentManager());
-        tabsAdapter.addFragment(mSettlementUnpaidFragment, getString(R.string.tab_compensations_new));
-        tabsAdapter.addFragment(mSettlementPaidFragment, getString(R.string.tab_compensations_history));
+        tabsAdapter.addFragment(mCompensationsUnpaidFragment, getString(R.string.tab_compensations_new));
+        tabsAdapter.addFragment(mCompensationsPaidFragment, getString(R.string.tab_compensations_history));
         viewPager.setAdapter(tabsAdapter);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
@@ -260,14 +260,14 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
     private void updateFragmentAdapter(@AdapterType int adapter) {
         switch (adapter) {
             case FRAGMENT_ADAPTER_BOTH:
-                mSettlementPaidFragment.updateAdapter();
-                mSettlementUnpaidFragment.updateAdapter();
+                mCompensationsPaidFragment.updateAdapter();
+                mCompensationsUnpaidFragment.updateAdapter();
                 break;
             case FRAGMENT_ADAPTER_PAID:
-                mSettlementPaidFragment.updateAdapter();
+                mCompensationsPaidFragment.updateAdapter();
                 break;
             case FRAGMENT_ADAPTER_UNPAID:
-                mSettlementUnpaidFragment.updateAdapter();
+                mCompensationsUnpaidFragment.updateAdapter();
                 break;
         }
     }
@@ -276,8 +276,8 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
     public void setLoading(boolean isLoading) {
         super.setLoading(isLoading);
 
-        mSettlementUnpaidFragment.setLoading(isLoading);
-        mSettlementPaidFragment.setLoading(isLoading);
+        mCompensationsUnpaidFragment.setLoading(isLoading);
+        mCompensationsPaidFragment.setLoading(isLoading);
     }
 
     @Override
@@ -296,7 +296,7 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
 
     @Override
     public void changeAmount(BigFraction amount) {
-        mSettlementUnpaidFragment.changeAmount(amount);
+        mCompensationsUnpaidFragment.changeAmount(amount);
     }
 
     @Override
@@ -309,12 +309,12 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
         super.onSaveInstanceState(outState);
 
         // save fragments in saveInstanceBundle if they are added
-        if (mSettlementUnpaidFragment != null && mSettlementUnpaidFragment.isAdded() &&
-                mSettlementPaidFragment != null && mSettlementPaidFragment.isAdded()) {
-            getFragmentManager().putFragment(outState, ACCOUNT_BALANCE_NEW_FRAGMENT,
-                    mSettlementUnpaidFragment);
-            getFragmentManager().putFragment(outState, ACCOUNT_BALANCE_HISTORY_FRAGMENT,
-                    mSettlementPaidFragment);
+        if (mCompensationsUnpaidFragment != null && mCompensationsUnpaidFragment.isAdded() &&
+                mCompensationsPaidFragment != null && mCompensationsPaidFragment.isAdded()) {
+            getFragmentManager().putFragment(outState, COMPENSATIONS_UNPAID_FRAGMENT,
+                    mCompensationsUnpaidFragment);
+            getFragmentManager().putFragment(outState, COMPENSATIONS_PAID_FRAGMENT,
+                    mCompensationsPaidFragment);
         }
     }
 
