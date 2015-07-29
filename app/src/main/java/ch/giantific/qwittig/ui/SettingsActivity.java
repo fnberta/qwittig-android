@@ -1,5 +1,6 @@
 package ch.giantific.qwittig.ui;
 
+import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -28,6 +29,7 @@ import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.Installation;
 import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.helper.LogoutHelper;
 import ch.giantific.qwittig.ui.dialogs.AccountDeleteDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.GroupLeaveBalanceNotZeroDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.GroupLeaveDialogFragment;
@@ -43,7 +45,8 @@ public class SettingsActivity extends BaseActivity implements
         GroupLeaveBalanceNotZeroDialogFragment.FragmentInteractionListener,
         AccountDeleteDialogFragment.DialogInteractionListener,
         CloudCode.CloudFunctionListener,
-        LocalQuery.UserLocalQueryListener {
+        LocalQuery.UserLocalQueryListener,
+        LogoutHelper.HelperInteractionListener {
 
     public static final String PREF_CATEGORY_ME = "pref_category_me";
     public static final String PREF_PROFILE = "pref_profile";
@@ -57,6 +60,7 @@ public class SettingsActivity extends BaseActivity implements
     public static final int RESULT_LOGOUT = 2;
     public static final int RESULT_GROUP_CHANGED = 3;
     private static final String SETTINGS_FRAGMENT = "settings_fragment";
+    private static final String LOGOUT_HELPER = "logout_helper";
     private static final int UPDATE_LIST_NAME = 1;
     private static final int UPDATE_LIST_GROUP = 2;
     private static final String LOG_TAG = SettingsActivity.class.getSimpleName();
@@ -296,33 +300,54 @@ public class SettingsActivity extends BaseActivity implements
         }
 
         showProgressDialog(getString(R.string.progress_logout));
-
-        // Unsubscribe from all notification channels and remove currentUser from installation
-        // object, so that the device does not keep receiving push notifications.
-        ParseInstallation installation = Installation.getResetInstallation();
-        installation.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e != null) {
-                    onParseError(ParseErrorHandler.getErrorMessage(mContext, e));
-                    return;
-                }
-
-                logOut();
-            }
-        });
+        logOutWithHelper(false);
     }
 
-    private void logOut() {
-        ParseUser.logOutInBackground(new LogOutCallback() {
-            @Override
-            public void done(ParseException e) {
-                // ignore possible exception, currentUser will always be null now
-                setLoading(false);
-                setResult(RESULT_LOGOUT);
-                finish();
-            }
-        });
+    private void logOutWithHelper(boolean deleteUser) {
+        FragmentManager fragmentManager = getFragmentManager();
+        LogoutHelper logoutHelper = findLogoutHelper(fragmentManager);
+
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (logoutHelper == null) {
+            logoutHelper = LogoutHelper.newInstance(deleteUser);
+
+            fragmentManager.beginTransaction()
+                    .add(logoutHelper, LOGOUT_HELPER)
+                    .commit();
+        }
+    }
+
+    private LogoutHelper findLogoutHelper(FragmentManager fragmentManager) {
+        return (LogoutHelper) fragmentManager.findFragmentByTag(LOGOUT_HELPER);
+    }
+
+    @Override
+    public void onLogoutSucceeded() {
+        setLoading(false);
+        setResult(RESULT_LOGOUT);
+        finish();
+    }
+
+    @Override
+    public void onLogoutFailed(ParseException e) {
+        ParseErrorHandler.handleParseError(this, e);
+        onParseError(ParseErrorHandler.getErrorMessage(this, e));
+        removeLoginHelper();
+    }
+
+    private void onParseError(String errorMessage) {
+        setLoading(false);
+        MessageUtils.showBasicSnackbar(mToolbar, errorMessage);
+    }
+
+    private void removeLoginHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        LogoutHelper loginHelper = findLogoutHelper(fragmentManager);
+
+        if (loginHelper != null) {
+            fragmentManager.beginTransaction().remove(loginHelper).commit();
+        }
     }
 
     private void setLoading(boolean isLoading) {
@@ -361,48 +386,13 @@ public class SettingsActivity extends BaseActivity implements
         onParseError(ParseErrorHandler.getErrorMessage(this, e));
     }
 
-    private void onParseError(String errorMessage) {
-        setLoading(false);
-        MessageUtils.showBasicSnackbar(mToolbar, errorMessage);
-    }
-
     @Override
     public void onCloudFunctionReturned(String cloudFunction, Object o) {
         switch (cloudFunction) {
             case CloudCode.DELETE_ACCOUNT:
-                setUserDeleted();
+                logOutWithHelper(true);
                 break;
         }
-    }
-
-    private void setUserDeleted() {
-        ParseInstallation installation = Installation.getResetInstallation();
-        installation.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e != null) {
-                    ParseErrorHandler.handleParseError(mContext, e);
-                    onParseError(ParseErrorHandler.getErrorMessage(mContext, e));
-                    return;
-                }
-
-                mCurrentUser.deleteUserFields();
-                mCurrentUser.saveInBackground(new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        if (e != null) {
-                            ParseErrorHandler.handleParseError(mContext, e);
-                            onParseError(ParseErrorHandler.getErrorMessage(mContext, e));
-                            return;
-                        }
-
-                        logOut();
-                    }
-                });
-            }
-        });
-
-        // TODO: check in CloudCode if user is the only member in his groups, if yes delete groups (tricky!!)
     }
 
     @Override
