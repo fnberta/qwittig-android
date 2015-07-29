@@ -388,10 +388,10 @@ public class OnlineQuery {
                     return;
                 }
 
+                Compensation compensation = (Compensation) parseObject;
+                boolean isPaid = compensation.isPaid();
                 if (isNew) {
-                    Compensation compensation = (Compensation) parseObject;
                     String groupId = compensation.getGroup().getObjectId();
-                    boolean isPaid = compensation.isPaid();
                     String pinLabel;
                     if (isPaid) {
                         pinLabel = Compensation.PIN_LABEL_PAID + groupId;
@@ -400,8 +400,7 @@ public class OnlineQuery {
                     }
 
                     pinCompensation(parseObject, pinLabel, context, isPaid);
-                } else {
-                    // compensation is now done for sure, hence change label to PAID
+                } else if (isPaid) {
                     parseObject.unpinInBackground(Compensation.PIN_LABEL_UNPAID, new DeleteCallback() {
                         @Override
                         public void done(ParseException e) {
@@ -416,6 +415,8 @@ public class OnlineQuery {
                             pinCompensation(parseObject, pinLabel, context, true);
                         }
                     });
+                } else {
+                    notifyCompensationChange(context, null, false);
                 }
             }
         });

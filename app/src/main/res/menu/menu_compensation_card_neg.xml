@@ -7,4 +7,9 @@
         android:title="@string/action_compensation_not_now"
         android:orderInCategory="1"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_compensation_change_amount"
+        android:title="@string/action_compensation_change_amount"
+        android:orderInCategory="2"
+        app:showAsAction="never"/>
 </menu>

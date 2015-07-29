@@ -204,7 +204,7 @@
     <string name="dialog_group_leave_delete_message">You are the last member of this group. Leaving it will delete the group and all its purchases!</string>
     <string name="dialog_compensation_manual_title">Manual payment</string>
     <string name="progress_compensation_single_save">Saving payment…</string>
-    <string name="error_item_amount">Please enter a valid amount</string>
+    <string name="error_valid_amount">Please enter a valid amount</string>
     <string name="dialog_positive_pay">Pay</string>
     <string name="toast_payment_saved">Payment to %1$s added</string>
     <string name="header_users_invited">Already invited</string>
@@ -264,5 +264,10 @@
     <string name="action_show_group">Show group numbers</string>
     <string name="action_show_percent">Show percent Values</string>
     <string name="progress_purchase_auto">Uploading and processing image…</string>
+    <string name="action_compensation_change_amount">Change amount</string>
+    <string name="dialog_positive_change">Change</string>
+    <string name="dialog_change_amount_message">Enter the desired new amount.</string>
+    <string name="push_compensation_amount_changed_title">Amount changed</string>
+    <string name="push_compensation_amount_changed_alert">%1$s will pay you %2$s</string>
 
 </resources>

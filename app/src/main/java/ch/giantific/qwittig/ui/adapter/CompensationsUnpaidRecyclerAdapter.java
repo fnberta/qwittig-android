@@ -166,6 +166,8 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<Rec
         void onRemindPaidButtonClick(int position);
 
         void onNotNowMenuClick(int position);
+
+        void onChangeAmountMenuClick(int position);
     }
 
     private static class CompensationRow extends RecyclerView.ViewHolder {
@@ -241,6 +243,9 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<Rec
                     switch (menuItem.getItemId()) {
                         case R.id.action_compensation_not_now:
                             listener.onNotNowMenuClick(getAdapterPosition());
+                            return true;
+                        case R.id.action_compensation_change_amount:
+                            listener.onChangeAmountMenuClick(getAdapterPosition());
                             return true;
                         default:
                             return true;

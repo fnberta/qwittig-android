@@ -59,7 +59,6 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     public static final String PUSH_PARAM_INITIATOR = "initiator";
     public static final String PUSH_PARAM_GROUP_NAME = "groupName";
     public static final String PUSH_PARAM_CURRENCY_CODE = "currencyCode";
-    public static final String PUSH_PARAM_INVITED_EMAIL = "invitedEmail";
 
     public static final String INTENT_ACTION_INVITATION = "intent_action_invitation";
     public static final int ACTION_INVITATION_ACCEPTED = 1;
@@ -83,6 +82,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     private static final String TYPE_COMPENSATION_EXISTING_NOT_NOW = "compensationExistingNotNow";
     private static final String TYPE_COMPENSATION_REMIND_USER = "compensationRemindUser";
     private static final String TYPE_COMPENSATION_REMIND_USER_HAS_PAID = "compensationRemindUserHasPaid";
+    private static final String TYPE_COMPENSATION_AMOUNT_CHANGED = "compensationAmountChanged";
     private static final String TYPE_USER_JOINED = "userJoined";
     private static final String TYPE_USER_LEFT = "userLeft";
     private static final String TYPE_USER_DELETED = "userDeleted";
@@ -325,6 +325,17 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 }
                 break;
             }
+            case TYPE_COMPENSATION_AMOUNT_CHANGED: {
+                // update compensation for all users
+                queryCompensation(context, jsonExtras, false);
+
+                // only show notification for beneficiary
+                String beneficiaryId = jsonExtras.optString(PUSH_PARAM_BENEFICIARY);
+                if (!beneficiaryId.equals(ParseUser.getCurrentUser().getObjectId())) {
+                    return;
+                }
+                break;
+            }
             case TYPE_USER_DELETED: {
                 OnlineQuery.queryPurchases(context, null);
                 OnlineQuery.queryUsers(context, null);
@@ -489,8 +500,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 builder.setContentTitle(title).setContentText(alert);
                 break;
             case TYPE_COMPENSATION_REMIND_USER: {
-                String currencyCode = jsonExtras.optString(PUSH_PARAM_CURRENCY_CODE);
-                String amount = getAmount(jsonExtras, currencyCode);
+                String amount = getAmount(jsonExtras);
                 title = context.getString(R.string.push_compensation_remind_title);
                 alert = context.getString(R.string.push_compensation_remind_alert, user, amount);
 
@@ -510,8 +520,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 break;
             }
             case TYPE_COMPENSATION_REMIND_USER_HAS_PAID: {
-                String currencyCode = jsonExtras.optString(PUSH_PARAM_CURRENCY_CODE);
-                String amount = getAmount(jsonExtras, currencyCode);
+                String amount = getAmount(jsonExtras);
                 title = context.getString(R.string.push_compensation_remind_paid_title, user);
                 alert = context.getString(R.string.push_compensation_remind_paid_alert, amount);
 
@@ -531,8 +540,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 break;
             }
             case TYPE_COMPENSATION_EXISTING_PAID: {
-                String currencyCode = jsonExtras.optString(PUSH_PARAM_CURRENCY_CODE);
-                String amount = getAmount(jsonExtras, currencyCode);
+                String amount = getAmount(jsonExtras);
                 title = context.getString(R.string.push_compensation_payment_done_title);
                 alert = context.getString(R.string.push_compensation_payment_done_alert, user, amount);
 
@@ -543,6 +551,15 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
             case TYPE_COMPENSATION_EXISTING_NOT_NOW: {
                 title = context.getString(R.string.push_compensation_not_now_title);
                 alert = context.getString(R.string.push_compensation_not_now_alert, user);
+
+                // set title and alert
+                builder.setContentTitle(title).setContentText(alert);
+                break;
+            }
+            case TYPE_COMPENSATION_AMOUNT_CHANGED: {
+                String amount = getAmount(jsonExtras);
+                title = context.getString(R.string.push_compensation_amount_changed_title);
+                alert = context.getString(R.string.push_compensation_amount_changed_alert, user, amount);
 
                 // set title and alert
                 builder.setContentTitle(title).setContentText(alert);
@@ -621,7 +638,8 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
         return builder.build();
     }
 
-    private String getAmount(JSONObject jsonExtras, String currencyCode) {
+    private String getAmount(JSONObject jsonExtras) {
+        String currencyCode = jsonExtras.optString(PUSH_PARAM_CURRENCY_CODE);
         double amount = jsonExtras.optDouble(PUSH_PARAM_AMOUNT);
         return MoneyUtils.formatMoney(amount, currencyCode);
     }
@@ -689,6 +707,8 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                     clearStoredPurchaseNotifications(groupId);
                     return PurchaseDetailsActivity.class;
                 }
+            case TYPE_COMPENSATION_AMOUNT_CHANGED:
+                // fall through
             case TYPE_SETTLEMENT_NEW:
                 // fall through
             case TYPE_COMPENSATION_REMIND_USER:

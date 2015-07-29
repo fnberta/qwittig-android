@@ -19,6 +19,8 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.SaveCallback;
 
+import org.apache.commons.math3.fraction.BigFraction;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -57,6 +59,7 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
     private boolean mAutoStartNew;
     private ArrayList<String> mLoadingCompensations;
     private boolean mIsCalculatingNew;
+    private Compensation mCompensationChangeAmount;
 
     public CompensationsUnpaidFragment() {
         // Required empty public constructor
@@ -412,8 +415,8 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
         }
 
         setCompensationLoading(compensation, compensationId, position, true);
-        CloudCode.pushCompensationRemind(getActivity(), compensationId, mCurrentGroup.getCurrency()
-                , this);
+        CloudCode.pushCompensationRemind(getActivity(), compensationId, mCurrentGroup.getCurrency(),
+                this);
     }
 
     @Override
@@ -453,5 +456,29 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
         removeItemFromList(position);
 
         MessageUtils.showBasicSnackbar(mRecyclerView, getString(R.string.toast_not_now_done, beneficiaryName));
+    }
+
+    @Override
+    public void onChangeAmountMenuClick(int position) {
+        if (ParseUtils.isTestUser(mCurrentUser)) {
+            mListener.showAccountCreateDialog();
+            return;
+        }
+
+        mCompensationChangeAmount = (Compensation) mCompensations.get(position);
+        BigFraction amount = mCompensationChangeAmount.getAmount();
+        String currency = mCurrentGroup.getCurrency();
+        mListener.showChangeAmountDialog(amount, currency);
+    }
+
+    /**
+     * Called from activity when change amount dialog is closed.
+     * @param amount the new amount to be set in the compensation
+     */
+    public void changeAmount(BigFraction amount) {
+        mCompensationChangeAmount.setAmount(amount);
+        int position = mCompensations.indexOf(mCompensationChangeAmount);
+        mRecyclerAdapter.notifyItemChanged(position);
+        mCompensationChangeAmount.saveEventually();
     }
 }
