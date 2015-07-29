@@ -1,5 +1,6 @@
 package ch.giantific.qwittig.ui;
 
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
@@ -22,6 +23,7 @@ import ch.giantific.qwittig.data.models.ItemUsersChecked;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.data.rates.RestClient;
 import ch.giantific.qwittig.data.rates.models.CurrencyRates;
+import ch.giantific.qwittig.helper.RatesHelper;
 import ch.giantific.qwittig.utils.MessageUtils;
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -103,21 +105,19 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
         if (mCurrencySelected.equals(mCurrentGroupCurrency)) {
             createNewPurchase(1);
         } else {
-            RestClient.getService().getRates(mCurrencySelected, new Callback<CurrencyRates>() {
-                @Override
-                public void success(CurrencyRates currencyRates, Response response) {
-                    Map<String, Double> exchangeRates = currencyRates.getRates();
-                    double exchangeRate = exchangeRates.get(mCurrentGroupCurrency);
-                    createNewPurchase(exchangeRate);
-                }
-
-                @Override
-                public void failure(RetrofitError error) {
-                    // TODO: check if safe to do (i.e. purchase safe needs to fail now)
-                    createNewPurchase(1);
-                }
-            });
+            getExchangeRateWithHelper();
         }
+    }
+
+    public void onRatesFetchSuccessful(Map<String, Double> exchangeRates) {
+        double exchangeRate = exchangeRates.get(mCurrentGroupCurrency);
+        createNewPurchase(exchangeRate);
+    }
+
+    public void onRatesFetchFailed(String errorMessage) {
+        // TODO: check if safe to do (i.e. purchase safe needs to fail now)
+        createNewPurchase(1);
+        removeRatesHelper();
     }
 
     private void createNewPurchase(double exchangeRate) {

@@ -32,6 +32,7 @@ import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.ui.adapter.TabsAdapter;
 import ch.giantific.qwittig.ui.dialogs.AccountCreateDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.CompensationAddManualDialogFragment;
+import ch.giantific.qwittig.ui.dialogs.CompensationChangeAmountDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
@@ -42,7 +43,8 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
         OnlineQuery.CompensationPinListener,
         LocalQuery.UserLocalQueryListener,
         CompensationAddManualDialogFragment.DialogInteractionListener,
-        GroupCreateDialogFragment.DialogInteractionListener {
+        GroupCreateDialogFragment.DialogInteractionListener,
+        CompensationChangeAmountDialogFragment.FragmentInteractionListener {
 
     public static final String INTENT_AUTO_START_NEW = "intent_auto_start_new";
     private static final String ACCOUNT_BALANCE_NEW_FRAGMENT = "account_balance_new_fragment";
@@ -283,6 +285,18 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
         AccountCreateDialogFragment accountCreateDialogFragment =
                 new AccountCreateDialogFragment();
         accountCreateDialogFragment.show(getFragmentManager(), "account_create");
+    }
+
+    @Override
+    public void showChangeAmountDialog(BigFraction amount, String currency) {
+        CompensationChangeAmountDialogFragment storeSelectionDialogFragment =
+                CompensationChangeAmountDialogFragment.newInstance(amount, currency);
+        storeSelectionDialogFragment.show(getFragmentManager(), "change_amount");
+    }
+
+    @Override
+    public void changeAmount(BigFraction amount) {
+        mSettlementUnpaidFragment.changeAmount(amount);
     }
 
     @Override

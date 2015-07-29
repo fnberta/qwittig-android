@@ -9,6 +9,8 @@ import android.transition.Slide;
 import android.transition.Transition;
 import android.view.MenuItem;
 
+import java.util.Map;
+
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.ui.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.utils.MessageUtils;
@@ -73,6 +75,16 @@ public class PurchaseEditActivity extends PurchaseBaseActivity implements
                 MessageUtils.showBasicSnackbar(mToolbar, message);
             }
         }
+    }
+
+    @Override
+    public void onRatesFetchSuccessful(Map<String, Double> exchangeRates) {
+        ((PurchaseEditFragment) mPurchaseFragment).onRatesFetchSuccessful(exchangeRates);
+    }
+
+    @Override
+    public void onRatesFetchFailed(String errorMessage) {
+        ((PurchaseEditFragment) mPurchaseFragment).onRatesFetchFailed(errorMessage);
     }
 
     @Override

@@ -52,7 +52,7 @@ public class PurchaseDetailsUsersInvolvedRecyclerAdapter extends
             mUsersInvolvedSorted.add(parseUser);
         }
 
-        User buyer = (User) mPurchase.getBuyer();
+        User buyer = mPurchase.getBuyer();
         if (mUsersInvolvedSorted.contains(buyer)) {
             mUsersInvolvedSorted.remove(buyer);
         }
@@ -71,7 +71,7 @@ public class PurchaseDetailsUsersInvolvedRecyclerAdapter extends
     public void onBindViewHolder(final UserInvolvedRow viewHolder, int position) {
         User user = (User) mUsersInvolvedSorted.get(position);
 
-        User buyer = (User) mPurchase.getBuyer();
+        User buyer = mPurchase.getBuyer();
         if (buyer.getObjectId().equals(user.getObjectId())) {
             viewHolder.setNameBold();
         }

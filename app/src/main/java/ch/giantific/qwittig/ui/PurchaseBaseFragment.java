@@ -1,6 +1,7 @@
 package ch.giantific.qwittig.ui;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
@@ -37,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.ItemUsersChecked;
@@ -46,6 +48,7 @@ import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.Item;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.helper.RatesHelper;
 import ch.giantific.qwittig.ui.adapter.PurchaseAddUsersInvolvedRecyclerAdapter;
 import ch.giantific.qwittig.ui.widgets.SwipeDismissTouchListener;
 import ch.giantific.qwittig.utils.ComparatorParseUserIgnoreCase;
@@ -63,6 +66,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         PurchaseAddUsersInvolvedRecyclerAdapter.AdapterInteractionListener,
         LocalQuery.UserLocalQueryListener {
 
+    static final String RATES_HELPER = "rates_helper";
     private static final String STATE_ROW_COUNT = "row_count";
     private static final String STATE_STORE_SELECTED = "state_store_selected";
     private static final String STATE_DATE_SELECTED = "state_date_selected";
@@ -864,6 +868,34 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      * AddFragment creates a new purchase and EditFragment updates the original one
      */
     protected abstract void setPurchase();
+
+    final void getExchangeRateWithHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        RatesHelper ratesHelper = findRatesHelper(fragmentManager);
+
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (ratesHelper == null) {
+            ratesHelper = RatesHelper.newInstance(mCurrencySelected);
+
+            fragmentManager.beginTransaction()
+                    .add(ratesHelper, RATES_HELPER)
+                    .commit();
+        }
+    }
+
+    final RatesHelper findRatesHelper(FragmentManager fragmentManager) {
+        return (RatesHelper) fragmentManager.findFragmentByTag(RATES_HELPER);
+    }
+
+    final void removeRatesHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        RatesHelper ratesHelper = findRatesHelper(fragmentManager);
+
+        if (ratesHelper != null) {
+            fragmentManager.beginTransaction().remove(ratesHelper).commit();
+        }
+    }
 
     /**
      * Saves purchase in Parse database.

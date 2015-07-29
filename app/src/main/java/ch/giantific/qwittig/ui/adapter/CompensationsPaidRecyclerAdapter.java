@@ -80,10 +80,10 @@ public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<Recyc
                 int color;
 
                 User currentUser = (User) ParseUser.getCurrentUser();
-                User beneficiary = (User) compensation.getBeneficiary();
+                User beneficiary = compensation.getBeneficiary();
                 if (beneficiary.getObjectId().equals(currentUser.getObjectId())) {
                     // positive
-                    User payer = (User) compensation.getPayer();
+                    User payer = compensation.getPayer();
                     if (userIsInCurrentGroup(payer)) {
                         nickname = payer.getNickname();
                     } else {

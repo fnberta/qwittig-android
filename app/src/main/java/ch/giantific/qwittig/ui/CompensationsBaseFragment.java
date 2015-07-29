@@ -11,6 +11,8 @@ import android.view.View;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import org.apache.commons.math3.fraction.BigFraction;
+
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Group;
@@ -120,5 +122,7 @@ public abstract class CompensationsBaseFragment extends BaseFragment implements
         void onlineQuery();
 
         void showAccountCreateDialog();
+
+        void showChangeAmountDialog(BigFraction amount, String currency);
     }
 }

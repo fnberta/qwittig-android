@@ -262,22 +262,21 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
             mPurchase.setExchangeRate(1);
             checkIfReceiptNull();
         } else {
-            RestClient.getService().getRates(mCurrencySelected, new Callback<CurrencyRates>() {
-                @Override
-                public void success(CurrencyRates currencyRates, Response response) {
-                    Map<String, Double> exchangeRates = currencyRates.getRates();
-                    double exchangeRate = exchangeRates.get(mCurrentGroupCurrency);
-                    mPurchase.setExchangeRate(exchangeRate);
-
-                    checkIfReceiptNull();
-                }
-
-                @Override
-                public void failure(RetrofitError error) {
-                    onParseError(ParseUtils.getNoConnectionException(error.toString()));
-                }
-            });
+            getExchangeRateWithHelper();
         }
+    }
+
+    public void onRatesFetchSuccessful(Map<String, Double> exchangeRates) {
+        double exchangeRate = exchangeRates.get(mCurrentGroupCurrency);
+        mPurchase.setExchangeRate(exchangeRate);
+
+        checkIfReceiptNull();
+    }
+
+    public void onRatesFetchFailed(String errorMessage) {
+        onParseError(ParseUtils.getNoConnectionException(errorMessage));
+
+        removeRatesHelper();
     }
 
     void checkIfReceiptNull() {

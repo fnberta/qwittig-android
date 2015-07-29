@@ -198,7 +198,7 @@
     <string name="dialog_group_leave_delete_message">Du bist das letzte Mitglied dieser Gruppe. Wenn du sie verlässt, werden die Gruppe und alle dazugehörigen Einkäufe gelöscht!</string>
     <string name="dialog_compensation_manual_title">Manuelle Zahlung</string>
     <string name="progress_compensation_single_save">Speichere Zahlung…</string>
-    <string name="error_item_amount">Bitte gib einen gültigen Betrag an</string>
+    <string name="error_valid_amount">Bitte gib einen gültigen Betrag an</string>
     <string name="dialog_positive_pay">Bezahlen</string>
     <string name="toast_payment_saved">Zahlung an %1$s hinzugefügt</string>
     <string name="tab_compensations_history">Vergangen</string>
@@ -258,5 +258,10 @@
     <string name="action_show_group">Zeige Gruppenwerte</string>
     <string name="action_show_percent">Zeige Prozentwerte</string>
     <string name="progress_purchase_auto">Hochladen und verarbeiten….</string>
+    <string name="action_compensation_change_amount">Betrag ändern</string>
+    <string name="dialog_positive_change">Ändern</string>
+    <string name="dialog_change_amount_message">Gib den gewünschten neuen Betrag ein.</string>
+    <string name="push_compensation_amount_changed_title">Betrag geändert</string>
+    <string name="push_compensation_amount_changed_alert">%1$s wird dir %2$s bezahlen</string>
 
 </resources>

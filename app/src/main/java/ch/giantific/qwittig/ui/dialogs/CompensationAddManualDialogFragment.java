@@ -109,7 +109,7 @@ public class CompensationAddManualDialogFragment extends DialogFragment {
             mListener.onManualPaymentValuesSet(recipientSelected, amountString);
             dismiss();
         } else {
-            mTextInputLayoutAmount.setError(getActivity().getString(R.string.error_item_amount));
+            mTextInputLayoutAmount.setError(getActivity().getString(R.string.error_valid_amount));
         }
     }
 

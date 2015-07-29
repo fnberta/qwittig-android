@@ -76,7 +76,7 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<Rec
     @Override
     public int getItemViewType(int position) {
         Compensation compensation = (Compensation) mCompensations.get(position);
-        User beneficiary = (User) compensation.getBeneficiary();
+        User beneficiary = compensation.getBeneficiary();
         User currentUser = (User) ParseUser.getCurrentUser();
 
         if (beneficiary.getObjectId().equals(currentUser.getObjectId())) {
@@ -105,7 +105,7 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<Rec
 
         switch (getItemViewType(position)) {
             case TYPE_POS:
-                User payer = (User) compensation.getPayer();
+                User payer = compensation.getPayer();
                 avatar = getAvatar(payer);
                 nickname = payer.getNickname();
                 message = mContext.getString(R.string.balance_owe_you, amount);
@@ -113,7 +113,7 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<Rec
                         .setText(mContext.getString(R.string.button_remind, nickname));
                 break;
             case TYPE_NEG:
-                User beneficiary = (User) compensation.getBeneficiary();
+                User beneficiary = compensation.getBeneficiary();
                 avatar = getAvatar(beneficiary);
                 nickname = beneficiary.getNickname();
                 message = mContext.getString(R.string.balance_gets_from_you, amount);
@@ -166,6 +166,8 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<Rec
         void onRemindPaidButtonClick(int position);
 
         void onNotNowMenuClick(int position);
+
+        void onChangeAmountMenuClick(int position);
     }
 
     private static class CompensationRow extends RecyclerView.ViewHolder {
@@ -241,6 +243,9 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<Rec
                     switch (menuItem.getItemId()) {
                         case R.id.action_compensation_not_now:
                             listener.onNotNowMenuClick(getAdapterPosition());
+                            return true;
+                        case R.id.action_compensation_change_amount:
+                            listener.onChangeAmountMenuClick(getAdapterPosition());
                             return true;
                         default:
                             return true;

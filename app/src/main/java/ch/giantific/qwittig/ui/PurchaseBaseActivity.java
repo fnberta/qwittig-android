@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Locale;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.helper.RatesHelper;
 import ch.giantific.qwittig.helper.ReceiptHelper;
 import ch.giantific.qwittig.data.models.ImageReceipt;
 import ch.giantific.qwittig.ui.dialogs.AccountCreateDialogFragment;
@@ -58,7 +59,8 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         ReceiptHelper.HelperInteractionListener,
         StoreSelectionDialogFragment.DialogInteractionListener,
         PurchaseReceiptAddEditFragment.FragmentInteractionListener,
-        FABProgressListener {
+        FABProgressListener,
+        RatesHelper.HelperInteractionListener {
 
     @IntDef({PURCHASE_SAVED, PURCHASE_SAVED_AUTO, PURCHASE_DISCARDED, PURCHASE_SAVED_AS_DRAFT, PURCHASE_DRAFT_DELETED,
             PURCHASE_ERROR,
