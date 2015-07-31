@@ -10,7 +10,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.StringDef;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.parse.ParseObject;
@@ -54,7 +53,6 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     public static final String PUSH_PARAM_BUYER = "buyer";
     public static final String PUSH_PARAM_AMOUNT = "amount";
     public static final String PUSH_PARAM_STORE = "store";
-    public static final String PUSH_PARAM_TOTAL_PRICE = "totalPrice";
     public static final String PUSH_PARAM_USERS_INVOLVED = "usersInvolved";
     public static final String PUSH_PARAM_INITIATOR = "initiator";
     public static final String PUSH_PARAM_GROUP_NAME = "groupName";
@@ -239,8 +237,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
 
                 // store text in LinkedHashSet for combined notifications
                 String store = jsonExtras.optString(PUSH_PARAM_STORE);
-                String currencyCode = jsonExtras.optString(PUSH_PARAM_CURRENCY_CODE);
-                String totalAmountFormatted = getPurchaseTotalAmount(jsonExtras, currencyCode);
+                String totalAmountFormatted = getAmount(jsonExtras);
                 mPurchaseNotifications = mSharedPreferences.getStringSet(
                         STORED_PURCHASE_NOTIFICATIONS + notificationTag, new LinkedHashSet<String>());
                 mPurchaseNotifications.add(store + ": " + totalAmountFormatted);
@@ -370,14 +367,10 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
         OnlineQuery.queryCompensation(context, compensationId, isNew);
     }
 
-    private String getPurchaseTotalAmount(JSONObject jsonExtras, String currencyCode) {
-        String totalAmount = jsonExtras.optString(PUSH_PARAM_TOTAL_PRICE);
-        String totalAmountFormatted = "";
-        if (!TextUtils.isEmpty(totalAmount)) {
-            totalAmountFormatted = MoneyUtils.formatMoney(Double.parseDouble(totalAmount),
-                    currencyCode);
-        }
-        return totalAmountFormatted;
+    private String getAmount(JSONObject jsonExtras) {
+        String currencyCode = jsonExtras.optString(PUSH_PARAM_CURRENCY_CODE);
+        double amount = jsonExtras.optDouble(PUSH_PARAM_AMOUNT);
+        return MoneyUtils.formatMoney(amount, currencyCode);
     }
 
     private boolean isSilentNotification(String type) {
@@ -458,8 +451,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
         switch (type) {
             case TYPE_PURCHASE_NEW: {
                 String store = jsonExtras.optString(PUSH_PARAM_STORE);
-                String currencyCode = jsonExtras.optString(PUSH_PARAM_CURRENCY_CODE);
-                String totalAmountFormatted = getPurchaseTotalAmount(jsonExtras, currencyCode);
+                String totalAmountFormatted = getAmount(jsonExtras);
                 title = context.getString(R.string.push_purchase_new_title, user);
                 alert = context.getString(R.string.push_purchase_new_alert, store, totalAmountFormatted);
 
@@ -636,12 +628,6 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
         }
 
         return builder.build();
-    }
-
-    private String getAmount(JSONObject jsonExtras) {
-        String currencyCode = jsonExtras.optString(PUSH_PARAM_CURRENCY_CODE);
-        double amount = jsonExtras.optDouble(PUSH_PARAM_AMOUNT);
-        return MoneyUtils.formatMoney(amount, currencyCode);
     }
 
     public static JSONObject getData(Intent intent) throws JSONException {
