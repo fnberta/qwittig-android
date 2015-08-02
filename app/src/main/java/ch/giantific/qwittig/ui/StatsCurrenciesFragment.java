@@ -47,10 +47,8 @@ public class StatsCurrenciesFragment extends StatsPieBaseFragment {
     void calcStats(String year, int month) {
         super.calcStats(year, month);
 
-        if (mCurrentGroup != null) {
-            String groupId = mCurrentGroup.getObjectId();
-            CloudCode.statsCurrencies(getActivity(), this, groupId, year, month);
-        }
+        String groupId = mCurrentGroup.getObjectId();
+        CloudCode.statsCurrencies(getActivity(), this, groupId, year, month);
     }
 
     @Override

@@ -2,7 +2,6 @@ package ch.giantific.qwittig.ui;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.design.widget.Snackbar;
@@ -15,6 +14,7 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
@@ -25,6 +25,7 @@ import java.util.List;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.Month;
 import ch.giantific.qwittig.data.parse.CloudCode;
+import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.data.stats.models.Stats;
@@ -37,7 +38,8 @@ import ch.giantific.qwittig.utils.Utils;
  * A simple {@link Fragment} subclass.
  */
 public abstract class StatsBaseFragment extends BaseFragment implements
-        CloudCode.CloudFunctionListener {
+        CloudCode.CloudFunctionListener,
+        LocalQuery.ObjectLocalFetchListener {
 
     static final int PERIOD_YEAR = 0;
     static final int PERIOD_MONTH = 1;
@@ -53,7 +55,7 @@ public abstract class StatsBaseFragment extends BaseFragment implements
     ProgressBar mProgressBar;
     boolean mIsLoading;
     Stats mStatsData;
-
+    boolean mDataIsLoaded;
 
     public StatsBaseFragment() {
         // Required empty public constructor
@@ -67,20 +69,6 @@ public abstract class StatsBaseFragment extends BaseFragment implements
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement FragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        updateCurrentUserAndGroup();
-    }
-
-    private void updateCurrentUserAndGroup() {
-        mCurrentUser = (User) ParseUser.getCurrentUser();
-        if (mCurrentUser != null) {
-            mCurrentGroup = mCurrentUser.getCurrentGroup();
         }
     }
 
@@ -109,47 +97,6 @@ public abstract class StatsBaseFragment extends BaseFragment implements
         spinnerPeriodAdapter.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item);
         mSpinnerPeriod.setAdapter(spinnerPeriodAdapter);
-        mSpinnerPeriod.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String period = (String) parent.getItemAtPosition(position);
-                if (userIsInGroup()) {
-                    onPeriodSelected(period);
-                } else {
-                    setEmptyViewVisibility(true);
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-    }
-
-    private void onPeriodSelected(String period) {
-        if (period.equals(getString(R.string.period_year))) {
-            mPeriodType = PERIOD_YEAR;
-
-            if (mSpinnerMonth.getVisibility() == View.VISIBLE) {
-                mSpinnerMonth.setVisibility(View.GONE);
-            }
-
-            onYearSelected((String) mSpinnerYear.getSelectedItem());
-        } else if (period.equals(getString(R.string.period_month))) {
-            mPeriodType = PERIOD_MONTH;
-
-            if (mSpinnerMonth.getVisibility() == View.GONE) {
-                mSpinnerMonth.setVisibility(View.VISIBLE);
-            }
-
-            Month month = (Month) mSpinnerMonth.getSelectedItem();
-            onMonthSelected(month.getNumber());
-        }
-    }
-
-    private boolean userIsInGroup() {
-        return mCurrentUser != null && mCurrentGroup != null;
     }
 
     private void setupYearAdapter() {
@@ -158,36 +105,6 @@ public abstract class StatsBaseFragment extends BaseFragment implements
         spinnerYearAdapter.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item);
         mSpinnerYear.setAdapter(spinnerYearAdapter);
-        mSpinnerYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String year = (String) parent.getItemAtPosition(position);
-                if (userIsInGroup()) {
-                    onYearSelected(year);
-                } else {
-                    setEmptyViewVisibility(true);
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-    }
-
-    private void onYearSelected(String year) {
-        if (!mIsLoading) {
-            switch (mPeriodType) {
-                case PERIOD_YEAR:
-                    calcStats(year);
-                    break;
-                case PERIOD_MONTH:
-                    Month month = (Month) mSpinnerMonth.getSelectedItem();
-                    calcStats(year, month.getNumber());
-                    break;
-            }
-        }
     }
 
     private List<String> getLastYears(int timeToGoBack) {
@@ -218,12 +135,60 @@ public abstract class StatsBaseFragment extends BaseFragment implements
         spinnerMonthAdapter.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item);
         mSpinnerMonth.setAdapter(spinnerMonthAdapter);
-        mSpinnerMonth.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        updateData();
+    }
+
+    @CallSuper
+    void updateData() {
+        updateCurrentUserAndGroup();
+        checkCurrentGroup();
+    }
+
+    private void updateCurrentUserAndGroup() {
+        mCurrentUser = (User) ParseUser.getCurrentUser();
+        if (mCurrentUser != null) {
+            mCurrentGroup = mCurrentUser.getCurrentGroup();
+        }
+    }
+
+    private void checkCurrentGroup() {
+        if (mCurrentGroup != null) {
+            if (mCurrentGroup.isDataAvailable()) {
+                setStuffWithGroupData();
+            } else {
+                LocalQuery.fetchObjectData(this, mCurrentGroup);
+            }
+        } else {
+            setEmptyViewVisibility(true);
+            toggleProgressBarVisibility();
+        }
+    }
+
+    @CallSuper
+    void setStuffWithGroupData() {
+        setPeriodSelectedListener();
+        setYearSelectedListener();
+        setMonthSelectedListener();
+    }
+
+    @Override
+    public void onObjectFetched(ParseObject object) {
+        setStuffWithGroupData();
+    }
+
+    private void setPeriodSelectedListener() {
+        mSpinnerPeriod.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Month month = (Month) parent.getItemAtPosition(position);
+                String period = (String) parent.getItemAtPosition(position);
                 if (userIsInGroup()) {
-                    onMonthSelected(month.getNumber());
+                    onPeriodSelected(period);
                 } else {
                     setEmptyViewVisibility(true);
                 }
@@ -236,16 +201,78 @@ public abstract class StatsBaseFragment extends BaseFragment implements
         });
     }
 
-    private void onMonthSelected(int month) {
-        if (!mIsLoading) {
-            String year = (String) mSpinnerYear.getSelectedItem();
-            calcStats(year, month);
-        }
+    private boolean userIsInGroup() {
+        return mCurrentUser != null && mCurrentGroup != null;
     }
 
-    @CallSuper
-    void calcStats(String year) {
-        calcStats(year, 0);
+    private void onPeriodSelected(String period) {
+        if (period.equals(getString(R.string.period_year))) {
+            mPeriodType = PERIOD_YEAR;
+
+            if (mSpinnerMonth.getVisibility() == View.VISIBLE) {
+                mSpinnerMonth.setVisibility(View.GONE);
+            }
+        } else if (period.equals(getString(R.string.period_month))) {
+            mPeriodType = PERIOD_MONTH;
+
+            if (mSpinnerMonth.getVisibility() == View.GONE) {
+                mSpinnerMonth.setVisibility(View.VISIBLE);
+            }
+        }
+
+        loadData();
+    }
+
+    private void setYearSelectedListener() {
+        mSpinnerYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (userIsInGroup()) {
+                    loadData();
+                } else {
+                    setEmptyViewVisibility(true);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
+    private void setMonthSelectedListener() {
+        mSpinnerMonth.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (userIsInGroup()) {
+                    loadData();
+                } else {
+                    setEmptyViewVisibility(true);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
+    public void loadData() {
+        if (mIsLoading) {
+            return;
+        }
+
+        String year = (String) mSpinnerYear.getSelectedItem();
+        int monthNumber = 0;
+
+        if (mPeriodType == PERIOD_MONTH) {
+            Month month = (Month) mSpinnerMonth.getSelectedItem();
+            monthNumber = month.getNumber();
+        }
+
+        calcStats(year, monthNumber);
     }
 
     @CallSuper
@@ -285,20 +312,6 @@ public abstract class StatsBaseFragment extends BaseFragment implements
         }
     }
 
-    public void reloadData() {
-        updateCurrentUserAndGroup();
-
-        String year = (String) mSpinnerYear.getSelectedItem();
-        int monthNumber = 0;
-
-        if (mPeriodType == PERIOD_MONTH) {
-            Month month = (Month) mSpinnerMonth.getSelectedItem();
-            monthNumber = month.getNumber();
-        }
-
-        calcStats(year, monthNumber);
-    }
-
     final List<Integer> getColors() {
         List<Integer> colors = new ArrayList<>();
 
@@ -326,6 +339,11 @@ public abstract class StatsBaseFragment extends BaseFragment implements
     }
 
     @Override
+    public void onCloudFunctionReturned(String cloudFunction, Object o) {
+        mDataIsLoaded = true;
+    }
+
+    @Override
     public void onCloudFunctionError(ParseException e) {
         mIsLoading = false;
         showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
@@ -336,7 +354,7 @@ public abstract class StatsBaseFragment extends BaseFragment implements
         snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                reloadData();
+                loadData();
             }
         });
         snackbar.show();

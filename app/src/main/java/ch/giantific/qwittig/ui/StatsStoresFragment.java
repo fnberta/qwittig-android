@@ -104,10 +104,8 @@ public class StatsStoresFragment extends StatsPieBaseFragment {
     void calcStats(String year, int month) {
         super.calcStats(year, month);
 
-        if (mCurrentGroup != null) {
-            String groupId = mCurrentGroup.getObjectId();
-            CloudCode.statsStores(getActivity(), this, groupId, year, month);
-        }
+        String groupId = mCurrentGroup.getObjectId();
+        CloudCode.statsStores(getActivity(), this, groupId, year, month);
     }
 
     @Override

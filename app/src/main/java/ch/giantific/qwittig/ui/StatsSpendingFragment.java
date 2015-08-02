@@ -78,13 +78,11 @@ public class StatsSpendingFragment extends StatsBaseFragment {
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    void setStuffWithGroupData() {
+        super.setStuffWithGroupData();
 
-        User currentUser = (User) ParseUser.getCurrentUser();
-        Group currentGroup = currentUser.getCurrentGroup();
         YAxis yAxis = mBarChart.getAxisLeft();
-        yAxis.setValueFormatter(new CurrencyFormatter(currentGroup.getCurrency()));
+        yAxis.setValueFormatter(new CurrencyFormatter(mCurrentGroup.getCurrency()));
     }
 
     @Override
@@ -121,9 +119,7 @@ public class StatsSpendingFragment extends StatsBaseFragment {
     void calcStats(String year, int month) {
         super.calcStats(year, month);
 
-        if (mCurrentGroup != null) {
-            CloudCode.statsSpending(getActivity(), this, mCurrentGroup.getObjectId(), year, month);
-        }
+        CloudCode.statsSpending(getActivity(), this, mCurrentGroup.getObjectId(), year, month);
     }
 
     @Override
@@ -149,6 +145,10 @@ public class StatsSpendingFragment extends StatsBaseFragment {
     }
 
     private void setChartData() {
+        if (!mDataIsLoaded) {
+            return;
+        }
+
         List<Stats.Member> userData = mStatsData.getMembers();
         Stats.Group groupData = mStatsData.getGroup();
         int unitSize = mStatsData.getNumberOfUnits();
