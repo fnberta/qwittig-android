@@ -53,6 +53,8 @@ public class StatsCurrenciesFragment extends StatsPieBaseFragment {
 
     @Override
     public void onCloudFunctionReturned(String cloudFunction, Object o) {
+        super.onCloudFunctionReturned(cloudFunction, o);
+
         switch (cloudFunction) {
             case CloudCode.STATS_CURRENCIES: {
                 String dataJson = (String) o;

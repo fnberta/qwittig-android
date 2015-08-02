@@ -110,6 +110,8 @@ public class StatsStoresFragment extends StatsPieBaseFragment {
 
     @Override
     public void onCloudFunctionReturned(String cloudFunction, Object o) {
+        super.onCloudFunctionReturned(cloudFunction, o);
+
         switch (cloudFunction) {
             case CloudCode.STATS_STORES: {
                 String dataJson = (String) o;

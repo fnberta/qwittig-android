@@ -134,6 +134,8 @@ public class StatsSpendingFragment extends StatsBaseFragment {
 
     @Override
     public void onCloudFunctionReturned(String cloudFunction, Object o) {
+        super.onCloudFunctionReturned(cloudFunction, o);
+
         switch (cloudFunction) {
             case CloudCode.STATS_SPENDING:
                 String dataJson = (String) o;
