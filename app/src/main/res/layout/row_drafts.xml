@@ -38,7 +38,7 @@
     <TextView
         android:id="@id/tv_total_value"
         style="@style/ListTextView"
-        android:layout_width="@dimen/balance_change_length"
+        android:layout_width="@dimen/balance_change_width"
         android:layout_height="@dimen/balance_change_height"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
