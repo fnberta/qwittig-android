@@ -76,13 +76,17 @@ public class User extends ParseUser {
     }
 
     /**
-     * Sets deleted flag to true, username to deleted and password to empty. NOTE: the rest of the
+     * Sets deleted flag to true and username to deleted. NOTE: the rest of the
      * user fields will get emptied by CloudCode on the server
      */
     public void deleteUserFields() {
         setDeleted(true);
-
         setUsername(USERNAME_PREFIX_DELETED + UUID.randomUUID().toString());
+    }
+
+    public void undeleteUserFields(String username) {
+        setDeleted(false);
+        setUsername(username);
     }
 
     public String getNicknameOrMe(Context context) {

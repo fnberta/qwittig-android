@@ -12,9 +12,12 @@ import android.widget.TextView;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import org.apache.commons.math3.fraction.BigFraction;
+
 import java.util.List;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.parse.models.Item;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.ui.adapter.rows.ProgressRow;
@@ -97,14 +100,22 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
                 }
                 purchaseRow.mTextViewBuyer.setText(nickname);
 
-                String myShare = MoneyUtils.formatMoneyNoSymbol(Utils.calculateMyShare(purchase),
+                double myShareNumber = Utils.calculateMyShare(purchase);
+                String myShare = MoneyUtils.formatMoneyNoSymbol(myShareNumber,
                         mCurrentGroupCurrency);
                 purchaseRow.mTextViewShare.setText(myShare);
+                String balanceChange = MoneyUtils.formatMoneyNoSymbol(myShareNumber * -1,
+                        mCurrentGroupCurrency);
                 if (buyer.getObjectId().equals(currentUser.getObjectId())) {
-                    purchaseRow.mTextViewShare.setTextColor(mContext.getResources().getColor(R.color.green));
+                    balanceChange = "+" + MoneyUtils.formatMoneyNoSymbol(
+                            calculateBalanceChange(purchase), mCurrentGroupCurrency);
+                    purchaseRow.mTextViewBalanceChange.setTextColor(
+                            mContext.getResources().getColor(R.color.green));
                 } else {
-                    purchaseRow.mTextViewShare.setTextColor(mContext.getResources().getColor(R.color.red));
+                    purchaseRow.mTextViewBalanceChange.setTextColor(
+                            mContext.getResources().getColor(R.color.red));
                 }
+                purchaseRow.mTextViewBalanceChange.setText(balanceChange);
 
                 if (!purchase.currentUserHasReadPurchase()) {
                     if (Utils.isRunningLollipopAndHigher()) {
@@ -124,6 +135,29 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
                 // do nothing
                 break;
         }
+    }
+
+    private double calculateBalanceChange(ParseObject purchaseParse) {
+        Purchase purchase = (Purchase) purchaseParse;
+
+        String userId = ParseUser.getCurrentUser().getObjectId();
+        double balanceChange = 0;
+        List<ParseObject> items = purchase.getItems();
+
+        for (ParseObject parseObject : items) {
+            Item item = (Item) parseObject;
+
+            List<String> usersInvolvedIds = item.getUsersInvolvedIds();
+            int sizeUsersInvolved = usersInvolvedIds.size();
+            double price = item.getPrice();
+            if (usersInvolvedIds.contains(userId)) {
+                balanceChange += price - (price / sizeUsersInvolved);
+            } else {
+                balanceChange += price;
+            }
+        }
+
+        return balanceChange;
     }
 
     @Override
@@ -147,6 +181,7 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
         private TextView mTextViewStore;
         private TextView mTextViewBuyer;
         private TextView mTextViewShare;
+        private TextView mTextViewBalanceChange;
 
         public PurchaseRow(View view, final AdapterInteractionListener listener, Context context) {
             super(view);
@@ -164,6 +199,7 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
             mTextViewStore = (TextView) view.findViewById(R.id.tv_store);
             mTextViewBuyer = (TextView) view.findViewById(R.id.tv_user);
             mTextViewShare = (TextView) view.findViewById(R.id.tv_my_share);
+            mTextViewBalanceChange = (TextView) view.findViewById(R.id.tv_balance_change);
         }
 
         private void resetBackground() {

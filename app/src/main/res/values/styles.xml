@@ -30,6 +30,7 @@
     <style name="ListTextView" parent="@style/TextAppearance.AppCompat.Subhead">
         <item name="android:lines">1</item>
         <item name="android:ellipsize">end</item>
+        <item name="android:textColor">?android:textColorPrimary</item>
     </style>
 
     <style name="SubHeader">
@@ -39,7 +40,7 @@
     </style>
 
     <style name="HomeToolbarTitle">
-        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Display1</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Display2</item>
     </style>
 
     <style name="ColoredRaisedButton" parent="Widget.AppCompat.Button">

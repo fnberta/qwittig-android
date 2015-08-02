@@ -130,6 +130,10 @@ public abstract class StatsPieBaseFragment extends StatsBaseFragment {
     }
 
     final void setChartData() {
+        if (!mDataIsLoaded) {
+            return;
+        }
+
         List<Stats.Member> userData = mStatsData.getMembers();
         Stats.Group groupData = mStatsData.getGroup();
 

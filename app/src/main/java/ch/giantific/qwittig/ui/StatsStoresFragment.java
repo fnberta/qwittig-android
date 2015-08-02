@@ -104,14 +104,14 @@ public class StatsStoresFragment extends StatsPieBaseFragment {
     void calcStats(String year, int month) {
         super.calcStats(year, month);
 
-        if (mCurrentGroup != null) {
-            String groupId = mCurrentGroup.getObjectId();
-            CloudCode.statsStores(getActivity(), this, groupId, year, month);
-        }
+        String groupId = mCurrentGroup.getObjectId();
+        CloudCode.statsStores(getActivity(), this, groupId, year, month);
     }
 
     @Override
     public void onCloudFunctionReturned(String cloudFunction, Object o) {
+        super.onCloudFunctionReturned(cloudFunction, o);
+
         switch (cloudFunction) {
             case CloudCode.STATS_STORES: {
                 String dataJson = (String) o;
