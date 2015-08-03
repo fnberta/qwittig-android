@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -41,6 +42,7 @@ public abstract class StatsBaseFragment extends BaseFragment implements
         CloudCode.CloudFunctionListener,
         LocalQuery.ObjectLocalFetchListener {
 
+    private static final String LOG_TAG = StatsBaseFragment.class.getSimpleName();
     static final int PERIOD_YEAR = 0;
     static final int PERIOD_MONTH = 1;
     static final int NUMBER_OF_MONTHS = 12;
@@ -56,6 +58,7 @@ public abstract class StatsBaseFragment extends BaseFragment implements
     boolean mIsLoading;
     Stats mStatsData;
     boolean mDataIsLoaded;
+    boolean mListenersAreSet;
 
     public StatsBaseFragment() {
         // Required empty public constructor
@@ -172,9 +175,20 @@ public abstract class StatsBaseFragment extends BaseFragment implements
 
     @CallSuper
     void setStuffWithGroupData() {
-        setPeriodSelectedListener();
-        setYearSelectedListener();
-        setMonthSelectedListener();
+        if (!mListenersAreSet) {
+            setPeriodSelectedListener();
+            setYearSelectedListener();
+            setMonthSelectedListener();
+
+            mListenersAreSet = true;
+        } else {
+            if (userIsInGroup()) {
+                loadData();
+            } else {
+                setEmptyViewVisibility(true);
+                toggleProgressBarVisibility();
+            }
+        }
     }
 
     @Override
@@ -191,6 +205,7 @@ public abstract class StatsBaseFragment extends BaseFragment implements
                     onPeriodSelected(period);
                 } else {
                     setEmptyViewVisibility(true);
+                    toggleProgressBarVisibility();
                 }
             }
 
@@ -231,6 +246,7 @@ public abstract class StatsBaseFragment extends BaseFragment implements
                     loadData();
                 } else {
                     setEmptyViewVisibility(true);
+                    toggleProgressBarVisibility();
                 }
             }
 
@@ -249,6 +265,7 @@ public abstract class StatsBaseFragment extends BaseFragment implements
                     loadData();
                 } else {
                     setEmptyViewVisibility(true);
+                    toggleProgressBarVisibility();
                 }
             }
 
@@ -338,11 +355,13 @@ public abstract class StatsBaseFragment extends BaseFragment implements
         return gson.fromJson(json, Stats.class);
     }
 
+    @CallSuper
     @Override
     public void onCloudFunctionReturned(String cloudFunction, Object o) {
         mDataIsLoaded = true;
     }
 
+    @CallSuper
     @Override
     public void onCloudFunctionError(ParseException e) {
         mIsLoading = false;

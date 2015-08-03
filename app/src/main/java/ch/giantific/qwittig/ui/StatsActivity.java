@@ -72,7 +72,14 @@ public class StatsActivity extends BaseNavDrawerActivity implements
 
     @Override
     protected void onNewGroupSet() {
-        mStatsSpendingFragment.updateData();
-        mStatsStoresFragment.updateData();
+        if (mStatsSpendingFragment.isAdded()) {
+            mStatsSpendingFragment.updateData();
+        }
+        if (mStatsStoresFragment.isAdded()) {
+            mStatsStoresFragment.updateData();
+        }
+        if (mStatsCurrenciesFragment.isAdded()) {
+            mStatsCurrenciesFragment.updateData();
+        }
     }
 }
