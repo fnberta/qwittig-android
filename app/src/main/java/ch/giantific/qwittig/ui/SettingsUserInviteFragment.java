@@ -3,6 +3,7 @@ package ch.giantific.qwittig.ui;
 import android.app.Activity;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.design.widget.TextInputLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -177,9 +178,12 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
         for (int i = 0, mUsersToInviteEmailsSize = mUsersToInviteEmails.size(); i < mUsersToInviteEmailsSize; i++) {
             String email = mUsersToInviteEmails.get(i);
 
+            TextInputLayout tilUser = mUsersToInviteFields.get(i);
             if (mCurrentGroup.getUsersInvited().contains(email)) {
-                mUsersToInviteFields.get(i).setError(getString(R.string.toast_already_invited, email));
+                tilUser.setError(getString(R.string.toast_already_invited, email));
                 emailsAreNotAlreadyInvited = false;
+            } else {
+                tilUser.setErrorEnabled(false);
             }
         }
 
@@ -202,9 +206,12 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
             for (int i = 0, mUsersToInviteEmailsSize = mUsersToInviteEmails.size(); i < mUsersToInviteEmailsSize; i++) {
                 String email = mUsersToInviteEmails.get(i);
 
+                TextInputLayout tilUser = mUsersToInviteFields.get(i);
                 if (email.equals(user.getUsername())) {
-                    mUsersToInviteFields.get(i).setError(getString(R.string.toast_already_in_group, email));
+                    tilUser.setError(getString(R.string.toast_already_in_group, email));
                     allEmailsAreNotAlreadyInGroup = false;
+                } else {
+                    tilUser.setErrorEnabled(false);
                 }
             }
         }

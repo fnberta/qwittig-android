@@ -143,11 +143,12 @@ public class StoreSelectionDialogFragment extends DialogFragment {
         String storeSelected = mSpinnerStore.getSelectedItem().toString();
         if (storeSelected.equals(mOtherStore)) {
             mStoreSelected = mTextInputLayoutStoreManual.getEditText().getText().toString().trim();
-            if (TextUtils.isEmpty(mStoreSelected)) {
-                mTextInputLayoutStoreManual.setError(getString(R.string.error_store));
-            } else {
+            if (!TextUtils.isEmpty(mStoreSelected)) {
+                mTextInputLayoutStoreManual.setErrorEnabled(false);
                 mListener.setStore(mStoreSelected, true);
                 dismiss();
+            } else {
+                mTextInputLayoutStoreManual.setError(getString(R.string.error_store));
             }
         } else {
             mStoreSelected = storeSelected;

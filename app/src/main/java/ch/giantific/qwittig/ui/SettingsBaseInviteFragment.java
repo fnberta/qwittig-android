@@ -123,7 +123,8 @@ public abstract class SettingsBaseInviteFragment extends BaseFragment implements
             String email = invitedUser.getEditText().getText().toString().trim();
             if (Utils.emailIsValid(email)) {
                 mUsersToInviteEmails.add(email);
-            } else if (!TextUtils.isEmpty(email)) {
+                invitedUser.setErrorEnabled(false);
+            } else {
                 invitedUser.setError(getString(R.string.error_email));
                 allEmailsAreValid = false;
             }

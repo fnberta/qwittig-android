@@ -118,6 +118,7 @@ public class SettingsProfileFragment extends Fragment {
 
         if (Utils.emailIsValid(mEmail)) {
             currentUser.setUsername(mEmail);
+            mTextInputLayoutEmail.setErrorEnabled(false);
         } else {
             fieldsAreComplete = false;
             mTextInputLayoutEmail.setError(getString(R.string.error_email));
@@ -125,6 +126,7 @@ public class SettingsProfileFragment extends Fragment {
 
         if (!TextUtils.isEmpty(mNickname)) {
             currentUser.setNickname(mNickname);
+            mTextInputLayoutNickname.setErrorEnabled(false);
         } else {
             fieldsAreComplete = false;
             mTextInputLayoutNickname.setError(getString(R.string.error_nickname));
@@ -133,6 +135,7 @@ public class SettingsProfileFragment extends Fragment {
         if (!TextUtils.isEmpty(mPassword)) {
             if (mPassword.equals(mPasswordRepeat)) {
                 currentUser.setPassword(mPassword);
+                mTextInputLayoutPasswordRepeat.setErrorEnabled(false);
             } else {
                 fieldsAreComplete = false;
                 mTextInputLayoutPasswordRepeat.setError(getString(R.string.error_login_signup_password_nomatch));

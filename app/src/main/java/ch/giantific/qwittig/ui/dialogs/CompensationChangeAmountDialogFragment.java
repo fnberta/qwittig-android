@@ -103,6 +103,7 @@ public class CompensationChangeAmountDialogFragment extends DialogFragment {
                             .setScale(maxFractionDigits, BigDecimal.ROUND_HALF_UP);
                     BigFraction amountNew = new BigFraction(amount.doubleValue());
                     if (amountNew.compareTo(BigFraction.ZERO) > 0) {
+                        mTextInputLayoutAmount.setErrorEnabled(false);
                         mListener.changeAmount(amountNew);
                         dismiss();
                     } else {

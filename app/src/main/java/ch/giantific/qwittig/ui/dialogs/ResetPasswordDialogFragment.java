@@ -88,6 +88,7 @@ public class ResetPasswordDialogFragment extends DialogFragment {
                 public void onClick(View v) {
                     mEmail = mTextInputLayoutEmail.getEditText().getText().toString();
                     if (Utils.emailIsValid(mEmail)) {
+                        mTextInputLayoutEmail.setErrorEnabled(false);
                         mListener.resetPassword(mEmail);
                         dismiss();
                     } else {
