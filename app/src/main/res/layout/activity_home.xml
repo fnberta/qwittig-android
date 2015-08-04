@@ -62,7 +62,7 @@
             android:layout_gravity="end|bottom"
             android:layout_margin="@dimen/normal_space"
             android:visibility="invisible"
-            app:layout_behavior="ch.giantific.qwittig.ui.widgets.FloatingActionMenuBehavior"
+            app:layout_behavior="ch.giantific.qwittig.ui.widgets.FloatingActionBehavior"
             app:menu_colorNormal="@color/accent"
             app:menu_colorPressed="@color/accent"
             app:menu_colorRipple="?colorControlHighlight"

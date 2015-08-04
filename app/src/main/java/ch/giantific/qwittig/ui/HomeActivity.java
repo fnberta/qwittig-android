@@ -42,7 +42,6 @@ import ch.giantific.qwittig.ui.adapter.TabsAdapter;
 import ch.giantific.qwittig.ui.dialogs.GoPremiumDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.GroupJoinDialogFragment;
-import ch.giantific.qwittig.ui.widgets.FabSpeedDial;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
