@@ -5,7 +5,6 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.design.widget.Snackbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -42,23 +41,23 @@ public abstract class StatsBaseFragment extends BaseFragment implements
         CloudCode.CloudFunctionListener,
         LocalQuery.ObjectLocalFetchListener {
 
-    private static final String LOG_TAG = StatsBaseFragment.class.getSimpleName();
     static final int PERIOD_YEAR = 0;
     static final int PERIOD_MONTH = 1;
     static final int NUMBER_OF_MONTHS = 12;
+    private static final String LOG_TAG = StatsBaseFragment.class.getSimpleName();
     FragmentInteractionListener mListener;
     User mCurrentUser;
     Group mCurrentGroup;
     int mPeriodType;
-    Spinner mSpinnerPeriod;
-    Spinner mSpinnerYear;
-    Spinner mSpinnerMonth;
-    TextView mTextViewEmptyView;
-    ProgressBar mProgressBar;
     boolean mIsLoading;
     Stats mStatsData;
     boolean mDataIsLoaded;
-    boolean mListenersAreSet;
+    private Spinner mSpinnerPeriod;
+    private Spinner mSpinnerYear;
+    private Spinner mSpinnerMonth;
+    private TextView mTextViewEmptyView;
+    private ProgressBar mProgressBar;
+    private boolean mListenersAreSet;
 
     public StatsBaseFragment() {
         // Required empty public constructor
