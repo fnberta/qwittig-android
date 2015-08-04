@@ -269,5 +269,7 @@
     <string name="dialog_change_amount_message">Enter the desired new amount.</string>
     <string name="push_compensation_amount_changed_title">Amount changed</string>
     <string name="push_compensation_amount_changed_alert">%1$s will pay you %2$s</string>
+    <string name="fab_label_auto">Magically</string>
+    <string name="fab_label_manual">Manually</string>
 
 </resources>

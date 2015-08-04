@@ -55,35 +55,41 @@
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-        <ch.giantific.qwittig.ui.widgets.FabSpeedDial
-            android:id="@+id/fab_auto"
+        <com.github.clans.fab.FloatingActionMenu
+            android:id="@+id/fab_menu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"
             android:layout_margin="@dimen/normal_space"
-            android:visibility="gone"
-            app:showTranslationY="@dimen/fab_translationY_auto"
-            android:src="@drawable/ic_camera_alt_black_24dp" />
-
-        <ch.giantific.qwittig.ui.widgets.FabSpeedDial
-            android:id="@+id/fab_manual"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
-            android:layout_margin="@dimen/normal_space"
-            android:visibility="gone"
-            app:showTranslationY="@dimen/fab_translationY_manual"
-            android:src="@drawable/ic_create_black_24dp" />
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_group_new"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
-            android:layout_margin="@dimen/normal_space"
-            android:src="@drawable/ic_add_shopping_cart_black_24dp"
             android:visibility="invisible"
-            tools:visibility="visible"/>
+            app:layout_behavior="ch.giantific.qwittig.ui.widgets.FloatingActionMenuBehavior"
+            app:menu_colorNormal="@color/accent"
+            app:menu_colorPressed="@color/accent"
+            app:menu_colorRipple="?colorControlHighlight"
+            app:menu_icon="@drawable/ic_add_black_24dp"
+            app:menu_labels_colorRipple="?colorControlHighlight">
+
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/fab_auto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_camera_alt_black_24dp"
+                app:fab_colorNormal="@color/accent"
+                app:fab_colorPressed="@color/accent"
+                app:fab_size="mini"
+                app:fab_label="@string/fab_label_auto" />
+
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/fab_manual"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_create_black_24dp"
+                app:fab_colorNormal="@color/accent"
+                app:fab_colorPressed="@color/accent"
+                app:fab_size="mini"
+                app:fab_label="@string/fab_label_manual" />
+
+        </com.github.clans.fab.FloatingActionMenu>
 
     </android.support.design.widget.CoordinatorLayout>
 

@@ -263,5 +263,7 @@
     <string name="dialog_change_amount_message">Gib den gewünschten neuen Betrag ein.</string>
     <string name="push_compensation_amount_changed_title">Betrag geändert</string>
     <string name="push_compensation_amount_changed_alert">%1$s wird dir %2$s bezahlen</string>
+    <string name="fab_label_auto">Magisch</string>
+    <string name="fab_label_manual">Von Hand</string>
 
 </resources>
