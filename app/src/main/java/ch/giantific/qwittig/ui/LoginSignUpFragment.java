@@ -131,18 +131,24 @@ public class LoginSignUpFragment extends Fragment {
             fieldsAreComplete = false;
             mTextInputLayoutEmail.setError(getString(R.string.error_email));
             focusView = mEditTextEmail;
+        } else {
+            mTextInputLayoutEmail.setErrorEnabled(false);
         }
 
-        if (!TextUtils.isEmpty(password)) {
+        if (TextUtils.isEmpty(password)) {
+            fieldsAreComplete = false;
+            mTextInputLayoutPassword.setError(getString(R.string.error_login_password));
+            focusView = mEditTextPassword;
+        } else {
+            mTextInputLayoutPassword.setErrorEnabled(false);
+
             if (!password.equals(passwordRepeat)) {
                 mTextInputLayoutPasswordRepeat.setError(getString(R.string.error_login_signup_password_nomatch));
                 focusView = mEditTextPasswordRepeat;
                 fieldsAreComplete = false;
+            } else {
+                mTextInputLayoutPasswordRepeat.setErrorEnabled(false);
             }
-        } else {
-            fieldsAreComplete = false;
-            mTextInputLayoutPassword.setError(getString(R.string.error_login_password));
-            focusView = mEditTextPassword;
         }
 
         if (TextUtils.isEmpty(nickname)) {
@@ -153,6 +159,8 @@ public class LoginSignUpFragment extends Fragment {
             fieldsAreComplete = false;
             mTextInputLayoutNickname.setError(getString(R.string.error_nickname_length));
             focusView = mEditTextNickname;
+        } else {
+            mTextInputLayoutNickname.setErrorEnabled(false);
         }
 
         if (fieldsAreComplete) {

@@ -105,6 +105,7 @@ public class CompensationAddManualDialogFragment extends DialogFragment {
     private void validateAmount() {
         String amountString = mTextInputLayoutAmount.getEditText().getText().toString();
         if (!TextUtils.isEmpty(amountString)) {
+            mTextInputLayoutAmount.setErrorEnabled(false);
             ItemUserPicker recipientSelected = (ItemUserPicker) mSpinnerUsers.getSelectedItem();
             mListener.onManualPaymentValuesSet(recipientSelected, amountString);
             dismiss();

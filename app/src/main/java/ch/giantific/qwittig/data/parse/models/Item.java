@@ -196,6 +196,8 @@ public class Item extends ParseObject {
         if (!acceptEmptyFields && TextUtils.isEmpty(name)) {
             mTextInputLayoutName.setError(mContext.getString(R.string.error_item_name));
             isComplete = false;
+        } else {
+            mTextInputLayoutName.setErrorEnabled(false);
         }
 
         // check if price is empty
@@ -204,6 +206,7 @@ public class Item extends ParseObject {
             mTextInputLayoutPrice.setError(mContext.getString(R.string.error_item_price));
             isComplete = false;
         } else {
+            mTextInputLayoutPrice.setErrorEnabled(false);
             price = MoneyUtils.parsePrice(priceString);
             int maxFractionDigits = MoneyUtils.getMaximumFractionDigits(currencySelected);
             price = price.setScale(maxFractionDigits, BigDecimal.ROUND_HALF_UP);

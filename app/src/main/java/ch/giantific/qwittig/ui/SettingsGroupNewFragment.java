@@ -107,6 +107,8 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
         if (TextUtils.isEmpty(name)) {
             mTextInputLayoutName.setError(getString(R.string.error_group_name));
             return;
+        } else {
+            mTextInputLayoutName.setErrorEnabled(false);
         }
 
         boolean groupIsNew = true;

@@ -150,12 +150,16 @@ public class LoginFragment extends Fragment {
             fieldsAreComplete = false;
             mTextInputLayoutEmail.setError(getString(R.string.error_email));
             focusView = mEditTextEmail;
+        } else {
+            mTextInputLayoutEmail.setErrorEnabled(false);
         }
 
         if (TextUtils.isEmpty(password)) {
             fieldsAreComplete = false;
             mTextInputLayoutPassword.setError(getString(R.string.error_login_password));
             focusView = mEditTextPassword;
+        } else {
+            mTextInputLayoutPassword.setErrorEnabled(false);
         }
 
         if (fieldsAreComplete) {
