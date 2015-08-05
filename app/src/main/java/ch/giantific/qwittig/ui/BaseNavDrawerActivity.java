@@ -206,7 +206,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
 
     /**
      * Verifies the developer payload of a purchase.
-     * */
+     */
     private boolean developerPayloadIsValid(Purchase iabPurchase) {
         String payload = iabPurchase.getDeveloperPayload();
         return payload.equals(mCurrentUser.getObjectId());
@@ -315,7 +315,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
             mCurrentGroup = currentUser.getCurrentGroup();
 
             setupNavDrawerHeader();
-            setupIab();
+            //setupIab();
         }
     }
 

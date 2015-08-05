@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.IntDef;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -34,6 +35,7 @@ import java.lang.annotation.RetentionPolicy;
 
 import ch.giantific.qwittig.PushBroadcastReceiver;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.constants.AppConstants;
 import ch.giantific.qwittig.data.parse.CloudCode;
 import ch.giantific.qwittig.data.parse.OnlineQuery;
 import ch.giantific.qwittig.data.parse.models.Config;
@@ -99,17 +101,14 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
         mBalance = (TextView) findViewById(R.id.tv_balance);
         mFabMenu = (FloatingActionMenu) findViewById(R.id.fab_menu);
-        if (Utils.isRunningLollipopAndHigher()) {
-            mFabMenu.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-                @Override
-                public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                    v.removeOnLayoutChangeListener(this);
-                    circularRevealFab();
-                }
-            });
-        } else {
-            mFabMenu.setVisibility(View.VISIBLE);
-        }
+        mFabMenu.hideMenuButton(false);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mFabMenu.showMenuButton(true);
+            }
+        }, AppConstants.FAB_CIRCULAR_REVEAL_DELAY * 4);
+
         mFabAuto = (FloatingActionButton) findViewById(R.id.fab_auto);
         mFabAuto.setOnClickListener(this);
         mFabManual = (FloatingActionButton) findViewById(R.id.fab_manual);
@@ -127,19 +126,6 @@ public class HomeActivity extends BaseNavDrawerActivity implements
                 setupTabs();
             }
         }
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void circularRevealFab() {
-        Animator reveal = Utils.getCircularRevealAnimator(mFabMenu);
-        reveal.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                super.onAnimationStart(animation);
-                mFabMenu.setVisibility(View.VISIBLE);
-            }
-        });
-        reveal.start();
     }
 
     private void addViewPagerFragments() {

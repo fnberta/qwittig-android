@@ -19,10 +19,11 @@
         android:id="@+id/fab_user_invite_circle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:elevation="6dp"
         app:layout_anchor="@id/appbar"
         app:layout_anchorGravity="bottom|start"
         app:finalIcon="@drawable/ic_done_black_24dp"
-        app:arcColor="@color/green"
+        app:arcColor="@color/red"
         app:circleSize="mini"
         app:reusable="true">
 

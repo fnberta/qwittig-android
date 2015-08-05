@@ -37,7 +37,6 @@
                     android:textColor="@android:color/white"
                     android:lines="1"
                     android:ellipsize="middle"
-
                     tools:text="-123.40"/>
 
             </android.support.v7.widget.Toolbar>
@@ -61,8 +60,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"
             android:layout_margin="@dimen/normal_space"
-            android:visibility="invisible"
             app:layout_behavior="ch.giantific.qwittig.ui.widgets.FloatingActionBehavior"
+            app:menu_buttonSpacing="@dimen/normal_space"
             app:menu_colorNormal="@color/accent"
             app:menu_colorPressed="@color/accent"
             app:menu_colorRipple="?colorControlHighlight"
@@ -74,6 +73,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_camera_alt_black_24dp"
+                app:fab_elevationCompat="@dimen/fab_elevation"
                 app:fab_colorNormal="@color/accent"
                 app:fab_colorPressed="@color/accent"
                 app:fab_size="mini"
@@ -84,6 +84,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_create_black_24dp"
+                app:fab_elevationCompat="@dimen/fab_elevation"
                 app:fab_colorNormal="@color/accent"
                 app:fab_colorPressed="@color/accent"
                 app:fab_size="mini"
