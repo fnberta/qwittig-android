@@ -7,20 +7,24 @@ import android.view.View;
 
 import com.parse.ParseUser;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.constants.AppConstants;
+import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.ui.adapter.UsersRecyclerAdapter;
 import ch.giantific.qwittig.utils.ComparatorParseUserIgnoreCase;
 import ch.giantific.qwittig.utils.ParseUtils;
 
 
 public class HomeUsersFragment extends HomeBaseFragment implements
+        LocalQuery.UserLocalQueryListener,
         UsersRecyclerAdapter.AdapterInteractionListener {
 
     private UsersRecyclerAdapter mRecyclerAdapter;
+    private List<ParseUser> mUsers = new ArrayList<>();
 
     public HomeUsersFragment() {
     }
@@ -43,8 +47,25 @@ public class HomeUsersFragment extends HomeBaseFragment implements
     }
 
     @Override
+    public void updateAdapter() {
+        super.updateAdapter();
+
+        if (mCurrentUser != null) {
+            LocalQuery.queryUsers(this);
+        }
+    }
+
+    @Override
     public void onUsersLocalQueried(List<ParseUser> users) {
-        super.onUsersLocalQueried(users);
+        mUsers.clear();
+
+        if (!users.isEmpty()) {
+            for (ParseUser user : users) {
+                if (!user.getObjectId().equals(mCurrentUser.getObjectId())) {
+                    mUsers.add(user);
+                }
+            }
+        }
 
         if (!mUsers.isEmpty()) {
             Collections.sort(mUsers, new ComparatorParseUserIgnoreCase());

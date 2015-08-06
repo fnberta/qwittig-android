@@ -50,13 +50,12 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
     private String mCurrentGroupCurrency = ParseUtils.getGroupCurrency();
 
     public PurchaseDetailsRecyclerAdapter(Context context, int itemsViewResource,
-                                          ParseObject purchase, List<ParseUser> currentGroupUsers) {
+                                          ParseObject purchase) {
 
         mContext = context;
         mItemsViewResource = itemsViewResource;
         mPurchase = (Purchase) purchase;
         mItems = mPurchase.getItems();
-        mCurrentGroupUsers = currentGroupUsers;
     }
 
     @Override
@@ -75,7 +74,7 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
             case TYPE_USER_RECYCLER: {
                 View v = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.row_recycler_user, parent, false);
-                return new UserRecyclerRow(v, mContext, mPurchase, mCurrentGroupUsers);
+                return new UserRecyclerRow(v, mContext, mPurchase);
             }
             case TYPE_TOTAL: {
                 View v = LayoutInflater.from(parent.getContext())
@@ -213,13 +212,12 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
         private RecyclerView mUsersInvolvedView;
         private RecyclerView.Adapter mUsersInvolvedAdapter;
 
-        public UserRecyclerRow(View view, Context context, ParseObject purchase,
-                               List<ParseUser> currentGroupUsers) {
+        public UserRecyclerRow(View view, Context context, ParseObject purchase) {
             super(view);
 
             mUsersInvolvedView = (RecyclerView) view.findViewById(R.id.rv_users_involved);
             mUsersInvolvedAdapter = new PurchaseDetailsUsersInvolvedRecyclerAdapter(context,
-                    R.layout.row_users_involved_list, purchase, currentGroupUsers);
+                    R.layout.row_users_involved_list, purchase);
             mUsersInvolvedView.setHasFixedSize(true);
             mUsersInvolvedView.setLayoutManager(new LinearLayoutManager(context,
                     LinearLayoutManager.HORIZONTAL, false));

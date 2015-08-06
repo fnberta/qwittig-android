@@ -16,6 +16,7 @@ import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.ImageAvatar;
+import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.ui.adapter.rows.UserInvolvedRow;
@@ -34,16 +35,13 @@ public class PurchaseDetailsUsersInvolvedRecyclerAdapter extends
     private List<ParseUser> mUsersInvolved;
     private List<ParseUser> mUsersInvolvedSorted = new ArrayList<>();
     private Purchase mPurchase;
-    private List<ParseUser> mCurrentGroupUsers;
 
     public PurchaseDetailsUsersInvolvedRecyclerAdapter(Context context, int viewResource,
-                                                       ParseObject purchase,
-                                                       List<ParseUser> currentGroupUsers) {
+                                                       ParseObject purchase) {
 
         mContext = context;
         mViewResource = viewResource;
         mPurchase = (Purchase) purchase;
-        mCurrentGroupUsers = currentGroupUsers;
         setupUsersInvolved();
     }
 
@@ -78,8 +76,10 @@ public class PurchaseDetailsUsersInvolvedRecyclerAdapter extends
             viewHolder.setNameBold();
         }
 
+        User currentUser = (User) ParseUser.getCurrentUser();
+        Group currentGroup = currentUser.getCurrentGroup();
         String nickname;
-        if (mCurrentGroupUsers.contains(user)) {
+        if (user.getGroupIds().contains(currentGroup.getObjectId())) {
             nickname = user.getNicknameOrMe(mContext);
         } else {
             nickname = mContext.getString(R.string.user_deleted);
