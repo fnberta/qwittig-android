@@ -74,8 +74,9 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
     private int mSelectedNavDrawerItem;
     private int mFetchCounter = 0;
     private int mGroupsCount;
-    private Spinner mGroupSpinner;
-    private NavHeaderGroupsArrayAdapter mGroupSpinnerAdapter;
+    private ImageView mImageViewHeaderAvatar;
+    private Spinner mSpinnerGroups;
+    private NavHeaderGroupsArrayAdapter mSpinnerGroupsAdapter;
     private List<ParseObject> mGroups = new ArrayList<>();
 
     private BroadcastReceiver mLocalBroadcastReceiver = new BroadcastReceiver() {
@@ -127,6 +128,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
             toggleGoPremiumVisibility();
         }
     };
+    private TextView mTextViewHeaderNickname;
 
     private boolean freeAutoPurchasesAvailable() {
         ParseConfig config = ParseConfig.getCurrentConfig();
@@ -317,28 +319,9 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
     }
 
     private void setupNavDrawerHeader() {
-        final ImageView ivAvatar = (ImageView) findViewById(R.id.iv_drawer_avatar);
-        TextView tvNickname = (TextView) findViewById(R.id.tv_drawer_nickname);
-
-        User currentUser = (User) ParseUser.getCurrentUser();
-        String nickname = currentUser.getNickname();
-        tvNickname.setText(nickname);
-
-        byte[] avatarByteArray = currentUser.getAvatar();
-        if (avatarByteArray != null) {
-            Glide.with(this)
-                    .load(avatarByteArray)
-                    .asBitmap()
-                    .into(new BitmapImageViewTarget(ivAvatar) {
-                        @Override
-                        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                            view.setImageDrawable(Avatar.getRoundedDrawable(mContext, resource, true));
-                        }
-                    });
-        } else {
-            ivAvatar.setImageDrawable(Avatar.getFallbackDrawable(mContext, false, true));
-        }
-        ivAvatar.setOnClickListener(new View.OnClickListener() {
+        mTextViewHeaderNickname = (TextView) findViewById(R.id.tv_drawer_nickname);
+        mImageViewHeaderAvatar = (ImageView) findViewById(R.id.iv_drawer_avatar);
+        mImageViewHeaderAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, SettingsProfileActivity.class);
@@ -346,15 +329,37 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
             }
         });
 
+        setAvatarAndNickname();
         setupNavDrawerHeaderGroupSpinner();
     }
 
+    private void setAvatarAndNickname() {
+        User currentUser = (User) ParseUser.getCurrentUser();
+        String nickname = currentUser.getNickname();
+        mTextViewHeaderNickname.setText(nickname);
+
+        byte[] avatarByteArray = currentUser.getAvatar();
+        if (avatarByteArray != null) {
+            Glide.with(this)
+                    .load(avatarByteArray)
+                    .asBitmap()
+                    .into(new BitmapImageViewTarget(mImageViewHeaderAvatar) {
+                        @Override
+                        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                            view.setImageDrawable(Avatar.getRoundedDrawable(mContext, resource, true));
+                        }
+                    });
+        } else {
+            mImageViewHeaderAvatar.setImageDrawable(Avatar.getFallbackDrawable(mContext, false, true));
+        }
+    }
+
     private void setupNavDrawerHeaderGroupSpinner() {
-        mGroupSpinner = (Spinner) findViewById(R.id.sp_drawer_group);
-        mGroupSpinnerAdapter = new NavHeaderGroupsArrayAdapter(this,
+        mSpinnerGroups = (Spinner) findViewById(R.id.sp_drawer_group);
+        mSpinnerGroupsAdapter = new NavHeaderGroupsArrayAdapter(this,
                 R.layout.spinner_item_nav, android.R.layout.simple_spinner_dropdown_item, mGroups);
-        mGroupSpinner.setAdapter(mGroupSpinnerAdapter);
-        mGroupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        mSpinnerGroups.setAdapter(mSpinnerGroupsAdapter);
+        mSpinnerGroups.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Group groupSelected = (Group) parent.getItemAtPosition(position);
@@ -377,8 +382,8 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
 
     final void updateGroupSpinnerPosition() {
         User currentUser = (User) ParseUser.getCurrentUser();
-        int position = mGroupSpinnerAdapter.getPosition(currentUser.getCurrentGroup());
-        mGroupSpinner.setSelection(position);
+        int position = mSpinnerGroupsAdapter.getPosition(currentUser.getCurrentGroup());
+        mSpinnerGroups.setSelection(position);
     }
 
     final void updateGroupSpinnerList() {
@@ -392,7 +397,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
             }
         }
 
-        mGroupSpinnerAdapter.notifyDataSetChanged();
+        mSpinnerGroupsAdapter.notifyDataSetChanged();
     }
 
     private void onGroupChanged(ParseObject group) {
@@ -540,11 +545,12 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
             case SettingsActivity.INTENT_REQUEST_SETTINGS_PROFILE:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
-                        MessageUtils.showBasicSnackbar(mGroupSpinner,
+                        MessageUtils.showBasicSnackbar(mSpinnerGroups,
                                 getString(R.string.toast_changes_saved));
+                        setAvatarAndNickname();
                         break;
                     case SettingsProfileActivity.RESULT_CHANGES_DISCARDED:
-                        MessageUtils.showBasicSnackbar(mGroupSpinner,
+                        MessageUtils.showBasicSnackbar(mSpinnerGroups,
                                 getString(R.string.toast_changes_discarded));
                         break;
                 }
