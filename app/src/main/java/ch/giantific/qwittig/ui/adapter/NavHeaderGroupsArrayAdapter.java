@@ -51,17 +51,9 @@ public class NavHeaderGroupsArrayAdapter extends ArrayAdapter<ParseObject> {
                                boolean isDropDown) {
         final ViewHolder viewHolder;
         if (convertView == null) {
-            viewHolder = new ViewHolder();
-
-            int viewResource;
-            if (isDropDown) {
-                viewResource = mDropDownViewResource;
-            } else {
-                viewResource = mViewResource;
-            }
-            convertView = LayoutInflater.from(parent.getContext()).inflate(viewResource, parent,
-                    false);
-            viewHolder.mTextViewGroup = (TextView) convertView.findViewById(android.R.id.text1);
+            convertView = LayoutInflater.from(parent.getContext()).inflate(
+                    isDropDown ? mDropDownViewResource : mViewResource, parent, false);
+            viewHolder = new ViewHolder(convertView);
 
             convertView.setTag(viewHolder);
         } else {
@@ -69,7 +61,7 @@ public class NavHeaderGroupsArrayAdapter extends ArrayAdapter<ParseObject> {
         }
 
         Group group = (Group) mGroups.get(position);
-        viewHolder.mTextViewGroup.setText(group.getName());
+        viewHolder.setGroup(group.getName());
 
         return convertView;
     }
@@ -77,5 +69,13 @@ public class NavHeaderGroupsArrayAdapter extends ArrayAdapter<ParseObject> {
     private static class ViewHolder {
 
         private TextView mTextViewGroup;
+
+        public ViewHolder(View view) {
+            mTextViewGroup = (TextView) view.findViewById(android.R.id.text1);
+        }
+
+        public void setGroup(String group) {
+            mTextViewGroup.setText(group);
+        }
     }
 }

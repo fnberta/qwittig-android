@@ -9,6 +9,7 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,6 +23,9 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.parse.ParseException;
 import com.parse.ParseInstallation;
 import com.parse.ParseUser;
@@ -30,11 +34,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.helper.AvatarHelper;
-import ch.giantific.qwittig.helper.LoginHelper;
-import ch.giantific.qwittig.data.models.ImageAvatar;
+import ch.giantific.qwittig.data.models.Avatar;
 import ch.giantific.qwittig.data.parse.models.Installation;
 import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.helper.LoginHelper;
 import ch.giantific.qwittig.ui.dialogs.ResetPasswordDialogFragment;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
@@ -46,7 +49,6 @@ public class LoginActivity extends AppCompatActivity implements
         LoginFragment.FragmentInteractionListener,
         LoginSignUpFragment.FragmentInteractionListener,
         ResetPasswordDialogFragment.FragmentInteractionListener,
-        AvatarHelper.HelperInteractionListener,
         LoaderManager.LoaderCallbacks<Cursor>,
         LoginHelper.HelperInteractionListener {
 
@@ -55,7 +57,6 @@ public class LoginActivity extends AppCompatActivity implements
     private static final int INTENT_REQUEST_IMAGE = 1;
     private static final String LOGIN_FRAGMENT = "login_fragment";
     private static final String SIGN_UP_FRAGMENT = "sign_up_fragment";
-    private static final String ASYNC_AVATAR_HELPER = "async_avatar_helper";
     private static final String LOGIN_HELPER = "login_helper";
     private static final String STATE_LOADING = "state_progress";
     private static final String LOG_TAG = LoginActivity.class.getSimpleName();
@@ -302,47 +303,27 @@ public class LoginActivity extends AppCompatActivity implements
             case INTENT_REQUEST_IMAGE:
                 if (resultCode == RESULT_OK) {
                     final Uri imageUri = data.getData();
-                    getAvatarAsync(imageUri);
+                    setAvatar(imageUri);
                 }
         }
     }
 
-    private void getAvatarAsync(Uri imageUri) {
-        FragmentManager fragmentManager = getFragmentManager();
-        AvatarHelper avatarHelper = findAvatarHelper(fragmentManager);
+    public void setAvatar(Uri imageUri) {
+        Glide.with(this)
+                .load(imageUri)
+                .asBitmap()
+                .toBytes(Bitmap.CompressFormat.JPEG, Avatar.JPEG_COMPRESSION_RATE)
+                .centerCrop()
+                .into(new SimpleTarget<byte[]>(Avatar.WIDTH, Avatar.HEIGHT) {
+                    @Override
+                    public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
+                        mAvatar = resource;
+                    }
+                });
 
-        // If the Fragment is non-null, then it is currently being
-        // retained across a configuration change.
-        if (avatarHelper == null) {
-            avatarHelper = AvatarHelper.newInstance(imageUri);
-
-            fragmentManager.beginTransaction()
-                    .add(avatarHelper, ASYNC_AVATAR_HELPER)
-                    .commit();
-        }
-    }
-
-    private AvatarHelper findAvatarHelper(FragmentManager fragmentManager) {
-        return (AvatarHelper)
-                    fragmentManager.findFragmentByTag(ASYNC_AVATAR_HELPER);
-    }
-
-    @Override
-    public void onPostExecute(ImageAvatar avatar) {
-        if (avatar != null) {
-            mAvatar = avatar.getByteArray();
-
-            LoginSignUpFragment loginSignUpFragment = (LoginSignUpFragment)
-                    getFragmentManager().findFragmentByTag(SIGN_UP_FRAGMENT);
-            loginSignUpFragment.setAvatarImage(avatar);
-        }
-
-        // remote async fragment because we need a new one when the user clicks on the avatar again
-        FragmentManager fragmentManager = getFragmentManager();
-        AvatarHelper avatarHelper = findAvatarHelper(fragmentManager);
-        if (avatarHelper != null) {
-            fragmentManager.beginTransaction().remove(avatarHelper).commit();
-        }
+        LoginSignUpFragment loginSignUpFragment = (LoginSignUpFragment)
+                getFragmentManager().findFragmentByTag(SIGN_UP_FRAGMENT);
+        loginSignUpFragment.setAvatar(imageUri);
     }
 
     @Override

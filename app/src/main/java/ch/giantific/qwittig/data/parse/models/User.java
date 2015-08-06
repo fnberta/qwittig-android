@@ -189,16 +189,16 @@ public class User extends ParseUser {
     }
 
     public BigFraction getBalance(ParseObject group) {
-        String groupId = "";
-        if (group != null) {
-            groupId = group.getObjectId();
+        if (group == null) {
+            return BigFraction.ZERO;
         }
+
         Map<String, List<Number>> balanceMap = getMap(BALANCE);
         if (balanceMap == null) {
             return BigFraction.ZERO;
         }
 
-        List<Number> balanceList = balanceMap.get(groupId);
+        List<Number> balanceList = balanceMap.get(group.getObjectId());
         if (balanceList == null) {
             return BigFraction.ZERO;
         }

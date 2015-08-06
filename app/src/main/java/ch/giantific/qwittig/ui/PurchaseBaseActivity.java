@@ -7,6 +7,7 @@ import android.app.DatePickerDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,6 +24,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.github.jorgecastilloprz.FABProgressCircle;
 import com.github.jorgecastilloprz.listeners.FABProgressListener;
 import com.parse.ParseFile;
@@ -37,15 +41,14 @@ import java.util.List;
 import java.util.Locale;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.models.Receipt;
 import ch.giantific.qwittig.helper.RatesHelper;
-import ch.giantific.qwittig.helper.ReceiptHelper;
-import ch.giantific.qwittig.data.models.ImageReceipt;
 import ch.giantific.qwittig.ui.dialogs.AccountCreateDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.DatePickerDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.PurchaseUserSelectionDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.StoreSelectionDialogFragment;
-import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.ui.widgets.TransitionListenerAdapter;
+import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -56,7 +59,6 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         PurchaseBaseFragment.FragmentInteractionListener,
         DatePickerDialog.OnDateSetListener,
         PurchaseUserSelectionDialogFragment.FragmentInteractionListener,
-        ReceiptHelper.HelperInteractionListener,
         StoreSelectionDialogFragment.DialogInteractionListener,
         PurchaseReceiptAddEditFragment.FragmentInteractionListener,
         FABProgressListener,
@@ -83,14 +85,12 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     static final int INTENT_REQUEST_IMAGE_CAPTURE = 1;
     static final String PURCHASE_RECEIPT_FRAGMENT = "purchase_receipt_fragment";
 
-    private static final String RECEIPT_HELPER = "async_receipt_fragment";
     private static final String LOG_TAG = PurchaseBaseActivity.class.getSimpleName();
 
     PurchaseBaseFragment mPurchaseFragment;
-    File mPhotoFile;
+    File mReceiptPhotoFile;
     FloatingActionButton mFabPurchaseSave;
     ParseFile mReceiptParseFile;
-    String mCurrentPhotoPath;
     private FABProgressCircle mFabProgressCircle;
 
     @Override
@@ -221,32 +221,28 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         if (cameraIntent.resolveActivity(getPackageManager()) != null) {
             // Create the File where the photo should go
             try {
-                mPhotoFile = createImageFile();
+                mReceiptPhotoFile = createImageFile();
             } catch (IOException ex) {
                 // Error occurred while creating the File
                 setResultForSnackbar(PURCHASE_ERROR);
                 finishPurchase();
             }
-            if (mPhotoFile != null) {
-                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mPhotoFile));
+            if (mReceiptPhotoFile != null) {
+                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mReceiptPhotoFile));
                 startActivityForResult(cameraIntent, INTENT_REQUEST_IMAGE_CAPTURE);
             }
         }
     }
 
     private File createImageFile() throws IOException {
-        // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
+        return File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
-
-        mCurrentPhotoPath = image.getAbsolutePath();
-        return image;
     }
 
     @Override
@@ -255,51 +251,22 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
 
         if (requestCode == INTENT_REQUEST_IMAGE_CAPTURE) {
             if (resultCode == RESULT_OK) {
-                getReceiptFileAsync();
+                getReceiptFile();
             }
         }
     }
 
-    private void getReceiptFileAsync() {
-        FragmentManager fragmentManager = getFragmentManager();
-        ReceiptHelper receiptHelper = findReceiptHelper(fragmentManager);
-
-        // If the Fragment is non-null, then it is currently being
-        // retained across a configuration change.
-        if (receiptHelper == null) {
-            receiptHelper = ReceiptHelper.newInstance(mCurrentPhotoPath);
-
-            fragmentManager.beginTransaction()
-                    .add(receiptHelper, RECEIPT_HELPER)
-                    .commit();
-        }
-    }
-
-    private ReceiptHelper findReceiptHelper(FragmentManager fragmentManager) {
-        return (ReceiptHelper) fragmentManager.findFragmentByTag(RECEIPT_HELPER);
-    }
-
-    @Override
-    public void onPostExecute(ImageReceipt receipt) {
-        FragmentManager fragmentManager = getFragmentManager();
-
-        if (receipt != null) {
-            mReceiptParseFile = receipt.getParseFile();
-            invalidateOptionsMenu();
-
-            PurchaseReceiptAddEditFragment purchaseReceiptAddEditFragment =
-                    (PurchaseReceiptAddEditFragment) fragmentManager.findFragmentByTag(
-                            PURCHASE_RECEIPT_FRAGMENT);
-            if (purchaseReceiptAddEditFragment != null) {
-                purchaseReceiptAddEditFragment.setReceiptImage(mReceiptParseFile);
-            }
-        }
-
-        // remove async fragment because we need a new one when the user wants to edit the receipt
-        ReceiptHelper receiptHelper = findReceiptHelper(fragmentManager);
-        if (receiptHelper != null) {
-            getFragmentManager().beginTransaction().remove(receiptHelper).commit();
-        }
+    private void getReceiptFile() {
+        Glide.with(getBaseContext()).load(mReceiptPhotoFile)
+                .asBitmap()
+                .toBytes(Bitmap.CompressFormat.JPEG, Receipt.JPEG_COMPRESSION_RATE)
+                .centerCrop()
+                .into(new SimpleTarget<byte[]>(Receipt.WIDTH, Receipt.HEIGHT) {
+                    @Override
+                    public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
+                        mReceiptParseFile = new ParseFile(Receipt.PARSE_FILE_NAME, resource);
+                    }
+                });
     }
 
     @Override
@@ -390,8 +357,8 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     @Override
     public void finishPurchase() {
         ActivityCompat.finishAfterTransition(this);
-        if (mPhotoFile != null) {
-            boolean fileWasDeleted = mPhotoFile.delete();
+        if (mReceiptPhotoFile != null) {
+            boolean fileWasDeleted = mReceiptPhotoFile.delete();
             if (!fileWasDeleted) {
                 Log.e(LOG_TAG, "could not delete file");
             }

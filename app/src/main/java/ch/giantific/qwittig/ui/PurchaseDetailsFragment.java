@@ -36,6 +36,7 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     private ProgressBar mProgressBar;
     private String mPurchaseId;
     private Purchase mPurchase;
+    private PurchaseDetailsRecyclerAdapter mRecyclerAdapter;
 
     public PurchaseDetailsFragment() {
     }
@@ -85,6 +86,9 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mRecyclerAdapter = new PurchaseDetailsRecyclerAdapter(getActivity(),
+                R.layout.row_details_item_list);
+        mRecyclerView.setAdapter(mRecyclerAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setHasFixedSize(true);
     }
@@ -112,9 +116,8 @@ public class PurchaseDetailsFragment extends BaseFragment implements
         updateToolbarTitle();
         updateActionBarMenu();
 
-        PurchaseDetailsRecyclerAdapter recyclerAdapter = new PurchaseDetailsRecyclerAdapter(getActivity(),
-                R.layout.row_details_item_list, mPurchase);
-        mRecyclerView.setAdapter(recyclerAdapter);
+        mRecyclerAdapter.setPurchase(object);
+        mRecyclerAdapter.notifyDataSetChanged();
 
         mProgressBar.setVisibility(View.GONE);
         ActivityCompat.startPostponedEnterTransition(getActivity());

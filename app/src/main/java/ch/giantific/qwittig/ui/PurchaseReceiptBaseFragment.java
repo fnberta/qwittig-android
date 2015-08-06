@@ -8,12 +8,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import com.bumptech.glide.Glide;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.ImageReceipt;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 
 
@@ -51,8 +51,9 @@ public abstract class PurchaseReceiptBaseFragment extends BaseFragment {
                         return;
                     }
 
-                    ImageReceipt receipt = new ImageReceipt(getActivity(), bytes);
-                    mImageViewReceipt.setImageBitmap(receipt.getBitmap());
+                    Glide.with(getActivity())
+                            .load(bytes)
+                            .into(mImageViewReceipt);
                 }
             });
         }

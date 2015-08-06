@@ -1,7 +1,6 @@
 package ch.giantific.qwittig.ui;
 
 import android.annotation.TargetApi;
-import android.app.FragmentManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -17,14 +16,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.helper.AvatarHelper;
-import ch.giantific.qwittig.data.models.ImageAvatar;
 import ch.giantific.qwittig.ui.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.utils.Utils;
 
 public class SettingsProfileActivity extends BaseActivity implements
         SettingsProfileFragment.FragmentInteractionListener,
-        AvatarHelper.HelperInteractionListener,
         DiscardChangesDialogFragment.DialogInteractionListener {
 
     @IntDef({CHANGES_SAVED, CHANGES_DISCARDED, NO_CHANGES})
@@ -36,15 +32,8 @@ public class SettingsProfileActivity extends BaseActivity implements
 
     public static final int RESULT_CHANGES_DISCARDED = 2;
     private static final String PROFILE_FRAGMENT = "profile_fragment";
-    private static final String ASYNC_AVATAR_FRAGMENT = "async_avatar_fragment";
     private static final int INTENT_REQUEST_IMAGE = 1;
     private SettingsProfileFragment mSettingsProfileFragment;
-    private byte[] mAvatar;
-
-    @Override
-    public byte[] getAvatar() {
-        return mAvatar;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,30 +122,10 @@ public class SettingsProfileActivity extends BaseActivity implements
         switch (requestCode) {
             case INTENT_REQUEST_IMAGE:
                 if (resultCode == RESULT_OK) {
-                    final Uri imageUri = data.getData();
-                    getAvatarAsync(imageUri);
+                    Uri imageUri = data.getData();
+                    mSettingsProfileFragment.setAvatar(imageUri);
                 }
         }
-    }
-
-    private void getAvatarAsync(Uri imageUri) {
-        FragmentManager fragmentManager = getFragmentManager();
-        AvatarHelper avatarHelper = findAvatarHelper(fragmentManager);
-
-        // If the Fragment is non-null, then it is currently being
-        // retained across a configuration change.
-        if (avatarHelper == null) {
-            avatarHelper = AvatarHelper.newInstance(imageUri);
-
-            fragmentManager.beginTransaction()
-                    .add(avatarHelper, ASYNC_AVATAR_FRAGMENT)
-                    .commit();
-        }
-    }
-
-    private AvatarHelper findAvatarHelper(FragmentManager fragmentManager) {
-        return (AvatarHelper)
-                    fragmentManager.findFragmentByTag(ASYNC_AVATAR_FRAGMENT);
     }
 
     @Override
@@ -173,21 +142,6 @@ public class SettingsProfileActivity extends BaseActivity implements
         }
 
         ActivityCompat.finishAfterTransition(this);
-    }
-
-    @Override
-    public void onPostExecute(ImageAvatar avatar) {
-        if (avatar != null) {
-            mAvatar = avatar.getByteArray();
-            mSettingsProfileFragment.setAvatarImage(avatar);
-        }
-
-        // remote async fragment because we need a new one when the user clicks on the avatar again
-        FragmentManager fragmentManager = getFragmentManager();
-        AvatarHelper avatarHelper = findAvatarHelper(fragmentManager);
-        if (avatarHelper != null) {
-            fragmentManager.beginTransaction().remove(avatarHelper).commit();
-        }
     }
 
     @Override

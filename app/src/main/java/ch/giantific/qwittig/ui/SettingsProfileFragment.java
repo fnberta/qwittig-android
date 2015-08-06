@@ -2,7 +2,8 @@ package ch.giantific.qwittig.ui;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.graphics.drawable.Drawable;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
@@ -12,10 +13,14 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.parse.ParseUser;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.ImageAvatar;
+import ch.giantific.qwittig.data.models.Avatar;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
@@ -43,10 +48,22 @@ public class SettingsProfileFragment extends Fragment {
     private String mPassword;
     private String mPasswordRepeat;
 
+    private byte[] mAvatar;
 
     private FragmentInteractionListener mListener;
 
     public SettingsProfileFragment() {
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (FragmentInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement FragmentInteractionListener");
+        }
     }
 
     @Override
@@ -80,8 +97,19 @@ public class SettingsProfileFragment extends Fragment {
         mEditTextNickname.setText(mCurrentNickname);
 
         byte[] avatarByteArray = mCurrentUser.getAvatar();
-        Drawable avatar = ImageAvatar.getRoundedAvatar(getActivity(), avatarByteArray, true);
-        mImageViewAvatar.setImageDrawable(avatar);
+        if (avatarByteArray != null) {
+            Glide.with(this)
+                    .load(avatarByteArray)
+                    .asBitmap()
+                    .into(new BitmapImageViewTarget(mImageViewAvatar) {
+                        @Override
+                        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                            view.setImageDrawable(Avatar.getRoundedDrawable(getActivity(), resource, true));
+                        }
+                    });
+        } else {
+            mImageViewAvatar.setImageDrawable(Avatar.getFallbackDrawable(getActivity(), true, true));
+        }
         mImageViewAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -142,9 +170,8 @@ public class SettingsProfileFragment extends Fragment {
             }
         }
 
-        byte[] avatar = mListener.getAvatar();
-        if (avatar != null) {
-            currentUser.setAvatar(avatar);
+        if (mAvatar != null) {
+            currentUser.setAvatar(mAvatar);
         }
 
         if (fieldsAreComplete) {
@@ -153,19 +180,29 @@ public class SettingsProfileFragment extends Fragment {
         }
     }
 
-    public void setAvatarImage(ImageAvatar avatar) {
-        mImageViewAvatar.setImageDrawable(avatar.getRoundedDrawable());
-    }
+    public void setAvatar(Uri imageUri) {
+        Glide.with(this)
+                .load(imageUri)
+                .asBitmap()
+                .toBytes(Bitmap.CompressFormat.JPEG, Avatar.JPEG_COMPRESSION_RATE)
+                .centerCrop()
+                .into(new SimpleTarget<byte[]>(Avatar.WIDTH, Avatar.HEIGHT) {
+                    @Override
+                    public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
+                        mAvatar = resource;
+                    }
+                });
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (FragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
-        }
+        Glide.with(this)
+                .load(imageUri)
+                .asBitmap()
+                .centerCrop()
+                .into(new BitmapImageViewTarget(mImageViewAvatar) {
+                    @Override
+                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                        view.setImageDrawable(Avatar.getRoundedDrawable(getActivity(), resource, true));
+                    }
+                });
     }
 
     @Override
@@ -178,8 +215,6 @@ public class SettingsProfileFragment extends Fragment {
         void pickAvatar();
 
         void finishEdit(@SettingsProfileActivity.EditAction int editAction);
-
-        byte[] getAvatar();
 
         void showAccountCreateDialog();
     }

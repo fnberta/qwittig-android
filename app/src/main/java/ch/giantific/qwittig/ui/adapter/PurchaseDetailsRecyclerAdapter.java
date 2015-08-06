@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
@@ -18,6 +19,7 @@ import ch.giantific.qwittig.data.parse.models.Item;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.ui.adapter.rows.HeaderRow;
+import ch.giantific.qwittig.ui.adapter.rows.UserInvolvedRow;
 import ch.giantific.qwittig.ui.widgets.CircleDisplay;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
@@ -46,16 +48,12 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
     private int mItemsViewResource;
     private Purchase mPurchase;
     private List<ParseObject> mItems;
-    private List<ParseUser> mCurrentGroupUsers;
     private String mCurrentGroupCurrency = ParseUtils.getGroupCurrency();
 
-    public PurchaseDetailsRecyclerAdapter(Context context, int itemsViewResource,
-                                          ParseObject purchase) {
+    public PurchaseDetailsRecyclerAdapter(Context context, int itemsViewResource) {
 
         mContext = context;
         mItemsViewResource = itemsViewResource;
-        mPurchase = (Purchase) purchase;
-        mItems = mPurchase.getItems();
     }
 
     @Override
@@ -74,7 +72,7 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
             case TYPE_USER_RECYCLER: {
                 View v = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.row_recycler_user, parent, false);
-                return new UserRecyclerRow(v, mContext, mPurchase);
+                return new UserRecyclerRow(v, mContext);
             }
             case TYPE_TOTAL: {
                 View v = LayoutInflater.from(parent.getContext())
@@ -94,30 +92,33 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
+        if (mPurchase == null) {
+            return;
+        }
+
         switch (getItemViewType(position)) {
             case TYPE_ITEM: {
                 ItemRow itemRow = (ItemRow) viewHolder;
                 Item item = (Item) mItems.get(position - NUMBER_OF_USER_ROWS -
                         NUMBER_OF_HEADER_ROWS);
 
-                itemRow.mTextViewName.setText(item.getName());
+                itemRow.setName(item.getName());
 
                 double price = item.getPrice();
-                itemRow.mTextViewPrice.setText(
-                        MoneyUtils.formatMoney(price, mCurrentGroupCurrency));
+                itemRow.setPrice(MoneyUtils.formatMoney(price, mCurrentGroupCurrency));
 
                 User currentUser = (User) ParseUser.getCurrentUser();
                 List<ParseUser> usersInvolved = item.getUsersInvolved();
                 int usersInvolvedCount = usersInvolved.size();
                 float percentageCurrentUser = 0;
 
+                float alpha = 1f;
                 if (usersInvolved.contains(currentUser)) {
                     percentageCurrentUser = (1f / usersInvolvedCount) * 100;
-                    viewHolder.itemView.setAlpha(1f);
                 } else {
-                    viewHolder.itemView.setAlpha(DISABLED_ALPHA);
+                    alpha = DISABLED_ALPHA;
                 }
-                itemRow.mCircleDisplayPercentage.showValue(percentageCurrentUser, 100f, false);
+                itemRow.setAlpha(alpha, percentageCurrentUser, false);
 
                 break;
             }
@@ -136,13 +137,14 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
                 break;
             }
             case TYPE_USER_RECYCLER: {
+                UserRecyclerRow userRecyclerRow = (UserRecyclerRow) viewHolder;
+                userRecyclerRow.setPurchase(mPurchase);
                 break;
             }
             case TYPE_TOTAL: {
                 TotalRow totalRow = (TotalRow) viewHolder;
-
-                totalRow.mTextViewTotalValue.setText(MoneyUtils.formatMoney(
-                        mPurchase.getTotalPrice(), mCurrentGroupCurrency));
+                totalRow.setTotalValue(MoneyUtils.formatMoney(mPurchase.getTotalPrice(),
+                        mCurrentGroupCurrency));
                 break;
             }
             case TYPE_MY_SHARE: {
@@ -150,10 +152,9 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
 
                 double myShare = Utils.calculateMyShare(mPurchase);
                 if (myShare != mPurchase.getTotalPrice()) {
-                    myShareRow.mTextViewMyShareValue.setText(MoneyUtils.formatMoney(myShare,
-                            mCurrentGroupCurrency));
+                    myShareRow.setMyShare(MoneyUtils.formatMoney(myShare, mCurrentGroupCurrency));
                 } else {
-                    myShareRow.mViewMyShare.setVisibility(View.GONE);
+                    myShareRow.hideView();
                 }
             }
         }
@@ -181,8 +182,13 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
 
     @Override
     public int getItemCount() {
-        return mItems.size() + NUMBER_OF_USER_ROWS + NUMBER_OF_HEADER_ROWS +
-                NUMBER_OF_TOTAL_ROWS;
+        int numberOfExtraRows = NUMBER_OF_USER_ROWS + NUMBER_OF_HEADER_ROWS + NUMBER_OF_TOTAL_ROWS;
+        return mItems == null ? numberOfExtraRows : mItems.size() + numberOfExtraRows ;
+    }
+
+    public void setPurchase(ParseObject purchase) {
+        mPurchase = (Purchase) purchase;
+        mItems = mPurchase.getItems();
     }
 
     public static class ItemRow extends RecyclerView.ViewHolder {
@@ -206,22 +212,39 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
             mCircleDisplayPercentage.setDimAlpha(DISABLED_ALPHA_RGB);
         }
 
+        public void setName(String name) {
+            mTextViewName.setText(name);
+        }
+
+        public void setPrice(String price) {
+            mTextViewPrice.setText(price);
+        }
+
+        public void setAlpha(float alpha, float circlePercentage, boolean animate) {
+            itemView.setAlpha(alpha);
+            mCircleDisplayPercentage.showValue(circlePercentage, 100f, animate);
+        }
     }
 
     public static class UserRecyclerRow extends RecyclerView.ViewHolder {
         private RecyclerView mUsersInvolvedView;
-        private RecyclerView.Adapter mUsersInvolvedAdapter;
+        private PurchaseDetailsUsersInvolvedRecyclerAdapter mUsersInvolvedAdapter;
 
-        public UserRecyclerRow(View view, Context context, ParseObject purchase) {
+        public UserRecyclerRow(View view, Context context) {
             super(view);
 
             mUsersInvolvedView = (RecyclerView) view.findViewById(R.id.rv_users_involved);
             mUsersInvolvedAdapter = new PurchaseDetailsUsersInvolvedRecyclerAdapter(context,
-                    R.layout.row_users_involved_list, purchase);
+                    R.layout.row_users_involved_list);
             mUsersInvolvedView.setHasFixedSize(true);
             mUsersInvolvedView.setLayoutManager(new LinearLayoutManager(context,
                     LinearLayoutManager.HORIZONTAL, false));
             mUsersInvolvedView.setAdapter(mUsersInvolvedAdapter);
+        }
+
+        public void setPurchase(ParseObject purchase) {
+            mUsersInvolvedAdapter.setPurchase(purchase);
+            mUsersInvolvedAdapter.notifyDataSetChanged();
         }
     }
 
@@ -235,19 +258,27 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
             mTextViewTotalValue = (TextView) view.findViewById(R.id.tv_total_value);
         }
 
+        public void setTotalValue(String totalValue) {
+            mTextViewTotalValue.setText(totalValue);
+        }
     }
 
     public static class MyShareRow extends RecyclerView.ViewHolder {
 
-        private View mViewMyShare;
         private TextView mTextViewMyShareValue;
 
         public MyShareRow(View view) {
             super(view);
 
-            mViewMyShare = view.findViewById(R.id.rl_my_share);
             mTextViewMyShareValue = (TextView) view.findViewById(R.id.tv_my_share_value);
         }
 
+        public void hideView() {
+            itemView.setVisibility(View.GONE);
+        }
+
+        public void setMyShare(String myShare) {
+            mTextViewMyShareValue.setText(myShare);
+        }
     }
 }

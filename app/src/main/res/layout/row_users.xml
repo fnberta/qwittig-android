@@ -8,7 +8,7 @@
     android:layout_height="@dimen/list_avatar_with_text">
 
     <ImageView
-        android:id="@+id/list_avatar"
+        android:id="@+id/user_avatar"
         android:layout_width="@dimen/avatar_size"
         android:layout_height="@dimen/avatar_size"
         android:layout_marginStart="@dimen/key_line_1"
@@ -17,7 +17,7 @@
         android:contentDescription="@string/user_avatar"/>
 
     <TextView
-        android:id="@+id/list_name"
+        android:id="@+id/user_name"
         style="@style/ListTextView"
         android:layout_width="0dp"
         android:layout_height="match_parent"
@@ -26,7 +26,7 @@
         tools:text="Vera"/>
 
     <TextView
-        android:id="@+id/list_balance"
+        android:id="@+id/user_balance"
         style="@style/ListTextView"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"

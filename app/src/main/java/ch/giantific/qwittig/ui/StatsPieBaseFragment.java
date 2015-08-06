@@ -85,8 +85,8 @@ public abstract class StatsPieBaseFragment extends StatsBaseFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mRecyclerAdapter = new StatsPieChartRecyclerAdapter(getActivity(),
-                R.layout.row_stats_stores_user, mUserPieData, mUserNicknames);
+        mRecyclerAdapter = new StatsPieChartRecyclerAdapter(R.layout.row_stats_stores_user,
+                mUserPieData, mUserNicknames);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mRecyclerAdapter);

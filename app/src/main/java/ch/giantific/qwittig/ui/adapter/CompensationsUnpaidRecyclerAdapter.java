@@ -1,9 +1,7 @@
 package ch.giantific.qwittig.ui.adapter;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -15,14 +13,14 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.constants.AppConstants;
-import ch.giantific.qwittig.data.models.ImageAvatar;
+import ch.giantific.qwittig.data.models.Avatar;
 import ch.giantific.qwittig.data.parse.models.Compensation;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.utils.MoneyUtils;
@@ -91,60 +89,39 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<Rec
         CompensationRow compensationRow = (CompensationRow) viewHolder;
         Compensation compensation = (Compensation) mCompensations.get(position);
 
-        if (compensation.isLoading()) {
-            compensationRow.mProgressBar.setVisibility(View.VISIBLE);
-        } else {
-            compensationRow.mProgressBar.setVisibility(View.GONE);
-        }
+        compensationRow.setProgressBarVisibility(compensation.isLoading());
 
         String amount = MoneyUtils.formatMoney(compensation.getAmount().doubleValue(),
                 mCurrentGroupCurrency);
-        Bitmap avatar;
+        byte[] avatar;
         String nickname;
         String message;
 
         switch (getItemViewType(position)) {
             case TYPE_POS:
                 User payer = compensation.getPayer();
-                avatar = getAvatar(payer);
+                avatar = payer.getAvatar();
                 nickname = payer.getNickname();
                 message = mContext.getString(R.string.balance_owe_you, amount);
-                ((CompensationPosRow) viewHolder).mButtonRemind
-                        .setText(mContext.getString(R.string.button_remind, nickname));
+                ((CompensationPosRow) viewHolder).setButtonRemind(
+                        mContext.getString(R.string.button_remind, nickname));
                 break;
             case TYPE_NEG:
                 User beneficiary = compensation.getBeneficiary();
-                avatar = getAvatar(beneficiary);
+                avatar = beneficiary.getAvatar();
                 nickname = beneficiary.getNickname();
                 message = mContext.getString(R.string.balance_gets_from_you, amount);
-                ((CompensationNegRow) viewHolder).mButtonRemindPaid
-                        .setText(mContext.getString(R.string.button_remind_paid, nickname));
+                ((CompensationNegRow) viewHolder).setButtonRemindPaid(
+                        mContext.getString(R.string.button_remind_paid, nickname));
                 break;
             default:
                 throw new RuntimeException("there is no type that matches the type for position " +
                         position + " + make sure your using types correctly");
         }
 
-        if (avatar != null) {
-            compensationRow.mImageViewAvatar.setImageBitmap(avatar);
-        } else {
-            Drawable avatarDrawable = ContextCompat.getDrawable(
-                    mContext, R.drawable.ic_account_circle_black_80dp);
-            avatarDrawable.setAlpha(AppConstants.ICON_BLACK_ALPHA_RGB);
-            compensationRow.mImageViewAvatar.setImageDrawable(avatarDrawable);
-        }
-        compensationRow.mTextViewUser.setText(nickname);
-        compensationRow.mTextViewAmount.setText(message);
-    }
-
-    private Bitmap getAvatar(User user) {
-        byte[] avatarByteArray = user.getAvatar();
-        if (avatarByteArray != null) {
-            ImageAvatar imageAvatar = new ImageAvatar(mContext, avatarByteArray);
-            return imageAvatar.getBitmap();
-        }
-
-        return null;
+        compensationRow.setAvatar(avatar, mContext);
+        compensationRow.setUsername(nickname);
+        compensationRow.setAmountMessage(message);
     }
 
     @Override
@@ -191,6 +168,32 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<Rec
             mTextViewAmount = (TextView) view.findViewById(R.id.tv_amount);
             mProgressBar = (ProgressBar) view.findViewById(R.id.pb_compensation);
         }
+
+        public void setAvatar(byte[] avatarBytes, Context context) {
+            if (avatarBytes != null) {
+                Glide.with(context)
+                        .load(avatarBytes)
+                        .into(mImageViewAvatar);
+            } else {
+                setAvatar(Avatar.getFallbackDrawable(context, true, false));
+            }
+        }
+
+        public void setAvatar(Drawable avatar) {
+            mImageViewAvatar.setImageDrawable(avatar);
+        }
+
+        public void setUsername(String username) {
+            mTextViewUser.setText(username);
+        }
+
+        public void setAmountMessage(String amount) {
+            mTextViewAmount.setText(amount);
+        }
+
+        public void setProgressBarVisibility(boolean show) {
+            mProgressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+        }
     }
 
     private static class CompensationPosRow extends CompensationRow {
@@ -215,7 +218,14 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<Rec
                     listener.onRemindButtonClick(getAdapterPosition());
                 }
             });
+        }
 
+        public void setButtonDone(String buttonDone) {
+            mButtonDone.setText(buttonDone);
+        }
+
+        public void setButtonRemind(String buttonRemind) {
+            mButtonRemind.setText(buttonRemind);
         }
     }
 
@@ -252,6 +262,10 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<Rec
                     }
                 }
             });
+        }
+
+        public void setButtonRemindPaid(String buttonRemindPaid) {
+            mButtonRemindPaid.setText(buttonRemindPaid);
         }
     }
 }

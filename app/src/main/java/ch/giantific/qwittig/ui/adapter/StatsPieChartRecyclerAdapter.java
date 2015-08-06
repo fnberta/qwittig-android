@@ -19,16 +19,15 @@ import ch.giantific.qwittig.R;
 public class StatsPieChartRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final String LOG_TAG = StatsPieChartRecyclerAdapter.class.getSimpleName();
-    private Context mContext;
     private int mItemsViewResource;
     private List<PieData> mPieData;
     private List<String> mNicknames;
     private boolean mShowPercent;
 
-    public StatsPieChartRecyclerAdapter(Context context, int itemsViewResource,
+    public StatsPieChartRecyclerAdapter(int itemsViewResource,
                                         List<PieData> pieData, List<String> nicknames) {
+        super();
 
-        mContext = context;
         mItemsViewResource = itemsViewResource;
         mPieData = pieData;
         mNicknames = nicknames;
@@ -46,10 +45,9 @@ public class StatsPieChartRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
         PieRow pieRow = (PieRow) viewHolder;
 
         PieData pieData = mPieData.get(position);
-        pieRow.mPieChart.setCenterText(mNicknames.get(position));
-        pieRow.mPieChart.setData(pieData);
-        pieRow.mPieChart.setUsePercentValues(mShowPercent);
-        pieRow.mPieChart.animateY(PieChart.ANIMATION_Y_TIME);
+        pieRow.setCenterText(mNicknames.get(position));
+        pieRow.setData(pieData);
+        pieRow.setUsePercentValues(mShowPercent);
     }
 
     public void showPercentValues(boolean showPercentValues) {
@@ -69,7 +67,20 @@ public class StatsPieChartRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
             super(view);
 
             mPieChart = (PieChart) view.findViewById(R.id.pc_stores_user);
+            mPieChart.animateY(PieChart.ANIMATION_Y_TIME);
+
         }
 
+        public void setData(PieData data) {
+            mPieChart.setData(data);
+        }
+
+        public void setCenterText(String centerText) {
+            mPieChart.setCenterText(centerText);
+        }
+
+        public void setUsePercentValues(boolean showPercentagValues) {
+            mPieChart.setUsePercentValues(showPercentagValues);
+        }
     }
 }
