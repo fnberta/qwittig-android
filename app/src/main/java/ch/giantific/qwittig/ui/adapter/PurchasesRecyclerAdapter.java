@@ -12,8 +12,7 @@ import android.widget.TextView;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
-import org.apache.commons.math3.fraction.BigFraction;
-
+import java.util.Date;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
@@ -38,18 +37,16 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
     private int mPurchasesViewResource;
     private Context mContext;
     private List<ParseObject> mPurchases;
-    private List<ParseUser> mUsers;
     private String mCurrentGroupCurrency;
 
     public PurchasesRecyclerAdapter(Context context, int viewResource, List<ParseObject> purchases,
-                                    List<ParseUser> users, AdapterInteractionListener listener) {
+                                    AdapterInteractionListener listener) {
         super();
 
         mListener = listener;
         mContext = context;
         mPurchasesViewResource = viewResource;
         mPurchases = purchases;
-        mUsers = users;
     }
 
     @Override
@@ -88,23 +85,20 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
                 PurchaseRow purchaseRow = (PurchaseRow) viewHolder;
                 Purchase purchase = (Purchase) mPurchases.get(position);
 
-                purchaseRow.mTextViewDate.setText(DateUtils.formatMonthDayLineSeparated(purchase.getDate()));
-                purchaseRow.mTextViewStore.setText(purchase.getStore());
+                purchaseRow.setDate(purchase.getDate());
+                purchaseRow.setStore(purchase.getStore());
 
                 User buyer = purchase.getBuyer();
                 User currentUser = (User) ParseUser.getCurrentUser();
-                String nickname;
-                if (mUsers.contains(buyer) || buyer.getObjectId().equals(currentUser.getObjectId())) {
-                    nickname = buyer.getNicknameOrMe(mContext);
-                } else {
-                    nickname = mContext.getString(R.string.user_deleted);
-                }
-                purchaseRow.mTextViewBuyer.setText(nickname);
+                String nickname = buyer.getGroupIds().contains(currentUser.getCurrentGroup().getObjectId()) ||
+                        buyer.getObjectId().equals(currentUser.getObjectId()) ?
+                        buyer.getNicknameOrMe(mContext) : mContext.getString(R.string.user_deleted);
+                purchaseRow.setBuyer(nickname);
 
                 double myShareNumber = Utils.calculateMyShare(purchase);
                 String myShare = MoneyUtils.formatMoneyNoSymbol(myShareNumber,
                         mCurrentGroupCurrency);
-                purchaseRow.mTextViewShare.setText(myShare);
+                purchaseRow.setMyShare(myShare);
                 String balanceChange = MoneyUtils.formatMoneyNoSymbol(myShareNumber * -1,
                         mCurrentGroupCurrency);
                 if (buyer.getObjectId().equals(currentUser.getObjectId())) {
@@ -116,16 +110,10 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
                     purchaseRow.mTextViewBalanceChange.setTextColor(
                             mContext.getResources().getColor(R.color.red));
                 }
-                purchaseRow.mTextViewBalanceChange.setText(balanceChange);
+                purchaseRow.setBalanceChange(balanceChange);
 
                 if (!purchase.currentUserHasReadPurchase()) {
-                    if (Utils.isRunningLollipopAndHigher()) {
-                        purchaseRow.mView.setBackground(ContextCompat.getDrawable(
-                                mContext, R.drawable.ripple_white));
-                    } else {
-                        purchaseRow.mView.setBackgroundColor(mContext.getResources().getColor(
-                                android.R.color.white));
-                    }
+                    purchaseRow.setWhiteBackground();
                 } else {
                     purchaseRow.resetBackground();
                 }
@@ -181,7 +169,7 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
         private TextView mTextViewDate;
         private TextView mTextViewStore;
         private TextView mTextViewBuyer;
-        private TextView mTextViewShare;
+        private TextView mTextViewMyShare;
         private TextView mTextViewBalanceChange;
 
         public PurchaseRow(View view, final AdapterInteractionListener listener, Context context) {
@@ -199,16 +187,44 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
             mTextViewDate = (TextView) view.findViewById(R.id.tv_date);
             mTextViewStore = (TextView) view.findViewById(R.id.tv_store);
             mTextViewBuyer = (TextView) view.findViewById(R.id.tv_user);
-            mTextViewShare = (TextView) view.findViewById(R.id.tv_my_share);
+            mTextViewMyShare = (TextView) view.findViewById(R.id.tv_my_share);
             mTextViewBalanceChange = (TextView) view.findViewById(R.id.tv_balance_change);
         }
 
-        private void resetBackground() {
+        public void setWhiteBackground() {
+            if (Utils.isRunningLollipopAndHigher()) {
+                mView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.ripple_white));
+            } else {
+                mView.setBackgroundColor(mContext.getResources().getColor(android.R.color.white));
+            }
+        }
+
+        public void resetBackground() {
             int[] attrs = new int[]{R.attr.selectableItemBackground};
             TypedArray typedArray = mContext.obtainStyledAttributes(attrs);
             int backgroundResource = typedArray.getResourceId(0, 0);
             typedArray.recycle();
             mView.setBackgroundResource(backgroundResource);
+        }
+
+        public void setDate(Date date) {
+            mTextViewDate.setText(DateUtils.formatMonthDayLineSeparated(date));
+        }
+
+        public void setStore(String store) {
+            mTextViewStore.setText(store);
+        }
+
+        public void setBuyer(String buyer) {
+            mTextViewBuyer.setText(buyer);
+        }
+
+        public void setMyShare(String myShare) {
+            mTextViewMyShare.setText(myShare);
+        }
+
+        public void setBalanceChange(String balanceChange) {
+            mTextViewBalanceChange.setText(balanceChange);
         }
     }
 }

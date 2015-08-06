@@ -17,10 +17,7 @@ import ch.giantific.qwittig.data.ocr.models.PurchaseRest;
 import ch.giantific.qwittig.helper.OcrHelper;
 import ch.giantific.qwittig.ui.dialogs.PurchaseDiscardDialogFragment;
 import ch.giantific.qwittig.utils.MessageUtils;
-import ch.giantific.qwittig.utils.ParseErrorHandler;
-import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
-import retrofit.RetrofitError;
 
 
 public class PurchaseAddActivity extends PurchaseBaseActivity implements
@@ -102,7 +99,7 @@ public class PurchaseAddActivity extends PurchaseBaseActivity implements
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
         if (ocrHelper == null) {
-            ocrHelper = OcrHelper.newInstance(mCurrentPhotoPath);
+            ocrHelper = OcrHelper.newInstance(mReceiptPhotoFile.getAbsolutePath());
 
             fragmentManager.beginTransaction()
                     .add(ocrHelper, OCR_HELPER)
@@ -161,8 +158,6 @@ public class PurchaseAddActivity extends PurchaseBaseActivity implements
         setResultForSnackbar(PURCHASE_DISCARDED);
         finishPurchase();
     }
-
-
 
     @Override
     public void onBackPressed() {

@@ -1,6 +1,7 @@
 package ch.giantific.qwittig.ui.adapter;
 
 import android.content.Context;
+import android.support.annotation.ColorInt;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -102,11 +103,9 @@ public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<Recyc
                     amountString = MoneyUtils.formatMoney(amount.negate(), mCurrentGroupCurrency);
                 }
 
-                compensationHistoryRow.mTextViewDate.setText(DateUtils.formatMonthDayLineSeparated(date));
-                compensationHistoryRow.mTextViewUser.setText(nickname);
-                compensationHistoryRow.mTextViewAmount.setText(amountString);
-                compensationHistoryRow.mTextViewAmount.setTextColor(mContext.getResources()
-                        .getColor(color));
+                compensationHistoryRow.setDate(date);
+                compensationHistoryRow.setUser(nickname);
+                compensationHistoryRow.setAmount(amountString, mContext.getResources().getColor(color));
 
                 break;
             }
@@ -149,6 +148,19 @@ public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<Recyc
             mTextViewDate = (TextView) view.findViewById(R.id.tv_date);
             mTextViewUser = (TextView) view.findViewById(R.id.tv_user);
             mTextViewAmount = (TextView) view.findViewById(R.id.tv_amount);
+        }
+
+        public void setDate(Date date) {
+            mTextViewDate.setText(DateUtils.formatMonthDayLineSeparated(date));
+        }
+
+        public void setUser(String user) {
+            mTextViewUser.setText(user);
+        }
+
+        public void setAmount(String amount, @ColorInt int color) {
+            mTextViewAmount.setText(amount);
+            mTextViewAmount.setTextColor(color);
         }
     }
 }

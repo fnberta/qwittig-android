@@ -62,10 +62,8 @@ public class HelpFeedbackRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
             case TYPE_ITEM: {
                 ItemRow itemRow = (ItemRow) viewHolder;
 
-                itemRow.mTextViewTitle.setText(mContext.getString(item.getTitle()));
-                Drawable drawable = ContextCompat.getDrawable(mContext, item.getIcon());
-                drawable.setAlpha(AppConstants.ICON_BLACK_ALPHA_RGB);
-                itemRow.mTextViewTitle.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
+                itemRow.setTitleWithDrawable(mContext.getString(item.getTitle()),
+                        ContextCompat.getDrawable(mContext, item.getIcon()));
                 break;
             }
             case TYPE_HEADER: {
@@ -91,7 +89,7 @@ public class HelpFeedbackRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
     }
 
     public interface AdapterInteractionListener {
-        public void onHelpFeedbackItemClicked(int position);
+        void onHelpFeedbackItemClicked(int position);
     }
 
     public static class ItemRow extends RecyclerView.ViewHolder {
@@ -111,5 +109,10 @@ public class HelpFeedbackRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
             mTextViewTitle = (TextView) view.findViewById(R.id.tv_help_title);
         }
 
+        public void setTitleWithDrawable(String title, Drawable drawable) {
+            mTextViewTitle.setText(title);
+            drawable.setAlpha(AppConstants.ICON_BLACK_ALPHA_RGB);
+            mTextViewTitle.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
+        }
     }
 }

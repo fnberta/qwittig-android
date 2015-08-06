@@ -1,6 +1,7 @@
 package ch.giantific.qwittig.ui.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,10 +10,14 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
+
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.ImageAvatar;
+import ch.giantific.qwittig.data.models.Avatar;
 import ch.giantific.qwittig.data.models.ItemUserPicker;
 
 
@@ -49,39 +54,57 @@ public class RecipientsArrayAdapter extends ArrayAdapter<ItemUserPicker> {
 
     private View getCustomView(int position, View convertView, ViewGroup parent,
                                boolean isDropDown) {
-        final ViewHolder viewHolder;
+        final RecipientRow recipientRow;
         if (convertView == null) {
-            viewHolder = new ViewHolder();
-
-            int viewResource;
-            if (isDropDown) {
-                viewResource = mDropDownViewResource;
-            } else {
-                viewResource = mViewResource;
-            }
-            convertView = LayoutInflater.from(parent.getContext()).inflate(viewResource, parent,
-                    false);
-            viewHolder.ivAvatar = (ImageView) convertView.findViewById(R.id.list_avatar);
-            viewHolder.tvName = (TextView) convertView.findViewById(R.id.list_name);
-
-            convertView.setTag(viewHolder);
+            convertView = LayoutInflater.from(parent.getContext()).inflate(
+                    isDropDown ? mDropDownViewResource : mViewResource, parent, false);
+            recipientRow = new RecipientRow(convertView);
+            convertView.setTag(recipientRow);
         } else {
-            viewHolder = (ViewHolder) convertView.getTag();
+            recipientRow = (RecipientRow) convertView.getTag();
         }
 
         ItemUserPicker user = mUsers.get(position);
-        viewHolder.tvName.setText(user.getNickname());
+        recipientRow.setUsername(user.getNickname());
 
         byte[] avatarByteArray = user.getAvatar();
-        Drawable avatar = ImageAvatar.getRoundedAvatar(mContext, avatarByteArray, false);
-        viewHolder.ivAvatar.setImageDrawable(avatar);
+        recipientRow.setAvatar(avatarByteArray, mContext, false);
 
         return convertView;
     }
 
-    private static class ViewHolder {
+    private static class RecipientRow {
 
-        private ImageView ivAvatar;
-        private TextView tvName;
+        private ImageView mImageViewAvatar;
+        private TextView mTextViewName;
+
+        public RecipientRow(View view) {
+            mImageViewAvatar = (ImageView) view.findViewById(R.id.list_avatar);
+            mTextViewName = (TextView) view.findViewById(R.id.list_name);
+        }
+
+        public void setUsername(String username) {
+            mTextViewName.setText(username);
+        }
+
+        public void setAvatar(byte[] avatarBytes, final Context context, final boolean withRipple) {
+            if (avatarBytes != null) {
+                Glide.with(context)
+                        .load(avatarBytes)
+                        .asBitmap()
+                        .into(new BitmapImageViewTarget(mImageViewAvatar) {
+                            @Override
+                            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                                view.setImageDrawable(Avatar.getRoundedDrawable(context, resource, withRipple));
+                            }
+                        });
+            } else {
+                setAvatar(Avatar.getFallbackDrawable(context, false, withRipple));
+            }
+        }
+
+        public void setAvatar(Drawable avatar) {
+            mImageViewAvatar.setImageDrawable(avatar);
+        }
     }
 }

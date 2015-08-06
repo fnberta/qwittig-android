@@ -1,12 +1,10 @@
 package ch.giantific.qwittig.ui.adapter;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.parse.ParseUser;
@@ -16,9 +14,9 @@ import org.apache.commons.math3.fraction.BigFraction;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.ImageAvatar;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.ui.adapter.rows.BaseUserAvatarRow;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -49,7 +47,7 @@ public class UsersRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
         View view = LayoutInflater.from(parent.getContext()).inflate(mUsersViewResource, parent,
                 false);
 
-        return new UsersRow(view, mListener);
+        return new UsersRow(view, mContext, mListener);
     }
 
     @Override
@@ -57,24 +55,15 @@ public class UsersRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
         final UsersRow usersRow = (UsersRow) viewHolder;
         User user = (User) mUsers.get(position);
 
-        usersRow.mTextViewName.setText(user.getNickname());
+        usersRow.setName(user.getNickname());
 
         byte[] avatarByteArray = user.getAvatar();
-        Drawable avatar = ImageAvatar.getRoundedAvatar(mContext, avatarByteArray, false);
-        usersRow.mImageViewAvatar.setImageDrawable(avatar);
+        usersRow.setAvatar(avatarByteArray, false);
 
         User currentUser = (User) ParseUser.getCurrentUser();
-        Group currentGroup = null;
-        if (currentUser != null) {
-            currentGroup = currentUser.getCurrentGroup();
-        }
+        Group currentGroup = currentUser.getCurrentGroup();
         BigFraction balance = user.getBalance(currentGroup);
-        if (Utils.isPositive(balance)) {
-            usersRow.mTextViewBalance.setTextColor(mContext.getResources().getColor(R.color.green));
-        } else {
-            usersRow.mTextViewBalance.setTextColor(mContext.getResources().getColor(R.color.red));
-        }
-        usersRow.mTextViewBalance.setText(MoneyUtils.formatMoneyNoSymbol(balance, mCurrentGroupCurrency));
+        usersRow.setBalance(balance, mCurrentGroupCurrency);
     }
 
     @Override
@@ -87,17 +76,15 @@ public class UsersRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
 
     public interface AdapterInteractionListener {
-        public void onUsersRowItemClick(int position);
+        void onUsersRowItemClick(int position);
     }
 
-    private static class UsersRow extends RecyclerView.ViewHolder {
+    private static class UsersRow extends BaseUserAvatarRow {
 
-        private ImageView mImageViewAvatar;
-        private TextView mTextViewName;
         private TextView mTextViewBalance;
 
-        public UsersRow(View view, final AdapterInteractionListener listener) {
-            super(view);
+        public UsersRow(View view, Context context, final AdapterInteractionListener listener) {
+            super(view, context);
 
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -106,9 +93,14 @@ public class UsersRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
                 }
             });
 
-            mImageViewAvatar = (ImageView) view.findViewById(R.id.list_avatar);
-            mTextViewName = (TextView) view.findViewById(R.id.list_name);
-            mTextViewBalance = (TextView) view.findViewById(R.id.list_balance);
+            mTextViewBalance = (TextView) view.findViewById(R.id.user_balance);
+        }
+
+        public void setBalance(BigFraction balance, String currency) {
+            mTextViewBalance.setTextColor(Utils.isPositive(balance) ?
+                    mContext.getResources().getColor(R.color.green) :
+                    mContext.getResources().getColor(R.color.red));
+            mTextViewBalance.setText(MoneyUtils.formatMoneyNoSymbol(balance, currency));
         }
     }
 }

@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.parse.ParseObject;
 
+import java.util.Date;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
@@ -52,35 +53,48 @@ public class DraftsAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
-        final ViewHolder viewHolder;
+        final DraftRow draftRow;
         if (convertView == null) {
-            viewHolder = new ViewHolder();
-
             convertView = LayoutInflater.from(parent.getContext()).inflate(mViewResource, parent,
                     false);
-            viewHolder.tvDate = (TextView) convertView.findViewById(R.id.tv_date);
-            viewHolder.tvStore = (TextView) convertView.findViewById(R.id.tv_store);
-            viewHolder.tvTotal = (TextView) convertView.findViewById(R.id.tv_total_value);
-
-            convertView.setTag(viewHolder);
+            draftRow = new DraftRow(convertView);
+            convertView.setTag(draftRow);
         } else {
-            viewHolder = (ViewHolder) convertView.getTag();
+            draftRow = (DraftRow) convertView.getTag();
         }
 
         Purchase draft = (Purchase) mDrafts.get(position);
 
-        viewHolder.tvDate.setText(DateUtils.formatMonthDayLineSeparated(draft.getDate()));
-        viewHolder.tvStore.setText(draft.getStore());
+        draftRow.setDate(draft.getDate());
+        draftRow.setStore(draft.getStore());
 
         double totalPrice = draft.getTotalPrice();
-        viewHolder.tvTotal.setText(MoneyUtils.formatMoneyNoSymbol(totalPrice, mCurrentGroupCurrency));
+        draftRow.setTotal(MoneyUtils.formatMoneyNoSymbol(totalPrice, mCurrentGroupCurrency));
 
         return convertView;
     }
 
-    private static class ViewHolder {
-        private TextView tvDate;
-        private TextView tvStore;
-        private TextView tvTotal;
+    private static class DraftRow {
+        private TextView mTextViewDate;
+        private TextView mTextViewStore;
+        private TextView mTestViewTotal;
+
+        public DraftRow(View view) {
+            mTextViewDate = (TextView) view.findViewById(R.id.tv_date);
+            mTextViewStore = (TextView) view.findViewById(R.id.tv_store);
+            mTestViewTotal = (TextView) view.findViewById(R.id.tv_total_value);
+        }
+
+        public void setDate(Date date) {
+            mTextViewDate.setText(DateUtils.formatMonthDayLineSeparated(date));
+        }
+
+        public void setStore(String store) {
+            mTextViewStore.setText(store);
+        }
+
+        public void setTotal(String total) {
+            mTestViewTotal.setText(total);
+        }
     }
 }

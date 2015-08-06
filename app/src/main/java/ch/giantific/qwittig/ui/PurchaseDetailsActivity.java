@@ -35,8 +35,8 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     private static final String PURCHASE_RECEIPT_FRAGMENT = "purchase_receipt_fragment";
     private String mPurchaseId;
     private PurchaseDetailsActivity mThis = this;
-    private boolean mShowEditOptions = false;
-    private boolean mHasReceiptFile = false;
+    private boolean mShowEditOptions;
+    private boolean mHasReceiptFile;
     private TextView mTextViewStore;
     private TextView mTextViewDate;
     private PurchaseDetailsFragment mPurchaseDetailsFragment;

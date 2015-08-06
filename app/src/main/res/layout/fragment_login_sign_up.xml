@@ -21,8 +21,7 @@
             android:layout_marginTop="@dimen/normal_space"
             android:layout_marginBottom="@dimen/small_space"
             android:contentDescription="@string/user_avatar"
-            android:src="@drawable/ic_account_circle_black_80dp"
-            android:alpha="@dimen/icon_black_alpha"/>
+            tools:src="@drawable/ic_account_circle_black_80dp"/>
 
         <TextView
             android:id="@+id/user_name"

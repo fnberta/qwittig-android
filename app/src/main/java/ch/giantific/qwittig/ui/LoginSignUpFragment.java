@@ -2,6 +2,8 @@ package ch.giantific.qwittig.ui;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
@@ -14,10 +16,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
+
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.ImageAvatar;
+import ch.giantific.qwittig.data.models.Avatar;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
@@ -99,6 +105,7 @@ public class LoginSignUpFragment extends Fragment {
             mEditTextEmail.setText(mEmail);
         }
 
+        mImageButtonAvatar.setImageDrawable(Avatar.getFallbackDrawable(getActivity(), true, true));
         mImageButtonAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -113,9 +120,17 @@ public class LoginSignUpFragment extends Fragment {
         });
     }
 
-    public void setAvatarImage(ImageAvatar avatar) {
-        mImageButtonAvatar.setAlpha(1f);
-        mImageButtonAvatar.setImageDrawable(avatar.getRoundedDrawable());
+    public void setAvatar(Uri imageUri) {
+        Glide.with(this)
+                .load(imageUri)
+                .asBitmap()
+                .centerCrop()
+                .into(new BitmapImageViewTarget(mImageButtonAvatar) {
+                    @Override
+                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                        view.setImageDrawable(Avatar.getRoundedDrawable(getActivity(), resource, true));
+                    }
+                });
     }
 
     private void signUpUser() {

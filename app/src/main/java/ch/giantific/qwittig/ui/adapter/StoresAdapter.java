@@ -34,6 +34,8 @@ public class StoresAdapter extends BaseAdapter {
 
     public StoresAdapter(Context context, int viewResource, List<String> storesAdded,
                          List<String> storesFavorites) {
+        super();
+
         mContext = context;
         mViewResource = viewResource;
         mStoresAdded = storesAdded;
@@ -103,17 +105,16 @@ public class StoresAdapter extends BaseAdapter {
 
         final ViewHolder viewHolder;
         if (convertView == null) {
-            viewHolder = new ViewHolder();
-
             if (rowType == TYPE_HEADER) {
                 convertView = LayoutInflater.from(parent.getContext()).inflate(
                         R.layout.row_header, parent, false);
-                viewHolder.tvHeader = (TextView) convertView.findViewById(R.id.tv_header);
+
+                viewHolder = new HeaderRow(convertView);
             } else {
                 convertView = LayoutInflater.from(parent.getContext()).inflate(
                         mViewResource, parent, false);
-                viewHolder.tvName = (TextView) convertView.findViewById(R.id.tv_store_name);
-                viewHolder.cbFavorite = (CheckBox) convertView.findViewById(R.id.cb_store_favorite);
+
+                viewHolder = new StoreRow(convertView);
             }
 
             convertView.setTag(viewHolder);
@@ -122,37 +123,57 @@ public class StoresAdapter extends BaseAdapter {
         }
 
         if (rowType == TYPE_HEADER) {
-            String header = "";
-            if (position == 0) {
-                header = mContext.getString(R.string.header_stores_default);
-            } else {
-                header = mContext.getString(R.string.header_stores_own);
-            }
-            viewHolder.tvHeader.setText(header);
+            String header = position == 0 ? mContext.getString(R.string.header_stores_default) :
+                    mContext.getString(R.string.header_stores_own);
+            ((HeaderRow) viewHolder).mTextViewHeader.setText(header);
         } else {
-            viewHolder.cbFavorite.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ((ListView) parent).performItemClick(v, position, 0);
-                }
-            });
+            StoreRow storeRow = (StoreRow) viewHolder;
 
+            storeRow.setClickListener(((ListView) parent), position);
             String store = (String) getItem(position);
-            viewHolder.tvName.setText(store);
-
-            if (mStoresFavorites.contains(store)) {
-                viewHolder.cbFavorite.setChecked(true);
-            } else {
-                viewHolder.cbFavorite.setChecked(false);
-            }
+            storeRow.setName(store);
+            storeRow.setFavorite(mStoresFavorites.contains(store));
         }
 
         return convertView;
     }
 
-    private static class ViewHolder {
-        private TextView tvHeader;
-        private TextView tvName;
-        private CheckBox cbFavorite;
+    private abstract static class ViewHolder {
+
+    }
+
+    private static class StoreRow extends ViewHolder {
+        private TextView mTextViewName;
+        private CheckBox mCheckBoxFavorite;
+
+        public StoreRow(View view) {
+            mTextViewName = (TextView) view.findViewById(R.id.tv_store_name);
+            mCheckBoxFavorite = (CheckBox) view.findViewById(R.id.cb_store_favorite);
+        }
+
+        public void setClickListener(final ListView listView, final int position) {
+            mCheckBoxFavorite.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listView.performItemClick(v, position, 0);
+                }
+            });
+        }
+
+        public void setName(String name) {
+            mTextViewName.setText(name);
+        }
+
+        public void setFavorite(boolean isFavorite) {
+            mCheckBoxFavorite.setChecked(isFavorite);
+        }
+    }
+
+    private static class HeaderRow extends ViewHolder {
+        private TextView mTextViewHeader;
+
+        public HeaderRow(View view) {
+            mTextViewHeader = (TextView) view.findViewById(R.id.tv_header);
+        }
     }
 }

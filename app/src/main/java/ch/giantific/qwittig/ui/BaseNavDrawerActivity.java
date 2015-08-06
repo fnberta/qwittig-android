@@ -1,20 +1,15 @@
 package ch.giantific.qwittig.ui;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.ColorStateList;
 import android.content.res.Configuration;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.RippleDrawable;
+import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
-import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -30,6 +25,9 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.parse.ParseConfig;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
@@ -38,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.ImageAvatar;
+import ch.giantific.qwittig.data.models.Avatar;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.OnlineQuery;
 import ch.giantific.qwittig.data.parse.models.Config;
@@ -46,7 +44,6 @@ import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.ui.adapter.NavHeaderGroupsArrayAdapter;
 import ch.giantific.qwittig.utils.MessageUtils;
-import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.inappbilling.IabHelper;
 import ch.giantific.qwittig.utils.inappbilling.IabKey;
 import ch.giantific.qwittig.utils.inappbilling.IabResult;
@@ -320,7 +317,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
     }
 
     private void setupNavDrawerHeader() {
-        ImageView ivAvatar = (ImageView) findViewById(R.id.iv_drawer_avatar);
+        final ImageView ivAvatar = (ImageView) findViewById(R.id.iv_drawer_avatar);
         TextView tvNickname = (TextView) findViewById(R.id.tv_drawer_nickname);
 
         User currentUser = (User) ParseUser.getCurrentUser();
@@ -328,12 +325,18 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
         tvNickname.setText(nickname);
 
         byte[] avatarByteArray = currentUser.getAvatar();
-        Drawable avatar = ImageAvatar.getRoundedAvatar(this, avatarByteArray, false);
-        if (Utils.isRunningLollipopAndHigher()) {
-            RippleDrawable rippleAvatar = createRippleDrawable(avatar);
-            ivAvatar.setImageDrawable(rippleAvatar);
+        if (avatarByteArray != null) {
+            Glide.with(this)
+                    .load(avatarByteArray)
+                    .asBitmap()
+                    .into(new BitmapImageViewTarget(ivAvatar) {
+                        @Override
+                        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                            view.setImageDrawable(Avatar.getRoundedDrawable(mContext, resource, true));
+                        }
+                    });
         } else {
-            ivAvatar.setImageDrawable(avatar);
+            ivAvatar.setImageDrawable(Avatar.getFallbackDrawable(mContext, false, true));
         }
         ivAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -344,13 +347,6 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
         });
 
         setupNavDrawerHeaderGroupSpinner();
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    @NonNull
-    private RippleDrawable createRippleDrawable(Drawable drawable) {
-        return new RippleDrawable(ColorStateList.valueOf(getResources()
-                .getColor(R.color.primary)), drawable, null);
     }
 
     private void setupNavDrawerHeaderGroupSpinner() {

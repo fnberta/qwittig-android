@@ -11,7 +11,7 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.ImageReceipt;
+import ch.giantific.qwittig.data.models.Receipt;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 
 /**
@@ -88,7 +88,7 @@ public class PurchaseEditDraftFragment extends PurchaseEditFragment implements
     void checkForReceiptFile() {
         byte[] receiptData = mPurchase.getReceiptData();
         if (receiptData != null && mListener.getReceiptParseFile() == null) {
-            mReceiptFileOld = new ParseFile(ImageReceipt.RECEIPT_PARSE_FILE_NAME, receiptData);
+            mReceiptFileOld = new ParseFile(Receipt.PARSE_FILE_NAME, receiptData);
             mListener.setReceiptParseFile(mReceiptFileOld);
             getActivity().invalidateOptionsMenu();
         }

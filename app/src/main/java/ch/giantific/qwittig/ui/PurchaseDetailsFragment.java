@@ -17,7 +17,9 @@ import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.parse.LocalQuery;
+import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.Purchase;
+import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.ui.adapter.PurchaseDetailsRecyclerAdapter;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
@@ -27,7 +29,6 @@ import ch.giantific.qwittig.utils.ParseUtils;
  * A placeholder fragment containing a simple view.
  */
 public class PurchaseDetailsFragment extends BaseFragment implements
-        LocalQuery.UserLocalQueryListener,
         LocalQuery.ObjectLocalFetchListener {
 
     private FragmentInteractionListener mListener;
@@ -35,7 +36,7 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     private ProgressBar mProgressBar;
     private String mPurchaseId;
     private Purchase mPurchase;
-    private List<ParseUser> mCurrentGroupUsers;
+    private PurchaseDetailsRecyclerAdapter mRecyclerAdapter;
 
     public PurchaseDetailsFragment() {
     }
@@ -85,6 +86,9 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mRecyclerAdapter = new PurchaseDetailsRecyclerAdapter(getActivity(),
+                R.layout.row_details_item_list);
+        mRecyclerView.setAdapter(mRecyclerAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setHasFixedSize(true);
     }
@@ -101,12 +105,6 @@ public class PurchaseDetailsFragment extends BaseFragment implements
      * which will call the method to query the actual purchase in its done callback.
      */
     public void queryData() {
-        LocalQuery.queryUsers(this);
-    }
-
-    @Override
-    public void onUsersLocalQueried(List<ParseUser> users) {
-        mCurrentGroupUsers = users;
         // user query instead of fetch because fetch would not include data for the pointers
         LocalQuery.queryPurchase(mPurchaseId, this);
     }
@@ -116,11 +114,10 @@ public class PurchaseDetailsFragment extends BaseFragment implements
         mPurchase = (Purchase) object;
 
         updateToolbarTitle();
-        updateActionBarMenu(mCurrentGroupUsers);
+        updateActionBarMenu();
 
-        PurchaseDetailsRecyclerAdapter recyclerAdapter = new PurchaseDetailsRecyclerAdapter(getActivity(),
-                R.layout.row_details_item_list, mPurchase, mCurrentGroupUsers);
-        mRecyclerView.setAdapter(recyclerAdapter);
+        mRecyclerAdapter.setPurchase(object);
+        mRecyclerAdapter.notifyDataSetChanged();
 
         mProgressBar.setVisibility(View.GONE);
         ActivityCompat.startPostponedEnterTransition(getActivity());
@@ -142,23 +139,32 @@ public class PurchaseDetailsFragment extends BaseFragment implements
      * in the ActionBar. Checks if the purchase has a receipt file, if yes show option to display
      * it in the ActionBar.
      */
-    private void updateActionBarMenu(List<ParseUser> currentGroupUsers) {
+    private void updateActionBarMenu() {
         List<ParseUser> usersInvolved = mPurchase.getUsersInvolved();
+        User currentUser = (User) ParseUser.getCurrentUser();
+        Group currentGroup = currentUser.getCurrentGroup();
+        boolean allUsersAreValid = true;
 
-        if (!currentGroupUsers.containsAll(usersInvolved)) {
-            if (mPurchase.getReceiptParseFile() != null) {
-                mListener.updateActionBarMenu(false, true);
+        for (ParseUser parseUser : usersInvolved) {
+            User user = (User) parseUser;
+            if (!user.getGroupIds().contains(currentGroup.getObjectId())) {
+                allUsersAreValid = false;
             }
-        } else {
+        }
+
+        if (allUsersAreValid) {
             String buyerId = mPurchase.getBuyer().getObjectId();
-            String currentUserId = ParseUser.getCurrentUser().getObjectId();
-            if (buyerId.equals(currentUserId)) {
+            if (buyerId.equals(currentUser.getObjectId())) {
                 if (mPurchase.getReceiptParseFile() != null) {
                     mListener.updateActionBarMenu(true, true);
                 } else {
                     mListener.updateActionBarMenu(true, false);
                 }
             } else if (mPurchase.getReceiptParseFile() != null) {
+                mListener.updateActionBarMenu(false, true);
+            }
+        } else {
+            if (mPurchase.getReceiptParseFile() != null) {
                 mListener.updateActionBarMenu(false, true);
             }
         }
