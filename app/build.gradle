@@ -50,5 +50,6 @@ dependencies {
     compile 'com.github.jorgecastilloprz:fabprogresscircle:1.01@aar'
     compile 'com.parse.bolts:bolts-android:1.+'
     compile 'com.github.PhilJay:MPAndroidChart:v2.1.2'
-    compile 'com.github.clans:fab:1.5.5'
+//    compile 'com.github.clans:fab:1.5.5'
+    compile(name:'fab', ext:'aar')
 }

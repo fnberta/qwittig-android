@@ -10,7 +10,8 @@
 
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:clipChildren="false">
 
         <android.support.design.widget.AppBarLayout
             android:id="@+id/appbar"
@@ -61,7 +62,7 @@
             android:layout_gravity="end|bottom"
             android:layout_margin="@dimen/normal_space"
             app:layout_behavior="ch.giantific.qwittig.ui.widgets.FloatingActionBehavior"
-            app:menu_buttonSpacing="@dimen/normal_space"
+            app:menu_elevationCompat="3dp"
             app:menu_colorNormal="@color/accent"
             app:menu_colorPressed="@color/accent"
             app:menu_colorRipple="?colorControlHighlight"
@@ -73,7 +74,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_camera_alt_black_24dp"
-                app:fab_elevationCompat="@dimen/fab_elevation"
+                app:fab_elevationCompat="3dp"
                 app:fab_colorNormal="@color/accent"
                 app:fab_colorPressed="@color/accent"
                 app:fab_size="mini"
@@ -84,7 +85,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_create_black_24dp"
-                app:fab_elevationCompat="@dimen/fab_elevation"
+                app:fab_elevationCompat="3dp"
                 app:fab_colorNormal="@color/accent"
                 app:fab_colorPressed="@color/accent"
                 app:fab_size="mini"
