@@ -334,11 +334,9 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
     }
 
     private void setAvatarAndNickname() {
-        User currentUser = (User) ParseUser.getCurrentUser();
-        String nickname = currentUser.getNickname();
-        mTextViewHeaderNickname.setText(nickname);
+        mTextViewHeaderNickname.setText(mCurrentUser.getNickname());
 
-        byte[] avatarByteArray = currentUser.getAvatar();
+        byte[] avatarByteArray = mCurrentUser.getAvatar();
         if (avatarByteArray != null) {
             Glide.with(this)
                     .load(avatarByteArray)
@@ -350,7 +348,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
                         }
                     });
         } else {
-            mImageViewHeaderAvatar.setImageDrawable(Avatar.getFallbackDrawable(mContext, false, true));
+            mImageViewHeaderAvatar.setImageDrawable(Avatar.getFallbackDrawable(mContext, true, true));
         }
     }
 
