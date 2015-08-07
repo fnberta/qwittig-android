@@ -9,7 +9,7 @@
 
     <TextView
         android:id="@+id/tv_app_title"
-        style="@style/Base.TextAppearance.AppCompat.Display4"
+        style="@style/LoginHeader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"

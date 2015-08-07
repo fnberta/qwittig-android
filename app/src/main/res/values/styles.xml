@@ -39,12 +39,16 @@
         <item name="android:textColor">?attr/colorPrimary</item>
     </style>
 
-    <style name="HomeToolbarTitle">
-        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Display2</item>
-    </style>
-
     <style name="ColoredRaisedButton" parent="Widget.AppCompat.Button">
         <item name="android:textColor">@android:color/white</item>
         <item name="colorButtonNormal">@color/accent</item>
+    </style>
+
+    <style name="HomeToolbarTitle">
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Display1</item>
+    </style>
+
+    <style name="LoginHeader">
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Display3</item>
     </style>
 </resources>
