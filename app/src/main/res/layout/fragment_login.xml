@@ -10,6 +10,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:transitionGroup="true"
         tools:context="ch.giantific.qwittig.ui.LoginFragment">
 
         <android.support.design.widget.TextInputLayout
@@ -20,7 +21,8 @@
             android:layout_marginEnd="@dimen/key_line_1"
             android:layout_alignParentTop="true"
             android:layout_marginTop="@dimen/small_space"
-            android:layout_marginBottom="@dimen/small_space">
+            android:layout_marginBottom="@dimen/small_space"
+            android:transitionGroup="true">
 
             <AutoCompleteTextView
                 android:id="@+id/et_login_email"
@@ -39,7 +41,8 @@
             android:layout_marginStart="@dimen/key_line_1"
             android:layout_marginEnd="@dimen/key_line_1"
             android:layout_below="@id/til_login_email"
-            android:layout_marginBottom="@dimen/small_space">
+            android:layout_marginBottom="@dimen/small_space"
+            android:transitionGroup="true">
 
             <EditText
                 android:id="@+id/et_login_password"

@@ -1,5 +1,6 @@
 package ch.giantific.qwittig.ui;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,6 +9,7 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.design.widget.NavigationView;
@@ -16,7 +18,11 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.transition.Fade;
+import android.transition.Slide;
+import android.transition.Transition;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,6 +50,7 @@ import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.ui.adapter.NavHeaderGroupsArrayAdapter;
 import ch.giantific.qwittig.utils.MessageUtils;
+import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.inappbilling.IabHelper;
 import ch.giantific.qwittig.utils.inappbilling.IabKey;
 import ch.giantific.qwittig.utils.inappbilling.IabResult;
@@ -74,6 +81,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
     private int mSelectedNavDrawerItem;
     private int mFetchCounter = 0;
     private int mGroupsCount;
+    private TextView mTextViewHeaderNickname;
     private ImageView mImageViewHeaderAvatar;
     private Spinner mSpinnerGroups;
     private NavHeaderGroupsArrayAdapter mSpinnerGroupsAdapter;
@@ -128,7 +136,6 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
             toggleGoPremiumVisibility();
         }
     };
-    private TextView mTextViewHeaderNickname;
 
     private boolean freeAutoPurchasesAvailable() {
         ParseConfig config = ParseConfig.getCurrentConfig();
@@ -186,6 +193,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
         }
     }
 
+
     private void startLoginActivity() {
         Intent intentLogin = new Intent(this, LoginActivity.class);
         Intent intent = getIntent();
@@ -198,8 +206,10 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
             intentLogin.putExtra(LoginActivity.INTENT_EXTRA_SIGN_UP, true);
         }
 
-        ActivityOptionsCompat activityOptionsCompat =
-                ActivityOptionsCompat.makeSceneTransitionAnimation(this);
+//        Starting an activity with forResult and transitions during a lifecycle method results on
+//        onActivityResult not being called
+//        ActivityOptionsCompat activityOptionsCompat =
+//                ActivityOptionsCompat.makeSceneTransitionAnimation(this);
         startActivityForResult(intentLogin, INTENT_REQUEST_LOGIN);
     }
 

@@ -3,7 +3,6 @@ package ch.giantific.qwittig.ui;
 import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -16,7 +15,6 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.transition.Fade;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.view.Gravity;
@@ -113,13 +111,10 @@ public class LoginActivity extends AppCompatActivity implements
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void setActivityTransition() {
-        Transition transitionEnter = new Fade();
+        Transition transitionEnter = new Slide(Gravity.BOTTOM);
+        transitionEnter.excludeTarget(android.R.id.statusBarBackground, true);
+        transitionEnter.excludeTarget(android.R.id.navigationBarBackground, true);
         getWindow().setEnterTransition(transitionEnter);
-
-        Transition transitionExit = new Slide(Gravity.TOP);
-        transitionExit.excludeTarget(android.R.id.statusBarBackground, true);
-        transitionExit.excludeTarget(android.R.id.navigationBarBackground, true);
-        getWindow().setExitTransition(transitionExit);
     }
 
     /**
@@ -281,11 +276,25 @@ public class LoginActivity extends AppCompatActivity implements
     public void launchSignUpFragment(String email) {
         FragmentManager fragmentManager = getFragmentManager();
         LoginSignUpFragment loginSignUpFragment = LoginSignUpFragment.newInstance(email);
+        if (Utils.isRunningLollipopAndHigher()) {
+            setFragmentTransitions(loginSignUpFragment);
+        }
         fragmentManager.beginTransaction()
                 .replace(R.id.container, loginSignUpFragment, SIGN_UP_FRAGMENT)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .addToBackStack(null)
                 .commit();
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void setFragmentTransitions(LoginSignUpFragment loginSignUpFragment) {
+        loginSignUpFragment.setEnterTransition(new Slide(Gravity.BOTTOM));
+
+        LoginFragment loginFragment = findLoginFragment(getFragmentManager());
+        loginFragment.setExitTransition(new Slide(Gravity.BOTTOM));
+    }
+
+    private LoginFragment findLoginFragment(FragmentManager fragmentManager) {
+        return (LoginFragment) fragmentManager.findFragmentByTag(LOGIN_FRAGMENT);
     }
 
     @Override
@@ -321,9 +330,13 @@ public class LoginActivity extends AppCompatActivity implements
                     }
                 });
 
-        LoginSignUpFragment loginSignUpFragment = (LoginSignUpFragment)
-                getFragmentManager().findFragmentByTag(SIGN_UP_FRAGMENT);
+        LoginSignUpFragment loginSignUpFragment = findSignUpFragment(getFragmentManager());
         loginSignUpFragment.setAvatar(imageUri);
+    }
+
+    private LoginSignUpFragment findSignUpFragment(FragmentManager fragmentManager) {
+        return (LoginSignUpFragment) fragmentManager
+                .findFragmentByTag(SIGN_UP_FRAGMENT);
     }
 
     @Override
@@ -365,11 +378,8 @@ public class LoginActivity extends AppCompatActivity implements
     private void updateFragmentEmailField(List<String> emails) {
         FragmentManager fragmentManager = getFragmentManager();
 
-        LoginFragment loginFragment = (LoginFragment) fragmentManager
-                .findFragmentByTag(LOGIN_FRAGMENT);
-
-        LoginSignUpFragment loginSignUpFragment = (LoginSignUpFragment) fragmentManager
-                .findFragmentByTag(SIGN_UP_FRAGMENT);
+        LoginFragment loginFragment = findLoginFragment(fragmentManager);
+        LoginSignUpFragment loginSignUpFragment = findSignUpFragment(fragmentManager);
 
         if (loginFragment != null && loginFragment.isAdded()) {
             loginFragment.addEmailsToAutoComplete(emails);

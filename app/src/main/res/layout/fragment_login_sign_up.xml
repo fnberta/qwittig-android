@@ -11,6 +11,7 @@
         android:orientation="vertical"
         android:layout_marginStart="@dimen/key_line_1"
         android:layout_marginEnd="@dimen/key_line_1"
+        android:transitionGroup="true"
         tools:context="ch.giantific.qwittig.ui.LoginSignUpFragment">
 
         <ImageView
@@ -38,7 +39,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/small_space"
-            android:layout_marginBottom="@dimen/small_space">
+            android:layout_marginBottom="@dimen/small_space"
+            android:transitionGroup="true">
 
             <AutoCompleteTextView
                 android:id="@+id/et_login_signup_email"
@@ -54,7 +56,8 @@
             android:id="@+id/til_login_signup_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/small_space">
+            android:layout_marginBottom="@dimen/small_space"
+            android:transitionGroup="true">
 
             <EditText
                 android:id="@+id/et_login_signup_password"
@@ -69,7 +72,8 @@
             android:id="@+id/til_login_signup_password_repeat"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/small_space">
+            android:layout_marginBottom="@dimen/small_space"
+            android:transitionGroup="true">
 
             <EditText
                 android:id="@+id/et_login_signup_password_repeat"
@@ -84,7 +88,8 @@
             android:id="@+id/til_login_signup_nickname"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/small_space">
+            android:layout_marginBottom="@dimen/small_space"
+            android:transitionGroup="true">
 
             <EditText
                 android:id="@+id/et_login_signup_nickname"
