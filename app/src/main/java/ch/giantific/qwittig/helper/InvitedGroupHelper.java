@@ -10,16 +10,20 @@ import com.parse.GetCallback;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParsePush;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import ch.giantific.qwittig.PushBroadcastReceiver;
+import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.parse.CloudCode;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.utils.ParseErrorHandler;
 
 /**
  * Created by fabio on 10.12.14.
@@ -127,6 +131,32 @@ public class InvitedGroupHelper extends BaseHelper {
         }
     }
 
+    public void joinInvitedGroup(final ParseObject invitedGroup) {
+        final User currentUser = (User) ParseUser.getCurrentUser();
+        final Group currentGroup = currentUser.getCurrentGroup();
+        // user needs to be saved before group, otherwise check in CloudCode will fail and user
+        // will be removed from group Role!
+        currentUser.addGroup(invitedGroup);
+        currentUser.setCurrentGroup(invitedGroup);
+        currentUser.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    currentUser.removeGroup(invitedGroup);
+                    currentUser.setCurrentGroup(currentGroup);
+
+                    if (mListener != null) {
+                        mListener.onUserJoinGroupFailed(e);
+                    }
+                }
+
+                if (mListener != null) {
+                    mListener.onUserJoinedGroup();
+                }
+            }
+        });
+    }
+
     @Override
     public void onDetach() {
         super.onDetach();
@@ -139,5 +169,9 @@ public class InvitedGroupHelper extends BaseHelper {
         void onInvitedGroupQueryFailed(ParseException e);
 
         void onEmailNotValid();
+
+        void onUserJoinedGroup();
+
+        void onUserJoinGroupFailed(ParseException e);
     }
 }

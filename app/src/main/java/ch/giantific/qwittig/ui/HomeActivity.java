@@ -24,7 +24,6 @@ import com.parse.ParseConfig;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
-import com.parse.SaveCallback;
 
 import org.apache.commons.math3.fraction.BigFraction;
 import org.json.JSONException;
@@ -303,8 +302,6 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
     @Override
     public void onInvitedGroupQueried(ParseObject parseObject) {
-        removeInvitedGroupHelper();
-
         mInvitedGroup = (Group) parseObject;
 
         switch (mInvitationAction) {
@@ -320,15 +317,6 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         }
     }
 
-    private void removeInvitedGroupHelper() {
-        FragmentManager fragmentManager = getFragmentManager();
-        InvitedGroupHelper invitedGroupHelper = findInvitedGroupHelper(fragmentManager);
-
-        if (invitedGroupHelper != null) {
-            fragmentManager.beginTransaction().remove(invitedGroupHelper).commitAllowingStateLoss();
-        }
-    }
-
     private void showGroupJoinDialog(String groupName) {
         GroupJoinDialogFragment groupJoinDialogFragment =
                 GroupJoinDialogFragment.newInstance(groupName, mInviteInitiator);
@@ -339,33 +327,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     public void joinInvitedGroup() {
         showProgressDialog(getString(R.string.progress_switch_groups));
 
-        // user needs to be saved before group, otherwise check in CloudCode will fail and user
-        // will be removed from group Role!
-        mCurrentUser.addGroup(mInvitedGroup);
-        mCurrentUser.setCurrentGroup(mInvitedGroup);
-        mCurrentUser.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e != null) {
-                    ParseErrorHandler.handleParseError(mContext, e);
-
-                    mCurrentUser.removeGroup(mInvitedGroup);
-                    mCurrentUser.setCurrentGroup(mCurrentGroup);
-                    setLoading(false);
-                }
-
-                // register for notifications for the new group
-                ParsePush.subscribeInBackground(mInvitedGroup.getObjectId());
-
-                // remove user from invited list
-                mInvitedGroup.removeUserInvited(mCurrentUser.getUsername());
-                mInvitedGroup.saveEventually();
-
-                mNewQueryNeeded = true;
-                mCheckForInvitations = false;
-                updateCurrentUserGroups();
-            }
-        });
+        findInvitedGroupHelper(getFragmentManager()).joinInvitedGroup(mInvitedGroup);
     }
 
     private void showProgressDialog(String message) {
@@ -374,11 +336,47 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void discardInvitation() {
+    public void onUserJoinedGroup() {
+        removeInvitedGroupHelper();
+
+        // register for notifications for the new group
+        ParsePush.subscribeInBackground(mInvitedGroup.getObjectId());
+
+        // remove user from invited list
         mInvitedGroup.removeUserInvited(mCurrentUser.getUsername());
         mInvitedGroup.saveEventually();
 
-        MessageUtils.showBasicSnackbar(mFabAddPurchase, getString(R.string.toast_invitation_discarded));
+        mNewQueryNeeded = true;
+        mCheckForInvitations = false;
+        updateCurrentUserGroups();
+    }
+
+    @Override
+    public void onUserJoinGroupFailed(ParseException e) {
+        ParseErrorHandler.handleParseError(this, e);
+        MessageUtils.getBasicSnackbar(mToolbar, ParseErrorHandler.getErrorMessage(this, e));
+        removeInvitedGroupHelper();
+
+        setLoading(false);
+    }
+
+    private void removeInvitedGroupHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        InvitedGroupHelper invitedGroupHelper = findInvitedGroupHelper(fragmentManager);
+
+        if (invitedGroupHelper != null) {
+            fragmentManager.beginTransaction().remove(invitedGroupHelper).commitAllowingStateLoss();
+        }
+    }
+
+    @Override
+    public void discardInvitation() {
+        removeInvitedGroupHelper();
+
+        mInvitedGroup.removeUserInvited(mCurrentUser.getUsername());
+        mInvitedGroup.saveEventually();
+
+        MessageUtils.showBasicSnackbar(mToolbar, getString(R.string.toast_invitation_discarded));
     }
 
     @Override
@@ -396,7 +394,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     public void onlineQuery() {
         if (!Utils.isConnected(this)) {
             setLoading(false);
-            showErrorSnackbar(getString(R.string.toast_no_connection));
+            showOnlineQueryErrorSnackbar(getString(R.string.toast_no_connection));
             return;
         }
 
@@ -421,7 +419,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     @Override
     public void onPinFailed(ParseException e) {
         ParseErrorHandler.handleParseError(this, e);
-        showErrorSnackbar(ParseErrorHandler.getErrorMessage(this, e));
+        showOnlineQueryErrorSnackbar(ParseErrorHandler.getErrorMessage(this, e));
 
         setLoading(false);
         removeQueryHelper();
@@ -436,7 +434,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         }
     }
 
-    private void showErrorSnackbar(String errorMessage) {
+    private void showOnlineQueryErrorSnackbar(String errorMessage) {
         Snackbar snackbar = MessageUtils.getBasicSnackbar(mToolbar, errorMessage);
         snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
             @Override
