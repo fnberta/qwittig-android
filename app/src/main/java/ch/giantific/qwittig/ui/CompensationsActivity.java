@@ -32,6 +32,7 @@ import ch.giantific.qwittig.data.parse.models.Compensation;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.helper.CompensationQueryHelper;
 import ch.giantific.qwittig.helper.CompensationRemindHelper;
+import ch.giantific.qwittig.helper.CompensationSaveHelper;
 import ch.giantific.qwittig.helper.MoreQueryHelper;
 import ch.giantific.qwittig.helper.SettlementHelper;
 import ch.giantific.qwittig.ui.adapter.TabsAdapter;
@@ -54,7 +55,8 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
         CompensationQueryHelper.HelperInteractionListener,
         MoreQueryHelper.HelperInteractionListener,
         SettlementHelper.HelperInteractionListener,
-        CompensationRemindHelper.HelperInteractionListener {
+        CompensationRemindHelper.HelperInteractionListener,
+        CompensationSaveHelper.HelperInteractionListener {
 
     public static final String INTENT_AUTO_START_NEW = "intent_auto_start_new";
     private static final String COMPENSATIONS_UNPAID_FRAGMENT = "compensations_unpaid_fragment";
@@ -354,6 +356,16 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
     @Override
     public void onNewSettlementCreationFailed(ParseException e) {
         mCompensationsUnpaidFragment.onNewSettlementCreationFailed(e);
+    }
+
+    @Override
+    public void onCompensationSaved(ParseObject compensation) {
+        mCompensationsUnpaidFragment.onCompensationSaved(compensation);
+    }
+
+    @Override
+    public void onCompensationSaveFailed(ParseObject compensation, ParseException e) {
+        mCompensationsUnpaidFragment.onCompensationSaveFailed(compensation, e);
     }
 
     @Override

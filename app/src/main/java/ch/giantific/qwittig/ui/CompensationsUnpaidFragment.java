@@ -3,6 +3,7 @@ package ch.giantific.qwittig.ui;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,11 +29,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.CloudCode;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Compensation;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.helper.CompensationRemindHelper;
+import ch.giantific.qwittig.helper.CompensationSaveHelper;
 import ch.giantific.qwittig.helper.SettlementHelper;
 import ch.giantific.qwittig.ui.adapter.CompensationsUnpaidRecyclerAdapter;
 import ch.giantific.qwittig.utils.MessageUtils;
@@ -51,6 +52,7 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
     private static final String BUNDLE_AUTO_START_NEW = "auto_start_new";
     private static final String STATE_COMPENSATIONS_LOADING = "state_comps_loading";
     private static final String STATE_IS_CALCULATING_NEW = "state_is_calculating_new";
+    private static final String COMPENSATION_SAVE_HELPER = "compensation_save_helper";
     private static final String LOG_TAG = CompensationsUnpaidFragment.class.getSimpleName();
     private TextView mTextViewEmptyTitle;
     private TextView mTextViewEmptySubtitle;
@@ -333,9 +335,9 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
         return compensationLoading;
     }
 
-    private void setCompensationLoading(Compensation compensation, String objectId, int position,
+    private void setCompensationLoading(ParseObject compensation, String objectId, int position,
                                                 boolean isLoading) {
-        compensation.setIsLoading(isLoading);
+        ((Compensation) compensation).setIsLoading(isLoading);
         mRecyclerAdapter.notifyItemChanged(position);
 
         if (isLoading) {
@@ -370,27 +372,63 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
 
         setCompensationLoading(compensation, compensationId, position, true);
         compensation.setPaid(true);
-        compensation.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e != null) {
-                    ParseErrorHandler.handleParseError(getActivity(), e);
-                    MessageUtils.showBasicSnackbar(mFabNew,
-                            ParseErrorHandler.getErrorMessage(getActivity(), e));
+        saveCompensationWithHelper(compensation);
+    }
 
-                    // position might have changed
-                    int compPosition = mCompensations.indexOf(compensation);
-                    setCompensationLoading(compensation, compensationId, compPosition, false);
-                    compensation.setPaid(false);
-                    return;
-                }
+    private void saveCompensationWithHelper(ParseObject compensation) {
+        FragmentManager fragmentManager = getFragmentManager();
+        CompensationSaveHelper saveHelper = findCompensationSaveHelper(fragmentManager);
 
-                // position might have changed
-                int compPosition = mCompensations.indexOf(compensation);
-                removeItemFromList(compPosition);
-                mLoadingCompensations.remove(compensationId);
-            }
-        });
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (saveHelper == null) {
+            saveHelper = new CompensationSaveHelper(compensation);
+
+            fragmentManager.beginTransaction()
+                    .add(saveHelper, COMPENSATION_SAVE_HELPER)
+                    .commit();
+        }
+    }
+
+    private CompensationSaveHelper findCompensationSaveHelper(FragmentManager fragmentManager) {
+        return (CompensationSaveHelper) fragmentManager.findFragmentByTag(COMPENSATION_SAVE_HELPER);
+    }
+
+    /**
+     * Called from activity when helper successfully saved compensation
+     * @param compensation
+     */
+    public void onCompensationSaved(ParseObject compensation) {
+        removeCompensationSaveHelper();
+
+        // position might have changed
+        int compPosition = mCompensations.indexOf(compensation);
+        removeItemFromList(compPosition);
+        mLoadingCompensations.remove(compensation.getObjectId());
+    }
+
+    /**
+     * Called from activity when helper failed to save compensation
+     * @param compensation
+     * @param e
+     */
+    public void onCompensationSaveFailed(ParseObject compensation, ParseException e) {
+        ParseErrorHandler.handleParseError(getActivity(), e);
+        MessageUtils.showBasicSnackbar(mFabNew, ParseErrorHandler.getErrorMessage(getActivity(), e));
+        removeCompensationSaveHelper();
+
+        // position might have changed
+        int compPosition = mCompensations.indexOf(compensation);
+        setCompensationLoading(compensation, compensation.getObjectId(), compPosition, false);
+    }
+
+    private void removeCompensationSaveHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        CompensationSaveHelper compensationSaveHelper = findCompensationSaveHelper(fragmentManager);
+
+        if (compensationSaveHelper != null) {
+            fragmentManager.beginTransaction().remove(compensationSaveHelper).commitAllowingStateLoss();
+        }
     }
 
     private void removeItemFromList(int position) {
@@ -481,8 +519,7 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
                     nickname = beneficiary.getNickname();
                 }
                 MessageUtils.showBasicSnackbar(mRecyclerView,
-                        getString(R.string.toast_compensation_reminded_user_paid,
-                                nickname));
+                        getString(R.string.toast_compensation_reminded_user_paid, nickname));
                 break;
             }
         }
