@@ -3,9 +3,11 @@ package ch.giantific.qwittig.ui;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.FragmentManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -30,6 +32,8 @@ import ch.giantific.qwittig.data.parse.CloudCode;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Compensation;
 import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.helper.CompensationRemindHelper;
+import ch.giantific.qwittig.helper.SettlementHelper;
 import ch.giantific.qwittig.ui.adapter.CompensationsUnpaidRecyclerAdapter;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
@@ -42,7 +46,6 @@ import ch.giantific.qwittig.utils.Utils;
 public class CompensationsUnpaidFragment extends CompensationsBaseFragment implements
         CompensationsUnpaidRecyclerAdapter.AdapterInteractionListener,
         LocalQuery.CompensationLocalQueryListener,
-        CloudCode.CloudFunctionListener,
         FABProgressListener {
 
     private static final String BUNDLE_AUTO_START_NEW = "auto_start_new";
@@ -241,7 +244,7 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
         }
 
         if (!Utils.isConnected(getActivity())) {
-            MessageUtils.showBasicSnackbar(mFabNew, getString(R.string.toast_no_connection));
+            showSettlementErrorSnackbar(getString(R.string.toast_no_connection));
             return;
         }
 
@@ -249,71 +252,71 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
             if (mCompensationsAll.isEmpty()) {
                 mIsCalculatingNew = true;
                 mFabProgressCircle.show();
-                CloudCode.startNewSettlement(getActivity(), mCurrentGroup, false, this);
+                calculateNewSettlementWithHelper();
             } else {
                 MessageUtils.showBasicSnackbar(mRecyclerView,
                         getString(R.string.toast_compensation_finish_old));
             }
         }
     }
+    
+    private void calculateNewSettlementWithHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        SettlementHelper settlementHelper = findSettlementHelper(fragmentManager);
 
-    @Override
-    public void onCloudFunctionError(ParseException e) {
-        mFabProgressCircle.hide();
-        MessageUtils.showBasicSnackbar(mFabNew, ParseErrorHandler.getErrorMessage(getActivity(), e));
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (settlementHelper == null) {
+            settlementHelper = SettlementHelper.newInstance(false);
 
-        if (!mLoadingCompensations.isEmpty()) {
-            for (Iterator<String> iterator = mLoadingCompensations.iterator(); iterator.hasNext(); ) {
-                String loadingCompensationId = iterator.next();
-                for (int i = 0, compensationsSize = mCompensations.size(); i < compensationsSize; i++) {
-                    Compensation compensation = (Compensation) mCompensations.get(i);
-                    if (loadingCompensationId.equals(compensation.getObjectId())) {
-                        compensation.setIsLoading(false);
-                        mRecyclerAdapter.notifyItemChanged(i);
-                        iterator.remove();
-                        break;
-                    }
-                }
-            }
+            fragmentManager.beginTransaction()
+                    .add(settlementHelper, SettlementHelper.SETTLEMENT_HELPER)
+                    .commit();
         }
-
-        // TODO: find a way to disable only the specific compensation concerned
     }
 
-    @Override
-    public void onCloudFunctionReturned(String cloudFunction, Object o) {
-        switch (cloudFunction) {
-            case CloudCode.PUSH_COMPENSATION_REMIND: {
-                String compensationId = (String) o;
-                Compensation compensation = setCompensationLoading(compensationId, false);
+    private SettlementHelper findSettlementHelper(FragmentManager fragmentManager) {
+        return (SettlementHelper) fragmentManager.findFragmentByTag(SettlementHelper.SETTLEMENT_HELPER);
+    }
 
-                String nickname = "";
-                if (compensation != null) {
-                    User payer = compensation.getPayer();
-                    nickname = payer.getNickname();
-                }
-                MessageUtils.showBasicSnackbar(mRecyclerView,
-                        getString(R.string.toast_compensation_reminded_user, nickname));
-                break;
-            }
-            case CloudCode.PUSH_COMPENSATION_REMIND_PAID: {
-                String compensationId = (String) o;
-                Compensation compensation = setCompensationLoading(compensationId, false);
+    private void removeSettlementHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        SettlementHelper settlementHelper = findSettlementHelper(fragmentManager);
 
-                String nickname = "";
-                if (compensation != null) {
-                    User beneficiary = compensation.getBeneficiary();
-                    nickname = beneficiary.getNickname();
-                }
-                MessageUtils.showBasicSnackbar(mRecyclerView,
-                        getString(R.string.toast_compensation_reminded_user_paid,
-                                nickname));
-                break;
-            }
-            case CloudCode.SETTLEMENT_NEW:
-                // do nothing
-                break;
+        if (settlementHelper != null) {
+            fragmentManager.beginTransaction().remove(settlementHelper).commitAllowingStateLoss();
         }
+    }
+
+    /**
+     * Called from activity when helper created new settlement
+     * @param result object returned from CloudCode
+     */
+    public void onNewSettlementCreated(Object result) {
+        removeSettlementHelper();
+    }
+
+    /**
+     * Called from activity when helper failed to create a new settlement
+     * @param e
+     */
+    public void onNewSettlementCreationFailed(ParseException e) {
+        ParseErrorHandler.handleParseError(getActivity(), e);
+        showSettlementErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
+        removeSettlementHelper();
+
+        mFabProgressCircle.hide();
+    }
+
+    private void showSettlementErrorSnackbar(String errorMessage) {
+        Snackbar snackbar = MessageUtils.getBasicSnackbar(mRecyclerView, errorMessage);
+        snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                newSettlement();
+            }
+        });
+        snackbar.show();
     }
 
     private Compensation setCompensationLoading(String objectId, boolean isLoading) {
@@ -415,8 +418,101 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
         }
 
         setCompensationLoading(compensation, compensationId, position, true);
-        CloudCode.pushCompensationRemind(getActivity(), compensationId, mCurrentGroup.getCurrency(),
-                this);
+        remindUserWithHelper(CompensationRemindHelper.TYPE_REMIND, compensationId);
+    }
+
+    private void remindUserWithHelper(@CompensationRemindHelper.RemindType int remindType,
+                                      String compensationId) {
+        FragmentManager fragmentManager = getFragmentManager();
+        CompensationRemindHelper compensationRemindHelper = findCompensationRemindHelper(fragmentManager);
+
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (compensationRemindHelper == null) {
+            compensationRemindHelper = CompensationRemindHelper.newInstance(remindType, compensationId);
+
+            fragmentManager.beginTransaction()
+                    .add(compensationRemindHelper, CompensationRemindHelper.COMPENSATION_REMIND_HELPER)
+                    .commit();
+        }
+    }
+
+    private CompensationRemindHelper findCompensationRemindHelper(FragmentManager fragmentManager) {
+        return (CompensationRemindHelper) fragmentManager.findFragmentByTag(
+                CompensationRemindHelper.COMPENSATION_REMIND_HELPER);
+    }
+
+    private void removeCompensationRemindHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        CompensationRemindHelper compensationRemindHelper = findCompensationRemindHelper(fragmentManager);
+
+        if (compensationRemindHelper != null) {
+            fragmentManager.beginTransaction().remove(compensationRemindHelper).commitAllowingStateLoss();
+        }
+    }
+
+    /**
+     * Called from activity when helper successfully reminded user
+     * @param remindType remind to pay or remind that paid
+     * @param compensationId
+     */
+    public void onUserReminded(int remindType, String compensationId) {
+        removeCompensationRemindHelper();
+
+        switch (remindType) {
+            case CompensationRemindHelper.TYPE_REMIND: {
+                Compensation compensation = setCompensationLoading(compensationId, false);
+
+                String nickname = "";
+                if (compensation != null) {
+                    User payer = compensation.getPayer();
+                    nickname = payer.getNickname();
+                }
+                MessageUtils.showBasicSnackbar(mRecyclerView,
+                        getString(R.string.toast_compensation_reminded_user, nickname));
+                break;
+            }
+            case CompensationRemindHelper.TYPE_REMIND_PAID: {
+                Compensation compensation = setCompensationLoading(compensationId, false);
+
+                String nickname = "";
+                if (compensation != null) {
+                    User beneficiary = compensation.getBeneficiary();
+                    nickname = beneficiary.getNickname();
+                }
+                MessageUtils.showBasicSnackbar(mRecyclerView,
+                        getString(R.string.toast_compensation_reminded_user_paid,
+                                nickname));
+                break;
+            }
+        }
+    }
+
+    /**
+     * Called from activity when helper failed to remind user
+     * @param remindType remind to pay or remind that paid
+     * @param e
+     */
+    public void onFailedToRemindUser(int remindType, ParseException e) {
+        ParseErrorHandler.handleParseError(getActivity(), e);
+        MessageUtils.showBasicSnackbar(mRecyclerView, ParseErrorHandler.getErrorMessage(getActivity(), e));
+        removeCompensationRemindHelper();
+
+        if (!mLoadingCompensations.isEmpty()) {
+            for (Iterator<String> iterator = mLoadingCompensations.iterator(); iterator.hasNext(); ) {
+                String loadingCompensationId = iterator.next();
+                for (int i = 0, compensationsSize = mCompensations.size(); i < compensationsSize; i++) {
+                    Compensation compensation = (Compensation) mCompensations.get(i);
+                    if (loadingCompensationId.equals(compensation.getObjectId())) {
+                        compensation.setIsLoading(false);
+                        mRecyclerAdapter.notifyItemChanged(i);
+                        iterator.remove();
+                        break;
+                    }
+                }
+            }
+        }
+        // TODO: find a way to disable only the specific compensation concerned
     }
 
     @Override
@@ -438,8 +534,7 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
         }
 
         setCompensationLoading(compensation, compensationId, position, true);
-        CloudCode.pushCompensationRemindPaid(getActivity(), compensationId,
-                mCurrentGroup.getCurrency(), this);
+        remindUserWithHelper(CompensationRemindHelper.TYPE_REMIND_PAID, compensationId);
     }
 
     @Override

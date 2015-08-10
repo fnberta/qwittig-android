@@ -1,5 +1,6 @@
 package ch.giantific.qwittig.ui;
 
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
@@ -11,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
@@ -26,9 +28,12 @@ import java.util.List;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.ItemUserPicker;
 import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.data.parse.OnlineQuery;
 import ch.giantific.qwittig.data.parse.models.Compensation;
 import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.helper.CompensationQueryHelper;
+import ch.giantific.qwittig.helper.CompensationRemindHelper;
+import ch.giantific.qwittig.helper.MoreQueryHelper;
+import ch.giantific.qwittig.helper.SettlementHelper;
 import ch.giantific.qwittig.ui.adapter.TabsAdapter;
 import ch.giantific.qwittig.ui.dialogs.AccountCreateDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.CompensationAddManualDialogFragment;
@@ -36,15 +41,20 @@ import ch.giantific.qwittig.ui.dialogs.CompensationChangeAmountDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
+import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
+import ch.giantific.qwittig.utils.Utils;
 
 public class CompensationsActivity extends BaseNavDrawerActivity implements
         CompensationsUnpaidFragment.FragmentInteractionListener,
-        OnlineQuery.CompensationPinListener,
         LocalQuery.UserLocalQueryListener,
         CompensationAddManualDialogFragment.DialogInteractionListener,
         GroupCreateDialogFragment.DialogInteractionListener,
-        CompensationChangeAmountDialogFragment.FragmentInteractionListener {
+        CompensationChangeAmountDialogFragment.FragmentInteractionListener,
+        CompensationQueryHelper.HelperInteractionListener,
+        MoreQueryHelper.HelperInteractionListener,
+        SettlementHelper.HelperInteractionListener,
+        CompensationRemindHelper.HelperInteractionListener {
 
     public static final String INTENT_AUTO_START_NEW = "intent_auto_start_new";
     private static final String COMPENSATIONS_UNPAID_FRAGMENT = "compensations_unpaid_fragment";
@@ -229,13 +239,40 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
 
     @Override
     public void onlineQuery() {
-        OnlineQuery.queryCompensations(this, this);
+        if (!Utils.isConnected(this)) {
+            setLoading(false);
+            showErrorSnackbar(getString(R.string.toast_no_connection));
+            return;
+        }
+
+        FragmentManager fragmentManager = getFragmentManager();
+        CompensationQueryHelper compensationQueryHelper = findQueryHelper(fragmentManager);
+
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (compensationQueryHelper == null) {
+            compensationQueryHelper = new CompensationQueryHelper();
+
+            fragmentManager.beginTransaction()
+                    .add(compensationQueryHelper, CompensationQueryHelper.COMPENSATION_QUERY_HELPER)
+                    .commit();
+        }
+    }
+
+    private CompensationQueryHelper findQueryHelper(FragmentManager fragmentManager) {
+        return (CompensationQueryHelper) fragmentManager.findFragmentByTag(CompensationQueryHelper.COMPENSATION_QUERY_HELPER);
     }
 
     @Override
-    public void onCompensationsPinFailed(String errorMessage) {
-        setLoading(false);
+    public void onCompensationsPinFailed(ParseException e) {
+        ParseErrorHandler.handleParseError(this, e);
+        showErrorSnackbar(ParseErrorHandler.getErrorMessage(this, e));
+        removeQueryHelper();
 
+        setLoading(false);
+    }
+
+    private void showErrorSnackbar(String errorMessage) {
         Snackbar snackbar = MessageUtils.getBasicSnackbar(mToolbar, errorMessage);
         snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
             @Override
@@ -250,10 +287,23 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
     @Override
     public void onCompensationsPinned(boolean isPaid) {
         super.onCompensationsPinned(isPaid);
+
+        removeQueryHelper();
+        setLoading(false);
+
         if (isPaid) {
             updateFragmentAdapter(FRAGMENT_ADAPTER_PAID);
         } else {
             updateFragmentAdapter(FRAGMENT_ADAPTER_UNPAID);
+        }
+    }
+
+    private void removeQueryHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        CompensationQueryHelper compensationQueryHelper = findQueryHelper(fragmentManager);
+
+        if (compensationQueryHelper != null) {
+            fragmentManager.beginTransaction().remove(compensationQueryHelper).commitAllowingStateLoss();
         }
     }
 
@@ -272,10 +322,7 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
         }
     }
 
-    @Override
-    public void setLoading(boolean isLoading) {
-        super.setLoading(isLoading);
-
+    private void setLoading(boolean isLoading) {
         mCompensationsUnpaidFragment.setLoading(isLoading);
         mCompensationsPaidFragment.setLoading(isLoading);
     }
@@ -297,6 +344,36 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
     @Override
     public void changeAmount(BigFraction amount) {
         mCompensationsUnpaidFragment.changeAmount(amount);
+    }
+
+    @Override
+    public void onNewSettlementCreated(Object result) {
+        mCompensationsUnpaidFragment.onNewSettlementCreated(result);
+    }
+
+    @Override
+    public void onNewSettlementCreationFailed(ParseException e) {
+        mCompensationsUnpaidFragment.onNewSettlementCreationFailed(e);
+    }
+
+    @Override
+    public void onUserReminded(int remindType, String compensationId) {
+        mCompensationsUnpaidFragment.onUserReminded(remindType, compensationId);
+    }
+
+    @Override
+    public void onFailedToRemindUser(int remindType, ParseException e) {
+        mCompensationsUnpaidFragment.onFailedToRemindUser(remindType, e);
+    }
+
+    @Override
+    public void onMoreObjectsPinned(List<ParseObject> objects) {
+        mCompensationsPaidFragment.onMoreObjectsPinned(objects);
+    }
+
+    @Override
+    public void onMoreObjectsPinFailed(ParseException e) {
+        mCompensationsPaidFragment.onMoreObjectsPinFailed(e);
     }
 
     @Override

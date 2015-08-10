@@ -34,18 +34,15 @@ public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<Recyc
     private int mViewResource;
     private Context mContext;
     private List<ParseObject> mCompensations;
-    private List<ParseUser> mUsers;
     private String mCurrentGroupCurrency;
 
     public CompensationsPaidRecyclerAdapter(Context context, int viewResource,
-                                            List<ParseObject> compensations,
-                                            List<ParseUser> users) {
+                                            List<ParseObject> compensations) {
         super();
 
         mContext = context;
         mViewResource = viewResource;
         mCompensations = compensations;
-        mUsers = users;
     }
 
     @Override
@@ -85,20 +82,14 @@ public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<Recyc
                 if (beneficiary.getObjectId().equals(currentUser.getObjectId())) {
                     // positive
                     User payer = compensation.getPayer();
-                    if (userIsInCurrentGroup(payer)) {
-                        nickname = payer.getNickname();
-                    } else {
-                        nickname = mContext.getString(R.string.user_deleted);
-                    }
+                    nickname = payer.getGroupIds().contains(currentUser.getCurrentGroup().getObjectId()) ?
+                            payer.getNickname() : mContext.getString(R.string.user_deleted);
                     color = R.color.green;
                     amountString = MoneyUtils.formatMoney(amount, mCurrentGroupCurrency);
                 } else {
                     // negative
-                    if (userIsInCurrentGroup(beneficiary)) {
-                        nickname = beneficiary.getNickname();
-                    } else {
-                        nickname = mContext.getString(R.string.user_deleted);
-                    }
+                    nickname = beneficiary.getGroupIds().contains(currentUser.getCurrentGroup().getObjectId()) ?
+                            beneficiary.getNickname() : mContext.getString(R.string.user_deleted);
                     color = R.color.red;
                     amountString = MoneyUtils.formatMoney(amount.negate(), mCurrentGroupCurrency);
                 }
@@ -113,10 +104,6 @@ public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<Recyc
                 // do nothing
                 break;
         }
-    }
-
-    private boolean userIsInCurrentGroup(ParseUser user) {
-        return mUsers.contains(user);
     }
 
     @Override

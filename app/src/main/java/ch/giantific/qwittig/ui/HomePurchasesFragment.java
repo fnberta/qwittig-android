@@ -1,5 +1,6 @@
 package ch.giantific.qwittig.ui;
 
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -9,8 +10,8 @@ import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 
+import com.parse.ParseException;
 import com.parse.ParseObject;
-import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,27 +19,45 @@ import java.util.List;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.constants.AppConstants;
 import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.data.parse.OnlineQuery;
 import ch.giantific.qwittig.data.parse.models.Purchase;
+import ch.giantific.qwittig.helper.MoreQueryHelper;
 import ch.giantific.qwittig.ui.adapter.PurchasesRecyclerAdapter;
 import ch.giantific.qwittig.ui.widgets.InfiniteScrollListener;
 import ch.giantific.qwittig.utils.MessageUtils;
+import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 public class HomePurchasesFragment extends HomeBaseFragment implements
         PurchasesRecyclerAdapter.AdapterInteractionListener,
-        OnlineQuery.PurchaseQueryListener,
         LocalQuery.PurchaseLocalQueryListener {
 
     public static final String INTENT_PURCHASE_ID = "purchase_id";
     public static final String INTENT_THEME = "intent_theme";
+    private static final String STATE_IS_LOADING_MORE = "state_is_loading_more";
     private static final String LOG_TAG =  HomePurchasesFragment.class.getSimpleName();
     private PurchasesRecyclerAdapter mRecyclerAdapter;
     private InfiniteScrollListener mScrollListener;
     private List<ParseObject> mPurchases = new ArrayList<>();
+    private boolean mIsLoadingMore;
 
     public HomePurchasesFragment() {
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            mIsLoadingMore = savedInstanceState.getBoolean(STATE_IS_LOADING_MORE, false);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        
+        outState.putBoolean(STATE_IS_LOADING_MORE, mIsLoadingMore);
     }
 
     @Override
@@ -102,7 +121,11 @@ public class HomePurchasesFragment extends HomeBaseFragment implements
         mRecyclerAdapter.notifyDataSetChanged();
         toggleMainVisibility();
 
-        mScrollListener.resetPreviousTotal();
+        if (mIsLoadingMore) {
+            int purchasesSize = mPurchases.size();
+            addLoadMoreProgressBar(purchasesSize);
+            mRecyclerView.scrollToPosition(purchasesSize);
+        }
     }
 
     @Override
@@ -121,35 +144,79 @@ public class HomePurchasesFragment extends HomeBaseFragment implements
     }
 
     private void loadMoreData() {
-        int purchasesSize = mPurchases.size();
+        if (mSwipeRefreshLayout.isRefreshing()) {
+            return;
+        }
 
-        if (mPurchases.get(purchasesSize - 1) != null) {
-            mPurchases.add(null);
-            mRecyclerAdapter.notifyItemInserted(purchasesSize); // purchasesSize points to last item now
+        if (!Utils.isConnected(getActivity())) {
+            showErrorSnackbar(getString(R.string.toast_no_connection));
+            return;
+        }
 
-            if (Utils.isConnected(getActivity())) {
-                OnlineQuery.queryPurchasesMore(getActivity(), this, purchasesSize);
-            } else {
-                onPurchasesQueryFailed(getString(R.string.toast_no_connection));
-            }
+        if (!mIsLoadingMore) {
+            mIsLoadingMore = true;
+
+            int purchasesSize = mPurchases.size();
+            addLoadMoreProgressBar(purchasesSize);
+            loadMoreDataWithHelper(purchasesSize);
         }
     }
 
-    @Override
-    public void onPurchasesQueried(List<ParseObject> purchases) {
+    private void addLoadMoreProgressBar(int progressBarPosition) {
+        mPurchases.add(null);
+        mRecyclerAdapter.notifyItemInserted(progressBarPosition);
+    }
+    
+    private void loadMoreDataWithHelper(int skip) {
+        FragmentManager fragmentManager = getFragmentManager();
+        MoreQueryHelper moreQueryHelper = findMoreQueryHelper(fragmentManager);
+
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (moreQueryHelper == null) {
+            moreQueryHelper = MoreQueryHelper.newInstance(Purchase.CLASS, skip);
+
+            fragmentManager.beginTransaction()
+                    .add(moreQueryHelper, MoreQueryHelper.MORE_QUERY_HELPER)
+                    .commit();
+        }
+    }
+
+    private MoreQueryHelper findMoreQueryHelper(FragmentManager fragmentManager) {
+        return (MoreQueryHelper) fragmentManager.findFragmentByTag(MoreQueryHelper.MORE_QUERY_HELPER);
+    }
+
+    private void removeMoreQueryHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        MoreQueryHelper moreQueryHelper = findMoreQueryHelper(fragmentManager);
+
+        if (moreQueryHelper != null) {
+            fragmentManager.beginTransaction().remove(moreQueryHelper).commitAllowingStateLoss();
+        }
+    }
+
+    public void onMoreObjectsPinned(List<ParseObject> objects) {
+        removeMoreQueryHelper();
+        mIsLoadingMore = false;
+
         int progressBarPosition = mPurchases.size() - 1;
         mPurchases.remove(progressBarPosition);
         mRecyclerAdapter.notifyItemRemoved(progressBarPosition);
 
-        for (ParseObject purchase : purchases) {
+        for (ParseObject purchase : objects) {
             mPurchases.add(purchase);
         }
 
-        mRecyclerAdapter.notifyItemRangeInserted(progressBarPosition, purchases.size());
+        mRecyclerAdapter.notifyItemRangeInserted(progressBarPosition, objects.size());
     }
 
-    @Override
-    public void onPurchasesQueryFailed(String errorMessage) {
+    public void onMoreObjectsPinFailed(ParseException e) {
+        ParseErrorHandler.handleParseError(getActivity(), e);
+        showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
+        removeMoreQueryHelper();
+
+        mIsLoadingMore = false;
+
         if (!mPurchases.isEmpty()) {
             int progressBarPosition = mPurchases.size() - 1;
             if (mPurchases.get(progressBarPosition) == null) {
@@ -169,7 +236,9 @@ public class HomePurchasesFragment extends HomeBaseFragment implements
                 }, 200);
             }
         }
+    }
 
+    private void showErrorSnackbar(String errorMessage) {
         Snackbar snackbar = MessageUtils.getBasicSnackbar(mRecyclerView, errorMessage);
         snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
             @Override

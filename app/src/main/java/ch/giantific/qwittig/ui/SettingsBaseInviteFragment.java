@@ -3,34 +3,26 @@ package ch.giantific.qwittig.ui;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.design.widget.TextInputLayout;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
-
-import com.parse.ParseException;
-import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.CloudCode;
-import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.ui.widgets.SwipeDismissTouchListener;
 import ch.giantific.qwittig.utils.MessageUtils;
-import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
  * Created by fabio on 09.06.15.
  */
-public abstract class SettingsBaseInviteFragment extends BaseFragment implements
-        CloudCode.CloudFunctionListener {
+public abstract class SettingsBaseInviteFragment extends BaseFragment {
 
     private static final String STATE_ROW_COUNT = "state_row_count";
     List<TextInputLayout> mUsersToInviteFields = new ArrayList<>();
-    List<String> mUsersToInviteEmails = new ArrayList<>();
+    ArrayList<String> mUsersToInviteEmails = new ArrayList<>();
     private int mInvitedUsersRowCount;
     private LinearLayout mLinearLayoutUsers;
     private Button mButtonAddUser;
@@ -133,10 +125,6 @@ public abstract class SettingsBaseInviteFragment extends BaseFragment implements
         return allEmailsAreValid;
     }
 
-    final void inviteUsers(Group group) {
-        CloudCode.inviteUsers(getActivity(), mUsersToInviteEmails, group.getName(), this);
-    }
-
     @CallSuper
     void onParseError(String errorMessage) {
         hideProgressCircle();
@@ -144,10 +132,4 @@ public abstract class SettingsBaseInviteFragment extends BaseFragment implements
     }
 
     protected abstract void hideProgressCircle();
-
-    @Override
-    @CallSuper
-    public void onCloudFunctionError(ParseException e) {
-        onParseError(ParseErrorHandler.getErrorMessage(getActivity(), e));
-    }
 }

@@ -257,7 +257,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     }
 
     private void getReceiptFile() {
-        Glide.with(getBaseContext()).load(mReceiptPhotoFile)
+        Glide.with(this).load(mReceiptPhotoFile)
                 .asBitmap()
                 .toBytes(Bitmap.CompressFormat.JPEG, Receipt.JPEG_COMPRESSION_RATE)
                 .centerCrop()

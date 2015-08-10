@@ -1,26 +1,30 @@
 package ch.giantific.qwittig.ui;
 
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.parse.ParseException;
 import com.parse.ParseObject;
-import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.data.parse.OnlineQuery;
+import ch.giantific.qwittig.data.parse.models.Compensation;
+import ch.giantific.qwittig.helper.MoreQueryHelper;
 import ch.giantific.qwittig.ui.adapter.CompensationsPaidRecyclerAdapter;
 import ch.giantific.qwittig.ui.widgets.InfiniteScrollListener;
 import ch.giantific.qwittig.utils.MessageUtils;
+import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -28,18 +32,33 @@ import ch.giantific.qwittig.utils.Utils;
  * A simple {@link Fragment} subclass.
  */
 public class CompensationsPaidFragment extends CompensationsBaseFragment implements
-        LocalQuery.UserLocalQueryListener,
-        LocalQuery.CompensationLocalQueryListener,
-        OnlineQuery.CompensationQueryListener {
+        LocalQuery.CompensationLocalQueryListener {
 
+    private static final String STATE_IS_LOADING_MORE = "state_is_loading_more";
     private static final String LOG_TAG = CompensationsPaidFragment.class.getSimpleName();
     private InfiniteScrollListener mScrollListener;
     private CompensationsPaidRecyclerAdapter mRecyclerAdapter;
     private List<ParseObject> mCompensations = new ArrayList<>();
-    private List<ParseUser> mUsers = new ArrayList<>();
+    private boolean mIsLoadingMore;
 
     public CompensationsPaidFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            mIsLoadingMore = savedInstanceState.getBoolean(STATE_IS_LOADING_MORE, false);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putBoolean(STATE_IS_LOADING_MORE, mIsLoadingMore);
     }
 
     @Override
@@ -59,7 +78,7 @@ public class CompensationsPaidFragment extends CompensationsBaseFragment impleme
         super.onViewCreated(view, savedInstanceState);
 
         mRecyclerAdapter = new CompensationsPaidRecyclerAdapter(getActivity(),
-                R.layout.row_compensations_history, mCompensations, mUsers);
+                R.layout.row_compensations_history, mCompensations);
         mRecyclerView.setAdapter(mRecyclerAdapter);
         mScrollListener = new InfiniteScrollListener(mLayoutManager, mRecyclerView) {
             @Override
@@ -73,20 +92,6 @@ public class CompensationsPaidFragment extends CompensationsBaseFragment impleme
     @Override
     public void updateAdapter() {
         super.updateAdapter();
-
-        LocalQuery.queryUsers(this);
-    }
-
-    @Override
-    public void onUsersLocalQueried(List<ParseUser> users) {
-        mUsers.clear();
-        if (!users.isEmpty()) {
-            for (ParseUser user : users) {
-                if (!user.getObjectId().equals(mCurrentUser.getObjectId())) {
-                    mUsers.add(user);
-                }
-            }
-        }
 
         LocalQuery.queryCompensationsPaid(this);
     }
@@ -106,6 +111,12 @@ public class CompensationsPaidFragment extends CompensationsBaseFragment impleme
         mRecyclerAdapter.setCurrentGroupCurrency(ParseUtils.getGroupCurrency());
         mRecyclerAdapter.notifyDataSetChanged();
         toggleEmptyViewVisibility();
+
+        if (mIsLoadingMore) {
+            int compensationsSize = mCompensations.size();
+            addLoadMoreProgressBar(compensationsSize);
+            mRecyclerView.scrollToPosition(compensationsSize);
+        }
     }
 
     @Override
@@ -118,33 +129,79 @@ public class CompensationsPaidFragment extends CompensationsBaseFragment impleme
     }
 
     private void loadMoreData() {
-        int itemsToSkip = mCompensations.size();
+        if (mSwipeRefreshLayout.isRefreshing()) {
+            return;
+        }
 
-        mCompensations.add(null);
-        mRecyclerAdapter.notifyItemInserted(mCompensations.size() - 1);
+        if (!Utils.isConnected(getActivity())) {
+            showErrorSnackbar(getString(R.string.toast_no_connection));
+            return;
+        }
 
-        if (Utils.isConnected(getActivity())) {
-            OnlineQuery.queryCompensationsPaidMore(getActivity(), this, itemsToSkip);
-        } else {
-            onCompensationsQueryFailed(getString(R.string.toast_no_connection));
+        if (!mIsLoadingMore) {
+            mIsLoadingMore = true;
+
+            int compensationsSize = mCompensations.size();
+            addLoadMoreProgressBar(compensationsSize);
+            loadMoreDataWithHelper(compensationsSize);
         }
     }
 
-    @Override
-    public void onCompensationsQueried(List<ParseObject> compensations) {
+    private void addLoadMoreProgressBar(int progressBarPosition) {
+        mCompensations.add(null);
+        mRecyclerAdapter.notifyItemInserted(progressBarPosition);
+    }
+
+    private void loadMoreDataWithHelper(int skip) {
+        FragmentManager fragmentManager = getFragmentManager();
+        MoreQueryHelper moreQueryHelper = findMoreQueryHelper(fragmentManager);
+
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (moreQueryHelper == null) {
+            moreQueryHelper = MoreQueryHelper.newInstance(Compensation.CLASS, skip);
+
+            fragmentManager.beginTransaction()
+                    .add(moreQueryHelper, MoreQueryHelper.MORE_QUERY_HELPER)
+                    .commit();
+        }
+    }
+
+    private MoreQueryHelper findMoreQueryHelper(FragmentManager fragmentManager) {
+        return (MoreQueryHelper) fragmentManager.findFragmentByTag(MoreQueryHelper.MORE_QUERY_HELPER);
+    }
+
+    private void removeMoreQueryHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        MoreQueryHelper moreQueryHelper = findMoreQueryHelper(fragmentManager);
+
+        if (moreQueryHelper != null) {
+            fragmentManager.beginTransaction().remove(moreQueryHelper).commitAllowingStateLoss();
+        }
+    }
+
+    public void onMoreObjectsPinned(List<ParseObject> objects) {
+        removeMoreQueryHelper();
+        mIsLoadingMore = false;
+
         int progressBarPosition = mCompensations.size() - 1;
         mCompensations.remove(progressBarPosition);
         mRecyclerAdapter.notifyItemRemoved(progressBarPosition);
 
-        for (ParseObject compensation : compensations) {
+        for (ParseObject compensation : objects) {
             mCompensations.add(compensation);
         }
 
-        mRecyclerAdapter.notifyItemRangeInserted(progressBarPosition, compensations.size());
+        mRecyclerAdapter.notifyItemRangeInserted(progressBarPosition, objects.size());
     }
 
-    @Override
-    public void onCompensationsQueryFailed(String errorMessage) {
+    public void onMoreObjectsPinFailed(ParseException e) {
+        ParseErrorHandler.handleParseError(getActivity(), e);
+        showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
+        removeMoreQueryHelper();
+
+        mIsLoadingMore = false;
+
         if (!mCompensations.isEmpty()) {
             int progressBarPosition = mCompensations.size() - 1;
             if (mCompensations.get(progressBarPosition) == null) {
@@ -164,7 +221,16 @@ public class CompensationsPaidFragment extends CompensationsBaseFragment impleme
                 }, 200);
             }
         }
+    }
 
-        MessageUtils.showBasicSnackbar(mRecyclerView, errorMessage);
+    private void showErrorSnackbar(String errorMessage) {
+        Snackbar snackbar = MessageUtils.getBasicSnackbar(mRecyclerView, errorMessage);
+        snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadMoreData();
+            }
+        });
+        snackbar.show();
     }
 }

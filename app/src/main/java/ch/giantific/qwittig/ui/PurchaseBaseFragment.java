@@ -893,7 +893,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         RatesHelper ratesHelper = findRatesHelper(fragmentManager);
 
         if (ratesHelper != null) {
-            fragmentManager.beginTransaction().remove(ratesHelper).commit();
+            fragmentManager.beginTransaction().remove(ratesHelper).commitAllowingStateLoss();
         }
     }
 
@@ -934,10 +934,11 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
 
     @CallSuper
     void onParseError(ParseException e) {
-        mIsSaving = false;
-        mListener.progressCircleHide();
         ParseErrorHandler.handleParseError(getActivity(), e);
         showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
+
+        mIsSaving = false;
+        mListener.progressCircleHide();
     }
 
     void showErrorSnackbar(String message) {

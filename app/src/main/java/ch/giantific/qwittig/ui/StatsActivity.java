@@ -4,13 +4,20 @@ import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
+
+import com.parse.ParseException;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.stats.models.Stats;
+import ch.giantific.qwittig.helper.StatsHelper;
 import ch.giantific.qwittig.ui.adapter.TabsAdapter;
 
 public class StatsActivity extends BaseNavDrawerActivity implements
-        StatsBaseFragment.FragmentInteractionListener {
+        StatsBaseFragment.FragmentInteractionListener,
+        StatsHelper.HelperInteractionListener {
 
+    private static final String LOG_TAG = StatsActivity.class.getSimpleName();
     private static final String STATS_COSTS_FRAGMENT = "stats_costs_fragment";
     private static final String STATS_STORES_FRAGMENT = "stats_stores_fragment";
     private static final String STATS_CURRENCIES_FRAGMENT = "stats_currencies_fragment";
@@ -68,6 +75,36 @@ public class StatsActivity extends BaseNavDrawerActivity implements
         addViewPagerFragments();
 
         super.afterLoginSetup();
+    }
+
+    @Override
+    public void onStatsCalculated(int statsType, Stats stats) {
+        switch (statsType) {
+            case StatsHelper.TYPE_SPENDING:
+                mStatsSpendingFragment.onStatsCalculated(stats);
+                break;
+            case StatsHelper.TYPE_STORES:
+                mStatsStoresFragment.onStatsCalculated(stats);
+                break;
+            case StatsHelper.TYPE_CURRENCIES:
+                mStatsCurrenciesFragment.onStatsCalculated(stats);
+                break;
+        }
+    }
+
+    @Override
+    public void onFailedToCalculateStats(int statsType, ParseException e) {
+        switch (statsType) {
+            case StatsHelper.TYPE_SPENDING:
+                mStatsSpendingFragment.onFailedToCalculateStats(e);
+                break;
+            case StatsHelper.TYPE_STORES:
+                mStatsStoresFragment.onFailedToCalculateStats(e);
+                break;
+            case StatsHelper.TYPE_CURRENCIES:
+                mStatsCurrenciesFragment.onFailedToCalculateStats(e);
+                break;
+        }
     }
 
     @Override

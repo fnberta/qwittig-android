@@ -3,7 +3,6 @@ package ch.giantific.qwittig.ui;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,29 +12,21 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.CloudCode;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.User;
-import ch.giantific.qwittig.utils.MessageUtils;
-import ch.giantific.qwittig.utils.ParseErrorHandler;
-import ch.giantific.qwittig.utils.Utils;
 
 /**
  * Created by fabio on 02.11.14.
  */
 public abstract class HomeBaseFragment extends BaseFragment implements
-        CloudCode.CloudFunctionListener,
         LocalQuery.ObjectLocalFetchListener {
 
+    private static final String STATE_IS_LOADING = "state_is_loading";
     User mCurrentUser;
     Group mCurrentGroup;
     FragmentInteractionListener mListener;
@@ -86,11 +77,28 @@ public abstract class HomeBaseFragment extends BaseFragment implements
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                calcBalancesAndRefresh();
+                mListener.onlineQuery();
             }
         });
 
         setEmptyViewDrawableAndText();
+
+        if (savedInstanceState != null) {
+            final boolean isLoading = savedInstanceState.getBoolean(STATE_IS_LOADING, false);
+            mSwipeRefreshLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    mSwipeRefreshLayout.setRefreshing(isLoading);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putBoolean(STATE_IS_LOADING, mSwipeRefreshLayout.isRefreshing());
     }
 
     protected abstract void setEmptyViewDrawableAndText();
@@ -98,57 +106,6 @@ public abstract class HomeBaseFragment extends BaseFragment implements
     public void setLoading(boolean isLoading) {
         if (mSwipeRefreshLayout != null) {
             mSwipeRefreshLayout.setRefreshing(isLoading);
-        }
-    }
-
-    /**
-     * Calls CloudFunction to calculate balances for users in currentGroup
-     */
-    private void calcBalancesAndRefresh() {
-        if (!Utils.isConnected(getActivity())) {
-            disableLoadingAndShowError(getString(R.string.toast_no_connection));
-            return;
-        }
-
-        User currentUser = (User) ParseUser.getCurrentUser();
-        Group currentGroup = null;
-        if (currentUser != null) {
-            currentGroup = currentUser.getCurrentGroup();
-        }
-        if (currentGroup != null) {
-            CloudCode.calculateBalance(getActivity(), this);
-        } else {
-            mListener.fullOnlineQuery();
-        }
-    }
-
-    @Override
-    public void onCloudFunctionError(ParseException e) {
-        disableLoadingAndShowError(ParseErrorHandler.getErrorMessage(getActivity(), e));
-    }
-
-    private void disableLoadingAndShowError(String errorMessage) {
-        setLoading(false);
-
-        Snackbar snackbar = MessageUtils.getBasicSnackbar(mRecyclerView, errorMessage);
-        snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setLoading(true);
-                calcBalancesAndRefresh();
-            }
-        });
-        snackbar.show();
-    }
-
-    @Override
-    public void onCloudFunctionReturned(String cloudFunction, Object o) {
-        switch (cloudFunction) {
-            case CloudCode.CALCULATE_BALANCE:
-                if (mListener != null) {
-                    mListener.fullOnlineQuery();
-                }
-                break;
         }
     }
 
@@ -208,6 +165,6 @@ public abstract class HomeBaseFragment extends BaseFragment implements
     }
 
     public interface FragmentInteractionListener {
-        void fullOnlineQuery();
+        void onlineQuery();
     }
 }

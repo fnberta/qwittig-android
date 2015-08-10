@@ -299,7 +299,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     private void deleteOldReceiptFile() {
         String fileName = mReceiptFileOld.getName();
         if (!TextUtils.isEmpty(fileName)) {
-            CloudCode.deleteParseFile(getActivity(), fileName, this);
+            CloudCode.deleteParseFile(fileName, this);
         }
     }
 

@@ -1,7 +1,6 @@
 package ch.giantific.qwittig.helper;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
 import android.text.TextUtils;
 
@@ -16,7 +15,7 @@ import ch.giantific.qwittig.data.parse.models.User;
 /**
  * Created by fabio on 10.12.14.
  */
-public class LoginHelper extends Fragment {
+public class LoginHelper extends BaseHelper {
 
     private static final String BUNDLE_USERNAME = "username";
     private static final String BUNDLE_PASSWORD = "password";
@@ -73,9 +72,6 @@ public class LoginHelper extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Retain this fragment across configuration changes.
-        setRetainInstance(true);
-
         String username = "";
         String password = "";
         String nickname = "";
@@ -86,7 +82,7 @@ public class LoginHelper extends Fragment {
             nickname = args.getString(BUNDLE_NICKNAME);
             mAvatar = args.getByteArray(BUNDLE_AVATAR);
         }
-        
+
         if (TextUtils.isEmpty(password)) {
             resetPassword(username);
         } else if (TextUtils.isEmpty(nickname)) {
@@ -95,7 +91,7 @@ public class LoginHelper extends Fragment {
             createAccount(username, password, nickname);
         }
     }
-    
+
     private void resetPassword(String email) {
         ParseUser.requestPasswordResetInBackground(email, new RequestPasswordResetCallback() {
             @Override
@@ -106,7 +102,7 @@ public class LoginHelper extends Fragment {
                     }
                     return;
                 }
-                
+
                 if (mListener != null) {
                     mListener.onPasswordReset();
                 }
@@ -167,7 +163,9 @@ public class LoginHelper extends Fragment {
 
     public interface HelperInteractionListener {
         void onParseError(ParseException e);
+
         void onLoginSucceeded(ParseUser parseUser);
+
         void onPasswordReset();
     }
 }

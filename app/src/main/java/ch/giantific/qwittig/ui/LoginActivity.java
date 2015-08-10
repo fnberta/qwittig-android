@@ -188,7 +188,7 @@ public class LoginActivity extends AppCompatActivity implements
         LoginHelper loginHelper = findLoginHelper(fragmentManager);
 
         if (loginHelper != null) {
-            fragmentManager.beginTransaction().remove(loginHelper).commit();
+            fragmentManager.beginTransaction().remove(loginHelper).commitAllowingStateLoss();
         }
     }
 

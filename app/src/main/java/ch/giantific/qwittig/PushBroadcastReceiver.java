@@ -27,11 +27,11 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
 
-import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.data.parse.OnlineQuery;
 import ch.giantific.qwittig.data.parse.models.Compensation;
 import ch.giantific.qwittig.data.parse.models.Group;
+import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.services.ParseQueryService;
 import ch.giantific.qwittig.ui.CompensationsActivity;
 import ch.giantific.qwittig.ui.PurchaseDetailsActivity;
 import ch.giantific.qwittig.utils.MoneyUtils;
@@ -220,14 +220,14 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 notificationTag = jsonExtras.optString(PUSH_PARAM_GROUP);
 
                 // update balance for all users
-                OnlineQuery.queryUsers(context, null);
+                ParseQueryService.startQueryUsers(context);
 
                 // query purchase only for users in purchase's usersInvolved
                 if (!userIsInUsersInvolved(jsonExtras)) {
                     return;
                 }
                 String purchaseId = jsonExtras.optString(PUSH_PARAM_PURCHASE);
-                OnlineQuery.queryPurchase(context, purchaseId, true);
+                ParseQueryService.startQueryObject(context, Purchase.CLASS, purchaseId, true);
 
                 // don't show notification for buyer
                 String buyerId = jsonExtras.optString(PUSH_PARAM_BUYER);
@@ -250,19 +250,19 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
             }
             case TYPE_PURCHASE_EDIT: {
                 // update balance for all users
-                OnlineQuery.queryUsers(context, null);
+                ParseQueryService.startQueryUsers(context);
 
                 // only update purchase for users in purchase's usersInvolved
                 if (!userIsInUsersInvolved(jsonExtras)) {
                     return;
                 }
                 String purchaseId = jsonExtras.optString(PUSH_PARAM_PURCHASE);
-                OnlineQuery.queryPurchase(context, purchaseId, false);
+                ParseQueryService.startQueryObject(context, Purchase.CLASS, purchaseId, false);
                 break;
             }
             case TYPE_PURCHASE_DELETE: {
                 // update balance for all users
-                OnlineQuery.queryUsers(context, null);
+                ParseQueryService.startQueryUsers(context);
 
                 // only unpin local purchase for users in purchase's usersInvolved
                 if (!userIsInUsersInvolved(jsonExtras)) {
@@ -270,7 +270,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 }
                 String purchaseId = jsonExtras.optString(PUSH_PARAM_PURCHASE);
                 String groupId = jsonExtras.optString(PUSH_PARAM_GROUP);
-                LocalQuery.unpinLocalPurchase(context, purchaseId, groupId);
+                ParseQueryService.startUnpinObject(context, Purchase.CLASS, purchaseId, groupId);
                 break;
             }
             case TYPE_SETTLEMENT_NEW: {
@@ -287,7 +287,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
             }
             case TYPE_COMPENSATION_NEW_PAID: {
                 // update balance for all users
-                OnlineQuery.queryUsers(context, null);
+                ParseQueryService.startQueryUsers(context);
 
                 // query compensation
                 queryCompensation(context, jsonExtras, true);
@@ -295,7 +295,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
             }
             case TYPE_COMPENSATION_EXISTING_PAID: {
                 // update balance for all users
-                OnlineQuery.queryUsers(context, null);
+                ParseQueryService.startQueryUsers(context);
 
                 // update compensation for all users
                 queryCompensation(context, jsonExtras, false);
@@ -309,11 +309,11 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
             }
             case TYPE_COMPENSATION_EXISTING_NOT_NOW: {
                 // update balance for all users
-                OnlineQuery.queryUsers(context, null);
+                ParseQueryService.startQueryUsers(context);
 
                 // unpin compensation for all users
                 String compensationId = jsonExtras.optString(PUSH_PARAM_COMPENSATION);
-                LocalQuery.unpinLocalCompensation(context, compensationId);
+                ParseQueryService.startUnpinObject(context, Compensation.CLASS, compensationId);
 
                 // only show notification for beneficiary
                 String beneficiaryId = jsonExtras.optString(PUSH_PARAM_BENEFICIARY);
@@ -334,22 +334,20 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 break;
             }
             case TYPE_USER_DELETED: {
-                OnlineQuery.queryPurchases(context, null);
-                OnlineQuery.queryUsers(context, null);
-                OnlineQuery.queryCompensations(context, null);
+                ParseQueryService.startQueryAll(context);
                 break;
             }
             case TYPE_USER_JOINED:
                 // fall through
             case TYPE_USER_LEFT: {
-                OnlineQuery.queryUsers(context, null);
+                ParseQueryService.startQueryUsers(context);
                 break;
             }
             case TYPE_GROUP_NAME_CHANGED:
                 // fall through
             case TYPE_GROUP_USERS_INVITED_CHANGED: {
                 String groupId = jsonExtras.optString(PUSH_PARAM_GROUP);
-                OnlineQuery.queryGroup(context, groupId, null);
+                ParseQueryService.startQueryObject(context, Group.CLASS, groupId, false);
                 break;
             }
         }
@@ -364,7 +362,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
 
     private void queryCompensation(Context context, JSONObject jsonExtras, boolean isNew) {
         String compensationId = jsonExtras.optString(PUSH_PARAM_COMPENSATION);
-        OnlineQuery.queryCompensation(context, compensationId, isNew);
+        ParseQueryService.startQueryObject(context, Compensation.CLASS, compensationId, isNew);
     }
 
     private String getAmount(JSONObject jsonExtras) {

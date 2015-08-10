@@ -90,8 +90,7 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
 
                 User buyer = purchase.getBuyer();
                 User currentUser = (User) ParseUser.getCurrentUser();
-                String nickname = buyer.getGroupIds().contains(currentUser.getCurrentGroup().getObjectId()) ||
-                        buyer.getObjectId().equals(currentUser.getObjectId()) ?
+                String nickname = buyer.getGroupIds().contains(currentUser.getCurrentGroup().getObjectId()) ?
                         buyer.getNicknameOrMe(mContext) : mContext.getString(R.string.user_deleted);
                 purchaseRow.setBuyer(nickname);
 

@@ -3,6 +3,7 @@ package ch.giantific.qwittig.ui;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
@@ -10,12 +11,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -31,13 +32,15 @@ import org.json.JSONObject;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.List;
 
 import ch.giantific.qwittig.PushBroadcastReceiver;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.CloudCode;
-import ch.giantific.qwittig.data.parse.OnlineQuery;
 import ch.giantific.qwittig.data.parse.models.Config;
 import ch.giantific.qwittig.data.parse.models.Group;
+import ch.giantific.qwittig.helper.FullQueryHelper;
+import ch.giantific.qwittig.helper.InvitedGroupHelper;
+import ch.giantific.qwittig.helper.MoreQueryHelper;
 import ch.giantific.qwittig.ui.adapter.TabsAdapter;
 import ch.giantific.qwittig.ui.dialogs.GoPremiumDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.GroupCreateDialogFragment;
@@ -53,14 +56,14 @@ import ch.giantific.qwittig.utils.Utils;
 public class HomeActivity extends BaseNavDrawerActivity implements
         View.OnClickListener,
         HomeBaseFragment.FragmentInteractionListener,
-        OnlineQuery.PurchasePinListener,
-        OnlineQuery.UserPinListener,
-        OnlineQuery.GroupQueryListener,
         GroupJoinDialogFragment.DialogInteractionListener,
         GroupCreateDialogFragment.DialogInteractionListener,
         GoPremiumDialogFragment.DialogInteractionListener,
-        CloudCode.CloudFunctionListener {
+        FullQueryHelper.HelperInteractionListener,
+        InvitedGroupHelper.HelperInteractionListener,
+        MoreQueryHelper.HelperInteractionListener {
 
+    private static final String INVITED_GROUP_HELPER = "invited_group_helper";
     private static final String LOG_TAG = HomeActivity.class.getSimpleName();
 
     @IntDef({ADAPTER_ALL, ADAPTER_PURCHASES, ADAPTER_USER})
@@ -186,7 +189,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         }
 
         if (mNewQueryNeeded) {
-            fullOnlineQuery();
+            onlineQuery();
             mNewQueryNeeded = false;
         }
     }
@@ -262,53 +265,67 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
             // add currentUser to the ACL and Role of the group he is invited to, otherwise we
             // won't be able to query the group
-            CloudCode.addUserToGroupRole(this, mInvitedGroupId, this);
+            getInvitedGroupWithHelper();
         }
     }
 
+    private void getInvitedGroupWithHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        InvitedGroupHelper invitedGroupHelper = findInvitedGroupHelper(fragmentManager);
+
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (invitedGroupHelper == null) {
+            invitedGroupHelper = InvitedGroupHelper.newInstance(mInvitedGroupId);
+
+            fragmentManager.beginTransaction()
+                    .add(invitedGroupHelper, INVITED_GROUP_HELPER)
+                    .commit();
+        }
+    }
+
+    private InvitedGroupHelper findInvitedGroupHelper(FragmentManager fragmentManager) {
+        return (InvitedGroupHelper) fragmentManager.findFragmentByTag(INVITED_GROUP_HELPER);
+    }
+
     @Override
-    public void onCloudFunctionError(ParseException e) {
+    public void onInvitedGroupQueryFailed(ParseException e) {
+        ParseErrorHandler.handleParseError(this, e);
         MessageUtils.showBasicSnackbar(mFabAddPurchase, ParseErrorHandler.getErrorMessage(this, e));
+        removeQueryHelper();
     }
 
     @Override
-    public void onCloudFunctionReturned(String cloudFunction, Object o) {
-        switch (cloudFunction) {
-            case CloudCode.GROUP_ROLE_ADD_USER:
-                // query for the group the user is invited to
-                OnlineQuery.queryGroup(this, mInvitedGroupId, this);
-                break;
-        }
+    public void onEmailNotValid() {
+        MessageUtils.showBasicSnackbar(mFabAddPurchase, getString(R.string.toast_group_invite_not_valid));
+        removeInvitedGroupHelper();
     }
 
     @Override
-    public void onGroupsQueryFailed(String errorMessage) {
-        MessageUtils.showBasicSnackbar(mFabAddPurchase, errorMessage);
+    public void onInvitedGroupQueried(ParseObject parseObject) {
+        removeInvitedGroupHelper();
 
-        // query for group failed for some reason, remove user from group ACL, he will be added
-        // back when he clicks on the link in the email again
-        CloudCode.removeUserFromGroupRole(mInvitedGroupId);
-    }
-
-    @Override
-    public void onGroupQueried(ParseObject parseObject) {
         mInvitedGroup = (Group) parseObject;
 
-        if (mInvitedGroup.getUsersInvited().contains(mCurrentUser.getUsername())) {
-            switch (mInvitationAction) {
-                case PushBroadcastReceiver.ACTION_INVITATION_ACCEPTED:
-                    joinInvitedGroup();
-                    break;
-                case PushBroadcastReceiver.ACTION_INVITATION_DISCARDED:
-                    discardInvitation();
-                    break;
-                default:
-                    String groupName = mInvitedGroup.getName();
-                    showGroupJoinDialog(groupName);
-            }
-        } else {
-            MessageUtils.showBasicSnackbar(mFabAddPurchase, getString(R.string.toast_group_invite_not_valid));
-            CloudCode.removeUserFromGroupRole(mInvitedGroupId);
+        switch (mInvitationAction) {
+            case PushBroadcastReceiver.ACTION_INVITATION_ACCEPTED:
+                joinInvitedGroup();
+                break;
+            case PushBroadcastReceiver.ACTION_INVITATION_DISCARDED:
+                discardInvitation();
+                break;
+            default:
+                String groupName = mInvitedGroup.getName();
+                showGroupJoinDialog(groupName);
+        }
+    }
+
+    private void removeInvitedGroupHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        InvitedGroupHelper invitedGroupHelper = findInvitedGroupHelper(fragmentManager);
+
+        if (invitedGroupHelper != null) {
+            fragmentManager.beginTransaction().remove(invitedGroupHelper).commitAllowingStateLoss();
         }
     }
 
@@ -372,33 +389,71 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         super.afterLoginSetup();
     }
 
+    /**
+     * Calls CloudFunction to calculate balances for users in currentGroup
+     */
     @Override
-    public void fullOnlineQuery() {
-        OnlineQuery.queryPurchases(this, this);
-        OnlineQuery.queryCompensations(this, null);
-        OnlineQuery.queryUsers(this, this);
-    }
-
-    @Override
-    public void onPurchasePinFailed(String errorMessage) {
-        MessageUtils.showBasicSnackbar(mFabAddPurchase, errorMessage);
-    }
-
-    @Override
-    public void onUsersPinFailed(String errorMessage) {
-        MessageUtils.showBasicSnackbar(mFabAddPurchase, errorMessage);
-    }
-
-    @Override
-    public void setLoading(boolean isLoading) {
-        super.setLoading(isLoading);
-
-        mHomeUsersFragment.setLoading(isLoading);
-        mHomePurchasesFragment.setLoading(isLoading);
-
-        if (!isLoading && mProgressDialog != null) {
-            mProgressDialog.dismiss();
+    public void onlineQuery() {
+        if (!Utils.isConnected(this)) {
+            setLoading(false);
+            showErrorSnackbar(getString(R.string.toast_no_connection));
+            return;
         }
+
+        FragmentManager fragmentManager = getFragmentManager();
+        FullQueryHelper fullQueryHelper = findQueryHelper(fragmentManager);
+
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (fullQueryHelper == null) {
+            fullQueryHelper = new FullQueryHelper();
+
+            fragmentManager.beginTransaction()
+                    .add(fullQueryHelper, FullQueryHelper.FULL_QUERY_HELPER)
+                    .commit();
+        }
+    }
+
+    private FullQueryHelper findQueryHelper(FragmentManager fragmentManager) {
+        return (FullQueryHelper) fragmentManager.findFragmentByTag(FullQueryHelper.FULL_QUERY_HELPER);
+    }
+
+    @Override
+    public void onPinFailed(ParseException e) {
+        ParseErrorHandler.handleParseError(this, e);
+        showErrorSnackbar(ParseErrorHandler.getErrorMessage(this, e));
+
+        setLoading(false);
+        removeQueryHelper();
+    }
+
+    private void removeQueryHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        FullQueryHelper fullQueryHelper = findQueryHelper(fragmentManager);
+
+        if (fullQueryHelper != null) {
+            fragmentManager.beginTransaction().remove(fullQueryHelper).commitAllowingStateLoss();
+        }
+    }
+
+    private void showErrorSnackbar(String errorMessage) {
+        Snackbar snackbar = MessageUtils.getBasicSnackbar(mToolbar, errorMessage);
+        snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setLoading(true);
+                onlineQuery();
+            }
+        });
+        snackbar.show();
+    }
+
+    @Override
+    public void onUsersPinned() {
+        super.onUsersPinned();
+
+        updateFragmentAdapters(ADAPTER_USER);
+        setToolbarHeader();
     }
 
     @Override
@@ -409,11 +464,20 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onUsersPinned() {
-        super.onUsersPinned();
+    public void onCompensationsPinned(boolean isPaid) {
+        super.onCompensationsPinned(isPaid);
 
-        updateFragmentAdapters(ADAPTER_USER);
-        setToolbarHeader();
+        setLoading(false);
+        removeQueryHelper();
+    }
+
+    private void setLoading(boolean isLoading) {
+        mHomeUsersFragment.setLoading(isLoading);
+        mHomePurchasesFragment.setLoading(isLoading);
+
+        if (!isLoading && mProgressDialog != null) {
+            mProgressDialog.dismiss();
+        }
     }
 
     private void updateFragmentAdapters(@FragmentAdapter int adapter) {
@@ -515,6 +579,16 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         goPremiumDialogFragment.show(getFragmentManager(), "go_premium");
 
         // goPremium() is handled in BaseNavDrawerActivity
+    }
+
+    @Override
+    public void onMoreObjectsPinned(List<ParseObject> objects) {
+        mHomePurchasesFragment.onMoreObjectsPinned(objects);
+    }
+
+    @Override
+    public void onMoreObjectsPinFailed(ParseException e) {
+        mHomePurchasesFragment.onMoreObjectsPinFailed(e);
     }
 
     @Override

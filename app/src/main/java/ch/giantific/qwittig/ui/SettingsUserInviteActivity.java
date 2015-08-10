@@ -12,14 +12,17 @@ import android.view.View;
 
 import com.github.jorgecastilloprz.FABProgressCircle;
 import com.github.jorgecastilloprz.listeners.FABProgressListener;
+import com.parse.ParseException;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.helper.InviteUsersHelper;
 import ch.giantific.qwittig.ui.widgets.TransitionListenerAdapter;
 import ch.giantific.qwittig.utils.Utils;
 
 public class SettingsUserInviteActivity extends BaseActivity implements
         SettingsUserInviteFragment.FragmentInteractionListener,
-        FABProgressListener {
+        FABProgressListener,
+        InviteUsersHelper.HelperInteractionListener {
 
     private static final String USER_INVITE_FRAGMENT = "user_invite_fragment";
     private SettingsUserInviteFragment mSettingsUserInviteFragment;
@@ -127,5 +130,15 @@ public class SettingsUserInviteActivity extends BaseActivity implements
     @Override
     public void progressCircleHide() {
         mFabProgressCircle.hide();
+    }
+
+    @Override
+    public void onUsersInvited() {
+        mSettingsUserInviteFragment.onUsersInvited();
+    }
+
+    @Override
+    public void onInviteUsersFailed(ParseException e) {
+        mSettingsUserInviteFragment.onInviteUsersFailed(e);
     }
 }

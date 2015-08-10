@@ -2,9 +2,11 @@ package ch.giantific.qwittig.ui;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -29,6 +31,8 @@ import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.data.stats.models.Stats;
+import ch.giantific.qwittig.helper.StatsHelper;
+import ch.giantific.qwittig.helper.StatsHelper;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
@@ -38,7 +42,6 @@ import ch.giantific.qwittig.utils.Utils;
  * A simple {@link Fragment} subclass.
  */
 public abstract class StatsBaseFragment extends BaseFragment implements
-        CloudCode.CloudFunctionListener,
         LocalQuery.ObjectLocalFetchListener {
 
     static final int PERIOD_YEAR = 0;
@@ -296,6 +299,9 @@ public abstract class StatsBaseFragment extends BaseFragment implements
         if (!Utils.isConnected(getActivity())) {
             showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(),
                     ParseUtils.getNoConnectionException()));
+
+            setEmptyViewVisibility(true);
+            toggleProgressBarVisibility();
             return;
         }
 
@@ -349,22 +355,63 @@ public abstract class StatsBaseFragment extends BaseFragment implements
         return -1;
     }
 
-    final Stats parseJson(String json) {
-        Gson gson = new Gson();
-        return gson.fromJson(json, Stats.class);
+    final void calcStatsWithHelper(@StatsHelper.StatsType int statsType,
+                                     String year, int month) {
+        FragmentManager fragmentManager = getFragmentManager();
+        StatsHelper statsHelper = findStatsHelper(fragmentManager);
+
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (statsHelper == null) {
+            statsHelper = StatsHelper.newInstance(statsType, year, month);
+
+            fragmentManager.beginTransaction()
+                    .add(statsHelper, getHelperTag())
+                    .commit();
+        }
     }
 
+    protected abstract String getHelperTag();
+
+    private StatsHelper findStatsHelper(FragmentManager fragmentManager) {
+        return (StatsHelper) fragmentManager.findFragmentByTag(getHelperTag());
+    }
+
+    private void removeStatsHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        StatsHelper statsHelper = findStatsHelper(fragmentManager);
+
+        if (statsHelper != null) {
+            fragmentManager.beginTransaction().remove(statsHelper).commitAllowingStateLoss();
+        }
+    }
+
+    /**
+     * Called from activity when helper successfully calculated new stats
+     * @param stats
+     */
     @CallSuper
-    @Override
-    public void onCloudFunctionReturned(String cloudFunction, Object o) {
+    public void onStatsCalculated(Stats stats) {
+        removeStatsHelper();
+
         mDataIsLoaded = true;
+        mStatsData = stats;
+        setChartData();
     }
 
+    protected abstract void setChartData();
+
+    /**
+     * Called from activity when helper failed to calculate stats
+     * @param e
+     */
     @CallSuper
-    @Override
-    public void onCloudFunctionError(ParseException e) {
-        mIsLoading = false;
+    public void onFailedToCalculateStats(ParseException e) {
+        ParseErrorHandler.handleParseError(getActivity(), e);
         showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
+        removeStatsHelper();
+                
+        mIsLoading = false;
     }
 
     private void showErrorSnackbar(String message) {

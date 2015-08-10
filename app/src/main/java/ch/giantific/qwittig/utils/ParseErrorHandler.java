@@ -27,7 +27,7 @@ public class ParseErrorHandler {
         int code = e.getCode();
         switch (code) {
             case ParseException.INVALID_SESSION_TOKEN: {
-                forceNewLogin(context);
+                forceNewLogin(context.getApplicationContext());
 
                 // TODO: can we unsubscribe from notification channels?
                 break;
