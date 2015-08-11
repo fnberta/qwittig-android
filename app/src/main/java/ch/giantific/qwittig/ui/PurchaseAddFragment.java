@@ -156,11 +156,6 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
         snackbar.show();
     }
 
-    @Override
-    public void onPurchaseSaveSucceeded() {
-        pinPurchase(false);
-    }
-
     /**
      * Creates new purchase object and calls method to pin it to local datastore.
      */

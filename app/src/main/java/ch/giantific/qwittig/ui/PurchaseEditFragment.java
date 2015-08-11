@@ -289,9 +289,10 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     }
 
     @Override
-    public void onPurchaseSaveSucceeded() {
+    public void onPurchaseSaveAndPinSucceeded() {
         deleteOldItems();
-        pinPurchase(false);
+
+        super.onPurchaseSaveAndPinSucceeded();
     }
 
     /**

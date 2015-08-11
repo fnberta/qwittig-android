@@ -113,20 +113,6 @@ public class PurchaseEditDraftFragment extends PurchaseEditFragment implements
     }
 
     @Override
-    public void onPurchaseSaveSucceeded() {
-        mPurchase.unpinInBackground(new DeleteCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e != null) {
-                    return;
-                }
-
-                pinPurchase(false);
-            }
-        });
-    }
-
-    @Override
     protected void savePurchaseAsDraft() {
         replacePurchaseData();
 

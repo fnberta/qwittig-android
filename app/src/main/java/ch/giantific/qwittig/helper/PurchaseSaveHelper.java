@@ -7,12 +7,15 @@ import android.os.Bundle;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.List;
 
+import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.Item;
 import ch.giantific.qwittig.data.parse.models.Purchase;
+import ch.giantific.qwittig.data.parse.models.User;
 
 /**
  * Created by fabio on 10.12.14.
@@ -93,9 +96,7 @@ public class PurchaseSaveHelper extends BaseHelper {
                     return;
                 }
 
-                if (mListener != null) {
-                    mListener.onPurchaseSaveSucceeded();
-                }
+                onPurchaseSaved();
             }
         });
     }
@@ -115,6 +116,27 @@ public class PurchaseSaveHelper extends BaseHelper {
         mPurchase.convertTotalPrice(toGroupCurrency);
     }
 
+    void onPurchaseSaved() {
+        pinPurchase();
+    }
+
+    /**
+     * Pins purchase to local datastore.
+     */
+    final void pinPurchase() {
+        final User currentUser = (User) ParseUser.getCurrentUser();
+        Group currentGroup = currentUser.getCurrentGroup();
+
+        mPurchase.pinInBackground(Purchase.PIN_LABEL + currentGroup.getObjectId(), new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if (e == null && mListener != null) {
+                        mListener.onPurchaseSaveAndPinSucceeded();
+                    }
+                }
+            });
+    }
+
     @Override
     public void onDetach() {
         super.onDetach();
@@ -122,7 +144,7 @@ public class PurchaseSaveHelper extends BaseHelper {
     }
 
     public interface HelperInteractionListener {
-        void onPurchaseSaveSucceeded();
+        void onPurchaseSaveAndPinSucceeded();
 
         void onPurchaseSaveFailed(ParseException e);
     }

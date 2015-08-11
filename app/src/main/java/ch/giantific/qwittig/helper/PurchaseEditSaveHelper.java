@@ -3,6 +3,7 @@ package ch.giantific.qwittig.helper;
 import android.annotation.SuppressLint;
 import android.text.TextUtils;
 
+import com.parse.DeleteCallback;
 import com.parse.FunctionCallback;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
@@ -90,5 +91,23 @@ public class PurchaseEditSaveHelper extends PurchaseSaveHelper {
         }
 
         super.onReceiptFileSaved();
+    }
+
+    @Override
+    void onPurchaseSaved() {
+        if (mIsDraft) {
+            mPurchase.unpinInBackground(new DeleteCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if (e != null) {
+                        return;
+                    }
+
+                    pinPurchase();
+                }
+            });
+        } else {
+            super.onPurchaseSaved();
+        }
     }
 }

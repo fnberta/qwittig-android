@@ -153,19 +153,17 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
     }
 
     @Override
-    public void onPurchaseSaveSucceeded() {
+    public void onPurchaseSaveAndPinSucceeded() {
         if (mInTrialMode) {
             mCurrentUser.incrementPremiumCount();
             mCurrentUser.saveEventually();
         }
 
-        super.onPurchaseSaveSucceeded();
+        super.onPurchaseSaveAndPinSucceeded();
     }
 
     @Override
-    void onPinSucceeded() {
-        mIsSaving = false;
-        mListener.setResultForSnackbar(PurchaseBaseActivity.PURCHASE_SAVED_AUTO);
-        mListener.progressCircleStartFinal();
+    int getPurchaseSavedAction() {
+        return PurchaseBaseActivity.PURCHASE_SAVED_AUTO;
     }
 }

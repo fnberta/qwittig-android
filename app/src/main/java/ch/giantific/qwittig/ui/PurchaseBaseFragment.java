@@ -139,9 +139,6 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
             mCurrencySelected = savedInstanceState.getString(STATE_CURRENCY_SELECTED);
             mStoreSelected = savedInstanceState.getString(STATE_STORE_SELECTED);
             mIsSaving = savedInstanceState.getBoolean(STATE_IS_SAVING);
-            if (mIsSaving) {
-                mListener.progressCircleShow();
-            }
         } else {
             mItemRowCount = 1;
             mDateSelected = new Date();
@@ -261,6 +258,15 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
 
     void revealFab() {
         mListener.showFab();
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if (savedInstanceState != null && mIsSaving) {
+            //mListener.progressCircleShow();
+        }
     }
 
     /**
@@ -927,9 +933,17 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     /**
-     * Pin purchase in AddFragment, finish in EditFragment and unpin/repin in EditDraftFragment
+     * Called from activity when helper saved and pinned new purchase
      */
-    public abstract void onPurchaseSaveSucceeded();
+    public void onPurchaseSaveAndPinSucceeded() {
+        mIsSaving = false;
+        mListener.setResultForSnackbar(getPurchaseSavedAction());
+        mListener.progressCircleStartFinal();
+    }
+
+    int getPurchaseSavedAction() {
+        return PurchaseBaseActivity.PURCHASE_SAVED;
+    }
 
     /**
      * Called from activity when helper fails to save purchase
@@ -965,44 +979,17 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     final void pinPurchaseAsDraft() {
         mPurchase.setRandomDraftId();
         mPurchase.swapReceiptParseFileToData();
-        pinPurchase(true);
-    }
-
-    /**
-     * Pins purchase to local datastore.
-     */
-    final void pinPurchase(final boolean asDraft) {
-        if (asDraft) {
-            mPurchase.pinInBackground(new SaveCallback() {
-                @Override
-                public void done(ParseException e) {
-                    if (e != null) {
-                        onParseError(e);
-                        return;
-                    }
-
-                    onPinAsDraftSucceeded();
+        mPurchase.pinInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    onParseError(e);
+                    return;
                 }
-            });
-        } else {
-            mPurchase.pinInBackground(Purchase.PIN_LABEL + mCurrentGroup.getObjectId(), new SaveCallback() {
-                @Override
-                public void done(ParseException e) {
-                    if (e != null) {
-                        onParseError(e);
-                        return;
-                    }
 
-                    onPinSucceeded();
-                }
-            });
-        }
-    }
-
-    void onPinSucceeded() {
-        mIsSaving = false;
-        mListener.setResultForSnackbar(PurchaseBaseActivity.PURCHASE_SAVED);
-        mListener.progressCircleStartFinal();
+                onPinAsDraftSucceeded();
+            }
+        });
     }
 
     private void onPinAsDraftSucceeded() {

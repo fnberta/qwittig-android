@@ -64,7 +64,6 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         PurchaseUserSelectionDialogFragment.FragmentInteractionListener,
         StoreSelectionDialogFragment.DialogInteractionListener,
         PurchaseReceiptAddEditFragment.FragmentInteractionListener,
-        FABProgressListener,
         RatesHelper.HelperInteractionListener,
         PurchaseSaveHelper.HelperInteractionListener {
 
@@ -124,7 +123,12 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
             }
         });
         mFabProgressCircle = (FABProgressCircle) findViewById(R.id.fab_purchase_save_circle);
-        mFabProgressCircle.attachListener(this);
+        mFabProgressCircle.attachListener(new FABProgressListener() {
+            @Override
+            public void onFABProgressAnimationEnd() {
+                finishPurchase();
+            }
+        });
 
         if (savedInstanceState == null) {
             if (Utils.isRunningLollipopAndHigher()) {
@@ -358,8 +362,8 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     }
 
     @Override
-    public void onPurchaseSaveSucceeded() {
-        mPurchaseFragment.onPurchaseSaveSucceeded();
+    public void onPurchaseSaveAndPinSucceeded() {
+        mPurchaseFragment.onPurchaseSaveAndPinSucceeded();
     }
 
     @Override
@@ -380,11 +384,6 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     @Override
     public void progressCircleHide() {
         mFabProgressCircle.hide();
-    }
-
-    @Override
-    public void onFABProgressAnimationEnd() {
-        finishPurchase();
     }
 
     @Override
