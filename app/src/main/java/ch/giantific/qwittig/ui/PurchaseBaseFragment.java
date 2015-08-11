@@ -401,7 +401,8 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
             mItemsUsersChecked.add(new ItemUsersChecked(Booleans.toArray(mPurchaseUsersInvolved)));
         }
 
-        final Item item = new Item(getActivity(), idCounter, tilItemName, tilItemPrice, cbEnabled);
+        final Item item = new Item(getActivity().getApplicationContext(), idCounter, tilItemName,
+                tilItemPrice, cbEnabled);
         mItems.add(item);
 
         itemRow.setOnClickListener(null); // SwipeDismissTouchListener doesn't work without an OnClickListener
