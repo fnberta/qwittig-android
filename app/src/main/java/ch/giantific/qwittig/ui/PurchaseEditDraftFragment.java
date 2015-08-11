@@ -116,6 +116,11 @@ public class PurchaseEditDraftFragment extends PurchaseEditFragment implements
     protected void savePurchaseAsDraft() {
         replacePurchaseData();
 
+        ParseFile receiptFile = mListener.getReceiptParseFile();
+        if (receiptFile != null) {
+            mPurchase.setReceiptParseFile(receiptFile);
+        }
+
         pinPurchaseAsDraft();
     }
 }

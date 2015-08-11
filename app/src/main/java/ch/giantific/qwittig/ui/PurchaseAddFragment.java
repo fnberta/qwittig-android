@@ -162,14 +162,12 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
     @Override
     protected void savePurchaseAsDraft() {
         List<ParseUser> purchaseUsersInvolved = getParseUsersInvolvedFromBoolean(mPurchaseUsersInvolved);
-        ParseFile receiptFile = mListener.getReceiptParseFile();
+        mPurchase = new Purchase(mCurrentGroup, mDateSelected, mStoreSelected, mItems,
+                mTotalPrice, purchaseUsersInvolved, mCurrencySelected);
 
+        ParseFile receiptFile = mListener.getReceiptParseFile();
         if (receiptFile != null) {
-            mPurchase = new Purchase(mCurrentGroup, mDateSelected, mStoreSelected,
-                    mItems, mTotalPrice, purchaseUsersInvolved, mCurrencySelected, receiptFile);
-        } else {
-            mPurchase = new Purchase(mCurrentGroup, mDateSelected, mStoreSelected, mItems,
-                    mTotalPrice, purchaseUsersInvolved, mCurrencySelected);
+            mPurchase.setReceiptParseFile(receiptFile);
         }
 
         pinPurchaseAsDraft();
