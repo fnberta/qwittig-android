@@ -6,7 +6,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 
 import com.parse.ParseObject;
 
@@ -95,7 +94,7 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
     @Override
     void revealFab() {
         if (mOcrValuesAreSet) {
-            mListener.showFab();
+            mListener.showFab(false);
         }
     }
 
@@ -154,19 +153,17 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
     }
 
     @Override
-    protected void onSaveSucceeded() {
+    public void onPurchaseSaveAndPinSucceeded() {
         if (mInTrialMode) {
             mCurrentUser.incrementPremiumCount();
             mCurrentUser.saveEventually();
         }
 
-        super.onSaveSucceeded();
+        super.onPurchaseSaveAndPinSucceeded();
     }
 
     @Override
-    void onPinSucceeded() {
-        mIsSaving = false;
-        mListener.setResultForSnackbar(PurchaseBaseActivity.PURCHASE_SAVED_AUTO);
-        mListener.progressCircleStartFinal();
+    int getPurchaseSavedAction() {
+        return PurchaseBaseActivity.PURCHASE_SAVED_AUTO;
     }
 }

@@ -78,16 +78,6 @@ public class PurchaseEditActivity extends PurchaseBaseActivity implements
     }
 
     @Override
-    public void onRatesFetchSuccessful(Map<String, Double> exchangeRates) {
-        ((PurchaseEditFragment) mPurchaseFragment).onRatesFetchSuccessful(exchangeRates);
-    }
-
-    @Override
-    public void onRatesFetchFailed(String errorMessage) {
-        ((PurchaseEditFragment) mPurchaseFragment).onRatesFetchFailed(errorMessage);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:

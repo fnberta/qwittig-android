@@ -13,6 +13,8 @@ import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 
+import java.io.File;
+
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 
@@ -51,11 +53,21 @@ public abstract class PurchaseReceiptBaseFragment extends BaseFragment {
                         return;
                     }
 
-                    Glide.with(getActivity())
-                            .load(bytes)
-                            .into(mImageViewReceipt);
+                    setImage(bytes);
                 }
             });
         }
+    }
+
+    private void setImage(byte[] receiptBytes) {
+        Glide.with(this)
+                .load(receiptBytes)
+                .into(mImageViewReceipt);
+    }
+
+    public void updateReceiptImage(File receipt) {
+        Glide.with(this)
+                .load(receipt)
+                .into(mImageViewReceipt);
     }
 }

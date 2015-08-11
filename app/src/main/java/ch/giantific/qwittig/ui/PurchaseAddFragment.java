@@ -3,17 +3,14 @@ package ch.giantific.qwittig.ui;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.google.common.primitives.Booleans;
-import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 import java.util.List;
 import java.util.Map;
@@ -21,13 +18,8 @@ import java.util.Map;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.ItemUsersChecked;
 import ch.giantific.qwittig.data.parse.models.Purchase;
-import ch.giantific.qwittig.data.rates.RestClient;
-import ch.giantific.qwittig.data.rates.models.CurrencyRates;
-import ch.giantific.qwittig.helper.RatesHelper;
+import ch.giantific.qwittig.helper.PurchaseSaveHelper;
 import ch.giantific.qwittig.utils.MessageUtils;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 
 /**
@@ -109,15 +101,18 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
         }
     }
 
+    @Override
     public void onRatesFetchSuccessful(Map<String, Double> exchangeRates) {
         double exchangeRate = exchangeRates.get(mCurrentGroupCurrency);
         createNewPurchase(exchangeRate);
     }
 
+    @Override
     public void onRatesFetchFailed(String errorMessage) {
+        super.onRatesFetchFailed(errorMessage);
+
         // TODO: check if safe to do (i.e. purchase safe needs to fail now)
         createNewPurchase(1);
-        removeRatesHelper();
     }
 
     private void createNewPurchase(double exchangeRate) {
@@ -126,21 +121,21 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
                 mItems, mTotalPrice, purchaseUsersInvolved, mCurrencySelected, exchangeRate);
         ParseFile receiptFile = mListener.getReceiptParseFile();
 
-        if (receiptFile != null) {
-            mPurchase.setReceiptParseFile(receiptFile);
-            receiptFile.saveInBackground(new SaveCallback() {
-                @Override
-                public void done(ParseException e) {
-                    if (e != null) {
-                        onParseError(e);
-                        return;
-                    }
+        savePurchaseWithHelper(receiptFile);
+    }
 
-                    savePurchaseInParse();
-                }
-            });
-        } else {
-            savePurchaseInParse();
+    private void savePurchaseWithHelper(ParseFile receiptFile) {
+        FragmentManager fragmentManager = getFragmentManager();
+        PurchaseSaveHelper purchaseSaveHelper = findPurchaseSaveHelper(fragmentManager);
+
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (purchaseSaveHelper == null) {
+            purchaseSaveHelper = new PurchaseSaveHelper(receiptFile, mPurchase);
+
+            fragmentManager.beginTransaction()
+                    .add(purchaseSaveHelper, PURCHASE_SAVE_HELPER)
+                    .commit();
         }
     }
 
@@ -161,25 +156,18 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
         snackbar.show();
     }
 
-    @Override
-    protected void onSaveSucceeded() {
-        pinPurchase(false);
-    }
-
     /**
      * Creates new purchase object and calls method to pin it to local datastore.
      */
     @Override
     protected void savePurchaseAsDraft() {
         List<ParseUser> purchaseUsersInvolved = getParseUsersInvolvedFromBoolean(mPurchaseUsersInvolved);
-        ParseFile receiptFile = mListener.getReceiptParseFile();
+        mPurchase = new Purchase(mCurrentGroup, mDateSelected, mStoreSelected, mItems,
+                mTotalPrice, purchaseUsersInvolved, mCurrencySelected);
 
+        ParseFile receiptFile = mListener.getReceiptParseFile();
         if (receiptFile != null) {
-            mPurchase = new Purchase(mCurrentGroup, mDateSelected, mStoreSelected,
-                    mItems, mTotalPrice, purchaseUsersInvolved, mCurrencySelected, receiptFile);
-        } else {
-            mPurchase = new Purchase(mCurrentGroup, mDateSelected, mStoreSelected, mItems,
-                    mTotalPrice, purchaseUsersInvolved, mCurrencySelected);
+            mPurchase.setReceiptParseFile(receiptFile);
         }
 
         pinPurchaseAsDraft();

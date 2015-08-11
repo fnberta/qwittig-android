@@ -1,14 +1,12 @@
 package ch.giantific.qwittig.ui;
 
+import android.app.FragmentManager;
 import android.os.Bundle;
-import android.text.TextUtils;
 
 import com.google.common.primitives.Booleans;
-import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,27 +14,20 @@ import java.util.List;
 import java.util.Map;
 
 import ch.giantific.qwittig.data.models.ItemUsersChecked;
-import ch.giantific.qwittig.data.parse.CloudCode;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Item;
 import ch.giantific.qwittig.data.parse.models.Purchase;
-import ch.giantific.qwittig.data.rates.RestClient;
-import ch.giantific.qwittig.data.rates.models.CurrencyRates;
+import ch.giantific.qwittig.helper.PurchaseEditSaveHelper;
+import ch.giantific.qwittig.helper.PurchaseSaveHelper;
 import ch.giantific.qwittig.utils.DateUtils;
-import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
-import ch.giantific.qwittig.utils.Utils;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class PurchaseEditFragment extends PurchaseBaseFragment implements
-        LocalQuery.ObjectLocalFetchListener,
-        CloudCode.CloudFunctionListener {
+        LocalQuery.ObjectLocalFetchListener {
 
     static final String BUNDLE_EDIT_PURCHASE_ID = "edit_purchase_id";
     private static final String STATE_ITEMS_SET = "items_set";
@@ -45,11 +36,9 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     private static final String STATE_OLD_DATE = "old_date";
     private static final String STATE_OLD_CURRENCY = "old_currency";
     private static final String STATE_OLD_EXCHANGE_RATE = "old_exchange_rate";
-
     private static final String LOG_TAG = PurchaseEditFragment.class.getSimpleName();
     String mEditPurchaseId;
     ParseFile mReceiptFileOld;
-    ParseFile mReceiptFileNew;
     private boolean mOldValuesAreSet;
     private List<ParseObject> mOldItems;
     private ArrayList<String> mOldItemIds;
@@ -239,10 +228,6 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     final void replacePurchaseData() {
         final List<ParseUser> globalUsersInvolvedParse =
                 getParseUsersInvolvedFromBoolean(mPurchaseUsersInvolved);
-        mReceiptFileNew = mListener.getReceiptParseFile();
-        if (mReceiptFileNew != null) {
-            mPurchase.setReceiptParseFile(mReceiptFileNew);
-        }
 
         // Replace the old values with new ones
         mPurchase.replaceItems(mItems);
@@ -260,89 +245,54 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     private void updateExchangeRate() {
         if (mCurrencySelected.equals(mCurrentGroupCurrency)) {
             mPurchase.setExchangeRate(1);
-            checkIfReceiptNull();
+            savePurchaseWithHelper();
         } else {
             getExchangeRateWithHelper();
         }
     }
 
+    @Override
     public void onRatesFetchSuccessful(Map<String, Double> exchangeRates) {
         double exchangeRate = exchangeRates.get(mCurrentGroupCurrency);
         mPurchase.setExchangeRate(exchangeRate);
 
-        checkIfReceiptNull();
+        savePurchaseWithHelper();
     }
 
+    @Override
     public void onRatesFetchFailed(String errorMessage) {
+        super.onRatesFetchFailed(errorMessage);
+
         onParseError(ParseUtils.getNoConnectionException(errorMessage));
-
-        removeRatesHelper();
     }
 
-    void checkIfReceiptNull() {
-        if (mReceiptFileNew != null) {
-            if (mReceiptFileOld != null) {
-                deleteOldReceiptFile();
-            } else {
-                saveReceiptFile();
-            }
-        } else {
-            if (mReceiptFileOld != null) {
-                deleteOldReceiptFile();
-                mPurchase.removeReceiptParseFile();
-            } else {
-                savePurchaseInParse();
-            }
+    private void savePurchaseWithHelper() {
+        ParseFile receiptParseFileNew = mListener.getReceiptParseFile();
+
+        FragmentManager fragmentManager = getFragmentManager();
+        PurchaseEditSaveHelper purchaseEditSaveHelper = (PurchaseEditSaveHelper)
+                fragmentManager.findFragmentByTag(PURCHASE_SAVE_HELPER);;
+
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (purchaseEditSaveHelper == null) {
+            purchaseEditSaveHelper = new PurchaseEditSaveHelper(mReceiptFileOld, receiptParseFileNew, mPurchase, isDraft());
+
+            fragmentManager.beginTransaction()
+                    .add(purchaseEditSaveHelper, PURCHASE_SAVE_HELPER)
+                    .commit();
         }
     }
 
-    private void deleteOldReceiptFile() {
-        String fileName = mReceiptFileOld.getName();
-        if (!TextUtils.isEmpty(fileName)) {
-            CloudCode.deleteParseFile(fileName, this);
-        }
+    boolean isDraft() {
+        return false;
     }
 
     @Override
-    public void onCloudFunctionError(ParseException e) {
-        onParseError(e);
-    }
-
-    @Override
-    public void onCloudFunctionReturned(String cloudFunction, Object o) {
-        switch (cloudFunction) {
-            case CloudCode.DELETE_PARSE_FILE:
-                if (mReceiptFileNew != null) {
-                    saveReceiptFile();
-                } else {
-                    savePurchaseInParse();
-                }
-                break;
-        }
-    }
-
-    void saveReceiptFile() {
-        mReceiptFileNew.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e != null) {
-                    onParseError(e);
-                    return;
-                }
-
-                onReceiptFileSaved();
-            }
-        });
-    }
-
-    void onReceiptFileSaved() {
-        savePurchaseInParse();
-    }
-
-    @Override
-    protected void onSaveSucceeded() {
+    public void onPurchaseSaveAndPinSucceeded() {
         deleteOldItems();
-        pinPurchase(false);
+
+        super.onPurchaseSaveAndPinSucceeded();
     }
 
     /**

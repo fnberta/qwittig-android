@@ -29,6 +29,7 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.github.jorgecastilloprz.FABProgressCircle;
 import com.github.jorgecastilloprz.listeners.FABProgressListener;
+import com.parse.ParseException;
 import com.parse.ParseFile;
 
 import java.io.File;
@@ -39,9 +40,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.Receipt;
+import ch.giantific.qwittig.helper.PurchaseSaveHelper;
 import ch.giantific.qwittig.helper.RatesHelper;
 import ch.giantific.qwittig.ui.dialogs.AccountCreateDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.DatePickerDialogFragment;
@@ -61,8 +64,8 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         PurchaseUserSelectionDialogFragment.FragmentInteractionListener,
         StoreSelectionDialogFragment.DialogInteractionListener,
         PurchaseReceiptAddEditFragment.FragmentInteractionListener,
-        FABProgressListener,
-        RatesHelper.HelperInteractionListener {
+        RatesHelper.HelperInteractionListener,
+        PurchaseSaveHelper.HelperInteractionListener {
 
     @IntDef({PURCHASE_SAVED, PURCHASE_SAVED_AUTO, PURCHASE_DISCARDED, PURCHASE_SAVED_AS_DRAFT, PURCHASE_DRAFT_DELETED,
             PURCHASE_ERROR,
@@ -120,7 +123,12 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
             }
         });
         mFabProgressCircle = (FABProgressCircle) findViewById(R.id.fab_purchase_save_circle);
-        mFabProgressCircle.attachListener(this);
+        mFabProgressCircle.attachListener(new FABProgressListener() {
+            @Override
+            public void onFABProgressAnimationEnd() {
+                finishPurchase();
+            }
+        });
 
         if (savedInstanceState == null) {
             if (Utils.isRunningLollipopAndHigher()) {
@@ -149,33 +157,48 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         });
     }
 
-    @Override
     public void showFab() {
+        showFab(false);
+    }
+
+    @Override
+    public void showFab(final boolean isSaving) {
         if (Utils.isRunningLollipopAndHigher()) {
             if (ViewCompat.isLaidOut(mFabPurchaseSave)) {
-                circularRevealFab();
+                circularRevealFab(isSaving);
             } else {
                 mFabPurchaseSave.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
                     @Override
                     public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
                         v.removeOnLayoutChangeListener(this);
-                        circularRevealFab();
+                        circularRevealFab(isSaving);
                     }
                 });
             }
         } else {
             mFabPurchaseSave.setVisibility(View.VISIBLE);
+            if (isSaving) {
+                mFabProgressCircle.show();
+            }
         }
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void circularRevealFab() {
+        circularRevealFab(false);
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void circularRevealFab(final boolean isSaving) {
         Animator reveal = Utils.getCircularRevealAnimator(mFabPurchaseSave);
         reveal.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
                 mFabPurchaseSave.setVisibility(View.VISIBLE);
+                if (isSaving) {
+                    mFabProgressCircle.show();
+                }
             }
         });
         reveal.start();
@@ -252,6 +275,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         if (requestCode == INTENT_REQUEST_IMAGE_CAPTURE) {
             if (resultCode == RESULT_OK) {
                 getReceiptFile();
+                updateReceiptFragment();
             }
         }
     }
@@ -267,6 +291,15 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
                         mReceiptParseFile = new ParseFile(Receipt.PARSE_FILE_NAME, resource);
                     }
                 });
+    }
+
+    private void updateReceiptFragment() {
+        PurchaseReceiptAddEditFragment purchaseReceiptAddEditFragment =
+                (PurchaseReceiptAddEditFragment) getFragmentManager().findFragmentByTag(PURCHASE_RECEIPT_FRAGMENT);
+
+        if (purchaseReceiptAddEditFragment != null) {
+            purchaseReceiptAddEditFragment.updateReceiptImage(mReceiptPhotoFile);
+        }
     }
 
     @Override
@@ -333,6 +366,25 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     }
 
 
+    @Override
+    public void onRatesFetchSuccessful(Map<String, Double> exchangeRates) {
+        mPurchaseFragment.onRatesFetchSuccessful(exchangeRates);
+    }
+
+    @Override
+    public void onRatesFetchFailed(String errorMessage) {
+        mPurchaseFragment.onRatesFetchFailed(errorMessage);
+    }
+
+    @Override
+    public void onPurchaseSaveAndPinSucceeded() {
+        mPurchaseFragment.onPurchaseSaveAndPinSucceeded();
+    }
+
+    @Override
+    public void onPurchaseSaveFailed(ParseException e) {
+        mPurchaseFragment.onPurchaseSaveFailed(e);
+    }
 
     @Override
     public void progressCircleShow() {
@@ -347,11 +399,6 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     @Override
     public void progressCircleHide() {
         mFabProgressCircle.hide();
-    }
-
-    @Override
-    public void onFABProgressAnimationEnd() {
-        finishPurchase();
     }
 
     @Override
