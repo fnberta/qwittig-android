@@ -34,30 +34,4 @@ public class CloudCode {
     private CloudCode() {
         // Class cannot be instantiated
     }
-
-    public static void deleteParseFile(String fileName, final CloudFunctionListener listener) {
-        Map<String, Object> params = new HashMap<>();
-        params.put(PARAM_FILE_NAME, fileName);
-        ParseCloud.callFunctionInBackground(DELETE_PARSE_FILE, params, new FunctionCallback<Object>() {
-            @Override
-            public void done(Object o, ParseException e) {
-                if (e != null) {
-                    if (listener != null) {
-                        listener.onCloudFunctionError(e);
-                    }
-                    return;
-                }
-
-                if (listener != null) {
-                    listener.onCloudFunctionReturned(DELETE_PARSE_FILE, o);
-                }
-            }
-        });
-    }
-
-    public interface CloudFunctionListener {
-        void onCloudFunctionError(ParseException e);
-
-        void onCloudFunctionReturned(String cloudFunction, Object o);
-    }
 }

@@ -6,7 +6,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 
 import com.parse.ParseObject;
 
@@ -154,13 +153,13 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
     }
 
     @Override
-    protected void onSaveSucceeded() {
+    public void onPurchaseSaveSucceeded() {
         if (mInTrialMode) {
             mCurrentUser.incrementPremiumCount();
             mCurrentUser.saveEventually();
         }
 
-        super.onSaveSucceeded();
+        super.onPurchaseSaveSucceeded();
     }
 
     @Override

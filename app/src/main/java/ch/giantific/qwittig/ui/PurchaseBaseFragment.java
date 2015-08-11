@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
-import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -48,6 +47,7 @@ import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.Item;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.helper.PurchaseSaveHelper;
 import ch.giantific.qwittig.helper.RatesHelper;
 import ch.giantific.qwittig.ui.adapter.PurchaseAddUsersInvolvedRecyclerAdapter;
 import ch.giantific.qwittig.ui.widgets.SwipeDismissTouchListener;
@@ -67,6 +67,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         LocalQuery.UserLocalQueryListener {
 
     static final String RATES_HELPER = "rates_helper";
+    static final String PURCHASE_SAVE_HELPER = "save_helper";
     private static final String STATE_ROW_COUNT = "row_count";
     private static final String STATE_STORE_SELECTED = "state_store_selected";
     private static final String STATE_DATE_SELECTED = "state_date_selected";
@@ -74,7 +75,6 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     private static final String STATE_ITEMS_USERS_INVOLVED = "state_items_users_involved";
     private static final String STATE_CURRENCY_SELECTED = "state_currency_selected";
     private static final String STATE_IS_SAVING = "state_is_saving";
-
     private static final String LOG_TAG = PurchaseBaseFragment.class.getSimpleName();
 
     FragmentInteractionListener mListener;
@@ -139,6 +139,9 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
             mCurrencySelected = savedInstanceState.getString(STATE_CURRENCY_SELECTED);
             mStoreSelected = savedInstanceState.getString(STATE_STORE_SELECTED);
             mIsSaving = savedInstanceState.getBoolean(STATE_IS_SAVING);
+            if (mIsSaving) {
+                mListener.progressCircleShow();
+            }
         } else {
             mItemRowCount = 1;
             mDateSelected = new Date();
@@ -262,6 +265,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
 
     /**
      * Sets the currency spinner to the position of the specified currency code.
+     *
      * @param currencyCode
      */
     final void setCurrency(String currencyCode) {
@@ -898,42 +902,19 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     /**
-     * Saves purchase in Parse database.
+     * Called from activity when helper sucessfully fetched currency rates
+     *
+     * @param exchangeRates
      */
-    final void savePurchaseInParse() {
-        convertPrices(true);
+    public abstract void onRatesFetchSuccessful(Map<String, Double> exchangeRates);
 
-        mPurchase.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e != null) {
-                    convertPrices(false);
-                    onParseError(e);
-                    return;
-                }
-
-                onSaveSucceeded();
-            }
-        });
-    }
-
-    private void convertPrices(boolean toGroupCurrency) {
-        double exchangeRate = mPurchase.getExchangeRate();
-        if (exchangeRate == 1) {
-            return;
-        }
-
-        List<ParseObject> items = mPurchase.getItems();
-        for (ParseObject parseObject : items) {
-            Item item = (Item) parseObject;
-            item.convertPrice(exchangeRate, toGroupCurrency);
-        }
-
-        mPurchase.convertTotalPrice(toGroupCurrency);
+    @CallSuper
+    public void onRatesFetchFailed(String errorMessage) {
+        removeRatesHelper();
     }
 
     @CallSuper
-    void onParseError(ParseException e) {
+    public void onParseError(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
 
@@ -948,7 +929,29 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     /**
      * Pin purchase in AddFragment, finish in EditFragment and unpin/repin in EditDraftFragment
      */
-    protected abstract void onSaveSucceeded();
+    public abstract void onPurchaseSaveSucceeded();
+
+    /**
+     * Called from activity when helper fails to save purchase
+     */
+    public void onPurchaseSaveFailed(ParseException e) {
+        onParseError(e);
+        removeSaveHelper();
+    }
+
+    private void removeSaveHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        PurchaseSaveHelper purchaseSaveHelper = findPurchaseSaveHelper(fragmentManager);
+
+        if (purchaseSaveHelper != null) {
+            fragmentManager.beginTransaction().remove(purchaseSaveHelper).commitAllowingStateLoss();
+        }
+    }
+
+    final PurchaseSaveHelper findPurchaseSaveHelper(FragmentManager fragmentManager) {
+        return (PurchaseSaveHelper)
+                fragmentManager.findFragmentByTag(PURCHASE_SAVE_HELPER);
+    }
 
     /**
      * Save purchase as local draft in AddFragment. Save changes to draft in EditDraftFragment.
