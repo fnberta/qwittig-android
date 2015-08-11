@@ -257,16 +257,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     void revealFab() {
-        mListener.showFab();
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        if (savedInstanceState != null && mIsSaving) {
-            //mListener.progressCircleShow();
-        }
+        mListener.showFab(mIsSaving);
     }
 
     /**
@@ -1040,7 +1031,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
 
         void finishPurchase();
 
-        void showFab();
+        void showFab(boolean isSaving);
 
         void showReceiptFragment();
 

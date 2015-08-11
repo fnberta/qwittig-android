@@ -157,33 +157,48 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         });
     }
 
-    @Override
     public void showFab() {
+        showFab(false);
+    }
+
+    @Override
+    public void showFab(final boolean isSaving) {
         if (Utils.isRunningLollipopAndHigher()) {
             if (ViewCompat.isLaidOut(mFabPurchaseSave)) {
-                circularRevealFab();
+                circularRevealFab(isSaving);
             } else {
                 mFabPurchaseSave.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
                     @Override
                     public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
                         v.removeOnLayoutChangeListener(this);
-                        circularRevealFab();
+                        circularRevealFab(isSaving);
                     }
                 });
             }
         } else {
             mFabPurchaseSave.setVisibility(View.VISIBLE);
+            if (isSaving) {
+                mFabProgressCircle.show();
+            }
         }
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void circularRevealFab() {
+        circularRevealFab(false);
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void circularRevealFab(final boolean isSaving) {
         Animator reveal = Utils.getCircularRevealAnimator(mFabPurchaseSave);
         reveal.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
                 mFabPurchaseSave.setVisibility(View.VISIBLE);
+                if (isSaving) {
+                    mFabProgressCircle.show();
+                }
             }
         });
         reveal.start();

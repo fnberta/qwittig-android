@@ -94,7 +94,7 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
     @Override
     void revealFab() {
         if (mOcrValuesAreSet) {
-            mListener.showFab();
+            mListener.showFab(false);
         }
     }
 
