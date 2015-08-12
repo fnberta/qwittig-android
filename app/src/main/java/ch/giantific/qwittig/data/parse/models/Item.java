@@ -34,13 +34,6 @@ public class Item extends ParseObject {
     public static final String PRICE = "price";
     public static final String USERS_INVOLVED = "usersInvolved";
 
-    private Context mContext;
-    private TextInputLayout mTextInputLayoutName;
-    private EditText mEditTextName;
-    private TextInputLayout mTextInputLayoutPrice;
-    private EditText mEditTextPrice;
-    private CheckBox mCheckBoxEnabled;
-
     public String getName() {
         return getString(NAME);
     }
@@ -49,23 +42,8 @@ public class Item extends ParseObject {
         put(NAME, name);
     }
 
-    public double getPriceForeign(double exchangeRate) {
-        double price = getPrice();
-        if (exchangeRate == 1) {
-            return price;
-        }
-
-        return price / exchangeRate;
-    }
-
     public double getPrice() {
         return getDouble(PRICE);
-    }
-
-    public void convertPrice(double exchangeRate, boolean toGroupCurrency) {
-        double price = getPrice();
-        double priceConverted = toGroupCurrency ? price * exchangeRate : price / exchangeRate;
-        setPrice(priceConverted);
     }
 
     public void setPrice(Number finalPrice) {
@@ -84,23 +62,15 @@ public class Item extends ParseObject {
         // A default constructor is required.
     }
 
-    public Item(Context context, int id, TextInputLayout tilName, TextInputLayout tilPrice,
-                CheckBox cbEnabled) {
-        mContext = context;
-        mTextInputLayoutName = tilName;
-        mEditTextName = mTextInputLayoutName.getEditText();
-        mTextInputLayoutPrice = tilPrice;
-        mEditTextPrice = mTextInputLayoutPrice.getEditText();
-        mCheckBoxEnabled = cbEnabled;
-        setIds(id);
-        setAccessRights(getCurrentGroup());
+    public Item(String name, BigDecimal price, List<ParseUser> usersInvolved) {
+        this(name, price);
+        setUsersInvolved(usersInvolved);
     }
 
-    public void setIds(int id) {
-        mEditTextName.setId(id);
-        mEditTextPrice.setId(id + 1000);
-        mCheckBoxEnabled.setId(id + 2000);
-        mCheckBoxEnabled.setTag(id - 1);
+    public Item(String name, BigDecimal price) {
+        setName(name);
+        setPrice(price);
+        setAccessRights(getCurrentGroup());
     }
 
     private void setAccessRights(ParseObject group) {
@@ -113,6 +83,21 @@ public class Item extends ParseObject {
         return currentUser.getCurrentGroup();
     }
 
+    public double getPriceForeign(double exchangeRate) {
+        double price = getPrice();
+        if (exchangeRate == 1) {
+            return price;
+        }
+
+        return price / exchangeRate;
+    }
+
+    public void convertPrice(double exchangeRate, boolean toGroupCurrency) {
+        double price = getPrice();
+        double priceConverted = toGroupCurrency ? price * exchangeRate : price / exchangeRate;
+        setPrice(priceConverted);
+    }
+
     public List<String> getUsersInvolvedIds() {
         List<String> listIds = new ArrayList<>();
         List<ParseUser> list = getUsersInvolved();
@@ -120,108 +105,5 @@ public class Item extends ParseObject {
             listIds.add(user.getObjectId());
         }
         return listIds;
-    }
-
-    public String getEditTextName() {
-        return mEditTextName.getText().toString().trim();
-    }
-
-    public void setEditTextName(String name) {
-        mEditTextName.setText(name);
-    }
-
-    public BigDecimal getEditTextPrice(String currencyCode) {
-        BigDecimal price = BigDecimal.ZERO;
-        String priceString = mEditTextPrice.getText().toString();
-
-        if (!TextUtils.isEmpty(priceString)) {
-            int maxFractionDigits = MoneyUtils.getMaximumFractionDigits(currencyCode);
-            price = MoneyUtils.parsePrice(priceString).setScale(maxFractionDigits,
-                    BigDecimal.ROUND_HALF_UP);
-        }
-
-        return price;
-    }
-
-    public void setEditTextPrice(String price) {
-        mEditTextPrice.setText(price);
-    }
-
-    public boolean isCheckBoxChecked() {
-        return mCheckBoxEnabled.isChecked();
-    }
-
-    public void setCheckBoxChecked(boolean isEnabled) {
-        mCheckBoxEnabled.setChecked(isEnabled);
-    }
-
-    public void setCheckBoxColor(boolean isSpecial) {
-        if (isSpecial) {
-            if (Utils.isRunningLollipopAndHigher()) {
-                setCheckBoxTintList(mContext.getResources()
-                        .getColorStateList(R.color.checkbox_color_red));
-            }
-        } else {
-            if (Utils.isRunningLollipopAndHigher()) {
-                setCheckBoxTintList(mContext.getResources()
-                        .getColorStateList(R.color.checkbox_color_accent));
-            }
-        }
-        // TODO: implement for android versions <5.0
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void setCheckBoxTintList(ColorStateList colorStateList) {
-        mCheckBoxEnabled.setButtonTintList(colorStateList);
-    }
-
-    public void setPriceImeOptions(int imeOption) {
-        mEditTextPrice.setImeOptions(imeOption);
-    }
-
-    public void formatPrice(String currencyCode) {
-        String price = mEditTextPrice.getText().toString();
-        if (!TextUtils.isEmpty(price)) {
-            mEditTextPrice.setText(MoneyUtils.formatPrice(price, currencyCode));
-        }
-    }
-
-    public boolean setValuesFromEditTexts(boolean acceptEmptyFields, String currencySelected) {
-        boolean isComplete = true;
-
-        String name = getEditTextName();
-        String priceString = mEditTextPrice.getText().toString();
-
-        // check if name is empty
-        if (!acceptEmptyFields && TextUtils.isEmpty(name)) {
-            mTextInputLayoutName.setError(mContext.getString(R.string.error_item_name));
-            isComplete = false;
-        } else {
-            mTextInputLayoutName.setErrorEnabled(false);
-        }
-
-        // check if price is empty
-        BigDecimal price = BigDecimal.ZERO;
-        if (!acceptEmptyFields && TextUtils.isEmpty(priceString)) {
-            mTextInputLayoutPrice.setError(mContext.getString(R.string.error_item_price));
-            isComplete = false;
-        } else {
-            mTextInputLayoutPrice.setErrorEnabled(false);
-            price = MoneyUtils.parsePrice(priceString);
-            int maxFractionDigits = MoneyUtils.getMaximumFractionDigits(currencySelected);
-            price = price.setScale(maxFractionDigits, BigDecimal.ROUND_HALF_UP);
-        }
-
-        // if name and price fields are not empty, send data to parse.com
-        if (isComplete) {
-            setName(name);
-            setPrice(price);
-        }
-
-        return isComplete;
-    }
-
-    public void requestFocusForName() {
-        mEditTextName.requestFocus();
     }
 }

@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import ch.giantific.qwittig.data.models.ItemRow;
 import ch.giantific.qwittig.data.models.ItemUsersChecked;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Item;
@@ -169,16 +170,16 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     }
 
     private void restoreOldItemValues() {
-        List<ParseObject> itemsNew = new ArrayList<>();
+        List<ItemRow> itemRowsNew = new ArrayList<>();
         int oldItemsSize = mOldItems.size();
         for (int i = 0; i < oldItemsSize; i++) {
             final Item itemOld = (Item) mOldItems.get(i);
-            final Item itemNew = (Item) addNewItemRow(i + 1);
-            itemNew.setEditTextName(itemOld.getName());
+            final ItemRow itemRowNew = addNewItemRow(i + 1);
+            itemRowNew.setEditTextName(itemOld.getName());
             String price = MoneyUtils.formatMoneyNoSymbol(itemOld.getPriceForeign(mOldExchangeRate),
                     mCurrencySelected);
-            itemNew.setEditTextPrice(price);
-            itemsNew.add(itemNew);
+            itemRowNew.setEditTextPrice(price);
+            itemRowsNew.add(itemRowNew);
 
             // update ImeOptions
             setEditTextPriceImeOptions();
@@ -188,12 +189,12 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
             ItemUsersChecked itemUsersChecked = mItemsUsersChecked.get(i);
             itemUsersChecked.setUsersChecked(ParseUserToBoolean(usersInvolved));
             if (buyerIsOnlyUserInvolved(usersInvolved)) {
-                itemNew.setCheckBoxChecked(false);
+                itemRowNew.setCheckBoxChecked(false);
             }
         }
-        Item firstItem = (Item) itemsNew.get(0);
-        if (firstItem != null) {
-            firstItem.requestFocusForName();
+        ItemRow firstItemRow = itemRowsNew.get(0);
+        if (firstItemRow != null) {
+            firstItemRow.requestFocusForName();
         }
         mItemRowCount = oldItemsSize;
     }
