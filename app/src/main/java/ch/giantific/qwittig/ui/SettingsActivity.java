@@ -65,7 +65,6 @@ public class SettingsActivity extends BaseActivity implements
     private SettingsFragment mSettingsFragment;
     private User mCurrentUser;
     private Group mCurrentGroup;
-    private boolean mDeleteGroup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,14 +182,10 @@ public class SettingsActivity extends BaseActivity implements
 
     @Override
     public void onUsersLocalQueried(List<ParseUser> users) {
-        String message;
-        if (users.size() == 1 && users.get(0).getObjectId().equals(mCurrentUser.getObjectId())) {
-            message = getString(R.string.dialog_group_leave_delete_message);
-            mDeleteGroup = true;
-        } else {
-            message = getString(R.string.dialog_group_leave_message);
-            mDeleteGroup = false;
-        }
+        String message = users.size() == 1 &&
+                users.get(0).getObjectId().equals(mCurrentUser.getObjectId()) ?
+                getString(R.string.dialog_group_leave_delete_message) :
+                getString(R.string.dialog_group_leave_message);
 
         GroupLeaveDialogFragment groupLeaveDialogFragment =
                 GroupLeaveDialogFragment.newInstance(message);
@@ -212,11 +207,7 @@ public class SettingsActivity extends BaseActivity implements
             return;
         }
 
-        final Group groupToLeaveOrDelete = mCurrentGroup;
         deleteCurrentUserFromCurrentGroup();
-        if (mDeleteGroup) {
-            groupToLeaveOrDelete.deleteEventually();
-        }
     }
 
     private void deleteCurrentUserFromCurrentGroup() {
@@ -253,6 +244,9 @@ public class SettingsActivity extends BaseActivity implements
                 "group_leave_balance_not_zero");
     }
 
+    /**
+     * Callback from dialog when user decides to create a new settlement
+     */
     @Override
     public void startNewSettlement() {
         Intent intent = new Intent(this, CompensationsActivity.class);
