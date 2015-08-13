@@ -10,12 +10,10 @@ import android.util.AttributeSet;
 import android.widget.CheckBox;
 
 import com.google.common.primitives.Booleans;
-import com.parse.ParseUser;
 
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.ItemRow;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
@@ -54,7 +52,8 @@ public class ListCheckBox extends CheckBox {
 
     /**
      * Updates the usersInvolved for the item where the checkbox was clicked.
-     * @param buyerPosition the position of the buyer
+     *
+     * @param buyerPosition         the position of the buyer
      * @param purchaseUsersInvolved list with purchase wide usersInvolved
      */
     public void updateUsersCheckedAfterCheckedChange(int buyerPosition,
@@ -94,6 +93,7 @@ public class ListCheckBox extends CheckBox {
 
     /**
      * Unchecks all users except the buyer of the purchase
+     *
      * @param buyerPosition the position of the buyer
      */
     private void unCheckAllUsersExceptBuyer(int buyerPosition) {
@@ -105,7 +105,7 @@ public class ListCheckBox extends CheckBox {
     /**
      * Checks if the given user is selected/unselected and changes it accordingly
      *
-     * @param purchaseUserPosition the position of the user that was clicked in the purchase wide selection
+     * @param purchaseUserPosition  the position of the user that was clicked in the purchase wide selection
      * @param purchaseUserIsChecked whether the user is now checked or unchecked
      */
     public void updateUsersCheckedAfterPurchaseUserClick(int purchaseUserPosition, boolean purchaseUserIsChecked) {
@@ -166,6 +166,7 @@ public class ListCheckBox extends CheckBox {
 
     /**
      * Sets the color depending on the users checked differ from the purchase wide or not
+     *
      * @param isSpecial whether users checked differ from the purchase wide or not
      */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -175,6 +176,8 @@ public class ListCheckBox extends CheckBox {
         } else {
             setButtonTintList(getResources().getColorStateList(R.color.checkbox_color_accent));
         }
+
+        // TODO: implement for Android <5.0
     }
 
     @NonNull
