@@ -121,16 +121,6 @@ public class PurchaseAddActivity extends PurchaseBaseActivity implements
     }
 
     @Override
-    public void onRatesFetchSuccessful(Map<String, Double> exchangeRates) {
-        ((PurchaseAddFragment) mPurchaseFragment).onRatesFetchSuccessful(exchangeRates);
-    }
-
-    @Override
-    public void onRatesFetchFailed(String errorMessage) {
-        ((PurchaseAddFragment) mPurchaseFragment).onRatesFetchFailed(errorMessage);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {

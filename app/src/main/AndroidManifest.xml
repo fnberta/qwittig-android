@@ -28,13 +28,13 @@
         android:required="false" />
 
     <application
-        android:name="ch.giantific.qwittig.Qwittig"
+        android:name=".Qwittig"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="ch.giantific.qwittig.ui.HomeActivity"
+            android:name=".ui.HomeActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.WithNavDrawer" >
             <intent-filter>
@@ -65,76 +65,76 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="ch.giantific.qwittig.ui.SettingsActivity"
+            android:name=".ui.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName="ch.giantific.qwittig.ui.HomeActivity" >
+            android:parentActivityName=".ui.HomeActivity" >
         </activity>
         <activity
-            android:name="ch.giantific.qwittig.ui.PurchaseDetailsActivity"
+            android:name=".ui.PurchaseDetailsActivity"
             android:label="@string/title_activity_purchase_details"
-            android:parentActivityName="ch.giantific.qwittig.ui.HomeActivity"
+            android:parentActivityName=".ui.HomeActivity"
             android:theme="@style/AppTheme.WithNavDrawer" >
         </activity>
         <activity
-            android:name="ch.giantific.qwittig.ui.PurchaseAddActivity"
+            android:name=".ui.PurchaseAddActivity"
             android:label="@string/title_activity_add_purchase"
-            android:parentActivityName="ch.giantific.qwittig.ui.HomeActivity"
+            android:parentActivityName=".ui.HomeActivity"
             android:windowSoftInputMode="stateUnchanged" >
         </activity>
         <activity
-            android:name="ch.giantific.qwittig.ui.PurchaseEditActivity"
+            android:name=".ui.PurchaseEditActivity"
             android:label="@string/title_activity_edit_purchase"
-            android:parentActivityName="ch.giantific.qwittig.ui.PurchaseDetailsActivity"
+            android:parentActivityName=".ui.PurchaseDetailsActivity"
             android:windowSoftInputMode="stateUnchanged" >
         </activity>
         <activity
-            android:name="ch.giantific.qwittig.ui.LoginActivity"
+            android:name=".ui.LoginActivity"
             android:label="@string/title_activity_login"
             android:theme="@style/AppTheme.WithNavDrawer.Login"
             android:windowSoftInputMode="stateUnchanged|adjustPan" />
         <activity
-            android:name="ch.giantific.qwittig.ui.SettingsGroupNewActivity"
+            android:name=".ui.SettingsGroupNewActivity"
             android:label="@string/title_activity_settings_group_new"
-            android:parentActivityName="ch.giantific.qwittig.ui.SettingsActivity"
+            android:parentActivityName=".ui.SettingsActivity"
             android:windowSoftInputMode="stateUnchanged" >
         </activity>
         <activity
-            android:name="ch.giantific.qwittig.ui.SettingsUserInviteActivity"
+            android:name=".ui.SettingsUserInviteActivity"
             android:label="@string/title_activity_settings_user_invite"
-            android:parentActivityName="ch.giantific.qwittig.ui.SettingsActivity"
+            android:parentActivityName=".ui.SettingsActivity"
             android:windowSoftInputMode="stateUnchanged" >
         </activity>
         <activity
-            android:name="ch.giantific.qwittig.ui.SettingsProfileActivity"
+            android:name=".ui.SettingsProfileActivity"
             android:label="@string/title_activity_settings_profile"
-            android:parentActivityName="ch.giantific.qwittig.ui.SettingsActivity"
+            android:parentActivityName=".ui.SettingsActivity"
             android:windowSoftInputMode="stateUnchanged" >
         </activity>
         <activity
-            android:name="ch.giantific.qwittig.ui.CompensationsActivity"
+            android:name=".ui.CompensationsActivity"
             android:label="@string/title_activity_settlement"
-            android:parentActivityName="ch.giantific.qwittig.ui.HomeActivity"
+            android:parentActivityName=".ui.HomeActivity"
             android:theme="@style/AppTheme.WithNavDrawer" >
         </activity>
         <activity
-            android:name="ch.giantific.qwittig.ui.SettingsStoresActivity"
+            android:name=".ui.SettingsStoresActivity"
             android:label="@string/title_activity_settings_stores"
-            android:parentActivityName="ch.giantific.qwittig.ui.SettingsActivity" >
+            android:parentActivityName=".ui.SettingsActivity" >
         </activity>
         <activity
-            android:name="ch.giantific.qwittig.ui.HelpFeedbackActivity"
+            android:name=".ui.HelpFeedbackActivity"
             android:label="@string/title_activity_help_feedback"
-            android:parentActivityName="ch.giantific.qwittig.ui.HomeActivity" >
+            android:parentActivityName=".ui.HomeActivity" >
         </activity>
         <activity
-            android:name="ch.giantific.qwittig.ui.PurchaseDraftsActivity"
+            android:name=".ui.PurchaseDraftsActivity"
             android:label="@string/title_activity_purchase_drafts"
             android:theme="@style/AppTheme.WithNavDrawer" >
         </activity>
         <activity
-            android:name="ch.giantific.qwittig.ui.StatsActivity"
+            android:name=".ui.StatsActivity"
             android:label="@string/title_activity_stats"
-            android:theme="@style/AppTheme.WithNavDrawer">
+            android:theme="@style/AppTheme.WithNavDrawer" >
         </activity>
 
         <service android:name="com.parse.PushService" />
@@ -150,7 +150,7 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name="ch.giantific.qwittig.PushBroadcastReceiver"
+            android:name=".PushBroadcastReceiver"
             android:exported="false" >
             <intent-filter>
                 <action android:name="com.parse.push.intent.RECEIVE" />
@@ -165,6 +165,10 @@
             android:name="com.parse.push.notification_icon"
             android:resource="@mipmap/ic_launcher" />
 
+        <service
+            android:name=".services.ParseQueryService"
+            android:exported="false" >
+        </service>
     </application>
 
 </manifest>

@@ -102,43 +102,24 @@ public class PurchaseEditDraftFragment extends PurchaseEditFragment implements
     }
 
     @Override
-    void checkIfReceiptNull() {
-        if (mReceiptFileNew != null) {
-            saveReceiptFile();
-        } else {
-            savePurchaseInParse();
-        }
+    boolean isDraft() {
+        return true;
     }
 
     @Override
-    void onReceiptFileSaved() {
-        mPurchase.removeReceiptData();
-        super.onReceiptFileSaved();
-    }
-
-    @Override
-    void onParseError(ParseException e) {
+    public void onParseError(ParseException e) {
         mPurchase.setDraftId(mEditPurchaseId);
         super.onParseError(e);
     }
 
     @Override
-    protected void onSaveSucceeded() {
-        mPurchase.unpinInBackground(new DeleteCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e != null) {
-                    return;
-                }
-
-                pinPurchase(false);
-            }
-        });
-    }
-
-    @Override
     protected void savePurchaseAsDraft() {
         replacePurchaseData();
+
+        ParseFile receiptFile = mListener.getReceiptParseFile();
+        if (receiptFile != null) {
+            mPurchase.setReceiptParseFile(receiptFile);
+        }
 
         pinPurchaseAsDraft();
     }

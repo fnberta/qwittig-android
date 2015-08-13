@@ -9,6 +9,7 @@ import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
@@ -38,13 +39,22 @@ public class ParseUtils {
         return currencyCode;
     }
 
-    private static Group getCurrentGroup() {
+    public static Group getCurrentGroup() {
         User currentUser = (User) ParseUser.getCurrentUser();
         Group currentGroup = null;
         if (currentUser != null) {
             currentGroup = currentUser.getCurrentGroup();
         }
         return currentGroup;
+    }
+
+    public static List<ParseObject> getCurrentUserGroups() {
+        User currentUser = (User) ParseUser.getCurrentUser();
+        if (currentUser == null) {
+            return Collections.emptyList();
+        }
+
+        return currentUser.getGroups();
     }
 
     public static boolean isTestUser(ParseUser parseUser) {

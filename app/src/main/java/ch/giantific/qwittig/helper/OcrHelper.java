@@ -1,14 +1,12 @@
 package ch.giantific.qwittig.helper;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import com.parse.GetCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseSession;
 
@@ -26,7 +24,7 @@ import retrofit.mime.TypedString;
 /**
  * Created by fabio on 10.12.14.
  */
-public class OcrHelper extends Fragment {
+public class OcrHelper extends BaseHelper {
 
     private static final String LOG_TAG = OcrHelper.class.getSimpleName();
     private static final String BUNDLE_RECEIPT = "receipt";
@@ -61,9 +59,6 @@ public class OcrHelper extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Retain this fragment across configuration changes.
-        setRetainInstance(true);
 
         Bundle args = getArguments();
         if (args != null) {
@@ -121,7 +116,7 @@ public class OcrHelper extends Fragment {
                     }
                 });
     }
-    
+
     @Override
     public void onDetach() {
         super.onDetach();
@@ -130,6 +125,7 @@ public class OcrHelper extends Fragment {
 
     public interface HelperInteractionListener {
         void onOcrSuccessful(PurchaseRest purchaseRest);
+
         void onOcrFailed(String errorMessage);
     }
 }

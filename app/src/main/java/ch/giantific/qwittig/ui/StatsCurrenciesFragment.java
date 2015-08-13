@@ -13,7 +13,7 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.utils.PercentFormatter;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.CloudCode;
+import ch.giantific.qwittig.helper.StatsHelper;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,6 +21,7 @@ import ch.giantific.qwittig.data.parse.CloudCode;
 public class StatsCurrenciesFragment extends StatsPieBaseFragment {
 
     private static final String LOG_TAG = StatsCurrenciesFragment.class.getSimpleName();
+    private static final String STATS_HELPER = "stats_helper_currencies";
 
     public StatsCurrenciesFragment() {
         // Required empty public constructor
@@ -44,26 +45,15 @@ public class StatsCurrenciesFragment extends StatsPieBaseFragment {
     }
 
     @Override
-    void calcStats(String year, int month) {
-        super.calcStats(year, month);
-
-        String groupId = mCurrentGroup.getObjectId();
-        CloudCode.statsCurrencies(getActivity(), this, groupId, year, month);
+    protected String getHelperTag() {
+        return STATS_HELPER;
     }
 
     @Override
-    public void onCloudFunctionReturned(String cloudFunction, Object o) {
-        super.onCloudFunctionReturned(cloudFunction, o);
+    void calcStats(String year, int month) {
+        super.calcStats(year, month);
 
-        switch (cloudFunction) {
-            case CloudCode.STATS_CURRENCIES: {
-                String dataJson = (String) o;
-                mStatsData = parseJson(dataJson);
-
-                setChartData();
-                break;
-            }
-        }
+        calcStatsWithHelper(StatsHelper.TYPE_CURRENCIES, year, month);
     }
 
     @Override

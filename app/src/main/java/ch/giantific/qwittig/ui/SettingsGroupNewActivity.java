@@ -14,14 +14,19 @@ import android.view.View;
 
 import com.github.jorgecastilloprz.FABProgressCircle;
 import com.github.jorgecastilloprz.listeners.FABProgressListener;
+import com.parse.ParseException;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.parse.models.Group;
+import ch.giantific.qwittig.helper.CreateGroupHelper;
+import ch.giantific.qwittig.helper.InviteUsersHelper;
 import ch.giantific.qwittig.ui.widgets.TransitionListenerAdapter;
 import ch.giantific.qwittig.utils.Utils;
 
 public class SettingsGroupNewActivity extends BaseActivity implements
         SettingsGroupNewFragment.FragmentInteractionListener,
-        FABProgressListener {
+        FABProgressListener,
+        CreateGroupHelper.HelperInteractionListener {
 
     private static final String GROUP_NEW_FRAGMENT = "group_new_fragment";
     public static final String RESULT_DATA_GROUP = "result_data_group";
@@ -130,6 +135,26 @@ public class SettingsGroupNewActivity extends BaseActivity implements
         intentNewGroupName.putExtra(RESULT_DATA_GROUP, mNewGroupName);
         setResult(RESULT_OK, intentNewGroupName);
         ActivityCompat.finishAfterTransition(this);
+    }
+
+    @Override
+    public void onNewGroupCreated(Group newGroup, boolean invitingUser) {
+        mSettingsGroupNewFragment.onNewGroupCreated(newGroup, invitingUser);
+    }
+
+    @Override
+    public void onCreateNewGroupFailed(ParseException e) {
+        mSettingsGroupNewFragment.onCreateNewGroupFailed(e);
+    }
+
+    @Override
+    public void onUsersInvited() {
+        mSettingsGroupNewFragment.onUsersInvited();
+    }
+
+    @Override
+    public void onInviteUsersFailed(ParseException e) {
+        mSettingsGroupNewFragment.onInviteUsersFailed(e);
     }
 
     @Override

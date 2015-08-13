@@ -6,7 +6,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 
 import com.parse.ParseObject;
 
@@ -14,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.models.ItemRow;
 import ch.giantific.qwittig.data.parse.models.Item;
 import ch.giantific.qwittig.data.ocr.models.ItemRest;
 import ch.giantific.qwittig.data.ocr.models.PurchaseRest;
@@ -95,7 +95,7 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
     @Override
     void revealFab() {
         if (mOcrValuesAreSet) {
-            mListener.showFab();
+            mListener.showFab(false);
         }
     }
 
@@ -122,24 +122,24 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
         mTextViewPickStore.setText(purchaseRest.getStore());
 
         // set item rows
-        List<ParseObject> itemsNew = new ArrayList<>();
+        List<ItemRow> itemRowsNew = new ArrayList<>();
         List<ItemRest> itemsRest = purchaseRest.getItems();
         int itemsRestSize = itemsRest.size();
         for (int i = 0; i < itemsRestSize; i++) {
             final ItemRest itemRest = itemsRest.get(i);
-            final Item itemNew = (Item) addNewItemRow(i + 1);
-            itemNew.setEditTextName(itemRest.getName());
+            final ItemRow itemRowNew = addNewItemRow(i + 1);
+            itemRowNew.setEditTextName(itemRest.getName());
             String price = MoneyUtils.formatPrice(itemRest.getPrice(), mCurrencySelected);
-            itemNew.setEditTextPrice(price);
-            itemsNew.add(itemNew);
+            itemRowNew.setEditTextPrice(price);
+            itemRowsNew.add(itemRowNew);
 
             // update ImeOptions
             setEditTextPriceImeOptions();
         }
 
-        if (!itemsNew.isEmpty()) {
-            Item firstItem = (Item) itemsNew.get(0);
-            firstItem.requestFocusForName();
+        if (!itemRowsNew.isEmpty()) {
+            ItemRow firstItemRow = itemRowsNew.get(0);
+            firstItemRow.requestFocusForName();
         }
 
         mItemRowCount = itemsRestSize;
@@ -154,19 +154,17 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
     }
 
     @Override
-    protected void onSaveSucceeded() {
+    public void onPurchaseSaveAndPinSucceeded() {
         if (mInTrialMode) {
             mCurrentUser.incrementPremiumCount();
             mCurrentUser.saveEventually();
         }
 
-        super.onSaveSucceeded();
+        super.onPurchaseSaveAndPinSucceeded();
     }
 
     @Override
-    void onPinSucceeded() {
-        mIsSaving = false;
-        mListener.setResultForSnackbar(PurchaseBaseActivity.PURCHASE_SAVED_AUTO);
-        mListener.progressCircleStartFinal();
+    int getPurchaseSavedAction() {
+        return PurchaseBaseActivity.PURCHASE_SAVED_AUTO;
     }
 }

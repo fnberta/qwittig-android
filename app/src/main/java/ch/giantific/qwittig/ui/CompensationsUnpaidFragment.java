@@ -3,9 +3,12 @@ package ch.giantific.qwittig.ui;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -26,10 +29,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.CloudCode;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Compensation;
 import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.helper.CompensationRemindHelper;
+import ch.giantific.qwittig.helper.CompensationSaveHelper;
+import ch.giantific.qwittig.helper.SettlementHelper;
 import ch.giantific.qwittig.ui.adapter.CompensationsUnpaidRecyclerAdapter;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
@@ -42,12 +47,12 @@ import ch.giantific.qwittig.utils.Utils;
 public class CompensationsUnpaidFragment extends CompensationsBaseFragment implements
         CompensationsUnpaidRecyclerAdapter.AdapterInteractionListener,
         LocalQuery.CompensationLocalQueryListener,
-        CloudCode.CloudFunctionListener,
         FABProgressListener {
 
     private static final String BUNDLE_AUTO_START_NEW = "auto_start_new";
     private static final String STATE_COMPENSATIONS_LOADING = "state_comps_loading";
     private static final String STATE_IS_CALCULATING_NEW = "state_is_calculating_new";
+    private static final String COMPENSATION_SAVE_HELPER = "compensation_save_helper";
     private static final String LOG_TAG = CompensationsUnpaidFragment.class.getSimpleName();
     private TextView mTextViewEmptyTitle;
     private TextView mTextViewEmptySubtitle;
@@ -241,7 +246,7 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
         }
 
         if (!Utils.isConnected(getActivity())) {
-            MessageUtils.showBasicSnackbar(mFabNew, getString(R.string.toast_no_connection));
+            showSettlementErrorSnackbar(getString(R.string.toast_no_connection));
             return;
         }
 
@@ -249,71 +254,71 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
             if (mCompensationsAll.isEmpty()) {
                 mIsCalculatingNew = true;
                 mFabProgressCircle.show();
-                CloudCode.startNewSettlement(getActivity(), mCurrentGroup, false, this);
+                calculateNewSettlementWithHelper();
             } else {
                 MessageUtils.showBasicSnackbar(mRecyclerView,
                         getString(R.string.toast_compensation_finish_old));
             }
         }
     }
+    
+    private void calculateNewSettlementWithHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        SettlementHelper settlementHelper = findSettlementHelper(fragmentManager);
 
-    @Override
-    public void onCloudFunctionError(ParseException e) {
-        mFabProgressCircle.hide();
-        MessageUtils.showBasicSnackbar(mFabNew, ParseErrorHandler.getErrorMessage(getActivity(), e));
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (settlementHelper == null) {
+            settlementHelper = SettlementHelper.newInstance(false);
 
-        if (!mLoadingCompensations.isEmpty()) {
-            for (Iterator<String> iterator = mLoadingCompensations.iterator(); iterator.hasNext(); ) {
-                String loadingCompensationId = iterator.next();
-                for (int i = 0, compensationsSize = mCompensations.size(); i < compensationsSize; i++) {
-                    Compensation compensation = (Compensation) mCompensations.get(i);
-                    if (loadingCompensationId.equals(compensation.getObjectId())) {
-                        compensation.setIsLoading(false);
-                        mRecyclerAdapter.notifyItemChanged(i);
-                        iterator.remove();
-                        break;
-                    }
-                }
-            }
+            fragmentManager.beginTransaction()
+                    .add(settlementHelper, SettlementHelper.SETTLEMENT_HELPER)
+                    .commit();
         }
-
-        // TODO: find a way to disable only the specific compensation concerned
     }
 
-    @Override
-    public void onCloudFunctionReturned(String cloudFunction, Object o) {
-        switch (cloudFunction) {
-            case CloudCode.PUSH_COMPENSATION_REMIND: {
-                String compensationId = (String) o;
-                Compensation compensation = setCompensationLoading(compensationId, false);
+    private SettlementHelper findSettlementHelper(FragmentManager fragmentManager) {
+        return (SettlementHelper) fragmentManager.findFragmentByTag(SettlementHelper.SETTLEMENT_HELPER);
+    }
 
-                String nickname = "";
-                if (compensation != null) {
-                    User payer = compensation.getPayer();
-                    nickname = payer.getNickname();
-                }
-                MessageUtils.showBasicSnackbar(mRecyclerView,
-                        getString(R.string.toast_compensation_reminded_user, nickname));
-                break;
-            }
-            case CloudCode.PUSH_COMPENSATION_REMIND_PAID: {
-                String compensationId = (String) o;
-                Compensation compensation = setCompensationLoading(compensationId, false);
+    private void removeSettlementHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        SettlementHelper settlementHelper = findSettlementHelper(fragmentManager);
 
-                String nickname = "";
-                if (compensation != null) {
-                    User beneficiary = compensation.getBeneficiary();
-                    nickname = beneficiary.getNickname();
-                }
-                MessageUtils.showBasicSnackbar(mRecyclerView,
-                        getString(R.string.toast_compensation_reminded_user_paid,
-                                nickname));
-                break;
-            }
-            case CloudCode.SETTLEMENT_NEW:
-                // do nothing
-                break;
+        if (settlementHelper != null) {
+            fragmentManager.beginTransaction().remove(settlementHelper).commitAllowingStateLoss();
         }
+    }
+
+    /**
+     * Called from activity when helper created new settlement
+     * @param result object returned from CloudCode
+     */
+    public void onNewSettlementCreated(Object result) {
+        removeSettlementHelper();
+    }
+
+    /**
+     * Called from activity when helper failed to create a new settlement
+     * @param e
+     */
+    public void onNewSettlementCreationFailed(ParseException e) {
+        ParseErrorHandler.handleParseError(getActivity(), e);
+        showSettlementErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
+        removeSettlementHelper();
+
+        mFabProgressCircle.hide();
+    }
+
+    private void showSettlementErrorSnackbar(String errorMessage) {
+        Snackbar snackbar = MessageUtils.getBasicSnackbar(mRecyclerView, errorMessage);
+        snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                newSettlement();
+            }
+        });
+        snackbar.show();
     }
 
     private Compensation setCompensationLoading(String objectId, boolean isLoading) {
@@ -330,9 +335,9 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
         return compensationLoading;
     }
 
-    private void setCompensationLoading(Compensation compensation, String objectId, int position,
+    private void setCompensationLoading(ParseObject compensation, String objectId, int position,
                                                 boolean isLoading) {
-        compensation.setIsLoading(isLoading);
+        ((Compensation) compensation).setIsLoading(isLoading);
         mRecyclerAdapter.notifyItemChanged(position);
 
         if (isLoading) {
@@ -367,27 +372,63 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
 
         setCompensationLoading(compensation, compensationId, position, true);
         compensation.setPaid(true);
-        compensation.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e != null) {
-                    ParseErrorHandler.handleParseError(getActivity(), e);
-                    MessageUtils.showBasicSnackbar(mFabNew,
-                            ParseErrorHandler.getErrorMessage(getActivity(), e));
+        saveCompensationWithHelper(compensation);
+    }
 
-                    // position might have changed
-                    int compPosition = mCompensations.indexOf(compensation);
-                    setCompensationLoading(compensation, compensationId, compPosition, false);
-                    compensation.setPaid(false);
-                    return;
-                }
+    private void saveCompensationWithHelper(ParseObject compensation) {
+        FragmentManager fragmentManager = getFragmentManager();
+        CompensationSaveHelper saveHelper = findCompensationSaveHelper(fragmentManager);
 
-                // position might have changed
-                int compPosition = mCompensations.indexOf(compensation);
-                removeItemFromList(compPosition);
-                mLoadingCompensations.remove(compensationId);
-            }
-        });
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (saveHelper == null) {
+            saveHelper = new CompensationSaveHelper(compensation);
+
+            fragmentManager.beginTransaction()
+                    .add(saveHelper, COMPENSATION_SAVE_HELPER)
+                    .commit();
+        }
+    }
+
+    private CompensationSaveHelper findCompensationSaveHelper(FragmentManager fragmentManager) {
+        return (CompensationSaveHelper) fragmentManager.findFragmentByTag(COMPENSATION_SAVE_HELPER);
+    }
+
+    /**
+     * Called from activity when helper successfully saved compensation
+     * @param compensation
+     */
+    public void onCompensationSaved(ParseObject compensation) {
+        removeCompensationSaveHelper();
+
+        // position might have changed
+        int compPosition = mCompensations.indexOf(compensation);
+        removeItemFromList(compPosition);
+        mLoadingCompensations.remove(compensation.getObjectId());
+    }
+
+    /**
+     * Called from activity when helper failed to save compensation
+     * @param compensation
+     * @param e
+     */
+    public void onCompensationSaveFailed(ParseObject compensation, ParseException e) {
+        ParseErrorHandler.handleParseError(getActivity(), e);
+        MessageUtils.showBasicSnackbar(mFabNew, ParseErrorHandler.getErrorMessage(getActivity(), e));
+        removeCompensationSaveHelper();
+
+        // position might have changed
+        int compPosition = mCompensations.indexOf(compensation);
+        setCompensationLoading(compensation, compensation.getObjectId(), compPosition, false);
+    }
+
+    private void removeCompensationSaveHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        CompensationSaveHelper compensationSaveHelper = findCompensationSaveHelper(fragmentManager);
+
+        if (compensationSaveHelper != null) {
+            fragmentManager.beginTransaction().remove(compensationSaveHelper).commitAllowingStateLoss();
+        }
     }
 
     private void removeItemFromList(int position) {
@@ -415,8 +456,100 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
         }
 
         setCompensationLoading(compensation, compensationId, position, true);
-        CloudCode.pushCompensationRemind(getActivity(), compensationId, mCurrentGroup.getCurrency(),
-                this);
+        remindUserWithHelper(CompensationRemindHelper.TYPE_REMIND, compensationId);
+    }
+
+    private void remindUserWithHelper(@CompensationRemindHelper.RemindType int remindType,
+                                      String compensationId) {
+        FragmentManager fragmentManager = getFragmentManager();
+        CompensationRemindHelper compensationRemindHelper = findCompensationRemindHelper(fragmentManager);
+
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (compensationRemindHelper == null) {
+            compensationRemindHelper = CompensationRemindHelper.newInstance(remindType, compensationId);
+
+            fragmentManager.beginTransaction()
+                    .add(compensationRemindHelper, CompensationRemindHelper.COMPENSATION_REMIND_HELPER)
+                    .commit();
+        }
+    }
+
+    private CompensationRemindHelper findCompensationRemindHelper(FragmentManager fragmentManager) {
+        return (CompensationRemindHelper) fragmentManager.findFragmentByTag(
+                CompensationRemindHelper.COMPENSATION_REMIND_HELPER);
+    }
+
+    private void removeCompensationRemindHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        CompensationRemindHelper compensationRemindHelper = findCompensationRemindHelper(fragmentManager);
+
+        if (compensationRemindHelper != null) {
+            fragmentManager.beginTransaction().remove(compensationRemindHelper).commitAllowingStateLoss();
+        }
+    }
+
+    /**
+     * Called from activity when helper successfully reminded user
+     * @param remindType remind to pay or remind that paid
+     * @param compensationId
+     */
+    public void onUserReminded(int remindType, String compensationId) {
+        removeCompensationRemindHelper();
+
+        switch (remindType) {
+            case CompensationRemindHelper.TYPE_REMIND: {
+                Compensation compensation = setCompensationLoading(compensationId, false);
+
+                String nickname = "";
+                if (compensation != null) {
+                    User payer = compensation.getPayer();
+                    nickname = payer.getNickname();
+                }
+                MessageUtils.showBasicSnackbar(mRecyclerView,
+                        getString(R.string.toast_compensation_reminded_user, nickname));
+                break;
+            }
+            case CompensationRemindHelper.TYPE_REMIND_PAID: {
+                Compensation compensation = setCompensationLoading(compensationId, false);
+
+                String nickname = "";
+                if (compensation != null) {
+                    User beneficiary = compensation.getBeneficiary();
+                    nickname = beneficiary.getNickname();
+                }
+                MessageUtils.showBasicSnackbar(mRecyclerView,
+                        getString(R.string.toast_compensation_reminded_user_paid, nickname));
+                break;
+            }
+        }
+    }
+
+    /**
+     * Called from activity when helper failed to remind user
+     * @param remindType remind to pay or remind that paid
+     * @param e
+     */
+    public void onFailedToRemindUser(int remindType, ParseException e) {
+        ParseErrorHandler.handleParseError(getActivity(), e);
+        MessageUtils.showBasicSnackbar(mRecyclerView, ParseErrorHandler.getErrorMessage(getActivity(), e));
+        removeCompensationRemindHelper();
+
+        if (!mLoadingCompensations.isEmpty()) {
+            for (Iterator<String> iterator = mLoadingCompensations.iterator(); iterator.hasNext(); ) {
+                String loadingCompensationId = iterator.next();
+                for (int i = 0, compensationsSize = mCompensations.size(); i < compensationsSize; i++) {
+                    Compensation compensation = (Compensation) mCompensations.get(i);
+                    if (loadingCompensationId.equals(compensation.getObjectId())) {
+                        compensation.setIsLoading(false);
+                        mRecyclerAdapter.notifyItemChanged(i);
+                        iterator.remove();
+                        break;
+                    }
+                }
+            }
+        }
+        // TODO: find a way to disable only the specific compensation concerned
     }
 
     @Override
@@ -438,8 +571,7 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
         }
 
         setCompensationLoading(compensation, compensationId, position, true);
-        CloudCode.pushCompensationRemindPaid(getActivity(), compensationId,
-                mCurrentGroup.getCurrency(), this);
+        remindUserWithHelper(CompensationRemindHelper.TYPE_REMIND_PAID, compensationId);
     }
 
     @Override

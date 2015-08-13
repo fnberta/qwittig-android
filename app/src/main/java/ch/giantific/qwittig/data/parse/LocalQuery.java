@@ -1,6 +1,7 @@
 package ch.giantific.qwittig.data.parse;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.parse.DeleteCallback;
@@ -74,18 +75,6 @@ public class LocalQuery {
 
                 if (listener != null) {
                     listener.onObjectFetched(parseObject);
-                }
-            }
-        });
-    }
-
-    public static void unpinLocalPurchase(final Context context, String purchaseId, String groupId) {
-        ParseObject purchase = ParseObject.createWithoutData(Purchase.CLASS, purchaseId);
-        purchase.unpinInBackground(Purchase.PIN_LABEL + groupId, new DeleteCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e == null) {
-                    OnlineQuery.notifyPurchaseChange(context, null);
                 }
             }
         });
@@ -206,18 +195,6 @@ public class LocalQuery {
 
                 if (listener != null) {
                     listener.onCompensationsLocalQueried(parseObjects);
-                }
-            }
-        });
-    }
-
-    public static void unpinLocalCompensation(final Context context, String compensationId) {
-        ParseObject compensation = ParseObject.createWithoutData(Compensation.CLASS, compensationId);
-        compensation.unpinInBackground(Compensation.PIN_LABEL_UNPAID, new DeleteCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e == null) {
-                    OnlineQuery.notifyCompensationChange(context, null, false);
                 }
             }
         });

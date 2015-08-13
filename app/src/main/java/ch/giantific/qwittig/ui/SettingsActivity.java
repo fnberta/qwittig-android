@@ -7,28 +7,23 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.parse.LogOutCallback;
 import com.parse.ParseException;
-import com.parse.ParseInstallation;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.CloudCode;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Group;
-import ch.giantific.qwittig.data.parse.models.Installation;
 import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.helper.DeleteAccountHelper;
 import ch.giantific.qwittig.helper.LogoutHelper;
 import ch.giantific.qwittig.ui.dialogs.AccountDeleteDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.GroupLeaveBalanceNotZeroDialogFragment;
@@ -44,9 +39,9 @@ public class SettingsActivity extends BaseActivity implements
         SettingsFragment.FragmentInteractionListener,
         GroupLeaveBalanceNotZeroDialogFragment.FragmentInteractionListener,
         AccountDeleteDialogFragment.DialogInteractionListener,
-        CloudCode.CloudFunctionListener,
         LocalQuery.UserLocalQueryListener,
-        LogoutHelper.HelperInteractionListener {
+        LogoutHelper.HelperInteractionListener,
+        DeleteAccountHelper.HelperInteractionListener {
 
     public static final String PREF_CATEGORY_ME = "pref_category_me";
     public static final String PREF_PROFILE = "pref_profile";
@@ -61,6 +56,7 @@ public class SettingsActivity extends BaseActivity implements
     public static final int RESULT_GROUP_CHANGED = 3;
     private static final String SETTINGS_FRAGMENT = "settings_fragment";
     private static final String LOGOUT_HELPER = "logout_helper";
+    private static final String DELETE_ACCOUNT_HELPER = "delete_account_helper";
     private static final int UPDATE_LIST_NAME = 1;
     private static final int UPDATE_LIST_GROUP = 2;
     private static final String LOG_TAG = SettingsActivity.class.getSimpleName();
@@ -300,17 +296,17 @@ public class SettingsActivity extends BaseActivity implements
         }
 
         showProgressDialog(getString(R.string.progress_logout));
-        logOutWithHelper(false);
+        logOutWithHelper();
     }
 
-    private void logOutWithHelper(boolean deleteUser) {
+    private void logOutWithHelper() {
         FragmentManager fragmentManager = getFragmentManager();
         LogoutHelper logoutHelper = findLogoutHelper(fragmentManager);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
         if (logoutHelper == null) {
-            logoutHelper = LogoutHelper.newInstance(deleteUser);
+            logoutHelper = new LogoutHelper();
 
             fragmentManager.beginTransaction()
                     .add(logoutHelper, LOGOUT_HELPER)
@@ -346,7 +342,7 @@ public class SettingsActivity extends BaseActivity implements
         LogoutHelper loginHelper = findLogoutHelper(fragmentManager);
 
         if (loginHelper != null) {
-            fragmentManager.beginTransaction().remove(loginHelper).commit();
+            fragmentManager.beginTransaction().remove(loginHelper).commitAllowingStateLoss();
         }
     }
 
@@ -378,21 +374,42 @@ public class SettingsActivity extends BaseActivity implements
         }
 
         showProgressDialog(getString(R.string.progress_account_delete));
-        CloudCode.deleteAccount(this, this);
+        deleteAccountWithHelper();
     }
 
-    @Override
-    public void onCloudFunctionError(ParseException e) {
-        onParseError(ParseErrorHandler.getErrorMessage(this, e));
-    }
+    private void deleteAccountWithHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        DeleteAccountHelper deleteAccountHelper = findDeleteAccountHelper(fragmentManager);
 
-    @Override
-    public void onCloudFunctionReturned(String cloudFunction, Object o) {
-        switch (cloudFunction) {
-            case CloudCode.DELETE_ACCOUNT:
-                logOutWithHelper(true);
-                break;
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (deleteAccountHelper == null) {
+            deleteAccountHelper = new DeleteAccountHelper();
+
+            fragmentManager.beginTransaction()
+                    .add(deleteAccountHelper, DELETE_ACCOUNT_HELPER)
+                    .commit();
         }
+    }
+
+    private DeleteAccountHelper findDeleteAccountHelper(FragmentManager fragmentManager) {
+        return (DeleteAccountHelper) fragmentManager.findFragmentByTag(DELETE_ACCOUNT_HELPER);
+    }
+
+    private void removeDeleteAccountHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        DeleteAccountHelper deleteAccountHelper = findDeleteAccountHelper(fragmentManager);
+
+        if (deleteAccountHelper != null) {
+            fragmentManager.beginTransaction().remove(deleteAccountHelper).commitAllowingStateLoss();
+        }
+    }
+
+    @Override
+    public void onDeleteUserFailed(ParseException e) {
+        ParseErrorHandler.handleParseError(this, e);
+        onParseError(ParseErrorHandler.getErrorMessage(this, e));
+        removeDeleteAccountHelper();
     }
 
     @Override

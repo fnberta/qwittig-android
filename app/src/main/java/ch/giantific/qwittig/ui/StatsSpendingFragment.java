@@ -2,7 +2,6 @@ package ch.giantific.qwittig.ui;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,16 +14,14 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.parse.ParseObject;
-import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.CloudCode;
-import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.data.stats.models.Stats;
+import ch.giantific.qwittig.helper.StatsHelper;
 import ch.giantific.qwittig.ui.widgets.BarChart;
 import ch.giantific.qwittig.ui.widgets.CurrencyFormatter;
 import ch.giantific.qwittig.utils.DateUtils;
@@ -35,6 +32,7 @@ import ch.giantific.qwittig.utils.DateUtils;
 public class StatsSpendingFragment extends StatsBaseFragment {
 
     private static final String LOG_TAG = StatsSpendingFragment.class.getSimpleName();
+    private static final String STATS_HELPER = "stats_helper_spending";
     private static final String STATE_SHOW_GROUP = "state_show_group";
     private static final String STATE_SHOW_AVERAGE = "state_show_average";
     private BarChart mBarChart;
@@ -116,10 +114,15 @@ public class StatsSpendingFragment extends StatsBaseFragment {
     }
 
     @Override
+    protected String getHelperTag() {
+        return STATS_HELPER;
+    }
+
+    @Override
     void calcStats(String year, int month) {
         super.calcStats(year, month);
 
-        CloudCode.statsSpending(getActivity(), this, mCurrentGroup.getObjectId(), year, month);
+        calcStatsWithHelper(StatsHelper.TYPE_SPENDING, year, month);
     }
 
     @Override
@@ -132,21 +135,7 @@ public class StatsSpendingFragment extends StatsBaseFragment {
         mBarChart.setVisibility(View.GONE);
     }
 
-    @Override
-    public void onCloudFunctionReturned(String cloudFunction, Object o) {
-        super.onCloudFunctionReturned(cloudFunction, o);
-
-        switch (cloudFunction) {
-            case CloudCode.STATS_SPENDING:
-                String dataJson = (String) o;
-                mStatsData = parseJson(dataJson);
-
-                setChartData();
-                break;
-        }
-    }
-
-    private void setChartData() {
+    protected void setChartData() {
         if (!mDataIsLoaded) {
             return;
         }

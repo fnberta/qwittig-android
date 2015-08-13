@@ -1,6 +1,5 @@
 package ch.giantific.qwittig.ui;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -9,20 +8,14 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.transition.Fade;
-import android.transition.Slide;
-import android.transition.Transition;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,13 +37,12 @@ import java.util.List;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.Avatar;
 import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.data.parse.OnlineQuery;
 import ch.giantific.qwittig.data.parse.models.Config;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.services.ParseQueryService;
 import ch.giantific.qwittig.ui.adapter.NavHeaderGroupsArrayAdapter;
 import ch.giantific.qwittig.utils.MessageUtils;
-import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.inappbilling.IabHelper;
 import ch.giantific.qwittig.utils.inappbilling.IabKey;
 import ch.giantific.qwittig.utils.inappbilling.IabResult;
@@ -90,19 +82,19 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
     private BroadcastReceiver mLocalBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            int dataType = intent.getIntExtra(OnlineQuery.INTENT_DATA_TYPE, 0);
+            int dataType = intent.getIntExtra(ParseQueryService.INTENT_DATA_TYPE, 0);
             switch (dataType) {
-                case OnlineQuery.DATA_TYPE_PURCHASE:
+                case ParseQueryService.DATA_TYPE_PURCHASE:
                     onPurchasesPinned();
                     break;
-                case OnlineQuery.DATA_TYPE_USER:
+                case ParseQueryService.DATA_TYPE_USER:
                     onUsersPinned();
                     break;
-                case OnlineQuery.DATA_TYPE_COMPENSATION:
-                    boolean isPaid = intent.getBooleanExtra(OnlineQuery.INTENT_COMPENSATION_PAID, false);
+                case ParseQueryService.DATA_TYPE_COMPENSATION:
+                    boolean isPaid = intent.getBooleanExtra(ParseQueryService.INTENT_COMPENSATION_PAID, false);
                     onCompensationsPinned(isPaid);
                     break;
-                case OnlineQuery.DATA_TYPE_GROUP:
+                case ParseQueryService.DATA_TYPE_GROUP:
                     onGroupQueried();
                     break;
             }
@@ -154,27 +146,22 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
 
     @CallSuper
     public void onPurchasesPinned() {
-        setLoading(false);
+        // empty default implementation
     }
 
     @CallSuper
     public void onUsersPinned() {
-        setLoading(false);
+        // empty default implementation
     }
 
     @CallSuper
     public void onCompensationsPinned(boolean isPaid) {
-        setLoading(false);
+        // empty default implementation
     }
 
     @CallSuper
     public void onGroupQueried() {
         updateGroupSpinnerList();
-    }
-
-    @CallSuper
-    public void setLoading(boolean isLoading) {
-        // empty default implementation
     }
 
     @Override
@@ -589,7 +576,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
         super.onResume();
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mLocalBroadcastReceiver,
-                new IntentFilter(OnlineQuery.INTENT_FILTER_DATA_NEW));
+                new IntentFilter(ParseQueryService.INTENT_FILTER_DATA_NEW));
     }
 
     @Override

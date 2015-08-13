@@ -1,8 +1,8 @@
 package ch.giantific.qwittig.ui;
 
 
-import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,8 +14,8 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.utils.PercentFormatter;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.CloudCode;
 import ch.giantific.qwittig.data.stats.models.Stats;
+import ch.giantific.qwittig.helper.StatsHelper;
 import ch.giantific.qwittig.ui.widgets.CurrencyFormatter;
 
 /**
@@ -24,6 +24,7 @@ import ch.giantific.qwittig.ui.widgets.CurrencyFormatter;
 public class StatsStoresFragment extends StatsPieBaseFragment {
 
     private static final String LOG_TAG = StatsStoresFragment.class.getSimpleName();
+    private static final String STATS_HELPER = "stats_helper_stores";
     private static final String STATE_SHOW_PERCENT = "state_show_percent";
     private static final String STATE_SHOW_AVERAGE = "state_show_average";
     private boolean mShowPercent = true;
@@ -101,26 +102,22 @@ public class StatsStoresFragment extends StatsPieBaseFragment {
     }
 
     @Override
-    void calcStats(String year, int month) {
-        super.calcStats(year, month);
-
-        String groupId = mCurrentGroup.getObjectId();
-        CloudCode.statsStores(getActivity(), this, groupId, year, month);
+    protected String getHelperTag() {
+        return STATS_HELPER;
     }
 
     @Override
-    public void onCloudFunctionReturned(String cloudFunction, Object o) {
-        super.onCloudFunctionReturned(cloudFunction, o);
+    void calcStats(String year, int month) {
+        super.calcStats(year, month);
 
-        switch (cloudFunction) {
-            case CloudCode.STATS_STORES: {
-                String dataJson = (String) o;
-                mStatsData = parseJson(dataJson);
+        calcStatsWithHelper(StatsHelper.TYPE_STORES, year, month);
+    }
 
-                setChartData();
-                break;
-            }
-        }
+    @Override
+    public void onStatsCalculated(Stats stats) {
+        super.onStatsCalculated(stats);
+
+        setChartData();
     }
 
     @Override

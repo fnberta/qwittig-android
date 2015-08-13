@@ -1,7 +1,6 @@
 package ch.giantific.qwittig.helper;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
 import android.text.TextUtils;
 
@@ -16,7 +15,7 @@ import retrofit.client.Response;
 /**
  * Created by fabio on 10.12.14.
  */
-public class RatesHelper extends Fragment {
+public class RatesHelper extends BaseHelper {
 
     private static final String LOG_TAG = RatesHelper.class.getSimpleName();
     private static final String BUNDLE_BASE_CURRENCY = "base_currency";
@@ -48,9 +47,6 @@ public class RatesHelper extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Retain this fragment across configuration changes.
-        setRetainInstance(true);
 
         String baseCurrency = "";
         Bundle args = getArguments();
@@ -90,6 +86,7 @@ public class RatesHelper extends Fragment {
 
     public interface HelperInteractionListener {
         void onRatesFetchSuccessful(Map<String, Double> exchangeRates);
+
         void onRatesFetchFailed(String errorMessage);
     }
 }

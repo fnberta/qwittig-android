@@ -129,7 +129,7 @@ public abstract class StatsPieBaseFragment extends StatsBaseFragment {
         mRecyclerView.setVisibility(View.GONE);
     }
 
-    final void setChartData() {
+    protected void setChartData() {
         if (!mDataIsLoaded) {
             return;
         }

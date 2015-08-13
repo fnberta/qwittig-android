@@ -1,8 +1,10 @@
 package ch.giantific.qwittig.ui;
 
 import android.app.Activity;
-import android.os.Bundle;
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.os.Bundle;
+import android.support.annotation.CallSuper;
 import android.support.design.widget.TextInputLayout;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +22,9 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.helper.InviteUsersHelper;
 import ch.giantific.qwittig.utils.MessageUtils;
+import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -33,6 +37,7 @@ import ch.giantific.qwittig.utils.Utils;
 public class SettingsUserInviteFragment extends SettingsBaseInviteFragment implements
         LocalQuery.UserLocalQueryListener {
 
+    private static final String INVITE_HELPER = "invite_helper";
     private static final String LOG_TAG = SettingsUserInviteFragment.class.getSimpleName();
     private FragmentInteractionListener mListener;
     private LinearLayout mLinearLayoutUsersInvited;
@@ -223,12 +228,54 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
         mIsInviting = true;
         mListener.progressCircleShow();
 
-        inviteUsers(mCurrentGroup);
+        inviteUsersWithHelper(mCurrentGroup);
     }
 
-    @Override
-    public void onCloudFunctionReturned(String cloudFunction, Object o) {
+    private void inviteUsersWithHelper(Group group) {
+        FragmentManager fragmentManager = getFragmentManager();
+        InviteUsersHelper inviteUsersHelper = findInviteHelper(fragmentManager);
+
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (inviteUsersHelper == null) {
+            inviteUsersHelper = InviteUsersHelper.newInstance(mUsersToInviteEmails, group.getName());
+
+            fragmentManager.beginTransaction()
+                    .add(inviteUsersHelper, INVITE_HELPER)
+                    .commit();
+        }
+    }
+
+    private InviteUsersHelper findInviteHelper(FragmentManager fragmentManager) {
+        return (InviteUsersHelper) fragmentManager.findFragmentByTag(INVITE_HELPER);
+    }
+
+    private void removeInviteHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        InviteUsersHelper inviteUsersHelper = findInviteHelper(fragmentManager);
+
+        if (inviteUsersHelper != null) {
+            fragmentManager.beginTransaction().remove(inviteUsersHelper).commitAllowingStateLoss();
+        }
+    }
+
+    /**
+     * Called from activity when helper fails to invite users
+     * @param e
+     */
+    public void onInviteUsersFailed(ParseException e) {
+        ParseErrorHandler.handleParseError(getActivity(), e);
+        onParseError(ParseErrorHandler.getErrorMessage(getActivity(), e));
+        removeInviteHelper();
+    }
+
+    /**
+     * Called from activity when helper successfully invited users
+     */
+    public void onUsersInvited() {
         mListener.progressCircleStartFinal();
+        removeInviteHelper();
+
     }
 
     public void finishInvitations() {

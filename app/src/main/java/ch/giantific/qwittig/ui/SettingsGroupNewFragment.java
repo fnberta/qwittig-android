@@ -2,6 +2,7 @@ package ch.giantific.qwittig.ui;
 
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.design.widget.TextInputLayout;
@@ -24,6 +25,7 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.Currency;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.helper.CreateGroupHelper;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
@@ -34,6 +36,7 @@ import ch.giantific.qwittig.utils.Utils;
  */
 public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
 
+    private static final String CREATE_GROUP_HELPER = "create_group_helper";
     private FragmentInteractionListener mListener;
     private Group mGroupNew;
     private TextInputLayout mTextInputLayoutName;
@@ -133,48 +136,87 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
         mGroupNewName = name;
 
         String currency = ((Currency) mSpinnerCurrency.getSelectedItem()).getCode();
-        final Group groupOld = currentUser.getCurrentGroup();
-        final Group groupNew = new Group(name, currency);
-        currentUser.addGroup(groupNew);
-        currentUser.setCurrentGroup(groupNew);
-        // We use saveInBackground because we need the object to have an objectId when
-        // SettingsFragment starts
-        currentUser.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e != null) {
-                    ParseErrorHandler.handleParseError(getActivity(), e);
-                    onParseError(ParseErrorHandler.getErrorMessage(getActivity(), e));
+        createNewGroupWithHelper(currency);
+    }
 
-                    currentUser.removeGroup(groupNew);
-                    currentUser.setCurrentGroup(groupOld);
-                    return;
-                }
+    private void createNewGroupWithHelper(String newGroupCurrency) {
+        FragmentManager fragmentManager = getFragmentManager();
+        CreateGroupHelper createGroupHelper = findInviteHelper(fragmentManager);
 
-                mGroupNew = groupNew;
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (createGroupHelper == null) {
+            createGroupHelper = CreateGroupHelper.newInstance(mGroupNewName, newGroupCurrency,
+                    mUsersToInviteEmails);
 
-                // register for notifications for the new group
-                ParsePush.subscribeInBackground(groupNew.getObjectId());
+            fragmentManager.beginTransaction()
+                    .add(createGroupHelper, CREATE_GROUP_HELPER)
+                    .commit();
+        }
+    }
 
-                // If user has listed people to invite, invite them, otherwhise finish
-                if (mUsersToInviteEmails.isEmpty()) {
-                    mListener.finishGroupCreation(mGroupNewName);
-                } else {
-                    inviteUsers(mGroupNew);
-                }
-            }
-        });
+    private CreateGroupHelper findInviteHelper(FragmentManager fragmentManager) {
+        return (CreateGroupHelper) fragmentManager.findFragmentByTag(CREATE_GROUP_HELPER);
+    }
+
+    private void removeCreateGroupHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        CreateGroupHelper createGroupHelper = findInviteHelper(fragmentManager);
+
+        if (createGroupHelper != null) {
+            fragmentManager.beginTransaction().remove(createGroupHelper).commitAllowingStateLoss();
+        }
+    }
+
+    /**
+     * Called from activity when helper fails to create new group
+     * @param e
+     */
+    public void onCreateNewGroupFailed(ParseException e) {
+        ParseErrorHandler.handleParseError(getActivity(), e);
+        onParseError(ParseErrorHandler.getErrorMessage(getActivity(), e));
+        removeCreateGroupHelper();
+    }
+
+    /**
+     * Called from activity when helper finished creating new group
+     * @param newGroup
+     * @param invitingUser if the helper is also inviting users to the new group
+     */
+    public void onNewGroupCreated(Group newGroup, boolean invitingUser) {
+        mGroupNew = newGroup;
+
+        // register for notifications for the new group
+        ParsePush.subscribeInBackground(newGroup.getObjectId());
+
+        if (!invitingUser) {
+            mListener.finishGroupCreation(mGroupNewName);
+        }
+    }
+
+    /**
+     * Called from activity when helper finished inviting user
+     */
+    public void onUsersInvited() {
+        mListener.finishGroupCreation(mGroupNewName);
+    }
+
+    /**
+     * Called from activity when helper fails to invite new users to newly created group
+     * @param e
+     */
+    public void onInviteUsersFailed(ParseException e) {
+        ParseErrorHandler.handleParseError(getActivity(), e);
+        onParseError(ParseErrorHandler.getErrorMessage(getActivity(), e));
+        removeCreateGroupHelper();
+
+        // TODO: new group is created but users not invited, finish activity but tell the user
     }
 
     @Override
     protected void hideProgressCircle() {
         mIsCreatingNew = false;
         mListener.progressCircleHide();
-    }
-
-    @Override
-    public void onCloudFunctionReturned(String cloudFunction, Object o) {
-        mListener.finishGroupCreation(mGroupNewName);
     }
 
     @Override
