@@ -287,11 +287,14 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onCompensationsPinned(boolean isPaid) {
-        super.onCompensationsPinned(isPaid);
-
+    public void onAllQueriesFinished() {
         removeQueryHelper();
         setLoading(false);
+    }
+
+    @Override
+    public void onCompensationsPinned(boolean isPaid) {
+        super.onCompensationsPinned(isPaid);
 
         if (isPaid) {
             updateFragmentAdapter(FRAGMENT_ADAPTER_PAID);

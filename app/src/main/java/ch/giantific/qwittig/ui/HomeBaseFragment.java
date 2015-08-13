@@ -121,10 +121,10 @@ public abstract class HomeBaseFragment extends BaseFragment implements
      */
     @CallSuper
     public void updateAdapter() {
-        updateCurrentUserGroup();
+        updateCurrentUserAndGroup();
     }
 
-    private void updateCurrentUserGroup() {
+    private void updateCurrentUserAndGroup() {
         mCurrentUser = (User) ParseUser.getCurrentUser();
         if (mCurrentUser != null) {
             mCurrentGroup = mCurrentUser.getCurrentGroup();

@@ -33,6 +33,14 @@ public class CompensationQueryHelper extends BaseQueryHelper {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (mCurrentGroup == null || mCurrentUserGroups == null) {
+            mListener.onAllQueriesFinished();
+            return;
+        }
+
+        // compensationsPaid for each group + compensationsUnpaid
+        mTotalNumberOfQueries = mCurrentUserGroups.size() + 1;
+
         queryCompensations();
     }
 
@@ -44,8 +52,17 @@ public class CompensationQueryHelper extends BaseQueryHelper {
     }
 
     @Override
+    protected void finish() {
+        if (mListener != null) {
+            mListener.onAllQueriesFinished();
+        }
+    }
+
+    @Override
     void onCompensationsUnpaidPinned() {
         super.onCompensationsUnpaidPinned();
+
+        checkQueryCount();
 
         if (mListener != null) {
             mListener.onCompensationsPinned(false);
@@ -55,6 +72,8 @@ public class CompensationQueryHelper extends BaseQueryHelper {
     @Override
     void onCompensationsPaidPinned(String groupId) {
         super.onCompensationsPaidPinned(groupId);
+
+        checkQueryCount();
 
         if (mListener != null && mCurrentGroup != null &&
                 groupId.equals(mCurrentGroup.getObjectId())) {
@@ -72,5 +91,7 @@ public class CompensationQueryHelper extends BaseQueryHelper {
         void onCompensationsPinned(boolean isPaid);
 
         void onCompensationsPinFailed(ParseException e);
+
+        void onAllQueriesFinished();
     }
 }

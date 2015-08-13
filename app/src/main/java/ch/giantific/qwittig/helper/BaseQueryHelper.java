@@ -27,6 +27,9 @@ public abstract class BaseQueryHelper extends BaseHelper {
 
     private static final String LOG_TAG = BaseQueryHelper.class.getSimpleName();
     Group mCurrentGroup;
+    List<ParseObject> mCurrentUserGroups;
+    int mTotalNumberOfQueries;
+    int mQueryCount;
 
     public BaseQueryHelper() {
         // empty default constructor
@@ -36,19 +39,20 @@ public abstract class BaseQueryHelper extends BaseHelper {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setCurrentGroup();
+        setCurrentGroups();
     }
 
-    private void setCurrentGroup() {
+    private void setCurrentGroups() {
         User currentUser = (User) ParseUser.getCurrentUser();
         if (currentUser != null) {
             mCurrentGroup = currentUser.getCurrentGroup();
+            mCurrentUserGroups = currentUser.getGroups();
         }
     }
 
     final void queryUsers() {
         ParseQuery<ParseUser> query = User.getQuery();
-        query.whereContainedIn(User.GROUPS, ParseUtils.getCurrentUserGroups());
+        query.whereContainedIn(User.GROUPS, mCurrentUserGroups);
         query.whereEqualTo(User.IS_DELETED, false);
         query.findInBackground(new FindCallback<ParseUser>() {
             @Override
@@ -86,12 +90,7 @@ public abstract class BaseQueryHelper extends BaseHelper {
     }
 
     final void queryPurchases() {
-        List<ParseObject> groups = ParseUtils.getCurrentUserGroups();
-        if (groups.isEmpty()) {
-            return;
-        }
-
-        for (final ParseObject group : groups) {
+        for (final ParseObject group : mCurrentUserGroups) {
             ParseQuery<ParseObject> query = OnlineQuery.getPurchasesQuery();
             query.whereEqualTo(Purchase.GROUP, group);
             query.findInBackground(new FindCallback<ParseObject>() {
@@ -135,13 +134,9 @@ public abstract class BaseQueryHelper extends BaseHelper {
     }
 
     final void queryCompensations() {
-        List<ParseObject> groups = ParseUtils.getCurrentUserGroups();
-        if (groups.isEmpty()) {
-            return;
-        }
+        queryCompensationsUnpaid(mCurrentUserGroups);
 
-        queryCompensationsUnpaid(groups);
-        for (ParseObject group : groups) {
+        for (ParseObject group : mCurrentUserGroups) {
             queryCompensationsPaid(group);
         }
     }
@@ -224,5 +219,15 @@ public abstract class BaseQueryHelper extends BaseHelper {
         // empty default implementation
     }
 
+    final void checkQueryCount() {
+        mQueryCount++;
+
+        if (mQueryCount == mTotalNumberOfQueries) {
+            finish();
+        }
+    }
+
     protected abstract void onParseError(ParseException e);
+
+    protected abstract void finish();
 }

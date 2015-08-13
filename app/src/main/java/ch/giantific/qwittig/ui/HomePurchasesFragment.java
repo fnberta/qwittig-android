@@ -203,11 +203,13 @@ public class HomePurchasesFragment extends HomeBaseFragment implements
         mPurchases.remove(progressBarPosition);
         mRecyclerAdapter.notifyItemRemoved(progressBarPosition);
 
-        for (ParseObject purchase : objects) {
-            mPurchases.add(purchase);
-        }
+        if (!objects.isEmpty()) {
+            for (ParseObject purchase : objects) {
+                mPurchases.add(purchase);
+            }
 
-        mRecyclerAdapter.notifyItemRangeInserted(progressBarPosition, objects.size());
+            mRecyclerAdapter.notifyItemRangeInserted(progressBarPosition, objects.size());
+        }
     }
 
     public void onMoreObjectsPinFailed(ParseException e) {
