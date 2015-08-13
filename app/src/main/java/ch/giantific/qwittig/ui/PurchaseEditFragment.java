@@ -2,7 +2,6 @@ package ch.giantific.qwittig.ui;
 
 import android.app.FragmentManager;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.google.common.primitives.Booleans;
 import com.parse.ParseFile;
@@ -15,12 +14,10 @@ import java.util.List;
 import java.util.Map;
 
 import ch.giantific.qwittig.data.models.ItemRow;
-import ch.giantific.qwittig.data.models.ItemUsersChecked;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Item;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.helper.PurchaseEditSaveHelper;
-import ch.giantific.qwittig.helper.PurchaseSaveHelper;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
@@ -272,7 +269,8 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
 
         FragmentManager fragmentManager = getFragmentManager();
         PurchaseEditSaveHelper purchaseEditSaveHelper = (PurchaseEditSaveHelper)
-                fragmentManager.findFragmentByTag(PURCHASE_SAVE_HELPER);;
+                fragmentManager.findFragmentByTag(PURCHASE_SAVE_HELPER);
+        ;
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -327,7 +325,6 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
             if (!itemOld.getName().equals(itemRowNew.getEditTextName()) ||
                     itemOld.getPriceForeign(mOldExchangeRate) !=
                             itemRowNew.getEditTextPrice(mCurrencySelected).doubleValue()) {
-                Log.e(LOG_TAG, "price or name different");
                 return true;
             }
 
@@ -335,7 +332,6 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
             List<String> usersInvolvedNew = getParseUsersInvolvedIdsFromItemRow(itemRowNew);
             if (usersInvolvedOld.size() != usersInvolvedNew.size() ||
                     !usersInvolvedOld.equals(usersInvolvedNew)) {
-                Log.e(LOG_TAG, "usersInvolved different");
                 return true;
             }
         }
@@ -343,7 +339,6 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
         ParseFile receiptNew = mListener.getReceiptParseFile();
         if (receiptNew == null && mReceiptFileOld != null ||
                 receiptNew != null && !receiptNew.equals(mReceiptFileOld)) {
-            Log.e(LOG_TAG, "receipt file different");
             return true;
         }
 
