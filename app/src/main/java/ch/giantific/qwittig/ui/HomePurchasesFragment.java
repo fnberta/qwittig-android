@@ -105,17 +105,6 @@ public class HomePurchasesFragment extends HomeBaseFragment implements
     }
 
     @Override
-    void toggleMainVisibility() {
-        super.toggleMainVisibility();
-
-        if (mPurchases.isEmpty()) {
-            mTextViewEmpty.setVisibility(View.VISIBLE);
-        } else {
-            mTextViewEmpty.setVisibility(View.GONE);
-        }
-    }
-
-    @Override
     protected void updateView() {
         mRecyclerAdapter.setCurrentGroupCurrency(ParseUtils.getGroupCurrency());
         mRecyclerAdapter.notifyDataSetChanged();
@@ -125,6 +114,15 @@ public class HomePurchasesFragment extends HomeBaseFragment implements
             int purchasesSize = mPurchases.size();
             addLoadMoreProgressBar(purchasesSize);
             mRecyclerView.scrollToPosition(purchasesSize);
+        }
+    }
+
+    @Override
+    protected void toggleEmptyViewVisibility() {
+        if (mPurchases.isEmpty()) {
+            mTextViewEmpty.setVisibility(View.VISIBLE);
+        } else {
+            mTextViewEmpty.setVisibility(View.GONE);
         }
     }
 

@@ -154,9 +154,14 @@ public abstract class HomeBaseFragment extends BaseFragment implements
      * Hides the loading progressbar and displays the RecyclerView
      */
     @CallSuper
-    void toggleMainVisibility() {
-        mProgressBarLoading.setVisibility(View.GONE);
+    final void toggleMainVisibility() {
+        if (!mListener.isNewQueryNeeded()) {
+            mProgressBarLoading.setVisibility(View.GONE);
+            toggleEmptyViewVisibility();
+        }
     }
+
+    protected abstract void toggleEmptyViewVisibility();
 
     @Override
     public void onDetach() {
@@ -166,5 +171,7 @@ public abstract class HomeBaseFragment extends BaseFragment implements
 
     public interface FragmentInteractionListener {
         void onlineQuery();
+
+        boolean isNewQueryNeeded();
     }
 }

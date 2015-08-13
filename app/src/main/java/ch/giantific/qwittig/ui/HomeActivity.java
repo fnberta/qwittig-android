@@ -86,9 +86,14 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     private FloatingActionButton mFabAddPurchase;
     private FabSpeedDial mFabAddPurchaseAuto;
     private FabSpeedDial mFabAddPurchaseManual;
-    private boolean mNewQueryNeeded = false;
+    private boolean mNewQueryNeeded;
     private boolean mCheckForInvitations = true;
     private int mInvitationAction;
+
+    @Override
+    public boolean isNewQueryNeeded() {
+        return mNewQueryNeeded;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
