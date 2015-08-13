@@ -186,8 +186,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
 
             // update usersInvolved for each item
             List<ParseUser> usersInvolved = itemOld.getUsersInvolved();
-            ItemUsersChecked itemUsersChecked = mItemsUsersChecked.get(i);
-            itemUsersChecked.setUsersChecked(ParseUserToBoolean(usersInvolved));
+            itemRowNew.setUsersChecked(ParseUserToBoolean(usersInvolved));
             if (buyerIsOnlyUserInvolved(usersInvolved)) {
                 itemRowNew.setCheckBoxChecked(false);
             }

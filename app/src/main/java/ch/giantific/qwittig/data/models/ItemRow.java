@@ -1,20 +1,17 @@
 package ch.giantific.qwittig.data.models;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.res.ColorStateList;
-import android.os.Build;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.EditText;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.ui.widgets.ListCheckBox;
 import ch.giantific.qwittig.utils.MoneyUtils;
-import ch.giantific.qwittig.utils.Utils;
 
 /**
  * Created by fabio on 12.10.14.
@@ -27,7 +24,7 @@ public class ItemRow {
     private EditText mEditTextName;
     private TextInputLayout mTextInputLayoutPrice;
     private EditText mEditTextPrice;
-    private CheckBox mCheckBoxEnabled;
+    private ListCheckBox mCheckBoxEnabled;
     private String mName;
     private BigDecimal mPrice;
 
@@ -52,7 +49,7 @@ public class ItemRow {
     }
 
     public ItemRow(Context context, View itemRowView, int id, TextInputLayout tilName,
-                   TextInputLayout tilPrice, CheckBox cbEnabled) {
+                   TextInputLayout tilPrice, ListCheckBox cbEnabled) {
         mContext = context;
         mItemRowView = itemRowView;
         mTextInputLayoutName = tilName;
@@ -96,32 +93,29 @@ public class ItemRow {
         mEditTextPrice.setText(price);
     }
 
-    public boolean isCheckBoxChecked() {
-        return mCheckBoxEnabled.isChecked();
-    }
-
     public void setCheckBoxChecked(boolean isEnabled) {
         mCheckBoxEnabled.setChecked(isEnabled);
     }
 
-    public void setCheckBoxColor(boolean isSpecial) {
-        if (isSpecial) {
-            if (Utils.isRunningLollipopAndHigher()) {
-                setCheckBoxTintList(mContext.getResources()
-                        .getColorStateList(R.color.checkbox_color_red));
-            }
-        } else {
-            if (Utils.isRunningLollipopAndHigher()) {
-                setCheckBoxTintList(mContext.getResources()
-                        .getColorStateList(R.color.checkbox_color_accent));
-            }
-        }
-        // TODO: implement for android versions <5.0
+    public boolean[] getUsersChecked() {
+        return mCheckBoxEnabled.getUsersChecked();
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void setCheckBoxTintList(ColorStateList colorStateList) {
-        mCheckBoxEnabled.setButtonTintList(colorStateList);
+    public void setUsersChecked(boolean[] usersChecked) {
+        mCheckBoxEnabled.setUsersChecked(usersChecked);
+    }
+
+    public void updateUsersCheckedAfterPurchaseUserClick(int purchaseUserPosition,
+                                                         boolean purchaseUserIsChecked) {
+        mCheckBoxEnabled.updateUsersCheckedAfterPurchaseUserClick(purchaseUserPosition, purchaseUserIsChecked);
+    }
+
+    public void updateCheckedStatus(int buyerPosition) {
+        mCheckBoxEnabled.updateCheckedStatus(buyerPosition);
+    }
+
+    public void setCheckBoxColor(List<Boolean> purchaseUsersInvolved) {
+        mCheckBoxEnabled.setCheckBoxColor(purchaseUsersInvolved);
     }
 
     public void setPriceImeOptions(int imeOption) {
