@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.models.ItemRow;
 import ch.giantific.qwittig.data.models.ItemUsersChecked;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.helper.PurchaseSaveHelper;
@@ -82,8 +83,9 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
      * not be empty, hence the item's values will not be reset.
      */
     private void setFirstRowItemUsersChecked() {
-        if (mItemsUsersChecked.size() == 0) {
-            mItemsUsersChecked.add(new ItemUsersChecked(Booleans.toArray(mPurchaseUsersInvolved)));
+        ItemRow firstItemRow = mItemRows.get(0);
+        if (mItemRows.size() == 1 && firstItemRow.getUsersChecked() == null) {
+            firstItemRow.setUsersChecked(Booleans.toArray(mPurchaseUsersInvolved));
         }
     }
 

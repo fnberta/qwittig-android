@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="@dimen/small_space">
 
-    <CheckBox
+    <ch.giantific.qwittig.ui.widgets.ListCheckBox
         android:id="@+id/cb_item_enabled"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

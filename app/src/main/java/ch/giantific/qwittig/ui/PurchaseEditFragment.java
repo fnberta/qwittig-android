@@ -14,12 +14,10 @@ import java.util.List;
 import java.util.Map;
 
 import ch.giantific.qwittig.data.models.ItemRow;
-import ch.giantific.qwittig.data.models.ItemUsersChecked;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Item;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.helper.PurchaseEditSaveHelper;
-import ch.giantific.qwittig.helper.PurchaseSaveHelper;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
@@ -186,8 +184,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
 
             // update usersInvolved for each item
             List<ParseUser> usersInvolved = itemOld.getUsersInvolved();
-            ItemUsersChecked itemUsersChecked = mItemsUsersChecked.get(i);
-            itemUsersChecked.setUsersChecked(ParseUserToBoolean(usersInvolved));
+            itemRowNew.setUsersChecked(ParseUserToBoolean(usersInvolved));
             if (buyerIsOnlyUserInvolved(usersInvolved)) {
                 itemRowNew.setCheckBoxChecked(false);
             }
@@ -272,7 +269,8 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
 
         FragmentManager fragmentManager = getFragmentManager();
         PurchaseEditSaveHelper purchaseEditSaveHelper = (PurchaseEditSaveHelper)
-                fragmentManager.findFragmentByTag(PURCHASE_SAVE_HELPER);;
+                fragmentManager.findFragmentByTag(PURCHASE_SAVE_HELPER);
+        ;
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -317,21 +315,21 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
             mOldItems = mPurchase.getItems();
         }
         int oldItemsSize = mOldItems.size();
-        if (oldItemsSize != mItems.size()) {
+        if (oldItemsSize != mItemRows.size()) {
             return true;
         }
 
-        setItemValues(true);
         for (int i = 0; i < oldItemsSize; i++) {
             Item itemOld = (Item) mOldItems.get(i);
-            Item itemNew = (Item) mItems.get(i);
-            if (!itemOld.getName().equals(itemNew.getName()) ||
-                    itemOld.getPriceForeign(mOldExchangeRate) != itemNew.getPrice()) {
+            ItemRow itemRowNew = mItemRows.get(i);
+            if (!itemOld.getName().equals(itemRowNew.getEditTextName()) ||
+                    itemOld.getPriceForeign(mOldExchangeRate) !=
+                            itemRowNew.getEditTextPrice(mCurrencySelected).doubleValue()) {
                 return true;
             }
 
             List<String> usersInvolvedOld = itemOld.getUsersInvolvedIds();
-            List<String> usersInvolvedNew = itemNew.getUsersInvolvedIds();
+            List<String> usersInvolvedNew = getParseUsersInvolvedIdsFromItemRow(itemRowNew);
             if (usersInvolvedOld.size() != usersInvolvedNew.size() ||
                     !usersInvolvedOld.equals(usersInvolvedNew)) {
                 return true;
@@ -345,6 +343,20 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
         }
 
         return false;
+    }
+
+    private List<String> getParseUsersInvolvedIdsFromItemRow(ItemRow itemRow) {
+        final List<String> usersInvolved = new ArrayList<>();
+
+        boolean[] usersChecked = itemRow.getUsersChecked();
+        for (int i = 0, mUsersAvailableParseSize = mUsersAvailableParse.size();
+             i < mUsersAvailableParseSize; i++) {
+            ParseUser parseUser = mUsersAvailableParse.get(i);
+            if (usersChecked[i]) {
+                usersInvolved.add(parseUser.getObjectId());
+            }
+        }
+        return usersInvolved;
     }
 
     @Override
