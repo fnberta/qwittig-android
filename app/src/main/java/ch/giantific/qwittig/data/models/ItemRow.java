@@ -150,9 +150,9 @@ public class ItemRow {
             isComplete = false;
         } else {
             mTextInputLayoutPrice.setErrorEnabled(false);
-            price = MoneyUtils.parsePrice(priceString);
             int maxFractionDigits = MoneyUtils.getMaximumFractionDigits(currencySelected);
-            price = price.setScale(maxFractionDigits, BigDecimal.ROUND_HALF_UP);
+            price = MoneyUtils.parsePrice(priceString)
+                    .setScale(maxFractionDigits, BigDecimal.ROUND_HALF_UP);
         }
 
         // if name and price fields are not empty, send data to parse.com

@@ -2,6 +2,7 @@ package ch.giantific.qwittig.ui;
 
 import android.app.FragmentManager;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.common.primitives.Booleans;
 import com.parse.ParseFile;
@@ -316,23 +317,25 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
             mOldItems = mPurchase.getItems();
         }
         int oldItemsSize = mOldItems.size();
-        if (oldItemsSize != mItems.size()) {
+        if (oldItemsSize != mItemRows.size()) {
             return true;
         }
 
-        setItemValues(true);
         for (int i = 0; i < oldItemsSize; i++) {
             Item itemOld = (Item) mOldItems.get(i);
-            Item itemNew = (Item) mItems.get(i);
-            if (!itemOld.getName().equals(itemNew.getName()) ||
-                    itemOld.getPriceForeign(mOldExchangeRate) != itemNew.getPrice()) {
+            ItemRow itemRowNew = mItemRows.get(i);
+            if (!itemOld.getName().equals(itemRowNew.getEditTextName()) ||
+                    itemOld.getPriceForeign(mOldExchangeRate) !=
+                            itemRowNew.getEditTextPrice(mCurrencySelected).doubleValue()) {
+                Log.e(LOG_TAG, "price or name different");
                 return true;
             }
 
             List<String> usersInvolvedOld = itemOld.getUsersInvolvedIds();
-            List<String> usersInvolvedNew = itemNew.getUsersInvolvedIds();
+            List<String> usersInvolvedNew = getParseUsersInvolvedIdsFromItemRow(itemRowNew);
             if (usersInvolvedOld.size() != usersInvolvedNew.size() ||
                     !usersInvolvedOld.equals(usersInvolvedNew)) {
+                Log.e(LOG_TAG, "usersInvolved different");
                 return true;
             }
         }
@@ -340,10 +343,25 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
         ParseFile receiptNew = mListener.getReceiptParseFile();
         if (receiptNew == null && mReceiptFileOld != null ||
                 receiptNew != null && !receiptNew.equals(mReceiptFileOld)) {
+            Log.e(LOG_TAG, "receipt file different");
             return true;
         }
 
         return false;
+    }
+
+    private List<String> getParseUsersInvolvedIdsFromItemRow(ItemRow itemRow) {
+        final List<String> usersInvolved = new ArrayList<>();
+
+        boolean[] usersChecked = itemRow.getUsersChecked();
+        for (int i = 0, mUsersAvailableParseSize = mUsersAvailableParse.size();
+             i < mUsersAvailableParseSize; i++) {
+            ParseUser parseUser = mUsersAvailableParse.get(i);
+            if (usersChecked[i]) {
+                usersInvolved.add(parseUser.getObjectId());
+            }
+        }
+        return usersInvolved;
     }
 
     @Override
