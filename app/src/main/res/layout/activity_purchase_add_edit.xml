@@ -20,7 +20,7 @@
         android:id="@+id/fab_purchase_save_circle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:elevation="6dp"
+        android:elevation="@dimen/fab_elevation"
         app:layout_anchor="@id/appbar"
         app:layout_anchorGravity="bottom|end"
         app:finalIcon="@drawable/ic_done_black_24dp"
