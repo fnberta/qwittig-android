@@ -51,7 +51,7 @@ public class PurchaseReceiptDetailsFragment extends PurchaseReceiptBaseFragment 
             mPurchaseId = getArguments().getString(BUNDLE_PURCHASE_ID);
         }
 
-        mListener.updateActionBarMenu(true, false);
+        mListener.updateActionBarMenu(true, false, false);
     }
 
     @Override
@@ -75,6 +75,7 @@ public class PurchaseReceiptDetailsFragment extends PurchaseReceiptBaseFragment 
     }
 
     public interface FragmentInteractionListener {
-        void updateActionBarMenu(boolean showEditOptions, boolean hasReceiptFile);
+        void updateActionBarMenu(boolean showEditOptions, boolean hasReceiptFile,
+                                 boolean hasForeignCurrency);
     }
 }

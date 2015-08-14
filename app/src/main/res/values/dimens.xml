@@ -71,4 +71,7 @@
     <!-- Charts -->
     <dimen name="pc_multiple_size">345dp</dimen>
 
+    <!-- add/edit -->
+    <dimen name="my_share_neg_margin">-8dp</dimen>
+
 </resources>

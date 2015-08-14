@@ -269,5 +269,11 @@
     <string name="dialog_change_amount_message">Enter the desired new amount.</string>
     <string name="push_compensation_amount_changed_title">Amount changed</string>
     <string name="push_compensation_amount_changed_alert">%1$s will pay you %2$s</string>
+    <string name="toast_exchange_no_data">No exchange rate data, please try again later</string>
+    <string name="toast_exchange_rate_fetching">Still fetching exchange rate</string>
+    <string name="hint_exchange_rate">Exchange rate</string>
+    <string name="exchange_rate">Exchange rate:</string>
+    <string name="toast_exchange_rate_value">Exchange rate: %1$s</string>
+    <string name="action_purchase_show_exchange_rate">Show exchange rate</string>
 
 </resources>

@@ -140,11 +140,12 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void circularRevealFab() {
-        Animator reveal = Utils.getCircularRevealAnimator(mFabAddPurchase);
+        final Animator reveal = Utils.getCircularRevealAnimator(mFabAddPurchase);
         reveal.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
+                animation.removeListener(this);
                 mFabAddPurchase.setVisibility(View.VISIBLE);
             }
         });
