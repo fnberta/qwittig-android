@@ -188,11 +188,13 @@ public class CompensationsPaidFragment extends CompensationsBaseFragment impleme
         mCompensations.remove(progressBarPosition);
         mRecyclerAdapter.notifyItemRemoved(progressBarPosition);
 
-        for (ParseObject compensation : objects) {
-            mCompensations.add(compensation);
-        }
+        if (!objects.isEmpty()) {
+            for (ParseObject compensation : objects) {
+                mCompensations.add(compensation);
+            }
 
-        mRecyclerAdapter.notifyItemRangeInserted(progressBarPosition, objects.size());
+            mRecyclerAdapter.notifyItemRangeInserted(progressBarPosition, objects.size());
+        }
     }
 
     public void onMoreObjectsPinFailed(ParseException e) {

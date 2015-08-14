@@ -87,6 +87,11 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     private int mInvitationAction;
 
     @Override
+    public boolean isNewQueryNeeded() {
+        return mNewQueryNeeded;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
@@ -399,9 +404,24 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     public void onPinFailed(ParseException e) {
         ParseErrorHandler.handleParseError(this, e);
         showOnlineQueryErrorSnackbar(ParseErrorHandler.getErrorMessage(this, e));
+        removeQueryHelper();
 
         setLoading(false);
+    }
+
+    @Override
+    public void onAllQueriesFinished() {
         removeQueryHelper();
+        setLoading(false);
+    }
+
+    private void setLoading(boolean isLoading) {
+        mHomeUsersFragment.setLoading(isLoading);
+        mHomePurchasesFragment.setLoading(isLoading);
+
+        if (!isLoading && mProgressDialog != null) {
+            mProgressDialog.dismiss();
+        }
     }
 
     private void removeQueryHelper() {
@@ -438,23 +458,6 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         super.onPurchasesPinned();
 
         updateFragmentAdapters(ADAPTER_PURCHASES);
-    }
-
-    @Override
-    public void onCompensationsPinned(boolean isPaid) {
-        super.onCompensationsPinned(isPaid);
-
-        setLoading(false);
-        removeQueryHelper();
-    }
-
-    private void setLoading(boolean isLoading) {
-        mHomeUsersFragment.setLoading(isLoading);
-        mHomePurchasesFragment.setLoading(isLoading);
-
-        if (!isLoading && mProgressDialog != null) {
-            mProgressDialog.dismiss();
-        }
     }
 
     private void updateFragmentAdapters(@FragmentAdapter int adapter) {

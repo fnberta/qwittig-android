@@ -10,6 +10,9 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.SaveCallback;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import ch.giantific.qwittig.data.parse.OnlineQuery;
@@ -65,7 +68,8 @@ public class MoreQueryHelper extends BaseQueryHelper {
             skip = args.getInt(SKIP);
         }
 
-        if (TextUtils.isEmpty(className)) {
+        if (TextUtils.isEmpty(className) || mCurrentGroup == null) {
+            finish();
             return;
         }
 
@@ -80,14 +84,9 @@ public class MoreQueryHelper extends BaseQueryHelper {
     }
 
     private void queryPurchasesMore(int skip) {
-        final Group group = ParseUtils.getCurrentGroup();
-        if (group == null) {
-            return;
-        }
-
         ParseQuery<ParseObject> query = OnlineQuery.getPurchasesQuery();
         query.setSkip(skip);
-        query.whereEqualTo(Purchase.GROUP, group);
+        query.whereEqualTo(Purchase.GROUP, mCurrentGroup);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(final List<ParseObject> parseObjects, ParseException e) {
@@ -97,7 +96,7 @@ public class MoreQueryHelper extends BaseQueryHelper {
                 }
 
                 // Add the latest results for this query to the cache
-                ParseObject.pinAllInBackground(Purchase.PIN_LABEL + group.getObjectId(),
+                ParseObject.pinAllInBackground(Purchase.PIN_LABEL + mCurrentGroup.getObjectId(),
                         parseObjects, new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
@@ -111,14 +110,9 @@ public class MoreQueryHelper extends BaseQueryHelper {
     }
 
     private void queryCompensationsPaidMore(int skip) {
-        final Group group = ParseUtils.getCurrentGroup();
-        if (group == null) {
-            return;
-        }
-
         ParseQuery<ParseObject> query = OnlineQuery.getCompensationsQuery();
         query.setSkip(skip);
-        query.whereEqualTo(Compensation.GROUP, group);
+        query.whereEqualTo(Compensation.GROUP, mCurrentGroup);
         query.whereEqualTo(Compensation.IS_PAID, true);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -129,7 +123,7 @@ public class MoreQueryHelper extends BaseQueryHelper {
                 }
 
                 // Add the latest results for this query to the cache.
-                ParseObject.pinAllInBackground(Compensation.PIN_LABEL_PAID + group.getObjectId(),
+                ParseObject.pinAllInBackground(Compensation.PIN_LABEL_PAID + mCurrentGroup.getObjectId(),
                         parseObjects, new SaveCallback() {
                             @Override
                             public void done(ParseException e) {
@@ -146,6 +140,14 @@ public class MoreQueryHelper extends BaseQueryHelper {
     protected void onParseError(ParseException e) {
         if (mListener != null) {
             mListener.onMoreObjectsPinFailed(e);
+        }
+    }
+
+    @Override
+    protected void finish() {
+        if (mListener != null) {
+            List<ParseObject> emptyList = new ArrayList<>();
+            mListener.onMoreObjectsPinned(emptyList);
         }
     }
 

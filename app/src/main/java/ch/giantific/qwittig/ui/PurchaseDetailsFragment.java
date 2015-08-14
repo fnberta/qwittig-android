@@ -2,9 +2,11 @@ package ch.giantific.qwittig.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +24,8 @@ import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.ui.adapter.PurchaseDetailsRecyclerAdapter;
 import ch.giantific.qwittig.utils.DateUtils;
+import ch.giantific.qwittig.utils.MessageUtils;
+import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 
 
@@ -37,6 +41,9 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     private String mPurchaseId;
     private Purchase mPurchase;
     private PurchaseDetailsRecyclerAdapter mRecyclerAdapter;
+    private User mCurrentUser;
+    private Group mCurrentGroup;
+    private static final String LOG_TAG = PurchaseDetailsFragment.class.getSimpleName();
 
     public PurchaseDetailsFragment() {
     }
@@ -97,6 +104,10 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     public void onStart() {
         super.onStart();
 
+        mCurrentUser = (User) ParseUser.getCurrentUser();
+        if (mCurrentUser != null) {
+            mCurrentGroup = mCurrentUser.getCurrentGroup();
+        }
         queryData();
     }
 
@@ -119,14 +130,10 @@ public class PurchaseDetailsFragment extends BaseFragment implements
         mRecyclerAdapter.setPurchase(object);
         mRecyclerAdapter.notifyDataSetChanged();
 
-        mProgressBar.setVisibility(View.GONE);
+        toggleMainViewVisibility();
         ActivityCompat.startPostponedEnterTransition(getActivity());
 
-        if (!mPurchase.currentUserHasReadPurchase() &&
-                !ParseUtils.isTestUser(ParseUser.getCurrentUser())) {
-            mPurchase.addCurrentUserToReadBy();
-            mPurchase.saveEventually();
-        }
+        updateReadBy();
     }
 
     private void updateToolbarTitle() {
@@ -141,32 +148,47 @@ public class PurchaseDetailsFragment extends BaseFragment implements
      */
     private void updateActionBarMenu() {
         List<ParseUser> usersInvolved = mPurchase.getUsersInvolved();
-        User currentUser = (User) ParseUser.getCurrentUser();
-        Group currentGroup = currentUser.getCurrentGroup();
         boolean allUsersAreValid = true;
 
         for (ParseUser parseUser : usersInvolved) {
             User user = (User) parseUser;
-            if (!user.getGroupIds().contains(currentGroup.getObjectId())) {
+            if (!user.getGroupIds().contains(mCurrentGroup.getObjectId())) {
                 allUsersAreValid = false;
+                break;
             }
         }
 
+        boolean hasForeignCurrency = !mCurrentGroup.getCurrency().equals(mPurchase.getCurrency());
+
         if (allUsersAreValid) {
             String buyerId = mPurchase.getBuyer().getObjectId();
-            if (buyerId.equals(currentUser.getObjectId())) {
+            if (buyerId.equals(mCurrentUser.getObjectId())) {
                 if (mPurchase.getReceiptParseFile() != null) {
-                    mListener.updateActionBarMenu(true, true);
+                    mListener.updateActionBarMenu(true, true, hasForeignCurrency);
                 } else {
-                    mListener.updateActionBarMenu(true, false);
+                    mListener.updateActionBarMenu(true, false, hasForeignCurrency);
                 }
             } else if (mPurchase.getReceiptParseFile() != null) {
-                mListener.updateActionBarMenu(false, true);
+                mListener.updateActionBarMenu(false, true, hasForeignCurrency);
             }
         } else {
             if (mPurchase.getReceiptParseFile() != null) {
-                mListener.updateActionBarMenu(false, true);
+                mListener.updateActionBarMenu(false, true, hasForeignCurrency);
             }
+        }
+    }
+
+    private void toggleMainViewVisibility() {
+        boolean purchaseIsNull = mPurchase == null;
+        mRecyclerView.setVisibility(purchaseIsNull ? View.GONE : View.VISIBLE);
+        mProgressBar.setVisibility(purchaseIsNull ? View.VISIBLE : View.GONE);
+    }
+
+    private void updateReadBy() {
+        if (!mPurchase.currentUserHasReadPurchase() &&
+                !ParseUtils.isTestUser(ParseUser.getCurrentUser())) {
+            mPurchase.addCurrentUserToReadBy();
+            mPurchase.saveEventually();
         }
     }
 
@@ -182,6 +204,17 @@ public class PurchaseDetailsFragment extends BaseFragment implements
         }
     }
 
+    /**
+     * Shows snackbar with exchange rate
+     */
+    public void showExchangeRate() {
+        float exchangeRate = mPurchase.getExchangeRate();
+        String message = getString(R.string.toast_exchange_rate_value,
+                MoneyUtils.formatMoneyNoSymbol(exchangeRate,
+                        MoneyUtils.EXCHANGE_RATE_FRACTION_DIGITS));
+        MessageUtils.showBasicSnackbar(mRecyclerView, message);
+    }
+
     @Override
     public void onDetach() {
         super.onDetach();
@@ -191,7 +224,8 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     public interface FragmentInteractionListener {
         void setToolbarStoreDate(String title, String subtitle);
 
-        void updateActionBarMenu(boolean showEditOptions, boolean hasReceiptFile);
+        void updateActionBarMenu(boolean showEditOptions, boolean hasReceiptFile,
+                                 boolean hasForeignCurrency);
 
         void showAccountCreateDialog();
 

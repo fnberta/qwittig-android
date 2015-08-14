@@ -2,6 +2,7 @@ package ch.giantific.qwittig.helper;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.parse.FunctionCallback;
 import com.parse.ParseCloud;
@@ -40,15 +41,15 @@ public class FullQueryHelper extends BaseQueryHelper {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        runFullQuery();
-    }
-
-    private void runFullQuery() {
-        if (mCurrentGroup != null) {
-            calculateBalance();
-        } else {
-            queryUsers();
+        if (mCurrentGroup == null || mCurrentUserGroups == null) {
+            mListener.onAllQueriesFinished();
+            return;
         }
+
+        // purchases for each group + compensationsPaid for each group + compensationsUnpaid + users
+        mTotalNumberOfQueries = mCurrentUserGroups.size() * 2 + 1 + 1;
+
+        calculateBalance();
     }
 
     private void calculateBalance() {
@@ -74,8 +75,17 @@ public class FullQueryHelper extends BaseQueryHelper {
     }
 
     @Override
+    protected void finish() {
+        if (mListener != null) {
+            mListener.onAllQueriesFinished();
+        }
+    }
+
+    @Override
     void onUsersPinned() {
         super.onUsersPinned();
+
+        checkQueryCount();
 
         if (mListener != null) {
             mListener.onUsersPinned();
@@ -87,6 +97,8 @@ public class FullQueryHelper extends BaseQueryHelper {
     @Override
     void onPurchasesPinned(String groupId) {
         super.onPurchasesPinned(groupId);
+
+        checkQueryCount();
 
         if (mListener != null && mCurrentGroup != null &&
                 groupId.equals(mCurrentGroup.getObjectId())) {
@@ -100,6 +112,8 @@ public class FullQueryHelper extends BaseQueryHelper {
     void onCompensationsUnpaidPinned() {
         super.onCompensationsUnpaidPinned();
 
+        checkQueryCount();
+
         if (mListener != null) {
             mListener.onCompensationsPinned(false);
         }
@@ -108,6 +122,8 @@ public class FullQueryHelper extends BaseQueryHelper {
     @Override
     void onCompensationsPaidPinned(String groupId) {
         super.onCompensationsPaidPinned(groupId);
+
+        checkQueryCount();
 
         if (mListener != null && mCurrentGroup != null &&
                 groupId.equals(mCurrentGroup.getObjectId())) {
@@ -127,6 +143,8 @@ public class FullQueryHelper extends BaseQueryHelper {
         void onPurchasesPinned();
 
         void onCompensationsPinned(boolean isPaid);
+
+        void onAllQueriesFinished();
 
         void onPinFailed(ParseException e);
     }

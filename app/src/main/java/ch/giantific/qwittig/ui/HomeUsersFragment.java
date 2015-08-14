@@ -75,9 +75,7 @@ public class HomeUsersFragment extends HomeBaseFragment implements
     }
 
     @Override
-    void toggleMainVisibility() {
-        super.toggleMainVisibility();
-
+    protected void toggleEmptyViewVisibility() {
         if (mUsers.isEmpty()) {
             mTextViewEmpty.setVisibility(View.VISIBLE);
         } else {

@@ -14,7 +14,7 @@ public class CurrencyRates {
     @SerializedName("date")
     private String mDate;
     @SerializedName("rates")
-    private Map<String, Double> mRates;
+    private Map<String, Float> mRates;
 
     public String getBase() {
         return mBase;
@@ -32,11 +32,11 @@ public class CurrencyRates {
         mDate = date;
     }
 
-    public Map<String, Double> getRates() {
+    public Map<String, Float> getRates() {
         return mRates;
     }
 
-    public void setRates(Map<String, Double> rates) {
+    public void setRates(Map<String, Float> rates) {
         mRates = rates;
     }
 }

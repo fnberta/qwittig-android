@@ -265,5 +265,11 @@
     <string name="push_compensation_amount_changed_alert">%1$s wird dir %2$s bezahlen</string>
     <string name="fab_label_auto">Magisch</string>
     <string name="fab_label_manual">Von Hand</string>
+    <string name="toast_exchange_no_data">Keine Wechselkursdaten, bitte versuche es später noch einmal</string>
+    <string name="toast_exchange_rate_fetching">Wechselkurs noch nicht abgerufen</string>
+    <string name="hint_exchange_rate">Wechselkurs</string>
+    <string name="exchange_rate">Wechselkurs:</string>
+    <string name="toast_exchange_rate_value">Wechselkurs: %1$s</string>
+    <string name="action_purchase_show_exchange_rate">Zeige Wechselkurs</string>
 
 </resources>

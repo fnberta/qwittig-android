@@ -83,7 +83,7 @@ public class Item extends ParseObject {
         return currentUser.getCurrentGroup();
     }
 
-    public double getPriceForeign(double exchangeRate) {
+    public double getPriceForeign(float exchangeRate) {
         double price = getPrice();
         if (exchangeRate == 1) {
             return price;
@@ -92,10 +92,10 @@ public class Item extends ParseObject {
         return price / exchangeRate;
     }
 
-    public void convertPrice(double exchangeRate, boolean toGroupCurrency) {
+    public void convertPrice(float exchangeRate, boolean toGroupCurrency) {
         double price = getPrice();
         double priceConverted = toGroupCurrency ? price * exchangeRate : price / exchangeRate;
-        setPrice(priceConverted);
+        setPrice(MoneyUtils.roundToFractionDigits(4, priceConverted));
     }
 
     public List<String> getUsersInvolvedIds() {

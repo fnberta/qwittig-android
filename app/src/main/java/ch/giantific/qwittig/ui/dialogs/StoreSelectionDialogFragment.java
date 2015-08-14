@@ -17,6 +17,7 @@ import android.widget.Spinner;
 
 import com.parse.ParseUser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
@@ -89,12 +90,15 @@ public class StoreSelectionDialogFragment extends DialogFragment {
     }
 
     private void setupSpinner() {
-        mOtherStore = getString(R.string.dialog_store_other);
+        List<String> stores = new ArrayList<>();
         User currentUser = (User) ParseUser.getCurrentUser();
-        List<String> stores = currentUser.getStoresFavorites();
-        if (stores.contains(mOtherStore)) {
-            stores.remove(mOtherStore);
+        List<String> storesFavorites = currentUser.getStoresFavorites();
+        if (!storesFavorites.isEmpty()) {
+            for (String store : storesFavorites) {
+                stores.add(store);
+            }
         }
+        mOtherStore = getString(R.string.dialog_store_other);
         stores.add(mOtherStore);
 
         final ArrayAdapter<String> spinnerStoreDataAdapter = new ArrayAdapter<>(getActivity(),
@@ -143,12 +147,12 @@ public class StoreSelectionDialogFragment extends DialogFragment {
         String storeSelected = mSpinnerStore.getSelectedItem().toString();
         if (storeSelected.equals(mOtherStore)) {
             mStoreSelected = mTextInputLayoutStoreManual.getEditText().getText().toString().trim();
-            if (!TextUtils.isEmpty(mStoreSelected)) {
+            if (TextUtils.isEmpty(mStoreSelected)) {
+                mTextInputLayoutStoreManual.setError(getString(R.string.error_store));
+            } else {
                 mTextInputLayoutStoreManual.setErrorEnabled(false);
                 mListener.setStore(mStoreSelected, true);
                 dismiss();
-            } else {
-                mTextInputLayoutStoreManual.setError(getString(R.string.error_store));
             }
         } else {
             mStoreSelected = storeSelected;

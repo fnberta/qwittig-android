@@ -48,6 +48,7 @@ import ch.giantific.qwittig.helper.PurchaseSaveHelper;
 import ch.giantific.qwittig.helper.RatesHelper;
 import ch.giantific.qwittig.ui.dialogs.AccountCreateDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.DatePickerDialogFragment;
+import ch.giantific.qwittig.ui.dialogs.ManualExchangeRateDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.PurchaseUserSelectionDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.StoreSelectionDialogFragment;
 import ch.giantific.qwittig.ui.widgets.TransitionListenerAdapter;
@@ -65,7 +66,8 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         StoreSelectionDialogFragment.DialogInteractionListener,
         PurchaseReceiptAddEditFragment.FragmentInteractionListener,
         RatesHelper.HelperInteractionListener,
-        PurchaseSaveHelper.HelperInteractionListener {
+        PurchaseSaveHelper.HelperInteractionListener,
+        ManualExchangeRateDialogFragment.DialogInteractionListener {
 
     @IntDef({PURCHASE_SAVED, PURCHASE_SAVED_AUTO, PURCHASE_DISCARDED, PURCHASE_SAVED_AS_DRAFT,
             PURCHASE_DRAFT_DELETED, PURCHASE_ERROR, PURCHASE_NO_CHANGES})
@@ -182,7 +184,6 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void circularRevealFab() {
         circularRevealFab(false);
     }
@@ -364,9 +365,20 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         MessageUtils.showBasicSnackbar(mFabPurchaseSave, getString(R.string.toast_receipt_deleted));
     }
 
+    @Override
+    public void showManualExchangeRateSelectorDialog(String exchangeRate) {
+        ManualExchangeRateDialogFragment manualExchangeRateDialogFragment =
+                ManualExchangeRateDialogFragment.newInstance(exchangeRate);
+        manualExchangeRateDialogFragment.show(getFragmentManager(), "manual_exchange_rate");
+    }
 
     @Override
-    public void onRatesFetchSuccessful(Map<String, Double> exchangeRates) {
+    public void setExchangeRate(float exchangeRate) {
+        mPurchaseFragment.setExchangeRateManual(exchangeRate);
+    }
+
+    @Override
+    public void onRatesFetchSuccessful(Map<String, Float> exchangeRates) {
         mPurchaseFragment.onRatesFetchSuccessful(exchangeRates);
     }
 

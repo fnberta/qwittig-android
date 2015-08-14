@@ -102,7 +102,7 @@ public class PurchaseSaveHelper extends BaseHelper {
     }
 
     private void convertPrices(boolean toGroupCurrency) {
-        double exchangeRate = mPurchase.getExchangeRate();
+        float exchangeRate = mPurchase.getExchangeRate();
         if (exchangeRate == 1) {
             return;
         }
