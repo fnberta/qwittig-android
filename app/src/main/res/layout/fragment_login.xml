@@ -1,99 +1,81 @@
-<ScrollView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:paddingTop="@dimen/small_space"
-    android:clipToPadding="false">
+    android:layout_marginStart="@dimen/key_line_1"
+    android:layout_marginEnd="@dimen/key_line_1"
+    android:orientation="vertical"
+    android:transitionGroup="true"
+    tools:context="ch.giantific.qwittig.ui.LoginFragment">
 
-    <RelativeLayout
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/til_login_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:transitionGroup="true"
-        tools:context="ch.giantific.qwittig.ui.LoginFragment">
+        android:layout_marginTop="@dimen/small_space"
+        android:layout_marginBottom="@dimen/small_space"
+        android:transitionGroup="true">
 
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/til_login_email"
+        <AutoCompleteTextView
+            android:id="@+id/et_login_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/key_line_1"
-            android:layout_marginEnd="@dimen/key_line_1"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="@dimen/small_space"
-            android:layout_marginBottom="@dimen/small_space"
-            android:transitionGroup="true">
+            android:inputType="textEmailAddress"
+            android:imeOptions="actionNext"
+            android:hint="@string/hint_email"/>
 
-            <AutoCompleteTextView
-                android:id="@+id/et_login_email"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
-                android:imeOptions="actionNext"
-                android:hint="@string/hint_email"/>
+    </android.support.design.widget.TextInputLayout>
 
-        </android.support.design.widget.TextInputLayout>
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/til_login_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/small_space"
+        android:transitionGroup="true">
 
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/til_login_password"
+        <EditText
+            android:id="@+id/et_login_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/key_line_1"
-            android:layout_marginEnd="@dimen/key_line_1"
-            android:layout_below="@id/til_login_email"
-            android:layout_marginBottom="@dimen/small_space"
-            android:transitionGroup="true">
+            android:inputType="textPassword"
+            android:hint="@string/hint_password"/>
 
-            <EditText
-                android:id="@+id/et_login_password"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:hint="@string/hint_password"/>
+    </android.support.design.widget.TextInputLayout>
 
-        </android.support.design.widget.TextInputLayout>
+    <Button
+        android:id="@+id/bt_login_login"
+        android:theme="@style/ColoredRaisedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/login_button_log_in" />
 
-        <Button
-            android:id="@+id/bt_login_login"
-            android:theme="@style/ColoredRaisedButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/key_line_1"
-            android:layout_marginEnd="@dimen/key_line_1"
-            android:layout_below="@id/til_login_password"
-            android:text="@string/login_button_log_in" />
+    <TextView
+        android:id="@+id/tv_reset_password"
+        style="@style/TextAppearance.AppCompat.Caption"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/touch_target_min"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_vertical"
+        android:text="@string/login_text_forgot_credentials" />
 
-        <TextView
-            android:id="@+id/tv_reset_password"
-            style="@style/TextAppearance.AppCompat.Caption"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/touch_target_min"
-            android:layout_marginStart="@dimen/key_line_1"
-            android:layout_marginEnd="@dimen/key_line_1"
-            android:layout_below="@id/bt_login_login"
-            android:layout_centerHorizontal="true"
-            android:gravity="center_vertical"
-            android:text="@string/login_text_forgot_credentials" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+    </View>
 
-        <Button
-            android:id="@+id/bt_login_signup"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/key_line_1"
-            android:layout_marginEnd="@dimen/key_line_1"
-            android:layout_above="@+id/bt_login_tryout"
-            android:text="@string/login_button_sign_up" />
+    <Button
+        android:id="@+id/bt_login_signup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/login_button_sign_up" />
 
-        <Button
-            android:id="@id/bt_login_tryout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/key_line_1"
-            android:layout_marginEnd="@dimen/key_line_1"
-            android:layout_marginBottom="@dimen/small_space"
-            android:layout_alignParentBottom="true"
-            android:text="@string/login_button_tryout" />
+    <Button
+        android:id="@+id/bt_login_tryout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/login_button_tryout" />
 
-    </RelativeLayout>
-</ScrollView>
+</LinearLayout>
 

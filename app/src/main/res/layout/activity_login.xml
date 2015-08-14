@@ -1,50 +1,60 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:transitionGroup="true"
-    tools:context="ch.giantific.qwittig.ui.LoginActivity">
-
-    <TextView
-        android:id="@+id/tv_app_title"
-        style="@style/LoginHeader"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="@dimen/small_space"
-        android:text="@string/app_name"/>
-
-    <FrameLayout
-        android:id="@+id/container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:ignore="MergeRootFrame" />
+    android:fillViewport="true"
+    android:paddingTop="@dimen/small_space"
+    android:paddingBottom="@dimen/small_space"
+    android:clipToPadding="false"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <LinearLayout
-        android:id="@+id/ll_progress"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:transitionGroup="true"
-        android:visibility="gone"
-        tools:context="ch.giantific.qwittig.ui.ProgressFragment">
-
-        <ProgressBar
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/small_space"
-            android:indeterminate="true"/>
+        tools:context="ch.giantific.qwittig.ui.LoginActivity">
 
         <TextView
-            android:id="@+id/tv_progress_message"
+            android:id="@+id/tv_app_title"
+            style="@style/LoginHeader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/progress_login"/>
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/small_space"
+            android:text="@string/app_name"/>
+
+        <FrameLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:ignore="MergeRootFrame"/>
+
+        <LinearLayout
+            android:id="@+id/ll_progress"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:transitionGroup="true"
+            android:visibility="gone"
+            tools:context="ch.giantific.qwittig.ui.ProgressFragment">
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/small_space"
+                android:indeterminate="true"/>
+
+            <TextView
+                android:id="@+id/tv_progress_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/progress_login"/>
+
+        </LinearLayout>
 
     </LinearLayout>
-
-</LinearLayout>
+</ScrollView>
