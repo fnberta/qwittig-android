@@ -69,9 +69,8 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         PurchaseSaveHelper.HelperInteractionListener,
         ManualExchangeRateDialogFragment.DialogInteractionListener {
 
-    @IntDef({PURCHASE_SAVED, PURCHASE_SAVED_AUTO, PURCHASE_DISCARDED, PURCHASE_SAVED_AS_DRAFT, PURCHASE_DRAFT_DELETED,
-            PURCHASE_ERROR,
-            PURCHASE_NO_CHANGES})
+    @IntDef({PURCHASE_SAVED, PURCHASE_SAVED_AUTO, PURCHASE_DISCARDED, PURCHASE_SAVED_AS_DRAFT,
+            PURCHASE_DRAFT_DELETED, PURCHASE_ERROR, PURCHASE_NO_CHANGES})
     @Retention(RetentionPolicy.SOURCE)
     public @interface PurchaseAction {}
     public static final int PURCHASE_SAVED = 0;

@@ -1,25 +1,22 @@
 package ch.giantific.qwittig.ui;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.IntDef;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 import com.parse.ParseConfig;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -35,6 +32,7 @@ import java.util.List;
 
 import ch.giantific.qwittig.PushBroadcastReceiver;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.constants.AppConstants;
 import ch.giantific.qwittig.data.parse.models.Config;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.helper.FullQueryHelper;
@@ -44,7 +42,6 @@ import ch.giantific.qwittig.ui.adapter.TabsAdapter;
 import ch.giantific.qwittig.ui.dialogs.GoPremiumDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.GroupJoinDialogFragment;
-import ch.giantific.qwittig.ui.widgets.FabSpeedDial;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
@@ -62,8 +59,6 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         InvitedGroupHelper.HelperInteractionListener,
         MoreQueryHelper.HelperInteractionListener {
 
-    private static final String INVITED_GROUP_HELPER = "invited_group_helper";
-    private static final String LOG_TAG = HomeActivity.class.getSimpleName();
 
     @IntDef({ADAPTER_ALL, ADAPTER_PURCHASES, ADAPTER_USER})
     @Retention(RetentionPolicy.SOURCE)
@@ -71,7 +66,8 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     public static final int ADAPTER_ALL = 0;
     public static final int ADAPTER_PURCHASES = 1;
     public static final int ADAPTER_USER = 2;
-
+    private static final String INVITED_GROUP_HELPER = "invited_group_helper";
+    private static final String LOG_TAG = HomeActivity.class.getSimpleName();
     private static final String URI_INVITED_GROUP_ID = "group";
     private static final String PURCHASE_FRAGMENT = "purchase_fragment";
     private static final String USER_FRAGMENT = "user_fragment";
@@ -83,10 +79,10 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     private HomePurchasesFragment mHomePurchasesFragment;
     private HomeUsersFragment mHomeUsersFragment;
     private TabLayout mTabLayout;
-    private FloatingActionButton mFabAddPurchase;
-    private FabSpeedDial mFabAddPurchaseAuto;
-    private FabSpeedDial mFabAddPurchaseManual;
-    private boolean mNewQueryNeeded;
+    private FloatingActionMenu mFabMenu;
+    private FloatingActionButton mFabAuto;
+    private FloatingActionButton mFabManual;
+    private boolean mNewQueryNeeded = false;
     private boolean mCheckForInvitations = true;
     private int mInvitationAction;
 
@@ -106,23 +102,19 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         getSupportActionBar().setTitle(null);
 
         mBalance = (TextView) findViewById(R.id.tv_balance);
-        mFabAddPurchase = (FloatingActionButton) findViewById(R.id.fab_group_new);
-        mFabAddPurchase.setOnClickListener(this);
-        if (Utils.isRunningLollipopAndHigher()) {
-            mFabAddPurchase.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-                @Override
-                public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                    v.removeOnLayoutChangeListener(this);
-                    circularRevealFab();
-                }
-            });
-        } else {
-            mFabAddPurchase.setVisibility(View.VISIBLE);
-        }
-        mFabAddPurchaseAuto = (FabSpeedDial) findViewById(R.id.fab_auto);
-        mFabAddPurchaseAuto.setOnClickListener(this);
-        mFabAddPurchaseManual = (FabSpeedDial) findViewById(R.id.fab_manual);
-        mFabAddPurchaseManual.setOnClickListener(this);
+        mFabMenu = (FloatingActionMenu) findViewById(R.id.fab_menu);
+        mFabMenu.hideMenuButton(false);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mFabMenu.showMenuButton(true);
+            }
+        }, AppConstants.FAB_CIRCULAR_REVEAL_DELAY * 4);
+
+        mFabAuto = (FloatingActionButton) findViewById(R.id.fab_auto);
+        mFabAuto.setOnClickListener(this);
+        mFabManual = (FloatingActionButton) findViewById(R.id.fab_manual);
+        mFabManual.setOnClickListener(this);
 
         if (mUserIsLoggedIn) {
             if (savedInstanceState == null) {
@@ -136,20 +128,6 @@ public class HomeActivity extends BaseNavDrawerActivity implements
                 setupTabs();
             }
         }
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void circularRevealFab() {
-        final Animator reveal = Utils.getCircularRevealAnimator(mFabAddPurchase);
-        reveal.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                super.onAnimationStart(animation);
-                animation.removeListener(this);
-                mFabAddPurchase.setVisibility(View.VISIBLE);
-            }
-        });
-        reveal.start();
     }
 
     private void addViewPagerFragments() {
@@ -241,7 +219,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
                 mInvitedGroupId = uri.getQueryParameter(URI_INVITED_GROUP_ID);
 
                 if (!email.equals(mCurrentUser.getUsername())) {
-                    MessageUtils.showBasicSnackbar(mFabAddPurchase, getString(R.string.toast_emails_no_match));
+                    MessageUtils.showBasicSnackbar(mFabMenu, getString(R.string.toast_emails_no_match));
                     return;
                 }
             }
@@ -264,7 +242,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
         if (!TextUtils.isEmpty(mInvitedGroupId)) {
             if (!Utils.isConnected(this)) {
-                MessageUtils.showBasicSnackbar(mToolbar, getString(R.string.toast_no_connection));
+                MessageUtils.showBasicSnackbar(mFabMenu, getString(R.string.toast_no_connection));
                 return;
             }
 
@@ -296,13 +274,13 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     @Override
     public void onInvitedGroupQueryFailed(ParseException e) {
         ParseErrorHandler.handleParseError(this, e);
-        MessageUtils.showBasicSnackbar(mFabAddPurchase, ParseErrorHandler.getErrorMessage(this, e));
+        MessageUtils.showBasicSnackbar(mFabMenu, ParseErrorHandler.getErrorMessage(this, e));
         removeQueryHelper();
     }
 
     @Override
     public void onEmailNotValid() {
-        MessageUtils.showBasicSnackbar(mFabAddPurchase, getString(R.string.toast_group_invite_not_valid));
+        MessageUtils.showBasicSnackbar(mFabMenu, getString(R.string.toast_group_invite_not_valid));
         removeInvitedGroupHelper();
     }
 
@@ -360,7 +338,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     @Override
     public void onUserJoinGroupFailed(ParseException e) {
         ParseErrorHandler.handleParseError(this, e);
-        MessageUtils.getBasicSnackbar(mToolbar, ParseErrorHandler.getErrorMessage(this, e));
+        MessageUtils.getBasicSnackbar(mFabMenu, ParseErrorHandler.getErrorMessage(this, e));
         removeInvitedGroupHelper();
 
         setLoading(false);
@@ -382,7 +360,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         mInvitedGroup.removeUserInvited(mCurrentUser.getUsername());
         mInvitedGroup.saveEventually();
 
-        MessageUtils.showBasicSnackbar(mToolbar, getString(R.string.toast_invitation_discarded));
+        MessageUtils.showBasicSnackbar(mFabMenu, getString(R.string.toast_invitation_discarded));
     }
 
     @Override
@@ -456,7 +434,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     private void showOnlineQueryErrorSnackbar(String errorMessage) {
-        Snackbar snackbar = MessageUtils.getBasicSnackbar(mToolbar, errorMessage);
+        Snackbar snackbar = MessageUtils.getBasicSnackbar(mFabMenu, errorMessage);
         snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -500,10 +478,6 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.fab_group_new: {
-                toggleFabVisibility();
-                break;
-            }
             case R.id.fab_auto: {
                 if (userIsInGroup()) {
                     if (mIsPremium || mInTrialMode) {
@@ -516,7 +490,6 @@ public class HomeActivity extends BaseNavDrawerActivity implements
                         showGoPremiumDialog();
                     }
                 }
-                toggleFabVisibility();
                 break;
             }
             case R.id.fab_manual: {
@@ -529,23 +502,11 @@ public class HomeActivity extends BaseNavDrawerActivity implements
                             HomeActivity.INTENT_REQUEST_PURCHASE_MODIFY,
                             activityOptionsCompat.toBundle());
                 }
-                toggleFabVisibility();
                 break;
             }
         }
-    }
 
-    private void toggleFabVisibility() {
-        if (mFabAddPurchaseAuto.getVisibility() == View.VISIBLE &&
-                mFabAddPurchaseManual.getVisibility() == View.VISIBLE) {
-            mFabAddPurchaseAuto.hideSpeedDial();
-            mFabAddPurchaseManual.hideSpeedDial();
-            mFabAddPurchase.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add_shopping_cart_black_24dp));
-        } else {
-            mFabAddPurchaseAuto.showSpeedDial();
-            mFabAddPurchaseManual.showSpeedDial();
-            mFabAddPurchase.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_clear_black_24dp));
-        }
+        mFabMenu.close(true);
     }
 
     private boolean userIsInGroup() {
@@ -601,7 +562,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
             case HomeActivity.INTENT_REQUEST_PURCHASE_MODIFY:
                 switch (resultCode) {
                     case PurchaseAddActivity.RESULT_PURCHASE_SAVED:
-                        MessageUtils.showBasicSnackbar(mFabAddPurchase, getString(R.string.toast_purchase_added));
+                        MessageUtils.showBasicSnackbar(mFabMenu, getString(R.string.toast_purchase_added));
                         break;
                     case PurchaseAddActivity.RESULT_PURCHASE_SAVED_AUTO:
                         String purchaseAdded = getString(R.string.toast_purchase_added);
@@ -611,18 +572,18 @@ public class HomeActivity extends BaseNavDrawerActivity implements
                             int freePurchasesLeft = freeAutoLimit - mCurrentUser.getPremiumCount();
                             purchaseAdded += ". " + getString(R.string.toast_free_purchases_left, freePurchasesLeft);
                         }
-                        MessageUtils.showBasicSnackbar(mFabAddPurchase, purchaseAdded);
+                        MessageUtils.showBasicSnackbar(mFabMenu, purchaseAdded);
                         break;
                     case PurchaseAddActivity.RESULT_PURCHASE_DRAFT:
-                        MessageUtils.showBasicSnackbar(mFabAddPurchase,
+                        MessageUtils.showBasicSnackbar(mFabMenu,
                                 getString(R.string.toast_purchase_added_draft));
                         break;
                     case PurchaseAddActivity.RESULT_PURCHASE_DISCARDED:
-                        MessageUtils.showBasicSnackbar(mFabAddPurchase,
+                        MessageUtils.showBasicSnackbar(mFabMenu,
                                 getString(R.string.toast_purchase_discarded));
                         break;
                     case PurchaseAddActivity.RESULT_PURCHASE_ERROR:
-                        MessageUtils.showBasicSnackbar(mFabAddPurchase,
+                        MessageUtils.showBasicSnackbar(mFabMenu,
                                 getString(R.string.toast_create_image_file_failed));
                         break;
                 }
@@ -630,7 +591,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
             case HomeActivity.INTENT_REQUEST_PURCHASE_DETAILS:
                 switch (resultCode) {
                     case PurchaseDetailsActivity.RESULT_PURCHASE_DELETED:
-                        MessageUtils.showBasicSnackbar(mFabAddPurchase,
+                        MessageUtils.showBasicSnackbar(mFabMenu,
                                 getString(R.string.toast_purchase_deleted));
                         break;
                     case PurchaseDetailsActivity.RESULT_GROUP_CHANGED:
