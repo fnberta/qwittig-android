@@ -35,7 +35,7 @@ public class Qwittig extends Application {
 
         if (BuildConfig.DEBUG) {
             // check memory leaks
-            mRefWatcher = LeakCanary.install(this);
+           // mRefWatcher = LeakCanary.install(this);
         }
 
         // register ParseObject subclasses
