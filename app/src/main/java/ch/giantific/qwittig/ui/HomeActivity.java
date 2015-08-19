@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.IntDef;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -15,8 +16,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
-import com.github.clans.fab.FloatingActionButton;
-import com.github.clans.fab.FloatingActionMenu;
 import com.parse.ParseConfig;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -30,6 +29,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.List;
 
+import ch.berta.fabio.fabspeeddial.FabMenu;
 import ch.giantific.qwittig.PushBroadcastReceiver;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.constants.AppConstants;
@@ -79,7 +79,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     private HomePurchasesFragment mHomePurchasesFragment;
     private HomeUsersFragment mHomeUsersFragment;
     private TabLayout mTabLayout;
-    private FloatingActionMenu mFabMenu;
+    private FabMenu mFabMenu;
     private FloatingActionButton mFabAuto;
     private FloatingActionButton mFabManual;
     private boolean mNewQueryNeeded = false;
@@ -102,7 +102,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         getSupportActionBar().setTitle(null);
 
         mBalance = (TextView) findViewById(R.id.tv_balance);
-        mFabMenu = (FloatingActionMenu) findViewById(R.id.fab_menu);
+        mFabMenu = (FabMenu) findViewById(R.id.fab_menu);
         mFabMenu.hideMenuButton(false);
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -506,7 +506,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
             }
         }
 
-        mFabMenu.close(true);
+        mFabMenu.close();
     }
 
     private boolean userIsInGroup() {

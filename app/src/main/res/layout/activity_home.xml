@@ -55,43 +55,28 @@
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-        <com.github.clans.fab.FloatingActionMenu
+        <ch.berta.fabio.fabspeeddial.FabMenu
             android:id="@+id/fab_menu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
+            android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/normal_space"
-            app:layout_behavior="ch.giantific.qwittig.ui.widgets.FloatingActionBehavior"
-            app:menu_elevationCompat="3dp"
-            app:menu_colorNormal="@color/accent"
-            app:menu_colorPressed="@color/accent"
-            app:menu_colorRipple="?colorControlHighlight"
-            app:menu_icon="@drawable/ic_add_black_24dp"
-            app:menu_labels_colorRipple="?colorControlHighlight">
+            app:labels="@array/fab_labels">
 
-            <com.github.clans.fab.FloatingActionButton
-                android:id="@+id/fab_auto"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_camera_alt_black_24dp"
-                app:fab_elevationCompat="3dp"
-                app:fab_colorNormal="@color/accent"
-                app:fab_colorPressed="@color/accent"
-                app:fab_size="mini"
-                app:fab_label="@string/fab_label_auto" />
-
-            <com.github.clans.fab.FloatingActionButton
+            <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fab_manual"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_create_black_24dp"
-                app:fab_elevationCompat="3dp"
-                app:fab_colorNormal="@color/accent"
-                app:fab_colorPressed="@color/accent"
-                app:fab_size="mini"
-                app:fab_label="@string/fab_label_manual" />
+                app:fabSize="mini"/>
 
-        </com.github.clans.fab.FloatingActionMenu>
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab_auto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_camera_alt_black_24dp"
+                app:fabSize="mini"/>
+        </ch.berta.fabio.fabspeeddial.FabMenu>
 
     </android.support.design.widget.CoordinatorLayout>
 
