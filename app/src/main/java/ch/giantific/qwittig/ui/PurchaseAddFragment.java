@@ -13,11 +13,9 @@ import com.parse.ParseFile;
 import com.parse.ParseUser;
 
 import java.util.List;
-import java.util.Map;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.ItemRow;
-import ch.giantific.qwittig.data.models.ItemUsersChecked;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.helper.PurchaseSaveHelper;
 import ch.giantific.qwittig.utils.MessageUtils;

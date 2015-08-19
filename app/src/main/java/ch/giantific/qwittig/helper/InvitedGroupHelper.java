@@ -1,7 +1,6 @@
 package ch.giantific.qwittig.helper;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
 import android.text.TextUtils;
 
@@ -10,7 +9,6 @@ import com.parse.GetCallback;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseObject;
-import com.parse.ParsePush;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -19,11 +17,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ch.giantific.qwittig.PushBroadcastReceiver;
-import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.parse.CloudCode;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.User;
-import ch.giantific.qwittig.utils.ParseErrorHandler;
 
 /**
  * Created by fabio on 10.12.14.

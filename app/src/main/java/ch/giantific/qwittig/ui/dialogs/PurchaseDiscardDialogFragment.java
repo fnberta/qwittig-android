@@ -48,8 +48,8 @@ public class PurchaseDiscardDialogFragment extends DialogFragment {
     }
 
     public interface DialogInteractionListener {
-        public void savePurchaseAsDraft();
+        void savePurchaseAsDraft();
 
-        public void discardPurchase();
+        void discardPurchase();
     }
 }

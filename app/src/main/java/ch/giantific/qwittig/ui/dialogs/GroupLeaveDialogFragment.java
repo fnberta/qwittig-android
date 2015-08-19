@@ -64,6 +64,6 @@ public class GroupLeaveDialogFragment extends DialogFragment {
     }
 
     public interface FragmentInteractionListener {
-        public void leaveCurrentGroup();
+        void leaveCurrentGroup();
     }
 }

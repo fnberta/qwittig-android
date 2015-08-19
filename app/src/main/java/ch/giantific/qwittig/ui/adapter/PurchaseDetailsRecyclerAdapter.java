@@ -1,6 +1,7 @@
 package ch.giantific.qwittig.ui.adapter;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -223,7 +224,7 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
             mTextViewPrice = (TextView) view.findViewById(R.id.list_item_final_price);
             mCircleDisplayPercentage = (CircleDisplay) view.findViewById(R.id.list_item_percentage);
 
-            mCircleDisplayPercentage.setColor(mContext.getResources().getColor(R.color.accent));
+            mCircleDisplayPercentage.setColor(ContextCompat.getColor(mContext, R.color.accent));
             mCircleDisplayPercentage.setAnimDuration(1000);
             mCircleDisplayPercentage.setDimAlpha(DISABLED_ALPHA_RGB);
         }

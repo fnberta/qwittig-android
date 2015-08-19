@@ -2,7 +2,6 @@ package ch.giantific.qwittig.helper;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.parse.FunctionCallback;
 import com.parse.ParseCloud;

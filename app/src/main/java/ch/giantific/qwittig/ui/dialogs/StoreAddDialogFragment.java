@@ -57,6 +57,6 @@ public class StoreAddDialogFragment extends DialogFragment {
     }
 
     public interface DialogInteractionListener {
-        public void addStore(String storeName);
+        void addStore(String storeName);
     }
 }

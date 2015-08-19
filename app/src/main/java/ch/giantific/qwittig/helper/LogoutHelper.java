@@ -10,7 +10,6 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import ch.giantific.qwittig.data.parse.models.Installation;
-import ch.giantific.qwittig.data.parse.models.User;
 
 /**
  * Created by fabio on 10.12.14.

@@ -11,15 +11,11 @@ import com.parse.ParseQuery;
 import com.parse.SaveCallback;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import ch.giantific.qwittig.data.parse.OnlineQuery;
 import ch.giantific.qwittig.data.parse.models.Compensation;
-import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.Purchase;
-import ch.giantific.qwittig.utils.ParseUtils;
 
 /**
  * Created by fabio on 10.12.14.

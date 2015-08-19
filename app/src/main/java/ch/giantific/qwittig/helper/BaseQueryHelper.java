@@ -18,7 +18,6 @@ import ch.giantific.qwittig.data.parse.models.Compensation;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.data.parse.models.User;
-import ch.giantific.qwittig.utils.ParseUtils;
 
 /**
  * Created by fabio on 10.12.14.

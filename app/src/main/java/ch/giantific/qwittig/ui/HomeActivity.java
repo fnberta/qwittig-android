@@ -11,6 +11,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.view.View;
@@ -191,12 +192,12 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         int colorDark;
         int style;
         if (Utils.isPositive(balance)) {
-            color = getResources().getColor(R.color.green);
-            colorDark = getResources().getColor(R.color.green_dark);
+            color = ContextCompat.getColor(this, R.color.green);
+            colorDark = ContextCompat.getColor(this, R.color.green_dark);
             style = R.style.AppTheme_WithNavDrawer_Green;
         } else {
-            color = getResources().getColor(R.color.red);
-            colorDark = getResources().getColor(R.color.red_dark);
+            color = ContextCompat.getColor(this, R.color.red);
+            colorDark = ContextCompat.getColor(this, R.color.red_dark);
             style = R.style.AppTheme_WithNavDrawer_Red;
         }
         setTheme(style);

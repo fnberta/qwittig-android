@@ -19,7 +19,6 @@ import ch.giantific.qwittig.PushBroadcastReceiver;
 import ch.giantific.qwittig.data.parse.CloudCode;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.User;
-import ch.giantific.qwittig.utils.ParseUtils;
 
 /**
  * Created by fabio on 10.12.14.

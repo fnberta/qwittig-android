@@ -3,7 +3,6 @@ package ch.giantific.qwittig.ui;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,7 +19,6 @@ import com.github.jorgecastilloprz.FABProgressCircle;
 import com.github.jorgecastilloprz.listeners.FABProgressListener;
 import com.parse.ParseException;
 import com.parse.ParseObject;
-import com.parse.SaveCallback;
 
 import org.apache.commons.math3.fraction.BigFraction;
 

@@ -8,7 +8,6 @@ import com.parse.ParseACL;
 import com.parse.ParseCrashReporting;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
-import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
 
 import ch.giantific.qwittig.data.parse.models.Compensation;

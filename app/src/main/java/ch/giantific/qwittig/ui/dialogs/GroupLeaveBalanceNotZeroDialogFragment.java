@@ -48,6 +48,6 @@ public class GroupLeaveBalanceNotZeroDialogFragment extends DialogFragment {
     }
 
     public interface FragmentInteractionListener {
-        public void startNewSettlement();
+        void startNewSettlement();
     }
 }

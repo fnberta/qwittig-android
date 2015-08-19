@@ -9,8 +9,6 @@ import android.transition.Slide;
 import android.transition.Transition;
 import android.view.MenuItem;
 
-import java.util.Map;
-
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.ui.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.utils.MessageUtils;

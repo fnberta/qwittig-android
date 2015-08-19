@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.widget.CheckBox;
 
@@ -172,9 +173,9 @@ public class ListCheckBox extends CheckBox {
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public void setListStatus(boolean isSpecial) {
         if (isSpecial) {
-            setButtonTintList(getResources().getColorStateList(R.color.checkbox_color_red));
+            setButtonTintList(ContextCompat.getColorStateList(getContext(), R.color.checkbox_color_red));
         } else {
-            setButtonTintList(getResources().getColorStateList(R.color.checkbox_color_accent));
+            setButtonTintList(ContextCompat.getColorStateList(getContext(), R.color.checkbox_color_accent));
         }
 
         // TODO: implement for Android <5.0

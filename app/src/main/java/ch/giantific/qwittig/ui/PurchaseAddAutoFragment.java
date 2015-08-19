@@ -7,14 +7,11 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.parse.ParseObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.ItemRow;
-import ch.giantific.qwittig.data.parse.models.Item;
 import ch.giantific.qwittig.data.ocr.models.ItemRest;
 import ch.giantific.qwittig.data.ocr.models.PurchaseRest;
 import ch.giantific.qwittig.utils.MoneyUtils;

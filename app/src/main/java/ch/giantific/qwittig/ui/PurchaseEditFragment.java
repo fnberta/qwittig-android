@@ -2,7 +2,6 @@ package ch.giantific.qwittig.ui;
 
 import android.app.FragmentManager;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.google.common.primitives.Booleans;
 import com.parse.ParseFile;
@@ -270,7 +269,6 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
         FragmentManager fragmentManager = getFragmentManager();
         PurchaseEditSaveHelper purchaseEditSaveHelper = (PurchaseEditSaveHelper)
                 fragmentManager.findFragmentByTag(PURCHASE_SAVE_HELPER);
-        ;
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
