@@ -1,7 +1,6 @@
 package ch.giantific.qwittig.helper;
 
 import android.app.Activity;
-import android.os.Bundle;
 
 import com.parse.FunctionCallback;
 import com.parse.ParseCloud;

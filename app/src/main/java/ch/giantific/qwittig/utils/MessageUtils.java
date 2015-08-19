@@ -22,8 +22,17 @@ public class MessageUtils {
         snackbar.show();
     }
 
+    public static void showBasicSnackbar(View view, String message, int duration) {
+        Snackbar snackbar = getBasicSnackbar(view, message, duration);
+        snackbar.show();
+    }
+
     public static Snackbar getBasicSnackbar(View view, String message) {
-        return Snackbar.make(view, message, Snackbar.LENGTH_LONG);
+        return getBasicSnackbar(view, message, Snackbar.LENGTH_LONG);
+    }
+
+    public static Snackbar getBasicSnackbar(View view, String message, int duration) {
+        return Snackbar.make(view, message, duration);
     }
 
     public static Toast showToast(Context context, String message) {

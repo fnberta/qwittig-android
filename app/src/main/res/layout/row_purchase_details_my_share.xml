@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/small_space">
+    android:layout_marginTop="@dimen/min_space">
 
     <TextView
         style="@style/Base.TextAppearance.AppCompat.Title"
@@ -25,6 +25,20 @@
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="@dimen/key_line_1"
         android:textColor="?attr/colorAccent"
-        tools:text="124.50"/>
+        tools:text="124.50 CHF"/>
+
+    <TextView
+        android:id="@+id/tv_my_share_value_foreign"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_my_share_value"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="@dimen/key_line_1"
+        android:textColor="?attr/colorAccent"
+        android:visibility="gone"
+        tools:visibility="visible"
+        tools:text="1.34 GBP"/>
 
 </RelativeLayout>

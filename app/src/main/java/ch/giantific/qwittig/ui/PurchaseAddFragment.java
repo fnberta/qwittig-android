@@ -13,11 +13,9 @@ import com.parse.ParseFile;
 import com.parse.ParseUser;
 
 import java.util.List;
-import java.util.Map;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.ItemRow;
-import ch.giantific.qwittig.data.models.ItemUsersChecked;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.helper.PurchaseSaveHelper;
 import ch.giantific.qwittig.utils.MessageUtils;
@@ -96,31 +94,13 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
      */
     @Override
     protected void setPurchase() {
-        if (mCurrencySelected.equals(mCurrentGroupCurrency)) {
-            createNewPurchase(1);
-        } else {
-            getExchangeRateWithHelper();
-        }
+        createNewPurchase();
     }
 
-    @Override
-    public void onRatesFetchSuccessful(Map<String, Double> exchangeRates) {
-        double exchangeRate = exchangeRates.get(mCurrentGroupCurrency);
-        createNewPurchase(exchangeRate);
-    }
-
-    @Override
-    public void onRatesFetchFailed(String errorMessage) {
-        super.onRatesFetchFailed(errorMessage);
-
-        // TODO: check if safe to do (i.e. purchase safe needs to fail now)
-        createNewPurchase(1);
-    }
-
-    private void createNewPurchase(double exchangeRate) {
+    private void createNewPurchase() {
         List<ParseUser> purchaseUsersInvolved = getParseUsersInvolvedFromBoolean(mPurchaseUsersInvolved);
         mPurchase = new Purchase(mCurrentGroup, mDateSelected, mStoreSelected,
-                mItems, mTotalPrice, purchaseUsersInvolved, mCurrencySelected, exchangeRate);
+                mItems, mTotalPrice, purchaseUsersInvolved, mCurrencySelected, mExchangeRate);
         ParseFile receiptFile = mListener.getReceiptParseFile();
 
         savePurchaseWithHelper(receiptFile);

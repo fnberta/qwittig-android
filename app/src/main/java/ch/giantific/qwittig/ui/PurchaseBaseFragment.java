@@ -2,8 +2,11 @@ package ch.giantific.qwittig.ui;
 
 import android.app.Activity;
 import android.app.FragmentManager;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.CallSuper;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -74,8 +77,10 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     private static final String STATE_PURCHASE_USERS_INVOLVED = "state_purchase_users_involved";
     private static final String STATE_CURRENCY_SELECTED = "state_currency_selected";
     private static final String STATE_IS_SAVING = "state_is_saving";
+    private static final String STATE_IS_FETCHING_RATES = "state_is_fetching_rates";
+    private static final String EXCHANGE_RATE_LAST_FETCHED_TIME = "rates_last_fetched";
+    private static final long EXCHANGE_RATE_REFRESH_INTERVAL = 24 * 60 * 60 * 1000;
     private static final String LOG_TAG = PurchaseBaseFragment.class.getSimpleName();
-
     FragmentInteractionListener mListener;
     Purchase mPurchase;
     Date mDateSelected;
@@ -93,10 +98,15 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     boolean mIsSaving;
     Button mButtonAddRow;
     List<ItemRow> mItemRows = new ArrayList<>();
+    float mExchangeRate;
+    private boolean mIsFetchingExchangeRates;
+    private SharedPreferences mSharedPreferences;
     private View mViewDate;
     private View mViewStore;
     private TextView mTextViewPickDate;
     private Spinner mSpinnerCurrency;
+    private TextView mTextViewExchangeRateDesc;
+    private TextView mTextViewExchangeRate;
     private ArrayAdapter<String> mSpinnerCurrencySelectionAdapter;
     private TextView mTextViewTotalValue;
     private TextView mTextViewMyShareValue;
@@ -127,14 +137,17 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         mCurrentGroup = mCurrentUser.getCurrentGroup();
         mCurrentGroupCurrency = mCurrentGroup.getCurrency();
 
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
         if (savedInstanceState != null) {
             mItemRowCount = savedInstanceState.getInt(STATE_ROW_COUNT);
             mDateSelected = DateUtils.parseLongToDate(savedInstanceState.getLong(STATE_DATE_SELECTED));
-            mPurchaseUsersInvolved = Booleans.asList(savedInstanceState
-                    .getBooleanArray(STATE_PURCHASE_USERS_INVOLVED));
+            boolean[] usersInvolved = savedInstanceState.getBooleanArray(STATE_PURCHASE_USERS_INVOLVED);
+            mPurchaseUsersInvolved = usersInvolved != null ? Booleans.asList(usersInvolved) : new ArrayList<Boolean>();
             mCurrencySelected = savedInstanceState.getString(STATE_CURRENCY_SELECTED);
             mStoreSelected = savedInstanceState.getString(STATE_STORE_SELECTED);
             mIsSaving = savedInstanceState.getBoolean(STATE_IS_SAVING);
+            mIsFetchingExchangeRates = savedInstanceState.getBoolean(STATE_IS_FETCHING_RATES);
         } else {
             mItemRowCount = 1;
             mDateSelected = new Date();
@@ -154,6 +167,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
                 Booleans.toArray(mPurchaseUsersInvolved));
         outState.putString(STATE_CURRENCY_SELECTED, mCurrencySelected);
         outState.putBoolean(STATE_IS_SAVING, mIsSaving);
+        outState.putBoolean(STATE_IS_FETCHING_RATES, mIsFetchingExchangeRates);
     }
 
     @Override
@@ -177,6 +191,8 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         mSpinnerCurrency = (Spinner) rootView.findViewById(R.id.sp_currency);
         mTextViewMyShareValue = (TextView) rootView.findViewById(R.id.tv_my_share_value);
         mTextViewMyShareCurrency = (TextView) rootView.findViewById(R.id.tv_my_share_currency);
+        mTextViewExchangeRateDesc = (TextView) rootView.findViewById(R.id.tv_exchange_rate_text);
+        mTextViewExchangeRate = (TextView) rootView.findViewById(R.id.tv_exchange_rate_value);
         mRecyclerViewUsersInvolved = (RecyclerView) rootView.findViewById(R.id.rv_users_involved);
     }
 
@@ -243,6 +259,13 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         });
         setCurrency(mCurrencySelected);
 
+        mTextViewExchangeRate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.showManualExchangeRateSelectorDialog(((TextView) v).getText().toString());
+            }
+        });
+
         if (savedInstanceState != null) {
             revealFab();
         }
@@ -284,6 +307,33 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         for (ItemRow itemRow : mItemRows) {
             itemRow.formatPrice(currencyCode);
         }
+
+        // update exchangeRate
+        updateExchangeRate();
+    }
+
+    void updateExchangeRate() {
+        if (mCurrencySelected.equals(mCurrentGroupCurrency)) {
+            mExchangeRate = 1;
+            toggleExchangeRateViewVisibility();
+        } else {
+            mExchangeRate = mSharedPreferences.getFloat(mCurrencySelected, 1);
+            if (mExchangeRate == 1) {
+                fetchExchangeRateWithHelper();
+            } else {
+                long lastFetched = mSharedPreferences.getLong(EXCHANGE_RATE_LAST_FETCHED_TIME, 0);
+                long currentTime = System.currentTimeMillis();
+                if (currentTime - lastFetched > EXCHANGE_RATE_REFRESH_INTERVAL) {
+                    SharedPreferences.Editor editor = mSharedPreferences.edit();
+                    editor.putLong(EXCHANGE_RATE_LAST_FETCHED_TIME, currentTime);
+                    editor.apply();
+
+                    fetchExchangeRateWithHelper();
+                } else {
+                    setExchangeRate();
+                }
+            }
+        }
     }
 
     private void setTotalValue(BigDecimal totalValue) {
@@ -294,6 +344,90 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         mTextViewMyShareValue.setText(MoneyUtils.formatMoneyNoSymbol(myShareValue,
                 mCurrencySelected));
         mTextViewMyShareCurrency.setText(mCurrencySelected);
+    }
+
+    final void setExchangeRate() {
+        mTextViewExchangeRate.setText(MoneyUtils.formatMoneyNoSymbol(mExchangeRate,
+                MoneyUtils.EXCHANGE_RATE_FRACTION_DIGITS));
+        toggleExchangeRateViewVisibility();
+    }
+
+    private void toggleExchangeRateViewVisibility() {
+        int visibility = mExchangeRate != 1 ? View.VISIBLE : View.GONE;
+        mTextViewExchangeRateDesc.setVisibility(visibility);
+        mTextViewExchangeRate.setVisibility(visibility);
+    }
+
+    /**
+     * Called from activity when user set a manual exchange rate in the dialog
+     * @param exchangeRate
+     */
+    public void setExchangeRateManual(float exchangeRate) {
+        BigDecimal roundedExchangeRate = MoneyUtils.roundToFractionDigits(
+                MoneyUtils.EXCHANGE_RATE_FRACTION_DIGITS, exchangeRate);
+        mExchangeRate = roundedExchangeRate.floatValue();
+        setExchangeRate();
+    }
+
+    private void fetchExchangeRateWithHelper() {
+        mIsFetchingExchangeRates = true;
+
+        FragmentManager fragmentManager = getFragmentManager();
+        RatesHelper ratesHelper = findRatesHelper(fragmentManager);
+
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (ratesHelper == null) {
+            ratesHelper = RatesHelper.newInstance(mCurrentGroupCurrency);
+
+            fragmentManager.beginTransaction()
+                    .add(ratesHelper, RATES_HELPER)
+                    .commit();
+        }
+    }
+
+    private RatesHelper findRatesHelper(FragmentManager fragmentManager) {
+        return (RatesHelper) fragmentManager.findFragmentByTag(RATES_HELPER);
+    }
+
+    private void removeRatesHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        RatesHelper ratesHelper = findRatesHelper(fragmentManager);
+
+        if (ratesHelper != null) {
+            fragmentManager.beginTransaction().remove(ratesHelper).commitAllowingStateLoss();
+        }
+    }
+
+    /**
+     * Called from activity when helper failed to fetch rates
+     *
+     * @param errorMessage the network error message
+     */
+    public void onRatesFetchFailed(String errorMessage) {
+        removeRatesHelper();
+        mIsFetchingExchangeRates = false;
+    }
+
+    /**
+     * Called from activity when helper successfully fetched currency rates
+     *
+     * @param exchangeRates
+     */
+    public void onRatesFetchSuccessful(Map<String, Float> exchangeRates) {
+        removeRatesHelper();
+
+        mIsFetchingExchangeRates = false;
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        for (Map.Entry<String, Float> exchangeRate : exchangeRates.entrySet()) {
+            BigDecimal roundedExchangeRate = MoneyUtils.roundToFractionDigits(
+                    MoneyUtils.EXCHANGE_RATE_FRACTION_DIGITS, 1 / exchangeRate.getValue());
+            editor.putFloat(exchangeRate.getKey(), roundedExchangeRate.floatValue());
+        }
+        editor.apply();
+
+        mExchangeRate = exchangeRates.get(mCurrencySelected);
+        setExchangeRate();
     }
 
     @CallSuper
@@ -696,6 +830,23 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      * the purchase.
      */
     public void savePurchase(boolean saveAsDraft) {
+        if (mIsFetchingExchangeRates) {
+            MessageUtils.showBasicSnackbar(mButtonAddRow, getString(R.string.toast_exchange_rate_fetching));
+            return;
+        }
+
+        if (!saveAsDraft && !mCurrencySelected.equals(mCurrentGroupCurrency) && mExchangeRate == 1) {
+            Snackbar snackbar = MessageUtils.getBasicSnackbar(mButtonAddRow, getString(R.string.toast_exchange_no_data));
+            snackbar.setAction(R.string.action_purchase_save_draft, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    savePurchase(true);
+                }
+            });
+
+            return;
+        }
+
         if (!mIsSaving) {
             boolean itemsAreComplete = setItemValues(saveAsDraft);
             if (itemsAreComplete) {
@@ -764,46 +915,6 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      * AddFragment creates a new purchase and EditFragment updates the original one
      */
     protected abstract void setPurchase();
-
-    final void getExchangeRateWithHelper() {
-        FragmentManager fragmentManager = getFragmentManager();
-        RatesHelper ratesHelper = findRatesHelper(fragmentManager);
-
-        // If the Fragment is non-null, then it is currently being
-        // retained across a configuration change.
-        if (ratesHelper == null) {
-            ratesHelper = RatesHelper.newInstance(mCurrencySelected);
-
-            fragmentManager.beginTransaction()
-                    .add(ratesHelper, RATES_HELPER)
-                    .commit();
-        }
-    }
-
-    final RatesHelper findRatesHelper(FragmentManager fragmentManager) {
-        return (RatesHelper) fragmentManager.findFragmentByTag(RATES_HELPER);
-    }
-
-    final void removeRatesHelper() {
-        FragmentManager fragmentManager = getFragmentManager();
-        RatesHelper ratesHelper = findRatesHelper(fragmentManager);
-
-        if (ratesHelper != null) {
-            fragmentManager.beginTransaction().remove(ratesHelper).commitAllowingStateLoss();
-        }
-    }
-
-    /**
-     * Called from activity when helper sucessfully fetched currency rates
-     *
-     * @param exchangeRates
-     */
-    public abstract void onRatesFetchSuccessful(Map<String, Double> exchangeRates);
-
-    @CallSuper
-    public void onRatesFetchFailed(String errorMessage) {
-        removeRatesHelper();
-    }
 
     @CallSuper
     public void onParseError(ParseException e) {
@@ -909,6 +1020,8 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     public interface FragmentInteractionListener {
+        void showManualExchangeRateSelectorDialog(String exchangeRate);
+
         void showDatePickerDialog();
 
         void showUserPickerDialog(CharSequence[] usersAvailable, boolean[] usersChecked);

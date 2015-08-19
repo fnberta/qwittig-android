@@ -103,11 +103,11 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
                 if (buyer.getObjectId().equals(currentUser.getObjectId())) {
                     balanceChange = "+" + MoneyUtils.formatMoneyNoSymbol(
                             calculateBalanceChange(purchase), mCurrentGroupCurrency);
-                    purchaseRow.mTextViewBalanceChange.setTextColor(
-                            mContext.getResources().getColor(R.color.green));
+                    purchaseRow.mTextViewBalanceChange.setTextColor(ContextCompat.getColor(mContext,
+                            R.color.green));
                 } else {
-                    purchaseRow.mTextViewBalanceChange.setTextColor(
-                            mContext.getResources().getColor(R.color.red));
+                    purchaseRow.mTextViewBalanceChange.setTextColor(ContextCompat.getColor(mContext,
+                            R.color.red));
                 }
                 purchaseRow.setBalanceChange(balanceChange);
 
@@ -194,7 +194,7 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
             if (Utils.isRunningLollipopAndHigher()) {
                 mView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.ripple_white));
             } else {
-                mView.setBackgroundColor(mContext.getResources().getColor(android.R.color.white));
+                mView.setBackgroundColor(ContextCompat.getColor(mContext, android.R.color.white));
             }
         }
 

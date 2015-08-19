@@ -1,14 +1,5 @@
 package ch.giantific.qwittig.data.parse.models;
 
-import android.annotation.TargetApi;
-import android.content.Context;
-import android.content.res.ColorStateList;
-import android.os.Build;
-import android.support.design.widget.TextInputLayout;
-import android.text.TextUtils;
-import android.widget.CheckBox;
-import android.widget.EditText;
-
 import com.parse.ParseACL;
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
@@ -18,10 +9,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
-import ch.giantific.qwittig.utils.Utils;
 
 /**
  * Created by fabio on 12.10.14.
@@ -83,7 +72,7 @@ public class Item extends ParseObject {
         return currentUser.getCurrentGroup();
     }
 
-    public double getPriceForeign(double exchangeRate) {
+    public double getPriceForeign(float exchangeRate) {
         double price = getPrice();
         if (exchangeRate == 1) {
             return price;
@@ -92,10 +81,10 @@ public class Item extends ParseObject {
         return price / exchangeRate;
     }
 
-    public void convertPrice(double exchangeRate, boolean toGroupCurrency) {
+    public void convertPrice(float exchangeRate, boolean toGroupCurrency) {
         double price = getPrice();
         double priceConverted = toGroupCurrency ? price * exchangeRate : price / exchangeRate;
-        setPrice(priceConverted);
+        setPrice(MoneyUtils.roundToFractionDigits(4, priceConverted));
     }
 
     public List<String> getUsersInvolvedIds() {

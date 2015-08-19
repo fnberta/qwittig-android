@@ -1,25 +1,15 @@
 package ch.giantific.qwittig.data.parse;
 
-import android.support.annotation.IntDef;
-
-import com.parse.FindCallback;
-import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import ch.giantific.qwittig.data.parse.models.Compensation;
-import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.data.parse.models.User;
-import ch.giantific.qwittig.services.ParseQueryService;
 
 /**
  * Created by fabio on 31.12.14.

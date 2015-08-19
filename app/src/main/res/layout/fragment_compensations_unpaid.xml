@@ -59,7 +59,7 @@
             android:layout_height="wrap_content"
             app:reusable="true"
             app:finalIcon="@drawable/ic_done_black_24dp"
-            app:arcColor="@color/green">
+            app:arcColor="@color/red">
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fab_new_account_balance"

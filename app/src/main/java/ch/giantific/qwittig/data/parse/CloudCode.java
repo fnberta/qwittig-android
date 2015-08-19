@@ -1,12 +1,5 @@
 package ch.giantific.qwittig.data.parse;
 
-import com.parse.FunctionCallback;
-import com.parse.ParseCloud;
-import com.parse.ParseException;
-
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Created by fabio on 05.02.15.
  */

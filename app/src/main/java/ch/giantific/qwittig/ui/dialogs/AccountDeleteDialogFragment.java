@@ -43,6 +43,6 @@ public class AccountDeleteDialogFragment extends DialogFragment {
     }
 
     public interface DialogInteractionListener {
-        public void deleteAccount();
+        void deleteAccount();
     }
 }

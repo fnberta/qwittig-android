@@ -1,6 +1,7 @@
 package ch.giantific.qwittig.ui.adapter;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,7 +12,6 @@ import android.widget.TextView;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
@@ -19,7 +19,6 @@ import ch.giantific.qwittig.data.parse.models.Item;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.ui.adapter.rows.HeaderRow;
-import ch.giantific.qwittig.ui.adapter.rows.UserInvolvedRow;
 import ch.giantific.qwittig.ui.widgets.CircleDisplay;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
@@ -76,12 +75,12 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
             }
             case TYPE_TOTAL: {
                 View v = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.row_purchase_total, parent, false);
+                        .inflate(R.layout.row_purchase_details_total, parent, false);
                 return new TotalRow(v);
             }
             case TYPE_MY_SHARE: {
                 View v = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.row_purchase_my_share, parent, false);
+                        .inflate(R.layout.row_purchase_details_my_share, parent, false);
                 return new MyShareRow(v);
             }
             default:
@@ -145,6 +144,15 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
                 TotalRow totalRow = (TotalRow) viewHolder;
                 totalRow.setTotalValue(MoneyUtils.formatMoney(mPurchase.getTotalPrice(),
                         mCurrentGroupCurrency));
+
+                String purchaseCurrency = mPurchase.getCurrency();
+                if (!mCurrentGroupCurrency.equals(purchaseCurrency)) {
+                    totalRow.setTotalValueForeignVisibility(true);
+                    totalRow.setTotalValueForeign(MoneyUtils.formatMoney(
+                            mPurchase.getTotalPriceForeign(), purchaseCurrency));
+                } else {
+                    totalRow.setTotalValueForeignVisibility(false);
+                }
                 break;
             }
             case TYPE_MY_SHARE: {
@@ -155,6 +163,15 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
                     myShareRow.setMyShare(MoneyUtils.formatMoney(myShare, mCurrentGroupCurrency));
                 } else {
                     myShareRow.hideView();
+                }
+
+                String purchaseCurrency = mPurchase.getCurrency();
+                if (!mCurrentGroupCurrency.equals(purchaseCurrency)) {
+                    myShareRow.setMyShareForeignVisibility(true);
+                    myShareRow.setMyShareForeign(MoneyUtils.formatMoney(
+                            myShare / mPurchase.getExchangeRate(), purchaseCurrency));
+                } else {
+                    myShareRow.setMyShareForeignVisibility(false);
                 }
             }
         }
@@ -207,7 +224,7 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
             mTextViewPrice = (TextView) view.findViewById(R.id.list_item_final_price);
             mCircleDisplayPercentage = (CircleDisplay) view.findViewById(R.id.list_item_percentage);
 
-            mCircleDisplayPercentage.setColor(mContext.getResources().getColor(R.color.accent));
+            mCircleDisplayPercentage.setColor(ContextCompat.getColor(mContext, R.color.accent));
             mCircleDisplayPercentage.setAnimDuration(1000);
             mCircleDisplayPercentage.setDimAlpha(DISABLED_ALPHA_RGB);
         }
@@ -251,26 +268,38 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
     public static class TotalRow extends RecyclerView.ViewHolder {
 
         private TextView mTextViewTotalValue;
+        private TextView mTextViewTotalValueForeign;
 
         public TotalRow(View view) {
             super(view);
 
             mTextViewTotalValue = (TextView) view.findViewById(R.id.tv_total_value);
+            mTextViewTotalValueForeign = (TextView) view.findViewById(R.id.tv_total_value_foreign);
         }
 
         public void setTotalValue(String totalValue) {
             mTextViewTotalValue.setText(totalValue);
         }
+
+        public void setTotalValueForeign(String totalValueForeign) {
+            mTextViewTotalValueForeign.setText(totalValueForeign);
+        }
+
+        public void setTotalValueForeignVisibility(boolean show) {
+            mTextViewTotalValueForeign.setVisibility(show ? View.VISIBLE : View.GONE);
+        }
     }
 
     public static class MyShareRow extends RecyclerView.ViewHolder {
 
-        private TextView mTextViewMyShareValue;
+        private TextView mTextViewMyShare;
+        private TextView mTextViewMyShareForeign;
 
         public MyShareRow(View view) {
             super(view);
 
-            mTextViewMyShareValue = (TextView) view.findViewById(R.id.tv_my_share_value);
+            mTextViewMyShare = (TextView) view.findViewById(R.id.tv_my_share_value);
+            mTextViewMyShareForeign = (TextView) view.findViewById(R.id.tv_my_share_value_foreign);
         }
 
         public void hideView() {
@@ -278,7 +307,15 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
         }
 
         public void setMyShare(String myShare) {
-            mTextViewMyShareValue.setText(myShare);
+            mTextViewMyShare.setText(myShare);
+        }
+
+        public void setMyShareForeign(String myShareForeign) {
+            mTextViewMyShareForeign.setText(myShareForeign);
+        }
+
+        public void setMyShareForeignVisibility(boolean show) {
+            mTextViewMyShareForeign.setVisibility(show ? View.VISIBLE : View.GONE);
         }
     }
 }

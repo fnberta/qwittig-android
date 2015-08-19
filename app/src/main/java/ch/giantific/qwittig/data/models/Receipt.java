@@ -1,12 +1,5 @@
 package ch.giantific.qwittig.data.models;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-
-import com.parse.ParseFile;
-
-import java.io.ByteArrayOutputStream;
-
 /**
  * Created by fabio on 13.12.14.
  */

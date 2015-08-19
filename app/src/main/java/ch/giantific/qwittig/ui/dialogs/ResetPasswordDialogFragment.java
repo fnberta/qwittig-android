@@ -100,6 +100,6 @@ public class ResetPasswordDialogFragment extends DialogFragment {
     }
 
     public interface FragmentInteractionListener {
-        public void resetPassword(String email);
+        void resetPassword(String email);
     }
 }

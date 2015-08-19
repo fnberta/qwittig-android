@@ -10,7 +10,8 @@
 
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:clipChildren="false">
 
         <android.support.design.widget.AppBarLayout
             android:id="@+id/appbar"
@@ -37,7 +38,6 @@
                     android:textColor="@android:color/white"
                     android:lines="1"
                     android:ellipsize="middle"
-
                     tools:text="-123.40"/>
 
             </android.support.v7.widget.Toolbar>
@@ -55,35 +55,28 @@
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-        <ch.giantific.qwittig.ui.widgets.FabSpeedDial
-            android:id="@+id/fab_auto"
+        <ch.berta.fabio.fabspeeddial.FabMenu
+            android:id="@+id/fab_menu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
+            android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/normal_space"
-            android:visibility="gone"
-            app:showTranslationY="@dimen/fab_translationY_auto"
-            android:src="@drawable/ic_camera_alt_black_24dp" />
+            app:labels="@array/fab_labels">
 
-        <ch.giantific.qwittig.ui.widgets.FabSpeedDial
-            android:id="@+id/fab_manual"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
-            android:layout_margin="@dimen/normal_space"
-            android:visibility="gone"
-            app:showTranslationY="@dimen/fab_translationY_manual"
-            android:src="@drawable/ic_create_black_24dp" />
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab_manual"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_create_black_24dp"
+                app:fabSize="mini"/>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_group_new"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
-            android:layout_margin="@dimen/normal_space"
-            android:src="@drawable/ic_add_shopping_cart_black_24dp"
-            android:visibility="invisible"
-            tools:visibility="visible"/>
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab_auto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_camera_alt_black_24dp"
+                app:fabSize="mini"/>
+        </ch.berta.fabio.fabspeeddial.FabMenu>
 
     </android.support.design.widget.CoordinatorLayout>
 

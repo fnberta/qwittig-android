@@ -115,6 +115,6 @@ public class CompensationAddManualDialogFragment extends DialogFragment {
     }
 
     public interface DialogInteractionListener {
-        public void onManualPaymentValuesSet(ItemUserPicker recipient, String amount);
+        void onManualPaymentValuesSet(ItemUserPicker recipient, String amount);
     }
 }

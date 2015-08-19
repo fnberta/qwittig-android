@@ -9,7 +9,8 @@
     android:paddingBottom="@dimen/small_space"
     android:gravity="center_horizontal"
     android:orientation="horizontal"
-    android:background="@color/light_blue_50">
+    android:background="@color/light_blue_50"
+    android:elevation="2dp">
 
     <Spinner
         android:id="@+id/sp_period"

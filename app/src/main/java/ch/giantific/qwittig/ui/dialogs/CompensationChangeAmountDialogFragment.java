@@ -11,13 +11,11 @@ import android.view.View;
 import android.widget.Button;
 
 import org.apache.commons.math3.fraction.BigFraction;
-import org.apache.commons.math3.fraction.Fraction;
 
 import java.math.BigDecimal;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.utils.MoneyUtils;
-import ch.giantific.qwittig.utils.Utils;
 
 /**
  * Created by fabio on 20.11.14.

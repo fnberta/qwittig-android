@@ -17,7 +17,6 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 import java.util.List;
 
@@ -38,7 +37,6 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
 
     private static final String CREATE_GROUP_HELPER = "create_group_helper";
     private FragmentInteractionListener mListener;
-    private Group mGroupNew;
     private TextInputLayout mTextInputLayoutName;
     private Spinner mSpinnerCurrency;
     private String mGroupNewName;
@@ -184,8 +182,6 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
      * @param invitingUser if the helper is also inviting users to the new group
      */
     public void onNewGroupCreated(Group newGroup, boolean invitingUser) {
-        mGroupNew = newGroup;
-
         // register for notifications for the new group
         ParsePush.subscribeInBackground(newGroup.getObjectId());
 

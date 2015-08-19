@@ -48,6 +48,6 @@ public class GoPremiumDialogFragment extends DialogFragment {
     }
 
     public interface DialogInteractionListener {
-        public void goPremium();
+        void goPremium();
     }
 }

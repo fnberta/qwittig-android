@@ -15,6 +15,8 @@ import java.util.Locale;
  */
 public class MoneyUtils {
 
+    public static final int EXCHANGE_RATE_FRACTION_DIGITS = 6;
+
     private MoneyUtils() {
         // class cannot be instantiated
     }
@@ -74,13 +76,20 @@ public class MoneyUtils {
     }
 
     public static String formatMoneyNoSymbol(Number money, String currencyCode) {
+        return formatMoneyNoSymbol(money, getMaximumFractionDigits(currencyCode));
+    }
+
+    public static String formatMoneyNoSymbol(Number money, int maxFractionDigits) {
         NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
         numberFormat.setRoundingMode(RoundingMode.HALF_UP);
-        int fractionDigits = getMaximumFractionDigits(currencyCode);
-        numberFormat.setMinimumFractionDigits(fractionDigits);
-        numberFormat.setMaximumFractionDigits(fractionDigits);
+        numberFormat.setMinimumFractionDigits(maxFractionDigits);
+        numberFormat.setMaximumFractionDigits(maxFractionDigits);
 
         return numberFormat.format(money);
+    }
+
+    public static BigDecimal roundToFractionDigits(int numberOfFractionDigits, double number) {
+        return new BigDecimal(number).setScale(numberOfFractionDigits, RoundingMode.HALF_UP);
     }
 
     public static List<String> getCurrencyDisplayNames(List<String> currencyCodes) {

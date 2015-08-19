@@ -8,10 +8,10 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import ch.giantific.qwittig.data.models.ItemRow;
 import ch.giantific.qwittig.data.parse.LocalQuery;
@@ -20,7 +20,6 @@ import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.helper.PurchaseEditSaveHelper;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
-import ch.giantific.qwittig.utils.ParseUtils;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -44,7 +43,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     private String mOldStore;
     private Date mOldDate;
     private String mOldCurrency;
-    private double mOldExchangeRate;
+    private float mOldExchangeRate;
 
     public PurchaseEditFragment() {
     }
@@ -73,11 +72,24 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
             mOldStore = savedInstanceState.getString(STATE_OLD_STORE);
             mOldDate = DateUtils.parseLongToDate(savedInstanceState.getLong(STATE_OLD_DATE));
             mOldCurrency = savedInstanceState.getString(STATE_OLD_CURRENCY);
-            mOldExchangeRate = savedInstanceState.getDouble(STATE_OLD_EXCHANGE_RATE);
+            mOldExchangeRate = savedInstanceState.getFloat(STATE_OLD_EXCHANGE_RATE);
         } else {
             mOldValuesAreSet = false;
             mOldItemIds = new ArrayList<>();
         }
+    }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putBoolean(STATE_ITEMS_SET, mOldValuesAreSet);
+        outState.putStringArrayList(STATE_OLD_ITEMS, mOldItemIds);
+        outState.putString(STATE_OLD_STORE, mOldStore);
+        outState.putLong(STATE_OLD_DATE, DateUtils.parseDateToLong(mOldDate));
+        outState.putString(STATE_OLD_CURRENCY, mOldCurrency);
+        outState.putFloat(STATE_OLD_EXCHANGE_RATE, mOldExchangeRate);
     }
 
     @Override
@@ -130,6 +142,16 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
 
             // get original exchangeRate to convert prices
             mOldExchangeRate = mPurchase.getExchangeRate();
+        }
+    }
+
+    @Override
+    void updateExchangeRate() {
+        if (!mOldValuesAreSet && !mOldCurrency.equals(mCurrentGroupCurrency)) {
+            mExchangeRate = mOldExchangeRate;
+            setExchangeRate();
+        } else {
+            super.updateExchangeRate();
         }
     }
 
@@ -220,7 +242,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     protected void setPurchase() {
         replacePurchaseData();
         resetReadBy();
-        updateExchangeRate();
+        savePurchaseWithHelper();
     }
 
     final void replacePurchaseData() {
@@ -229,39 +251,16 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
 
         // Replace the old values with new ones
         mPurchase.replaceItems(mItems);
-        mPurchase.replaceUsersInvolved(globalUsersInvolvedParse);
+        mPurchase.setUsersInvolved(globalUsersInvolvedParse);
         mPurchase.setDate(mDateSelected);
         mPurchase.setStore(mStoreSelected);
         mPurchase.setTotalPrice(mTotalPrice);
         mPurchase.setCurrency(mCurrencySelected);
+        mPurchase.setExchangeRate(mExchangeRate);
     }
 
     private void resetReadBy() {
         mPurchase.resetReadBy();
-    }
-
-    private void updateExchangeRate() {
-        if (mCurrencySelected.equals(mCurrentGroupCurrency)) {
-            mPurchase.setExchangeRate(1);
-            savePurchaseWithHelper();
-        } else {
-            getExchangeRateWithHelper();
-        }
-    }
-
-    @Override
-    public void onRatesFetchSuccessful(Map<String, Double> exchangeRates) {
-        double exchangeRate = exchangeRates.get(mCurrentGroupCurrency);
-        mPurchase.setExchangeRate(exchangeRate);
-
-        savePurchaseWithHelper();
-    }
-
-    @Override
-    public void onRatesFetchFailed(String errorMessage) {
-        super.onRatesFetchFailed(errorMessage);
-
-        onParseError(ParseUtils.getNoConnectionException(errorMessage));
     }
 
     private void savePurchaseWithHelper() {
@@ -270,7 +269,6 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
         FragmentManager fragmentManager = getFragmentManager();
         PurchaseEditSaveHelper purchaseEditSaveHelper = (PurchaseEditSaveHelper)
                 fragmentManager.findFragmentByTag(PURCHASE_SAVE_HELPER);
-        ;
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -322,9 +320,14 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
         for (int i = 0; i < oldItemsSize; i++) {
             Item itemOld = (Item) mOldItems.get(i);
             ItemRow itemRowNew = mItemRows.get(i);
-            if (!itemOld.getName().equals(itemRowNew.getEditTextName()) ||
-                    itemOld.getPriceForeign(mOldExchangeRate) !=
-                            itemRowNew.getEditTextPrice(mCurrencySelected).doubleValue()) {
+            if (!itemOld.getName().equals(itemRowNew.getEditTextName())) {
+                return true;
+            }
+
+            int maxFractionDigits = MoneyUtils.getMaximumFractionDigits(mCurrencySelected);
+            BigDecimal oldPrice = new BigDecimal(itemOld.getPriceForeign(mOldExchangeRate))
+                    .setScale(maxFractionDigits, BigDecimal.ROUND_HALF_UP);
+            if (oldPrice.compareTo(itemRowNew.getEditTextPrice(mCurrencySelected)) > 0) {
                 return true;
             }
 
@@ -362,16 +365,5 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     @Override
     protected void savePurchaseAsDraft() {
         // is never called here, only in EditDraftFragment
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putBoolean(STATE_ITEMS_SET, mOldValuesAreSet);
-        outState.putStringArrayList(STATE_OLD_ITEMS, mOldItemIds);
-        outState.putString(STATE_OLD_STORE, mOldStore);
-        outState.putLong(STATE_OLD_DATE, DateUtils.parseDateToLong(mOldDate));
-        outState.putString(STATE_OLD_CURRENCY, mOldCurrency);
     }
 }

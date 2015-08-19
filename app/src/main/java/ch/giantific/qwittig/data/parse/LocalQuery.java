@@ -1,10 +1,7 @@
 package ch.giantific.qwittig.data.parse;
 
-import android.content.Context;
-import android.text.TextUtils;
 import android.util.Log;
 
-import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;

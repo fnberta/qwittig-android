@@ -48,6 +48,6 @@ public class DiscardChangesDialogFragment extends DialogFragment {
     }
 
     public interface DialogInteractionListener {
-        public void discardChanges();
+        void discardChanges();
     }
 }

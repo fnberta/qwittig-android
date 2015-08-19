@@ -1,6 +1,7 @@
 package ch.giantific.qwittig.ui.adapter;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -98,8 +99,8 @@ public class UsersRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
 
         public void setBalance(BigFraction balance, String currency) {
             mTextViewBalance.setTextColor(Utils.isPositive(balance) ?
-                    mContext.getResources().getColor(R.color.green) :
-                    mContext.getResources().getColor(R.color.red));
+                    ContextCompat.getColor(mContext, R.color.green) :
+                    ContextCompat.getColor(mContext, R.color.red));
             mTextViewBalance.setText(MoneyUtils.formatMoneyNoSymbol(balance, currency));
         }
     }

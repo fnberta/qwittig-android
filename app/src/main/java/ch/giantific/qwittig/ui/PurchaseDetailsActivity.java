@@ -37,6 +37,7 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     private PurchaseDetailsActivity mThis = this;
     private boolean mShowEditOptions;
     private boolean mHasReceiptFile;
+    private boolean mHasForeignCurrency;
     private TextView mTextViewStore;
     private TextView mTextViewDate;
     private PurchaseDetailsFragment mPurchaseDetailsFragment;
@@ -158,6 +159,9 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
         if (mHasReceiptFile) {
             menu.findItem(R.id.action_purchase_show_receipt).setVisible(true);
         }
+        if (mHasForeignCurrency) {
+            menu.findItem(R.id.action_purchase_show_exchange_rate).setVisible(true);
+        }
         return true;
     }
 
@@ -173,6 +177,8 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
             case R.id.action_purchase_delete:
                 mPurchaseDetailsFragment.deletePurchase();
                 return true;
+            case R.id.action_purchase_show_exchange_rate:
+                mPurchaseDetailsFragment.showExchangeRate();
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -221,9 +227,11 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void updateActionBarMenu(boolean showEditOptions, boolean hasReceiptFile) {
+    public void updateActionBarMenu(boolean showEditOptions, boolean hasReceiptFile,
+                                    boolean hasForeignCurrency) {
         mShowEditOptions = showEditOptions;
         mHasReceiptFile = hasReceiptFile;
+        mHasForeignCurrency = hasForeignCurrency;
         invalidateOptionsMenu();
     }
 

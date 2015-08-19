@@ -63,7 +63,7 @@ public class RatesHelper extends BaseHelper {
         RestClient.getService().getRates(baseCurrency, new Callback<CurrencyRates>() {
             @Override
             public void success(CurrencyRates currencyRates, Response response) {
-                Map<String, Double> exchangeRates = currencyRates.getRates();
+                Map<String, Float> exchangeRates = currencyRates.getRates();
                 if (mListener != null) {
                     mListener.onRatesFetchSuccessful(exchangeRates);
                 }
@@ -85,7 +85,7 @@ public class RatesHelper extends BaseHelper {
     }
 
     public interface HelperInteractionListener {
-        void onRatesFetchSuccessful(Map<String, Double> exchangeRates);
+        void onRatesFetchSuccessful(Map<String, Float> exchangeRates);
 
         void onRatesFetchFailed(String errorMessage);
     }

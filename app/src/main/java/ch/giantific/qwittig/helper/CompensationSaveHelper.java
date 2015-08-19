@@ -3,28 +3,12 @@ package ch.giantific.qwittig.helper;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.annotation.IntDef;
-import android.text.TextUtils;
 
-import com.parse.FunctionCallback;
-import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseObject;
-import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.util.HashMap;
-import java.util.Map;
-
-import ch.giantific.qwittig.PushBroadcastReceiver;
-import ch.giantific.qwittig.data.parse.CloudCode;
 import ch.giantific.qwittig.data.parse.models.Compensation;
-import ch.giantific.qwittig.data.parse.models.Group;
-import ch.giantific.qwittig.data.parse.models.User;
-import ch.giantific.qwittig.utils.MessageUtils;
-import ch.giantific.qwittig.utils.ParseErrorHandler;
 
 /**
  * Created by fabio on 10.12.14.

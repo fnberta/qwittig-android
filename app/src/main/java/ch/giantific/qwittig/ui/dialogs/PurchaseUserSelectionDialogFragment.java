@@ -5,6 +5,8 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.TextViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -90,13 +92,13 @@ public class PurchaseUserSelectionDialogFragment extends DialogFragment {
                                                 boolean isChecked) {
                                 if (isChecked) {
                                     mUsersSelected.add(which);
-                                    if (mTextViewError.getCurrentTextColor() == getResources().getColor(R.color.red_error)) {
+                                    if (mTextViewError.getCurrentTextColor() == ContextCompat.getColor(getActivity(), R.color.red_error)) {
                                         mTextViewError.setTextAppearance(getActivity(), R.style.TextAppearance_AppCompat_Caption);
                                     }
                                 } else if (mUsersSelected.contains(which)) {
                                     mUsersSelected.remove(Integer.valueOf(which));
                                     if (mUsersSelected.isEmpty()) {
-                                        mTextViewError.setTextColor(getResources().getColor(R.color.red_error));
+                                        mTextViewError.setTextColor(ContextCompat.getColor(getActivity(), R.color.red_error));
                                     }
                                 }
                             }
@@ -144,6 +146,6 @@ public class PurchaseUserSelectionDialogFragment extends DialogFragment {
     }
 
     public interface FragmentInteractionListener {
-        public void onItemUsersInvolvedSet(List<Integer> userInvolved);
+        void onItemUsersInvolvedSet(List<Integer> userInvolved);
     }
 }

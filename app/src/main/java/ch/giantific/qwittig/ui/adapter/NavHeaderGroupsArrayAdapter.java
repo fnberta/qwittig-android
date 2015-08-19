@@ -24,13 +24,11 @@ public class NavHeaderGroupsArrayAdapter extends ArrayAdapter<ParseObject> {
     private int mViewResource;
     private int mDropDownViewResource;
     private List<ParseObject> mGroups;
-    private Context mContext;
 
     public NavHeaderGroupsArrayAdapter(Context context, int viewResource, int dropDownViewResource,
                                        List<ParseObject> groups) {
         super(context, viewResource, groups);
 
-        mContext = context;
         mViewResource = viewResource;
         mDropDownViewResource = dropDownViewResource;
         mGroups = groups;

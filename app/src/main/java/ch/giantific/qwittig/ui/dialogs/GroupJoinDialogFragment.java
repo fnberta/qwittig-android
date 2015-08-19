@@ -89,8 +89,8 @@ public class GroupJoinDialogFragment extends DialogFragment {
     }
 
     public interface DialogInteractionListener {
-        public void joinInvitedGroup();
+        void joinInvitedGroup();
 
-        public void discardInvitation();
+        void discardInvitation();
     }
 }

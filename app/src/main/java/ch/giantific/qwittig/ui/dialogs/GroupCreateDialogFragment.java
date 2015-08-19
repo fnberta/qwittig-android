@@ -48,6 +48,6 @@ public class GroupCreateDialogFragment extends DialogFragment {
     }
 
     public interface DialogInteractionListener {
-        public void createNewGroup();
+        void createNewGroup();
     }
 }

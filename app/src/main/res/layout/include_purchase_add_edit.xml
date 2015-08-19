@@ -161,11 +161,13 @@
     </Spinner>
 
     <TextView
+        android:id="@+id/tv_my_share_text"
         style="@style/Base.TextAppearance.AppCompat.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_total_text"
         android:layout_alignParentStart="true"
+        android:layout_marginTop="@dimen/my_share_neg_margin"
         android:layout_marginStart="@dimen/key_line_2"
         android:textColor="?attr/colorAccent"
         android:text="@string/purchase_my_share"/>
@@ -177,6 +179,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_total_value"
         android:layout_alignEnd="@id/tv_total_value"
+        android:layout_marginTop="@dimen/my_share_neg_margin"
         android:textColor="?attr/colorAccent"
         tools:text="124.50"/>
 
@@ -187,8 +190,32 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_total_value"
         android:layout_alignStart="@id/sp_currency"
+        android:layout_marginTop="@dimen/my_share_neg_margin"
         android:textColor="?attr/colorAccent"
         tools:text="CHF"/>
+
+    <TextView
+        android:id="@+id/tv_exchange_rate_text"
+        style="@style/Base.TextAppearance.AppCompat.Caption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_my_share_text"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="@dimen/small_space"
+        android:layout_marginStart="@dimen/key_line_2"
+        android:text="@string/exchange_rate"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/tv_exchange_rate_value"
+        style="@style/Base.TextAppearance.AppCompat.Caption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_my_share_value"
+        android:layout_alignEnd="@id/tv_my_share_currency"
+        android:layout_marginTop="@dimen/small_space"
+        android:visibility="gone"
+        tools:text="1.34657564636"/>
 
 </RelativeLayout>
 

@@ -4,17 +4,10 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import com.parse.FunctionCallback;
-import com.parse.ParseCloud;
 import com.parse.ParseException;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import ch.giantific.qwittig.PushBroadcastReceiver;
-import ch.giantific.qwittig.data.parse.CloudCode;
 
 /**
  * Created by fabio on 10.12.14.

@@ -6,6 +6,7 @@ import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.view.ViewCompat;
 import android.transition.Explode;
 import android.transition.Transition;
 import android.view.View;
@@ -41,6 +42,8 @@ public class SettingsStoresActivity extends BaseActivity implements
 
             if (savedInstanceState == null) {
                 addActivityTransitionListener();
+            } else if (ViewCompat.isLaidOut(mFab)) {
+                circularRevealFab();
             } else {
                 mFab.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
                     @Override
