@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.view.ViewCompat;
 import android.transition.Explode;
 import android.transition.Transition;
 import android.view.View;
@@ -19,7 +20,6 @@ import com.parse.ParseException;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.helper.CreateGroupHelper;
-import ch.giantific.qwittig.helper.InviteUsersHelper;
 import ch.giantific.qwittig.ui.widgets.TransitionListenerAdapter;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -32,7 +32,7 @@ public class SettingsGroupNewActivity extends BaseActivity implements
     public static final String RESULT_DATA_GROUP = "result_data_group";
     private static final String LOG_TAG = SettingsGroupNewActivity.class.getSimpleName();
     private SettingsGroupNewFragment mSettingsGroupNewFragment;
-    private FloatingActionButton mFabAddNewGroup;
+    private FloatingActionButton mFab;
     private FABProgressCircle mFabProgressCircle;
     private String mNewGroupName;
 
@@ -41,8 +41,8 @@ public class SettingsGroupNewActivity extends BaseActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings_group_new);
 
-        mFabAddNewGroup = (FloatingActionButton) findViewById(R.id.fab_group_new);
-        mFabAddNewGroup.setOnClickListener(new View.OnClickListener() {
+        mFab = (FloatingActionButton) findViewById(R.id.fab_group_new);
+        mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mSettingsGroupNewFragment.addNewGroup();
@@ -56,8 +56,10 @@ public class SettingsGroupNewActivity extends BaseActivity implements
 
             if (savedInstanceState == null) {
                 addActivityTransitionListener();
+            } else if (ViewCompat.isLaidOut(mFab)) {
+                circularRevealFab();
             } else {
-                mFabAddNewGroup.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                mFab.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
                     @Override
                     public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
                         v.removeOnLayoutChangeListener(this);
@@ -66,7 +68,7 @@ public class SettingsGroupNewActivity extends BaseActivity implements
                 });
             }
         } else {
-            mFabAddNewGroup.setVisibility(View.VISIBLE);
+            mFab.setVisibility(View.VISIBLE);
         }
 
         if (savedInstanceState == null) {
@@ -98,12 +100,12 @@ public class SettingsGroupNewActivity extends BaseActivity implements
     }
 
     private void circularRevealFab() {
-        Animator reveal = Utils.getCircularRevealAnimator(mFabAddNewGroup);
+        Animator reveal = Utils.getCircularRevealAnimator(mFab);
         reveal.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
-                mFabAddNewGroup.setVisibility(View.VISIBLE);
+                mFab.setVisibility(View.VISIBLE);
             }
         });
         reveal.start();
