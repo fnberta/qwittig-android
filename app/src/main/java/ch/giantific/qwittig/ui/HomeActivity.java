@@ -14,6 +14,7 @@ import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -60,13 +61,13 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         InvitedGroupHelper.HelperInteractionListener,
         MoreQueryHelper.HelperInteractionListener {
 
-
     @IntDef({ADAPTER_ALL, ADAPTER_PURCHASES, ADAPTER_USER})
     @Retention(RetentionPolicy.SOURCE)
     public @interface FragmentAdapter {}
     public static final int ADAPTER_ALL = 0;
     public static final int ADAPTER_PURCHASES = 1;
     public static final int ADAPTER_USER = 2;
+    private static final String FULL_QUERY_HELPER = "full_query_helper";
     private static final String INVITED_GROUP_HELPER = "invited_group_helper";
     private static final String LOG_TAG = HomeActivity.class.getSimpleName();
     private static final String URI_INVITED_GROUP_ID = "group";
@@ -392,13 +393,13 @@ public class HomeActivity extends BaseNavDrawerActivity implements
             fullQueryHelper = new FullQueryHelper();
 
             fragmentManager.beginTransaction()
-                    .add(fullQueryHelper, FullQueryHelper.FULL_QUERY_HELPER)
+                    .add(fullQueryHelper, FULL_QUERY_HELPER)
                     .commit();
         }
     }
 
     private FullQueryHelper findQueryHelper(FragmentManager fragmentManager) {
-        return (FullQueryHelper) fragmentManager.findFragmentByTag(FullQueryHelper.FULL_QUERY_HELPER);
+        return (FullQueryHelper) fragmentManager.findFragmentByTag(FULL_QUERY_HELPER);
     }
 
     @Override
@@ -430,6 +431,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         FullQueryHelper fullQueryHelper = findQueryHelper(fragmentManager);
 
         if (fullQueryHelper != null) {
+            Log.e(LOG_TAG, "removing query helper");
             fragmentManager.beginTransaction().remove(fullQueryHelper).commitAllowingStateLoss();
         }
     }

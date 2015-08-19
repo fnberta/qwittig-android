@@ -2,6 +2,7 @@ package ch.giantific.qwittig.helper;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.parse.FunctionCallback;
 import com.parse.ParseCloud;
@@ -17,7 +18,6 @@ import ch.giantific.qwittig.data.parse.CloudCode;
  */
 public class FullQueryHelper extends BaseQueryHelper {
 
-    public static final String FULL_QUERY_HELPER = "full_query_helper";
     private static final String LOG_TAG = FullQueryHelper.class.getSimpleName();
     private HelperInteractionListener mListener;
 
@@ -68,6 +68,7 @@ public class FullQueryHelper extends BaseQueryHelper {
 
     @Override
     protected void onParseError(ParseException e) {
+        Log.e(LOG_TAG, "parse e " + e);
         if (mListener != null) {
             mListener.onPinFailed(e);
         }
@@ -84,50 +85,50 @@ public class FullQueryHelper extends BaseQueryHelper {
     void onUsersPinned() {
         super.onUsersPinned();
 
-        checkQueryCount();
-
         if (mListener != null) {
             mListener.onUsersPinned();
         }
 
-        queryPurchases();
+        if (!checkQueryCount()) {
+            queryPurchases();
+        }
     }
 
     @Override
     void onPurchasesPinned(String groupId) {
         super.onPurchasesPinned(groupId);
 
-        checkQueryCount();
-
         if (mListener != null && mCurrentGroup != null &&
                 groupId.equals(mCurrentGroup.getObjectId())) {
             mListener.onPurchasesPinned();
         }
 
-        queryCompensations();
+        if (!checkQueryCount()) {
+            queryCompensations();
+        }
     }
 
     @Override
     void onCompensationsUnpaidPinned() {
         super.onCompensationsUnpaidPinned();
 
-        checkQueryCount();
-
         if (mListener != null) {
             mListener.onCompensationsPinned(false);
         }
+
+        checkQueryCount();
     }
 
     @Override
     void onCompensationsPaidPinned(String groupId) {
         super.onCompensationsPaidPinned(groupId);
 
-        checkQueryCount();
-
         if (mListener != null && mCurrentGroup != null &&
                 groupId.equals(mCurrentGroup.getObjectId())) {
             mListener.onCompensationsPinned(true);
         }
+
+        checkQueryCount();
     }
 
     @Override

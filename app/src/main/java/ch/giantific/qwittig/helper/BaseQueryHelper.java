@@ -65,6 +65,7 @@ public abstract class BaseQueryHelper extends BaseHelper {
                 ParseObject.unpinAllInBackground(User.PIN_LABEL, new DeleteCallback() {
                     public void done(ParseException e) {
                         if (e != null) {
+                            onParseError(e);
                             return;
                         }
 
@@ -108,6 +109,7 @@ public abstract class BaseQueryHelper extends BaseHelper {
                         @Override
                         public void done(ParseException e) {
                             if (e != null) {
+                                onParseError(e);
                                 return;
                             }
 
@@ -155,6 +157,7 @@ public abstract class BaseQueryHelper extends BaseHelper {
                 ParseObject.unpinAllInBackground(Compensation.PIN_LABEL_UNPAID, new DeleteCallback() {
                     public void done(ParseException e) {
                         if (e != null) {
+                            onParseError(e);
                             return;
                         }
 
@@ -218,12 +221,15 @@ public abstract class BaseQueryHelper extends BaseHelper {
         // empty default implementation
     }
 
-    final void checkQueryCount() {
+    final boolean checkQueryCount() {
         mQueryCount++;
 
         if (mQueryCount == mTotalNumberOfQueries) {
             finish();
+            return true;
         }
+
+        return false;
     }
 
     protected abstract void onParseError(ParseException e);

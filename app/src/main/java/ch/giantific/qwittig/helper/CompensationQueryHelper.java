@@ -62,23 +62,23 @@ public class CompensationQueryHelper extends BaseQueryHelper {
     void onCompensationsUnpaidPinned() {
         super.onCompensationsUnpaidPinned();
 
-        checkQueryCount();
-
         if (mListener != null) {
             mListener.onCompensationsPinned(false);
         }
+
+        checkQueryCount();
     }
 
     @Override
     void onCompensationsPaidPinned(String groupId) {
         super.onCompensationsPaidPinned(groupId);
 
-        checkQueryCount();
-
         if (mListener != null && mCurrentGroup != null &&
                 groupId.equals(mCurrentGroup.getObjectId())) {
             mListener.onCompensationsPinned(true);
         }
+
+        checkQueryCount();
     }
 
     @Override
