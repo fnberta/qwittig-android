@@ -14,7 +14,6 @@ import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -431,7 +430,6 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         FullQueryHelper fullQueryHelper = findQueryHelper(fragmentManager);
 
         if (fullQueryHelper != null) {
-            Log.e(LOG_TAG, "removing query helper");
             fragmentManager.beginTransaction().remove(fullQueryHelper).commitAllowingStateLoss();
         }
     }

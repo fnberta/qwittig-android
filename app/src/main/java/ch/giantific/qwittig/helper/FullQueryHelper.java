@@ -68,7 +68,6 @@ public class FullQueryHelper extends BaseQueryHelper {
 
     @Override
     protected void onParseError(ParseException e) {
-        Log.e(LOG_TAG, "parse e " + e);
         if (mListener != null) {
             mListener.onPinFailed(e);
         }
