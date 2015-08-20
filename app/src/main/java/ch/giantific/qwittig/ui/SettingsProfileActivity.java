@@ -1,21 +1,33 @@
 package ch.giantific.qwittig.ui;
 
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.ActionBar;
 import android.transition.Explode;
 import android.transition.Transition;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.parse.ParseUser;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.models.Avatar;
+import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.ui.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -33,7 +45,9 @@ public class SettingsProfileActivity extends BaseActivity implements
     public static final int RESULT_CHANGES_DISCARDED = 2;
     private static final String PROFILE_FRAGMENT = "profile_fragment";
     private static final int INTENT_REQUEST_IMAGE = 1;
+    private ImageView mImageViewAvatar;
     private SettingsProfileFragment mSettingsProfileFragment;
+    private Context mContext = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +58,14 @@ public class SettingsProfileActivity extends BaseActivity implements
             setActivityTransition();
         }
 
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_clear_white_24dp);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(null);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_clear_white_24dp);
+        }
+
+        mImageViewAvatar = (ImageView) findViewById(R.id.iv_avatar);
+        setAvatar();
 
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()
@@ -59,6 +80,32 @@ public class SettingsProfileActivity extends BaseActivity implements
         transitionEnter.excludeTarget(android.R.id.statusBarBackground, true);
         transitionEnter.excludeTarget(android.R.id.navigationBarBackground, true);
         getWindow().setEnterTransition(transitionEnter);
+    }
+
+    private void setAvatar() {
+        User currentUser = (User) ParseUser.getCurrentUser();
+
+        byte[] avatarByteArray = currentUser.getAvatar();
+        if (avatarByteArray != null) {
+            Glide.with(this)
+                    .load(avatarByteArray)
+                    .asBitmap()
+                    .into(new BitmapImageViewTarget(mImageViewAvatar) {
+                        @Override
+                        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                            view.setImageDrawable(Avatar.getRoundedDrawable(mContext, resource, true));
+                        }
+                    });
+        } else {
+            mImageViewAvatar.setImageDrawable(Avatar.getFallbackDrawable(getApplicationContext(), true, true));
+        }
+
+        mImageViewAvatar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pickAvatar();
+            }
+        });
     }
 
     @Override
@@ -124,6 +171,17 @@ public class SettingsProfileActivity extends BaseActivity implements
                 if (resultCode == RESULT_OK) {
                     Uri imageUri = data.getData();
                     mSettingsProfileFragment.setAvatar(imageUri);
+
+                    Glide.with(this)
+                            .load(imageUri)
+                            .asBitmap()
+                            .centerCrop()
+                            .into(new BitmapImageViewTarget(mImageViewAvatar) {
+                                @Override
+                                public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                                    view.setImageDrawable(Avatar.getRoundedDrawable(mContext, resource, true));
+                                }
+                            });
                 }
         }
     }

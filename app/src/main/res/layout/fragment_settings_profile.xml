@@ -2,33 +2,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:paddingTop="@dimen/small_space"
+    android:clipToPadding="false">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         tools:context="ch.giantific.qwittig.ui.SettingsProfileFragment">
-
-        <ImageView
-            android:id="@+id/iv_avatar"
-            android:layout_width="@dimen/avatar_size_2x"
-            android:layout_height="@dimen/avatar_size_2x"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="@dimen/normal_space"
-            android:layout_marginBottom="@dimen/small_space"
-            android:contentDescription="@string/user_avatar"
-            tools:src="@drawable/ic_account_circle_black_80dp"/>
-
-        <TextView
-            android:id="@+id/user_name"
-            style="@style/TextAppearance.AppCompat.Caption"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="@dimen/small_space"
-            android:gravity="center_horizontal"
-            android:text="@string/user_avatar"/>
 
         <LinearLayout
             android:layout_width="match_parent"

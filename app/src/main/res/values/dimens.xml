@@ -24,6 +24,7 @@
     <!-- Avatar and Icons-->
     <dimen name="avatar_size">40dp</dimen>
     <dimen name="avatar_size_2x">80dp</dimen>
+    <dimen name="avatar_size_2.5x">100dp</dimen>
     <dimen name="icon_size">24dp</dimen>
     <item name="icon_black_alpha" type="dimen" format="float">0.54</item>
 
@@ -34,6 +35,7 @@
     <!-- Toolbar -->
     <dimen name="toolbar_height_x2">112dp</dimen>
     <dimen name="toolbar_height_x2_plus_tabs">160dp</dimen>
+    <dimen name="toolbar_height_x3">168dp</dimen>
 
     <!-- NavDrawer -->
     <dimen name="navdrawer_status_bar_plus_normal_space">40dp</dimen>

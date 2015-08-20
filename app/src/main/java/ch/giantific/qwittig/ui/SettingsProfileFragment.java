@@ -38,7 +38,6 @@ public class SettingsProfileFragment extends Fragment {
     private EditText mEditTextPassword;
     private TextInputLayout mTextInputLayoutPasswordRepeat;
     private EditText mEditTextPasswordRepeat;
-    private ImageView mImageViewAvatar;
 
     private User mCurrentUser;
     private String mCurrentEmail;
@@ -79,7 +78,6 @@ public class SettingsProfileFragment extends Fragment {
         mEditTextPassword = mTextInputLayoutPassword.getEditText();
         mTextInputLayoutPasswordRepeat = (TextInputLayout) rootView.findViewById(R.id.til_password_repeat);
         mEditTextPasswordRepeat = mTextInputLayoutPasswordRepeat.getEditText();
-        mImageViewAvatar = (ImageView) rootView.findViewById(R.id.iv_avatar);
 
         return rootView;
     }
@@ -95,27 +93,6 @@ public class SettingsProfileFragment extends Fragment {
             mEditTextEmail.setText(mCurrentEmail);
         }
         mEditTextNickname.setText(mCurrentNickname);
-
-        byte[] avatarByteArray = mCurrentUser.getAvatar();
-        if (avatarByteArray != null) {
-            Glide.with(this)
-                    .load(avatarByteArray)
-                    .asBitmap()
-                    .into(new BitmapImageViewTarget(mImageViewAvatar) {
-                        @Override
-                        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                            view.setImageDrawable(Avatar.getRoundedDrawable(getActivity(), resource, true));
-                        }
-                    });
-        } else {
-            mImageViewAvatar.setImageDrawable(Avatar.getFallbackDrawable(getActivity(), true, true));
-        }
-        mImageViewAvatar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mListener.pickAvatar();
-            }
-        });
     }
 
     public boolean changesWereMade() {
@@ -190,17 +167,6 @@ public class SettingsProfileFragment extends Fragment {
                     @Override
                     public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
                         mAvatar = resource;
-                    }
-                });
-
-        Glide.with(this)
-                .load(imageUri)
-                .asBitmap()
-                .centerCrop()
-                .into(new BitmapImageViewTarget(mImageViewAvatar) {
-                    @Override
-                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                        view.setImageDrawable(Avatar.getRoundedDrawable(getActivity(), resource, true));
                     }
                 });
     }
