@@ -27,6 +27,10 @@ public class SettingsStoresActivity extends BaseActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (Utils.isRunningLollipopAndHigher()) {
+            setActivityTransition();
+        }
         setContentView(R.layout.activity_settings_stores);
 
         mFab = (FloatingActionButton) findViewById(R.id.fab_add_store);
@@ -37,30 +41,18 @@ public class SettingsStoresActivity extends BaseActivity implements
             }
         });
 
-        if (Utils.isRunningLollipopAndHigher()) {
-            setActivityTransition();
-
-            if (savedInstanceState == null) {
-                addActivityTransitionListener();
-            } else if (ViewCompat.isLaidOut(mFab)) {
-                circularRevealFab();
-            } else {
-                mFab.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-                    @Override
-                    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                        v.removeOnLayoutChangeListener(this);
-                        circularRevealFab();
-                    }
-                });
-            }
-        } else {
-            mFab.setVisibility(View.VISIBLE);
-        }
-
         if (savedInstanceState == null) {
+            if (Utils.isRunningLollipopAndHigher()) {
+                addActivityTransitionListener();
+            } else {
+                mFab.show();
+            }
+
             getFragmentManager().beginTransaction()
                     .add(R.id.container, new SettingsStoresFragment(), SETTINGS_STORE_FRAGMENT)
                     .commit();
+        } else {
+            mFab.show();
         }
     }
 
@@ -79,35 +71,10 @@ public class SettingsStoresActivity extends BaseActivity implements
             public void onTransitionEnd(Transition transition) {
                 super.onTransitionEnd(transition);
                 transition.removeListener(this);
-                circularRevealFab();
-            }
-        });
-    }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void circularRevealFab() {
-        Animator reveal = Utils.getCircularRevealAnimator(mFab);
-        reveal.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                super.onAnimationStart(animation);
-                mFab.setVisibility(View.VISIBLE);
+                mFab.show();
             }
         });
-        reveal.start();
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void circularHideFab() {
-        Animator hide = Utils.getCircularHideAnimator(mFab);
-        hide.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                mFab.setVisibility(View.INVISIBLE);
-            }
-        });
-        hide.start();
     }
 
     private void showStoreAddDialog() {
@@ -131,17 +98,9 @@ public class SettingsStoresActivity extends BaseActivity implements
     @Override
     public void toggleFabVisibility() {
         if (mFab.getVisibility() == View.VISIBLE) {
-            if (Utils.isRunningLollipopAndHigher()) {
-                circularHideFab();
-            } else {
-                mFab.setVisibility(View.INVISIBLE);
-            }
+            mFab.hide();
         } else {
-            if (Utils.isRunningLollipopAndHigher()) {
-                circularRevealFab();
-            } else {
-                mFab.setVisibility(View.VISIBLE);
-            }
+            mFab.show();
         }
     }
 }

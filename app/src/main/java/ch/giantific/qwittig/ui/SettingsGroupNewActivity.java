@@ -39,6 +39,10 @@ public class SettingsGroupNewActivity extends BaseActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (Utils.isRunningLollipopAndHigher()) {
+            setActivityTransition();
+        }
         setContentView(R.layout.activity_settings_group_new);
 
         mFab = (FloatingActionButton) findViewById(R.id.fab_group_new);
@@ -51,30 +55,18 @@ public class SettingsGroupNewActivity extends BaseActivity implements
         mFabProgressCircle = (FABProgressCircle) findViewById(R.id.fab_group_new_circle);
         mFabProgressCircle.attachListener(this);
 
-        if (Utils.isRunningLollipopAndHigher()) {
-            setActivityTransition();
-
-            if (savedInstanceState == null) {
-                addActivityTransitionListener();
-            } else if (ViewCompat.isLaidOut(mFab)) {
-                circularRevealFab();
-            } else {
-                mFab.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-                    @Override
-                    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                        v.removeOnLayoutChangeListener(this);
-                        circularRevealFab();
-                    }
-                });
-            }
-        } else {
-            mFab.setVisibility(View.VISIBLE);
-        }
-
         if (savedInstanceState == null) {
+            if (Utils.isRunningLollipopAndHigher()) {
+                addActivityTransitionListener();
+            } else {
+                mFab.show();
+            }
+
             getFragmentManager().beginTransaction()
                     .add(R.id.container, new SettingsGroupNewFragment(), GROUP_NEW_FRAGMENT)
                     .commit();
+        } else {
+            mFab.show();
         }
     }
 
@@ -94,23 +86,10 @@ public class SettingsGroupNewActivity extends BaseActivity implements
             public void onTransitionEnd(Transition transition) {
                 super.onTransitionEnd(transition);
                 transition.removeListener(this);
-                circularRevealFab();
-            }
-        });
-    }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void circularRevealFab() {
-        Animator reveal = Utils.getCircularRevealAnimator(mFab);
-        reveal.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                super.onAnimationStart(animation);
-                animation.removeListener(this);
-                mFab.setVisibility(View.VISIBLE);
+                mFab.show();
             }
         });
-        reveal.start();
     }
 
     @Override

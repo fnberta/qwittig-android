@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -212,15 +213,19 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
 
     private void showFab() {
         if (Utils.isRunningLollipopAndHigher()) {
-            mFabNew.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-                @Override
-                public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                    v.removeOnLayoutChangeListener(this);
-                    circularRevealFab();
-                }
-            });
+            if (ViewCompat.isLaidOut(mFabNew)) {
+                circularRevealFab();
+            } else {
+                mFabNew.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                    @Override
+                    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                        v.removeOnLayoutChangeListener(this);
+                        circularRevealFab();
+                    }
+                });
+            }
         } else {
-            mFabNew.setVisibility(View.VISIBLE);
+            mFabNew.show();
         }
     }
 
@@ -231,6 +236,8 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
             @Override
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
+                animation.removeListener(this);
+
                 mFabNew.setVisibility(View.VISIBLE);
             }
         });

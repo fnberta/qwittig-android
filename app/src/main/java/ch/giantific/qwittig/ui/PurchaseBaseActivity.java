@@ -117,11 +117,11 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_purchase_add_edit);
 
         if (Utils.isRunningLollipopAndHigher()) {
             setActivityTransition();
         }
+        setContentView(R.layout.activity_purchase_add_edit);
 
         mFabPurchaseSave = (FloatingActionButton) findViewById(R.id.fab_purchase_save);
         mFabPurchaseSave.setOnClickListener(new View.OnClickListener() {
@@ -160,7 +160,8 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
             public void onTransitionEnd(Transition transition) {
                 super.onTransitionEnd(transition);
                 transition.removeListener(this);
-                circularRevealFab();
+
+                showFab();
             }
         });
     }
@@ -171,44 +172,24 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
 
     @Override
     public void showFab(final boolean isSaving) {
-        if (Utils.isRunningLollipopAndHigher()) {
-            if (ViewCompat.isLaidOut(mFabPurchaseSave)) {
-                circularRevealFab(isSaving);
-            } else {
-                mFabPurchaseSave.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-                    @Override
-                    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                        v.removeOnLayoutChangeListener(this);
-                        circularRevealFab(isSaving);
-                    }
-                });
-            }
+        if (ViewCompat.isLaidOut(mFabPurchaseSave)) {
+            revealFab(isSaving);
         } else {
-            mFabPurchaseSave.setVisibility(View.VISIBLE);
-            if (isSaving) {
-                mFabProgressCircle.show();
-            }
+            mFabPurchaseSave.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                @Override
+                public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                    v.removeOnLayoutChangeListener(this);
+                    revealFab(isSaving);
+                }
+            });
         }
     }
 
-    private void circularRevealFab() {
-        circularRevealFab(false);
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void circularRevealFab(final boolean isSaving) {
-        Animator reveal = Utils.getCircularRevealAnimator(mFabPurchaseSave);
-        reveal.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                super.onAnimationStart(animation);
-                mFabPurchaseSave.setVisibility(View.VISIBLE);
-                if (isSaving) {
-                    mFabProgressCircle.show();
-                }
-            }
-        });
-        reveal.start();
+    private void revealFab(boolean isSaving) {
+        mFabPurchaseSave.show();
+        if (isSaving) {
+            mFabProgressCircle.show();
+        }
     }
 
     @Override

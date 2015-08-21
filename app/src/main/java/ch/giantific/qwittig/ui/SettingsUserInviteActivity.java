@@ -33,11 +33,11 @@ public class SettingsUserInviteActivity extends BaseActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings_user_invite);
 
         if (Utils.isRunningLollipopAndHigher()) {
             setActivityTransition();
         }
+        setContentView(R.layout.activity_settings_user_invite);
 
         mFab = (FloatingActionButton) findViewById(R.id.fab_user_invite);
         mFab.setOnClickListener(new View.OnClickListener() {
@@ -49,28 +49,18 @@ public class SettingsUserInviteActivity extends BaseActivity implements
         mFabProgressCircle = (FABProgressCircle) findViewById(R.id.fab_user_invite_circle);
         mFabProgressCircle.attachListener(this);
 
-        if (Utils.isRunningLollipopAndHigher()) {
-            if (savedInstanceState == null) {
-                addActivityTransitionListener();
-            } else if (ViewCompat.isLaidOut(mFab)) {
-                circularRevealFab();
-            } else {
-                mFab.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-                    @Override
-                    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                        v.removeOnLayoutChangeListener(this);
-                        circularRevealFab();
-                    }
-                });
-            }
-        } else {
-            mFab.setVisibility(View.VISIBLE);
-        }
-
         if (savedInstanceState == null) {
+            if (Utils.isRunningLollipopAndHigher()) {
+                addActivityTransitionListener();
+            } else {
+                mFab.show();
+            }
+
             getFragmentManager().beginTransaction()
                     .add(R.id.container, new SettingsUserInviteFragment(), USER_INVITE_FRAGMENT)
                     .commit();
+        } else {
+            mFab.show();
         }
     }
 
@@ -90,21 +80,10 @@ public class SettingsUserInviteActivity extends BaseActivity implements
             public void onTransitionEnd(Transition transition) {
                 super.onTransitionEnd(transition);
                 transition.removeListener(this);
-                circularRevealFab();
-            }
-        });
-    }
 
-    private void circularRevealFab() {
-        Animator reveal = Utils.getCircularRevealAnimator(mFab);
-        reveal.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                super.onAnimationStart(animation);
-                mFab.setVisibility(View.VISIBLE);
+                mFab.show();
             }
         });
-        reveal.start();
     }
 
     @Override
