@@ -36,6 +36,8 @@
     <dimen name="toolbar_height_x2">112dp</dimen>
     <dimen name="toolbar_height_x2_plus_tabs">160dp</dimen>
     <dimen name="toolbar_height_x3">168dp</dimen>
+    <dimen name="toolbar_height_x4">224dp</dimen>
+    <dimen name="toolbar_height_x5">280dp</dimen>
 
     <!-- NavDrawer -->
     <dimen name="navdrawer_status_bar_plus_normal_space">40dp</dimen>

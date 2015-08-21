@@ -36,7 +36,7 @@
         <activity
             android:name=".ui.HomeActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.WithNavDrawer" >
+            android:theme="@style/AppTheme.DrawStatusBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -73,7 +73,7 @@
             android:name=".ui.PurchaseDetailsActivity"
             android:label="@string/title_activity_purchase_details"
             android:parentActivityName=".ui.HomeActivity"
-            android:theme="@style/AppTheme.WithNavDrawer" >
+            android:theme="@style/AppTheme.DrawStatusBar" >
         </activity>
         <activity
             android:name=".ui.PurchaseAddActivity"
@@ -108,13 +108,14 @@
             android:name=".ui.SettingsProfileActivity"
             android:label="@string/title_activity_settings_profile"
             android:parentActivityName=".ui.SettingsActivity"
-            android:windowSoftInputMode="stateUnchanged" >
+            android:windowSoftInputMode="stateUnchanged"
+            android:theme="@style/AppTheme.DrawStatusBar">
         </activity>
         <activity
             android:name=".ui.CompensationsActivity"
             android:label="@string/title_activity_settlement"
             android:parentActivityName=".ui.HomeActivity"
-            android:theme="@style/AppTheme.WithNavDrawer" >
+            android:theme="@style/AppTheme.DrawStatusBar" >
         </activity>
         <activity
             android:name=".ui.SettingsStoresActivity"
@@ -129,12 +130,12 @@
         <activity
             android:name=".ui.PurchaseDraftsActivity"
             android:label="@string/title_activity_purchase_drafts"
-            android:theme="@style/AppTheme.WithNavDrawer" >
+            android:theme="@style/AppTheme.DrawStatusBar" >
         </activity>
         <activity
             android:name=".ui.StatsActivity"
             android:label="@string/title_activity_stats"
-            android:theme="@style/AppTheme.WithNavDrawer" >
+            android:theme="@style/AppTheme.DrawStatusBar" >
         </activity>
 
         <service android:name="com.parse.PushService" />

@@ -12,17 +12,17 @@
 
     <style name="AppTheme" parent="BaseTheme"/>
 
-    <style name="AppTheme.WithNavDrawer" parent="AppTheme"/>
+    <style name="AppTheme.DrawStatusBar" parent="AppTheme"/>
 
-    <style name="AppTheme.WithNavDrawer.Login" parent="AppTheme.WithNavDrawer">
+    <style name="AppTheme.WithNavDrawer.Login" parent="AppTheme.DrawStatusBar">
     </style>
 
-    <style name="AppTheme.WithNavDrawer.Green" parent="AppTheme.WithNavDrawer">
+    <style name="AppTheme.WithNavDrawer.Green" parent="AppTheme.DrawStatusBar">
         <item name="colorPrimary">@color/green</item>
         <item name="colorPrimaryDark">@color/green_dark</item>
     </style>
 
-    <style name="AppTheme.WithNavDrawer.Red" parent="AppTheme.WithNavDrawer">
+    <style name="AppTheme.WithNavDrawer.Red" parent="AppTheme.DrawStatusBar">
         <item name="colorPrimary">@color/red</item>
         <item name="colorPrimaryDark">@color/red_dark</item>
     </style>

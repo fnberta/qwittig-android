@@ -277,5 +277,6 @@
     <string name="exchange_rate">Exchange rate:</string>
     <string name="toast_exchange_rate_value">Exchange rate: %1$s</string>
     <string name="action_purchase_show_exchange_rate">Show exchange rate</string>
+    <string name="action_purchase_edit_avatar">Edit profile image</string>
 
 </resources>

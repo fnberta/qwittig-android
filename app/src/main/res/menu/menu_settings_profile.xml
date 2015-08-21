@@ -2,8 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="ch.giantific.qwittig.ui.SettingsProfileActivity">
-    <item android:id="@+id/action_settings_profile_save"
-          android:title="@string/action_purchase_save"
+    <item android:id="@+id/action_settings_profile_edit_avatar"
+          android:title="@string/action_purchase_edit_avatar"
           android:orderInCategory="1"
-          app:showAsAction="always"/>
+          app:showAsAction="never"/>
 </menu>

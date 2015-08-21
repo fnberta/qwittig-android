@@ -1,15 +1,19 @@
 package ch.giantific.qwittig.ui;
 
 import android.annotation.TargetApi;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.graphics.Palette;
 import android.transition.Explode;
 import android.transition.Transition;
 import android.view.Menu;
@@ -35,6 +39,9 @@ public class SettingsProfileActivity extends BaseActivity implements
         SettingsProfileFragment.FragmentInteractionListener,
         DiscardChangesDialogFragment.DialogInteractionListener {
 
+
+    private FloatingActionButton mFab;
+
     @IntDef({CHANGES_SAVED, CHANGES_DISCARDED, NO_CHANGES})
     @Retention(RetentionPolicy.SOURCE)
     public @interface EditAction {}
@@ -42,30 +49,41 @@ public class SettingsProfileActivity extends BaseActivity implements
     public static final int CHANGES_DISCARDED = 1;
     public static final int NO_CHANGES = 2;
 
+    public static final String SHARED_AVATAR = "shared_avatar";
     public static final int RESULT_CHANGES_DISCARDED = 2;
     private static final String PROFILE_FRAGMENT = "profile_fragment";
     private static final int INTENT_REQUEST_IMAGE = 1;
+    private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private ImageView mImageViewAvatar;
     private SettingsProfileFragment mSettingsProfileFragment;
-    private Context mContext = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings_profile);
 
         if (Utils.isRunningLollipopAndHigher()) {
             setActivityTransition();
         }
+        setContentView(R.layout.activity_settings_profile);
+        ViewCompat.setTransitionName(findViewById(R.id.appbar), SHARED_AVATAR);
+        supportPostponeEnterTransition();
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setTitle(null);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_clear_white_24dp);
         }
+        mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
 
         mImageViewAvatar = (ImageView) findViewById(R.id.iv_avatar);
         setAvatar();
+
+        mFab = (FloatingActionButton) findViewById(R.id.fab_save);
+        mFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSettingsProfileFragment.saveChanges();
+            }
+        });
 
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()
@@ -93,19 +111,33 @@ public class SettingsProfileActivity extends BaseActivity implements
                     .into(new BitmapImageViewTarget(mImageViewAvatar) {
                         @Override
                         public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                            view.setImageDrawable(Avatar.getRoundedDrawable(mContext, resource, true));
+                            setAvatarToView(view, resource);
                         }
                     });
         } else {
             mImageViewAvatar.setImageDrawable(Avatar.getFallbackDrawable(getApplicationContext(), true, true));
         }
+    }
 
-        mImageViewAvatar.setOnClickListener(new View.OnClickListener() {
+    private void setAvatarToView(ImageView view, Bitmap resource) {
+        view.setImageBitmap(resource);
+        Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
             @Override
-            public void onClick(View v) {
-                pickAvatar();
+            public void onGenerated(Palette palette) {
+                applyPalette(palette);
             }
         });
+    }
+
+    private void applyPalette(Palette palette) {
+        int primaryDark = ContextCompat.getColor(this, R.color.primary_dark);
+        Palette.Swatch vibrantSwatch = palette.getVibrantSwatch();
+        if (vibrantSwatch != null) {
+            mCollapsingToolbarLayout.setContentScrimColor(vibrantSwatch.getRgb());
+            mCollapsingToolbarLayout.setStatusBarScrimColor(palette.getDarkVibrantColor(primaryDark));
+            //mCollapsingToolbarLayout.setExpandedTitleColor(vibrantSwatch.getTitleTextColor());
+        }
+        supportStartPostponedEnterTransition();
     }
 
     @Override
@@ -129,8 +161,8 @@ public class SettingsProfileActivity extends BaseActivity implements
             case android.R.id.home:
                 checkForChangesAndExit();
                 return true;
-            case R.id.action_settings_profile_save:
-                mSettingsProfileFragment.saveChanges();
+            case R.id.action_settings_profile_edit_avatar:
+                pickAvatar();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -179,7 +211,7 @@ public class SettingsProfileActivity extends BaseActivity implements
                             .into(new BitmapImageViewTarget(mImageViewAvatar) {
                                 @Override
                                 public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                                    view.setImageDrawable(Avatar.getRoundedDrawable(mContext, resource, true));
+                                    setAvatarToView(view, resource);
                                 }
                             });
                 }

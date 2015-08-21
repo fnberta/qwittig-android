@@ -2,10 +2,9 @@
     <style name="AppTheme" parent="BaseTheme">
         <item name="android:windowActivityTransitions">true</item>
         <item name="android:windowSharedElementEnterTransition">@android:transition/move</item>
-        <item name="android:windowSharedElementReturnTransition">@android:transition/move</item>
     </style>
 
-    <style name="AppTheme.WithNavDrawer" parent="AppTheme">
+    <style name="AppTheme.DrawStatusBar" parent="AppTheme">
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>

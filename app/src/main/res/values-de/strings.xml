@@ -271,5 +271,6 @@
     <string name="exchange_rate">Wechselkurs:</string>
     <string name="toast_exchange_rate_value">Wechselkurs: %1$s</string>
     <string name="action_purchase_show_exchange_rate">Zeige Wechselkurs</string>
+    <string name="action_purchase_edit_avatar">Profilbild ändern</string>
 
 </resources>
