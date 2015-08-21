@@ -99,12 +99,14 @@ public class SettingsGroupNewActivity extends BaseActivity implements
         });
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void circularRevealFab() {
         Animator reveal = Utils.getCircularRevealAnimator(mFab);
         reveal.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
+                animation.removeListener(this);
                 mFab.setVisibility(View.VISIBLE);
             }
         });

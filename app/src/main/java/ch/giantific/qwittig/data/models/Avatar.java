@@ -23,8 +23,8 @@ import ch.giantific.qwittig.utils.Utils;
 public class Avatar {
 
     public static final int JPEG_COMPRESSION_RATE = 60;
-    public static final int HEIGHT = 250;
-    public static final int WIDTH = 250;
+    public static final int HEIGHT = 720;
+    public static final int WIDTH = 720;
 
     private Avatar() {
         // class cannot be instantiated

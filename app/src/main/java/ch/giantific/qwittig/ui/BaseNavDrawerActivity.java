@@ -11,8 +11,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
@@ -321,8 +323,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
         mImageViewHeaderAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mContext, SettingsProfileActivity.class);
-                startActivityForResult(intent, SettingsActivity.INTENT_REQUEST_SETTINGS_PROFILE);
+                startProfileSettings();
             }
         });
 
@@ -330,10 +331,22 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
         setupNavDrawerHeaderGroupSpinner();
     }
 
+    private void startProfileSettings() {
+        // TODO: make shared element transition nice
+        //ViewCompat.setTransitionName(mImageViewHeaderAvatar, SettingsProfileActivity.SHARED_AVATAR);
+
+        Intent intent = new Intent(this, SettingsProfileActivity.class);
+        ActivityOptionsCompat options =
+                ActivityOptionsCompat.makeSceneTransitionAnimation(this);
+        startActivityForResult(intent, SettingsActivity.INTENT_REQUEST_SETTINGS_PROFILE,
+                options.toBundle());
+    }
+
     private void setAvatarAndNickname() {
         mTextViewHeaderNickname.setText(mCurrentUser.getNickname());
 
         byte[] avatarByteArray = mCurrentUser.getAvatar();
+        final Context context = this;
         if (avatarByteArray != null) {
             Glide.with(this)
                     .load(avatarByteArray)
@@ -341,11 +354,11 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
                     .into(new BitmapImageViewTarget(mImageViewHeaderAvatar) {
                         @Override
                         public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                            view.setImageDrawable(Avatar.getRoundedDrawable(mContext, resource, true));
+                            view.setImageDrawable(Avatar.getRoundedDrawable(context, resource, true));
                         }
                     });
         } else {
-            mImageViewHeaderAvatar.setImageDrawable(Avatar.getFallbackDrawable(mContext, true, true));
+            mImageViewHeaderAvatar.setImageDrawable(Avatar.getFallbackDrawable(context, true, true));
         }
     }
 

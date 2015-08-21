@@ -29,7 +29,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
     public static final int INTENT_REQUEST_SETTINGS_GROUP_NEW = 6;
 
     Toolbar mToolbar;
-    Context mContext = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,11 +68,15 @@ public abstract class BaseActivity extends AppCompatActivity implements
         ParseUser.logOutInBackground(new LogOutCallback() {
             @Override
             public void done(ParseException e) {
-                Intent intent = new Intent(mContext, HomeActivity.class);
-                intent.putExtra(LoginActivity.INTENT_EXTRA_SIGN_UP, true);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
+                startHomeScreen();
             }
         });
+    }
+
+    private void startHomeScreen() {
+        Intent intent = new Intent(this, HomeActivity.class);
+        intent.putExtra(LoginActivity.INTENT_EXTRA_SIGN_UP, true);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 }
