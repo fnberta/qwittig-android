@@ -172,6 +172,20 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
 
     @Override
     public void showFab(final boolean isSaving) {
+        if (ViewCompat.isLaidOut(mFabPurchaseSave)) {
+            revealFab(isSaving);
+        } else {
+            mFabPurchaseSave.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                @Override
+                public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                    v.removeOnLayoutChangeListener(this);
+                    revealFab(isSaving);
+                }
+            });
+        }
+    }
+
+    private void revealFab(boolean isSaving) {
         mFabPurchaseSave.show();
         if (isSaving) {
             mFabProgressCircle.show();
