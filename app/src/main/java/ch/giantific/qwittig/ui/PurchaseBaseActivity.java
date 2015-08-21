@@ -325,6 +325,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
                     @Override
                     public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
                         mReceiptParseFile = new ParseFile(Receipt.PARSE_FILE_NAME, resource);
+                        invalidateOptionsMenu();
                     }
                 });
     }
