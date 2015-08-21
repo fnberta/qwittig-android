@@ -109,7 +109,7 @@
     <string name="title_activity_home">Overview</string>
     <string name="toast_compensation_finish_old">All members of the group must haved settled their debts first</string>
     <string name="no_compensations">No compensation payments</string>
-    <string name="action_compensation_add_manual">Add manual payment</string>
+    <string name="action_compensation_add_manual">Add single payment</string>
     <string name="header_recipient_amount">Recipient and amount</string>
     <string name="hint_amount">Amount</string>
     <string name="action_compensation_not_now">Not now</string>

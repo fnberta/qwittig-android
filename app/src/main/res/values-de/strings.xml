@@ -108,7 +108,7 @@
     <string name="title_activity_home">Übersicht</string>
     <string name="toast_compensation_finish_old">Alle Mitglieder der Gruppe müssen zuerst ihre Schulden begleichen haben</string>
     <string name="no_compensations">Keine Ausgleichszahlungen</string>
-    <string name="action_compensation_add_manual">Manuelle Zahlung hinzufügen</string>
+    <string name="action_compensation_add_manual">Einzelne Zahlung hinzufügen</string>
     <string name="header_recipient_amount">Empfänger und Betrag</string>
     <string name="hint_amount">Betrag</string>
     <string name="action_compensation_not_now">Nicht jetzt</string>
