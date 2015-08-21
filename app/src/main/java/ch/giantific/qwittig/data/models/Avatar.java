@@ -30,6 +30,14 @@ public class Avatar {
         // class cannot be instantiated
     }
 
+    public static Drawable getFallbackDrawableRect(Context context, boolean withRipple) {
+        Drawable avatar = ContextCompat.getDrawable(context, R.drawable.ic_account_box_black_120dp);
+        avatar.setAlpha(AppConstants.ICON_BLACK_ALPHA_RGB);
+
+        return withRipple && Utils.isRunningLollipopAndHigher() ?
+                createRippleDrawable(context, avatar) : avatar;
+    }
+
     public static Drawable getFallbackDrawable(Context context, boolean getBigSize,
                                                boolean withRipple) {
         int drawableId = getBigSize ? R.drawable.ic_account_circle_black_80dp :

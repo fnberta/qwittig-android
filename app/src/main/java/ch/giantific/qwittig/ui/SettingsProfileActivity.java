@@ -10,10 +10,7 @@ import android.support.annotation.IntDef;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.graphics.Palette;
 import android.transition.Explode;
 import android.transition.Transition;
 import android.view.Menu;
@@ -39,8 +36,6 @@ public class SettingsProfileActivity extends BaseActivity implements
         SettingsProfileFragment.FragmentInteractionListener,
         DiscardChangesDialogFragment.DialogInteractionListener {
 
-
-    private FloatingActionButton mFab;
 
     @IntDef({CHANGES_SAVED, CHANGES_DISCARDED, NO_CHANGES})
     @Retention(RetentionPolicy.SOURCE)
@@ -77,8 +72,8 @@ public class SettingsProfileActivity extends BaseActivity implements
         mImageViewAvatar = (ImageView) findViewById(R.id.iv_avatar);
         setAvatar();
 
-        mFab = (FloatingActionButton) findViewById(R.id.fab_save);
-        mFab.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_save);
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mSettingsProfileFragment.saveChanges();
@@ -111,33 +106,14 @@ public class SettingsProfileActivity extends BaseActivity implements
                     .into(new BitmapImageViewTarget(mImageViewAvatar) {
                         @Override
                         public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                            setAvatarToView(view, resource);
+                            view.setImageBitmap(resource);
+                            supportStartPostponedEnterTransition();
                         }
                     });
         } else {
-            mImageViewAvatar.setImageDrawable(Avatar.getFallbackDrawable(getApplicationContext(), true, true));
+            mImageViewAvatar.setImageDrawable(Avatar.getFallbackDrawableRect(this, false));
+            supportStartPostponedEnterTransition();
         }
-    }
-
-    private void setAvatarToView(ImageView view, Bitmap resource) {
-        view.setImageBitmap(resource);
-        Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
-            @Override
-            public void onGenerated(Palette palette) {
-                applyPalette(palette);
-            }
-        });
-    }
-
-    private void applyPalette(Palette palette) {
-        int primaryDark = ContextCompat.getColor(this, R.color.primary_dark);
-        Palette.Swatch vibrantSwatch = palette.getVibrantSwatch();
-        if (vibrantSwatch != null) {
-            mCollapsingToolbarLayout.setContentScrimColor(vibrantSwatch.getRgb());
-            mCollapsingToolbarLayout.setStatusBarScrimColor(palette.getDarkVibrantColor(primaryDark));
-            //mCollapsingToolbarLayout.setExpandedTitleColor(vibrantSwatch.getTitleTextColor());
-        }
-        supportStartPostponedEnterTransition();
     }
 
     @Override
@@ -206,14 +182,7 @@ public class SettingsProfileActivity extends BaseActivity implements
 
                     Glide.with(this)
                             .load(imageUri)
-                            .asBitmap()
-                            .centerCrop()
-                            .into(new BitmapImageViewTarget(mImageViewAvatar) {
-                                @Override
-                                public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                                    setAvatarToView(view, resource);
-                                }
-                            });
+                            .into(mImageViewAvatar);
                 }
         }
     }
