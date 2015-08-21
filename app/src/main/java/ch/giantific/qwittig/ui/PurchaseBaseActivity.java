@@ -1,5 +1,6 @@
 package ch.giantific.qwittig.ui;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
@@ -7,6 +8,7 @@ import android.app.DatePickerDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
@@ -14,8 +16,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.transition.Transition;
 import android.util.Log;
@@ -49,6 +53,7 @@ import ch.giantific.qwittig.helper.RatesHelper;
 import ch.giantific.qwittig.ui.dialogs.AccountCreateDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.DatePickerDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.ManualExchangeRateDialogFragment;
+import ch.giantific.qwittig.ui.dialogs.PermissionDeniedDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.PurchaseUserSelectionDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.StoreSelectionDialogFragment;
 import ch.giantific.qwittig.ui.widgets.TransitionListenerAdapter;
@@ -67,7 +72,8 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         PurchaseReceiptAddEditFragment.FragmentInteractionListener,
         RatesHelper.HelperInteractionListener,
         PurchaseSaveHelper.HelperInteractionListener,
-        ManualExchangeRateDialogFragment.DialogInteractionListener {
+        ManualExchangeRateDialogFragment.DialogInteractionListener,
+        PermissionDeniedDialogFragment.DialogInteractionListener {
 
     @IntDef({PURCHASE_SAVED, PURCHASE_SAVED_AUTO, PURCHASE_DISCARDED, PURCHASE_SAVED_AS_DRAFT,
             PURCHASE_DRAFT_DELETED, PURCHASE_ERROR, PURCHASE_NO_CHANGES})
@@ -89,6 +95,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     static final int INTENT_REQUEST_IMAGE_CAPTURE = 1;
     static final String PURCHASE_RECEIPT_FRAGMENT = "purchase_receipt_fragment";
 
+    private static final int PERMISSIONS_REQUEST_EXTERNAL_STORAGE = 1;
     private static final String LOG_TAG = PurchaseBaseActivity.class.getSimpleName();
 
     PurchaseBaseFragment mPurchaseFragment;
@@ -240,6 +247,12 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
 
     @Override
     public void captureImage() {
+        if (permissionsAreGranted()) {
+            getImage();
+        }
+    }
+
+    private void getImage() {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (cameraIntent.resolveActivity(getPackageManager()) != null) {
             // Create the File where the photo should go
@@ -255,6 +268,48 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
                 startActivityForResult(cameraIntent, INTENT_REQUEST_IMAGE_CAPTURE);
             }
         }
+    }
+
+    private boolean permissionsAreGranted() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
+                PackageManager.PERMISSION_GRANTED) {
+            String[] permissionsToGrant = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
+            ActivityCompat.requestPermissions(this, permissionsToGrant,
+                    PERMISSIONS_REQUEST_EXTERNAL_STORAGE);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_EXTERNAL_STORAGE:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getImage();
+                } else {
+                    PermissionDeniedDialogFragment permissionDeniedDialogFragment =
+                            PermissionDeniedDialogFragment.newInstance(
+                            getString(R.string.dialog_message_permission_storage_denied));
+                    permissionDeniedDialogFragment.show(getFragmentManager(), "permission_denied");
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    /**
+     * Callback from permission denied dialog when user decides to launch system settings.
+     */
+    @Override
+    public void startSystemSettings() {
+        Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.setData(Uri.parse("package:" + getPackageName()));
+        startActivity(intent);
     }
 
     private File createImageFile() throws IOException {

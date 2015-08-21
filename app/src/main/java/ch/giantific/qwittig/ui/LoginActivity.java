@@ -1,5 +1,6 @@
 package ch.giantific.qwittig.ui;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -7,13 +8,16 @@ import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
 import android.transition.Transition;
@@ -52,6 +56,7 @@ public class LoginActivity extends AppCompatActivity implements
 
     public static final String INTENT_URI_EMAIL = "intent_uri_email";
     public static final String INTENT_EXTRA_SIGN_UP = "intent_sign_up";
+    private static final int PERMISSIONS_REQUEST_CONTACTS = 1;
     private static final int INTENT_REQUEST_IMAGE = 1;
     private static final String LOGIN_FRAGMENT = "login_fragment";
     private static final String SIGN_UP_FRAGMENT = "sign_up_fragment";
@@ -341,6 +346,58 @@ public class LoginActivity extends AppCompatActivity implements
 
     @Override
     public void populateAutoComplete() {
+        if (permissionsAreGranted()) {
+            initLoader();
+        }
+    }
+
+    private boolean permissionsAreGranted() {
+        List<String> permissionsToRequest = new ArrayList<>();
+
+        int hasGetAccountsPerm = ContextCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS);
+        if (hasGetAccountsPerm != PackageManager.PERMISSION_GRANTED) {
+            permissionsToRequest.add(Manifest.permission.GET_ACCOUNTS);
+        }
+
+        int hasReadContactsPerm = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
+        if (hasReadContactsPerm != PackageManager.PERMISSION_GRANTED) {
+            permissionsToRequest.add(Manifest.permission.READ_CONTACTS);
+        }
+
+        if (!permissionsToRequest.isEmpty()) {
+            String[] permissionsArray = permissionsToRequest.toArray(
+                    new String[permissionsToRequest.size()]);
+            ActivityCompat.requestPermissions(this, permissionsArray, PERMISSIONS_REQUEST_CONTACTS);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_CONTACTS:
+                boolean allPermissionsGranted = true;
+                for (int result : grantResults) {
+                    if (result != PackageManager.PERMISSION_GRANTED) {
+                        allPermissionsGranted = false;
+                        break;
+                    }
+                }
+
+                if (allPermissionsGranted) {
+                    initLoader();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    private void initLoader() {
         getLoaderManager().initLoader(0, null, this);
     }
 
