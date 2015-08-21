@@ -332,7 +332,8 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
     }
 
     private void startProfileSettings() {
-        ViewCompat.setTransitionName(mImageViewHeaderAvatar, SettingsProfileActivity.SHARED_AVATAR);
+        // TODO: make shared element transition nice
+        //ViewCompat.setTransitionName(mImageViewHeaderAvatar, SettingsProfileActivity.SHARED_AVATAR);
 
         Intent intent = new Intent(this, SettingsProfileActivity.class);
         ActivityOptionsCompat options =

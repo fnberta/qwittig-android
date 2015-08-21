@@ -65,7 +65,7 @@ public class SettingsProfileActivity extends BaseActivity implements
             setActivityTransition();
         }
         setContentView(R.layout.activity_settings_profile);
-        ViewCompat.setTransitionName(findViewById(R.id.appbar), SHARED_AVATAR);
+        //ViewCompat.setTransitionName(findViewById(R.id.appbar), SHARED_AVATAR);
         supportPostponeEnterTransition();
 
         ActionBar actionBar = getSupportActionBar();
