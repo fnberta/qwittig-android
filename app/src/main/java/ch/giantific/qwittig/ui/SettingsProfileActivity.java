@@ -48,6 +48,7 @@ public class SettingsProfileActivity extends BaseActivity implements
     public static final int RESULT_CHANGES_DISCARDED = 2;
     private static final String PROFILE_FRAGMENT = "profile_fragment";
     private static final int INTENT_REQUEST_IMAGE = 1;
+    private boolean mHasAvatarSet = true;
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private ImageView mImageViewAvatar;
     private SettingsProfileFragment mSettingsProfileFragment;
@@ -111,6 +112,9 @@ public class SettingsProfileActivity extends BaseActivity implements
                         }
                     });
         } else {
+            mHasAvatarSet = false;
+            invalidateOptionsMenu();
+
             mImageViewAvatar.setImageDrawable(Avatar.getFallbackDrawableRect(this, false));
             supportStartPostponedEnterTransition();
         }
@@ -127,6 +131,9 @@ public class SettingsProfileActivity extends BaseActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_settings_profile, menu);
+        MenuItem deleteAvatar = menu.findItem(R.id.action_settings_profile_avatar_delete);
+        deleteAvatar.setVisible(mHasAvatarSet);
+
         return true;
     }
 
@@ -137,8 +144,11 @@ public class SettingsProfileActivity extends BaseActivity implements
             case android.R.id.home:
                 checkForChangesAndExit();
                 return true;
-            case R.id.action_settings_profile_edit_avatar:
+            case R.id.action_settings_profile_avatar_edit:
                 pickAvatar();
+                return true;
+            case R.id.action_settings_profile_avatar_delete:
+                deleteAvatar();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -179,12 +189,21 @@ public class SettingsProfileActivity extends BaseActivity implements
                 if (resultCode == RESULT_OK) {
                     Uri imageUri = data.getData();
                     mSettingsProfileFragment.setAvatar(imageUri);
+                    mHasAvatarSet = true;
+                    invalidateOptionsMenu();
 
                     Glide.with(this)
                             .load(imageUri)
                             .into(mImageViewAvatar);
                 }
         }
+    }
+
+    private void deleteAvatar() {
+        mSettingsProfileFragment.deleteAvatar();
+        mImageViewAvatar.setImageDrawable(Avatar.getFallbackDrawableRect(this, false));
+        mHasAvatarSet = false;
+        invalidateOptionsMenu();
     }
 
     @Override

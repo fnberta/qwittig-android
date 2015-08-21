@@ -271,8 +271,9 @@
     <string name="exchange_rate">Wechselkurs:</string>
     <string name="toast_exchange_rate_value">Wechselkurs: %1$s</string>
     <string name="action_purchase_show_exchange_rate">Zeige Wechselkurs</string>
-    <string name="action_purchase_edit_avatar">Profilbild ändern</string>
+    <string name="action_settings_profile_avatar_edit">Profilbild ändern</string>
     <string name="dialog_message_permission_storage_denied">Du hast Qwittig nicht erlaubt, eine Quittung anzuhängen. Du kannst dies in den System-Einstellungen ändern.</string>
     <string name="dialog_positive_open_settings">Einstellungen öffnen</string>
+    <string name="action_settings_profile_avatar_delete">Profilbild löschen</string>
 
 </resources>

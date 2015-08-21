@@ -2,8 +2,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="ch.giantific.qwittig.ui.SettingsProfileActivity">
-    <item android:id="@+id/action_settings_profile_edit_avatar"
-          android:title="@string/action_purchase_edit_avatar"
+    <item android:id="@+id/action_settings_profile_avatar_edit"
+          android:title="@string/action_settings_profile_avatar_edit"
+          android:orderInCategory="1"
+          app:showAsAction="never"/>
+    <item android:id="@+id/action_settings_profile_avatar_delete"
+          android:title="@string/action_settings_profile_avatar_delete"
           android:orderInCategory="1"
           app:showAsAction="never"/>
 </menu>

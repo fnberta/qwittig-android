@@ -19,6 +19,8 @@ import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.parse.ParseUser;
 
+import java.util.Arrays;
+
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.Avatar;
 import ch.giantific.qwittig.data.parse.models.User;
@@ -46,8 +48,8 @@ public class SettingsProfileFragment extends Fragment {
     private String mNickname;
     private String mPassword;
     private String mPasswordRepeat;
-
     private byte[] mAvatar;
+    private boolean mDeleteAvatar;
 
     private FragmentInteractionListener mListener;
 
@@ -99,7 +101,8 @@ public class SettingsProfileFragment extends Fragment {
         readFields();
 
         return !mEmail.equals(mCurrentEmail) && !ParseUtils.isTestUser(mCurrentUser) ||
-                !mNickname.equals(mCurrentNickname) || !TextUtils.isEmpty(mPassword);
+                !mNickname.equals(mCurrentNickname) || !TextUtils.isEmpty(mPassword) ||
+                mAvatar != null && !Arrays.equals(mAvatar, mCurrentUser.getAvatar());
 
     }
 
@@ -147,7 +150,9 @@ public class SettingsProfileFragment extends Fragment {
             }
         }
 
-        if (mAvatar != null) {
+        if (mDeleteAvatar) {
+            currentUser.removeAvatar();
+        } else if (mAvatar != null) {
             currentUser.setAvatar(mAvatar);
         }
 
@@ -157,7 +162,13 @@ public class SettingsProfileFragment extends Fragment {
         }
     }
 
+    public void deleteAvatar() {
+        mDeleteAvatar = true;
+    }
+
     public void setAvatar(Uri imageUri) {
+        mDeleteAvatar = false;
+
         Glide.with(this)
                 .load(imageUri)
                 .asBitmap()

@@ -277,8 +277,9 @@
     <string name="exchange_rate">Exchange rate:</string>
     <string name="toast_exchange_rate_value">Exchange rate: %1$s</string>
     <string name="action_purchase_show_exchange_rate">Show exchange rate</string>
-    <string name="action_purchase_edit_avatar">Edit profile image</string>
+    <string name="action_settings_profile_avatar_edit">Edit profile image</string>
     <string name="dialog_message_permission_storage_denied">You denied Qwittig the permission to add a receipt. You can always change this in the system settings.</string>
     <string name="dialog_positive_open_settings">Open system settings</string>
+    <string name="action_settings_profile_avatar_delete">Delete profile image</string>
 
 </resources>
