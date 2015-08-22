@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.ui.widgets.SwipeDismissTouchListener;
+import ch.giantific.qwittig.ui.listeners.SwipeDismissTouchListener;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.Utils;
 

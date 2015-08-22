@@ -53,7 +53,7 @@ import ch.giantific.qwittig.helper.PurchaseSaveHelper;
 import ch.giantific.qwittig.helper.RatesHelper;
 import ch.giantific.qwittig.ui.adapter.PurchaseAddUsersInvolvedRecyclerAdapter;
 import ch.giantific.qwittig.ui.widgets.ListCheckBox;
-import ch.giantific.qwittig.ui.widgets.SwipeDismissTouchListener;
+import ch.giantific.qwittig.ui.listeners.SwipeDismissTouchListener;
 import ch.giantific.qwittig.utils.ComparatorParseUserIgnoreCase;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MessageUtils;

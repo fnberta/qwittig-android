@@ -1,4 +1,4 @@
-package ch.giantific.qwittig.ui.widgets;
+package ch.giantific.qwittig.ui.listeners;
 
 /**
  * Created by fabio on 18.03.15.

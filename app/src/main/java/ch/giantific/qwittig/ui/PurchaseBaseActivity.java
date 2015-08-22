@@ -1,8 +1,6 @@
 package ch.giantific.qwittig.ui;
 
 import android.Manifest;
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
 import android.app.FragmentManager;
@@ -56,7 +54,7 @@ import ch.giantific.qwittig.ui.dialogs.ManualExchangeRateDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.PermissionDeniedDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.PurchaseUserSelectionDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.StoreSelectionDialogFragment;
-import ch.giantific.qwittig.ui.widgets.TransitionListenerAdapter;
+import ch.giantific.qwittig.ui.listeners.TransitionListenerAdapter;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.Utils;

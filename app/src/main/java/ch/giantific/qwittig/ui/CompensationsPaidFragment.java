@@ -22,7 +22,7 @@ import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Compensation;
 import ch.giantific.qwittig.helper.MoreQueryHelper;
 import ch.giantific.qwittig.ui.adapter.CompensationsPaidRecyclerAdapter;
-import ch.giantific.qwittig.ui.widgets.InfiniteScrollListener;
+import ch.giantific.qwittig.ui.listeners.InfiniteScrollListener;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;

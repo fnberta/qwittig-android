@@ -1,4 +1,4 @@
-package ch.giantific.qwittig.ui.widgets;
+package ch.giantific.qwittig.ui.listeners;
 
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ch.giantific.qwittig.ui.widgets;
+package ch.giantific.qwittig.ui.listeners;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -256,7 +256,7 @@ public class SwipeDismissTouchListener implements View.OnTouchListener {
     }
 
     /**
-     * The callback interface used by {@link ch.giantific.qwittig.ui.widgets.SwipeDismissTouchListener} to inform its client
+     * The callback interface used by {@link SwipeDismissTouchListener} to inform its client
      * about a successful dismissal of the view for which it was created.
      */
     public interface DismissCallbacks {

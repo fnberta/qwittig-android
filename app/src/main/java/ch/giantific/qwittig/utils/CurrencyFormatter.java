@@ -1,4 +1,4 @@
-package ch.giantific.qwittig.ui.widgets;
+package ch.giantific.qwittig.utils;
 
 import com.github.mikephil.charting.utils.ValueFormatter;
 

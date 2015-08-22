@@ -1,12 +1,9 @@
 package ch.giantific.qwittig.ui;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.view.ViewCompat;
 import android.transition.Explode;
 import android.transition.Transition;
 import android.view.View;
@@ -17,7 +14,7 @@ import com.parse.ParseException;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.helper.InviteUsersHelper;
-import ch.giantific.qwittig.ui.widgets.TransitionListenerAdapter;
+import ch.giantific.qwittig.ui.listeners.TransitionListenerAdapter;
 import ch.giantific.qwittig.utils.Utils;
 
 public class SettingsUserInviteActivity extends BaseActivity implements
