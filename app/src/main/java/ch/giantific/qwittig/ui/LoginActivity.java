@@ -70,11 +70,11 @@ public class LoginActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
 
         if (Utils.isRunningLollipopAndHigher()) {
             setActivityTransition();
         }
+        setContentView(R.layout.activity_login);
 
         mViewMain = findViewById(R.id.container);
         mViewProgress = findViewById(R.id.ll_progress);

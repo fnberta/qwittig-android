@@ -48,6 +48,10 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (Utils.isRunningLollipopAndHigher()) {
+            setActivityTransition();
+        }
+
         // green or red toolbar
         applyCorrectTheme();
         // disable default actionBar title
@@ -66,11 +70,7 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
         mTextViewStore = (TextView) findViewById(R.id.tv_store);
         mTextViewDate = (TextView) findViewById(R.id.tv_date);
 
-        if (Utils.isRunningLollipopAndHigher()) {
-            setActivityTransition();
-        }
         supportPostponeEnterTransition();
-
         getPurchaseId();
 
         if (savedInstanceState == null && mUserIsLoggedIn) {
