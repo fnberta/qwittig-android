@@ -43,7 +43,7 @@ public class HomeUsersFragment extends HomeBaseFragment implements
         Drawable drawable = ContextCompat.getDrawable(getActivity(), R.drawable.ic_people_black_144dp);
         drawable.setAlpha(AppConstants.ICON_BLACK_ALPHA_RGB);
         mTextViewEmpty.setCompoundDrawablesRelativeWithIntrinsicBounds(null, drawable, null, null);
-        mTextViewEmpty.setText(R.string.no_user);
+        mTextViewEmpty.setText(R.string.no_users);
     }
 
     @Override
