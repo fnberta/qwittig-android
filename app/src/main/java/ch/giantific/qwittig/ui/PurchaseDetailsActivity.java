@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBar;
 import android.transition.Explode;
 import android.transition.Transition;
 import android.view.Menu;
@@ -34,7 +35,6 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     private static final String PURCHASE_DETAILS_FRAGMENT = "purchase_details_fragment";
     private static final String PURCHASE_RECEIPT_FRAGMENT = "purchase_receipt_fragment";
     private String mPurchaseId;
-    private PurchaseDetailsActivity mThis = this;
     private boolean mShowEditOptions;
     private boolean mHasReceiptFile;
     private boolean mHasForeignCurrency;
@@ -54,16 +54,22 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
 
         // green or red toolbar
         applyCorrectTheme();
+        setContentView(R.layout.activity_purchase_details);
+
         // disable default actionBar title
-        getSupportActionBar().setTitle(null);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(null);
+        }
 
         replaceDrawerIndicatorWithUp();
         uncheckNavDrawerItems();
 
+        final PurchaseDetailsActivity activity = this;
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                NavUtils.navigateUpFromSameTask(mThis);
+                NavUtils.navigateUpFromSameTask(activity);
             }
         });
 
@@ -99,7 +105,6 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
             theme = R.style.AppTheme_WithNavDrawer_Red;
         }
         setTheme(theme);
-        setContentView(R.layout.activity_purchase_details);
     }
 
     private void addDetailsFragment() {

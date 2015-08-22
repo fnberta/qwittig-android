@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
+import android.support.v7.app.ActionBar;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.view.MenuItem;
@@ -23,7 +24,10 @@ public class PurchaseEditActivity extends PurchaseBaseActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_clear_white_24dp);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_clear_white_24dp);
+        }
 
         String editPurchaseId = getIntent().getStringExtra(HomePurchasesFragment.INTENT_PURCHASE_ID);
         boolean inDraftMode = getIntent().getBooleanExtra(
