@@ -13,6 +13,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
@@ -81,8 +82,6 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     private HomeUsersFragment mHomeUsersFragment;
     private TabLayout mTabLayout;
     private FabMenu mFabMenu;
-    private FloatingActionButton mFabAuto;
-    private FloatingActionButton mFabManual;
     private boolean mNewQueryNeeded = false;
     private boolean mCheckForInvitations = true;
     private int mInvitationAction;
@@ -100,7 +99,10 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         // check item in NavDrawer
         checkNavDrawerItem(R.id.nav_home);
 
-        getSupportActionBar().setTitle(null);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(null);
+        }
 
         mBalance = (TextView) findViewById(R.id.tv_balance);
         mFabMenu = (FabMenu) findViewById(R.id.fab_menu);
@@ -112,10 +114,10 @@ public class HomeActivity extends BaseNavDrawerActivity implements
             }
         }, AppConstants.FAB_CIRCULAR_REVEAL_DELAY * 4);
 
-        mFabAuto = (FloatingActionButton) findViewById(R.id.fab_auto);
-        mFabAuto.setOnClickListener(this);
-        mFabManual = (FloatingActionButton) findViewById(R.id.fab_manual);
-        mFabManual.setOnClickListener(this);
+        FloatingActionButton fabAuto = (FloatingActionButton) findViewById(R.id.fab_auto);
+        fabAuto.setOnClickListener(this);
+        FloatingActionButton fabManual = (FloatingActionButton) findViewById(R.id.fab_manual);
+        fabManual.setOnClickListener(this);
 
         if (mUserIsLoggedIn) {
             if (savedInstanceState == null) {

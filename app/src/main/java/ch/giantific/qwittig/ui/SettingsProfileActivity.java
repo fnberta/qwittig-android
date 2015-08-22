@@ -49,7 +49,6 @@ public class SettingsProfileActivity extends BaseActivity implements
     private static final String PROFILE_FRAGMENT = "profile_fragment";
     private static final int INTENT_REQUEST_IMAGE = 1;
     private boolean mHasAvatarSet = true;
-    private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private ImageView mImageViewAvatar;
     private SettingsProfileFragment mSettingsProfileFragment;
 
@@ -68,7 +67,6 @@ public class SettingsProfileActivity extends BaseActivity implements
         if (actionBar != null) {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_clear_white_24dp);
         }
-        mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
 
         mImageViewAvatar = (ImageView) findViewById(R.id.iv_avatar);
         setAvatar();
