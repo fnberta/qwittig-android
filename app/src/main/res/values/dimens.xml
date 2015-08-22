@@ -4,8 +4,6 @@
     <!-- Text sizes -->
     <dimen name="text_size_avatar_with_text">16sp</dimen>
     <dimen name="text_size_subheader">14sp</dimen>
-    <dimen name="text_size_edit_text">16sp</dimen>
-    <dimen name="text_size_tab">14sp</dimen>
 
     <!-- Spacing -->
     <dimen name="key_line_1">16dp</dimen>
@@ -24,7 +22,6 @@
     <!-- Avatar and Icons-->
     <dimen name="avatar_size">40dp</dimen>
     <dimen name="avatar_size_2x">80dp</dimen>
-    <dimen name="avatar_size_2.5x">100dp</dimen>
     <dimen name="icon_size">24dp</dimen>
     <item name="icon_black_alpha" type="dimen" format="float">0.54</item>
 
@@ -62,8 +59,6 @@
     <dimen name="dialog_padding">24dp</dimen>
 
     <!-- FAB -->
-    <dimen name="fab_translationY_auto">-72dp</dimen>
-    <dimen name="fab_translationY_manual">-144dp</dimen>
     <dimen name="fab_elevation">6dp</dimen>
 
     <!-- CardView -->
