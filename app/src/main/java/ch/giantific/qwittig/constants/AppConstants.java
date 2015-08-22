@@ -5,8 +5,6 @@ package ch.giantific.qwittig.constants;
  */
 public class AppConstants {
 
-    public static final float ANIMATION_ACC_DEC_SPEED = 3f;
-
     public static final float DISABLED_ALPHA = 0.26f;
     public static final int DISABLED_ALPHA_RGB = 66;
 
