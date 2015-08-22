@@ -390,6 +390,13 @@ public abstract class StatsBaseFragment extends BaseFragment implements
     public void onStatsCalculated(Stats stats) {
         removeStatsHelper();
 
+        if (stats == null) {
+            mIsLoading = false;
+            toggleProgressBarVisibility();
+            setEmptyViewVisibility(true);
+            return;
+        }
+
         mDataIsLoaded = true;
         mStatsData = stats;
         setChartData();
@@ -408,6 +415,8 @@ public abstract class StatsBaseFragment extends BaseFragment implements
         removeStatsHelper();
                 
         mIsLoading = false;
+        toggleProgressBarVisibility();
+        setEmptyViewVisibility(true);
     }
 
     private void showErrorSnackbar(String message) {

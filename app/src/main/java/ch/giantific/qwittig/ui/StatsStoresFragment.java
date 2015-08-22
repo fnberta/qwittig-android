@@ -114,13 +114,6 @@ public class StatsStoresFragment extends StatsPieBaseFragment {
     }
 
     @Override
-    public void onStatsCalculated(Stats stats) {
-        super.onStatsCalculated(stats);
-
-        setChartData();
-    }
-
-    @Override
     float getValue(Stats.Unit unit) {
         if (mShowAverage) {
             return unit.getAverage();
