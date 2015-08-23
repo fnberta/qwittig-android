@@ -1,0 +1,13 @@
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="ch.giantific.qwittig.ui.PurchaseDetailsFragment">
+
+    <item
+        android:id="@+id/action_purchase_show_receipt"
+        android:title="@string/action_purchase_show_receipt"
+        android:orderInCategory="3"
+        android:visible="false"
+        app:showAsAction="never"/>
+</menu>

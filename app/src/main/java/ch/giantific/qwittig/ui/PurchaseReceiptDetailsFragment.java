@@ -17,7 +17,6 @@ import ch.giantific.qwittig.data.parse.models.Purchase;
 public class PurchaseReceiptDetailsFragment extends PurchaseReceiptBaseFragment implements
         LocalQuery.ObjectLocalFetchListener {
 
-    private FragmentInteractionListener mListener;
     private static final String BUNDLE_PURCHASE_ID = "purchase_id";
     private String mPurchaseId;
 
@@ -33,25 +32,12 @@ public class PurchaseReceiptDetailsFragment extends PurchaseReceiptBaseFragment 
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (FragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
-        }
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
             mPurchaseId = getArguments().getString(BUNDLE_PURCHASE_ID);
         }
-
-        mListener.updateActionBarMenu(true, false, false);
     }
 
     @Override
@@ -66,16 +52,5 @@ public class PurchaseReceiptDetailsFragment extends PurchaseReceiptBaseFragment 
         Purchase purchase = (Purchase) object;
         ParseFile receiptFile = purchase.getReceiptParseFile();
         setReceiptImage(receiptFile);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    public interface FragmentInteractionListener {
-        void updateActionBarMenu(boolean showEditOptions, boolean hasReceiptFile,
-                                 boolean hasForeignCurrency);
     }
 }

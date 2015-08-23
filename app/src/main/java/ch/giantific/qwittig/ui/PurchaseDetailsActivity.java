@@ -27,8 +27,7 @@ import ch.giantific.qwittig.utils.Utils;
 
 
 public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
-        PurchaseDetailsFragment.FragmentInteractionListener,
-        PurchaseReceiptDetailsFragment.FragmentInteractionListener {
+        PurchaseDetailsFragment.FragmentInteractionListener {
 
     public static final int RESULT_PURCHASE_DELETED = 2;
     public static final int RESULT_GROUP_CHANGED = 3;
@@ -161,9 +160,6 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
             menu.findItem(R.id.action_purchase_edit).setVisible(true);
             menu.findItem(R.id.action_purchase_delete).setVisible(true);
         }
-        if (mHasReceiptFile) {
-            menu.findItem(R.id.action_purchase_show_receipt).setVisible(true);
-        }
         if (mHasForeignCurrency) {
             menu.findItem(R.id.action_purchase_show_exchange_rate).setVisible(true);
         }
@@ -173,9 +169,6 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_purchase_show_receipt:
-                replaceWithReceiptFragment();
-                return true;
             case R.id.action_purchase_edit:
                 editPurchase();
                 return true;
@@ -189,7 +182,8 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
         }
     }
 
-    private void replaceWithReceiptFragment() {
+    @Override
+    public void replaceWithReceiptFragment() {
         FragmentManager fragmentManager = getFragmentManager();
         PurchaseReceiptDetailsFragment purchaseReceiptDetailsFragment =
                 PurchaseReceiptDetailsFragment.newInstance(mPurchaseId);
@@ -232,10 +226,8 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void updateActionBarMenu(boolean showEditOptions, boolean hasReceiptFile,
-                                    boolean hasForeignCurrency) {
+    public void toggleActionBarOptions(boolean showEditOptions, boolean hasForeignCurrency) {
         mShowEditOptions = showEditOptions;
-        mHasReceiptFile = hasReceiptFile;
         mHasForeignCurrency = hasForeignCurrency;
         invalidateOptionsMenu();
     }

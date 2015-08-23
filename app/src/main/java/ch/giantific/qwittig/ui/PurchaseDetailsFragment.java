@@ -6,6 +6,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -41,6 +44,8 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     private PurchaseDetailsRecyclerAdapter mRecyclerAdapter;
     private User mCurrentUser;
     private Group mCurrentGroup;
+    private boolean mHasReceiptFile;
+
     private static final String LOG_TAG = PurchaseDetailsFragment.class.getSimpleName();
 
     public PurchaseDetailsFragment() {
@@ -71,6 +76,8 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setHasOptionsMenu(true);
+
         if (getArguments() != null) {
             mPurchaseId = getArguments().getString(HomePurchasesFragment.INTENT_PURCHASE_ID);
         }
@@ -96,6 +103,27 @@ public class PurchaseDetailsFragment extends BaseFragment implements
         mRecyclerView.setAdapter(mRecyclerAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setHasFixedSize(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_purchase_details_frag, menu);
+
+        if (mHasReceiptFile) {
+            menu.findItem(R.id.action_purchase_show_receipt).setVisible(true);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.action_purchase_show_receipt:
+                mListener.replaceWithReceiptFragment();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -156,24 +184,16 @@ public class PurchaseDetailsFragment extends BaseFragment implements
             }
         }
 
-        boolean hasForeignCurrency = !mCurrentGroup.getCurrency().equals(mPurchase.getCurrency());
+        mHasReceiptFile = mPurchase.getReceiptParseFile() != null;
+        // invalidateOptionsMenu will be called in toggleActionBarOptions()
 
+        boolean userIsBuyer = false;
         if (allUsersAreValid) {
             String buyerId = mPurchase.getBuyer().getObjectId();
-            if (buyerId.equals(mCurrentUser.getObjectId())) {
-                if (mPurchase.getReceiptParseFile() != null) {
-                    mListener.updateActionBarMenu(true, true, hasForeignCurrency);
-                } else {
-                    mListener.updateActionBarMenu(true, false, hasForeignCurrency);
-                }
-            } else if (mPurchase.getReceiptParseFile() != null) {
-                mListener.updateActionBarMenu(false, true, hasForeignCurrency);
-            }
-        } else {
-            if (mPurchase.getReceiptParseFile() != null) {
-                mListener.updateActionBarMenu(false, true, hasForeignCurrency);
-            }
+            userIsBuyer = buyerId.equals(mCurrentUser.getObjectId());
         }
+        boolean hasForeignCurrency = !mCurrentGroup.getCurrency().equals(mPurchase.getCurrency());
+        mListener.toggleActionBarOptions(userIsBuyer, hasForeignCurrency);
     }
 
     private void toggleMainViewVisibility() {
@@ -222,8 +242,9 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     public interface FragmentInteractionListener {
         void setToolbarStoreDate(String title, String subtitle);
 
-        void updateActionBarMenu(boolean showEditOptions, boolean hasReceiptFile,
-                                 boolean hasForeignCurrency);
+        void toggleActionBarOptions(boolean showEditOptions, boolean hasForeignCurrency);
+
+        void replaceWithReceiptFragment();
 
         void showAccountCreateDialog();
 

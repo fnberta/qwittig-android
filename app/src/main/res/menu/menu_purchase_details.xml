@@ -19,13 +19,6 @@
         android:orderInCategory="2"
         app:showAsAction="ifRoom"/>
     <item
-        android:id="@+id/action_purchase_show_receipt"
-        android:title="@string/action_purchase_show_receipt"
-        android:orderInCategory="3"
-        android:visible="false"
-        app:showAsAction="never"/>
-
-    <item
         android:id="@+id/action_purchase_show_exchange_rate"
         android:title="@string/action_purchase_show_exchange_rate"
         android:orderInCategory="4"
