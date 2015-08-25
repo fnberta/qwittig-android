@@ -342,10 +342,11 @@ public abstract class StatsBaseFragment extends BaseFragment implements
 
     final int getColor(int position) {
         int[] colors = getResources().getIntArray(R.array.stats_colors);
-        if (position >= 0 && position <= 11) {
+        int colorsSize = colors.length;
+        if (position >= 0 && position < colorsSize) {
             return colors[position];
-        } else if (position > 11) {
-            return getColor(position - 12);
+        } else if (position >= colorsSize) {
+            return getColor(position - colorsSize);
         }
 
         return -1;

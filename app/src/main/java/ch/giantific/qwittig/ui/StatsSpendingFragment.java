@@ -168,7 +168,7 @@ public class StatsSpendingFragment extends StatsBaseFragment {
 
     @NonNull
     private List<String> getXvals(int unitSize) {
-        List<String> xVals = new ArrayList<>();
+        List<String> xVals = new ArrayList<>(unitSize);
         for (int i = 1; i <= unitSize; i++) {
             switch (mPeriodType) {
                 case PERIOD_YEAR:
@@ -183,9 +183,9 @@ public class StatsSpendingFragment extends StatsBaseFragment {
     }
 
     private BarData getUserBarData(List<Stats.Member> userData, List<String> xVals) {
-        List<BarDataSet> barDataSets = new ArrayList<>();
-
-        for (int i = 0, userDataSize = userData.size(); i < userDataSize; i++) {
+        int userDataSize = userData.size();
+        List<BarDataSet> barDataSets = new ArrayList<>(userDataSize);
+        for (int i = 0; i < userDataSize; i++) {
             Stats.Member user = userData.get(i);
             List<Stats.Unit> units = user.getUnits();
             List<BarEntry> barEntries = getBarEntries(units);
@@ -203,7 +203,7 @@ public class StatsSpendingFragment extends StatsBaseFragment {
 
     @NonNull
     private List<BarEntry> getBarEntries(List<Stats.Unit> units) {
-        List<BarEntry> barEntries = new ArrayList<>();
+        List<BarEntry> barEntries = new ArrayList<>(units.size());
 
         for (Stats.Unit unit : units) {
             float value = mShowAverage ? unit.getAverage() : unit.getTotal();

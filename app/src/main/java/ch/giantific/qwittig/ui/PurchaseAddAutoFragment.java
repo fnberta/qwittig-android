@@ -119,9 +119,9 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
         mTextViewPickStore.setText(purchaseRest.getStore());
 
         // set item rows
-        List<ItemRow> itemRowsNew = new ArrayList<>();
         List<ItemRest> itemsRest = purchaseRest.getItems();
         int itemsRestSize = itemsRest.size();
+        List<ItemRow> itemRowsNew = new ArrayList<>(itemsRestSize);
         for (int i = 0; i < itemsRestSize; i++) {
             final ItemRest itemRest = itemsRest.get(i);
             final ItemRow itemRowNew = addNewItemRow(i + 1);

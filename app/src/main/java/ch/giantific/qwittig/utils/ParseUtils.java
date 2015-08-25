@@ -79,10 +79,13 @@ public class ParseUtils {
         ParseConfig config = ParseConfig.getCurrentConfig();
         List<String> currencyCodes = config.getList(Config.SUPPORTED_CURRENCIES);
         List<String> currencyNames = MoneyUtils.getCurrencyDisplayNames(currencyCodes);
-        List<ch.giantific.qwittig.data.models.Currency> currencies = new ArrayList<>();
 
-        for (int i = 0, currencyNamesLength = currencyNames.size(); i < currencyNamesLength; i++) {
-            currencies.add(new ch.giantific.qwittig.data.models.Currency(currencyNames.get(i), currencyCodes.get(i)));
+        int currencyNamesLength = currencyNames.size();
+        List<ch.giantific.qwittig.data.models.Currency> currencies =
+                new ArrayList<>(currencyNamesLength);
+        for (int i = 0; i < currencyNamesLength; i++) {
+            currencies.add(new ch.giantific.qwittig.data.models.Currency(currencyNames.get(i),
+                    currencyCodes.get(i)));
         }
 
         return currencies;

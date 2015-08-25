@@ -710,11 +710,11 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      * @param usersInvolvedInt the users selected in the dialog
      */
     public void setItemUsersInvolved(List<Integer> usersInvolvedInt) {
-        List<ParseUser> usersInvolved = new ArrayList<>();
+        List<ParseUser> usersInvolved = new ArrayList<>(usersInvolvedInt.size());
         for (Integer i : usersInvolvedInt) {
             usersInvolved.add(mUsersAvailableParse.get(i));
         }
-        List<Boolean> usersChecked = new ArrayList<>();
+        List<Boolean> usersChecked = new ArrayList<>(mUsersAvailableParse.size());
         for (ParseUser parseUser : mUsersAvailableParse) {
             if (usersInvolved.contains(parseUser)) {
                 usersChecked.add(true);

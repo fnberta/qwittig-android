@@ -190,8 +190,8 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     }
 
     private void restoreOldItemValues() {
-        List<ItemRow> itemRowsNew = new ArrayList<>();
         int oldItemsSize = mOldItems.size();
+        List<ItemRow> itemRowsNew = new ArrayList<>(oldItemsSize);
         for (int i = 0; i < oldItemsSize; i++) {
             final Item itemOld = (Item) mOldItems.get(i);
             final ItemRow itemRowNew = addNewItemRow(i + 1);
@@ -225,7 +225,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     }
 
     private boolean[] ParseUserToBoolean(List<ParseUser> usersInvolved) {
-        List<Boolean> usersInvolvedBoolean = new ArrayList<>();
+        List<Boolean> usersInvolvedBoolean = new ArrayList<>(mUsersAvailableParse.size());
 
         for (ParseUser parseUser : mUsersAvailableParse) {
             if (usersInvolved.contains(parseUser)) {
@@ -349,11 +349,11 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     }
 
     private List<String> getParseUsersInvolvedIdsFromItemRow(ItemRow itemRow) {
-        final List<String> usersInvolved = new ArrayList<>();
+        int usersAvailableParseSize = mUsersAvailableParse.size();
+        final List<String> usersInvolved = new ArrayList<>(usersAvailableParseSize);
 
         boolean[] usersChecked = itemRow.getUsersChecked();
-        for (int i = 0, mUsersAvailableParseSize = mUsersAvailableParse.size();
-             i < mUsersAvailableParseSize; i++) {
+        for (int i = 0; i < usersAvailableParseSize; i++) {
             ParseUser parseUser = mUsersAvailableParse.get(i);
             if (usersChecked[i]) {
                 usersInvolved.add(parseUser.getObjectId());

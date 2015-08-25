@@ -74,7 +74,6 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
     private CompensationsPaidFragment mCompensationsPaidFragment;
     private String mCurrentGroupCurrency;
     private List<ParseUser> mSinglePaymentUsers;
-    private ArrayList<ItemUserPicker> mSinglePaymentRecipients = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,21 +175,24 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
     @Override
     public void onUsersLocalQueried(List<ParseUser> users) {
         mSinglePaymentUsers = users;
-        mSinglePaymentRecipients.clear();
+        ArrayList<ItemUserPicker> recipients;
 
         if (!users.isEmpty()) {
+            recipients = new ArrayList<>(users.size() - 1); // -1 as currentUser will not be included
             for (ParseUser parseUser : users) {
                 User user = (User) parseUser;
                 if (!user.getObjectId().equals(mCurrentUser.getObjectId())) {
-                    mSinglePaymentRecipients.add(new ItemUserPicker(user.getObjectId(),
+                    recipients.add(new ItemUserPicker(user.getObjectId(),
                             user.getNickname(), user.getAvatar()));
                 }
             }
 
-            Collections.sort(mSinglePaymentRecipients);
+            Collections.sort(recipients);
+        } else {
+            recipients = new ArrayList<>();
         }
 
-        showAddManualDialog(mSinglePaymentRecipients);
+        showAddManualDialog(recipients);
     }
 
     private void showAddManualDialog(ArrayList<ItemUserPicker> users) {

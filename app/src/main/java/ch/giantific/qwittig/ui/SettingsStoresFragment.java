@@ -66,12 +66,18 @@ public class SettingsStoresFragment extends Fragment {
     }
 
     private void setupStoreList() {
-        for (String store : mCurrentUser.getStoresFavorites()) {
-            mStoresFavorites.add(store);
+        List<String> storeFavorites = mCurrentUser.getStoresFavorites();
+        if (!storeFavorites.isEmpty()) {
+            for (String store : storeFavorites) {
+                mStoresFavorites.add(store);
+            }
         }
 
-        for (String store : mCurrentUser.getStoresAdded()) {
-            mStoresAdded.add(store);
+        List<String> storesAdded = mCurrentUser.getStoresAdded();
+        if (!storesAdded.isEmpty()) {
+            for (String store : storesAdded) {
+                mStoresAdded.add(store);
+            }
         }
     }
 

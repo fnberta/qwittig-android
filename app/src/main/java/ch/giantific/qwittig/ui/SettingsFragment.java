@@ -143,7 +143,7 @@ public class SettingsFragment extends PreferenceFragment {
      * method that handles correct display of default value and summary.
      */
     public void setupCurrentGroup() {
-        getCurrentUserGroupsList(); // get new values
+        setCurrentUserGroupsList(); // set new values
 
         // Define selected value from parse.com database
         String selectedValue = null;
@@ -162,22 +162,26 @@ public class SettingsFragment extends PreferenceFragment {
     /**
      * Gets the groups of the currentUser and puts them in arrays to be used in the settings.
      */
-    private void getCurrentUserGroupsList() {
+    private void setCurrentUserGroupsList() {
         List<ParseObject> groups = mCurrentUser.getGroups();
 
-        final List<String> groupsEntries = new ArrayList<>();
-        final List<String> groupsValues = new ArrayList<>();
-
         if (!groups.isEmpty()) {
+            int groupsSize = groups.size();
+            final List<String> groupsEntries = new ArrayList<>(groupsSize);
+            final List<String> groupsValues = new ArrayList<>(groupsSize);
+
             for (ParseObject parseObject : groups) {
                 Group group = (Group) parseObject;
                 groupsEntries.add(group.getName());
                 groupsValues.add(group.getObjectId());
             }
-        }
 
-        mCurrentUserGroupsEntries = groupsEntries.toArray(new CharSequence[groupsEntries.size()]);
-        mCurrentUserGroupsValues = groupsValues.toArray(new CharSequence[groupsValues.size()]);
+            mCurrentUserGroupsEntries = groupsEntries.toArray(new CharSequence[groupsSize]);
+            mCurrentUserGroupsValues = groupsValues.toArray(new CharSequence[groupsSize]);
+        } else {
+            mCurrentUserGroupsEntries = new CharSequence[0];
+            mCurrentUserGroupsValues = new CharSequence[0];
+        }
     }
 
     private void setupListPreference(final ListPreference pref, String selectedValue) {
