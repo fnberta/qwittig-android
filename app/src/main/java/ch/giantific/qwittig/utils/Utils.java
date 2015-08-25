@@ -73,6 +73,7 @@ public class Utils {
 
     /**
      * Returns a randomly chosen int between 0 and the max value given -1.
+     *
      * @param max Maximum value, excluded!
      * @return Random int between 0 and max -1
      */
@@ -85,13 +86,13 @@ public class Utils {
      * Returns the size in pixels of an attribute dimension
      *
      * @param context the context to get the resources from
-     * @param attr is the attribute dimension we want to know the size from
+     * @param attr    is the attribute dimension we want to know the size from
      * @return the size in pixels of an attribute dimension
      */
     public static int getThemeAttributeDimensionSize(Context context, int attr) {
         TypedArray typedArray = null;
         try {
-            typedArray = context.getTheme().obtainStyledAttributes(new int[] { attr });
+            typedArray = context.getTheme().obtainStyledAttributes(new int[]{attr});
             return typedArray.getDimensionPixelSize(0, 0);
         } finally {
             if (typedArray != null) {
@@ -168,6 +169,20 @@ public class Utils {
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        return activeNetwork != null &&  activeNetwork.isConnectedOrConnecting();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    }
+
+    public static int countTrue(boolean... values) {
+        int count = 0;
+        for (boolean value : values) {
+            if (value) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public static <T> T getLastInNonEmptyList(List<T> list) {
+        return list.get(list.size() - 1);
     }
 }

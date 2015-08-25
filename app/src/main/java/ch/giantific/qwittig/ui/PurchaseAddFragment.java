@@ -8,7 +8,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.google.common.primitives.Booleans;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
 
@@ -61,9 +60,10 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
 
     @Override
     protected void setupPurchaseUsersInvolved() {
-        mPurchaseUsersInvolved.clear();
-        for (ParseUser ignored : mUsersAvailableParse) {
-            mPurchaseUsersInvolved.add(true);
+        int usersAvailableParseSize = mUsersAvailableParse.size();
+        mPurchaseUsersInvolved = new boolean[usersAvailableParseSize];
+        for (int i = 0; i < usersAvailableParseSize; i++) {
+            mPurchaseUsersInvolved[i] = true;
         }
     }
 
@@ -83,7 +83,7 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
     private void setFirstRowItemUsersChecked() {
         ItemRow firstItemRow = mItemRows.get(0);
         if (mItemRows.size() == 1 && firstItemRow.getUsersChecked() == null) {
-            firstItemRow.setUsersChecked(Booleans.toArray(mPurchaseUsersInvolved));
+            firstItemRow.setUsersChecked(mPurchaseUsersInvolved);
         }
     }
 

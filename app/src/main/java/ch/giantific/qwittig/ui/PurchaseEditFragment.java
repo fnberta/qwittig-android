@@ -3,7 +3,6 @@ package ch.giantific.qwittig.ui;
 import android.app.FragmentManager;
 import android.os.Bundle;
 
-import com.google.common.primitives.Booleans;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
@@ -165,14 +164,13 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
 
     @Override
     protected void setupPurchaseUsersInvolved() {
-        mPurchaseUsersInvolved.clear();
         List<ParseUser> usersInvolved = mPurchase.getUsersInvolved();
-        for (ParseUser parseUser : mUsersAvailableParse) {
-            if (usersInvolved.contains(parseUser)) {
-                mPurchaseUsersInvolved.add(true);
-            } else {
-                mPurchaseUsersInvolved.add(false);
-            }
+
+        int usersAvailableParseSize = mUsersAvailableParse.size();
+        mPurchaseUsersInvolved = new boolean[usersAvailableParseSize];
+        for (int i = 0; i < usersAvailableParseSize; i++) {
+            ParseUser parseUser = mUsersAvailableParse.get(i);
+            mPurchaseUsersInvolved[i] = usersInvolved.contains(parseUser);
         }
     }
 
@@ -225,17 +223,15 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     }
 
     private boolean[] ParseUserToBoolean(List<ParseUser> usersInvolved) {
-        List<Boolean> usersInvolvedBoolean = new ArrayList<>(mUsersAvailableParse.size());
+        int usersAvailableParseSize = mUsersAvailableParse.size();
+        boolean[] usersInvolvedBoolean = new boolean[usersAvailableParseSize];
 
-        for (ParseUser parseUser : mUsersAvailableParse) {
-            if (usersInvolved.contains(parseUser)) {
-                usersInvolvedBoolean.add(true);
-            } else {
-                usersInvolvedBoolean.add(false);
-            }
+        for (int i = 0; i < usersAvailableParseSize; i++) {
+            ParseUser parseUser = mUsersAvailableParse.get(i);
+            usersInvolvedBoolean[i] = usersInvolved.contains(parseUser);
         }
 
-        return Booleans.toArray(usersInvolvedBoolean);
+        return usersInvolvedBoolean;
     }
 
     @Override

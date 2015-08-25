@@ -25,8 +25,6 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.google.common.collect.Iterables;
-import com.google.common.primitives.Booleans;
 import com.parse.ParseConfig;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -52,8 +50,8 @@ import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.helper.PurchaseSaveHelper;
 import ch.giantific.qwittig.helper.RatesHelper;
 import ch.giantific.qwittig.ui.adapter.PurchaseAddUsersInvolvedRecyclerAdapter;
-import ch.giantific.qwittig.ui.widgets.ListCheckBox;
 import ch.giantific.qwittig.ui.listeners.SwipeDismissTouchListener;
+import ch.giantific.qwittig.ui.widgets.ListCheckBox;
 import ch.giantific.qwittig.utils.ComparatorParseUserIgnoreCase;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
@@ -90,7 +88,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     List<ParseObject> mItems = new ArrayList<>();
     double mTotalPrice;
     List<ParseUser> mUsersAvailableParse = new ArrayList<>();
-    List<Boolean> mPurchaseUsersInvolved;
+    boolean[] mPurchaseUsersInvolved;
     Group mCurrentGroup;
     String mCurrencySelected;
     String mCurrentGroupCurrency;
@@ -115,8 +113,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     private RecyclerView mRecyclerViewUsersInvolved;
     private PurchaseAddUsersInvolvedRecyclerAdapter mRecyclerAdapter;
     private int mSelectedItemPosition;
-    private List<String> mUsersAvailable = new ArrayList<>();
-    private CharSequence[] mUsersAvailableArray;
+    private CharSequence[] mUsersAvailableNicknames;
 
     @Override
     public void onAttach(Activity activity) {
@@ -142,8 +139,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         if (savedInstanceState != null) {
             mItemRowCount = savedInstanceState.getInt(STATE_ROW_COUNT);
             mDateSelected = DateUtils.parseLongToDate(savedInstanceState.getLong(STATE_DATE_SELECTED));
-            boolean[] usersInvolved = savedInstanceState.getBooleanArray(STATE_PURCHASE_USERS_INVOLVED);
-            mPurchaseUsersInvolved = usersInvolved != null ? Booleans.asList(usersInvolved) : new ArrayList<Boolean>();
+            mPurchaseUsersInvolved = savedInstanceState.getBooleanArray(STATE_PURCHASE_USERS_INVOLVED);
             mCurrencySelected = savedInstanceState.getString(STATE_CURRENCY_SELECTED);
             mStoreSelected = savedInstanceState.getString(STATE_STORE_SELECTED);
             mIsSaving = savedInstanceState.getBoolean(STATE_IS_SAVING);
@@ -151,7 +147,6 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         } else {
             mItemRowCount = 1;
             mDateSelected = new Date();
-            mPurchaseUsersInvolved = new ArrayList<>();
             mCurrencySelected = mCurrentGroupCurrency;
         }
     }
@@ -163,8 +158,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         outState.putInt(STATE_ROW_COUNT, mItemRowCount);
         outState.putLong(STATE_DATE_SELECTED, DateUtils.parseDateToLong(mDateSelected));
         outState.putString(STATE_STORE_SELECTED, mStoreSelected);
-        outState.putBooleanArray(STATE_PURCHASE_USERS_INVOLVED,
-                Booleans.toArray(mPurchaseUsersInvolved));
+        outState.putBooleanArray(STATE_PURCHASE_USERS_INVOLVED, mPurchaseUsersInvolved);
         outState.putString(STATE_CURRENCY_SELECTED, mCurrencySelected);
         outState.putBoolean(STATE_IS_SAVING, mIsSaving);
         outState.putBoolean(STATE_IS_FETCHING_RATES, mIsFetchingExchangeRates);
@@ -233,8 +227,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         });
 
         mRecyclerAdapter = new PurchaseAddUsersInvolvedRecyclerAdapter(getActivity(),
-                R.layout.row_users_involved_list, mUsersAvailableParse, mPurchaseUsersInvolved,
-                this);
+                R.layout.row_users_involved_list, mUsersAvailableParse, this);
         mRecyclerViewUsersInvolved.setLayoutManager(new LinearLayoutManager(getActivity(),
                 LinearLayoutManager.HORIZONTAL, false));
         mRecyclerViewUsersInvolved.setHasFixedSize(true);
@@ -360,6 +353,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
 
     /**
      * Called from activity when user set a manual exchange rate in the dialog
+     *
      * @param exchangeRate
      */
     public void setExchangeRateManual(float exchangeRate) {
@@ -485,15 +479,16 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
             }
         });
 
-        final ListCheckBox cbEnabled = (ListCheckBox) itemRowView.findViewById(R.id.cb_item_enabled);
+        ListCheckBox cbEnabled = (ListCheckBox) itemRowView.findViewById(R.id.cb_item_enabled);
         cbEnabled.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ListCheckBox cb = (ListCheckBox) v;
                 mSelectedItemPosition = Utils.getViewPositionFromTag(v);
 
                 int buyerPosition = mUsersAvailableParse.indexOf(ParseUser.getCurrentUser());
-                cbEnabled.updateUsersCheckedAfterCheckedChange(buyerPosition, mPurchaseUsersInvolved);
-                cbEnabled.setCheckBoxColor(mPurchaseUsersInvolved);
+                cb.updateUsersCheckedAfterCheckedChange(buyerPosition, mPurchaseUsersInvolved);
+                cb.setCheckBoxColor(mPurchaseUsersInvolved);
                 updatePurchaseUsersInvolved();
                 updateTotalAndMyShareValues();
             }
@@ -501,10 +496,11 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         cbEnabled.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+                ListCheckBox cb = (ListCheckBox) v;
                 mSelectedItemPosition = Utils.getViewPositionFromTag(v);
 
-                boolean[] usersChecked = cbEnabled.getUsersChecked();
-                mListener.showUserPickerDialog(mUsersAvailableArray, usersChecked);
+                boolean[] usersChecked = cb.getUsersChecked();
+                mListener.showUserPickerDialog(mUsersAvailableNicknames, usersChecked);
 
                 return true;
             }
@@ -515,7 +511,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         // a default value for the first row when the user lists are ready. On recreation,
         // mItemsUsersChecked will already be filled with values, hence no new values will be added
         // (size() will be bigger than idCounter)
-        if (cbEnabled.getUsersChecked() == null && !mPurchaseUsersInvolved.isEmpty()) {
+        if (cbEnabled.getUsersChecked() == null && mPurchaseUsersInvolved != null) {
             int buyerPosition = mUsersAvailableParse.indexOf(ParseUser.getCurrentUser());
             cbEnabled.updateUsersCheckedAfterCheckedChange(buyerPosition, mPurchaseUsersInvolved);
         }
@@ -578,7 +574,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
             // update my share
             boolean[] itemUsersChecked = itemRow.getUsersChecked();
             List<ParseUser> usersChecked =
-                    getParseUsersInvolvedFromBoolean(Booleans.asList(itemUsersChecked));
+                    getParseUsersInvolvedFromBoolean(itemUsersChecked);
             if (usersChecked.contains(mCurrentUser)) {
                 BigDecimal usersCount = new BigDecimal(usersChecked.size());
                 myShare = myShare.add(finalPrice.divide(usersCount,
@@ -600,7 +596,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         for (ItemRow itemRow : mItemRows) {
             itemRow.setPriceImeOptions(EditorInfo.IME_ACTION_NEXT);
         }
-        ItemRow lastItemRow = Iterables.getLast(mItemRows);
+        ItemRow lastItemRow = Utils.getLastInNonEmptyList(mItemRows);
         lastItemRow.setPriceImeOptions(EditorInfo.IME_ACTION_DONE);
     }
 
@@ -622,9 +618,11 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     void setupUserLists(List<ParseUser> users) {
         List<ParseUser> usersSorted = sortUserList(users);
         setupUsersAvailable(usersSorted);
-        if (mPurchaseUsersInvolved.isEmpty()) {
+        if (mPurchaseUsersInvolved == null) {
             setupPurchaseUsersInvolved();
         }
+        mRecyclerAdapter.setUsersInvolved(mPurchaseUsersInvolved);
+        mRecyclerAdapter.notifyDataSetChanged();
     }
 
     private List<ParseUser> sortUserList(List<ParseUser> users) {
@@ -637,16 +635,14 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
 
     private void setupUsersAvailable(List<ParseUser> users) {
         // list with user names and list with ParseUser objects
-        mUsersAvailable.clear();
         mUsersAvailableParse.clear();
-        for (ParseUser user : users) {
-            mUsersAvailable.add(((User) user).getNicknameOrMe(getActivity()));
+        int usersSize = users.size();
+        mUsersAvailableNicknames = new CharSequence[usersSize];
+        for (int i = 0; i < usersSize; i++) {
+            User user = (User) users.get(i);
             mUsersAvailableParse.add(user);
+            mUsersAvailableNicknames[i] = user.getNicknameOrMe(getActivity());
         }
-        mRecyclerAdapter.notifyDataSetChanged();
-
-        mUsersAvailableArray = mUsersAvailable.toArray(
-                new CharSequence[mUsersAvailable.size()]);
     }
 
     /**
@@ -663,16 +659,16 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      */
     @Override
     public void onPurchaseUserClick(int position) {
-        if (mPurchaseUsersInvolved.get(position)) {
+        if (mPurchaseUsersInvolved[position]) {
             if (!userIsLastOneChecked()) {
-                mPurchaseUsersInvolved.set(position, false);
+                mPurchaseUsersInvolved[position] = false;
                 updateItemsUsersChecked(position, false);
                 mRecyclerAdapter.notifyItemChanged(position);
             } else {
                 selectMinOneUser();
             }
         } else {
-            mPurchaseUsersInvolved.set(position, true);
+            mPurchaseUsersInvolved[position] = true;
             updateItemsUsersChecked(position, true);
             mRecyclerAdapter.notifyItemChanged(position);
         }
@@ -694,7 +690,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      * @return whether a clicked checked user is the only one checked
      */
     private boolean userIsLastOneChecked() {
-        int countUsersChecked = Booleans.countTrue(Booleans.toArray(mPurchaseUsersInvolved));
+        int countUsersChecked = Utils.countTrue(mPurchaseUsersInvolved);
 
         return countUsersChecked < 2;
     }
@@ -714,17 +710,16 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         for (Integer i : usersInvolvedInt) {
             usersInvolved.add(mUsersAvailableParse.get(i));
         }
-        List<Boolean> usersChecked = new ArrayList<>(mUsersAvailableParse.size());
-        for (ParseUser parseUser : mUsersAvailableParse) {
-            if (usersInvolved.contains(parseUser)) {
-                usersChecked.add(true);
-            } else {
-                usersChecked.add(false);
-            }
+
+        int usersAvailableParseSize = mUsersAvailableParse.size();
+        boolean[] usersChecked = new boolean[usersAvailableParseSize];
+        for (int i = 0; i < usersAvailableParseSize; i++) {
+            ParseUser parseUser = mUsersAvailableParse.get(i);
+            usersChecked[i] = usersInvolved.contains(parseUser);
         }
 
         ItemRow itemRow = mItemRows.get(mSelectedItemPosition);
-        itemRow.setUsersChecked(Booleans.toArray(usersChecked));
+        itemRow.setUsersChecked(usersChecked);
         itemRow.updateCheckedStatus(mUsersAvailableParse.indexOf(ParseUser.getCurrentUser()));
 
         updatePurchaseUsersInvolved();
@@ -753,11 +748,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         }
 
         for (int i = 0, usersInvolvedLength = usersInvolved.length; i < usersInvolvedLength; i++) {
-            if (usersInvolved[i]) {
-                mPurchaseUsersInvolved.set(i, true);
-            } else {
-                mPurchaseUsersInvolved.set(i, false);
-            }
+            mPurchaseUsersInvolved[i] = usersInvolved[i];
             mRecyclerAdapter.notifyItemChanged(i);
         }
 
@@ -898,7 +889,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
 
                 // get usersInvolved for the item
                 boolean[] usersChecked = itemRow.getUsersChecked();
-                List<ParseUser> usersInvolved = getParseUsersInvolvedFromBoolean(Booleans.asList(usersChecked));
+                List<ParseUser> usersInvolved = getParseUsersInvolvedFromBoolean(usersChecked);
 
                 // create new Item object and add to list
                 Item item = new Item(itemRow.getName(), itemRow.getPrice(), usersInvolved);
@@ -1001,12 +992,12 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      * @param usersInvolvedBoolean
      * @return List with ParseUser objects
      */
-    final List<ParseUser> getParseUsersInvolvedFromBoolean(List<Boolean> usersInvolvedBoolean) {
+    final List<ParseUser> getParseUsersInvolvedFromBoolean(boolean[] usersInvolvedBoolean) {
         final List<ParseUser> usersInvolved = new ArrayList<>();
         for (int i = 0, mUsersAvailableParseSize = mUsersAvailableParse.size();
              i < mUsersAvailableParseSize; i++) {
             ParseUser parseUser = mUsersAvailableParse.get(i);
-            if (usersInvolvedBoolean.get(i)) {
+            if (usersInvolvedBoolean[i]) {
                 usersInvolved.add(parseUser);
             }
         }

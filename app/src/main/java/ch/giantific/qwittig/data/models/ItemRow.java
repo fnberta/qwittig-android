@@ -114,7 +114,7 @@ public class ItemRow {
         mCheckBoxEnabled.updateCheckedStatus(buyerPosition);
     }
 
-    public void setCheckBoxColor(List<Boolean> purchaseUsersInvolved) {
+    public void setCheckBoxColor(boolean[] purchaseUsersInvolved) {
         mCheckBoxEnabled.setCheckBoxColor(purchaseUsersInvolved);
     }
 

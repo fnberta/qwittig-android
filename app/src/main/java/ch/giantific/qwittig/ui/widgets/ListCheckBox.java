@@ -10,9 +10,7 @@ import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.widget.CheckBox;
 
-import com.google.common.primitives.Booleans;
-
-import java.util.List;
+import java.util.Arrays;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.utils.Utils;
@@ -58,20 +56,20 @@ public class ListCheckBox extends CheckBox {
      * @param purchaseUsersInvolved list with purchase wide usersInvolved
      */
     public void updateUsersCheckedAfterCheckedChange(int buyerPosition,
-                                                     List<Boolean> purchaseUsersInvolved) {
+                                                     boolean[] purchaseUsersInvolved) {
         if (isChecked()) {
             boolean onlyBuyerIsChecked = true;
-            for (int i = 0, mPurchaseUsersInvolvedSize = purchaseUsersInvolved.size();
-                 i < mPurchaseUsersInvolvedSize; i++) {
-                if (purchaseUsersInvolved.get(i) && i != buyerPosition) {
+            int purchaseUsersInvolvedSize = purchaseUsersInvolved.length;
+            for (int i = 0; i < purchaseUsersInvolvedSize; i++) {
+                if (purchaseUsersInvolved[i] && i != buyerPosition) {
                     onlyBuyerIsChecked = false;
                 }
             }
 
             if (onlyBuyerIsChecked) {
-                checkAllUsers(purchaseUsersInvolved.size());
+                checkAllUsers(purchaseUsersInvolvedSize);
             } else {
-                setUsersChecked(Booleans.toArray(purchaseUsersInvolved));
+                setUsersChecked(purchaseUsersInvolved);
             }
         } else {
             unCheckAllUsersExceptBuyer(buyerPosition);
@@ -152,11 +150,11 @@ public class ListCheckBox extends CheckBox {
      * usersInvolved. If yes, set color to normal, if no set it to special.
      * If checkbox is unchecked, set it to normal in any case.
      */
-    public void setCheckBoxColor(List<Boolean> purchaseUsersInvolved) {
-        List<Boolean> usersChecked = Booleans.asList(getUsersChecked());
+    public void setCheckBoxColor(boolean[] purchaseUsersInvolved) {
+        boolean[] usersChecked = getUsersChecked();
         boolean isSpecial = false;
 
-        if (isChecked() && !usersChecked.equals(purchaseUsersInvolved)) {
+        if (isChecked() && !Arrays.equals(usersChecked, purchaseUsersInvolved)) {
             isSpecial = true;
         }
 

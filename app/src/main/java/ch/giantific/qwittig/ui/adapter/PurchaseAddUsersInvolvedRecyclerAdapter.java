@@ -24,19 +24,17 @@ public class PurchaseAddUsersInvolvedRecyclerAdapter extends
     private Context mContext;
     private int mViewResource;
     private List<ParseUser> mUsersAvailable;
-    private List<Boolean> mUsersInvolved;
+    private boolean[] mUsersInvolved;
     private AdapterInteractionListener mListener;
 
     public PurchaseAddUsersInvolvedRecyclerAdapter(Context context, int viewResource,
                                                    List<ParseUser> usersAvailable,
-                                                   List<Boolean> usersInvolved,
                                                    AdapterInteractionListener listener) {
         super();
 
         mContext = context;
         mViewResource = viewResource;
         mUsersAvailable = usersAvailable;
-        mUsersInvolved = usersInvolved;
         mListener = listener;
     }
 
@@ -48,8 +46,11 @@ public class PurchaseAddUsersInvolvedRecyclerAdapter extends
     }
 
     @Override
-    public void onBindViewHolder(UserInvolvedRow viewHolder,
-                                 int position) {
+    public void onBindViewHolder(UserInvolvedRow viewHolder, int position) {
+        if (mUsersInvolved == null) {
+            return;
+        }
+
         User user = (User) mUsersAvailable.get(position);
 
         viewHolder.setName(user.getNicknameOrMe(mContext));
@@ -57,12 +58,16 @@ public class PurchaseAddUsersInvolvedRecyclerAdapter extends
         byte[] avatarByteArray = user.getAvatar();
         viewHolder.setAvatar(avatarByteArray, true);
 
-        viewHolder.setAlpha(!mUsersInvolved.get(position) ? DISABLED_ALPHA : 1f);
+        viewHolder.setAlpha(!mUsersInvolved[position] ? DISABLED_ALPHA : 1f);
     }
 
     @Override
     public int getItemCount() {
         return mUsersAvailable.size();
+    }
+
+    public void setUsersInvolved(boolean[] usersInvolved) {
+        mUsersInvolved = usersInvolved;
     }
 
     public interface AdapterInteractionListener {
