@@ -51,7 +51,7 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
     private static final String BUNDLE_AUTO_START_NEW = "auto_start_new";
     private static final String STATE_COMPENSATIONS_LOADING = "state_comps_loading";
     private static final String STATE_IS_CALCULATING_NEW = "state_is_calculating_new";
-    private static final String COMPENSATION_SAVE_HELPER = "compensation_save_helper";
+    private static final String COMPENSATION_SAVE_HELPER = "compensation_save_helper_";
     private static final String LOG_TAG = CompensationsUnpaidFragment.class.getSimpleName();
     private TextView mTextViewEmptyTitle;
     private TextView mTextViewEmptySubtitle;
@@ -382,7 +382,9 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
 
     private void saveCompensationWithHelper(ParseObject compensation) {
         FragmentManager fragmentManager = getFragmentManager();
-        CompensationSaveHelper saveHelper = findCompensationSaveHelper(fragmentManager);
+        String compensationId = compensation.getObjectId();
+        CompensationSaveHelper saveHelper = findCompensationSaveHelper(fragmentManager,
+                compensationId);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -390,13 +392,15 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
             saveHelper = new CompensationSaveHelper(compensation);
 
             fragmentManager.beginTransaction()
-                    .add(saveHelper, COMPENSATION_SAVE_HELPER)
+                    .add(saveHelper, COMPENSATION_SAVE_HELPER + compensationId)
                     .commit();
         }
     }
 
-    private CompensationSaveHelper findCompensationSaveHelper(FragmentManager fragmentManager) {
-        return (CompensationSaveHelper) fragmentManager.findFragmentByTag(COMPENSATION_SAVE_HELPER);
+    private CompensationSaveHelper findCompensationSaveHelper(FragmentManager fragmentManager,
+                                                              String compensationId) {
+        return (CompensationSaveHelper) fragmentManager.findFragmentByTag(
+                COMPENSATION_SAVE_HELPER + compensationId);
     }
 
     /**
@@ -404,7 +408,7 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
      * @param compensation
      */
     public void onCompensationSaved(ParseObject compensation) {
-        removeCompensationSaveHelper();
+        removeCompensationSaveHelper(compensation.getObjectId());
 
         // position might have changed
         int compPosition = mCompensations.indexOf(compensation);
@@ -420,16 +424,17 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
     public void onCompensationSaveFailed(ParseObject compensation, ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         MessageUtils.showBasicSnackbar(mFabNew, ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeCompensationSaveHelper();
+        removeCompensationSaveHelper(compensation.getObjectId());
 
         // position might have changed
         int compPosition = mCompensations.indexOf(compensation);
         setCompensationLoading(compensation, compensation.getObjectId(), compPosition, false);
     }
 
-    private void removeCompensationSaveHelper() {
+    private void removeCompensationSaveHelper(String compensationId) {
         FragmentManager fragmentManager = getFragmentManager();
-        CompensationSaveHelper compensationSaveHelper = findCompensationSaveHelper(fragmentManager);
+        CompensationSaveHelper compensationSaveHelper = findCompensationSaveHelper(fragmentManager,
+                compensationId);
 
         if (compensationSaveHelper != null) {
             fragmentManager.beginTransaction().remove(compensationSaveHelper).commitAllowingStateLoss();
