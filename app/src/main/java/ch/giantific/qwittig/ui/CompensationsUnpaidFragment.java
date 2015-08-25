@@ -408,12 +408,13 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
      * @param compensation
      */
     public void onCompensationSaved(ParseObject compensation) {
-        removeCompensationSaveHelper(compensation.getObjectId());
+        String compensationId = compensation.getObjectId();
+        removeCompensationSaveHelper(compensationId);
 
         // position might have changed
         int compPosition = mCompensations.indexOf(compensation);
         removeItemFromList(compPosition);
-        mLoadingCompensations.remove(compensation.getObjectId());
+        mLoadingCompensations.remove(compensationId);
     }
 
     /**
@@ -424,11 +425,12 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
     public void onCompensationSaveFailed(ParseObject compensation, ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         MessageUtils.showBasicSnackbar(mFabNew, ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeCompensationSaveHelper(compensation.getObjectId());
+        String compensationId = compensation.getObjectId();
+        removeCompensationSaveHelper(compensationId);
 
         // position might have changed
         int compPosition = mCompensations.indexOf(compensation);
-        setCompensationLoading(compensation, compensation.getObjectId(), compPosition, false);
+        setCompensationLoading(compensation, compensationId, compPosition, false);
     }
 
     private void removeCompensationSaveHelper(String compensationId) {
