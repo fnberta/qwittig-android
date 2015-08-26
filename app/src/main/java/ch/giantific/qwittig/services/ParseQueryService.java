@@ -130,6 +130,8 @@ public class ParseQueryService extends IntentService {
                 } catch (ParseException e) {
                     return;
                 }
+
+                break;
             }
             case ACTION_QUERY_OBJECT: {
                 final String className = intent.getStringExtra(EXTRA_OBJECT_CLASS);
@@ -140,34 +142,27 @@ public class ParseQueryService extends IntentService {
                 } catch (ParseException e) {
                     return;
                 }
+
                 break;
             }
             case ACTION_QUERY_USERS: {
                 try {
                     queryUsers();
-                    sendLocalBroadcast(DATA_TYPE_USER);
                 } catch (ParseException ignored) {
                     return;
                 }
+
+                break;
             }
             case ACTION_QUERY_ALL: {
                 try {
                     queryUsers();
-                } catch (ParseException e) {
-                    return;
-                }
-
-                try {
                     queryPurchases();
-                } catch (ParseException e) {
-                    return;
-                }
-
-                try {
                     queryCompensations();
                 } catch (ParseException e) {
                     return;
                 }
+
                 break;
             }
         }
@@ -297,11 +292,12 @@ public class ParseQueryService extends IntentService {
         }
 
         queryCompensationsUnpaid(groups);
+        sendLocalBroadcastCompensation(false);
+
         for (ParseObject group : groups) {
             queryCompensationsPaid(group);
         }
-
-        sendLocalBroadcast(DATA_TYPE_COMPENSATION);
+        sendLocalBroadcastCompensation(true);
     }
 
     private void queryCompensationsUnpaid(List<ParseObject> groups) throws ParseException {
