@@ -17,7 +17,7 @@ public class StatsActivity extends BaseNavDrawerActivity implements
         StatsHelper.HelperInteractionListener {
 
     private static final String LOG_TAG = StatsActivity.class.getSimpleName();
-    private static final String STATS_COSTS_FRAGMENT = "stats_costs_fragment";
+    private static final String STATS_SPENDING_FRAGMENT = "stats_costs_fragment";
     private static final String STATS_STORES_FRAGMENT = "stats_stores_fragment";
     private static final String STATS_CURRENCIES_FRAGMENT = "stats_currencies_fragment";
 
@@ -39,7 +39,7 @@ public class StatsActivity extends BaseNavDrawerActivity implements
             } else {
                 FragmentManager fragmentManager = getFragmentManager();
                 mStatsSpendingFragment = (StatsSpendingFragment) fragmentManager
-                        .getFragment(savedInstanceState, STATS_COSTS_FRAGMENT);
+                        .getFragment(savedInstanceState, STATS_SPENDING_FRAGMENT);
                 mStatsStoresFragment = (StatsStoresFragment) fragmentManager
                         .getFragment(savedInstanceState, STATS_STORES_FRAGMENT);
                 mStatsCurrenciesFragment = (StatsCurrenciesFragment) fragmentManager
@@ -64,9 +64,20 @@ public class StatsActivity extends BaseNavDrawerActivity implements
         tabsAdapter.addFragment(mStatsStoresFragment, getString(R.string.tab_stats_stores));
         tabsAdapter.addFragment(mStatsCurrenciesFragment, getString(R.string.tab_stats_currencies));
         viewPager.setAdapter(tabsAdapter);
+        // we want to keep all 3 tabs in memory, TODO: check if consumes too much memory?
+        viewPager.setOffscreenPageLimit(2);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        getFragmentManager().putFragment(outState, STATS_SPENDING_FRAGMENT, mStatsSpendingFragment);
+        getFragmentManager().putFragment(outState, STATS_STORES_FRAGMENT, mStatsStoresFragment);
+        getFragmentManager().putFragment(outState, STATS_CURRENCIES_FRAGMENT, mStatsCurrenciesFragment);
     }
 
     @Override
@@ -108,14 +119,8 @@ public class StatsActivity extends BaseNavDrawerActivity implements
 
     @Override
     protected void onNewGroupSet() {
-        if (mStatsSpendingFragment.isAdded()) {
-            mStatsSpendingFragment.updateData();
-        }
-        if (mStatsStoresFragment.isAdded()) {
-            mStatsStoresFragment.updateData();
-        }
-        if (mStatsCurrenciesFragment.isAdded()) {
-            mStatsCurrenciesFragment.updateData();
-        }
+        mStatsSpendingFragment.updateData();
+        mStatsStoresFragment.updateData();
+        mStatsCurrenciesFragment.updateData();
     }
 }
