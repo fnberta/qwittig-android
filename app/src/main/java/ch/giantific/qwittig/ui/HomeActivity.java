@@ -155,15 +155,12 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        // Check if fragments are added because they might not be when LoginActivity is started in
-        // HomeActivity.
-        if (mHomePurchasesFragment != null && mHomePurchasesFragment.isAdded()) {
-            getFragmentManager().putFragment(outState, PURCHASE_FRAGMENT, mHomePurchasesFragment);
+        // If user is logged in, fragments will be added, hence save them
+        if (mUserIsLoggedIn) {
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.putFragment(outState, PURCHASE_FRAGMENT, mHomePurchasesFragment);
+            fragmentManager.putFragment(outState, USER_FRAGMENT, mHomeUsersFragment);
         }
-        if (mHomeUsersFragment != null && mHomeUsersFragment.isAdded()) {
-            getFragmentManager().putFragment(outState, USER_FRAGMENT, mHomeUsersFragment);
-        }
-
     }
 
     @Override

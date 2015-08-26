@@ -567,6 +567,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
 
     @CallSuper
     void afterLoginSetup() {
+        mUserIsLoggedIn = true;
         updateCurrentUserGroups();
 
         // subclasses are free to add stuff here

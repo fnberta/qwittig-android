@@ -75,9 +75,12 @@ public class StatsActivity extends BaseNavDrawerActivity implements
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        getFragmentManager().putFragment(outState, STATS_SPENDING_FRAGMENT, mStatsSpendingFragment);
-        getFragmentManager().putFragment(outState, STATS_STORES_FRAGMENT, mStatsStoresFragment);
-        getFragmentManager().putFragment(outState, STATS_CURRENCIES_FRAGMENT, mStatsCurrenciesFragment);
+        if (mUserIsLoggedIn) {
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.putFragment(outState, STATS_SPENDING_FRAGMENT, mStatsSpendingFragment);
+            fragmentManager.putFragment(outState, STATS_STORES_FRAGMENT, mStatsStoresFragment);
+            fragmentManager.putFragment(outState, STATS_CURRENCIES_FRAGMENT, mStatsCurrenciesFragment);
+        }
     }
 
     @Override

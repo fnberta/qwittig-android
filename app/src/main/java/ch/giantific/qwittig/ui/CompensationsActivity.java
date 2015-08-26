@@ -61,15 +61,15 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
     public static final String INTENT_AUTO_START_NEW = "intent_auto_start_new";
     private static final String COMPENSATIONS_UNPAID_FRAGMENT = "compensations_unpaid_fragment";
     private static final String COMPENSATIONS_PAID_FRAGMENT = "compensations_paid_fragment";
+
     @IntDef({FRAGMENT_ADAPTER_BOTH, FRAGMENT_ADAPTER_UNPAID, FRAGMENT_ADAPTER_PAID})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface AdapterType {}
+    public @interface AdapterType {
+    }
     private static final int FRAGMENT_ADAPTER_BOTH = 0;
     private static final int FRAGMENT_ADAPTER_UNPAID = 1;
     private static final int FRAGMENT_ADAPTER_PAID = 2;
-
     private static final String LOG_TAG = CompensationsActivity.class.getSimpleName();
-
     private CompensationsUnpaidFragment mCompensationsUnpaidFragment;
     private CompensationsPaidFragment mCompensationsPaidFragment;
     private String mCurrentGroupCurrency;
@@ -115,6 +115,20 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // save fragments in saveInstanceBundle if user is logged in
+        if (mUserIsLoggedIn) {
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.putFragment(outState, COMPENSATIONS_UNPAID_FRAGMENT,
+                    mCompensationsUnpaidFragment);
+            fragmentManager.putFragment(outState, COMPENSATIONS_PAID_FRAGMENT,
+                    mCompensationsPaidFragment);
+        }
     }
 
     @Override
@@ -396,21 +410,6 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
     @Override
     protected void onNewGroupSet() {
         updateFragmentAdapter(FRAGMENT_ADAPTER_BOTH);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        // save fragments in saveInstanceBundle if they are added
-        if (mCompensationsUnpaidFragment != null && mCompensationsUnpaidFragment.isAdded()) {
-            getFragmentManager().putFragment(outState, COMPENSATIONS_UNPAID_FRAGMENT,
-                    mCompensationsUnpaidFragment);
-        }
-        if (mCompensationsPaidFragment != null && mCompensationsPaidFragment.isAdded()) {
-            getFragmentManager().putFragment(outState, COMPENSATIONS_PAID_FRAGMENT,
-                    mCompensationsPaidFragment);
-        }
     }
 
     @Override
