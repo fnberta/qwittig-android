@@ -15,7 +15,7 @@ import com.github.mikephil.charting.utils.PercentFormatter;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.stats.models.Stats;
-import ch.giantific.qwittig.helper.StatsHelper;
+import ch.giantific.qwittig.helpers.StatsHelper;
 import ch.giantific.qwittig.utils.CurrencyFormatter;
 
 /**

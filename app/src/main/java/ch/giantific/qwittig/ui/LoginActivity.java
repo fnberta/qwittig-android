@@ -39,7 +39,7 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.Avatar;
 import ch.giantific.qwittig.data.parse.models.Installation;
 import ch.giantific.qwittig.data.parse.models.User;
-import ch.giantific.qwittig.helper.LoginHelper;
+import ch.giantific.qwittig.helpers.LoginHelper;
 import ch.giantific.qwittig.ui.dialogs.ResetPasswordDialogFragment;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;

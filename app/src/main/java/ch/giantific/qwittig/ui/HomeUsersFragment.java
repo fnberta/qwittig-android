@@ -14,7 +14,7 @@ import java.util.List;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.constants.AppConstants;
 import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.ui.adapter.UsersRecyclerAdapter;
+import ch.giantific.qwittig.ui.adapters.UsersRecyclerAdapter;
 import ch.giantific.qwittig.utils.ComparatorParseUserIgnoreCase;
 import ch.giantific.qwittig.utils.ParseUtils;
 

@@ -16,7 +16,7 @@ import java.util.List;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.ItemRow;
 import ch.giantific.qwittig.data.parse.models.Purchase;
-import ch.giantific.qwittig.helper.PurchaseSaveHelper;
+import ch.giantific.qwittig.helpers.PurchaseSaveHelper;
 import ch.giantific.qwittig.utils.MessageUtils;
 
 

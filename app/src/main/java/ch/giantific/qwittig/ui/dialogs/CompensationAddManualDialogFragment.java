@@ -17,7 +17,7 @@ import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.ItemUserPicker;
-import ch.giantific.qwittig.ui.adapter.RecipientsArrayAdapter;
+import ch.giantific.qwittig.ui.adapters.RecipientsArrayAdapter;
 
 /**
  * Created by fabio on 20.11.14.

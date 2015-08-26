@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.HelpItem;
-import ch.giantific.qwittig.ui.adapter.HelpFeedbackRecyclerAdapter;
+import ch.giantific.qwittig.ui.adapters.HelpFeedbackRecyclerAdapter;
 
 /**
  * A placeholder fragment containing a simple view.

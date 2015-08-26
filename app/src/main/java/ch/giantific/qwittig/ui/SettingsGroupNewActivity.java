@@ -16,7 +16,7 @@ import com.parse.ParseException;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.parse.models.Group;
-import ch.giantific.qwittig.helper.CreateGroupHelper;
+import ch.giantific.qwittig.helpers.CreateGroupHelper;
 import ch.giantific.qwittig.ui.listeners.TransitionListenerAdapter;
 import ch.giantific.qwittig.utils.Utils;
 

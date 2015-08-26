@@ -42,7 +42,7 @@ import ch.giantific.qwittig.data.parse.models.Config;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.services.ParseQueryService;
-import ch.giantific.qwittig.ui.adapter.NavHeaderGroupsArrayAdapter;
+import ch.giantific.qwittig.ui.adapters.NavHeaderGroupsArrayAdapter;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.inappbilling.IabHelper;
 import ch.giantific.qwittig.utils.inappbilling.IabKey;

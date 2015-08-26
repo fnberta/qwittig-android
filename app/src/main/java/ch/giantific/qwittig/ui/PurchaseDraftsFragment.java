@@ -32,7 +32,7 @@ import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.data.parse.models.User;
-import ch.giantific.qwittig.ui.adapter.DraftsAdapter;
+import ch.giantific.qwittig.ui.adapters.DraftsAdapter;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 

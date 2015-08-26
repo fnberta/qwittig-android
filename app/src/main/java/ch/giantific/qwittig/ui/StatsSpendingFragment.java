@@ -21,7 +21,7 @@ import java.util.List;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.data.stats.models.Stats;
-import ch.giantific.qwittig.helper.StatsHelper;
+import ch.giantific.qwittig.helpers.StatsHelper;
 import ch.giantific.qwittig.ui.widgets.BarChart;
 import ch.giantific.qwittig.utils.CurrencyFormatter;
 import ch.giantific.qwittig.utils.DateUtils;

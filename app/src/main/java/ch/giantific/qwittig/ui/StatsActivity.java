@@ -9,8 +9,8 @@ import com.parse.ParseException;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.stats.models.Stats;
-import ch.giantific.qwittig.helper.StatsHelper;
-import ch.giantific.qwittig.ui.adapter.TabsAdapter;
+import ch.giantific.qwittig.helpers.StatsHelper;
+import ch.giantific.qwittig.ui.adapters.TabsAdapter;
 
 public class StatsActivity extends BaseNavDrawerActivity implements
         StatsBaseFragment.FragmentInteractionListener,

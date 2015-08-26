@@ -16,7 +16,7 @@ import ch.giantific.qwittig.data.models.ItemRow;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Item;
 import ch.giantific.qwittig.data.parse.models.Purchase;
-import ch.giantific.qwittig.helper.PurchaseEditSaveHelper;
+import ch.giantific.qwittig.helpers.PurchaseEditSaveHelper;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 

@@ -12,7 +12,7 @@ import android.view.MenuItem;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.ocr.models.PurchaseRest;
-import ch.giantific.qwittig.helper.OcrHelper;
+import ch.giantific.qwittig.helpers.OcrHelper;
 import ch.giantific.qwittig.ui.dialogs.PurchaseDiscardDialogFragment;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.Utils;

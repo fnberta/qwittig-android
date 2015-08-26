@@ -24,7 +24,7 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.Currency;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.User;
-import ch.giantific.qwittig.helper.CreateGroupHelper;
+import ch.giantific.qwittig.helpers.CreateGroupHelper;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;

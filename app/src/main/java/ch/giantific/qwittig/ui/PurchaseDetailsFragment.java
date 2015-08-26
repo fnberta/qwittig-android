@@ -23,7 +23,7 @@ import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.data.parse.models.User;
-import ch.giantific.qwittig.ui.adapter.PurchaseDetailsRecyclerAdapter;
+import ch.giantific.qwittig.ui.adapters.PurchaseDetailsRecyclerAdapter;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;

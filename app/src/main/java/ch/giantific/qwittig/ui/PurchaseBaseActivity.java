@@ -46,8 +46,8 @@ import java.util.Map;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.Receipt;
-import ch.giantific.qwittig.helper.PurchaseSaveHelper;
-import ch.giantific.qwittig.helper.RatesHelper;
+import ch.giantific.qwittig.helpers.PurchaseSaveHelper;
+import ch.giantific.qwittig.helpers.RatesHelper;
 import ch.giantific.qwittig.ui.dialogs.AccountCreateDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.DatePickerDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.ManualExchangeRateDialogFragment;

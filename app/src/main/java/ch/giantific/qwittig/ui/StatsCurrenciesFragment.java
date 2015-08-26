@@ -13,7 +13,7 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.utils.PercentFormatter;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.helper.StatsHelper;
+import ch.giantific.qwittig.helpers.StatsHelper;
 
 /**
  * A simple {@link Fragment} subclass.
