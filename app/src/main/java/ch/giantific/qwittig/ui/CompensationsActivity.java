@@ -403,10 +403,11 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
         super.onSaveInstanceState(outState);
 
         // save fragments in saveInstanceBundle if they are added
-        if (mCompensationsUnpaidFragment != null && mCompensationsUnpaidFragment.isAdded() &&
-                mCompensationsPaidFragment != null && mCompensationsPaidFragment.isAdded()) {
+        if (mCompensationsUnpaidFragment != null && mCompensationsUnpaidFragment.isAdded()) {
             getFragmentManager().putFragment(outState, COMPENSATIONS_UNPAID_FRAGMENT,
                     mCompensationsUnpaidFragment);
+        }
+        if (mCompensationsPaidFragment != null && mCompensationsPaidFragment.isAdded()) {
             getFragmentManager().putFragment(outState, COMPENSATIONS_PAID_FRAGMENT,
                     mCompensationsPaidFragment);
         }

@@ -157,11 +157,13 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
         // Check if fragments are added because they might not be when LoginActivity is started in
         // HomeActivity.
-        if (mHomePurchasesFragment != null && mHomePurchasesFragment.isAdded() &&
-                mHomeUsersFragment != null && mHomeUsersFragment.isAdded()) {
+        if (mHomePurchasesFragment != null && mHomePurchasesFragment.isAdded()) {
             getFragmentManager().putFragment(outState, PURCHASE_FRAGMENT, mHomePurchasesFragment);
+        }
+        if (mHomeUsersFragment != null && mHomeUsersFragment.isAdded()) {
             getFragmentManager().putFragment(outState, USER_FRAGMENT, mHomeUsersFragment);
         }
+
     }
 
     @Override
