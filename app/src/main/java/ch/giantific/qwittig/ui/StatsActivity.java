@@ -126,7 +126,8 @@ public class StatsActivity extends BaseNavDrawerActivity implements
 
     /**
      * Adds itemSelectedListeners for spinners with a Runnable. The reason being that they should
-     * not  fire when the spinners are laid out.
+     * not fire when the spinners are first laid out. Maybe use GlobalLayoutListener for a more
+     * elegant solution.
      */
     private void setSpinnerListeners() {
         mSpinnerStatsType.post(new Runnable() {
