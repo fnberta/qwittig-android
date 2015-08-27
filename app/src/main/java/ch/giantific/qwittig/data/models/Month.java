@@ -14,6 +14,11 @@ public class Month {
         return mNumber;
     }
 
+    public Month(String allName) {
+        mNumber = 0;
+        mNameShort = allName;
+    }
+
     public Month(int number) {
         mNumber = number;
         mNameShort = DateUtils.getMonthNameShort(number);
