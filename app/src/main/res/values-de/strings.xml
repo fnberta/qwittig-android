@@ -241,5 +241,6 @@
     <string name="dialog_message_permission_storage_denied">Du hast Qwittig nicht erlaubt, eine Quittung anzuhängen. Du kannst dies in den System-Einstellungen ändern.</string>
     <string name="dialog_positive_open_settings">Einstellungen öffnen</string>
     <string name="action_settings_profile_avatar_delete">Profilbild löschen</string>
+    <string name="stats_month_all">Alle</string>
 
 </resources>

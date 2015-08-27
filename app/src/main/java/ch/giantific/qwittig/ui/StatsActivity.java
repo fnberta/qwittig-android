@@ -2,28 +2,35 @@ package ch.giantific.qwittig.ui;
 
 import android.app.FragmentManager;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import com.parse.ParseException;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.List;
+
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.models.Month;
 import ch.giantific.qwittig.data.stats.models.Stats;
 import ch.giantific.qwittig.helpers.StatsHelper;
-import ch.giantific.qwittig.ui.adapters.TabsAdapter;
 
 public class StatsActivity extends BaseNavDrawerActivity implements
         StatsBaseFragment.FragmentInteractionListener,
         StatsHelper.HelperInteractionListener {
 
     private static final String LOG_TAG = StatsActivity.class.getSimpleName();
-    private static final String STATS_SPENDING_FRAGMENT = "stats_costs_fragment";
-    private static final String STATS_STORES_FRAGMENT = "stats_stores_fragment";
-    private static final String STATS_CURRENCIES_FRAGMENT = "stats_currencies_fragment";
-
-    private StatsSpendingFragment mStatsSpendingFragment;
-    private StatsStoresFragment mStatsStoresFragment;
-    private StatsCurrenciesFragment mStatsCurrenciesFragment;
+    private static final String STATS_FRAGMENT = "stats_fragment";
+    private static final int NUMBER_OF_MONTHS = 12;
+    private Spinner mSpinnerStatsType;
+    private Spinner mSpinnerYear;
+    private Spinner mSpinnerMonth;
+    private StatsBaseFragment mStatsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,97 +40,156 @@ public class StatsActivity extends BaseNavDrawerActivity implements
         // check item in NavDrawer
         checkNavDrawerItem(R.id.nav_stats);
 
-        if (mUserIsLoggedIn) {
-            if (savedInstanceState == null) {
-                addViewPagerFragments();
-            } else {
-                FragmentManager fragmentManager = getFragmentManager();
-                mStatsSpendingFragment = (StatsSpendingFragment) fragmentManager
-                        .getFragment(savedInstanceState, STATS_SPENDING_FRAGMENT);
-                mStatsStoresFragment = (StatsStoresFragment) fragmentManager
-                        .getFragment(savedInstanceState, STATS_STORES_FRAGMENT);
-                mStatsCurrenciesFragment = (StatsCurrenciesFragment) fragmentManager
-                        .getFragment(savedInstanceState, STATS_CURRENCIES_FRAGMENT);
-                setupTabs();
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(null);
+        }
+
+        mSpinnerStatsType = (Spinner) findViewById(R.id.sp_stats_type);
+        setupTypeSpinner();
+        mSpinnerYear = (Spinner) findViewById(R.id.sp_year);
+        setupYearSpinner();
+        mSpinnerMonth = (Spinner) findViewById(R.id.sp_month);
+        setupMonthSpinner();
+    }
+
+    private void setupTypeSpinner() {
+        String[] types = new String[]{
+                getString(R.string.tab_stats_spending),
+                getString(R.string.tab_stats_stores),
+                getString(R.string.tab_stats_currencies)};
+        final ArrayAdapter<String> typesAdapter =
+                new ArrayAdapter<>(this, R.layout.spinner_item_stats_type, types);
+        typesAdapter.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item);
+        mSpinnerStatsType.setAdapter(typesAdapter);
+        mSpinnerStatsType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String statsType = (String) parent.getItemAtPosition(position);
+                switchFragment(statsType);
             }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
+    private void setupYearSpinner() {
+        ArrayAdapter<String> spinnerYearAdapter =
+                new ArrayAdapter<>(this, R.layout.spinner_item_stats_period, getLastYears(5));
+        spinnerYearAdapter.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item);
+        mSpinnerYear.setAdapter(spinnerYearAdapter);
+        mSpinnerYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                onPeriodSelected();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
+    private void onPeriodSelected() {
+        if (mStatsFragment != null) {
+            mStatsFragment.loadData();
         }
     }
 
-    private void addViewPagerFragments() {
-        mStatsSpendingFragment = new StatsSpendingFragment();
-        mStatsStoresFragment = new StatsStoresFragment();
-        mStatsCurrenciesFragment = new StatsCurrenciesFragment();
+    private void setupMonthSpinner() {
+        List<Month> months = new ArrayList<>();
+        months.add(new Month(getString(R.string.stats_month_all)));
+        for (int i = 1; i <= NUMBER_OF_MONTHS; i++) {
+            months.add(new Month(i));
+        }
 
-        setupTabs();
+        ArrayAdapter<Month> spinnerMonthAdapter =
+                new ArrayAdapter<>(this, R.layout.spinner_item_stats_period, months);
+        spinnerMonthAdapter.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item);
+        mSpinnerMonth.setAdapter(spinnerMonthAdapter);
+        mSpinnerMonth.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                onPeriodSelected();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
-    private void setupTabs() {
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-        TabsAdapter tabsAdapter = new TabsAdapter(getFragmentManager());
-        tabsAdapter.addFragment(mStatsSpendingFragment, getString(R.string.tab_stats_spending));
-        tabsAdapter.addFragment(mStatsStoresFragment, getString(R.string.tab_stats_stores));
-        tabsAdapter.addFragment(mStatsCurrenciesFragment, getString(R.string.tab_stats_currencies));
-        viewPager.setAdapter(tabsAdapter);
-        // we want to keep all 3 tabs in memory, TODO: check if consumes too much memory?
-        viewPager.setOffscreenPageLimit(2);
+    private List<String> getLastYears(int timeToGoBack) {
+        List<String> lastYears = new ArrayList<>();
+        Calendar calendar = Calendar.getInstance();
+        int yearNow = calendar.get(Calendar.YEAR);
+        int year = yearNow - timeToGoBack;
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(viewPager);
+        while (year <= yearNow) {
+            lastYears.add(String.valueOf(year));
+            year++;
+        }
+
+        Collections.reverse(lastYears);
+        return lastYears;
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
+    private void switchFragment(String statsType) {
+        StatsBaseFragment fragment = null;
+        if (statsType.equals(getString(R.string.tab_stats_spending))) {
+            fragment = new StatsSpendingFragment();
+        } else if (statsType.equals(getString(R.string.tab_stats_stores))) {
+            fragment = new StatsStoresFragment();
+        } else if (statsType.equals(getString(R.string.tab_stats_currencies))) {
+            fragment = new StatsCurrenciesFragment();
+        }
 
-        if (mUserIsLoggedIn) {
+        if (fragment != null) {
             FragmentManager fragmentManager = getFragmentManager();
-            fragmentManager.putFragment(outState, STATS_SPENDING_FRAGMENT, mStatsSpendingFragment);
-            fragmentManager.putFragment(outState, STATS_STORES_FRAGMENT, mStatsStoresFragment);
-            fragmentManager.putFragment(outState, STATS_CURRENCIES_FRAGMENT, mStatsCurrenciesFragment);
+            fragmentManager.beginTransaction()
+                    .replace(R.id.container, fragment, STATS_FRAGMENT)
+                    .commit();
+            fragmentManager.executePendingTransactions();
+            mStatsFragment = fragment;
         }
     }
 
     @Override
     void afterLoginSetup() {
-        addViewPagerFragments();
 
         super.afterLoginSetup();
     }
 
     @Override
+    public String getYear() {
+        return (String) mSpinnerYear.getSelectedItem();
+    }
+
+    @Override
+    public Month getMonth() {
+        return (Month) mSpinnerMonth.getSelectedItem();
+    }
+
+    @Override
     public void onStatsCalculated(int statsType, Stats stats) {
-        switch (statsType) {
-            case StatsHelper.TYPE_SPENDING:
-                mStatsSpendingFragment.onStatsCalculated(stats);
-                break;
-            case StatsHelper.TYPE_STORES:
-                mStatsStoresFragment.onStatsCalculated(stats);
-                break;
-            case StatsHelper.TYPE_CURRENCIES:
-                mStatsCurrenciesFragment.onStatsCalculated(stats);
-                break;
-        }
+        mStatsFragment.onStatsCalculated(stats);
     }
 
     @Override
     public void onFailedToCalculateStats(int statsType, ParseException e) {
-        switch (statsType) {
-            case StatsHelper.TYPE_SPENDING:
-                mStatsSpendingFragment.onFailedToCalculateStats(e);
-                break;
-            case StatsHelper.TYPE_STORES:
-                mStatsStoresFragment.onFailedToCalculateStats(e);
-                break;
-            case StatsHelper.TYPE_CURRENCIES:
-                mStatsCurrenciesFragment.onFailedToCalculateStats(e);
-                break;
-        }
+        mStatsFragment.onFailedToCalculateStats(e);
     }
 
     @Override
     protected void onNewGroupSet() {
-        mStatsSpendingFragment.updateData();
-        mStatsStoresFragment.updateData();
-        mStatsCurrenciesFragment.updateData();
+        mStatsFragment.updateData();
     }
 }

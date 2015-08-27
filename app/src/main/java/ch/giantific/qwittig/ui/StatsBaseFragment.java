@@ -42,7 +42,6 @@ public abstract class StatsBaseFragment extends BaseFragment implements
 
     static final int PERIOD_YEAR = 0;
     static final int PERIOD_MONTH = 1;
-    static final int NUMBER_OF_MONTHS = 12;
     private static final String LOG_TAG = StatsBaseFragment.class.getSimpleName();
     FragmentInteractionListener mListener;
     User mCurrentUser;
@@ -51,12 +50,8 @@ public abstract class StatsBaseFragment extends BaseFragment implements
     boolean mIsLoading;
     Stats mStatsData;
     boolean mDataIsLoaded;
-    private Spinner mSpinnerPeriod;
-    private Spinner mSpinnerYear;
-    private Spinner mSpinnerMonth;
     private TextView mTextViewEmptyView;
     private ProgressBar mProgressBar;
-    private boolean mListenersAreSet;
 
     public StatsBaseFragment() {
         // Required empty public constructor
@@ -75,67 +70,8 @@ public abstract class StatsBaseFragment extends BaseFragment implements
 
     @CallSuper
     void findBaseViews(View rootView) {
-        mSpinnerPeriod = (Spinner) rootView.findViewById(R.id.sp_period);
-        mSpinnerYear = (Spinner) rootView.findViewById(R.id.sp_year);
-        mSpinnerMonth = (Spinner) rootView.findViewById(R.id.sp_month);
         mTextViewEmptyView = (TextView) rootView.findViewById(R.id.tv_empty_view);
         mProgressBar = (ProgressBar) rootView.findViewById(R.id.pb_stats);
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        setupPeriodAdapter();
-        setupYearAdapter();
-        setupMonthAdapter();
-    }
-
-    private void setupPeriodAdapter() {
-        String[] periods = getResources().getStringArray(R.array.stats_periods);
-        final ArrayAdapter<String> spinnerPeriodAdapter = new ArrayAdapter<>(getActivity(),
-                R.layout.spinner_item_stats, periods);
-        spinnerPeriodAdapter.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item);
-        mSpinnerPeriod.setAdapter(spinnerPeriodAdapter);
-    }
-
-    private void setupYearAdapter() {
-        ArrayAdapter<String> spinnerYearAdapter = new ArrayAdapter<>(getActivity(),
-                R.layout.spinner_item_stats, getLastYears(5));
-        spinnerYearAdapter.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item);
-        mSpinnerYear.setAdapter(spinnerYearAdapter);
-    }
-
-    private List<String> getLastYears(int timeToGoBack) {
-        List<String> lastYears = new ArrayList<>();
-        Calendar calendar = Calendar.getInstance();
-        int yearNow = calendar.get(Calendar.YEAR);
-        int year = yearNow - timeToGoBack;
-
-        while (year <= yearNow) {
-            lastYears.add(String.valueOf(year));
-            year++;
-        }
-
-        Collections.reverse(lastYears);
-        return lastYears;
-    }
-
-    private void setupMonthAdapter() {
-        List<Month> months = new ArrayList<>();
-        int i = 1;
-        while (i <= NUMBER_OF_MONTHS) {
-            months.add(new Month(i));
-            i++;
-        }
-
-        ArrayAdapter<Month> spinnerMonthAdapter = new ArrayAdapter<>(getActivity(),
-                R.layout.spinner_item_stats, months);
-        spinnerMonthAdapter.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item);
-        mSpinnerMonth.setAdapter(spinnerMonthAdapter);
     }
 
     @Override
@@ -162,6 +98,7 @@ public abstract class StatsBaseFragment extends BaseFragment implements
         if (mCurrentGroup != null) {
             if (mCurrentGroup.isDataAvailable()) {
                 setStuffWithGroupData();
+                loadData();
             } else {
                 LocalQuery.fetchObjectData(this, mCurrentGroup);
             }
@@ -173,105 +110,17 @@ public abstract class StatsBaseFragment extends BaseFragment implements
 
     @CallSuper
     void setStuffWithGroupData() {
-        if (!mListenersAreSet) {
-            setPeriodSelectedListener();
-            setYearSelectedListener();
-            setMonthSelectedListener();
-
-            mListenersAreSet = true;
-        } else {
-            if (userIsInGroup()) {
-                loadData();
-            } else {
-                setEmptyViewVisibility(true);
-                toggleProgressBarVisibility();
-            }
-        }
+        // empty default implementation
     }
 
     @Override
     public void onObjectFetched(ParseObject object) {
         setStuffWithGroupData();
-    }
-
-    private void setPeriodSelectedListener() {
-        mSpinnerPeriod.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String period = (String) parent.getItemAtPosition(position);
-                if (userIsInGroup()) {
-                    onPeriodSelected(period);
-                } else {
-                    setEmptyViewVisibility(true);
-                    toggleProgressBarVisibility();
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
+        loadData();
     }
 
     private boolean userIsInGroup() {
         return mCurrentUser != null && mCurrentGroup != null;
-    }
-
-    private void onPeriodSelected(String period) {
-        if (period.equals(getString(R.string.period_year))) {
-            mPeriodType = PERIOD_YEAR;
-
-            if (mSpinnerMonth.getVisibility() == View.VISIBLE) {
-                mSpinnerMonth.setVisibility(View.GONE);
-            }
-        } else if (period.equals(getString(R.string.period_month))) {
-            mPeriodType = PERIOD_MONTH;
-
-            if (mSpinnerMonth.getVisibility() == View.GONE) {
-                mSpinnerMonth.setVisibility(View.VISIBLE);
-            }
-        }
-
-        loadData();
-    }
-
-    private void setYearSelectedListener() {
-        mSpinnerYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (userIsInGroup()) {
-                    loadData();
-                } else {
-                    setEmptyViewVisibility(true);
-                    toggleProgressBarVisibility();
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-    }
-
-    private void setMonthSelectedListener() {
-        mSpinnerMonth.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (userIsInGroup()) {
-                    loadData();
-                } else {
-                    setEmptyViewVisibility(true);
-                    toggleProgressBarVisibility();
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
     }
 
     public void loadData() {
@@ -279,13 +128,16 @@ public abstract class StatsBaseFragment extends BaseFragment implements
             return;
         }
 
-        String year = (String) mSpinnerYear.getSelectedItem();
-        int monthNumber = 0;
-
-        if (mPeriodType == PERIOD_MONTH) {
-            Month month = (Month) mSpinnerMonth.getSelectedItem();
-            monthNumber = month.getNumber();
+        if (!userIsInGroup()) {
+            setEmptyViewVisibility(true);
+            toggleProgressBarVisibility();
+            return;
         }
+
+        String year = mListener.getYear();
+        Month month = mListener.getMonth();
+        int monthNumber = month.getNumber();
+        mPeriodType = monthNumber == 0 ? PERIOD_YEAR : PERIOD_MONTH;
 
         calcStats(year, monthNumber);
     }
@@ -421,7 +273,7 @@ public abstract class StatsBaseFragment extends BaseFragment implements
     }
 
     private void showErrorSnackbar(String message) {
-        Snackbar snackbar = MessageUtils.getBasicSnackbar(mSpinnerPeriod, message);
+        Snackbar snackbar = MessageUtils.getBasicSnackbar(mTextViewEmptyView, message);
         snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -438,6 +290,9 @@ public abstract class StatsBaseFragment extends BaseFragment implements
     }
 
     public interface FragmentInteractionListener {
+        String getYear();
+
+        Month getMonth();
     }
 
 }
