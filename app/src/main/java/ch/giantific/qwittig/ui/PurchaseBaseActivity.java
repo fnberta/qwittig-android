@@ -16,6 +16,7 @@ import android.provider.MediaStore;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
@@ -51,7 +52,6 @@ import ch.giantific.qwittig.helpers.RatesHelper;
 import ch.giantific.qwittig.ui.dialogs.AccountCreateDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.DatePickerDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.ManualExchangeRateDialogFragment;
-import ch.giantific.qwittig.ui.dialogs.PermissionDeniedDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.PurchaseUserSelectionDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.StoreSelectionDialogFragment;
 import ch.giantific.qwittig.ui.listeners.TransitionListenerAdapter;
@@ -70,8 +70,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         PurchaseReceiptAddEditFragment.FragmentInteractionListener,
         RatesHelper.HelperInteractionListener,
         PurchaseSaveHelper.HelperInteractionListener,
-        ManualExchangeRateDialogFragment.DialogInteractionListener,
-        PermissionDeniedDialogFragment.DialogInteractionListener {
+        ManualExchangeRateDialogFragment.DialogInteractionListener {
 
     @IntDef({PURCHASE_SAVED, PURCHASE_SAVED_AUTO, PURCHASE_DISCARDED, PURCHASE_SAVED_AS_DRAFT,
             PURCHASE_DRAFT_DELETED, PURCHASE_ERROR, PURCHASE_NO_CHANGES})
@@ -270,10 +269,14 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     getImage();
                 } else {
-                    PermissionDeniedDialogFragment permissionDeniedDialogFragment =
-                            PermissionDeniedDialogFragment.newInstance(
-                            getString(R.string.dialog_message_permission_storage_denied));
-                    permissionDeniedDialogFragment.show(getFragmentManager(), "permission_denied");
+                    Snackbar snackbar = MessageUtils.getBasicSnackbar(mToolbar,
+                            getString(R.string.snackbar_permission_storage_denied));
+                    snackbar.setAction(R.string.snackbar_action_open_settings, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            startSystemSettings();
+                        }
+                    });
                 }
                 break;
             default:
@@ -281,11 +284,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         }
     }
 
-    /**
-     * Callback from permission denied dialog when user decides to launch system settings.
-     */
-    @Override
-    public void startSystemSettings() {
+    private void startSystemSettings() {
         Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         intent.setData(Uri.parse("package:" + getPackageName()));
         startActivity(intent);
