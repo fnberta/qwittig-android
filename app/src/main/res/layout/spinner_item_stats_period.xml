@@ -8,6 +8,5 @@
     android:gravity="center_vertical"
     android:lines="1"
     android:ellipsize="marquee"
-    android:textColor="?android:textColorPrimaryInverse"
-    style="@style/TextAppearance.AppCompat.Subhead"
+    style="@style/TextAppearance.AppCompat.Subhead.Inverse"
     />

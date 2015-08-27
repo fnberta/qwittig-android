@@ -1,9 +1,8 @@
 package ch.giantific.qwittig.ui;
 
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.ActionBar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -20,7 +19,6 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.Month;
 import ch.giantific.qwittig.data.stats.models.Stats;
 import ch.giantific.qwittig.helpers.StatsHelper;
-import ch.giantific.qwittig.utils.Utils;
 
 public class StatsActivity extends BaseNavDrawerActivity implements
         StatsBaseFragment.FragmentInteractionListener,
@@ -42,6 +40,11 @@ public class StatsActivity extends BaseNavDrawerActivity implements
         // check item in NavDrawer
         checkNavDrawerItem(R.id.nav_stats);
 
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(null);
+        }
+
         mSpinnerStatsType = (Spinner) findViewById(R.id.sp_stats_type);
         setupTypeSpinner();
         mSpinnerYear = (Spinner) findViewById(R.id.sp_year);
@@ -56,7 +59,7 @@ public class StatsActivity extends BaseNavDrawerActivity implements
                 getString(R.string.tab_stats_stores),
                 getString(R.string.tab_stats_currencies)};
         final ArrayAdapter<String> typesAdapter =
-                new ArrayAdapter<>(this, R.layout.spinner_item_stats, types);
+                new ArrayAdapter<>(this, R.layout.spinner_item_stats_type, types);
         typesAdapter.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item);
         mSpinnerStatsType.setAdapter(typesAdapter);
@@ -76,7 +79,7 @@ public class StatsActivity extends BaseNavDrawerActivity implements
 
     private void setupYearSpinner() {
         ArrayAdapter<String> spinnerYearAdapter =
-                new ArrayAdapter<>(this, R.layout.spinner_item_stats, getLastYears(5));
+                new ArrayAdapter<>(this, R.layout.spinner_item_stats_period, getLastYears(5));
         spinnerYearAdapter.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item);
         mSpinnerYear.setAdapter(spinnerYearAdapter);
@@ -107,7 +110,7 @@ public class StatsActivity extends BaseNavDrawerActivity implements
         }
 
         ArrayAdapter<Month> spinnerMonthAdapter =
-                new ArrayAdapter<>(this, R.layout.spinner_item_stats, months);
+                new ArrayAdapter<>(this, R.layout.spinner_item_stats_period, months);
         spinnerMonthAdapter.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item);
         mSpinnerMonth.setAdapter(spinnerMonthAdapter);
