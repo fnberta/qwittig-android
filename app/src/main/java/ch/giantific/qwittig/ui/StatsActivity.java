@@ -51,6 +51,10 @@ public class StatsActivity extends BaseNavDrawerActivity implements
         setupYearSpinner();
         mSpinnerMonth = (Spinner) findViewById(R.id.sp_month);
         setupMonthSpinner();
+
+        if (savedInstanceState == null && mUserIsLoggedIn) {
+            addFirstFragment();
+        }
     }
 
     private void setupTypeSpinner() {
@@ -63,18 +67,6 @@ public class StatsActivity extends BaseNavDrawerActivity implements
         typesAdapter.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item);
         mSpinnerStatsType.setAdapter(typesAdapter);
-        mSpinnerStatsType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String statsType = (String) parent.getItemAtPosition(position);
-                switchFragment(statsType);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
     }
 
     private void setupYearSpinner() {
@@ -83,48 +75,6 @@ public class StatsActivity extends BaseNavDrawerActivity implements
         spinnerYearAdapter.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item);
         mSpinnerYear.setAdapter(spinnerYearAdapter);
-        mSpinnerYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                onPeriodSelected();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-    }
-
-    private void onPeriodSelected() {
-        if (mStatsFragment != null) {
-            mStatsFragment.loadData();
-        }
-    }
-
-    private void setupMonthSpinner() {
-        List<Month> months = new ArrayList<>();
-        months.add(new Month(getString(R.string.stats_month_all)));
-        for (int i = 1; i <= NUMBER_OF_MONTHS; i++) {
-            months.add(new Month(i));
-        }
-
-        ArrayAdapter<Month> spinnerMonthAdapter =
-                new ArrayAdapter<>(this, R.layout.spinner_item_stats_period, months);
-        spinnerMonthAdapter.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item);
-        mSpinnerMonth.setAdapter(spinnerMonthAdapter);
-        mSpinnerMonth.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                onPeriodSelected();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
     }
 
     private List<String> getLastYears(int timeToGoBack) {
@@ -140,6 +90,92 @@ public class StatsActivity extends BaseNavDrawerActivity implements
 
         Collections.reverse(lastYears);
         return lastYears;
+    }
+
+    private void setupMonthSpinner() {
+        List<Month> months = new ArrayList<>();
+        months.add(new Month(getString(R.string.stats_month_all)));
+        for (int i = 1; i <= NUMBER_OF_MONTHS; i++) {
+            months.add(new Month(i));
+        }
+
+        ArrayAdapter<Month> spinnerMonthAdapter =
+                new ArrayAdapter<>(this, R.layout.spinner_item_stats_period, months);
+        spinnerMonthAdapter.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item);
+        mSpinnerMonth.setAdapter(spinnerMonthAdapter);
+    }
+
+    private void addFirstFragment() {
+        getFragmentManager().beginTransaction()
+                .add(R.id.container, new StatsSpendingFragment(), STATS_FRAGMENT)
+                .commit();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        findStatsFragment();
+        setSpinnerListeners();
+    }
+
+    private void findStatsFragment() {
+        mStatsFragment = (StatsBaseFragment) getFragmentManager().findFragmentByTag(STATS_FRAGMENT);
+    }
+
+    private void setSpinnerListeners() {
+        mSpinnerStatsType.post(new Runnable() {
+            @Override
+            public void run() {
+                mSpinnerStatsType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        String statsType = (String) parent.getItemAtPosition(position);
+                        switchFragment(statsType);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+            }
+        });
+
+        mSpinnerYear.post(new Runnable() {
+            @Override
+            public void run() {
+                mSpinnerYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        onPeriodSelected();
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+            }
+        });
+
+        mSpinnerMonth.post(new Runnable() {
+            @Override
+            public void run() {
+                mSpinnerMonth.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        onPeriodSelected();
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+            }
+        });
     }
 
     private void switchFragment(String statsType) {
@@ -158,14 +194,21 @@ public class StatsActivity extends BaseNavDrawerActivity implements
                     .replace(R.id.container, fragment, STATS_FRAGMENT)
                     .commit();
             fragmentManager.executePendingTransactions();
-            mStatsFragment = fragment;
+            findStatsFragment();
         }
+    }
+
+    private void onPeriodSelected() {
+        mStatsFragment.loadData();
     }
 
     @Override
     void afterLoginSetup() {
-
         super.afterLoginSetup();
+
+        addFirstFragment();
+        getFragmentManager().executePendingTransactions();
+        findStatsFragment();
     }
 
     @Override

@@ -42,6 +42,8 @@ public abstract class StatsBaseFragment extends BaseFragment implements
 
     static final int PERIOD_YEAR = 0;
     static final int PERIOD_MONTH = 1;
+    private static final String STATE_STATS_DATA = "state_stats_data";
+    private static final String STATE_PERIOD_TYPE = "state_period_type";
     private static final String LOG_TAG = StatsBaseFragment.class.getSimpleName();
     FragmentInteractionListener mListener;
     User mCurrentUser;
@@ -52,6 +54,7 @@ public abstract class StatsBaseFragment extends BaseFragment implements
     boolean mDataIsLoaded;
     private TextView mTextViewEmptyView;
     private ProgressBar mProgressBar;
+    private boolean mIsRecreating;
 
     public StatsBaseFragment() {
         // Required empty public constructor
@@ -65,6 +68,27 @@ public abstract class StatsBaseFragment extends BaseFragment implements
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement FragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            mStatsData = savedInstanceState.getParcelable(STATE_STATS_DATA);
+            mPeriodType = savedInstanceState.getInt(STATE_PERIOD_TYPE);
+            mIsRecreating = true;
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        if (mStatsData != null) {
+            outState.putParcelable(STATE_STATS_DATA, mStatsData);
+            outState.putInt(STATE_PERIOD_TYPE, mPeriodType);
         }
     }
 
@@ -134,12 +158,18 @@ public abstract class StatsBaseFragment extends BaseFragment implements
             return;
         }
 
-        String year = mListener.getYear();
-        Month month = mListener.getMonth();
-        int monthNumber = month.getNumber();
-        mPeriodType = monthNumber == 0 ? PERIOD_YEAR : PERIOD_MONTH;
+        if (mIsRecreating && mStatsData != null) {
+            mIsRecreating = false;
+            mDataIsLoaded = true;
+            setChartData();
+        } else {
+            String year = mListener.getYear();
+            Month month = mListener.getMonth();
+            int monthNumber = month.getNumber();
+            mPeriodType = monthNumber == 0 ? PERIOD_YEAR : PERIOD_MONTH;
 
-        calcStats(year, monthNumber);
+            calcStats(year, monthNumber);
+        }
     }
 
     @CallSuper
