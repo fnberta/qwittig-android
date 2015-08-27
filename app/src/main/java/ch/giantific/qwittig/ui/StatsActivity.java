@@ -124,6 +124,10 @@ public class StatsActivity extends BaseNavDrawerActivity implements
         mStatsFragment = (StatsBaseFragment) getFragmentManager().findFragmentByTag(STATS_FRAGMENT);
     }
 
+    /**
+     * Adds itemSelectedListeners for spinners with a Runnable. The reason being that they should
+     * not  fire when the spinners are laid out.
+     */
     private void setSpinnerListeners() {
         mSpinnerStatsType.post(new Runnable() {
             @Override
