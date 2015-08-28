@@ -19,6 +19,7 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.Month;
 import ch.giantific.qwittig.data.stats.models.Stats;
 import ch.giantific.qwittig.helpers.StatsHelper;
+import ch.giantific.qwittig.ui.adapters.StatsTypeAdapter;
 
 public class StatsActivity extends BaseNavDrawerActivity implements
         StatsBaseFragment.FragmentInteractionListener,
@@ -58,14 +59,12 @@ public class StatsActivity extends BaseNavDrawerActivity implements
     }
 
     private void setupTypeSpinner() {
-        String[] types = new String[]{
-                getString(R.string.tab_stats_spending),
-                getString(R.string.tab_stats_stores),
-                getString(R.string.tab_stats_currencies)};
-        final ArrayAdapter<String> typesAdapter =
-                new ArrayAdapter<>(this, R.layout.spinner_item_stats_type, types);
-        typesAdapter.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item);
+        final int[] types = new int[]{
+                R.string.tab_stats_spending,
+                R.string.tab_stats_stores,
+                R.string.tab_stats_currencies};
+        final StatsTypeAdapter typesAdapter =
+                new StatsTypeAdapter(this, R.layout.spinner_item_stats_type, types);
         mSpinnerStatsType.setAdapter(typesAdapter);
     }
 
@@ -136,7 +135,7 @@ public class StatsActivity extends BaseNavDrawerActivity implements
                 mSpinnerStatsType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        String statsType = (String) parent.getItemAtPosition(position);
+                        int statsType = (int) parent.getItemAtPosition(position);
                         switchFragment(statsType);
                     }
 
@@ -183,14 +182,18 @@ public class StatsActivity extends BaseNavDrawerActivity implements
         });
     }
 
-    private void switchFragment(String statsType) {
+    private void switchFragment(int statsType) {
         StatsBaseFragment fragment = null;
-        if (statsType.equals(getString(R.string.tab_stats_spending))) {
-            fragment = new StatsSpendingFragment();
-        } else if (statsType.equals(getString(R.string.tab_stats_stores))) {
-            fragment = new StatsStoresFragment();
-        } else if (statsType.equals(getString(R.string.tab_stats_currencies))) {
-            fragment = new StatsCurrenciesFragment();
+        switch (statsType) {
+            case R.string.tab_stats_spending:
+                fragment = new StatsSpendingFragment();
+                break;
+            case R.string.tab_stats_stores:
+                fragment = new StatsStoresFragment();
+                break;
+            case R.string.tab_stats_currencies:
+                fragment = new StatsCurrenciesFragment();
+                break;
         }
 
         if (fragment != null) {
