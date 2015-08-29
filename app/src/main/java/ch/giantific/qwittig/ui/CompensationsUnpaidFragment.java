@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.constants.AppConstants;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Compensation;
 import ch.giantific.qwittig.data.parse.models.User;
@@ -126,12 +127,13 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
                 R.layout.row_compensations_pos, R.layout.row_compensations_neg, mCompensations,
                 this);
         mRecyclerView.setAdapter(mRecyclerAdapter);
-                mFabNew.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        newSettlement();
-                    }
-                });
+        mFabNew.setImageAlpha(AppConstants.ICON_BLACK_ALPHA_RGB);
+        mFabNew.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                newSettlement();
+            }
+        });
         mFabProgressCircle.attachListener(this);
     }
 
@@ -266,7 +268,7 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
             }
         }
     }
-    
+
     private void calculateNewSettlementWithHelper() {
         FragmentManager fragmentManager = getFragmentManager();
         SettlementHelper settlementHelper = findSettlementHelper(fragmentManager);
@@ -297,6 +299,7 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
 
     /**
      * Called from activity when helper created new settlement
+     *
      * @param result object returned from CloudCode
      */
     public void onNewSettlementCreated(Object result) {
@@ -305,6 +308,7 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
 
     /**
      * Called from activity when helper failed to create a new settlement
+     *
      * @param e
      */
     public void onNewSettlementCreationFailed(ParseException e) {
@@ -341,7 +345,7 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
     }
 
     private void setCompensationLoading(ParseObject compensation, String objectId, int position,
-                                                boolean isLoading) {
+                                        boolean isLoading) {
         ((Compensation) compensation).setIsLoading(isLoading);
         mRecyclerAdapter.notifyItemChanged(position);
 
@@ -405,6 +409,7 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
 
     /**
      * Called from activity when helper successfully saved compensation
+     *
      * @param compensation
      */
     public void onCompensationSaved(ParseObject compensation) {
@@ -419,6 +424,7 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
 
     /**
      * Called from activity when helper failed to save compensation
+     *
      * @param compensation
      * @param e
      */
@@ -503,7 +509,8 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
 
     /**
      * Called from activity when helper successfully reminded user
-     * @param remindType remind to pay or remind that paid
+     *
+     * @param remindType     remind to pay or remind that paid
      * @param compensationId
      */
     public void onUserReminded(int remindType, String compensationId) {
@@ -539,6 +546,7 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
 
     /**
      * Called from activity when helper failed to remind user
+     *
      * @param remindType remind to pay or remind that paid
      * @param e
      */
@@ -617,6 +625,7 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
 
     /**
      * Called from activity when change amount dialog is closed.
+     *
      * @param amount the new amount to be set in the compensation
      */
     public void changeAmount(BigFraction amount) {

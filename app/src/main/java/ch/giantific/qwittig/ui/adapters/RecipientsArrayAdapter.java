@@ -39,7 +39,6 @@ public class RecipientsArrayAdapter extends ArrayAdapter<ItemUserPicker> {
         mViewResource = viewResource;
         mDropDownViewResource = dropDownViewResource;
         mUsers = users;
-        setDropDownViewResource(dropDownViewResource);
     }
 
     @Override

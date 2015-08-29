@@ -9,6 +9,7 @@ import android.transition.Transition;
 import android.view.View;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.constants.AppConstants;
 import ch.giantific.qwittig.ui.dialogs.StoreAddDialogFragment;
 import ch.giantific.qwittig.ui.listeners.TransitionListenerAdapter;
 import ch.giantific.qwittig.utils.Utils;
@@ -31,6 +32,7 @@ public class SettingsStoresActivity extends BaseActivity implements
         setContentView(R.layout.activity_settings_stores);
 
         mFab = (FloatingActionButton) findViewById(R.id.fab_add_store);
+        mFab.setImageAlpha(AppConstants.ICON_BLACK_ALPHA_RGB);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

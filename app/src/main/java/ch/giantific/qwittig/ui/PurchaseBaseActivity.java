@@ -46,6 +46,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.constants.AppConstants;
 import ch.giantific.qwittig.data.models.Receipt;
 import ch.giantific.qwittig.helpers.PurchaseSaveHelper;
 import ch.giantific.qwittig.helpers.RatesHelper;
@@ -121,6 +122,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         setContentView(R.layout.activity_purchase_add_edit);
 
         mFabPurchaseSave = (FloatingActionButton) findViewById(R.id.fab_purchase_save);
+        mFabPurchaseSave.setImageAlpha(AppConstants.ICON_BLACK_ALPHA_RGB);
         mFabPurchaseSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

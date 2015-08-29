@@ -13,6 +13,7 @@ import com.github.jorgecastilloprz.listeners.FABProgressListener;
 import com.parse.ParseException;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.constants.AppConstants;
 import ch.giantific.qwittig.helpers.InviteUsersHelper;
 import ch.giantific.qwittig.ui.listeners.TransitionListenerAdapter;
 import ch.giantific.qwittig.utils.Utils;
@@ -37,6 +38,7 @@ public class SettingsUserInviteActivity extends BaseActivity implements
         setContentView(R.layout.activity_settings_user_invite);
 
         mFab = (FloatingActionButton) findViewById(R.id.fab_user_invite);
+        mFab.setImageAlpha(AppConstants.ICON_BLACK_ALPHA_RGB);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

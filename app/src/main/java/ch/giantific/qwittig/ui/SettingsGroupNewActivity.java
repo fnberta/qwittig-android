@@ -15,6 +15,7 @@ import com.github.jorgecastilloprz.listeners.FABProgressListener;
 import com.parse.ParseException;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.constants.AppConstants;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.helpers.CreateGroupHelper;
 import ch.giantific.qwittig.ui.listeners.TransitionListenerAdapter;
@@ -43,6 +44,7 @@ public class SettingsGroupNewActivity extends BaseActivity implements
         setContentView(R.layout.activity_settings_group_new);
 
         mFab = (FloatingActionButton) findViewById(R.id.fab_group_new);
+        mFab.setImageAlpha(AppConstants.ICON_BLACK_ALPHA_RGB);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
