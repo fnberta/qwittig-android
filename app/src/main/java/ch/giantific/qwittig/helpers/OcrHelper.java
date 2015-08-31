@@ -28,7 +28,7 @@ public class OcrHelper extends BaseHelper {
 
     private static final String LOG_TAG = OcrHelper.class.getSimpleName();
     private static final String BUNDLE_RECEIPT = "receipt";
-    private static final int MAX_RETRIES = 2;
+    private static final int MAX_RETRIES = 0;
     private HelperInteractionListener mListener;
     private String mReceiptPath;
     private int mRetries;
