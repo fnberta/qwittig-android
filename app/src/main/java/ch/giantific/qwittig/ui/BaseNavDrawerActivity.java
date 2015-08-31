@@ -312,7 +312,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
             mCurrentGroup = currentUser.getCurrentGroup();
 
             setupNavDrawerHeader();
-            //setupIab();
+            setupIab();
         }
     }
 

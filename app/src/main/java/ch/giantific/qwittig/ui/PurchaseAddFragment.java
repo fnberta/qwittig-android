@@ -80,7 +80,7 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
      * fill it with default purchase wide usersInvolved. On recreation, mItemsUsersChecked will be
      * not be empty, hence the item's values will not be reset.
      */
-    private void setFirstRowItemUsersChecked() {
+    void setFirstRowItemUsersChecked() {
         ItemRow firstItemRow = mItemRows.get(0);
         if (mItemRows.size() == 1 && firstItemRow.getUsersChecked() == null) {
             firstItemRow.setUsersChecked(mPurchaseUsersInvolved);

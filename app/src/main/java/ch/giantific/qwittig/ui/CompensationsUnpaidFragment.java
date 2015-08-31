@@ -416,9 +416,7 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
         String compensationId = compensation.getObjectId();
         removeCompensationSaveHelper(compensationId);
 
-        // position might have changed
-        int compPosition = mCompensations.indexOf(compensation);
-        removeItemFromList(compPosition);
+        removeItemFromList(compensation);
         mLoadingCompensations.remove(compensationId);
     }
 
@@ -449,8 +447,13 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
         }
     }
 
-    private void removeItemFromList(int position) {
+    private void removeItemFromList(ParseObject compensation) {
+        int position = mCompensations.indexOf(compensation);
         mCompensations.remove(position);
+
+        int positionAll = mCompensationsAll.indexOf(compensation);
+        mCompensationsAll.remove(positionAll);
+
         mRecyclerAdapter.notifyItemRemoved(position);
         toggleEmptyViewVisibility();
     }
@@ -605,7 +608,7 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
         User beneficiary = compensation.getBeneficiary();
         String beneficiaryName = beneficiary.getNickname();
         compensation.deleteEventually();
-        removeItemFromList(position);
+        removeItemFromList(compensation);
 
         MessageUtils.showBasicSnackbar(mRecyclerView, getString(R.string.toast_not_now_done, beneficiaryName));
     }

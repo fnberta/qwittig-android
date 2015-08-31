@@ -112,11 +112,18 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
         }
     }
 
+    @Override
+    void setFirstRowItemUsersChecked() {
+        if (mOcrValuesAreSet) {
+            super.setFirstRowItemUsersChecked();
+        }
+    }
+
     public void setValuesFromOcr(PurchaseRest purchaseRest) {
         // set date
         //setDateSelected(purchaseRest.getDate());
         // set store
-        mTextViewPickStore.setText(purchaseRest.getStore());
+        setStore(purchaseRest.getStore(), false);
 
         // set item rows
         List<ItemRest> itemsRest = purchaseRest.getItems();
