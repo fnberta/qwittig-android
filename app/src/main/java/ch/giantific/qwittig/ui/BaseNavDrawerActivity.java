@@ -35,6 +35,7 @@ import com.parse.ParseUser;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.Avatar;
 import ch.giantific.qwittig.data.parse.LocalQuery;
@@ -312,7 +313,9 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
             mCurrentGroup = currentUser.getCurrentGroup();
 
             setupNavDrawerHeader();
-            setupIab();
+            if (!BuildConfig.DEBUG) {
+                setupIab();
+            }
         }
     }
 

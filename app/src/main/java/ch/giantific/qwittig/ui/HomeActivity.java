@@ -32,6 +32,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.List;
 
 import ch.berta.fabio.fabspeeddial.FabMenu;
+import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.PushBroadcastReceiver;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.constants.AppConstants;
@@ -484,7 +485,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         switch (view.getId()) {
             case R.id.fab_auto: {
                 if (userIsInGroup()) {
-                    if (mIsPremium || mInTrialMode) {
+                    if (mIsPremium || mInTrialMode || BuildConfig.DEBUG) {
                         Intent intent = new Intent(this, PurchaseAddActivity.class);
                         intent.putExtra(PurchaseAddActivity.INTENT_PURCHASE_NEW_AUTO, true);
                         intent.putExtra(PurchaseAddActivity.INTENT_PURCHASE_NEW_TRIAL_MODE, mInTrialMode);
