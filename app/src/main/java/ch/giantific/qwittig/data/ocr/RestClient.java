@@ -19,7 +19,7 @@ import retrofit.mime.TypedString;
  */
 public class RestClient {
 
-    private static final String BASE_URL = "http://192.168.0.150:3000";
+    private static final String BASE_URL = "http://37.120.165.175:3000";
     private static final long READ_TIMEOUT = 300000;
     private static final RestAdapter REST_ADAPTER = new RestAdapter.Builder()
             .setEndpoint(BASE_URL)
