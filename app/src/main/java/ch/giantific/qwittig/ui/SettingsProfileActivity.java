@@ -56,10 +56,6 @@ public class SettingsProfileActivity extends BaseActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (Utils.isRunningLollipopAndHigher()) {
-            setActivityTransition();
-        }
         setContentView(R.layout.activity_settings_profile);
         //ViewCompat.setTransitionName(findViewById(R.id.appbar), SHARED_AVATAR);
         supportPostponeEnterTransition();
@@ -86,14 +82,6 @@ public class SettingsProfileActivity extends BaseActivity implements
                     .add(R.id.container, new SettingsProfileFragment(), PROFILE_FRAGMENT)
                     .commit();
         }
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void setActivityTransition() {
-        Transition transitionEnter = new Explode();
-        transitionEnter.excludeTarget(android.R.id.statusBarBackground, true);
-        transitionEnter.excludeTarget(android.R.id.navigationBarBackground, true);
-        getWindow().setEnterTransition(transitionEnter);
     }
 
     private void setAvatar() {

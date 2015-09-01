@@ -1,12 +1,23 @@
 <resources>
-    <style name="AppTheme" parent="BaseTheme">
-        <item name="android:windowActivityTransitions">true</item>
-        <item name="android:windowSharedElementEnterTransition">@android:transition/move</item>
-    </style>
-
     <style name="AppTheme.DrawStatusBar" parent="AppTheme">
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="AppTheme.DrawStatusBar.Explode" parent="AppTheme.DrawStatusBar">
+        <item name="android:windowEnterTransition">@transition/explode_main</item>
+    </style>
+
+    <style name="AppTheme.SlideBottom" parent="AppTheme">
+        <item name="android:windowEnterTransition">@transition/slide_main_bottom</item>
+    </style>
+
+    <style name="AppTheme.SlideEnd" parent="AppTheme">
+        <item name="android:windowEnterTransition">@transition/slide_main_end</item>
+    </style>
+
+    <style name="AppTheme.Explode" parent="AppTheme">
+        <item name="android:windowEnterTransition">@transition/explode_main</item>
     </style>
 
 </resources>

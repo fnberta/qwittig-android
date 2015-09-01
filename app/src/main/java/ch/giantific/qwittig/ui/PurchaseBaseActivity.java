@@ -115,10 +115,6 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (Utils.isRunningLollipopAndHigher()) {
-            setActivityTransition();
-        }
         setContentView(R.layout.activity_purchase_add_edit);
 
         mFabPurchaseSave = (FloatingActionButton) findViewById(R.id.fab_purchase_save);
@@ -145,11 +141,6 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
             }
         }
     }
-
-    /**
-     * Slide from Bottom in Add, and slide from right side in Edit
-     */
-    protected abstract void setActivityTransition();
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void addActivityTransitionListener() {

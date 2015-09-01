@@ -70,10 +70,6 @@ public class LoginActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (Utils.isRunningLollipopAndHigher()) {
-            setActivityTransition();
-        }
         setContentView(R.layout.activity_login);
 
         mViewMain = findViewById(R.id.container);
@@ -112,14 +108,6 @@ public class LoginActivity extends AppCompatActivity implements
 
         boolean isLoading = mViewProgress.getVisibility() == View.VISIBLE;
         outState.putBoolean(STATE_LOADING, isLoading);
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void setActivityTransition() {
-        Transition transitionEnter = new Slide(Gravity.BOTTOM);
-        transitionEnter.excludeTarget(android.R.id.statusBarBackground, true);
-        transitionEnter.excludeTarget(android.R.id.navigationBarBackground, true);
-        getWindow().setEnterTransition(transitionEnter);
     }
 
     /**

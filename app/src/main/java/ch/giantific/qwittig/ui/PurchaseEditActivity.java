@@ -1,13 +1,8 @@
 package ch.giantific.qwittig.ui;
 
-import android.annotation.TargetApi;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBar;
-import android.transition.Slide;
-import android.transition.Transition;
 import android.view.MenuItem;
 
 import ch.giantific.qwittig.R;
@@ -46,14 +41,6 @@ public class PurchaseEditActivity extends PurchaseBaseActivity implements
                             PURCHASE_EDIT_FRAGMENT)
                     .commit();
         }
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    protected void setActivityTransition() {
-        Transition transitionEnter = new Slide(GravityCompat.END);
-        transitionEnter.excludeTarget(android.R.id.statusBarBackground, true);
-        transitionEnter.excludeTarget(android.R.id.navigationBarBackground, true);
-        getWindow().setEnterTransition(transitionEnter);
     }
 
     @Override
