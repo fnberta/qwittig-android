@@ -31,10 +31,6 @@ public class SettingsUserInviteActivity extends BaseActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (Utils.isRunningLollipopAndHigher()) {
-            setActivityTransition();
-        }
         setContentView(R.layout.activity_settings_user_invite);
 
         mFab = (FloatingActionButton) findViewById(R.id.fab_user_invite);
@@ -61,14 +57,6 @@ public class SettingsUserInviteActivity extends BaseActivity implements
         } else {
             mFab.show();
         }
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void setActivityTransition() {
-        Transition transitionEnter = new Explode();
-        transitionEnter.excludeTarget(android.R.id.statusBarBackground, true);
-        transitionEnter.excludeTarget(android.R.id.navigationBarBackground, true);
-        getWindow().setEnterTransition(transitionEnter);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)

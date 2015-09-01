@@ -47,10 +47,6 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (Utils.isRunningLollipopAndHigher()) {
-            setActivityTransition();
-        }
-
         // green or red toolbar
         applyCorrectTheme();
         setContentView(R.layout.activity_purchase_details);
@@ -81,13 +77,6 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
         if (savedInstanceState == null && mUserIsLoggedIn) {
             addDetailsFragment();
         }
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void setActivityTransition() {
-        Transition transitionEnter = new Explode();
-        transitionEnter.excludeTarget(android.R.id.navigationBarBackground, true);
-        getWindow().setEnterTransition(transitionEnter);
     }
 
     /**

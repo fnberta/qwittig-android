@@ -14,8 +14,13 @@
 
     <style name="AppTheme.DrawStatusBar" parent="AppTheme"/>
 
-    <style name="AppTheme.WithNavDrawer.Login" parent="AppTheme.DrawStatusBar">
-    </style>
+    <style name="AppTheme.DrawStatusBar.Explode" parent="AppTheme.DrawStatusBar"/>
+
+    <style name="AppTheme.Explode" parent="AppTheme"/>
+
+    <style name="AppTheme.SlideBottom" parent="AppTheme"/>
+
+    <style name="AppTheme.SlideEnd" parent="AppTheme"/>
 
     <style name="AppTheme.WithNavDrawer.Green" parent="AppTheme.DrawStatusBar">
         <item name="colorPrimary">@color/green</item>
