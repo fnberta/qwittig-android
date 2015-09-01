@@ -23,16 +23,31 @@
             app:contentScrim="?attr/colorPrimary"
             app:expandedTitleMarginStart="@dimen/key_line_1"
             app:expandedTitleMarginEnd="@dimen/key_line_1"
-            android:fitsSystemWindows="true">
+            android:fitsSystemWindows="true"
+            >
 
-            <ImageView
-                android:id="@+id/iv_avatar"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:contentDescription="@string/user_avatar"
-                android:scaleType="centerCrop"
                 android:fitsSystemWindows="true"
-                app:layout_collapseMode="parallax"/>
+                app:layout_collapseMode="parallax"
+                >
+
+                <ImageView
+                    android:id="@+id/iv_avatar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/user_avatar"
+                    android:scaleType="centerCrop"
+                    />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/scrim_gradient"
+                    />
+            </FrameLayout>
+
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
