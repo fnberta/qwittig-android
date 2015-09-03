@@ -221,11 +221,8 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
     @Override
     public void onPurchaseRowItemClick(int position) {
         Purchase purchase = (Purchase) mPurchases.get(position);
-        boolean isGreen = purchase.getBuyer().getObjectId().equals(mCurrentUser.getObjectId());
-
         Intent intent = new Intent(getActivity(), PurchaseDetailsActivity.class);
         intent.putExtra(INTENT_PURCHASE_ID, purchase.getObjectId());
-        intent.putExtra(INTENT_THEME, isGreen);
 
         ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
                 getActivity());

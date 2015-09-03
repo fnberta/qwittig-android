@@ -277,8 +277,8 @@
     <color name="white">#FFFFFF</color>
 
 
-    <color name="primary">@color/light_blue_500</color>
-    <color name="primary_dark">@color/light_blue_700</color>
+    <color name="primary">@color/deep_purple_500</color>
+    <color name="primary_dark">@color/deep_purple_700</color>
     <color name="accent">@color/amber_A700</color>
 
     <color name="red">@color/red_500</color>

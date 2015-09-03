@@ -2,13 +2,18 @@ package ch.giantific.qwittig.ui.adapters;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
@@ -16,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.models.Avatar;
 import ch.giantific.qwittig.data.parse.models.Item;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.data.parse.models.User;
@@ -84,32 +90,21 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
             case TYPE_ITEM: {
                 PurchaseRow purchaseRow = (PurchaseRow) viewHolder;
                 Purchase purchase = (Purchase) mPurchases.get(position);
+                User buyer = purchase.getBuyer();
 
+                purchaseRow.setAvatar(buyer.getAvatar());
                 purchaseRow.setDate(purchase.getDate());
                 purchaseRow.setStore(purchase.getStore());
 
-                User buyer = purchase.getBuyer();
                 User currentUser = (User) ParseUser.getCurrentUser();
                 String nickname = buyer.getGroupIds().contains(currentUser.getCurrentGroup().getObjectId()) ?
                         buyer.getNicknameOrMe(mContext) : mContext.getString(R.string.user_deleted);
                 purchaseRow.setBuyer(nickname);
 
-                double myShareNumber = Utils.calculateMyShare(purchase);
-                String myShare = MoneyUtils.formatMoneyNoSymbol(myShareNumber,
-                        mCurrentGroupCurrency);
-                purchaseRow.setMyShare(myShare);
-                String balanceChange = MoneyUtils.formatMoneyNoSymbol(myShareNumber * -1,
-                        mCurrentGroupCurrency);
-                if (buyer.getObjectId().equals(currentUser.getObjectId())) {
-                    balanceChange = "+" + MoneyUtils.formatMoneyNoSymbol(
-                            calculateBalanceChange(purchase), mCurrentGroupCurrency);
-                    purchaseRow.mTextViewBalanceChange.setTextColor(ContextCompat.getColor(mContext,
-                            R.color.green));
-                } else {
-                    purchaseRow.mTextViewBalanceChange.setTextColor(ContextCompat.getColor(mContext,
-                            R.color.red));
-                }
-                purchaseRow.setBalanceChange(balanceChange);
+                double totalPrice = purchase.getTotalPrice();
+                purchaseRow.setTotal(MoneyUtils.formatMoneyNoSymbol(totalPrice, mCurrentGroupCurrency));
+                double myShare = Utils.calculateMyShare(purchase);
+                purchaseRow.setMyShare(MoneyUtils.formatMoneyNoSymbol(myShare, mCurrentGroupCurrency));
 
                 if (!purchase.currentUserHasReadPurchase()) {
                     purchaseRow.setWhiteBackground();
@@ -117,35 +112,15 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
                     purchaseRow.resetBackground();
                 }
 
+                int showDivider = position == getItemCount() - 1 ? View.GONE : View.VISIBLE;
+                purchaseRow.toggleDividerVisibility(showDivider);
+
                 break;
             }
             case TYPE_PROGRESS:
                 // do nothing
                 break;
         }
-    }
-
-    private double calculateBalanceChange(ParseObject purchaseParse) {
-        Purchase purchase = (Purchase) purchaseParse;
-
-        String userId = ParseUser.getCurrentUser().getObjectId();
-        double balanceChange = 0;
-        List<ParseObject> items = purchase.getItems();
-
-        for (ParseObject parseObject : items) {
-            Item item = (Item) parseObject;
-
-            List<String> usersInvolvedIds = item.getUsersInvolvedIds();
-            int sizeUsersInvolved = usersInvolvedIds.size();
-            double price = item.getPrice();
-            if (usersInvolvedIds.contains(userId)) {
-                balanceChange += price - (price / sizeUsersInvolved);
-            } else {
-                balanceChange += price;
-            }
-        }
-
-        return balanceChange;
     }
 
     @Override
@@ -165,11 +140,13 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
 
         private Context mContext;
         private View mView;
+        private View mDivider;
+        private ImageView mImageViewAvatar;
         private TextView mTextViewDate;
         private TextView mTextViewStore;
         private TextView mTextViewBuyer;
         private TextView mTextViewMyShare;
-        private TextView mTextViewBalanceChange;
+        private TextView mTextViewTotal;
 
         public PurchaseRow(View view, final AdapterInteractionListener listener, Context context) {
             super(view);
@@ -183,11 +160,17 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
             });
 
             mView = view.findViewById(R.id.rl_purchase);
+            mDivider = view.findViewById(R.id.divider);
+            mImageViewAvatar = (ImageView) view.findViewById(R.id.iv_avatar);
             mTextViewDate = (TextView) view.findViewById(R.id.tv_date);
             mTextViewStore = (TextView) view.findViewById(R.id.tv_store);
             mTextViewBuyer = (TextView) view.findViewById(R.id.tv_user);
+            mTextViewTotal = (TextView) view.findViewById(R.id.tv_total);
             mTextViewMyShare = (TextView) view.findViewById(R.id.tv_my_share);
-            mTextViewBalanceChange = (TextView) view.findViewById(R.id.tv_balance_change);
+        }
+
+        public void toggleDividerVisibility(int showDivider) {
+            mDivider.setVisibility(showDivider);
         }
 
         public void setWhiteBackground() {
@@ -206,8 +189,24 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
             mView.setBackgroundResource(backgroundResource);
         }
 
+        public void setAvatar(byte[] avatar) {
+            if (avatar != null) {
+                Glide.with(mContext)
+                        .load(avatar)
+                        .asBitmap()
+                        .into(new BitmapImageViewTarget(mImageViewAvatar) {
+                            @Override
+                            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                                view.setImageDrawable(Avatar.getRoundedDrawable(mContext, resource, false));
+                            }
+                        });
+            } else {
+                mImageViewAvatar.setImageDrawable(Avatar.getFallbackDrawable(mContext, false, false));
+            }
+        }
+
         public void setDate(Date date) {
-            mTextViewDate.setText(DateUtils.formatMonthDayLineSeparated(date));
+            mTextViewDate.setText(DateUtils.formatDateShort(date));
         }
 
         public void setStore(String store) {
@@ -218,12 +217,12 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
             mTextViewBuyer.setText(buyer);
         }
 
-        public void setMyShare(String myShare) {
-            mTextViewMyShare.setText(myShare);
+        public void setTotal(String total) {
+            mTextViewTotal.setText(total);
         }
 
-        public void setBalanceChange(String balanceChange) {
-            mTextViewBalanceChange.setText(balanceChange);
+        public void setMyShare(String myShare) {
+            mTextViewMyShare.setText(myShare);
         }
     }
 }
