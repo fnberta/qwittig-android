@@ -45,15 +45,10 @@
     <dimen name="list_with_text">48dp</dimen>
     <dimen name="list_icon_with_text">56dp</dimen>
     <dimen name="list_avatar_with_text">56dp</dimen>
-    <dimen name="list_avatar_with_text_double">112dp</dimen>
     <dimen name="list_avatar_with_two_line_text">72dp</dimen>
     <dimen name="list_avatar_with_three_line_text">88dp</dimen>
     <dimen name="avatar_plus_caption_plus_padding">72dp</dimen>
     <dimen name="subheader_height">48dp</dimen>
-
-    <!-- TextView -->
-    <dimen name="balance_change_width">90dp</dimen>
-    <dimen name="balance_change_height">40dp</dimen>
 
     <!-- Dialog -->
     <dimen name="dialog_padding">24dp</dimen>

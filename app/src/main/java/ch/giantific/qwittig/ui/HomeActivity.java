@@ -6,29 +6,22 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.IntDef;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.TextView;
 
 import com.parse.ParseConfig;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
 
-import org.apache.commons.math3.fraction.BigFraction;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.List;
 
 import ch.berta.fabio.fabspeeddial.FabMenu;
@@ -41,47 +34,39 @@ import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.helpers.FullQueryHelper;
 import ch.giantific.qwittig.helpers.InvitedGroupHelper;
 import ch.giantific.qwittig.helpers.MoreQueryHelper;
+import ch.giantific.qwittig.helpers.PurchaseQueryHelper;
 import ch.giantific.qwittig.ui.adapters.TabsAdapter;
 import ch.giantific.qwittig.ui.dialogs.GoPremiumDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.GroupJoinDialogFragment;
 import ch.giantific.qwittig.utils.MessageUtils;
-import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
-import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 
 public class HomeActivity extends BaseNavDrawerActivity implements
         View.OnClickListener,
-        HomeBaseFragment.FragmentInteractionListener,
+        HomePurchasesFragment.FragmentInteractionListener,
         GroupJoinDialogFragment.DialogInteractionListener,
         GroupCreateDialogFragment.DialogInteractionListener,
         GoPremiumDialogFragment.DialogInteractionListener,
-        FullQueryHelper.HelperInteractionListener,
+        PurchaseQueryHelper.HelperInteractionListener,
         InvitedGroupHelper.HelperInteractionListener,
+        FullQueryHelper.HelperInteractionListener,
         MoreQueryHelper.HelperInteractionListener {
 
-    @IntDef({ADAPTER_ALL, ADAPTER_PURCHASES, ADAPTER_USER})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface FragmentAdapter {}
-    public static final int ADAPTER_ALL = 0;
-    public static final int ADAPTER_PURCHASES = 1;
-    public static final int ADAPTER_USER = 2;
-    private static final String FULL_QUERY_HELPER = "full_query_helper";
     private static final String INVITED_GROUP_HELPER = "invited_group_helper";
     private static final String LOG_TAG = HomeActivity.class.getSimpleName();
     private static final String URI_INVITED_GROUP_ID = "group";
     private static final String PURCHASE_FRAGMENT = "purchase_fragment";
-    private static final String USER_FRAGMENT = "user_fragment";
-    private TextView mBalance;
+    private static final String DRAFTS_FRAGMENT = "drafts_fragment";
+    private static final String FULL_QUERY_HELPER = "full_query_helper";
     private Group mInvitedGroup;
     private String mInviteInitiator;
     private String mInvitedGroupId;
     private ProgressDialog mProgressDialog;
     private HomePurchasesFragment mHomePurchasesFragment;
-    private HomeUsersFragment mHomeUsersFragment;
-    private TabLayout mTabLayout;
+    private HomeDraftsFragment mHomeDraftsFragment;
     private FabMenu mFabMenu;
     private boolean mNewQueryNeeded = false;
     private boolean mCheckForInvitations = true;
@@ -100,12 +85,6 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         // check item in NavDrawer
         checkNavDrawerItem(R.id.nav_home);
 
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setTitle(null);
-        }
-
-        mBalance = (TextView) findViewById(R.id.tv_balance);
         mFabMenu = (FabMenu) findViewById(R.id.fab_menu);
         mFabMenu.hideMenuButton(false);
         new Handler().postDelayed(new Runnable() {
@@ -128,8 +107,8 @@ public class HomeActivity extends BaseNavDrawerActivity implements
             } else {
                 mHomePurchasesFragment = (HomePurchasesFragment) getFragmentManager()
                         .getFragment(savedInstanceState, PURCHASE_FRAGMENT);
-                mHomeUsersFragment = (HomeUsersFragment) getFragmentManager()
-                        .getFragment(savedInstanceState, USER_FRAGMENT);
+                mHomeDraftsFragment = (HomeDraftsFragment) getFragmentManager()
+                        .findFragmentByTag(DRAFTS_FRAGMENT);
 
                 setupTabs();
             }
@@ -138,7 +117,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
     private void addViewPagerFragments() {
         mHomePurchasesFragment = new HomePurchasesFragment();
-        mHomeUsersFragment = new HomeUsersFragment();
+        mHomeDraftsFragment = new HomeDraftsFragment();
 
         setupTabs();
     }
@@ -147,11 +126,11 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         TabsAdapter tabsAdapter = new TabsAdapter(getFragmentManager());
         tabsAdapter.addFragment(mHomePurchasesFragment, getString(R.string.tab_purchases));
-        tabsAdapter.addFragment(mHomeUsersFragment, getString(R.string.tab_users));
+        tabsAdapter.addFragment(mHomeDraftsFragment, getString(R.string.title_activity_purchase_drafts));
         viewPager.setAdapter(tabsAdapter);
 
-        mTabLayout = (TabLayout) findViewById(R.id.tabs);
-        mTabLayout.setupWithViewPager(viewPager);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
     }
 
     @Override
@@ -162,7 +141,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         if (mUserIsLoggedIn) {
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.putFragment(outState, PURCHASE_FRAGMENT, mHomePurchasesFragment);
-            fragmentManager.putFragment(outState, USER_FRAGMENT, mHomeUsersFragment);
+            fragmentManager.putFragment(outState, DRAFTS_FRAGMENT, mHomeDraftsFragment);
         }
     }
 
@@ -170,44 +149,14 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     public void onGroupsFetched() {
         super.onGroupsFetched();
 
-        setToolbarHeader();
-
         if (mCheckForInvitations) {
             checkForInvitations();
         }
 
         if (mNewQueryNeeded) {
-            onlineQuery();
+            fullOnlineQuery();
             mNewQueryNeeded = false;
         }
-    }
-
-    private void setToolbarHeader() {
-        BigFraction balance = BigFraction.ZERO;
-        if (mCurrentUser != null) {
-            balance = mCurrentUser.getBalance(mCurrentGroup);
-        }
-        mBalance.setText(MoneyUtils.formatMoney(balance, ParseUtils.getGroupCurrency()));
-        setColorTheme(balance);
-    }
-
-    private void setColorTheme(BigFraction balance) {
-        int color;
-        int colorDark;
-        int style;
-        if (Utils.isPositive(balance)) {
-            color = ContextCompat.getColor(this, R.color.green);
-            colorDark = ContextCompat.getColor(this, R.color.green_dark);
-            style = R.style.AppTheme_WithNavDrawer_Green;
-        } else {
-            color = ContextCompat.getColor(this, R.color.red);
-            colorDark = ContextCompat.getColor(this, R.color.red_dark);
-            style = R.style.AppTheme_WithNavDrawer_Red;
-        }
-        setTheme(style);
-        mToolbar.setBackgroundColor(color);
-        mTabLayout.setBackgroundColor(color);
-        setStatusBarBackgroundColor(colorDark);
     }
 
     private void checkForInvitations() {
@@ -280,7 +229,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     public void onInvitedGroupQueryFailed(ParseException e) {
         ParseErrorHandler.handleParseError(this, e);
         MessageUtils.showBasicSnackbar(mFabMenu, ParseErrorHandler.getErrorMessage(this, e));
-        removeQueryHelper();
+        removeInvitedGroupHelper();
     }
 
     @Override
@@ -346,7 +295,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         MessageUtils.getBasicSnackbar(mFabMenu, ParseErrorHandler.getErrorMessage(this, e));
         removeInvitedGroupHelper();
 
-        setLoading(false);
+        dismissProgressDialog();
     }
 
     private void removeInvitedGroupHelper() {
@@ -355,6 +304,12 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
         if (invitedGroupHelper != null) {
             fragmentManager.beginTransaction().remove(invitedGroupHelper).commitAllowingStateLoss();
+        }
+    }
+
+    private void dismissProgressDialog() {
+        if (mProgressDialog != null) {
+            mProgressDialog.dismiss();
         }
     }
 
@@ -368,22 +323,10 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         MessageUtils.showBasicSnackbar(mFabMenu, getString(R.string.toast_invitation_discarded));
     }
 
-    @Override
-    void afterLoginSetup() {
-        mNewQueryNeeded = true;
-        addViewPagerFragments();
-
-        super.afterLoginSetup();
-    }
-
-    /**
-     * Calls CloudFunction to calculate balances for users in currentGroup
-     */
-    @Override
-    public void onlineQuery() {
+    private void fullOnlineQuery() {
         if (!Utils.isConnected(this)) {
-            setLoading(false);
-            showOnlineQueryErrorSnackbar(getString(R.string.toast_no_connection));
+            dismissProgressDialog();
+            showFullOnlineQueryErrorSnackbar();
             return;
         }
 
@@ -401,6 +344,19 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         }
     }
 
+    private void showFullOnlineQueryErrorSnackbar() {
+        Snackbar snackbar = MessageUtils.getBasicSnackbar(mFabMenu, getString(R.string.toast_failed_load_new_group_data));
+        snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showProgressDialog(getString(R.string.progress_new_group_data));
+                fullOnlineQuery();
+            }
+        });
+        snackbar.show();
+
+    }
+
     private FullQueryHelper findQueryHelper(FragmentManager fragmentManager) {
         return (FullQueryHelper) fragmentManager.findFragmentByTag(FULL_QUERY_HELPER);
     }
@@ -408,25 +364,18 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     @Override
     public void onPinFailed(ParseException e) {
         ParseErrorHandler.handleParseError(this, e);
-        showOnlineQueryErrorSnackbar(ParseErrorHandler.getErrorMessage(this, e));
+        showFullOnlineQueryErrorSnackbar();
         removeQueryHelper();
 
-        setLoading(false);
+        dismissProgressDialog();
     }
 
     @Override
-    public void onAllQueriesFinished() {
+    public void onFullQueryFinished() {
         removeQueryHelper();
-        setLoading(false);
-    }
 
-    private void setLoading(boolean isLoading) {
-        mHomeUsersFragment.setLoading(isLoading);
-        mHomePurchasesFragment.setLoading(isLoading);
-
-        if (!isLoading && mProgressDialog != null) {
-            mProgressDialog.dismiss();
-        }
+        updateFragmentAdapters();
+        dismissProgressDialog();
     }
 
     private void removeQueryHelper() {
@@ -438,46 +387,17 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         }
     }
 
-    private void showOnlineQueryErrorSnackbar(String errorMessage) {
-        Snackbar snackbar = MessageUtils.getBasicSnackbar(mFabMenu, errorMessage);
-        snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setLoading(true);
-                onlineQuery();
-            }
-        });
-        snackbar.show();
+    private void updateFragmentAdapters() {
+        mHomePurchasesFragment.updateAdapter();
+        mHomeDraftsFragment.updateAdapter();
     }
 
     @Override
-    public void onUsersPinned() {
-        super.onUsersPinned();
+    void afterLoginSetup() {
+        mNewQueryNeeded = true;
+        addViewPagerFragments();
 
-        updateFragmentAdapters(ADAPTER_USER);
-        setToolbarHeader();
-    }
-
-    @Override
-    public void onPurchasesPinned() {
-        super.onPurchasesPinned();
-
-        updateFragmentAdapters(ADAPTER_PURCHASES);
-    }
-
-    private void updateFragmentAdapters(@FragmentAdapter int adapter) {
-        switch (adapter) {
-            case ADAPTER_ALL:
-                mHomePurchasesFragment.updateAdapter();
-                mHomeUsersFragment.updateAdapter();
-                break;
-            case ADAPTER_PURCHASES:
-                mHomePurchasesFragment.updateAdapter();
-                break;
-            case ADAPTER_USER:
-                mHomeUsersFragment.updateAdapter();
-                break;
-        }
+        super.afterLoginSetup();
     }
 
     @Override
@@ -550,6 +470,23 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
+    public void onPurchasesPinFailed(ParseException e) {
+        mHomePurchasesFragment.onPurchasesPinFailed(e);
+    }
+
+    @Override
+    public void onPurchasesPinned() {
+        super.onPurchasesPinned();
+
+        mHomePurchasesFragment.onPurchasesPinned();
+    }
+
+    @Override
+    public void onAllPurchasesQueriesFinished() {
+        mHomePurchasesFragment.onAllPurchasesQueriesFinished();
+    }
+
+    @Override
     public void onMoreObjectsPinned(List<ParseObject> objects) {
         mHomePurchasesFragment.onMoreObjectsPinned(objects);
     }
@@ -610,8 +547,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     @Override
     protected void onNewGroupSet() {
         updateCurrentUserGroups();
-        updateFragmentAdapters(ADAPTER_ALL);
-        setToolbarHeader();
+        updateFragmentAdapters();
     }
 
     @Override

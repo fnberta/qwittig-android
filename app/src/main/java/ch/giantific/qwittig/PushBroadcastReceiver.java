@@ -32,7 +32,7 @@ import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.services.ParseQueryService;
-import ch.giantific.qwittig.ui.CompensationsActivity;
+import ch.giantific.qwittig.ui.FinanceActivity;
 import ch.giantific.qwittig.ui.PurchaseDetailsActivity;
 import ch.giantific.qwittig.utils.MoneyUtils;
 
@@ -700,7 +700,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
             case TYPE_COMPENSATION_EXISTING_NOT_NOW:
                 // fall through
             case TYPE_COMPENSATION_REMIND_USER_HAS_PAID:
-                return CompensationsActivity.class;
+                return FinanceActivity.class;
             default:
                 return super.getActivity(context, intent);
         }

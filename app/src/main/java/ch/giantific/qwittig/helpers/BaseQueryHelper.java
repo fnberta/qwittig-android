@@ -142,7 +142,7 @@ public abstract class BaseQueryHelper extends BaseHelper {
         }
     }
 
-    private void queryCompensationsUnpaid(List<ParseObject> groups) {
+    final void queryCompensationsUnpaid(List<ParseObject> groups) {
         ParseQuery<ParseObject> query = OnlineQuery.getCompensationsQuery();
         query.whereContainedIn(Compensation.GROUP, groups);
         query.whereEqualTo(Compensation.IS_PAID, false);
@@ -180,7 +180,7 @@ public abstract class BaseQueryHelper extends BaseHelper {
         // empty default implementation
     }
 
-    private void queryCompensationsPaid(final ParseObject group) {
+    final void queryCompensationsPaid(final ParseObject group) {
         ParseQuery<ParseObject> query = OnlineQuery.getCompensationsQuery();
         query.whereEqualTo(Compensation.GROUP, group);
         query.whereEqualTo(Compensation.IS_PAID, true);

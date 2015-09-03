@@ -3,40 +3,46 @@
 
     <group
         android:id="@+id/nav_group_main"
-        android:checkableBehavior="single">
+        android:checkableBehavior="single"
+        >
         <item
             android:id="@+id/nav_home"
             android:checked="true"
             android:icon="@drawable/ic_local_grocery_store_black_24dp"
-            android:title="@string/title_activity_home" />
+            android:title="@string/title_activity_home"
+            />
         <item
-            android:id="@+id/nav_settlement"
-            android:icon="@drawable/ic_account_balance_wallet_black_24dp"
-            android:title="@string/title_activity_settlement" />
+            android:id="@+id/nav_finance"
+            android:icon="@drawable/ic_attach_money_black_24dp"
+            android:title="@string/title_activity_finance"
+            />
         <item
-            android:id="@+id/nav_drafts"
-            android:icon="@drawable/ic_receipt_black_24dp"
-            android:title="@string/title_activity_purchase_drafts" />
-
+            android:id="@+id/nav_tasks"
+            android:icon="@drawable/ic_assignment_black_24dp"
+            android:title="Tasks"
+            />
         <item
             android:id="@+id/nav_stats"
             android:icon="@drawable/ic_assessment_black_24dp"
-            android:title="@string/title_activity_stats" />
+            android:title="@string/title_activity_stats"
+            />
     </group>
 
     <item
         android:id="@+id/nav_settings"
         android:icon="@drawable/ic_settings_black_24dp"
-        android:title="@string/title_activity_settings" />
+        android:title="@string/title_activity_settings"
+        />
     <item
         android:id="@+id/nav_help_feedback"
         android:icon="@drawable/ic_help_black_24dp"
-        android:title="@string/title_activity_help_feedback" />
-
+        android:title="@string/title_activity_help_feedback"
+        />
     <item
         android:id="@+id/nav_go_premium"
         android:icon="@drawable/ic_flight_takeoff_black_24dp"
         android:title="@string/go_premium"
-        android:visible="false" />
+        android:visible="false"
+        />
 
 </menu>

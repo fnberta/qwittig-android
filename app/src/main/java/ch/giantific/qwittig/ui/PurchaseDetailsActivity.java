@@ -46,9 +46,6 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // green or red toolbar
-        applyCorrectTheme();
         setContentView(R.layout.activity_purchase_details);
 
         // disable default actionBar title
@@ -77,22 +74,6 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
         if (savedInstanceState == null && mUserIsLoggedIn) {
             addDetailsFragment();
         }
-    }
-
-    /**
-     * Applies the correct theme, depending on whether the currentUser is the buyer of the purchase
-     * or not.
-     */
-    private void applyCorrectTheme() {
-        final Intent intent = getIntent();
-        boolean isGreen = intent.getBooleanExtra(HomePurchasesFragment.INTENT_THEME, true);
-        int theme;
-        if (isGreen) {
-            theme = R.style.AppTheme_WithNavDrawer_Green;
-        } else {
-            theme = R.style.AppTheme_WithNavDrawer_Red;
-        }
-        setTheme(theme);
     }
 
     private void addDetailsFragment() {

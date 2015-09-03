@@ -4,12 +4,13 @@ import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
+import android.widget.TextView;
 
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -35,6 +36,7 @@ import ch.giantific.qwittig.helpers.CompensationRemindHelper;
 import ch.giantific.qwittig.helpers.CompensationSaveHelper;
 import ch.giantific.qwittig.helpers.MoreQueryHelper;
 import ch.giantific.qwittig.helpers.SettlementHelper;
+import ch.giantific.qwittig.helpers.UserQueryHelper;
 import ch.giantific.qwittig.ui.adapters.TabsAdapter;
 import ch.giantific.qwittig.ui.dialogs.AccountCreateDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.CompensationAddManualDialogFragment;
@@ -42,16 +44,16 @@ import ch.giantific.qwittig.ui.dialogs.CompensationChangeAmountDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
-import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
-public class CompensationsActivity extends BaseNavDrawerActivity implements
-        CompensationsUnpaidFragment.FragmentInteractionListener,
+public class FinanceActivity extends BaseNavDrawerActivity implements
+        FinanceCompensationsUnpaidFragment.FragmentInteractionListener,
         LocalQuery.UserLocalQueryListener,
         CompensationAddManualDialogFragment.DialogInteractionListener,
         GroupCreateDialogFragment.DialogInteractionListener,
         CompensationChangeAmountDialogFragment.FragmentInteractionListener,
+        UserQueryHelper.HelperInteractionListener,
         CompensationQueryHelper.HelperInteractionListener,
         MoreQueryHelper.HelperInteractionListener,
         SettlementHelper.HelperInteractionListener,
@@ -59,37 +61,42 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
         CompensationSaveHelper.HelperInteractionListener {
 
     public static final String INTENT_AUTO_START_NEW = "intent_auto_start_new";
+    private static final String USER_BALANCES_FRAGMENT = "user_balances_fragment";
     private static final String COMPENSATIONS_UNPAID_FRAGMENT = "compensations_unpaid_fragment";
     private static final String COMPENSATIONS_PAID_FRAGMENT = "compensations_paid_fragment";
-
-    @IntDef({FRAGMENT_ADAPTER_BOTH, FRAGMENT_ADAPTER_UNPAID, FRAGMENT_ADAPTER_PAID})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface AdapterType {
-    }
-    private static final int FRAGMENT_ADAPTER_BOTH = 0;
-    private static final int FRAGMENT_ADAPTER_UNPAID = 1;
-    private static final int FRAGMENT_ADAPTER_PAID = 2;
-    private static final String LOG_TAG = CompensationsActivity.class.getSimpleName();
-    private CompensationsUnpaidFragment mCompensationsUnpaidFragment;
-    private CompensationsPaidFragment mCompensationsPaidFragment;
+    private static final String LOG_TAG = FinanceActivity.class.getSimpleName();
+    private TabLayout mTabLayout;
+    private TextView mTextViewBalance;
+    private FinanceUserBalancesFragment mUserBalancesFragment;
+    private FinanceCompensationsUnpaidFragment mCompensationsUnpaidFragment;
+    private FinanceCompensationsPaidFragment mCompensationsPaidFragment;
     private String mCurrentGroupCurrency;
     private List<ParseUser> mSinglePaymentUsers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_compensations);
+        setContentView(R.layout.activity_finance);
 
         // check item in NavDrawer
-        checkNavDrawerItem(R.id.nav_settlement);
+        checkNavDrawerItem(R.id.nav_finance);
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(null);
+        }
+
+        mTextViewBalance = (TextView) findViewById(R.id.tv_balance);
 
         if (mUserIsLoggedIn) {
             if (savedInstanceState == null) {
                 addViewPagerFragments();
             } else {
-                mCompensationsUnpaidFragment = (CompensationsUnpaidFragment) getFragmentManager()
+                mUserBalancesFragment = (FinanceUserBalancesFragment) getFragmentManager()
+                        .getFragment(savedInstanceState, USER_BALANCES_FRAGMENT);
+                mCompensationsUnpaidFragment = (FinanceCompensationsUnpaidFragment) getFragmentManager()
                         .getFragment(savedInstanceState, COMPENSATIONS_UNPAID_FRAGMENT);
-                mCompensationsPaidFragment = (CompensationsPaidFragment) getFragmentManager()
+                mCompensationsPaidFragment = (FinanceCompensationsPaidFragment) getFragmentManager()
                         .getFragment(savedInstanceState, COMPENSATIONS_PAID_FRAGMENT);
                 setupTabs();
             }
@@ -100,8 +107,9 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
         Intent intent = getIntent();
         boolean autoStartNew = intent.getBooleanExtra(INTENT_AUTO_START_NEW, false);
 
-        mCompensationsUnpaidFragment = CompensationsUnpaidFragment.newInstance(autoStartNew);
-        mCompensationsPaidFragment = new CompensationsPaidFragment();
+        mUserBalancesFragment = new FinanceUserBalancesFragment();
+        mCompensationsUnpaidFragment = FinanceCompensationsUnpaidFragment.newInstance(autoStartNew);
+        mCompensationsPaidFragment = new FinanceCompensationsPaidFragment();
 
         setupTabs();
     }
@@ -109,12 +117,14 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
     private void setupTabs() {
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         TabsAdapter tabsAdapter = new TabsAdapter(getFragmentManager());
+        tabsAdapter.addFragment(mUserBalancesFragment, getString(R.string.tab_users));
         tabsAdapter.addFragment(mCompensationsUnpaidFragment, getString(R.string.tab_compensations_new));
         tabsAdapter.addFragment(mCompensationsPaidFragment, getString(R.string.tab_compensations_history));
         viewPager.setAdapter(tabsAdapter);
+        viewPager.setOffscreenPageLimit(2); // TODO: do we really want this?
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(viewPager);
+        mTabLayout = (TabLayout) findViewById(R.id.tabs);
+        mTabLayout.setupWithViewPager(viewPager);
     }
 
     @Override
@@ -124,6 +134,7 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
         // save fragments in saveInstanceBundle if user is logged in
         if (mUserIsLoggedIn) {
             FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.putFragment(outState, USER_BALANCES_FRAGMENT, mUserBalancesFragment);
             fragmentManager.putFragment(outState, COMPENSATIONS_UNPAID_FRAGMENT,
                     mCompensationsUnpaidFragment);
             fragmentManager.putFragment(outState, COMPENSATIONS_PAID_FRAGMENT,
@@ -136,6 +147,35 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
         super.onGroupsFetched();
 
         mCurrentGroupCurrency = ParseUtils.getGroupCurrency();
+        setToolbarHeader();
+    }
+
+    private void setToolbarHeader() {
+        BigFraction balance = BigFraction.ZERO;
+        if (mCurrentUser != null) {
+            balance = mCurrentUser.getBalance(mCurrentGroup);
+        }
+        mTextViewBalance.setText(MoneyUtils.formatMoney(balance, ParseUtils.getGroupCurrency()));
+        setColorTheme(balance);
+    }
+
+    private void setColorTheme(BigFraction balance) {
+        int color;
+        int colorDark;
+        int style;
+        if (Utils.isPositive(balance)) {
+            color = ContextCompat.getColor(this, R.color.green);
+            colorDark = ContextCompat.getColor(this, R.color.green_dark);
+            style = R.style.AppTheme_WithNavDrawer_Green;
+        } else {
+            color = ContextCompat.getColor(this, R.color.red);
+            colorDark = ContextCompat.getColor(this, R.color.red_dark);
+            style = R.style.AppTheme_WithNavDrawer_Red;
+        }
+        setTheme(style);
+        mToolbar.setBackgroundColor(color);
+        mTabLayout.setBackgroundColor(color);
+        setStatusBarBackgroundColor(colorDark);
     }
 
     @Override
@@ -247,105 +287,12 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
         compensation.pinInBackground(Compensation.PIN_LABEL_UNPAID, new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                updateFragmentAdapter(FRAGMENT_ADAPTER_UNPAID);
+                mCompensationsUnpaidFragment.onCompensationsPinned();
                 compensation.saveEventually();
                 MessageUtils.showBasicSnackbar(mToolbar,
                         getString(R.string.toast_payment_saved, recipientNickname));
             }
         });
-    }
-
-    @Override
-    public void onlineQuery() {
-        if (!Utils.isConnected(this)) {
-            setLoading(false);
-            showErrorSnackbar(getString(R.string.toast_no_connection));
-            return;
-        }
-
-        FragmentManager fragmentManager = getFragmentManager();
-        CompensationQueryHelper compensationQueryHelper = findQueryHelper(fragmentManager);
-
-        // If the Fragment is non-null, then it is currently being
-        // retained across a configuration change.
-        if (compensationQueryHelper == null) {
-            compensationQueryHelper = new CompensationQueryHelper();
-
-            fragmentManager.beginTransaction()
-                    .add(compensationQueryHelper, CompensationQueryHelper.COMPENSATION_QUERY_HELPER)
-                    .commit();
-        }
-    }
-
-    private CompensationQueryHelper findQueryHelper(FragmentManager fragmentManager) {
-        return (CompensationQueryHelper) fragmentManager.findFragmentByTag(CompensationQueryHelper.COMPENSATION_QUERY_HELPER);
-    }
-
-    @Override
-    public void onCompensationsPinFailed(ParseException e) {
-        ParseErrorHandler.handleParseError(this, e);
-        showErrorSnackbar(ParseErrorHandler.getErrorMessage(this, e));
-        removeQueryHelper();
-
-        setLoading(false);
-    }
-
-    private void showErrorSnackbar(String errorMessage) {
-        Snackbar snackbar = MessageUtils.getBasicSnackbar(mToolbar, errorMessage);
-        snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setLoading(true);
-                onlineQuery();
-            }
-        });
-        snackbar.show();
-    }
-
-    @Override
-    public void onAllQueriesFinished() {
-        removeQueryHelper();
-        setLoading(false);
-    }
-
-    @Override
-    public void onCompensationsPinned(boolean isPaid) {
-        super.onCompensationsPinned(isPaid);
-
-        if (isPaid) {
-            updateFragmentAdapter(FRAGMENT_ADAPTER_PAID);
-        } else {
-            updateFragmentAdapter(FRAGMENT_ADAPTER_UNPAID);
-        }
-    }
-
-    private void removeQueryHelper() {
-        FragmentManager fragmentManager = getFragmentManager();
-        CompensationQueryHelper compensationQueryHelper = findQueryHelper(fragmentManager);
-
-        if (compensationQueryHelper != null) {
-            fragmentManager.beginTransaction().remove(compensationQueryHelper).commitAllowingStateLoss();
-        }
-    }
-
-    private void updateFragmentAdapter(@AdapterType int adapter) {
-        switch (adapter) {
-            case FRAGMENT_ADAPTER_BOTH:
-                mCompensationsPaidFragment.updateAdapter();
-                mCompensationsUnpaidFragment.updateAdapter();
-                break;
-            case FRAGMENT_ADAPTER_PAID:
-                mCompensationsPaidFragment.updateAdapter();
-                break;
-            case FRAGMENT_ADAPTER_UNPAID:
-                mCompensationsUnpaidFragment.updateAdapter();
-                break;
-        }
-    }
-
-    private void setLoading(boolean isLoading) {
-        mCompensationsUnpaidFragment.setLoading(isLoading);
-        mCompensationsPaidFragment.setLoading(isLoading);
     }
 
     @Override
@@ -355,16 +302,60 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
         accountCreateDialogFragment.show(getFragmentManager(), "account_create");
     }
 
-    @Override
-    public void showChangeAmountDialog(BigFraction amount, String currency) {
-        CompensationChangeAmountDialogFragment storeSelectionDialogFragment =
-                CompensationChangeAmountDialogFragment.newInstance(amount, currency);
-        storeSelectionDialogFragment.show(getFragmentManager(), "change_amount");
-    }
-
+    /**
+     * Callback from changeAmount dialog
+     * @param amount
+     */
     @Override
     public void changeAmount(BigFraction amount) {
         mCompensationsUnpaidFragment.changeAmount(amount);
+    }
+
+    @Override
+    public void onUsersPinFailed(ParseException e) {
+        mUserBalancesFragment.onUsersPinFailed(e);
+    }
+
+    @Override
+    public void onUsersPinned() {
+        super.onUsersPinned();
+
+        mUserBalancesFragment.onUsersPinned();
+        setToolbarHeader();
+    }
+
+    @Override
+    public void onAllUserQueriesFinished() {
+        mUserBalancesFragment.onAllUserQueriesFinished();
+    }
+
+    @Override
+    public void onCompensationsPinFailed(ParseException e, boolean isPaid) {
+        if (isPaid) {
+            mCompensationsPaidFragment.onCompensationsPinFailed(e);
+        } else {
+            mCompensationsUnpaidFragment.onCompensationsPinFailed(e);
+        }
+    }
+
+    @Override
+    public void onAllQueriesFinished(boolean isPaid) {
+        if (isPaid) {
+            mCompensationsPaidFragment.onAllCompensationQueriesFinished();
+        } else {
+            mCompensationsUnpaidFragment.onAllCompensationQueriesFinished();
+        }
+    }
+
+    @Override
+    public void onCompensationsPinned(boolean isPaid) {
+        super.onCompensationsPinned(isPaid);
+
+        if (isPaid) {
+            mCompensationsPaidFragment.onCompensationsPinned();
+        } else {
+            mCompensationsUnpaidFragment.onCompensationsPinned();
+        }
     }
 
     @Override
@@ -409,11 +400,18 @@ public class CompensationsActivity extends BaseNavDrawerActivity implements
 
     @Override
     protected void onNewGroupSet() {
-        updateFragmentAdapter(FRAGMENT_ADAPTER_BOTH);
+        updateFragmentAdapters();
+        setToolbarHeader();
+    }
+
+    private void updateFragmentAdapters() {
+        mUserBalancesFragment.updateAdapter();
+        mCompensationsPaidFragment.updateAdapter();
+        mCompensationsUnpaidFragment.updateAdapter();
     }
 
     @Override
     int getSelfNavDrawerItem() {
-        return R.id.nav_settlement;
+        return R.id.nav_finance;
     }
 }

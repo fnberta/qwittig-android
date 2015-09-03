@@ -1,34 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ch.giantific.qwittig.ui.CompensationsPaidFragment">
-    <!--android:animateLayoutChanges="true"> currently broken in design lib 22.2.1 -->
+    >
+    <!--android:animateLayoutChanges="true"> currently broken in design lib 23.0.0 -->
 
     <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/srl_compensations_history"
+        android:id="@+id/srl_base"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        >
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_compensations_history"
+            android:id="@+id/rv_base"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:paddingBottom="@dimen/small_space"
-            android:clipToPadding="false"/>
+            android:clipToPadding="false"
+            android:scrollbars="vertical"
+            />
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
-    <TextView
-        android:id="@+id/tv_empty_view"
-        style="@style/Base.TextAppearance.AppCompat.Title"
+    <ProgressBar
+        android:id="@+id/pb_base"
+        style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:visibility="gone"
-        android:text="@string/no_compensations_history"
-        tools:visibility="visible"/>
+        android:indeterminate="true"
+        />
 
 </FrameLayout>

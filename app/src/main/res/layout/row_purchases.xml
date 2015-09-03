@@ -4,80 +4,93 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rl_purchase"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/list_avatar_with_text"
+    android:layout_height="@dimen/list_avatar_with_two_line_text"
     android:background="?android:attr/selectableItemBackground">
 
-    <TextView
-        android:id="@+id/tv_date"
-        style="@style/TextAppearance.AppCompat.Caption"
+    <ImageView
+        android:id="@+id/iv_avatar"
         android:layout_width="@dimen/avatar_size"
         android:layout_height="@dimen/avatar_size"
+        android:layout_marginStart="@dimen/key_line_1"
+        android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_avatar_size"
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
-        android:layout_marginStart="@dimen/key_line_1"
-        android:layout_marginEnd="@dimen/normal_space"
-        android:paddingStart="@dimen/min_space"
-        android:paddingEnd="@dimen/min_space"
-        android:gravity="center"
-        android:lines="2"
-        android:textAllCaps="true"
-        android:background="@color/grey_light"
-        tools:text="FEB\n24"/>
-
-    <TextView
-        android:id="@+id/tv_user"
-        style="@style/ListTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@id/tv_date"
-        android:gravity="center_vertical"
-        tools:text="Vera"/>
-
-    <TextView
-        android:id="@+id/tv_store"
-        style="@style/ListTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@id/tv_user"
-        android:layout_toStartOf="@+id/ll_share"
-        android:gravity="center_vertical|end"
-        tools:text="Denner"/>
+        android:contentDescription="@string/user_avatar"
+        tools:src="@drawable/ic_account_circle_black_40dp"
+        />
 
     <LinearLayout
-        android:id="@id/ll_share"
-        android:layout_width="@dimen/balance_change_width"
-        android:layout_height="@dimen/balance_change_height"
+        android:id="@+id/ll_store_user_date"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@id/iv_avatar"
+        android:layout_toStartOf="@+id/ll_share"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="@dimen/normal_space"
+        android:layout_marginEnd="@dimen/normal_space"
+        android:gravity="center_vertical"
+        >
+
+        <TextView
+            android:id="@+id/tv_store"
+            style="@style/TextAppearance.AppCompat.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|top"
+            tools:text="Denner"
+            />
+
+        <TextView
+            android:id="@+id/tv_user_date"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|bottom"
+            android:textColor="?android:textColorSecondary"
+            tools:text="Vera, 24.02.2015"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_share"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:layout_marginStart="@dimen/normal_space"
         android:layout_marginEnd="@dimen/key_line_1"
-        android:background="@color/grey_light">
+        android:gravity="center_vertical"
+        >
+
+        <TextView
+            android:id="@+id/tv_total"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|top"
+            tools:text="56.20"/>
 
         <TextView
             android:id="@+id/tv_my_share"
-            style="@style/ListTextView"
+            style="@style/TextAppearance.AppCompat.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingStart="@dimen/small_space"
-            android:paddingEnd="@dimen/small_space"
-            android:layout_gravity="center_horizontal|top"
+            android:layout_gravity="end|bottom"
             android:textColor="?android:textColorSecondary"
-            tools:text="45"/>
-
-        <TextView
-            android:id="@+id/tv_balance_change"
-            style="@style/TextAppearance.AppCompat.Caption"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingStart="@dimen/small_space"
-            android:paddingEnd="@dimen/small_space"
-            android:layout_gravity="center_horizontal|bottom"
-            android:textColor="@color/green"
-            tools:text="-8.40"/>
-
+            tools:text="2.30"/>
     </LinearLayout>
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="@dimen/key_line_2"
+        android:layout_marginEnd="@dimen/key_line_1"
+        android:background="?android:attr/listDivider"
+        />
 
 </RelativeLayout>

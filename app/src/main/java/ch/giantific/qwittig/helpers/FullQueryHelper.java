@@ -40,7 +40,7 @@ public class FullQueryHelper extends BaseQueryHelper {
         super.onCreate(savedInstanceState);
 
         if (mCurrentGroup == null || mCurrentUserGroups == null) {
-            mListener.onAllQueriesFinished();
+            mListener.onFullQueryFinished();
             return;
         }
 
@@ -75,7 +75,7 @@ public class FullQueryHelper extends BaseQueryHelper {
     @Override
     protected void finish() {
         if (mListener != null) {
-            mListener.onAllQueriesFinished();
+            mListener.onFullQueryFinished();
         }
     }
 
@@ -142,7 +142,7 @@ public class FullQueryHelper extends BaseQueryHelper {
 
         void onCompensationsPinned(boolean isPaid);
 
-        void onAllQueriesFinished();
+        void onFullQueryFinished();
 
         void onPinFailed(ParseException e);
     }

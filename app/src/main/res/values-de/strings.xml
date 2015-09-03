@@ -73,7 +73,7 @@
     <string name="toast_receipt_added">Quittung hinzugefügt</string>
     <string name="toast_receipt_changed">Quittung geändert</string>
     <string name="error_nickname_length">Spitzname ist zu lang</string>
-    <string name="title_activity_settlement">Kontoausgleich</string>
+    <string name="title_activity_finance">Finanzen</string>
     <string name="hint_password_new">Neues Passwort</string>
     <string name="balance_owe_you">schuldet dir %1$s</string>
     <string name="button_done">Erledigt</string>
@@ -83,7 +83,7 @@
     <string name="header_receipt">Quittung</string>
     <string name="drawer_open">Navigationsleiste öffnen</string>
     <string name="drawer_close">Navigationsleiste schliessen</string>
-    <string name="title_activity_home">Übersicht</string>
+    <string name="title_activity_home">Einkäufe</string>
     <string name="toast_compensation_finish_old">Alle Mitglieder der Gruppe müssen zuerst ihre Schulden begleichen haben</string>
     <string name="no_compensations">Keine Ausgleichszahlungen</string>
     <string name="action_compensation_add_manual">Einzelne Zahlung hinzufügen</string>
@@ -242,5 +242,8 @@
     <string name="snackbar_action_open_settings">Einstellungen</string>
     <string name="action_settings_profile_avatar_delete">Profilbild löschen</string>
     <string name="stats_month_all">Alle</string>
+    <string name="toast_failed_load_new_group_data">Laden der neuen Gruppendaten fehlgeschlagen</string>
+    <string name="progress_new_group_data">Lade neue Gruppendaten…</string>
+    <string name="title_activity_tasks">Aufgaben</string>
 
 </resources>

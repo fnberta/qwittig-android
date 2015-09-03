@@ -4,18 +4,28 @@ import android.app.Activity;
 import android.os.Bundle;
 
 import com.parse.ParseException;
+import com.parse.ParseObject;
 
 /**
  * Created by fabio on 10.12.14.
  */
 public class CompensationQueryHelper extends BaseQueryHelper {
 
-    public static final String COMPENSATION_QUERY_HELPER = "compensation_query_helper";
     private static final String LOG_TAG = CompensationQueryHelper.class.getSimpleName();
+    private static final String QUERY_PAID = "query_paid";
+    private boolean mQueryPaid;
     private HelperInteractionListener mListener;
 
     public CompensationQueryHelper() {
         // empty default constructor
+    }
+
+    public static CompensationQueryHelper newInstance(boolean queryPaid) {
+        CompensationQueryHelper fragment = new CompensationQueryHelper();
+        Bundle args = new Bundle();
+        args.putBoolean(QUERY_PAID, queryPaid);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
@@ -33,28 +43,38 @@ public class CompensationQueryHelper extends BaseQueryHelper {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Bundle args = getArguments();
+        if (args != null) {
+            mQueryPaid = args.getBoolean(QUERY_PAID, false);
+        }
+
         if (mCurrentGroup == null || mCurrentUserGroups == null) {
-            mListener.onAllQueriesFinished();
+            mListener.onAllQueriesFinished(mQueryPaid);
             return;
         }
 
-        // compensationsPaid for each group + compensationsUnpaid
-        mTotalNumberOfQueries = mCurrentUserGroups.size() + 1;
-
-        queryCompensations();
+        if (mQueryPaid) {
+            mTotalNumberOfQueries = mCurrentUserGroups.size();
+            for (ParseObject group : mCurrentUserGroups) {
+                queryCompensationsPaid(group);
+            }
+        } else {
+            mTotalNumberOfQueries = 1;
+            queryCompensationsUnpaid(mCurrentUserGroups);
+        }
     }
 
     @Override
     protected void onParseError(ParseException e) {
         if (mListener != null) {
-            mListener.onCompensationsPinFailed(e);
+            mListener.onCompensationsPinFailed(e, mQueryPaid);
         }
     }
 
     @Override
     protected void finish() {
         if (mListener != null) {
-            mListener.onAllQueriesFinished();
+            mListener.onAllQueriesFinished(mQueryPaid);
         }
     }
 
@@ -90,8 +110,8 @@ public class CompensationQueryHelper extends BaseQueryHelper {
     public interface HelperInteractionListener {
         void onCompensationsPinned(boolean isPaid);
 
-        void onCompensationsPinFailed(ParseException e);
+        void onCompensationsPinFailed(ParseException e, boolean isPaid);
 
-        void onAllQueriesFinished();
+        void onAllQueriesFinished(boolean isPaid);
     }
 }
