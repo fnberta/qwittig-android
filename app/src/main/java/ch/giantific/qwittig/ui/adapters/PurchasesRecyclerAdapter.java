@@ -22,7 +22,6 @@ import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.Avatar;
-import ch.giantific.qwittig.data.parse.models.Item;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.ui.adapters.rows.ProgressRow;
@@ -93,13 +92,12 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
                 User buyer = purchase.getBuyer();
 
                 purchaseRow.setAvatar(buyer.getAvatar());
-                purchaseRow.setDate(purchase.getDate());
                 purchaseRow.setStore(purchase.getStore());
 
                 User currentUser = (User) ParseUser.getCurrentUser();
                 String nickname = buyer.getGroupIds().contains(currentUser.getCurrentGroup().getObjectId()) ?
                         buyer.getNicknameOrMe(mContext) : mContext.getString(R.string.user_deleted);
-                purchaseRow.setBuyer(nickname);
+                purchaseRow.setBuyerAndDate(nickname, purchase.getDate());
 
                 double totalPrice = purchase.getTotalPrice();
                 purchaseRow.setTotal(MoneyUtils.formatMoneyNoSymbol(totalPrice, mCurrentGroupCurrency));
@@ -142,9 +140,8 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
         private View mView;
         private View mDivider;
         private ImageView mImageViewAvatar;
-        private TextView mTextViewDate;
         private TextView mTextViewStore;
-        private TextView mTextViewBuyer;
+        private TextView mTextViewBuyerDate;
         private TextView mTextViewMyShare;
         private TextView mTextViewTotal;
 
@@ -162,9 +159,8 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
             mView = view.findViewById(R.id.rl_purchase);
             mDivider = view.findViewById(R.id.divider);
             mImageViewAvatar = (ImageView) view.findViewById(R.id.iv_avatar);
-            mTextViewDate = (TextView) view.findViewById(R.id.tv_date);
             mTextViewStore = (TextView) view.findViewById(R.id.tv_store);
-            mTextViewBuyer = (TextView) view.findViewById(R.id.tv_user);
+            mTextViewBuyerDate = (TextView) view.findViewById(R.id.tv_user_date);
             mTextViewTotal = (TextView) view.findViewById(R.id.tv_total);
             mTextViewMyShare = (TextView) view.findViewById(R.id.tv_my_share);
         }
@@ -205,16 +201,13 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
             }
         }
 
-        public void setDate(Date date) {
-            mTextViewDate.setText(DateUtils.formatDateShort(date));
+        public void setBuyerAndDate(String buyer, Date date) {
+            String userAndDate = String.format("%s, %s", buyer, DateUtils.formatDateShort(date));
+            mTextViewBuyerDate.setText(userAndDate);
         }
 
         public void setStore(String store) {
             mTextViewStore.setText(store);
-        }
-
-        public void setBuyer(String buyer) {
-            mTextViewBuyer.setText(buyer);
         }
 
         public void setTotal(String total) {

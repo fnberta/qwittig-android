@@ -19,22 +19,13 @@
         tools:src="@drawable/ic_account_circle_black_40dp"
         />
 
-    <TextView
-        android:id="@+id/tv_user"
-        style="@style/ListTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_toEndOf="@id/iv_avatar"
-        android:gravity="center_vertical"
-        tools:text="Vera"
-        />
-
     <LinearLayout
-        android:id="@+id/ll_store_and_date"
+        android:id="@+id/ll_store_user_date"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:layout_alignParentTop="true"
+        android:layout_toEndOf="@id/iv_avatar"
         android:layout_toStartOf="@+id/ll_share"
         android:layout_centerVertical="true"
         android:layout_marginStart="@dimen/normal_space"
@@ -44,26 +35,28 @@
 
         <TextView
             android:id="@+id/tv_store"
-            style="@style/TextAppearance.AppCompat.Subhead"
+            style="@style/TextAppearance.AppCompat.Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start|top"
-            tools:text="Denner"/>
+            tools:text="Denner"
+            />
 
         <TextView
-            android:id="@+id/tv_date"
-            style="@style/TextAppearance.AppCompat.Body1"
+            android:id="@+id/tv_user_date"
+            style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start|bottom"
             android:textColor="?android:textColorSecondary"
-            tools:text="24. Feb 2015"/>
+            tools:text="Vera, 24.02.2015"
+            />
 
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/ll_share"
-        android:layout_width="80dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:layout_alignParentEnd="true"
