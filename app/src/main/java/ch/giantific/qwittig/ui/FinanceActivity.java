@@ -3,7 +3,6 @@ package ch.giantific.qwittig.ui;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.IntDef;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
@@ -19,8 +18,6 @@ import com.parse.SaveCallback;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -166,11 +163,11 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
         if (Utils.isPositive(balance)) {
             color = ContextCompat.getColor(this, R.color.green);
             colorDark = ContextCompat.getColor(this, R.color.green_dark);
-            style = R.style.AppTheme_WithNavDrawer_Green;
+            style = R.style.AppTheme_DrawStatusBar_Green;
         } else {
             color = ContextCompat.getColor(this, R.color.red);
             colorDark = ContextCompat.getColor(this, R.color.red_dark);
-            style = R.style.AppTheme_WithNavDrawer_Red;
+            style = R.style.AppTheme_DrawStatusBar_Red;
         }
         setTheme(style);
         mToolbar.setBackgroundColor(color);

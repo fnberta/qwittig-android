@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ch.giantific.qwittig" >
+    package="ch.giantific.qwittig"
+    >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -15,27 +16,32 @@
 
     <permission
         android:name="ch.giantific.qwittig.permission.C2D_MESSAGE"
-        android:protectionLevel="signature" />
+        android:protectionLevel="signature"
+        />
 
     <uses-permission android:name="ch.giantific.qwittig.permission.C2D_MESSAGE" />
 
     <uses-feature
         android:name="android.hardware.camera"
-        android:required="false" />
+        android:required="false"
+        />
     <uses-feature
         android:name="android.hardware.camera.autofocus"
-        android:required="false" />
+        android:required="false"
+        />
 
     <application
         android:name=".Qwittig"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        >
         <activity
             android:name=".ui.HomeActivity"
             android:label="@string/title_activity_home"
-            android:theme="@style/AppTheme.DrawStatusBar" >
+            android:theme="@style/AppTheme.DrawStatusBar"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -51,84 +57,100 @@
                     android:host="192.168.0.150"
                     android:pathPrefix="/invitation"
                     android:port="3000"
-                    android:scheme="http" />
+                    android:scheme="http"
+                    />
                 <data
                     android:host="qwittig.ch"
                     android:pathPrefix="/invitation"
-                    android:scheme="http" />
+                    android:scheme="http"
+                    />
                 <data
                     android:host="www.qwittig.ch"
                     android:pathPrefix="/invitation"
-                    android:scheme="http" />
+                    android:scheme="http"
+                    />
                 <data android:scheme="qwittig" />
             </intent-filter>
         </activity>
         <activity
             android:name=".ui.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".ui.HomeActivity" />
+            android:parentActivityName=".ui.HomeActivity"
+            />
         <activity
             android:name=".ui.PurchaseDetailsActivity"
             android:label="@string/title_activity_purchase_details"
             android:parentActivityName=".ui.HomeActivity"
-            android:theme="@style/AppTheme.DrawStatusBar.Explode" />
+            android:theme="@style/AppTheme.DrawStatusBar.Explode"
+            />
         <activity
             android:name=".ui.PurchaseAddActivity"
             android:label="@string/title_activity_add_purchase"
             android:parentActivityName=".ui.HomeActivity"
             android:theme="@style/AppTheme.SlideBottom"
-            android:windowSoftInputMode="stateUnchanged" />
+            android:windowSoftInputMode="stateUnchanged"
+            />
         <activity
             android:name=".ui.PurchaseEditActivity"
             android:label="@string/title_activity_edit_purchase"
             android:parentActivityName=".ui.PurchaseDetailsActivity"
             android:theme="@style/AppTheme.SlideEnd"
-            android:windowSoftInputMode="stateUnchanged" />
+            android:windowSoftInputMode="stateUnchanged"
+            />
         <activity
             android:name=".ui.LoginActivity"
             android:label="@string/title_activity_login"
-            android:theme="@style/AppTheme.SlideBottom"
-            android:windowSoftInputMode="stateUnchanged|adjustPan" />
+            android:theme="@style/AppTheme.Login"
+            android:windowSoftInputMode="stateUnchanged|adjustPan"
+            />
         <activity
             android:name=".ui.SettingsGroupNewActivity"
             android:label="@string/title_activity_settings_group_new"
             android:parentActivityName=".ui.SettingsActivity"
             android:theme="@style/AppTheme.Explode"
-            android:windowSoftInputMode="stateUnchanged" />
+            android:windowSoftInputMode="stateUnchanged"
+            />
         <activity
             android:name=".ui.SettingsUserInviteActivity"
             android:label="@string/title_activity_settings_user_invite"
             android:parentActivityName=".ui.SettingsActivity"
             android:theme="@style/AppTheme.Explode"
-            android:windowSoftInputMode="stateUnchanged" />
+            android:windowSoftInputMode="stateUnchanged"
+            />
         <activity
             android:name=".ui.SettingsProfileActivity"
             android:label="@string/title_activity_settings_profile"
             android:parentActivityName=".ui.SettingsActivity"
             android:theme="@style/AppTheme.DrawStatusBar.Explode"
-            android:windowSoftInputMode="stateUnchanged" />
+            android:windowSoftInputMode="stateUnchanged"
+            />
         <activity
             android:name=".ui.FinanceActivity"
             android:label="@string/title_activity_finance"
             android:parentActivityName=".ui.HomeActivity"
-            android:theme="@style/AppTheme.DrawStatusBar" />
+            android:theme="@style/AppTheme.DrawStatusBar"
+            />
         <activity
             android:name=".ui.SettingsStoresActivity"
             android:label="@string/title_activity_settings_stores"
             android:parentActivityName=".ui.SettingsActivity"
-            android:theme="@style/AppTheme.Explode" />
+            android:theme="@style/AppTheme.Explode"
+            />
         <activity
             android:name=".ui.HelpFeedbackActivity"
             android:label="@string/title_activity_help_feedback"
-            android:parentActivityName=".ui.HomeActivity" />
+            android:parentActivityName=".ui.HomeActivity"
+            />
         <activity
             android:name=".ui.StatsActivity"
             android:label="@string/title_activity_stats"
-            android:theme="@style/AppTheme.DrawStatusBar" />
+            android:theme="@style/AppTheme.DrawStatusBar"
+            />
         <activity
             android:name=".ui.TasksActivity"
             android:label="@string/title_activity_tasks"
-            android:theme="@style/AppTheme.DrawStatusBar" />
+            android:theme="@style/AppTheme.DrawStatusBar"
+            />
 
         <service android:name="com.parse.PushService" />
         <service
@@ -138,7 +160,8 @@
 
         <receiver
             android:name="com.parse.GcmBroadcastReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND" >
+            android:permission="com.google.android.c2dm.permission.SEND"
+            >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
@@ -148,7 +171,8 @@
         </receiver>
         <receiver
             android:name=".PushBroadcastReceiver"
-            android:exported="false" >
+            android:exported="false"
+            >
             <intent-filter>
                 <action android:name="com.parse.push.intent.RECEIVE" />
                 <action android:name="com.parse.push.intent.DELETE" />
@@ -160,7 +184,8 @@
 
         <meta-data
             android:name="com.parse.push.notification_icon"
-            android:resource="@mipmap/ic_launcher" />
+            android:resource="@mipmap/ic_launcher"
+            />
 
     </application>
 

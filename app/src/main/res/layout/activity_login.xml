@@ -37,7 +37,6 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:orientation="vertical"
-            android:transitionGroup="true"
             android:visibility="gone"
             tools:context="ch.giantific.qwittig.ui.ProgressFragment">
 
