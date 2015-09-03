@@ -3,8 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
-    tools:context="ch.giantific.qwittig.ui.PurchaseDraftsFragment">
+    tools:context="ch.giantific.qwittig.ui.HomeDraftsFragment">
 
     <ListView
         android:id="@+id/lv_drafts"
@@ -23,7 +22,7 @@
         android:drawablePadding="@dimen/small_space"
         android:visibility="gone"
         android:text="@string/no_drafts"
-        tools:drawableTop="@drawable/ic_folder_open_black_144dp"
+        android:drawableTop="@drawable/ic_folder_open_black_144dp"
         tools:visibility="visible"/>
 
 </FrameLayout>

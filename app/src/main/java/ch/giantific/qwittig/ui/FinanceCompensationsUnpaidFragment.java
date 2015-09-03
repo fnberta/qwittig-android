@@ -9,8 +9,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +34,7 @@ import ch.giantific.qwittig.helpers.CompensationRemindHelper;
 import ch.giantific.qwittig.helpers.CompensationSaveHelper;
 import ch.giantific.qwittig.helpers.SettlementHelper;
 import ch.giantific.qwittig.ui.adapters.CompensationsUnpaidRecyclerAdapter;
+import ch.giantific.qwittig.ui.dialogs.CompensationChangeAmountDialogFragment;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
@@ -44,7 +43,7 @@ import ch.giantific.qwittig.utils.Utils;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class CompensationsUnpaidFragment extends CompensationsBaseFragment implements
+public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBaseFragment implements
         CompensationsUnpaidRecyclerAdapter.AdapterInteractionListener,
         LocalQuery.CompensationLocalQueryListener,
         FABProgressListener {
@@ -52,8 +51,9 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
     private static final String BUNDLE_AUTO_START_NEW = "auto_start_new";
     private static final String STATE_COMPENSATIONS_LOADING = "state_comps_loading";
     private static final String STATE_IS_CALCULATING_NEW = "state_is_calculating_new";
+    private static final String COMPENSATION_QUERY_HELPER = "compensation_unpaid_query_helper";
     private static final String COMPENSATION_SAVE_HELPER = "compensation_save_helper_";
-    private static final String LOG_TAG = CompensationsUnpaidFragment.class.getSimpleName();
+    private static final String LOG_TAG = FinanceCompensationsUnpaidFragment.class.getSimpleName();
     private TextView mTextViewEmptyTitle;
     private TextView mTextViewEmptySubtitle;
     private FABProgressCircle mFabProgressCircle;
@@ -66,12 +66,12 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
     private boolean mIsCalculatingNew;
     private Compensation mCompensationChangeAmount;
 
-    public CompensationsUnpaidFragment() {
+    public FinanceCompensationsUnpaidFragment() {
         // Required empty public constructor
     }
 
-    public static CompensationsUnpaidFragment newInstance(boolean autoStartNew) {
-        CompensationsUnpaidFragment fragment = new CompensationsUnpaidFragment();
+    public static FinanceCompensationsUnpaidFragment newInstance(boolean autoStartNew) {
+        FinanceCompensationsUnpaidFragment fragment = new FinanceCompensationsUnpaidFragment();
         Bundle args = new Bundle();
         args.putBoolean(BUNDLE_AUTO_START_NEW, autoStartNew);
         fragment.setArguments(args);
@@ -106,11 +106,9 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_compensations_unpaid, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_finance_compensations_unpaid, container, false);
+        findBaseViews(rootView);
 
-        mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.srl_compensations);
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.rv_compensations);
-        mEmptyView = rootView.findViewById(R.id.tv_empty_view);
         mFabNew = (FloatingActionButton) rootView.findViewById(R.id.fab_new_account_balance);
         mFabProgressCircle = (FABProgressCircle) rootView.findViewById(R.id.fab_new_account_balance_circle);
         mTextViewEmptyTitle = (TextView) rootView.findViewById(R.id.tv_empty_view_title);
@@ -135,6 +133,16 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
             }
         });
         mFabProgressCircle.attachListener(this);
+    }
+
+    @Override
+    protected String getQueryHelperTag() {
+        return COMPENSATION_QUERY_HELPER;
+    }
+
+    @Override
+    protected void onlineQuery() {
+        onlineQuery(false);
     }
 
     @Override
@@ -183,7 +191,7 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
             mFabProgressCircle.beginFinalAnimation();
         } else {
             mRecyclerAdapter.notifyDataSetChanged();
-            toggleEmptyViewVisibility();
+            toggleMainVisibility();
         }
     }
 
@@ -623,7 +631,13 @@ public class CompensationsUnpaidFragment extends CompensationsBaseFragment imple
         mCompensationChangeAmount = (Compensation) mCompensations.get(position);
         BigFraction amount = mCompensationChangeAmount.getAmount();
         String currency = mCurrentGroup.getCurrency();
-        mListener.showChangeAmountDialog(amount, currency);
+        showChangeAmountDialog(amount, currency);
+    }
+
+    private void showChangeAmountDialog(BigFraction amount, String currency) {
+        CompensationChangeAmountDialogFragment storeSelectionDialogFragment =
+                CompensationChangeAmountDialogFragment.newInstance(amount, currency);
+        storeSelectionDialogFragment.show(getFragmentManager(), "change_amount");
     }
 
     /**

@@ -1,6 +1,5 @@
 package ch.giantific.qwittig.ui;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -39,12 +38,11 @@ import ch.giantific.qwittig.utils.ParseUtils;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class PurchaseDraftsFragment extends BaseFragment implements
+public class HomeDraftsFragment extends BaseFragment implements
         LocalQuery.PurchaseLocalQueryListener,
         LocalQuery.ObjectLocalFetchListener {
 
     public static final String INTENT_PURCHASE_EDIT_DRAFT = "purchase_edit_draft";
-    private FragmentInteractionListener mListener;
     private User mCurrentUser;
     private Group mCurrentGroup;
     private TextView mTextViewEmpty;
@@ -52,24 +50,13 @@ public class PurchaseDraftsFragment extends BaseFragment implements
     private DraftsAdapter mDraftsAdapter;
     private List<ParseObject> mDrafts = new ArrayList<>();
 
-    public PurchaseDraftsFragment() {
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (FragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
-        }
+    public HomeDraftsFragment() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_purchase_drafts, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_home_drafts, container, false);
 
         mTextViewEmpty = (TextView) rootView.findViewById(R.id.tv_empty_view);
         mListView = (ListView) rootView.findViewById(R.id.lv_drafts);
@@ -128,10 +115,6 @@ public class PurchaseDraftsFragment extends BaseFragment implements
                 editPurchaseDraft(position);
             }
         });
-
-        Drawable drawable = ContextCompat.getDrawable(getActivity(), R.drawable.ic_folder_open_black_144dp);
-        drawable.setAlpha(AppConstants.ICON_BLACK_ALPHA_RGB);
-        mTextViewEmpty.setCompoundDrawablesRelativeWithIntrinsicBounds(null, drawable, null, null);
     }
 
     private void editPurchaseDraft(int position) {
@@ -250,14 +233,5 @@ public class PurchaseDraftsFragment extends BaseFragment implements
 
         toggleEmptyViewVisibility();
         mDraftsAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    public interface FragmentInteractionListener {
     }
 }

@@ -1,14 +1,15 @@
 package ch.giantific.qwittig.ui;
 
+import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.content.ContextCompat;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -17,9 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.constants.AppConstants;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Purchase;
+import ch.giantific.qwittig.helpers.PurchaseQueryHelper;
 import ch.giantific.qwittig.helpers.MoreQueryHelper;
 import ch.giantific.qwittig.ui.adapters.PurchasesRecyclerAdapter;
 import ch.giantific.qwittig.ui.listeners.InfiniteScrollListener;
@@ -28,20 +29,33 @@ import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
-public class HomePurchasesFragment extends HomeBaseFragment implements
+public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
         PurchasesRecyclerAdapter.AdapterInteractionListener,
         LocalQuery.PurchaseLocalQueryListener {
 
     public static final String INTENT_PURCHASE_ID = "purchase_id";
     public static final String INTENT_THEME = "intent_theme";
     private static final String STATE_IS_LOADING_MORE = "state_is_loading_more";
+    private static final String PURCHASE_QUERY_HELPER = "purchase_query_helper";
     private static final String LOG_TAG =  HomePurchasesFragment.class.getSimpleName();
+    private FragmentInteractionListener mListener;
     private PurchasesRecyclerAdapter mRecyclerAdapter;
     private InfiniteScrollListener mScrollListener;
     private List<ParseObject> mPurchases = new ArrayList<>();
     private boolean mIsLoadingMore;
 
     public HomePurchasesFragment() {
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (FragmentInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement FragmentInteractionListener");
+        }
     }
 
     @Override
@@ -56,8 +70,16 @@ public class HomePurchasesFragment extends HomeBaseFragment implements
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        
+
         outState.putBoolean(STATE_IS_LOADING_MORE, mIsLoadingMore);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_home_purchases, container, false);
+        findBaseViews(rootView);
+
+        return rootView;
     }
 
     @Override
@@ -77,11 +99,74 @@ public class HomePurchasesFragment extends HomeBaseFragment implements
     }
 
     @Override
-    protected void setEmptyViewDrawableAndText() {
-        Drawable drawable = ContextCompat.getDrawable(getActivity(), R.drawable.ic_shopping_cart_black_144dp);
-        drawable.setAlpha(AppConstants.ICON_BLACK_ALPHA_RGB);
-        mTextViewEmpty.setCompoundDrawablesRelativeWithIntrinsicBounds(null, drawable, null, null);
-        mTextViewEmpty.setText(R.string.no_purchases);
+    protected void onlineQuery() {
+        if (!Utils.isConnected(getActivity())) {
+            setLoading(false);
+            showOnlineQueryErrorSnackbar(getString(R.string.toast_no_connection));
+            return;
+        }
+
+        FragmentManager fragmentManager = getFragmentManager();
+        PurchaseQueryHelper PurchaseQueryHelper = findQueryHelper(fragmentManager);
+
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (PurchaseQueryHelper == null) {
+            PurchaseQueryHelper = new PurchaseQueryHelper();
+
+            fragmentManager.beginTransaction()
+                    .add(PurchaseQueryHelper, PURCHASE_QUERY_HELPER)
+                    .commit();
+        }
+    }
+
+    private PurchaseQueryHelper findQueryHelper(FragmentManager fragmentManager) {
+        return (PurchaseQueryHelper) fragmentManager.findFragmentByTag(PURCHASE_QUERY_HELPER);
+    }
+
+    /**
+     * Called from activity when helper fails to pin new purchases
+     * @param e
+     */
+    public void onPurchasesPinFailed(ParseException e) {
+        ParseErrorHandler.handleParseError(getActivity(), e);
+        showOnlineQueryErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
+        removeQueryHelper();
+
+        setLoading(false);
+    }
+
+    public void onPurchasesPinned() {
+        updateAdapter();
+    }
+
+    /**
+     * Called from activity when all purchases queries are finished
+     */
+    public void onAllPurchasesQueriesFinished() {
+        removeQueryHelper();
+        setLoading(false);
+    }
+
+    private void removeQueryHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        PurchaseQueryHelper purchaseQueryHelper = findQueryHelper(fragmentManager);
+
+        if (purchaseQueryHelper != null) {
+            fragmentManager.beginTransaction().remove(purchaseQueryHelper).commitAllowingStateLoss();
+        }
+    }
+
+    private void showOnlineQueryErrorSnackbar(String errorMessage) {
+        Snackbar snackbar = MessageUtils.getBasicSnackbar(mRecyclerView, errorMessage);
+        snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setLoading(true);
+                onlineQuery();
+            }
+        });
+        snackbar.show();
     }
 
     @Override
@@ -118,11 +203,18 @@ public class HomePurchasesFragment extends HomeBaseFragment implements
     }
 
     @Override
+    void toggleMainVisibility() {
+        if (!mListener.isNewQueryNeeded()) {
+            super.toggleMainVisibility();
+        }
+    }
+
+    @Override
     protected void toggleEmptyViewVisibility() {
         if (mPurchases.isEmpty()) {
-            mTextViewEmpty.setVisibility(View.VISIBLE);
+            mEmptyView.setVisibility(View.VISIBLE);
         } else {
-            mTextViewEmpty.setVisibility(View.GONE);
+            mEmptyView.setVisibility(View.GONE);
         }
     }
 
@@ -147,7 +239,7 @@ public class HomePurchasesFragment extends HomeBaseFragment implements
         }
 
         if (!Utils.isConnected(getActivity())) {
-            showErrorSnackbar(getString(R.string.toast_no_connection));
+            showLoadMoreErrorSnackbar(getString(R.string.toast_no_connection));
             return;
         }
 
@@ -212,7 +304,7 @@ public class HomePurchasesFragment extends HomeBaseFragment implements
 
     public void onMoreObjectsPinFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
-        showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
+        showLoadMoreErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
         removeMoreQueryHelper();
 
         mIsLoadingMore = false;
@@ -238,7 +330,7 @@ public class HomePurchasesFragment extends HomeBaseFragment implements
         }
     }
 
-    private void showErrorSnackbar(String errorMessage) {
+    private void showLoadMoreErrorSnackbar(String errorMessage) {
         Snackbar snackbar = MessageUtils.getBasicSnackbar(mRecyclerView, errorMessage);
         snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
             @Override
@@ -247,5 +339,15 @@ public class HomePurchasesFragment extends HomeBaseFragment implements
             }
         });
         snackbar.show();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    public interface FragmentInteractionListener {
+        boolean isNewQueryNeeded();
     }
 }

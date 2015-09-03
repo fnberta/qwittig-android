@@ -496,13 +496,13 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
                 startActivity(intent);
                 finish();
                 break;
-            case R.id.nav_settlement:
-                intent = new Intent(this, CompensationsActivity.class);
+            case R.id.nav_finance:
+                intent = new Intent(this, FinanceActivity.class);
                 startActivity(intent);
                 finish();
                 break;
-            case R.id.nav_drafts:
-                intent = new Intent(this, PurchaseDraftsActivity.class);
+            case R.id.nav_tasks:
+                intent = new Intent(this, TasksActivity.class);
                 startActivity(intent);
                 finish();
                 break;

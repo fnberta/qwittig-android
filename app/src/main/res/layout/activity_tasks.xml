@@ -5,22 +5,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="ch.giantific.qwittig.ui.PurchaseDraftsActivity">
+    tools:context="ch.giantific.qwittig.ui.TasksActivity"
+    >
 
-    <LinearLayout
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <include layout="@layout/include_appbar"/>
+        >
 
         <FrameLayout
             android:id="@+id/container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:ignore="MergeRootFrame"/>
+            android:layout_marginTop="?actionBarSize"
+            tools:ignore="MergeRootFrame"
+            />
 
-    </LinearLayout>
+        <include layout="@layout/include_appbar" />
+
+    </android.support.design.widget.CoordinatorLayout>
 
     <include layout="@layout/include_navdrawer"/>
 

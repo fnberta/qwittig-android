@@ -5,8 +5,6 @@ import android.app.FragmentManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,17 +29,18 @@ import ch.giantific.qwittig.utils.Utils;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CompensationsPaidFragment extends CompensationsBaseFragment implements
+public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFragment implements
         LocalQuery.CompensationLocalQueryListener {
 
+    private static final String COMPENSATION_QUERY_HELPER = "compensation_paid_query_helper";
     private static final String STATE_IS_LOADING_MORE = "state_is_loading_more";
-    private static final String LOG_TAG = CompensationsPaidFragment.class.getSimpleName();
+    private static final String LOG_TAG = FinanceCompensationsPaidFragment.class.getSimpleName();
     private InfiniteScrollListener mScrollListener;
     private CompensationsPaidRecyclerAdapter mRecyclerAdapter;
     private List<ParseObject> mCompensations = new ArrayList<>();
     private boolean mIsLoadingMore;
 
-    public CompensationsPaidFragment() {
+    public FinanceCompensationsPaidFragment() {
         // Required empty public constructor
     }
 
@@ -64,11 +63,8 @@ public class CompensationsPaidFragment extends CompensationsBaseFragment impleme
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_compensations_paid, container, false);
-
-        mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.srl_compensations_history);
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.rv_compensations_history);
-        mEmptyView = rootView.findViewById(R.id.tv_empty_view);
+        View rootView = inflater.inflate(R.layout.fragment_finance_compensations_paid, container, false);
+        findBaseViews(rootView);
 
         return rootView;
     }
@@ -87,6 +83,24 @@ public class CompensationsPaidFragment extends CompensationsBaseFragment impleme
             }
         };
         mRecyclerView.addOnScrollListener(mScrollListener);
+    }
+
+    @Override
+    protected String getQueryHelperTag() {
+        return COMPENSATION_QUERY_HELPER;
+    }
+
+    @Override
+    protected void onlineQuery() {
+        onlineQuery(true);
+    }
+
+    /**
+     * Called from activity when helper finished pinning new compensations
+     */
+    public void onCompensationsPinned() {
+        setLoading(false);
+        updateAdapter();
     }
 
     @Override
@@ -110,7 +124,7 @@ public class CompensationsPaidFragment extends CompensationsBaseFragment impleme
     protected void updateView() {
         mRecyclerAdapter.setCurrentGroupCurrency(ParseUtils.getGroupCurrency());
         mRecyclerAdapter.notifyDataSetChanged();
-        toggleEmptyViewVisibility();
+        toggleMainVisibility();
 
         if (mIsLoadingMore) {
             int compensationsSize = mCompensations.size();

@@ -1,6 +1,5 @@
 package ch.giantific.qwittig.ui;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -23,44 +22,26 @@ import ch.giantific.qwittig.data.parse.models.User;
 /**
  * Created by fabio on 02.11.14.
  */
-public abstract class HomeBaseFragment extends BaseFragment implements
+public abstract class BaseRecyclerViewFragment extends BaseFragment implements
         LocalQuery.ObjectLocalFetchListener {
 
     private static final String STATE_IS_LOADING = "state_is_loading";
     User mCurrentUser;
     Group mCurrentGroup;
-    FragmentInteractionListener mListener;
     RecyclerView mRecyclerView;
     SwipeRefreshLayout mSwipeRefreshLayout;
     ProgressBar mProgressBarLoading;
-    TextView mTextViewEmpty;
+    View mEmptyView;
     LinearLayoutManager mLayoutManager;
 
-    public HomeBaseFragment() {
+    public BaseRecyclerViewFragment() {
     }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (FragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_home_tabs, container, false);
-
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.rv_home);
-        mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.srl_home);
-        mProgressBarLoading = (ProgressBar) rootView.findViewById(R.id.pb_home);
-        mTextViewEmpty = (TextView) rootView.findViewById(R.id.tv_empty_view);
-
-        return rootView;
+    final void findBaseViews(View rootView) {
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.rv_base);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.srl_base);
+        mProgressBarLoading = (ProgressBar) rootView.findViewById(R.id.pb_base);
+        mEmptyView = rootView.findViewById(R.id.empty_view);
     }
 
     @Override
@@ -77,11 +58,9 @@ public abstract class HomeBaseFragment extends BaseFragment implements
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mListener.onlineQuery();
+                onlineQuery();
             }
         });
-
-        setEmptyViewDrawableAndText();
 
         if (savedInstanceState != null) {
             final boolean isLoading = savedInstanceState.getBoolean(STATE_IS_LOADING, false);
@@ -94,14 +73,14 @@ public abstract class HomeBaseFragment extends BaseFragment implements
         }
     }
 
+    protected abstract void onlineQuery();
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
         outState.putBoolean(STATE_IS_LOADING, mSwipeRefreshLayout.isRefreshing());
     }
-
-    protected abstract void setEmptyViewDrawableAndText();
 
     public void setLoading(boolean isLoading) {
         if (mSwipeRefreshLayout != null) {
@@ -154,24 +133,10 @@ public abstract class HomeBaseFragment extends BaseFragment implements
      * Hides the loading progressbar and displays the RecyclerView
      */
     @CallSuper
-    final void toggleMainVisibility() {
-        if (!mListener.isNewQueryNeeded()) {
-            mProgressBarLoading.setVisibility(View.GONE);
-            toggleEmptyViewVisibility();
-        }
+    void toggleMainVisibility() {
+        mProgressBarLoading.setVisibility(View.GONE);
+        toggleEmptyViewVisibility();
     }
 
     protected abstract void toggleEmptyViewVisibility();
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    public interface FragmentInteractionListener {
-        void onlineQuery();
-
-        boolean isNewQueryNeeded();
-    }
 }

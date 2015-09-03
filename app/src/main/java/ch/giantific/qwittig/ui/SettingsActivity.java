@@ -249,8 +249,8 @@ public class SettingsActivity extends BaseActivity implements
      */
     @Override
     public void startNewSettlement() {
-        Intent intent = new Intent(this, CompensationsActivity.class);
-        intent.putExtra(CompensationsActivity.INTENT_AUTO_START_NEW, true);
+        Intent intent = new Intent(this, FinanceActivity.class);
+        intent.putExtra(FinanceActivity.INTENT_AUTO_START_NEW, true);
         startActivity(intent);
     }
 

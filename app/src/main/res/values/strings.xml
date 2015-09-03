@@ -70,7 +70,7 @@
     <string name="toast_receipt_added">Added receipt</string>
     <string name="toast_receipt_changed">Changed receipt</string>
     <string name="error_nickname_length">Nickname is too long</string>
-    <string name="title_activity_settlement">Settlements</string>
+    <string name="title_activity_finance">Finance</string>
     <string name="hint_password_new">New password</string>
     <string name="balance_owe_you">owes you %1$s</string>
     <string name="button_done">Done</string>
@@ -80,7 +80,7 @@
     <string name="header_receipt">Receipt</string>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
-    <string name="title_activity_home">Overview</string>
+    <string name="title_activity_home">Purchases</string>
     <string name="toast_compensation_finish_old">All members of the group must haved settled their debts first</string>
     <string name="no_compensations">No compensation payments</string>
     <string name="action_compensation_add_manual">Add single payment</string>
@@ -244,5 +244,12 @@
     <string name="snackbar_action_open_settings">System settings</string>
     <string name="action_settings_profile_avatar_delete">Delete profile image</string>
     <string name="stats_month_all">All</string>
+    <string name="toast_failed_load_new_group_data">Failed to load data for new group</string>
+    <string name="progress_new_group_data">Loading data for new group…</string>
+    <string name="pref_group_add_new">Create new group</string>
+    <string name="pref_group_add_user">Invite users</string>
+    <string name="pref_group_current">Current group</string>
+    <string name="pref_group_name">Change group name</string>
+    <string name="title_activity_tasks">Tasks</string>
 
 </resources>

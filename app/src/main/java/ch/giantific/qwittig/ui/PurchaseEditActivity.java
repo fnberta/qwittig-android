@@ -26,7 +26,7 @@ public class PurchaseEditActivity extends PurchaseBaseActivity implements
 
         String editPurchaseId = getIntent().getStringExtra(HomePurchasesFragment.INTENT_PURCHASE_ID);
         boolean inDraftMode = getIntent().getBooleanExtra(
-                PurchaseDraftsFragment.INTENT_PURCHASE_EDIT_DRAFT, false);
+                HomeDraftsFragment.INTENT_PURCHASE_EDIT_DRAFT, false);
 
         if (savedInstanceState == null) {
             PurchaseEditFragment fragment;
