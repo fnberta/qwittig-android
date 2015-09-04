@@ -38,7 +38,7 @@ public class UserQueryHelper extends BaseQueryHelper {
         }
 
         mTotalNumberOfQueries = 1;
-        queryUsers();
+        calculateBalances();
     }
 
     @Override
@@ -53,6 +53,13 @@ public class UserQueryHelper extends BaseQueryHelper {
         if (mListener != null) {
             mListener.onAllUserQueriesFinished();
         }
+    }
+
+    @Override
+    void onBalancesCalculated() {
+        super.onBalancesCalculated();
+
+        queryUsers();
     }
 
     @Override

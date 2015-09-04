@@ -5,14 +5,19 @@ import android.support.annotation.CallSuper;
 
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
+import com.parse.FunctionCallback;
+import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import ch.giantific.qwittig.data.parse.CloudCode;
 import ch.giantific.qwittig.data.parse.OnlineQuery;
 import ch.giantific.qwittig.data.parse.models.Compensation;
 import ch.giantific.qwittig.data.parse.models.Group;
@@ -47,6 +52,26 @@ public abstract class BaseQueryHelper extends BaseHelper {
             mCurrentGroup = currentUser.getCurrentGroup();
             mCurrentUserGroups = currentUser.getGroups();
         }
+    }
+
+    final void calculateBalances() {
+        Map<String, Object> params = new HashMap<>();
+        ParseCloud.callFunctionInBackground(CloudCode.CALCULATE_BALANCE, params, new FunctionCallback<Object>() {
+            @Override
+            public void done(Object o, ParseException e) {
+                if (e != null) {
+                    onParseError(e);
+                    return;
+                }
+
+                onBalancesCalculated();
+            }
+        });
+    }
+
+    @CallSuper
+    void onBalancesCalculated() {
+        // empty default implementation
     }
 
     final void queryUsers() {

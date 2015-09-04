@@ -416,19 +416,6 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     }
 
     /**
-     * Called from activity when helper successfully saved compensation
-     *
-     * @param compensation
-     */
-    public void onCompensationSaved(ParseObject compensation) {
-        String compensationId = compensation.getObjectId();
-        removeCompensationSaveHelper(compensationId);
-
-        removeItemFromList(compensation);
-        mLoadingCompensations.remove(compensationId);
-    }
-
-    /**
      * Called from activity when helper failed to save compensation
      *
      * @param compensation
@@ -453,6 +440,19 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         if (compensationSaveHelper != null) {
             fragmentManager.beginTransaction().remove(compensationSaveHelper).commitAllowingStateLoss();
         }
+    }
+
+    /**
+     * Called from activity when helper successfully saved compensation
+     *
+     * @param compensation
+     */
+    public void onCompensationSaved(ParseObject compensation) {
+        String compensationId = compensation.getObjectId();
+        removeCompensationSaveHelper(compensationId);
+
+        removeItemFromList(compensation);
+        mLoadingCompensations.remove(compensationId);
     }
 
     private void removeItemFromList(ParseObject compensation) {

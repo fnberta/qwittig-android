@@ -3,14 +3,7 @@ package ch.giantific.qwittig.helpers;
 import android.app.Activity;
 import android.os.Bundle;
 
-import com.parse.FunctionCallback;
-import com.parse.ParseCloud;
 import com.parse.ParseException;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import ch.giantific.qwittig.data.parse.CloudCode;
 
 /**
  * Created by fabio on 10.12.14.
@@ -46,23 +39,7 @@ public class FullQueryHelper extends BaseQueryHelper {
 
         // purchases for each group + compensationsPaid for each group + compensationsUnpaid + users
         mTotalNumberOfQueries = mCurrentUserGroups.size() * 2 + 1 + 1;
-
-        calculateBalance();
-    }
-
-    private void calculateBalance() {
-        Map<String, Object> params = new HashMap<>();
-        ParseCloud.callFunctionInBackground(CloudCode.CALCULATE_BALANCE, params, new FunctionCallback<Object>() {
-            @Override
-            public void done(Object o, ParseException e) {
-                if (e != null) {
-                    onParseError(e);
-                    return;
-                }
-
-                queryUsers();
-            }
-        });
+        calculateBalances();
     }
 
     @Override
@@ -77,6 +54,13 @@ public class FullQueryHelper extends BaseQueryHelper {
         if (mListener != null) {
             mListener.onFullQueryFinished();
         }
+    }
+
+    @Override
+    void onBalancesCalculated() {
+        super.onBalancesCalculated();
+
+        queryUsers();
     }
 
     @Override
