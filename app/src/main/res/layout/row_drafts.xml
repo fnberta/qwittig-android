@@ -38,16 +38,12 @@
     <TextView
         android:id="@id/tv_total_value"
         style="@style/ListTextSubhead"
-        android:layout_width="@dimen/balance_change_width"
-        android:layout_height="@dimen/balance_change_height"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
         android:layout_marginStart="@dimen/normal_space"
         android:layout_marginEnd="@dimen/key_line_1"
-        android:paddingStart="@dimen/small_space"
-        android:paddingEnd="@dimen/small_space"
         android:gravity="center"
-        android:background="@color/grey_light"
         tools:text="-50"/>
 
 </RelativeLayout>
