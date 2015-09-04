@@ -1,14 +1,19 @@
 package ch.giantific.qwittig.ui.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.annotation.ColorInt;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
@@ -18,6 +23,7 @@ import java.util.Date;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.models.Avatar;
 import ch.giantific.qwittig.data.parse.models.Compensation;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.ui.adapters.rows.ProgressRow;
@@ -51,7 +57,7 @@ public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<Recyc
         switch (viewType) {
             case TYPE_ITEM: {
                 View view = LayoutInflater.from(parent.getContext()).inflate(mViewResource, parent, false);
-                return new CompensationHistoryRow(view);
+                return new CompensationHistoryRow(view, mContext);
             }
             case TYPE_PROGRESS: {
                 View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_progress, parent,
@@ -73,9 +79,12 @@ public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<Recyc
                 Compensation compensation = (Compensation) mCompensations.get(position);
 
                 Date date = compensation.getCreatedAt();
+                compensationHistoryRow.setDate(date);
+
                 BigFraction amount = compensation.getAmount();
                 String amountString;
                 String nickname;
+                byte[] avatar;
                 int color;
 
                 User currentUser = (User) ParseUser.getCurrentUser();
@@ -85,19 +94,20 @@ public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<Recyc
                     User payer = compensation.getPayer();
                     nickname = payer.getGroupIds().contains(currentUser.getCurrentGroup().getObjectId()) ?
                             payer.getNickname() : mContext.getString(R.string.user_deleted);
+                    avatar = payer.getAvatar();
                     color = R.color.green;
                     amountString = MoneyUtils.formatMoney(amount, mCurrentGroupCurrency);
                 } else {
                     // negative
                     nickname = beneficiary.getGroupIds().contains(currentUser.getCurrentGroup().getObjectId()) ?
                             beneficiary.getNickname() : mContext.getString(R.string.user_deleted);
+                    avatar = beneficiary.getAvatar();
                     color = R.color.red;
                     amountString = MoneyUtils.formatMoney(amount.negate(), mCurrentGroupCurrency);
                 }
 
-                compensationHistoryRow.setDate(date);
+                compensationHistoryRow.setAvatar(avatar);
                 compensationHistoryRow.setUser(nickname);
-
                 compensationHistoryRow.setAmount(amountString, ContextCompat.getColor(mContext, color));
 
                 break;
@@ -127,20 +137,41 @@ public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<Recyc
     }
 
     private static class CompensationHistoryRow extends RecyclerView.ViewHolder {
+
+        private Context mContext;
+        private ImageView mImageViewAvatar;
         private TextView mTextViewDate;
         private TextView mTextViewUser;
         private TextView mTextViewAmount;
 
-        public CompensationHistoryRow(View view) {
+        public CompensationHistoryRow(View view, Context context) {
             super(view);
 
+            mContext = context;
+            mImageViewAvatar = (ImageView) view.findViewById(R.id.iv_avatar);
             mTextViewDate = (TextView) view.findViewById(R.id.tv_date);
             mTextViewUser = (TextView) view.findViewById(R.id.tv_user);
             mTextViewAmount = (TextView) view.findViewById(R.id.tv_amount);
         }
 
+        public void setAvatar(byte[] avatar) {
+            if (avatar != null) {
+                Glide.with(mContext)
+                        .load(avatar)
+                        .asBitmap()
+                        .into(new BitmapImageViewTarget(mImageViewAvatar) {
+                            @Override
+                            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                                view.setImageDrawable(Avatar.getRoundedDrawable(mContext, resource, false));
+                            }
+                        });
+            } else {
+                mImageViewAvatar.setImageDrawable(Avatar.getFallbackDrawable(mContext, false, false));
+            }
+        }
+
         public void setDate(Date date) {
-            mTextViewDate.setText(DateUtils.formatMonthDayLineSeparated(date));
+            mTextViewDate.setText(DateUtils.formatDateShort(date));
         }
 
         public void setUser(String user) {

@@ -74,7 +74,7 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
         super.onViewCreated(view, savedInstanceState);
 
         mRecyclerAdapter = new CompensationsPaidRecyclerAdapter(getActivity(),
-                R.layout.row_compensations_history, mCompensations);
+                R.layout.row_compensations_paid, mCompensations);
         mRecyclerView.setAdapter(mRecyclerAdapter);
         mScrollListener = new InfiniteScrollListener(mLayoutManager, mRecyclerView) {
             @Override

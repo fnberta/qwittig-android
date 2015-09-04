@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/rl_purchase"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/list_avatar_with_two_line_text"
-    android:background="?android:attr/selectableItemBackground">
+    android:layout_height="@dimen/list_avatar_with_two_line_text">
 
     <ImageView
         android:id="@+id/iv_avatar"
@@ -20,65 +19,47 @@
         />
 
     <LinearLayout
-        android:id="@+id/ll_store_user_date"
+        android:id="@+id/ll_user_date"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:layout_alignParentTop="true"
         android:layout_toEndOf="@id/iv_avatar"
-        android:layout_toStartOf="@+id/ll_share"
+        android:layout_toStartOf="@+id/tv_amount"
         android:layout_marginEnd="@dimen/normal_space"
         android:gravity="center_vertical"
         >
 
         <TextView
-            android:id="@+id/tv_store"
+            android:id="@+id/tv_user"
             style="@style/ListTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
-            tools:text="Denner"
-            />
+            tools:text="Vera"/>
 
         <TextView
-            android:id="@+id/tv_user_date"
+            android:id="@+id/tv_date"
             style="@style/TextAppearance.AppCompat.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:textColor="?android:textColorSecondary"
-            tools:text="Vera, 24.02.2015"
-            />
+            tools:text="23.02.2015"/>
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/ll_share"
+    <TextView
+        android:id="@+id/tv_amount"
+        style="@style/ListTextView"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="@dimen/normal_space"
         android:layout_marginEnd="@dimen/key_line_1"
-        android:gravity="center_vertical"
-        >
-
-        <TextView
-            android:id="@+id/tv_total"
-            style="@style/ListTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|top"
-            tools:text="56.20"/>
-
-        <TextView
-            android:id="@+id/tv_my_share"
-            style="@style/TextAppearance.AppCompat.Body1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
-            android:textColor="?android:textColorSecondary"
-            tools:text="2.30"/>
-    </LinearLayout>
+        android:gravity="center"
+        tools:text="-50"
+        tools:textColor="@color/green"/>
 
     <include layout="@layout/include_inset_divider" />
 

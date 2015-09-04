@@ -122,7 +122,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         super.onViewCreated(view, savedInstanceState);
 
         mRecyclerAdapter = new CompensationsUnpaidRecyclerAdapter(getActivity(),
-                R.layout.row_compensations_pos, R.layout.row_compensations_neg, mCompensations,
+                R.layout.row_compensations_unpaid_pos, R.layout.row_compensations_unpaid_neg, mCompensations,
                 this);
         mRecyclerView.setAdapter(mRecyclerAdapter);
         mFabNew.setImageAlpha(AppConstants.ICON_BLACK_ALPHA_RGB);
