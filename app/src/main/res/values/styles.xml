@@ -35,7 +35,7 @@
         <item name="colorPrimaryDark">@color/red_dark</item>
     </style>
 
-    <style name="ListTextView" parent="@style/TextAppearance.AppCompat.Subhead">
+    <style name="ListTextSubhead" parent="@style/TextAppearance.AppCompat.Subhead">
         <item name="android:lines">1</item>
         <item name="android:ellipsize">end</item>
         <item name="android:textColor">?android:textColorPrimary</item>

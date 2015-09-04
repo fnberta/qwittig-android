@@ -18,7 +18,7 @@
 
     <TextView
         android:id="@+id/list_item_name"
-        style="@style/ListTextView"
+        style="@style/ListTextSubhead"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
@@ -29,7 +29,7 @@
 
     <TextView
         android:id="@id/list_item_final_price"
-        style="@style/ListTextView"
+        style="@style/ListTextSubhead"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"

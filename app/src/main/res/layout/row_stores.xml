@@ -10,7 +10,7 @@
 
     <TextView
         android:id="@+id/tv_store_name"
-        style="@style/ListTextView"
+        style="@style/ListTextSubhead"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_marginStart="@dimen/key_line_1"
