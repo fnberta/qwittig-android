@@ -110,8 +110,8 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
                     purchaseRow.resetBackground();
                 }
 
-                int showDivider = position == getItemCount() - 1 ? View.GONE : View.VISIBLE;
-                purchaseRow.toggleDividerVisibility(showDivider);
+//                int showDivider = position == getItemCount() - 1 ? View.GONE : View.VISIBLE;
+//                purchaseRow.toggleDividerVisibility(showDivider);
 
                 break;
             }
@@ -148,7 +148,6 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
         public PurchaseRow(View view, final AdapterInteractionListener listener, Context context) {
             super(view);
 
-            mContext = context;
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -156,6 +155,7 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
                 }
             });
 
+            mContext = context;
             mView = view.findViewById(R.id.rl_purchase);
             mDivider = view.findViewById(R.id.divider);
             mImageViewAvatar = (ImageView) view.findViewById(R.id.iv_avatar);
@@ -165,8 +165,8 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
             mTextViewMyShare = (TextView) view.findViewById(R.id.tv_my_share);
         }
 
-        public void toggleDividerVisibility(int showDivider) {
-            mDivider.setVisibility(showDivider);
+        public void toggleDividerVisibility(int visibility) {
+            mDivider.setVisibility(visibility);
         }
 
         public void setWhiteBackground() {

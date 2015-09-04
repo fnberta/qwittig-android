@@ -110,6 +110,9 @@ public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<Recyc
                 compensationHistoryRow.setUser(nickname);
                 compensationHistoryRow.setAmount(amountString, ContextCompat.getColor(mContext, color));
 
+//                int showDivider = position == getItemCount() - 1 ? View.GONE : View.VISIBLE;
+//                compensationHistoryRow.toggleDividerVisibility(showDivider);
+
                 break;
             }
             case TYPE_PROGRESS:
@@ -139,6 +142,7 @@ public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<Recyc
     private static class CompensationHistoryRow extends RecyclerView.ViewHolder {
 
         private Context mContext;
+        private View mDivider;
         private ImageView mImageViewAvatar;
         private TextView mTextViewDate;
         private TextView mTextViewUser;
@@ -148,10 +152,15 @@ public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<Recyc
             super(view);
 
             mContext = context;
+            mDivider = view.findViewById(R.id.divider);
             mImageViewAvatar = (ImageView) view.findViewById(R.id.iv_avatar);
             mTextViewDate = (TextView) view.findViewById(R.id.tv_date);
             mTextViewUser = (TextView) view.findViewById(R.id.tv_user);
             mTextViewAmount = (TextView) view.findViewById(R.id.tv_amount);
+        }
+
+        public void toggleDividerVisibility(int visibility) {
+            mDivider.setVisibility(visibility);
         }
 
         public void setAvatar(byte[] avatar) {
