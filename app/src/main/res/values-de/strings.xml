@@ -245,5 +245,6 @@
     <string name="toast_failed_load_new_group_data">Laden der neuen Gruppendaten fehlgeschlagen</string>
     <string name="progress_new_group_data">Lade neue Gruppendaten…</string>
     <string name="title_activity_tasks">Aufgaben</string>
+    <string name="toast_error_purchase_details_load">Laden des Einkaufes fehlgeschlagen</string>
 
 </resources>

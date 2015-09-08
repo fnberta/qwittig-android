@@ -108,14 +108,10 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
         String action = intent.getAction();
         switch (action) {
             case ACTION_PUSH_BUTTON_ACCEPT: {
-                JSONObject jsonExtras = null;
+                JSONObject jsonExtras;
                 try {
                     jsonExtras = getData(intent);
                 } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                if (jsonExtras == null) {
                     super.onReceive(context, intent);
                     return;
                 }
@@ -142,14 +138,10 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 break;
             }
             case ACTION_PUSH_BUTTON_DISCARD: {
-                JSONObject jsonExtras = null;
+                JSONObject jsonExtras;
                 try {
                     jsonExtras = getData(intent);
                 } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                if (jsonExtras == null) {
                     super.onReceive(context, intent);
                     return;
                 }
@@ -196,17 +188,18 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     protected void onPushReceive(Context context, Intent intent) {
         Log.e(LOG_TAG, "onPushReceive");
 
-        JSONObject jsonExtras = null;
+        // return immediately if on user is logged in
+        if (ParseUser.getCurrentUser() == null) {
+            Log.e(LOG_TAG, "currentUser is null");
+            return;
+        }
+
+        JSONObject jsonExtras;
         try {
             jsonExtras = getData(intent);
         } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        // if there is no data or no user is logged in, return immediately
-        if (jsonExtras == null || ParseUser.getCurrentUser() == null) {
-            Log.e(LOG_TAG, "jsonExtras is null " + String.valueOf(jsonExtras == null));
-            Log.e(LOG_TAG, "currentUser is null " + String.valueOf(ParseUser.getCurrentUser() == null));
+            // return immediately if no data
+            Log.e(LOG_TAG, "jsonExtras is null");
             return;
         }
 
@@ -378,18 +371,13 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     }
 
     private String getNotificationType(Intent intent) {
-        JSONObject jsonExtras = null;
+        JSONObject jsonExtras;
         try {
             jsonExtras = getData(intent);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        if (jsonExtras != null) {
             return jsonExtras.optString(NOTIFICATION_TYPE);
+        } catch (JSONException e) {
+            return "";
         }
-
-        return "";
     }
 
     private boolean userIsInUsersInvolved(JSONObject jsonExtras) {
@@ -399,17 +387,16 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
 
     @Override
     protected Notification getNotification(Context context, Intent intent) {
-        JSONObject jsonExtras = null;
+        JSONObject jsonExtras;
         try {
             jsonExtras = getData(intent);
         } catch (JSONException e) {
-            e.printStackTrace();
+            // fall back to super implementation if there is no data
+            return super.getNotification(context, intent);
         }
 
-        // if we have no data or push has non empty title and/or alert, fall back to super
-        // implementation
-        if (jsonExtras == null || jsonExtras.has(PUSH_PARAM_TITLE) ||
-                jsonExtras.has(PUSH_PARAM_ALERT)) {
+        // if push has non empty title and/or alert, fall back to super implementation
+        if (jsonExtras.has(PUSH_PARAM_TITLE) || jsonExtras.has(PUSH_PARAM_ALERT)) {
             return super.getNotification(context, intent);
         }
 
@@ -645,8 +632,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
             JSONObject jsonExtras = null;
             try {
                 jsonExtras = getData(intent);
-            } catch (JSONException e) {
-                e.printStackTrace();
+            } catch (JSONException ignored) {
             }
 
             if (jsonExtras != null) {
@@ -671,15 +657,11 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
         switch (type) {
             case TYPE_PURCHASE_NEW:
                 String groupId = "";
-                JSONObject jsonExtras = null;
+                JSONObject jsonExtras;
                 try {
                     jsonExtras = getData(intent);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                if (jsonExtras != null) {
                     groupId = jsonExtras.optString(PUSH_PARAM_GROUP);
+                } catch (JSONException ignored) {
                 }
 
                 mPurchaseNotifications = mSharedPreferences.getStringSet(
@@ -720,15 +702,11 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
         String type = getNotificationType(intent);
         if (type.equals(TYPE_PURCHASE_NEW)) {
             String groupId = "";
-            JSONObject jsonExtras = null;
+            JSONObject jsonExtras;
             try {
                 jsonExtras = getData(intent);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            if (jsonExtras != null) {
                 groupId = jsonExtras.optString(PUSH_PARAM_GROUP);
+            } catch (JSONException ignored) {
             }
 
             clearStoredPurchaseNotifications(groupId);

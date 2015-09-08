@@ -251,5 +251,6 @@
     <string name="pref_group_current">Current group</string>
     <string name="pref_group_name">Change group name</string>
     <string name="title_activity_tasks">Tasks</string>
+    <string name="toast_error_purchase_details_load">Failed to load purchase</string>
 
 </resources>

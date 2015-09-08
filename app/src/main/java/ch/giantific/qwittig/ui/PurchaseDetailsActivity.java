@@ -95,7 +95,7 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
                 JSONObject jsonExtras = PushBroadcastReceiver.getData(intent);
                 mPurchaseId = jsonExtras.optString(PushBroadcastReceiver.PUSH_PARAM_PURCHASE);
             } catch (JSONException e) {
-                e.printStackTrace();
+                MessageUtils.showBasicSnackbar(mToolbar, getString(R.string.toast_error_purchase_details_load));
             }
         }
     }

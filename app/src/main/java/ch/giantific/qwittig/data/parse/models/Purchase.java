@@ -271,8 +271,7 @@ public class Purchase extends ParseObject {
                 put(RECEIPT_BYTE, receiptData);
                 removeReceiptParseFile();
             } catch (ParseException e) {
-                Log.e("qwittig", "swap " + e.toString());
-                e.printStackTrace();
+                // TODO: do we need to handle this?
             }
         }
     }

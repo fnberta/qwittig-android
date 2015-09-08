@@ -57,8 +57,7 @@ public class MoneyUtils {
         } catch (NumberFormatException e) {
             try {
                 price = parseLocalizedStringToBigDecimal(priceString);
-            } catch (ParseException e1) {
-                e1.printStackTrace();
+            } catch (ParseException ignored) {
             }
         }
 
