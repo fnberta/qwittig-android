@@ -21,8 +21,8 @@
     <string name="action_logout">Log out</string>
     <string name="login_button_log_in">Log in</string>
     <string name="login_button_sign_up">Create new account</string>
-    <string name="no_purchases">No purchases yet</string>
-    <string name="no_users">No users yet</string>
+    <string name="no_purchases">No purchases</string>
+    <string name="no_users">No users</string>
     <string name="action_purchase_delete">Delete purchase</string>
     <string name="toast_purchase_deleted">Purchase deleted</string>
     <string name="title_activity_settings_group_new">Add new group</string>

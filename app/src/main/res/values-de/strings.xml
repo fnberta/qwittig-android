@@ -21,8 +21,8 @@
     <string name="login_button_log_in">Anmelden</string>
     <string name="login_button_sign_up">Neuen Account erstellen</string>
     <string name="login_button_tryout">Ohne Account testen</string>
-    <string name="no_purchases">Noch keine Einkäufe vorhanden</string>
-    <string name="no_users">Noch keine Nutzer vorhanden</string>
+    <string name="no_purchases">Keine Einkäufe vorhanden</string>
+    <string name="no_users">Keine Nutzer vorhanden</string>
     <string name="pref_group_current">Aktive Gruppe</string>
     <string name="pref_group_add_new">Neue Gruppe erstellen</string>
     <string name="pref_group_name">Gruppennamen ändern</string>

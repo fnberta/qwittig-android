@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import com.github.jorgecastilloprz.FABProgressCircle;
 import com.github.jorgecastilloprz.listeners.FABProgressListener;
 import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
@@ -209,8 +211,10 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         if (mCompensationsAll == null || mCompensationsAll.isEmpty()) {
             mEmptyView.setVisibility(View.VISIBLE);
             mTextViewEmptyTitle.setText(R.string.no_compensations);
-            mTextViewEmptySubtitle.setText(R.string.no_compensations_subhead);
-            showFab();
+            if (!ParseUtils.isTestUser(mCurrentUser) && mCurrentGroup != null) {
+                mTextViewEmptySubtitle.setText(R.string.no_compensations_subhead);
+                showFab();
+            }
         } else if (mCompensations.isEmpty()) {
             mEmptyView.setVisibility(View.VISIBLE);
             mTextViewEmptyTitle.setText(R.string.no_compensations);
