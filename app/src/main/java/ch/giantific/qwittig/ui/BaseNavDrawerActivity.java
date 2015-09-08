@@ -35,6 +35,7 @@ import com.parse.ParseUser;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.giantific.qwittig.BlurTransformation;
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.Avatar;
@@ -76,6 +77,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
     private int mFetchCounter = 0;
     private int mGroupsCount;
     private TextView mTextViewHeaderNickname;
+    private ImageView mImageViewHeader;
     private ImageView mImageViewHeaderAvatar;
     private Spinner mSpinnerGroups;
     private NavHeaderGroupsArrayAdapter mSpinnerGroupsAdapter;
@@ -321,6 +323,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
 
     private void setupNavDrawerHeader() {
         mTextViewHeaderNickname = (TextView) findViewById(R.id.tv_drawer_nickname);
+        mImageViewHeader = (ImageView) findViewById(R.id.iv_header_background);
         mImageViewHeaderAvatar = (ImageView) findViewById(R.id.iv_drawer_avatar);
         mImageViewHeaderAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -359,6 +362,11 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
                             view.setImageDrawable(Avatar.getRoundedDrawable(context, resource, true));
                         }
                     });
+
+            Glide.with(this)
+                    .load(avatarByteArray)
+                    .bitmapTransform(new BlurTransformation(context))
+                    .into(mImageViewHeader);
         } else {
             mImageViewHeaderAvatar.setImageDrawable(Avatar.getFallbackDrawable(context, true, true));
         }
