@@ -252,5 +252,26 @@
     <string name="pref_group_name">Change group name</string>
     <string name="title_activity_tasks">Tasks</string>
     <string name="toast_error_purchase_details_load">Failed to load purchase</string>
+    <string name="deadline_today">Today</string>
+    <string name="deadline_month">This month</string>
+    <string name="deadline_year">This Year</string>
+    <string name="deadline_week">This week</string>
+    <string name="no_tasks">No Tasks</string>
+    <string name="deadline_all">All</string>
+    <string name="deadline_text_pos">In %1$d days</string>
+    <string name="deadline_text_neg">%1$d days ago</string>
+    <string name="time_frame_as_needed">As needed</string>
+    <string name="time_frame_daily">Daily</string>
+    <string name="time_frame_weekly">Weekly</string>
+    <string name="time_frame_monthly">Monthly</string>
+    <string name="time_frame_yearly">Yearly</string>
+    <string name="task_done_single">Done</string>
+    <string name="task_done_week">Done for this week</string>
+    <string name="task_done_month">Done for this month</string>
+    <string name="task_done_year">Done for this year</string>
+    <string name="task_done_today">Done for this day</string>
+    <string name="task_users_involved_next">Next: </string>
+    <string name="task_header_my">My tasks</string>
+    <string name="task_header_group">Group\'s tasks</string>
 
 </resources>

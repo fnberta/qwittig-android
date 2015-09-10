@@ -2,6 +2,7 @@ package ch.giantific.qwittig.ui;
 
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +19,7 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.utils.MessageUtils;
 
 /**
  * Created by fabio on 02.11.14.
@@ -74,6 +76,18 @@ public abstract class BaseRecyclerViewFragment extends BaseFragment implements
     }
 
     protected abstract void onlineQuery();
+
+    final void showOnlineQueryErrorSnackbar(String errorMessage) {
+        Snackbar snackbar = MessageUtils.getBasicSnackbar(mRecyclerView, errorMessage);
+        snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setLoading(true);
+                onlineQuery();
+            }
+        });
+        snackbar.show();
+    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {

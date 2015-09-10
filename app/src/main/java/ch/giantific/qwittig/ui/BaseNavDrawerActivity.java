@@ -164,6 +164,11 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
     }
 
     @CallSuper
+    public void onTasksPinned() {
+        // empty default implementation
+    }
+
+    @CallSuper
     public void onGroupQueried() {
         updateGroupSpinnerList();
     }

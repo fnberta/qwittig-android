@@ -115,18 +115,6 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewFragment implem
         }
     }
 
-    private void showOnlineQueryErrorSnackbar(String errorMessage) {
-        Snackbar snackbar = MessageUtils.getBasicSnackbar(mRecyclerView, errorMessage);
-        snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setLoading(true);
-                onlineQuery();
-            }
-        });
-        snackbar.show();
-    }
-
     @Override
     public void updateAdapter() {
         super.updateAdapter();

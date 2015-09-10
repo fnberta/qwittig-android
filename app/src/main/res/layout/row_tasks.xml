@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/small_space"
+    android:layout_marginEnd="@dimen/small_space"
+    android:layout_marginTop="@dimen/min_space"
+    android:layout_marginBottom="@dimen/min_space"
+    card_view:cardCornerRadius="@dimen/card_corner_radius"
+    card_view:cardElevation="@dimen/card_elevation"
+    >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <ImageView
+            android:id="@+id/iv_avatar"
+            android:layout_width="@dimen/avatar_size"
+            android:layout_height="@dimen/avatar_size"
+            android:layout_marginTop="@dimen/normal_space"
+            android:layout_marginBottom="@dimen/normal_space"
+            android:layout_marginStart="@dimen/key_line_1"
+            android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_avatar_size"
+            android:layout_alignParentStart="true"
+            android:contentDescription="@string/user_avatar"
+            tools:src="@drawable/ic_account_circle_black_40dp"
+            />
+
+        <TextView
+            android:id="@+id/tv_task_user_responsible"
+            style="@style/Base.TextAppearance.AppCompat.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/iv_avatar"
+            android:layout_toStartOf="@+id/tv_task_deadline"
+            android:layout_marginTop="@dimen/normal_space"
+            tools:text="Vera"
+            />
+
+        <TextView
+            android:id="@+id/tv_task_title"
+            style="@style/Base.TextAppearance.AppCompat.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/iv_avatar"
+            android:layout_below="@id/tv_task_user_responsible"
+            tools:text="Küche putzen"
+            />
+
+        <TextView
+            android:id="@+id/tv_task_time_frame"
+            style="@style/Base.TextAppearance.AppCompat.Body2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/iv_avatar"
+            android:layout_below="@id/tv_task_title"
+            android:layout_marginTop="@dimen/small_space"
+            tools:text="Wöchentlich"
+            />
+
+        <TextView
+            android:id="@+id/tv_task_users_involved"
+            style="@style/Base.TextAppearance.AppCompat.Body1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/iv_avatar"
+            android:layout_below="@id/tv_task_time_frame"
+            android:layout_marginBottom="@dimen/normal_space"
+            tools:text="vera - lexli - sturzi"
+            />
+
+        <TextView
+            android:id="@+id/tv_task_deadline"
+            style="@style/Base.TextAppearance.AppCompat.Body2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/normal_space"
+            android:layout_marginEnd="@dimen/normal_space"
+            android:layout_alignParentEnd="true"
+            tools:textColor="@color/green"
+            tools:text="In 2 Tagen"
+            />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@id/tv_task_users_involved"
+            android:background="?android:attr/listDivider"
+            />
+
+        <Button
+            android:id="@+id/bt_task_done"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/divider"
+            android:textColor="?attr/colorAccent"
+            tools:text="Done for this week"
+            />
+
+    </RelativeLayout>
+</android.support.v7.widget.CardView>

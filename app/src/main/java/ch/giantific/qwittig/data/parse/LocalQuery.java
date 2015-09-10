@@ -10,11 +10,13 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import ch.giantific.qwittig.data.parse.models.Compensation;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.Purchase;
+import ch.giantific.qwittig.data.parse.models.Task;
 import ch.giantific.qwittig.data.parse.models.User;
 
 /**
@@ -197,6 +199,39 @@ public class LocalQuery {
         });
     }
 
+    public static void queryTasks(Date deadline, final TaskLocalQueryListener listener) {
+        ParseQuery<ParseObject> deadlineQuery = ParseQuery.getQuery(Task.CLASS);
+        deadlineQuery.whereLessThan(Task.DEADLINE, deadline);
+
+        ParseQuery<ParseObject> asNeededQuery = ParseQuery.getQuery(Task.CLASS);
+        asNeededQuery.whereDoesNotExist(Task.DEADLINE);
+
+        List<ParseQuery<ParseObject>> queries = new ArrayList<>();
+        queries.add(deadlineQuery);
+        queries.add(asNeededQuery);
+
+        ParseQuery<ParseObject> query = ParseQuery.or(queries);
+        query.fromLocalDatastore();
+        query.ignoreACLs();
+        query.include(Task.USER_RESPONSIBLE);
+        query.include(Task.USERS_INVOLVED);
+        query.whereEqualTo(Task.GROUP, getCurrentGroup());
+        query.orderByAscending(Task.DEADLINE);
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> parseObjects, ParseException e) {
+                if (e != null) {
+                    Log.e(LOG_TAG, "queryTasks " + e.toString());
+                    return;
+                }
+
+                if (listener != null) {
+                    listener.onTasksLocalQueried(parseObjects);
+                }
+            }
+        });
+    }
+
     public static void fetchObjectData(final ObjectLocalFetchListener listener,
                                        final ParseObject parseObjectToFetch) {
         parseObjectToFetch.fetchFromLocalDatastoreInBackground(new GetCallback<ParseObject>() {
@@ -255,6 +290,10 @@ public class LocalQuery {
 
     public interface UserLocalQueryListener {
         void onUsersLocalQueried(List<ParseUser> users);
+    }
+
+    public interface TaskLocalQueryListener {
+        void onTasksLocalQueried(List<ParseObject> tasks);
     }
 
     public interface ObjectLocalFetchListener {

@@ -246,5 +246,26 @@
     <string name="progress_new_group_data">Lade neue Gruppendaten…</string>
     <string name="title_activity_tasks">Aufgaben</string>
     <string name="toast_error_purchase_details_load">Laden des Einkaufes fehlgeschlagen</string>
+    <string name="deadline_today">Heute</string>
+    <string name="deadline_month">Diesen Monat</string>
+    <string name="deadline_year">Dieses Jahr</string>
+    <string name="deadline_week">Diese Woche</string>
+    <string name="no_tasks">Keine Aufgaben</string>
+    <string name="deadline_all">Alle</string>
+    <string name="deadline_text_pos">In %1$d Tagen</string>
+    <string name="deadline_text_neg">Vor %1$d Tagen</string>
+    <string name="time_frame_as_needed">Bei Bedarf</string>
+    <string name="time_frame_daily">Täglich</string>
+    <string name="time_frame_weekly">Wöchentlich</string>
+    <string name="time_frame_monthly">Monatlich</string>
+    <string name="time_frame_yearly">Jährlich</string>
+    <string name="task_done_single">Erledigt</string>
+    <string name="task_done_week">Erledigt für diese Woche</string>
+    <string name="task_done_month">Erledigt für diesen Monat</string>
+    <string name="task_done_year">Erledigt für dieses Jahr</string>
+    <string name="task_done_today">Erledigt für diesen Tag</string>
+    <string name="task_users_involved_next">Danach: </string>
+    <string name="task_header_my">Meine Aufgaben</string>
+    <string name="task_header_group">Aufgaben Gruppe</string>
 
 </resources>

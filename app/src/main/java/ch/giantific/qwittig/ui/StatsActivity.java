@@ -19,7 +19,7 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.Month;
 import ch.giantific.qwittig.data.stats.models.Stats;
 import ch.giantific.qwittig.helpers.StatsHelper;
-import ch.giantific.qwittig.ui.adapters.StatsTypeAdapter;
+import ch.giantific.qwittig.ui.adapters.StringResSpinnerAdapter;
 
 public class StatsActivity extends BaseNavDrawerActivity implements
         StatsBaseFragment.FragmentInteractionListener,
@@ -63,8 +63,8 @@ public class StatsActivity extends BaseNavDrawerActivity implements
                 R.string.tab_stats_spending,
                 R.string.tab_stats_stores,
                 R.string.tab_stats_currencies};
-        final StatsTypeAdapter typesAdapter =
-                new StatsTypeAdapter(this, R.layout.spinner_item_stats_type, types);
+        final StringResSpinnerAdapter typesAdapter =
+                new StringResSpinnerAdapter(this, R.layout.spinner_item_toolbar, types);
         mSpinnerStatsType.setAdapter(typesAdapter);
     }
 
@@ -115,8 +115,10 @@ public class StatsActivity extends BaseNavDrawerActivity implements
     protected void onStart() {
         super.onStart();
 
-        findStatsFragment();
-        setSpinnerListeners();
+        if (mUserIsLoggedIn) {
+            findStatsFragment();
+            setSpinnerListeners();
+        }
     }
 
     private void findStatsFragment() {
@@ -217,6 +219,7 @@ public class StatsActivity extends BaseNavDrawerActivity implements
         addFirstFragment();
         getFragmentManager().executePendingTransactions();
         findStatsFragment();
+        setSpinnerListeners();
     }
 
     @Override

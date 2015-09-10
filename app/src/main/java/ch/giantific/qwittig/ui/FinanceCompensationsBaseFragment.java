@@ -2,22 +2,12 @@ package ch.giantific.qwittig.ui;
 
 import android.app.Activity;
 import android.app.FragmentManager;
-import android.os.Bundle;
-import android.support.annotation.CallSuper;
-import android.support.design.widget.Snackbar;
-import android.view.View;
 
 import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseUser;
-
-import org.apache.commons.math3.fraction.BigFraction;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.helpers.CompensationQueryHelper;
-import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -48,7 +38,7 @@ public abstract class FinanceCompensationsBaseFragment extends BaseRecyclerViewF
     final void onlineQuery(boolean queryPaid) {
         if (!Utils.isConnected(getActivity())) {
             setLoading(false);
-            showErrorSnackbar(getString(R.string.toast_no_connection));
+            showOnlineQueryErrorSnackbar(getString(R.string.toast_no_connection));
             return;
         }
 
@@ -78,22 +68,10 @@ public abstract class FinanceCompensationsBaseFragment extends BaseRecyclerViewF
      */
     public void onCompensationsPinFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
-        showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
+        showOnlineQueryErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
         removeQueryHelper();
 
         setLoading(false);
-    }
-
-    private void showErrorSnackbar(String errorMessage) {
-        Snackbar snackbar = MessageUtils.getBasicSnackbar(mRecyclerView, errorMessage);
-        snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setLoading(true);
-                onlineQuery();
-            }
-        });
-        snackbar.show();
     }
 
     private void removeQueryHelper() {

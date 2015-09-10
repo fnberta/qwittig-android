@@ -37,8 +37,8 @@ public class FullQueryHelper extends BaseQueryHelper {
             return;
         }
 
-        // purchases for each group + compensationsPaid for each group + compensationsUnpaid + users
-        mTotalNumberOfQueries = mCurrentUserGroups.size() * 2 + 1 + 1;
+        // purchases for each group + compensationsPaid for each group + compensationsUnpaid + users + tasks
+        mTotalNumberOfQueries = mCurrentUserGroups.size() * 2 + 1 + 1 + 1;
         calculateBalances();
     }
 
@@ -86,6 +86,19 @@ public class FullQueryHelper extends BaseQueryHelper {
         }
 
         if (!checkQueryCount()) {
+            queryTasks();
+        }
+    }
+
+    @Override
+    void onTasksPinned() {
+        super.onTasksPinned();
+
+        if (mListener != null) {
+            mListener.onTasksPinned();
+        }
+
+        if (!checkQueryCount()) {
             queryCompensations();
         }
     }
@@ -125,6 +138,8 @@ public class FullQueryHelper extends BaseQueryHelper {
         void onPurchasesPinned();
 
         void onCompensationsPinned(boolean isPaid);
+
+        void onTasksPinned();
 
         void onFullQueryFinished();
 
