@@ -2,7 +2,6 @@ package ch.giantific.qwittig.ui;
 
 import android.app.FragmentManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +20,6 @@ import java.util.List;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Task;
-import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.helpers.TaskQueryHelper;
 import ch.giantific.qwittig.ui.adapters.TasksRecyclerAdapter;
 import ch.giantific.qwittig.utils.DateUtils;
@@ -167,61 +165,39 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
     }
 
     public void onDeadlineSelected(int deadline) {
-        switch (deadline) {
-            case R.string.deadline_all:
-                mDeadlineSelected = new Date(Long.MAX_VALUE);
-                break;
-            case R.string.deadline_today: {
-                Calendar cal = Calendar.getInstance();
-                cal.add(Calendar.DAY_OF_YEAR, 1);
-                resetToMidnight(cal);
+        if (deadline == R.string.deadline_all) {
+            mDeadlineSelected = new Date(Long.MAX_VALUE);
+            updateAdapter();
+            return;
+        }
 
-                mDeadlineSelected = cal.getTime();
+        Calendar cal = Calendar.getInstance();
+        switch (deadline) {
+            case R.string.deadline_today: {
+                cal.add(Calendar.DAY_OF_YEAR, 1);
                 break;
             }
             case R.string.deadline_week: {
-                Calendar cal = Calendar.getInstance();
                 int firstDayOfWeek = cal.getFirstDayOfWeek();
                 cal.set(Calendar.DAY_OF_WEEK, firstDayOfWeek);
                 cal.add(Calendar.WEEK_OF_YEAR, 1);
-                resetToMidnight(cal);
-
-                mDeadlineSelected = cal.getTime();
                 break;
             }
             case R.string.deadline_month: {
-                Calendar cal = Calendar.getInstance();
                 cal.set(Calendar.DAY_OF_MONTH, 1);
                 cal.add(Calendar.MONTH, 1);
-                resetToMidnight(cal);
-
-                mDeadlineSelected = cal.getTime();
                 break;
             }
             case R.string.deadline_year: {
-                Calendar cal = Calendar.getInstance();
                 cal.set(Calendar.DAY_OF_YEAR, 1);
                 cal.add(Calendar.YEAR, 1);
-                resetToMidnight(cal);
-
-                mDeadlineSelected = cal.getTime();
                 break;
             }
         }
 
+        cal = DateUtils.resetToMidnight(cal);
+        mDeadlineSelected = cal.getTime();
         updateAdapter();
-    }
-
-    /**
-     * Resets hour, minutes, seconds and millis to 0, meaning midnight.
-     * @param cal
-     * @return
-     */
-    private void resetToMidnight(Calendar cal) {
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
     }
 
     @Override
@@ -243,7 +219,7 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
 
         if (!timeFrame.equals(Task.TIME_FRAME_AS_NEEDED)) {
             Date deadline = task.getDeadline();
-            Calendar deadlineNew = Calendar.getInstance();
+            Calendar deadlineNew = DateUtils.getCalendarInstanceUTC();
             deadlineNew.setTime(deadline);
             switch (timeFrame) {
                 case Task.TIME_FRAME_DAILY:
@@ -259,16 +235,22 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
                     deadlineNew.add(Calendar.YEAR, 1);
                     break;
             }
-            resetToMidnight(deadlineNew);
             task.setDeadline(deadlineNew.getTime());
         }
 
+        final ParseUser userResponsible = task.getUserResponsible();
         List<ParseUser> usersInvolved = task.getUsersInvolved();
         Collections.rotate(usersInvolved, -1);
         ParseUser userResponsibleNew = usersInvolved.get(0);
         task.setUserResponsible(userResponsibleNew);
 
         task.saveEventually();
-        mRecyclerAdapter.notifyItemChanged(position);
+        String currentUserId = mCurrentUser.getObjectId();
+        if (userResponsible.getObjectId().equals(currentUserId) ||
+                userResponsibleNew.getObjectId().equals(currentUserId)) {
+            updateAdapter();
+        } else {
+            mRecyclerAdapter.notifyItemChanged(position);
+        }
     }
 }

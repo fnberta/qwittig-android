@@ -1,6 +1,9 @@
 package ch.giantific.qwittig.ui.adapters;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.support.annotation.Nullable;
+import android.support.v7.widget.ThemedSpinnerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +14,9 @@ import android.widget.TextView;
 /**
  * Created by fabio on 28.08.15.
  */
-public class StringResSpinnerAdapter extends BaseAdapter {
+public class StringResSpinnerAdapter extends BaseAdapter implements ThemedSpinnerAdapter {
 
+    private final ThemedSpinnerAdapter.Helper mDropDownHelper;
     private Context mContext;
     private int mViewResource;
     private int[] mStringRes;
@@ -20,6 +24,7 @@ public class StringResSpinnerAdapter extends BaseAdapter {
     public StringResSpinnerAdapter(Context context, int resource, int[] stringRes) {
         super();
 
+        mDropDownHelper = new ThemedSpinnerAdapter.Helper(context);
         mContext = context;
         mViewResource = resource;
         mStringRes = stringRes;
@@ -67,6 +72,17 @@ public class StringResSpinnerAdapter extends BaseAdapter {
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
         return getCustomView(position, convertView, parent, true);
+    }
+
+    @Override
+    public void setDropDownViewTheme(Resources.Theme theme) {
+        mDropDownHelper.setDropDownViewTheme(theme);
+    }
+
+    @Nullable
+    @Override
+    public Resources.Theme getDropDownViewTheme() {
+        return mDropDownHelper.getDropDownViewTheme();
     }
 
     private static class TypeRow {

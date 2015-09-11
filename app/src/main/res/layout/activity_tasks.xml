@@ -35,15 +35,16 @@
                 android:layout_width="match_parent"
                 android:minHeight="?attr/actionBarSize"
                 android:background="?attr/colorPrimary"
+                android:theme="@style/ThemeOverlay.AppCompat"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 app:contentInsetStart="@dimen/key_line_2"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+                >
 
                 <Spinner
                     android:id="@+id/sp_tasks_deadline"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:backgroundTint="@android:color/white"
-                    android:theme="@style/ThemeOverlay.AppCompat.Light"
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                     />
 
             </android.support.v7.widget.Toolbar>

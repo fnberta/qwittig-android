@@ -15,6 +15,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
@@ -75,12 +76,9 @@ public class Task extends ParseObject {
     }
     
     public void setDeadline(@NonNull Date deadline) {
-        Calendar cal = Calendar.getInstance();
+        Calendar cal = DateUtils.getCalendarInstanceUTC();
         cal.setTime(deadline);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
+        cal = DateUtils.resetToMidnight(cal);
 
         put(DEADLINE, cal.getTime());
     }

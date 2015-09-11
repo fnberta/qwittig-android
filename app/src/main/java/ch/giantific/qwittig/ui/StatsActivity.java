@@ -20,6 +20,7 @@ import ch.giantific.qwittig.data.models.Month;
 import ch.giantific.qwittig.data.stats.models.Stats;
 import ch.giantific.qwittig.helpers.StatsHelper;
 import ch.giantific.qwittig.ui.adapters.StringResSpinnerAdapter;
+import ch.giantific.qwittig.ui.adapters.ThemedArrayAdapter;
 
 public class StatsActivity extends BaseNavDrawerActivity implements
         StatsBaseFragment.FragmentInteractionListener,
@@ -69,8 +70,8 @@ public class StatsActivity extends BaseNavDrawerActivity implements
     }
 
     private void setupYearSpinner() {
-        ArrayAdapter<String> spinnerYearAdapter =
-                new ArrayAdapter<>(this, R.layout.spinner_item_stats_period, getLastYears(5));
+        ThemedArrayAdapter<String> spinnerYearAdapter =
+                new ThemedArrayAdapter<>(this, R.layout.spinner_item_stats_period, getLastYears(5));
         spinnerYearAdapter.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item);
         mSpinnerYear.setAdapter(spinnerYearAdapter);
@@ -98,8 +99,8 @@ public class StatsActivity extends BaseNavDrawerActivity implements
             months.add(new Month(i));
         }
 
-        ArrayAdapter<Month> spinnerMonthAdapter =
-                new ArrayAdapter<>(this, R.layout.spinner_item_stats_period, months);
+        ThemedArrayAdapter<Month> spinnerMonthAdapter =
+                new ThemedArrayAdapter<>(this, R.layout.spinner_item_stats_period, months);
         spinnerMonthAdapter.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item);
         mSpinnerMonth.setAdapter(spinnerMonthAdapter);

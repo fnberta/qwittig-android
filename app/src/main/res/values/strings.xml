@@ -257,7 +257,7 @@
     <string name="deadline_year">This Year</string>
     <string name="deadline_week">This week</string>
     <string name="no_tasks">No Tasks</string>
-    <string name="deadline_all">All</string>
+    <string name="deadline_all">All tasks</string>
     <string name="deadline_text_pos">In %1$d days</string>
     <string name="deadline_text_neg">%1$d days ago</string>
     <string name="time_frame_as_needed">As needed</string>

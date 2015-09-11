@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/navdrawer_chosen_account_height"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     >
 
     <ImageView
@@ -31,7 +32,8 @@
             android:layout_marginTop="@dimen/navdrawer_status_bar_plus_normal_space"
             android:layout_marginBottom="@dimen/small_space"
             android:contentDescription="@string/user_avatar"
-            tools:src="@drawable/ic_account_circle_black_80dp"/>
+            tools:src="@drawable/ic_account_circle_black_80dp"
+            />
 
         <TextView
             android:id="@+id/tv_drawer_nickname"
@@ -41,7 +43,8 @@
             android:layout_marginStart="@dimen/key_line_1"
             android:layout_marginEnd="@dimen/key_line_1"
             android:textColor="@android:color/white"
-            tools:text="beeeezn"/>
+            tools:text="beeeezn"
+            />
 
         <Spinner
             android:id="@+id/sp_drawer_group"
@@ -49,7 +52,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/key_line_1"
             android:layout_marginEnd="@dimen/key_line_1"
-            android:backgroundTint="@android:color/white"/> <!--TODO: implement for <21-->
+            android:theme="@style/ThemeOverlay.AppCompat"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            />
     </LinearLayout>
 
 </FrameLayout>

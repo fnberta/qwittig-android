@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * Created by fabio on 27.03.15.
@@ -69,5 +70,23 @@ public class DateUtils {
 
     public static String getMonthNameShort(int month) {
         return getMonthNames()[month - 1];
+    }
+
+    public static Calendar getCalendarInstanceUTC() {
+        return Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+    }
+
+    /**
+     * Resets hour, minutes, seconds and millis to 0, meaning midnight.
+     * @param cal
+     * @return
+     */
+    public static Calendar resetToMidnight(Calendar cal) {
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+
+        return cal;
     }
 }

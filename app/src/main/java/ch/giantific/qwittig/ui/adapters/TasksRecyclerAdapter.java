@@ -30,6 +30,7 @@ import ch.giantific.qwittig.data.models.Avatar;
 import ch.giantific.qwittig.data.parse.models.Task;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.ui.adapters.rows.HeaderRow;
+import ch.giantific.qwittig.utils.DateUtils;
 
 /**
  * Created by fabio on 09.11.14.
@@ -215,8 +216,8 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
 
         private int getDaysToDeadline(Date deadlineDate) {
-            Calendar today = Calendar.getInstance();
-            Calendar deadline = Calendar.getInstance();
+            Calendar today = DateUtils.getCalendarInstanceUTC();
+            Calendar deadline = DateUtils.getCalendarInstanceUTC();
             deadline.setTime(deadlineDate);
 
             if (today.get(Calendar.YEAR) == deadline.get(Calendar.YEAR)) {
