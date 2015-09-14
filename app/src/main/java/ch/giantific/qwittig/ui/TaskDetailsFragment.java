@@ -16,6 +16,8 @@ import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +31,7 @@ import ch.giantific.qwittig.data.parse.models.Task;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.ui.adapters.TaskHistoryRecyclerAdapter;
 import ch.giantific.qwittig.ui.dialogs.AccountCreateDialogFragment;
+import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 
@@ -137,13 +140,17 @@ public class TaskDetailsFragment extends BaseFragment implements
         updateToolbarHeader();
         updateToolbarMenu();
 
+        queryUsers();
+    }
+
+    private void queryUsers() {
         LocalQuery.queryUsers(this);
     }
 
     @Override
     public void onUsersLocalQueried(List<ParseUser> users) {
         mTaskHistory.clear();
-        mTaskHistory.add(null);
+
         Map<String, List<Date>> taskHistory = mTask.getHistory();
         Set<String> keys = taskHistory.keySet();
         for (ParseUser user : users) {
@@ -156,6 +163,7 @@ public class TaskDetailsFragment extends BaseFragment implements
             }
         }
 
+        Collections.sort(mTaskHistory, Collections.reverseOrder());
         mRecyclerAdapter.notifyDataSetChanged();
 
         toggleMainVisibility();
@@ -206,37 +214,37 @@ public class TaskDetailsFragment extends BaseFragment implements
     }
 
     /**
-     * Checks if task contains deleted user, if yes don't offer edit option
+     * Checks if user is the initator of the task. If yes and task does not contain deleted user,
+     * show edit option.
      */
     private void updateToolbarMenu() {
-        List<ParseUser> usersInvolved = mTask.getUsersInvolved();
-        boolean allUsersAreValid = true;
+        User initiator = mTask.getInitiator();
+        boolean showEditOptions = initiator.getObjectId().equals(mCurrentUser.getObjectId());
 
-        for (ParseUser parseUser : usersInvolved) {
-            User user = (User) parseUser;
-            if (!user.getGroupIds().contains(mCurrentGroup.getObjectId())) {
-                allUsersAreValid = false;
-                break;
+        if (showEditOptions) {
+            List<ParseUser> usersInvolved = mTask.getUsersInvolved();
+            for (ParseUser parseUser : usersInvolved) {
+                User user = (User) parseUser;
+                if (!user.getGroupIds().contains(mCurrentGroup.getObjectId())) {
+                    showEditOptions = false;
+                    break;
+                }
             }
         }
 
-        mListener.showEditOption(allUsersAreValid);
+        mListener.showEditOptions(showEditOptions);
     }
 
     private void toggleMainVisibility() {
         mProgressBar.setVisibility(View.GONE);
 
-        if (historyAvailable()) {
+        if (!mTaskHistory.isEmpty()) {
             mRecyclerViewHistory.setVisibility(View.VISIBLE);
             mEmptyView.setVisibility(View.GONE);
         } else {
             mRecyclerViewHistory.setVisibility(View.GONE);
             mEmptyView.setVisibility(View.VISIBLE);
         }
-    }
-
-    private boolean historyAvailable() {
-        return mTaskHistory.size() > 1;
     }
 
     public void deleteTask() {
@@ -270,7 +278,25 @@ public class TaskDetailsFragment extends BaseFragment implements
     }
 
     public void setTaskDone() {
+        String timeFrame = mTask.getTimeFrame();
 
+        if (timeFrame.equals(Task.TIME_FRAME_ONE_TIME)) {
+            // TODO: implement proper deletion
+            mTask.deleteEventually();
+            finish(TaskDetailsActivity.RESULT_TASK_DELETED);
+            return;
+        }
+
+        TasksFragment.setTaskDeadline(mTask, timeFrame);
+
+        List<ParseUser> usersInvolved = mTask.getUsersInvolved();
+        Collections.rotate(usersInvolved, -1);
+
+        mTask.addHistoryEvent();
+
+        mTask.saveEventually();
+        updateToolbarHeader();
+        queryUsers();
     }
 
     @Override
@@ -301,6 +327,6 @@ public class TaskDetailsFragment extends BaseFragment implements
         void setToolbarHeader(String title, String timeFrame, String usersInvolved,
                               boolean currentUserIsResponsible);
 
-        void showEditOption(boolean show);
+        void showEditOptions(boolean show);
     }
 }

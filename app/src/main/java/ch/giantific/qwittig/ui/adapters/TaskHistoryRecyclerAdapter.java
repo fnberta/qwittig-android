@@ -67,7 +67,7 @@ public class TaskHistoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerVie
 
     @Override
     public int getItemViewType(int position) {
-        if (mTaskHistory.get(position) == null) {
+        if (position == 0) {
             return TYPE_HEADER;
         }
 
@@ -80,7 +80,7 @@ public class TaskHistoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerVie
         switch (viewType) {
             case TYPE_ITEM: {
                 final TaskHistoryRow historyRow = (TaskHistoryRow) viewHolder;
-                TaskHistory taskHistory = mTaskHistory.get(position);
+                TaskHistory taskHistory = mTaskHistory.get(position - 1);
                 User user = taskHistory.getUser();
 
                 historyRow.setDate(taskHistory.getDate());
@@ -98,7 +98,7 @@ public class TaskHistoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerVie
 
     @Override
     public int getItemCount() {
-        return mTaskHistory.size();
+        return mTaskHistory.size() + 1;
     }
 
     public interface AdapterInteractionListener {

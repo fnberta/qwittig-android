@@ -61,14 +61,14 @@ public class TaskRemindHelper extends BaseHelper {
         }
     }
 
-    private void pushTaskRemind(String taskId) {
+    private void pushTaskRemind(final String taskId) {
         Map<String, Object> params = new HashMap<>();
         params.put(PushBroadcastReceiver.PUSH_PARAM_TASK, taskId);
-        ParseCloud.callFunctionInBackground(CloudCode.PUSH_TASK_REMIND, params, new FunctionCallback<String>() {
+        ParseCloud.callFunctionInBackground(CloudCode.PUSH_TASK_REMIND, params, new FunctionCallback<Object>() {
             @Override
-            public void done(String taskId, ParseException e) {
+            public void done(Object object, ParseException e) {
                 if (e != null) {
-                    onParseError(e);
+                    onParseError(e, taskId);
                     return;
                 }
 
@@ -79,9 +79,9 @@ public class TaskRemindHelper extends BaseHelper {
         });
     }
 
-    private void onParseError(ParseException e) {
+    private void onParseError(ParseException e, String taskId) {
         if (mListener != null) {
-            mListener.onFailedToRemindUser(e);
+            mListener.onFailedToRemindUser(e, taskId);
         }
     }
 
@@ -94,6 +94,6 @@ public class TaskRemindHelper extends BaseHelper {
     public interface HelperInteractionListener {
         void onUserReminded(String taskId);
 
-        void onFailedToRemindUser(ParseException e);
+        void onFailedToRemindUser(ParseException e, String taskId);
     }
 }

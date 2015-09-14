@@ -201,9 +201,15 @@ public class ParseQueryService extends IntentService {
                 break;
             }
             case Compensation.CLASS: {
-                ParseObject compensations = ParseObject.createWithoutData(Compensation.CLASS, objectId);
-                compensations.unpin(Compensation.PIN_LABEL_UNPAID);
+                ParseObject compensation = ParseObject.createWithoutData(Compensation.CLASS, objectId);
+                compensation.unpin(Compensation.PIN_LABEL_UNPAID);
                 sendLocalBroadcastCompensation(false);
+                break;
+            }
+            case Task.CLASS: {
+                ParseObject task = ParseObject.createWithoutData(Task.CLASS, objectId);
+                task.unpin(Task.PIN_LABEL);
+                sendLocalBroadcast(DATA_TYPE_TASK);
                 break;
             }
         }
@@ -223,7 +229,7 @@ public class ParseQueryService extends IntentService {
                 queryGroup(objectId);
                 break;
             case Task.CLASS:
-                queryTask(objectId);
+                queryTask(objectId, isNew);
                 sendLocalBroadcast(DATA_TYPE_TASK);
                 break;
         }
@@ -351,10 +357,13 @@ public class ParseQueryService extends IntentService {
         ParseObject.pinAll(pinLabel, compensationsPaid);
     }
 
-    private void queryTask(String taskId) throws ParseException {
+    private void queryTask(String taskId, boolean isNew) throws ParseException {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Task.CLASS);
         query.include(Task.USERS_INVOLVED);
-        query.get(taskId);
+        Task task = (Task) query.get(taskId);
+        if (isNew) {
+            task.pin(Task.PIN_LABEL);
+        }
     }
 
     private void setTaskDone(String taskId) throws ParseException {

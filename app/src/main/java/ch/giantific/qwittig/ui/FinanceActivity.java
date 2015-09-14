@@ -383,8 +383,8 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onFailedToRemindUser(int remindType, ParseException e) {
-        mCompensationsUnpaidFragment.onFailedToRemindUser(remindType, e);
+    public void onFailedToRemindUser(int remindType, ParseException e, String compensationId) {
+        mCompensationsUnpaidFragment.onFailedToRemindUser(remindType, e, compensationId);
     }
 
     @Override

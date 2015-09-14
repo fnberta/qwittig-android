@@ -1,7 +1,12 @@
 package ch.giantific.qwittig.ui;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.view.View;
 import android.widget.AdapterView;
@@ -14,6 +19,7 @@ import ch.giantific.qwittig.constants.AppConstants;
 import ch.giantific.qwittig.helpers.TaskQueryHelper;
 import ch.giantific.qwittig.helpers.TaskRemindHelper;
 import ch.giantific.qwittig.ui.adapters.StringResSpinnerAdapter;
+import ch.giantific.qwittig.utils.Utils;
 
 public class TasksActivity extends BaseNavDrawerActivity implements
         TasksFragment.FragmentInteractionListener,
@@ -46,12 +52,7 @@ public class TasksActivity extends BaseNavDrawerActivity implements
                 mTaskFragment.addNewTask();
             }
         });
-        mFab.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mFab.show();
-            }
-        }, AppConstants.FAB_CIRCULAR_REVEAL_DELAY * 4);
+        showFab();
 
         mSpinnerDeadline = (Spinner) findViewById(R.id.sp_tasks_deadline);
         setupDeadlineSpinner();
@@ -59,6 +60,39 @@ public class TasksActivity extends BaseNavDrawerActivity implements
         if (mUserIsLoggedIn && savedInstanceState == null) {
             addTasksFragment();
         }
+    }
+
+    private void showFab() {
+        if (Utils.isRunningLollipopAndHigher()) {
+            if (ViewCompat.isLaidOut(mFab)) {
+                circularRevealFab();
+            } else {
+                mFab.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                    @Override
+                    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                        v.removeOnLayoutChangeListener(this);
+                        circularRevealFab();
+                    }
+                });
+            }
+        } else {
+            mFab.show();
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void circularRevealFab() {
+        Animator reveal = Utils.getCircularRevealAnimator(mFab);
+        reveal.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                animation.removeListener(this);
+
+                mFab.setVisibility(View.VISIBLE);
+            }
+        });
+        reveal.start();
     }
 
     private void setupDeadlineSpinner() {
@@ -146,8 +180,8 @@ public class TasksActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onFailedToRemindUser(ParseException e) {
-        mTaskFragment.onFailedToRemindUser(e);
+    public void onFailedToRemindUser(ParseException e, String taskId) {
+        mTaskFragment.onFailedToRemindUser(e, taskId);
     }
 
     @Override

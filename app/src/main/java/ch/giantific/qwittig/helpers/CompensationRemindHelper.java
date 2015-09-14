@@ -25,7 +25,6 @@ import ch.giantific.qwittig.data.parse.models.User;
  */
 public class CompensationRemindHelper extends BaseHelper {
 
-    public static final String COMPENSATION_REMIND_HELPER = "compensation_remind_helper";
     @IntDef({TYPE_REMIND, TYPE_REMIND_PAID})
     @Retention(RetentionPolicy.SOURCE)
     public @interface RemindType {}
@@ -93,13 +92,13 @@ public class CompensationRemindHelper extends BaseHelper {
         return currentGroup.getCurrency();
     }
 
-    private void pushCompensationRemind(String compensationId, String currencyCode) {
+    private void pushCompensationRemind(final String compensationId, String currencyCode) {
         Map<String, Object> params = getCompensationPushParams(compensationId, currencyCode);
-        ParseCloud.callFunctionInBackground(CloudCode.PUSH_COMPENSATION_REMIND, params, new FunctionCallback<String>() {
+        ParseCloud.callFunctionInBackground(CloudCode.PUSH_COMPENSATION_REMIND, params, new FunctionCallback<Object>() {
             @Override
-            public void done(String compensationId, ParseException e) {
+            public void done(Object object, ParseException e) {
                 if (e != null) {
-                    onParseError(e);
+                    onParseError(e, compensationId);
                     return;
                 }
 
@@ -110,13 +109,13 @@ public class CompensationRemindHelper extends BaseHelper {
         });
     }
 
-    private void pushCompensationRemindPaid(String compensationId, String currencyCode) {
+    private void pushCompensationRemindPaid(final String compensationId, String currencyCode) {
         Map<String, Object> params = getCompensationPushParams(compensationId, currencyCode);
-        ParseCloud.callFunctionInBackground(CloudCode.PUSH_COMPENSATION_REMIND_PAID, params, new FunctionCallback<String>() {
+        ParseCloud.callFunctionInBackground(CloudCode.PUSH_COMPENSATION_REMIND_PAID, params, new FunctionCallback<Object>() {
             @Override
-            public void done(String compensationId, ParseException e) {
+            public void done(Object object, ParseException e) {
                 if (e != null) {
-                    onParseError(e);
+                    onParseError(e, compensationId);
                     return;
                 }
 
@@ -136,9 +135,9 @@ public class CompensationRemindHelper extends BaseHelper {
         return params;
     }
 
-    private void onParseError(ParseException e) {
+    private void onParseError(ParseException e, String compensationId) {
         if (mListener != null) {
-            mListener.onFailedToRemindUser(mRemindType, e);
+            mListener.onFailedToRemindUser(mRemindType, e, compensationId);
         }
     }
 
@@ -151,6 +150,6 @@ public class CompensationRemindHelper extends BaseHelper {
     public interface HelperInteractionListener {
         void onUserReminded(int remindType, String compensationId);
 
-        void onFailedToRemindUser(int remindType, ParseException e);
+        void onFailedToRemindUser(int remindType, ParseException e, String compensationId);
     }
 }

@@ -280,7 +280,7 @@
     <string name="toast_task_discarded">Neue Aufgabe verworfen</string>
     <string name="title_activity_task_edit">Aufgabe bearbeiten</string>
     <string name="toast_task_deleted">Aufgabe gelöscht</string>
-    <string name="toast_task_reminded_user">%1$s wurde erinnert, seine Aufgabe zu erledigen</string>
+    <string name="toast_task_reminded_user">%1$s wurde erinnert, die Aufgabe zu erledigen</string>
     <string name="push_task_remind_alert">%1$s möchte, dass du deine Aufgabe erledigts</string>
     <string name="toast_error_task_details_load">Laden der Aufgabe fehlgeschlagen</string>
     <string name="push_task_remind_title">Erledige %1$s </string>
@@ -288,5 +288,8 @@
     <string name="hint_reorder">Neu anordner</string>
     <string name="header_task_history">Bisher erledigt von</string>
     <string name="no_task_history">Noch von niemandem erledigt</string>
+    <string name="push_action_finished">Erledigt</string>
+    <string name="push_task_delete_title">%1$s gelöscht</string>
+    <string name="push_task_delete_alert">%1$s hat die Aufgabe gelöscht</string>
 
 </resources>

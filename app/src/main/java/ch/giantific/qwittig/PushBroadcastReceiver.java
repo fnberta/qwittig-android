@@ -36,6 +36,7 @@ import ch.giantific.qwittig.services.ParseQueryService;
 import ch.giantific.qwittig.ui.FinanceActivity;
 import ch.giantific.qwittig.ui.PurchaseDetailsActivity;
 import ch.giantific.qwittig.ui.TaskDetailsActivity;
+import ch.giantific.qwittig.ui.TasksActivity;
 import ch.giantific.qwittig.utils.MoneyUtils;
 
 /**
@@ -71,7 +72,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
             TYPE_COMPENSATION_REMIND_USER, TYPE_COMPENSATION_REMIND_USER_HAS_PAID,
             TYPE_COMPENSATION_EXISTING_NOT_NOW, TYPE_COMPENSATION_EXISTING_PAID, TYPE_USER_INVITED,
             TYPE_USER_JOINED, TYPE_USER_LEFT, TYPE_USER_DELETED, TYPE_GROUP_USERS_INVITED_CHANGED,
-            TYPE_TASK_NEW, TYPE_TASK_EDIT, TYPE_TASK_REMIND_USER})
+            TYPE_TASK_NEW, TYPE_TASK_EDIT, TYPE_TASK_DELETE, TYPE_TASK_REMIND_USER})
     @Retention(RetentionPolicy.SOURCE)
     public @interface NotificationType {}
     public static final String TYPE_USER_INVITED = "userInvited";
@@ -92,6 +93,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     private static final String TYPE_GROUP_NAME_CHANGED = "groupNameChanged";
     private static final String TYPE_GROUP_USERS_INVITED_CHANGED = "groupUsersInvitedChanged";
     private static final String TYPE_TASK_NEW = "taskNew";
+    private static final String TYPE_TASK_DELETE = "taskDelete";
     private static final String TYPE_TASK_EDIT = "taskEdit";
     private static final String TYPE_TASK_REMIND_USER = "taskRemindUser";
 
@@ -355,6 +357,12 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 ParseQueryService.startQueryObject(context, Task.CLASS, taskId, false);
                 break;
             }
+            case TYPE_TASK_DELETE: {
+                String taskId = jsonExtras.optString(PUSH_PARAM_TASK);
+                String groupId = jsonExtras.optString(PUSH_PARAM_GROUP);
+                ParseQueryService.startUnpinObject(context, Task.CLASS, taskId, groupId);
+                break;
+            }
             case TYPE_USER_DELETED: {
                 ParseQueryService.startQueryAll(context);
                 break;
@@ -580,6 +588,15 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 builder.setContentTitle(title).setContentText(alert);
                 break;
             }
+            case TYPE_TASK_DELETE: {
+                String taskTitle = jsonExtras.optString(PUSH_PARAM_TASK_TITLE);
+                title = context.getString(R.string.push_task_delete_title, taskTitle);
+                alert = context.getString(R.string.push_task_delete_alert, user);
+
+                // set title and alert
+                builder.setContentTitle(title).setContentText(alert);
+                break;
+            }
             case TYPE_TASK_REMIND_USER: {
                 String taskTitle = jsonExtras.optString(PUSH_PARAM_TASK_TITLE);
                 title = context.getString(R.string.push_task_remind_title, taskTitle);
@@ -597,7 +614,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                         acceptContentIntentRequestCode, acceptContentIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT);
                 builder.addAction(R.drawable.ic_check_black_24dp,
-                        context.getString(R.string.push_action_confirm), pAcceptContentIntent);
+                        context.getString(R.string.push_action_finished), pAcceptContentIntent);
                 break;
             }
             case TYPE_USER_INVITED: {
@@ -741,8 +758,12 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 // fall through
             case TYPE_COMPENSATION_REMIND_USER_HAS_PAID:
                 return FinanceActivity.class;
+            case TYPE_TASK_NEW:
+                // fall through
             case TYPE_TASK_REMIND_USER:
                 return TaskDetailsActivity.class;
+            case TYPE_TASK_DELETE:
+                return TasksActivity.class;
             default:
                 return super.getActivity(context, intent);
         }

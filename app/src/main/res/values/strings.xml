@@ -288,7 +288,7 @@
     <string name="toast_task_discarded">New task discarded</string>
     <string name="title_activity_task_edit">Edit task</string>
     <string name="toast_task_deleted">Task deleted</string>
-    <string name="toast_task_reminded_user">Reminded %1$s to finish his task</string>
+    <string name="toast_task_reminded_user">Reminded %1$s to finish the task</string>
     <string name="push_task_remind_alert">%1$s wants you to finish your task</string>
     <string name="toast_error_task_details_load">Failed to load task</string>
     <string name="push_task_remind_title">Finish %1$s</string>
@@ -296,5 +296,8 @@
     <string name="hint_reorder">reorder</string>
     <string name="header_task_history">Previously finished by</string>
     <string name="no_task_history">Nobody finished yet</string>
+    <string name="push_action_finished">Finished</string>
+    <string name="push_task_delete_title">%1$s deleted</string>
+    <string name="push_task_delete_alert">%1$s deleted the task</string>
 
 </resources>

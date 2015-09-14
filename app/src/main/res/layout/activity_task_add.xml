@@ -50,6 +50,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_new_task"
                     android:inputType="text|textCapSentences"
+                    android:imeOptions="actionDone"
                     />
 
             </android.support.design.widget.TextInputLayout>

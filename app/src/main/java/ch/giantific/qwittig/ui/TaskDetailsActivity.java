@@ -28,7 +28,7 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
     private TextView mTextViewTimeFrame;
     private TextView mTextViewUsersInvolved;
     private FloatingActionButton mFab;
-    private boolean mShowEditOption;
+    private boolean mShowEditOptions;
     private String mTaskId;
 
     @Override
@@ -112,8 +112,9 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_task_details, menu);
-        if (mShowEditOption) {
+        if (mShowEditOptions) {
             menu.findItem(R.id.action_task_edit).setVisible(true);
+            menu.findItem(R.id.action_task_delete).setVisible(true);
         }
         return true;
     }
@@ -156,8 +157,8 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void showEditOption(boolean show) {
-        mShowEditOption = show;
+    public void showEditOptions(boolean show) {
+        mShowEditOptions = show;
         invalidateOptionsMenu();
     }
 
