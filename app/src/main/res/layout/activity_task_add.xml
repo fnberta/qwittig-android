@@ -63,7 +63,6 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/normal_space"
         android:src="@drawable/ic_save_black_24dp"
-        android:visibility="invisible"
         app:layout_anchor="@id/appbar"
         app:layout_anchorGravity="bottom|end"
         />

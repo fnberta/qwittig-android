@@ -39,7 +39,7 @@
         android:layout_marginEnd="@dimen/key_line_1"
         android:src="@drawable/ic_reorder_black_24dp"
         android:alpha="@dimen/icon_black_alpha"
-
+        android:contentDescription="@string/hint_reorder"
         />
 
 </RelativeLayout>

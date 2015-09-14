@@ -23,12 +23,15 @@ import java.util.List;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Task;
+import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.helpers.TaskQueryHelper;
+import ch.giantific.qwittig.helpers.TaskRemindHelper;
 import ch.giantific.qwittig.ui.adapters.TasksRecyclerAdapter;
 import ch.giantific.qwittig.ui.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
+import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
@@ -39,13 +42,46 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
 
     public static final String INTENT_TASK_ID = "ch.giantific.qwittig.INTENT_TASK_ID";
     private static final String LOG_TAG = TasksFragment.class.getSimpleName();
+    private static final String STATE_TASKS_LOADING = "state_tasks_loading";
     private static final String TASK_QUERY_HELPER = "task_query_helper";
+    private static final String TASK_REMIND_HELPER = "task_remind_helper";
 
+    private FragmentInteractionListener mListener;
     private Date mDeadlineSelected = new Date(Long.MAX_VALUE);
     private List<ParseObject> mTasks = new ArrayList<>();
     private TasksRecyclerAdapter mRecyclerAdapter;
+    private ArrayList<String> mLoadingTasks;
 
     public TasksFragment() {
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (FragmentInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement FragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            mLoadingTasks = savedInstanceState.getStringArrayList(STATE_TASKS_LOADING);
+        } else {
+            mLoadingTasks = new ArrayList<>();
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putStringArrayList(STATE_TASKS_LOADING, mLoadingTasks);
     }
 
     @Override
@@ -141,6 +177,9 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
                     mTasks.add(null);
                     for (Iterator<ParseObject> iterator = tasks.iterator(); iterator.hasNext(); ) {
                         Task task = (Task) iterator.next();
+
+                        task.setLoading(mLoadingTasks.contains(task.getObjectId()));
+
                         List<ParseUser> usersInvolved = task.getUsersInvolved();
                         if (usersInvolved.isEmpty()) {
                             iterator.remove();
@@ -331,6 +370,121 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
 
     @Override
     public void onRemindButtonClicked(int position) {
-        // TODO: send remind push
+        if (ParseUtils.isTestUser(mCurrentUser)) {
+            mListener.showAccountCreateDialog();
+            return;
+        }
+
+        if (!Utils.isConnected(getActivity())) {
+            MessageUtils.showBasicSnackbar(mRecyclerView, getString(R.string.toast_no_connection));
+            return;
+        }
+
+        final Task task = (Task) mTasks.get(position);
+        final String taskId = task.getObjectId();
+        if (mLoadingTasks.contains(taskId)) {
+            return;
+        }
+
+        setTaskLoading(task, taskId, position, true);
+        remindUserWithHelper(taskId);
+    }
+
+    private Task setTaskLoading(String objectId, boolean isLoading) {
+        Task taskLoading = null;
+
+        for (int i = 0, tasksSize = mTasks.size(); i < tasksSize; i++) {
+            Task task = (Task) mTasks.get(i);
+            if (task != null && objectId.equals(task.getObjectId())) {
+                setTaskLoading(task, objectId, i, isLoading);
+                taskLoading = task;
+            }
+        }
+
+        return taskLoading;
+    }
+
+    private void setTaskLoading(Task task, String objectId, int position,
+                                        boolean isLoading) {
+        task.setLoading(isLoading);
+        mRecyclerAdapter.notifyItemChanged(position);
+
+        if (isLoading) {
+            mLoadingTasks.add(objectId);
+        } else {
+            mLoadingTasks.remove(objectId);
+        }
+    }
+
+    private void remindUserWithHelper(String taskId) {
+        FragmentManager fragmentManager = getFragmentManager();
+        TaskRemindHelper taskRemindHelper = findTaskRemindHelper(fragmentManager);
+
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (taskRemindHelper == null) {
+            taskRemindHelper = TaskRemindHelper.newInstance(taskId);
+
+            fragmentManager.beginTransaction()
+                    .add(taskRemindHelper, TASK_REMIND_HELPER)
+                    .commit();
+        }
+    }
+
+    private TaskRemindHelper findTaskRemindHelper(FragmentManager fragmentManager) {
+        return (TaskRemindHelper) fragmentManager.findFragmentByTag(TASK_REMIND_HELPER);
+    }
+
+    private void removeTaskRemindHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        TaskRemindHelper taskRemindHelper = findTaskRemindHelper(fragmentManager);
+
+        if (taskRemindHelper != null) {
+            fragmentManager.beginTransaction().remove(taskRemindHelper).commitAllowingStateLoss();
+        }
+    }
+
+    public void onUserReminded(String compensationId) {
+        removeTaskRemindHelper();
+
+        Task task = setTaskLoading(compensationId, false);
+        if (task != null) {
+            User userResponsible = (User) task.getUsersInvolved().get(0);
+            String nickname = userResponsible.getNickname();
+            MessageUtils.showBasicSnackbar(mRecyclerView,
+                    getString(R.string.toast_task_reminded_user, nickname));
+        }
+    }
+
+    public void onFailedToRemindUser(ParseException e) {
+        ParseErrorHandler.handleParseError(getActivity(), e);
+        MessageUtils.showBasicSnackbar(mRecyclerView, ParseErrorHandler.getErrorMessage(getActivity(), e));
+        removeTaskRemindHelper();
+
+        if (!mLoadingTasks.isEmpty()) {
+            for (Iterator<String> iterator = mLoadingTasks.iterator(); iterator.hasNext(); ) {
+                String loadingTaskId = iterator.next();
+                for (int i = 0, tasksSize = mTasks.size(); i < tasksSize; i++) {
+                    Task task = (Task) mTasks.get(i);
+                    if (loadingTaskId.equals(task.getObjectId())) {
+                        task.setLoading(false);
+                        mRecyclerAdapter.notifyItemChanged(i);
+                        iterator.remove();
+                        break;
+                    }
+                }
+            }
+        }
+        // TODO: find a way to disable only the specific task concerned
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    public interface FragmentInteractionListener {
+        void showAccountCreateDialog();
     }
 }

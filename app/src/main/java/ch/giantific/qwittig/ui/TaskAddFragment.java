@@ -37,6 +37,7 @@ import ch.giantific.qwittig.ui.dialogs.DatePickerDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
+import ch.giantific.qwittig.utils.ParseUtils;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -45,9 +46,6 @@ public class TaskAddFragment extends BaseFragment implements
         LocalQuery.UserLocalQueryListener,
         TaskUsersInvolvedRecyclerAdapter.AdapterInteractionListener {
 
-    @IntDef({TASK_SAVED, TASK_DISCARDED, TASK_NO_CHANGES})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface TaskAction {}
     public static final int TASK_SAVED = 0;
     public static final int TASK_DISCARDED = 1;
     public static final int TASK_NO_CHANGES = 2;
@@ -67,7 +65,6 @@ public class TaskAddFragment extends BaseFragment implements
     private ItemTouchHelper mUsersItemTouchHelper;
     private User mCurrentUser;
     private Group mCurrentGroup;
-
     public TaskAddFragment() {
     }
 
@@ -158,6 +155,10 @@ public class TaskAddFragment extends BaseFragment implements
                 ItemTouchHelper.START | ItemTouchHelper.END) {
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder source, RecyclerView.ViewHolder target) {
+                if (source.getItemViewType() != target.getItemViewType()) {
+                    return false;
+                }
+
                 mUsersRecyclerAdapter.onItemMove(source.getAdapterPosition(), target.getAdapterPosition());
                 return true;
             }
@@ -226,6 +227,11 @@ public class TaskAddFragment extends BaseFragment implements
     }
 
     public void saveTask(String title) {
+        if (ParseUtils.isTestUser(mCurrentUser)) {
+            mListener.showAccountCreateDialog();
+            return;
+        }
+
         if (TextUtils.isEmpty(title)) {
             MessageUtils.showBasicSnackbar(mRecyclerViewUsers, getString(R.string.error_task_title));
             return;
@@ -237,8 +243,8 @@ public class TaskAddFragment extends BaseFragment implements
 
     @NonNull
     Task getTask(String title) {
-        return new Task(title, mCurrentGroup, getTimeFrameSelected(), mDeadlineSelected,
-                    getUsersFromId(mUsersInvolved));
+        return new Task(mCurrentUser, title, mCurrentGroup, getTimeFrameSelected(),
+                mDeadlineSelected, getUsersFromId(mUsersInvolved));
     }
 
     private void pinTask(final Task task) {
@@ -356,7 +362,14 @@ public class TaskAddFragment extends BaseFragment implements
         mListener = null;
     }
 
+    @IntDef({TASK_SAVED, TASK_DISCARDED, TASK_NO_CHANGES})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface TaskAction {
+    }
+
     public interface FragmentInteractionListener {
+        void showAccountCreateDialog();
+
         String getTaskTitle();
 
         void setTaskTitle(String title);

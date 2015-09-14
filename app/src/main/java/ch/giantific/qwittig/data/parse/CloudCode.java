@@ -7,6 +7,7 @@ public class CloudCode {
 
     public static final String PUSH_COMPENSATION_REMIND = "pushCompensationRemind";
     public static final String PUSH_COMPENSATION_REMIND_PAID = "pushCompensationRemindPaid";
+    public static final String PUSH_TASK_REMIND = "pushTaskRemind";
     public static final String CALCULATE_BALANCE = "calculateBalance";
     public static final String SETTLEMENT_NEW = "settlementNew";
     public static final String GROUP_ROLE_ADD_USER = "groupRoleAddUser";

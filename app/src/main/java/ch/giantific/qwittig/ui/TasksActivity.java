@@ -12,10 +12,13 @@ import com.parse.ParseException;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.constants.AppConstants;
 import ch.giantific.qwittig.helpers.TaskQueryHelper;
+import ch.giantific.qwittig.helpers.TaskRemindHelper;
 import ch.giantific.qwittig.ui.adapters.StringResSpinnerAdapter;
 
 public class TasksActivity extends BaseNavDrawerActivity implements
-        TaskQueryHelper.HelperInteractionListener {
+        TasksFragment.FragmentInteractionListener,
+        TaskQueryHelper.HelperInteractionListener,
+        TaskRemindHelper.HelperInteractionListener {
 
     private Spinner mSpinnerDeadline;
     private TasksFragment mTaskFragment;
@@ -135,6 +138,16 @@ public class TasksActivity extends BaseNavDrawerActivity implements
     @Override
     public void onAllTaskQueriesFinished() {
         mTaskFragment.onAllTasksQueriesFinished();
+    }
+
+    @Override
+    public void onUserReminded(String taskId) {
+        mTaskFragment.onUserReminded(taskId);
+    }
+
+    @Override
+    public void onFailedToRemindUser(ParseException e) {
+        mTaskFragment.onFailedToRemindUser(e);
     }
 
     @Override

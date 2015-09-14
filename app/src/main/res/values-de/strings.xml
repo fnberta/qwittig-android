@@ -148,7 +148,7 @@
     <string name="dialog_positive_create">Erstellen</string>
     <string name="nickname_me">Ich</string>
     <string name="progress_account_delete">Lösche Account…</string>
-    <string name="push_user_deleted_alert">Ausstehende Schulden or Guthaben wurde automatisch abgerechnet.</string>
+    <string name="push_user_deleted_alert">Ausstehende Schulden oder Guthaben wurde automatisch abgerechnet</string>
     <string name="push_user_deleted_title">%1$s hat den Account gelöscht</string>
     <string name="progress_login">Anmelden…</string>
     <string name="dialog_purchase_discard">Verwerfen</string>
@@ -280,5 +280,13 @@
     <string name="toast_task_discarded">Neue Aufgabe verworfen</string>
     <string name="title_activity_task_edit">Aufgabe bearbeiten</string>
     <string name="toast_task_deleted">Aufgabe gelöscht</string>
+    <string name="toast_task_reminded_user">%1$s wurde erinnert, seine Aufgabe zu erledigen</string>
+    <string name="push_task_remind_alert">%1$s möchte, dass du deine Aufgabe erledigts</string>
+    <string name="toast_error_task_details_load">Laden der Aufgabe fehlgeschlagen</string>
+    <string name="push_task_remind_title">Erledige %1$s </string>
+    <string name="push_task_new_alert">%1$s hat eine neue Aufgabe erstellt</string>
+    <string name="hint_reorder">Neu anordner</string>
+    <string name="header_task_history">Bisher erledigt von</string>
+    <string name="no_task_history">Noch von niemandem erledigt</string>
 
 </resources>

@@ -3,7 +3,6 @@ package ch.giantific.qwittig.data.parse.models;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
-import android.util.Log;
 
 import com.parse.ParseACL;
 import com.parse.ParseClassName;
@@ -30,6 +29,7 @@ import ch.giantific.qwittig.utils.ParseUtils;
 public class Task extends ParseObject {
 
     public static final String CLASS = "Task";
+    public static final String INITIATOR = "initiator";
     public static final String TITLE = "title";
     public static final String GROUP = "group";
     public static final String TIME_FRAME = "timeFrame";
@@ -49,6 +49,15 @@ public class Task extends ParseObject {
     public static final String TIME_FRAME_YEARLY = "yearly";
     public static final String TIME_FRAME_AS_NEEDED = "asNeeded";
 
+    private boolean mIsLoading;
+
+    public User getInitiator() {
+        return (User) getParseUser(INITIATOR);
+    }
+
+    public void setInititator(@NonNull ParseUser initiator) {
+        put(INITIATOR, initiator);
+    }
 
     public String getTitle() {
         return getString(TITLE);
@@ -121,14 +130,10 @@ public class Task extends ParseObject {
         // A default constructor is required.
     }
 
-    public Task(@NonNull String title, @NonNull ParseObject group,
-                @NonNull List<ParseUser> usersInvolved) {
-        this(title, group, Task.TIME_FRAME_AS_NEEDED, null, usersInvolved);
-    }
-
-    public Task(@NonNull String title, @NonNull ParseObject group,
+    public Task(@NonNull ParseUser initiator, @NonNull String title, @NonNull ParseObject group,
                 @NonNull @TimeFrame String timeFrame, @Nullable Date deadline,
                 List<ParseUser> usersInvolved) {
+        setInititator(initiator);
         setTitle(title);
         setGroup(group);
         setTimeFrame(timeFrame);
@@ -164,5 +169,13 @@ public class Task extends ParseObject {
         entries.add(new Date());
         historyNew.put(currentUser.getObjectId(), entries);
         put(HISTORY, historyNew);
+    }
+
+    public boolean isLoading() {
+        return mIsLoading;
+    }
+
+    public void setLoading(boolean isLoading) {
+        mIsLoading = isLoading;
     }
 }

@@ -166,7 +166,7 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<Rec
             mImageViewAvatar = (ImageView) view.findViewById(R.id.iv_avatar);
             mTextViewUser = (TextView) view.findViewById(R.id.tv_payer);
             mTextViewAmount = (TextView) view.findViewById(R.id.tv_amount);
-            mProgressBar = (ProgressBar) view.findViewById(R.id.pb_compensation);
+            mProgressBar = (ProgressBar) view.findViewById(R.id.pb_card);
         }
 
         public void setAvatar(byte[] avatarBytes, Context context) {

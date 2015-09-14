@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.parse.ParseObject;
 import com.parse.ParseUser;
@@ -47,6 +48,8 @@ public class TaskDetailsFragment extends BaseFragment implements
     private List<TaskHistory> mTaskHistory = new ArrayList<>();
     private RecyclerView mRecyclerViewHistory;
     private TaskHistoryRecyclerAdapter mRecyclerAdapter;
+    private View mEmptyView;
+    private ProgressBar mProgressBar;
 
     public TaskDetailsFragment() {
     }
@@ -88,6 +91,8 @@ public class TaskDetailsFragment extends BaseFragment implements
         View rootView = inflater.inflate(R.layout.fragment_task_details, container, false);
 
         mRecyclerViewHistory = (RecyclerView) rootView.findViewById(R.id.rv_task_details_history);
+        mEmptyView = rootView.findViewById(R.id.empty_view);
+        mProgressBar = (ProgressBar) rootView.findViewById(R.id.pb_task_details);
 
         return rootView;
     }
@@ -115,17 +120,22 @@ public class TaskDetailsFragment extends BaseFragment implements
         queryData();
     }
 
-    private void queryData() {
+    public void queryData() {
         // user query instead of fetch because fetch would not include data for the pointers
         LocalQuery.queryTask(mTaskId, this);
     }
 
     @Override
     public void onObjectFetched(ParseObject object) {
+        if (object == null) {
+            ActivityCompat.startPostponedEnterTransition(getActivity());
+            return;
+        }
+
         mTask = (Task) object;
 
-        updateToolbarTitle();
-        checkAllUsersValid();
+        updateToolbarHeader();
+        updateToolbarMenu();
 
         LocalQuery.queryUsers(this);
     }
@@ -133,6 +143,7 @@ public class TaskDetailsFragment extends BaseFragment implements
     @Override
     public void onUsersLocalQueried(List<ParseUser> users) {
         mTaskHistory.clear();
+        mTaskHistory.add(null);
         Map<String, List<Date>> taskHistory = mTask.getHistory();
         Set<String> keys = taskHistory.keySet();
         for (ParseUser user : users) {
@@ -147,11 +158,11 @@ public class TaskDetailsFragment extends BaseFragment implements
 
         mRecyclerAdapter.notifyDataSetChanged();
 
-        toggleMainViewVisibility();
+        toggleMainVisibility();
         ActivityCompat.startPostponedEnterTransition(getActivity());
     }
 
-    private void updateToolbarTitle() {
+    private void updateToolbarHeader() {
         String title = mTask.getTitle();
         String timeFrame = mTask.getTimeFrame();
         String timeFrameLocalized;
@@ -175,13 +186,29 @@ public class TaskDetailsFragment extends BaseFragment implements
                 timeFrameLocalized = "";
         }
 
-        mListener.setToolbarTitleTimeFrame(title, timeFrameLocalized);
+        List<ParseUser> usersInvolved = mTask.getUsersInvolved();
+        boolean currentUserIsResponsible = mCurrentUser.getObjectId().equals(
+                usersInvolved.get(0).getObjectId());
+        String usersString = "";
+        if (usersInvolved.size() > 1) {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (ParseUser parseUser : usersInvolved) {
+                User user = (User) parseUser;
+                stringBuilder.append(user.getNicknameOrMe(getActivity())).append(" - ");
+            }
+            // delete last -
+            int length = stringBuilder.length();
+            stringBuilder.delete(length - 3, length - 1);
+            usersString = stringBuilder.toString();
+        }
+
+        mListener.setToolbarHeader(title, timeFrameLocalized, usersString, currentUserIsResponsible);
     }
 
     /**
      * Checks if task contains deleted user, if yes don't offer edit option
      */
-    private void checkAllUsersValid() {
+    private void updateToolbarMenu() {
         List<ParseUser> usersInvolved = mTask.getUsersInvolved();
         boolean allUsersAreValid = true;
 
@@ -196,10 +223,20 @@ public class TaskDetailsFragment extends BaseFragment implements
         mListener.showEditOption(allUsersAreValid);
     }
 
-    private void toggleMainViewVisibility() {
-//        boolean purchaseIsNull = mPurchase == null;
-//        mRecyclerView.setVisibility(purchaseIsNull ? View.GONE : View.VISIBLE);
-//        mProgressBar.setVisibility(purchaseIsNull ? View.VISIBLE : View.GONE);
+    private void toggleMainVisibility() {
+        mProgressBar.setVisibility(View.GONE);
+
+        if (historyAvailable()) {
+            mRecyclerViewHistory.setVisibility(View.VISIBLE);
+            mEmptyView.setVisibility(View.GONE);
+        } else {
+            mRecyclerViewHistory.setVisibility(View.GONE);
+            mEmptyView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private boolean historyAvailable() {
+        return mTaskHistory.size() > 1;
     }
 
     public void deleteTask() {
@@ -232,6 +269,10 @@ public class TaskDetailsFragment extends BaseFragment implements
         startActivityForResult(intent, BaseActivity.INTENT_REQUEST_TASK_MODIFY, options.toBundle());
     }
 
+    public void setTaskDone() {
+
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -257,7 +298,8 @@ public class TaskDetailsFragment extends BaseFragment implements
     }
 
     public interface FragmentInteractionListener {
-        void setToolbarTitleTimeFrame(String title, String timeFrame);
+        void setToolbarHeader(String title, String timeFrame, String usersInvolved,
+                              boolean currentUserIsResponsible);
 
         void showEditOption(boolean show);
     }

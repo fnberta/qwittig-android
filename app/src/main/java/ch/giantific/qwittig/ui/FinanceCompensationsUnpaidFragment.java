@@ -356,9 +356,9 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         return compensationLoading;
     }
 
-    private void setCompensationLoading(ParseObject compensation, String objectId, int position,
+    private void setCompensationLoading(Compensation compensation, String objectId, int position,
                                         boolean isLoading) {
-        ((Compensation) compensation).setIsLoading(isLoading);
+        compensation.setIsLoading(isLoading);
         mRecyclerAdapter.notifyItemChanged(position);
 
         if (isLoading) {
@@ -433,7 +433,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
 
         // position might have changed
         int compPosition = mCompensations.indexOf(compensation);
-        setCompensationLoading(compensation, compensationId, compPosition, false);
+        setCompensationLoading((Compensation) compensation, compensationId, compPosition, false);
     }
 
     private void removeCompensationSaveHelper(String compensationId) {
@@ -534,26 +534,23 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         switch (remindType) {
             case CompensationRemindHelper.TYPE_REMIND: {
                 Compensation compensation = setCompensationLoading(compensationId, false);
-
-                String nickname = "";
                 if (compensation != null) {
                     User payer = compensation.getPayer();
-                    nickname = payer.getNickname();
+                    String nickname = payer.getNickname();
+
+                    MessageUtils.showBasicSnackbar(mRecyclerView,
+                            getString(R.string.toast_compensation_reminded_user, nickname));
                 }
-                MessageUtils.showBasicSnackbar(mRecyclerView,
-                        getString(R.string.toast_compensation_reminded_user, nickname));
                 break;
             }
             case CompensationRemindHelper.TYPE_REMIND_PAID: {
                 Compensation compensation = setCompensationLoading(compensationId, false);
-
-                String nickname = "";
                 if (compensation != null) {
                     User beneficiary = compensation.getBeneficiary();
-                    nickname = beneficiary.getNickname();
+                    String nickname = beneficiary.getNickname();
+                    MessageUtils.showBasicSnackbar(mRecyclerView,
+                            getString(R.string.toast_compensation_reminded_user_paid, nickname));
                 }
-                MessageUtils.showBasicSnackbar(mRecyclerView,
-                        getString(R.string.toast_compensation_reminded_user_paid, nickname));
                 break;
             }
         }

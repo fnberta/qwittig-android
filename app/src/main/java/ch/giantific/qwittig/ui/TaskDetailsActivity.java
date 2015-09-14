@@ -2,6 +2,7 @@ package ch.giantific.qwittig.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.view.Menu;
@@ -9,7 +10,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import ch.giantific.qwittig.PushBroadcastReceiver;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.utils.MessageUtils;
 
 public class TaskDetailsActivity extends BaseNavDrawerActivity implements
         TaskDetailsFragment.FragmentInteractionListener {
@@ -20,6 +26,8 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
     private TaskDetailsFragment mTaskDetailsFragment;
     private TextView mTextViewTitle;
     private TextView mTextViewTimeFrame;
+    private TextView mTextViewUsersInvolved;
+    private FloatingActionButton mFab;
     private boolean mShowEditOption;
     private String mTaskId;
 
@@ -36,6 +44,7 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
 
         replaceDrawerIndicatorWithUp();
         uncheckNavDrawerItems();
+        supportPostponeEnterTransition();
         getTaskObjectId();
 
         final TaskDetailsActivity activity = this;
@@ -48,6 +57,14 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
 
         mTextViewTitle = (TextView) findViewById(R.id.tv_details_title);
         mTextViewTimeFrame = (TextView) findViewById(R.id.tv_details_subtitle);
+        mTextViewUsersInvolved = (TextView) findViewById(R.id.tv_task_details_users_involved);
+        mFab = (FloatingActionButton) findViewById(R.id.fab_task_details_done);
+        mFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mTaskDetailsFragment.setTaskDone();
+            }
+        });
 
         if (savedInstanceState == null && mUserIsLoggedIn) {
             addDetailsFragment();
@@ -62,12 +79,12 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
         mTaskId = intent.getStringExtra(TasksFragment.INTENT_TASK_ID); // started from TaskFragment
 
         if (mTaskId == null) { // started via Push Notification
-//            try {
-//                JSONObject jsonExtras = PushBroadcastReceiver.getData(intent);
-//                mTaskId = jsonExtras.optString(PushBroadcastReceiver.PUSH_PARAM_TASK);
-//            } catch (JSONException e) {
-//                MessageUtils.showBasicSnackbar(mToolbar, getString(R.string.toast_error_task_details_load));
-//            }
+            try {
+                JSONObject jsonExtras = PushBroadcastReceiver.getData(intent);
+                mTaskId = jsonExtras.optString(PushBroadcastReceiver.PUSH_PARAM_TASK);
+            } catch (JSONException e) {
+                MessageUtils.showBasicSnackbar(mToolbar, getString(R.string.toast_error_task_details_load));
+            }
         }
     }
 
@@ -126,15 +143,29 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void setToolbarTitleTimeFrame(String title, String timeFrame) {
+    public void setToolbarHeader(String title, String timeFrame, String usersInvolved,
+                                 boolean currentUserIsResponsible) {
         mTextViewTitle.setText(title);
         mTextViewTimeFrame.setText(timeFrame);
+        mTextViewUsersInvolved.setText(usersInvolved);
+        if (currentUserIsResponsible) {
+            mFab.show();
+        } else {
+            mFab.hide();
+        }
     }
 
     @Override
     public void showEditOption(boolean show) {
         mShowEditOption = show;
         invalidateOptionsMenu();
+    }
+
+    @Override
+    public void onTasksPinned() {
+        super.onTasksPinned();
+
+        mTaskDetailsFragment.queryData();
     }
 
     @Override

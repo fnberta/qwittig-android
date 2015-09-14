@@ -21,6 +21,8 @@
         android:background="?selectableItemBackground"
         >
 
+        <include layout="@layout/include_card_top_progress"/>
+
         <ImageView
             android:id="@+id/iv_avatar"
             android:layout_width="@dimen/avatar_size"

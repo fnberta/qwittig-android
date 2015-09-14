@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -83,6 +84,7 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
                 taskRow.setTitle(task.getTitle());
                 taskRow.setDeadline(task.getDeadline());
                 taskRow.setTimeFrame(task.getTimeFrame());
+                taskRow.setProgressBarVisibility(task.isLoading());
 
                 break;
             }
@@ -133,6 +135,7 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
         private TextView mTextViewUsersInvolved;
         private Button mButtonDone;
         private Button mButtonRemind;
+        private ProgressBar mProgressBar;
 
         public TaskRow(View view, Context context, final AdapterInteractionListener listener) {
             super(view);
@@ -165,6 +168,7 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
                     listener.onRemindButtonClicked(getAdapterPosition());
                 }
             });
+            mProgressBar = (ProgressBar) view.findViewById(R.id.pb_card);
         }
 
         public void setAvatar(byte[] avatar) {
@@ -312,6 +316,10 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
                 mButtonRemind.setVisibility(View.VISIBLE);
                 mButtonRemind.setText(mContext.getString(R.string.task_remind_user, userResponsible.getNickname()));
             }
+        }
+
+        public void setProgressBarVisibility(boolean show) {
+            mProgressBar.setVisibility(show ? View.VISIBLE : View.GONE);
         }
     }
 }

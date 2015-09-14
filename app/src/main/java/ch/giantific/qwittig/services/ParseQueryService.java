@@ -13,12 +13,14 @@ import com.parse.ParseUser;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Collections;
 import java.util.List;
 
 import ch.giantific.qwittig.data.parse.OnlineQuery;
 import ch.giantific.qwittig.data.parse.models.Compensation;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.Purchase;
+import ch.giantific.qwittig.data.parse.models.Task;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.utils.ParseUtils;
 
@@ -32,7 +34,7 @@ public class ParseQueryService extends IntentService {
     public static final String INTENT_COMPENSATION_PAID = "intent_compensation_paid";
 
     @IntDef({DATA_TYPE_ALL, DATA_TYPE_PURCHASE, DATA_TYPE_USER, DATA_TYPE_COMPENSATION,
-            DATA_TYPE_GROUP})
+            DATA_TYPE_GROUP, DATA_TYPE_TASK})
     @Retention(RetentionPolicy.SOURCE)
     public @interface DataType {}
     public static final int DATA_TYPE_ALL = 1;
@@ -40,6 +42,7 @@ public class ParseQueryService extends IntentService {
     public static final int DATA_TYPE_USER = 3;
     public static final int DATA_TYPE_COMPENSATION = 4;
     public static final int DATA_TYPE_GROUP = 5;
+    public static final int DATA_TYPE_TASK = 6;
 
     private static final String SERVICE_NAME = "ParseQueryService";
 
@@ -47,6 +50,7 @@ public class ParseQueryService extends IntentService {
     private static final String ACTION_QUERY_OBJECT = "ch.giantific.qwittig.services.action.QUERY_OBJECT";
     private static final String ACTION_QUERY_USERS = "ch.giantific.qwittig.services.action.QUERY_USERS";
     private static final String ACTION_QUERY_ALL = "ch.giantific.qwittig.services.action.QUERY_ALL";
+    private static final String ACTION_QUERY_TASK_DONE = "ch.giantific.qwittig.services.action.TASK_DONE";
 
     private static final String EXTRA_OBJECT_CLASS = "ch.giantific.qwittig.services.extra.OBJECT_CLASS";
     private static final String EXTRA_OBJECT_ID = "ch.giantific.qwittig.services.extra.OBJECT_ID";
@@ -113,6 +117,18 @@ public class ParseQueryService extends IntentService {
         context.startService(intent);
     }
 
+    /**
+     * Starts this service to query a task and rotate usersInvolved
+     *
+     * @see IntentService
+     */
+    public static void startTaskDone(Context context, String taskId) {
+        Intent intent = new Intent(context, ParseQueryService.class);
+        intent.setAction(ACTION_QUERY_TASK_DONE);
+        intent.putExtra(EXTRA_OBJECT_ID, taskId);
+        context.startService(intent);
+    }
+
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent == null) {
@@ -165,6 +181,14 @@ public class ParseQueryService extends IntentService {
 
                 break;
             }
+            case ACTION_QUERY_TASK_DONE: {
+                final String taskId = intent.getStringExtra(EXTRA_OBJECT_ID);
+                try {
+                    setTaskDone(taskId);
+                } catch (ParseException e) {
+                    return;
+                }
+            }
         }
     }
 
@@ -197,6 +221,10 @@ public class ParseQueryService extends IntentService {
                 break;
             case Group.CLASS:
                 queryGroup(objectId);
+                break;
+            case Task.CLASS:
+                queryTask(objectId);
+                sendLocalBroadcast(DATA_TYPE_TASK);
                 break;
         }
     }
@@ -321,6 +349,22 @@ public class ParseQueryService extends IntentService {
         final String pinLabel = Compensation.PIN_LABEL_PAID + groupId;
         ParseObject.unpinAll(pinLabel);
         ParseObject.pinAll(pinLabel, compensationsPaid);
+    }
+
+    private void queryTask(String taskId) throws ParseException {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(Task.CLASS);
+        query.include(Task.USERS_INVOLVED);
+        query.get(taskId);
+    }
+
+    private void setTaskDone(String taskId) throws ParseException {
+        Task task = (Task) ParseObject.createWithoutData(Task.CLASS, taskId);
+        task.fetchFromLocalDatastore();
+        List<ParseUser> usersInvolved = task.getUsersInvolved();
+        Collections.rotate(usersInvolved, -1);
+        task.addHistoryEvent();
+        task.saveEventually();
+        sendLocalBroadcast(DATA_TYPE_TASK);
     }
 
     private void sendLocalBroadcast(@DataType int dataType) {

@@ -101,6 +101,9 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
                 case ParseQueryService.DATA_TYPE_GROUP:
                     onGroupQueried();
                     break;
+                case ParseQueryService.DATA_TYPE_TASK:
+                    onTasksPinned();
+                    break;
             }
         }
     };

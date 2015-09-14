@@ -20,6 +20,7 @@ import ch.giantific.qwittig.data.models.TaskHistory;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.ui.adapters.rows.BaseUserAvatarRow;
+import ch.giantific.qwittig.ui.adapters.rows.HeaderRow;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.Utils;
@@ -30,6 +31,8 @@ import ch.giantific.qwittig.utils.Utils;
  */
 public class TaskHistoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    private static final int TYPE_ITEM = 0;
+    private static final int TYPE_HEADER = 1;
     private int mViewResource;
     private List<TaskHistory> mTaskHistory;
     private Context mContext;
@@ -45,21 +48,52 @@ public class TaskHistoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerVie
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(mViewResource, parent,
-                false);
+        switch (viewType) {
+            case TYPE_ITEM: {
+                View v = LayoutInflater.from(parent.getContext()).inflate(mViewResource, parent,
+                        false);
+                return new TaskHistoryRow(v, mContext);
+            }
+            case TYPE_HEADER: {
+                View v = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.row_header, parent, false);
+                return new HeaderRow(v);
+            }
+            default:
+                throw new RuntimeException("there is no type that matches the type " + viewType +
+                        " + make sure your using types correctly");
+        }
+    }
 
-        return new TaskHistoryRow(view, mContext);
+    @Override
+    public int getItemViewType(int position) {
+        if (mTaskHistory.get(position) == null) {
+            return TYPE_HEADER;
+        }
+
+        return TYPE_ITEM;
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        final TaskHistoryRow historyRow = (TaskHistoryRow) viewHolder;
-        TaskHistory taskHistory = mTaskHistory.get(position);
-        User user = taskHistory.getUser();
+        int viewType = getItemViewType(position);
+        switch (viewType) {
+            case TYPE_ITEM: {
+                final TaskHistoryRow historyRow = (TaskHistoryRow) viewHolder;
+                TaskHistory taskHistory = mTaskHistory.get(position);
+                User user = taskHistory.getUser();
 
-        historyRow.setDate(taskHistory.getDate());
-        historyRow.setName(user.getNickname());
-        historyRow.setAvatar(user.getAvatar(), false);
+                historyRow.setDate(taskHistory.getDate());
+                historyRow.setName(user.getNickname());
+                historyRow.setAvatar(user.getAvatar(), false);
+                break;
+            }
+            case TYPE_HEADER: {
+                final HeaderRow headerRow = (HeaderRow) viewHolder;
+                headerRow.setHeader(mContext.getString(R.string.header_task_history));
+                break;
+            }
+        }
     }
 
     @Override
