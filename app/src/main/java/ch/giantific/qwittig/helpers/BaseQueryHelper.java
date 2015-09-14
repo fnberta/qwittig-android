@@ -250,6 +250,7 @@ public abstract class BaseQueryHelper extends BaseHelper {
     final void queryTasks() {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Task.CLASS);
         query.whereContainedIn(Task.GROUP, mCurrentUserGroups);
+        query.include(Task.USERS_INVOLVED);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(final List<ParseObject> parseObjects, ParseException e) {

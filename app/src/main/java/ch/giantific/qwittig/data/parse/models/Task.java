@@ -1,6 +1,7 @@
 package ch.giantific.qwittig.data.parse.models;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
 import android.util.Log;
 
@@ -11,11 +12,13 @@ import com.parse.ParseUser;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.TimeZone;
+import java.util.Map;
 
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
@@ -31,8 +34,8 @@ public class Task extends ParseObject {
     public static final String GROUP = "group";
     public static final String TIME_FRAME = "timeFrame";
     public static final String DEADLINE = "deadline";
-    public static final String USER_RESPONSIBLE = "userResponsible";
     public static final String USERS_INVOLVED = "usersInvolved";
+    public static final String HISTORY = "history";
     public static final String PIN_LABEL = "tasksPinLabel";
 
     @StringDef({TIME_FRAME_ONE_TIME, TIME_FRAME_DAILY, TIME_FRAME_WEEKLY, TIME_FRAME_MONTHLY,
@@ -51,7 +54,7 @@ public class Task extends ParseObject {
         return getString(TITLE);
     }
 
-    public void setTitle(String name) {
+    public void setTitle(@NonNull String name) {
         put(TITLE, name);
     }
 
@@ -59,15 +62,16 @@ public class Task extends ParseObject {
         return (Group) getParseObject(GROUP);
     }
 
-    public void setGroup(ParseObject group) {
+    public void setGroup(@NonNull ParseObject group) {
         put(GROUP, group);
     }
 
+    @TimeFrame
     public String getTimeFrame() {
         return getString(TIME_FRAME);
     }
 
-    public void setTimeFrame(@TimeFrame String timeFrame) {
+    public void setTimeFrame(@NonNull @TimeFrame String timeFrame) {
         put(TIME_FRAME, timeFrame);
     }
 
@@ -75,20 +79,16 @@ public class Task extends ParseObject {
         return getDate(DEADLINE);
     }
     
-    public void setDeadline(@NonNull Date deadline) {
-        Calendar cal = DateUtils.getCalendarInstanceUTC();
-        cal.setTime(deadline);
-        cal = DateUtils.resetToMidnight(cal);
+    public void setDeadline(@Nullable Date deadline) {
+        if (deadline == null) {
+            remove(DEADLINE);
+        } else {
+            Calendar cal = DateUtils.getCalendarInstanceUTC();
+            cal.setTime(deadline);
+            cal = DateUtils.resetToMidnight(cal);
 
-        put(DEADLINE, cal.getTime());
-    }
-
-    public User getUserResponsible() {
-        return (User) getParseUser(USER_RESPONSIBLE);
-    }
-
-    public void setUserResponsible(ParseUser userResponsible) {
-        put(USER_RESPONSIBLE, userResponsible);
+            put(DEADLINE, cal.getTime());
+        }
     }
 
     public List<ParseUser> getUsersInvolved() {
@@ -104,31 +104,65 @@ public class Task extends ParseObject {
         put(USERS_INVOLVED, usersInvolved);
     }
 
+    public Map<String, List<Date>> getHistory() {
+        Map<String, List<Date>> history = getMap(HISTORY);
+        if (history == null) {
+            return Collections.emptyMap();
+        }
+
+        return history;
+    }
+
+    public void setHistory(Map<String, List<Date>> history) {
+        put(HISTORY, history);
+    }
+
     public Task() {
         // A default constructor is required.
     }
 
-    public Task(String title, ParseObject group, ParseUser userResponsible,
-                List<ParseUser> usersInvolved) {
-        this(title, group, Task.TIME_FRAME_AS_NEEDED, null, userResponsible,
-                usersInvolved);
+    public Task(@NonNull String title, @NonNull ParseObject group,
+                @NonNull List<ParseUser> usersInvolved) {
+        this(title, group, Task.TIME_FRAME_AS_NEEDED, null, usersInvolved);
     }
 
-    public Task(String title, ParseObject group, @TimeFrame String timeFrame, Date deadline,
-                ParseUser userResponsible, List<ParseUser> usersInvolved) {
+    public Task(@NonNull String title, @NonNull ParseObject group,
+                @NonNull @TimeFrame String timeFrame, @Nullable Date deadline,
+                List<ParseUser> usersInvolved) {
         setTitle(title);
         setGroup(group);
         setTimeFrame(timeFrame);
         if (deadline != null) {
             setDeadline(deadline);
         }
-        setUserResponsible(userResponsible);
         setUsersInvolved(usersInvolved);
         setAccessRights(group);
     }
 
-    private void setAccessRights(ParseObject group) {
+    private void setAccessRights(@NonNull ParseObject group) {
         ParseACL acl = ParseUtils.getDefaultAcl(group);
         setACL(acl);
+    }
+
+    public void addHistoryEvent() {
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        if (currentUser == null) {
+            return;
+        }
+        String currentUserId = currentUser.getObjectId();
+        Map<String, List<Date>> historyNew = new HashMap<>();
+
+        Map<String, List<Date>> historyOld = getHistory();
+        if (!historyOld.isEmpty()) {
+            historyNew.putAll(historyOld);
+        }
+
+        List<Date> entries = historyNew.get(currentUserId);
+        if (entries == null) {
+            entries = new ArrayList<>();
+        }
+        entries.add(new Date());
+        historyNew.put(currentUser.getObjectId(), entries);
+        put(HISTORY, historyNew);
     }
 }

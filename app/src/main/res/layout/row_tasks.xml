@@ -18,6 +18,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
         >
 
         <ImageView
@@ -105,6 +106,17 @@
             android:layout_below="@id/divider"
             android:textColor="?attr/colorAccent"
             tools:text="Done for this week"
+            />
+
+        <Button
+            android:id="@+id/bt_task_remind"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/divider"
+            android:textColor="?attr/colorAccent"
+            tools:text="Remind sturzi"
             />
 
     </RelativeLayout>

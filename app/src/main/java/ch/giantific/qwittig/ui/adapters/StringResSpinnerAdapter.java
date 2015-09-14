@@ -10,6 +10,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.util.Arrays;
+
+import ch.giantific.qwittig.data.parse.models.Task;
+
 
 /**
  * Created by fabio on 28.08.15.
@@ -72,6 +76,16 @@ public class StringResSpinnerAdapter extends BaseAdapter implements ThemedSpinne
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
         return getCustomView(position, convertView, parent, true);
+    }
+
+    public int getPosition(int stringRes) {
+        for (int i = 0, stringResLength = mStringRes.length; i < stringResLength; i++) {
+            if (mStringRes[i] == stringRes) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     @Override

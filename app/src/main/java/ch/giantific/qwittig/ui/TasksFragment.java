@@ -1,7 +1,10 @@
 package ch.giantific.qwittig.ui;
 
+import android.app.Activity;
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +25,9 @@ import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Task;
 import ch.giantific.qwittig.helpers.TaskQueryHelper;
 import ch.giantific.qwittig.ui.adapters.TasksRecyclerAdapter;
+import ch.giantific.qwittig.ui.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.utils.DateUtils;
+import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -32,12 +37,13 @@ import ch.giantific.qwittig.utils.Utils;
 public class TasksFragment extends BaseRecyclerViewFragment implements
         TasksRecyclerAdapter.AdapterInteractionListener {
 
+    public static final String INTENT_TASK_ID = "ch.giantific.qwittig.INTENT_TASK_ID";
+    private static final String LOG_TAG = TasksFragment.class.getSimpleName();
+    private static final String TASK_QUERY_HELPER = "task_query_helper";
+
     private Date mDeadlineSelected = new Date(Long.MAX_VALUE);
     private List<ParseObject> mTasks = new ArrayList<>();
     private TasksRecyclerAdapter mRecyclerAdapter;
-
-    private static final String LOG_TAG = TasksFragment.class.getSimpleName();
-    private static final String TASK_QUERY_HELPER = "task_query_helper";
 
     public TasksFragment() {
     }
@@ -87,6 +93,7 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
 
     /**
      * Called from activity when helper fails to pin tasks
+     *
      * @param e
      */
     public void onTasksPinFailed(ParseException e) {
@@ -134,9 +141,15 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
                     mTasks.add(null);
                     for (Iterator<ParseObject> iterator = tasks.iterator(); iterator.hasNext(); ) {
                         Task task = (Task) iterator.next();
-                        if (task.getUserResponsible().getObjectId().equals(mCurrentUser.getObjectId())) {
-                            mTasks.add(task);
+                        List<ParseUser> usersInvolved = task.getUsersInvolved();
+                        if (usersInvolved.isEmpty()) {
                             iterator.remove();
+                        } else {
+                            ParseUser userResponsible = usersInvolved.get(0);
+                            if (mCurrentUser.getObjectId().equals(userResponsible.getObjectId())) {
+                                mTasks.add(task);
+                                iterator.remove();
+                            }
                         }
                     }
 
@@ -200,9 +213,70 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
         updateAdapter();
     }
 
+    public void addNewTask() {
+        if (userIsInGroup()) {
+            Activity activity = getActivity();
+            Intent intent = new Intent(activity, TaskAddActivity.class);
+            ActivityOptionsCompat options =
+                    ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
+            startActivityForResult(intent, BaseActivity.INTENT_REQUEST_TASK_NEW, options.toBundle());
+        }
+    }
+
+    private boolean userIsInGroup() {
+        if (mCurrentUser == null) {
+            return false;
+        }
+
+        if (mCurrentGroup == null) {
+            showCreateGroupDialog();
+            return false;
+        }
+
+        return true;
+    }
+
+    private void showCreateGroupDialog() {
+        GroupCreateDialogFragment groupCreateDialogFragment = new GroupCreateDialogFragment();
+        groupCreateDialogFragment.show(getFragmentManager(), "create_group");
+    }
+
     @Override
     public void onTaskRowClicked(int position) {
-        // do nothing for now
+        Task task = (Task) mTasks.get(position);
+        Intent intent = new Intent(getActivity(), TaskDetailsActivity.class);
+        intent.putExtra(INTENT_TASK_ID, task.getObjectId());
+        ActivityOptionsCompat options =
+                ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity());
+        startActivityForResult(intent, BaseActivity.INTENT_REQUEST_TASK_DETAILS, options.toBundle());
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case BaseActivity.INTENT_REQUEST_TASK_DETAILS:
+                switch (resultCode) {
+                    case TaskDetailsActivity.RESULT_TASK_DELETED:
+                        MessageUtils.showBasicSnackbar(mRecyclerView,
+                                getString(R.string.toast_task_deleted));
+                        break;
+                }
+                break;
+            case BaseActivity.INTENT_REQUEST_TASK_NEW:
+                switch (resultCode) {
+                    case TaskAddFragment.RESULT_TASK_SAVED:
+                        MessageUtils.showBasicSnackbar(mRecyclerView,
+                                getString(R.string.toast_task_added_new));
+                        break;
+                    case TaskAddFragment.RESULT_TASK_DISCARDED:
+                        MessageUtils.showBasicSnackbar(mRecyclerView,
+                                getString(R.string.toast_task_discarded));
+                        break;
+                }
+                break;
+        }
     }
 
     @Override
@@ -238,11 +312,12 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
             task.setDeadline(deadlineNew.getTime());
         }
 
-        final ParseUser userResponsible = task.getUserResponsible();
         List<ParseUser> usersInvolved = task.getUsersInvolved();
+        final ParseUser userResponsible = usersInvolved.get(0);
         Collections.rotate(usersInvolved, -1);
-        ParseUser userResponsibleNew = usersInvolved.get(0);
-        task.setUserResponsible(userResponsibleNew);
+        final ParseUser userResponsibleNew = usersInvolved.get(0);
+
+        task.addHistoryEvent();
 
         task.saveEventually();
         String currentUserId = mCurrentUser.getObjectId();
@@ -252,5 +327,10 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
         } else {
             mRecyclerAdapter.notifyItemChanged(position);
         }
+    }
+
+    @Override
+    public void onRemindButtonClicked(int position) {
+        // TODO: send remind push
     }
 }

@@ -3,21 +3,14 @@ package ch.giantific.qwittig.ui;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
 
 import com.parse.ParseException;
-import com.parse.ParseUser;
-import com.parse.SaveCallback;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.models.Task;
+import ch.giantific.qwittig.constants.AppConstants;
 import ch.giantific.qwittig.helpers.TaskQueryHelper;
 import ch.giantific.qwittig.ui.adapters.StringResSpinnerAdapter;
 
@@ -47,29 +40,25 @@ public class TasksActivity extends BaseNavDrawerActivity implements
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                List<ParseUser> usersInvolved = new ArrayList<>();
-                usersInvolved.add(mCurrentUser);
-                Task task = new Task("Küche putzen", mCurrentGroup, mCurrentUser, usersInvolved);
-                task.saveEventually(new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        if (e != null) {
-                            Log.e(LOG_TAG, "e " + e.toString());
-                        }
-                    }
-                });
-                // TODO: add new task
+                mTaskFragment.addNewTask();
             }
         });
+        mFab.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mFab.show();
+            }
+        }, AppConstants.FAB_CIRCULAR_REVEAL_DELAY * 4);
+
         mSpinnerDeadline = (Spinner) findViewById(R.id.sp_tasks_deadline);
-        setupTimeFrameSpinner();
+        setupDeadlineSpinner();
 
         if (mUserIsLoggedIn && savedInstanceState == null) {
             addTasksFragment();
         }
     }
 
-    private void setupTimeFrameSpinner() {
+    private void setupDeadlineSpinner() {
         final int[] deadlines = new int[]{
                 R.string.deadline_all,
                 R.string.deadline_today,
@@ -150,7 +139,9 @@ public class TasksActivity extends BaseNavDrawerActivity implements
 
     @Override
     protected void onNewGroupSet() {
-        // TODO: empty implementation
+        if (mTaskFragment.isAdded()) {
+            mTaskFragment.updateAdapter();
+        }
     }
 
     @Override

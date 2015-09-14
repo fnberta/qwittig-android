@@ -12,7 +12,7 @@
     <string name="button_add_item">Artikel hinzufügen</string>
     <string name="toast_purchase_added">Neuer Einkauf hinzugefügt</string>
     <string name="toast_purchase_discarded">Einkauf verworfen</string>
-    <string name="header_user">Personen</string>
+    <string name="header_users">Personen</string>
     <string name="dialog_users_involved_title">Wähle betroffene Nutzer</string>
     <string name="hint_password">Passwort</string>
     <string name="hint_email">E-Mail</string>
@@ -267,5 +267,18 @@
     <string name="task_users_involved_next">Danach: </string>
     <string name="task_header_my">Meine Aufgaben</string>
     <string name="task_header_group">Aufgaben Gruppe</string>
+    <string name="hint_new_task">Aufgabe</string>
+    <string name="hint_time_frame">Zeitrahmen</string>
+    <string name="error_task_title">Bitte gib einen Titel an</string>
+    <string name="action_task_edit">Aufgabe bearbeiten</string>
+    <string name="action_task_delete">Aufgabe löschen</string>
+    <string name="toast_task_added_new">Neue Aufgabe hinzugefügt</string>
+    <string name="title_activity_task_add">Aufgabe hinzufügen</string>
+    <string name="title_activity_task_detail">Details Aufgabe</string>
+    <string name="task_remind_user">%1$s erinnern</string>
+    <string name="dialog_task_discard_message">Neue Aufgabe verwerfen?</string>
+    <string name="toast_task_discarded">Neue Aufgabe verworfen</string>
+    <string name="title_activity_task_edit">Aufgabe bearbeiten</string>
+    <string name="toast_task_deleted">Aufgabe gelöscht</string>
 
 </resources>

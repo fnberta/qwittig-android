@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
     package="ch.giantific.qwittig"
     >
 
@@ -122,8 +123,7 @@
             android:label="@string/title_activity_settings_profile"
             android:parentActivityName=".ui.SettingsActivity"
             android:theme="@style/AppTheme.DrawStatusBar.Explode"
-            android:windowSoftInputMode="stateUnchanged"
-            />
+            android:windowSoftInputMode="stateUnchanged" />
         <activity
             android:name=".ui.FinanceActivity"
             android:label="@string/title_activity_finance"
@@ -151,12 +151,30 @@
             android:label="@string/title_activity_tasks"
             android:theme="@style/AppTheme.DrawStatusBar"
             />
+        <activity
+            android:name=".ui.TaskDetailsActivity"
+            android:label="@string/title_activity_task_detail"
+            android:parentActivityName=".ui.TasksActivity"
+            android:theme="@style/AppTheme.DrawStatusBar.Explode"
+            />
+        <activity
+            android:name=".ui.TaskAddActivity"
+            android:label="@string/title_activity_task_add"
+            android:parentActivityName=".ui.TasksActivity"
+            android:theme="@style/AppTheme.SlideBottom"
+            />
+        <activity
+            android:name=".ui.TaskEditActivity"
+            android:label="@string/title_activity_task_edit"
+            android:parentActivityName=".ui.TaskDetailsActivity"
+            android:theme="@style/AppTheme.SlideEnd"
+            />
 
         <service android:name="com.parse.PushService" />
         <service
             android:name=".services.ParseQueryService"
             android:exported="false"
-        />
+            />
 
         <receiver
             android:name="com.parse.GcmBroadcastReceiver"
@@ -186,7 +204,6 @@
             android:name="com.parse.push.notification_icon"
             android:resource="@mipmap/ic_launcher"
             />
-
     </application>
 
 </manifest>

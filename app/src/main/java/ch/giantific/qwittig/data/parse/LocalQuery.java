@@ -213,9 +213,8 @@ public class LocalQuery {
         ParseQuery<ParseObject> query = ParseQuery.or(queries);
         query.fromLocalDatastore();
         query.ignoreACLs();
-        query.include(Task.USER_RESPONSIBLE);
-        query.include(Task.USERS_INVOLVED);
         query.whereEqualTo(Task.GROUP, getCurrentGroup());
+        query.include(Task.USERS_INVOLVED);
         query.orderByAscending(Task.DEADLINE);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -227,6 +226,26 @@ public class LocalQuery {
 
                 if (listener != null) {
                     listener.onTasksLocalQueried(parseObjects);
+                }
+            }
+        });
+    }
+
+    public static void queryTask(String taskId, final ObjectLocalFetchListener listener) {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(Task.CLASS);
+        query.fromLocalDatastore();
+        query.ignoreACLs();
+        query.include(Task.USERS_INVOLVED);
+        query.getInBackground(taskId, new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject object, ParseException e) {
+                if (e != null) {
+                    Log.e(LOG_TAG, "queryTask " + e.toString());
+                    return;
+                }
+
+                if (listener != null) {
+                    listener.onObjectFetched(object);
                 }
             }
         });
@@ -254,8 +273,8 @@ public class LocalQuery {
         });
     }
 
-    public static void fetchObjectFromId(final ObjectLocalFetchListener listener,
-                                         String objectType, String objectId) {
+    public static void fetchObjectFromId(String objectType, String objectId,
+                                         final ObjectLocalFetchListener listener) {
         ParseObject parseObject = ParseObject.createWithoutData(objectType, objectId);
         parseObject.fetchFromLocalDatastoreInBackground(new GetCallback<ParseObject>() {
             public void done(ParseObject parseObject, ParseException e) {

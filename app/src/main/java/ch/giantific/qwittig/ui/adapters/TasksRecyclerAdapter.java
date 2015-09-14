@@ -3,11 +3,8 @@ package ch.giantific.qwittig.ui.adapters;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.ColorInt;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -82,12 +79,10 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
             case TYPE_ITEM: {
                 TaskRow taskRow = (TaskRow) viewHolder;
 
-                User userResponsible = task.getUserResponsible();
-                taskRow.setUserResponsible(userResponsible);
+                taskRow.setUsersInvolved(task.getUsersInvolved());
                 taskRow.setTitle(task.getTitle());
                 taskRow.setDeadline(task.getDeadline());
                 taskRow.setTimeFrame(task.getTimeFrame());
-                taskRow.setUsersInvolved(task.getUsersInvolved(), userResponsible);
 
                 break;
             }
@@ -123,6 +118,8 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
         void onTaskRowClicked(int position);
 
         void onDoneButtonClicked(int position);
+
+        void onRemindButtonClicked(int position);
     }
 
     public static class TaskRow extends RecyclerView.ViewHolder {
@@ -135,6 +132,7 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
         private TextView mTextViewTimeFrame;
         private TextView mTextViewUsersInvolved;
         private Button mButtonDone;
+        private Button mButtonRemind;
 
         public TaskRow(View view, Context context, final AdapterInteractionListener listener) {
             super(view);
@@ -160,11 +158,13 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
                     listener.onDoneButtonClicked(getAdapterPosition());
                 }
             });
-        }
-
-        public void setUserResponsible(User userResponsible) {
-            mTextViewUserResponsible.setText(userResponsible.getNicknameOrMe(mContext));
-            setAvatar(userResponsible.getAvatar());
+            mButtonRemind = (Button) view.findViewById(R.id.bt_task_remind);
+            mButtonRemind.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onRemindButtonClicked(getAdapterPosition());
+                }
+            });
         }
 
         public void setAvatar(byte[] avatar) {
@@ -276,19 +276,42 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
             mButtonDone.setText(doneButtonText);
         }
 
-        public void setUsersInvolved(List<ParseUser> usersInvolved, ParseUser userResponsible) {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(mContext.getString(R.string.task_users_involved_next)).append(" ");
-            for (ParseUser parseUser : usersInvolved) {
-                User user = (User) parseUser;
-                if (!user.getObjectId().equals(userResponsible.getObjectId())) {
-                    stringBuilder.append(user.getNicknameOrMe(mContext)).append(" - ");
+        public void setUsersInvolved(List<ParseUser> usersInvolved) {
+            User userResponsible = (User) usersInvolved.get(0);
+            mTextViewUserResponsible.setText(userResponsible.getNicknameOrMe(mContext));
+            setAvatar(userResponsible.getAvatar());
+
+            if (usersInvolved.size() > 1) {
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append(mContext.getString(R.string.task_users_involved_next)).append(" ");
+                for (ParseUser parseUser : usersInvolved) {
+                    User user = (User) parseUser;
+                    if (!user.getObjectId().equals(userResponsible.getObjectId())) {
+                        stringBuilder.append(user.getNicknameOrMe(mContext)).append(" - ");
+                    }
                 }
+                // delete last -
+                int length = stringBuilder.length();
+                stringBuilder.delete(length - 3, length - 1);
+                mTextViewUsersInvolved.setText(stringBuilder.toString());
+            } else {
+                mTextViewUsersInvolved.setText("");
             }
-            // delete last -
-            int length = stringBuilder.length();
-            stringBuilder.delete(length - 3, length - 1);
-            mTextViewUsersInvolved.setText(stringBuilder.toString());
+
+            toggleButtons(userResponsible);
+        }
+
+        private void toggleButtons(User userResponsible) {
+            ParseUser currentUser = ParseUser.getCurrentUser();
+
+            if (currentUser.getObjectId().equals(userResponsible.getObjectId())) {
+                mButtonDone.setVisibility(View.VISIBLE);
+                mButtonRemind.setVisibility(View.GONE);
+            } else {
+                mButtonDone.setVisibility(View.GONE);
+                mButtonRemind.setVisibility(View.VISIBLE);
+                mButtonRemind.setText(mContext.getString(R.string.task_remind_user, userResponsible.getNickname()));
+            }
         }
     }
 }

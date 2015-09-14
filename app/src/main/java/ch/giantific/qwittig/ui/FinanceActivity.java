@@ -284,10 +284,12 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
         compensation.pinInBackground(Compensation.PIN_LABEL_UNPAID, new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                mCompensationsUnpaidFragment.onCompensationsPinned();
-                compensation.saveEventually();
-                MessageUtils.showBasicSnackbar(mToolbar,
-                        getString(R.string.toast_payment_saved, recipientNickname));
+                if (e == null) {
+                    mCompensationsUnpaidFragment.onCompensationsPinned();
+                    compensation.saveEventually();
+                    MessageUtils.showBasicSnackbar(mToolbar,
+                            getString(R.string.toast_payment_saved, recipientNickname));
+                }
             }
         });
     }

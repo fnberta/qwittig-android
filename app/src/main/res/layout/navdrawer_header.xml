@@ -21,6 +21,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:background="@drawable/scrim_solid"
+        android:theme="@style/ThemeOverlay.AppCompat"
         >
 
         <ImageView
@@ -52,7 +53,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/key_line_1"
             android:layout_marginEnd="@dimen/key_line_1"
-            android:theme="@style/ThemeOverlay.AppCompat"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             />
     </LinearLayout>

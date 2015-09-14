@@ -1,16 +1,12 @@
 package ch.giantific.qwittig.ui;
 
-import android.annotation.TargetApi;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
-import android.transition.Explode;
-import android.transition.Transition;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,7 +19,6 @@ import ch.giantific.qwittig.PushBroadcastReceiver;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.ui.dialogs.AccountCreateDialogFragment;
 import ch.giantific.qwittig.utils.MessageUtils;
-import ch.giantific.qwittig.utils.Utils;
 
 
 public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
@@ -35,7 +30,6 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     private static final String PURCHASE_RECEIPT_FRAGMENT = "purchase_receipt_fragment";
     private String mPurchaseId;
     private boolean mShowEditOptions;
-    private boolean mHasReceiptFile;
     private boolean mHasForeignCurrency;
     private TextView mTextViewStore;
     private TextView mTextViewDate;
@@ -65,8 +59,8 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
             }
         });
 
-        mTextViewStore = (TextView) findViewById(R.id.tv_store);
-        mTextViewDate = (TextView) findViewById(R.id.tv_date);
+        mTextViewStore = (TextView) findViewById(R.id.tv_details_title);
+        mTextViewDate = (TextView) findViewById(R.id.tv_details_subtitle);
 
         supportPostponeEnterTransition();
         getPurchaseId();
@@ -225,12 +219,6 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
         } else {
             super.onBackPressed();
         }
-    }
-
-    @Override
-    public void finishAfterDelete() {
-        setResult(RESULT_PURCHASE_DELETED);
-        finish();
     }
 
     @Override

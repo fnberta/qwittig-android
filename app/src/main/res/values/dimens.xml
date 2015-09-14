@@ -23,6 +23,7 @@
     <dimen name="avatar_size">40dp</dimen>
     <dimen name="avatar_size_2x">80dp</dimen>
     <dimen name="icon_size">24dp</dimen>
+    <dimen name="icon_compound_drawable_padding_end">32dp</dimen>
     <item name="icon_black_alpha" type="dimen" format="float">0.54</item>
 
     <!-- Checkbox special margins -->

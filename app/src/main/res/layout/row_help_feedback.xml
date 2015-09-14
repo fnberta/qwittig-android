@@ -10,5 +10,5 @@
     android:paddingEnd="@dimen/key_line_1"
     android:gravity="center_vertical"
     android:drawablePadding="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
-    android:background="?attr/selectableItemBackground"
+    android:background="?selectableItemBackground"
     tools:text="Send Feedback"/>

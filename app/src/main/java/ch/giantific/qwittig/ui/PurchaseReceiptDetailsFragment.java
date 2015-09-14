@@ -1,6 +1,5 @@
 package ch.giantific.qwittig.ui;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 
@@ -44,7 +43,7 @@ public class PurchaseReceiptDetailsFragment extends PurchaseReceiptBaseFragment 
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        LocalQuery.fetchObjectFromId(this, Purchase.CLASS, mPurchaseId);
+        LocalQuery.fetchObjectFromId(Purchase.CLASS, mPurchaseId, this);
     }
 
     @Override

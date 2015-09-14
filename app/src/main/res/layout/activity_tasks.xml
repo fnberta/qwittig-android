@@ -58,6 +58,8 @@
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/key_line_1"
             android:src="@drawable/ic_add_black_24dp"
+            android:visibility="invisible"
+            tools:visibility="visible"
             />
 
     </android.support.design.widget.CoordinatorLayout>
