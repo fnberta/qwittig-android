@@ -50,7 +50,7 @@
                 >
 
                 <TextView
-                    android:id="@+id/tv_details_title"
+                    android:id="@+id/tv_task_details_title"
                     style="@style/Base.TextAppearance.AppCompat.Display1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -61,7 +61,7 @@
                     />
 
                 <TextView
-                    android:id="@+id/tv_details_subtitle"
+                    android:id="@+id/tv_task_details_subtitle"
                     style="@style/Base.TextAppearance.AppCompat.Title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

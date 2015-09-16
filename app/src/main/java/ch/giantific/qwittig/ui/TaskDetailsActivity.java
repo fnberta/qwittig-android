@@ -55,8 +55,8 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
             }
         });
 
-        mTextViewTitle = (TextView) findViewById(R.id.tv_details_title);
-        mTextViewTimeFrame = (TextView) findViewById(R.id.tv_details_subtitle);
+        mTextViewTitle = (TextView) findViewById(R.id.tv_task_details_title);
+        mTextViewTimeFrame = (TextView) findViewById(R.id.tv_task_details_subtitle);
         mTextViewUsersInvolved = (TextView) findViewById(R.id.tv_task_details_users_involved);
         mFab = (FloatingActionButton) findViewById(R.id.fab_task_details_done);
         mFab.setOnClickListener(new View.OnClickListener() {

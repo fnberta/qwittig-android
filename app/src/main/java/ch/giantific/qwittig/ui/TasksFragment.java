@@ -223,7 +223,7 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
             return;
         }
 
-        Calendar cal = Calendar.getInstance();
+        Calendar cal = DateUtils.getCalendarInstanceUTC();
         switch (deadline) {
             case R.string.deadline_today: {
                 cal.add(Calendar.DAY_OF_YEAR, 1);

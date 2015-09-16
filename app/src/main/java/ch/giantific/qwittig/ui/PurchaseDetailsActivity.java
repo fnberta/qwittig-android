@@ -59,8 +59,8 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
             }
         });
 
-        mTextViewStore = (TextView) findViewById(R.id.tv_details_title);
-        mTextViewDate = (TextView) findViewById(R.id.tv_details_subtitle);
+        mTextViewStore = (TextView) findViewById(R.id.tv_purchase_details_title);
+        mTextViewDate = (TextView) findViewById(R.id.tv_purchase_details_subtitle);
 
         supportPostponeEnterTransition();
         getPurchaseId();
