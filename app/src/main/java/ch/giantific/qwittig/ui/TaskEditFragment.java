@@ -2,7 +2,6 @@ package ch.giantific.qwittig.ui;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.parse.ParseObject;
 import com.parse.ParseUser;
@@ -11,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.models.TaskUser;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Task;
 import ch.giantific.qwittig.data.parse.models.User;
@@ -34,7 +34,6 @@ public class TaskEditFragment extends TaskAddFragment {
     private String mOldTimeFrame;
     private Date mOldDeadline;
     private List<ParseUser> mOldUsersInvolved;
-    private List<ParseUser> mUsersQueried;
 
     public static TaskEditFragment newInstance(String taskId) {
         TaskEditFragment fragment = new TaskEditFragment();
@@ -77,13 +76,7 @@ public class TaskEditFragment extends TaskAddFragment {
     }
 
     @Override
-    void setupStartUserLists(List<ParseUser> users, int usersSize) {
-        mUsersQueried = users;
-        // do nothing else, users lists will be setup when old task is fetched
-    }
-
-    @Override
-    void onUsersAvailableReady() {
+    void setupUserList() {
         fetchOldTask();
     }
 
@@ -95,9 +88,9 @@ public class TaskEditFragment extends TaskAddFragment {
 
                 if (!mOldValuesSet) {
                     restoreOldValues();
-                } else {
-                    mUsersRecyclerAdapter.notifyDataSetChanged();
                 }
+
+                queryUsers();
             }
         });
     }
@@ -112,7 +105,7 @@ public class TaskEditFragment extends TaskAddFragment {
             setDeadline(mOldDeadline);
         }
         mOldUsersInvolved = mEditTask.getUsersInvolved();
-        setUsers(mOldUsersInvolved);
+        setUsersInvolved(mOldUsersInvolved);
 
         mOldValuesSet = true;
         mUsersRecyclerAdapter.notifyDataSetChanged();
@@ -145,16 +138,9 @@ public class TaskEditFragment extends TaskAddFragment {
         }
     }
 
-    private void setUsers(List<ParseUser> usersInvolved) {
+    private void setUsersInvolved(List<ParseUser> usersInvolved) {
         for (ParseUser user : usersInvolved) {
-            mUsersAvailable.add(user);
-            mUsersInvolved.add(user.getObjectId());
-        }
-
-        for (ParseUser user : mUsersQueried) {
-            if (!mUsersAvailable.contains(user)) {
-                mUsersAvailable.add(user);
-            }
+            mUsersInvolved.add(new TaskUser(user.getObjectId(), true));
         }
     }
 
@@ -171,13 +157,14 @@ public class TaskEditFragment extends TaskAddFragment {
         }
 
         int oldUsersInvolvedSize = mOldUsersInvolved.size();
-        if (oldUsersInvolvedSize != mUsersInvolved.size()) {
+        List<ParseUser> newUsersInvolved = getUsersInvolved();
+        if (oldUsersInvolvedSize != newUsersInvolved.size()) {
             return true;
         }
 
         for (int i = 0; i < oldUsersInvolvedSize; i++) {
-            User userOld = (User) mOldUsersInvolved.get(i);
-            User userNew = (User) mUsersAvailable.get(i);
+            ParseUser userOld = mOldUsersInvolved.get(i);
+            ParseUser userNew = newUsersInvolved.get(i);
 
             if (!userOld.getObjectId().equals(userNew.getObjectId())) {
                 return true;
@@ -193,7 +180,7 @@ public class TaskEditFragment extends TaskAddFragment {
         mEditTask.setTitle(title);
         mEditTask.setTimeFrame(getTimeFrameSelected());
         mEditTask.setDeadline(mDeadlineSelected);
-        mEditTask.setUsersInvolved(getUsersFromId(mUsersInvolved));
+        mEditTask.setUsersInvolved(getUsersInvolved());
         return mEditTask;
     }
 }

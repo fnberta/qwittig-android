@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.models.TaskUser;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.ui.adapters.rows.BaseUserAvatarRow;
 
@@ -33,12 +34,12 @@ public class TaskUsersInvolvedRecyclerAdapter extends RecyclerView.Adapter<Recyc
     private AdapterInteractionListener mListener;
     private int mViewResource;
     private List<ParseUser> mUsersAvailable;
-    private List<String> mUsersInvolved;
+    private List<TaskUser> mUsersInvolved;
     private Context mContext;
 
     public TaskUsersInvolvedRecyclerAdapter(Context context, int viewResource,
                                             List<ParseUser> usersAvailable,
-                                            List<String> usersInvolved,
+                                            List<TaskUser> usersInvolved,
                                             AdapterInteractionListener listener) {
         super();
 
@@ -63,7 +64,7 @@ public class TaskUsersInvolvedRecyclerAdapter extends RecyclerView.Adapter<Recyc
         User user = (User) mUsersAvailable.get(position);
         usersRow.setName(user.getNickname());
         usersRow.setAvatar(user.getAvatar(), false);
-        usersRow.setAlpha(mUsersInvolved.contains(user.getObjectId()) ? 1f : DISABLED_ALPHA);
+        usersRow.setAlpha(mUsersInvolved.get(position).isInvolved() ? 1f : DISABLED_ALPHA);
     }
 
     @Override
@@ -74,12 +75,14 @@ public class TaskUsersInvolvedRecyclerAdapter extends RecyclerView.Adapter<Recyc
     @Override
     public void onItemMove(int fromPosition, int toPosition) {
         Collections.swap(mUsersAvailable, fromPosition, toPosition);
+        Collections.swap(mUsersInvolved, fromPosition, toPosition);
         notifyItemMoved(fromPosition, toPosition);
     }
 
     @Override
     public void onItemDismiss(int position) {
         mUsersAvailable.remove(position);
+        mUsersInvolved.remove(position);
         notifyItemRemoved(position);
     }
 

@@ -23,10 +23,13 @@ import com.parse.SaveCallback;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.models.TaskUser;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.Task;
@@ -46,6 +49,9 @@ public class TaskAddFragment extends BaseFragment implements
         LocalQuery.UserLocalQueryListener,
         TaskUsersInvolvedRecyclerAdapter.AdapterInteractionListener {
 
+    @IntDef({TASK_SAVED, TASK_DISCARDED, TASK_NO_CHANGES})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface TaskAction {}
     public static final int TASK_SAVED = 0;
     public static final int TASK_DISCARDED = 1;
     public static final int TASK_NO_CHANGES = 2;
@@ -58,7 +64,7 @@ public class TaskAddFragment extends BaseFragment implements
     TaskUsersInvolvedRecyclerAdapter mUsersRecyclerAdapter;
     Date mDeadlineSelected;
     List<ParseUser> mUsersAvailable = new ArrayList<>();
-    ArrayList<String> mUsersInvolved;
+    ArrayList<TaskUser> mUsersInvolved;
     StringResSpinnerAdapter mTimeFrameAdapter;
     private TextView mTextViewDeadline;
     private RecyclerView mRecyclerViewUsers;
@@ -88,7 +94,7 @@ public class TaskAddFragment extends BaseFragment implements
 
         if (savedInstanceState != null) {
             mDeadlineSelected = DateUtils.parseLongToDate(savedInstanceState.getLong(STATE_DEADLINE_SELECTED));
-            mUsersInvolved = savedInstanceState.getStringArrayList(STATE_USERS_INVOLVED);
+            mUsersInvolved = savedInstanceState.getParcelableArrayList(STATE_USERS_INVOLVED);
         } else {
             mDeadlineSelected = new Date();
             mUsersInvolved = new ArrayList<>();
@@ -100,7 +106,7 @@ public class TaskAddFragment extends BaseFragment implements
         super.onSaveInstanceState(outState);
 
         outState.putLong(STATE_DEADLINE_SELECTED, DateUtils.parseDateToLong(mDeadlineSelected));
-        outState.putStringArrayList(STATE_USERS_INVOLVED, mUsersInvolved);
+        outState.putParcelableArrayList(STATE_USERS_INVOLVED, mUsersInvolved);
     }
 
     @Override
@@ -130,7 +136,7 @@ public class TaskAddFragment extends BaseFragment implements
         setupUsersInvolvedRecyclerView();
         setupTimeFrameSpinner();
 
-        LocalQuery.queryUsers(this);
+        setupUserList();
     }
 
     private void showDatePickerDialog() {
@@ -189,11 +195,8 @@ public class TaskAddFragment extends BaseFragment implements
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 int timeFrame = (int) parent.getItemAtPosition(position);
-                if (timeFrame == R.string.time_frame_as_needed) {
-                    mTextViewDeadline.setVisibility(View.GONE);
-                } else {
-                    mTextViewDeadline.setVisibility(View.VISIBLE);
-                }
+                mTextViewDeadline.setVisibility(timeFrame == R.string.time_frame_as_needed ?
+                        View.GONE : View.VISIBLE);
             }
 
             @Override
@@ -203,26 +206,57 @@ public class TaskAddFragment extends BaseFragment implements
         });
     }
 
+    void setupUserList() {
+        queryUsers();
+    }
+
+    final void queryUsers() {
+        LocalQuery.queryUsers(this);
+    }
+
     @Override
     public void onUsersLocalQueried(List<ParseUser> users) {
         mUsersAvailable.clear();
 
-        int usersSize = users.size();
-        setupStartUserLists(users, usersSize);
+        if (!users.isEmpty()) {
+            final int usersSize = users.size();
+            if (mUsersInvolved.isEmpty()) {
+                for (int i = 0; i < usersSize; i++) {
+                    ParseUser user = users.get(i);
+                    mUsersAvailable.add(user);
+                    mUsersInvolved.add(new TaskUser(user.getObjectId(), true));
+                }
+            } else {
+                int usersInvolvedSize = mUsersInvolved.size();
+                ParseUser[] parseUsers = new ParseUser[usersInvolvedSize];
+                List<String> ids = new ArrayList<>(usersInvolvedSize);
+                for (int i = 0; i < usersInvolvedSize; i++) {
+                    TaskUser taskUser = mUsersInvolved.get(i);
+                    ids.add(taskUser.getUserId());
+                }
 
-        mRecyclerViewUsers.setMinimumHeight(usersSize * getResources().getDimensionPixelSize(R.dimen.list_avatar_with_text));
-        onUsersAvailableReady();
-    }
+                for (Iterator<ParseUser> iterator = users.iterator(); iterator.hasNext(); ) {
+                    ParseUser user = iterator.next();
+                    String userId = user.getObjectId();
+                    if (ids.contains(userId)) {
+                        int pos = ids.indexOf(userId);
+                        parseUsers[pos] =  user;
+                        iterator.remove();
+                    }
+                }
 
-    void setupStartUserLists(List<ParseUser> users, int usersSize) {
-        for (int i = 0; i < usersSize; i++) {
-            ParseUser user = users.get(i);
-            mUsersAvailable.add(user);
-            mUsersInvolved.add(user.getObjectId());
+                Collections.addAll(mUsersAvailable, parseUsers);
+                if (!users.isEmpty()) {
+                    for (ParseUser user : users) {
+                        mUsersAvailable.add(user);
+                        mUsersInvolved.add(new TaskUser(user.getObjectId(), false));
+                    }
+                }
+            }
+
+            mRecyclerViewUsers.setMinimumHeight(usersSize * getResources().getDimensionPixelSize(R.dimen.list_avatar_with_text));
         }
-    }
 
-    void onUsersAvailableReady() {
         mUsersRecyclerAdapter.notifyDataSetChanged();
     }
 
@@ -244,7 +278,7 @@ public class TaskAddFragment extends BaseFragment implements
     @NonNull
     Task getTask(String title) {
         return new Task(mCurrentUser, title, mCurrentGroup, getTimeFrameSelected(),
-                mDeadlineSelected, getUsersFromId(mUsersInvolved));
+                mDeadlineSelected, getUsersInvolved());
     }
 
     private void pinTask(final Task task) {
@@ -277,15 +311,17 @@ public class TaskAddFragment extends BaseFragment implements
         }
     }
 
-    final List<ParseUser> getUsersFromId(List<String> usersInvolvedIds) {
-        final List<ParseUser> usersInvolved = new ArrayList<>();
-        for (ParseUser user : mUsersAvailable) {
-            if (usersInvolvedIds.contains(user.getObjectId())) {
-                usersInvolved.add(user);
+    final List<ParseUser> getUsersInvolved() {
+        final List<ParseUser> parseUsers = new ArrayList<>();
+
+        for (int i = 0, usersInvolvedSize = mUsersInvolved.size(); i < usersInvolvedSize; i++) {
+            TaskUser taskUser = mUsersInvolved.get(i);
+            if (taskUser.isInvolved()) {
+                parseUsers.add(mUsersAvailable.get(i));
             }
         }
 
-        return usersInvolved;
+        return parseUsers;
     }
 
     public void finish(@TaskAction int taskAction) {
@@ -306,18 +342,17 @@ public class TaskAddFragment extends BaseFragment implements
 
     @Override
     public void onUsersRowItemClick(int position) {
-        User user = (User) mUsersAvailable.get(position);
-        String userId = user.getObjectId();
-        if (mUsersInvolved.contains(userId)) {
+        TaskUser taskUser = mUsersInvolved.get(position);
+        if (taskUser.isInvolved()) {
             if (!userIsLastOneChecked()) {
-                mUsersInvolved.remove(userId);
+                taskUser.setIsInvolved(false);
                 mUsersRecyclerAdapter.notifyItemChanged(position);
             } else {
                 MessageUtils.showBasicSnackbar(mRecyclerViewUsers,
                         getString(R.string.toast_min_one_user));
             }
         } else {
-            mUsersInvolved.add(userId);
+            taskUser.setIsInvolved(true);
             mUsersRecyclerAdapter.notifyItemChanged(position);
         }
     }
@@ -328,9 +363,18 @@ public class TaskAddFragment extends BaseFragment implements
      * @return whether a clicked checked user is the only one checked
      */
     private boolean userIsLastOneChecked() {
-        int countUsersChecked = mUsersInvolved.size();
+        int usersInvolvedCount = 0;
+        for (TaskUser taskUser : mUsersInvolved) {
+            if (taskUser.isInvolved()) {
+                usersInvolvedCount++;
+            }
 
-        return countUsersChecked < 2;
+            if (usersInvolvedCount > 1) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override
@@ -360,11 +404,6 @@ public class TaskAddFragment extends BaseFragment implements
     public void onDetach() {
         super.onDetach();
         mListener = null;
-    }
-
-    @IntDef({TASK_SAVED, TASK_DISCARDED, TASK_NO_CHANGES})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface TaskAction {
     }
 
     public interface FragmentInteractionListener {
