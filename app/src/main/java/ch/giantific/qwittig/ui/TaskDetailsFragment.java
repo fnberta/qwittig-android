@@ -287,7 +287,6 @@ public class TaskDetailsFragment extends BaseFragment implements
         String timeFrame = mTask.getTimeFrame();
 
         if (timeFrame.equals(Task.TIME_FRAME_ONE_TIME)) {
-            // TODO: implement proper deletion
             mTask.deleteEventually();
             finish(TaskDetailsActivity.RESULT_TASK_DELETED);
             return;
