@@ -55,6 +55,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     private static final String STATE_IS_CALCULATING_NEW = "state_is_calculating_new";
     private static final String COMPENSATION_QUERY_HELPER = "compensation_unpaid_query_helper";
     private static final String COMPENSATION_SAVE_HELPER = "compensation_save_helper_";
+    private static final String COMPENSATION_REMIND_HELPER = "compensation_remind_helper_";
     private static final String LOG_TAG = FinanceCompensationsUnpaidFragment.class.getSimpleName();
     private TextView mTextViewEmptyTitle;
     private TextView mTextViewEmptySubtitle;
@@ -356,9 +357,9 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         return compensationLoading;
     }
 
-    private void setCompensationLoading(ParseObject compensation, String objectId, int position,
+    private void setCompensationLoading(Compensation compensation, String objectId, int position,
                                         boolean isLoading) {
-        ((Compensation) compensation).setIsLoading(isLoading);
+        compensation.setIsLoading(isLoading);
         mRecyclerAdapter.notifyItemChanged(position);
 
         if (isLoading) {
@@ -433,7 +434,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
 
         // position might have changed
         int compPosition = mCompensations.indexOf(compensation);
-        setCompensationLoading(compensation, compensationId, compPosition, false);
+        setCompensationLoading((Compensation) compensation, compensationId, compPosition, false);
     }
 
     private void removeCompensationSaveHelper(String compensationId) {
@@ -495,7 +496,8 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     private void remindUserWithHelper(@CompensationRemindHelper.RemindType int remindType,
                                       String compensationId) {
         FragmentManager fragmentManager = getFragmentManager();
-        CompensationRemindHelper compensationRemindHelper = findCompensationRemindHelper(fragmentManager);
+        CompensationRemindHelper compensationRemindHelper = findCompensationRemindHelper(
+                fragmentManager, compensationId);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -503,19 +505,21 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
             compensationRemindHelper = CompensationRemindHelper.newInstance(remindType, compensationId);
 
             fragmentManager.beginTransaction()
-                    .add(compensationRemindHelper, CompensationRemindHelper.COMPENSATION_REMIND_HELPER)
+                    .add(compensationRemindHelper, COMPENSATION_REMIND_HELPER + compensationId)
                     .commit();
         }
     }
 
-    private CompensationRemindHelper findCompensationRemindHelper(FragmentManager fragmentManager) {
+    private CompensationRemindHelper findCompensationRemindHelper(FragmentManager fragmentManager,
+                                                                  String compensationId) {
         return (CompensationRemindHelper) fragmentManager.findFragmentByTag(
-                CompensationRemindHelper.COMPENSATION_REMIND_HELPER);
+                COMPENSATION_REMIND_HELPER + compensationId);
     }
 
-    private void removeCompensationRemindHelper() {
+    private void removeCompensationRemindHelper(String compensationId) {
         FragmentManager fragmentManager = getFragmentManager();
-        CompensationRemindHelper compensationRemindHelper = findCompensationRemindHelper(fragmentManager);
+        CompensationRemindHelper compensationRemindHelper = findCompensationRemindHelper(
+                fragmentManager, compensationId);
 
         if (compensationRemindHelper != null) {
             fragmentManager.beginTransaction().remove(compensationRemindHelper).commitAllowingStateLoss();
@@ -529,31 +533,28 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
      * @param compensationId
      */
     public void onUserReminded(int remindType, String compensationId) {
-        removeCompensationRemindHelper();
+        removeCompensationRemindHelper(compensationId);
 
         switch (remindType) {
             case CompensationRemindHelper.TYPE_REMIND: {
                 Compensation compensation = setCompensationLoading(compensationId, false);
-
-                String nickname = "";
                 if (compensation != null) {
                     User payer = compensation.getPayer();
-                    nickname = payer.getNickname();
+                    String nickname = payer.getNickname();
+
+                    MessageUtils.showBasicSnackbar(mRecyclerView,
+                            getString(R.string.toast_compensation_reminded_user, nickname));
                 }
-                MessageUtils.showBasicSnackbar(mRecyclerView,
-                        getString(R.string.toast_compensation_reminded_user, nickname));
                 break;
             }
             case CompensationRemindHelper.TYPE_REMIND_PAID: {
                 Compensation compensation = setCompensationLoading(compensationId, false);
-
-                String nickname = "";
                 if (compensation != null) {
                     User beneficiary = compensation.getBeneficiary();
-                    nickname = beneficiary.getNickname();
+                    String nickname = beneficiary.getNickname();
+                    MessageUtils.showBasicSnackbar(mRecyclerView,
+                            getString(R.string.toast_compensation_reminded_user_paid, nickname));
                 }
-                MessageUtils.showBasicSnackbar(mRecyclerView,
-                        getString(R.string.toast_compensation_reminded_user_paid, nickname));
                 break;
             }
         }
@@ -565,26 +566,12 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
      * @param remindType remind to pay or remind that paid
      * @param e
      */
-    public void onFailedToRemindUser(int remindType, ParseException e) {
+    public void onFailedToRemindUser(int remindType, ParseException e, String compensationId) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         MessageUtils.showBasicSnackbar(mRecyclerView, ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeCompensationRemindHelper();
+        removeCompensationRemindHelper(compensationId);
 
-        if (!mLoadingCompensations.isEmpty()) {
-            for (Iterator<String> iterator = mLoadingCompensations.iterator(); iterator.hasNext(); ) {
-                String loadingCompensationId = iterator.next();
-                for (int i = 0, compensationsSize = mCompensations.size(); i < compensationsSize; i++) {
-                    Compensation compensation = (Compensation) mCompensations.get(i);
-                    if (loadingCompensationId.equals(compensation.getObjectId())) {
-                        compensation.setIsLoading(false);
-                        mRecyclerAdapter.notifyItemChanged(i);
-                        iterator.remove();
-                        break;
-                    }
-                }
-            }
-        }
-        // TODO: find a way to disable only the specific compensation concerned
+        setCompensationLoading(compensationId, false);
     }
 
     @Override

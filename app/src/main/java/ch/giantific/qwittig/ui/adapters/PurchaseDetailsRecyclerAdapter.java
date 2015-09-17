@@ -126,7 +126,7 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
                 String header = "";
                 switch (position) {
                     case HEADER_POSITION_USER:
-                        header = mContext.getString(R.string.header_user);
+                        header = mContext.getString(R.string.header_users);
                         break;
                     case HEADER_POSITION_ITEMS:
                         header = mContext.getString(R.string.header_items);

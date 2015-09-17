@@ -101,6 +101,9 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
                 case ParseQueryService.DATA_TYPE_GROUP:
                     onGroupQueried();
                     break;
+                case ParseQueryService.DATA_TYPE_TASK:
+                    onTasksPinned();
+                    break;
             }
         }
     };
@@ -160,6 +163,11 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
 
     @CallSuper
     public void onCompensationsPinned(boolean isPaid) {
+        // empty default implementation
+    }
+
+    @CallSuper
+    public void onTasksPinned() {
         // empty default implementation
     }
 

@@ -1,0 +1,72 @@
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:transitionGroup="true"
+    >
+
+    <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/toolbar_height_x3"
+        tools:ignore="MergeRootFrame"
+        />
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        >
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_height_x3"
+            android:paddingBottom="36dp"
+            android:gravity="bottom"
+            android:minHeight="?attr/actionBarSize"
+            app:contentInsetStart="@dimen/key_line_2"
+            app:contentInsetEnd="@dimen/key_line_1"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            >
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/til_task_add_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:transitionGroup="true"
+                app:errorEnabled="false"
+                >
+
+                <EditText
+                    android:id="@+id/et_task_add_title"
+                    style="@style/Base.TextAppearance.AppCompat.Display1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_new_task"
+                    android:inputType="text|textCapSentences"
+                    android:imeOptions="actionDone"
+                    />
+
+            </android.support.design.widget.TextInputLayout>
+
+        </android.support.v7.widget.Toolbar>
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_task_save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/normal_space"
+        android:src="@drawable/ic_save_black_24dp"
+        app:layout_anchor="@id/appbar"
+        app:layout_anchorGravity="bottom|end"
+        />
+
+</android.support.design.widget.CoordinatorLayout>
+

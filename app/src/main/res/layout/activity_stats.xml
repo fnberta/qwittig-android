@@ -27,16 +27,16 @@
                 android:layout_height="?attr/actionBarSize"
                 android:layout_width="match_parent"
                 android:background="?attr/colorPrimary"
-                app:contentInsetStart="@dimen/key_line_2"
+                android:theme="@style/ThemeOverlay.AppCompat"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                app:contentInsetStart="@dimen/key_line_2"
                 >
 
                 <Spinner
                     android:id="@+id/sp_stats_type"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:backgroundTint="@android:color/white"
-                    android:theme="@style/ThemeOverlay.AppCompat.Light"
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                     />
 
             </android.support.v7.widget.Toolbar>
@@ -47,6 +47,7 @@
                 android:orientation="horizontal"
                 android:layout_marginStart="@dimen/key_line_2"
                 android:layout_marginEnd="@dimen/key_line_1"
+                android:theme="@style/ThemeOverlay.AppCompat"
                 >
 
                 <Spinner
@@ -54,16 +55,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="@dimen/normal_space"
-                    android:backgroundTint="@android:color/white"
-                    android:theme="@style/ThemeOverlay.AppCompat.Light"
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                     />
 
                 <Spinner
                     android:id="@+id/sp_month"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:backgroundTint="@android:color/white"
-                    android:theme="@style/ThemeOverlay.AppCompat.Light"
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                     />
 
             </LinearLayout>

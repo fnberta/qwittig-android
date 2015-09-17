@@ -104,7 +104,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     }
 
     void fetchPurchase() {
-        LocalQuery.fetchObjectFromId(this, Purchase.CLASS, mEditPurchaseId);
+        LocalQuery.fetchObjectFromId(Purchase.CLASS, mEditPurchaseId, this);
     }
 
     @Override

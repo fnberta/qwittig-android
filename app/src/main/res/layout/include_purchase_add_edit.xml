@@ -33,7 +33,7 @@
         android:layout_marginTop="@dimen/small_space"
         android:paddingStart="@dimen/key_line_1"
         android:paddingEnd="@dimen/key_line_1"
-        android:background="?attr/selectableItemBackground"
+        android:background="?selectableItemBackground"
         android:orientation="horizontal">
 
         <ImageView
@@ -63,7 +63,7 @@
         android:layout_marginTop="@dimen/small_space"
         android:paddingStart="@dimen/key_line_1"
         android:paddingEnd="@dimen/key_line_1"
-        android:background="?attr/selectableItemBackground">
+        android:background="?selectableItemBackground">
 
         <ImageView
             android:layout_width="@dimen/icon_size"

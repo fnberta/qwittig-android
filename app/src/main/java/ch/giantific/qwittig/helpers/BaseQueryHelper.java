@@ -22,6 +22,7 @@ import ch.giantific.qwittig.data.parse.OnlineQuery;
 import ch.giantific.qwittig.data.parse.models.Compensation;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.Purchase;
+import ch.giantific.qwittig.data.parse.models.Task;
 import ch.giantific.qwittig.data.parse.models.User;
 
 /**
@@ -244,6 +245,47 @@ public abstract class BaseQueryHelper extends BaseHelper {
     @CallSuper
     void onCompensationsPaidPinned(String groupId) {
         // empty default implementation
+    }
+
+    final void queryTasks() {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(Task.CLASS);
+        query.whereContainedIn(Task.GROUP, mCurrentUserGroups);
+        query.include(Task.USERS_INVOLVED);
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(final List<ParseObject> parseObjects, ParseException e) {
+                if (e != null) {
+                    onParseError(e);
+                    return;
+                }
+
+                // Release any objects previously pinned for this query.
+                ParseObject.unpinAllInBackground(Task.PIN_LABEL, new DeleteCallback() {
+                    public void done(ParseException e) {
+                        if (e != null) {
+                            onParseError(e);
+                            return;
+                        }
+
+                        // Add the latest results for this query to the cache.
+                        ParseObject.pinAllInBackground(Task.PIN_LABEL, parseObjects, new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e == null) {
+                                    onTasksPinned();
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    @CallSuper
+    void onTasksPinned() {
+        // empty default implementation
+
     }
 
     final boolean checkQueryCount() {

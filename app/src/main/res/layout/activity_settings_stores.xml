@@ -6,14 +6,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="ch.giantific.qwittig.ui.SettingsStoresActivity"
-    tools:ignore="MergeRootFrame">
+    >
 
     <FrameLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="@dimen/toolbar_height_x2"
-        tools:ignore="MergeRootFrame" />
+        tools:ignore="MergeRootFrame"
+        />
 
     <include layout="@layout/include_appbar_x2"/>
 
@@ -26,6 +27,7 @@
         android:visibility="invisible"
         app:layout_anchor="@id/appbar"
         app:layout_anchorGravity="bottom|end"
-        tools:visibility="visible"/>
+        tools:visibility="visible"
+        />
 
 </android.support.design.widget.CoordinatorLayout>

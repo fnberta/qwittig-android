@@ -30,10 +30,13 @@ import java.util.Set;
 import ch.giantific.qwittig.data.parse.models.Compensation;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.Purchase;
+import ch.giantific.qwittig.data.parse.models.Task;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.services.ParseQueryService;
 import ch.giantific.qwittig.ui.FinanceActivity;
 import ch.giantific.qwittig.ui.PurchaseDetailsActivity;
+import ch.giantific.qwittig.ui.TaskDetailsActivity;
+import ch.giantific.qwittig.ui.TasksActivity;
 import ch.giantific.qwittig.utils.MoneyUtils;
 
 /**
@@ -57,6 +60,8 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     public static final String PUSH_PARAM_INITIATOR = "initiator";
     public static final String PUSH_PARAM_GROUP_NAME = "groupName";
     public static final String PUSH_PARAM_CURRENCY_CODE = "currencyCode";
+    public static final String PUSH_PARAM_TASK = "task";
+    public static final String PUSH_PARAM_TASK_TITLE = "taskTitle";
 
     public static final String INTENT_ACTION_INVITATION = "intent_action_invitation";
     public static final int ACTION_INVITATION_ACCEPTED = 1;
@@ -66,7 +71,8 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
             TYPE_SETTLEMENT_NEW, TYPE_COMPENSATION_NEW_PAID, TYPE_COMPENSATION_NEW_UNPAID,
             TYPE_COMPENSATION_REMIND_USER, TYPE_COMPENSATION_REMIND_USER_HAS_PAID,
             TYPE_COMPENSATION_EXISTING_NOT_NOW, TYPE_COMPENSATION_EXISTING_PAID, TYPE_USER_INVITED,
-            TYPE_USER_JOINED, TYPE_USER_LEFT, TYPE_USER_DELETED, TYPE_GROUP_USERS_INVITED_CHANGED})
+            TYPE_USER_JOINED, TYPE_USER_LEFT, TYPE_USER_DELETED, TYPE_GROUP_USERS_INVITED_CHANGED,
+            TYPE_TASK_NEW, TYPE_TASK_EDIT, TYPE_TASK_DELETE, TYPE_TASK_REMIND_USER})
     @Retention(RetentionPolicy.SOURCE)
     public @interface NotificationType {}
     public static final String TYPE_USER_INVITED = "userInvited";
@@ -86,6 +92,10 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     private static final String TYPE_USER_DELETED = "userDeleted";
     private static final String TYPE_GROUP_NAME_CHANGED = "groupNameChanged";
     private static final String TYPE_GROUP_USERS_INVITED_CHANGED = "groupUsersInvitedChanged";
+    private static final String TYPE_TASK_NEW = "taskNew";
+    private static final String TYPE_TASK_DELETE = "taskDelete";
+    private static final String TYPE_TASK_EDIT = "taskEdit";
+    private static final String TYPE_TASK_REMIND_USER = "taskRemindUser";
 
     private static final String ACTION_PUSH_BUTTON_ACCEPT = "ch.giantific.qwittig.push.intent.ACCEPT";
     private static final String ACTION_PUSH_BUTTON_DISCARD = "ch.giantific.qwittig.push.intent.DISCARD";
@@ -134,6 +144,11 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                         closeShade(context);
                         break;
                     }
+                    case TYPE_TASK_REMIND_USER:
+                        String taskId = jsonExtras.optString(PUSH_PARAM_TASK);
+                        ParseQueryService.startTaskDone(context, taskId);
+
+                        cancelNotification(intent);
                 }
                 break;
             }
@@ -326,6 +341,37 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 }
                 break;
             }
+            case TYPE_TASK_NEW: {
+                String taskId = jsonExtras.optString(PUSH_PARAM_TASK);
+                ParseQueryService.startQueryObject(context, Task.CLASS, taskId, true);
+
+                // don't show notification for initiator of task
+                String initiatorId = jsonExtras.optString(PUSH_PARAM_INITIATOR);
+                if (initiatorId.equals(ParseUser.getCurrentUser().getObjectId())) {
+                    return;
+                }
+                break;
+            }
+            case TYPE_TASK_EDIT: {
+                String taskId = jsonExtras.optString(PUSH_PARAM_TASK);
+                ParseQueryService.startQueryObject(context, Task.CLASS, taskId, false);
+                break;
+            }
+            case TYPE_TASK_DELETE: {
+                String taskId = jsonExtras.optString(PUSH_PARAM_TASK);
+                String groupId = jsonExtras.optString(PUSH_PARAM_GROUP);
+                ParseQueryService.startUnpinObject(context, Task.CLASS, taskId, groupId);
+
+                // don't show notification for initiator of task,
+                // TODO: actually we don't want to show for the user that deleted the task / finished a one-time task
+                String initiatorId = jsonExtras.optString(PUSH_PARAM_INITIATOR);
+                if (initiatorId.equals(ParseUser.getCurrentUser().getObjectId())) {
+                    return;
+                }
+
+                // don't show notification if task was one-time
+                break;
+            }
             case TYPE_USER_DELETED: {
                 ParseQueryService.startQueryAll(context);
                 break;
@@ -345,7 +391,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
             }
         }
 
-        // get the notification and display it the data contains a title and/or an alert
+        // get the notification and display it if it's not a silent one
         if (!isSilentNotification(type)) {
             intent.putExtra(NOTIFICATION_ID, notificationId);
             Notification notification = getNotification(context, intent);
@@ -367,7 +413,8 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     private boolean isSilentNotification(String type) {
         return type.equals(TYPE_PURCHASE_EDIT) || type.equals(TYPE_PURCHASE_DELETE) ||
                 type.equals(TYPE_COMPENSATION_NEW_PAID) || type.equals(TYPE_COMPENSATION_NEW_UNPAID) ||
-                type.equals(TYPE_GROUP_NAME_CHANGED) || type.equals(TYPE_GROUP_USERS_INVITED_CHANGED);
+                type.equals(TYPE_GROUP_NAME_CHANGED) || type.equals(TYPE_GROUP_USERS_INVITED_CHANGED) ||
+                type.equals(TYPE_TASK_EDIT);
     }
 
     private String getNotificationType(Intent intent) {
@@ -542,6 +589,43 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 builder.setContentTitle(title).setContentText(alert);
                 break;
             }
+            case TYPE_TASK_NEW: {
+                title = jsonExtras.optString(PUSH_PARAM_TASK_TITLE);
+                alert = context.getString(R.string.push_task_new_alert, user);
+
+                // set title and alert
+                builder.setContentTitle(title).setContentText(alert);
+                break;
+            }
+            case TYPE_TASK_DELETE: {
+                String taskTitle = jsonExtras.optString(PUSH_PARAM_TASK_TITLE);
+                title = context.getString(R.string.push_task_delete_title, taskTitle);
+                alert = context.getString(R.string.push_task_delete_alert, user);
+
+                // set title and alert
+                builder.setContentTitle(title).setContentText(alert);
+                break;
+            }
+            case TYPE_TASK_REMIND_USER: {
+                String taskTitle = jsonExtras.optString(PUSH_PARAM_TASK_TITLE);
+                title = context.getString(R.string.push_task_remind_title, taskTitle);
+                alert = context.getString(R.string.push_task_remind_alert, user);
+
+                // set title and alert
+                builder.setContentTitle(title).setContentText(alert);
+
+                // setup action button
+                Intent acceptContentIntent = new Intent(ACTION_PUSH_BUTTON_ACCEPT);
+                acceptContentIntent.setPackage(packageName);
+                acceptContentIntent.putExtras(extras);
+                int acceptContentIntentRequestCode = random.nextInt();
+                PendingIntent pAcceptContentIntent = PendingIntent.getBroadcast(context,
+                        acceptContentIntentRequestCode, acceptContentIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT);
+                builder.addAction(R.drawable.ic_check_black_24dp,
+                        context.getString(R.string.push_action_finished), pAcceptContentIntent);
+                break;
+            }
             case TYPE_USER_INVITED: {
                 String groupName = jsonExtras.optString(PUSH_PARAM_GROUP_NAME);
                 title = context.getString(R.string.push_user_invite_title, groupName);
@@ -683,6 +767,12 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 // fall through
             case TYPE_COMPENSATION_REMIND_USER_HAS_PAID:
                 return FinanceActivity.class;
+            case TYPE_TASK_NEW:
+                // fall through
+            case TYPE_TASK_REMIND_USER:
+                return TaskDetailsActivity.class;
+            case TYPE_TASK_DELETE:
+                return TasksActivity.class;
             default:
                 return super.getActivity(context, intent);
         }

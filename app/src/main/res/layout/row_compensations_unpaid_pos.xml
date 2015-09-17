@@ -21,7 +21,7 @@
 
         <include layout="@layout/include_compensation_avatar"/>
 
-        <include layout="@layout/include_compensation_progress"/>
+        <include layout="@layout/include_card_top_progress"/>
 
         <include layout="@layout/include_compensation_header"/>
 

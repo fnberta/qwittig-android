@@ -2,6 +2,7 @@ package ch.giantific.qwittig.ui.adapters;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.ThemedSpinnerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,32 +10,38 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.util.Arrays;
+
+import ch.giantific.qwittig.data.parse.models.Task;
+
 
 /**
  * Created by fabio on 28.08.15.
  */
-public class StatsTypeAdapter extends BaseAdapter {
+public class StringResSpinnerAdapter extends BaseAdapter implements ThemedSpinnerAdapter {
 
+    private final ThemedSpinnerAdapter.Helper mDropDownHelper;
     private Context mContext;
     private int mViewResource;
-    private int[] mStatsTypes;
+    private int[] mStringRes;
 
-    public StatsTypeAdapter(Context context, int resource, int[] types) {
+    public StringResSpinnerAdapter(Context context, int resource, int[] stringRes) {
         super();
 
+        mDropDownHelper = new ThemedSpinnerAdapter.Helper(context);
         mContext = context;
         mViewResource = resource;
-        mStatsTypes = types;
+        mStringRes = stringRes;
     }
 
     @Override
     public int getCount() {
-        return mStatsTypes.length;
+        return mStringRes.length;
     }
 
     @Override
     public Object getItem(int position) {
-        return mStatsTypes[position];
+        return mStringRes[position];
     }
 
     @Override
@@ -60,7 +67,7 @@ public class StatsTypeAdapter extends BaseAdapter {
             typeRow = (TypeRow) convertView.getTag();
         }
 
-        String title = mContext.getString(mStatsTypes[position]);
+        String title = mContext.getString(mStringRes[position]);
         typeRow.setTitle(title);
 
         return convertView;
@@ -69,6 +76,27 @@ public class StatsTypeAdapter extends BaseAdapter {
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
         return getCustomView(position, convertView, parent, true);
+    }
+
+    public int getPosition(int stringRes) {
+        for (int i = 0, stringResLength = mStringRes.length; i < stringResLength; i++) {
+            if (mStringRes[i] == stringRes) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    @Override
+    public void setDropDownViewTheme(Resources.Theme theme) {
+        mDropDownHelper.setDropDownViewTheme(theme);
+    }
+
+    @Nullable
+    @Override
+    public Resources.Theme getDropDownViewTheme() {
+        return mDropDownHelper.getDropDownViewTheme();
     }
 
     private static class TypeRow {

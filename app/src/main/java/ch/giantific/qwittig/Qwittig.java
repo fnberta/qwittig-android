@@ -12,6 +12,7 @@ import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
 
 import ch.giantific.qwittig.data.parse.models.Compensation;
+import ch.giantific.qwittig.data.parse.models.Task;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.data.parse.models.Item;
@@ -44,6 +45,7 @@ public class Qwittig extends Application {
         ParseObject.registerSubclass(Purchase.class);
         ParseObject.registerSubclass(Item.class);
         ParseObject.registerSubclass(Compensation.class);
+        ParseObject.registerSubclass(Task.class);
 
         // enable local datastore
         Parse.enableLocalDatastore(this);

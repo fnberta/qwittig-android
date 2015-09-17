@@ -78,8 +78,9 @@ public class PurchaseDetailsFragment extends BaseFragment implements
 
         setHasOptionsMenu(true);
 
-        if (getArguments() != null) {
-            mPurchaseId = getArguments().getString(HomePurchasesFragment.INTENT_PURCHASE_ID);
+        Bundle args = getArguments();
+        if (args != null) {
+            mPurchaseId = args.getString(HomePurchasesFragment.INTENT_PURCHASE_ID);
         }
     }
 
@@ -216,10 +217,17 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     public void deletePurchase() {
         if (!ParseUtils.isTestUser(ParseUser.getCurrentUser())) {
             mPurchase.deleteEventually();
-            mListener.finishAfterDelete();
+
+            finish(PurchaseDetailsActivity.RESULT_PURCHASE_DELETED);
         } else {
             mListener.showAccountCreateDialog();
         }
+    }
+
+    private void finish(int result) {
+        Activity activity = getActivity();
+        activity.setResult(result);
+        activity.finish();
     }
 
     /**
@@ -247,7 +255,5 @@ public class PurchaseDetailsFragment extends BaseFragment implements
         void replaceWithReceiptFragment();
 
         void showAccountCreateDialog();
-
-        void finishAfterDelete();
     }
 }

@@ -7,6 +7,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center_vertical"
     android:paddingEnd="@dimen/small_space"
-    android:textColor="@android:color/white"
     android:lines="1"
-    android:ellipsize="marquee"/>
+    android:ellipsize="marquee"
+    android:textColor="@android:color/white"
+    />

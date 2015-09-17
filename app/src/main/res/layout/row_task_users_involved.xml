@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/list_avatar_with_text"
+    android:background="?selectableItemBackground"
+    >
+
+    <ImageView
+        android:id="@+id/user_avatar"
+        android:layout_width="@dimen/avatar_size"
+        android:layout_height="@dimen/avatar_size"
+        android:layout_marginStart="@dimen/key_line_1"
+        android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_avatar_size"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:contentDescription="@string/user_avatar"
+        tools:src="@drawable/ic_account_circle_black_40dp"
+        />
+
+    <TextView
+        android:id="@+id/user_name"
+        style="@style/ListTextSubhead"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:layout_toEndOf="@id/user_avatar"
+        android:layout_toStartOf="@+id/iv_reorder"
+        tools:text="Vera"/>
+
+    <ImageView
+        android:id="@+id/iv_reorder"
+        android:layout_width="@dimen/icon_size"
+        android:layout_height="@dimen/icon_size"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="@dimen/key_line_1"
+        android:src="@drawable/ic_reorder_black_24dp"
+        android:alpha="@dimen/icon_black_alpha"
+        android:contentDescription="@string/hint_reorder"
+        />
+
+</RelativeLayout>
