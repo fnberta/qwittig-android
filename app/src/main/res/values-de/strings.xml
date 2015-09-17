@@ -293,5 +293,6 @@
     <string name="push_task_delete_alert">%1$s hat die Aufgabe gelöscht</string>
     <string name="time_frame_one_time">Einmalig</string>
     <string name="toast_task_max_one_user_one_time">Bitte wähle exakt ein Benutzer für eine einmalige Aufgabe</string>
+    <string name="yesterday">Gestern</string>
 
 </resources>

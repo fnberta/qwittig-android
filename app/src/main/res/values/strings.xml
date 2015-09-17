@@ -301,5 +301,6 @@
     <string name="push_task_delete_alert">%1$s deleted the task</string>
     <string name="time_frame_one_time">One time</string>
     <string name="toast_task_max_one_user_one_time">Please select exactly one user for a one-time task</string>
+    <string name="yesterday">Yesterday</string>
 
 </resources>

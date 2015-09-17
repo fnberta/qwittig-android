@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -205,6 +206,9 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
                 if (daysToDeadline == 0) {
                     deadlineString = mContext.getString(R.string.deadline_today);
                     color = R.color.green;
+                } else if (daysToDeadline == -1) {
+                    deadlineString = mContext.getString(R.string.yesterday);
+                    color = R.color.red;
                 } else if (daysToDeadline < 0) {
                     deadlineString = mContext.getString(R.string.deadline_text_neg, daysToDeadline * -1);
                     color = R.color.red;
@@ -213,7 +217,9 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
                     color = R.color.green;
                 }
             }
-            mTextViewDeadline.setText(deadlineString);
+            if (!deadlineString.equals(mTextViewDeadline.getText().toString())) {
+                mTextViewDeadline.setText(deadlineString);
+            }
             if (color != 0) {
                 mTextViewDeadline.setTextColor(ContextCompat.getColor(mContext, color));
             }
@@ -280,13 +286,20 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
                     doneButtonText = mContext.getString(R.string.task_done_year);
                     break;
             }
-            mTextViewTimeFrame.setText(timeFrameLocalized);
-            mButtonDone.setText(doneButtonText);
+            if (!timeFrameLocalized.equals(mTextViewTimeFrame.getText().toString())) {
+                mTextViewTimeFrame.setText(timeFrameLocalized);
+            }
+            if (!doneButtonText.equals(mButtonDone.getText().toString())) {
+                mButtonDone.setText(doneButtonText);
+            }
         }
 
         public void setUsersInvolved(List<ParseUser> usersInvolved) {
             User userResponsible = (User) usersInvolved.get(0);
-            mTextViewUserResponsible.setText(userResponsible.getNicknameOrMe(mContext));
+            String nickname = userResponsible.getNicknameOrMe(mContext);
+            if (!nickname.equals(mTextViewUserResponsible.getText().toString())) {
+                mTextViewUserResponsible.setText(nickname);
+            }
             setAvatar(userResponsible.getAvatar());
 
             String usersInvolvedString = "";
@@ -304,7 +317,9 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
                 stringBuilder.delete(length - 3, length - 1);
                 usersInvolvedString = stringBuilder.toString();
             }
-            mTextViewUsersInvolved.setText(usersInvolvedString);
+            if (!usersInvolvedString.equals(mTextViewUsersInvolved.getText().toString())) {
+                mTextViewUsersInvolved.setText(usersInvolvedString);
+            }
 
             toggleButtons(userResponsible);
         }
@@ -318,7 +333,10 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
             } else {
                 mButtonDone.setVisibility(View.GONE);
                 mButtonRemind.setVisibility(View.VISIBLE);
-                mButtonRemind.setText(mContext.getString(R.string.task_remind_user, userResponsible.getNickname()));
+                String remind = mContext.getString(R.string.task_remind_user, userResponsible.getNickname());
+                if (!remind.equals(mButtonRemind.getText().toString())) {
+                    mButtonRemind.setText(remind);
+                }
             }
         }
 
