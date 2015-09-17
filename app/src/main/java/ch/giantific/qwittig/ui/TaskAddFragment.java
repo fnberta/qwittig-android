@@ -188,7 +188,8 @@ public class TaskAddFragment extends BaseFragment implements
                 R.string.time_frame_weekly,
                 R.string.time_frame_monthly,
                 R.string.time_frame_yearly,
-                R.string.time_frame_as_needed};
+                R.string.time_frame_as_needed,
+                R.string.time_frame_one_time};
         mTimeFrameAdapter = new StringResSpinnerAdapter(getActivity(), R.layout.spinner_item, timeFrames);
         mSpinnerTimeFrame.setAdapter(mTimeFrameAdapter);
         mSpinnerTimeFrame.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -271,14 +272,21 @@ public class TaskAddFragment extends BaseFragment implements
             return;
         }
 
-        Task task = getTask(title);
+        String timeFrame = getTimeFrameSelected();
+        List<ParseUser> usersInvolved = getUsersInvolved();
+        if (timeFrame.equals(Task.TIME_FRAME_ONE_TIME) && usersInvolved.size() > 1) {
+            MessageUtils.showBasicSnackbar(mRecyclerViewUsers, getString(R.string.toast_task_max_one_user_one_time));
+            return;
+        }
+
+        Task task = getTask(title, timeFrame, usersInvolved);
         pinTask(task);
     }
 
     @NonNull
-    Task getTask(String title) {
-        return new Task(mCurrentUser, title, mCurrentGroup, getTimeFrameSelected(),
-                mDeadlineSelected, getUsersInvolved());
+    Task getTask(String title, String timeFrame, List<ParseUser> usersInvolved) {
+        return new Task(mCurrentUser, title, mCurrentGroup, timeFrame, mDeadlineSelected,
+                usersInvolved);
     }
 
     private void pinTask(final Task task) {
@@ -305,6 +313,8 @@ public class TaskAddFragment extends BaseFragment implements
                 return Task.TIME_FRAME_MONTHLY;
             case R.string.time_frame_yearly:
                 return Task.TIME_FRAME_YEARLY;
+            case R.string.time_frame_one_time:
+                return Task.TIME_FRAME_ONE_TIME;
             default:
                 mDeadlineSelected = null;
                 return Task.TIME_FRAME_AS_NEEDED;

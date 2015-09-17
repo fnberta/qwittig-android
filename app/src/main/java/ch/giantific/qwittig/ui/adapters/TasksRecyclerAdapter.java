@@ -255,6 +255,10 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
             String timeFrameLocalized = "";
             String doneButtonText = mContext.getString(R.string.task_done_single);
             switch (timeFrame) {
+                case Task.TIME_FRAME_ONE_TIME:
+                    timeFrameLocalized = mContext.getString(R.string.time_frame_one_time);
+                    doneButtonText = mContext.getString(R.string.task_done_single);
+                    break;
                 case Task.TIME_FRAME_AS_NEEDED:
                     timeFrameLocalized = mContext.getString(R.string.time_frame_as_needed);
                     doneButtonText = mContext.getString(R.string.task_done_single);
@@ -285,6 +289,7 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
             mTextViewUserResponsible.setText(userResponsible.getNicknameOrMe(mContext));
             setAvatar(userResponsible.getAvatar());
 
+            String usersInvolvedString = "";
             if (usersInvolved.size() > 1) {
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.append(mContext.getString(R.string.task_users_involved_next)).append(" ");
@@ -297,10 +302,9 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
                 // delete last -
                 int length = stringBuilder.length();
                 stringBuilder.delete(length - 3, length - 1);
-                mTextViewUsersInvolved.setText(stringBuilder.toString());
-            } else {
-                mTextViewUsersInvolved.setText("");
+                usersInvolvedString = stringBuilder.toString();
             }
+            mTextViewUsersInvolved.setText(usersInvolvedString);
 
             toggleButtons(userResponsible);
         }

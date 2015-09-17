@@ -361,6 +361,15 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 String taskId = jsonExtras.optString(PUSH_PARAM_TASK);
                 String groupId = jsonExtras.optString(PUSH_PARAM_GROUP);
                 ParseQueryService.startUnpinObject(context, Task.CLASS, taskId, groupId);
+
+                // don't show notification for initiator of task,
+                // TODO: actually we don't want to show for the user that deleted the task / finished a one-time task
+                String initiatorId = jsonExtras.optString(PUSH_PARAM_INITIATOR);
+                if (initiatorId.equals(ParseUser.getCurrentUser().getObjectId())) {
+                    return;
+                }
+
+                // don't show notification if task was one-time
                 break;
             }
             case TYPE_USER_DELETED: {

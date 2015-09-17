@@ -291,5 +291,7 @@
     <string name="push_action_finished">Erledigt</string>
     <string name="push_task_delete_title">%1$s gelöscht</string>
     <string name="push_task_delete_alert">%1$s hat die Aufgabe gelöscht</string>
+    <string name="time_frame_one_time">Einmalig</string>
+    <string name="toast_task_max_one_user_one_time">Bitte wähle exakt ein Benutzer für eine einmalige Aufgabe</string>
 
 </resources>

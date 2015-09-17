@@ -16,7 +16,6 @@ import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -31,7 +30,6 @@ import ch.giantific.qwittig.data.parse.models.Task;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.ui.adapters.TaskHistoryRecyclerAdapter;
 import ch.giantific.qwittig.ui.dialogs.AccountCreateDialogFragment;
-import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 
@@ -190,6 +188,9 @@ public class TaskDetailsFragment extends BaseFragment implements
             case Task.TIME_FRAME_AS_NEEDED:
                 timeFrameLocalized = getString(R.string.time_frame_as_needed);
                 break;
+            case Task.TIME_FRAME_ONE_TIME:
+                timeFrameLocalized = getString(R.string.time_frame_one_time);
+                break;
             default:
                 timeFrameLocalized = "";
         }
@@ -197,24 +198,29 @@ public class TaskDetailsFragment extends BaseFragment implements
         List<ParseUser> usersInvolved = mTask.getUsersInvolved();
         boolean currentUserIsResponsible = mCurrentUser.getObjectId().equals(
                 usersInvolved.get(0).getObjectId());
+
         String usersString = "";
-        if (usersInvolved.size() > 1) {
+        int usersInvolvedSize = usersInvolved.size();
+        if (usersInvolvedSize > 1) {
             StringBuilder stringBuilder = new StringBuilder();
-            for (ParseUser parseUser : usersInvolved) {
-                User user = (User) parseUser;
+            for (int i = 0; i < usersInvolvedSize; i++) {
+                User user = (User) usersInvolved.get(i);
                 stringBuilder.append(user.getNicknameOrMe(getActivity())).append(" - ");
             }
             // delete last -
             int length = stringBuilder.length();
             stringBuilder.delete(length - 3, length - 1);
             usersString = stringBuilder.toString();
+        } else if (usersInvolvedSize == 1) {
+            User userInvolved = (User) usersInvolved.get(0);
+            usersString = userInvolved.getNicknameOrMe(getActivity());
         }
 
         mListener.setToolbarHeader(title, timeFrameLocalized, usersString, currentUserIsResponsible);
     }
 
     /**
-     * Checks if user is the initator of the task. If yes and task does not contain deleted user,
+     * Checks if user is the initiator of the task. If yes and task does not contain deleted user,
      * show edit option.
      */
     private void updateToolbarMenu() {

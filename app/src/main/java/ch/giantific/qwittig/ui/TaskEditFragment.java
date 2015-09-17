@@ -115,6 +115,9 @@ public class TaskEditFragment extends TaskAddFragment {
         int res = 0;
 
         switch (timeFrame) {
+            case Task.TIME_FRAME_ONE_TIME:
+                res = R.string.time_frame_one_time;
+                break;
             case Task.TIME_FRAME_DAILY:
                 res = R.string.time_frame_daily;
                 break;
@@ -176,11 +179,11 @@ public class TaskEditFragment extends TaskAddFragment {
 
     @NonNull
     @Override
-    Task getTask(String title) {
+    Task getTask(String title, String timeFrame, List<ParseUser> usersInvolved) {
         mEditTask.setTitle(title);
-        mEditTask.setTimeFrame(getTimeFrameSelected());
+        mEditTask.setTimeFrame(timeFrame);
         mEditTask.setDeadline(mDeadlineSelected);
-        mEditTask.setUsersInvolved(getUsersInvolved());
+        mEditTask.setUsersInvolved(usersInvolved);
         return mEditTask;
     }
 }
