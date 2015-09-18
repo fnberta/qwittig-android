@@ -54,8 +54,12 @@ public class StatsActivity extends BaseNavDrawerActivity implements
         mSpinnerMonth = (Spinner) findViewById(R.id.sp_month);
         setupMonthSpinner();
 
-        if (savedInstanceState == null && mUserIsLoggedIn) {
-            addFirstFragment();
+        if (mUserIsLoggedIn) {
+            if (savedInstanceState == null) {
+                addFirstFragment();
+            }
+
+            fetchCurrentUserGroups();
         }
     }
 

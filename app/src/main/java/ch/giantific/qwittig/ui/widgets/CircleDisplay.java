@@ -113,15 +113,11 @@ public class CircleDisplay extends View {
      * @param c
      */
     private void drawValue(Canvas c) {
-
         mArcPaint.setAlpha(255);
 
         float angle = mAngle * mPhase;
 
         c.drawArc(mCircleBox, mStartAngle, angle, true, mArcPaint);
-
-        // Log.i(LOG_TAG, "CircleBox bounds: " + mCircleBox.toString() +
-        // ", Angle: " + angle + ", StartAngle: " + mStartAngle);
     }
 
     /**
@@ -146,7 +142,6 @@ public class CircleDisplay extends View {
      * @param animated
      */
     public void showValue(float toShow, float total, boolean animated) {
-
         mAngle = calcAngle(toShow / total * 100f);
         mValue = toShow;
 

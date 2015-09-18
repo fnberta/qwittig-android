@@ -66,8 +66,12 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
             }
         });
 
-        if (savedInstanceState == null && mUserIsLoggedIn) {
-            addDetailsFragment();
+        if (mUserIsLoggedIn) {
+            if (savedInstanceState == null) {
+                addDetailsFragment();
+            }
+
+            fetchCurrentUserGroups();
         }
     }
 

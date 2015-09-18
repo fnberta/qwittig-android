@@ -136,6 +136,14 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
         }
     };
 
+    /**
+     * Verifies the developer payload of a purchase.
+     */
+    private boolean developerPayloadIsValid(Purchase iabPurchase) {
+        String payload = iabPurchase.getDeveloperPayload();
+        return payload.equals(mCurrentUser.getObjectId());
+    }
+
     private boolean freeAutoPurchasesAvailable() {
         ParseConfig config = ParseConfig.getCurrentConfig();
         int freeAutoLimit = config.getInt(Config.FREE_PURCHASES_LIMIT);
@@ -211,14 +219,6 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
         startActivityForResult(intentLogin, INTENT_REQUEST_LOGIN);
     }
 
-    /**
-     * Verifies the developer payload of a purchase.
-     */
-    private boolean developerPayloadIsValid(Purchase iabPurchase) {
-        String payload = iabPurchase.getDeveloperPayload();
-        return payload.equals(mCurrentUser.getObjectId());
-    }
-
     @Override
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
@@ -263,15 +263,6 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
         };
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        if (mUserIsLoggedIn) {
-            fetchCurrentUserGroups();
-        }
     }
 
     final void fetchCurrentUserGroups() {
@@ -586,6 +577,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
     @CallSuper
     void afterLoginSetup() {
         mUserIsLoggedIn = true;
+        fetchCurrentUserGroups();
 
         // subclasses are free to add stuff here
     }

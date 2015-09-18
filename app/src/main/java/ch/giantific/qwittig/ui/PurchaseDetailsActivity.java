@@ -65,8 +65,12 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
         supportPostponeEnterTransition();
         getPurchaseId();
 
-        if (savedInstanceState == null && mUserIsLoggedIn) {
-            addDetailsFragment();
+        if (mUserIsLoggedIn) {
+            if (savedInstanceState == null) {
+                addDetailsFragment();
+            }
+
+            fetchCurrentUserGroups();
         }
     }
 

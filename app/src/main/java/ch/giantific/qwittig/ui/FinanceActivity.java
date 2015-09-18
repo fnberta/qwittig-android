@@ -97,6 +97,8 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
                         .getFragment(savedInstanceState, COMPENSATIONS_PAID_FRAGMENT);
                 setupTabs();
             }
+
+            fetchCurrentUserGroups();
         }
     }
 

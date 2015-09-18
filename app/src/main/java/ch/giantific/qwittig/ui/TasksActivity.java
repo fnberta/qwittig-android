@@ -57,8 +57,12 @@ public class TasksActivity extends BaseNavDrawerActivity implements
         mSpinnerDeadline = (Spinner) findViewById(R.id.sp_tasks_deadline);
         setupDeadlineSpinner();
 
-        if (mUserIsLoggedIn && savedInstanceState == null) {
-            addTasksFragment();
+        if (mUserIsLoggedIn) {
+            if (savedInstanceState == null) {
+                addTasksFragment();
+            }
+
+            fetchCurrentUserGroups();
         }
     }
 

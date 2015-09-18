@@ -114,10 +114,12 @@ public class HomeActivity extends BaseNavDrawerActivity implements
                 mHomePurchasesFragment = (HomePurchasesFragment) getFragmentManager()
                         .getFragment(savedInstanceState, PURCHASE_FRAGMENT);
                 mHomeDraftsFragment = (HomeDraftsFragment) getFragmentManager()
-                        .findFragmentByTag(DRAFTS_FRAGMENT);
+                        .getFragment(savedInstanceState, DRAFTS_FRAGMENT);
 
                 setupTabs();
             }
+
+            fetchCurrentUserGroups();
         }
     }
 
@@ -398,10 +400,10 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
     @Override
     void afterLoginSetup() {
-        super.afterLoginSetup();
-
         mNewQueryNeeded = true;
         addViewPagerFragments();
+
+        super.afterLoginSetup();
     }
 
     @Override
