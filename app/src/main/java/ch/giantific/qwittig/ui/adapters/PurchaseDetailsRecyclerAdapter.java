@@ -102,22 +102,8 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
                         NUMBER_OF_HEADER_ROWS);
 
                 itemRow.setName(item.getName());
-
-                double price = item.getPrice();
-                itemRow.setPrice(MoneyUtils.formatMoney(price, mCurrentGroupCurrency));
-
-                User currentUser = (User) ParseUser.getCurrentUser();
-                List<ParseUser> usersInvolved = item.getUsersInvolved();
-                int usersInvolvedCount = usersInvolved.size();
-                float percentageCurrentUser = 0;
-
-                float alpha = 1f;
-                if (usersInvolved.contains(currentUser)) {
-                    percentageCurrentUser = (1f / usersInvolvedCount) * 100;
-                } else {
-                    alpha = DISABLED_ALPHA;
-                }
-                itemRow.setAlpha(alpha, percentageCurrentUser, false);
+                itemRow.setPrice(item.getPrice(), mCurrentGroupCurrency);
+                itemRow.setAlpha(item.getUsersInvolved());
 
                 break;
             }
@@ -133,46 +119,32 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
                         break;
                 }
                 headerRow.setHeader(header);
+
                 break;
             }
             case TYPE_USER_RECYCLER: {
                 UserRecyclerRow userRecyclerRow = (UserRecyclerRow) viewHolder;
                 userRecyclerRow.setPurchase(mPurchase);
+
                 break;
             }
             case TYPE_TOTAL: {
                 TotalRow totalRow = (TotalRow) viewHolder;
-                totalRow.setTotalValue(MoneyUtils.formatMoney(mPurchase.getTotalPrice(),
-                        mCurrentGroupCurrency));
+                totalRow.setTotalValue(mPurchase.getTotalPrice(), mCurrentGroupCurrency);
+                totalRow.setTotalValueForeign(mPurchase.getTotalPriceForeign(),
+                        mCurrentGroupCurrency, mPurchase.getCurrency());
 
-                String purchaseCurrency = mPurchase.getCurrency();
-                if (!mCurrentGroupCurrency.equals(purchaseCurrency)) {
-                    totalRow.setTotalValueForeignVisibility(true);
-                    totalRow.setTotalValueForeign(MoneyUtils.formatMoney(
-                            mPurchase.getTotalPriceForeign(), purchaseCurrency));
-                } else {
-                    totalRow.setTotalValueForeignVisibility(false);
-                }
                 break;
             }
             case TYPE_MY_SHARE: {
                 MyShareRow myShareRow = (MyShareRow) viewHolder;
 
                 double myShare = Utils.calculateMyShare(mPurchase);
-                if (myShare != mPurchase.getTotalPrice()) {
-                    myShareRow.setMyShare(MoneyUtils.formatMoney(myShare, mCurrentGroupCurrency));
-                } else {
-                    myShareRow.hideView();
-                }
+                myShareRow.setMyShare(myShare, mPurchase.getTotalPrice(), mCurrentGroupCurrency);
+                myShareRow.setMyShareForeign(myShare, mPurchase.getExchangeRate(),
+                        mCurrentGroupCurrency, mPurchase.getCurrency());
 
-                String purchaseCurrency = mPurchase.getCurrency();
-                if (!mCurrentGroupCurrency.equals(purchaseCurrency)) {
-                    myShareRow.setMyShareForeignVisibility(true);
-                    myShareRow.setMyShareForeign(MoneyUtils.formatMoney(
-                            myShare / mPurchase.getExchangeRate(), purchaseCurrency));
-                } else {
-                    myShareRow.setMyShareForeignVisibility(false);
-                }
+                break;
             }
         }
     }
@@ -233,11 +205,27 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
             mTextViewName.setText(name);
         }
 
-        public void setPrice(String price) {
-            mTextViewPrice.setText(price);
+        public void setPrice (double price, String currencyCode) {
+            String priceFormatted = MoneyUtils.formatMoney(price, currencyCode);
+            mTextViewPrice.setText(priceFormatted);
         }
 
-        public void setAlpha(float alpha, float circlePercentage, boolean animate) {
+        public void setAlpha(List<ParseUser> usersInvolved) {
+            User currentUser = (User) ParseUser.getCurrentUser();
+            int usersInvolvedCount = usersInvolved.size();
+
+            float percentageCurrentUser = 0;
+            float alpha = 1f;
+            if (usersInvolved.contains(currentUser)) {
+                percentageCurrentUser = (1f / usersInvolvedCount) * 100;
+            } else {
+                alpha = DISABLED_ALPHA;
+            }
+
+            setAlpha(alpha, percentageCurrentUser, false);
+        }
+
+        private void setAlpha(float alpha, float circlePercentage, boolean animate) {
             itemView.setAlpha(alpha);
             mCircleDisplayPercentage.showValue(circlePercentage, 100f, animate);
         }
@@ -277,15 +265,23 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
             mTextViewTotalValueForeign = (TextView) view.findViewById(R.id.tv_total_value_foreign);
         }
 
-        public void setTotalValue(String totalValue) {
-            mTextViewTotalValue.setText(totalValue);
+        public void setTotalValue(double totalPrice, String currencyCode) {
+            String totalFormatted = MoneyUtils.formatMoney(totalPrice, currencyCode);
+            mTextViewTotalValue.setText(totalFormatted);
         }
 
-        public void setTotalValueForeign(String totalValueForeign) {
-            mTextViewTotalValueForeign.setText(totalValueForeign);
+        public void setTotalValueForeign(double totalPriceForeign, String groupCurrency,
+                                         String purchaseCurrency) {
+            if (!groupCurrency.equals(purchaseCurrency)) {
+                setTotalValueForeignVisibility(true);
+                String foreignFormatted = MoneyUtils.formatMoney(totalPriceForeign, purchaseCurrency);
+                mTextViewTotalValueForeign.setText(foreignFormatted);
+            } else {
+                setTotalValueForeignVisibility(false);
+            }
         }
 
-        public void setTotalValueForeignVisibility(boolean show) {
+        private void setTotalValueForeignVisibility(boolean show) {
             mTextViewTotalValueForeign.setVisibility(show ? View.VISIBLE : View.GONE);
         }
     }
@@ -302,19 +298,31 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
             mTextViewMyShareForeign = (TextView) view.findViewById(R.id.tv_my_share_value_foreign);
         }
 
-        public void hideView() {
+        public void setMyShare(double myShare, double totalPrice, String currencyCode) {
+            if (myShare != totalPrice) {
+                String shareFormatted = MoneyUtils.formatMoney(myShare, currencyCode);
+                mTextViewMyShare.setText(shareFormatted);
+            } else {
+                hideView();
+            }
+        }
+
+        private void hideView() {
             itemView.setVisibility(View.GONE);
         }
 
-        public void setMyShare(String myShare) {
-            mTextViewMyShare.setText(myShare);
+        public void setMyShareForeign(double myShare, double exchangeRate, String groupCurrency,
+                                      String purchaseCurrency) {
+            if (!groupCurrency.equals(purchaseCurrency)) {
+                setMyShareForeignVisibility(true);
+                String shareFormatted = MoneyUtils.formatMoney(myShare / exchangeRate, purchaseCurrency);
+                mTextViewMyShareForeign.setText(shareFormatted);
+            } else {
+                setMyShareForeignVisibility(false);
+            }
         }
 
-        public void setMyShareForeign(String myShareForeign) {
-            mTextViewMyShareForeign.setText(myShareForeign);
-        }
-
-        public void setMyShareForeignVisibility(boolean show) {
+        private void setMyShareForeignVisibility(boolean show) {
             mTextViewMyShareForeign.setVisibility(show ? View.VISIBLE : View.GONE);
         }
     }
