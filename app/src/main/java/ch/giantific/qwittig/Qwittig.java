@@ -23,21 +23,21 @@ import ch.giantific.qwittig.data.parse.models.Group;
  */
 public class Qwittig extends Application {
 
-    public static RefWatcher getRefWatcher(Context context) {
-        Qwittig application = (Qwittig) context.getApplicationContext();
-        return application.mRefWatcher;
-    }
-
-    private RefWatcher mRefWatcher;
+//    public static RefWatcher getRefWatcher(Context context) {
+//        Qwittig application = (Qwittig) context.getApplicationContext();
+//        return application.mRefWatcher;
+//    }
+//
+//    private RefWatcher mRefWatcher;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        if (BuildConfig.DEBUG) {
-            // check memory leaks
-           mRefWatcher = LeakCanary.install(this);
-        }
+//        if (BuildConfig.DEBUG) {
+//            // check memory leaks
+//           mRefWatcher = LeakCanary.install(this);
+//        }
 
         // register ParseObject subclasses
         ParseObject.registerSubclass(Group.class);
