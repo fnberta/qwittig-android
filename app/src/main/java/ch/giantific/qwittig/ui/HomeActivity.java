@@ -56,8 +56,8 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         FullQueryHelper.HelperInteractionListener,
         MoreQueryHelper.HelperInteractionListener {
 
-    private static final String INVITED_GROUP_HELPER = "invited_group_helper";
     private static final String LOG_TAG = HomeActivity.class.getSimpleName();
+    private static final String INVITED_GROUP_HELPER = "invited_group_helper";
     private static final String URI_INVITED_GROUP_ID = "group";
     private static final String PURCHASE_FRAGMENT = "purchase_fragment";
     private static final String DRAFTS_FRAGMENT = "drafts_fragment";
@@ -161,7 +161,6 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
         if (mNewQueryNeeded) {
             fullOnlineQuery();
-            mNewQueryNeeded = false;
         }
     }
 
@@ -380,7 +379,6 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     public void onFullQueryFinished() {
         removeQueryHelper();
 
-        updateFragmentAdapters();
         dismissProgressDialog();
     }
 
@@ -400,10 +398,10 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
     @Override
     void afterLoginSetup() {
+        super.afterLoginSetup();
+
         mNewQueryNeeded = true;
         addViewPagerFragments();
-
-        super.afterLoginSetup();
     }
 
     @Override
@@ -483,6 +481,9 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     @Override
     public void onPurchasesPinned() {
         super.onPurchasesPinned();
+
+        // will be set to true after login and group change
+        mNewQueryNeeded = false;
 
         mHomePurchasesFragment.onPurchasesPinned();
     }

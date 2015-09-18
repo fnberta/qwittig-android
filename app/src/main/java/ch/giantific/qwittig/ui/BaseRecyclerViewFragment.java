@@ -148,6 +148,7 @@ public abstract class BaseRecyclerViewFragment extends BaseFragment implements
      */
     @CallSuper
     void toggleMainVisibility() {
+        mRecyclerView.setVisibility(View.VISIBLE);
         mProgressBarLoading.setVisibility(View.GONE);
         toggleEmptyViewVisibility();
     }
