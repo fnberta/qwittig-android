@@ -11,6 +11,7 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -84,6 +85,11 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
         // check item in NavDrawer
         checkNavDrawerItem(R.id.nav_home);
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(R.string.title_activity_home);
+        }
 
         mFabMenu = (FabMenu) findViewById(R.id.fab_menu);
         mFabMenu.hideMenuButton(false);

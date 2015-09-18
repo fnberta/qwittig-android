@@ -3,7 +3,7 @@
     <string name="app_name">Qwittig</string>
     <string name="title_activity_purchase_details">Details Einkauf</string>
     <string name="tab_purchases">Einkäufe</string>
-    <string name="tab_users">Benutzer</string>
+    <string name="tab_users">Bilanzen</string>
     <string name="title_activity_settings">Einstellungen</string>
     <string name="title_activity_add_purchase">Neuer Einkauf</string>
     <string name="header_items">Artikel</string>
@@ -170,8 +170,8 @@
     <string name="error_valid_amount">Bitte gib einen gültigen Betrag an</string>
     <string name="dialog_positive_pay">Bezahlen</string>
     <string name="toast_payment_saved">Zahlung an %1$s hinzugefügt</string>
-    <string name="tab_compensations_history">Vergangen</string>
-    <string name="tab_compensations_new">Aktuell</string>
+    <string name="tab_compensations_history">Vergangene Zahlungen</string>
+    <string name="tab_compensations_new">Offene Zahlungen</string>
     <string name="header_users_invited">Bereits eingeladen</string>
     <string name="hint_clear">Entfernen</string>
     <string name="no_invitations">Keine offenen Einladungen</string>

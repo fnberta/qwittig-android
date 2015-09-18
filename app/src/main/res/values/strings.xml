@@ -6,7 +6,7 @@
     <string name="title_activity_purchase_details">Purchase details</string>
     <string name="title_activity_add_purchase">New purchase</string>
     <string name="tab_purchases">Purchases</string>
-    <string name="tab_users">Users</string>
+    <string name="tab_users">Balances</string>
     <string name="header_items">Items</string>
     <string name="hint_item_name">Item name</string>
     <string name="hint_item_price">Price</string>
@@ -175,8 +175,8 @@
     <string name="header_users_invited">Already invited</string>
     <string name="hint_clear">Remove</string>
     <string name="no_invitations">No open invitations</string>
-    <string name="tab_compensations_new">Current</string>
-    <string name="tab_compensations_history">Past</string>
+    <string name="tab_compensations_new">Unsettled payments</string>
+    <string name="tab_compensations_history">Past payments</string>
     <string name="hint_store_new">New store</string>
     <string name="header_purchase">Purchase</string>
     <string name="action_purchase_edit_save_changes_draft">Save changes in draft</string>
