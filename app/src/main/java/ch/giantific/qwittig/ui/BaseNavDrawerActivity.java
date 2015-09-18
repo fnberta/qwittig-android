@@ -192,7 +192,6 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
         }
     }
 
-
     private void startLoginActivity() {
         Intent intentLogin = new Intent(this, LoginActivity.class);
         Intent intent = getIntent();
@@ -271,16 +270,11 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
         super.onStart();
 
         if (mUserIsLoggedIn) {
-            updateCurrentUserGroups();
+            fetchCurrentUserGroups();
         }
     }
 
-    @CallSuper
-    void updateCurrentUserGroups() {
-        fetchCurrentUserGroups();
-    }
-
-    private void fetchCurrentUserGroups() {
+    final void fetchCurrentUserGroups() {
         User currentUser = (User) ParseUser.getCurrentUser();
         List<ParseObject> groups = null;
         if (currentUser != null) {
@@ -317,15 +311,20 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
 
     @CallSuper
     void onGroupsFetched() {
-        User currentUser = (User) ParseUser.getCurrentUser();
-        if (currentUser != null) {
-            mCurrentUser = currentUser;
-            mCurrentGroup = currentUser.getCurrentGroup();
-
+        setCurrentUserAndGroup();
+        if (mCurrentUser != null) {
             setupNavDrawerHeader();
             if (!BuildConfig.DEBUG) {
                 setupIab();
             }
+        }
+    }
+
+    final void setCurrentUserAndGroup() {
+        User currentUser = (User) ParseUser.getCurrentUser();
+        if (currentUser != null) {
+            mCurrentUser = currentUser;
+            mCurrentGroup = currentUser.getCurrentGroup();
         }
     }
 
@@ -406,12 +405,6 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
         updateGroupSpinnerPosition();
     }
 
-    final void updateGroupSpinnerPosition() {
-        User currentUser = (User) ParseUser.getCurrentUser();
-        int position = mSpinnerGroupsAdapter.getPosition(currentUser.getCurrentGroup());
-        mSpinnerGroups.setSelection(position);
-    }
-
     final void updateGroupSpinnerList() {
         mGroups.clear();
 
@@ -426,15 +419,21 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
         mSpinnerGroupsAdapter.notifyDataSetChanged();
     }
 
-    private void onGroupChanged(ParseObject group) {
+    final void updateGroupSpinnerPosition() {
         User currentUser = (User) ParseUser.getCurrentUser();
-        Group oldGroup = currentUser.getCurrentGroup();
+        int position = mSpinnerGroupsAdapter.getPosition(currentUser.getCurrentGroup());
+        mSpinnerGroups.setSelection(position);
+    }
+
+    private void onGroupChanged(ParseObject group) {
+        Group oldGroup = mCurrentUser.getCurrentGroup();
         if (oldGroup.getObjectId().equals(group.getObjectId())) {
             return;
         }
 
-        currentUser.setCurrentGroup(group);
-        currentUser.saveEventually();
+        mCurrentGroup = (Group) group;
+        mCurrentUser.setCurrentGroup(group);
+        mCurrentUser.saveEventually();
         onNewGroupSet();
     }
 
@@ -587,7 +586,6 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
     @CallSuper
     void afterLoginSetup() {
         mUserIsLoggedIn = true;
-        updateCurrentUserGroups();
 
         // subclasses are free to add stuff here
     }

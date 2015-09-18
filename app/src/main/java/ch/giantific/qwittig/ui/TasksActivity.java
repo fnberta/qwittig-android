@@ -186,9 +186,7 @@ public class TasksActivity extends BaseNavDrawerActivity implements
 
     @Override
     protected void onNewGroupSet() {
-        if (mTaskFragment.isAdded()) {
-            mTaskFragment.updateAdapter();
-        }
+        mTaskFragment.updateAdapter();
     }
 
     @Override

@@ -292,7 +292,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
         mNewQueryNeeded = true;
         mCheckForInvitations = false;
-        updateCurrentUserGroups();
+        fetchCurrentUserGroups();
     }
 
     @Override
@@ -552,7 +552,6 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
     @Override
     protected void onNewGroupSet() {
-        updateCurrentUserGroups();
         updateFragmentAdapters();
     }
 
