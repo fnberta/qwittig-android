@@ -1,5 +1,13 @@
 <resources>
 
+    <style name="LoginTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+
+        <item name="android:windowBackground">?attr/colorPrimary</item>
+    </style>
+
     <style name="BaseTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
@@ -16,10 +24,6 @@
     <style name="AppTheme.SlideBottom" parent="AppTheme"/>
 
     <style name="AppTheme.SlideEnd" parent="AppTheme"/>
-
-    <style name="AppTheme.Login" parent="AppTheme">
-        <item name="android:windowBackground">?attr/colorPrimary</item>
-    </style>
 
     <style name="AppTheme.DrawStatusBar" parent="AppTheme"/>
 

@@ -99,7 +99,7 @@
         <activity
             android:name=".ui.LoginActivity"
             android:label="@string/title_activity_login"
-            android:theme="@style/AppTheme.Login"
+            android:theme="@style/LoginTheme"
             android:windowSoftInputMode="stateUnchanged|adjustPan"
             />
         <activity
