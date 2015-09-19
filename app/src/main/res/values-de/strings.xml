@@ -166,7 +166,7 @@
     <string name="toast_store_already_in_list">Geschäft ist bereits in deiner Liste</string>
     <string name="toast_group_already_in_list">Diese Gruppe existiert bereits</string>
     <string name="dialog_group_leave_delete_message">Du bist das letzte Mitglied dieser Gruppe. Wenn du sie verlässt, werden die Gruppe und alle dazugehörigen Einkäufe gelöscht!</string>
-    <string name="dialog_compensation_manual_title">Manuelle Zahlung</string>
+    <string name="dialog_compensation_single_title">Einzelne Zahlung</string>
     <string name="error_valid_amount">Bitte gib einen gültigen Betrag an</string>
     <string name="dialog_positive_pay">Bezahlen</string>
     <string name="toast_payment_saved">Zahlung an %1$s hinzugefügt</string>

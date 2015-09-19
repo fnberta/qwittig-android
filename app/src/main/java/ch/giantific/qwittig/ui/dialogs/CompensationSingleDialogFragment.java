@@ -22,7 +22,7 @@ import ch.giantific.qwittig.ui.adapters.RecipientsArrayAdapter;
 /**
  * Created by fabio on 20.11.14.
  */
-public class CompensationAddManualDialogFragment extends DialogFragment {
+public class CompensationSingleDialogFragment extends DialogFragment {
 
     private static final String BUNDLE_USERS = "bundle_users";
     private List<ItemUserPicker> mUsers;
@@ -30,8 +30,8 @@ public class CompensationAddManualDialogFragment extends DialogFragment {
     private Spinner mSpinnerUsers;
     private TextInputLayout mTextInputLayoutAmount;
 
-    public static CompensationAddManualDialogFragment newInstance(ArrayList<ItemUserPicker> users) {
-        CompensationAddManualDialogFragment fragment = new CompensationAddManualDialogFragment();
+    public static CompensationSingleDialogFragment newInstance(ArrayList<ItemUserPicker> users) {
+        CompensationSingleDialogFragment fragment = new CompensationSingleDialogFragment();
 
         Bundle args = new Bundle();
         args.putParcelableArrayList(BUNDLE_USERS, users);
@@ -70,7 +70,7 @@ public class CompensationAddManualDialogFragment extends DialogFragment {
         mTextInputLayoutAmount = (TextInputLayout) view.findViewById(R.id.til_amount);
         setupSpinner();
 
-        dialogBuilder.setTitle(R.string.dialog_compensation_manual_title)
+        dialogBuilder.setTitle(R.string.dialog_compensation_single_title)
                 .setView(view)
                 .setPositiveButton(R.string.dialog_positive_pay, null)
                 .setNegativeButton(android.R.string.no, null);

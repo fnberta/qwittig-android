@@ -42,7 +42,7 @@
 
                     <TextView
                         android:id="@+id/tv_purchase_details_title"
-                        style="@style/Base.TextAppearance.AppCompat.Headline"
+                        style="@style/TextAppearance.AppCompat.Headline"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@android:color/white"
@@ -51,10 +51,9 @@
 
                     <TextView
                         android:id="@+id/tv_purchase_details_subtitle"
-                        style="@style/Base.TextAppearance.AppCompat.Title"
+                        style="@style/TextAppearance.AppCompat.Subhead.Inverse"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@android:color/white"
                         tools:text="27.10.14"
                         />
                 </LinearLayout>

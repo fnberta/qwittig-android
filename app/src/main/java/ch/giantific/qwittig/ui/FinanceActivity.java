@@ -36,7 +36,7 @@ import ch.giantific.qwittig.helpers.SettlementHelper;
 import ch.giantific.qwittig.helpers.UserQueryHelper;
 import ch.giantific.qwittig.ui.adapters.TabsAdapter;
 import ch.giantific.qwittig.ui.dialogs.AccountCreateDialogFragment;
-import ch.giantific.qwittig.ui.dialogs.CompensationAddManualDialogFragment;
+import ch.giantific.qwittig.ui.dialogs.CompensationSingleDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.CompensationChangeAmountDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.utils.MessageUtils;
@@ -47,7 +47,7 @@ import ch.giantific.qwittig.utils.Utils;
 public class FinanceActivity extends BaseNavDrawerActivity implements
         FinanceCompensationsUnpaidFragment.FragmentInteractionListener,
         LocalQuery.UserLocalQueryListener,
-        CompensationAddManualDialogFragment.DialogInteractionListener,
+        CompensationSingleDialogFragment.DialogInteractionListener,
         GroupCreateDialogFragment.DialogInteractionListener,
         CompensationChangeAmountDialogFragment.FragmentInteractionListener,
         UserQueryHelper.HelperInteractionListener,
@@ -249,8 +249,8 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     }
 
     private void showAddManualDialog(ArrayList<ItemUserPicker> users) {
-        CompensationAddManualDialogFragment userPickerDialogFragment =
-                CompensationAddManualDialogFragment.newInstance(users);
+        CompensationSingleDialogFragment userPickerDialogFragment =
+                CompensationSingleDialogFragment.newInstance(users);
         userPickerDialogFragment.show(getFragmentManager(), "recipient_picker");
     }
 
