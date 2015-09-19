@@ -2,11 +2,15 @@ package ch.giantific.qwittig.ui;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -195,27 +199,25 @@ public class TaskDetailsFragment extends BaseFragment implements
         }
 
         List<ParseUser> usersInvolved = mTask.getUsersInvolved();
+        User userResponsible = (User) usersInvolved.get(0);
         boolean currentUserIsResponsible = mCurrentUser.getObjectId().equals(
                 usersInvolved.get(0).getObjectId());
 
-        String usersString = "";
+        SpannableStringBuilder stringBuilder = new SpannableStringBuilder();
         int usersInvolvedSize = usersInvolved.size();
+        stringBuilder.append(userResponsible.getNicknameOrMe(getActivity()));
+
         if (usersInvolvedSize > 1) {
-            StringBuilder stringBuilder = new StringBuilder();
-            for (int i = 0; i < usersInvolvedSize; i++) {
+            int spanEnd = stringBuilder.length();
+            stringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, spanEnd,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            for (int i = 1; i < usersInvolvedSize; i++) {
                 User user = (User) usersInvolved.get(i);
-                stringBuilder.append(user.getNicknameOrMe(getActivity())).append(" - ");
+                stringBuilder.append(" - ").append(user.getNicknameOrMe(getActivity()));
             }
-            // delete last -
-            int length = stringBuilder.length();
-            stringBuilder.delete(length - 3, length - 1);
-            usersString = stringBuilder.toString();
-        } else if (usersInvolvedSize == 1) {
-            User userInvolved = (User) usersInvolved.get(0);
-            usersString = userInvolved.getNicknameOrMe(getActivity());
         }
 
-        mListener.setToolbarHeader(title, timeFrameLocalized, usersString, currentUserIsResponsible);
+        mListener.setToolbarHeader(title, timeFrameLocalized, stringBuilder, currentUserIsResponsible);
     }
 
     /**
@@ -328,7 +330,7 @@ public class TaskDetailsFragment extends BaseFragment implements
     }
 
     public interface FragmentInteractionListener {
-        void setToolbarHeader(String title, String timeFrame, String usersInvolved,
+        void setToolbarHeader(String title, String timeFrame, SpannableStringBuilder usersInvolved,
                               boolean currentUserIsResponsible);
 
         void showEditOptions(boolean show);

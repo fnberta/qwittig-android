@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -135,7 +137,8 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void setToolbarHeader(String title, String timeFrame, String usersInvolved,
+    public void setToolbarHeader(String title, String timeFrame,
+                                 SpannableStringBuilder usersInvolved,
                                  boolean currentUserIsResponsible) {
         mTextViewTitle.setText(title);
         mTextViewTimeFrame.setText(timeFrame);
