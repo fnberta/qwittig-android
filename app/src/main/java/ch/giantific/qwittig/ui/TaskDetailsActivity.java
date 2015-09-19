@@ -66,13 +66,11 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
             }
         });
 
-        if (mUserIsLoggedIn) {
-            if (savedInstanceState == null) {
-                addDetailsFragment();
-            }
-
-            fetchCurrentUserGroups();
+        if (savedInstanceState == null) {
+            addDetailsFragment();
         }
+
+        fetchCurrentUserGroups();
     }
 
     /**
@@ -103,9 +101,7 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
     protected void onStart() {
         super.onStart();
 
-        if (mUserIsLoggedIn) {
-            findDetailsFragment();
-        }
+        findDetailsFragment();
     }
 
     private void findDetailsFragment() {
@@ -136,15 +132,6 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    @Override
-    void afterLoginSetup() {
-        super.afterLoginSetup();
-
-        addDetailsFragment();
-        getFragmentManager().executePendingTransactions();
-        findDetailsFragment();
     }
 
     @Override

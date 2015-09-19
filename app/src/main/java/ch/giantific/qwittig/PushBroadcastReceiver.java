@@ -23,6 +23,7 @@ import org.json.JSONObject;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
@@ -34,6 +35,7 @@ import ch.giantific.qwittig.data.parse.models.Task;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.services.ParseQueryService;
 import ch.giantific.qwittig.ui.FinanceActivity;
+import ch.giantific.qwittig.ui.HomeActivity;
 import ch.giantific.qwittig.ui.PurchaseDetailsActivity;
 import ch.giantific.qwittig.ui.TaskDetailsActivity;
 import ch.giantific.qwittig.ui.TasksActivity;
@@ -43,6 +45,7 @@ import ch.giantific.qwittig.utils.MoneyUtils;
  * Created by fabio on 07.12.14.
  */
 public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
+
 
     public static final String NOTIFICATION_TYPE = "type";
     public static final String PUSH_PARAM_PURCHASE = "purchase";
@@ -96,19 +99,26 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     private static final String TYPE_TASK_DELETE = "taskDelete";
     private static final String TYPE_TASK_EDIT = "taskEdit";
     private static final String TYPE_TASK_REMIND_USER = "taskRemindUser";
-
     private static final String ACTION_PUSH_BUTTON_ACCEPT = "ch.giantific.qwittig.push.intent.ACCEPT";
     private static final String ACTION_PUSH_BUTTON_DISCARD = "ch.giantific.qwittig.push.intent.DISCARD";
     private static final String NOTIFICATION_ID = "notification_id";
     private static final int NEW_PURCHASE_NOTIFICATION_ID = 1;
     private static final String STORED_PURCHASE_NOTIFICATIONS = "stored_purchase_notifications_";
     private static final int MAX_LINES_INBOX_STYLE = 7;
-
     private static final String LOG_TAG = PushBroadcastReceiver.class.getSimpleName();
-
     private SharedPreferences mSharedPreferences;
     private NotificationManager mNotificationManager;
     private Set<String> mPurchaseNotifications;
+
+    public static JSONObject getData(Intent intent) throws JSONException {
+        JSONObject extras;
+        if (intent.hasExtra(KEY_PUSH_DATA)) {
+            extras = new JSONObject(intent.getStringExtra(KEY_PUSH_DATA));
+        } else {
+            extras = new JSONObject("");
+        }
+        return extras;
+    }
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -517,7 +527,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 break;
             }
             case TYPE_SETTLEMENT_NEW:
-                title =  context.getString(R.string.push_settlement_new_title, user);
+                title = context.getString(R.string.push_settlement_new_title, user);
                 alert = context.getString(R.string.push_settlement_new_alert);
 
                 // set title and alert
@@ -699,32 +709,23 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
         return builder.build();
     }
 
-    public static JSONObject getData(Intent intent) throws JSONException {
-        JSONObject extras;
-        if (intent.hasExtra(KEY_PUSH_DATA)) {
-            extras = new JSONObject(intent.getStringExtra(KEY_PUSH_DATA));
-        } else {
-            extras = new JSONObject("");
-        }
-        return extras;
-    }
-
     @Override
     protected void onPushOpen(Context context, Intent intent) {
         String type = getNotificationType(intent);
         if (!isSilentNotification(type) && !type.equals(TYPE_USER_INVITED)) {
-            JSONObject jsonExtras = null;
+            String groupId;
             try {
-                jsonExtras = getData(intent);
-            } catch (JSONException ignored) {
+                groupId = getGroupId(intent);
+            } catch (JSONException e) {
+                super.onPushOpen(context, intent);
+                return;
             }
 
-            if (jsonExtras != null) {
-                String groupId = jsonExtras.optString(PUSH_PARAM_GROUP);
-
-                User currentUser = (User) ParseUser.getCurrentUser();
+            User currentUser = (User) ParseUser.getCurrentUser();
+            if (currentUser != null) {
                 Group oldGroup = currentUser.getCurrentGroup();
-                if (!oldGroup.getObjectId().equals(groupId)) {
+                if (!oldGroup.getObjectId().equals(groupId) &&
+                        isInPurchaseGroup(currentUser, groupId)) {
                     ParseObject group = ParseObject.createWithoutData(Group.CLASS, groupId);
                     currentUser.setCurrentGroup(group);
                     currentUser.saveEventually();
@@ -735,28 +736,45 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
         super.onPushOpen(context, intent);
     }
 
+    private String getGroupId(Intent intent) throws JSONException {
+        JSONObject jsonExtras = getData(intent);
+        return jsonExtras.optString(PUSH_PARAM_GROUP);
+    }
+
+    private boolean isInPurchaseGroup(User currentUser, String purchaseGroupId) {
+        List<String> groupIds = currentUser.getGroupIds();
+        return groupIds.contains(purchaseGroupId);
+    }
+
     @Override
     protected Class<? extends Activity> getActivity(Context context, Intent intent) {
         String type = getNotificationType(intent);
         switch (type) {
-            case TYPE_PURCHASE_NEW:
-                String groupId = "";
-                JSONObject jsonExtras;
+            case TYPE_PURCHASE_NEW: {
+                String groupId;
                 try {
-                    jsonExtras = getData(intent);
-                    groupId = jsonExtras.optString(PUSH_PARAM_GROUP);
-                } catch (JSONException ignored) {
+                    groupId = getGroupId(intent);
+                } catch (JSONException e) {
+                    return HomeActivity.class;
+
                 }
 
                 mPurchaseNotifications = mSharedPreferences.getStringSet(
                         STORED_PURCHASE_NOTIFICATIONS + groupId, new LinkedHashSet<String>());
                 if (mPurchaseNotifications.size() > 1) {
                     clearStoredPurchaseNotifications(groupId);
-                    return super.getActivity(context, intent);
+                    
+                    return HomeActivity.class;
                 } else {
                     clearStoredPurchaseNotifications(groupId);
-                    return PurchaseDetailsActivity.class;
+
+                    User currentUser = (User) ParseUser.getCurrentUser();
+                    if (currentUser != null && isInPurchaseGroup(currentUser, groupId)) {
+                        return PurchaseDetailsActivity.class;
+                    }
+                    return HomeActivity.class;
                 }
+            }
             case TYPE_COMPENSATION_AMOUNT_CHANGED:
                 // fall through
             case TYPE_SETTLEMENT_NEW:
@@ -769,8 +787,22 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 return FinanceActivity.class;
             case TYPE_TASK_NEW:
                 // fall through
-            case TYPE_TASK_REMIND_USER:
-                return TaskDetailsActivity.class;
+            case TYPE_TASK_REMIND_USER: {
+                String groupId;
+                try {
+                    groupId = getGroupId(intent);
+                } catch (JSONException e) {
+                    return TasksActivity.class;
+
+                }
+
+                User currentUser = (User) ParseUser.getCurrentUser();
+                if (currentUser != null && isInPurchaseGroup(currentUser, groupId)) {
+                    return TaskDetailsActivity.class;
+                }
+
+                return TasksActivity.class;
+            }
             case TYPE_TASK_DELETE:
                 return TasksActivity.class;
             default:
@@ -791,12 +823,12 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     protected void onPushDismiss(Context context, Intent intent) {
         String type = getNotificationType(intent);
         if (type.equals(TYPE_PURCHASE_NEW)) {
-            String groupId = "";
-            JSONObject jsonExtras;
+            String groupId;
             try {
-                jsonExtras = getData(intent);
-                groupId = jsonExtras.optString(PUSH_PARAM_GROUP);
-            } catch (JSONException ignored) {
+                groupId = getGroupId(intent);
+            } catch (JSONException e) {
+                super.onPushDismiss(context, intent);
+                return;
             }
 
             clearStoredPurchaseNotifications(groupId);

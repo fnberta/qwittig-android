@@ -28,14 +28,13 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     public static final int RESULT_GROUP_CHANGED = 3;
     private static final String PURCHASE_DETAILS_FRAGMENT = "purchase_details_fragment";
     private static final String PURCHASE_RECEIPT_FRAGMENT = "purchase_receipt_fragment";
+    private static final String LOG_TAG = PurchaseDetailsActivity.class.getSimpleName();
     private String mPurchaseId;
     private boolean mShowEditOptions;
     private boolean mHasForeignCurrency;
     private TextView mTextViewStore;
     private TextView mTextViewDate;
     private PurchaseDetailsFragment mPurchaseDetailsFragment;
-
-    private static final String LOG_TAG = PurchaseDetailsActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,13 +64,11 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
         supportPostponeEnterTransition();
         getPurchaseId();
 
-        if (mUserIsLoggedIn) {
-            if (savedInstanceState == null) {
-                addDetailsFragment();
-            }
-
-            fetchCurrentUserGroups();
+        if (savedInstanceState == null) {
+            addDetailsFragment();
         }
+
+        fetchCurrentUserGroups();
     }
 
     private void addDetailsFragment() {
@@ -102,23 +99,12 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     protected void onStart() {
         super.onStart();
 
-        if (mUserIsLoggedIn) {
-            findDetailsFragment();
-        }
+        findDetailsFragment();
     }
 
     private void findDetailsFragment() {
         mPurchaseDetailsFragment = (PurchaseDetailsFragment) getFragmentManager()
                 .findFragmentByTag(PURCHASE_DETAILS_FRAGMENT);
-    }
-
-    @Override
-    void afterLoginSetup() {
-        super.afterLoginSetup();
-
-        addDetailsFragment();
-        getFragmentManager().executePendingTransactions();
-        findDetailsFragment();
     }
 
     @Override

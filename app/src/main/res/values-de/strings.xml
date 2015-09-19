@@ -281,7 +281,7 @@
     <string name="title_activity_task_edit">Aufgabe bearbeiten</string>
     <string name="toast_task_deleted">Aufgabe gelöscht</string>
     <string name="toast_task_reminded_user">%1$s wurde erinnert, die Aufgabe zu erledigen</string>
-    <string name="push_task_remind_alert">%1$s möchte, dass du deine Aufgabe erledigts</string>
+    <string name="push_task_remind_alert">%1$s möchte, dass du deine Aufgabe erledigst</string>
     <string name="toast_error_task_details_load">Laden der Aufgabe fehlgeschlagen</string>
     <string name="push_task_remind_title">Erledige %1$s </string>
     <string name="push_task_new_alert">%1$s hat eine neue Aufgabe erstellt</string>
@@ -294,5 +294,6 @@
     <string name="time_frame_one_time">Einmalig</string>
     <string name="toast_task_max_one_user_one_time">Bitte wähle exakt ein Benutzer für eine einmalige Aufgabe</string>
     <string name="yesterday">Gestern</string>
+    <string name="toast_error_purchase_details_group_not">Laden des Einkaufes felgeschlagen, da du nicht Teil dessen Gruppe bist</string>
 
 </resources>

@@ -116,9 +116,13 @@ public class TaskDetailsFragment extends BaseFragment implements
         mCurrentUser = (User) ParseUser.getCurrentUser();
         if (mCurrentUser != null) {
             mCurrentGroup = mCurrentUser.getCurrentGroup();
+            if (mCurrentGroup != null) {
+                queryData();
+            } else {
+                MessageUtils.showBasicSnackbar(mRecyclerViewHistory,
+                        getString(R.string.toast_error_purchase_details_group_not));
+            }
         }
-
-        queryData();
     }
 
     public void queryData() {
@@ -128,11 +132,6 @@ public class TaskDetailsFragment extends BaseFragment implements
 
     @Override
     public void onObjectFetched(ParseObject object) {
-        if (object == null) {
-            ActivityCompat.startPostponedEnterTransition(getActivity());
-            return;
-        }
-
         mTask = (Task) object;
 
         updateToolbarHeader();

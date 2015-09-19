@@ -302,5 +302,6 @@
     <string name="time_frame_one_time">One time</string>
     <string name="toast_task_max_one_user_one_time">Please select exactly one user for a one-time task</string>
     <string name="yesterday">Yesterday</string>
+    <string name="toast_error_purchase_details_group_not">Failed to load purchase since you are not a member of its group</string>
 
 </resources>

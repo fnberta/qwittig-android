@@ -134,8 +134,13 @@ public class PurchaseDetailsFragment extends BaseFragment implements
         mCurrentUser = (User) ParseUser.getCurrentUser();
         if (mCurrentUser != null) {
             mCurrentGroup = mCurrentUser.getCurrentGroup();
+            if (mCurrentGroup != null) {
+                queryData();
+            } else {
+                MessageUtils.showBasicSnackbar(mRecyclerView,
+                        getString(R.string.toast_error_purchase_details_group_not));
+            }
         }
-        queryData();
     }
 
     /**
