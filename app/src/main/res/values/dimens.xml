@@ -33,6 +33,7 @@
     <!-- Toolbar -->
     <dimen name="toolbar_height_x2">112dp</dimen>
     <dimen name="toolbar_height_x3">168dp</dimen>
+    <dimen name="toolbar_task_add">168dp</dimen>
     <dimen name="toolbar_height_x4">224dp</dimen>
     <dimen name="toolbar_height_x5">280dp</dimen>
 
@@ -59,6 +60,7 @@
 
     <!-- FAB -->
     <dimen name="fab_elevation">6dp</dimen>
+    <dimen name="fab_margin_toolbar_x4">196dp</dimen>
 
     <!-- CardView -->
     <dimen name="card_elevation">2dp</dimen>

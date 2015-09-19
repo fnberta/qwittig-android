@@ -4,7 +4,11 @@
     <!-- Toolbar -->
     <dimen name="toolbar_height_x2">80dp</dimen>
     <dimen name="toolbar_height_x3">120dp</dimen>
+    <dimen name="toolbar_task_add">160dp</dimen>
     <dimen name="toolbar_height_x4">160dp</dimen>
     <dimen name="toolbar_height_x5">200dp</dimen>
+
+    <!-- FAB -->
+    <dimen name="fab_margin_toolbar_x4">132dp</dimen>
 
 </resources>
