@@ -144,7 +144,7 @@
     <string name="dialog_account_delete_message">Willst du deinen Account wirklich löschen? Du kannst das nicht rückgängig machen!</string>
     <string name="add_store">Geschäft hinzufügen</string>
     <string name="dialog_positive_add">Hinzufügen</string>
-    <string name="dialog_group_create">Du musst in einer Gruppe sein um Einkäufe hinzufügen zu können. Möchtest du eine neue Gruppe erstellen?</string>
+    <string name="dialog_group_create_purchases">Du musst in einer Gruppe sein um Einkäufe hinzufügen zu können. Möchtest du eine neue Gruppe erstellen?</string>
     <string name="dialog_positive_create">Erstellen</string>
     <string name="nickname_me">Ich</string>
     <string name="progress_account_delete">Lösche Account…</string>
@@ -295,5 +295,7 @@
     <string name="toast_task_max_one_user_one_time">Bitte wähle exakt ein Benutzer für eine einmalige Aufgabe</string>
     <string name="yesterday">Gestern</string>
     <string name="toast_error_purchase_details_group_not">Laden des Einkaufes felgeschlagen, da du nicht Teil dessen Gruppe bist</string>
+    <string name="dialog_group_create_finance">Du musst in einer Gruppe sein um Zahlungen hinzufügen zu können. Möchtest du eine neue Gruppe erstellen?</string>
+    <string name="dialog_group_create_tasks">Du musst in einer Gruppe sein um Aufgaben hinzufügen zu können. Möchtest du eine neue Gruppe erstellen?</string>
 
 </resources>

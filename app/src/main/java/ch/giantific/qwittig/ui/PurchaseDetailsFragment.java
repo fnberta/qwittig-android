@@ -16,6 +16,7 @@ import android.widget.ProgressBar;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import java.util.Date;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
@@ -169,8 +170,7 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     }
 
     private void updateToolbarTitle() {
-        mListener.setToolbarStoreDate(mPurchase.getStore(),
-                DateUtils.formatDateShort(mPurchase.getDate()));
+        mListener.setToolbarStoreDate(mPurchase.getStore(), mPurchase.getDate());
     }
 
     /**
@@ -253,7 +253,7 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     }
 
     public interface FragmentInteractionListener {
-        void setToolbarStoreDate(String title, String subtitle);
+        void setToolbarStoreDate(String store, Date date);
 
         void toggleActionBarOptions(boolean showEditOptions, boolean hasForeignCurrency);
 

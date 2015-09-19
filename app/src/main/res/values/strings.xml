@@ -146,7 +146,7 @@
     <string name="user_deleted" translatable="false">n/a</string>
     <string name="add_store">Add store</string>
     <string name="dialog_positive_add">Add</string>
-    <string name="dialog_group_create">You have to be in a group to add purchases. Would you like to a create a new group?</string>
+    <string name="dialog_group_create_purchases">You have to be in a group to add purchases. Would you like to a create a new group?</string>
     <string name="dialog_positive_create">Create</string>
     <string name="nickname_me">Me</string>
     <string name="progress_account_delete">Deleting account…</string>
@@ -303,5 +303,7 @@
     <string name="toast_task_max_one_user_one_time">Please select exactly one user for a one-time task</string>
     <string name="yesterday">Yesterday</string>
     <string name="toast_error_purchase_details_group_not">Failed to load purchase since you are not a member of its group</string>
+    <string name="dialog_group_create_finance">You have to be in a group to add payments. Would you like to a create a new group?</string>
+    <string name="dialog_group_create_tasks">You have to be in a group to add tasks. Would you like to a create a new group?</string>
 
 </resources>

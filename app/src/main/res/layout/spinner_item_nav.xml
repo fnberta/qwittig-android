@@ -9,5 +9,4 @@
     android:paddingEnd="@dimen/small_space"
     android:lines="1"
     android:ellipsize="marquee"
-    android:textColor="@android:color/white"
     />

@@ -14,7 +14,18 @@ import ch.giantific.qwittig.R;
  */
 public class GroupCreateDialogFragment extends DialogFragment {
 
+    private static final String BUNDLE_MESSAGE = "bundle_message";
     private DialogInteractionListener mListener;
+    private int mMessage;
+
+    public static GroupCreateDialogFragment newInstance(int message) {
+        GroupCreateDialogFragment fragment = new GroupCreateDialogFragment();
+        Bundle args = new Bundle();
+        args.putInt(BUNDLE_MESSAGE, message);
+        fragment.setArguments(args);
+
+        return fragment;
+    }
 
     @Override
     public void onAttach(Activity activity) {
@@ -29,9 +40,19 @@ public class GroupCreateDialogFragment extends DialogFragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Bundle args = getArguments();
+        if (args != null) {
+            mMessage = args.getInt(BUNDLE_MESSAGE);
+        }
+    }
+
+    @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
-        dialogBuilder.setMessage(R.string.dialog_group_create)
+        dialogBuilder.setMessage(mMessage)
                 .setPositiveButton(R.string.dialog_positive_create, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         mListener.createNewGroup();

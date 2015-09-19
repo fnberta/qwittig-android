@@ -49,6 +49,10 @@ public class DateUtils {
         return dateFormatter.format(date);
     }
 
+    public static String formatDateLong(long date) {
+        return formatDateLong(new Date(date));
+    }
+
     public static String formatDateLong(Date date) {
         final DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.LONG, Locale.getDefault());
 

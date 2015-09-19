@@ -15,9 +15,12 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Date;
+
 import ch.giantific.qwittig.PushBroadcastReceiver;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.ui.dialogs.AccountCreateDialogFragment;
+import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 
 
@@ -26,6 +29,8 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
 
     public static final int RESULT_PURCHASE_DELETED = 2;
     public static final int RESULT_GROUP_CHANGED = 3;
+    private static final String STATE_TOOLBAR_TITLE = "state_toolbar_title";
+    private static final String STATE_TOOLBAR_SUBTITLE = "state_toolbar_subtitle";
     private static final String PURCHASE_DETAILS_FRAGMENT = "purchase_details_fragment";
     private static final String PURCHASE_RECEIPT_FRAGMENT = "purchase_receipt_fragment";
     private static final String LOG_TAG = PurchaseDetailsActivity.class.getSimpleName();
@@ -34,6 +39,8 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     private boolean mHasForeignCurrency;
     private TextView mTextViewStore;
     private TextView mTextViewDate;
+    private String mStore;
+    private long mDate;
     private PurchaseDetailsFragment mPurchaseDetailsFragment;
 
     @Override
@@ -66,9 +73,21 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
 
         if (savedInstanceState == null) {
             addDetailsFragment();
+        } else {
+            mStore = savedInstanceState.getString(STATE_TOOLBAR_TITLE);
+            mDate = savedInstanceState.getLong(STATE_TOOLBAR_SUBTITLE);
+            setToolbarTitleValues();
         }
 
         fetchCurrentUserGroups();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putString(STATE_TOOLBAR_TITLE, mStore);
+        outState.putLong(STATE_TOOLBAR_SUBTITLE, mDate);
     }
 
     private void addDetailsFragment() {
@@ -174,9 +193,16 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void setToolbarStoreDate(String store, String date) {
-        mTextViewStore.setText(store);
-        mTextViewDate.setText(date);
+    public void setToolbarStoreDate(String store, Date date) {
+        mStore = store;
+        mDate = DateUtils.parseDateToLong(date);
+
+        setToolbarTitleValues();
+    }
+
+    private void setToolbarTitleValues() {
+        mTextViewStore.setText(mStore);
+        mTextViewDate.setText(DateUtils.formatDateLong(mDate));
     }
 
     @Override

@@ -211,7 +211,7 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     }
 
     private void showCreateGroupDialog() {
-        GroupCreateDialogFragment groupCreateDialogFragment = new GroupCreateDialogFragment();
+        GroupCreateDialogFragment groupCreateDialogFragment = GroupCreateDialogFragment.newInstance(R.string.dialog_group_create_finance);
         groupCreateDialogFragment.show(getFragmentManager(), "create_group");
     }
 

@@ -3,6 +3,7 @@ package ch.giantific.qwittig.ui;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -19,12 +20,14 @@ import ch.giantific.qwittig.constants.AppConstants;
 import ch.giantific.qwittig.helpers.TaskQueryHelper;
 import ch.giantific.qwittig.helpers.TaskRemindHelper;
 import ch.giantific.qwittig.ui.adapters.StringResSpinnerAdapter;
+import ch.giantific.qwittig.ui.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.utils.Utils;
 
 public class TasksActivity extends BaseNavDrawerActivity implements
         TasksFragment.FragmentInteractionListener,
         TaskQueryHelper.HelperInteractionListener,
-        TaskRemindHelper.HelperInteractionListener {
+        TaskRemindHelper.HelperInteractionListener,
+        GroupCreateDialogFragment.DialogInteractionListener {
 
     private Spinner mSpinnerDeadline;
     private TasksFragment mTaskFragment;
@@ -186,6 +189,16 @@ public class TasksActivity extends BaseNavDrawerActivity implements
     @Override
     public void onFailedToRemindUser(ParseException e, String taskId) {
         mTaskFragment.onFailedToRemindUser(e, taskId);
+    }
+
+    /**
+     * Called from dialog that is shown when user tries to add new task and is not yet part of
+     * any group.
+     */
+    @Override
+    public void createNewGroup() {
+        Intent intent = new Intent(this, SettingsGroupNewActivity.class);
+        startActivity(intent);
     }
 
     @Override

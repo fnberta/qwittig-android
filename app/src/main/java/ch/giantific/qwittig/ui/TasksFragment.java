@@ -276,7 +276,7 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
     }
 
     private void showCreateGroupDialog() {
-        GroupCreateDialogFragment groupCreateDialogFragment = new GroupCreateDialogFragment();
+        GroupCreateDialogFragment groupCreateDialogFragment = GroupCreateDialogFragment.newInstance(R.string.dialog_group_create_tasks);
         groupCreateDialogFragment.show(getFragmentManager(), "create_group");
     }
 
