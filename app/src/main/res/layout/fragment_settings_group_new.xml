@@ -14,7 +14,7 @@
         android:orientation="vertical">
 
         <TextView
-            style="@style/Base.TextAppearance.AppCompat.Subhead"
+            style="@style/TextAppearance.AppCompat.Subhead"
             android:text="@string/desc_group_add_new"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

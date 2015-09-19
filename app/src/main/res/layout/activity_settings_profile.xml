@@ -7,24 +7,26 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     tools:context="ch.giantific.qwittig.ui.SettingsProfileActivity"
-    tools:ignore="MergeRootFrame">
+    tools:ignore="MergeRootFrame"
+    >
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/toolbar_height_x5"
+        android:fitsSystemWindows="true"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        android:fitsSystemWindows="true">
+        >
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:contentScrim="?attr/colorPrimary"
             app:expandedTitleMarginStart="@dimen/key_line_1"
             app:expandedTitleMarginEnd="@dimen/key_line_1"
-            android:fitsSystemWindows="true"
             >
 
             <FrameLayout
@@ -54,8 +56,8 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:contentInsetStart="@dimen/key_line_2"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                app:contentInsetStart="@dimen/key_line_2"
                 app:layout_collapseMode="pin"/>
 
         </android.support.design.widget.CollapsingToolbarLayout>

@@ -48,8 +48,6 @@
                 android:id="@+id/sp_task_time_frame"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:theme="@style/ThemeOverlay.AppCompat"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 />
 
         </LinearLayout>

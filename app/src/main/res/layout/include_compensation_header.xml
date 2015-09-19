@@ -10,7 +10,7 @@
 
     <TextView
         android:id="@+id/tv_payer"
-        style="@style/Base.TextAppearance.AppCompat.Headline"
+        style="@style/TextAppearance.AppCompat.Headline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/normal_space"
@@ -21,7 +21,7 @@
 
     <TextView
         android:id="@+id/tv_amount"
-        style="@style/Base.TextAppearance.AppCompat.Subhead"
+        style="@style/TextAppearance.AppCompat.Subhead"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/normal_space"

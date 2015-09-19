@@ -23,7 +23,7 @@
 
         <TextView
             android:id="@+id/tv_empty_view_title"
-            style="@style/Base.TextAppearance.AppCompat.Title"
+            style="@style/TextAppearance.AppCompat.Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/small_space"
@@ -32,7 +32,7 @@
 
         <TextView
             android:id="@+id/tv_empty_view_subtitle"
-            style="@style/Base.TextAppearance.AppCompat.Subhead"
+            style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/normal_space"

@@ -17,7 +17,7 @@
         android:background="?android:attr/listDivider"/>
 
     <TextView
-        style="@style/Base.TextAppearance.AppCompat.Title"
+        style="@style/TextAppearance.AppCompat.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/divider"
@@ -28,7 +28,7 @@
 
     <TextView
         android:id="@+id/tv_total_value"
-        style="@style/Base.TextAppearance.AppCompat.Title"
+        style="@style/TextAppearance.AppCompat.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/divider"

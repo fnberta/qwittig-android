@@ -128,7 +128,7 @@
 
     <TextView
         android:id="@+id/tv_total_text"
-        style="@style/Base.TextAppearance.AppCompat.Title"
+        style="@style/TextAppearance.AppCompat.Title"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/touch_target_min"
         android:gravity="center_vertical"
@@ -140,7 +140,7 @@
 
     <TextView
         android:id="@+id/tv_total_value"
-        style="@style/Base.TextAppearance.AppCompat.Title"
+        style="@style/TextAppearance.AppCompat.Title"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/touch_target_min"
         android:gravity="center_vertical"
@@ -162,7 +162,7 @@
 
     <TextView
         android:id="@+id/tv_my_share_text"
-        style="@style/Base.TextAppearance.AppCompat.Title"
+        style="@style/TextAppearance.AppCompat.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_total_text"
@@ -174,7 +174,7 @@
 
     <TextView
         android:id="@+id/tv_my_share_value"
-        style="@style/Base.TextAppearance.AppCompat.Title"
+        style="@style/TextAppearance.AppCompat.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_total_value"
@@ -185,7 +185,7 @@
 
     <TextView
         android:id="@+id/tv_my_share_currency"
-        style="@style/Base.TextAppearance.AppCompat.Title"
+        style="@style/TextAppearance.AppCompat.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_total_value"
@@ -196,7 +196,7 @@
 
     <TextView
         android:id="@+id/tv_exchange_rate_text"
-        style="@style/Base.TextAppearance.AppCompat.Caption"
+        style="@style/TextAppearance.AppCompat.Caption"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_my_share_text"
@@ -208,7 +208,7 @@
 
     <TextView
         android:id="@+id/tv_exchange_rate_value"
-        style="@style/Base.TextAppearance.AppCompat.Caption"
+        style="@style/TextAppearance.AppCompat.Caption"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_my_share_value"

@@ -38,7 +38,7 @@
 
         <TextView
             android:id="@+id/tv_task_user_responsible"
-            style="@style/Base.TextAppearance.AppCompat.Subhead"
+            style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/iv_avatar"
@@ -49,7 +49,7 @@
 
         <TextView
             android:id="@+id/tv_task_title"
-            style="@style/Base.TextAppearance.AppCompat.Title"
+            style="@style/TextAppearance.AppCompat.Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/iv_avatar"
@@ -59,7 +59,7 @@
 
         <TextView
             android:id="@+id/tv_task_time_frame"
-            style="@style/Base.TextAppearance.AppCompat.Body2"
+            style="@style/TextAppearance.AppCompat.Body2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/iv_avatar"
@@ -70,7 +70,7 @@
 
         <TextView
             android:id="@+id/tv_task_users_involved"
-            style="@style/Base.TextAppearance.AppCompat.Body1"
+            style="@style/TextAppearance.AppCompat.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/iv_avatar"
@@ -81,7 +81,7 @@
 
         <TextView
             android:id="@+id/tv_task_deadline"
-            style="@style/Base.TextAppearance.AppCompat.Body2"
+            style="@style/TextAppearance.AppCompat.Body2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/normal_space"
@@ -101,7 +101,7 @@
 
         <Button
             android:id="@+id/bt_task_done"
-            style="?android:attr/borderlessButtonStyle"
+            style="?borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
@@ -112,7 +112,7 @@
 
         <Button
             android:id="@+id/bt_task_remind"
-            style="?android:attr/borderlessButtonStyle"
+            style="?borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"

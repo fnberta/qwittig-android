@@ -11,7 +11,7 @@
         android:orientation="vertical">
 
         <TextView
-            style="@style/Base.TextAppearance.AppCompat.Subhead"
+            style="@style/TextAppearance.AppCompat.Subhead"
             android:text="@string/desc_user_invite"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -28,7 +28,7 @@
 
         <Button
             android:id="@+id/bt_user_add"
-            style="?android:attr/borderlessButtonStyle"
+            style="?borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/key_line_2"
@@ -54,7 +54,7 @@
 
             <TextView
                 android:id="@+id/tv_no_open_invitations"
-                style="@style/Base.TextAppearance.AppCompat.Title"
+                style="@style/TextAppearance.AppCompat.Title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
