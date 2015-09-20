@@ -28,6 +28,8 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/small_space"
             android:gravity="center_horizontal"
+            android:drawablePadding="@dimen/small_space"
+            android:drawableTop="@drawable/ic_attach_money_black_144dp"
             tools:text="@string/no_compensations"/>
 
         <TextView

@@ -213,6 +213,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
             mEmptyView.setVisibility(View.VISIBLE);
             mTextViewEmptyTitle.setText(R.string.no_compensations);
             if (!ParseUtils.isTestUser(mCurrentUser) && mCurrentGroup != null) {
+                mTextViewEmptyTitle.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
                 mTextViewEmptySubtitle.setText(R.string.no_compensations_subhead);
                 showFab();
             }

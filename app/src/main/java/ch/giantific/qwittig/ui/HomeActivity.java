@@ -378,10 +378,15 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onFullQueryFinished() {
+    public void onFullQueryFinished(boolean failedEarly) {
         removeQueryHelper();
 
         dismissProgressDialog();
+
+        if (failedEarly) {
+            mNewQueryNeeded = false;
+            updateFragmentAdapters();
+        }
     }
 
     private void removeQueryHelper() {
