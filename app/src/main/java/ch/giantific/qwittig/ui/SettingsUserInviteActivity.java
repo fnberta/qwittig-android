@@ -34,7 +34,6 @@ public class SettingsUserInviteActivity extends BaseActivity implements
         setContentView(R.layout.activity_settings_user_invite);
 
         mFab = (FloatingActionButton) findViewById(R.id.fab_user_invite);
-        mFab.setImageAlpha(AppConstants.ICON_BLACK_ALPHA_RGB);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

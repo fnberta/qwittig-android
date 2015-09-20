@@ -102,10 +102,8 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
         FloatingActionButton fabAuto = (FloatingActionButton) findViewById(R.id.fab_auto);
         fabAuto.setOnClickListener(this);
-        fabAuto.setImageAlpha(AppConstants.ICON_BLACK_ALPHA_RGB);
         FloatingActionButton fabManual = (FloatingActionButton) findViewById(R.id.fab_manual);
         fabManual.setOnClickListener(this);
-        fabManual.setImageAlpha(AppConstants.ICON_BLACK_ALPHA_RGB);
 
         if (mUserIsLoggedIn) {
             if (savedInstanceState == null) {

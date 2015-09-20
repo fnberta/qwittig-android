@@ -119,7 +119,6 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         setContentView(R.layout.activity_purchase_add_edit);
 
         mFabPurchaseSave = (FloatingActionButton) findViewById(R.id.fab_purchase_save);
-        mFabPurchaseSave.setImageAlpha(AppConstants.ICON_BLACK_ALPHA_RGB);
         mFabPurchaseSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

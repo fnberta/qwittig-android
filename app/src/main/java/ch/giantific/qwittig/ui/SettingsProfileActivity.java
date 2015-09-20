@@ -69,7 +69,6 @@ public class SettingsProfileActivity extends BaseActivity implements
         setAvatar();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_save);
-        fab.setImageAlpha(AppConstants.ICON_BLACK_ALPHA_RGB);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

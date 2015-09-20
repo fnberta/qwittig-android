@@ -128,7 +128,6 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
                 R.layout.row_compensations_unpaid_pos, R.layout.row_compensations_unpaid_neg, mCompensations,
                 this);
         mRecyclerView.setAdapter(mRecyclerAdapter);
-        mFabNew.setImageAlpha(AppConstants.ICON_BLACK_ALPHA_RGB);
         mFabNew.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

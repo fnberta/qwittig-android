@@ -28,7 +28,6 @@ public class SettingsStoresActivity extends BaseActivity implements
         setContentView(R.layout.activity_settings_stores);
 
         mFab = (FloatingActionButton) findViewById(R.id.fab_add_store);
-        mFab.setImageAlpha(AppConstants.ICON_BLACK_ALPHA_RGB);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
