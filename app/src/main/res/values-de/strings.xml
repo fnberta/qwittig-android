@@ -297,5 +297,9 @@
     <string name="toast_error_purchase_details_group_not">Laden des Einkaufes felgeschlagen, da du nicht Teil dessen Gruppe bist</string>
     <string name="dialog_group_create_finance">Du musst in einer Gruppe sein um Zahlungen hinzufügen zu können. Möchtest du eine neue Gruppe erstellen?</string>
     <string name="dialog_group_create_tasks">Du musst in einer Gruppe sein um Aufgaben hinzufügen zu können. Möchtest du eine neue Gruppe erstellen?</string>
+    <string name="camera_redo">Aufnahme wiederholen</string>
+    <string name="camera_done">Erledigt</string>
+    <string name="camera_add">Foto hinzufügen</string>
+    <string name="toast_no_camera">Dein Gerät hat keine Kamera</string>
 
 </resources>

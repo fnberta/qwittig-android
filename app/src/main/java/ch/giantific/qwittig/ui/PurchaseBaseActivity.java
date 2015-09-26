@@ -11,13 +11,10 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v13.app.FragmentCompat;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
@@ -37,17 +34,15 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
+import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.constants.AppConstants;
 import ch.giantific.qwittig.data.models.Receipt;
 import ch.giantific.qwittig.helpers.PurchaseSaveHelper;
 import ch.giantific.qwittig.helpers.RatesHelper;
@@ -94,11 +89,11 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     static final int INTENT_REQUEST_IMAGE_CAPTURE = 1;
     static final String PURCHASE_RECEIPT_FRAGMENT = "purchase_receipt_fragment";
 
-    private static final int PERMISSIONS_REQUEST_EXTERNAL_STORAGE = 1;
+    private static final int PERMISSIONS_REQUEST_CAPTURE_IMAGES = 1;
     private static final String LOG_TAG = PurchaseBaseActivity.class.getSimpleName();
 
     PurchaseBaseFragment mPurchaseFragment;
-    File mReceiptPhotoFile;
+    List<String> mReceiptFilePaths;
     FloatingActionButton mFabPurchaseSave;
     ParseFile mReceiptParseFile;
     private FABProgressCircle mFabProgressCircle;
@@ -218,35 +213,38 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
 
     @Override
     public void captureImage() {
+        if (!hasCameraHardware()) {
+            MessageUtils.showBasicSnackbar(mToolbar, getString(R.string.toast_no_camera));
+            return;
+        }
+
         if (permissionsAreGranted()) {
             getImage();
         }
     }
 
-    private void getImage() {
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (cameraIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
-            try {
-                mReceiptPhotoFile = createImageFile();
-            } catch (IOException ex) {
-                // Error occurred while creating the File
-                setResultForSnackbar(PURCHASE_ERROR);
-                finishPurchase();
-            }
-            if (mReceiptPhotoFile != null) {
-                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mReceiptPhotoFile));
-                startActivityForResult(cameraIntent, INTENT_REQUEST_IMAGE_CAPTURE);
-            }
-        }
+    private boolean hasCameraHardware() {
+        return getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
     }
 
     private boolean permissionsAreGranted() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
-                PackageManager.PERMISSION_GRANTED) {
-            String[] permissionsToGrant = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
-            ActivityCompat.requestPermissions(this, permissionsToGrant,
-                    PERMISSIONS_REQUEST_EXTERNAL_STORAGE);
+        int hasExternalStoragePerm = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int hasCameraPerm = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+        List<String> permissions = new ArrayList<>();
+
+        if (hasExternalStoragePerm != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+
+        if (hasCameraPerm != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.CAMERA);
+        }
+
+        if (!permissions.isEmpty()) {
+            ActivityCompat.requestPermissions(this,
+                    permissions.toArray(new String[permissions.size()]),
+                    PERMISSIONS_REQUEST_CAPTURE_IMAGES);
 
             return false;
         }
@@ -254,12 +252,17 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         return true;
     }
 
+    private void getImage() {
+        Intent intent = new Intent(this, CameraActivity.class);
+        startActivityForResult(intent, INTENT_REQUEST_IMAGE_CAPTURE);
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         switch (requestCode) {
-            case PERMISSIONS_REQUEST_EXTERNAL_STORAGE:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            case PERMISSIONS_REQUEST_CAPTURE_IMAGES:
+                if (Utils.verifyPermissions(grantResults)) {
                     getImage();
                 } else {
                     Snackbar snackbar = MessageUtils.getBasicSnackbar(mToolbar,
@@ -271,6 +274,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
                         }
                     });
                 }
+
                 break;
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -283,23 +287,13 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         startActivity(intent);
     }
 
-    private File createImageFile() throws IOException {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        return File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == INTENT_REQUEST_IMAGE_CAPTURE) {
             if (resultCode == RESULT_OK) {
+                mReceiptFilePaths = data.getStringArrayListExtra(CameraActivity.INTENT_EXTRA_PATHS);
                 getReceiptFile();
                 updateReceiptFragment();
             }
@@ -307,7 +301,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     }
 
     private void getReceiptFile() {
-        Glide.with(this).load(mReceiptPhotoFile)
+        Glide.with(this).load(mReceiptFilePaths.get(0))
                 .asBitmap()
                 .toBytes(Bitmap.CompressFormat.JPEG, Receipt.JPEG_COMPRESSION_RATE)
                 .centerCrop()
@@ -325,7 +319,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
                 (PurchaseReceiptAddEditFragment) getFragmentManager().findFragmentByTag(PURCHASE_RECEIPT_FRAGMENT);
 
         if (purchaseReceiptAddEditFragment != null) {
-            purchaseReceiptAddEditFragment.updateReceiptImage(mReceiptPhotoFile);
+            purchaseReceiptAddEditFragment.updateReceiptImage(mReceiptFilePaths.get(0));
         }
     }
 
@@ -442,10 +436,12 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     @Override
     public void finishPurchase() {
         ActivityCompat.finishAfterTransition(this);
-        if (mReceiptPhotoFile != null) {
-            boolean fileWasDeleted = mReceiptPhotoFile.delete();
-            if (!fileWasDeleted) {
-                Log.e(LOG_TAG, "could not delete file");
+        if (!mReceiptFilePaths.isEmpty()) {
+            for (String path : mReceiptFilePaths) {
+                boolean fileDeleted = new File(path).delete();
+                if (!fileDeleted && BuildConfig.DEBUG) {
+                    Log.e(LOG_TAG, "could not delete file");
+                }
             }
         }
     }

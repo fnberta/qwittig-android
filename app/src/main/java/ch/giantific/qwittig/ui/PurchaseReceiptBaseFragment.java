@@ -65,9 +65,9 @@ public abstract class PurchaseReceiptBaseFragment extends BaseFragment {
                 .into(mImageViewReceipt);
     }
 
-    public void updateReceiptImage(File receipt) {
+    public void updateReceiptImage(String path) {
         Glide.with(this)
-                .load(receipt)
+                .load(path)
                 .into(mImageViewReceipt);
     }
 }

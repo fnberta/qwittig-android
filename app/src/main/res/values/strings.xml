@@ -305,5 +305,10 @@
     <string name="toast_error_purchase_details_group_not">Failed to load purchase since you are not a member of its group</string>
     <string name="dialog_group_create_finance">You have to be in a group to add payments. Would you like to a create a new group?</string>
     <string name="dialog_group_create_tasks">You have to be in a group to add tasks. Would you like to a create a new group?</string>
+    <string name="title_activity_camera">CameraActivity</string>
+    <string name="camera_redo">Redo capture</string>
+    <string name="camera_done">Done</string>
+    <string name="camera_add">Add photo</string>
+    <string name="toast_no_camera">Your device has no camera</string>
 
 </resources>

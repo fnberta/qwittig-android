@@ -84,7 +84,7 @@ public class PurchaseAddActivity extends PurchaseBaseActivity implements
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
         if (ocrHelper == null) {
-            ocrHelper = OcrHelper.newInstance(mReceiptPhotoFile.getAbsolutePath());
+            ocrHelper = OcrHelper.newInstance(mReceiptFilePaths.get(0));
 
             fragmentManager.beginTransaction()
                     .add(ocrHelper, OCR_HELPER)
