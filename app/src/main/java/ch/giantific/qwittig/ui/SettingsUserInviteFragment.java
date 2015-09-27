@@ -299,9 +299,7 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
         mListener = null;
     }
 
-    public interface FragmentInteractionListener {
-        void showAccountCreateDialog();
-
+    public interface FragmentInteractionListener extends BaseFragmentInteractionListener {
         void progressCircleShow();
 
         void progressCircleStartFinal();

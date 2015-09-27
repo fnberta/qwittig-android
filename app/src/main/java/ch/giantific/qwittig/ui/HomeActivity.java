@@ -515,10 +515,10 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         switch (requestCode) {
             case HomeActivity.INTENT_REQUEST_PURCHASE_MODIFY:
                 switch (resultCode) {
-                    case PurchaseAddActivity.RESULT_PURCHASE_SAVED:
+                    case PurchaseAddFragment.RESULT_PURCHASE_SAVED:
                         MessageUtils.showBasicSnackbar(mFabMenu, getString(R.string.toast_purchase_added));
                         break;
-                    case PurchaseAddActivity.RESULT_PURCHASE_SAVED_AUTO:
+                    case PurchaseAddFragment.RESULT_PURCHASE_SAVED_AUTO:
                         String purchaseAdded = getString(R.string.toast_purchase_added);
                         if (mInTrialMode) {
                             ParseConfig config = ParseConfig.getCurrentConfig();
@@ -528,15 +528,15 @@ public class HomeActivity extends BaseNavDrawerActivity implements
                         }
                         MessageUtils.showBasicSnackbar(mFabMenu, purchaseAdded);
                         break;
-                    case PurchaseAddActivity.RESULT_PURCHASE_DRAFT:
+                    case PurchaseAddFragment.RESULT_PURCHASE_DRAFT:
                         MessageUtils.showBasicSnackbar(mFabMenu,
                                 getString(R.string.toast_purchase_added_draft));
                         break;
-                    case PurchaseAddActivity.RESULT_PURCHASE_DISCARDED:
+                    case PurchaseAddFragment.RESULT_PURCHASE_DISCARDED:
                         MessageUtils.showBasicSnackbar(mFabMenu,
                                 getString(R.string.toast_purchase_discarded));
                         break;
-                    case PurchaseAddActivity.RESULT_PURCHASE_ERROR:
+                    case PurchaseAddFragment.RESULT_PURCHASE_ERROR:
                         MessageUtils.showBasicSnackbar(mFabMenu,
                                 getString(R.string.toast_create_image_file_failed));
                         break;

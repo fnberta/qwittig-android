@@ -252,13 +252,11 @@ public class PurchaseDetailsFragment extends BaseFragment implements
         mListener = null;
     }
 
-    public interface FragmentInteractionListener {
+    public interface FragmentInteractionListener extends BaseFragmentInteractionListener {
         void setToolbarStoreDate(String store, Date date);
 
         void toggleActionBarOptions(boolean showEditOptions, boolean hasForeignCurrency);
 
         void replaceWithReceiptFragment();
-
-        void showAccountCreateDialog();
     }
 }

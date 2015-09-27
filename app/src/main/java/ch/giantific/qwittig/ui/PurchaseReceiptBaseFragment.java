@@ -2,6 +2,7 @@ package ch.giantific.qwittig.ui;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,15 +60,21 @@ public abstract class PurchaseReceiptBaseFragment extends BaseFragment {
         }
     }
 
-    private void setImage(byte[] receiptBytes) {
+    void setImage(byte[] receiptBytes) {
         Glide.with(this)
                 .load(receiptBytes)
                 .into(mImageViewReceipt);
     }
 
-    public void updateReceiptImage(File receipt) {
+    void setReceiptImage(String receiptPath) {
+        if (!TextUtils.isEmpty(receiptPath)) {
+            setImage(receiptPath);
+        }
+    }
+
+    public void setImage(String receiptPath) {
         Glide.with(this)
-                .load(receipt)
+                .load(receiptPath)
                 .into(mImageViewReceipt);
     }
 }

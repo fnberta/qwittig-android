@@ -8,19 +8,27 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.parse.ParseFile;
-
 import ch.giantific.qwittig.R;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class PurchaseReceiptAddEditFragment extends PurchaseReceiptBaseFragment {
+public class PurchaseReceiptAddFragment extends PurchaseReceiptBaseFragment {
 
+    private static final String BUNDLE_IMAGE_PATH = "bundle_image_path";
     private FragmentInteractionListener mListener;
+    private String mReceiptPath;
 
-    public PurchaseReceiptAddEditFragment() {
+    public PurchaseReceiptAddFragment() {
+    }
+
+    public static PurchaseReceiptAddFragment newInstance(String imagePath) {
+        PurchaseReceiptAddFragment purchaseReceiptAddFragment = new PurchaseReceiptAddFragment();
+        Bundle args = new Bundle();
+        args.putString(BUNDLE_IMAGE_PATH, imagePath);
+        purchaseReceiptAddFragment.setArguments(args);
+        return purchaseReceiptAddFragment;
     }
 
     @Override
@@ -39,14 +47,25 @@ public class PurchaseReceiptAddEditFragment extends PurchaseReceiptBaseFragment 
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
+        getDataFromBundle();
+    }
+
+    void getDataFromBundle() {
+        Bundle args = getArguments();
+        if (args != null) {
+            mReceiptPath = args.getString(BUNDLE_IMAGE_PATH);
+        }
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        ParseFile receiptFile = mListener.getReceiptParseFile();
-        setReceiptImage(receiptFile);
+        setData();
+    }
+
+    void setData() {
+        setReceiptImage(mReceiptPath);
     }
 
     @Override
@@ -76,7 +95,6 @@ public class PurchaseReceiptAddEditFragment extends PurchaseReceiptBaseFragment 
     }
 
     public interface FragmentInteractionListener {
-        ParseFile getReceiptParseFile();
         void deleteReceipt();
         void captureImage();
     }

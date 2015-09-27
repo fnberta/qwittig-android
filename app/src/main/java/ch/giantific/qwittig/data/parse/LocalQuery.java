@@ -125,7 +125,7 @@ public class LocalQuery {
         return query;
     }
 
-    public static void queryDraft(final ObjectLocalFetchListener listener, String draftId) {
+    public static void queryDraft(String draftId, final ObjectLocalFetchListener listener) {
         ParseQuery<ParseObject> query = getDraftsQuery();
         query.whereEqualTo(Purchase.DRAFT_ID, draftId);
         query.getFirstInBackground(new GetCallback<ParseObject>() {

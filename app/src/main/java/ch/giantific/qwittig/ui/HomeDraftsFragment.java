@@ -135,16 +135,16 @@ public class HomeDraftsFragment extends BaseFragment implements
 
         if (requestCode == HomeActivity.INTENT_REQUEST_PURCHASE_MODIFY) {
             switch (resultCode) {
-                case PurchaseEditActivity.RESULT_PURCHASE_SAVED:
+                case PurchaseEditFragment.RESULT_PURCHASE_SAVED:
                     MessageUtils.showBasicSnackbar(mListView, getString(R.string.toast_purchase_added));
                     break;
-                case PurchaseEditActivity.RESULT_PURCHASE_DISCARDED:
+                case PurchaseEditFragment.RESULT_PURCHASE_DISCARDED:
                     MessageUtils.showBasicSnackbar(mListView, getString(R.string.toast_changes_discarded));
                     break;
-                case PurchaseEditActivity.RESULT_PURCHASE_DRAFT:
+                case PurchaseEditFragment.RESULT_PURCHASE_DRAFT:
                     MessageUtils.showBasicSnackbar(mListView, getString(R.string.toast_changes_saved_as_draft));
                     break;
-                case PurchaseEditActivity.RESULT_PURCHASE_DRAFT_DELETED:
+                case PurchaseEditFragment.RESULT_PURCHASE_DRAFT_DELETED:
                     MessageUtils.showBasicSnackbar(mListView, getString(R.string.toast_draft_deleted));
                     break;
             }

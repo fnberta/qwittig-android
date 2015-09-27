@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    >
+
+    <FrameLayout
+        android:id="@+id/fl_camera_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+
+    <LinearLayout
+        android:id="@+id/ll_camera_image_taken"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/key_line_1"
+        android:layout_marginBottom="88dp"
+        android:layout_gravity="start|bottom"
+        android:orientation="vertical"
+        android:animateLayoutChanges="true"
+        />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_camera_capture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/normal_space"
+        android:layout_gravity="center_horizontal|bottom"
+        android:src="@drawable/ic_camera_alt_black_24dp"
+        />
+
+    <RelativeLayout
+        android:id="@+id/rl_camera_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:padding="@dimen/normal_space"
+        android:background="@drawable/scrim_solid"
+        android:visibility="gone"
+        >
+
+        <ImageView
+            android:id="@+id/iv_camera_bottom_redo"
+            android:layout_width="@dimen/touch_target_min"
+            android:layout_height="@dimen/touch_target_min"
+            android:layout_alignParentStart="true"
+            android:src="@drawable/ic_redo_white_48dp"
+            android:contentDescription="@string/camera_redo"
+            />
+
+        <ImageView
+            android:id="@+id/iv_camera_bottom_done"
+            android:layout_width="@dimen/touch_target_min"
+            android:layout_height="@dimen/touch_target_min"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/ic_done_white_48dp"
+            android:contentDescription="@string/camera_done"
+            />
+
+        <ImageView
+            android:id="@+id/iv_camera_bottom_add"
+            android:layout_width="@dimen/touch_target_min"
+            android:layout_height="@dimen/touch_target_min"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/ic_add_white_48dp"
+            android:contentDescription="@string/camera_add"
+            />
+
+    </RelativeLayout>
+</FrameLayout>

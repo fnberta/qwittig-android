@@ -1,5 +1,8 @@
 package ch.giantific.qwittig.ui;
 
+import android.app.Activity;
+import android.app.FragmentManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,7 +17,10 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.ItemRow;
 import ch.giantific.qwittig.data.ocr.models.ItemRest;
 import ch.giantific.qwittig.data.ocr.models.PurchaseRest;
+import ch.giantific.qwittig.helpers.OcrHelper;
+import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
+import ch.giantific.qwittig.utils.Utils;
 
 
 /**
@@ -24,6 +30,7 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
 
     private static final String STATE_ITEMS_SET = "items_set";
     private static final String LOG_TAG = PurchaseAddAutoFragment.class.getSimpleName();
+    static final String OCR_HELPER = "ocr_helper";
     private View mProgressView;
     private View mMainView;
     private boolean mOcrValuesAreSet;
@@ -43,9 +50,9 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
 
         setHasOptionsMenu(true);
 
-        if (getArguments() != null) {
-            mInTrialMode = getArguments().getBoolean(
-                    PurchaseAddActivity.INTENT_PURCHASE_NEW_TRIAL_MODE, false);
+        Bundle args = getArguments();
+        if (args != null) {
+            mInTrialMode = args.getBoolean(PurchaseAddActivity.INTENT_PURCHASE_NEW_TRIAL_MODE, false);
         }
 
         if (savedInstanceState != null) {
@@ -53,6 +60,8 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
         } else {
             mOcrValuesAreSet = false;
         }
+
+        captureImage();
     }
 
     @Override
@@ -119,6 +128,59 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
         }
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case INTENT_REQUEST_IMAGE_CAPTURE:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        doReceiptOcrWithHelper();
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        setResultForSnackbar(PURCHASE_DISCARDED);
+                        getActivity().finish();
+                        break;
+                }
+                break;
+        }
+    }
+
+    @Override
+    void showReceiptAddedSnackbar() {
+        // don't show anything in auto mode
+    }
+
+    public void doReceiptOcrWithHelper() {
+        if (!Utils.isConnected(getActivity())) {
+            onOcrFailed(getString(R.string.toast_no_connection));
+            return;
+        }
+
+        FragmentManager fragmentManager = getFragmentManager();
+        OcrHelper ocrHelper = (OcrHelper) fragmentManager.findFragmentByTag(OCR_HELPER);
+
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (ocrHelper == null) {
+            ocrHelper = OcrHelper.newInstance(mReceiptImagePath);
+
+            fragmentManager.beginTransaction()
+                    .add(ocrHelper, OCR_HELPER)
+                    .commit();
+        }
+    }
+
+    public void onOcrSuccessful(PurchaseRest purchaseRest) {
+        setValuesFromOcr(purchaseRest);
+    }
+
+    public void onOcrFailed(String errorMessage) {
+        MessageUtils.showBasicSnackbar(mButtonAddRow, errorMessage);
+        showMainScreen();
+    }
+
     public void setValuesFromOcr(PurchaseRest purchaseRest) {
         // set date
         //setDateSelected(purchaseRest.getDate());
@@ -168,7 +230,8 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
     }
 
     @Override
+    @PurchaseAction
     int getPurchaseSavedAction() {
-        return PurchaseBaseActivity.PURCHASE_SAVED_AUTO;
+        return PURCHASE_SAVED_AUTO;
     }
 }

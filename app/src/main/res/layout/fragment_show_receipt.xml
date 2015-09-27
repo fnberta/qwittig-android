@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    tools:context="ch.giantific.qwittig.ui.PurchaseReceiptDetailsFragment">
+    tools:context="ch.giantific.qwittig.ui.PurchaseReceiptDetailFragment">
 
     <ProgressBar
         android:id="@+id/pb_receipt"

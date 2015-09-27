@@ -186,11 +186,9 @@ public class SettingsProfileFragment extends Fragment {
         mListener = null;
     }
 
-    public interface FragmentInteractionListener {
+    public interface FragmentInteractionListener extends BaseFragment.BaseFragmentInteractionListener {
         void pickAvatar();
 
         void finishEdit(@SettingsProfileActivity.EditAction int editAction);
-
-        void showAccountCreateDialog();
     }
 }

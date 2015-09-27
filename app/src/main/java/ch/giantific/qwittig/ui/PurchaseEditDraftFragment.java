@@ -1,6 +1,7 @@
 package ch.giantific.qwittig.ui;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -65,8 +66,8 @@ public class PurchaseEditDraftFragment extends PurchaseEditFragment implements
             @Override
             public void done(ParseException e) {
                 if (e == null) {
-                    mListener.setResultForSnackbar(PurchaseBaseActivity.PURCHASE_DRAFT_DELETED);
-                    mListener.finishPurchase();
+                    setResultForSnackbar(PURCHASE_DRAFT_DELETED);
+                    finishPurchase();
                 }
             }
         });
@@ -74,7 +75,7 @@ public class PurchaseEditDraftFragment extends PurchaseEditFragment implements
 
     @Override
     void fetchPurchase() {
-        LocalQuery.queryDraft(this, mEditPurchaseId);
+        LocalQuery.queryDraft(mEditPurchaseId, this);
     }
 
     @Override
@@ -85,13 +86,13 @@ public class PurchaseEditDraftFragment extends PurchaseEditFragment implements
     }
 
     @Override
-    void checkForReceiptFile() {
+    ParseFile getOldReceiptFile() {
         byte[] receiptData = mPurchase.getReceiptData();
-        if (receiptData != null && mListener.getReceiptParseFile() == null) {
-            mReceiptFileOld = new ParseFile(Receipt.PARSE_FILE_NAME, receiptData);
-            mListener.setReceiptParseFile(mReceiptFileOld);
-            getActivity().invalidateOptionsMenu();
+        if (receiptData != null) {
+            return new ParseFile(Receipt.PARSE_FILE_NAME, receiptData);
         }
+
+        return null;
     }
 
     @Override
@@ -116,11 +117,10 @@ public class PurchaseEditDraftFragment extends PurchaseEditFragment implements
     protected void savePurchaseAsDraft() {
         replacePurchaseData();
 
-        ParseFile receiptFile = mListener.getReceiptParseFile();
-        if (receiptFile != null) {
-            mPurchase.setReceiptParseFile(receiptFile);
+        if (TextUtils.isEmpty(mReceiptImagePath)) {
+            pinPurchaseAsDraft();
+        } else {
+            getReceiptDataForDraft();
         }
-
-        pinPurchaseAsDraft();
     }
 }

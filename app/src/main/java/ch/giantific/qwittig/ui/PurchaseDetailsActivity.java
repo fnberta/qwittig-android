@@ -158,10 +158,10 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     @Override
     public void replaceWithReceiptFragment() {
         FragmentManager fragmentManager = getFragmentManager();
-        PurchaseReceiptDetailsFragment purchaseReceiptDetailsFragment =
-                PurchaseReceiptDetailsFragment.newInstance(mPurchaseId);
+        PurchaseReceiptDetailFragment purchaseReceiptDetailFragment =
+                PurchaseReceiptDetailFragment.newInstance(mPurchaseId);
         fragmentManager.beginTransaction()
-                .replace(R.id.container, purchaseReceiptDetailsFragment, PURCHASE_RECEIPT_FRAGMENT)
+                .replace(R.id.container, purchaseReceiptDetailFragment, PURCHASE_RECEIPT_FRAGMENT)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .addToBackStack(null)
                 .commit();
@@ -182,10 +182,10 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
 
         if (requestCode == HomeActivity.INTENT_REQUEST_PURCHASE_MODIFY) {
             switch (resultCode) {
-                case PurchaseEditActivity.RESULT_PURCHASE_SAVED:
+                case PurchaseEditFragment.RESULT_PURCHASE_SAVED:
                     MessageUtils.showBasicSnackbar(mToolbar, getString(R.string.toast_changes_saved));
                     break;
-                case PurchaseEditActivity.RESULT_PURCHASE_DISCARDED:
+                case PurchaseEditFragment.RESULT_PURCHASE_DISCARDED:
                     MessageUtils.showBasicSnackbar(mToolbar, getString(R.string.toast_changes_discarded));
                     break;
             }

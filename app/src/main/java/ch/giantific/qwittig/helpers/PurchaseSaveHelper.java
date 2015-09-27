@@ -2,8 +2,13 @@ package ch.giantific.qwittig.helpers;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.text.TextUtils;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -12,6 +17,7 @@ import com.parse.SaveCallback;
 
 import java.util.List;
 
+import ch.giantific.qwittig.data.models.Receipt;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.Item;
 import ch.giantific.qwittig.data.parse.models.Purchase;
@@ -25,16 +31,16 @@ public class PurchaseSaveHelper extends BaseHelper {
     private static final String LOG_TAG = PurchaseSaveHelper.class.getSimpleName();
     HelperInteractionListener mListener;
     Purchase mPurchase;
-    ParseFile mReceiptParseFile;
+    String mReceiptPath;
 
     public PurchaseSaveHelper() {
         // empty default constructor
     }
 
     @SuppressLint("ValidFragment")
-    public PurchaseSaveHelper(ParseFile receiptParseFile, Purchase purchase) {
-        mReceiptParseFile = receiptParseFile;
+    public PurchaseSaveHelper(Purchase purchase, String receiptPath) {
         mPurchase = purchase;
+        mReceiptPath = receiptPath;
     }
 
     @Override
@@ -52,11 +58,11 @@ public class PurchaseSaveHelper extends BaseHelper {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        checkIfReceiptNull();
+        checkReceiptImage();
     }
 
-    void checkIfReceiptNull() {
-        if (mReceiptParseFile != null) {
+    void checkReceiptImage() {
+        if (!TextUtils.isEmpty(mReceiptPath)) {
             saveReceiptFile();
         } else {
             savePurchase();
@@ -64,18 +70,29 @@ public class PurchaseSaveHelper extends BaseHelper {
     }
 
     final void saveReceiptFile() {
-        mPurchase.setReceiptParseFile(mReceiptParseFile);
-        mReceiptParseFile.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e != null && mListener != null) {
-                    mListener.onPurchaseSaveFailed(e);
-                    return;
-                }
+        Glide.with(this).load(mReceiptPath)
+                .asBitmap()
+                .toBytes(Bitmap.CompressFormat.JPEG, Receipt.JPEG_COMPRESSION_RATE)
+                .centerCrop()
+                .into(new SimpleTarget<byte[]>(Receipt.WIDTH, Receipt.HEIGHT) {
+                    @Override
+                    public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
+                        ParseFile file = new ParseFile(Receipt.PARSE_FILE_NAME, resource);
+                        mPurchase.setReceiptParseFile(file);
 
-                onReceiptFileSaved();
-            }
-        });
+                        file.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e != null && mListener != null) {
+                                    mListener.onPurchaseSaveFailed(e);
+                                    return;
+                                }
+
+                                onReceiptFileSaved();
+                            }
+                        });
+                    }
+                });
     }
 
     void onReceiptFileSaved() {
