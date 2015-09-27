@@ -147,6 +147,11 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
         }
     }
 
+    @Override
+    void showReceiptAddedSnackbar() {
+        // don't show anything in auto mode
+    }
+
     public void doReceiptOcrWithHelper() {
         if (!Utils.isConnected(getActivity())) {
             onOcrFailed(getString(R.string.toast_no_connection));
@@ -159,7 +164,7 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
         if (ocrHelper == null) {
-            ocrHelper = OcrHelper.newInstance(mReceiptImagePaths.get(0));
+            ocrHelper = OcrHelper.newInstance(mReceiptImagePath);
 
             fragmentManager.beginTransaction()
                     .add(ocrHelper, OCR_HELPER)

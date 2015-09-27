@@ -10,7 +10,9 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.annotation.CallSuper;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
@@ -42,19 +44,21 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.parse.ParseConfig;
 import com.parse.ParseException;
-import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import ch.giantific.qwittig.BuildConfig;
@@ -120,10 +124,12 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     private static final String STATE_IS_SAVING = "state_is_saving";
     private static final String STATE_IS_FETCHING_RATES = "state_is_fetching_rates";
     private static final String STATE_RECEIPT_IMAGES_PATHS = "state_receipt_images_paths";
+    private static final String STATE_RECEIPT_IMAGES_PATH = "state_receipt_images_path";
     private static final String EXCHANGE_RATE_LAST_FETCHED_TIME = "rates_last_fetched";
     private static final long EXCHANGE_RATE_REFRESH_INTERVAL = 24 * 60 * 60 * 1000;
     private static final String LOG_TAG = PurchaseBaseFragment.class.getSimpleName();
     private static final int PERMISSIONS_REQUEST_CAPTURE_IMAGES = 1;
+    static final boolean USE_CUSTOM_CAMERA = false;
     FragmentInteractionListener mListener;
     Purchase mPurchase;
     Date mDateSelected;
@@ -143,6 +149,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     List<ItemRow> mItemRows = new ArrayList<>();
     float mExchangeRate;
     ArrayList<String> mReceiptImagePaths;
+    String mReceiptImagePath;
     private boolean mIsFetchingExchangeRates;
     private SharedPreferences mSharedPreferences;
     private View mViewDate;
@@ -190,12 +197,17 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
             mStoreSelected = savedInstanceState.getString(STATE_STORE_SELECTED);
             mIsSaving = savedInstanceState.getBoolean(STATE_IS_SAVING);
             mIsFetchingExchangeRates = savedInstanceState.getBoolean(STATE_IS_FETCHING_RATES);
-            mReceiptImagePaths = savedInstanceState.getStringArrayList(STATE_RECEIPT_IMAGES_PATHS);
+            if (USE_CUSTOM_CAMERA) {
+                mReceiptImagePaths = savedInstanceState.getStringArrayList(STATE_RECEIPT_IMAGES_PATHS);
+            }
+            mReceiptImagePath = savedInstanceState.getString(STATE_RECEIPT_IMAGES_PATH);
         } else {
             mItemRowCount = 1;
             mDateSelected = new Date();
             mCurrencySelected = mCurrentGroupCurrency;
-            mReceiptImagePaths = new ArrayList<>();
+            if (USE_CUSTOM_CAMERA) {
+                mReceiptImagePaths = new ArrayList<>();
+            }
         }
     }
 
@@ -210,7 +222,10 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         outState.putString(STATE_CURRENCY_SELECTED, mCurrencySelected);
         outState.putBoolean(STATE_IS_SAVING, mIsSaving);
         outState.putBoolean(STATE_IS_FETCHING_RATES, mIsFetchingExchangeRates);
-        outState.putStringArrayList(STATE_RECEIPT_IMAGES_PATHS, mReceiptImagePaths);
+        if (USE_CUSTOM_CAMERA) {
+            outState.putStringArrayList(STATE_RECEIPT_IMAGES_PATHS, mReceiptImagePaths);
+        }
+        outState.putString(STATE_RECEIPT_IMAGES_PATH,mReceiptImagePath);
     }
 
     @Override
@@ -905,17 +920,19 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
 
     private boolean permissionsAreGranted() {
         Activity activity = getActivity();
-        int hasExternalStoragePerm = ContextCompat.checkSelfPermission(activity,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        int hasCameraPerm = ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
         List<String> permissions = new ArrayList<>();
 
+        int hasExternalStoragePerm = ContextCompat.checkSelfPermission(activity,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (hasExternalStoragePerm != PackageManager.PERMISSION_GRANTED) {
             permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
 
-        if (hasCameraPerm != PackageManager.PERMISSION_GRANTED) {
-            permissions.add(Manifest.permission.CAMERA);
+        if (USE_CUSTOM_CAMERA) {
+            int hasCameraPerm = ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
+            if (hasCameraPerm != PackageManager.PERMISSION_GRANTED) {
+                permissions.add(Manifest.permission.CAMERA);
+            }
         }
 
         if (!permissions.isEmpty()) {
@@ -956,8 +973,45 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     private void getImage() {
-        Intent intent = new Intent(getActivity(), CameraActivity.class);
-        startActivityForResult(intent, INTENT_REQUEST_IMAGE_CAPTURE);
+        if (USE_CUSTOM_CAMERA) {
+            Intent intent = new Intent(getActivity(), CameraActivity.class);
+            startActivityForResult(intent, INTENT_REQUEST_IMAGE_CAPTURE);
+        } else {
+            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if (cameraIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                File imageFile;
+                // Create the File where the photo should go
+                try {
+                    imageFile = createImageFile();
+                } catch (IOException ex) {
+                    // Error occurred while creating the File
+                    setResultForSnackbar(PURCHASE_ERROR);
+                    finishPurchase();
+                    return;
+                }
+
+                mReceiptImagePath = imageFile.getAbsolutePath();
+                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(imageFile));
+                startActivityForResult(cameraIntent, INTENT_REQUEST_IMAGE_CAPTURE);
+            }
+        }
+    }
+
+    private File createImageFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        return File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+    }
+
+    private void startSystemSettings() {
+        Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.setData(Uri.parse("package:" + getActivity().getPackageName()));
+        startActivity(intent);
     }
 
     @Override
@@ -970,18 +1024,16 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
                     case Activity.RESULT_OK:
                         mListener.updateActionBarMenu(true);
 
-                        List<String> paths = data.getStringArrayListExtra(CameraActivity.INTENT_EXTRA_PATHS);
-                        setReceiptImagePaths(paths);
+                        if (USE_CUSTOM_CAMERA) {
+                            List<String> paths = data.getStringArrayListExtra(CameraActivity.INTENT_EXTRA_PATHS);
+                            setReceiptImagePaths(paths);
+                        }
+
+                        updateReceiptFragment();
                         break;
                 }
                 break;
         }
-    }
-
-    private void startSystemSettings() {
-        Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        intent.setData(Uri.parse("package:" + getActivity().getPackageName()));
-        startActivity(intent);
     }
 
     public void setReceiptImagePaths(List<String> receiptImagePaths) {
@@ -993,16 +1045,16 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
             }
         }
 
-        updateReceiptFragment(mReceiptImagePaths.get(0));
+        mReceiptImagePath = mReceiptImagePaths.get(0);
     }
 
-    private void updateReceiptFragment(String imagePath) {
+    private void updateReceiptFragment() {
         PurchaseReceiptBaseFragment receiptFragment =
                 (PurchaseReceiptAddFragment) getFragmentManager()
                         .findFragmentByTag(PurchaseBaseFragment.PURCHASE_RECEIPT_FRAGMENT);
 
         if (receiptFragment != null) {
-            receiptFragment.setImage(imagePath);
+            receiptFragment.setImage(mReceiptImagePath);
         }
     }
 
@@ -1167,7 +1219,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     protected abstract void savePurchaseAsDraft();
 
     final void getReceiptDataForDraft() {
-        Glide.with(this).load(mReceiptImagePaths.get(0))
+        Glide.with(this).load(mReceiptImagePath)
                 .asBitmap()
                 .toBytes(Bitmap.CompressFormat.JPEG, Receipt.JPEG_COMPRESSION_RATE)
                 .centerCrop()
@@ -1240,12 +1292,19 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     final void deleteTakenImages() {
-        if (!mReceiptImagePaths.isEmpty()) {
-            for (String path : mReceiptImagePaths) {
-                boolean fileDeleted = new File(path).delete();
-                if (!fileDeleted && BuildConfig.DEBUG) {
-                    Log.e(LOG_TAG, "failed to delete file");
+        if (USE_CUSTOM_CAMERA) {
+            if (!mReceiptImagePaths.isEmpty()) {
+                for (String path : mReceiptImagePaths) {
+                    boolean fileDeleted = new File(path).delete();
+                    if (!fileDeleted && BuildConfig.DEBUG) {
+                        Log.e(LOG_TAG, "failed to delete file");
+                    }
                 }
+            }
+        } else {
+            boolean fileDeleted = new File(mReceiptImagePath).delete();
+            if (!fileDeleted && BuildConfig.DEBUG) {
+                Log.e(LOG_TAG, "failed to delete file");
             }
         }
     }

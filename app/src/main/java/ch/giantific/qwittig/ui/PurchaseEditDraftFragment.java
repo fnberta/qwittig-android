@@ -1,6 +1,7 @@
 package ch.giantific.qwittig.ui;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -116,7 +117,7 @@ public class PurchaseEditDraftFragment extends PurchaseEditFragment implements
     protected void savePurchaseAsDraft() {
         replacePurchaseData();
 
-        if (mReceiptImagePaths.isEmpty()) {
+        if (TextUtils.isEmpty(mReceiptImagePath)) {
             pinPurchaseAsDraft();
         } else {
             getReceiptDataForDraft();

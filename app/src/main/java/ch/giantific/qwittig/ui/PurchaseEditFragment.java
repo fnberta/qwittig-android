@@ -295,7 +295,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
                 purchaseEditSaveHelper = new PurchaseEditSaveHelper(mPurchase, isDraft(), getOldReceiptFile());
             } else {
                 purchaseEditSaveHelper = new PurchaseEditSaveHelper(mPurchase, isDraft(),
-                        getOldReceiptFile(), mReceiptImagePaths.isEmpty() ? "" : mReceiptImagePaths.get(0));
+                        getOldReceiptFile(), mReceiptImagePath);
             }
 
             fragmentManager.beginTransaction()

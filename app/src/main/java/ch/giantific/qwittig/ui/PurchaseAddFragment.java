@@ -5,6 +5,7 @@ import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -15,6 +16,7 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
 
+import java.net.UnknownServiceException;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
@@ -97,15 +99,21 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
 
         if (requestCode == INTENT_REQUEST_IMAGE_CAPTURE) {
             if (resultCode == Activity.RESULT_OK) {
-                MessageUtils.showBasicSnackbar(mButtonAddRow, getString(R.string.toast_receipt_added));
+                showReceiptAddedSnackbar();
             }
         }
+    }
+
+    void showReceiptAddedSnackbar() {
+        MessageUtils.showBasicSnackbar(mButtonAddRow, getString(R.string.toast_receipt_added));
     }
 
     @Override
     public void deleteReceipt() {
         deleteTakenImages();
-        mReceiptImagePaths.clear();
+        if (USE_CUSTOM_CAMERA) {
+            mReceiptImagePaths.clear();
+        }
     }
 
     /**
@@ -133,8 +141,7 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
         if (purchaseSaveHelper == null) {
-            purchaseSaveHelper = new PurchaseSaveHelper(mPurchase,
-                    mReceiptImagePaths.isEmpty() ? "" : mReceiptImagePaths.get(0));
+            purchaseSaveHelper = new PurchaseSaveHelper(mPurchase, mReceiptImagePath);
 
             fragmentManager.beginTransaction()
                     .add(purchaseSaveHelper, PURCHASE_SAVE_HELPER)
@@ -179,7 +186,7 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
         mPurchase = new Purchase(mCurrentGroup, mDateSelected, mStoreSelected, mItems,
                 mTotalPrice, purchaseUsersInvolved, mCurrencySelected);
 
-        if (mReceiptImagePaths.isEmpty()) {
+        if (TextUtils.isEmpty(mReceiptImagePath)) {
             pinPurchaseAsDraft();
         } else {
             getReceiptDataForDraft();
@@ -188,6 +195,6 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
 
     @Override
     protected PurchaseReceiptBaseFragment getReceiptFragment() {
-        return PurchaseReceiptAddFragment.newInstance(mReceiptImagePaths.get(0));
+        return PurchaseReceiptAddFragment.newInstance(mReceiptImagePath);
     }
 }
