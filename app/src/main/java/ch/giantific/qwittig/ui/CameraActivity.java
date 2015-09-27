@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Locale;
 
 import ch.giantific.qwittig.BuildConfig;
-import ch.giantific.qwittig.CameraPreview;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.utils.MessageUtils;
 
