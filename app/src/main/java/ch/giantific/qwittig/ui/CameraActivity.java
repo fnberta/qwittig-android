@@ -272,35 +272,6 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         finish();
     }
 
-    private String joinImages() {
-        Bitmap bm1 = BitmapFactory.decodeFile(mImageFiles.get(0).getAbsolutePath());
-        Bitmap bm2 = BitmapFactory.decodeFile(mImageFiles.get(1).getAbsolutePath());
-        int bm1width = bm1.getWidth();
-        int bm2width = bm2.getWidth();
-        int bm1height = bm1.getHeight();
-
-        int width = bm1width > bm2width ? bm1width : bm2width;
-        int height = bm1height + bm2.getHeight();
-
-        Bitmap overlay = Bitmap.createBitmap(width, height, bm1.getConfig());
-        Canvas combined = new Canvas(overlay);
-        combined.drawBitmap(bm1, 0f, 0f, null);
-        combined.drawBitmap(bm2, 0f, bm1height, null);
-
-        File imageFile;
-        try {
-            imageFile = createImageFile();
-            FileOutputStream fos = new FileOutputStream(imageFile);
-            overlay.compress(Bitmap.CompressFormat.JPEG, Receipt.JPEG_COMPRESSION_RATE, fos);
-            fos.close();
-        } catch (IOException e) {
-            showErrorToast();
-            return "";
-        }
-
-        return imageFile.getAbsolutePath();
-    }
-
     @Override
     protected void onPause() {
         super.onPause();
