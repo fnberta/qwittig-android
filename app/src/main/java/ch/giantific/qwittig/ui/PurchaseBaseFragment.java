@@ -1,18 +1,30 @@
 package ch.giantific.qwittig.ui;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.CallSuper;
+import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
+import android.support.v13.app.FragmentCompat;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +37,9 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.parse.ParseConfig;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -32,6 +47,9 @@ import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.io.File;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,8 +57,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.ItemRow;
+import ch.giantific.qwittig.data.models.Receipt;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Config;
 import ch.giantific.qwittig.data.parse.models.Group;
@@ -50,6 +70,10 @@ import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.helpers.PurchaseSaveHelper;
 import ch.giantific.qwittig.helpers.RatesHelper;
 import ch.giantific.qwittig.ui.adapters.PurchaseAddUsersInvolvedRecyclerAdapter;
+import ch.giantific.qwittig.ui.dialogs.DatePickerDialogFragment;
+import ch.giantific.qwittig.ui.dialogs.ManualExchangeRateDialogFragment;
+import ch.giantific.qwittig.ui.dialogs.PurchaseUserSelectionDialogFragment;
+import ch.giantific.qwittig.ui.dialogs.StoreSelectionDialogFragment;
 import ch.giantific.qwittig.ui.listeners.SwipeDismissTouchListener;
 import ch.giantific.qwittig.ui.widgets.ListCheckBox;
 import ch.giantific.qwittig.utils.ComparatorParseUserIgnoreCase;
@@ -67,8 +91,27 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         PurchaseAddUsersInvolvedRecyclerAdapter.AdapterInteractionListener,
         LocalQuery.UserLocalQueryListener {
 
+    @IntDef({PURCHASE_SAVED, PURCHASE_SAVED_AUTO, PURCHASE_DISCARDED, PURCHASE_SAVED_AS_DRAFT,
+            PURCHASE_DRAFT_DELETED, PURCHASE_ERROR, PURCHASE_NO_CHANGES})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface PurchaseAction {}
+    public static final int PURCHASE_SAVED = 0;
+    public static final int PURCHASE_SAVED_AUTO = 1;
+    public static final int PURCHASE_DISCARDED = 2;
+    public static final int PURCHASE_SAVED_AS_DRAFT = 3;
+    public static final int PURCHASE_DRAFT_DELETED = 4;
+    public static final int PURCHASE_ERROR = 5;
+    public static final int PURCHASE_NO_CHANGES = 6;
+    public static final int RESULT_PURCHASE_SAVED = 2;
+    public static final int RESULT_PURCHASE_SAVED_AUTO = 3;
+    public static final int RESULT_PURCHASE_DRAFT = 4;
+    public static final int RESULT_PURCHASE_ERROR = 5;
+    public static final int RESULT_PURCHASE_DISCARDED = 6;
+    public static final int RESULT_PURCHASE_DRAFT_DELETED = 7;
     static final String RATES_HELPER = "rates_helper";
     static final String PURCHASE_SAVE_HELPER = "save_helper";
+    static final String PURCHASE_RECEIPT_FRAGMENT = "purchase_receipt_fragment";
+    static final int INTENT_REQUEST_IMAGE_CAPTURE = 1;
     private static final String STATE_ROW_COUNT = "row_count";
     private static final String STATE_STORE_SELECTED = "state_store_selected";
     private static final String STATE_DATE_SELECTED = "state_date_selected";
@@ -76,9 +119,11 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     private static final String STATE_CURRENCY_SELECTED = "state_currency_selected";
     private static final String STATE_IS_SAVING = "state_is_saving";
     private static final String STATE_IS_FETCHING_RATES = "state_is_fetching_rates";
+    private static final String STATE_RECEIPT_IMAGES_PATHS = "state_receipt_images_paths";
     private static final String EXCHANGE_RATE_LAST_FETCHED_TIME = "rates_last_fetched";
     private static final long EXCHANGE_RATE_REFRESH_INTERVAL = 24 * 60 * 60 * 1000;
     private static final String LOG_TAG = PurchaseBaseFragment.class.getSimpleName();
+    private static final int PERMISSIONS_REQUEST_CAPTURE_IMAGES = 1;
     FragmentInteractionListener mListener;
     Purchase mPurchase;
     Date mDateSelected;
@@ -97,6 +142,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     Button mButtonAddRow;
     List<ItemRow> mItemRows = new ArrayList<>();
     float mExchangeRate;
+    ArrayList<String> mReceiptImagePaths;
     private boolean mIsFetchingExchangeRates;
     private SharedPreferences mSharedPreferences;
     private View mViewDate;
@@ -144,10 +190,12 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
             mStoreSelected = savedInstanceState.getString(STATE_STORE_SELECTED);
             mIsSaving = savedInstanceState.getBoolean(STATE_IS_SAVING);
             mIsFetchingExchangeRates = savedInstanceState.getBoolean(STATE_IS_FETCHING_RATES);
+            mReceiptImagePaths = savedInstanceState.getStringArrayList(STATE_RECEIPT_IMAGES_PATHS);
         } else {
             mItemRowCount = 1;
             mDateSelected = new Date();
             mCurrencySelected = mCurrentGroupCurrency;
+            mReceiptImagePaths = new ArrayList<>();
         }
     }
 
@@ -162,6 +210,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         outState.putString(STATE_CURRENCY_SELECTED, mCurrencySelected);
         outState.putBoolean(STATE_IS_SAVING, mIsSaving);
         outState.putBoolean(STATE_IS_FETCHING_RATES, mIsFetchingExchangeRates);
+        outState.putStringArrayList(STATE_RECEIPT_IMAGES_PATHS, mReceiptImagePaths);
     }
 
     @Override
@@ -197,7 +246,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         mViewDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mListener.showDatePickerDialog();
+                showDatePickerDialog();
             }
         });
         mTextViewPickDate.setText(DateUtils.formatDateLong(mDateSelected));
@@ -205,7 +254,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         mViewStore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.showStorePickerDialog(mTextViewPickStore.getText().toString());
+                showStorePickerDialog(mTextViewPickStore.getText().toString());
             }
         });
 
@@ -255,7 +304,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         mTextViewExchangeRate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.showManualExchangeRateSelectorDialog(((TextView) v).getText().toString());
+                showManualExchangeRateSelectorDialog(((TextView) v).getText().toString());
             }
         });
 
@@ -264,6 +313,23 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         }
 
         setupRows();
+    }
+
+    private void showDatePickerDialog() {
+        DatePickerDialogFragment datePickerDialogFragment = new DatePickerDialogFragment();
+        datePickerDialogFragment.show(getFragmentManager(), "date_picker");
+    }
+
+    private void showStorePickerDialog(String defaultStore) {
+        StoreSelectionDialogFragment storeSelectionDialogFragment = StoreSelectionDialogFragment
+                .newInstance(defaultStore);
+        storeSelectionDialogFragment.show(getFragmentManager(), "store_selector");
+    }
+
+    private void showManualExchangeRateSelectorDialog(String exchangeRate) {
+        ManualExchangeRateDialogFragment manualExchangeRateDialogFragment =
+                ManualExchangeRateDialogFragment.newInstance(exchangeRate);
+        manualExchangeRateDialogFragment.show(getFragmentManager(), "manual_exchange_rate");
     }
 
     void revealFab() {
@@ -500,7 +566,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
                 mSelectedItemPosition = Utils.getViewPositionFromTag(v);
 
                 boolean[] usersChecked = cb.getUsersChecked();
-                mListener.showUserPickerDialog(mUsersAvailableNicknames, usersChecked);
+                showUserPickerDialog(mUsersAvailableNicknames, usersChecked);
 
                 return true;
             }
@@ -544,6 +610,12 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         mItemRows.add(itemRow);
 
         return itemRow;
+    }
+
+    private void showUserPickerDialog(CharSequence[] usersAvailable, boolean[] usersChecked) {
+        PurchaseUserSelectionDialogFragment purchaseUserSelectionDialogFragment =
+                PurchaseUserSelectionDialogFragment.newInstance(usersAvailable, usersChecked);
+        purchaseUserSelectionDialogFragment.show(getFragmentManager(), "user_picker");
     }
 
     /**
@@ -816,6 +888,138 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         }
     }
 
+    public void captureImage() {
+        if (!hasCameraHardware()) {
+            MessageUtils.showBasicSnackbar(mButtonAddRow, getString(R.string.toast_no_camera));
+            return;
+        }
+
+        if (permissionsAreGranted()) {
+            getImage();
+        }
+    }
+
+    private boolean hasCameraHardware() {
+        return getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
+    }
+
+    private boolean permissionsAreGranted() {
+        Activity activity = getActivity();
+        int hasExternalStoragePerm = ContextCompat.checkSelfPermission(activity,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int hasCameraPerm = ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
+        List<String> permissions = new ArrayList<>();
+
+        if (hasExternalStoragePerm != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+
+        if (hasCameraPerm != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.CAMERA);
+        }
+
+        if (!permissions.isEmpty()) {
+            FragmentCompat.requestPermissions(this,
+                    permissions.toArray(new String[permissions.size()]),
+                    PERMISSIONS_REQUEST_CAPTURE_IMAGES);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_CAPTURE_IMAGES:
+                if (Utils.verifyPermissions(grantResults)) {
+                    getImage();
+                } else {
+                    Snackbar snackbar = MessageUtils.getBasicSnackbar(mButtonAddRow,
+                            getString(R.string.snackbar_permission_storage_denied));
+                    snackbar.setAction(R.string.snackbar_action_open_settings, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            startSystemSettings();
+                        }
+                    });
+                }
+
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    private void getImage() {
+        Intent intent = new Intent(getActivity(), CameraActivity.class);
+        startActivityForResult(intent, INTENT_REQUEST_IMAGE_CAPTURE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case INTENT_REQUEST_IMAGE_CAPTURE:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        mListener.updateActionBarMenu(true);
+
+                        List<String> paths = data.getStringArrayListExtra(CameraActivity.INTENT_EXTRA_PATHS);
+                        setReceiptImagePaths(paths);
+                        break;
+                }
+                break;
+        }
+    }
+
+    private void startSystemSettings() {
+        Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.setData(Uri.parse("package:" + getActivity().getPackageName()));
+        startActivity(intent);
+    }
+
+    public void setReceiptImagePaths(List<String> receiptImagePaths) {
+        mReceiptImagePaths.clear();
+
+        if (!receiptImagePaths.isEmpty()) {
+            for (String path : receiptImagePaths) {
+                mReceiptImagePaths.add(path);
+            }
+        }
+
+        updateReceiptFragment(mReceiptImagePaths.get(0));
+    }
+
+    private void updateReceiptFragment(String imagePath) {
+        PurchaseReceiptBaseFragment receiptFragment =
+                (PurchaseReceiptAddFragment) getFragmentManager()
+                        .findFragmentByTag(PurchaseBaseFragment.PURCHASE_RECEIPT_FRAGMENT);
+
+        if (receiptFragment != null) {
+            receiptFragment.setImage(imagePath);
+        }
+    }
+
+    public void showReceiptFragment() {
+        FragmentManager fragmentManager = getFragmentManager();
+        PurchaseReceiptBaseFragment receiptFragment = getReceiptFragment();
+        fragmentManager.beginTransaction()
+                .replace(R.id.container, receiptFragment, PURCHASE_RECEIPT_FRAGMENT)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    protected abstract PurchaseReceiptBaseFragment getReceiptFragment();
+
+    public abstract void deleteReceipt();
+
     /**
      * Gets called from the activity when the "save" action item is clicked. Initiates the save of
      * the purchase.
@@ -925,12 +1129,13 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      */
     public void onPurchaseSaveAndPinSucceeded() {
         mIsSaving = false;
-        mListener.setResultForSnackbar(getPurchaseSavedAction());
+        setResultForSnackbar(getPurchaseSavedAction());
         mListener.progressCircleStartFinal();
     }
 
+    @PurchaseAction
     int getPurchaseSavedAction() {
-        return PurchaseBaseActivity.PURCHASE_SAVED;
+        return PURCHASE_SAVED;
     }
 
     /**
@@ -961,12 +1166,25 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      */
     protected abstract void savePurchaseAsDraft();
 
+    final void getReceiptDataForDraft() {
+        Glide.with(this).load(mReceiptImagePaths.get(0))
+                .asBitmap()
+                .toBytes(Bitmap.CompressFormat.JPEG, Receipt.JPEG_COMPRESSION_RATE)
+                .centerCrop()
+                .into(new SimpleTarget<byte[]>(Receipt.WIDTH, Receipt.HEIGHT) {
+                    @Override
+                    public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
+                        mPurchase.setReceiptData(resource);
+                        pinPurchaseAsDraft();
+                    }
+                });
+    }
+
     /**
      * Sets new random draft id if not already set and swaps parsefile to bytearray.
      */
     final void pinPurchaseAsDraft() {
         mPurchase.setRandomDraftId();
-        mPurchase.swapReceiptParseFileToData();
         mPurchase.pinInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
@@ -981,8 +1199,55 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     private void onPinAsDraftSucceeded() {
-        mListener.setResultForSnackbar(PurchaseBaseActivity.PURCHASE_SAVED_AS_DRAFT);
-        mListener.finishPurchase();
+        setResultForSnackbar(PURCHASE_SAVED_AS_DRAFT);
+        finishPurchase();
+    }
+
+    public void discard() {
+        setResultForSnackbar(PURCHASE_DISCARDED);
+        finishPurchase();
+    }
+
+    final void setResultForSnackbar(@PurchaseAction int purchaseAction) {
+        switch (purchaseAction) {
+            case PURCHASE_SAVED:
+                getActivity().setResult(RESULT_PURCHASE_SAVED);
+                break;
+            case PURCHASE_SAVED_AUTO:
+                getActivity().setResult(RESULT_PURCHASE_SAVED_AUTO);
+                break;
+            case PURCHASE_DISCARDED:
+                getActivity().setResult(RESULT_PURCHASE_DISCARDED);
+                break;
+            case PURCHASE_SAVED_AS_DRAFT:
+                getActivity().setResult(RESULT_PURCHASE_DRAFT);
+                break;
+            case PURCHASE_DRAFT_DELETED:
+                getActivity().setResult(RESULT_PURCHASE_DRAFT_DELETED);
+                break;
+            case PURCHASE_ERROR:
+                getActivity().setResult(RESULT_PURCHASE_ERROR);
+                break;
+            case PURCHASE_NO_CHANGES:
+                getActivity().setResult(Activity.RESULT_CANCELED);
+                break;
+        }
+    }
+
+    final void finishPurchase() {
+        ActivityCompat.finishAfterTransition(getActivity());
+        deleteTakenImages();
+    }
+
+    final void deleteTakenImages() {
+        if (!mReceiptImagePaths.isEmpty()) {
+            for (String path : mReceiptImagePaths) {
+                boolean fileDeleted = new File(path).delete();
+                if (!fileDeleted && BuildConfig.DEBUG) {
+                    Log.e(LOG_TAG, "failed to delete file");
+                }
+            }
+        }
     }
 
     /**
@@ -1010,30 +1275,10 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         mListener = null;
     }
 
-    public interface FragmentInteractionListener {
-        void showManualExchangeRateSelectorDialog(String exchangeRate);
-
-        void showDatePickerDialog();
-
-        void showUserPickerDialog(CharSequence[] usersAvailable, boolean[] usersChecked);
-
-        void showStorePickerDialog(String defaultStore);
-
-        void showAccountCreateDialog();
-
-        ParseFile getReceiptParseFile();
-
-        void setReceiptParseFile(ParseFile receiptParseFile);
-
-        void setResultForSnackbar(@PurchaseBaseActivity.PurchaseAction int purchaseAction);
-
-        void finishPurchase();
+    public interface FragmentInteractionListener extends BaseFragmentInteractionListener {
+        void updateActionBarMenu(boolean hasReceiptFile);
 
         void showFab(boolean isSaving);
-
-        void showReceiptFragment();
-
-        void captureImage();
 
         void progressCircleShow();
 
@@ -1041,5 +1286,4 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
 
         void progressCircleHide();
     }
-
 }

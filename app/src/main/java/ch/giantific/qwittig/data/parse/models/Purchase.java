@@ -263,17 +263,13 @@ public class Purchase extends ParseObject {
         remove(RECEIPT);
     }
 
-    public void swapReceiptParseFileToData() {
-        ParseFile receiptFile = getReceiptParseFile();
-        if (receiptFile != null) {
-            try {
-                byte[] receiptData = receiptFile.getData();
-                put(RECEIPT_BYTE, receiptData);
-                removeReceiptParseFile();
-            } catch (ParseException e) {
-                // TODO: do we need to handle this?
-            }
-        }
+    public void swapReceiptParseFileToData(byte[] bytes) {
+        put(RECEIPT_BYTE, bytes);
+        removeReceiptParseFile();
+    }
+
+    public void setReceiptData(byte[] bytes) {
+        put(RECEIPT_BYTE, bytes);
     }
 
     public byte[] getReceiptData() {

@@ -1,6 +1,8 @@
 package ch.giantific.qwittig.ui;
 
+import android.app.Activity;
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.view.Menu;
@@ -8,6 +10,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.parse.GetDataCallback;
+import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
 
@@ -87,6 +91,23 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
         }
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == INTENT_REQUEST_IMAGE_CAPTURE) {
+            if (resultCode == Activity.RESULT_OK) {
+                MessageUtils.showBasicSnackbar(mButtonAddRow, getString(R.string.toast_receipt_added));
+            }
+        }
+    }
+
+    @Override
+    public void deleteReceipt() {
+        deleteTakenImages();
+        mReceiptImagePaths.clear();
+    }
+
     /**
      * Creates a new purchase Object, with or without a receipt photo and saves it to Parse and
      * pins it to local datastore. If there is no connection, it will only pin it to the local
@@ -101,19 +122,19 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
         List<ParseUser> purchaseUsersInvolved = getParseUsersInvolvedFromBoolean(mPurchaseUsersInvolved);
         mPurchase = new Purchase(mCurrentGroup, mDateSelected, mStoreSelected,
                 mItems, mTotalPrice, purchaseUsersInvolved, mCurrencySelected, mExchangeRate);
-        ParseFile receiptFile = mListener.getReceiptParseFile();
 
-        savePurchaseWithHelper(receiptFile);
+        savePurchaseWithHelper();
     }
 
-    private void savePurchaseWithHelper(ParseFile receiptFile) {
+    private void savePurchaseWithHelper() {
         FragmentManager fragmentManager = getFragmentManager();
         PurchaseSaveHelper purchaseSaveHelper = findPurchaseSaveHelper(fragmentManager);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
         if (purchaseSaveHelper == null) {
-            purchaseSaveHelper = new PurchaseSaveHelper(receiptFile, mPurchase);
+            purchaseSaveHelper = new PurchaseSaveHelper(mPurchase,
+                    mReceiptImagePaths.isEmpty() ? "" : mReceiptImagePaths.get(0));
 
             fragmentManager.beginTransaction()
                     .add(purchaseSaveHelper, PURCHASE_SAVE_HELPER)
@@ -128,7 +149,18 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
             @Override
             public void onClick(View v) {
                 if (mPurchase != null) {
-                    pinPurchaseAsDraft();
+                    ParseFile receipt = mPurchase.getReceiptParseFile();
+                    if (receipt != null) {
+                        receipt.getDataInBackground(new GetDataCallback() {
+                            @Override
+                            public void done(byte[] data, ParseException e) {
+                                mPurchase.swapReceiptParseFileToData(data);
+                                pinPurchaseAsDraft();
+                            }
+                        });
+                    } else {
+                        pinPurchaseAsDraft();
+                    }
                 } else {
                     // if we failed fast because of no network, purchase will not yet be created
                     savePurchaseAsDraft();
@@ -147,11 +179,15 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
         mPurchase = new Purchase(mCurrentGroup, mDateSelected, mStoreSelected, mItems,
                 mTotalPrice, purchaseUsersInvolved, mCurrencySelected);
 
-        ParseFile receiptFile = mListener.getReceiptParseFile();
-        if (receiptFile != null) {
-            mPurchase.setReceiptParseFile(receiptFile);
+        if (mReceiptImagePaths.isEmpty()) {
+            pinPurchaseAsDraft();
+        } else {
+            getReceiptDataForDraft();
         }
+    }
 
-        pinPurchaseAsDraft();
+    @Override
+    protected PurchaseReceiptBaseFragment getReceiptFragment() {
+        return PurchaseReceiptAddFragment.newInstance(mReceiptImagePaths.get(0));
     }
 }

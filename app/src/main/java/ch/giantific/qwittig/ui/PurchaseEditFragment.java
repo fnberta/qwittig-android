@@ -1,6 +1,8 @@
 package ch.giantific.qwittig.ui;
 
+import android.app.Activity;
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.parse.ParseFile;
@@ -12,12 +14,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.ItemRow;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Item;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.helpers.PurchaseEditSaveHelper;
+import ch.giantific.qwittig.ui.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.utils.DateUtils;
+import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 
 /**
@@ -35,7 +40,6 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     private static final String STATE_OLD_EXCHANGE_RATE = "old_exchange_rate";
     private static final String LOG_TAG = PurchaseEditFragment.class.getSimpleName();
     String mEditPurchaseId;
-    ParseFile mReceiptFileOld;
     private boolean mOldValuesAreSet;
     private List<ParseObject> mOldItems;
     private ArrayList<String> mOldItemIds;
@@ -43,6 +47,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     private Date mOldDate;
     private String mOldCurrency;
     private float mOldExchangeRate;
+    private boolean mDeleteOldReceipt;
 
     public PurchaseEditFragment() {
     }
@@ -115,8 +120,6 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     void processOldPurchase(ParseObject parseObject) {
         mPurchase = (Purchase) parseObject;
 
-        checkForReceiptFile();
-
         if (!mOldValuesAreSet) {
             // get old items and save in class wide list
             mOldItems = mPurchase.getItems();
@@ -126,6 +129,9 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
 
             // call here because we need mPurchase and mOldItems to be set
             fetchUsersAvailable();
+
+            // check if there is a receipt image file and update action bar menu accordingly
+            mListener.updateActionBarMenu(getOldReceiptFile() != null);
 
             // set store to value from original purchase
             mOldStore = mPurchase.getStore();
@@ -154,12 +160,8 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
         }
     }
 
-    void checkForReceiptFile() {
-        mReceiptFileOld = mPurchase.getReceiptParseFile();
-        if (mReceiptFileOld != null && mListener.getReceiptParseFile() == null) {
-            mListener.setReceiptParseFile(mReceiptFileOld);
-            getActivity().invalidateOptionsMenu();
-        }
+    ParseFile getOldReceiptFile() {
+        return mPurchase.getReceiptParseFile();
     }
 
     @Override
@@ -235,6 +237,28 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == INTENT_REQUEST_IMAGE_CAPTURE) {
+            if (resultCode == Activity.RESULT_OK) {
+                String message;
+                if (getOldReceiptFile() != null) {
+                    message = getString(R.string.toast_receipt_changed);
+                } else {
+                    message = getString(R.string.toast_receipt_added);
+                }
+                MessageUtils.showBasicSnackbar(mButtonAddRow, message);
+            }
+        }
+    }
+
+    @Override
+    public void deleteReceipt() {
+        mDeleteOldReceipt = true;
+    }
+
+    @Override
     protected void setPurchase() {
         replacePurchaseData();
         resetReadBy();
@@ -260,8 +284,6 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     }
 
     private void savePurchaseWithHelper() {
-        ParseFile receiptParseFileNew = mListener.getReceiptParseFile();
-
         FragmentManager fragmentManager = getFragmentManager();
         PurchaseEditSaveHelper purchaseEditSaveHelper = (PurchaseEditSaveHelper)
                 fragmentManager.findFragmentByTag(PURCHASE_SAVE_HELPER);
@@ -269,7 +291,12 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
         if (purchaseEditSaveHelper == null) {
-            purchaseEditSaveHelper = new PurchaseEditSaveHelper(mReceiptFileOld, receiptParseFileNew, mPurchase, isDraft());
+            if (mDeleteOldReceipt) {
+                purchaseEditSaveHelper = new PurchaseEditSaveHelper(mPurchase, isDraft(), getOldReceiptFile());
+            } else {
+                purchaseEditSaveHelper = new PurchaseEditSaveHelper(mPurchase, isDraft(),
+                        getOldReceiptFile(), mReceiptImagePaths.isEmpty() ? "" : mReceiptImagePaths.get(0));
+            }
 
             fragmentManager.beginTransaction()
                     .add(purchaseEditSaveHelper, PURCHASE_SAVE_HELPER)
@@ -296,6 +323,21 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
             ParseObject item = ParseObject.createWithoutData(Item.CLASS, itemId);
             item.deleteEventually();
         }
+    }
+
+    public void checkForChangesAndExit() {
+        if (changesWereMade()) {
+            showDiscardChangesDialog();
+        } else {
+            setResultForSnackbar(PURCHASE_NO_CHANGES);
+            finishPurchase();
+        }
+    }
+
+    private void showDiscardChangesDialog() {
+        DiscardChangesDialogFragment discardChangesDialogFragment =
+                new DiscardChangesDialogFragment();
+        discardChangesDialogFragment.show(getFragmentManager(), "discard_changes");
     }
 
     public boolean changesWereMade() {
@@ -335,11 +377,11 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
             }
         }
 
-        ParseFile receiptNew = mListener.getReceiptParseFile();
-        if (receiptNew == null && mReceiptFileOld != null ||
-                receiptNew != null && !receiptNew.equals(mReceiptFileOld)) {
-            return true;
-        }
+        // TODO: fix
+//        if (receiptNew == null && mReceiptFileOld != null ||
+//                receiptNew != null && !receiptNew.equals(mReceiptFileOld)) {
+//            return true;
+//        }
 
         return false;
     }
@@ -361,5 +403,10 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     @Override
     protected void savePurchaseAsDraft() {
         // is never called here, only in EditDraftFragment
+    }
+
+    @Override
+    protected PurchaseReceiptBaseFragment getReceiptFragment() {
+        return PurchaseReceiptEditFragment.newInstance(mPurchase.getObjectId(), isDraft());
     }
 }

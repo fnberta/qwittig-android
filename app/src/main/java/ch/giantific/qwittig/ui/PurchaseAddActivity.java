@@ -1,7 +1,5 @@
 package ch.giantific.qwittig.ui;
 
-import android.app.FragmentManager;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -9,8 +7,6 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.ocr.models.PurchaseRest;
 import ch.giantific.qwittig.helpers.OcrHelper;
 import ch.giantific.qwittig.ui.dialogs.PurchaseDiscardDialogFragment;
-import ch.giantific.qwittig.utils.MessageUtils;
-import ch.giantific.qwittig.utils.Utils;
 
 
 public class PurchaseAddActivity extends PurchaseBaseActivity implements
@@ -19,89 +15,35 @@ public class PurchaseAddActivity extends PurchaseBaseActivity implements
 
     public static final String INTENT_PURCHASE_NEW_AUTO = "purchase_new_auto";
     public static final String INTENT_PURCHASE_NEW_TRIAL_MODE = "purchase_new_trial_mode";
-    private static final String PURCHASE_ADD_FRAGMENT = "purchase_add_fragment";
-    private static final String OCR_HELPER = "ocr_helper";
     private static final String LOG_TAG = PurchaseAddActivity.class.getSimpleName();
-    private boolean mInAutoMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // if in autoMode, start Camera Activity via intent
-        mInAutoMode = getIntent().getBooleanExtra(INTENT_PURCHASE_NEW_AUTO, false);
+        boolean inAutoMode = getIntent().getBooleanExtra(INTENT_PURCHASE_NEW_AUTO, false);
         boolean inTrialMode = getIntent().getBooleanExtra(INTENT_PURCHASE_NEW_TRIAL_MODE, false);
 
         if (savedInstanceState == null) {
-            PurchaseBaseFragment fragment;
-            if (mInAutoMode) {
-                captureImage();
-                fragment = PurchaseAddAutoFragment.newInstance(inTrialMode);
-            } else {
-                fragment = new PurchaseAddFragment();
-            }
+            PurchaseBaseFragment fragment = inAutoMode ?
+                    PurchaseAddAutoFragment.newInstance(inTrialMode) :
+                    new PurchaseAddFragment();
 
             getFragmentManager().beginTransaction()
-                    .add(R.id.container, fragment, PURCHASE_ADD_FRAGMENT)
-                    .commit();
-        }
-    }
-
-    @Override
-    public void findPurchaseFragment() {
-        mPurchaseFragment = (PurchaseAddFragment) getFragmentManager()
-                .findFragmentByTag(PURCHASE_ADD_FRAGMENT);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == INTENT_REQUEST_IMAGE_CAPTURE) {
-            if (resultCode == RESULT_OK) {
-                if (mInAutoMode) {
-                    doReceiptOcrWithHelper();
-                } else {
-                    MessageUtils.showBasicSnackbar(mFabPurchaseSave, getString(R.string.toast_receipt_added));
-                }
-            } else if (resultCode == RESULT_CANCELED) {
-                if (mInAutoMode) {
-                    finish();
-                }
-            }
-        }
-    }
-
-    private void doReceiptOcrWithHelper() {
-        if (!Utils.isConnected(this)) {
-            onOcrFailed(getString(R.string.toast_no_connection));
-            return;
-        }
-
-        FragmentManager fragmentManager = getFragmentManager();
-        OcrHelper ocrHelper = (OcrHelper) fragmentManager.findFragmentByTag(OCR_HELPER);
-
-        // If the Fragment is non-null, then it is currently being
-        // retained across a configuration change.
-        if (ocrHelper == null) {
-            ocrHelper = OcrHelper.newInstance(mReceiptFilePaths.get(0));
-
-            fragmentManager.beginTransaction()
-                    .add(ocrHelper, OCR_HELPER)
+                    .add(R.id.container, fragment, PURCHASE_FRAGMENT)
                     .commit();
         }
     }
 
     @Override
     public void onOcrSuccessful(PurchaseRest purchaseRest) {
-        ((PurchaseAddAutoFragment) mPurchaseFragment).setValuesFromOcr(purchaseRest);
+        ((PurchaseAddAutoFragment) mPurchaseFragment).onOcrSuccessful(purchaseRest);
         showFab();
     }
 
     @Override
     public void onOcrFailed(String errorMessage) {
-        MessageUtils.showBasicSnackbar(mToolbar, errorMessage);
-        ((PurchaseAddAutoFragment) mPurchaseFragment).showMainScreen();
+        ((PurchaseAddAutoFragment) mPurchaseFragment).onOcrFailed(errorMessage);
         showFab();
     }
 
@@ -130,8 +72,7 @@ public class PurchaseAddActivity extends PurchaseBaseActivity implements
 
     @Override
     public void discardPurchase() {
-        setResultForSnackbar(PURCHASE_DISCARDED);
-        finishPurchase();
+        mPurchaseFragment.discard();
     }
 
     @Override

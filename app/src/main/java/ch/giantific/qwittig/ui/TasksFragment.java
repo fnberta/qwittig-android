@@ -474,7 +474,6 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
         mListener = null;
     }
 
-    public interface FragmentInteractionListener {
-        void showAccountCreateDialog();
+    public interface FragmentInteractionListener extends BaseFragmentInteractionListener {
     }
 }

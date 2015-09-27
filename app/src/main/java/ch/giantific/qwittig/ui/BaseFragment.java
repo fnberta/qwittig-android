@@ -7,5 +7,7 @@ import android.app.Fragment;
  */
 public abstract class BaseFragment extends Fragment {
 
-    // placeholder
+    public interface BaseFragmentInteractionListener {
+        void showAccountCreateDialog();
+    }
 }

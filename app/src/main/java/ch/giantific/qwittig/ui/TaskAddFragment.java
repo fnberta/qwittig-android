@@ -416,9 +416,7 @@ public class TaskAddFragment extends BaseFragment implements
         mListener = null;
     }
 
-    public interface FragmentInteractionListener {
-        void showAccountCreateDialog();
-
+    public interface FragmentInteractionListener extends BaseFragmentInteractionListener {
         String getTaskTitle();
 
         void setTaskTitle(String title);

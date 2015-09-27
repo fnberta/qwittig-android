@@ -260,7 +260,7 @@ public class TaskDetailsFragment extends BaseFragment implements
 
             finish(TaskDetailsActivity.RESULT_TASK_DELETED);
         } else {
-            showAccountCreateDialog();
+            mListener.showAccountCreateDialog();
         }
     }
 
@@ -268,12 +268,6 @@ public class TaskDetailsFragment extends BaseFragment implements
         Activity activity = getActivity();
         activity.setResult(result);
         activity.finish();
-    }
-
-    private void showAccountCreateDialog() {
-        AccountCreateDialogFragment accountCreateDialogFragment =
-                new AccountCreateDialogFragment();
-        accountCreateDialogFragment.show(getFragmentManager(), "account_create");
     }
 
     public void editTask() {
@@ -329,7 +323,7 @@ public class TaskDetailsFragment extends BaseFragment implements
         mListener = null;
     }
 
-    public interface FragmentInteractionListener {
+    public interface FragmentInteractionListener extends BaseFragmentInteractionListener {
         void setToolbarHeader(String title, String timeFrame, SpannableStringBuilder usersInvolved,
                               boolean currentUserIsResponsible);
 

@@ -23,35 +23,41 @@ public class PurchaseEditSaveHelper extends PurchaseSaveHelper {
     private static final String LOG_TAG = PurchaseEditSaveHelper.class.getSimpleName();
     private ParseFile mReceiptParseFileOld;
     private boolean mIsDraft;
+    private boolean mDeleteOldReceipt;
 
     public PurchaseEditSaveHelper() {
         // empty default constructor
     }
 
     @SuppressLint("ValidFragment")
-    public PurchaseEditSaveHelper(ParseFile receiptParseFileOld, ParseFile receiptParseFileNew,
-                                  Purchase purchase, boolean isDraft) {
-        super(receiptParseFileNew, purchase);
+    public PurchaseEditSaveHelper(Purchase purchase, boolean isDraft, ParseFile receiptParseFileOld) {
+        this(purchase, isDraft, receiptParseFileOld, "");
+
+        mDeleteOldReceipt = true;
+    }
+
+    @SuppressLint("ValidFragment")
+    public PurchaseEditSaveHelper(Purchase purchase, boolean isDraft, ParseFile receiptParseFileOld,
+                                  String receiptNewPath) {
+        super(purchase, receiptNewPath);
         
         mReceiptParseFileOld = receiptParseFileOld;
         mIsDraft = isDraft;
     }
 
     @Override
-    void checkIfReceiptNull() {
-        if (mReceiptParseFile != null) {
+    void checkReceiptImage() {
+        if (!TextUtils.isEmpty(mReceiptPath)) {
             if (mReceiptParseFileOld != null) {
                 deleteOldReceiptFile();
             } else {
                 saveReceiptFile();
             }
+        } else if (mDeleteOldReceipt && mReceiptParseFileOld != null) {
+            deleteOldReceiptFile();
+            mPurchase.removeReceiptParseFile();
         } else {
-            if (mReceiptParseFileOld != null) {
-                deleteOldReceiptFile();
-                mPurchase.removeReceiptParseFile();
-            } else {
-                savePurchase();
-            }
+            savePurchase();
         }
     }
 
@@ -81,7 +87,7 @@ public class PurchaseEditSaveHelper extends PurchaseSaveHelper {
     }
 
     private void onOldReceiptParseFileDeleted() {
-        super.checkIfReceiptNull();
+        super.checkReceiptImage();
     }
 
     @Override

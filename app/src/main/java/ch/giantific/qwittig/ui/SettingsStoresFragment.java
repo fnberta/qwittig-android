@@ -34,7 +34,7 @@ import ch.giantific.qwittig.utils.ParseUtils;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class SettingsStoresFragment extends Fragment {
+public class SettingsStoresFragment extends BaseFragment {
 
     private FragmentInteractionListener mListener;
     private StoresAdapter mStoresAdapter;
@@ -255,9 +255,7 @@ public class SettingsStoresFragment extends Fragment {
         mListener = null;
     }
 
-    public interface FragmentInteractionListener {
+    public interface FragmentInteractionListener extends BaseFragmentInteractionListener {
         void toggleFabVisibility();
-
-        void showAccountCreateDialog();
     }
 }

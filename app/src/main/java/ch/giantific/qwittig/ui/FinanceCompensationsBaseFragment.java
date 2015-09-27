@@ -104,7 +104,6 @@ public abstract class FinanceCompensationsBaseFragment extends BaseRecyclerViewF
         mListener = null;
     }
 
-    public interface FragmentInteractionListener {
-        void showAccountCreateDialog();
+    public interface FragmentInteractionListener extends BaseFragmentInteractionListener {
     }
 }
