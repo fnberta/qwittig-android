@@ -8,39 +8,39 @@
         <item
             android:id="@+id/nav_home"
             android:checked="true"
-            android:icon="@drawable/ic_local_grocery_store_black_24dp"
+            android:icon="@drawable/ic_nav_shopping_cart"
             android:title="@string/title_activity_home"
             />
         <item
             android:id="@+id/nav_finance"
-            android:icon="@drawable/ic_attach_money_black_24dp"
+            android:icon="@drawable/ic_nav_attach_money"
             android:title="@string/title_activity_finance"
             />
         <item
             android:id="@+id/nav_tasks"
-            android:icon="@drawable/ic_assignment_black_24dp"
+            android:icon="@drawable/ic_nav_assignment"
             android:title="@string/title_activity_tasks"
             />
         <item
             android:id="@+id/nav_stats"
-            android:icon="@drawable/ic_assessment_black_24dp"
+            android:icon="@drawable/ic_nav_assessment"
             android:title="@string/title_activity_stats"
             />
     </group>
 
     <item
         android:id="@+id/nav_settings"
-        android:icon="@drawable/ic_settings_black_24dp"
+        android:icon="@drawable/ic_nav_settings"
         android:title="@string/title_activity_settings"
         />
     <item
         android:id="@+id/nav_help_feedback"
-        android:icon="@drawable/ic_help_black_24dp"
+        android:icon="@drawable/ic_nav_help"
         android:title="@string/title_activity_help_feedback"
         />
     <item
         android:id="@+id/nav_go_premium"
-        android:icon="@drawable/ic_flight_takeoff_black_24dp"
+        android:icon="@drawable/ic_nav_star"
         android:title="@string/go_premium"
         android:visible="false"
         />

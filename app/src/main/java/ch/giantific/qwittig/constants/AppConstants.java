@@ -8,7 +8,5 @@ public class AppConstants {
     public static final float DISABLED_ALPHA = 0.26f;
     public static final int DISABLED_ALPHA_RGB = 66;
 
-    public static final int ICON_BLACK_ALPHA_RGB = 138;
-
     public static final long FAB_CIRCULAR_REVEAL_DELAY = 50;
 }

@@ -152,8 +152,6 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     String mReceiptImagePath;
     private boolean mIsFetchingExchangeRates;
     private SharedPreferences mSharedPreferences;
-    private View mViewDate;
-    private View mViewStore;
     private TextView mTextViewPickDate;
     private Spinner mSpinnerCurrency;
     private TextView mTextViewExchangeRateDesc;
@@ -239,9 +237,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
 
     @CallSuper
     void findViews(View rootView) {
-        mViewDate = rootView.findViewById(R.id.ll_date);
         mTextViewPickDate = (TextView) rootView.findViewById(R.id.tv_date);
-        mViewStore = rootView.findViewById(R.id.ll_store);
         mTextViewPickStore = (TextView) rootView.findViewById(R.id.tv_store);
         mLayoutTotalItemRow = (LinearLayout) rootView.findViewById(R.id.ll_items);
         mButtonAddRow = (Button) rootView.findViewById(R.id.bt_item_add);
@@ -258,7 +254,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mViewDate.setOnClickListener(new View.OnClickListener() {
+        mTextViewPickDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showDatePickerDialog();
@@ -266,7 +262,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         });
         mTextViewPickDate.setText(DateUtils.formatDateLong(mDateSelected));
 
-        mViewStore.setOnClickListener(new View.OnClickListener() {
+        mTextViewPickStore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showStorePickerDialog(mTextViewPickStore.getText().toString());

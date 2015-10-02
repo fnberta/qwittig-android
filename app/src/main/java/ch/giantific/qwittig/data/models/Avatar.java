@@ -31,8 +31,7 @@ public class Avatar {
     }
 
     public static Drawable getFallbackDrawableRect(Context context, boolean withRipple) {
-        Drawable avatar = ContextCompat.getDrawable(context, R.drawable.ic_account_box_black_120dp);
-        avatar.setAlpha(AppConstants.ICON_BLACK_ALPHA_RGB);
+        Drawable avatar = ContextCompat.getDrawable(context, R.drawable.ic_account_box_black_144dp);
 
         return withRipple && Utils.isRunningLollipopAndHigher() ?
                 createRippleDrawable(context, avatar) : avatar;
@@ -43,7 +42,6 @@ public class Avatar {
         int drawableId = getBigSize ? R.drawable.ic_account_circle_black_80dp :
                 R.drawable.ic_account_circle_black_40dp;
         Drawable avatar = ContextCompat.getDrawable(context, drawableId);
-        avatar.setAlpha(AppConstants.ICON_BLACK_ALPHA_RGB);
 
         return withRipple && Utils.isRunningLollipopAndHigher() ?
                 createRippleDrawable(context, avatar) : avatar;

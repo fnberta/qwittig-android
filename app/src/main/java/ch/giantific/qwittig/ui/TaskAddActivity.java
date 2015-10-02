@@ -49,7 +49,7 @@ public class TaskAddActivity extends BaseActivity implements
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setTitle(null);
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_clear_white_24dp);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white_24dp);
         }
 
         mTextInputLayoutTitle = (TextInputLayout) findViewById(R.id.til_task_add_title);

@@ -62,7 +62,7 @@ public class SettingsProfileActivity extends BaseActivity implements
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_clear_white_24dp);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white_24dp);
         }
 
         mImageViewAvatar = (ImageView) findViewById(R.id.iv_avatar);

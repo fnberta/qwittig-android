@@ -569,7 +569,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 PendingIntent pAcceptContentIntent = PendingIntent.getBroadcast(context,
                         acceptContentIntentRequestCode, acceptContentIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT);
-                builder.addAction(R.drawable.ic_check_black_24dp,
+                builder.addAction(R.drawable.ic_done_black_24dp,
                         context.getString(R.string.push_action_confirm), pAcceptContentIntent);
                 break;
             }
@@ -632,7 +632,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 PendingIntent pAcceptContentIntent = PendingIntent.getBroadcast(context,
                         acceptContentIntentRequestCode, acceptContentIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT);
-                builder.addAction(R.drawable.ic_check_black_24dp,
+                builder.addAction(R.drawable.ic_done_black_24dp,
                         context.getString(R.string.push_action_finished), pAcceptContentIntent);
                 break;
             }
@@ -652,7 +652,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 PendingIntent pAcceptContentIntent = PendingIntent.getBroadcast(context,
                         acceptContentIntentRequestCode, acceptContentIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT);
-                builder.addAction(R.drawable.ic_check_black_24dp,
+                builder.addAction(R.drawable.ic_done_black_24dp,
                         context.getString(R.string.dialog_positive_join), pAcceptContentIntent);
 
                 Intent discardContentIntent = new Intent(ACTION_PUSH_BUTTON_DISCARD);

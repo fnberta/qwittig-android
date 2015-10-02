@@ -13,7 +13,7 @@
         android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
         android:contentDescription="@string/hint_users"
         android:src="@drawable/ic_group_black_24dp"
-        android:alpha="@dimen/icon_black_alpha"/>
+        />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_users_involved"
