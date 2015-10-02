@@ -1297,7 +1297,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
                     }
                 }
             }
-        } else {
+        } else if (!TextUtils.isEmpty(mReceiptImagePath)) {
             boolean fileDeleted = new File(mReceiptImagePath).delete();
             if (!fileDeleted && BuildConfig.DEBUG) {
                 Log.e(LOG_TAG, "failed to delete file");
