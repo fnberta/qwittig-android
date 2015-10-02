@@ -15,7 +15,7 @@
         android:layout_gravity="center"
         android:drawablePadding="@dimen/small_space"
         android:visibility="gone"
-        android:drawableTop="@drawable/ic_people_black_144dp"
+        android:drawableTop="@drawable/ic_group_black_144dp"
         android:text="@string/no_users"
         tools:visibility="visible"/>
 

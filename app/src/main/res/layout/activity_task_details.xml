@@ -88,7 +88,7 @@
             android:layout_gravity="end"
             android:layout_marginEnd="@dimen/key_line_1"
             android:layout_marginTop="@dimen/fab_margin_toolbar_x4"
-            android:src="@drawable/ic_check_black_24dp"
+            android:src="@drawable/ic_done_black_24dp"
             android:visibility="gone"
             tools:visibility="visible"
             />

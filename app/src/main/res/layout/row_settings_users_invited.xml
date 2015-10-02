@@ -15,8 +15,8 @@
         android:layout_marginStart="@dimen/key_line_1"
         android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
         android:src="@drawable/ic_person_black_24dp"
-        android:alpha="@dimen/icon_black_alpha"
-        android:contentDescription="@string/hint_users"/>
+        android:contentDescription="@string/hint_users"
+        />
 
     <TextView
         android:id="@+id/tv_invited_user"
@@ -37,7 +37,7 @@
         android:clickable="true"
         android:background="?selectableItemBackground"
         android:src="@drawable/ic_clear_black_24dp"
-        android:alpha="@dimen/icon_black_alpha"
-        android:contentDescription="@string/hint_clear"/>
+        android:contentDescription="@string/hint_clear"
+        />
 
 </RelativeLayout>

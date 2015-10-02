@@ -17,7 +17,7 @@ public class PurchaseEditActivity extends PurchaseBaseActivity implements
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_clear_white_24dp);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white_24dp);
         }
 
         String editPurchaseId = getIntent().getStringExtra(HomePurchasesFragment.INTENT_PURCHASE_ID);

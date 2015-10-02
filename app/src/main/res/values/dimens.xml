@@ -24,7 +24,6 @@
     <dimen name="avatar_size_2x">80dp</dimen>
     <dimen name="icon_size">24dp</dimen>
     <dimen name="icon_compound_drawable_padding_end">32dp</dimen>
-    <item name="icon_black_alpha" type="dimen" format="float">0.54</item>
 
     <!-- Checkbox special margins -->
     <dimen name="key_line_1_minus_checkbox_margin">12dp</dimen>

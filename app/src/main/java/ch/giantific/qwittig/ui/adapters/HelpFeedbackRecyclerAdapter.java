@@ -111,7 +111,6 @@ public class HelpFeedbackRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
 
         public void setTitleWithDrawable(String title, Drawable drawable) {
             mTextViewTitle.setText(title);
-            drawable.setAlpha(AppConstants.ICON_BLACK_ALPHA_RGB);
             mTextViewTitle.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
         }
     }

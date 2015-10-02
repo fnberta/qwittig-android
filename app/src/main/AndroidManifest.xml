@@ -181,7 +181,7 @@
 
         <meta-data
             android:name="com.parse.push.notification_icon"
-            android:resource="@drawable/ic_shopping_cart_notification" />
+            android:resource="@drawable/ic_shopping_cart_white_24dp" />
 
     </application>
 
