@@ -1,43 +1,28 @@
 package ch.giantific.qwittig;
 
 import android.app.Application;
-import android.content.Context;
 
 import com.parse.Parse;
 import com.parse.ParseACL;
 import com.parse.ParseCrashReporting;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
-import com.squareup.leakcanary.LeakCanary;
-import com.squareup.leakcanary.RefWatcher;
 
 import ch.giantific.qwittig.data.parse.models.Compensation;
+import ch.giantific.qwittig.data.parse.models.Group;
+import ch.giantific.qwittig.data.parse.models.Item;
+import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.data.parse.models.Task;
 import ch.giantific.qwittig.data.parse.models.User;
-import ch.giantific.qwittig.data.parse.models.Purchase;
-import ch.giantific.qwittig.data.parse.models.Item;
-import ch.giantific.qwittig.data.parse.models.Group;
 
 /**
  * A subclass of {@link android.app.Application} to register Parse.com database.
  */
 public class Qwittig extends Application {
 
-//    public static RefWatcher getRefWatcher(Context context) {
-//        Qwittig application = (Qwittig) context.getApplicationContext();
-//        return application.mRefWatcher;
-//    }
-//
-//    private RefWatcher mRefWatcher;
-
     @Override
     public void onCreate() {
         super.onCreate();
-
-//        if (BuildConfig.DEBUG) {
-//            // check memory leaks
-//           mRefWatcher = LeakCanary.install(this);
-//        }
 
         // register ParseObject subclasses
         ParseObject.registerSubclass(Group.class);
