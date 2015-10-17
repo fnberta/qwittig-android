@@ -19,7 +19,7 @@ import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.ui.adapters.rows.UserInvolvedRow;
 import ch.giantific.qwittig.utils.ComparatorParseUserIgnoreCase;
 
-import static ch.giantific.qwittig.constants.AppConstants.DISABLED_ALPHA;
+import static ch.giantific.qwittig.utils.AnimUtils.DISABLED_ALPHA;
 
 /**
  * Created by fabio on 09.11.14.

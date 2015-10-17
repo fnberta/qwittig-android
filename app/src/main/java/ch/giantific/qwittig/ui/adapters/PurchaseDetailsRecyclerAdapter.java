@@ -22,10 +22,9 @@ import ch.giantific.qwittig.ui.adapters.rows.HeaderRow;
 import ch.giantific.qwittig.ui.widgets.CircleDisplay;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
-import ch.giantific.qwittig.utils.Utils;
 
-import static ch.giantific.qwittig.constants.AppConstants.DISABLED_ALPHA;
-import static ch.giantific.qwittig.constants.AppConstants.DISABLED_ALPHA_RGB;
+import static ch.giantific.qwittig.utils.AnimUtils.DISABLED_ALPHA;
+import static ch.giantific.qwittig.utils.AnimUtils.DISABLED_ALPHA_RGB;
 
 /**
  * Created by fabio on 09.11.14.
@@ -139,7 +138,7 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
             case TYPE_MY_SHARE: {
                 MyShareRow myShareRow = (MyShareRow) viewHolder;
 
-                double myShare = Utils.calculateMyShare(mPurchase);
+                double myShare = PurchasesRecyclerAdapter.calculateMyShare(mPurchase);
                 myShareRow.setMyShare(myShare, mPurchase.getTotalPrice(), mCurrentGroupCurrency);
                 myShareRow.setMyShareForeign(myShare, mPurchase.getExchangeRate(),
                         mCurrentGroupCurrency, mPurchase.getCurrency());

@@ -4,12 +4,10 @@ import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.transition.Explode;
 import android.transition.Transition;
 import android.view.View;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.constants.AppConstants;
 import ch.giantific.qwittig.ui.dialogs.StoreAddDialogFragment;
 import ch.giantific.qwittig.ui.listeners.TransitionListenerAdapter;
 import ch.giantific.qwittig.utils.Utils;

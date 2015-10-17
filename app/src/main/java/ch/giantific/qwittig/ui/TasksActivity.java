@@ -16,11 +16,11 @@ import android.widget.Spinner;
 import com.parse.ParseException;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.constants.AppConstants;
 import ch.giantific.qwittig.helpers.TaskQueryHelper;
 import ch.giantific.qwittig.helpers.TaskRemindHelper;
 import ch.giantific.qwittig.ui.adapters.StringResSpinnerAdapter;
 import ch.giantific.qwittig.ui.dialogs.GroupCreateDialogFragment;
+import ch.giantific.qwittig.utils.AnimUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 public class TasksActivity extends BaseNavDrawerActivity implements
@@ -89,7 +89,7 @@ public class TasksActivity extends BaseNavDrawerActivity implements
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void circularRevealFab() {
-        Animator reveal = Utils.getCircularRevealAnimator(mFab);
+        Animator reveal = AnimUtils.getCircularRevealAnimator(mFab);
         reveal.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {

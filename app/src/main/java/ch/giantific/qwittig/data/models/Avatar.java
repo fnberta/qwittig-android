@@ -14,7 +14,6 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.constants.AppConstants;
 import ch.giantific.qwittig.utils.Utils;
 
 /**

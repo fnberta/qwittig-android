@@ -3,7 +3,6 @@ package ch.giantific.qwittig.ui.adapters;
 import android.content.Context;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,7 +19,7 @@ import ch.giantific.qwittig.data.models.TaskUser;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.ui.adapters.rows.BaseUserAvatarRow;
 
-import static ch.giantific.qwittig.constants.AppConstants.DISABLED_ALPHA;
+import static ch.giantific.qwittig.utils.AnimUtils.DISABLED_ALPHA;
 
 
 /**

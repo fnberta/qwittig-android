@@ -1,7 +1,5 @@
 package ch.giantific.qwittig.utils;
 
-import android.animation.Animator;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -13,7 +11,6 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.View;
-import android.view.ViewAnimationUtils;
 
 import com.parse.ParseObject;
 import com.parse.ParseUser;
@@ -27,8 +24,6 @@ import java.util.Random;
 import ch.giantific.qwittig.data.parse.models.Item;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.data.parse.models.User;
-
-import static ch.giantific.qwittig.constants.AppConstants.FAB_CIRCULAR_REVEAL_DELAY;
 
 /**
  * Created by fabio on 05.10.14.
@@ -120,50 +115,6 @@ public class Utils {
 
     public static boolean isRunningLollipopAndHigher() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public static Animator getCircularRevealAnimator(View view) {
-        // get the center for the clipping circle
-        int cx = view.getWidth() / 2;
-        int cy = view.getHeight() / 2;
-
-        // get the final radius for the clipping circle
-        int finalRadius = Math.max(view.getWidth(), view.getHeight()) / 2;
-
-        // create the animator for this view (the start radius is zero)
-        Animator animator = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
-        animator.setStartDelay(FAB_CIRCULAR_REVEAL_DELAY);
-
-        return animator;
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public static Animator getCircularHideAnimator(View view) {
-        // get the center for the clipping circle
-        int cx = view.getWidth() / 2;
-        int cy = view.getHeight() / 2;
-
-        // get the initial radius for the clipping circle
-        int initialRadius = view.getWidth();
-
-        // create the animator for this view (the start radius is zero) and return it
-        return ViewAnimationUtils.createCircularReveal(view, cx, cy, initialRadius, 0);
-    }
-
-    public static double calculateMyShare(Purchase purchase) {
-        double myShare = 0;
-        double exchangeRate = purchase.getExchangeRate();
-        for (ParseObject parseObject : purchase.getItems()) {
-            Item item = (Item) parseObject;
-            List<ParseUser> usersInvolved = item.getUsersInvolved();
-            User currentUser = (User) ParseUser.getCurrentUser();
-            if (usersInvolved.contains(currentUser)) {
-                myShare += (item.getPrice() * exchangeRate / usersInvolved.size());
-            }
-        }
-
-        return myShare;
     }
 
     public static boolean isConnected(Context context) {

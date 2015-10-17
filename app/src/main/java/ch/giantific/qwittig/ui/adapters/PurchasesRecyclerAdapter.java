@@ -14,7 +14,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
-import com.parse.Parse;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
@@ -23,6 +22,7 @@ import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.Avatar;
+import ch.giantific.qwittig.data.parse.models.Item;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.ui.adapters.rows.ProgressRow;
@@ -53,6 +53,21 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
         mContext = context;
         mPurchasesViewResource = viewResource;
         mPurchases = purchases;
+    }
+
+    public static double calculateMyShare(Purchase purchase) {
+        double myShare = 0;
+        double exchangeRate = purchase.getExchangeRate();
+        for (ParseObject parseObject : purchase.getItems()) {
+            Item item = (Item) parseObject;
+            List<ParseUser> usersInvolved = item.getUsersInvolved();
+            User currentUser = (User) ParseUser.getCurrentUser();
+            if (usersInvolved.contains(currentUser)) {
+                myShare += (item.getPrice() * exchangeRate / usersInvolved.size());
+            }
+        }
+
+        return myShare;
     }
 
     @Override
@@ -102,7 +117,7 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
 
                 double totalPrice = purchase.getTotalPrice();
                 purchaseRow.setTotal(MoneyUtils.formatMoneyNoSymbol(totalPrice, mCurrentGroupCurrency));
-                double myShare = Utils.calculateMyShare(purchase);
+                double myShare = calculateMyShare(purchase);
                 purchaseRow.setMyShare(MoneyUtils.formatMoneyNoSymbol(myShare, mCurrentGroupCurrency));
 
                 if (!purchase.currentUserHasReadPurchase()) {

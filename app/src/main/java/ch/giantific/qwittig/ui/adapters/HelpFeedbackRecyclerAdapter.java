@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.constants.AppConstants;
 import ch.giantific.qwittig.data.models.HelpItem;
 import ch.giantific.qwittig.ui.adapters.rows.HeaderRow;
 

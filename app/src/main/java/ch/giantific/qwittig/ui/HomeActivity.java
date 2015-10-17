@@ -29,7 +29,6 @@ import ch.berta.fabio.fabspeeddial.FabMenu;
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.PushBroadcastReceiver;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.constants.AppConstants;
 import ch.giantific.qwittig.data.parse.models.Config;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.helpers.FullQueryHelper;
@@ -40,6 +39,7 @@ import ch.giantific.qwittig.ui.adapters.TabsAdapter;
 import ch.giantific.qwittig.ui.dialogs.GoPremiumDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.ui.dialogs.GroupJoinDialogFragment;
+import ch.giantific.qwittig.utils.AnimUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.Utils;
@@ -98,7 +98,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
             public void run() {
                 mFabMenu.showMenuButton(true);
             }
-        }, AppConstants.FAB_CIRCULAR_REVEAL_DELAY * 4);
+        }, AnimUtils.FAB_CIRCULAR_REVEAL_DELAY * 4);
 
         FloatingActionButton fabAuto = (FloatingActionButton) findViewById(R.id.fab_auto);
         fabAuto.setOnClickListener(this);
