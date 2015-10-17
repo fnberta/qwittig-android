@@ -2,7 +2,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="ch.giantific.qwittig.ui.StatsSpendingFragment">
+    tools:context="ch.giantific.qwittig.ui.fragments.StatsSpendingFragment">
 
     <item android:id="@+id/action_show_group"
           android:title="@string/action_show_group"

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    tools:context="ch.giantific.qwittig.ui.TasksFragment"
+    tools:context="ch.giantific.qwittig.ui.fragments.TasksFragment"
     >
 
     <include layout="@layout/include_srl_recycler_view" />

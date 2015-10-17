@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="ch.giantific.qwittig.ui.HelpFeedbackActivity"
+    tools:context="ch.giantific.qwittig.ui.activities.HelpFeedbackActivity"
     tools:ignore="MergeRootFrame">
 
     <include layout="@layout/include_appbar"/>

@@ -34,11 +34,11 @@ import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.data.parse.models.Task;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.services.ParseQueryService;
-import ch.giantific.qwittig.ui.FinanceActivity;
-import ch.giantific.qwittig.ui.HomeActivity;
-import ch.giantific.qwittig.ui.PurchaseDetailsActivity;
-import ch.giantific.qwittig.ui.TaskDetailsActivity;
-import ch.giantific.qwittig.ui.TasksActivity;
+import ch.giantific.qwittig.ui.activities.FinanceActivity;
+import ch.giantific.qwittig.ui.activities.HomeActivity;
+import ch.giantific.qwittig.ui.activities.PurchaseDetailsActivity;
+import ch.giantific.qwittig.ui.activities.TaskDetailsActivity;
+import ch.giantific.qwittig.ui.activities.TasksActivity;
 import ch.giantific.qwittig.utils.MoneyUtils;
 
 /**

@@ -34,7 +34,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".ui.HomeActivity"
+            android:name=".ui.activities.HomeActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.DrawStatusBar" >
             <intent-filter>
@@ -65,88 +65,88 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.SettingsActivity"
+            android:name=".ui.activities.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".ui.HomeActivity" />
+            android:parentActivityName=".ui.activities.HomeActivity" />
         <activity
-            android:name=".ui.PurchaseDetailsActivity"
+            android:name=".ui.activities.PurchaseDetailsActivity"
             android:label="@string/title_activity_purchase_details"
-            android:parentActivityName=".ui.HomeActivity"
+            android:parentActivityName=".ui.activities.HomeActivity"
             android:theme="@style/AppTheme.DrawStatusBar.Explode" />
         <activity
-            android:name=".ui.PurchaseAddActivity"
+            android:name=".ui.activities.PurchaseAddActivity"
             android:label="@string/title_activity_add_purchase"
-            android:parentActivityName=".ui.HomeActivity"
+            android:parentActivityName=".ui.activities.HomeActivity"
             android:theme="@style/AppTheme.SlideBottom"
             android:windowSoftInputMode="stateUnchanged" />
         <activity
-            android:name=".ui.PurchaseEditActivity"
+            android:name=".ui.activities.PurchaseEditActivity"
             android:label="@string/title_activity_edit_purchase"
-            android:parentActivityName=".ui.PurchaseDetailsActivity"
+            android:parentActivityName=".ui.activities.PurchaseDetailsActivity"
             android:theme="@style/AppTheme.SlideEnd"
             android:windowSoftInputMode="stateUnchanged" />
         <activity
-            android:name=".ui.LoginActivity"
+            android:name=".ui.activities.LoginActivity"
             android:label="@string/title_activity_login"
             android:theme="@style/AppThemeDark.Login"
             android:windowSoftInputMode="stateUnchanged|adjustPan" />
         <activity
-            android:name=".ui.SettingsGroupNewActivity"
+            android:name=".ui.activities.SettingsGroupNewActivity"
             android:label="@string/title_activity_settings_group_new"
-            android:parentActivityName=".ui.SettingsActivity"
+            android:parentActivityName=".ui.activities.SettingsActivity"
             android:theme="@style/AppTheme.Explode"
             android:windowSoftInputMode="stateUnchanged" />
         <activity
-            android:name=".ui.SettingsUserInviteActivity"
+            android:name=".ui.activities.SettingsUserInviteActivity"
             android:label="@string/title_activity_settings_user_invite"
-            android:parentActivityName=".ui.SettingsActivity"
+            android:parentActivityName=".ui.activities.SettingsActivity"
             android:theme="@style/AppTheme.Explode"
             android:windowSoftInputMode="stateUnchanged" />
         <activity
-            android:name=".ui.SettingsProfileActivity"
+            android:name=".ui.activities.SettingsProfileActivity"
             android:label="@string/title_activity_settings_profile"
-            android:parentActivityName=".ui.SettingsActivity"
+            android:parentActivityName=".ui.activities.SettingsActivity"
             android:theme="@style/AppTheme.DrawStatusBar.Explode"
             android:windowSoftInputMode="stateUnchanged" />
         <activity
-            android:name=".ui.FinanceActivity"
+            android:name=".ui.activities.FinanceActivity"
             android:label="@string/title_activity_finance"
-            android:parentActivityName=".ui.HomeActivity"
+            android:parentActivityName=".ui.activities.HomeActivity"
             android:theme="@style/AppTheme.DrawStatusBar" />
         <activity
-            android:name=".ui.SettingsStoresActivity"
+            android:name=".ui.activities.SettingsStoresActivity"
             android:label="@string/title_activity_settings_stores"
-            android:parentActivityName=".ui.SettingsActivity"
+            android:parentActivityName=".ui.activities.SettingsActivity"
             android:theme="@style/AppTheme.Explode" />
         <activity
-            android:name=".ui.HelpFeedbackActivity"
+            android:name=".ui.activities.HelpFeedbackActivity"
             android:label="@string/title_activity_help_feedback"
-            android:parentActivityName=".ui.HomeActivity" />
+            android:parentActivityName=".ui.activities.HomeActivity" />
         <activity
-            android:name=".ui.StatsActivity"
+            android:name=".ui.activities.StatsActivity"
             android:label="@string/title_activity_stats"
             android:theme="@style/AppTheme.DrawStatusBar" />
         <activity
-            android:name=".ui.TasksActivity"
+            android:name=".ui.activities.TasksActivity"
             android:label="@string/title_activity_tasks"
             android:theme="@style/AppTheme.DrawStatusBar" />
         <activity
-            android:name=".ui.TaskDetailsActivity"
+            android:name=".ui.activities.TaskDetailsActivity"
             android:label="@string/title_activity_task_detail"
-            android:parentActivityName=".ui.TasksActivity"
+            android:parentActivityName=".ui.activities.TasksActivity"
             android:theme="@style/AppTheme.DrawStatusBar.Explode" />
         <activity
-            android:name=".ui.TaskAddActivity"
+            android:name=".ui.activities.TaskAddActivity"
             android:label="@string/title_activity_task_add"
-            android:parentActivityName=".ui.TasksActivity"
+            android:parentActivityName=".ui.activities.TasksActivity"
             android:theme="@style/AppTheme.SlideBottom" />
         <activity
-            android:name=".ui.TaskEditActivity"
+            android:name=".ui.activities.TaskEditActivity"
             android:label="@string/title_activity_task_edit"
-            android:parentActivityName=".ui.TaskDetailsActivity"
+            android:parentActivityName=".ui.activities.TaskDetailsActivity"
             android:theme="@style/AppTheme.SlideEnd" />
         <activity
-            android:name=".ui.CameraActivity"
+            android:name=".ui.activities.CameraActivity"
             android:label="@string/title_activity_camera"
             android:screenOrientation="portrait"
             >

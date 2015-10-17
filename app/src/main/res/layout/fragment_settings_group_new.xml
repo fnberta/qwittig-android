@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/small_space"
     android:clipToPadding="false"
-    tools:context="ch.giantific.qwittig.ui.SettingsGroupNewFragment">
+    tools:context="ch.giantific.qwittig.ui.fragments.SettingsGroupNewFragment">
 
     <LinearLayout
         android:layout_width="match_parent"

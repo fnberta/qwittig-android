@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:transitionGroup="true"
-        tools:context="ch.giantific.qwittig.ui.LoginActivity">
+        tools:context="ch.giantific.qwittig.ui.activities.LoginActivity">
 
         <TextView
             android:id="@+id/tv_app_title"

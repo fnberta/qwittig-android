@@ -10,7 +10,7 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.ui.HomeActivity;
+import ch.giantific.qwittig.ui.activities.HomeActivity;
 
 /**
  * Created by fabio on 07.05.15.
