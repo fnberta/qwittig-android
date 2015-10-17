@@ -1,11 +1,9 @@
 package ch.giantific.qwittig.ui;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -26,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.constants.AppConstants;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.Purchase;
@@ -181,9 +178,7 @@ public class HomeDraftsFragment extends BaseFragment implements
         mDrafts.clear();
 
         if (!drafts.isEmpty()) {
-            for (ParseObject parseObject : drafts) {
-                mDrafts.add(parseObject);
-            }
+            mDrafts.addAll(drafts);
         }
 
         checkCurrentGroup();

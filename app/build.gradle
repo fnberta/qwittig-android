@@ -51,4 +51,5 @@ dependencies {
     compile 'com.github.PhilJay:MPAndroidChart:v2.1.3'
     compile 'com.github.jorgecastilloprz:fabprogresscircle:1.01@aar'
     compile 'com.github.fnberta:FabSpeedDial:0.1'
+    compile 'com.vinaysshenoy:mugen:1.0.2'
 }

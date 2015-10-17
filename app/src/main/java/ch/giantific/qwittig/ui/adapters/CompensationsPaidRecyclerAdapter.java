@@ -135,8 +135,46 @@ public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<Recyc
         return mCompensations.size();
     }
 
+    /**
+     * Returns the position of the last movie in the adapter.
+     *
+     * @return the position of the last movie, -1 if there are no movies
+     */
+    public int getLastPosition() {
+        return getItemCount() - 1;
+    }
+
     public void setCurrentGroupCurrency(String currentGroupCurrency) {
         mCurrentGroupCurrency = currentGroupCurrency;
+    }
+
+    /**
+     * Adds compensations to the adapter.
+     *
+     * @param compensations the compensations to be added
+     */
+    public void addCompensations(List<ParseObject> compensations) {
+        if (!compensations.isEmpty()) {
+            mCompensations.addAll(compensations);
+            notifyItemRangeInserted(getItemCount(), compensations.size());
+        }
+    }
+
+    /**
+     * Shows a progressbar in the last row as an indicator that more objects are being fetched.
+     */
+    public void showLoadMoreIndicator() {
+        mCompensations.add(null);
+        notifyItemInserted(getLastPosition());
+    }
+
+    /**
+     * Hides the progressbar in the last row.
+     */
+    public void hideLoadMoreIndicator() {
+        int position = getLastPosition();
+        mCompensations.remove(position);
+        notifyItemRemoved(position);
     }
 
     private static class CompensationHistoryRow extends RecyclerView.ViewHolder {

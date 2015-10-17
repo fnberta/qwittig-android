@@ -4,13 +4,14 @@ import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.mugen.Mugen;
+import com.mugen.MugenCallbacks;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 
@@ -20,10 +21,9 @@ import java.util.List;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Purchase;
-import ch.giantific.qwittig.helpers.PurchaseQueryHelper;
 import ch.giantific.qwittig.helpers.MoreQueryHelper;
+import ch.giantific.qwittig.helpers.PurchaseQueryHelper;
 import ch.giantific.qwittig.ui.adapters.PurchasesRecyclerAdapter;
-import ch.giantific.qwittig.ui.listeners.InfiniteScrollListener;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
@@ -34,13 +34,11 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
         LocalQuery.PurchaseLocalQueryListener {
 
     public static final String INTENT_PURCHASE_ID = "purchase_id";
-    public static final String INTENT_THEME = "intent_theme";
     private static final String STATE_IS_LOADING_MORE = "state_is_loading_more";
     private static final String PURCHASE_QUERY_HELPER = "purchase_query_helper";
-    private static final String LOG_TAG =  HomePurchasesFragment.class.getSimpleName();
+    private static final String LOG_TAG = HomePurchasesFragment.class.getSimpleName();
     private FragmentInteractionListener mListener;
     private PurchasesRecyclerAdapter mRecyclerAdapter;
-    private InfiniteScrollListener mScrollListener;
     private List<ParseObject> mPurchases = new ArrayList<>();
     private boolean mIsLoadingMore;
 
@@ -89,13 +87,23 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
         mRecyclerAdapter = new PurchasesRecyclerAdapter(getActivity(),
                 R.layout.row_purchases, mPurchases, this);
         mRecyclerView.setAdapter(mRecyclerAdapter);
-        mScrollListener = new InfiniteScrollListener(mLayoutManager, mRecyclerView) {
+        Mugen.with(mRecyclerView, new MugenCallbacks() {
             @Override
             public void onLoadMore() {
                 loadMoreData();
             }
-        };
-        mRecyclerView.addOnScrollListener(mScrollListener);
+
+            @Override
+            public boolean isLoading() {
+                return !Utils.isConnected(getActivity()) || mIsLoadingMore ||
+                        mSwipeRefreshLayout.isRefreshing();
+            }
+
+            @Override
+            public boolean hasLoadedAllItems() {
+                return false;
+            }
+        }).start();
     }
 
     @Override
@@ -126,6 +134,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
 
     /**
      * Called from activity when helper fails to pin new purchases
+     *
      * @param e
      */
     public void onPurchasesPinFailed(ParseException e) {
@@ -169,9 +178,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
         mPurchases.clear();
 
         if (!purchases.isEmpty()) {
-            for (ParseObject purchase : purchases) {
-                mPurchases.add(purchase);
-            }
+            mPurchases.addAll(purchases);
         }
 
         checkCurrentGroup();
@@ -184,9 +191,8 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
         toggleMainVisibility();
 
         if (mIsLoadingMore) {
-            int purchasesSize = mPurchases.size();
-            addLoadMoreProgressBar(purchasesSize);
-            mRecyclerView.scrollToPosition(purchasesSize);
+            mRecyclerAdapter.showLoadMoreIndicator();
+            mRecyclerView.scrollToPosition(mRecyclerAdapter.getLastPosition());
         }
     }
 
@@ -219,29 +225,12 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
     }
 
     private void loadMoreData() {
-        if (mSwipeRefreshLayout.isRefreshing()) {
-            return;
-        }
-
-        if (!Utils.isConnected(getActivity())) {
-            showLoadMoreErrorSnackbar(getString(R.string.toast_no_connection));
-            return;
-        }
-
-        if (!mIsLoadingMore) {
-            mIsLoadingMore = true;
-
-            int purchasesSize = mPurchases.size();
-            addLoadMoreProgressBar(purchasesSize);
-            loadMoreDataWithHelper(purchasesSize);
-        }
+        mIsLoadingMore = true;
+        final int skip = mPurchases.size();
+        mRecyclerAdapter.showLoadMoreIndicator();
+        loadMoreDataWithHelper(skip);
     }
 
-    private void addLoadMoreProgressBar(int progressBarPosition) {
-        mPurchases.add(null);
-        mRecyclerAdapter.notifyItemInserted(progressBarPosition);
-    }
-    
     private void loadMoreDataWithHelper(int skip) {
         FragmentManager fragmentManager = getFragmentManager();
         MoreQueryHelper moreQueryHelper = findMoreQueryHelper(fragmentManager);
@@ -272,19 +261,10 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
 
     public void onMoreObjectsPinned(List<ParseObject> objects) {
         removeMoreQueryHelper();
+
         mIsLoadingMore = false;
-
-        int progressBarPosition = mPurchases.size() - 1;
-        mPurchases.remove(progressBarPosition);
-        mRecyclerAdapter.notifyItemRemoved(progressBarPosition);
-
-        if (!objects.isEmpty()) {
-            for (ParseObject purchase : objects) {
-                mPurchases.add(purchase);
-            }
-
-            mRecyclerAdapter.notifyItemRangeInserted(progressBarPosition, objects.size());
-        }
+        mRecyclerAdapter.hideLoadMoreIndicator();
+        mRecyclerAdapter.addPurchases(objects);
     }
 
     public void onMoreObjectsPinFailed(ParseException e) {
@@ -293,26 +273,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
         removeMoreQueryHelper();
 
         mIsLoadingMore = false;
-
-        if (!mPurchases.isEmpty()) {
-            int progressBarPosition = mPurchases.size() - 1;
-            if (mPurchases.get(progressBarPosition) == null) {
-                mPurchases.remove(progressBarPosition);
-                mRecyclerAdapter.notifyItemRemoved(progressBarPosition);
-
-                // scroll to top, otherwise another "load more cycle" will be triggered immediately
-                mRecyclerView.smoothScrollToPosition(0);
-                // Reset previousTotal to zero (after a short delay to let the smooth scroll finish)
-                // Otherwise the user won't be able to start a new "load more cycle"
-                final Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mScrollListener.resetPreviousTotal();
-                    }
-                }, 200);
-            }
-        }
+        mRecyclerAdapter.hideLoadMoreIndicator();
     }
 
     private void showLoadMoreErrorSnackbar(String errorMessage) {

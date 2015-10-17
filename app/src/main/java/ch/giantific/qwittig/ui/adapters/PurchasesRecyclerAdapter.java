@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.parse.Parse;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
@@ -126,8 +127,46 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
         return mPurchases.size();
     }
 
+    /**
+     * Returns the position of the last movie in the adapter.
+     *
+     * @return the position of the last movie, -1 if there are no movies
+     */
+    public int getLastPosition() {
+        return getItemCount() - 1;
+    }
+
     public void setCurrentGroupCurrency(String currentGroupCurrency) {
         mCurrentGroupCurrency = currentGroupCurrency;
+    }
+
+    /**
+     * Adds purchases to the adapter.
+     *
+     * @param purchases the purchases to be added
+     */
+    public void addPurchases(List<ParseObject> purchases) {
+        if (!purchases.isEmpty()) {
+            mPurchases.addAll(purchases);
+            notifyItemRangeInserted(getItemCount(), purchases.size());
+        }
+    }
+
+    /**
+     * Shows a progressbar in the last row as an indicator that more objects are being fetched.
+     */
+    public void showLoadMoreIndicator() {
+        mPurchases.add(null);
+        notifyItemInserted(getLastPosition());
+    }
+
+    /**
+     * Hides the progressbar in the last row.
+     */
+    public void hideLoadMoreIndicator() {
+        int position = getLastPosition();
+        mPurchases.remove(position);
+        notifyItemRemoved(position);
     }
 
     public interface AdapterInteractionListener {

@@ -3,12 +3,13 @@ package ch.giantific.qwittig.ui;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.mugen.Mugen;
+import com.mugen.MugenCallbacks;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 
@@ -20,7 +21,6 @@ import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Compensation;
 import ch.giantific.qwittig.helpers.MoreQueryHelper;
 import ch.giantific.qwittig.ui.adapters.CompensationsPaidRecyclerAdapter;
-import ch.giantific.qwittig.ui.listeners.InfiniteScrollListener;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
@@ -35,7 +35,6 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
     private static final String COMPENSATION_QUERY_HELPER = "compensation_paid_query_helper";
     private static final String STATE_IS_LOADING_MORE = "state_is_loading_more";
     private static final String LOG_TAG = FinanceCompensationsPaidFragment.class.getSimpleName();
-    private InfiniteScrollListener mScrollListener;
     private CompensationsPaidRecyclerAdapter mRecyclerAdapter;
     private List<ParseObject> mCompensations = new ArrayList<>();
     private boolean mIsLoadingMore;
@@ -76,13 +75,23 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
         mRecyclerAdapter = new CompensationsPaidRecyclerAdapter(getActivity(),
                 R.layout.row_compensations_paid, mCompensations);
         mRecyclerView.setAdapter(mRecyclerAdapter);
-        mScrollListener = new InfiniteScrollListener(mLayoutManager, mRecyclerView) {
+        Mugen.with(mRecyclerView, new MugenCallbacks() {
             @Override
             public void onLoadMore() {
                 loadMoreData();
             }
-        };
-        mRecyclerView.addOnScrollListener(mScrollListener);
+
+            @Override
+            public boolean isLoading() {
+                return !Utils.isConnected(getActivity()) || mIsLoadingMore ||
+                        mSwipeRefreshLayout.isRefreshing();
+            }
+
+            @Override
+            public boolean hasLoadedAllItems() {
+                return false;
+            }
+        }).start();
     }
 
     @Override
@@ -127,9 +136,8 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
         toggleMainVisibility();
 
         if (mIsLoadingMore) {
-            int compensationsSize = mCompensations.size();
-            addLoadMoreProgressBar(compensationsSize);
-            mRecyclerView.scrollToPosition(compensationsSize);
+            mRecyclerAdapter.showLoadMoreIndicator();
+            mRecyclerView.scrollToPosition(mRecyclerAdapter.getLastPosition());
         }
     }
 
@@ -143,27 +151,10 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
     }
 
     private void loadMoreData() {
-        if (mSwipeRefreshLayout.isRefreshing()) {
-            return;
-        }
-
-        if (!Utils.isConnected(getActivity())) {
-            showErrorSnackbar(getString(R.string.toast_no_connection));
-            return;
-        }
-
-        if (!mIsLoadingMore) {
-            mIsLoadingMore = true;
-
-            int compensationsSize = mCompensations.size();
-            addLoadMoreProgressBar(compensationsSize);
-            loadMoreDataWithHelper(compensationsSize);
-        }
-    }
-
-    private void addLoadMoreProgressBar(int progressBarPosition) {
-        mCompensations.add(null);
-        mRecyclerAdapter.notifyItemInserted(progressBarPosition);
+        mIsLoadingMore = true;
+        final int skip = mCompensations.size();
+        mRecyclerAdapter.showLoadMoreIndicator();
+        loadMoreDataWithHelper(skip);
     }
 
     private void loadMoreDataWithHelper(int skip) {
@@ -196,50 +187,22 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
 
     public void onMoreObjectsPinned(List<ParseObject> objects) {
         removeMoreQueryHelper();
+
         mIsLoadingMore = false;
-
-        int progressBarPosition = mCompensations.size() - 1;
-        mCompensations.remove(progressBarPosition);
-        mRecyclerAdapter.notifyItemRemoved(progressBarPosition);
-
-        if (!objects.isEmpty()) {
-            for (ParseObject compensation : objects) {
-                mCompensations.add(compensation);
-            }
-
-            mRecyclerAdapter.notifyItemRangeInserted(progressBarPosition, objects.size());
-        }
+        mRecyclerAdapter.hideLoadMoreIndicator();
+        mRecyclerAdapter.addCompensations(objects);
     }
 
     public void onMoreObjectsPinFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
-        showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
+        showLoadMoreErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
         removeMoreQueryHelper();
 
         mIsLoadingMore = false;
-
-        if (!mCompensations.isEmpty()) {
-            int progressBarPosition = mCompensations.size() - 1;
-            if (mCompensations.get(progressBarPosition) == null) {
-                mCompensations.remove(progressBarPosition);
-                mRecyclerAdapter.notifyItemRemoved(progressBarPosition);
-
-                // scroll to top, otherwise another "load more cycle" will be triggered immediately
-                mRecyclerView.smoothScrollToPosition(0);
-                // Reset previousTotal to zero (after a short delay to let the smooth scroll finish)
-                // Otherwise the user won't be able to start a new "load more cycle"
-                final Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mScrollListener.resetPreviousTotal();
-                    }
-                }, 200);
-            }
-        }
+        mRecyclerAdapter.hideLoadMoreIndicator();
     }
 
-    private void showErrorSnackbar(String errorMessage) {
+    private void showLoadMoreErrorSnackbar(String errorMessage) {
         Snackbar snackbar = MessageUtils.getBasicSnackbar(mRecyclerView, errorMessage);
         snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
             @Override
