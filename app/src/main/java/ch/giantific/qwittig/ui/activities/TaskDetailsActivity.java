@@ -14,7 +14,7 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import ch.giantific.qwittig.PushBroadcastReceiver;
+import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.ui.fragments.TaskDetailsFragment;
 import ch.giantific.qwittig.ui.fragments.TasksFragment;

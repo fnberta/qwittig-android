@@ -27,7 +27,7 @@ import java.util.List;
 
 import ch.berta.fabio.fabspeeddial.FabMenu;
 import ch.giantific.qwittig.BuildConfig;
-import ch.giantific.qwittig.PushBroadcastReceiver;
+import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.parse.models.Config;
 import ch.giantific.qwittig.data.parse.models.Group;

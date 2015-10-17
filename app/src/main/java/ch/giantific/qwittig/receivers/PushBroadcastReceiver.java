@@ -1,4 +1,4 @@
-package ch.giantific.qwittig;
+package ch.giantific.qwittig.receivers;
 
 import android.app.Activity;
 import android.app.Notification;
@@ -28,6 +28,7 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
 
+import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.parse.models.Compensation;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.Purchase;

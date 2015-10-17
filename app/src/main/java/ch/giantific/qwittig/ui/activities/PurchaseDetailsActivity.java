@@ -17,7 +17,7 @@ import org.json.JSONObject;
 
 import java.util.Date;
 
-import ch.giantific.qwittig.PushBroadcastReceiver;
+import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.ui.fragments.HomePurchasesFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseDetailsFragment;

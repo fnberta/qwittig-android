@@ -168,7 +168,7 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".PushBroadcastReceiver"
+            android:name=".receivers.PushBroadcastReceiver"
             android:exported="false" >
             <intent-filter>
                 <action android:name="com.parse.push.intent.RECEIVE" />
