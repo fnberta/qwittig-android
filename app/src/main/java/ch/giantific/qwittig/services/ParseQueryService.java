@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.IntDef;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -45,6 +46,7 @@ public class ParseQueryService extends IntentService {
     public static final int DATA_TYPE_TASK = 6;
 
     private static final String SERVICE_NAME = "ParseQueryService";
+    private static final String LOG_TAG = ParseQueryService.class.getSimpleName();
 
     private static final String ACTION_UNPIN_OBJECT = "ch.giantific.qwittig.services.action.UNPIN_OBJECT";
     private static final String ACTION_QUERY_OBJECT = "ch.giantific.qwittig.services.action.QUERY_OBJECT";
@@ -216,6 +218,11 @@ public class ParseQueryService extends IntentService {
     }
 
     private void queryObject(String className, String objectId, boolean isNew) throws ParseException {
+        if (isNew && objectIsAlreadyPinned(className, objectId)) {
+            Log.e(LOG_TAG, "object already pinned");
+            return;
+        }
+
         switch (className) {
             case Purchase.CLASS:
                 queryPurchase(objectId, isNew);
@@ -233,6 +240,19 @@ public class ParseQueryService extends IntentService {
                 sendLocalBroadcast(DATA_TYPE_TASK);
                 break;
         }
+    }
+
+    private boolean objectIsAlreadyPinned(String className, String objectId) {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(className);
+        query.ignoreACLs();
+        query.fromLocalDatastore();
+        try {
+            query.get(objectId);
+        } catch (ParseException e) {
+            return false;
+        }
+
+        return true;
     }
 
     private void queryPurchase(String objectId, boolean isNew) throws ParseException {
