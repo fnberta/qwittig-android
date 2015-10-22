@@ -403,9 +403,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
         User currentUser = (User) ParseUser.getCurrentUser();
         List<ParseObject> groups = currentUser.getGroups();
         if (!groups.isEmpty()) {
-            for (ParseObject group : groups) {
-                mGroups.add(group);
-            }
+            mGroups.addAll(groups);
         }
 
         mSpinnerGroupsAdapter.notifyDataSetChanged();
