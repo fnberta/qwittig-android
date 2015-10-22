@@ -1,6 +1,7 @@
 package ch.giantific.qwittig.ui.fragments;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
@@ -114,7 +115,7 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
         }
 
         FragmentManager fragmentManager = getFragmentManager();
-        TaskQueryHelper taskQueryHelper = findQueryHelper(fragmentManager);
+        Fragment taskQueryHelper = findHelper(fragmentManager, TASK_QUERY_HELPER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -127,10 +128,6 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
         }
     }
 
-    private TaskQueryHelper findQueryHelper(FragmentManager fragmentManager) {
-        return (TaskQueryHelper) fragmentManager.findFragmentByTag(TASK_QUERY_HELPER);
-    }
-
     /**
      * Called from activity when helper fails to pin tasks
      *
@@ -139,7 +136,7 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
     public void onTasksPinFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         showOnlineQueryErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeQueryHelper();
+        removeHelper(TASK_QUERY_HELPER);
 
         setLoading(false);
     }
@@ -155,17 +152,8 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
      * Called from activity when all tasks queries are finished
      */
     public void onAllTasksQueriesFinished() {
-        removeQueryHelper();
+        removeHelper(TASK_QUERY_HELPER);
         setLoading(false);
-    }
-
-    private void removeQueryHelper() {
-        FragmentManager fragmentManager = getFragmentManager();
-        TaskQueryHelper taskQueryHelper = findQueryHelper(fragmentManager);
-
-        if (taskQueryHelper != null) {
-            fragmentManager.beginTransaction().remove(taskQueryHelper).commitAllowingStateLoss();
-        }
     }
 
     @Override
@@ -425,7 +413,7 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
 
     private void remindUserWithHelper(String taskId) {
         FragmentManager fragmentManager = getFragmentManager();
-        TaskRemindHelper taskRemindHelper = findTaskRemindHelper(fragmentManager, taskId);
+        Fragment taskRemindHelper = findHelper(fragmentManager, getTaskHelperTag(taskId));
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -438,21 +426,12 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
         }
     }
 
-    private TaskRemindHelper findTaskRemindHelper(FragmentManager fragmentManager, String taskId) {
-        return (TaskRemindHelper) fragmentManager.findFragmentByTag(TASK_REMIND_HELPER + taskId);
-    }
-
-    private void removeTaskRemindHelper(String taskId) {
-        FragmentManager fragmentManager = getFragmentManager();
-        TaskRemindHelper taskRemindHelper = findTaskRemindHelper(fragmentManager, taskId);
-
-        if (taskRemindHelper != null) {
-            fragmentManager.beginTransaction().remove(taskRemindHelper).commitAllowingStateLoss();
-        }
+    private String getTaskHelperTag(String taskId) {
+        return TASK_REMIND_HELPER + taskId;
     }
 
     public void onUserReminded(String taskId) {
-        removeTaskRemindHelper(taskId);
+        removeHelper(getTaskHelperTag(taskId));
 
         Task task = setTaskLoading(taskId, false);
         if (task != null) {
@@ -466,7 +445,7 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
     public void onFailedToRemindUser(ParseException e, String taskId) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         MessageUtils.showBasicSnackbar(mRecyclerView, ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeTaskRemindHelper(taskId);
+        removeHelper(getTaskHelperTag(taskId));
 
         setTaskLoading(taskId, false);
     }

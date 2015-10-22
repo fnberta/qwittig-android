@@ -98,7 +98,7 @@ public class LoginHelper extends BaseHelper {
             public void done(ParseException e) {
                 if (e != null) {
                     if (mListener != null) {
-                        mListener.onParseError(e);
+                        mListener.onLoginFailed(e);
                     }
                     return;
                 }
@@ -116,7 +116,7 @@ public class LoginHelper extends BaseHelper {
             public void done(ParseUser parseUser, ParseException e) {
                 if (e != null) {
                     if (mListener != null) {
-                        mListener.onParseError(e);
+                        mListener.onLoginFailed(e);
                     }
                     return;
                 }
@@ -145,7 +145,7 @@ public class LoginHelper extends BaseHelper {
             public void done(ParseException e) {
                 if (e != null) {
                     if (mListener != null) {
-                        mListener.onParseError(e);
+                        mListener.onLoginFailed(e);
                     }
                     return;
                 }
@@ -162,7 +162,7 @@ public class LoginHelper extends BaseHelper {
     }
 
     public interface HelperInteractionListener {
-        void onParseError(ParseException e);
+        void onLoginFailed(ParseException e);
 
         void onLoginSucceeded(ParseUser parseUser);
 

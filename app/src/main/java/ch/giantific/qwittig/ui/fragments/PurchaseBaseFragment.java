@@ -2,6 +2,7 @@ package ch.giantific.qwittig.ui.fragments;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
@@ -71,7 +72,6 @@ import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.Item;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.data.parse.models.User;
-import ch.giantific.qwittig.helpers.PurchaseSaveHelper;
 import ch.giantific.qwittig.helpers.RatesHelper;
 import ch.giantific.qwittig.ui.activities.CameraActivity;
 import ch.giantific.qwittig.ui.adapters.PurchaseAddUsersInvolvedRecyclerAdapter;
@@ -445,7 +445,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         mIsFetchingExchangeRates = true;
 
         FragmentManager fragmentManager = getFragmentManager();
-        RatesHelper ratesHelper = findRatesHelper(fragmentManager);
+        Fragment ratesHelper = findHelper(fragmentManager, RATES_HELPER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -458,26 +458,13 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         }
     }
 
-    private RatesHelper findRatesHelper(FragmentManager fragmentManager) {
-        return (RatesHelper) fragmentManager.findFragmentByTag(RATES_HELPER);
-    }
-
-    private void removeRatesHelper() {
-        FragmentManager fragmentManager = getFragmentManager();
-        RatesHelper ratesHelper = findRatesHelper(fragmentManager);
-
-        if (ratesHelper != null) {
-            fragmentManager.beginTransaction().remove(ratesHelper).commitAllowingStateLoss();
-        }
-    }
-
     /**
      * Called from activity when helper failed to fetch rates
      *
      * @param errorMessage the network error message
      */
     public void onRatesFetchFailed(String errorMessage) {
-        removeRatesHelper();
+        removeHelper(RATES_HELPER);
         mIsFetchingExchangeRates = false;
     }
 
@@ -487,7 +474,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      * @param exchangeRates
      */
     public void onRatesFetchSuccessful(Map<String, Float> exchangeRates) {
-        removeRatesHelper();
+        removeHelper(RATES_HELPER);
 
         mIsFetchingExchangeRates = false;
         SharedPreferences.Editor editor = mSharedPreferences.edit();
@@ -1192,21 +1179,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      */
     public void onPurchaseSaveFailed(ParseException e) {
         onParseError(e);
-        removeSaveHelper();
-    }
-
-    private void removeSaveHelper() {
-        FragmentManager fragmentManager = getFragmentManager();
-        PurchaseSaveHelper purchaseSaveHelper = findPurchaseSaveHelper(fragmentManager);
-
-        if (purchaseSaveHelper != null) {
-            fragmentManager.beginTransaction().remove(purchaseSaveHelper).commitAllowingStateLoss();
-        }
-    }
-
-    final PurchaseSaveHelper findPurchaseSaveHelper(FragmentManager fragmentManager) {
-        return (PurchaseSaveHelper)
-                fragmentManager.findFragmentByTag(PURCHASE_SAVE_HELPER);
+        removeHelper(PURCHASE_SAVE_HELPER);
     }
 
     /**

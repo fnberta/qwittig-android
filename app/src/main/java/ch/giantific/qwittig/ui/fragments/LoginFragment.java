@@ -1,15 +1,19 @@
 package ch.giantific.qwittig.ui.fragments;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
+import android.transition.Slide;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,18 +27,19 @@ import java.util.List;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.parse.models.Config;
 import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.helpers.LoginHelper;
 import ch.giantific.qwittig.ui.activities.LoginActivity;
 import ch.giantific.qwittig.ui.fragments.dialogs.ResetPasswordDialogFragment;
+import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class LoginFragment extends Fragment {
+public class LoginFragment extends LoginBaseFragment {
 
-    private FragmentInteractionListener mListener;
-    private AutoCompleteTextView mEditTextEmail;
+    public static final String LOGIN_HELPER = "login_helper";
     private TextInputLayout mTextInputLayoutEmail;
     private EditText mEditTextPassword;
     private TextInputLayout mTextInputLayoutPassword;
@@ -47,6 +52,11 @@ public class LoginFragment extends Fragment {
     public LoginFragment() {
     }
 
+    /**
+     * Returns a new instance of a {@link LoginFragment} with an email address as an argument.
+     * @param email the email to be used as an argument
+     * @return a new instance of a {@link LoginFragment}
+     */
     public static LoginFragment newInstance(String email) {
         LoginFragment fragment = new LoginFragment();
 
@@ -58,86 +68,63 @@ public class LoginFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (FragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
-        }
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments() != null) {
-            mEmailInvited = getArguments().getString(LoginActivity.INTENT_URI_EMAIL);
+        Bundle args = getArguments();
+        if (args != null) {
+            mEmailInvited = args.getString(LoginActivity.INTENT_URI_EMAIL);
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_login, container, false);
-
-        mTextInputLayoutEmail = (TextInputLayout) rootView.findViewById(R.id.til_login_email);
-        mEditTextEmail = (AutoCompleteTextView) mTextInputLayoutEmail.getEditText();
-        mTextInputLayoutPassword = (TextInputLayout) rootView.findViewById(R.id.til_login_password);
-        mEditTextPassword = mTextInputLayoutPassword.getEditText();
-        mButtonLogIn = (Button) rootView.findViewById(R.id.bt_login_login);
-        mButtonSignUp = (Button) rootView.findViewById(R.id.bt_login_signup);
-        mButtonTryOut = (Button) rootView.findViewById(R.id.bt_login_tryout);
-        mTextViewResetPassword = (TextView) rootView.findViewById(R.id.tv_reset_password);
-
-        return rootView;
+        return inflater.inflate(R.layout.fragment_login, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mTextInputLayoutEmail = (TextInputLayout) view.findViewById(R.id.til_login_email);
+        mEditTextEmail = (AutoCompleteTextView) mTextInputLayoutEmail.getEditText();
         mEditTextEmail.setText(mEmailInvited);
+
+        mTextInputLayoutPassword = (TextInputLayout) view.findViewById(R.id.til_login_password);
+        mEditTextPassword = mTextInputLayoutPassword.getEditText();
+
+        mButtonLogIn = (Button) view.findViewById(R.id.bt_login_login);
         mButtonLogIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 logInUser();
             }
         });
+
+        mButtonSignUp = (Button) view.findViewById(R.id.bt_login_signup);
         mButtonSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 launchSignUp();
             }
         });
+
+        mButtonTryOut = (Button) view.findViewById(R.id.bt_login_tryout);
         mButtonTryOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 tryWithoutAccount();
             }
         });
+
+        mTextViewResetPassword = (TextView) view.findViewById(R.id.tv_reset_password);
         mTextViewResetPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showResetPasswordDialog();
             }
         });
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        mListener.populateAutoComplete();
-    }
-
-    public void addEmailsToAutoComplete(List<String> emailAddressCollection) {
-        //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
-                android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
-
-        mEditTextEmail.setAdapter(adapter);
     }
 
     private void logInUser() {
@@ -164,21 +151,55 @@ public class LoginFragment extends Fragment {
         }
 
         if (fieldsAreComplete) {
-            mListener.logInUser(email, password);
+            logInUserToParseWithHelper(email, password);
         } else {
             focusView.requestFocus();
+        }
+    }
+
+    private void logInUserToParseWithHelper(final String email, String password) {
+        if (!Utils.isConnected(getActivity())) {
+            MessageUtils.showBasicSnackbar(mButtonLogIn, getString(R.string.toast_no_connection));
+            return;
+        }
+
+        setLoading(true);
+
+        FragmentManager fragmentManager = getFragmentManager();
+        Fragment loginHelper = findHelper(fragmentManager, LOGIN_HELPER);
+
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (loginHelper == null) {
+            loginHelper = LoginHelper.newInstance(email, password);
+
+            fragmentManager.beginTransaction()
+                    .add(loginHelper, LOGIN_HELPER)
+                    .commit();
         }
     }
 
     private void launchSignUp() {
         String email = mEditTextEmail.getText().toString();
 
-        mListener.launchSignUpFragment(email);
+        FragmentManager fragmentManager = getFragmentManager();
+        LoginSignUpFragment loginSignUpFragment = LoginSignUpFragment.newInstance(email);
+        if (Utils.isRunningLollipopAndHigher()) {
+            setFragmentTransitions(loginSignUpFragment);
+        }
+        fragmentManager.beginTransaction()
+                .replace(R.id.container, loginSignUpFragment, LoginActivity.LOGIN_FRAGMENT)
+                .addToBackStack(null)
+                .commit();
     }
 
-    /**
-     * Logs user in with test account credentials.
-     */
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void setFragmentTransitions(LoginSignUpFragment loginSignUpFragment) {
+        loginSignUpFragment.setEnterTransition(new Slide(Gravity.BOTTOM));
+
+        setExitTransition(new Slide(Gravity.BOTTOM));
+    }
+
     private void tryWithoutAccount() {
         ParseConfig config = ParseConfig.getCurrentConfig();
         String testUsersPassword = config.getString(Config.TEST_USERS_PASSWORD);
@@ -186,7 +207,7 @@ public class LoginFragment extends Fragment {
         int testUserNumber = Utils.getRandomInt(testUsersNicknames.size());
 
         if (!TextUtils.isEmpty(testUsersPassword)) {
-            mListener.logInUser(User.USERNAME_PREFIX_TEST + testUserNumber, testUsersPassword);
+            logInUserToParseWithHelper(User.USERNAME_PREFIX_TEST + testUserNumber, testUsersPassword);
         } else {
             ParseErrorHandler.handleParseError(getActivity(),
                     new ParseException(ParseException.CONNECTION_FAILED, ""));
@@ -200,17 +221,36 @@ public class LoginFragment extends Fragment {
         resetPasswordDialogFragment.show(getFragmentManager(), "reset_password");
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
+    /**
+     * Starts a helper fragment that resets a user's password.
+     * @param email the email of the user the whose password should be reset
+     */
+    public void resetPasswordWithHelper(String email) {
+        if (!Utils.isConnected(getActivity())) {
+            MessageUtils.showBasicSnackbar(mButtonLogIn, getString(R.string.toast_no_connection));
+            return;
+        }
+
+        FragmentManager fragmentManager = getFragmentManager();
+        Fragment loginHelper = findHelper(fragmentManager, LOGIN_HELPER);
+
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (loginHelper == null) {
+            loginHelper = LoginHelper.newInstance(email);
+
+            fragmentManager.beginTransaction()
+                    .add(loginHelper, LOGIN_HELPER)
+                    .commit();
+        }
     }
 
-    public interface FragmentInteractionListener {
-        void logInUser(String username, String password);
-
-        void launchSignUpFragment(String email);
-
-        void populateAutoComplete();
+    /**
+     * Handles the successful reset of a password. Removes the helper fragment and tells the user
+     * he needs to click on the link he received by email in order to really reset his password.
+     */
+    public void onPasswordReset() {
+        removeHelper(LOGIN_HELPER);
+        MessageUtils.showBasicSnackbar(mButtonLogIn, getString(R.string.toast_reset_password_link));
     }
 }

@@ -1,6 +1,7 @@
 package ch.giantific.qwittig.ui.fragments;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
@@ -135,7 +136,7 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
 
     private void savePurchaseWithHelper() {
         FragmentManager fragmentManager = getFragmentManager();
-        PurchaseSaveHelper purchaseSaveHelper = findPurchaseSaveHelper(fragmentManager);
+        Fragment purchaseSaveHelper = findHelper(fragmentManager, PURCHASE_SAVE_HELPER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.

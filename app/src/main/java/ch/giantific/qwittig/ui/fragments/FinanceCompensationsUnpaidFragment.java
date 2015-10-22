@@ -3,6 +3,7 @@ package ch.giantific.qwittig.ui.fragments;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -47,6 +48,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         LocalQuery.CompensationLocalQueryListener,
         FABProgressListener {
 
+    private static final String SETTLEMENT_HELPER = "settlement_helper";
     private static final String BUNDLE_AUTO_START_NEW = "auto_start_new";
     private static final String STATE_COMPENSATIONS_LOADING = "state_comps_loading";
     private static final String STATE_IS_CALCULATING_NEW = "state_is_calculating_new";
@@ -281,7 +283,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
 
     private void calculateNewSettlementWithHelper() {
         FragmentManager fragmentManager = getFragmentManager();
-        SettlementHelper settlementHelper = findSettlementHelper(fragmentManager);
+        Fragment settlementHelper = findHelper(fragmentManager, SETTLEMENT_HELPER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -289,21 +291,8 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
             settlementHelper = SettlementHelper.newInstance(false);
 
             fragmentManager.beginTransaction()
-                    .add(settlementHelper, SettlementHelper.SETTLEMENT_HELPER)
+                    .add(settlementHelper, SETTLEMENT_HELPER)
                     .commit();
-        }
-    }
-
-    private SettlementHelper findSettlementHelper(FragmentManager fragmentManager) {
-        return (SettlementHelper) fragmentManager.findFragmentByTag(SettlementHelper.SETTLEMENT_HELPER);
-    }
-
-    private void removeSettlementHelper() {
-        FragmentManager fragmentManager = getFragmentManager();
-        SettlementHelper settlementHelper = findSettlementHelper(fragmentManager);
-
-        if (settlementHelper != null) {
-            fragmentManager.beginTransaction().remove(settlementHelper).commitAllowingStateLoss();
         }
     }
 
@@ -313,7 +302,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
      * @param result object returned from CloudCode
      */
     public void onNewSettlementCreated(Object result) {
-        removeSettlementHelper();
+        removeHelper(SETTLEMENT_HELPER);
     }
 
     /**
@@ -324,7 +313,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     public void onNewSettlementCreationFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         showSettlementErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeSettlementHelper();
+        removeHelper(SETTLEMENT_HELPER);
 
         mFabProgressCircle.hide();
     }
@@ -397,8 +386,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     private void saveCompensationWithHelper(ParseObject compensation) {
         FragmentManager fragmentManager = getFragmentManager();
         String compensationId = compensation.getObjectId();
-        CompensationSaveHelper saveHelper = findCompensationSaveHelper(fragmentManager,
-                compensationId);
+        Fragment saveHelper = findHelper(fragmentManager, getCompensationHelperTag(compensationId));
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -411,12 +399,6 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         }
     }
 
-    private CompensationSaveHelper findCompensationSaveHelper(FragmentManager fragmentManager,
-                                                              String compensationId) {
-        return (CompensationSaveHelper) fragmentManager.findFragmentByTag(
-                COMPENSATION_SAVE_HELPER + compensationId);
-    }
-
     /**
      * Called from activity when helper failed to save compensation
      *
@@ -427,21 +409,11 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         ParseErrorHandler.handleParseError(getActivity(), e);
         MessageUtils.showBasicSnackbar(mFabNew, ParseErrorHandler.getErrorMessage(getActivity(), e));
         String compensationId = compensation.getObjectId();
-        removeCompensationSaveHelper(compensationId);
+        removeHelper(getCompensationHelperTag(compensationId));
 
         // position might have changed
         int compPosition = mCompensations.indexOf(compensation);
         setCompensationLoading((Compensation) compensation, compensationId, compPosition, false);
-    }
-
-    private void removeCompensationSaveHelper(String compensationId) {
-        FragmentManager fragmentManager = getFragmentManager();
-        CompensationSaveHelper compensationSaveHelper = findCompensationSaveHelper(fragmentManager,
-                compensationId);
-
-        if (compensationSaveHelper != null) {
-            fragmentManager.beginTransaction().remove(compensationSaveHelper).commitAllowingStateLoss();
-        }
     }
 
     /**
@@ -451,7 +423,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
      */
     public void onCompensationSaved(ParseObject compensation) {
         String compensationId = compensation.getObjectId();
-        removeCompensationSaveHelper(compensationId);
+        removeHelper(getCompensationHelperTag(compensationId));
 
         removeItemFromList(compensation);
         mLoadingCompensations.remove(compensationId);
@@ -493,8 +465,8 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     private void remindUserWithHelper(@CompensationRemindHelper.RemindType int remindType,
                                       String compensationId) {
         FragmentManager fragmentManager = getFragmentManager();
-        CompensationRemindHelper compensationRemindHelper = findCompensationRemindHelper(
-                fragmentManager, compensationId);
+        Fragment compensationRemindHelper = findHelper(fragmentManager,
+                getCompensationHelperTag(compensationId));
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -502,25 +474,13 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
             compensationRemindHelper = CompensationRemindHelper.newInstance(remindType, compensationId);
 
             fragmentManager.beginTransaction()
-                    .add(compensationRemindHelper, COMPENSATION_REMIND_HELPER + compensationId)
+                    .add(compensationRemindHelper, getCompensationHelperTag(compensationId))
                     .commit();
         }
     }
 
-    private CompensationRemindHelper findCompensationRemindHelper(FragmentManager fragmentManager,
-                                                                  String compensationId) {
-        return (CompensationRemindHelper) fragmentManager.findFragmentByTag(
-                COMPENSATION_REMIND_HELPER + compensationId);
-    }
-
-    private void removeCompensationRemindHelper(String compensationId) {
-        FragmentManager fragmentManager = getFragmentManager();
-        CompensationRemindHelper compensationRemindHelper = findCompensationRemindHelper(
-                fragmentManager, compensationId);
-
-        if (compensationRemindHelper != null) {
-            fragmentManager.beginTransaction().remove(compensationRemindHelper).commitAllowingStateLoss();
-        }
+    private String getCompensationHelperTag(String compensationId) {
+        return COMPENSATION_REMIND_HELPER + compensationId;
     }
 
     /**
@@ -530,7 +490,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
      * @param compensationId
      */
     public void onUserReminded(int remindType, String compensationId) {
-        removeCompensationRemindHelper(compensationId);
+        removeHelper(getCompensationHelperTag(compensationId));
 
         switch (remindType) {
             case CompensationRemindHelper.TYPE_REMIND: {
@@ -566,7 +526,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     public void onFailedToRemindUser(int remindType, ParseException e, String compensationId) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         MessageUtils.showBasicSnackbar(mRecyclerView, ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeCompensationRemindHelper(compensationId);
+        removeHelper(getCompensationHelperTag(compensationId));
 
         setCompensationLoading(compensationId, false);
     }

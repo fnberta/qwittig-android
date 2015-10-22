@@ -1,6 +1,7 @@
 package ch.giantific.qwittig.ui.fragments;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
@@ -117,7 +118,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
         }
 
         FragmentManager fragmentManager = getFragmentManager();
-        PurchaseQueryHelper PurchaseQueryHelper = findQueryHelper(fragmentManager);
+        Fragment PurchaseQueryHelper = findHelper(fragmentManager, PURCHASE_QUERY_HELPER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -130,10 +131,6 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
         }
     }
 
-    private PurchaseQueryHelper findQueryHelper(FragmentManager fragmentManager) {
-        return (PurchaseQueryHelper) fragmentManager.findFragmentByTag(PURCHASE_QUERY_HELPER);
-    }
-
     /**
      * Called from activity when helper fails to pin new purchases
      *
@@ -142,7 +139,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
     public void onPurchasesPinFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         showOnlineQueryErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeQueryHelper();
+        removeHelper(PURCHASE_QUERY_HELPER);
 
         setLoading(false);
     }
@@ -155,17 +152,8 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
      * Called from activity when all purchases queries are finished
      */
     public void onAllPurchasesQueriesFinished() {
-        removeQueryHelper();
+        removeHelper(PURCHASE_QUERY_HELPER);
         setLoading(false);
-    }
-
-    private void removeQueryHelper() {
-        FragmentManager fragmentManager = getFragmentManager();
-        PurchaseQueryHelper purchaseQueryHelper = findQueryHelper(fragmentManager);
-
-        if (purchaseQueryHelper != null) {
-            fragmentManager.beginTransaction().remove(purchaseQueryHelper).commitAllowingStateLoss();
-        }
     }
 
     @Override
@@ -235,7 +223,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
 
     private void loadMoreDataWithHelper(int skip) {
         FragmentManager fragmentManager = getFragmentManager();
-        MoreQueryHelper moreQueryHelper = findMoreQueryHelper(fragmentManager);
+        Fragment moreQueryHelper = findHelper(fragmentManager, MoreQueryHelper.MORE_QUERY_HELPER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -248,21 +236,8 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
         }
     }
 
-    private MoreQueryHelper findMoreQueryHelper(FragmentManager fragmentManager) {
-        return (MoreQueryHelper) fragmentManager.findFragmentByTag(MoreQueryHelper.MORE_QUERY_HELPER);
-    }
-
-    private void removeMoreQueryHelper() {
-        FragmentManager fragmentManager = getFragmentManager();
-        MoreQueryHelper moreQueryHelper = findMoreQueryHelper(fragmentManager);
-
-        if (moreQueryHelper != null) {
-            fragmentManager.beginTransaction().remove(moreQueryHelper).commitAllowingStateLoss();
-        }
-    }
-
     public void onMoreObjectsPinned(List<ParseObject> objects) {
-        removeMoreQueryHelper();
+        removeHelper(MoreQueryHelper.MORE_QUERY_HELPER);
 
         mIsLoadingMore = false;
         mRecyclerAdapter.hideLoadMoreIndicator();
@@ -272,7 +247,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
     public void onMoreObjectsPinFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         showLoadMoreErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeMoreQueryHelper();
+        removeHelper(MoreQueryHelper.MORE_QUERY_HELPER);
 
         mIsLoadingMore = false;
         mRecyclerAdapter.hideLoadMoreIndicator();

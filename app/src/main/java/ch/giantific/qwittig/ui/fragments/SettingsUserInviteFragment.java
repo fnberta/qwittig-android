@@ -232,7 +232,7 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
 
     private void inviteUsersWithHelper(Group group) {
         FragmentManager fragmentManager = getFragmentManager();
-        InviteUsersHelper inviteUsersHelper = findInviteHelper(fragmentManager);
+        Fragment inviteUsersHelper = findHelper(fragmentManager, INVITE_HELPER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -245,19 +245,6 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
         }
     }
 
-    private InviteUsersHelper findInviteHelper(FragmentManager fragmentManager) {
-        return (InviteUsersHelper) fragmentManager.findFragmentByTag(INVITE_HELPER);
-    }
-
-    private void removeInviteHelper() {
-        FragmentManager fragmentManager = getFragmentManager();
-        InviteUsersHelper inviteUsersHelper = findInviteHelper(fragmentManager);
-
-        if (inviteUsersHelper != null) {
-            fragmentManager.beginTransaction().remove(inviteUsersHelper).commitAllowingStateLoss();
-        }
-    }
-
     /**
      * Called from activity when helper fails to invite users
      * @param e
@@ -265,7 +252,7 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
     public void onInviteUsersFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         onParseError(ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeInviteHelper();
+        removeHelper(INVITE_HELPER);
     }
 
     /**
@@ -273,7 +260,7 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
      */
     public void onUsersInvited() {
         mListener.progressCircleStartFinal();
-        removeInviteHelper();
+        removeHelper(INVITE_HELPER);
 
     }
 

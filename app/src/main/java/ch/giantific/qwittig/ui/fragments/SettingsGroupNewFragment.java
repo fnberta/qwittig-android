@@ -139,7 +139,7 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
 
     private void createNewGroupWithHelper(String newGroupCurrency) {
         FragmentManager fragmentManager = getFragmentManager();
-        CreateGroupHelper createGroupHelper = findInviteHelper(fragmentManager);
+        Fragment createGroupHelper = findHelper(fragmentManager, CREATE_GROUP_HELPER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -153,19 +153,6 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
         }
     }
 
-    private CreateGroupHelper findInviteHelper(FragmentManager fragmentManager) {
-        return (CreateGroupHelper) fragmentManager.findFragmentByTag(CREATE_GROUP_HELPER);
-    }
-
-    private void removeCreateGroupHelper() {
-        FragmentManager fragmentManager = getFragmentManager();
-        CreateGroupHelper createGroupHelper = findInviteHelper(fragmentManager);
-
-        if (createGroupHelper != null) {
-            fragmentManager.beginTransaction().remove(createGroupHelper).commitAllowingStateLoss();
-        }
-    }
-
     /**
      * Called from activity when helper fails to create new group
      * @param e
@@ -173,7 +160,7 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
     public void onCreateNewGroupFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         onParseError(ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeCreateGroupHelper();
+        removeHelper(CREATE_GROUP_HELPER);
     }
 
     /**
@@ -204,7 +191,7 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
     public void onInviteUsersFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         onParseError(ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeCreateGroupHelper();
+        removeHelper(CREATE_GROUP_HELPER);
 
         // TODO: new group is created but users not invited, finish activity but tell the user
     }

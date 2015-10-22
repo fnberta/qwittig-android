@@ -324,7 +324,7 @@ public class SettingsActivity extends BaseActivity implements
     public void onLogoutFailed(ParseException e) {
         ParseErrorHandler.handleParseError(this, e);
         onParseError(ParseErrorHandler.getErrorMessage(this, e));
-        removeLoginHelper();
+        removeLogoutHelper();
     }
 
     private void onParseError(String errorMessage) {
@@ -332,7 +332,7 @@ public class SettingsActivity extends BaseActivity implements
         MessageUtils.showBasicSnackbar(mToolbar, errorMessage);
     }
 
-    private void removeLoginHelper() {
+    private void removeLogoutHelper() {
         FragmentManager fragmentManager = getFragmentManager();
         LogoutHelper loginHelper = findLogoutHelper(fragmentManager);
 

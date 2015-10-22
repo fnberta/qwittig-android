@@ -124,7 +124,6 @@ public class SettingsFragment extends PreferenceFragment {
                 return true;
             }
         });
-
     }
 
     @Override

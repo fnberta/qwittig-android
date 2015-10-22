@@ -159,7 +159,7 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
 
     private void loadMoreDataWithHelper(int skip) {
         FragmentManager fragmentManager = getFragmentManager();
-        MoreQueryHelper moreQueryHelper = findMoreQueryHelper(fragmentManager);
+        Fragment moreQueryHelper = findHelper(fragmentManager, MoreQueryHelper.MORE_QUERY_HELPER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -172,21 +172,8 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
         }
     }
 
-    private MoreQueryHelper findMoreQueryHelper(FragmentManager fragmentManager) {
-        return (MoreQueryHelper) fragmentManager.findFragmentByTag(MoreQueryHelper.MORE_QUERY_HELPER);
-    }
-
-    private void removeMoreQueryHelper() {
-        FragmentManager fragmentManager = getFragmentManager();
-        MoreQueryHelper moreQueryHelper = findMoreQueryHelper(fragmentManager);
-
-        if (moreQueryHelper != null) {
-            fragmentManager.beginTransaction().remove(moreQueryHelper).commitAllowingStateLoss();
-        }
-    }
-
     public void onMoreObjectsPinned(List<ParseObject> objects) {
-        removeMoreQueryHelper();
+        removeHelper(MoreQueryHelper.MORE_QUERY_HELPER);
 
         mIsLoadingMore = false;
         mRecyclerAdapter.hideLoadMoreIndicator();
@@ -196,7 +183,7 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
     public void onMoreObjectsPinFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         showLoadMoreErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeMoreQueryHelper();
+        removeHelper(MoreQueryHelper.MORE_QUERY_HELPER);
 
         mIsLoadingMore = false;
         mRecyclerAdapter.hideLoadMoreIndicator();
