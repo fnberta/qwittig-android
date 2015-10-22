@@ -83,6 +83,7 @@ import ch.giantific.qwittig.ui.listeners.SwipeDismissTouchListener;
 import ch.giantific.qwittig.ui.widgets.ListCheckBox;
 import ch.giantific.qwittig.utils.ComparatorParseUserIgnoreCase;
 import ch.giantific.qwittig.utils.DateUtils;
+import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
@@ -445,7 +446,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         mIsFetchingExchangeRates = true;
 
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment ratesHelper = findHelper(fragmentManager, RATES_HELPER);
+        Fragment ratesHelper = HelperUtils.findHelper(fragmentManager, RATES_HELPER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -464,7 +465,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      * @param errorMessage the network error message
      */
     public void onRatesFetchFailed(String errorMessage) {
-        removeHelper(RATES_HELPER);
+        HelperUtils.removeHelper(getFragmentManager(), RATES_HELPER);
         mIsFetchingExchangeRates = false;
     }
 
@@ -474,7 +475,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      * @param exchangeRates
      */
     public void onRatesFetchSuccessful(Map<String, Float> exchangeRates) {
-        removeHelper(RATES_HELPER);
+        HelperUtils.removeHelper(getFragmentManager(), RATES_HELPER);
 
         mIsFetchingExchangeRates = false;
         SharedPreferences.Editor editor = mSharedPreferences.edit();
@@ -1179,7 +1180,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      */
     public void onPurchaseSaveFailed(ParseException e) {
         onParseError(e);
-        removeHelper(PURCHASE_SAVE_HELPER);
+        HelperUtils.removeHelper(getFragmentManager(), PURCHASE_SAVE_HELPER);
     }
 
     /**

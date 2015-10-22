@@ -1,7 +1,6 @@
 package ch.giantific.qwittig.ui.fragments;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -30,6 +29,7 @@ import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.helpers.LoginHelper;
 import ch.giantific.qwittig.ui.activities.LoginActivity;
 import ch.giantific.qwittig.ui.fragments.dialogs.ResetPasswordDialogFragment;
+import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.Utils;
@@ -166,7 +166,7 @@ public class LoginFragment extends LoginBaseFragment {
         setLoading(true);
 
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment loginHelper = findHelper(fragmentManager, LOGIN_HELPER);
+        Fragment loginHelper = HelperUtils.findHelper(fragmentManager, LOGIN_HELPER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -232,7 +232,7 @@ public class LoginFragment extends LoginBaseFragment {
         }
 
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment loginHelper = findHelper(fragmentManager, LOGIN_HELPER);
+        Fragment loginHelper = HelperUtils.findHelper(fragmentManager, LOGIN_HELPER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -250,7 +250,7 @@ public class LoginFragment extends LoginBaseFragment {
      * he needs to click on the link he received by email in order to really reset his password.
      */
     public void onPasswordReset() {
-        removeHelper(LOGIN_HELPER);
+        HelperUtils.removeHelper(getFragmentManager(), LOGIN_HELPER);
         MessageUtils.showBasicSnackbar(mButtonLogIn, getString(R.string.toast_reset_password_link));
     }
 }

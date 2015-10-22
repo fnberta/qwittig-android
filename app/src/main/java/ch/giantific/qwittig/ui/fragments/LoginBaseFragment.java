@@ -29,6 +29,7 @@ import java.util.List;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.parse.models.Installation;
 import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
@@ -215,7 +216,7 @@ public abstract class LoginBaseFragment extends BaseFragment implements
         MessageUtils.showBasicSnackbar(getView(), ParseErrorHandler.getErrorMessage(getActivity(), e));
         setLoading(false);
 
-        removeHelper(LOGIN_HELPER);
+        HelperUtils.removeHelper(getFragmentManager(), LOGIN_HELPER);
     }
 
     /**

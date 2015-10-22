@@ -24,6 +24,7 @@ import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.data.stats.models.Stats;
 import ch.giantific.qwittig.helpers.StatsHelper;
+import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
@@ -232,7 +233,7 @@ public abstract class StatsBaseFragment extends BaseFragment implements
     final void calcStatsWithHelper(@StatsHelper.StatsType int statsType,
                                      String year, int month) {
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment statsHelper = findHelper(fragmentManager, getHelperTag());
+        Fragment statsHelper = HelperUtils.findHelper(fragmentManager, getHelperTag());
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -253,7 +254,7 @@ public abstract class StatsBaseFragment extends BaseFragment implements
      */
     @CallSuper
     public void onStatsCalculated(Stats stats) {
-        removeHelper(getHelperTag());
+        HelperUtils.removeHelper(getFragmentManager(), getHelperTag());
 
         if (stats == null) {
             mIsLoading = false;
@@ -277,7 +278,7 @@ public abstract class StatsBaseFragment extends BaseFragment implements
     public void onFailedToCalculateStats(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeHelper(getHelperTag());
+        HelperUtils.removeHelper(getFragmentManager(), getHelperTag());
                 
         mIsLoading = false;
         toggleProgressBarVisibility();

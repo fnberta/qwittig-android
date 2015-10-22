@@ -300,13 +300,6 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
         });
     }
 
-    @Override
-    public void showAccountCreateDialog() {
-        AccountCreateDialogFragment accountCreateDialogFragment =
-                new AccountCreateDialogFragment();
-        accountCreateDialogFragment.show(getFragmentManager(), "account_create");
-    }
-
     /**
      * Callback from changeAmount dialog
      * @param amount

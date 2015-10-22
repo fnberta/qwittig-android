@@ -9,6 +9,7 @@ import com.parse.ParseException;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.helpers.CompensationQueryHelper;
+import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -44,7 +45,7 @@ public abstract class FinanceCompensationsBaseFragment extends BaseRecyclerViewF
         }
 
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment queryHelper = findHelper(fragmentManager, getQueryHelperTag());
+        Fragment queryHelper = HelperUtils.findHelper(fragmentManager, getQueryHelperTag());
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -66,7 +67,7 @@ public abstract class FinanceCompensationsBaseFragment extends BaseRecyclerViewF
     public void onCompensationsPinFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         showOnlineQueryErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeHelper(getQueryHelperTag());
+        HelperUtils.removeHelper(getFragmentManager(), getQueryHelperTag());
 
         setLoading(false);
     }
@@ -75,7 +76,7 @@ public abstract class FinanceCompensationsBaseFragment extends BaseRecyclerViewF
      * Called from activity when all compensations queries are finished
      */
     public void onAllCompensationQueriesFinished() {
-        removeHelper(getQueryHelperTag());
+        HelperUtils.removeHelper(getFragmentManager(), getQueryHelperTag());
         setLoading(false);
     }
 

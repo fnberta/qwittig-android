@@ -33,6 +33,7 @@ import ch.giantific.qwittig.ui.activities.TaskDetailsActivity;
 import ch.giantific.qwittig.ui.adapters.TasksRecyclerAdapter;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.utils.DateUtils;
+import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
@@ -115,7 +116,7 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
         }
 
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment taskQueryHelper = findHelper(fragmentManager, TASK_QUERY_HELPER);
+        Fragment taskQueryHelper = HelperUtils.findHelper(fragmentManager, TASK_QUERY_HELPER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -136,7 +137,7 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
     public void onTasksPinFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         showOnlineQueryErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeHelper(TASK_QUERY_HELPER);
+        HelperUtils.removeHelper(getFragmentManager(), TASK_QUERY_HELPER);
 
         setLoading(false);
     }
@@ -152,7 +153,7 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
      * Called from activity when all tasks queries are finished
      */
     public void onAllTasksQueriesFinished() {
-        removeHelper(TASK_QUERY_HELPER);
+        HelperUtils.removeHelper(getFragmentManager(), TASK_QUERY_HELPER);
         setLoading(false);
     }
 
@@ -413,7 +414,7 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
 
     private void remindUserWithHelper(String taskId) {
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment taskRemindHelper = findHelper(fragmentManager, getTaskHelperTag(taskId));
+        Fragment taskRemindHelper = HelperUtils.findHelper(fragmentManager, getTaskHelperTag(taskId));
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -431,7 +432,7 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
     }
 
     public void onUserReminded(String taskId) {
-        removeHelper(getTaskHelperTag(taskId));
+        HelperUtils.removeHelper(getFragmentManager(), getTaskHelperTag(taskId));
 
         Task task = setTaskLoading(taskId, false);
         if (task != null) {
@@ -445,7 +446,7 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
     public void onFailedToRemindUser(ParseException e, String taskId) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         MessageUtils.showBasicSnackbar(mRecyclerView, ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeHelper(getTaskHelperTag(taskId));
+        HelperUtils.removeHelper(getFragmentManager(), getTaskHelperTag(taskId));
 
         setTaskLoading(taskId, false);
     }

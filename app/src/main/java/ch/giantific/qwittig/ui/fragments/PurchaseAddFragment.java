@@ -23,6 +23,7 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.ItemRow;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.helpers.PurchaseSaveHelper;
+import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 
 
@@ -136,7 +137,7 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
 
     private void savePurchaseWithHelper() {
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment purchaseSaveHelper = findHelper(fragmentManager, PURCHASE_SAVE_HELPER);
+        Fragment purchaseSaveHelper = HelperUtils.findHelper(fragmentManager, PURCHASE_SAVE_HELPER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.

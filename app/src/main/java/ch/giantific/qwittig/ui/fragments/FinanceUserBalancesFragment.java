@@ -19,6 +19,7 @@ import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.helpers.UserQueryHelper;
 import ch.giantific.qwittig.ui.adapters.UsersRecyclerAdapter;
 import ch.giantific.qwittig.utils.ComparatorParseUserIgnoreCase;
+import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
@@ -61,7 +62,7 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewFragment implem
         }
 
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment userQueryHelper = findHelper(fragmentManager, USER_QUERY_HELPER);
+        Fragment userQueryHelper = HelperUtils.findHelper(fragmentManager, USER_QUERY_HELPER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -81,7 +82,7 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewFragment implem
     public void onUsersPinFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         showOnlineQueryErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeHelper(USER_QUERY_HELPER);
+        HelperUtils.removeHelper(getFragmentManager(), USER_QUERY_HELPER);
 
         setLoading(false);
     }
@@ -97,7 +98,7 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewFragment implem
      * Called from activity when all purchases queries are finished
      */
     public void onAllUserQueriesFinished() {
-        removeHelper(USER_QUERY_HELPER);
+        HelperUtils.removeHelper(getFragmentManager(), USER_QUERY_HELPER);
         setLoading(false);
     }
 

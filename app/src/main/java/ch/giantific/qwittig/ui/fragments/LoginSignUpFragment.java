@@ -25,6 +25,7 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.Avatar;
 import ch.giantific.qwittig.helpers.LoginHelper;
+import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -217,7 +218,7 @@ public class LoginSignUpFragment extends LoginBaseFragment {
         setLoading(true);
 
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment loginHelper = findHelper(fragmentManager, LoginFragment.LOGIN_HELPER);
+        Fragment loginHelper = HelperUtils.findHelper(fragmentManager, LoginFragment.LOGIN_HELPER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.

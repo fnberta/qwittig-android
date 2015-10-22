@@ -217,13 +217,6 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void showAccountCreateDialog() {
-        AccountCreateDialogFragment accountCreateDialogFragment =
-                new AccountCreateDialogFragment();
-        accountCreateDialogFragment.show(getFragmentManager(), "account_create");
-    }
-
-    @Override
     public void onPurchasesPinned() {
         super.onPurchasesPinned();
 

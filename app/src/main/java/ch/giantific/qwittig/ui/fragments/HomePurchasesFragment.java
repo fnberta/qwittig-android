@@ -27,6 +27,7 @@ import ch.giantific.qwittig.helpers.PurchaseQueryHelper;
 import ch.giantific.qwittig.ui.activities.HomeActivity;
 import ch.giantific.qwittig.ui.activities.PurchaseDetailsActivity;
 import ch.giantific.qwittig.ui.adapters.PurchasesRecyclerAdapter;
+import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
@@ -118,7 +119,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
         }
 
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment PurchaseQueryHelper = findHelper(fragmentManager, PURCHASE_QUERY_HELPER);
+        Fragment PurchaseQueryHelper = HelperUtils.findHelper(fragmentManager, PURCHASE_QUERY_HELPER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -139,7 +140,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
     public void onPurchasesPinFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         showOnlineQueryErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeHelper(PURCHASE_QUERY_HELPER);
+        HelperUtils.removeHelper(getFragmentManager(), PURCHASE_QUERY_HELPER);
 
         setLoading(false);
     }
@@ -152,7 +153,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
      * Called from activity when all purchases queries are finished
      */
     public void onAllPurchasesQueriesFinished() {
-        removeHelper(PURCHASE_QUERY_HELPER);
+        HelperUtils.removeHelper(getFragmentManager(), PURCHASE_QUERY_HELPER);
         setLoading(false);
     }
 
@@ -223,7 +224,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
 
     private void loadMoreDataWithHelper(int skip) {
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment moreQueryHelper = findHelper(fragmentManager, MoreQueryHelper.MORE_QUERY_HELPER);
+        Fragment moreQueryHelper = HelperUtils.findHelper(fragmentManager, MoreQueryHelper.MORE_QUERY_HELPER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -237,7 +238,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
     }
 
     public void onMoreObjectsPinned(List<ParseObject> objects) {
-        removeHelper(MoreQueryHelper.MORE_QUERY_HELPER);
+        HelperUtils.removeHelper(getFragmentManager(), MoreQueryHelper.MORE_QUERY_HELPER);
 
         mIsLoadingMore = false;
         mRecyclerAdapter.hideLoadMoreIndicator();
@@ -247,7 +248,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
     public void onMoreObjectsPinFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         showLoadMoreErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeHelper(MoreQueryHelper.MORE_QUERY_HELPER);
+        HelperUtils.removeHelper(getFragmentManager(), MoreQueryHelper.MORE_QUERY_HELPER);
 
         mIsLoadingMore = false;
         mRecyclerAdapter.hideLoadMoreIndicator();

@@ -22,6 +22,7 @@ import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.helpers.InviteUsersHelper;
+import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
@@ -232,7 +233,7 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
 
     private void inviteUsersWithHelper(Group group) {
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment inviteUsersHelper = findHelper(fragmentManager, INVITE_HELPER);
+        Fragment inviteUsersHelper = HelperUtils.findHelper(fragmentManager, INVITE_HELPER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -252,7 +253,7 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
     public void onInviteUsersFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         onParseError(ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeHelper(INVITE_HELPER);
+        HelperUtils.removeHelper(getFragmentManager(), INVITE_HELPER);
     }
 
     /**
@@ -260,7 +261,7 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
      */
     public void onUsersInvited() {
         mListener.progressCircleStartFinal();
-        removeHelper(INVITE_HELPER);
+        HelperUtils.removeHelper(getFragmentManager(), INVITE_HELPER);
 
     }
 

@@ -46,6 +46,7 @@ import ch.giantific.qwittig.ui.activities.SettingsUserInviteActivity;
 import ch.giantific.qwittig.ui.fragments.dialogs.AccountDeleteDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupLeaveBalanceNotZeroDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupLeaveDialogFragment;
+import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
@@ -484,7 +485,7 @@ public class SettingsFragment extends PreferenceFragment implements
 
     private void logOutWithHelper() {
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment logoutHelper = findHelper(fragmentManager, LOGOUT_HELPER);
+        Fragment logoutHelper = HelperUtils.findHelper(fragmentManager, LOGOUT_HELPER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -495,10 +496,6 @@ public class SettingsFragment extends PreferenceFragment implements
                     .add(logoutHelper, LOGOUT_HELPER)
                     .commit();
         }
-    }
-
-    private Fragment findHelper(FragmentManager fragmentManager, String tag) {
-        return fragmentManager.findFragmentByTag(tag);
     }
 
     /**
@@ -525,21 +522,12 @@ public class SettingsFragment extends PreferenceFragment implements
     public void onLogoutFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         onParseError(ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeHelper(LOGOUT_HELPER);
+        HelperUtils.removeHelper(getFragmentManager(), LOGOUT_HELPER);
     }
 
     private void onParseError(String errorMessage) {
         dismissProgressDialog();
         MessageUtils.showBasicSnackbar(getView(), errorMessage);
-    }
-
-    private void removeHelper(String tag) {
-        FragmentManager fragmentManager = getFragmentManager();
-        Fragment fragment = findHelper(fragmentManager, tag);
-
-        if (fragment != null) {
-            fragmentManager.beginTransaction().remove(fragment).commitAllowingStateLoss();
-        }
     }
 
     public void deleteAccount() {
@@ -576,7 +564,7 @@ public class SettingsFragment extends PreferenceFragment implements
 
     private void deleteAccountWithHelper() {
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment deleteAccountHelper = findHelper(fragmentManager, DELETE_ACCOUNT_HELPER);
+        Fragment deleteAccountHelper = HelperUtils.findHelper(fragmentManager, DELETE_ACCOUNT_HELPER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -598,7 +586,7 @@ public class SettingsFragment extends PreferenceFragment implements
     public void onDeleteUserFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         onParseError(ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeHelper(DELETE_ACCOUNT_HELPER);
+        HelperUtils.removeHelper(getFragmentManager(), DELETE_ACCOUNT_HELPER);
     }
 
     @Override

@@ -21,6 +21,7 @@ import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Compensation;
 import ch.giantific.qwittig.helpers.MoreQueryHelper;
 import ch.giantific.qwittig.ui.adapters.CompensationsPaidRecyclerAdapter;
+import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
@@ -159,7 +160,7 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
 
     private void loadMoreDataWithHelper(int skip) {
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment moreQueryHelper = findHelper(fragmentManager, MoreQueryHelper.MORE_QUERY_HELPER);
+        Fragment moreQueryHelper = HelperUtils.findHelper(fragmentManager, MoreQueryHelper.MORE_QUERY_HELPER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -173,7 +174,7 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
     }
 
     public void onMoreObjectsPinned(List<ParseObject> objects) {
-        removeHelper(MoreQueryHelper.MORE_QUERY_HELPER);
+        HelperUtils.removeHelper(getFragmentManager(), MoreQueryHelper.MORE_QUERY_HELPER);
 
         mIsLoadingMore = false;
         mRecyclerAdapter.hideLoadMoreIndicator();
@@ -183,7 +184,7 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
     public void onMoreObjectsPinFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         showLoadMoreErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeHelper(MoreQueryHelper.MORE_QUERY_HELPER);
+        HelperUtils.removeHelper(getFragmentManager(), MoreQueryHelper.MORE_QUERY_HELPER);
 
         mIsLoadingMore = false;
         mRecyclerAdapter.hideLoadMoreIndicator();
