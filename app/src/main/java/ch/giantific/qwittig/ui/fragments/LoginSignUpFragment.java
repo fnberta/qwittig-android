@@ -2,6 +2,8 @@ package ch.giantific.qwittig.ui.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,7 +12,6 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,23 +20,25 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
-
-import java.util.List;
+import com.bumptech.glide.request.target.SimpleTarget;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.Avatar;
+import ch.giantific.qwittig.helpers.LoginHelper;
+import ch.giantific.qwittig.utils.HelperUtils;
+import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class LoginSignUpFragment extends Fragment {
+public class LoginSignUpFragment extends LoginBaseFragment {
 
     private static final String BUNDLE_EMAIL = "email";
     private static final int NICKNAME_MAX_CHARACTERS = 10;
+    private static final int INTENT_REQUEST_IMAGE = 1;
     private String mEmail;
     private TextInputLayout mTextInputLayoutEmail;
-    private AutoCompleteTextView mEditTextEmail;
     private TextInputLayout mTextInputLayoutPassword;
     private EditText mEditTextPassword;
     private TextInputLayout mTextInputLayoutPasswordRepeat;
@@ -44,29 +47,22 @@ public class LoginSignUpFragment extends Fragment {
     private EditText mEditTextNickname;
     private ImageView mImageButtonAvatar;
     private Button mButtonSignUp;
-
-    private FragmentInteractionListener mListener;
+    private byte[] mAvatar;
 
     public LoginSignUpFragment() {
     }
 
+    /**
+     * Returns a new instance of a {@link LoginSignUpFragment} with an email address as an argument.
+     * @param email the email to be used as an argument
+     * @return a new instance of a {@link LoginSignUpFragment}
+     */
     public static LoginSignUpFragment newInstance(String email) {
         LoginSignUpFragment fragment = new LoginSignUpFragment();
         Bundle args = new Bundle();
         args.putString(BUNDLE_EMAIL, email);
         fragment.setArguments(args);
         return fragment;
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (FragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
-        }
     }
 
     @Override
@@ -81,37 +77,36 @@ public class LoginSignUpFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_login_sign_up, container, false);
-
-        mTextInputLayoutEmail = (TextInputLayout) rootView.findViewById(R.id.til_login_signup_email);
-        mEditTextEmail = (AutoCompleteTextView) mTextInputLayoutEmail.getEditText();
-        mTextInputLayoutPassword = (TextInputLayout) rootView.findViewById(R.id.til_login_signup_password);
-        mEditTextPassword = mTextInputLayoutPassword.getEditText();
-        mTextInputLayoutPasswordRepeat = (TextInputLayout) rootView.findViewById(R.id.til_login_signup_password_repeat);
-        mEditTextPasswordRepeat = mTextInputLayoutPasswordRepeat.getEditText();
-        mTextInputLayoutNickname = (TextInputLayout) rootView.findViewById(R.id.til_login_signup_nickname);
-        mEditTextNickname = mTextInputLayoutNickname.getEditText();
-        mImageButtonAvatar = (ImageView) rootView.findViewById(R.id.ibt_login_signup_avatar);
-        mButtonSignUp = (Button) rootView.findViewById(R.id.bt_login_signup);
-
-        return rootView;
+        return inflater.inflate(R.layout.fragment_login_sign_up, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mTextInputLayoutEmail = (TextInputLayout) view.findViewById(R.id.til_login_signup_email);
+        mEditTextEmail = (AutoCompleteTextView) mTextInputLayoutEmail.getEditText();
         if (mEmail.length() > 0) {
             mEditTextEmail.setText(mEmail);
         }
 
+        mTextInputLayoutPassword = (TextInputLayout) view.findViewById(R.id.til_login_signup_password);
+        mEditTextPassword = mTextInputLayoutPassword.getEditText();
+        mTextInputLayoutPasswordRepeat = (TextInputLayout) view.findViewById(R.id.til_login_signup_password_repeat);
+        mEditTextPasswordRepeat = mTextInputLayoutPasswordRepeat.getEditText();
+        mTextInputLayoutNickname = (TextInputLayout) view.findViewById(R.id.til_login_signup_nickname);
+        mEditTextNickname = mTextInputLayoutNickname.getEditText();
+
+        mImageButtonAvatar = (ImageView) view.findViewById(R.id.ibt_login_signup_avatar);
         mImageButtonAvatar.setImageDrawable(Avatar.getFallbackDrawable(getActivity(), true, true));
         mImageButtonAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.pickAvatar();
+                pickAvatar();
             }
         });
+
+        mButtonSignUp = (Button) view.findViewById(R.id.bt_login_signup);
         mButtonSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -120,7 +115,36 @@ public class LoginSignUpFragment extends Fragment {
         });
     }
 
-    public void setAvatar(Uri imageUri) {
+    private void pickAvatar() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        startActivityForResult(intent, INTENT_REQUEST_IMAGE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == LoginSignUpFragment.INTENT_REQUEST_IMAGE &&
+                resultCode == Activity.RESULT_OK) {
+            final Uri imageUri = data.getData();
+            setAvatar(imageUri);
+        }
+    }
+
+    private void setAvatar(Uri imageUri) {
+        Glide.with(this)
+                .load(imageUri)
+                .asBitmap()
+                .toBytes(Bitmap.CompressFormat.JPEG, Avatar.JPEG_COMPRESSION_RATE)
+                .centerCrop()
+                .into(new SimpleTarget<byte[]>(Avatar.WIDTH, Avatar.HEIGHT) {
+                    @Override
+                    public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
+                        mAvatar = resource;
+                    }
+                });
+
         Glide.with(this)
                 .load(imageUri)
                 .asBitmap()
@@ -179,39 +203,31 @@ public class LoginSignUpFragment extends Fragment {
         }
 
         if (fieldsAreComplete) {
-            mListener.createAccount(email, password, nickname);
+            createAccountWithHelper(email, password, nickname);
         } else {
             focusView.requestFocus();
         }
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    private void createAccountWithHelper(final String email, final String password, final String nickname) {
+        if (!Utils.isConnected(getActivity())) {
+            MessageUtils.showBasicSnackbar(mButtonSignUp, getString(R.string.toast_no_connection));
+            return;
+        }
 
-        mListener.populateAutoComplete();
+        setLoading(true);
+
+        FragmentManager fragmentManager = getFragmentManager();
+        Fragment loginHelper = HelperUtils.findHelper(fragmentManager, LoginFragment.LOGIN_HELPER);
+
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (loginHelper == null) {
+            loginHelper = LoginHelper.newInstance(email, password, nickname, mAvatar);
+
+            fragmentManager.beginTransaction()
+                    .add(loginHelper, LoginFragment.LOGIN_HELPER)
+                    .commit();
+        }
     }
-
-    public void addEmailsToAutoComplete(List<String> emailAddressCollection) {
-        //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
-                android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
-
-        mEditTextEmail.setAdapter(adapter);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    public interface FragmentInteractionListener {
-        void pickAvatar();
-
-        void createAccount(String email, String password, String nickname);
-
-        void populateAutoComplete();
-    }
-
 }

@@ -25,6 +25,7 @@ import ch.giantific.qwittig.data.models.Currency;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.helpers.CreateGroupHelper;
+import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
@@ -139,7 +140,7 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
 
     private void createNewGroupWithHelper(String newGroupCurrency) {
         FragmentManager fragmentManager = getFragmentManager();
-        CreateGroupHelper createGroupHelper = findInviteHelper(fragmentManager);
+        Fragment createGroupHelper = HelperUtils.findHelper(fragmentManager, CREATE_GROUP_HELPER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -153,19 +154,6 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
         }
     }
 
-    private CreateGroupHelper findInviteHelper(FragmentManager fragmentManager) {
-        return (CreateGroupHelper) fragmentManager.findFragmentByTag(CREATE_GROUP_HELPER);
-    }
-
-    private void removeCreateGroupHelper() {
-        FragmentManager fragmentManager = getFragmentManager();
-        CreateGroupHelper createGroupHelper = findInviteHelper(fragmentManager);
-
-        if (createGroupHelper != null) {
-            fragmentManager.beginTransaction().remove(createGroupHelper).commitAllowingStateLoss();
-        }
-    }
-
     /**
      * Called from activity when helper fails to create new group
      * @param e
@@ -173,7 +161,7 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
     public void onCreateNewGroupFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         onParseError(ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeCreateGroupHelper();
+        HelperUtils.removeHelper(getFragmentManager(), CREATE_GROUP_HELPER);
     }
 
     /**
@@ -204,7 +192,7 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
     public void onInviteUsersFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         onParseError(ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeCreateGroupHelper();
+        HelperUtils.removeHelper(getFragmentManager(), CREATE_GROUP_HELPER);
 
         // TODO: new group is created but users not invited, finish activity but tell the user
     }

@@ -1,6 +1,7 @@
 package ch.giantific.qwittig.ui.fragments;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentManager;
 
 import com.parse.ParseException;
@@ -8,6 +9,7 @@ import com.parse.ParseException;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.helpers.CompensationQueryHelper;
+import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -43,21 +45,17 @@ public abstract class FinanceCompensationsBaseFragment extends BaseRecyclerViewF
         }
 
         FragmentManager fragmentManager = getFragmentManager();
-        CompensationQueryHelper compensationQueryHelper = findQueryHelper(fragmentManager);
+        Fragment queryHelper = HelperUtils.findHelper(fragmentManager, getQueryHelperTag());
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-        if (compensationQueryHelper == null) {
-            compensationQueryHelper = CompensationQueryHelper.newInstance(queryPaid);
+        if (queryHelper == null) {
+            queryHelper = CompensationQueryHelper.newInstance(queryPaid);
 
             fragmentManager.beginTransaction()
-                    .add(compensationQueryHelper, getQueryHelperTag())
+                    .add(queryHelper, getQueryHelperTag())
                     .commit();
         }
-    }
-
-    private CompensationQueryHelper findQueryHelper(FragmentManager fragmentManager) {
-        return (CompensationQueryHelper) fragmentManager.findFragmentByTag(getQueryHelperTag());
     }
 
     protected abstract String getQueryHelperTag();
@@ -69,25 +67,16 @@ public abstract class FinanceCompensationsBaseFragment extends BaseRecyclerViewF
     public void onCompensationsPinFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         showOnlineQueryErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeQueryHelper();
+        HelperUtils.removeHelper(getFragmentManager(), getQueryHelperTag());
 
         setLoading(false);
-    }
-
-    private void removeQueryHelper() {
-        FragmentManager fragmentManager = getFragmentManager();
-        CompensationQueryHelper compensationQueryHelper = findQueryHelper(fragmentManager);
-
-        if (compensationQueryHelper != null) {
-            fragmentManager.beginTransaction().remove(compensationQueryHelper).commitAllowingStateLoss();
-        }
     }
 
     /**
      * Called from activity when all compensations queries are finished
      */
     public void onAllCompensationQueriesFinished() {
-        removeQueryHelper();
+        HelperUtils.removeHelper(getFragmentManager(), getQueryHelperTag());
         setLoading(false);
     }
 

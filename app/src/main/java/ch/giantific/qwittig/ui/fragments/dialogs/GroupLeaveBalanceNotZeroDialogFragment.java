@@ -34,7 +34,7 @@ public class GroupLeaveBalanceNotZeroDialogFragment extends DialogFragment {
         dialogBuilder.setMessage(R.string.dialog_group_balance_not_zero_message)
                 .setPositiveButton(R.string.dialog_positive_start_new, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mListener.startNewSettlement();
+                        mListener.onStartSettlementSelected();
                         dismiss();
                     }
                 })
@@ -48,6 +48,6 @@ public class GroupLeaveBalanceNotZeroDialogFragment extends DialogFragment {
     }
 
     public interface FragmentInteractionListener {
-        void startNewSettlement();
+        void onStartSettlementSelected();
     }
 }

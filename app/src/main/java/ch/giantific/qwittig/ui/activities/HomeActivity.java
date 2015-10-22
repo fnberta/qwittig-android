@@ -1,5 +1,6 @@
 package ch.giantific.qwittig.ui.activities;
 
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -43,6 +44,7 @@ import ch.giantific.qwittig.ui.fragments.dialogs.GoPremiumDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupJoinDialogFragment;
 import ch.giantific.qwittig.utils.AnimUtils;
+import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.Utils;
@@ -163,7 +165,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         }
 
         if (mNewQueryNeeded) {
-            fullOnlineQuery();
+            fullOnlineQueryWithHelper();
         }
     }
 
@@ -216,7 +218,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
     private void getInvitedGroupWithHelper() {
         FragmentManager fragmentManager = getFragmentManager();
-        InvitedGroupHelper invitedGroupHelper = findInvitedGroupHelper(fragmentManager);
+        Fragment invitedGroupHelper = HelperUtils.findHelper(fragmentManager, INVITED_GROUP_HELPER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -229,21 +231,17 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         }
     }
 
-    private InvitedGroupHelper findInvitedGroupHelper(FragmentManager fragmentManager) {
-        return (InvitedGroupHelper) fragmentManager.findFragmentByTag(INVITED_GROUP_HELPER);
-    }
-
     @Override
     public void onInvitedGroupQueryFailed(ParseException e) {
         ParseErrorHandler.handleParseError(this, e);
         MessageUtils.showBasicSnackbar(mFabMenu, ParseErrorHandler.getErrorMessage(this, e));
-        removeInvitedGroupHelper();
+        HelperUtils.removeHelper(getFragmentManager(), INVITED_GROUP_HELPER);
     }
 
     @Override
     public void onEmailNotValid() {
         MessageUtils.showBasicSnackbar(mFabMenu, getString(R.string.toast_group_invite_not_valid));
-        removeInvitedGroupHelper();
+        HelperUtils.removeHelper(getFragmentManager(), INVITED_GROUP_HELPER);
     }
 
     @Override
@@ -273,7 +271,9 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     public void joinInvitedGroup() {
         showProgressDialog(getString(R.string.progress_switch_groups));
 
-        findInvitedGroupHelper(getFragmentManager()).joinInvitedGroup(mInvitedGroup);
+        InvitedGroupHelper helper = (InvitedGroupHelper)
+                HelperUtils.findHelper(getFragmentManager(), INVITED_GROUP_HELPER);
+        helper.joinInvitedGroup(mInvitedGroup);
     }
 
     private void showProgressDialog(String message) {
@@ -283,7 +283,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
     @Override
     public void onUserJoinedGroup() {
-        removeInvitedGroupHelper();
+        HelperUtils.removeHelper(getFragmentManager(), INVITED_GROUP_HELPER);
 
         // register for notifications for the new group
         ParsePush.subscribeInBackground(mInvitedGroup.getObjectId());
@@ -301,18 +301,9 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     public void onUserJoinGroupFailed(ParseException e) {
         ParseErrorHandler.handleParseError(this, e);
         MessageUtils.getBasicSnackbar(mFabMenu, ParseErrorHandler.getErrorMessage(this, e));
-        removeInvitedGroupHelper();
+        HelperUtils.removeHelper(getFragmentManager(), INVITED_GROUP_HELPER);
 
         dismissProgressDialog();
-    }
-
-    private void removeInvitedGroupHelper() {
-        FragmentManager fragmentManager = getFragmentManager();
-        InvitedGroupHelper invitedGroupHelper = findInvitedGroupHelper(fragmentManager);
-
-        if (invitedGroupHelper != null) {
-            fragmentManager.beginTransaction().remove(invitedGroupHelper).commitAllowingStateLoss();
-        }
     }
 
     private void dismissProgressDialog() {
@@ -323,7 +314,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
     @Override
     public void discardInvitation() {
-        removeInvitedGroupHelper();
+        HelperUtils.removeHelper(getFragmentManager(), INVITED_GROUP_HELPER);
 
         mInvitedGroup.removeUserInvited(mCurrentUser.getUsername());
         mInvitedGroup.saveEventually();
@@ -331,7 +322,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         MessageUtils.showBasicSnackbar(mFabMenu, getString(R.string.toast_invitation_discarded));
     }
 
-    private void fullOnlineQuery() {
+    private void fullOnlineQueryWithHelper() {
         if (!Utils.isConnected(this)) {
             dismissProgressDialog();
             showFullOnlineQueryErrorSnackbar();
@@ -339,7 +330,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         }
 
         FragmentManager fragmentManager = getFragmentManager();
-        FullQueryHelper fullQueryHelper = findQueryHelper(fragmentManager);
+        Fragment fullQueryHelper = HelperUtils.findHelper(fragmentManager, FULL_QUERY_HELPER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -358,44 +349,31 @@ public class HomeActivity extends BaseNavDrawerActivity implements
             @Override
             public void onClick(View v) {
                 showProgressDialog(getString(R.string.progress_new_group_data));
-                fullOnlineQuery();
+                fullOnlineQueryWithHelper();
             }
         });
         snackbar.show();
 
     }
 
-    private FullQueryHelper findQueryHelper(FragmentManager fragmentManager) {
-        return (FullQueryHelper) fragmentManager.findFragmentByTag(FULL_QUERY_HELPER);
-    }
-
     @Override
     public void onPinFailed(ParseException e) {
         ParseErrorHandler.handleParseError(this, e);
         showFullOnlineQueryErrorSnackbar();
-        removeQueryHelper();
+        HelperUtils.removeHelper(getFragmentManager(), FULL_QUERY_HELPER);
 
         dismissProgressDialog();
     }
 
     @Override
     public void onFullQueryFinished(boolean failedEarly) {
-        removeQueryHelper();
+        HelperUtils.removeHelper(getFragmentManager(), FULL_QUERY_HELPER);
 
         dismissProgressDialog();
 
         if (failedEarly) {
             mNewQueryNeeded = false;
             updateFragmentAdapters();
-        }
-    }
-
-    private void removeQueryHelper() {
-        FragmentManager fragmentManager = getFragmentManager();
-        FullQueryHelper fullQueryHelper = findQueryHelper(fragmentManager);
-
-        if (fullQueryHelper != null) {
-            fragmentManager.beginTransaction().remove(fullQueryHelper).commitAllowingStateLoss();
         }
     }
 
@@ -414,7 +392,8 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
+        int id = view.getId();
+        switch (id) {
             case R.id.fab_auto: {
                 if (userIsInGroup()) {
                     if (mIsPremium || mInTrialMode || BuildConfig.DEBUG) {
@@ -516,7 +495,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case HomeActivity.INTENT_REQUEST_PURCHASE_MODIFY:
+            case INTENT_REQUEST_PURCHASE_MODIFY:
                 switch (resultCode) {
                     case PurchaseAddFragment.RESULT_PURCHASE_SAVED:
                         MessageUtils.showBasicSnackbar(mFabMenu, getString(R.string.toast_purchase_added));
@@ -545,7 +524,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
                         break;
                 }
                 break;
-            case HomeActivity.INTENT_REQUEST_PURCHASE_DETAILS:
+            case INTENT_REQUEST_PURCHASE_DETAILS:
                 switch (resultCode) {
                     case PurchaseDetailsActivity.RESULT_PURCHASE_DELETED:
                         MessageUtils.showBasicSnackbar(mFabMenu,

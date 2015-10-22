@@ -21,7 +21,6 @@ import ch.giantific.qwittig.utils.ParseUtils;
  */
 public class SettlementHelper extends BaseHelper {
 
-    public static final String SETTLEMENT_HELPER = "settlement_helper";
     private static final String SINGLE_USER_SETTLEMENT = "single_user_settlement";
     private static final String LOG_TAG = SettlementHelper.class.getSimpleName();
     private HelperInteractionListener mListener;

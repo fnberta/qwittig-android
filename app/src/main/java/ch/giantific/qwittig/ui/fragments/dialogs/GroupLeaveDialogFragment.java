@@ -55,7 +55,7 @@ public class GroupLeaveDialogFragment extends DialogFragment {
         dialogBuilder.setMessage(mMessage)
                 .setPositiveButton(R.string.dialog_positive_leave, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mListener.leaveCurrentGroup();
+                        mListener.onLeaveGroupSelected();
                         dismiss();
                     }
                 })
@@ -64,6 +64,6 @@ public class GroupLeaveDialogFragment extends DialogFragment {
     }
 
     public interface FragmentInteractionListener {
-        void leaveCurrentGroup();
+        void onLeaveGroupSelected();
     }
 }

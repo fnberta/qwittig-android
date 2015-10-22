@@ -24,6 +24,7 @@ import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.data.stats.models.Stats;
 import ch.giantific.qwittig.helpers.StatsHelper;
+import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
@@ -232,7 +233,7 @@ public abstract class StatsBaseFragment extends BaseFragment implements
     final void calcStatsWithHelper(@StatsHelper.StatsType int statsType,
                                      String year, int month) {
         FragmentManager fragmentManager = getFragmentManager();
-        StatsHelper statsHelper = findStatsHelper(fragmentManager);
+        Fragment statsHelper = HelperUtils.findHelper(fragmentManager, getHelperTag());
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -247,26 +248,13 @@ public abstract class StatsBaseFragment extends BaseFragment implements
 
     protected abstract String getHelperTag();
 
-    private StatsHelper findStatsHelper(FragmentManager fragmentManager) {
-        return (StatsHelper) fragmentManager.findFragmentByTag(getHelperTag());
-    }
-
-    private void removeStatsHelper() {
-        FragmentManager fragmentManager = getFragmentManager();
-        StatsHelper statsHelper = findStatsHelper(fragmentManager);
-
-        if (statsHelper != null) {
-            fragmentManager.beginTransaction().remove(statsHelper).commitAllowingStateLoss();
-        }
-    }
-
     /**
      * Called from activity when helper successfully calculated new stats
      * @param stats
      */
     @CallSuper
     public void onStatsCalculated(Stats stats) {
-        removeStatsHelper();
+        HelperUtils.removeHelper(getFragmentManager(), getHelperTag());
 
         if (stats == null) {
             mIsLoading = false;
@@ -290,7 +278,7 @@ public abstract class StatsBaseFragment extends BaseFragment implements
     public void onFailedToCalculateStats(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeStatsHelper();
+        HelperUtils.removeHelper(getFragmentManager(), getHelperTag());
                 
         mIsLoading = false;
         toggleProgressBarVisibility();

@@ -1,5 +1,6 @@
 package ch.giantific.qwittig.ui.fragments;
 
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -18,6 +19,7 @@ import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.helpers.UserQueryHelper;
 import ch.giantific.qwittig.ui.adapters.UsersRecyclerAdapter;
 import ch.giantific.qwittig.utils.ComparatorParseUserIgnoreCase;
+import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
@@ -60,7 +62,7 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewFragment implem
         }
 
         FragmentManager fragmentManager = getFragmentManager();
-        UserQueryHelper userQueryHelper = findQueryHelper(fragmentManager);
+        Fragment userQueryHelper = HelperUtils.findHelper(fragmentManager, USER_QUERY_HELPER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
@@ -73,10 +75,6 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewFragment implem
         }
     }
 
-    private UserQueryHelper findQueryHelper(FragmentManager fragmentManager) {
-        return (UserQueryHelper) fragmentManager.findFragmentByTag(USER_QUERY_HELPER);
-    }
-
     /**
      * Called from activity when helper fails to pin new purchases
      * @param e
@@ -84,7 +82,7 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewFragment implem
     public void onUsersPinFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         showOnlineQueryErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
-        removeQueryHelper();
+        HelperUtils.removeHelper(getFragmentManager(), USER_QUERY_HELPER);
 
         setLoading(false);
     }
@@ -100,17 +98,8 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewFragment implem
      * Called from activity when all purchases queries are finished
      */
     public void onAllUserQueriesFinished() {
-        removeQueryHelper();
+        HelperUtils.removeHelper(getFragmentManager(), USER_QUERY_HELPER);
         setLoading(false);
-    }
-
-    private void removeQueryHelper() {
-        FragmentManager fragmentManager = getFragmentManager();
-        UserQueryHelper UserQueryHelper = findQueryHelper(fragmentManager);
-
-        if (UserQueryHelper != null) {
-            fragmentManager.beginTransaction().remove(UserQueryHelper).commitAllowingStateLoss();
-        }
     }
 
     @Override
