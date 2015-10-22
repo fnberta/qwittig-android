@@ -1,8 +1,12 @@
 package ch.giantific.qwittig.ui.fragments;
 
 import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -24,7 +28,9 @@ import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.ui.activities.BaseActivity;
 import ch.giantific.qwittig.ui.activities.PurchaseDetailsActivity;
+import ch.giantific.qwittig.ui.activities.PurchaseEditActivity;
 import ch.giantific.qwittig.ui.adapters.PurchaseDetailsRecyclerAdapter;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
@@ -37,6 +43,7 @@ import ch.giantific.qwittig.utils.ParseUtils;
 public class PurchaseDetailsFragment extends BaseFragment implements
         LocalQuery.ObjectLocalFetchListener {
 
+    private static final String PURCHASE_RECEIPT_FRAGMENT = "purchase_receipt_fragment";
     private FragmentInteractionListener mListener;
     private RecyclerView mRecyclerView;
     private ProgressBar mProgressBar;
@@ -105,27 +112,6 @@ public class PurchaseDetailsFragment extends BaseFragment implements
         mRecyclerView.setAdapter(mRecyclerAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setHasFixedSize(true);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_purchase_details_frag, menu);
-
-        if (mHasReceiptFile) {
-            menu.findItem(R.id.action_purchase_show_receipt).setVisible(true);
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.action_purchase_show_receipt:
-                mListener.replaceWithReceiptFragment();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 
     @Override
@@ -216,6 +202,50 @@ public class PurchaseDetailsFragment extends BaseFragment implements
         }
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_purchase_details_frag, menu);
+
+        if (mHasReceiptFile) {
+            menu.findItem(R.id.action_purchase_show_receipt).setVisible(true);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.action_purchase_show_receipt:
+                replaceWithReceiptFragment();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void replaceWithReceiptFragment() {
+        FragmentManager fragmentManager = getFragmentManager();
+        PurchaseReceiptDetailFragment purchaseReceiptDetailFragment =
+                PurchaseReceiptDetailFragment.newInstance(mPurchaseId);
+        fragmentManager.beginTransaction()
+                .replace(R.id.container, purchaseReceiptDetailFragment, PURCHASE_RECEIPT_FRAGMENT)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    /**
+     * Launches {@link PurchaseEditActivity} to edit the opened purchase.
+     */
+    public void editPurchase() {
+        Intent intent = new Intent(getActivity(), PurchaseEditActivity.class);
+        intent.putExtra(HomePurchasesFragment.INTENT_PURCHASE_ID, mPurchaseId);
+        ActivityOptionsCompat activityOptionsCompat =
+                ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity());
+        startActivityForResult(intent, BaseActivity.INTENT_REQUEST_PURCHASE_MODIFY,
+                activityOptionsCompat.toBundle());
+    }
+
     /**
      * Deletes purchase and all its items.
      */
@@ -236,7 +266,7 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     }
 
     /**
-     * Shows snackbar with exchange rate
+     * Shows snackbar with exchange rate.
      */
     public void showExchangeRate() {
         float exchangeRate = mPurchase.getExchangeRate();
@@ -256,7 +286,5 @@ public class PurchaseDetailsFragment extends BaseFragment implements
         void setToolbarStoreDate(String store, Date date);
 
         void toggleActionBarOptions(boolean showEditOptions, boolean hasForeignCurrency);
-
-        void replaceWithReceiptFragment();
     }
 }

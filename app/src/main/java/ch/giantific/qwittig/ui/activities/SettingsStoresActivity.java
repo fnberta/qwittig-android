@@ -1,6 +1,7 @@
 package ch.giantific.qwittig.ui.activities;
 
 import android.annotation.TargetApi;
+import android.app.FragmentManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -17,7 +18,7 @@ public class SettingsStoresActivity extends BaseActivity implements
         SettingsStoresFragment.FragmentInteractionListener,
         StoreAddDialogFragment.DialogInteractionListener {
 
-    private static final String SETTINGS_STORE_FRAGMENT = "settings_store_fragment";
+    private static final String STATE_SETTINGS_STORE_FRAGMENT = "STATE_SETTINGS_STORE_FRAGMENT";
     private SettingsStoresFragment mSettingsStoresFragment;
     private FloatingActionButton mFab;
 
@@ -34,6 +35,7 @@ public class SettingsStoresActivity extends BaseActivity implements
             }
         });
 
+        FragmentManager fragmentManager = getFragmentManager();
         if (savedInstanceState == null) {
             if (Utils.isRunningLollipopAndHigher()) {
                 addActivityTransitionListener();
@@ -41,11 +43,15 @@ public class SettingsStoresActivity extends BaseActivity implements
                 mFab.show();
             }
 
-            getFragmentManager().beginTransaction()
-                    .add(R.id.container, new SettingsStoresFragment(), SETTINGS_STORE_FRAGMENT)
+            mSettingsStoresFragment = new SettingsStoresFragment();
+            fragmentManager.beginTransaction()
+                    .add(R.id.container, mSettingsStoresFragment)
                     .commit();
         } else {
             mFab.show();
+
+            mSettingsStoresFragment = (SettingsStoresFragment) fragmentManager
+                    .getFragment(savedInstanceState, STATE_SETTINGS_STORE_FRAGMENT);
         }
     }
 
@@ -63,6 +69,14 @@ public class SettingsStoresActivity extends BaseActivity implements
         });
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        getFragmentManager().putFragment(outState, STATE_SETTINGS_STORE_FRAGMENT,
+                mSettingsStoresFragment);
+    }
+
     private void showStoreAddDialog() {
         StoreAddDialogFragment storeAddDialogFragment = new StoreAddDialogFragment();
         storeAddDialogFragment.show(getFragmentManager(), "add_store");
@@ -71,14 +85,6 @@ public class SettingsStoresActivity extends BaseActivity implements
     @Override
     public void addStore(String store) {
         mSettingsStoresFragment.addStoreToList(store);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        mSettingsStoresFragment = (SettingsStoresFragment) getFragmentManager()
-                .findFragmentByTag(SETTINGS_STORE_FRAGMENT);
     }
 
     @Override

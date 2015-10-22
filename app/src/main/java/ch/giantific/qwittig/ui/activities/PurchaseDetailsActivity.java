@@ -23,7 +23,6 @@ import ch.giantific.qwittig.ui.fragments.HomePurchasesFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseDetailsFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseEditFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseReceiptDetailFragment;
-import ch.giantific.qwittig.ui.fragments.dialogs.AccountCreateDialogFragment;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 
@@ -35,8 +34,7 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     public static final int RESULT_GROUP_CHANGED = 3;
     private static final String STATE_TOOLBAR_TITLE = "state_toolbar_title";
     private static final String STATE_TOOLBAR_SUBTITLE = "state_toolbar_subtitle";
-    private static final String PURCHASE_DETAILS_FRAGMENT = "purchase_details_fragment";
-    private static final String PURCHASE_RECEIPT_FRAGMENT = "purchase_receipt_fragment";
+    private static final String STATE_PURCHASE_DETAILS_FRAGMENT = "STATE_PURCHASE_DETAILS_FRAGMENT";
     private static final String LOG_TAG = PurchaseDetailsActivity.class.getSimpleName();
     private String mPurchaseId;
     private boolean mShowEditOptions;
@@ -75,9 +73,16 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
         supportPostponeEnterTransition();
         getPurchaseId();
 
+        FragmentManager fragmentManager = getFragmentManager();
         if (savedInstanceState == null) {
-            addDetailsFragment();
+            mPurchaseDetailsFragment = PurchaseDetailsFragment.newInstance(mPurchaseId);
+            fragmentManager.beginTransaction()
+                    .add(R.id.container, mPurchaseDetailsFragment)
+                    .commit();
         } else {
+            mPurchaseDetailsFragment = (PurchaseDetailsFragment) fragmentManager
+                    .getFragment(savedInstanceState, STATE_PURCHASE_DETAILS_FRAGMENT);
+
             mStore = savedInstanceState.getString(STATE_TOOLBAR_TITLE);
             mDate = savedInstanceState.getLong(STATE_TOOLBAR_SUBTITLE);
             setToolbarTitleValues();
@@ -90,15 +95,10 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
+        getFragmentManager().putFragment(outState, STATE_PURCHASE_DETAILS_FRAGMENT,
+                mPurchaseDetailsFragment);
         outState.putString(STATE_TOOLBAR_TITLE, mStore);
         outState.putLong(STATE_TOOLBAR_SUBTITLE, mDate);
-    }
-
-    private void addDetailsFragment() {
-        getFragmentManager().beginTransaction()
-                .add(R.id.container, PurchaseDetailsFragment.newInstance(mPurchaseId),
-                        PURCHASE_DETAILS_FRAGMENT)
-                .commit();
     }
 
     /**
@@ -119,18 +119,6 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-
-        findDetailsFragment();
-    }
-
-    private void findDetailsFragment() {
-        mPurchaseDetailsFragment = (PurchaseDetailsFragment) getFragmentManager()
-                .findFragmentByTag(PURCHASE_DETAILS_FRAGMENT);
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_purchase_details, menu);
         if (mShowEditOptions) {
@@ -147,7 +135,7 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_purchase_edit:
-                editPurchase();
+                mPurchaseDetailsFragment.editPurchase();
                 return true;
             case R.id.action_purchase_delete:
                 mPurchaseDetailsFragment.deletePurchase();
@@ -157,27 +145,6 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    @Override
-    public void replaceWithReceiptFragment() {
-        FragmentManager fragmentManager = getFragmentManager();
-        PurchaseReceiptDetailFragment purchaseReceiptDetailFragment =
-                PurchaseReceiptDetailFragment.newInstance(mPurchaseId);
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, purchaseReceiptDetailFragment, PURCHASE_RECEIPT_FRAGMENT)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .addToBackStack(null)
-                .commit();
-    }
-
-    private void editPurchase() {
-        Intent intent = new Intent(this, PurchaseEditActivity.class);
-        intent.putExtra(HomePurchasesFragment.INTENT_PURCHASE_ID, mPurchaseId);
-        ActivityOptionsCompat activityOptionsCompat =
-                ActivityOptionsCompat.makeSceneTransitionAnimation(this);
-        startActivityForResult(intent, INTENT_REQUEST_PURCHASE_MODIFY,
-                activityOptionsCompat.toBundle());
     }
 
     @Override

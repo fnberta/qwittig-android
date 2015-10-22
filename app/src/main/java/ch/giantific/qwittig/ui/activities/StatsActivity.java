@@ -30,7 +30,7 @@ public class StatsActivity extends BaseNavDrawerActivity implements
         StatsHelper.HelperInteractionListener {
 
     private static final String LOG_TAG = StatsActivity.class.getSimpleName();
-    private static final String STATS_FRAGMENT = "stats_fragment";
+    private static final String STATE_STATS_FRAGMENT = "stats_fragment";
     private static final int NUMBER_OF_MONTHS = 12;
     private Spinner mSpinnerStatsType;
     private Spinner mSpinnerYear;
@@ -60,6 +60,9 @@ public class StatsActivity extends BaseNavDrawerActivity implements
         if (mUserIsLoggedIn) {
             if (savedInstanceState == null) {
                 addFirstFragment();
+            } else {
+                mStatsFragment = (StatsBaseFragment) getFragmentManager()
+                        .getFragment(savedInstanceState, STATE_STATS_FRAGMENT);
             }
 
             fetchCurrentUserGroups();
@@ -114,9 +117,19 @@ public class StatsActivity extends BaseNavDrawerActivity implements
     }
 
     private void addFirstFragment() {
+        mStatsFragment = new StatsSpendingFragment();
         getFragmentManager().beginTransaction()
-                .add(R.id.container, new StatsSpendingFragment(), STATS_FRAGMENT)
+                .add(R.id.container, mStatsFragment)
                 .commit();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        if (mUserIsLoggedIn) {
+            getFragmentManager().putFragment(outState, STATE_STATS_FRAGMENT, mStatsFragment);
+        }
     }
 
     @Override
@@ -124,13 +137,8 @@ public class StatsActivity extends BaseNavDrawerActivity implements
         super.onStart();
 
         if (mUserIsLoggedIn) {
-            findStatsFragment();
             setSpinnerListeners();
         }
-    }
-
-    private void findStatsFragment() {
-        mStatsFragment = (StatsBaseFragment) getFragmentManager().findFragmentByTag(STATS_FRAGMENT);
     }
 
     /**
@@ -207,12 +215,11 @@ public class StatsActivity extends BaseNavDrawerActivity implements
         }
 
         if (fragment != null) {
+            mStatsFragment = fragment;
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction()
-                    .replace(R.id.container, fragment, STATS_FRAGMENT)
+                    .replace(R.id.container, mStatsFragment)
                     .commit();
-            fragmentManager.executePendingTransactions();
-            findStatsFragment();
         }
     }
 
@@ -225,8 +232,6 @@ public class StatsActivity extends BaseNavDrawerActivity implements
         super.afterLoginSetup();
 
         addFirstFragment();
-        getFragmentManager().executePendingTransactions();
-        findStatsFragment();
         setSpinnerListeners();
     }
 

@@ -46,8 +46,8 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         PurchaseSaveHelper.HelperInteractionListener,
         ManualExchangeRateDialogFragment.DialogInteractionListener {
 
-    static final String PURCHASE_FRAGMENT = "purchase_fragment";
-    private static final String STATE_HAS_RECEIPT_FILE = "state_has_receipt_file";
+    static final String STATE_PURCHASE_FRAGMENT = "STATE_PURCHASE_FRAGMENT";
+    private static final String STATE_HAS_RECEIPT_FILE = "STATE_HAS_RECEIPT_FILE";
     private static final String LOG_TAG = PurchaseBaseActivity.class.getSimpleName();
 
     PurchaseBaseFragment mPurchaseFragment;
@@ -91,6 +91,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         super.onSaveInstanceState(outState);
 
         outState.putBoolean(STATE_HAS_RECEIPT_FILE, mHasReceiptFile);
+        getFragmentManager().putFragment(outState, STATE_PURCHASE_FRAGMENT, mPurchaseFragment);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -131,18 +132,6 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         if (isSaving) {
             mFabProgressCircle.show();
         }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        findPurchaseFragment();
-    }
-
-    private void findPurchaseFragment() {
-        mPurchaseFragment = (PurchaseBaseFragment) getFragmentManager()
-                .findFragmentByTag(PURCHASE_FRAGMENT);
     }
 
     @Override

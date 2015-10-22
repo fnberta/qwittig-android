@@ -39,7 +39,6 @@ import ch.giantific.qwittig.ui.fragments.FinanceCompensationsPaidFragment;
 import ch.giantific.qwittig.ui.fragments.FinanceCompensationsUnpaidFragment;
 import ch.giantific.qwittig.ui.fragments.FinanceUserBalancesFragment;
 import ch.giantific.qwittig.ui.adapters.TabsAdapter;
-import ch.giantific.qwittig.ui.fragments.dialogs.AccountCreateDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.CompensationSingleDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.CompensationChangeAmountDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupCreateDialogFragment;
@@ -62,9 +61,9 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
         CompensationSaveHelper.HelperInteractionListener {
 
     public static final String INTENT_AUTO_START_NEW = "intent_auto_start_new";
-    private static final String USER_BALANCES_FRAGMENT = "user_balances_fragment";
-    private static final String COMPENSATIONS_UNPAID_FRAGMENT = "compensations_unpaid_fragment";
-    private static final String COMPENSATIONS_PAID_FRAGMENT = "compensations_paid_fragment";
+    private static final String STATE_USER_BALANCES_FRAGMENT = "STATE_USER_BALANCES_FRAGMENT";
+    private static final String STATE_COMPENSATIONS_UNPAID_FRAGMENT = "STATE_COMPENSATIONS_UNPAID_FRAGMENT";
+    private static final String STATE_COMPENSATIONS_PAID_FRAGMENT = "STATE_COMPENSATIONS_PAID_FRAGMENT";
     private static final String LOG_TAG = FinanceActivity.class.getSimpleName();
     private TabLayout mTabLayout;
     private TextView mTextViewBalance;
@@ -94,11 +93,11 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
                 addViewPagerFragments();
             } else {
                 mUserBalancesFragment = (FinanceUserBalancesFragment) getFragmentManager()
-                        .getFragment(savedInstanceState, USER_BALANCES_FRAGMENT);
+                        .getFragment(savedInstanceState, STATE_USER_BALANCES_FRAGMENT);
                 mCompensationsUnpaidFragment = (FinanceCompensationsUnpaidFragment) getFragmentManager()
-                        .getFragment(savedInstanceState, COMPENSATIONS_UNPAID_FRAGMENT);
+                        .getFragment(savedInstanceState, STATE_COMPENSATIONS_UNPAID_FRAGMENT);
                 mCompensationsPaidFragment = (FinanceCompensationsPaidFragment) getFragmentManager()
-                        .getFragment(savedInstanceState, COMPENSATIONS_PAID_FRAGMENT);
+                        .getFragment(savedInstanceState, STATE_COMPENSATIONS_PAID_FRAGMENT);
                 setupTabs();
             }
 
@@ -137,10 +136,10 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
         // save fragments in saveInstanceBundle if user is logged in
         if (mUserIsLoggedIn) {
             FragmentManager fragmentManager = getFragmentManager();
-            fragmentManager.putFragment(outState, USER_BALANCES_FRAGMENT, mUserBalancesFragment);
-            fragmentManager.putFragment(outState, COMPENSATIONS_UNPAID_FRAGMENT,
+            fragmentManager.putFragment(outState, STATE_USER_BALANCES_FRAGMENT, mUserBalancesFragment);
+            fragmentManager.putFragment(outState, STATE_COMPENSATIONS_UNPAID_FRAGMENT,
                     mCompensationsUnpaidFragment);
-            fragmentManager.putFragment(outState, COMPENSATIONS_PAID_FRAGMENT,
+            fragmentManager.putFragment(outState, STATE_COMPENSATIONS_PAID_FRAGMENT,
                     mCompensationsPaidFragment);
         }
     }
@@ -215,7 +214,8 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     }
 
     private void showCreateGroupDialog() {
-        GroupCreateDialogFragment groupCreateDialogFragment = GroupCreateDialogFragment.newInstance(R.string.dialog_group_create_finance);
+        GroupCreateDialogFragment groupCreateDialogFragment =
+                GroupCreateDialogFragment.newInstance(R.string.dialog_group_create_finance);
         groupCreateDialogFragment.show(getFragmentManager(), "create_group");
     }
 

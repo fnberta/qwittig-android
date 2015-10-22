@@ -1,5 +1,6 @@
 package ch.giantific.qwittig.ui.activities;
 
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -27,14 +28,18 @@ public class PurchaseAddActivity extends PurchaseBaseActivity implements
         boolean inAutoMode = getIntent().getBooleanExtra(INTENT_PURCHASE_NEW_AUTO, false);
         boolean inTrialMode = getIntent().getBooleanExtra(INTENT_PURCHASE_NEW_TRIAL_MODE, false);
 
+        FragmentManager fragmentManager = getFragmentManager();
         if (savedInstanceState == null) {
-            PurchaseBaseFragment fragment = inAutoMode ?
+            mPurchaseFragment = inAutoMode ?
                     PurchaseAddAutoFragment.newInstance(inTrialMode) :
                     new PurchaseAddFragment();
 
-            getFragmentManager().beginTransaction()
-                    .add(R.id.container, fragment, PURCHASE_FRAGMENT)
+            fragmentManager.beginTransaction()
+                    .add(R.id.container, mPurchaseFragment)
                     .commit();
+        } else {
+            mPurchaseFragment = (PurchaseBaseFragment) fragmentManager
+                    .getFragment(savedInstanceState, STATE_PURCHASE_FRAGMENT);
         }
     }
 

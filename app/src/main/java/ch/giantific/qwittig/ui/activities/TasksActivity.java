@@ -33,7 +33,7 @@ public class TasksActivity extends BaseNavDrawerActivity implements
     private Spinner mSpinnerDeadline;
     private TasksFragment mTaskFragment;
     private FloatingActionButton mFab;
-    private static final String TASKS_FRAGMENT = "tasks_fragment";
+    private static final String STATE_TASKS_FRAGMENT = "STATE_TASKS_FRAGMENT";
     private static final String LOG_TAG = TasksActivity.class.getSimpleName();
 
     @Override
@@ -64,6 +64,9 @@ public class TasksActivity extends BaseNavDrawerActivity implements
         if (mUserIsLoggedIn) {
             if (savedInstanceState == null) {
                 addTasksFragment();
+            } else {
+                mTaskFragment = (TasksFragment) getFragmentManager()
+                        .getFragment(savedInstanceState, STATE_TASKS_FRAGMENT);
             }
 
             fetchCurrentUserGroups();
@@ -116,9 +119,19 @@ public class TasksActivity extends BaseNavDrawerActivity implements
     }
 
     private void addTasksFragment() {
+        mTaskFragment = new TasksFragment();
         getFragmentManager().beginTransaction()
-                .add(R.id.container, new TasksFragment(), TASKS_FRAGMENT)
+                .add(R.id.container, mTaskFragment)
                 .commit();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        if (mUserIsLoggedIn) {
+            getFragmentManager().putFragment(outState, STATE_TASKS_FRAGMENT, mTaskFragment);
+        }
     }
 
     @Override
@@ -126,7 +139,6 @@ public class TasksActivity extends BaseNavDrawerActivity implements
         super.onStart();
 
         if (mUserIsLoggedIn) {
-            findTasksFragment();
             mSpinnerDeadline.post(new Runnable() {
                 @Override
                 public void run() {
@@ -134,10 +146,6 @@ public class TasksActivity extends BaseNavDrawerActivity implements
                 }
             });
         }
-    }
-
-    private void findTasksFragment() {
-        mTaskFragment = (TasksFragment) getFragmentManager().findFragmentByTag(TASKS_FRAGMENT);
     }
 
     private void setDeadlineListener() {
@@ -160,8 +168,6 @@ public class TasksActivity extends BaseNavDrawerActivity implements
         super.afterLoginSetup();
 
         addTasksFragment();
-        getFragmentManager().executePendingTransactions();
-        findTasksFragment();
         setDeadlineListener();
     }
 

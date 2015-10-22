@@ -26,7 +26,7 @@ public class TaskAddActivity extends BaseActivity implements
         DatePickerDialog.OnDateSetListener,
         DiscardChangesDialogFragment.DialogInteractionListener {
 
-    private static final String TASK_ADD_FRAGMENT = "task_add_fragment";
+    private static final String STATE_TASK_ADD_FRAGMENT = "STATE_TASK_ADD_FRAGMENT";
     TaskAddFragment mTaskAddFragment;
     TextInputLayout mTextInputLayoutTitle;
     private FloatingActionButton mFab;
@@ -68,16 +68,20 @@ public class TaskAddActivity extends BaseActivity implements
                 mFab.show();
             }
 
-            addTaskFragment();
+            mTaskAddFragment = getTaskFragment();
+            getFragmentManager().beginTransaction()
+                    .add(R.id.container, mTaskAddFragment)
+                    .commit();
         } else {
             mFab.show();
+
+            mTaskAddFragment = (TaskAddFragment) getFragmentManager()
+                    .getFragment(savedInstanceState, STATE_TASK_ADD_FRAGMENT);
         }
     }
 
-    void addTaskFragment() {
-        getFragmentManager().beginTransaction()
-                .add(R.id.container, new TaskAddFragment(), TASK_ADD_FRAGMENT)
-                .commit();
+    TaskAddFragment getTaskFragment() {
+        return new TaskAddFragment();
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -95,15 +99,10 @@ public class TaskAddActivity extends BaseActivity implements
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
-        findTaskFragment();
-    }
-
-    void findTaskFragment() {
-        mTaskAddFragment = (TaskAddFragment) getFragmentManager()
-                .findFragmentByTag(TASK_ADD_FRAGMENT);
+        getFragmentManager().putFragment(outState, STATE_TASK_ADD_FRAGMENT, mTaskAddFragment);
     }
 
     @Override

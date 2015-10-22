@@ -1,6 +1,7 @@
 package ch.giantific.qwittig.ui.activities;
 
 import android.annotation.TargetApi;
+import android.app.FragmentManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -22,7 +23,7 @@ public class SettingsUserInviteActivity extends BaseActivity implements
         FABProgressListener,
         InviteUsersHelper.HelperInteractionListener {
 
-    private static final String USER_INVITE_FRAGMENT = "user_invite_fragment";
+    private static final String STATE_USER_INVITE_FRAGMENT = "STATE_USER_INVITE_FRAGMENT";
     private SettingsUserInviteFragment mSettingsUserInviteFragment;
     private FloatingActionButton mFab;
     private FABProgressCircle mFabProgressCircle;
@@ -42,6 +43,7 @@ public class SettingsUserInviteActivity extends BaseActivity implements
         mFabProgressCircle = (FABProgressCircle) findViewById(R.id.fab_user_invite_circle);
         mFabProgressCircle.attachListener(this);
 
+        FragmentManager fragmentManager = getFragmentManager();
         if (savedInstanceState == null) {
             if (Utils.isRunningLollipopAndHigher()) {
                 addActivityTransitionListener();
@@ -49,11 +51,15 @@ public class SettingsUserInviteActivity extends BaseActivity implements
                 mFab.show();
             }
 
-            getFragmentManager().beginTransaction()
-                    .add(R.id.container, new SettingsUserInviteFragment(), USER_INVITE_FRAGMENT)
+            mSettingsUserInviteFragment = new SettingsUserInviteFragment();
+            fragmentManager.beginTransaction()
+                    .add(R.id.container, mSettingsUserInviteFragment)
                     .commit();
         } else {
             mFab.show();
+
+            mSettingsUserInviteFragment = (SettingsUserInviteFragment) fragmentManager
+                    .getFragment(savedInstanceState, STATE_USER_INVITE_FRAGMENT);
         }
     }
 
@@ -72,11 +78,11 @@ public class SettingsUserInviteActivity extends BaseActivity implements
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
-        mSettingsUserInviteFragment = (SettingsUserInviteFragment)
-                getFragmentManager().findFragmentByTag(USER_INVITE_FRAGMENT);
+        getFragmentManager().putFragment(outState, STATE_USER_INVITE_FRAGMENT,
+                mSettingsUserInviteFragment);
     }
 
     @Override

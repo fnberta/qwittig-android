@@ -25,7 +25,7 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
 
     public static final int RESULT_TASK_DELETED = 2;
     public static final int RESULT_GROUP_CHANGED = 3;
-    private static final String TASK_DETAILS_FRAGMENT = "tasks_details_fragment";
+    private static final String STATE_TASK_DETAILS_FRAGMENT = "STATE_TASK_DETAILS_FRAGMENT";
     private TaskDetailsFragment mTaskDetailsFragment;
     private TextView mTextViewTitle;
     private TextView mTextViewTimeFrame;
@@ -70,7 +70,13 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
         });
 
         if (savedInstanceState == null) {
-            addDetailsFragment();
+            mTaskDetailsFragment = TaskDetailsFragment.newInstance(mTaskId);
+            getFragmentManager().beginTransaction()
+                    .add(R.id.container, mTaskDetailsFragment)
+                    .commit();
+        } else {
+            mTaskDetailsFragment = (TaskDetailsFragment) getFragmentManager()
+                    .getFragment(savedInstanceState, STATE_TASK_DETAILS_FRAGMENT);
         }
 
         fetchCurrentUserGroups();
@@ -93,23 +99,11 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
         }
     }
 
-    private void addDetailsFragment() {
-        getFragmentManager().beginTransaction()
-                .add(R.id.container, TaskDetailsFragment.newInstance(mTaskId),
-                        TASK_DETAILS_FRAGMENT)
-                .commit();
-    }
-
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
-        findDetailsFragment();
-    }
-
-    private void findDetailsFragment() {
-        mTaskDetailsFragment = (TaskDetailsFragment) getFragmentManager()
-                .findFragmentByTag(TASK_DETAILS_FRAGMENT);
+        getFragmentManager().putFragment(outState, STATE_TASK_DETAILS_FRAGMENT, mTaskDetailsFragment);
     }
 
     @Override

@@ -64,8 +64,8 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     private static final String LOG_TAG = HomeActivity.class.getSimpleName();
     private static final String INVITED_GROUP_HELPER = "invited_group_helper";
     private static final String URI_INVITED_GROUP_ID = "group";
-    private static final String PURCHASE_FRAGMENT = "purchase_fragment";
-    private static final String DRAFTS_FRAGMENT = "drafts_fragment";
+    private static final String STATE_PURCHASE_FRAGMENT = "purchase_fragment";
+    private static final String STATE_DRAFTS_FRAGMENT = "drafts_fragment";
     private static final String FULL_QUERY_HELPER = "full_query_helper";
     private Group mInvitedGroup;
     private String mInviteInitiator;
@@ -115,9 +115,9 @@ public class HomeActivity extends BaseNavDrawerActivity implements
                 addViewPagerFragments();
             } else {
                 mHomePurchasesFragment = (HomePurchasesFragment) getFragmentManager()
-                        .getFragment(savedInstanceState, PURCHASE_FRAGMENT);
+                        .getFragment(savedInstanceState, STATE_PURCHASE_FRAGMENT);
                 mHomeDraftsFragment = (HomeDraftsFragment) getFragmentManager()
-                        .getFragment(savedInstanceState, DRAFTS_FRAGMENT);
+                        .getFragment(savedInstanceState, STATE_DRAFTS_FRAGMENT);
 
                 setupTabs();
             }
@@ -151,8 +151,8 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         // If user is logged in, fragments will be added, hence save them
         if (mUserIsLoggedIn) {
             FragmentManager fragmentManager = getFragmentManager();
-            fragmentManager.putFragment(outState, PURCHASE_FRAGMENT, mHomePurchasesFragment);
-            fragmentManager.putFragment(outState, DRAFTS_FRAGMENT, mHomeDraftsFragment);
+            fragmentManager.putFragment(outState, STATE_PURCHASE_FRAGMENT, mHomePurchasesFragment);
+            fragmentManager.putFragment(outState, STATE_DRAFTS_FRAGMENT, mHomeDraftsFragment);
         }
     }
 

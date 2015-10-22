@@ -1,5 +1,6 @@
 package ch.giantific.qwittig.ui.activities;
 
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,7 +23,7 @@ public class SettingsActivity extends BaseActivity implements
         LogoutHelper.HelperInteractionListener,
         DeleteAccountHelper.HelperInteractionListener {
 
-    private static final String SETTINGS_FRAGMENT = "settings_fragment";
+    private static final String STATE_SETTINGS_FRAGMENT = "STATE_SETTINGS_FRAGMENT";
     private static final String LOG_TAG = SettingsActivity.class.getSimpleName();
     private SettingsFragment mSettingsFragment;
 
@@ -35,23 +36,23 @@ public class SettingsActivity extends BaseActivity implements
         // finish HomeActivity as well
         setResult(RESULT_OK);
 
+        FragmentManager fragmentManager = getFragmentManager();
         if (savedInstanceState == null) {
-            getFragmentManager().beginTransaction()
-                    .add(R.id.container, new SettingsFragment(), SETTINGS_FRAGMENT)
+            mSettingsFragment = new SettingsFragment();
+            fragmentManager.beginTransaction()
+                    .add(R.id.container, mSettingsFragment)
                     .commit();
+        } else {
+            mSettingsFragment = (SettingsFragment) fragmentManager
+                    .getFragment(savedInstanceState, STATE_SETTINGS_FRAGMENT);
         }
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
-        findSettingsFragment();
-    }
-
-    private void findSettingsFragment() {
-        mSettingsFragment = (SettingsFragment) getFragmentManager()
-                .findFragmentByTag(SETTINGS_FRAGMENT);
+        getFragmentManager().putFragment(outState, STATE_SETTINGS_FRAGMENT, mSettingsFragment);
     }
 
     @Override

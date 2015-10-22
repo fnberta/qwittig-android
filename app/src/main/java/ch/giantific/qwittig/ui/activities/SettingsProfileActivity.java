@@ -1,5 +1,6 @@
 package ch.giantific.qwittig.ui.activities;
 
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -41,7 +42,7 @@ public class SettingsProfileActivity extends BaseActivity implements
 
     public static final String SHARED_AVATAR = "shared_avatar";
     public static final int RESULT_CHANGES_DISCARDED = 2;
-    private static final String PROFILE_FRAGMENT = "profile_fragment";
+    private static final String STATE_PROFILE_FRAGMENT = "STATE_PROFILE_FRAGMENT";
     private static final int INTENT_REQUEST_IMAGE = 1;
     private boolean mHasAvatarSet = true;
     private ImageView mImageViewAvatar;
@@ -70,10 +71,15 @@ public class SettingsProfileActivity extends BaseActivity implements
             }
         });
 
+        FragmentManager fragmentManager = getFragmentManager();
         if (savedInstanceState == null) {
-            getFragmentManager().beginTransaction()
-                    .add(R.id.container, new SettingsProfileFragment(), PROFILE_FRAGMENT)
+            mSettingsProfileFragment = new SettingsProfileFragment();
+            fragmentManager.beginTransaction()
+                    .add(R.id.container, mSettingsProfileFragment)
                     .commit();
+        } else {
+            mSettingsProfileFragment = (SettingsProfileFragment) fragmentManager
+                    .getFragment(savedInstanceState, STATE_PROFILE_FRAGMENT);
         }
     }
 
@@ -102,11 +108,10 @@ public class SettingsProfileActivity extends BaseActivity implements
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
-        mSettingsProfileFragment = (SettingsProfileFragment)
-                getFragmentManager().findFragmentByTag(PROFILE_FRAGMENT);
+        getFragmentManager().putFragment(outState, STATE_PROFILE_FRAGMENT, mSettingsProfileFragment);
     }
 
     @Override

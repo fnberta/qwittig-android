@@ -188,7 +188,7 @@ public class LoginFragment extends LoginBaseFragment {
             setFragmentTransitions(loginSignUpFragment);
         }
         fragmentManager.beginTransaction()
-                .replace(R.id.container, loginSignUpFragment, LoginActivity.LOGIN_FRAGMENT)
+                .replace(R.id.container, loginSignUpFragment)
                 .addToBackStack(null)
                 .commit();
     }

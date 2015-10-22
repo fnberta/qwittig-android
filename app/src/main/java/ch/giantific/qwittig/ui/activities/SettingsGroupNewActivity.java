@@ -1,6 +1,7 @@
 package ch.giantific.qwittig.ui.activities;
 
 import android.annotation.TargetApi;
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,7 +26,7 @@ public class SettingsGroupNewActivity extends BaseActivity implements
         FABProgressListener,
         CreateGroupHelper.HelperInteractionListener {
 
-    private static final String GROUP_NEW_FRAGMENT = "group_new_fragment";
+    private static final String STATE_GROUP_NEW_FRAGMENT = "STATE_GROUP_NEW_FRAGMENT";
     public static final String RESULT_DATA_GROUP = "result_data_group";
     private static final String LOG_TAG = SettingsGroupNewActivity.class.getSimpleName();
     private SettingsGroupNewFragment mSettingsGroupNewFragment;
@@ -48,6 +49,7 @@ public class SettingsGroupNewActivity extends BaseActivity implements
         mFabProgressCircle = (FABProgressCircle) findViewById(R.id.fab_group_new_circle);
         mFabProgressCircle.attachListener(this);
 
+        FragmentManager fragmentManager = getFragmentManager();
         if (savedInstanceState == null) {
             if (Utils.isRunningLollipopAndHigher()) {
                 addActivityTransitionListener();
@@ -55,10 +57,14 @@ public class SettingsGroupNewActivity extends BaseActivity implements
                 mFab.show();
             }
 
-            getFragmentManager().beginTransaction()
-                    .add(R.id.container, new SettingsGroupNewFragment(), GROUP_NEW_FRAGMENT)
+            mSettingsGroupNewFragment = new SettingsGroupNewFragment();
+            fragmentManager.beginTransaction()
+                    .add(R.id.container, mSettingsGroupNewFragment)
                     .commit();
         } else {
+            mSettingsGroupNewFragment = (SettingsGroupNewFragment) fragmentManager
+                    .getFragment(savedInstanceState, STATE_GROUP_NEW_FRAGMENT);
+
             mFab.show();
         }
     }
@@ -78,11 +84,10 @@ public class SettingsGroupNewActivity extends BaseActivity implements
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
-        mSettingsGroupNewFragment = (SettingsGroupNewFragment)
-                getFragmentManager().findFragmentByTag(GROUP_NEW_FRAGMENT);
+        getFragmentManager().putFragment(outState, STATE_GROUP_NEW_FRAGMENT, mSettingsGroupNewFragment);
     }
 
     @Override

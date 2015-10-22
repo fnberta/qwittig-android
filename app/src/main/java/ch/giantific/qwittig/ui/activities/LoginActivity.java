@@ -1,11 +1,9 @@
 package ch.giantific.qwittig.ui.activities;
 
-import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -24,9 +22,9 @@ public class LoginActivity extends AppCompatActivity implements
 
     public static final String INTENT_URI_EMAIL = "intent_uri_email";
     public static final String INTENT_EXTRA_SIGN_UP = "intent_sign_up";
-    public static final String LOGIN_FRAGMENT = "login_fragment";
+    public static final String STATE_LOGIN_FRAGMENT = "STATE_LOGIN_FRAGMENT";
     private static final String LOG_TAG = LoginActivity.class.getSimpleName();
-    private LoginBaseFragment mLoginFragment;
+    private LoginBaseFragment mLoginBaseFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,42 +38,46 @@ public class LoginActivity extends AppCompatActivity implements
             email = intent.getStringExtra(INTENT_URI_EMAIL);
         }
 
+        FragmentManager fragmentManager = getFragmentManager();
         if (savedInstanceState == null) {
-            Fragment fragment = showSignUpFragment ?
+            mLoginBaseFragment = showSignUpFragment ?
                     LoginSignUpFragment.newInstance(email) :
                     LoginFragment.newInstance(email);
 
-            getFragmentManager().beginTransaction()
-                    .add(R.id.container, fragment, LOGIN_FRAGMENT)
+            fragmentManager.beginTransaction()
+                    .add(R.id.container, mLoginBaseFragment)
                     .commit();
+        } else {
+            mLoginBaseFragment = (LoginBaseFragment) fragmentManager
+                    .getFragment(savedInstanceState, STATE_LOGIN_FRAGMENT);
         }
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
-        mLoginFragment = (LoginBaseFragment) getFragmentManager().findFragmentByTag(LOGIN_FRAGMENT);
+        getFragmentManager().putFragment(outState, STATE_LOGIN_FRAGMENT, mLoginBaseFragment);
     }
 
     @Override
     public void onLoginFailed(ParseException e) {
-        mLoginFragment.onLoginFailed(e);
+        mLoginBaseFragment.onLoginFailed(e);
     }
 
     @Override
     public void onLoginSucceeded(ParseUser parseUser) {
-        mLoginFragment.onLoginSucceeded(parseUser);
+        mLoginBaseFragment.onLoginSucceeded(parseUser);
     }
 
     @Override
     public void resetPassword(String email) {
-        ((LoginFragment) mLoginFragment).resetPasswordWithHelper(email);
+        ((LoginFragment) mLoginBaseFragment).resetPasswordWithHelper(email);
     }
 
     @Override
     public void onPasswordReset() {
-        ((LoginFragment) mLoginFragment).onPasswordReset();
+        ((LoginFragment) mLoginBaseFragment).onPasswordReset();
     }
 
     @Override
