@@ -208,7 +208,7 @@ public abstract class LoginBaseFragment extends BaseFragment implements
     /**
      * Handles a failed login attempt. Passes error to generic Parse error handler, hides the
      * progress bar and removes the helper fragment.
-     * @param e the ParseException thrown durin the login attempt
+     * @param e the ParseException thrown during the login attempt
      */
     public void onLoginFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);

@@ -45,6 +45,7 @@ import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.services.ParseQueryService;
 import ch.giantific.qwittig.ui.adapters.NavHeaderGroupsArrayAdapter;
+import ch.giantific.qwittig.ui.fragments.SettingsFragment;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.inappbilling.IabHelper;
 import ch.giantific.qwittig.utils.inappbilling.IabKey;
@@ -548,19 +549,19 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
                 break;
             case INTENT_REQUEST_SETTINGS:
                 switch (resultCode) {
-                    case SettingsActivity.RESULT_LOGOUT:
+                    case SettingsFragment.RESULT_LOGOUT:
                         Intent intent = new Intent(this, HomeActivity.class);
                         startActivity(intent);
                         finish();
                         break;
-                    case SettingsActivity.RESULT_GROUP_CHANGED:
+                    case SettingsFragment.RESULT_GROUP_CHANGED:
                         updateGroupSpinner();
                         break;
                 }
                 break;
-            case SettingsActivity.INTENT_REQUEST_SETTINGS_PROFILE:
+            case BaseActivity.INTENT_REQUEST_SETTINGS_PROFILE:
                 switch (resultCode) {
-                    case Activity.RESULT_OK:
+                    case RESULT_OK:
                         MessageUtils.showBasicSnackbar(mSpinnerGroups,
                                 getString(R.string.toast_changes_saved));
                         setAvatarAndNickname();
