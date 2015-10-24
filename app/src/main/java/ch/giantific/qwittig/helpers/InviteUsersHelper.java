@@ -14,8 +14,8 @@ import java.util.List;
  */
 public class InviteUsersHelper extends BaseInviteHelper {
 
-    private static final String USERS_TO_INVITE = "users_to_invite";
-    private static final String GROUP_NAME = "group_name";
+    private static final String BUNDLE_USERS_TO_INVITE = "BUNDLE_USERS_TO_INVITE";
+    private static final String BUNDLE_GROUP_NAME = "BUNDLE_GROUP_NAME";
     private static final String LOG_TAG = InviteUsersHelper.class.getSimpleName();
     private HelperInteractionListener mListener;
 
@@ -26,8 +26,8 @@ public class InviteUsersHelper extends BaseInviteHelper {
     public static InviteUsersHelper newInstance(ArrayList<String> usersToInvite, String groupName) {
         InviteUsersHelper fragment = new InviteUsersHelper();
         Bundle args = new Bundle();
-        args.putStringArrayList(USERS_TO_INVITE, usersToInvite);
-        args.putString(GROUP_NAME, groupName);
+        args.putStringArrayList(BUNDLE_USERS_TO_INVITE, usersToInvite);
+        args.putString(BUNDLE_GROUP_NAME, groupName);
         fragment.setArguments(args);
         return fragment;
     }
@@ -51,8 +51,8 @@ public class InviteUsersHelper extends BaseInviteHelper {
         String groupName = "";
         Bundle args = getArguments();
         if (args != null) {
-            usersToInvite = args.getStringArrayList(USERS_TO_INVITE);
-            groupName = args.getString(GROUP_NAME);
+            usersToInvite = args.getStringArrayList(BUNDLE_USERS_TO_INVITE);
+            groupName = args.getString(BUNDLE_GROUP_NAME);
         }
 
         if (usersToInvite == null || usersToInvite.isEmpty() || TextUtils.isEmpty(groupName)) {

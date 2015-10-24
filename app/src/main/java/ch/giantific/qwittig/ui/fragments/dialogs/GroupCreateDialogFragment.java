@@ -14,7 +14,7 @@ import ch.giantific.qwittig.R;
  */
 public class GroupCreateDialogFragment extends DialogFragment {
 
-    private static final String BUNDLE_MESSAGE = "bundle_message";
+    private static final String BUNDLE_MESSAGE = "BUNDLE_MESSAGE";
     private DialogInteractionListener mListener;
     private int mMessage;
 
@@ -55,7 +55,7 @@ public class GroupCreateDialogFragment extends DialogFragment {
         dialogBuilder.setMessage(mMessage)
                 .setPositiveButton(R.string.dialog_positive_create, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mListener.createNewGroup();
+                        mListener.onCreateGroupSelected();
                         dismiss();
                     }
                 })
@@ -69,6 +69,6 @@ public class GroupCreateDialogFragment extends DialogFragment {
     }
 
     public interface DialogInteractionListener {
-        void createNewGroup();
+        void onCreateGroupSelected();
     }
 }

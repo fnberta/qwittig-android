@@ -62,11 +62,11 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         MoreQueryHelper.HelperInteractionListener {
 
     private static final String LOG_TAG = HomeActivity.class.getSimpleName();
-    private static final String INVITED_GROUP_HELPER = "invited_group_helper";
-    private static final String URI_INVITED_GROUP_ID = "group";
-    private static final String STATE_PURCHASE_FRAGMENT = "purchase_fragment";
-    private static final String STATE_DRAFTS_FRAGMENT = "drafts_fragment";
-    private static final String FULL_QUERY_HELPER = "full_query_helper";
+    private static final String INVITED_GROUP_HELPER = "INVITED_GROUP_HELPER";
+    private static final String URI_INVITED_GROUP_ID = "URI_INVITED_GROUP_ID";
+    private static final String STATE_PURCHASE_FRAGMENT = "STATE_PURCHASE_FRAGMENT";
+    private static final String STATE_DRAFTS_FRAGMENT = "STATE_DRAFTS_FRAGMENT";
+    private static final String FULL_QUERY_HELPER = "FULL_QUERY_HELPER";
     private Group mInvitedGroup;
     private String mInviteInitiator;
     private String mInvitedGroupId;
@@ -250,10 +250,10 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
         switch (mInvitationAction) {
             case PushBroadcastReceiver.ACTION_INVITATION_ACCEPTED:
-                joinInvitedGroup();
+                onJoinInvitedGroupSelected();
                 break;
             case PushBroadcastReceiver.ACTION_INVITATION_DISCARDED:
-                discardInvitation();
+                onDiscardInvitationSelected();
                 break;
             default:
                 String groupName = mInvitedGroup.getName();
@@ -268,7 +268,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void joinInvitedGroup() {
+    public void onJoinInvitedGroupSelected() {
         showProgressDialog(getString(R.string.progress_switch_groups));
 
         InvitedGroupHelper helper = (InvitedGroupHelper)
@@ -313,7 +313,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void discardInvitation() {
+    public void onDiscardInvitationSelected() {
         HelperUtils.removeHelper(getFragmentManager(), INVITED_GROUP_HELPER);
 
         mInvitedGroup.removeUserInvited(mCurrentUser.getUsername());
@@ -448,7 +448,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
      * any group.
      */
     @Override
-    public void createNewGroup() {
+    public void onCreateGroupSelected() {
         Intent intent = new Intent(this, SettingsGroupNewActivity.class);
         startActivity(intent);
     }
@@ -457,7 +457,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         GoPremiumDialogFragment goPremiumDialogFragment = new GoPremiumDialogFragment();
         goPremiumDialogFragment.show(getFragmentManager(), "go_premium");
 
-        // goPremium() is handled in BaseNavDrawerActivity
+        // onGoPremiumSelected() is handled in BaseNavDrawerActivity
     }
 
     @Override
@@ -476,8 +476,8 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onAllPurchasesQueriesFinished() {
-        mHomePurchasesFragment.onAllPurchasesQueriesFinished();
+    public void onAllPurchasesQueried() {
+        mHomePurchasesFragment.onAllPurchasesQueried();
     }
 
     @Override

@@ -47,7 +47,7 @@ public class StoreAddDialogFragment extends DialogFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         String storeName = mTextInputLayoutStore.getEditText().getText().toString().trim();
                         if (!TextUtils.isEmpty(storeName)) {
-                            mListener.addStore(storeName);
+                            mListener.onNewStoreSet(storeName);
                         }
                     }
                 })
@@ -57,6 +57,6 @@ public class StoreAddDialogFragment extends DialogFragment {
     }
 
     public interface DialogInteractionListener {
-        void addStore(String storeName);
+        void onNewStoreSet(String storeName);
     }
 }

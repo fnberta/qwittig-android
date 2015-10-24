@@ -37,9 +37,9 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
         PurchasesRecyclerAdapter.AdapterInteractionListener,
         LocalQuery.PurchaseLocalQueryListener {
 
-    public static final String INTENT_PURCHASE_ID = "purchase_id";
-    private static final String STATE_IS_LOADING_MORE = "state_is_loading_more";
-    private static final String PURCHASE_QUERY_HELPER = "purchase_query_helper";
+    public static final String INTENT_PURCHASE_ID = "INTENT_PURCHASE_ID";
+    private static final String STATE_IS_LOADING_MORE = "STATE_IS_LOADING_MORE";
+    private static final String PURCHASE_QUERY_HELPER = "PURCHASE_QUERY_HELPER";
     private static final String LOG_TAG = HomePurchasesFragment.class.getSimpleName();
     private FragmentInteractionListener mListener;
     private PurchasesRecyclerAdapter mRecyclerAdapter;
@@ -152,7 +152,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
     /**
      * Called from activity when all purchases queries are finished
      */
-    public void onAllPurchasesQueriesFinished() {
+    public void onAllPurchasesQueried() {
         HelperUtils.removeHelper(getFragmentManager(), PURCHASE_QUERY_HELPER);
         setLoading(false);
     }

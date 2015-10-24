@@ -24,9 +24,9 @@ import ch.giantific.qwittig.utils.CurrencyFormatter;
 public class StatsStoresFragment extends StatsPieBaseFragment {
 
     private static final String LOG_TAG = StatsStoresFragment.class.getSimpleName();
-    private static final String STATS_HELPER = "stats_helper_stores";
-    private static final String STATE_SHOW_PERCENT = "state_show_percent";
-    private static final String STATE_SHOW_AVERAGE = "state_show_average";
+    private static final String STATS_HELPER_STORES = "STATS_HELPER_STORES";
+    private static final String STATE_SHOW_PERCENT = "STATE_SHOW_PERCENT";
+    private static final String STATE_SHOW_AVERAGE = "STATE_SHOW_AVERAGE";
     private boolean mShowPercent = true;
     private boolean mShowAverage;
 
@@ -103,7 +103,7 @@ public class StatsStoresFragment extends StatsPieBaseFragment {
 
     @Override
     protected String getHelperTag() {
-        return STATS_HELPER;
+        return STATS_HELPER_STORES;
     }
 
     @Override

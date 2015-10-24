@@ -1,6 +1,5 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/ll_add_purchase_row"
     android:orientation="horizontal"
     android:layout_width="match_parent"

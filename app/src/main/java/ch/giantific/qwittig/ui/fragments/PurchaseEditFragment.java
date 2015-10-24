@@ -31,13 +31,13 @@ import ch.giantific.qwittig.utils.MoneyUtils;
 public class PurchaseEditFragment extends PurchaseBaseFragment implements
         LocalQuery.ObjectLocalFetchListener {
 
-    static final String BUNDLE_EDIT_PURCHASE_ID = "edit_purchase_id";
-    private static final String STATE_ITEMS_SET = "items_set";
-    private static final String STATE_OLD_ITEMS = "old_items";
-    private static final String STATE_OLD_STORE = "old_store";
-    private static final String STATE_OLD_DATE = "old_date";
-    private static final String STATE_OLD_CURRENCY = "old_currency";
-    private static final String STATE_OLD_EXCHANGE_RATE = "old_exchange_rate";
+    static final String BUNDLE_EDIT_PURCHASE_ID = "BUNDLE_EDIT_PURCHASE_ID";
+    private static final String STATE_ITEMS_SET = "STATE_ITEMS_SET";
+    private static final String STATE_OLD_ITEM_IDS = "STATE_OLD_ITEM_IDS";
+    private static final String STATE_OLD_STORE = "STATE_OLD_STORE";
+    private static final String STATE_OLD_DATE = "STATE_OLD_DATE";
+    private static final String STATE_OLD_CURRENCY = "STATE_OLD_CURRENCY";
+    private static final String STATE_OLD_EXCHANGE_RATE = "STATE_OLD_EXCHANGE_RATE";
     private static final String LOG_TAG = PurchaseEditFragment.class.getSimpleName();
     String mEditPurchaseId;
     private boolean mOldValuesAreSet;
@@ -72,7 +72,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
 
         if (savedInstanceState != null) {
             mOldValuesAreSet = savedInstanceState.getBoolean(STATE_ITEMS_SET);
-            mOldItemIds = savedInstanceState.getStringArrayList(STATE_OLD_ITEMS);
+            mOldItemIds = savedInstanceState.getStringArrayList(STATE_OLD_ITEM_IDS);
             mOldStore = savedInstanceState.getString(STATE_OLD_STORE);
             mOldDate = DateUtils.parseLongToDate(savedInstanceState.getLong(STATE_OLD_DATE));
             mOldCurrency = savedInstanceState.getString(STATE_OLD_CURRENCY);
@@ -89,7 +89,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
         super.onSaveInstanceState(outState);
 
         outState.putBoolean(STATE_ITEMS_SET, mOldValuesAreSet);
-        outState.putStringArrayList(STATE_OLD_ITEMS, mOldItemIds);
+        outState.putStringArrayList(STATE_OLD_ITEM_IDS, mOldItemIds);
         outState.putString(STATE_OLD_STORE, mOldStore);
         outState.putLong(STATE_OLD_DATE, DateUtils.parseDateToLong(mOldDate));
         outState.putString(STATE_OLD_CURRENCY, mOldCurrency);
@@ -309,10 +309,10 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     }
 
     @Override
-    public void onPurchaseSaveAndPinSucceeded() {
+    public void onPurchaseSavedAndPinned() {
         deleteOldItems();
 
-        super.onPurchaseSaveAndPinSucceeded();
+        super.onPurchaseSavedAndPinned();
     }
 
     /**
@@ -340,7 +340,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
         discardChangesDialogFragment.show(getFragmentManager(), "discard_changes");
     }
 
-    public boolean changesWereMade() {
+    private boolean changesWereMade() {
         if (mOldDate.compareTo(mDateSelected) != 0 || !mOldStore.equals(mStoreSelected) ||
                 !mOldCurrency.equals(mCurrencySelected)) {
             return true;

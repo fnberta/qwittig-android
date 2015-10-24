@@ -16,7 +16,7 @@ import ch.giantific.qwittig.R;
  */
 public class PurchaseReceiptAddFragment extends PurchaseReceiptBaseFragment {
 
-    private static final String BUNDLE_IMAGE_PATH = "bundle_image_path";
+    private static final String BUNDLE_IMAGE_PATH = "BUNDLE_IMAGE_PATH";
     private FragmentInteractionListener mListener;
     private String mReceiptPath;
 

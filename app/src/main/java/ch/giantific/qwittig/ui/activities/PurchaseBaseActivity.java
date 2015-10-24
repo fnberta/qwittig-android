@@ -51,8 +51,8 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     private static final String LOG_TAG = PurchaseBaseActivity.class.getSimpleName();
 
     PurchaseBaseFragment mPurchaseFragment;
-    boolean mHasReceiptFile;
-    FloatingActionButton mFabPurchaseSave;
+    private boolean mHasReceiptFile;
+    private FloatingActionButton mFabPurchaseSave;
     private FABProgressCircle mFabProgressCircle;
 
     @Override
@@ -177,13 +177,13 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     }
 
     @Override
-    public void setStore(String store, boolean manuallyEntered) {
+    public void onStoreSet(String store, boolean manuallyEntered) {
         mPurchaseFragment.setStore(store, manuallyEntered);
     }
 
     @Override
     public void onItemUsersInvolvedSet(List<Integer> usersInvolved) {
-        mPurchaseFragment.setItemUsersInvolved(usersInvolved);
+        mPurchaseFragment.onItemUsersInvolvedSet(usersInvolved);
     }
 
     @Override
@@ -197,13 +197,13 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     }
 
     @Override
-    public void setExchangeRate(float exchangeRate) {
-        mPurchaseFragment.setExchangeRateManual(exchangeRate);
+    public void onExchangeRateSet(float exchangeRate) {
+        mPurchaseFragment.onExchangeRateSet(exchangeRate);
     }
 
     @Override
-    public void onRatesFetchSuccessful(Map<String, Float> exchangeRates) {
-        mPurchaseFragment.onRatesFetchSuccessful(exchangeRates);
+    public void onRatesFetched(Map<String, Float> exchangeRates) {
+        mPurchaseFragment.onRatesFetched(exchangeRates);
     }
 
     @Override
@@ -212,8 +212,8 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     }
 
     @Override
-    public void onPurchaseSaveAndPinSucceeded() {
-        mPurchaseFragment.onPurchaseSaveAndPinSucceeded();
+    public void onPurchaseSavedAndPinned() {
+        mPurchaseFragment.onPurchaseSavedAndPinned();
     }
 
     @Override

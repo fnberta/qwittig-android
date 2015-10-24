@@ -15,8 +15,8 @@ import ch.giantific.qwittig.R;
  */
 public class GroupJoinDialogFragment extends DialogFragment {
 
-    private static final String BUNDLE_GROUP_NAME = "group_name";
-    private static final String BUNDLE_INVITE_INITIATOR = "invite_initiator";
+    private static final String BUNDLE_GROUP_NAME = "BUNDLE_GROUP_NAME";
+    private static final String BUNDLE_INVITE_INITIATOR = "BUNDLE_INVITE_INITIATOR";
     private String mGroupName;
     private String mInviteInitiator;
     private DialogInteractionListener mListener;
@@ -68,14 +68,14 @@ public class GroupJoinDialogFragment extends DialogFragment {
                 .setMessage(mMessage)
                 .setPositiveButton(R.string.dialog_positive_join, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mListener.joinInvitedGroup();
+                        mListener.onJoinInvitedGroupSelected();
                         dismiss();
                     }
                 })
                 .setNegativeButton(R.string.dialog_negative_discard, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mListener.discardInvitation();
+                        mListener.onDiscardInvitationSelected();
                         dismiss();
                     }
                 })
@@ -89,8 +89,8 @@ public class GroupJoinDialogFragment extends DialogFragment {
     }
 
     public interface DialogInteractionListener {
-        void joinInvitedGroup();
+        void onJoinInvitedGroupSelected();
 
-        void discardInvitation();
+        void onDiscardInvitationSelected();
     }
 }

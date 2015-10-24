@@ -38,11 +38,11 @@ public abstract class StatsBaseFragment extends BaseFragment implements
 
     static final int PERIOD_YEAR = 0;
     static final int PERIOD_MONTH = 1;
-    private static final String STATE_STATS_DATA = "state_stats_data";
-    private static final String STATE_PERIOD_TYPE = "state_period_type";
+    private static final String STATE_STATS_DATA = "STATE_STATS_DATA";
+    private static final String STATE_PERIOD_TYPE = "STATE_PERIOD_TYPE";
     private static final String LOG_TAG = StatsBaseFragment.class.getSimpleName();
-    FragmentInteractionListener mListener;
-    User mCurrentUser;
+    private FragmentInteractionListener mListener;
+    private User mCurrentUser;
     Group mCurrentGroup;
     int mPeriodType;
     boolean mIsLoading;
@@ -275,7 +275,7 @@ public abstract class StatsBaseFragment extends BaseFragment implements
      * @param e
      */
     @CallSuper
-    public void onFailedToCalculateStats(ParseException e) {
+    public void onStatsCalculationFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
         HelperUtils.removeHelper(getFragmentManager(), getHelperTag());

@@ -29,9 +29,9 @@ import ch.giantific.qwittig.utils.Utils;
  */
 public class PurchaseAddAutoFragment extends PurchaseAddFragment {
 
-    private static final String STATE_ITEMS_SET = "items_set";
+    private static final String STATE_ITEMS_SET = "STATE_ITEMS_SET";
     private static final String LOG_TAG = PurchaseAddAutoFragment.class.getSimpleName();
-    static final String OCR_HELPER = "ocr_helper";
+    private static final String OCR_HELPER = "OCR_HELPER";
     private View mProgressView;
     private View mMainView;
     private boolean mOcrValuesAreSet;
@@ -153,7 +153,7 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
         // don't show anything in auto mode
     }
 
-    public void doReceiptOcrWithHelper() {
+    private void doReceiptOcrWithHelper() {
         if (!Utils.isConnected(getActivity())) {
             onOcrFailed(getString(R.string.toast_no_connection));
             return;
@@ -173,7 +173,7 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
         }
     }
 
-    public void onOcrSuccessful(PurchaseRest purchaseRest) {
+    public void onOcrFinished(PurchaseRest purchaseRest) {
         setValuesFromOcr(purchaseRest);
     }
 
@@ -182,7 +182,7 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
         showMainScreen();
     }
 
-    public void setValuesFromOcr(PurchaseRest purchaseRest) {
+    private void setValuesFromOcr(PurchaseRest purchaseRest) {
         // set date
         //setDateSelected(purchaseRest.getDate());
         // set store
@@ -214,20 +214,20 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
         showMainScreen();
     }
 
-    public void showMainScreen() {
+    private void showMainScreen() {
         mProgressView.setVisibility(View.GONE);
         mMainView.setVisibility(View.VISIBLE);
         getActivity().invalidateOptionsMenu();
     }
 
     @Override
-    public void onPurchaseSaveAndPinSucceeded() {
+    public void onPurchaseSavedAndPinned() {
         if (mInTrialMode) {
             mCurrentUser.incrementPremiumCount();
             mCurrentUser.saveEventually();
         }
 
-        super.onPurchaseSaveAndPinSucceeded();
+        super.onPurchaseSavedAndPinned();
     }
 
     @Override

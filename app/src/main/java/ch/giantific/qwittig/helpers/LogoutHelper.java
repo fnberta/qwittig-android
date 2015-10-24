@@ -83,7 +83,7 @@ public class LogoutHelper extends BaseHelper {
 
     void onLogoutSucceeded() {
         if (mListener != null) {
-            mListener.onLogoutSucceeded();
+            mListener.onLoggedOut();
         }
     }
 
@@ -96,6 +96,6 @@ public class LogoutHelper extends BaseHelper {
     public interface HelperInteractionListener {
         void onLogoutFailed(ParseException e);
 
-        void onLogoutSucceeded();
+        void onLoggedOut();
     }
 }

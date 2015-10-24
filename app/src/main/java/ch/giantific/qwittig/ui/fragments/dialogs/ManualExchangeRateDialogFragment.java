@@ -18,10 +18,10 @@ import ch.giantific.qwittig.R;
  */
 public class ManualExchangeRateDialogFragment extends DialogFragment {
 
+    private static final String BUNDLE_EXCHANGE_RATE = "BUNDLE_EXCHANGE_RATE";
     private DialogInteractionListener mListener;
     private TextInputLayout mTextInputLayoutExchangeRate;
     private String mAutoExchangeRate;
-    private static final String BUNDLE_EXCHANGE_RATE = "bundle_exchange_rate";
 
     public static ManualExchangeRateDialogFragment newInstance(String exchangeRate) {
         ManualExchangeRateDialogFragment fragment = new ManualExchangeRateDialogFragment();
@@ -72,7 +72,7 @@ public class ManualExchangeRateDialogFragment extends DialogFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         String exchangeRate = mTextInputLayoutExchangeRate.getEditText().getText().toString().trim();
                         if (!TextUtils.isEmpty(exchangeRate)) {
-                            mListener.setExchangeRate(Float.parseFloat(exchangeRate));
+                            mListener.onExchangeRateSet(Float.parseFloat(exchangeRate));
                         }
                     }
                 })
@@ -82,6 +82,6 @@ public class ManualExchangeRateDialogFragment extends DialogFragment {
     }
 
     public interface DialogInteractionListener {
-        void setExchangeRate(float exchangeRate);
+        void onExchangeRateSet(float exchangeRate);
     }
 }

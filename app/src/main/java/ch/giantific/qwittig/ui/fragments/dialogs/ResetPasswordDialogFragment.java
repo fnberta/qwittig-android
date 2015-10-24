@@ -19,7 +19,7 @@ import ch.giantific.qwittig.utils.Utils;
  */
 public class ResetPasswordDialogFragment extends DialogFragment {
 
-    private static final String BUNDLE_EMAIL = "email";
+    private static final String BUNDLE_EMAIL = "BUNDLE_EMAIL";
     private FragmentInteractionListener mListener;
     private String mEmail;
     private TextInputLayout mTextInputLayoutEmail;
@@ -89,7 +89,7 @@ public class ResetPasswordDialogFragment extends DialogFragment {
                     mEmail = mTextInputLayoutEmail.getEditText().getText().toString();
                     if (Utils.emailIsValid(mEmail)) {
                         mTextInputLayoutEmail.setErrorEnabled(false);
-                        mListener.resetPassword(mEmail);
+                        mListener.onResetPasswordSelected(mEmail);
                         dismiss();
                     } else {
                         mTextInputLayoutEmail.setError(getString(R.string.error_email));
@@ -100,6 +100,6 @@ public class ResetPasswordDialogFragment extends DialogFragment {
     }
 
     public interface FragmentInteractionListener {
-        void resetPassword(String email);
+        void onResetPasswordSelected(String email);
     }
 }

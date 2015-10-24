@@ -96,7 +96,7 @@ public class DeleteAccountHelper extends LogoutHelper {
     @Override
     protected void onLogoutSucceeded() {
         if (mListener != null) {
-            mListener.onLogoutSucceeded();
+            mListener.onLoggedOut();
         }
     }
 

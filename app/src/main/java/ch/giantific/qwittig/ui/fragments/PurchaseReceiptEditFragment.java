@@ -13,8 +13,8 @@ import ch.giantific.qwittig.data.parse.models.Purchase;
  */
 public class PurchaseReceiptEditFragment extends PurchaseReceiptAddFragment {
 
-    private static final String BUNDLE_PURCHASE_ID = "bundle_purchase_id";
-    private static final String BUNDLE_IS_DRAFT = "bundle_is_draft";
+    private static final String BUNDLE_PURCHASE_ID = "BUNDLE_PURCHASE_ID";
+    private static final String BUNDLE_IS_DRAFT = "BUNDLE_IS_DRAFT";
     private String mPurchaseId;
     private boolean mIsDraft;
 

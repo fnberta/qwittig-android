@@ -48,9 +48,10 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
 
     public static final String INTENT_TASK_ID = "ch.giantific.qwittig.INTENT_TASK_ID";
     private static final String LOG_TAG = TasksFragment.class.getSimpleName();
-    private static final String STATE_TASKS_LOADING = "state_tasks_loading";
-    private static final String TASK_QUERY_HELPER = "task_query_helper";
-    private static final String TASK_REMIND_HELPER = "task_remind_helper_";
+    private static final String STATE_TASKS_LOADING = "STATE_TASKS_LOADING";
+    private static final String TASK_QUERY_HELPER = "TASK_QUERY_HELPER";
+    private static final String TASK_REMIND_HELPER = "TASK_REMIND_HELPER_";
+    private static final String CREATE_GROUP_DIALOG = "CREATE_GROUP_DIALOG";
 
     private FragmentInteractionListener mListener;
     private Date mDeadlineSelected = new Date(Long.MAX_VALUE);
@@ -152,7 +153,7 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
     /**
      * Called from activity when all tasks queries are finished
      */
-    public void onAllTasksQueriesFinished() {
+    public void onAllTasksQueried() {
         HelperUtils.removeHelper(getFragmentManager(), TASK_QUERY_HELPER);
         setLoading(false);
     }
@@ -269,7 +270,7 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
 
     private void showCreateGroupDialog() {
         GroupCreateDialogFragment groupCreateDialogFragment = GroupCreateDialogFragment.newInstance(R.string.dialog_group_create_tasks);
-        groupCreateDialogFragment.show(getFragmentManager(), "create_group");
+        groupCreateDialogFragment.show(getFragmentManager(), CREATE_GROUP_DIALOG);
     }
 
     @Override
@@ -443,7 +444,7 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
         }
     }
 
-    public void onFailedToRemindUser(ParseException e, String taskId) {
+    public void onUserRemindFailed(ParseException e, String taskId) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         MessageUtils.showBasicSnackbar(mRecyclerView, ParseErrorHandler.getErrorMessage(getActivity(), e));
         HelperUtils.removeHelper(getFragmentManager(), getTaskHelperTag(taskId));

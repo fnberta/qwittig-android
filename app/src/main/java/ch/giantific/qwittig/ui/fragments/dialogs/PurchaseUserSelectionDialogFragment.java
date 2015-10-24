@@ -22,8 +22,8 @@ import ch.giantific.qwittig.R;
  */
 public class PurchaseUserSelectionDialogFragment extends DialogFragment {
 
-    private static final String BUNDLE_USERS_AVAILABLE = "users_available";
-    private static final String BUNDLE_USERS_CHECKED = "users_checked";
+    private static final String BUNDLE_USERS_AVAILABLE = "BUNDLE_USERS_AVAILABLE";
+    private static final String BUNDLE_USERS_CHECKED = "BUNDLE_USERS_CHECKED";
     private FragmentInteractionListener mListener;
     private List<Integer> mUsersSelected = new ArrayList<>();
     private List<Integer> mUsersSelectedStatusQuo = new ArrayList<>();
@@ -92,7 +92,7 @@ public class PurchaseUserSelectionDialogFragment extends DialogFragment {
                                 if (isChecked) {
                                     mUsersSelected.add(which);
                                     if (mTextViewError.getCurrentTextColor() == ContextCompat.getColor(getActivity(), R.color.red_error)) {
-                                        mTextViewError.setTextAppearance(getActivity(), R.style.TextAppearance_AppCompat_Caption);
+                                        mTextViewError.setTextAppearance(R.style.TextAppearance_AppCompat_Caption);
                                     }
                                 } else if (mUsersSelected.contains(which)) {
                                     mUsersSelected.remove(Integer.valueOf(which));

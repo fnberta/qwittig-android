@@ -23,7 +23,7 @@ import ch.giantific.qwittig.utils.ParseErrorHandler;
  */
 public abstract class PurchaseReceiptBaseFragment extends BaseFragment {
 
-    ImageView mImageViewReceipt;
+    private ImageView mImageViewReceipt;
     private ProgressBar mProgressBar;
 
     public PurchaseReceiptBaseFragment() {
@@ -40,7 +40,7 @@ public abstract class PurchaseReceiptBaseFragment extends BaseFragment {
         return rootView;
     }
 
-    public void setReceiptImage(ParseFile receiptFile) {
+    void setReceiptImage(ParseFile receiptFile) {
         if (receiptFile != null) {
             receiptFile.getDataInBackground(new GetDataCallback() {
                 @Override

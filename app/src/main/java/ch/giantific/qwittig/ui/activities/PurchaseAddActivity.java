@@ -17,8 +17,8 @@ public class PurchaseAddActivity extends PurchaseBaseActivity implements
         PurchaseDiscardDialogFragment.DialogInteractionListener,
         OcrHelper.HelperInteractionListener {
 
-    public static final String INTENT_PURCHASE_NEW_AUTO = "purchase_new_auto";
-    public static final String INTENT_PURCHASE_NEW_TRIAL_MODE = "purchase_new_trial_mode";
+    public static final String INTENT_PURCHASE_NEW_AUTO = "INTENT_PURCHASE_NEW_AUTO";
+    public static final String INTENT_PURCHASE_NEW_TRIAL_MODE = "INTENT_PURCHASE_NEW_TRIAL_MODE";
     private static final String LOG_TAG = PurchaseAddActivity.class.getSimpleName();
 
     @Override
@@ -44,8 +44,8 @@ public class PurchaseAddActivity extends PurchaseBaseActivity implements
     }
 
     @Override
-    public void onOcrSuccessful(PurchaseRest purchaseRest) {
-        ((PurchaseAddAutoFragment) mPurchaseFragment).onOcrSuccessful(purchaseRest);
+    public void onOcrFinished(PurchaseRest purchaseRest) {
+        ((PurchaseAddAutoFragment) mPurchaseFragment).onOcrFinished(purchaseRest);
         showFab();
     }
 
@@ -74,13 +74,13 @@ public class PurchaseAddActivity extends PurchaseBaseActivity implements
     }
 
     @Override
-    public void savePurchaseAsDraft() {
+    public void onSavePurchaseAsDraftSelected() {
         mPurchaseFragment.savePurchase(true);
     }
 
     @Override
-    public void discardPurchase() {
-        mPurchaseFragment.discard();
+    public void onDiscardPurchaseSelected() {
+        mPurchaseFragment.onDiscardPurchaseSelected();
     }
 
     @Override

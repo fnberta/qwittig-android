@@ -33,8 +33,8 @@ import ch.giantific.qwittig.utils.Utils;
 public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFragment implements
         LocalQuery.CompensationLocalQueryListener {
 
-    private static final String COMPENSATION_QUERY_HELPER = "compensation_paid_query_helper";
-    private static final String STATE_IS_LOADING_MORE = "state_is_loading_more";
+    private static final String COMPENSATION_QUERY_HELPER = "COMPENSATION_QUERY_HELPER";
+    private static final String STATE_IS_LOADING_MORE = "STATE_IS_LOADING_MORE";
     private static final String LOG_TAG = FinanceCompensationsPaidFragment.class.getSimpleName();
     private CompensationsPaidRecyclerAdapter mRecyclerAdapter;
     private List<ParseObject> mCompensations = new ArrayList<>();

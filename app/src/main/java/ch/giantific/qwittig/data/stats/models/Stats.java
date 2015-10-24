@@ -10,12 +10,30 @@ import java.util.List;
 
 public class Stats implements Parcelable {
 
+    public static final Parcelable.Creator<Stats> CREATOR = new Parcelable.Creator<Stats>() {
+        public Stats createFromParcel(Parcel source) {
+            return new Stats(source);
+        }
+
+        public Stats[] newArray(int size) {
+            return new Stats[size];
+        }
+    };
     @SerializedName("numberOfUnits")
     private int mNumberOfUnits;
     @SerializedName("members")
     private List<Member> mMembers = new ArrayList<>();
     @SerializedName("group")
     private Group mGroup;
+
+    public Stats() {
+    }
+
+    protected Stats(Parcel in) {
+        this.mNumberOfUnits = in.readInt();
+        this.mMembers = in.createTypedArrayList(Member.CREATOR);
+        this.mGroup = in.readParcelable(Group.class.getClassLoader());
+    }
 
     public int getNumberOfUnits() {
         return mNumberOfUnits;
@@ -41,9 +59,6 @@ public class Stats implements Parcelable {
         mGroup = group;
     }
 
-    public Stats() {
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -56,28 +71,29 @@ public class Stats implements Parcelable {
         dest.writeParcelable(this.mGroup, 0);
     }
 
-    protected Stats(Parcel in) {
-        this.mNumberOfUnits = in.readInt();
-        this.mMembers = in.createTypedArrayList(Member.CREATOR);
-        this.mGroup = in.readParcelable(Group.class.getClassLoader());
-    }
-
-    public static final Parcelable.Creator<Stats> CREATOR = new Parcelable.Creator<Stats>() {
-        public Stats createFromParcel(Parcel source) {
-            return new Stats(source);
-        }
-
-        public Stats[] newArray(int size) {
-            return new Stats[size];
-        }
-    };
-
     public static class Group implements Parcelable {
 
+        public static final Parcelable.Creator<Group> CREATOR = new Parcelable.Creator<Group>() {
+            public Group createFromParcel(Parcel source) {
+                return new Group(source);
+            }
+
+            public Group[] newArray(int size) {
+                return new Group[size];
+            }
+        };
         @SerializedName("groupId")
         private String mGroupId;
         @SerializedName("units")
         private List<Unit> mUnits = new ArrayList<>();
+
+        public Group() {
+        }
+
+        protected Group(Parcel in) {
+            this.mGroupId = in.readString();
+            this.mUnits = in.createTypedArrayList(Unit.CREATOR);
+        }
 
         public String getGroupId() {
             return mGroupId;
@@ -95,9 +111,6 @@ public class Stats implements Parcelable {
             mUnits = units;
         }
 
-        public Group() {
-        }
-
         @Override
         public String toString() {
             return getGroupId();
@@ -113,21 +126,6 @@ public class Stats implements Parcelable {
             dest.writeString(this.mGroupId);
             dest.writeTypedList(mUnits);
         }
-
-        protected Group(Parcel in) {
-            this.mGroupId = in.readString();
-            this.mUnits = in.createTypedArrayList(Unit.CREATOR);
-        }
-
-        public static final Parcelable.Creator<Group> CREATOR = new Parcelable.Creator<Group>() {
-            public Group createFromParcel(Parcel source) {
-                return new Group(source);
-            }
-
-            public Group[] newArray(int size) {
-                return new Group[size];
-            }
-        };
     }
 
     /**
@@ -135,10 +133,27 @@ public class Stats implements Parcelable {
      */
     public static class Member implements Parcelable {
 
+        public static final Parcelable.Creator<Member> CREATOR = new Parcelable.Creator<Member>() {
+            public Member createFromParcel(Parcel source) {
+                return new Member(source);
+            }
+
+            public Member[] newArray(int size) {
+                return new Member[size];
+            }
+        };
         @SerializedName("memberId")
         private String mMemberId;
         @SerializedName("units")
         private List<Unit> mUnits = new ArrayList<>();
+
+        public Member() {
+        }
+
+        protected Member(Parcel in) {
+            this.mMemberId = in.readString();
+            this.mUnits = in.createTypedArrayList(Unit.CREATOR);
+        }
 
         public String getMemberId() {
             return mMemberId;
@@ -161,9 +176,6 @@ public class Stats implements Parcelable {
             return getMemberId();
         }
 
-        public Member() {
-        }
-
         @Override
         public int describeContents() {
             return 0;
@@ -174,31 +186,34 @@ public class Stats implements Parcelable {
             dest.writeString(this.mMemberId);
             dest.writeTypedList(mUnits);
         }
-
-        protected Member(Parcel in) {
-            this.mMemberId = in.readString();
-            this.mUnits = in.createTypedArrayList(Unit.CREATOR);
-        }
-
-        public static final Parcelable.Creator<Member> CREATOR = new Parcelable.Creator<Member>() {
-            public Member createFromParcel(Parcel source) {
-                return new Member(source);
-            }
-
-            public Member[] newArray(int size) {
-                return new Member[size];
-            }
-        };
     }
 
     public static class Unit implements Parcelable {
 
+        public static final Parcelable.Creator<Unit> CREATOR = new Parcelable.Creator<Unit>() {
+            public Unit createFromParcel(Parcel source) {
+                return new Unit(source);
+            }
+
+            public Unit[] newArray(int size) {
+                return new Unit[size];
+            }
+        };
         @SerializedName("identifier")
         private String mIdentifier;
         @SerializedName("total")
         private float mTotal;
         @SerializedName("average")
         private float mAverage;
+
+        public Unit() {
+        }
+
+        protected Unit(Parcel in) {
+            this.mIdentifier = in.readString();
+            this.mTotal = in.readFloat();
+            this.mAverage = in.readFloat();
+        }
 
         public String getIdentifier() {
             return mIdentifier;
@@ -240,24 +255,5 @@ public class Stats implements Parcelable {
             dest.writeFloat(this.mTotal);
             dest.writeFloat(this.mAverage);
         }
-
-        public Unit() {
-        }
-
-        protected Unit(Parcel in) {
-            this.mIdentifier = in.readString();
-            this.mTotal = in.readFloat();
-            this.mAverage = in.readFloat();
-        }
-
-        public static final Parcelable.Creator<Unit> CREATOR = new Parcelable.Creator<Unit>() {
-            public Unit createFromParcel(Parcel source) {
-                return new Unit(source);
-            }
-
-            public Unit[] newArray(int size) {
-                return new Unit[size];
-            }
-        };
     }
 }

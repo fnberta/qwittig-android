@@ -52,13 +52,13 @@ public class Group extends ParseObject {
         // A default constructor is required.
     }
 
-    public Group(String name) {
-        put(NAME, name);
+    public Group(String name, String currency) {
+        this(name);
+        setCurrency(currency);
     }
 
-    public Group(String name, String currency) {
-        put(NAME, name);
-        put(CURRENCY, currency);
+    public Group(String name) {
+        setName(name);
     }
 
     public void addUsersInvited(List<String> usersInvited) {

@@ -16,7 +16,7 @@ import ch.giantific.qwittig.data.parse.models.Purchase;
 public class PurchaseReceiptDetailFragment extends PurchaseReceiptBaseFragment implements
         LocalQuery.ObjectLocalFetchListener {
 
-    static final String BUNDLE_PURCHASE_ID = "purchase_id";
+    static final String BUNDLE_PURCHASE_ID = "BUNDLE_PURCHASE_ID";
     private String mPurchaseId;
 
     public PurchaseReceiptDetailFragment() {

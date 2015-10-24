@@ -150,7 +150,7 @@ public class SettingsStoresFragment extends BaseFragment {
         });
     }
 
-    public void deleteSelectedStores() {
+    private void deleteSelectedStores() {
         if (ParseUtils.isTestUser(mCurrentUser)) {
             mListener.showAccountCreateDialog();
             return;
@@ -187,7 +187,7 @@ public class SettingsStoresFragment extends BaseFragment {
      *
      * @param store
      */
-    public void addStoreToList(String store) {
+    public void onNewStoreSet(String store) {
         if (ParseUtils.isTestUser(mCurrentUser)) {
             mListener.showAccountCreateDialog();
             return;

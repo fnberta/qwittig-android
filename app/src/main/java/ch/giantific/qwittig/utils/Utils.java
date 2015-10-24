@@ -12,18 +12,11 @@ import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.View;
 
-import com.parse.ParseObject;
-import com.parse.ParseUser;
-
 import org.apache.commons.math3.fraction.BigFraction;
 import org.apache.commons.math3.fraction.Fraction;
 
 import java.util.List;
 import java.util.Random;
-
-import ch.giantific.qwittig.data.parse.models.Item;
-import ch.giantific.qwittig.data.parse.models.Purchase;
-import ch.giantific.qwittig.data.parse.models.User;
 
 /**
  * Created by fabio on 05.10.14.

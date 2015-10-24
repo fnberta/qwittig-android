@@ -1,10 +1,8 @@
 package ch.giantific.qwittig.ui.activities;
 
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.view.Menu;
@@ -17,12 +15,11 @@ import org.json.JSONObject;
 
 import java.util.Date;
 
-import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.ui.fragments.HomePurchasesFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseDetailsFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseEditFragment;
-import ch.giantific.qwittig.ui.fragments.PurchaseReceiptDetailFragment;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 
@@ -32,8 +29,8 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
 
     public static final int RESULT_PURCHASE_DELETED = 2;
     public static final int RESULT_GROUP_CHANGED = 3;
-    private static final String STATE_TOOLBAR_TITLE = "state_toolbar_title";
-    private static final String STATE_TOOLBAR_SUBTITLE = "state_toolbar_subtitle";
+    private static final String STATE_TOOLBAR_TITLE = "STATE_TOOLBAR_TITLE";
+    private static final String STATE_TOOLBAR_SUBTITLE = "STATE_TOOLBAR_SUBTITLE";
     private static final String STATE_PURCHASE_DETAILS_FRAGMENT = "STATE_PURCHASE_DETAILS_FRAGMENT";
     private static final String LOG_TAG = PurchaseDetailsActivity.class.getSimpleName();
     private String mPurchaseId;

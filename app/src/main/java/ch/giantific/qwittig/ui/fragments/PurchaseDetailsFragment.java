@@ -43,7 +43,7 @@ import ch.giantific.qwittig.utils.ParseUtils;
 public class PurchaseDetailsFragment extends BaseFragment implements
         LocalQuery.ObjectLocalFetchListener {
 
-    private static final String PURCHASE_RECEIPT_FRAGMENT = "purchase_receipt_fragment";
+    private static final String PURCHASE_RECEIPT_FRAGMENT = "PURCHASE_RECEIPT_FRAGMENT";
     private FragmentInteractionListener mListener;
     private RecyclerView mRecyclerView;
     private ProgressBar mProgressBar;

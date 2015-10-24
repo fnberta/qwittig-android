@@ -57,15 +57,15 @@ public class TaskAddFragment extends BaseFragment implements
     public static final int TASK_NO_CHANGES = 2;
     public static final int RESULT_TASK_SAVED = 2;
     public static final int RESULT_TASK_DISCARDED = 3;
-    private static final String STATE_DEADLINE_SELECTED = "state_date_selected";
-    private static final String STATE_USERS_INVOLVED = "state_users_involved";
+    private static final String STATE_DEADLINE_SELECTED = "STATE_DEADLINE_SELECTED";
+    private static final String STATE_USERS_INVOLVED = "STATE_USERS_INVOLVED";
     FragmentInteractionListener mListener;
     Spinner mSpinnerTimeFrame;
     TaskUsersInvolvedRecyclerAdapter mUsersRecyclerAdapter;
     Date mDeadlineSelected;
-    List<ParseUser> mUsersAvailable = new ArrayList<>();
     ArrayList<TaskUser> mUsersInvolved;
     StringResSpinnerAdapter mTimeFrameAdapter;
+    private List<ParseUser> mUsersAvailable = new ArrayList<>();
     private TextView mTextViewDeadline;
     private RecyclerView mRecyclerViewUsers;
     private ItemTouchHelper mUsersItemTouchHelper;
@@ -241,7 +241,7 @@ public class TaskAddFragment extends BaseFragment implements
                     String userId = user.getObjectId();
                     if (ids.contains(userId)) {
                         int pos = ids.indexOf(userId);
-                        parseUsers[pos] =  user;
+                        parseUsers[pos] = user;
                         iterator.remove();
                     }
                 }

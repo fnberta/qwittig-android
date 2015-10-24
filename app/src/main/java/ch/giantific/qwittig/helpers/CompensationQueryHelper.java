@@ -12,7 +12,7 @@ import com.parse.ParseObject;
 public class CompensationQueryHelper extends BaseQueryHelper {
 
     private static final String LOG_TAG = CompensationQueryHelper.class.getSimpleName();
-    private static final String QUERY_PAID = "query_paid";
+    private static final String BUNDLE_QUERY_PAID = "BUNDLE_QUERY_PAID";
     private boolean mQueryPaid;
     private HelperInteractionListener mListener;
 
@@ -23,7 +23,7 @@ public class CompensationQueryHelper extends BaseQueryHelper {
     public static CompensationQueryHelper newInstance(boolean queryPaid) {
         CompensationQueryHelper fragment = new CompensationQueryHelper();
         Bundle args = new Bundle();
-        args.putBoolean(QUERY_PAID, queryPaid);
+        args.putBoolean(BUNDLE_QUERY_PAID, queryPaid);
         fragment.setArguments(args);
         return fragment;
     }
@@ -45,11 +45,11 @@ public class CompensationQueryHelper extends BaseQueryHelper {
 
         Bundle args = getArguments();
         if (args != null) {
-            mQueryPaid = args.getBoolean(QUERY_PAID, false);
+            mQueryPaid = args.getBoolean(BUNDLE_QUERY_PAID, false);
         }
 
         if (mCurrentGroup == null || mCurrentUserGroups == null) {
-            mListener.onAllQueriesFinished(mQueryPaid);
+            mListener.onAllCompensationsQueried(mQueryPaid);
             return;
         }
 
@@ -74,7 +74,7 @@ public class CompensationQueryHelper extends BaseQueryHelper {
     @Override
     protected void finish() {
         if (mListener != null) {
-            mListener.onAllQueriesFinished(mQueryPaid);
+            mListener.onAllCompensationsQueried(mQueryPaid);
         }
     }
 
@@ -112,6 +112,6 @@ public class CompensationQueryHelper extends BaseQueryHelper {
 
         void onCompensationsPinFailed(ParseException e, boolean isPaid);
 
-        void onAllQueriesFinished(boolean isPaid);
+        void onAllCompensationsQueried(boolean isPaid);
     }
 }

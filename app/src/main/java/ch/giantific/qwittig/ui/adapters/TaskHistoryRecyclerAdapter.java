@@ -1,29 +1,21 @@
 package ch.giantific.qwittig.ui.adapters;
 
 import android.content.Context;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.parse.ParseUser;
-
-import org.apache.commons.math3.fraction.BigFraction;
-
 import java.util.Date;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.TaskHistory;
-import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.ui.adapters.rows.BaseUserAvatarRow;
 import ch.giantific.qwittig.ui.adapters.rows.HeaderRow;
 import ch.giantific.qwittig.utils.DateUtils;
-import ch.giantific.qwittig.utils.MoneyUtils;
-import ch.giantific.qwittig.utils.Utils;
 
 
 /**

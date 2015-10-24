@@ -37,7 +37,7 @@ import ch.giantific.qwittig.utils.Utils;
 public class SettingsUserInviteFragment extends SettingsBaseInviteFragment implements
         LocalQuery.UserLocalQueryListener {
 
-    private static final String INVITE_HELPER = "invite_helper";
+    private static final String INVITE_HELPER = "INVITE_HELPER";
     private static final String LOG_TAG = SettingsUserInviteFragment.class.getSimpleName();
     private FragmentInteractionListener mListener;
     private LinearLayout mLinearLayoutUsersInvited;

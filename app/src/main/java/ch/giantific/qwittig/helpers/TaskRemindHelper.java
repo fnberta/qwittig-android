@@ -19,7 +19,7 @@ import ch.giantific.qwittig.data.parse.CloudCode;
  */
 public class TaskRemindHelper extends BaseHelper {
 
-    private static final String BUNDLE_TASK_ID = "task_id";
+    private static final String BUNDLE_TASK_ID = "BUNDLE_TASK_ID";
     private static final String LOG_TAG = TaskRemindHelper.class.getSimpleName();
     private HelperInteractionListener mListener;
 
@@ -81,7 +81,7 @@ public class TaskRemindHelper extends BaseHelper {
 
     private void onParseError(ParseException e, String taskId) {
         if (mListener != null) {
-            mListener.onFailedToRemindUser(e, taskId);
+            mListener.onUserRemindFailed(e, taskId);
         }
     }
 
@@ -94,6 +94,6 @@ public class TaskRemindHelper extends BaseHelper {
     public interface HelperInteractionListener {
         void onUserReminded(String taskId);
 
-        void onFailedToRemindUser(ParseException e, String taskId);
+        void onUserRemindFailed(ParseException e, String taskId);
     }
 }

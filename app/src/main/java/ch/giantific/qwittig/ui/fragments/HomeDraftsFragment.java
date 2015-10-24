@@ -41,7 +41,7 @@ public class HomeDraftsFragment extends BaseFragment implements
         LocalQuery.PurchaseLocalQueryListener,
         LocalQuery.ObjectLocalFetchListener {
 
-    public static final String INTENT_PURCHASE_EDIT_DRAFT = "purchase_edit_draft";
+    public static final String INTENT_PURCHASE_EDIT_DRAFT = "INTENT_PURCHASE_EDIT_DRAFT";
     private User mCurrentUser;
     private Group mCurrentGroup;
     private TextView mTextViewEmpty;
@@ -217,7 +217,7 @@ public class HomeDraftsFragment extends BaseFragment implements
         }
     }
 
-    public void deleteSelectedDrafts() {
+    private void deleteSelectedDrafts() {
         SparseBooleanArray checkedItemPositions = mListView.getCheckedItemPositions();
         int draftsSize = mDrafts.size();
         for (int i = draftsSize - 1; i >= 0; i--) {

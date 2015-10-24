@@ -34,7 +34,7 @@ public class DiscardChangesDialogFragment extends DialogFragment {
         dialogBuilder.setMessage(R.string.dialog_discard_changes_message)
                 .setPositiveButton(R.string.dialog_negative_discard, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mListener.discardChanges();
+                        mListener.onDiscardChangesSelected();
                         dismiss();
                     }
                 })
@@ -48,6 +48,6 @@ public class DiscardChangesDialogFragment extends DialogFragment {
     }
 
     public interface DialogInteractionListener {
-        void discardChanges();
+        void onDiscardChangesSelected();
     }
 }

@@ -24,14 +24,13 @@ import ch.giantific.qwittig.utils.MessageUtils;
 public abstract class BaseRecyclerViewFragment extends BaseFragment implements
         LocalQuery.ObjectLocalFetchListener {
 
-    private static final String STATE_IS_LOADING = "state_is_loading";
+    private static final String STATE_IS_LOADING = "STATE_IS_LOADING";
     User mCurrentUser;
     Group mCurrentGroup;
     RecyclerView mRecyclerView;
     SwipeRefreshLayout mSwipeRefreshLayout;
-    ProgressBar mProgressBarLoading;
     View mEmptyView;
-    LinearLayoutManager mLayoutManager;
+    private ProgressBar mProgressBarLoading;
 
     public BaseRecyclerViewFragment() {
     }
@@ -47,8 +46,8 @@ public abstract class BaseRecyclerViewFragment extends BaseFragment implements
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mLayoutManager = new LinearLayoutManager(getActivity());
-        mRecyclerView.setLayoutManager(mLayoutManager);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
         mSwipeRefreshLayout.setColorSchemeResources(R.color.primary,
                 R.color.accent,

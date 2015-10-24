@@ -20,8 +20,8 @@ import ch.giantific.qwittig.utils.Utils;
  */
 public class ListCheckBox extends CheckBox {
 
-    private static final String STATE_SUPER = "state_super";
-    private static final String STATE_USERS_CHECKED = "state_users_checked";
+    private static final String STATE_SUPER = "STATE_SUPER";
+    private static final String STATE_USERS_CHECKED = "STATE_USERS_CHECKED";
     private boolean[] mUsersChecked;
 
     public ListCheckBox(Context context) {
@@ -169,7 +169,7 @@ public class ListCheckBox extends CheckBox {
      * @param isSpecial whether users checked differ from the purchase wide or not
      */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public void setListStatus(boolean isSpecial) {
+    private void setListStatus(boolean isSpecial) {
         if (isSpecial) {
             setButtonTintList(ContextCompat.getColorStateList(getContext(), R.color.checkbox_color_red));
         } else {

@@ -34,7 +34,7 @@ public class GoPremiumDialogFragment extends DialogFragment {
         dialogBuilder.setMessage(R.string.dialog_go_premium)
                 .setPositiveButton(R.string.go_premium, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mListener.goPremium();
+                        mListener.onGoPremiumSelected();
                         dismiss();
                     }
                 })
@@ -48,6 +48,6 @@ public class GoPremiumDialogFragment extends DialogFragment {
     }
 
     public interface DialogInteractionListener {
-        void goPremium();
+        void onGoPremiumSelected();
     }
 }

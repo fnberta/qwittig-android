@@ -29,13 +29,13 @@ import java.util.Locale;
 
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.ui.fragments.CameraPreview;
+import ch.giantific.qwittig.ui.CameraPreview;
 import ch.giantific.qwittig.utils.MessageUtils;
 
 @SuppressWarnings("deprecation")
 public class CameraActivity extends AppCompatActivity implements View.OnClickListener {
 
-    public static final String INTENT_EXTRA_PATHS = "intent_extra_paths";
+    public static final String INTENT_EXTRA_PATHS = "INTENT_EXTRA_PATHS";
     private static final String LOG_TAG = CameraActivity.class.getSimpleName();
     private static final int MAX_NUMBER_IMAGES = 3;
     private Camera mCamera;
@@ -180,6 +180,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
+    // TODO: think about api 17
     private void setImmersiveMode() {
         getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE

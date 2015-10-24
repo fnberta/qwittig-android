@@ -184,8 +184,8 @@ public class TasksActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onAllTaskQueriesFinished() {
-        mTaskFragment.onAllTasksQueriesFinished();
+    public void onAllTasksQueried() {
+        mTaskFragment.onAllTasksQueried();
     }
 
     @Override
@@ -194,8 +194,8 @@ public class TasksActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onFailedToRemindUser(ParseException e, String taskId) {
-        mTaskFragment.onFailedToRemindUser(e, taskId);
+    public void onUserRemindFailed(ParseException e, String taskId) {
+        mTaskFragment.onUserRemindFailed(e, taskId);
     }
 
     /**
@@ -203,7 +203,7 @@ public class TasksActivity extends BaseNavDrawerActivity implements
      * any group.
      */
     @Override
-    public void createNewGroup() {
+    public void onCreateGroupSelected() {
         Intent intent = new Intent(this, SettingsGroupNewActivity.class);
         startActivity(intent);
     }

@@ -1,11 +1,9 @@
 package ch.giantific.qwittig.data.parse.models;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.parse.ParseACL;
 import com.parse.ParseClassName;
-import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
@@ -41,6 +39,10 @@ public class Purchase extends ParseObject {
     public static final String RECEIPT_BYTE = "receiptByte";
     public static final String DRAFT_ID = "draftId";
     public static final String PIN_LABEL = "purchasesPinLabel";
+
+    public Group getGroup() {
+        return (Group) getParseObject(GROUP);
+    }
 
     public void setGroup(ParseObject group) {
         put(GROUP, group);
@@ -94,20 +96,20 @@ public class Purchase extends ParseObject {
         put(TOTAL_PRICE, totalPrice);
     }
 
-    public void setCurrency(String currency) {
-        put(CURRENCY, currency);
-    }
-
     public String getCurrency() {
         return getString(CURRENCY);
     }
 
-    public void setExchangeRate(float exchangeRate) {
-        put(EXCHANGE_RATE, exchangeRate);
+    public void setCurrency(String currency) {
+        put(CURRENCY, currency);
     }
 
     public float getExchangeRate() {
         return (float) getDouble(EXCHANGE_RATE);
+    }
+
+    public void setExchangeRate(float exchangeRate) {
+        put(EXCHANGE_RATE, exchangeRate);
     }
 
     public ParseFile getReceiptParseFile() {
@@ -116,6 +118,14 @@ public class Purchase extends ParseObject {
 
     public void setReceiptParseFile(ParseFile file) {
         put(RECEIPT, file);
+    }
+
+    public byte[] getReceiptData() {
+        return getBytes(RECEIPT_BYTE);
+    }
+
+    public void setReceiptData(byte[] bytes) {
+        put(RECEIPT_BYTE, bytes);
     }
 
     public String getDraftId() {
@@ -186,10 +196,6 @@ public class Purchase extends ParseObject {
     private void setAccessRights(ParseObject group) {
         ParseACL acl = ParseUtils.getDefaultAcl(group);
         setACL(acl);
-    }
-
-    public Group getGroup() {
-        return (Group) getParseObject(GROUP);
     }
 
     public void addItems(List<ParseObject> items) {
@@ -266,14 +272,6 @@ public class Purchase extends ParseObject {
     public void swapReceiptParseFileToData(byte[] bytes) {
         put(RECEIPT_BYTE, bytes);
         removeReceiptParseFile();
-    }
-
-    public void setReceiptData(byte[] bytes) {
-        put(RECEIPT_BYTE, bytes);
-    }
-
-    public byte[] getReceiptData() {
-        return getBytes(RECEIPT_BYTE);
     }
 
     public void removeReceiptData() {

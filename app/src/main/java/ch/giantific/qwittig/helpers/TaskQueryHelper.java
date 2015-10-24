@@ -33,7 +33,7 @@ public class TaskQueryHelper extends BaseQueryHelper {
         super.onCreate(savedInstanceState);
 
         if (mCurrentGroup == null || mCurrentUserGroups == null) {
-            mListener.onAllTaskQueriesFinished();
+            mListener.onAllTasksQueried();
             return;
         }
 
@@ -51,7 +51,7 @@ public class TaskQueryHelper extends BaseQueryHelper {
     @Override
     protected void finish() {
         if (mListener != null) {
-            mListener.onAllTaskQueriesFinished();
+            mListener.onAllTasksQueried();
         }
     }
 
@@ -77,6 +77,6 @@ public class TaskQueryHelper extends BaseQueryHelper {
 
         void onTasksPinFailed(ParseException e);
 
-        void onAllTaskQueriesFinished();
+        void onAllTasksQueried();
     }
 }

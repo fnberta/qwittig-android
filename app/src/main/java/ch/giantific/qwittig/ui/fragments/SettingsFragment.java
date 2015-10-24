@@ -55,22 +55,22 @@ import ch.giantific.qwittig.utils.Utils;
 public class SettingsFragment extends PreferenceFragment implements
         SharedPreferences.OnSharedPreferenceChangeListener {
 
-    public static final String PREF_STORES = "pref_stores";
-    public static final String PREF_GROUP_CURRENT = "pref_group_current";
-    public static final String PREF_GROUP_NEW = "pref_group_add_new";
-    public static final String PREF_GROUP_NAME = "pref_group_name";
-    public static final String PREF_GROUP_LEAVE = "pref_group_leave";
-    public static final String PREF_GROUP_ADD_USER = "pref_group_add_user";
-    public static final String PREF_CATEGORY_CURRENT_GROUP = "pref_category_current_group";
-    public static final String GROUP_LEAVE_DIALOG = "group_leave";
-    public static final String GROUP_LEAVE_BALANCE_NOT_ZERO_DIALOG = "group_leave_balance_not_zero";
     public static final int RESULT_LOGOUT = 2;
     public static final int RESULT_GROUP_CHANGED = 3;
-    public static final String ACCOUNT_DELETE_DIALOG = "account_delete";
-    private static final String PREF_PROFILE = "pref_profile";
-    private static final String PREF_CATEGORY_ME = "pref_category_me";
-    private static final String LOGOUT_HELPER = "logout_helper";
-    private static final String DELETE_ACCOUNT_HELPER = "delete_account_helper";
+    private static final String PREF_CATEGORY_ME = "PREF_CATEGORY_ME";
+    private static final String PREF_PROFILE = "PREF_PROFILE";
+    private static final String PREF_STORES = "PREF_STORES";
+    private static final String PREF_GROUP_CURRENT = "PREF_GROUP_CURRENT";
+    private static final String PREF_GROUP_ADD_NEW = "PREF_GROUP_ADD_NEW";
+    private static final String PREF_CATEGORY_CURRENT_GROUP = "PREF_CATEGORY_CURRENT_GROUP";
+    private static final String PREF_GROUP_NAME = "PREF_GROUP_NAME";
+    private static final String PREF_GROUP_LEAVE = "PREF_GROUP_LEAVE";
+    private static final String PREF_GROUP_ADD_USER = "PREF_GROUP_ADD_USER";
+    private static final String GROUP_LEAVE_DIALOG = "GROUP_LEAVE_DIALOG";
+    private static final String GROUP_LEAVE_BALANCE_NOT_ZERO_DIALOG = "GROUP_LEAVE_BALANCE_NOT_ZERO_DIALOG";
+    private static final String ACCOUNT_DELETE_DIALOG = "ACCOUNT_DELETE_DIALOG";
+    private static final String LOGOUT_HELPER = "LOGOUT_HELPER";
+    private static final String DELETE_ACCOUNT_HELPER = "DELETE_ACCOUNT_HELPER";
     private static final int UPDATE_LIST_NAME = 1;
     private static final int UPDATE_LIST_GROUP = 2;
     private FragmentInteractionListener mListener;
@@ -147,7 +147,7 @@ public class SettingsFragment extends PreferenceFragment implements
                 return true;
             }
         });
-        final Preference prefGroupNew = findPreference(PREF_GROUP_NEW);
+        final Preference prefGroupNew = findPreference(PREF_GROUP_ADD_NEW);
         prefGroupNew.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -274,7 +274,7 @@ public class SettingsFragment extends PreferenceFragment implements
         setupCurrentGroupCategory();
     }
 
-    public void updateCurrentUserAndGroup() {
+    private void updateCurrentUserAndGroup() {
         mCurrentUser = (User) ParseUser.getCurrentUser();
         mCurrentGroup = mCurrentUser.getCurrentGroup();
     }
@@ -283,7 +283,7 @@ public class SettingsFragment extends PreferenceFragment implements
      * Sets up the current group list preference. Sets the entries and values and calls generic
      * method that handles correct display of default value and summary.
      */
-    public void setupCurrentGroup() {
+    private void setupCurrentGroup() {
         setCurrentUserGroupsList(); // set new values
 
         // Define selected value from parse.com database
@@ -350,7 +350,7 @@ public class SettingsFragment extends PreferenceFragment implements
         });
     }
 
-    public void setupCurrentGroupCategory() {
+    private void setupCurrentGroupCategory() {
         if (mCurrentGroup != null) {
             mCategoryCurrentGroup.setTitle(mCurrentGroup.getName());
             setCurrentGroupPreferencesVisibility(true);
@@ -384,7 +384,7 @@ public class SettingsFragment extends PreferenceFragment implements
         mPreferenceGroupLeave.setTitle(getString(R.string.pref_group_leave_group, mCurrentGroup.getName()));
     }
 
-    public void setGroupCurrentValue(String value) {
+    private void setGroupCurrentValue(String value) {
         mListPreferenceGroupCurrent.setValue(value);
     }
 
@@ -501,7 +501,7 @@ public class SettingsFragment extends PreferenceFragment implements
     /**
      * Handles a successful logout attempt. Hides the progress bar and finishes.
      */
-    public void onLogoutSucceeded() {
+    public void onLoggedOut() {
         dismissProgressDialog();
         getActivity().setResult(RESULT_LOGOUT);
         getActivity().finish();

@@ -148,7 +148,7 @@ public class PurchaseSaveHelper extends BaseHelper {
                 @Override
                 public void done(ParseException e) {
                     if (e == null && mListener != null) {
-                        mListener.onPurchaseSaveAndPinSucceeded();
+                        mListener.onPurchaseSavedAndPinned();
                     }
                 }
             });
@@ -161,7 +161,7 @@ public class PurchaseSaveHelper extends BaseHelper {
     }
 
     public interface HelperInteractionListener {
-        void onPurchaseSaveAndPinSucceeded();
+        void onPurchaseSavedAndPinned();
 
         void onPurchaseSaveFailed(ParseException e);
     }

@@ -24,7 +24,7 @@ import ch.giantific.qwittig.ui.adapters.RecipientsArrayAdapter;
  */
 public class CompensationSingleDialogFragment extends DialogFragment {
 
-    private static final String BUNDLE_USERS = "bundle_users";
+    private static final String BUNDLE_USERS = "BUNDLE_USERS";
     private List<ItemUserPicker> mUsers;
     private DialogInteractionListener mListener;
     private Spinner mSpinnerUsers;

@@ -46,7 +46,7 @@ public class TaskDetailsFragment extends BaseFragment implements
         LocalQuery.ObjectLocalFetchListener,
         LocalQuery.UserLocalQueryListener {
 
-    private static final String BUNDLE_TASK_ID = "bundle_task_id";
+    private static final String BUNDLE_TASK_ID = "BUNDLE_TASK_ID";
     private FragmentInteractionListener mListener;
     private Task mTask;
     private String mTaskId;

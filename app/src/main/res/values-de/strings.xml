@@ -37,7 +37,6 @@
     <string name="hint_group_currency">Währung</string>
     <string name="user_avatar">Profilbild</string>
     <string name="action_purchase_edit">Einkauf bearbeiten</string>
-    <string name="hint_date">Datum</string>
     <string name="hint_store">Geschäft</string>
     <string name="hint_users">Nutzer</string>
     <string name="desc_user_invite">Die Besitzer der eingebenen Email-Adressen erhalten eine Einladung, deiner Gruppe beizutreten.</string>
@@ -276,7 +275,6 @@
     <string name="title_activity_task_add">Aufgabe hinzufügen</string>
     <string name="title_activity_task_detail">Details Aufgabe</string>
     <string name="task_remind_user">%1$s erinnern</string>
-    <string name="dialog_task_discard_message">Neue Aufgabe verwerfen?</string>
     <string name="toast_task_discarded">Neue Aufgabe verworfen</string>
     <string name="title_activity_task_edit">Aufgabe bearbeiten</string>
     <string name="toast_task_deleted">Aufgabe gelöscht</string>

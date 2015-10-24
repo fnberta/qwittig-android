@@ -29,7 +29,7 @@ import ch.giantific.qwittig.data.parse.models.User;
 public class StoreSelectionDialogFragment extends DialogFragment {
 
     private static final String LOG_TAG = StoreSelectionDialogFragment.class.getSimpleName();
-    private static final String BUNDLE_STORE = "bundle_store";
+    private static final String BUNDLE_STORE = "BUNDLE_STORE";
     private DialogInteractionListener mListener;
     private String mStoreSelected;
     private TextInputLayout mTextInputLayoutStoreManual;
@@ -154,17 +154,17 @@ public class StoreSelectionDialogFragment extends DialogFragment {
                 mTextInputLayoutStoreManual.setError(getString(R.string.error_store));
             } else {
                 mTextInputLayoutStoreManual.setErrorEnabled(false);
-                mListener.setStore(mStoreSelected, true);
+                mListener.onStoreSet(mStoreSelected, true);
                 dismiss();
             }
         } else {
             mStoreSelected = storeSelected;
-            mListener.setStore(mStoreSelected, false);
+            mListener.onStoreSet(mStoreSelected, false);
             dismiss();
         }
     }
 
     public interface DialogInteractionListener {
-        void setStore(String store, boolean manuallyEntered);
+        void onStoreSet(String store, boolean manuallyEntered);
     }
 }

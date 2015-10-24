@@ -114,20 +114,20 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     public static final int RESULT_PURCHASE_ERROR = 5;
     public static final int RESULT_PURCHASE_DISCARDED = 6;
     public static final int RESULT_PURCHASE_DRAFT_DELETED = 7;
-    static final String RATES_HELPER = "rates_helper";
-    static final String PURCHASE_SAVE_HELPER = "save_helper";
-    static final String PURCHASE_RECEIPT_FRAGMENT = "purchase_receipt_fragment";
+    private static final String RATES_HELPER = "RATES_HELPER";
+    static final String PURCHASE_SAVE_HELPER = "PURCHASE_SAVE_HELPER";
+    private static final String PURCHASE_RECEIPT_FRAGMENT = "PURCHASE_RECEIPT_FRAGMENT";
     static final int INTENT_REQUEST_IMAGE_CAPTURE = 1;
-    private static final String STATE_ROW_COUNT = "row_count";
-    private static final String STATE_STORE_SELECTED = "state_store_selected";
-    private static final String STATE_DATE_SELECTED = "state_date_selected";
-    private static final String STATE_PURCHASE_USERS_INVOLVED = "state_purchase_users_involved";
-    private static final String STATE_CURRENCY_SELECTED = "state_currency_selected";
-    private static final String STATE_IS_SAVING = "state_is_saving";
-    private static final String STATE_IS_FETCHING_RATES = "state_is_fetching_rates";
-    private static final String STATE_RECEIPT_IMAGES_PATHS = "state_receipt_images_paths";
-    private static final String STATE_RECEIPT_IMAGES_PATH = "state_receipt_images_path";
-    private static final String EXCHANGE_RATE_LAST_FETCHED_TIME = "rates_last_fetched";
+    private static final String STATE_ROW_COUNT = "STATE_ROW_COUNT";
+    private static final String STATE_STORE_SELECTED = "STATE_STORE_SELECTED";
+    private static final String STATE_DATE_SELECTED = "STATE_DATE_SELECTED";
+    private static final String STATE_PURCHASE_USERS_INVOLVED = "STATE_PURCHASE_USERS_INVOLVED";
+    private static final String STATE_CURRENCY_SELECTED = "STATE_CURRENCY_SELECTED";
+    private static final String STATE_IS_SAVING = "STATE_IS_SAVING";
+    private static final String STATE_IS_FETCHING_RATES = "STATE_IS_FETCHING_RATES";
+    private static final String STATE_RECEIPT_IMAGES_PATHS = "STATE_RECEIPT_IMAGES_PATHS";
+    private static final String STATE_RECEIPT_IMAGES_PATH = "STATE_RECEIPT_IMAGES_PATH";
+    private static final String EXCHANGE_RATE_LAST_FETCHED_TIME = "EXCHANGE_RATE_LAST_FETCHED_TIME";
     private static final long EXCHANGE_RATE_REFRESH_INTERVAL = 24 * 60 * 60 * 1000;
     private static final String LOG_TAG = PurchaseBaseFragment.class.getSimpleName();
     private static final int PERMISSIONS_REQUEST_CAPTURE_IMAGES = 1;
@@ -135,7 +135,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     FragmentInteractionListener mListener;
     Purchase mPurchase;
     Date mDateSelected;
-    TextView mTextViewPickStore;
+    private TextView mTextViewPickStore;
     String mStoreSelected;
     int mItemRowCount;
     List<ParseObject> mItems = new ArrayList<>();
@@ -146,7 +146,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     String mCurrencySelected;
     String mCurrentGroupCurrency;
     User mCurrentUser;
-    boolean mIsSaving;
+    private boolean mIsSaving;
     Button mButtonAddRow;
     List<ItemRow> mItemRows = new ArrayList<>();
     float mExchangeRate;
@@ -435,7 +435,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      *
      * @param exchangeRate
      */
-    public void setExchangeRateManual(float exchangeRate) {
+    public void onExchangeRateSet(float exchangeRate) {
         BigDecimal roundedExchangeRate = MoneyUtils.roundToFractionDigits(
                 MoneyUtils.EXCHANGE_RATE_FRACTION_DIGITS, exchangeRate);
         mExchangeRate = roundedExchangeRate.floatValue();
@@ -474,7 +474,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      *
      * @param exchangeRates
      */
-    public void onRatesFetchSuccessful(Map<String, Float> exchangeRates) {
+    public void onRatesFetched(Map<String, Float> exchangeRates) {
         HelperUtils.removeHelper(getFragmentManager(), RATES_HELPER);
 
         mIsFetchingExchangeRates = false;
@@ -777,7 +777,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      *
      * @param usersInvolvedInt the users selected in the dialog
      */
-    public void setItemUsersInvolved(List<Integer> usersInvolvedInt) {
+    public void onItemUsersInvolvedSet(List<Integer> usersInvolvedInt) {
         List<ParseUser> usersInvolved = new ArrayList<>(usersInvolvedInt.size());
         for (Integer i : usersInvolvedInt) {
             usersInvolved.add(mUsersAvailableParse.get(i));
@@ -1021,7 +1021,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         }
     }
 
-    public void setReceiptImagePaths(List<String> receiptImagePaths) {
+    private void setReceiptImagePaths(List<String> receiptImagePaths) {
         mReceiptImagePaths.clear();
 
         if (!receiptImagePaths.isEmpty()) {
@@ -1103,7 +1103,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      *
      * @return true if all required fields have a value, false if not
      */
-    final boolean setItemValues(boolean acceptEmptyFields) {
+    private boolean setItemValues(boolean acceptEmptyFields) {
         // Read values from editTexts, check if items are complete and enabled. If they are, add
         // them to totalPrice. If there are no items, immediately return false.
         if (mItemRows.size() < 1) {
@@ -1164,7 +1164,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     /**
      * Called from activity when helper saved and pinned new purchase
      */
-    public void onPurchaseSaveAndPinSucceeded() {
+    public void onPurchaseSavedAndPinned() {
         mIsSaving = false;
         setResultForSnackbar(getPurchaseSavedAction());
         mListener.progressCircleStartFinal();
@@ -1226,7 +1226,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         finishPurchase();
     }
 
-    public void discard() {
+    public void onDiscardPurchaseSelected() {
         setResultForSnackbar(PURCHASE_DISCARDED);
         finishPurchase();
     }

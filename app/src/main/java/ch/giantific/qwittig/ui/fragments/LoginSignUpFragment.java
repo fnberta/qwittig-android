@@ -34,7 +34,7 @@ import ch.giantific.qwittig.utils.Utils;
  */
 public class LoginSignUpFragment extends LoginBaseFragment {
 
-    private static final String BUNDLE_EMAIL = "email";
+    private static final String BUNDLE_EMAIL = "BUNDLE_EMAIL";
     private static final int NICKNAME_MAX_CHARACTERS = 10;
     private static final int INTENT_REQUEST_IMAGE = 1;
     private String mEmail;

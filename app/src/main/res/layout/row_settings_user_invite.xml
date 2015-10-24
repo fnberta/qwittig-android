@@ -1,6 +1,5 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rl_users_invited_row"
     android:orientation="horizontal"
     android:layout_width="match_parent"

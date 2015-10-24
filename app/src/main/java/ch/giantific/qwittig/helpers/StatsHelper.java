@@ -34,9 +34,9 @@ public class StatsHelper extends BaseHelper {
     public static final int TYPE_SPENDING = 1;
     public static final int TYPE_STORES = 2;
     public static final int TYPE_CURRENCIES = 3;
-    private static final String STATS_TYPE = "STATS_type";
-    private static final String YEAR = "year";
-    private static final String MONTH = "month";
+    private static final String BUNDLE_STATS_TYPE = "BUNDLE_STATS_TYPE";
+    private static final String BUNDLE_YEAR = "BUNDLE_YEAR";
+    private static final String BUNDLE_MONTH = "BUNDLE_MONTH";
     private static final String LOG_TAG = StatsHelper.class.getSimpleName();
     private HelperInteractionListener mListener;
     private int mStatsType;
@@ -48,9 +48,9 @@ public class StatsHelper extends BaseHelper {
     public static StatsHelper newInstance(@StatsType int statsType, String year, int month) {
         StatsHelper fragment = new StatsHelper();
         Bundle args = new Bundle();
-        args.putInt(STATS_TYPE, statsType);
-        args.putString(YEAR, year);
-        args.putInt(MONTH, month);
+        args.putInt(BUNDLE_STATS_TYPE, statsType);
+        args.putString(BUNDLE_YEAR, year);
+        args.putInt(BUNDLE_MONTH, month);
         fragment.setArguments(args);
         return fragment;
     }
@@ -74,9 +74,9 @@ public class StatsHelper extends BaseHelper {
         int month = 0;
         Bundle args = getArguments();
         if (args != null) {
-            mStatsType = args.getInt(STATS_TYPE);
-            year = args.getString(YEAR);
-            month = args.getInt(MONTH);
+            mStatsType = args.getInt(BUNDLE_STATS_TYPE);
+            year = args.getString(BUNDLE_YEAR);
+            month = args.getInt(BUNDLE_MONTH);
         }
 
         if (TextUtils.isEmpty(year)) {
@@ -175,7 +175,7 @@ public class StatsHelper extends BaseHelper {
 
     private void onParseError(ParseException e) {
         if (mListener != null) {
-            mListener.onFailedToCalculateStats(mStatsType, e);
+            mListener.onStatsCalculationFailed(mStatsType, e);
         }
     }
 
@@ -188,6 +188,6 @@ public class StatsHelper extends BaseHelper {
     public interface HelperInteractionListener {
         void onStatsCalculated(int statsType, Stats stats);
 
-        void onFailedToCalculateStats(int statsType, ParseException e);
+        void onStatsCalculationFailed(int statsType, ParseException e);
     }
 }

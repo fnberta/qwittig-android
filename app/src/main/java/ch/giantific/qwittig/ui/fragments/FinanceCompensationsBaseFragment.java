@@ -75,7 +75,7 @@ public abstract class FinanceCompensationsBaseFragment extends BaseRecyclerViewF
     /**
      * Called from activity when all compensations queries are finished
      */
-    public void onAllCompensationQueriesFinished() {
+    public void onAllCompensationsQueried() {
         HelperUtils.removeHelper(getFragmentManager(), getQueryHelperTag());
         setLoading(false);
     }

@@ -60,7 +60,7 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
         CompensationRemindHelper.HelperInteractionListener,
         CompensationSaveHelper.HelperInteractionListener {
 
-    public static final String INTENT_AUTO_START_NEW = "intent_auto_start_new";
+    public static final String INTENT_AUTO_START_NEW = "INTENT_AUTO_START_NEW";
     private static final String STATE_USER_BALANCES_FRAGMENT = "STATE_USER_BALANCES_FRAGMENT";
     private static final String STATE_COMPENSATIONS_UNPAID_FRAGMENT = "STATE_COMPENSATIONS_UNPAID_FRAGMENT";
     private static final String STATE_COMPENSATIONS_PAID_FRAGMENT = "STATE_COMPENSATIONS_PAID_FRAGMENT";
@@ -224,7 +224,7 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
      * any group.
      */
     @Override
-    public void createNewGroup() {
+    public void onCreateGroupSelected() {
         Intent intent = new Intent(this, SettingsGroupNewActivity.class);
         startActivity(intent);
     }
@@ -300,13 +300,9 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
         });
     }
 
-    /**
-     * Callback from changeAmount dialog
-     * @param amount
-     */
     @Override
-    public void changeAmount(BigFraction amount) {
-        mCompensationsUnpaidFragment.changeAmount(amount);
+    public void onChangedAmountSet(BigFraction amount) {
+        mCompensationsUnpaidFragment.onChangedAmountSet(amount);
     }
 
     @Override
@@ -323,8 +319,8 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onAllUserQueriesFinished() {
-        mUserBalancesFragment.onAllUserQueriesFinished();
+    public void onAllUsersQueried() {
+        mUserBalancesFragment.onAllUsersQueried();
     }
 
     @Override
@@ -337,11 +333,11 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onAllQueriesFinished(boolean isPaid) {
+    public void onAllCompensationsQueried(boolean isPaid) {
         if (isPaid) {
-            mCompensationsPaidFragment.onAllCompensationQueriesFinished();
+            mCompensationsPaidFragment.onAllCompensationsQueried();
         } else {
-            mCompensationsUnpaidFragment.onAllCompensationQueriesFinished();
+            mCompensationsUnpaidFragment.onAllCompensationsQueried();
         }
     }
 
@@ -382,8 +378,8 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onFailedToRemindUser(int remindType, ParseException e, String compensationId) {
-        mCompensationsUnpaidFragment.onFailedToRemindUser(remindType, e, compensationId);
+    public void onUserRemindFailed(int remindType, ParseException e, String compensationId) {
+        mCompensationsUnpaidFragment.onUserRemindFailed(remindType, e, compensationId);
     }
 
     @Override

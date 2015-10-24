@@ -31,8 +31,8 @@ import ch.giantific.qwittig.utils.ParseUtils;
  */
 public class ParseQueryService extends IntentService {
     public static final String INTENT_FILTER_DATA_NEW = "ch.giantific.qwittig.push.DATA_NEW";
-    public static final String INTENT_DATA_TYPE = "intent_data_type";
-    public static final String INTENT_COMPENSATION_PAID = "intent_compensation_paid";
+    public static final String INTENT_DATA_TYPE = "INTENT_DATA_TYPE";
+    public static final String INTENT_COMPENSATION_PAID = "INTENT_COMPENSATION_PAID";
 
     @IntDef({DATA_TYPE_ALL, DATA_TYPE_PURCHASE, DATA_TYPE_USER, DATA_TYPE_COMPENSATION,
             DATA_TYPE_GROUP, DATA_TYPE_TASK})
@@ -275,7 +275,7 @@ public class ParseQueryService extends IntentService {
         }
     }
 
-    public boolean queryCompensation(String compensationId, boolean isNew) throws ParseException {
+    private boolean queryCompensation(String compensationId, boolean isNew) throws ParseException {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Compensation.CLASS);
         Compensation compensation = (Compensation) query.get(compensationId);
 

@@ -27,8 +27,8 @@ public class TaskAddActivity extends BaseActivity implements
         DiscardChangesDialogFragment.DialogInteractionListener {
 
     private static final String STATE_TASK_ADD_FRAGMENT = "STATE_TASK_ADD_FRAGMENT";
-    TaskAddFragment mTaskAddFragment;
-    TextInputLayout mTextInputLayoutTitle;
+    private TaskAddFragment mTaskAddFragment;
+    private TextInputLayout mTextInputLayoutTitle;
     private FloatingActionButton mFab;
 
     @Override
@@ -118,7 +118,7 @@ public class TaskAddActivity extends BaseActivity implements
     }
 
     @Override
-    public void discardChanges() {
+    public void onDiscardChangesSelected() {
         mTaskAddFragment.finish(TaskAddFragment.TASK_DISCARDED);
     }
 

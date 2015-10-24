@@ -21,7 +21,7 @@ import ch.giantific.qwittig.helpers.StatsHelper;
 public class StatsCurrenciesFragment extends StatsPieBaseFragment {
 
     private static final String LOG_TAG = StatsCurrenciesFragment.class.getSimpleName();
-    private static final String STATS_HELPER = "stats_helper_currencies";
+    private static final String STATS_HELPER_CURRENCIES = "STATS_HELPER_CURRENCIES";
 
     public StatsCurrenciesFragment() {
         // Required empty public constructor
@@ -46,7 +46,7 @@ public class StatsCurrenciesFragment extends StatsPieBaseFragment {
 
     @Override
     protected String getHelperTag() {
-        return STATS_HELPER;
+        return STATS_HELPER_CURRENCIES;
     }
 
     @Override

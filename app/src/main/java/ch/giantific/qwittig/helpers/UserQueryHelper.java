@@ -33,7 +33,7 @@ public class UserQueryHelper extends BaseQueryHelper {
         super.onCreate(savedInstanceState);
 
         if (mCurrentGroup == null || mCurrentUserGroups == null) {
-            mListener.onAllUserQueriesFinished();
+            mListener.onAllUsersQueried();
             return;
         }
 
@@ -51,7 +51,7 @@ public class UserQueryHelper extends BaseQueryHelper {
     @Override
     protected void finish() {
         if (mListener != null) {
-            mListener.onAllUserQueriesFinished();
+            mListener.onAllUsersQueried();
         }
     }
 
@@ -84,6 +84,6 @@ public class UserQueryHelper extends BaseQueryHelper {
 
         void onUsersPinFailed(ParseException e);
 
-        void onAllUserQueriesFinished();
+        void onAllUsersQueried();
     }
 }

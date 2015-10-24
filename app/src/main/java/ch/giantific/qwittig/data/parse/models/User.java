@@ -40,32 +40,6 @@ public class User extends ParseUser {
     public static final String USERNAME_PREFIX_DELETED = "DELETED_";
     public static final String USERNAME_PREFIX_TEST = "TEST_";
 
-    public User() {
-        // A default constructor is required.
-    }
-
-    public User(String email, String password, String nickname) {
-        this.setUsername(email);
-        this.setPassword(password);
-        put(IS_DELETED, false);
-        put(NICKNAME, nickname);
-        put(STORES_FAVORITES, getDefaultStores());
-    }
-
-    public User(String email, String password, String nickname, byte[] avatar) {
-        this.setUsername(email);
-        this.setPassword(password);
-        put(IS_DELETED, false);
-        put(NICKNAME, nickname);
-        put(AVATAR, avatar);
-        put(STORES_FAVORITES, getDefaultStores());
-    }
-
-    private List<String> getDefaultStores() {
-        ParseConfig config = ParseConfig.getCurrentConfig();
-
-        return config.getList(Config.DEFAULT_STORES);
-    }
 
     public boolean isDeleted() {
         return getBoolean(IS_DELETED);
@@ -73,6 +47,102 @@ public class User extends ParseUser {
 
     public void setDeleted(boolean isDeleted) {
         put(IS_DELETED, isDeleted);
+    }
+
+    public String getNickname() {
+        return getString(NICKNAME);
+    }
+
+    public void setNickname(String nickname) {
+        put(NICKNAME, nickname);
+    }
+
+    public Group getCurrentGroup() {
+        return (Group) getParseObject(CURRENT_GROUP);
+    }
+
+    public void setCurrentGroup(ParseObject currentGroup) {
+        put(CURRENT_GROUP, currentGroup);
+    }
+
+    public List<ParseObject> getGroups() {
+        List<ParseObject> groups = getList(GROUPS);
+        if (groups != null) {
+            return groups;
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    public void setGroups(List<ParseObject> groups) {
+        put(GROUPS, groups);
+    }
+
+    public byte[] getAvatar() {
+        return getBytes(AVATAR);
+    }
+
+    public void setAvatar(byte[] avatar) {
+        put(AVATAR, avatar);
+    }
+
+    public List<String> getStoresAdded() {
+        List<String> storesAdded = getList(STORES_ADDED);
+        if (storesAdded != null) {
+            Collections.sort(storesAdded, String.CASE_INSENSITIVE_ORDER);
+            return storesAdded;
+        }
+
+        return Collections.emptyList();
+    }
+
+    public void setStoresAdded(List<String> storesAdded) {
+        put(STORES_ADDED, storesAdded);
+    }
+
+    public List<String> getStoresFavorites() {
+        List<String> storesFavorites = getList(STORES_FAVORITES);
+        if (storesFavorites != null) {
+            Collections.sort(storesFavorites, String.CASE_INSENSITIVE_ORDER);
+            return storesFavorites;
+        }
+
+        return Collections.emptyList();
+    }
+
+    public void setStoresFavorites(List<String> storesFavorites) {
+        put(STORES_FAVORITES, storesFavorites);
+    }
+
+    public int getPremiumCount() {
+        return getInt(FREE_PURCHASES_COUNT);
+    }
+
+    public void setPremiumCount(int count) {
+        put(FREE_PURCHASES_COUNT, count);
+    }
+
+    public User() {
+        // A default constructor is required.
+    }
+
+    public User(String email, String password, String nickname, byte[] avatar) {
+        this(email, password, nickname);
+        setAvatar(avatar);
+    }
+
+    public User(String email, String password, String nickname) {
+        this.setUsername(email);
+        this.setPassword(password);
+        setDeleted(false);
+        setNickname(nickname);
+        setStoresFavorites(getDefaultStores());
+    }
+
+    private List<String> getDefaultStores() {
+        ParseConfig config = ParseConfig.getCurrentConfig();
+
+        return config.getList(Config.DEFAULT_STORES);
     }
 
     /**
@@ -99,38 +169,10 @@ public class User extends ParseUser {
         return nickname;
     }
 
-    public String getNickname() {
-        return getString(NICKNAME);
-    }
-
-    public void setNickname(String nickname) {
-        put(NICKNAME, nickname);
-    }
-
-    public void removeNickname() {
-        remove(NICKNAME);
-    }
-
-    public Group getCurrentGroup() {
-        return (Group) getParseObject(CURRENT_GROUP);
-    }
-
-    public void setCurrentGroup(ParseObject currentGroup) {
-        put(CURRENT_GROUP, currentGroup);
-    }
-
     public void removeCurrentGroup() {
         remove(CURRENT_GROUP);
     }
 
-    public List<ParseObject> getGroups() {
-        List<ParseObject> groups = getList(GROUPS);
-        if (groups != null) {
-            return groups;
-        } else {
-            return Collections.emptyList();
-        }
-    }
 
     public List<String> getGroupIds() {
         List<String> groupIds = new ArrayList<>();
@@ -174,14 +216,6 @@ public class User extends ParseUser {
 
     public void removeGroups() {
         remove(GROUPS);
-    }
-
-    public byte[] getAvatar() {
-        return getBytes(AVATAR);
-    }
-
-    public void setAvatar(byte[] avatar) {
-        put(AVATAR, avatar);
     }
 
     public void removeAvatar() {
@@ -228,32 +262,8 @@ public class User extends ParseUser {
         remove(BALANCE);
     }
 
-    public List<String> getStoresAdded() {
-        List<String> storesAdded = getList(STORES_ADDED);
-        if (storesAdded != null) {
-            Collections.sort(storesAdded, String.CASE_INSENSITIVE_ORDER);
-            return storesAdded;
-        }
-
-        return Collections.emptyList();
-    }
-
-    public void setStoresAdded(List<String> storesAdded) {
-        put(STORES_ADDED, storesAdded);
-    }
-
     public void addStoreAdded(String store) {
         add(STORES_ADDED, store);
-    }
-
-    public List<String> getStoresFavorites() {
-        List<String> storesFavorites = getList(STORES_FAVORITES);
-        if (storesFavorites != null) {
-            Collections.sort(storesFavorites, String.CASE_INSENSITIVE_ORDER);
-            return storesFavorites;
-        }
-
-        return Collections.emptyList();
     }
 
     public String getStoresFavoriteFirstInList(String otherStore) {
@@ -263,10 +273,6 @@ public class User extends ParseUser {
         }
         Collections.sort(stores, String.CASE_INSENSITIVE_ORDER);
         return stores.get(0);
-    }
-
-    public void setStoresFavorites(List<String> storesFavorites) {
-        put(STORES_FAVORITES, storesFavorites);
     }
 
     public void addStoreFavorites(String store) {
@@ -279,10 +285,6 @@ public class User extends ParseUser {
 
     public void resetPremiumCount() {
         put(FREE_PURCHASES_COUNT, 0);
-    }
-
-    public int getPremiumCount() {
-        return getInt(FREE_PURCHASES_COUNT);
     }
 }
 

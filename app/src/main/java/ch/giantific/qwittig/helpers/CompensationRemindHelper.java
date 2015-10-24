@@ -30,8 +30,8 @@ public class CompensationRemindHelper extends BaseHelper {
     public @interface RemindType {}
     public static final int TYPE_REMIND = 1;
     public static final int TYPE_REMIND_PAID = 2;
-    private static final String REMIND_TYPE = "remind_type";
-    private static final String COMPENSATION_ID = "compensation_id";
+    private static final String BUNDLE_REMIND_TYPE = "BUNDLE_REMIND_TYPE";
+    private static final String BUNDLE_COMPENSATION_ID = "BUNDLE_COMPENSATION_ID";
     private static final String LOG_TAG = CompensationRemindHelper.class.getSimpleName();
     private HelperInteractionListener mListener;
     private int mRemindType;
@@ -43,8 +43,8 @@ public class CompensationRemindHelper extends BaseHelper {
     public static CompensationRemindHelper newInstance(@RemindType int remindType, String compensationId) {
         CompensationRemindHelper fragment = new CompensationRemindHelper();
         Bundle args = new Bundle();
-        args.putInt(REMIND_TYPE, remindType);
-        args.putString(COMPENSATION_ID, compensationId);
+        args.putInt(BUNDLE_REMIND_TYPE, remindType);
+        args.putString(BUNDLE_COMPENSATION_ID, compensationId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -67,8 +67,8 @@ public class CompensationRemindHelper extends BaseHelper {
         String compensationId = "";
         Bundle args = getArguments();
         if (args != null) {
-            mRemindType = args.getInt(REMIND_TYPE);
-            compensationId = args.getString(COMPENSATION_ID);
+            mRemindType = args.getInt(BUNDLE_REMIND_TYPE);
+            compensationId = args.getString(BUNDLE_COMPENSATION_ID);
         }
         
         if (TextUtils.isEmpty(compensationId)) {
@@ -137,7 +137,7 @@ public class CompensationRemindHelper extends BaseHelper {
 
     private void onParseError(ParseException e, String compensationId) {
         if (mListener != null) {
-            mListener.onFailedToRemindUser(mRemindType, e, compensationId);
+            mListener.onUserRemindFailed(mRemindType, e, compensationId);
         }
     }
 
@@ -150,6 +150,6 @@ public class CompensationRemindHelper extends BaseHelper {
     public interface HelperInteractionListener {
         void onUserReminded(int remindType, String compensationId);
 
-        void onFailedToRemindUser(int remindType, ParseException e, String compensationId);
+        void onUserRemindFailed(int remindType, ParseException e, String compensationId);
     }
 }

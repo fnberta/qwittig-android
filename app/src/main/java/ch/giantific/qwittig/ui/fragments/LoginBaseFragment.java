@@ -40,17 +40,17 @@ import ch.giantific.qwittig.utils.ParseUtils;
 public abstract class LoginBaseFragment extends BaseFragment implements
         LoaderManager.LoaderCallbacks<Cursor> {
 
-    public static final String LOGIN_HELPER = "login_helper";
+    static final String LOGIN_HELPER = "LOGIN_HELPER";
     private static final int PERMISSIONS_REQUEST_CONTACTS = 1;
     private static final String[] PROFILE_COLUMNS = new String[]{
             ContactsContract.CommonDataKinds.Email.ADDRESS,
             ContactsContract.CommonDataKinds.Email.IS_PRIMARY,
     };
     private static final int COL_INDEX_ADDRESS = 0;
-    private static final String STATE_LOADING = "state_progress";
+    private static final String STATE_LOADING = "STATE_LOADING";
+    AutoCompleteTextView mEditTextEmail;
     private View mViewMain;
     private View mViewProgress;
-    AutoCompleteTextView mEditTextEmail;
 
     public LoginBaseFragment() {
     }
@@ -209,6 +209,7 @@ public abstract class LoginBaseFragment extends BaseFragment implements
     /**
      * Handles a failed login attempt. Passes error to generic Parse error handler, hides the
      * progress bar and removes the helper fragment.
+     *
      * @param e the ParseException thrown during the login attempt
      */
     public void onLoginFailed(ParseException e) {
@@ -222,9 +223,10 @@ public abstract class LoginBaseFragment extends BaseFragment implements
     /**
      * Adds user to the installation object and finishes the login process after a successful
      * login attempt
+     *
      * @param parseUser the now authenticated ParseUser
      */
-    public void onLoginSucceeded(ParseUser parseUser) {
+    public void onLoggedIn(ParseUser parseUser) {
         addUserToInstallation(parseUser);
         finishLogin();
     }

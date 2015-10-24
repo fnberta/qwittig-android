@@ -19,9 +19,9 @@ import ch.giantific.qwittig.data.parse.models.User;
  */
 public class CreateGroupHelper extends BaseInviteHelper {
 
-    private static final String GROUP_NAME = "group_name";
-    private static final String GROUP_CURRENCY = "group_currency";
-    private static final String USERS_TO_INVITE = "users_to_invite";
+    private static final String BUNDLE_GROUP_NAME = "BUNDLE_GROUP_NAME";
+    private static final String BUNDLE_GROUP_CURRENCY = "BUNDLE_GROUP_CURRENCY";
+    private static final String BUNDLE_USERS_TO_INVITE = "BUNDLE_USERS_TO_INVITE";
     private static final String LOG_TAG = CreateGroupHelper.class.getSimpleName();
     private HelperInteractionListener mListener;
     private List<String> mUsersToInvite;
@@ -34,9 +34,9 @@ public class CreateGroupHelper extends BaseInviteHelper {
                                                 ArrayList<String> usersToInvite) {
         CreateGroupHelper fragment = new CreateGroupHelper();
         Bundle args = new Bundle();
-        args.putString(GROUP_NAME, groupName);
-        args.putString(GROUP_CURRENCY, groupCurrency);
-        args.putStringArrayList(USERS_TO_INVITE, usersToInvite);
+        args.putString(BUNDLE_GROUP_NAME, groupName);
+        args.putString(BUNDLE_GROUP_CURRENCY, groupCurrency);
+        args.putStringArrayList(BUNDLE_USERS_TO_INVITE, usersToInvite);
         fragment.setArguments(args);
         return fragment;
     }
@@ -61,9 +61,9 @@ public class CreateGroupHelper extends BaseInviteHelper {
 
         Bundle args = getArguments();
         if (args != null) {
-            groupName = args.getString(GROUP_NAME);
-            groupCurrency = args.getString(GROUP_CURRENCY);
-            mUsersToInvite = args.getStringArrayList(USERS_TO_INVITE);
+            groupName = args.getString(BUNDLE_GROUP_NAME);
+            groupCurrency = args.getString(BUNDLE_GROUP_CURRENCY);
+            mUsersToInvite = args.getStringArrayList(BUNDLE_USERS_TO_INVITE);
         }
 
         if (TextUtils.isEmpty(groupName)) {

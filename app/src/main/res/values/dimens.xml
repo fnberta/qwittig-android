@@ -50,10 +50,6 @@
     <dimen name="avatar_plus_caption_plus_padding">72dp</dimen>
     <dimen name="subheader_height">48dp</dimen>
 
-    <!-- TextView -->
-    <dimen name="balance_change_width">96dp</dimen>
-    <dimen name="balance_change_height">40dp</dimen>
-
     <!-- Dialog -->
     <dimen name="dialog_padding">24dp</dimen>
 

@@ -29,6 +29,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     public static final int INTENT_REQUEST_TASK_NEW = 7;
     public static final int INTENT_REQUEST_TASK_MODIFY = 8;
     public static final int INTENT_REQUEST_TASK_DETAILS = 9;
+    private static final String ACCOUNT_CREATE_DIALOG = "ACCOUNT_CREATE_DIALOG";
 
     Toolbar mToolbar;
 
@@ -62,20 +63,20 @@ public abstract class BaseActivity extends AppCompatActivity implements
     public void showAccountCreateDialog() {
         AccountCreateDialogFragment accountCreateDialogFragment =
                 new AccountCreateDialogFragment();
-        accountCreateDialogFragment.show(getFragmentManager(), "account_create");
+        accountCreateDialogFragment.show(getFragmentManager(), ACCOUNT_CREATE_DIALOG);
     }
 
     @Override
-    public void createNewAccount() {
+    public void onCreateNewAccountSelected() {
         ParseUser.logOutInBackground(new LogOutCallback() {
             @Override
             public void done(ParseException e) {
-                startHomeScreen();
+                goToHomeScreen();
             }
         });
     }
 
-    private void startHomeScreen() {
+    private void goToHomeScreen() {
         Intent intent = new Intent(this, HomeActivity.class);
         intent.putExtra(LoginActivity.INTENT_EXTRA_SIGN_UP, true);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -87,19 +87,11 @@ public class Task extends ParseObject {
     public Date getDeadline() {
         return getDate(DEADLINE);
     }
-    
-    public void setDeadline(@Nullable Date deadline) {
-        if (deadline == null) {
-            remove(DEADLINE);
-        } else {
-            Calendar cal = DateUtils.getCalendarInstanceUTC();
-            cal.setTime(deadline);
-            cal = DateUtils.resetToMidnight(cal);
 
-            put(DEADLINE, cal.getTime());
-        }
+    public void setDeadline(Calendar calendar) {
+        put(DEADLINE, calendar.getTime());
     }
-
+    
     public List<ParseUser> getUsersInvolved() {
         List<ParseUser> usersInvolved = getList(USERS_INVOLVED);
         if (usersInvolved == null) {
@@ -126,6 +118,14 @@ public class Task extends ParseObject {
         put(HISTORY, history);
     }
 
+    public boolean isLoading() {
+        return mIsLoading;
+    }
+
+    public void setLoading(boolean isLoading) {
+        mIsLoading = isLoading;
+    }
+
     public Task() {
         // A default constructor is required.
     }
@@ -142,6 +142,18 @@ public class Task extends ParseObject {
         }
         setUsersInvolved(usersInvolved);
         setAccessRights(group);
+    }
+
+    public void setDeadline(@Nullable Date deadline) {
+        if (deadline == null) {
+            remove(DEADLINE);
+        } else {
+            Calendar cal = DateUtils.getCalendarInstanceUTC();
+            cal.setTime(deadline);
+            cal = DateUtils.resetToMidnight(cal);
+
+            setDeadline(cal);
+        }
     }
 
     private void setAccessRights(@NonNull ParseObject group) {
@@ -169,13 +181,5 @@ public class Task extends ParseObject {
         entries.add(new Date());
         historyNew.put(currentUser.getObjectId(), entries);
         put(HISTORY, historyNew);
-    }
-
-    public boolean isLoading() {
-        return mIsLoading;
-    }
-
-    public void setLoading(boolean isLoading) {
-        mIsLoading = isLoading;
     }
 }

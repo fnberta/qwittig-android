@@ -36,7 +36,7 @@ import ch.giantific.qwittig.utils.Utils;
  */
 public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
 
-    private static final String CREATE_GROUP_HELPER = "create_group_helper";
+    private static final String CREATE_GROUP_HELPER = "CREATE_GROUP_HELPER";
     private FragmentInteractionListener mListener;
     private TextInputLayout mTextInputLayoutName;
     private Spinner mSpinnerCurrency;

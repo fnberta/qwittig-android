@@ -27,38 +27,13 @@ public class Compensation extends ParseObject {
     public static final String IS_PAID = "isPaid";
     public static final String PIN_LABEL_PAID = "compensationPinLabelPaid";
     public static final String PIN_LABEL_UNPAID = "compensationPinLabelUnpaid";
-
     private boolean mIsLoading;
-
-    public Compensation() {
-        // A default constructor is required.
-    }
-
-    public Compensation(ParseObject group, ParseUser payer, ParseUser beneficiary, BigFraction amount,
-                        boolean isPaid) {
-        put(GROUP, group);
-        put(PAYER, payer);
-        put(BENEFICIARY, beneficiary);
-        setAmount(amount);
-        put(IS_PAID, isPaid);
-        setAccessRights(getCurrentGroup());
-    }
-
-    private Group getCurrentGroup() {
-        User currentUser = (User) ParseUser.getCurrentUser();
-        return currentUser.getCurrentGroup();
-    }
-
-    private void setAccessRights(ParseObject group) {
-        ParseACL acl = ParseUtils.getDefaultAcl(group);
-        setACL(acl);
-    }
 
     public Group getGroup() {
         return (Group) getParseObject(GROUP);
     }
 
-    public void setGroup (ParseObject group) {
+    public void setGroup(ParseObject group) {
         put(GROUP, group);
     }
 
@@ -112,5 +87,29 @@ public class Compensation extends ParseObject {
 
     public void setIsLoading(boolean isLoading) {
         mIsLoading = isLoading;
+    }
+
+    public Compensation() {
+        // A default constructor is required.
+    }
+
+    public Compensation(ParseObject group, ParseUser payer, ParseUser beneficiary, BigFraction amount,
+                        boolean isPaid) {
+        setGroup(group);
+        setPayer(payer);
+        setBeneficiary(beneficiary);
+        setAmount(amount);
+        setPaid(isPaid);
+        setAccessRights(getCurrentGroup());
+    }
+
+    private Group getCurrentGroup() {
+        User currentUser = (User) ParseUser.getCurrentUser();
+        return currentUser.getCurrentGroup();
+    }
+
+    private void setAccessRights(ParseObject group) {
+        ParseACL acl = ParseUtils.getDefaultAcl(group);
+        setACL(acl);
     }
 }

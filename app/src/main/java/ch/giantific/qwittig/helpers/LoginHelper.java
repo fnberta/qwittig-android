@@ -17,10 +17,10 @@ import ch.giantific.qwittig.data.parse.models.User;
  */
 public class LoginHelper extends BaseHelper {
 
-    private static final String BUNDLE_USERNAME = "username";
-    private static final String BUNDLE_PASSWORD = "password";
-    private static final String BUNDLE_NICKNAME = "nickname";
-    private static final String BUNDLE_AVATAR = "avatar";
+    private static final String BUNDLE_USERNAME = "BUNDLE_USERNAME";
+    private static final String BUNDLE_PASSWORD = "BUNDLE_PASSWORD";
+    private static final String BUNDLE_NICKNAME = "BUNDLE_NICKNAME";
+    private static final String BUNDLE_AVATAR = "BUNDLE_AVATAR";
     private HelperInteractionListener mListener;
     private byte[] mAvatar;
 
@@ -122,7 +122,7 @@ public class LoginHelper extends BaseHelper {
                 }
 
                 if (parseUser != null && mListener != null) {
-                    mListener.onLoginSucceeded(parseUser);
+                    mListener.onLoggedIn(parseUser);
                 }
             }
         });
@@ -164,7 +164,7 @@ public class LoginHelper extends BaseHelper {
     public interface HelperInteractionListener {
         void onLoginFailed(ParseException e);
 
-        void onLoginSucceeded(ParseUser parseUser);
+        void onLoggedIn(ParseUser parseUser);
 
         void onPasswordReset();
     }

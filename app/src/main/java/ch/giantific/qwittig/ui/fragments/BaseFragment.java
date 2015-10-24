@@ -1,7 +1,6 @@
 package ch.giantific.qwittig.ui.fragments;
 
 import android.app.Fragment;
-import android.app.FragmentManager;
 
 /**
  * Created by fabio on 05.06.15.

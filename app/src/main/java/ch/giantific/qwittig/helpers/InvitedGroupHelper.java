@@ -26,7 +26,7 @@ import ch.giantific.qwittig.data.parse.models.User;
  */
 public class InvitedGroupHelper extends BaseHelper {
 
-    private static final String GROUP_ID = "group_id";
+    private static final String BUNDLE_GROUP_ID = "BUNDLE_GROUP_ID";
     private static final String LOG_TAG = InvitedGroupHelper.class.getSimpleName();
     private HelperInteractionListener mListener;
     private String mGroupId;
@@ -38,7 +38,7 @@ public class InvitedGroupHelper extends BaseHelper {
     public static InvitedGroupHelper newInstance(String groupId) {
         InvitedGroupHelper fragment = new InvitedGroupHelper();
         Bundle args = new Bundle();
-        args.putString(GROUP_ID, groupId);
+        args.putString(BUNDLE_GROUP_ID, groupId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -60,7 +60,7 @@ public class InvitedGroupHelper extends BaseHelper {
 
         Bundle args = getArguments();
         if (args != null) {
-            mGroupId = args.getString(GROUP_ID);
+            mGroupId = args.getString(BUNDLE_GROUP_ID);
         }
 
         if (!TextUtils.isEmpty(mGroupId)) {

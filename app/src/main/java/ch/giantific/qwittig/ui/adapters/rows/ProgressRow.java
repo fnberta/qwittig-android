@@ -11,11 +11,7 @@ import ch.giantific.qwittig.R;
 */
 public class ProgressRow extends RecyclerView.ViewHolder {
 
-    private ProgressBar mProgressBar;
-
     public ProgressRow(View view) {
         super(view);
-
-        mProgressBar = (ProgressBar) view.findViewById(R.id.pb_more);
     }
 }

@@ -34,22 +34,22 @@ public class PurchaseDiscardDialogFragment extends DialogFragment {
         dialogBuilder.setMessage(R.string.dialog_purchase_discard_message)
                 .setPositiveButton(R.string.dialog_positive_save_draft, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mListener.savePurchaseAsDraft();
+                        mListener.onSavePurchaseAsDraftSelected();
                         dismiss();
                     }
                 })
                 .setNegativeButton(R.string.dialog_purchase_discard, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mListener.discardPurchase();
+                        mListener.onDiscardPurchaseSelected();
                     }
                 });
         return dialogBuilder.create();
     }
 
     public interface DialogInteractionListener {
-        void savePurchaseAsDraft();
+        void onSavePurchaseAsDraftSelected();
 
-        void discardPurchase();
+        void onDiscardPurchaseSelected();
     }
 }

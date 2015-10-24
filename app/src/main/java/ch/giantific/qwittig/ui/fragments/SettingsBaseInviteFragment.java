@@ -20,7 +20,7 @@ import ch.giantific.qwittig.utils.Utils;
  */
 public abstract class SettingsBaseInviteFragment extends BaseFragment {
 
-    private static final String STATE_ROW_COUNT = "state_row_count";
+    private static final String STATE_ROW_COUNT = "STATE_ROW_COUNT";
     List<TextInputLayout> mUsersToInviteFields = new ArrayList<>();
     ArrayList<String> mUsersToInviteEmails = new ArrayList<>();
     private int mInvitedUsersRowCount;
@@ -65,7 +65,7 @@ public abstract class SettingsBaseInviteFragment extends BaseFragment {
         }
     }
 
-    final void addUserRow(int idCounter) {
+    private void addUserRow(int idCounter) {
         View userRow = getActivity().getLayoutInflater()
                 .inflate(R.layout.row_settings_user_invite, mLinearLayoutUsers, false);
         userRow.setTag(idCounter - 1);
@@ -97,7 +97,7 @@ public abstract class SettingsBaseInviteFragment extends BaseFragment {
         mLinearLayoutUsers.addView(userRow);
     }
 
-    final void resetIdsAndTags() {
+    private void resetIdsAndTags() {
         for (int i = 0, sizeInvitedUsersRows = mUsersToInviteRows.size(); i < sizeInvitedUsersRows; i++) {
             View userRow = mUsersToInviteRows.get(i);
             userRow.setTag(i);

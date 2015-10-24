@@ -20,9 +20,9 @@ public class LoginActivity extends AppCompatActivity implements
         ResetPasswordDialogFragment.FragmentInteractionListener,
         LoginHelper.HelperInteractionListener {
 
-    public static final String INTENT_URI_EMAIL = "intent_uri_email";
-    public static final String INTENT_EXTRA_SIGN_UP = "intent_sign_up";
-    public static final String STATE_LOGIN_FRAGMENT = "STATE_LOGIN_FRAGMENT";
+    public static final String INTENT_URI_EMAIL = "INTENT_URI_EMAIL";
+    public static final String INTENT_EXTRA_SIGN_UP = "INTENT_EXTRA_SIGN_UP";
+    private static final String STATE_LOGIN_FRAGMENT = "STATE_LOGIN_FRAGMENT";
     private static final String LOG_TAG = LoginActivity.class.getSimpleName();
     private LoginBaseFragment mLoginBaseFragment;
 
@@ -66,13 +66,13 @@ public class LoginActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onLoginSucceeded(ParseUser parseUser) {
-        mLoginBaseFragment.onLoginSucceeded(parseUser);
+    public void onLoggedIn(ParseUser parseUser) {
+        mLoginBaseFragment.onLoggedIn(parseUser);
     }
 
     @Override
-    public void resetPassword(String email) {
-        ((LoginFragment) mLoginBaseFragment).resetPasswordWithHelper(email);
+    public void onResetPasswordSelected(String email) {
+        ((LoginFragment) mLoginBaseFragment).onResetPasswordSelected(email);
     }
 
     @Override

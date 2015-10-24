@@ -21,7 +21,7 @@ import ch.giantific.qwittig.utils.ParseUtils;
  */
 public class SettlementHelper extends BaseHelper {
 
-    private static final String SINGLE_USER_SETTLEMENT = "single_user_settlement";
+    private static final String BUNDLE_SINGLE_USER = "BUNDLE_SINGLE_USER";
     private static final String LOG_TAG = SettlementHelper.class.getSimpleName();
     private HelperInteractionListener mListener;
 
@@ -32,7 +32,7 @@ public class SettlementHelper extends BaseHelper {
     public static SettlementHelper newInstance(boolean doSingleUserSettlement) {
         SettlementHelper fragment = new SettlementHelper();
         Bundle args = new Bundle();
-        args.putBoolean(SINGLE_USER_SETTLEMENT, doSingleUserSettlement);
+        args.putBoolean(BUNDLE_SINGLE_USER, doSingleUserSettlement);
         fragment.setArguments(args);
         return fragment;
     }
@@ -55,7 +55,7 @@ public class SettlementHelper extends BaseHelper {
         boolean doSingleUserSettlement = false;
         Bundle args = getArguments();
         if (args != null) {
-            doSingleUserSettlement = args.getBoolean(SINGLE_USER_SETTLEMENT, false);
+            doSingleUserSettlement = args.getBoolean(BUNDLE_SINGLE_USER, false);
         }
 
         Group currentGroup = ParseUtils.getCurrentGroup();

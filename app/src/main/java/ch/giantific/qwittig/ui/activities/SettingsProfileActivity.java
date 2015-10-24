@@ -40,9 +40,9 @@ public class SettingsProfileActivity extends BaseActivity implements
     public static final int CHANGES_DISCARDED = 1;
     public static final int NO_CHANGES = 2;
 
-    public static final String SHARED_AVATAR = "shared_avatar";
     public static final int RESULT_CHANGES_DISCARDED = 2;
     private static final String STATE_PROFILE_FRAGMENT = "STATE_PROFILE_FRAGMENT";
+    private static final String DISCARD_CHANGES_DIALOG = "DISCARD_CHANGES_DIALOG";
     private static final int INTENT_REQUEST_IMAGE = 1;
     private boolean mHasAvatarSet = true;
     private ImageView mImageViewAvatar;
@@ -52,7 +52,6 @@ public class SettingsProfileActivity extends BaseActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings_profile);
-        //ViewCompat.setTransitionName(findViewById(R.id.appbar), SHARED_AVATAR);
         supportPostponeEnterTransition();
 
         ActionBar actionBar = getSupportActionBar();
@@ -151,11 +150,11 @@ public class SettingsProfileActivity extends BaseActivity implements
     private void showDiscardChangesDialog() {
         DiscardChangesDialogFragment discardChangesDialogFragment =
                 new DiscardChangesDialogFragment();
-        discardChangesDialogFragment.show(getFragmentManager(), "discard_changes");
+        discardChangesDialogFragment.show(getFragmentManager(), DISCARD_CHANGES_DIALOG);
     }
 
     @Override
-    public void discardChanges() {
+    public void onDiscardChangesSelected() {
         finishEdit(CHANGES_DISCARDED);
     }
 

@@ -67,7 +67,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     public static final String PUSH_PARAM_TASK = "task";
     public static final String PUSH_PARAM_TASK_TITLE = "taskTitle";
 
-    public static final String INTENT_ACTION_INVITATION = "intent_action_invitation";
+    public static final String INTENT_ACTION_INVITATION = "INTENT_ACTION_INVITATION";
     public static final int ACTION_INVITATION_ACCEPTED = 1;
     public static final int ACTION_INVITATION_DISCARDED = 2;
 
@@ -102,9 +102,9 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     private static final String TYPE_TASK_REMIND_USER = "taskRemindUser";
     private static final String ACTION_PUSH_BUTTON_ACCEPT = "ch.giantific.qwittig.push.intent.ACCEPT";
     private static final String ACTION_PUSH_BUTTON_DISCARD = "ch.giantific.qwittig.push.intent.DISCARD";
-    private static final String NOTIFICATION_ID = "notification_id";
+    private static final String NOTIFICATION_ID = "NOTIFICATION_ID";
     private static final int NEW_PURCHASE_NOTIFICATION_ID = 1;
-    private static final String STORED_PURCHASE_NOTIFICATIONS = "stored_purchase_notifications_";
+    private static final String STORED_PURCHASE_NOTIFICATIONS = "STORED_PURCHASE_NOTIFICATIONS";
     private static final int MAX_LINES_INBOX_STYLE = 7;
     private static final String LOG_TAG = PushBroadcastReceiver.class.getSimpleName();
     private SharedPreferences mSharedPreferences;

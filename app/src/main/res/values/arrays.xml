@@ -5,11 +5,6 @@
         <item>@string/fab_label_auto</item>
     </string-array>
 
-    <string-array name="stats_periods">
-        <item>@string/period_year</item>
-        <item>@string/period_month</item>
-    </string-array>
-    
     <integer-array name="stats_colors">
         <item>@color/red_500</item>
         <item>@color/indigo_500</item>

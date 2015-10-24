@@ -27,7 +27,7 @@ import retrofit.mime.TypedString;
 public class OcrHelper extends BaseHelper {
 
     private static final String LOG_TAG = OcrHelper.class.getSimpleName();
-    private static final String BUNDLE_RECEIPT = "receipt";
+    private static final String BUNDLE_RECEIPT_PATH = "BUNDLE_RECEIPT_PATH";
     private static final int MAX_RETRIES = 0;
     private HelperInteractionListener mListener;
     private String mReceiptPath;
@@ -40,7 +40,7 @@ public class OcrHelper extends BaseHelper {
     public static OcrHelper newInstance(String receiptPath) {
         OcrHelper fragment = new OcrHelper();
         Bundle args = new Bundle();
-        args.putString(BUNDLE_RECEIPT, receiptPath);
+        args.putString(BUNDLE_RECEIPT_PATH, receiptPath);
         fragment.setArguments(args);
         return fragment;
     }
@@ -62,7 +62,7 @@ public class OcrHelper extends BaseHelper {
 
         Bundle args = getArguments();
         if (args != null) {
-            mReceiptPath = args.getString(BUNDLE_RECEIPT);
+            mReceiptPath = args.getString(BUNDLE_RECEIPT_PATH);
             if (TextUtils.isEmpty(mReceiptPath)) {
                 return;
             }
@@ -99,7 +99,7 @@ public class OcrHelper extends BaseHelper {
                     public void success(PurchaseRest purchaseRest, Response response) {
                         mRetries = 0;
                         if (mListener != null) {
-                            mListener.onOcrSuccessful(purchaseRest);
+                            mListener.onOcrFinished(purchaseRest);
                         }
                     }
 
@@ -124,7 +124,7 @@ public class OcrHelper extends BaseHelper {
     }
 
     public interface HelperInteractionListener {
-        void onOcrSuccessful(PurchaseRest purchaseRest);
+        void onOcrFinished(PurchaseRest purchaseRest);
 
         void onOcrFailed(String errorMessage);
     }

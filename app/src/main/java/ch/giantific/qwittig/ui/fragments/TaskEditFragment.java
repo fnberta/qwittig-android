@@ -20,11 +20,11 @@ import ch.giantific.qwittig.utils.DateUtils;
  */
 public class TaskEditFragment extends TaskAddFragment {
 
-    private static final String BUNDLE_EDIT_TASK_ID = "edit_task_id";
-    private static final String STATE_ITEMS_SET = "items_set";
-    private static final String STATE_OLD_TITLE = "state_old_title";
-    private static final String STATE_OLD_TIME_FRAME = "state_old_time_frame";
-    private static final String STATE_OLD_DEADLINE = "state_old_deadline";
+    private static final String BUNDLE_EDIT_TASK_ID = "BUNDLE_EDIT_TASK_ID";
+    private static final String STATE_ITEMS_SET = "STATE_ITEMS_SET";
+    private static final String STATE_OLD_TITLE = "STATE_OLD_TITLE";
+    private static final String STATE_OLD_TIME_FRAME = "STATE_OLD_TIME_FRAME";
+    private static final String STATE_OLD_DEADLINE = "STATE_OLD_DEADLINE";
     private static final String LOG_TAG = TaskEditFragment.class.getSimpleName();
     private boolean mOldValuesSet;
     private Task mEditTask;

@@ -30,7 +30,7 @@ public class StatsActivity extends BaseNavDrawerActivity implements
         StatsHelper.HelperInteractionListener {
 
     private static final String LOG_TAG = StatsActivity.class.getSimpleName();
-    private static final String STATE_STATS_FRAGMENT = "stats_fragment";
+    private static final String STATE_STATS_FRAGMENT = "STATE_STATS_FRAGMENT";
     private static final int NUMBER_OF_MONTHS = 12;
     private Spinner mSpinnerStatsType;
     private Spinner mSpinnerYear;
@@ -251,8 +251,8 @@ public class StatsActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onFailedToCalculateStats(int statsType, ParseException e) {
-        mStatsFragment.onFailedToCalculateStats(e);
+    public void onStatsCalculationFailed(int statsType, ParseException e) {
+        mStatsFragment.onStatsCalculationFailed(e);
     }
 
     @Override

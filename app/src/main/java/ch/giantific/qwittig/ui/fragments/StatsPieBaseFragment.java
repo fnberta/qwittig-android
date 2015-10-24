@@ -33,13 +33,13 @@ import ch.giantific.qwittig.ui.widgets.PieChart;
 public abstract class StatsPieBaseFragment extends StatsBaseFragment {
 
     private static final String LOG_TAG = StatsPieBaseFragment.class.getSimpleName();
-    private static final String STATE_SORT_BY_USER = "state_sort_by_user";
+    private static final String STATE_SORT_BY_USER = "STATE_SORT_BY_USER";
     PieChart mPieChart;
-    RecyclerView mRecyclerView;
     StatsPieChartRecyclerAdapter mRecyclerAdapter;
-    List<PieData> mUserPieData = new ArrayList<>();
-    List<String> mUserNicknames = new ArrayList<>();
     boolean mSortByUser;
+    private RecyclerView mRecyclerView;
+    private List<PieData> mUserPieData = new ArrayList<>();
+    private List<String> mUserNicknames = new ArrayList<>();
 
     public StatsPieBaseFragment() {
         // Required empty public constructor
@@ -230,8 +230,7 @@ public abstract class StatsPieBaseFragment extends StatsBaseFragment {
         }
     }
 
-    @CallSuper
-    void setDataOptions(PieData pieData) {
+    private void setDataOptions(PieData pieData) {
         pieData.setValueTextSize(14f);
         pieData.setValueTextColor(Color.WHITE);
     }

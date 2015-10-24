@@ -33,7 +33,7 @@ public class PurchaseQueryHelper extends BaseQueryHelper {
         super.onCreate(savedInstanceState);
 
         if (mCurrentGroup == null || mCurrentUserGroups == null) {
-            mListener.onAllPurchasesQueriesFinished();
+            mListener.onAllPurchasesQueried();
             return;
         }
 
@@ -52,7 +52,7 @@ public class PurchaseQueryHelper extends BaseQueryHelper {
     @Override
     protected void finish() {
         if (mListener != null) {
-            mListener.onAllPurchasesQueriesFinished();
+            mListener.onAllPurchasesQueried();
         }
     }
 
@@ -79,6 +79,6 @@ public class PurchaseQueryHelper extends BaseQueryHelper {
 
         void onPurchasesPinFailed(ParseException e);
 
-        void onAllPurchasesQueriesFinished();
+        void onAllPurchasesQueried();
     }
 }

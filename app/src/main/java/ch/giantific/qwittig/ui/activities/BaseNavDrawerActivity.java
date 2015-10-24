@@ -1,6 +1,5 @@
 package ch.giantific.qwittig.ui.activities;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -59,7 +58,7 @@ import ch.giantific.qwittig.utils.inappbilling.Purchase;
 public abstract class BaseNavDrawerActivity extends BaseActivity implements
         LocalQuery.ObjectLocalFetchListener {
 
-    static final String URI_INVITED_EMAIL = "email";
+    static final String URI_INVITED_EMAIL = "URI_INVITED_EMAIL";
     private static final int NAVDRAWER_ITEM_INVALID = -1;
     private static final String SKU_PREMIUM = "ch.giantific.qwittig.iab.premium";
     private static final int RC_REQUEST = 10001;
@@ -336,9 +335,6 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
     }
 
     private void startProfileSettings() {
-        // TODO: make shared element transition nice
-        //ViewCompat.setTransitionName(mImageViewHeaderAvatar, SettingsProfileActivity.SHARED_AVATAR);
-
         Intent intent = new Intent(this, SettingsProfileActivity.class);
         ActivityOptionsCompat options =
                 ActivityOptionsCompat.makeSceneTransitionAnimation(this);
@@ -397,7 +393,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
         updateGroupSpinnerPosition();
     }
 
-    final void updateGroupSpinnerList() {
+    private void updateGroupSpinnerList() {
         mGroups.clear();
 
         User currentUser = (User) ParseUser.getCurrentUser();
@@ -525,7 +521,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
                 startActivity(intent);
                 break;
             case R.id.nav_go_premium:
-                goPremium();
+                onGoPremiumSelected();
                 break;
         }
     }
@@ -581,7 +577,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
         // subclasses are free to add stuff here
     }
 
-    final public void goPremium() {
+    final public void onGoPremiumSelected() {
         if (!mIabHelper.subscriptionsSupported()) {
             MessageUtils.showBasicSnackbar(mToolbar, getString(R.string.toast_not_supported));
             return;

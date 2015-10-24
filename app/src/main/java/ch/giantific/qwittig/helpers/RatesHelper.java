@@ -18,7 +18,7 @@ import retrofit.client.Response;
 public class RatesHelper extends BaseHelper {
 
     private static final String LOG_TAG = RatesHelper.class.getSimpleName();
-    private static final String BUNDLE_BASE_CURRENCY = "base_currency";
+    private static final String BUNDLE_BASE_CURRENCY = "BUNDLE_BASE_CURRENCY";
     private HelperInteractionListener mListener;
 
     public RatesHelper() {
@@ -65,7 +65,7 @@ public class RatesHelper extends BaseHelper {
             public void success(CurrencyRates currencyRates, Response response) {
                 Map<String, Float> exchangeRates = currencyRates.getRates();
                 if (mListener != null) {
-                    mListener.onRatesFetchSuccessful(exchangeRates);
+                    mListener.onRatesFetched(exchangeRates);
                 }
             }
 
@@ -85,7 +85,7 @@ public class RatesHelper extends BaseHelper {
     }
 
     public interface HelperInteractionListener {
-        void onRatesFetchSuccessful(Map<String, Float> exchangeRates);
+        void onRatesFetched(Map<String, Float> exchangeRates);
 
         void onRatesFetchFailed(String errorMessage);
     }

@@ -1,4 +1,4 @@
-package ch.giantific.qwittig.ui.fragments;
+package ch.giantific.qwittig.ui;
 
 import android.content.Context;
 import android.hardware.Camera;

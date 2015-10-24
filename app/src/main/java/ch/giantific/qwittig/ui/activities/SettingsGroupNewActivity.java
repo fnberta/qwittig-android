@@ -27,7 +27,7 @@ public class SettingsGroupNewActivity extends BaseActivity implements
         CreateGroupHelper.HelperInteractionListener {
 
     private static final String STATE_GROUP_NEW_FRAGMENT = "STATE_GROUP_NEW_FRAGMENT";
-    public static final String RESULT_DATA_GROUP = "result_data_group";
+    public static final String RESULT_DATA_GROUP = "RESULT_DATA_GROUP";
     private static final String LOG_TAG = SettingsGroupNewActivity.class.getSimpleName();
     private SettingsGroupNewFragment mSettingsGroupNewFragment;
     private FloatingActionButton mFab;

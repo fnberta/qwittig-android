@@ -22,9 +22,9 @@ import ch.giantific.qwittig.data.parse.models.Purchase;
  */
 public class MoreQueryHelper extends BaseQueryHelper {
 
-    public static final String MORE_QUERY_HELPER = "more_query_helper";
-    private static final String CLASS_NAME = "class_name";
-    private static final String SKIP = "skip";
+    public static final String MORE_QUERY_HELPER = "MORE_QUERY_HELPER";
+    private static final String BUNDLE_CLASS_NAME = "BUNDLE_CLASS_NAME";
+    private static final String BUNDLE_SKIP = "BUNDLE_SKIP";
     private static final String LOG_TAG = MoreQueryHelper.class.getSimpleName();
     private HelperInteractionListener mListener;
 
@@ -35,8 +35,8 @@ public class MoreQueryHelper extends BaseQueryHelper {
     public static MoreQueryHelper newInstance(String className, int skip) {
         MoreQueryHelper fragment = new MoreQueryHelper();
         Bundle args = new Bundle();
-        args.putString(CLASS_NAME, className);
-        args.putInt(SKIP, skip);
+        args.putString(BUNDLE_CLASS_NAME, className);
+        args.putInt(BUNDLE_SKIP, skip);
         fragment.setArguments(args);
         return fragment;
     }
@@ -60,8 +60,8 @@ public class MoreQueryHelper extends BaseQueryHelper {
         int skip = 0;
         Bundle args = getArguments();
         if (args != null) {
-            className = args.getString(CLASS_NAME);
-            skip = args.getInt(SKIP);
+            className = args.getString(BUNDLE_CLASS_NAME);
+            skip = args.getInt(BUNDLE_SKIP);
         }
 
         if (TextUtils.isEmpty(className) || mCurrentGroup == null) {

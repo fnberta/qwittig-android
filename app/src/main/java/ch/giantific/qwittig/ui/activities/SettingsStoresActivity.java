@@ -19,6 +19,7 @@ public class SettingsStoresActivity extends BaseActivity implements
         StoreAddDialogFragment.DialogInteractionListener {
 
     private static final String STATE_SETTINGS_STORE_FRAGMENT = "STATE_SETTINGS_STORE_FRAGMENT";
+    private static final String ADD_STORE_DIALOG = "ADD_STORE_DIALOG";
     private SettingsStoresFragment mSettingsStoresFragment;
     private FloatingActionButton mFab;
 
@@ -79,12 +80,12 @@ public class SettingsStoresActivity extends BaseActivity implements
 
     private void showStoreAddDialog() {
         StoreAddDialogFragment storeAddDialogFragment = new StoreAddDialogFragment();
-        storeAddDialogFragment.show(getFragmentManager(), "add_store");
+        storeAddDialogFragment.show(getFragmentManager(), ADD_STORE_DIALOG);
     }
 
     @Override
-    public void addStore(String store) {
-        mSettingsStoresFragment.addStoreToList(store);
+    public void onNewStoreSet(String store) {
+        mSettingsStoresFragment.onNewStoreSet(store);
     }
 
     @Override

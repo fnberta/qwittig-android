@@ -29,7 +29,7 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewFragment implem
         LocalQuery.UserLocalQueryListener,
         UsersRecyclerAdapter.AdapterInteractionListener {
 
-    private static final String USER_QUERY_HELPER = "user_query_helper";
+    private static final String USER_QUERY_HELPER = "USER_QUERY_HELPER";
     private UsersRecyclerAdapter mRecyclerAdapter;
     private List<ParseUser> mUsers = new ArrayList<>();
 
@@ -97,7 +97,7 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewFragment implem
     /**
      * Called from activity when all purchases queries are finished
      */
-    public void onAllUserQueriesFinished() {
+    public void onAllUsersQueried() {
         HelperUtils.removeHelper(getFragmentManager(), USER_QUERY_HELPER);
         setLoading(false);
     }

@@ -22,8 +22,8 @@ import ch.giantific.qwittig.utils.MoneyUtils;
  */
 public class CompensationChangeAmountDialogFragment extends DialogFragment {
 
-    private static final String BUNDLE_AMOUNT_OLD = "amountOld";
-    private static final String BUNDLE_CURRENCY = "currency";
+    private static final String BUNDLE_AMOUNT_OLD = "BUNDLE_AMOUNT_OLD";
+    private static final String BUNDLE_CURRENCY = "BUNDLE_CURRENCY";
     private FragmentInteractionListener mListener;
     private double mAmountOld;
     private String mCurrentGroupCurrency;
@@ -102,7 +102,7 @@ public class CompensationChangeAmountDialogFragment extends DialogFragment {
                     BigFraction amountNew = new BigFraction(amount.doubleValue());
                     if (amountNew.compareTo(BigFraction.ZERO) > 0) {
                         mTextInputLayoutAmount.setErrorEnabled(false);
-                        mListener.changeAmount(amountNew);
+                        mListener.onChangedAmountSet(amountNew);
                         dismiss();
                     } else {
                         mTextInputLayoutAmount.setError(getString(R.string.error_valid_amount));
@@ -113,6 +113,6 @@ public class CompensationChangeAmountDialogFragment extends DialogFragment {
     }
 
     public interface FragmentInteractionListener {
-        void changeAmount(BigFraction amount);
+        void onChangedAmountSet(BigFraction amount);
     }
 }

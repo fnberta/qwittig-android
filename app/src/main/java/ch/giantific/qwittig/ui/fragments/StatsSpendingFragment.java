@@ -32,9 +32,9 @@ import ch.giantific.qwittig.utils.DateUtils;
 public class StatsSpendingFragment extends StatsBaseFragment {
 
     private static final String LOG_TAG = StatsSpendingFragment.class.getSimpleName();
-    private static final String STATS_HELPER = "stats_helper_spending";
-    private static final String STATE_SHOW_GROUP = "state_show_group";
-    private static final String STATE_SHOW_AVERAGE = "state_show_average";
+    private static final String STATS_HELPER_SPENDING = "STATS_HELPER_SPENDING";
+    private static final String STATE_SHOW_GROUP = "STATE_SHOW_GROUP";
+    private static final String STATE_SHOW_AVERAGE = "STATE_SHOW_AVERAGE";
     private BarChart mBarChart;
     private boolean mShowGroup;
     private boolean mShowAverage;
@@ -115,7 +115,7 @@ public class StatsSpendingFragment extends StatsBaseFragment {
 
     @Override
     protected String getHelperTag() {
-        return STATS_HELPER;
+        return STATS_HELPER_SPENDING;
     }
 
     @Override

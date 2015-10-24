@@ -39,7 +39,6 @@ import ch.giantific.qwittig.utils.Utils;
  */
 public class LoginFragment extends LoginBaseFragment {
 
-    public static final String LOGIN_HELPER = "login_helper";
     private TextInputLayout mTextInputLayoutEmail;
     private EditText mEditTextPassword;
     private TextInputLayout mTextInputLayoutPassword;
@@ -222,10 +221,18 @@ public class LoginFragment extends LoginBaseFragment {
     }
 
     /**
+     * Initiates the resetting of a user's password.
+     * @param email the email of the user the whose password should be reset
+     */
+    public void onResetPasswordSelected(String email) {
+        resetPasswordWithHelper(email);
+    }
+
+    /**
      * Starts a helper fragment that resets a user's password.
      * @param email the email of the user the whose password should be reset
      */
-    public void resetPasswordWithHelper(String email) {
+    private void resetPasswordWithHelper(String email) {
         if (!Utils.isConnected(getActivity())) {
             MessageUtils.showBasicSnackbar(mButtonLogIn, getString(R.string.toast_no_connection));
             return;

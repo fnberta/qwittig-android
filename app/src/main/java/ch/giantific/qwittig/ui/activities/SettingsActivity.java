@@ -86,8 +86,8 @@ public class SettingsActivity extends BaseActivity implements
     }
 
     @Override
-    public void onLogoutSucceeded() {
-        mSettingsFragment.onLogoutSucceeded();
+    public void onLoggedOut() {
+        mSettingsFragment.onLoggedOut();
     }
 
     @Override

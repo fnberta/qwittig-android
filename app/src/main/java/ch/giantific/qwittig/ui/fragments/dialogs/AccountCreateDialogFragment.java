@@ -34,7 +34,7 @@ public class AccountCreateDialogFragment extends DialogFragment {
         dialogBuilder.setMessage(R.string.dialog_account_create)
                 .setPositiveButton(R.string.dialog_positive_create, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mListener.createNewAccount();
+                        mListener.onCreateNewAccountSelected();
                         dismiss();
                     }
                 })
@@ -48,6 +48,6 @@ public class AccountCreateDialogFragment extends DialogFragment {
     }
 
     public interface DialogInteractionListener {
-        void createNewAccount();
+        void onCreateNewAccountSelected();
     }
 }

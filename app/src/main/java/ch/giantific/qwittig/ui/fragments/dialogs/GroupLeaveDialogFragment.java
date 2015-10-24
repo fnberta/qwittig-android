@@ -14,7 +14,7 @@ import ch.giantific.qwittig.R;
  */
 public class GroupLeaveDialogFragment extends DialogFragment {
 
-    private static final String BUNDLE_MESSAGE = "message";
+    private static final String BUNDLE_MESSAGE = "BUNDLE_MESSAGE";
     private FragmentInteractionListener mListener;
     private String mMessage;
 

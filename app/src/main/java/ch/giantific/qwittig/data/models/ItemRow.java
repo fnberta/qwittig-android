@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.EditText;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.ui.widgets.ListCheckBox;

@@ -34,7 +34,7 @@ public abstract class BaseQueryHelper extends BaseHelper {
     Group mCurrentGroup;
     List<ParseObject> mCurrentUserGroups;
     int mTotalNumberOfQueries;
-    int mQueryCount;
+    private int mQueryCount;
 
     public BaseQueryHelper() {
         // empty default constructor

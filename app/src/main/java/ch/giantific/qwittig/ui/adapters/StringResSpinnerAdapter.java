@@ -10,10 +10,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import java.util.Arrays;
-
-import ch.giantific.qwittig.data.parse.models.Task;
-
 
 /**
  * Created by fabio on 28.08.15.

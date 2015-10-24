@@ -57,8 +57,8 @@ public class PurchaseEditActivity extends PurchaseBaseActivity implements
     }
 
     @Override
-    public void discardChanges() {
-        mPurchaseFragment.discard();
+    public void onDiscardChangesSelected() {
+        mPurchaseFragment.onDiscardPurchaseSelected();
     }
 
     @Override

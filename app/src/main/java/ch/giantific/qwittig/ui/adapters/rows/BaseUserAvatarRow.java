@@ -21,8 +21,8 @@ import ch.giantific.qwittig.data.models.Avatar;
 */
 public abstract class BaseUserAvatarRow extends RecyclerView.ViewHolder {
 
-    protected TextView mTextViewName;
-    protected ImageView mImageViewAvatar;
+    private TextView mTextViewName;
+    private ImageView mImageViewAvatar;
     protected Context mContext;
 
     public BaseUserAvatarRow(View view, Context context) {
