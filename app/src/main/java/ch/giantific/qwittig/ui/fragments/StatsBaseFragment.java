@@ -97,10 +97,12 @@ public abstract class StatsBaseFragment extends BaseFragment implements
         }
     }
 
-    @CallSuper
-    void findBaseViews(@NonNull View rootView) {
-        mTextViewEmptyView = (TextView) rootView.findViewById(R.id.tv_empty_view);
-        mProgressBar = (ProgressBar) rootView.findViewById(R.id.pb_stats);
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        mTextViewEmptyView = (TextView) view.findViewById(R.id.tv_empty_view);
+        mProgressBar = (ProgressBar) view.findViewById(R.id.pb_stats);
     }
 
     @Override

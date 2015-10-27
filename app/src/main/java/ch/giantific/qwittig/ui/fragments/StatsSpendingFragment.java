@@ -75,12 +75,14 @@ public class StatsSpendingFragment extends StatsBaseFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_stats_spending, container, false);
+        return inflater.inflate(R.layout.fragment_stats_spending, container, false);
+    }
 
-        mBarChart = (BarChart) rootView.findViewById(R.id.bc_spending);
-        findBaseViews(rootView);
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        return rootView;
+        mBarChart = (BarChart) view.findViewById(R.id.bc_spending);
     }
 
     @Override

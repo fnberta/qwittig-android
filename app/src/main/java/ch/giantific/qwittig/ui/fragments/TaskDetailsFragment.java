@@ -113,19 +113,17 @@ public class TaskDetailsFragment extends BaseFragment implements
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_task_details, container, false);
-
-        mRecyclerViewHistory = (RecyclerView) rootView.findViewById(R.id.rv_task_details_history);
-        mEmptyView = rootView.findViewById(R.id.empty_view);
-        mProgressBar = (ProgressBar) rootView.findViewById(R.id.pb_task_details);
-
-        return rootView;
+        return inflater.inflate(R.layout.fragment_task_details, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mEmptyView = view.findViewById(R.id.empty_view);
+        mProgressBar = (ProgressBar) view.findViewById(R.id.pb_task_details);
+
+        mRecyclerViewHistory = (RecyclerView) view.findViewById(R.id.rv_task_details_history);
         mRecyclerViewHistory.setHasFixedSize(true);
         mRecyclerViewHistory.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerAdapter = new TaskHistoryRecyclerAdapter(getActivity(), mTaskHistory);

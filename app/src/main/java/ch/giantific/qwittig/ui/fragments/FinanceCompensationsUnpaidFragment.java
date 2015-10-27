@@ -130,30 +130,29 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_finance_compensations_unpaid, container, false);
-        findBaseViews(rootView);
-
-        mFabNew = (FloatingActionButton) rootView.findViewById(R.id.fab_new_account_balance);
-        mFabProgressCircle = (FABProgressCircle) rootView.findViewById(R.id.fab_new_account_balance_circle);
-        mTextViewEmptyTitle = (TextView) rootView.findViewById(R.id.tv_empty_view_title);
-        mTextViewEmptySubtitle = (TextView) rootView.findViewById(R.id.tv_empty_view_subtitle);
-
-        return rootView;
+        return inflater.inflate(R.layout.fragment_finance_compensations_unpaid, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mTextViewEmptyTitle = (TextView) view.findViewById(R.id.tv_empty_view_title);
+        mTextViewEmptySubtitle = (TextView) view.findViewById(R.id.tv_empty_view_subtitle);
+
         mRecyclerAdapter = new CompensationsUnpaidRecyclerAdapter(getActivity(), mCompensations,
                 this);
         mRecyclerView.setAdapter(mRecyclerAdapter);
+
+        mFabNew = (FloatingActionButton) view.findViewById(R.id.fab_new_account_balance);
         mFabNew.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 newSettlement();
             }
         });
+
+        mFabProgressCircle = (FABProgressCircle) view.findViewById(R.id.fab_new_account_balance_circle);
         mFabProgressCircle.attachListener(this);
     }
 

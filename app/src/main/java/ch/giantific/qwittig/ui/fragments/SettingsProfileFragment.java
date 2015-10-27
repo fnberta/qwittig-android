@@ -73,18 +73,7 @@ public class SettingsProfileFragment extends BaseFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_settings_profile, container, false);
-
-        mTextInputLayoutEmail = (TextInputLayout) rootView.findViewById(R.id.til_email);
-        mEditTextEmail = mTextInputLayoutEmail.getEditText();
-        mTextInputLayoutNickname = (TextInputLayout) rootView.findViewById(R.id.til_nickname);
-        mEditTextNickname = mTextInputLayoutNickname.getEditText();
-        mTextInputLayoutPassword = (TextInputLayout) rootView.findViewById(R.id.til_password);
-        mEditTextPassword = mTextInputLayoutPassword.getEditText();
-        mTextInputLayoutPasswordRepeat = (TextInputLayout) rootView.findViewById(R.id.til_password_repeat);
-        mEditTextPasswordRepeat = mTextInputLayoutPasswordRepeat.getEditText();
-
-        return rootView;
+        return inflater.inflate(R.layout.fragment_settings_profile, container, false);
     }
 
     @Override
@@ -94,10 +83,22 @@ public class SettingsProfileFragment extends BaseFragment {
         mCurrentUser = (User) ParseUser.getCurrentUser();
         mCurrentEmail = mCurrentUser.getUsername();
         mCurrentNickname = mCurrentUser.getNickname();
+
+        mTextInputLayoutEmail = (TextInputLayout) view.findViewById(R.id.til_email);
+        mEditTextEmail = mTextInputLayoutEmail.getEditText();
         if (!ParseUtils.isTestUser(mCurrentUser)) {
             mEditTextEmail.setText(mCurrentEmail);
         }
+
+        mTextInputLayoutNickname = (TextInputLayout) view.findViewById(R.id.til_nickname);
+        mEditTextNickname = mTextInputLayoutNickname.getEditText();
         mEditTextNickname.setText(mCurrentNickname);
+
+        mTextInputLayoutPassword = (TextInputLayout) view.findViewById(R.id.til_password);
+        mEditTextPassword = mTextInputLayoutPassword.getEditText();
+
+        mTextInputLayoutPasswordRepeat = (TextInputLayout) view.findViewById(R.id.til_password_repeat);
+        mEditTextPasswordRepeat = mTextInputLayoutPasswordRepeat.getEditText();
     }
 
     /**

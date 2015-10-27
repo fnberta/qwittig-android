@@ -125,19 +125,14 @@ public class TaskAddFragment extends BaseFragment implements
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_task_add, container, false);
-
-        mTextViewDeadline = (TextView) rootView.findViewById(R.id.tv_task_deadline);
-        mSpinnerTimeFrame = (Spinner) rootView.findViewById(R.id.sp_task_time_frame);
-        mRecyclerViewUsers = (RecyclerView) rootView.findViewById(R.id.rv_task_users_involved);
-
-        return rootView;
+        return inflater.inflate(R.layout.fragment_task_add, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mTextViewDeadline = (TextView) view.findViewById(R.id.tv_task_deadline);
         mTextViewDeadline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -146,7 +141,10 @@ public class TaskAddFragment extends BaseFragment implements
         });
         mTextViewDeadline.setText(DateUtils.formatDateLong(mDeadlineSelected));
 
+        mRecyclerViewUsers = (RecyclerView) view.findViewById(R.id.rv_task_users_involved);
         setupUsersInvolvedRecyclerView();
+
+        mSpinnerTimeFrame = (Spinner) view.findViewById(R.id.sp_task_time_frame);
         setupTimeFrameSpinner();
 
         setupUserList();

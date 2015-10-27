@@ -36,12 +36,15 @@ public abstract class PurchaseReceiptBaseFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_show_receipt, container, false);
+        return inflater.inflate(R.layout.fragment_show_receipt, container, false);
+    }
 
-        mImageViewReceipt = (ImageView) rootView.findViewById(R.id.iv_receipt);
-        mProgressBar = (ProgressBar) rootView.findViewById(R.id.pb_receipt);
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        return rootView;
+        mImageViewReceipt = (ImageView) view.findViewById(R.id.iv_receipt);
+        mProgressBar = (ProgressBar) view.findViewById(R.id.pb_receipt);
     }
 
     void setReceiptImage(ParseFile receiptFile) {

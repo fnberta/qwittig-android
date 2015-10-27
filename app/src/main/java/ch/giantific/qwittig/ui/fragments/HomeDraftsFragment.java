@@ -70,18 +70,16 @@ public class HomeDraftsFragment extends BaseFragment implements
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_home_drafts, container, false);
-
-        mTextViewEmpty = (TextView) rootView.findViewById(R.id.tv_empty_view);
-        mListView = (ListView) rootView.findViewById(R.id.lv_drafts);
-
-        return rootView;
+        return inflater.inflate(R.layout.fragment_home_drafts, container, false);
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mTextViewEmpty = (TextView) view.findViewById(R.id.tv_empty_view);
+
+        mListView = (ListView) view.findViewById(R.id.lv_drafts);
         mDraftsAdapter = new DraftsAdapter(mDrafts);
         mListView.setAdapter(mDraftsAdapter);
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);

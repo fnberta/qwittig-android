@@ -57,9 +57,12 @@ public abstract class SettingsBaseInviteFragment extends BaseFragment {
         outState.putInt(STATE_ROW_COUNT, mInvitedUsersRowCount);
     }
 
-    final void findUsersToInviteViews(@NonNull View rootView) {
-        mLinearLayoutUsers = (LinearLayout) rootView.findViewById(R.id.ll_users);
-        mButtonAddUser = (Button) rootView.findViewById(R.id.bt_user_add);
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        mLinearLayoutUsers = (LinearLayout) view.findViewById(R.id.ll_users);
+        mButtonAddUser = (Button) view.findViewById(R.id.bt_user_add);
     }
 
     final void setupUsersToInviteRows() {

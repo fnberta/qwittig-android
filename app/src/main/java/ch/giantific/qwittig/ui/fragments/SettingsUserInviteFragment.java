@@ -74,19 +74,15 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_settings_user_invite, container, false);
-
-        mLinearLayoutUsersInvited = (LinearLayout) rootView.findViewById(R.id.ll_users_invited);
-        mTextViewNoInvitations = (TextView) rootView.findViewById(R.id.tv_no_open_invitations);
-
-        findUsersToInviteViews(rootView);
-
-        return rootView;
+        return inflater.inflate(R.layout.fragment_settings_user_invite, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        mLinearLayoutUsersInvited = (LinearLayout) view.findViewById(R.id.ll_users_invited);
+        mTextViewNoInvitations = (TextView) view.findViewById(R.id.tv_no_open_invitations);
 
         updateCurrentUserAndGroup();
         setupInvitedUsers();

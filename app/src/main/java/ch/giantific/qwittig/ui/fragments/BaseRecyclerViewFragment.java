@@ -48,20 +48,19 @@ public abstract class BaseRecyclerViewFragment extends BaseFragment implements
     public BaseRecyclerViewFragment() {
     }
 
-    final void findBaseViews(@NonNull View rootView) {
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.rv_base);
-        mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.srl_base);
-        mProgressBarLoading = (ProgressBar) rootView.findViewById(R.id.pb_base);
-        mEmptyView = rootView.findViewById(R.id.empty_view);
-    }
-
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mProgressBarLoading = (ProgressBar) view.findViewById(R.id.pb_base);
+        mEmptyView = view.findViewById(R.id.empty_view);
+
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.rv_base);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
+
+        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.srl_base);
         mSwipeRefreshLayout.setColorSchemeResources(R.color.primary,
                 R.color.accent,
                 R.color.green,

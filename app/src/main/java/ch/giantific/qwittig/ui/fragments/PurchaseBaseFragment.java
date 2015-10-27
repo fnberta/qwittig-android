@@ -178,7 +178,6 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     private TextView mTextViewMyShareValue;
     private TextView mTextViewMyShareCurrency;
     private LinearLayout mLayoutTotalItemRow;
-    private RecyclerView mRecyclerViewUsersInvolved;
     private PurchaseUsersInvolvedRecyclerAdapter mRecyclerAdapter;
     private int mSelectedItemPosition;
     private CharSequence[] mUsersAvailableNicknames;
@@ -248,31 +247,20 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_purchase_add_edit, container, false);
-        findViews(rootView);
-
-        return rootView;
-    }
-
-    @CallSuper
-    void findViews(@NonNull View rootView) {
-        mTextViewPickDate = (TextView) rootView.findViewById(R.id.tv_date);
-        mTextViewPickStore = (TextView) rootView.findViewById(R.id.tv_store);
-        mLayoutTotalItemRow = (LinearLayout) rootView.findViewById(R.id.ll_items);
-        mButtonAddRow = (Button) rootView.findViewById(R.id.bt_item_add);
-        mTextViewTotalValue = (TextView) rootView.findViewById(R.id.tv_total_value);
-        mSpinnerCurrency = (Spinner) rootView.findViewById(R.id.sp_currency);
-        mTextViewMyShareValue = (TextView) rootView.findViewById(R.id.tv_my_share_value);
-        mTextViewMyShareCurrency = (TextView) rootView.findViewById(R.id.tv_my_share_currency);
-        mTextViewExchangeRateDesc = (TextView) rootView.findViewById(R.id.tv_exchange_rate_text);
-        mTextViewExchangeRate = (TextView) rootView.findViewById(R.id.tv_exchange_rate_value);
-        mRecyclerViewUsersInvolved = (RecyclerView) rootView.findViewById(R.id.rv_users_involved);
+        return inflater.inflate(R.layout.fragment_purchase_add_edit, container, false);
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mLayoutTotalItemRow = (LinearLayout) view.findViewById(R.id.ll_items);
+        mButtonAddRow = (Button) view.findViewById(R.id.bt_item_add);
+        mTextViewTotalValue = (TextView) view.findViewById(R.id.tv_total_value);
+        mTextViewMyShareValue = (TextView) view.findViewById(R.id.tv_my_share_value);
+        mTextViewMyShareCurrency = (TextView) view.findViewById(R.id.tv_my_share_currency);
+
+        mTextViewPickDate = (TextView) view.findViewById(R.id.tv_date);
         mTextViewPickDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -281,13 +269,13 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         });
         mTextViewPickDate.setText(DateUtils.formatDateLong(mDateSelected));
 
+        mTextViewPickStore = (TextView) view.findViewById(R.id.tv_store);
         mTextViewPickStore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showStorePickerDialog(mTextViewPickStore.getText().toString());
             }
         });
-
         if (TextUtils.isEmpty(mStoreSelected)) {
             setStore(mCurrentUser.getStoresFavoriteFirstInList(), false);
         } else {
@@ -305,13 +293,15 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
             }
         });
 
+        RecyclerView recyclerViewUsersInvolved = (RecyclerView) view.findViewById(R.id.rv_users_involved);
         mRecyclerAdapter = new PurchaseUsersInvolvedRecyclerAdapter(getActivity(),
                 mUsersAvailableParse, this);
-        mRecyclerViewUsersInvolved.setLayoutManager(new LinearLayoutManager(getActivity(),
+        recyclerViewUsersInvolved.setLayoutManager(new LinearLayoutManager(getActivity(),
                 LinearLayoutManager.HORIZONTAL, false));
-        mRecyclerViewUsersInvolved.setHasFixedSize(true);
-        mRecyclerViewUsersInvolved.setAdapter(mRecyclerAdapter);
+        recyclerViewUsersInvolved.setHasFixedSize(true);
+        recyclerViewUsersInvolved.setAdapter(mRecyclerAdapter);
 
+        mSpinnerCurrency = (Spinner) view.findViewById(R.id.sp_currency);
         mSpinnerCurrencySelectionAdapter = new ArrayAdapter<>(
                 getActivity(), R.layout.spinner_item_title, ParseUtils.getSupportedCurrencyCodes());
         mSpinnerCurrencySelectionAdapter.setDropDownViewResource(
@@ -331,6 +321,8 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         });
         setCurrency(mCurrencySelected);
 
+        mTextViewExchangeRateDesc = (TextView) view.findViewById(R.id.tv_exchange_rate_text);
+        mTextViewExchangeRate = (TextView) view.findViewById(R.id.tv_exchange_rate_value);
         mTextViewExchangeRate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(@NonNull View v) {

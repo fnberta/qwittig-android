@@ -53,10 +53,7 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewFragment implem
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_finance_users, container, false);
-        findBaseViews(rootView);
-
-        return rootView;
+        return inflater.inflate(R.layout.fragment_finance_users, container, false);
     }
 
     @Override

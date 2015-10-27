@@ -74,20 +74,16 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_settings_group_new, container, false);
-
-        mTextInputLayoutName = (TextInputLayout) rootView.findViewById(R.id.til_settings_group_add_new_name);
-        mSpinnerCurrency = (Spinner) rootView.findViewById(R.id.sp_settings_group_add_new_currency);
-
-        findUsersToInviteViews(rootView);
-
-        return rootView;
+        return inflater.inflate(R.layout.fragment_settings_group_new, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mTextInputLayoutName = (TextInputLayout) view.findViewById(R.id.til_settings_group_add_new_name);
+
+        mSpinnerCurrency = (Spinner) view.findViewById(R.id.sp_settings_group_add_new_currency);
         ArrayAdapter<Currency> spinnerCurrencyAdapter = new ArrayAdapter<>(getActivity(),
                 R.layout.spinner_item, ParseUtils.getSupportedCurrencies());
         spinnerCurrencyAdapter.setDropDownViewResource(

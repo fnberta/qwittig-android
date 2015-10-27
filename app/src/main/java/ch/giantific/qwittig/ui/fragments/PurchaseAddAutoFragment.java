@@ -93,24 +93,15 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_purchase_add_auto, container, false);
-
-        findViews(rootView);
-
-        return rootView;
-    }
-
-    @Override
-    void findViews(@NonNull View rootView) {
-        super.findViews(rootView);
-
-        mProgressView = rootView.findViewById(R.id.ll_progress);
-        mMainView = rootView.findViewById(R.id.view_add);
+        return inflater.inflate(R.layout.fragment_purchase_add_auto, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        mProgressView = view.findViewById(R.id.ll_progress);
+        mMainView = view.findViewById(R.id.view_add);
 
         if (mOcrValuesAreSet) {
             showMainScreen();

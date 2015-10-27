@@ -76,25 +76,16 @@ public abstract class StatsPieBaseFragment extends StatsBaseFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_stats_pie, container, false);
-
-        findBaseViews(rootView);
-
-        return rootView;
-    }
-
-    @Override
-    void findBaseViews(@NonNull View rootView) {
-        super.findBaseViews(rootView);
-
-        mPieChart = (PieChart) rootView.findViewById(R.id.pc_stores);
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.rv_stats_stores);
+        return inflater.inflate(R.layout.fragment_stats_pie, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mPieChart = (PieChart) view.findViewById(R.id.pc_stores);
+
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.rv_stats_stores);
         mRecyclerAdapter = new StatsPieChartRecyclerAdapter(mUserPieData, mUserNicknames);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setHasFixedSize(true);

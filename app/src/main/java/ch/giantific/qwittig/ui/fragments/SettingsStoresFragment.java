@@ -101,17 +101,14 @@ public class SettingsStoresFragment extends BaseFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_settings_stores, container, false);
-
-        mListView = (ListView) rootView.findViewById(R.id.lv_stores);
-
-        return rootView;
+        return inflater.inflate(R.layout.fragment_settings_stores, container, false);
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mListView = (ListView) view.findViewById(R.id.lv_stores);
         mStoresAdapter = new StoresAdapter(getActivity(), mStoresAdded, mStoresFavorites);
         mListView.setAdapter(mStoresAdapter);
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);

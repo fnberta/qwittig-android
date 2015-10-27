@@ -46,7 +46,6 @@ public class HelpFeedbackFragment extends Fragment implements
     private static final int HELP_RECOMMEND = 8;
     private static final String EMAIL_SUPPORT = "support@qwittig.ch";
     private static final String EMAIL_FEEDBACK = "feedback@qwittig.ch";
-    private RecyclerView mRecyclerView;
 
     public HelpFeedbackFragment() {
     }
@@ -54,22 +53,19 @@ public class HelpFeedbackFragment extends Fragment implements
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_help_feedback, container, false);
-
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.rv_help_feedback);
-
-        return rootView;
+        return inflater.inflate(R.layout.fragment_help_feedback, container, false);
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.rv_help_feedback);
         HelpFeedbackRecyclerAdapter recyclerAdapter = new HelpFeedbackRecyclerAdapter(
                 getActivity(), HELP_ITEMS, this);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setAdapter(recyclerAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setAdapter(recyclerAdapter);
     }
 
     @Override

@@ -91,10 +91,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_home_purchases, container, false);
-        findBaseViews(rootView);
-
-        return rootView;
+        return inflater.inflate(R.layout.fragment_home_purchases, container, false);
     }
 
     @Override

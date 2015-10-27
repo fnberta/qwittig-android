@@ -112,18 +112,16 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_purchase_details, container, false);
-
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.rv_purchase_details);
-        mProgressBar = (ProgressBar) rootView.findViewById(R.id.pb_purchase_details);
-
-        return rootView;
+        return inflater.inflate(R.layout.fragment_purchase_details, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mProgressBar = (ProgressBar) view.findViewById(R.id.pb_purchase_details);
+
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.rv_purchase_details);
         mRecyclerAdapter = new PurchaseDetailsRecyclerAdapter(getActivity());
         mRecyclerView.setAdapter(mRecyclerAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
