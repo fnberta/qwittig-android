@@ -209,7 +209,7 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
                 task.setLoading(mLoadingTasks.contains(task.getObjectId()));
 
                 List<ParseUser> usersInvolved = task.getUsersInvolved();
-                if (usersInvolved.isEmpty()) {
+                if (usersInvolved.isEmpty() || !usersInvolved.contains(mCurrentUser)) {
                     iterator.remove();
                 } else {
                     ParseUser userResponsible = usersInvolved.get(0);
