@@ -1,6 +1,12 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.adapters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,68 +17,89 @@ import com.parse.ParseObject;
 
 import java.util.List;
 
+import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.parse.models.Group;
 
 
 /**
- * Created by fabio on 12.10.14.
+ * Handles the display of a user's groups in the navigation drawer.
+ * <p/>
+ * Subclass of {@link ArrayAdapter}.
  */
 public class NavHeaderGroupsArrayAdapter extends ArrayAdapter<ParseObject> {
 
     private static final String LOG_TAG = NavHeaderGroupsArrayAdapter.class.getSimpleName();
-
-    private int mViewResource;
-    private int mDropDownViewResource;
+    private static final int VIEW_RESOURCE = R.layout.spinner_item_nav;
+    private static final int VIEW_RESOURCE_DROPDOWN = android.R.layout.simple_spinner_dropdown_item;
     private List<ParseObject> mGroups;
 
-    public NavHeaderGroupsArrayAdapter(Context context, int viewResource, int dropDownViewResource,
-                                       List<ParseObject> groups) {
-        super(context, viewResource, groups);
+    /**
+     * Constructs a new {@link NavHeaderGroupsArrayAdapter}.
+     *
+     * @param context the context to use in the adapter
+     * @param groups  the groups to display
+     */
+    public NavHeaderGroupsArrayAdapter(@NonNull Context context,
+                                       @NonNull List<ParseObject> groups) {
+        super(context, VIEW_RESOURCE, groups);
 
-        mViewResource = viewResource;
-        mDropDownViewResource = dropDownViewResource;
         mGroups = groups;
-        setDropDownViewResource(dropDownViewResource);
     }
 
+    @Nullable
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         return getCustomView(position, convertView, parent, false);
     }
 
+    @Nullable
     @Override
-    public View getDropDownView(int position, View convertView, ViewGroup parent) {
+    public View getDropDownView(int position, View convertView, @NonNull ViewGroup parent) {
         return getCustomView(position, convertView, parent, true);
     }
 
-    private View getCustomView(int position, View convertView, ViewGroup parent,
+    @Nullable
+    private View getCustomView(int position, @Nullable View convertView, @NonNull ViewGroup parent,
                                boolean isDropDown) {
-        final ViewHolder viewHolder;
+        final GroupRow groupRow;
         if (convertView == null) {
             convertView = LayoutInflater.from(parent.getContext()).inflate(
-                    isDropDown ? mDropDownViewResource : mViewResource, parent, false);
-            viewHolder = new ViewHolder(convertView);
+                    isDropDown ? VIEW_RESOURCE_DROPDOWN : VIEW_RESOURCE, parent, false);
+            groupRow = new GroupRow(convertView);
 
-            convertView.setTag(viewHolder);
+            convertView.setTag(groupRow);
         } else {
-            viewHolder = (ViewHolder) convertView.getTag();
+            groupRow = (GroupRow) convertView.getTag();
         }
 
         Group group = (Group) mGroups.get(position);
-        viewHolder.setGroup(group.getName());
+        groupRow.setGroup(group.getName());
 
         return convertView;
     }
 
-    private static class ViewHolder {
+    /**
+     * Provides an adapter row that displays a user's group
+     */
+    private static class GroupRow {
 
         private TextView mTextViewGroup;
 
-        public ViewHolder(View view) {
+        /**
+         * Constructs a new {@link GroupRow}.
+         *
+         * @param view the inflated view
+         */
+        public GroupRow(@NonNull View view) {
             mTextViewGroup = (TextView) view.findViewById(android.R.id.text1);
         }
 
-        public void setGroup(String group) {
+        /**
+         * Sets the name of the group.
+         *
+         * @param group the name of the group to set
+         */
+        public void setGroup(@NonNull String group) {
             mTextViewGroup.setText(group);
         }
     }

@@ -1,7 +1,11 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.utils.inappbilling;
 
 /**
- * Created by fabio on 25.06.15.
+ * Contains the app key for the in app purchase service.
  */
 public class IabKey {
 
@@ -9,6 +13,11 @@ public class IabKey {
         // class cannot be instantiated
     }
 
+    /**
+     * Returns the in app billing key.
+     *
+     * @return the in app billing key
+     */
     public static String getKey() {
         String part1 = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7ydfgCT7axK95wgIzkHaKEKhAE1bsS5OwRmcfLnGdB3/89iTqP659241TjpV5SLOKwzg85yczv2c8";
         String part2 = "gktIus/B2YvcvcmXDc4YDUhpw46meJb9U0hMWkzdYqrmAknWU3uMvZzTnRPusXBLMkjkAHIIbJeWOPzF/eVOxm5GRSI0IdK2EZx+3yGo/PK1uQMwHnT+cEgije5yM7Y1ZqQ";

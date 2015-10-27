@@ -1,7 +1,14 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.helpers;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.StringDef;
 import android.text.TextUtils;
 
 import com.parse.FindCallback;
@@ -10,6 +17,8 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.SaveCallback;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,21 +27,37 @@ import ch.giantific.qwittig.data.parse.models.Compensation;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 
 /**
- * Created by fabio on 10.12.14.
+ * Queries for more items of one of the types defined in {@link ClassName} and pins them to the
+ * local data store.
+ * <p/>
+ * Subclass of {@link BaseQueryHelper}.
  */
 public class MoreQueryHelper extends BaseQueryHelper {
 
+    @StringDef({Purchase.CLASS, Compensation.CLASS})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface ClassName {}
     public static final String MORE_QUERY_HELPER = "MORE_QUERY_HELPER";
     private static final String BUNDLE_CLASS_NAME = "BUNDLE_CLASS_NAME";
     private static final String BUNDLE_SKIP = "BUNDLE_SKIP";
     private static final String LOG_TAG = MoreQueryHelper.class.getSimpleName();
+    @Nullable
     private HelperInteractionListener mListener;
 
     public MoreQueryHelper() {
         // empty default constructor
     }
 
-    public static MoreQueryHelper newInstance(String className, int skip) {
+    /**
+     * Return a new instance of {@link MoreQueryHelper} with the class name of the items to query
+     * and number of items to skip as arguments.
+     *
+     * @param className the class name of the items to query, must be defined in {@link ClassName}
+     * @param skip      the number of items to skip
+     * @return a new instance of {@link MoreQueryHelper}
+     */
+    @NonNull
+    public static MoreQueryHelper newInstance(@NonNull @ClassName String className, int skip) {
         MoreQueryHelper fragment = new MoreQueryHelper();
         Bundle args = new Bundle();
         args.putString(BUNDLE_CLASS_NAME, className);
@@ -42,13 +67,13 @@ public class MoreQueryHelper extends BaseQueryHelper {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
             mListener = (HelperInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
+                    + " must implement DialogInteractionListener");
         }
     }
 
@@ -85,22 +110,21 @@ public class MoreQueryHelper extends BaseQueryHelper {
         query.whereEqualTo(Purchase.GROUP, mCurrentGroup);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(final List<ParseObject> parseObjects, ParseException e) {
+            public void done(@NonNull final List<ParseObject> parseObjects, @Nullable ParseException e) {
                 if (e != null) {
                     onParseError(e);
                     return;
                 }
 
-                // Add the latest results for this query to the cache
                 ParseObject.pinAllInBackground(Purchase.PIN_LABEL + mCurrentGroup.getObjectId(),
                         parseObjects, new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        if (e == null && mListener != null) {
-                            mListener.onMoreObjectsPinned(parseObjects);
-                        }
-                    }
-                });
+                            @Override
+                            public void done(@Nullable ParseException e) {
+                                if (e == null && mListener != null) {
+                                    mListener.onMoreObjectsPinned(parseObjects);
+                                }
+                            }
+                        });
             }
         });
     }
@@ -112,17 +136,16 @@ public class MoreQueryHelper extends BaseQueryHelper {
         query.whereEqualTo(Compensation.IS_PAID, true);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(final List<ParseObject> parseObjects, ParseException e) {
+            public void done(@NonNull final List<ParseObject> parseObjects, @Nullable ParseException e) {
                 if (e != null) {
                     onParseError(e);
                     return;
                 }
 
-                // Add the latest results for this query to the cache.
                 ParseObject.pinAllInBackground(Compensation.PIN_LABEL_PAID + mCurrentGroup.getObjectId(),
                         parseObjects, new SaveCallback() {
                             @Override
-                            public void done(ParseException e) {
+                            public void done(@Nullable ParseException e) {
                                 if (e == null && mListener != null) {
                                     mListener.onMoreObjectsPinned(parseObjects);
                                 }
@@ -153,9 +176,23 @@ public class MoreQueryHelper extends BaseQueryHelper {
         mListener = null;
     }
 
+    /**
+     * Defines the actions to take after more objects were queried and pinned to the local data
+     * store or after the query failed.
+     */
     public interface HelperInteractionListener {
-        void onMoreObjectsPinned(List<ParseObject> objects);
+        /**
+         * Handles the successful pin of new objects.
+         *
+         * @param objects the newly pinned objects
+         */
+        void onMoreObjectsPinned(@NonNull List<ParseObject> objects);
 
-        void onMoreObjectsPinFailed(ParseException e);
+        /**
+         * Handles the failed query or pin of new objects.
+         *
+         * @param e the {@link ParseException} thrown during the process
+         */
+        void onMoreObjectsPinFailed(@NonNull ParseException e);
     }
 }

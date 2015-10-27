@@ -1,8 +1,16 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.RecyclerView;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -31,14 +39,24 @@ import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 
 /**
- * A placeholder fragment containing a simple view.
+ * Displays the settings screen where the user sees all stores added for his/her account and can
+ * add/delete new ones or un-star existing ones.
+ * <p/>
+ * Long-click on a user-added drafstoret will start selection mode, allowing the user to select
+ * more stores and deleting them via the contextual {@link ActionBar}.
+ * <p/>
+ * TODO: switch to {@link RecyclerView} and implement selection mode.
+ * <p/>
+ * Subclass of {@link BaseFragment}.
  */
 public class SettingsStoresFragment extends BaseFragment {
 
     private FragmentInteractionListener mListener;
     private StoresAdapter mStoresAdapter;
     private ListView mListView;
+    @NonNull
     private List<String> mStoresAdded = new ArrayList<>();
+    @NonNull
     private List<String> mStoresFavorites = new ArrayList<>();
     private User mCurrentUser;
 
@@ -46,13 +64,13 @@ public class SettingsStoresFragment extends BaseFragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
             mListener = (FragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
+                    + " must implement DialogInteractionListener");
         }
     }
 
@@ -81,7 +99,7 @@ public class SettingsStoresFragment extends BaseFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_settings_stores, container, false);
 
@@ -94,13 +112,12 @@ public class SettingsStoresFragment extends BaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mStoresAdapter = new StoresAdapter(getActivity(), R.layout.row_stores, mStoresAdded,
-                mStoresFavorites);
+        mStoresAdapter = new StoresAdapter(getActivity(), mStoresAdded, mStoresFavorites);
         mListView.setAdapter(mStoresAdapter);
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         mListView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
             @Override
-            public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
+            public void onItemCheckedStateChanged(@NonNull ActionMode mode, int position, long id,
                                                   boolean checked) {
                 mode.setTitle(getString(R.string.cab_title_selected,
                         mListView.getCheckedItemCount()));
@@ -108,7 +125,7 @@ public class SettingsStoresFragment extends BaseFragment {
             }
 
             @Override
-            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            public boolean onCreateActionMode(@NonNull ActionMode mode, Menu menu) {
                 mListener.toggleFabVisibility();
 
                 MenuInflater inflater = mode.getMenuInflater();
@@ -122,7 +139,7 @@ public class SettingsStoresFragment extends BaseFragment {
             }
 
             @Override
-            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            public boolean onActionItemClicked(@NonNull ActionMode mode, @NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.action_store_delete:
                         deleteSelectedStores();
@@ -140,7 +157,7 @@ public class SettingsStoresFragment extends BaseFragment {
         });
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(AdapterView<?> parent, @NonNull View view, int position, long id) {
                 long viewId = view.getId();
 
                 if (viewId == R.id.cb_store_favorite) {
@@ -182,12 +199,12 @@ public class SettingsStoresFragment extends BaseFragment {
     }
 
     /**
-     * Called from activity method which in turn is called from add store dialog. Adds entered
-     * store to list if is not empty and not already in the list.
+     * Adds entered store to the list if is not empty and not already in the list and saves it to
+     * the online Parse.com database.
      *
-     * @param store
+     * @param store the store to add
      */
-    public void onNewStoreSet(String store) {
+    public void onNewStoreSet(@NonNull String store) {
         if (ParseUtils.isTestUser(mCurrentUser)) {
             mListener.showAccountCreateDialog();
             return;
@@ -222,7 +239,7 @@ public class SettingsStoresFragment extends BaseFragment {
         }
     }
 
-    private void onStoreChecked(int position, CheckBox checkBox) {
+    private void onStoreChecked(int position, @NonNull CheckBox checkBox) {
         boolean isChecked = checkBox.isChecked();
 
         if (ParseUtils.isTestUser(mCurrentUser)) {
@@ -244,8 +261,8 @@ public class SettingsStoresFragment extends BaseFragment {
         saveStoreListInParse();
     }
 
-    private void showSnackbar(String message) {
-        MessageUtils.showBasicSnackbar(getView(), message);
+    private void showSnackbar(@NonNull String message) {
+        MessageUtils.showBasicSnackbar(mListView, message);
     }
 
     @Override
@@ -254,7 +271,15 @@ public class SettingsStoresFragment extends BaseFragment {
         mListener = null;
     }
 
+    /**
+     * Defines the interaction with the hosting {@link Activity}.
+     * <p/>
+     * Extends {@link BaseFragmentInteractionListener}.
+     */
     public interface FragmentInteractionListener extends BaseFragmentInteractionListener {
+        /**
+         * Handles the visibility change of the {@link FloatingActionButton}.
+         */
         void toggleFabVisibility();
     }
 }

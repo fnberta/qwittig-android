@@ -1,3 +1,7 @@
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
 <android.support.v7.widget.RecyclerView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/rv_help_feedback"

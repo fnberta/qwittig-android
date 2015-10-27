@@ -1,7 +1,11 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.data.parse;
 
 /**
- * Created by fabio on 05.02.15.
+ * Provides the names of the different parse.com CloudCode functions used.
  */
 public class CloudCode {
 
@@ -23,7 +27,6 @@ public class CloudCode {
     public static final String PARAM_FILE_NAME = "fileName";
     public static final String PARAM_YEAR = "year";
     public static final String PARAM_MONTH = "month";
-    private static final String LOG_TAG = CloudCode.class.getSimpleName();
 
     private CloudCode() {
         // Class cannot be instantiated

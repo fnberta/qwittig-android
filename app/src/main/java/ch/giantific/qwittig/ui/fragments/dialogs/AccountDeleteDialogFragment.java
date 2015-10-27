@@ -1,23 +1,30 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments.dialogs;
 
 import android.app.Activity;
-import android.support.v7.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 
 import ch.giantific.qwittig.R;
 
 /**
- * Created by fabio on 20.11.14.
+ * Provides a dialog that asks the user if he really wants to delete his/her account.
+ * <p/>
+ * Subclass of {@link DialogFragment}.
  */
 public class AccountDeleteDialogFragment extends DialogFragment {
 
     private DialogInteractionListener mListener;
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
 
         try {
@@ -42,7 +49,13 @@ public class AccountDeleteDialogFragment extends DialogFragment {
         return dialogBuilder.create();
     }
 
+    /**
+     * Defines the actions to take when user clicks on one of the dialog's buttons.
+     */
     public interface DialogInteractionListener {
+        /**
+         * Handles the click on the yes, delete my account button.
+         */
         void onDeleteAccountSelected();
     }
 }

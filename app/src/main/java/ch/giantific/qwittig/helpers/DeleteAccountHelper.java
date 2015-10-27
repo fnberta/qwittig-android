@@ -1,6 +1,12 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.helpers;
 
 import android.app.Activity;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.parse.FunctionCallback;
 import com.parse.ParseCloud;
@@ -15,10 +21,13 @@ import ch.giantific.qwittig.data.parse.CloudCode;
 import ch.giantific.qwittig.data.parse.models.User;
 
 /**
- * Created by fabio on 10.12.14.
+ * Deletes a user's account and if successful logs him/she out.
+ * <p/>
+ * Subclass of {@link LogoutHelper}.
  */
 public class DeleteAccountHelper extends LogoutHelper {
 
+    @Nullable
     private HelperInteractionListener mListener;
 
     public DeleteAccountHelper() {
@@ -26,13 +35,13 @@ public class DeleteAccountHelper extends LogoutHelper {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
             mListener = (HelperInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
+                    + " must implement DialogInteractionListener");
         }
     }
 
@@ -45,7 +54,7 @@ public class DeleteAccountHelper extends LogoutHelper {
         Map<String, Object> params = new HashMap<>();
         ParseCloud.callFunctionInBackground(CloudCode.DELETE_ACCOUNT, params, new FunctionCallback<Object>() {
             @Override
-            public void done(Object o, ParseException e) {
+            public void done(Object o, @Nullable ParseException e) {
                 if (e != null) {
                     if (mListener != null) {
                         mListener.onDeleteUserFailed(e);
@@ -59,7 +68,7 @@ public class DeleteAccountHelper extends LogoutHelper {
     }
 
     @Override
-    protected void onInstallationSaveFailed(ParseException e) {
+    protected void onInstallationSaveFailed(@NonNull ParseException e) {
         if (mListener != null) {
             mListener.onDeleteUserFailed(e);
         }
@@ -76,7 +85,7 @@ public class DeleteAccountHelper extends LogoutHelper {
         currentUser.deleteUserFields();
         currentUser.saveInBackground(new SaveCallback() {
             @Override
-            public void done(ParseException e) {
+            public void done(@Nullable ParseException e) {
                 if (e != null) {
                     currentUser.undeleteUserFields(username);
 
@@ -106,7 +115,17 @@ public class DeleteAccountHelper extends LogoutHelper {
         mListener = null;
     }
 
+    /**
+     * Defines the actions to take after the deletion of a user's account failed.
+     * <p/>
+     * Extends {@link LogoutHelper.HelperInteractionListener}.
+     */
     public interface HelperInteractionListener extends LogoutHelper.HelperInteractionListener {
-        void onDeleteUserFailed(ParseException e);
+        /**
+         * Handles the failed deletion of a user's account.
+         *
+         * @param e the {@link ParseException} thrown during the process
+         */
+        void onDeleteUserFailed(@NonNull ParseException e);
     }
 }

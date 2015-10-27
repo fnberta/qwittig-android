@@ -1,4 +1,10 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.data.ocr;
+
+import android.support.annotation.NonNull;
 
 import com.squareup.okhttp.OkHttpClient;
 
@@ -15,7 +21,8 @@ import retrofit.mime.TypedFile;
 import retrofit.mime.TypedString;
 
 /**
- * Created by fabio on 01.02.15.
+ * Provides a client to connect to the REST api of a specified server to perform the OCR on an
+ * image.
  */
 public class RestClient {
 
@@ -28,19 +35,36 @@ public class RestClient {
     private static final ReceiptOcr RECEIPT_OCR_SERVICE = REST_ADAPTER.create(ReceiptOcr.class);
 
     private RestClient() {
+        // class cannot be instantiated
     }
 
+    /**
+     * Returns the static singleton reference to the {@link ReceiptOcr} instance.
+     *
+     * @return the static singleton instance of the {@link ReceiptOcr}
+     */
     public static ReceiptOcr getService() {
         return RECEIPT_OCR_SERVICE;
     }
 
+    @NonNull
     private static OkHttpClient generateOkHttp() {
         OkHttpClient client = new OkHttpClient();
         client.setReadTimeout(READ_TIMEOUT, TimeUnit.MILLISECONDS);
         return client;
     }
 
+    /**
+     * Defines the call to the server to perform OCR on an image.
+     */
     public interface ReceiptOcr {
+        /**
+         * Makes a POST call to the server to perform the OCR.
+         *
+         * @param sessionToken the token of the current to authenticate with the server
+         * @param receipt      the receipt image to perform OCR on
+         * @param callback     the callback that gets called with server's response
+         */
         @Multipart
         @POST("/api/receipt")
         void uploadReceipt(@Part("sessionToken") TypedString sessionToken,

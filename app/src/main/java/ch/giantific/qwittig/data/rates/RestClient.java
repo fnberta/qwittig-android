@@ -1,4 +1,10 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.data.rates;
+
+import android.support.annotation.NonNull;
 
 import com.squareup.okhttp.OkHttpClient;
 
@@ -12,7 +18,7 @@ import retrofit.http.GET;
 import retrofit.http.Query;
 
 /**
- * Created by fabio on 01.02.15.
+ * Provides a client to connect to the REST api of a web service to fetch currency rates
  */
 public class RestClient {
 
@@ -25,19 +31,34 @@ public class RestClient {
     private static final ExchangeRates EXCHANGE_RATES_SERVICE = REST_ADAPTER.create(ExchangeRates.class);
 
     private RestClient() {
+        // class cannot be instantiated
     }
 
+    /**
+     * Returns the static singleton reference to the {@link ExchangeRates} instance.
+     *
+     * @return the static singleton instance of the {@link ExchangeRates}
+     */
     public static ExchangeRates getService() {
         return EXCHANGE_RATES_SERVICE;
     }
 
+    @NonNull
     private static OkHttpClient generateOkHttp() {
         OkHttpClient client = new OkHttpClient();
         client.setReadTimeout(READ_TIMEOUT, TimeUnit.MILLISECONDS);
         return client;
     }
 
+    /**
+     * Defines the call to the server to fetch the currency rates.
+     */
     public interface ExchangeRates {
+        /**
+         * Makes a GET call to the server to fetch the currency rates
+         * @param baseCurrency the base currency to base the rates on
+         * @param callback the callback that gets called with server's response
+         */
         @GET("/latest")
         void getRates(@Query("base") String baseCurrency, Callback<CurrencyRates> callback);
     }

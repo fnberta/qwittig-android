@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.widgets;
 
 import android.animation.ObjectAnimator;

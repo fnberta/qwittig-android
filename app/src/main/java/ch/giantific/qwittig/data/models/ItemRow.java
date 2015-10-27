@@ -1,6 +1,11 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.data.models;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
 import android.view.View;
@@ -13,7 +18,7 @@ import ch.giantific.qwittig.ui.widgets.ListCheckBox;
 import ch.giantific.qwittig.utils.MoneyUtils;
 
 /**
- * Created by fabio on 12.10.14.
+ * Represents a row of a purchase item. It includes the view containing the values for the item.
  */
 public class ItemRow {
 
@@ -27,28 +32,9 @@ public class ItemRow {
     private String mName;
     private BigDecimal mPrice;
 
-    public View getItemRowView() {
-        return mItemRowView;
-    }
-
-    public String getName() {
-        return mName;
-    }
-
-    public void setName(String name) {
-        mName = name;
-    }
-
-    public BigDecimal getPrice() {
-        return mPrice;
-    }
-
-    public void setPrice(BigDecimal price) {
-        mPrice = price;
-    }
-
-    public ItemRow(Context context, View itemRowView, int id, TextInputLayout tilName,
-                   TextInputLayout tilPrice, ListCheckBox cbEnabled) {
+    public ItemRow(@NonNull Context context, @NonNull View itemRowView, int id,
+                   @NonNull TextInputLayout tilName, @NonNull TextInputLayout tilPrice,
+                   @NonNull ListCheckBox cbEnabled) {
         mContext = context;
         mItemRowView = itemRowView;
         mTextInputLayoutName = tilName;
@@ -59,6 +45,31 @@ public class ItemRow {
         setIds(id);
     }
 
+    public View getItemRowView() {
+        return mItemRowView;
+    }
+
+    public String getName() {
+        return mName;
+    }
+
+    public void setName(@NonNull String name) {
+        mName = name;
+    }
+
+    public BigDecimal getPrice() {
+        return mPrice;
+    }
+
+    public void setPrice(@NonNull BigDecimal price) {
+        mPrice = price;
+    }
+
+    /**
+     * Sets the ides of the views that contain user input.
+     *
+     * @param id the base id to use
+     */
     public void setIds(int id) {
         mEditTextName.setId(id);
         mEditTextPrice.setId(id + 1000);
@@ -66,16 +77,32 @@ public class ItemRow {
         mCheckBoxEnabled.setTag(id - 1);
     }
 
-
+    /**
+     * Returns a string of the user input data of the name EditText.
+     *
+     * @return a string with the user input name
+     */
+    @NonNull
     public String getEditTextName() {
         return mEditTextName.getText().toString().trim();
     }
 
-    public void setEditTextName(String name) {
+    /**
+     * Sets the name of the EditText.
+     *
+     * @param name the name to set
+     */
+    public void setEditTextName(@NonNull String name) {
         mEditTextName.setText(name);
     }
 
-    public BigDecimal getEditTextPrice(String currencyCode) {
+    /**
+     * Returns a {@link BigDecimal} of the user input data of the price EditText.
+     *
+     * @param currencyCode the currency code to use to round the value
+     * @return a {@link BigDecimal} of the user input price
+     */
+    public BigDecimal getEditTextPrice(@NonNull String currencyCode) {
         BigDecimal price = BigDecimal.ZERO;
         String priceString = mEditTextPrice.getText().toString();
 
@@ -88,7 +115,12 @@ public class ItemRow {
         return price;
     }
 
-    public void setEditTextPrice(String price) {
+    /**
+     * Sets the price of the EditText.
+     *
+     * @param price the price to set
+     */
+    public void setEditTextPrice(@NonNull String price) {
         mEditTextPrice.setText(price);
     }
 
@@ -100,7 +132,7 @@ public class ItemRow {
         return mCheckBoxEnabled.getUsersChecked();
     }
 
-    public void setUsersChecked(boolean[] usersChecked) {
+    public void setUsersChecked(@NonNull boolean[] usersChecked) {
         mCheckBoxEnabled.setUsersChecked(usersChecked);
     }
 
@@ -113,7 +145,7 @@ public class ItemRow {
         mCheckBoxEnabled.updateCheckedStatus(buyerPosition);
     }
 
-    public void setCheckBoxColor(boolean[] purchaseUsersInvolved) {
+    public void setCheckBoxColor(@NonNull boolean[] purchaseUsersInvolved) {
         mCheckBoxEnabled.setCheckBoxColor(purchaseUsersInvolved);
     }
 
@@ -121,14 +153,25 @@ public class ItemRow {
         mEditTextPrice.setImeOptions(imeOption);
     }
 
-    public void formatPrice(String currencyCode) {
+    /**
+     * Formats the value of the price EditText with currency style
+     * @param currencyCode the currency code to use for the formatting
+     */
+    public void formatPrice(@NonNull String currencyCode) {
         String price = mEditTextPrice.getText().toString();
         if (!TextUtils.isEmpty(price)) {
             mEditTextPrice.setText(MoneyUtils.formatPrice(price, currencyCode));
         }
     }
 
-    public boolean setValuesFromEditTexts(boolean acceptEmptyFields, String currencySelected) {
+    /**
+     * Sets the values from the EditTexts to the global fields and returns <code>true</code> if
+     * they are not empty and <code>false</code> if the are.
+     * @param acceptEmptyFields whether to accept empty fields or not
+     * @param currencySelected the currency code of the selected currency
+     * @return whether the name and price are both non empty or not
+     */
+    public boolean setValuesFromEditTexts(boolean acceptEmptyFields, @NonNull String currencySelected) {
         boolean isComplete = true;
 
         String name = getEditTextName();

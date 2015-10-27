@@ -1,7 +1,11 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.data.models;
 
 /**
- * Created by fabio on 17.02.15.
+ * Represents a help item with a title and an icon, both referencing android resources.
  */
 public class HelpItem {
 

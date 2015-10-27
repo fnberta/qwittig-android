@@ -1,9 +1,15 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.helpers;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.bumptech.glide.Glide;
@@ -24,33 +30,48 @@ import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.data.parse.models.User;
 
 /**
- * Created by fabio on 10.12.14.
+ * Saves a {@link Purchase} object and its corresponding receipt image as a {@link ParseFile}.
+ * <p/>
+ * Subclass of {@link BaseHelper}.
  */
 public class PurchaseSaveHelper extends BaseHelper {
 
     private static final String LOG_TAG = PurchaseSaveHelper.class.getSimpleName();
+    @Nullable
     HelperInteractionListener mListener;
     Purchase mPurchase;
+    @Nullable
     String mReceiptPath;
 
     public PurchaseSaveHelper() {
         // empty default constructor
     }
 
+    /**
+     * Constructs a new {@link PurchaseSaveHelper} with a {@link Purchase} object and optionally
+     * the path to the receipt image as parameters.
+     * <p/>
+     * Using a non empty constructor to be able to pass a {@link com.parse.ParseObject}.
+     * Because the fragment  is retained across configuration changes, there is no risk that the
+     * system will recreate it with the default empty constructor.
+     *
+     * @param purchase    the {@link Purchase} object to save
+     * @param receiptPath the path to the receipt image
+     */
     @SuppressLint("ValidFragment")
-    public PurchaseSaveHelper(Purchase purchase, String receiptPath) {
+    public PurchaseSaveHelper(@NonNull Purchase purchase, @Nullable String receiptPath) {
         mPurchase = purchase;
         mReceiptPath = receiptPath;
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
             mListener = (HelperInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
+                    + " must implement DialogInteractionListener");
         }
     }
 
@@ -76,13 +97,13 @@ public class PurchaseSaveHelper extends BaseHelper {
                 .centerCrop()
                 .into(new SimpleTarget<byte[]>(Receipt.WIDTH, Receipt.HEIGHT) {
                     @Override
-                    public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
+                    public void onResourceReady(@NonNull byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
                         ParseFile file = new ParseFile(Receipt.PARSE_FILE_NAME, resource);
                         mPurchase.setReceiptParseFile(file);
 
                         file.saveInBackground(new SaveCallback() {
                             @Override
-                            public void done(ParseException e) {
+                            public void done(@Nullable ParseException e) {
                                 if (e != null && mListener != null) {
                                     mListener.onPurchaseSaveFailed(e);
                                     return;
@@ -103,7 +124,7 @@ public class PurchaseSaveHelper extends BaseHelper {
         convertPrices(true);
         mPurchase.saveInBackground(new SaveCallback() {
             @Override
-            public void done(ParseException e) {
+            public void done(@Nullable ParseException e) {
                 if (e != null) {
                     convertPrices(false);
 
@@ -137,21 +158,18 @@ public class PurchaseSaveHelper extends BaseHelper {
         pinPurchase();
     }
 
-    /**
-     * Pins purchase to local datastore.
-     */
     final void pinPurchase() {
         final User currentUser = (User) ParseUser.getCurrentUser();
         Group currentGroup = currentUser.getCurrentGroup();
 
         mPurchase.pinInBackground(Purchase.PIN_LABEL + currentGroup.getObjectId(), new SaveCallback() {
-                @Override
-                public void done(ParseException e) {
-                    if (e == null && mListener != null) {
-                        mListener.onPurchaseSavedAndPinned();
-                    }
+            @Override
+            public void done(@Nullable ParseException e) {
+                if (e == null && mListener != null) {
+                    mListener.onPurchaseSavedAndPinned();
                 }
-            });
+            }
+        });
     }
 
     @Override
@@ -160,9 +178,20 @@ public class PurchaseSaveHelper extends BaseHelper {
         mListener = null;
     }
 
+    /**
+     * Defines the action to take after the purchases are saved and pinned to the local data store
+     * or after the save process failed.
+     */
     public interface HelperInteractionListener {
+        /**
+         * Handles the successful save and pin to the local data store.
+         */
         void onPurchaseSavedAndPinned();
 
-        void onPurchaseSaveFailed(ParseException e);
+        /**
+         * Handles the failed save or pin to the local data store.
+         * @param e the {@link ParseException} thrown in the process
+         */
+        void onPurchaseSaveFailed(@NonNull ParseException e);
     }
 }

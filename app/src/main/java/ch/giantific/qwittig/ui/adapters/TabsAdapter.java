@@ -1,25 +1,44 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.adapters;
 
-import android.support.v13.app.FragmentPagerAdapter;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.support.annotation.NonNull;
+import android.support.v13.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by fabio on 29.05.15.
+ * Handles fragments as tabs in a {@link ViewPager}.
+ * <p/>
+ * Subclass of {@link FragmentPagerAdapter}.
  */
 public class TabsAdapter extends FragmentPagerAdapter {
 
     private final List<Fragment> mFragments = new ArrayList<>();
     private final List<String> mFragmentTitles = new ArrayList<>();
 
-    public TabsAdapter(FragmentManager fm) {
+    /**
+     * Constructs a new {@link TabsAdapter}.
+     *
+     * @param fm the {@link FragmentManager} to use in the adapter
+     */
+    public TabsAdapter(@NonNull FragmentManager fm) {
         super(fm);
     }
 
-    public void addFragment(Fragment fragment, String title) {
+    /**
+     * Adds a fragment to the adapter.
+     *
+     * @param fragment the fragment to add
+     * @param title    the title of the fragment to be displayed in the tab
+     */
+    public void addFragment(@NonNull Fragment fragment, @NonNull String title) {
         mFragments.add(fragment);
         mFragmentTitles.add(title);
     }

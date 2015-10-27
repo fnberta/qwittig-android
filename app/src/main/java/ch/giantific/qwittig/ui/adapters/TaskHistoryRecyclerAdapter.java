@@ -1,6 +1,11 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.adapters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,36 +24,45 @@ import ch.giantific.qwittig.utils.DateUtils;
 
 
 /**
- * Created by fabio on 12.10.14.
+ * Handles the display of users who already completed a task by showing the user and the date
+ * he/she completed the task on.
+ * <p/>
+ * Subclass of {@link RecyclerView.Adapter}.
  */
 public class TaskHistoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int TYPE_ITEM = 0;
     private static final int TYPE_HEADER = 1;
-    private int mViewResource;
+    private static final int VIEW_RESOURCE = R.layout.row_task_details_history;
     private List<TaskHistory> mTaskHistory;
     private Context mContext;
 
-    public TaskHistoryRecyclerAdapter(Context context, int viewResource,
-                                      List<TaskHistory> taskHistory) {
+    /**
+     * Constructs a new {@link TaskHistoryRecyclerAdapter}.
+     *
+     * @param context     the context to use in the adapter
+     * @param taskHistory the task history to display
+     */
+    public TaskHistoryRecyclerAdapter(@NonNull Context context,
+                                      @NonNull List<TaskHistory> taskHistory) {
         super();
 
         mContext = context;
-        mViewResource = viewResource;
         mTaskHistory = taskHistory;
     }
 
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         switch (viewType) {
             case TYPE_ITEM: {
-                View v = LayoutInflater.from(parent.getContext()).inflate(mViewResource, parent,
+                View v = LayoutInflater.from(parent.getContext()).inflate(VIEW_RESOURCE, parent,
                         false);
                 return new TaskHistoryRow(v, mContext);
             }
             case TYPE_HEADER: {
                 View v = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.row_header, parent, false);
+                        .inflate(HeaderRow.VIEW_RESOURCE, parent, false);
                 return new HeaderRow(v);
             }
             default:
@@ -93,20 +107,34 @@ public class TaskHistoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerVie
         return mTaskHistory.size() + 1;
     }
 
-    public interface AdapterInteractionListener {
-    }
-
+    /**
+     * Provides a {@link RecyclerView} row that displays a user's avatar image, the nickname
+     * and the date he/she completed the task on.
+     * <p/>
+     * Subclass of {@link BaseUserAvatarRow}.
+     */
     private static class TaskHistoryRow extends BaseUserAvatarRow {
 
         private TextView mTextViewDate;
 
-        public TaskHistoryRow(View view, Context context) {
+        /**
+         * Constructs a new {@link TaskHistoryRow}.
+         *
+         * @param view    the inflated view
+         * @param context the context to use to load the avatar image
+         */
+        public TaskHistoryRow(@NonNull View view, @NonNull Context context) {
             super(view, context);
 
             mTextViewDate = (TextView) view.findViewById(R.id.tv_task_details_history_date);
         }
 
-        public void setDate(Date date) {
+        /**
+         * Sets the date the task was completed on
+         *
+         * @param date the date to set
+         */
+        public void setDate(@NonNull Date date) {
             mTextViewDate.setText(DateUtils.formatDateLong(date));
         }
     }

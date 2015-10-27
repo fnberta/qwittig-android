@@ -1,14 +1,18 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.helpers;
 
 import android.app.Fragment;
 import android.os.Bundle;
 
 /**
- * Created by fabio on 10.12.14.
+ * Provides an abstract class for a so-called headless {@link Fragment}, which does not contain
+ * any UI elements is retained across configuration changes. It is useful for encapsulating
+ * background tasks.
  */
 public abstract class BaseHelper extends Fragment {
-
-    private static final String LOG_TAG = BaseHelper.class.getSimpleName();
 
     public BaseHelper() {
         // empty default constructor

@@ -1,10 +1,17 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.activities;
 
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,10 +27,18 @@ import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.ui.fragments.HomePurchasesFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseDetailsFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseEditFragment;
+import ch.giantific.qwittig.ui.fragments.PurchaseReceiptDetailFragment;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 
-
+/**
+ * Hosts {@link PurchaseDetailsFragment} that displays the details of a purchase and
+ * {@link PurchaseReceiptDetailFragment} that displays the image of a receipt.
+ * <p/>
+ * Displays the store and date of the purchase in the {@link Toolbar}.
+ * <p/>
+ * Subclass of {@link BaseNavDrawerActivity}.
+ */
 public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
         PurchaseDetailsFragment.FragmentInteractionListener {
 
@@ -38,12 +53,13 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     private boolean mHasForeignCurrency;
     private TextView mTextViewStore;
     private TextView mTextViewDate;
+    @Nullable
     private String mStore;
     private long mDate;
     private PurchaseDetailsFragment mPurchaseDetailsFragment;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_purchase_details);
 
@@ -89,7 +105,7 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         getFragmentManager().putFragment(outState, STATE_PURCHASE_DETAILS_FRAGMENT,
@@ -98,9 +114,6 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
         outState.putLong(STATE_TOOLBAR_SUBTITLE, mDate);
     }
 
-    /**
-     * Gets data passed on in intent from HomeActivity or Push Notification
-     */
     private void getPurchaseId() {
         final Intent intent = getIntent();
         mPurchaseId = intent.getStringExtra(HomePurchasesFragment.INTENT_PURCHASE_ID); // started from HomeActivity
@@ -116,7 +129,7 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(@NonNull Menu menu) {
         getMenuInflater().inflate(R.menu.menu_purchase_details, menu);
         if (mShowEditOptions) {
             menu.findItem(R.id.action_purchase_edit).setVisible(true);
@@ -129,7 +142,7 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_purchase_edit:
                 mPurchaseDetailsFragment.editPurchase();
@@ -161,7 +174,7 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void setToolbarStoreDate(String store, Date date) {
+    public void setToolbarStoreAndDate(@NonNull String store, @NonNull Date date) {
         mStore = store;
         mDate = DateUtils.parseDateToLong(date);
 

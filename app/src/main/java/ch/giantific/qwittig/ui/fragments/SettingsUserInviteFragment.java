@@ -1,9 +1,14 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.github.jorgecastilloprz.FABProgressCircle;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
@@ -29,10 +35,10 @@ import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link FragmentInteractionListener} interface
- * to handle interaction events.
+ * Displays the user invite screen, where the user can invite new users to the group and sees
+ * everybody that is currently invited but has not yet accepted/declined the invitation.
+ *
+ * Subclass of {@link SettingsBaseInviteFragment}.
  */
 public class SettingsUserInviteFragment extends SettingsBaseInviteFragment implements
         LocalQuery.UserLocalQueryListener {
@@ -42,7 +48,9 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
     private FragmentInteractionListener mListener;
     private LinearLayout mLinearLayoutUsersInvited;
     private TextView mTextViewNoInvitations;
+    @NonNull
     private List<String> mUsersInvitedEmails = new ArrayList<>();
+    @NonNull
     private List<View> mUsersInvitedRows = new ArrayList<>();
     private User mCurrentUser;
     private Group mCurrentGroup;
@@ -53,18 +61,18 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
             mListener = (FragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
+                    + " must implement DialogInteractionListener");
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_settings_user_invite, container, false);
 
@@ -119,7 +127,7 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
         clearInvite.setTag(position);
         clearInvite.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(@NonNull View v) {
                 int position = Utils.getViewPositionFromTag(v);
                 removeUserInvited(position);
                 updateViewTags();
@@ -156,6 +164,11 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
         mCurrentGroup.saveEventually();
     }
 
+    /**
+     * Starts the invitation process checking if there is already a process going on and if not
+     * checking that the entered emails are all not already invited and the queries all users of
+     * the group to check if the invitees are not already in the group.
+     */
     public void startInvitation() {
         if (ParseUtils.isTestUser(mCurrentUser)) {
             mListener.showAccountCreateDialog();
@@ -171,7 +184,7 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
         }
 
         if (!Utils.isConnected(getActivity())) {
-            MessageUtils.showBasicSnackbar(getView(), getString(R.string.toast_no_connection));
+            MessageUtils.showBasicSnackbar(mTextViewNoInvitations, getString(R.string.toast_no_connection));
             return;
         }
 
@@ -196,13 +209,13 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
     }
 
     @Override
-    public void onUsersLocalQueried(List<ParseUser> users) {
+    public void onUsersLocalQueried(@NonNull List<ParseUser> users) {
         if (allEmailsAreNotAlreadyInGroup(users)) {
             inviteNewUsers();
         }
     }
 
-    private boolean allEmailsAreNotAlreadyInGroup(List<ParseUser> users) {
+    private boolean allEmailsAreNotAlreadyInGroup(@NonNull List<ParseUser> users) {
         boolean allEmailsAreNotAlreadyInGroup = true;
 
         for (ParseUser parseUser : users) {
@@ -231,7 +244,7 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
         inviteUsersWithHelper(mCurrentGroup);
     }
 
-    private void inviteUsersWithHelper(Group group) {
+    private void inviteUsersWithHelper(@NonNull Group group) {
         FragmentManager fragmentManager = getFragmentManager();
         Fragment inviteUsersHelper = HelperUtils.findHelper(fragmentManager, INVITE_HELPER);
 
@@ -247,17 +260,20 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
     }
 
     /**
-     * Called from activity when helper fails to invite users
-     * @param e
+     * Passes the {@link ParseException} to the generic error handler, shows the user an error
+     * message and removes the retained helper fragment and loading indicators.
+     *
+     * @param e the {@link ParseException} thrown in the process
      */
-    public void onInviteUsersFailed(ParseException e) {
+    public void onInviteUsersFailed(@NonNull ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         onParseError(ParseErrorHandler.getErrorMessage(getActivity(), e));
         HelperUtils.removeHelper(getFragmentManager(), INVITE_HELPER);
     }
 
     /**
-     * Called from activity when helper successfully invited users
+     * Starts the {@link FABProgressCircle} final animation and removes the retained helper
+     * fragment.
      */
     public void onUsersInvited() {
         mListener.progressCircleStartFinal();
@@ -265,12 +281,16 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
 
     }
 
+    /**
+     * Finishes the invitation process by hiding the no invitations text view, adding indications
+     * for every user indicated and showing the user a message that users were invited.
+     */
     public void finishInvitations() {
         setNoInvitationsViewVisibility(false);
         for (String email : mUsersToInviteEmails) {
             addInvitedRow(mUsersInvitedRows.size(), email);
         }
-        MessageUtils.showBasicSnackbar(getView(), getString(R.string.toast_user_invited));
+        MessageUtils.showBasicSnackbar(mTextViewNoInvitations, getString(R.string.toast_user_invited));
 
         mIsInviting = false;
     }
@@ -287,11 +307,26 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
         mListener = null;
     }
 
+    /**
+     * Defines the interaction with the hosting {@link Activity}.
+     * <p/>
+     * Extends {@link BaseFragmentInteractionListener}.
+     */
     public interface FragmentInteractionListener extends BaseFragmentInteractionListener {
+
+        /**
+         * Handles the start of the loading animation of the {@link FABProgressCircle}.
+         */
         void progressCircleShow();
 
+        /**
+         * Handles the start of the final loading animation of the {@link FABProgressCircle}.
+         */
         void progressCircleStartFinal();
 
+        /**
+         * Handles the action to hide the loading animation of the {@link FABProgressCircle}.
+         */
         void progressCircleHide();
     }
 

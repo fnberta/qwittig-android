@@ -1,7 +1,12 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.parse.ParseObject;
 import com.parse.ParseUser;
@@ -16,7 +21,9 @@ import ch.giantific.qwittig.data.parse.models.Task;
 import ch.giantific.qwittig.utils.DateUtils;
 
 /**
- * A placeholder fragment containing a simple view.
+ * Provides an interface for the user to edit the details of a {@link Task}.
+ * <p/>
+ * Subclass of {@link TaskAddFragment}.
  */
 public class TaskEditFragment extends TaskAddFragment {
 
@@ -34,6 +41,15 @@ public class TaskEditFragment extends TaskAddFragment {
     private Date mOldDeadline;
     private List<ParseUser> mOldUsersInvolved;
 
+    public TaskEditFragment() {
+    }
+
+    /**
+     * Returns a new instance of {@link TaskEditFragment}.
+     * @param taskId the object id of the task to edit
+     * @return a new instance of {@link TaskEditFragment}
+     */
+    @NonNull
     public static TaskEditFragment newInstance(String taskId) {
         TaskEditFragment fragment = new TaskEditFragment();
 
@@ -44,28 +60,25 @@ public class TaskEditFragment extends TaskAddFragment {
         return fragment;
     }
 
-    public TaskEditFragment() {
-    }
-
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Bundle args = getArguments();
         if (args != null) {
-            mEditTaskId = args.getString(BUNDLE_EDIT_TASK_ID);
+            mEditTaskId = args.getString(BUNDLE_EDIT_TASK_ID, "");
         }
 
         if (savedInstanceState != null) {
             mOldValuesSet = savedInstanceState.getBoolean(STATE_ITEMS_SET, false);
-            mOldTitle = savedInstanceState.getString(STATE_OLD_TITLE);
-            mOldTimeFrame = savedInstanceState.getString(STATE_OLD_TIME_FRAME);
+            mOldTitle = savedInstanceState.getString(STATE_OLD_TITLE, "");
+            mOldTimeFrame = savedInstanceState.getString(STATE_OLD_TIME_FRAME, "");
             mOldDeadline = DateUtils.parseLongToDate(savedInstanceState.getLong(STATE_OLD_DEADLINE));
         }
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         outState.putBoolean(STATE_ITEMS_SET, mOldValuesSet);
@@ -82,7 +95,7 @@ public class TaskEditFragment extends TaskAddFragment {
     private void fetchOldTask() {
         LocalQuery.fetchObjectFromId(Task.CLASS, mEditTaskId, new LocalQuery.ObjectLocalFetchListener() {
             @Override
-            public void onObjectFetched(ParseObject object) {
+            public void onObjectFetched(@NonNull ParseObject object) {
                 mEditTask = (Task) object;
 
                 if (!mOldValuesSet) {
@@ -110,7 +123,7 @@ public class TaskEditFragment extends TaskAddFragment {
         mUsersRecyclerAdapter.notifyDataSetChanged();
     }
 
-    private void setTimeFrame(@Task.TimeFrame String timeFrame) {
+    private void setTimeFrame(@NonNull @Task.TimeFrame String timeFrame) {
         int res = 0;
 
         switch (timeFrame) {
@@ -140,7 +153,7 @@ public class TaskEditFragment extends TaskAddFragment {
         }
     }
 
-    private void setUsersInvolved(List<ParseUser> usersInvolved) {
+    private void setUsersInvolved(@NonNull List<ParseUser> usersInvolved) {
         for (ParseUser user : usersInvolved) {
             mUsersInvolved.add(new TaskUser(user.getObjectId(), true));
         }
@@ -178,7 +191,7 @@ public class TaskEditFragment extends TaskAddFragment {
 
     @NonNull
     @Override
-    Task getTask(String title, String timeFrame, List<ParseUser> usersInvolved) {
+    Task getTask(@NonNull String title, @NonNull String timeFrame, @NonNull List<ParseUser> usersInvolved) {
         mEditTask.setTitle(title);
         mEditTask.setTimeFrame(timeFrame);
         mEditTask.setDeadline(mDeadlineSelected);

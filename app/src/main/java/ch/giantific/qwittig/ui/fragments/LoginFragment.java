@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.annotation.TargetApi;
@@ -6,6 +10,8 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
 import android.transition.Slide;
@@ -35,17 +41,18 @@ import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
- * A placeholder fragment containing a simple view.
+ * Displays the login screen asking the user for the username and password.
+ * <p/>
+ * Subclass of {@link LoginBaseFragment}.
  */
 public class LoginFragment extends LoginBaseFragment {
 
     private TextInputLayout mTextInputLayoutEmail;
+    @Nullable
     private EditText mEditTextPassword;
     private TextInputLayout mTextInputLayoutPassword;
     private Button mButtonLogIn;
-    private Button mButtonSignUp;
-    private Button mButtonTryOut;
-    private TextView mTextViewResetPassword;
+    @Nullable
     private String mEmailInvited;
 
     public LoginFragment() {
@@ -53,10 +60,12 @@ public class LoginFragment extends LoginBaseFragment {
 
     /**
      * Returns a new instance of a {@link LoginFragment} with an email address as an argument.
+     *
      * @param email the email to be used as an argument
      * @return a new instance of a {@link LoginFragment}
      */
-    public static LoginFragment newInstance(String email) {
+    @NonNull
+    public static LoginFragment newInstance(@NonNull String email) {
         LoginFragment fragment = new LoginFragment();
 
         Bundle args = new Bundle();
@@ -77,13 +86,13 @@ public class LoginFragment extends LoginBaseFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_login, container, false);
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         mTextInputLayoutEmail = (TextInputLayout) view.findViewById(R.id.til_login_email);
@@ -101,24 +110,24 @@ public class LoginFragment extends LoginBaseFragment {
             }
         });
 
-        mButtonSignUp = (Button) view.findViewById(R.id.bt_login_signup);
-        mButtonSignUp.setOnClickListener(new View.OnClickListener() {
+        Button buttonSignUp = (Button) view.findViewById(R.id.bt_login_signup);
+        buttonSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 launchSignUp();
             }
         });
 
-        mButtonTryOut = (Button) view.findViewById(R.id.bt_login_tryout);
-        mButtonTryOut.setOnClickListener(new View.OnClickListener() {
+        Button buttonTryOut = (Button) view.findViewById(R.id.bt_login_tryout);
+        buttonTryOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 tryWithoutAccount();
             }
         });
 
-        mTextViewResetPassword = (TextView) view.findViewById(R.id.tv_reset_password);
-        mTextViewResetPassword.setOnClickListener(new View.OnClickListener() {
+        TextView textViewResetPassword = (TextView) view.findViewById(R.id.tv_reset_password);
+        textViewResetPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showResetPasswordDialog();
@@ -156,7 +165,7 @@ public class LoginFragment extends LoginBaseFragment {
         }
     }
 
-    private void logInUserToParseWithHelper(final String email, String password) {
+    private void logInUserToParseWithHelper(@NonNull final String email, @NonNull String password) {
         if (!Utils.isConnected(getActivity())) {
             MessageUtils.showBasicSnackbar(mButtonLogIn, getString(R.string.toast_no_connection));
             return;
@@ -193,7 +202,7 @@ public class LoginFragment extends LoginBaseFragment {
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void setFragmentTransitions(LoginSignUpFragment loginSignUpFragment) {
+    private void setFragmentTransitions(@NonNull LoginSignUpFragment loginSignUpFragment) {
         loginSignUpFragment.setEnterTransition(new Slide(Gravity.BOTTOM));
 
         setExitTransition(new Slide(Gravity.BOTTOM));
@@ -222,17 +231,19 @@ public class LoginFragment extends LoginBaseFragment {
 
     /**
      * Initiates the resetting of a user's password.
-     * @param email the email of the user the whose password should be reset
+     *
+     * @param email the email of the user whose password should be reset
      */
-    public void onResetPasswordSelected(String email) {
+    public void onResetPasswordSelected(@NonNull String email) {
         resetPasswordWithHelper(email);
     }
 
     /**
-     * Starts a helper fragment that resets a user's password.
-     * @param email the email of the user the whose password should be reset
+     * Starts a helper fragment that sends the user and email to reset his/her password.
+     *
+     * @param email the email of the user whose password should be reset
      */
-    private void resetPasswordWithHelper(String email) {
+    private void resetPasswordWithHelper(@NonNull String email) {
         if (!Utils.isConnected(getActivity())) {
             MessageUtils.showBasicSnackbar(mButtonLogIn, getString(R.string.toast_no_connection));
             return;
@@ -245,7 +256,6 @@ public class LoginFragment extends LoginBaseFragment {
         // retained across a configuration change.
         if (loginHelper == null) {
             loginHelper = LoginHelper.newInstance(email);
-
             fragmentManager.beginTransaction()
                     .add(loginHelper, LOGIN_HELPER)
                     .commit();
@@ -254,7 +264,7 @@ public class LoginFragment extends LoginBaseFragment {
 
     /**
      * Handles the successful reset of a password. Removes the helper fragment and tells the user
-     * he needs to click on the link he received by email in order to really reset his password.
+     * he needs to click on the link he/she received by email in order to reset the password.
      */
     public void onPasswordReset() {
         HelperUtils.removeHelper(getFragmentManager(), LOGIN_HELPER);

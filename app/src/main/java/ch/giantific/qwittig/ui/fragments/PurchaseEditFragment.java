@@ -1,9 +1,15 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -26,7 +32,9 @@ import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 
 /**
- * A placeholder fragment containing a simple view.
+ * Displays the interface where the user can edit an already existing {@link Purchase}.
+ * <p/>
+ * Subclass of {@link PurchaseBaseFragment}.
  */
 public class PurchaseEditFragment extends PurchaseBaseFragment implements
         LocalQuery.ObjectLocalFetchListener {
@@ -39,6 +47,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     private static final String STATE_OLD_CURRENCY = "STATE_OLD_CURRENCY";
     private static final String STATE_OLD_EXCHANGE_RATE = "STATE_OLD_EXCHANGE_RATE";
     private static final String LOG_TAG = PurchaseEditFragment.class.getSimpleName();
+    private static final String DISCARD_CHANGES_DIALOG = "DISCARD_CHANGES_DIALOG";
     String mEditPurchaseId;
     private boolean mOldValuesAreSet;
     private List<ParseObject> mOldItems;
@@ -52,6 +61,13 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     public PurchaseEditFragment() {
     }
 
+    /**
+     * Returns a new instance of {@link PurchaseEditFragment}.
+     *
+     * @param editPurchaseId the object id of the purchase to edit
+     * @return a new instance of {@link PurchaseEditFragment}
+     */
+    @NonNull
     public static PurchaseEditFragment newInstance(String editPurchaseId) {
         PurchaseEditFragment fragment = new PurchaseEditFragment();
 
@@ -63,19 +79,20 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
 
-        mEditPurchaseId = getArguments().getString(BUNDLE_EDIT_PURCHASE_ID);
+        mEditPurchaseId = getArguments().getString(BUNDLE_EDIT_PURCHASE_ID, "");
 
         if (savedInstanceState != null) {
             mOldValuesAreSet = savedInstanceState.getBoolean(STATE_ITEMS_SET);
-            mOldItemIds = savedInstanceState.getStringArrayList(STATE_OLD_ITEM_IDS);
-            mOldStore = savedInstanceState.getString(STATE_OLD_STORE);
+            ArrayList<String> oldIds = savedInstanceState.getStringArrayList(STATE_OLD_ITEM_IDS);
+            mOldItemIds = oldIds != null ? oldIds : new ArrayList<String>();
+            mOldStore = savedInstanceState.getString(STATE_OLD_STORE, "");
             mOldDate = DateUtils.parseLongToDate(savedInstanceState.getLong(STATE_OLD_DATE));
-            mOldCurrency = savedInstanceState.getString(STATE_OLD_CURRENCY);
+            mOldCurrency = savedInstanceState.getString(STATE_OLD_CURRENCY, "");
             mOldExchangeRate = savedInstanceState.getFloat(STATE_OLD_EXCHANGE_RATE);
         } else {
             mOldValuesAreSet = false;
@@ -85,7 +102,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
 
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         outState.putBoolean(STATE_ITEMS_SET, mOldValuesAreSet);
@@ -113,7 +130,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     }
 
     @Override
-    public void onObjectFetched(ParseObject object) {
+    public void onObjectFetched(@NonNull ParseObject object) {
         processOldPurchase(object);
     }
 
@@ -177,7 +194,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     }
 
     @Override
-    void setupUserLists(List<ParseUser> users) {
+    void setupUserLists(@NonNull List<ParseUser> users) {
         super.setupUserLists(users);
 
         if (!mOldValuesAreSet) {
@@ -218,13 +235,14 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
         mItemRowCount = oldItemsSize;
     }
 
-    private boolean buyerIsOnlyUserInvolved(List<ParseUser> usersInvolved) {
+    private boolean buyerIsOnlyUserInvolved(@NonNull List<ParseUser> usersInvolved) {
         ParseUser currentUser = ParseUser.getCurrentUser();
         return usersInvolved.size() == 1 && usersInvolved.get(0).getObjectId()
                 .equals(currentUser.getObjectId());
     }
 
-    private boolean[] ParseUserToBoolean(List<ParseUser> usersInvolved) {
+    @NonNull
+    private boolean[] ParseUserToBoolean(@NonNull List<ParseUser> usersInvolved) {
         int usersAvailableParseSize = mUsersAvailableParse.size();
         boolean[] usersInvolvedBoolean = new boolean[usersAvailableParseSize];
 
@@ -237,7 +255,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, @NonNull Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == INTENT_REQUEST_IMAGE_CAPTURE) {
@@ -316,7 +334,9 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     }
 
     /**
-     * Deletes old items in database only after new purchase has been successfully saved.
+     * Deletes old items in the Parse.com online database.
+     * <p/>
+     * Should be called only after the purchase with the new items were successfully saved.
      */
     private void deleteOldItems() {
         for (String itemId : mOldItemIds) {
@@ -325,6 +345,10 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
         }
     }
 
+    /**
+     * Checks whether the user made any changes. If yes, displays a dialog asking him/her if he/she
+     * wants to discard the changes. If no, sets no changes activity result and finishes.
+     */
     public void checkForChangesAndExit() {
         if (changesWereMade()) {
             showDiscardChangesDialog();
@@ -337,7 +361,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     private void showDiscardChangesDialog() {
         DiscardChangesDialogFragment discardChangesDialogFragment =
                 new DiscardChangesDialogFragment();
-        discardChangesDialogFragment.show(getFragmentManager(), "discard_changes");
+        discardChangesDialogFragment.show(getFragmentManager(), DISCARD_CHANGES_DIALOG);
     }
 
     private boolean changesWereMade() {
@@ -386,7 +410,8 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
         return false;
     }
 
-    private List<String> getParseUsersInvolvedIdsFromItemRow(ItemRow itemRow) {
+    @NonNull
+    private List<String> getParseUsersInvolvedIdsFromItemRow(@NonNull ItemRow itemRow) {
         int usersAvailableParseSize = mUsersAvailableParse.size();
         final List<String> usersInvolved = new ArrayList<>(usersAvailableParseSize);
 

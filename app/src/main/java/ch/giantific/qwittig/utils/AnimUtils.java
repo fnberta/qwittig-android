@@ -1,26 +1,45 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.utils;
 
 import android.animation.Animator;
 import android.annotation.TargetApi;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 
 /**
- * Created by fabio on 17.10.15.
+ * Provides useful static methods for animations.
  */
 public class AnimUtils {
 
+    /**
+     * Delay before a FAB gets revealed.
+     */
     public static final long FAB_CIRCULAR_REVEAL_DELAY = 50;
+    /**
+     * Default alpha of a disabled view.
+     */
     public static final float DISABLED_ALPHA = 0.26f;
+    /**
+     * Default alpha of a disabled view in RGB.
+     */
     public static final int DISABLED_ALPHA_RGB = 66;
 
     private AnimUtils() {
         // class cannot be instantiated
     }
 
+    /**
+     * Returns an {@link Animator} that reveals a view in a circular fashion.
+     * @param view the view to reveal
+     * @return a circular reveal {@link Animator}
+     */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public static Animator getCircularRevealAnimator(View view) {
+    public static Animator getCircularRevealAnimator(@NonNull View view) {
         // get the center for the clipping circle
         int cx = view.getWidth() / 2;
         int cy = view.getHeight() / 2;
@@ -35,8 +54,13 @@ public class AnimUtils {
         return animator;
     }
 
+    /**
+     * Returns an {@link Animator} that hides a view in a circular fashion.
+     * @param view the view to hide
+     * @return a circular hide {@link Animator}
+     */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public static Animator getCircularHideAnimator(View view) {
+    public static Animator getCircularHideAnimator(@NonNull View view) {
         // get the center for the clipping circle
         int cx = view.getWidth() / 2;
         int cy = view.getHeight() / 2;

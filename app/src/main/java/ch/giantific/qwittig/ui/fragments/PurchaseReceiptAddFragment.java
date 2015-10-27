@@ -1,8 +1,12 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -10,9 +14,10 @@ import android.view.View;
 
 import ch.giantific.qwittig.R;
 
-
 /**
- * A simple {@link Fragment} subclass.
+ * Shows the receipt image taken by the user when adding a new purchase.
+ * <p/>
+ * Subclass of {@link PurchaseReceiptBaseFragment}.
  */
 public class PurchaseReceiptAddFragment extends PurchaseReceiptBaseFragment {
 
@@ -23,7 +28,14 @@ public class PurchaseReceiptAddFragment extends PurchaseReceiptBaseFragment {
     public PurchaseReceiptAddFragment() {
     }
 
-    public static PurchaseReceiptAddFragment newInstance(String imagePath) {
+    /**
+     * Returns a new instance of {@link PurchaseReceiptAddFragment}.
+     *
+     * @param imagePath the path to the receipt image taken
+     * @return a new instance of {@link PurchaseReceiptAddFragment}
+     */
+    @NonNull
+    public static PurchaseReceiptAddFragment newInstance(@NonNull String imagePath) {
         PurchaseReceiptAddFragment purchaseReceiptAddFragment = new PurchaseReceiptAddFragment();
         Bundle args = new Bundle();
         args.putString(BUNDLE_IMAGE_PATH, imagePath);
@@ -32,13 +44,13 @@ public class PurchaseReceiptAddFragment extends PurchaseReceiptBaseFragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
             mListener = (FragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
+                    + " must implement DialogInteractionListener");
         }
     }
 
@@ -53,7 +65,7 @@ public class PurchaseReceiptAddFragment extends PurchaseReceiptBaseFragment {
     void getDataFromBundle() {
         Bundle args = getArguments();
         if (args != null) {
-            mReceiptPath = args.getString(BUNDLE_IMAGE_PATH);
+            mReceiptPath = args.getString(BUNDLE_IMAGE_PATH, "");
         }
     }
 
@@ -69,13 +81,13 @@ public class PurchaseReceiptAddFragment extends PurchaseReceiptBaseFragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         menu.clear();
         inflater.inflate(R.menu.menu_purchase_edit_receipt, menu);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_purchase_edit_receipt_edit:
                 mListener.captureImage();
@@ -94,8 +106,18 @@ public class PurchaseReceiptAddFragment extends PurchaseReceiptBaseFragment {
         mListener = null;
     }
 
+    /**
+     * Defines the interaction with the hosting {@link Activity}.
+     */
     public interface FragmentInteractionListener {
+        /**
+         * Handles the request to delete the receipt image file from online Parse.com database.
+         */
         void deleteReceipt();
+
+        /**
+         * Handles the request to capture a new image.
+         */
         void captureImage();
     }
 }

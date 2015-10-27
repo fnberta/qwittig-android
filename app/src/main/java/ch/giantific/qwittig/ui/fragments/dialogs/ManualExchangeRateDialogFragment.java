@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments.dialogs;
 
 import android.app.Activity;
@@ -5,6 +9,8 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -14,16 +20,26 @@ import android.view.View;
 import ch.giantific.qwittig.R;
 
 /**
- * Created by fabio on 20.11.14.
+ * Provides a dialog that allows the user to manually edit the currency exchange rate of a purchase.
+ * <p/>
+ * Subclass of {@link DialogFragment}.
  */
 public class ManualExchangeRateDialogFragment extends DialogFragment {
 
     private static final String BUNDLE_EXCHANGE_RATE = "BUNDLE_EXCHANGE_RATE";
     private DialogInteractionListener mListener;
     private TextInputLayout mTextInputLayoutExchangeRate;
+    @Nullable
     private String mAutoExchangeRate;
 
-    public static ManualExchangeRateDialogFragment newInstance(String exchangeRate) {
+    /**
+     * Returns a new instance of {@link ManualExchangeRateDialogFragment}.
+     *
+     * @param exchangeRate the currently set currency exchange rate
+     * @return a new instance of {@link ManualExchangeRateDialogFragment}
+     */
+    @NonNull
+    public static ManualExchangeRateDialogFragment newInstance(@NonNull String exchangeRate) {
         ManualExchangeRateDialogFragment fragment = new ManualExchangeRateDialogFragment();
 
         Bundle args = new Bundle();
@@ -34,7 +50,7 @@ public class ManualExchangeRateDialogFragment extends DialogFragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
 
         try {
@@ -81,7 +97,15 @@ public class ManualExchangeRateDialogFragment extends DialogFragment {
         return dialogBuilder.create();
     }
 
+    /**
+     * Defines the actions to take when user clicks on one of the dialog's buttons.
+     */
     public interface DialogInteractionListener {
+        /**
+         * Handles to click on the change exchange rate button.
+         *
+         * @param exchangeRate the newly set currency exchange rate
+         */
         void onExchangeRateSet(float exchangeRate);
     }
 }

@@ -1,7 +1,13 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.helpers;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.parse.FunctionCallback;
@@ -16,25 +22,38 @@ import com.parse.SaveCallback;
 import java.util.HashMap;
 import java.util.Map;
 
-import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.data.parse.CloudCode;
 import ch.giantific.qwittig.data.parse.models.Group;
 import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 
 /**
- * Created by fabio on 10.12.14.
+ * Handles the process of a user being invited to a group and he/she accepting the invitation and
+ * joining the group.
+ * <p/>
+ * Subclass of {@link BaseHelper}.
  */
 public class InvitedGroupHelper extends BaseHelper {
 
     private static final String BUNDLE_GROUP_ID = "BUNDLE_GROUP_ID";
     private static final String LOG_TAG = InvitedGroupHelper.class.getSimpleName();
+    @Nullable
     private HelperInteractionListener mListener;
+    @Nullable
     private String mGroupId;
 
     public InvitedGroupHelper() {
         // empty default constructor
     }
 
+    /**
+     * Returns a new instance of {@link InvitedGroupHelper} with the object id of the group the user
+     * is invited to as an argument.
+     *
+     * @param groupId the object id of the group the user is invited to
+     * @return a new instance of {@link InvitedGroupHelper}
+     */
+    @NonNull
     public static InvitedGroupHelper newInstance(String groupId) {
         InvitedGroupHelper fragment = new InvitedGroupHelper();
         Bundle args = new Bundle();
@@ -44,13 +63,13 @@ public class InvitedGroupHelper extends BaseHelper {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
             mListener = (HelperInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
+                    + " must implement DialogInteractionListener");
         }
     }
 
@@ -73,7 +92,7 @@ public class InvitedGroupHelper extends BaseHelper {
         params.put(PushBroadcastReceiver.PUSH_PARAM_GROUP, groupId);
         ParseCloud.callFunctionInBackground(CloudCode.GROUP_ROLE_ADD_USER, params, new FunctionCallback<Object>() {
             @Override
-            public void done(Object o, ParseException e) {
+            public void done(Object o, @Nullable ParseException e) {
                 if (e != null) {
                     if (mListener != null) {
                         mListener.onInvitedGroupQueryFailed(e);
@@ -90,7 +109,7 @@ public class InvitedGroupHelper extends BaseHelper {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Group.CLASS);
         query.getInBackground(groupId, new GetCallback<ParseObject>() {
             @Override
-            public void done(ParseObject parseObject, ParseException e) {
+            public void done(ParseObject parseObject, @Nullable ParseException e) {
                 if (e != null) {
                     removeUserFromGroupRole(mGroupId);
 
@@ -136,7 +155,7 @@ public class InvitedGroupHelper extends BaseHelper {
         currentUser.setCurrentGroup(invitedGroup);
         currentUser.saveInBackground(new SaveCallback() {
             @Override
-            public void done(ParseException e) {
+            public void done(@Nullable ParseException e) {
                 if (e != null) {
                     currentUser.removeGroup(invitedGroup);
                     currentUser.setCurrentGroup(currentGroup);
@@ -159,15 +178,39 @@ public class InvitedGroupHelper extends BaseHelper {
         mListener = null;
     }
 
+    /**
+     * Defines actions to be taken during the invited group querying and joining process.
+     */
     public interface HelperInteractionListener {
-        void onInvitedGroupQueried(ParseObject parseObject);
+        /**
+         * Handles the successful query of the group the user is invited to
+         *
+         * @param group the queried group
+         */
+        void onInvitedGroupQueried(@NonNull ParseObject group);
 
-        void onInvitedGroupQueryFailed(ParseException e);
+        /**
+         * Handles the failure to query of the group the user is invited to.
+         *
+         * @param e the {@link ParseException} thrown during the process
+         */
+        void onInvitedGroupQueryFailed(@NonNull ParseException e);
 
+        /**
+         * Handles the case when user's email was removed from the users invited to get group
+         */
         void onEmailNotValid();
 
+        /**
+         * Handles the case when the user successfully joined the new group
+         */
         void onUserJoinedGroup();
 
-        void onUserJoinGroupFailed(ParseException e);
+        /**
+         * Handles the failure to join the new group.
+         *
+         * @param e the {@link ParseException} thrown during the process
+         */
+        void onUserJoinGroupFailed(@NonNull ParseException e);
     }
 }

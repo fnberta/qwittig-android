@@ -1,8 +1,15 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.activities;
 
 import android.app.FragmentManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
@@ -18,13 +25,22 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.Month;
 import ch.giantific.qwittig.data.stats.models.Stats;
 import ch.giantific.qwittig.helpers.StatsHelper;
+import ch.giantific.qwittig.ui.adapters.StringResSpinnerAdapter;
+import ch.giantific.qwittig.ui.adapters.ThemedArrayAdapter;
 import ch.giantific.qwittig.ui.fragments.StatsBaseFragment;
 import ch.giantific.qwittig.ui.fragments.StatsCurrenciesFragment;
 import ch.giantific.qwittig.ui.fragments.StatsSpendingFragment;
 import ch.giantific.qwittig.ui.fragments.StatsStoresFragment;
-import ch.giantific.qwittig.ui.adapters.StringResSpinnerAdapter;
-import ch.giantific.qwittig.ui.adapters.ThemedArrayAdapter;
 
+/**
+ * Hosts the different stats fragments, {@link StatsSpendingFragment}, {@link StatsStoresFragment}
+ * and {@link StatsCurrenciesFragment}. They display statistical information about the behaviour in
+ * the current group.
+ * <p/>
+ * Handles the stats type and period selection with spinners in the {@link Toolbar}.
+ * <p/>
+ * Subclass of {@link BaseNavDrawerActivity}.
+ */
 public class StatsActivity extends BaseNavDrawerActivity implements
         StatsBaseFragment.FragmentInteractionListener,
         StatsHelper.HelperInteractionListener {
@@ -35,10 +51,11 @@ public class StatsActivity extends BaseNavDrawerActivity implements
     private Spinner mSpinnerStatsType;
     private Spinner mSpinnerYear;
     private Spinner mSpinnerMonth;
+    @Nullable
     private StatsBaseFragment mStatsFragment;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stats);
 
@@ -87,6 +104,7 @@ public class StatsActivity extends BaseNavDrawerActivity implements
         mSpinnerYear.setAdapter(spinnerYearAdapter);
     }
 
+    @NonNull
     private List<String> getLastYears(int timeToGoBack) {
         List<String> lastYears = new ArrayList<>();
         Calendar calendar = Calendar.getInstance();
@@ -152,7 +170,7 @@ public class StatsActivity extends BaseNavDrawerActivity implements
             public void run() {
                 mSpinnerStatsType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    public void onItemSelected(@NonNull AdapterView<?> parent, View view, int position, long id) {
                         int statsType = (int) parent.getItemAtPosition(position);
                         switchFragment(statsType);
                     }
@@ -224,7 +242,9 @@ public class StatsActivity extends BaseNavDrawerActivity implements
     }
 
     private void onPeriodSelected() {
-        mStatsFragment.loadData();
+        if (mStatsFragment != null) {
+            mStatsFragment.loadData();
+        }
     }
 
     @Override
@@ -235,28 +255,36 @@ public class StatsActivity extends BaseNavDrawerActivity implements
         setSpinnerListeners();
     }
 
+    @NonNull
     @Override
     public String getYear() {
         return (String) mSpinnerYear.getSelectedItem();
     }
 
+    @NonNull
     @Override
     public Month getMonth() {
         return (Month) mSpinnerMonth.getSelectedItem();
     }
 
     @Override
-    public void onStatsCalculated(int statsType, Stats stats) {
-        mStatsFragment.onStatsCalculated(stats);
+    public void onStatsCalculated(int statsType, @NonNull Stats stats) {
+        if (mStatsFragment != null) {
+            mStatsFragment.onStatsCalculated(stats);
+        }
     }
 
     @Override
-    public void onStatsCalculationFailed(int statsType, ParseException e) {
-        mStatsFragment.onStatsCalculationFailed(e);
+    public void onStatsCalculationFailed(int statsType, @NonNull ParseException e) {
+        if (mStatsFragment != null) {
+            mStatsFragment.onStatsCalculationFailed(e);
+        }
     }
 
     @Override
     protected void onNewGroupSet() {
-        mStatsFragment.updateData();
+        if (mStatsFragment != null) {
+            mStatsFragment.updateData();
+        }
     }
 }

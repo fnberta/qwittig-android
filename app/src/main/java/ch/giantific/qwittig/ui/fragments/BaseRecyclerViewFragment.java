@@ -1,7 +1,13 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,7 +25,14 @@ import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.utils.MessageUtils;
 
 /**
- * Created by fabio on 02.11.14.
+ * Provides a an abstract base class for screens with a {@link RecyclerView} that is refreshable on
+ * pull and shows a progress bar when loading and an empty view if no items are available.
+ * <p/>
+ * Subclass of {@link BaseFragment}.
+ *
+ * @see RecyclerView
+ * @see SwipeRefreshLayout
+ * @see ProgressBar
  */
 public abstract class BaseRecyclerViewFragment extends BaseFragment implements
         LocalQuery.ObjectLocalFetchListener {
@@ -35,7 +48,7 @@ public abstract class BaseRecyclerViewFragment extends BaseFragment implements
     public BaseRecyclerViewFragment() {
     }
 
-    final void findBaseViews(View rootView) {
+    final void findBaseViews(@NonNull View rootView) {
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.rv_base);
         mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.srl_base);
         mProgressBarLoading = (ProgressBar) rootView.findViewById(R.id.pb_base);
@@ -43,7 +56,7 @@ public abstract class BaseRecyclerViewFragment extends BaseFragment implements
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -73,7 +86,7 @@ public abstract class BaseRecyclerViewFragment extends BaseFragment implements
 
     protected abstract void onlineQuery();
 
-    final void showOnlineQueryErrorSnackbar(String errorMessage) {
+    final void showOnlineQueryErrorSnackbar(@NonNull String errorMessage) {
         Snackbar snackbar = MessageUtils.getBasicSnackbar(mRecyclerView, errorMessage);
         snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
             @Override
@@ -86,12 +99,17 @@ public abstract class BaseRecyclerViewFragment extends BaseFragment implements
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         outState.putBoolean(STATE_IS_LOADING, mSwipeRefreshLayout.isRefreshing());
     }
 
+    /**
+     * Sets the loading state of the {@link SwipeRefreshLayout}.
+     *
+     * @param isLoading whether the {@link SwipeRefreshLayout} should be loading or not
+     */
     public void setLoading(boolean isLoading) {
         if (mSwipeRefreshLayout != null) {
             mSwipeRefreshLayout.setRefreshing(isLoading);
@@ -106,7 +124,7 @@ public abstract class BaseRecyclerViewFragment extends BaseFragment implements
     }
 
     /**
-     * Updates the member variable for currentGroup and queries new data.
+     * Updates the member variable for the current group and queries new data.
      */
     @CallSuper
     public void updateAdapter() {
@@ -125,7 +143,7 @@ public abstract class BaseRecyclerViewFragment extends BaseFragment implements
             if (mCurrentGroup.isDataAvailable()) {
                 updateView();
             } else {
-                LocalQuery.fetchObjectData(this, mCurrentGroup);
+                LocalQuery.fetchObjectData(mCurrentGroup, this);
             }
         } else {
             updateView();
@@ -133,17 +151,17 @@ public abstract class BaseRecyclerViewFragment extends BaseFragment implements
     }
 
     @Override
-    public void onObjectFetched(ParseObject object) {
+    public void onObjectFetched(@NonNull ParseObject object) {
         updateView();
     }
 
     protected abstract void updateView();
 
     /**
-     * Hides the loading progressbar and displays the RecyclerView
+     * Hides the loading {@link ProgressBar} and displays the {@link RecyclerView}.
      */
     @CallSuper
-    void toggleMainVisibility() {
+    void showMainView() {
         mRecyclerView.setVisibility(View.VISIBLE);
         mProgressBarLoading.setVisibility(View.GONE);
         toggleEmptyViewVisibility();

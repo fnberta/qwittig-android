@@ -1,16 +1,25 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.helpers;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.parse.ParseException;
 
 /**
- * Created by fabio on 10.12.14.
+ * Performs an online query to the Parse.com database to query purchases.
+ * <p/>
+ * Subclass of {@link BaseQueryHelper}.
  */
 public class PurchaseQueryHelper extends BaseQueryHelper {
 
     private static final String LOG_TAG = PurchaseQueryHelper.class.getSimpleName();
+    @Nullable
     private HelperInteractionListener mListener;
 
     public PurchaseQueryHelper() {
@@ -18,13 +27,13 @@ public class PurchaseQueryHelper extends BaseQueryHelper {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
             mListener = (HelperInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
+                    + " must implement DialogInteractionListener");
         }
     }
 
@@ -33,7 +42,9 @@ public class PurchaseQueryHelper extends BaseQueryHelper {
         super.onCreate(savedInstanceState);
 
         if (mCurrentGroup == null || mCurrentUserGroups == null) {
-            mListener.onAllPurchasesQueried();
+            if (mListener != null) {
+                mListener.onAllPurchasesQueried();
+            }
             return;
         }
 
@@ -57,7 +68,7 @@ public class PurchaseQueryHelper extends BaseQueryHelper {
     }
 
     @Override
-    void onPurchasesPinned(String groupId) {
+    void onPurchasesPinned(@NonNull String groupId) {
         super.onPurchasesPinned(groupId);
 
         if (mListener != null && mCurrentGroup != null &&
@@ -74,11 +85,25 @@ public class PurchaseQueryHelper extends BaseQueryHelper {
         mListener = null;
     }
 
+    /**
+     * Defines the actions to take after a query finished.
+     */
     public interface HelperInteractionListener {
+        /**
+         * Handles the successful query and pin to the local data store.
+         */
         void onPurchasesPinned();
 
-        void onPurchasesPinFailed(ParseException e);
+        /**
+         * Handles the failed query or pin to the local data store.
+         *
+         * @param e the {@link ParseException} thrown in the process
+         */
+        void onPurchasesPinFailed(@NonNull ParseException e);
 
+        /**
+         * Handles the completion of all queries.
+         */
         void onAllPurchasesQueried();
     }
 }

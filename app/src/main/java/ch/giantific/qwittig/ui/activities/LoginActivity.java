@@ -1,8 +1,13 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.activities;
 
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
 import com.parse.ParseException;
@@ -15,9 +20,14 @@ import ch.giantific.qwittig.ui.fragments.LoginFragment;
 import ch.giantific.qwittig.ui.fragments.LoginSignUpFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.ResetPasswordDialogFragment;
 
-
+/**
+ * Hosts {@link LoginFragment} and {@link LoginSignUpFragment} that handle the user login and
+ * account creation processes.
+ * <p/>
+ * Subclass of {@link AppCompatActivity}.
+ */
 public class LoginActivity extends AppCompatActivity implements
-        ResetPasswordDialogFragment.FragmentInteractionListener,
+        ResetPasswordDialogFragment.DialogInteractionListener,
         LoginHelper.HelperInteractionListener {
 
     public static final String INTENT_URI_EMAIL = "INTENT_URI_EMAIL";
@@ -61,17 +71,17 @@ public class LoginActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onLoginFailed(ParseException e) {
+    public void onLoginFailed(@NonNull ParseException e) {
         mLoginBaseFragment.onLoginFailed(e);
     }
 
     @Override
-    public void onLoggedIn(ParseUser parseUser) {
+    public void onLoggedIn(@NonNull ParseUser parseUser) {
         mLoginBaseFragment.onLoggedIn(parseUser);
     }
 
     @Override
-    public void onResetPasswordSelected(String email) {
+    public void onResetPasswordSelected(@NonNull String email) {
         ((LoginFragment) mLoginBaseFragment).onResetPasswordSelected(email);
     }
 

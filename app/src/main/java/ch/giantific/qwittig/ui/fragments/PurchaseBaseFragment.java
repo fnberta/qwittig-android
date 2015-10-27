@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.Manifest;
@@ -17,6 +21,8 @@ import android.provider.MediaStore;
 import android.support.annotation.CallSuper;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v13.app.FragmentCompat;
@@ -43,6 +49,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.github.jorgecastilloprz.FABProgressCircle;
 import com.parse.ParseConfig;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -74,7 +81,7 @@ import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.helpers.RatesHelper;
 import ch.giantific.qwittig.ui.activities.CameraActivity;
-import ch.giantific.qwittig.ui.adapters.PurchaseAddUsersInvolvedRecyclerAdapter;
+import ch.giantific.qwittig.ui.adapters.PurchaseUsersInvolvedRecyclerAdapter;
 import ch.giantific.qwittig.ui.fragments.dialogs.DatePickerDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.ManualExchangeRateDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.PurchaseUserSelectionDialogFragment;
@@ -91,10 +98,12 @@ import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
- * Created by fabio on 14.01.15.
+ * Provides an abstract base class for the add and edit purchase screens.
+ * <p/>
+ * Subclass of {@link BaseFragment}.
  */
 public abstract class PurchaseBaseFragment extends BaseFragment implements
-        PurchaseAddUsersInvolvedRecyclerAdapter.AdapterInteractionListener,
+        PurchaseUsersInvolvedRecyclerAdapter.AdapterInteractionListener,
         LocalQuery.UserLocalQueryListener {
 
     @IntDef({PURCHASE_SAVED, PURCHASE_SAVED_AUTO, PURCHASE_DISCARDED, PURCHASE_SAVED_AS_DRAFT,
@@ -114,10 +123,14 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     public static final int RESULT_PURCHASE_ERROR = 5;
     public static final int RESULT_PURCHASE_DISCARDED = 6;
     public static final int RESULT_PURCHASE_DRAFT_DELETED = 7;
-    private static final String RATES_HELPER = "RATES_HELPER";
     static final String PURCHASE_SAVE_HELPER = "PURCHASE_SAVE_HELPER";
-    private static final String PURCHASE_RECEIPT_FRAGMENT = "PURCHASE_RECEIPT_FRAGMENT";
     static final int INTENT_REQUEST_IMAGE_CAPTURE = 1;
+    static final boolean USE_CUSTOM_CAMERA = false;
+    private static final String DATE_PICKER_DIALOG = "DATE_PICKER_DIALOG";
+    private static final String STORE_SELECTOR_DIALOG = "STORE_SELECTOR_DIALOG";
+    private static final String MANUAL_EXCHANGE_RATE_DIALOG = "MANUAL_EXCHANGE_RATE_DIALOG";
+    private static final String RATES_HELPER = "RATES_HELPER";
+    private static final String PURCHASE_RECEIPT_FRAGMENT = "PURCHASE_RECEIPT_FRAGMENT";
     private static final String STATE_ROW_COUNT = "STATE_ROW_COUNT";
     private static final String STATE_STORE_SELECTED = "STATE_STORE_SELECTED";
     private static final String STATE_DATE_SELECTED = "STATE_DATE_SELECTED";
@@ -131,27 +144,29 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     private static final long EXCHANGE_RATE_REFRESH_INTERVAL = 24 * 60 * 60 * 1000;
     private static final String LOG_TAG = PurchaseBaseFragment.class.getSimpleName();
     private static final int PERMISSIONS_REQUEST_CAPTURE_IMAGES = 1;
-    static final boolean USE_CUSTOM_CAMERA = false;
     FragmentInteractionListener mListener;
     Purchase mPurchase;
     Date mDateSelected;
-    private TextView mTextViewPickStore;
     String mStoreSelected;
     int mItemRowCount;
+    @NonNull
     List<ParseObject> mItems = new ArrayList<>();
     double mTotalPrice;
+    @NonNull
     List<ParseUser> mUsersAvailableParse = new ArrayList<>();
     boolean[] mPurchaseUsersInvolved;
     Group mCurrentGroup;
     String mCurrencySelected;
     String mCurrentGroupCurrency;
     User mCurrentUser;
-    private boolean mIsSaving;
     Button mButtonAddRow;
+    @NonNull
     List<ItemRow> mItemRows = new ArrayList<>();
     float mExchangeRate;
     ArrayList<String> mReceiptImagePaths;
     String mReceiptImagePath;
+    private TextView mTextViewPickStore;
+    private boolean mIsSaving;
     private boolean mIsFetchingExchangeRates;
     private SharedPreferences mSharedPreferences;
     private TextView mTextViewPickDate;
@@ -164,23 +179,23 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     private TextView mTextViewMyShareCurrency;
     private LinearLayout mLayoutTotalItemRow;
     private RecyclerView mRecyclerViewUsersInvolved;
-    private PurchaseAddUsersInvolvedRecyclerAdapter mRecyclerAdapter;
+    private PurchaseUsersInvolvedRecyclerAdapter mRecyclerAdapter;
     private int mSelectedItemPosition;
     private CharSequence[] mUsersAvailableNicknames;
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
             mListener = (FragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
+                    + " must implement DialogInteractionListener");
         }
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mCurrentUser = (User) ParseUser.getCurrentUser();
@@ -193,14 +208,15 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
             mItemRowCount = savedInstanceState.getInt(STATE_ROW_COUNT);
             mDateSelected = DateUtils.parseLongToDate(savedInstanceState.getLong(STATE_DATE_SELECTED));
             mPurchaseUsersInvolved = savedInstanceState.getBooleanArray(STATE_PURCHASE_USERS_INVOLVED);
-            mCurrencySelected = savedInstanceState.getString(STATE_CURRENCY_SELECTED);
-            mStoreSelected = savedInstanceState.getString(STATE_STORE_SELECTED);
+            mCurrencySelected = savedInstanceState.getString(STATE_CURRENCY_SELECTED, mCurrentGroupCurrency);
+            mStoreSelected = savedInstanceState.getString(STATE_STORE_SELECTED, "");
             mIsSaving = savedInstanceState.getBoolean(STATE_IS_SAVING);
             mIsFetchingExchangeRates = savedInstanceState.getBoolean(STATE_IS_FETCHING_RATES);
             if (USE_CUSTOM_CAMERA) {
-                mReceiptImagePaths = savedInstanceState.getStringArrayList(STATE_RECEIPT_IMAGES_PATHS);
+                ArrayList<String> imagePaths = savedInstanceState.getStringArrayList(STATE_RECEIPT_IMAGES_PATHS);
+                mReceiptImagePaths = imagePaths != null ? imagePaths : new ArrayList<String>();
             }
-            mReceiptImagePath = savedInstanceState.getString(STATE_RECEIPT_IMAGES_PATH);
+            mReceiptImagePath = savedInstanceState.getString(STATE_RECEIPT_IMAGES_PATH, "");
         } else {
             mItemRowCount = 1;
             mDateSelected = new Date();
@@ -212,7 +228,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         outState.putInt(STATE_ROW_COUNT, mItemRowCount);
@@ -225,11 +241,12 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         if (USE_CUSTOM_CAMERA) {
             outState.putStringArrayList(STATE_RECEIPT_IMAGES_PATHS, mReceiptImagePaths);
         }
-        outState.putString(STATE_RECEIPT_IMAGES_PATH,mReceiptImagePath);
+        outState.putString(STATE_RECEIPT_IMAGES_PATH, mReceiptImagePath);
     }
 
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_purchase_add_edit, container, false);
         findViews(rootView);
@@ -238,7 +255,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     @CallSuper
-    void findViews(View rootView) {
+    void findViews(@NonNull View rootView) {
         mTextViewPickDate = (TextView) rootView.findViewById(R.id.tv_date);
         mTextViewPickStore = (TextView) rootView.findViewById(R.id.tv_store);
         mLayoutTotalItemRow = (LinearLayout) rootView.findViewById(R.id.ll_items);
@@ -253,7 +270,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         mTextViewPickDate.setOnClickListener(new View.OnClickListener() {
@@ -272,7 +289,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         });
 
         if (TextUtils.isEmpty(mStoreSelected)) {
-            setStore(mCurrentUser.getStoresFavoriteFirstInList(getString(R.string.dialog_store_other)), false);
+            setStore(mCurrentUser.getStoresFavoriteFirstInList(), false);
         } else {
             setStore(mStoreSelected, false);
         }
@@ -288,8 +305,8 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
             }
         });
 
-        mRecyclerAdapter = new PurchaseAddUsersInvolvedRecyclerAdapter(getActivity(),
-                R.layout.row_users_involved_list, mUsersAvailableParse, this);
+        mRecyclerAdapter = new PurchaseUsersInvolvedRecyclerAdapter(getActivity(),
+                mUsersAvailableParse, this);
         mRecyclerViewUsersInvolved.setLayoutManager(new LinearLayoutManager(getActivity(),
                 LinearLayoutManager.HORIZONTAL, false));
         mRecyclerViewUsersInvolved.setHasFixedSize(true);
@@ -302,7 +319,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         mSpinnerCurrency.setAdapter(mSpinnerCurrencySelectionAdapter);
         mSpinnerCurrency.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemSelected(@NonNull AdapterView<?> parent, View view, int position, long id) {
                 String currencyCode = (String) parent.getItemAtPosition(position);
                 handleCurrencyChange(currencyCode);
             }
@@ -316,7 +333,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
 
         mTextViewExchangeRate.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(@NonNull View v) {
                 showManualExchangeRateSelectorDialog(((TextView) v).getText().toString());
             }
         });
@@ -330,19 +347,19 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
 
     private void showDatePickerDialog() {
         DatePickerDialogFragment datePickerDialogFragment = new DatePickerDialogFragment();
-        datePickerDialogFragment.show(getFragmentManager(), "date_picker");
+        datePickerDialogFragment.show(getFragmentManager(), DATE_PICKER_DIALOG);
     }
 
-    private void showStorePickerDialog(String defaultStore) {
+    private void showStorePickerDialog(@NonNull String defaultStore) {
         StoreSelectionDialogFragment storeSelectionDialogFragment = StoreSelectionDialogFragment
                 .newInstance(defaultStore);
-        storeSelectionDialogFragment.show(getFragmentManager(), "store_selector");
+        storeSelectionDialogFragment.show(getFragmentManager(), STORE_SELECTOR_DIALOG);
     }
 
-    private void showManualExchangeRateSelectorDialog(String exchangeRate) {
+    private void showManualExchangeRateSelectorDialog(@NonNull String exchangeRate) {
         ManualExchangeRateDialogFragment manualExchangeRateDialogFragment =
                 ManualExchangeRateDialogFragment.newInstance(exchangeRate);
-        manualExchangeRateDialogFragment.show(getFragmentManager(), "manual_exchange_rate");
+        manualExchangeRateDialogFragment.show(getFragmentManager(), MANUAL_EXCHANGE_RATE_DIALOG);
     }
 
     void revealFab() {
@@ -352,14 +369,14 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     /**
      * Sets the currency spinner to the position of the specified currency code.
      *
-     * @param currencyCode
+     * @param currencyCode the currency code to set the spinner to
      */
     final void setCurrency(String currencyCode) {
         int position = mSpinnerCurrencySelectionAdapter.getPosition(currencyCode);
         mSpinnerCurrency.setSelection(position);
     }
 
-    private void handleCurrencyChange(String currencyCode) {
+    private void handleCurrencyChange(@NonNull String currencyCode) {
         mCurrencySelected = currencyCode;
         int maxFractionDigits = MoneyUtils.getMaximumFractionDigits(currencyCode);
 
@@ -408,11 +425,11 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         }
     }
 
-    private void setTotalValue(BigDecimal totalValue) {
+    private void setTotalValue(@NonNull BigDecimal totalValue) {
         mTextViewTotalValue.setText(MoneyUtils.formatMoneyNoSymbol(totalValue, mCurrencySelected));
     }
 
-    private void setMyShareValue(BigDecimal myShareValue) {
+    private void setMyShareValue(@NonNull BigDecimal myShareValue) {
         mTextViewMyShareValue.setText(MoneyUtils.formatMoneyNoSymbol(myShareValue,
                 mCurrencySelected));
         mTextViewMyShareCurrency.setText(mCurrencySelected);
@@ -431,9 +448,9 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     /**
-     * Called from activity when user set a manual exchange rate in the dialog
+     * Sets the user set currency exchange rate to the member variable and currency spinner.
      *
-     * @param exchangeRate
+     * @param exchangeRate the currency exchange rate to set
      */
     public void onExchangeRateSet(float exchangeRate) {
         BigDecimal roundedExchangeRate = MoneyUtils.roundToFractionDigits(
@@ -460,21 +477,24 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     /**
-     * Called from activity when helper failed to fetch rates
+     * Removes the retained helper fragment and indicates that there is no long a currency fetch
+     * going on.
      *
      * @param errorMessage the network error message
      */
-    public void onRatesFetchFailed(String errorMessage) {
+    public void onRatesFetchFailed(@NonNull String errorMessage) {
         HelperUtils.removeHelper(getFragmentManager(), RATES_HELPER);
         mIsFetchingExchangeRates = false;
     }
 
     /**
-     * Called from activity when helper successfully fetched currency rates
+     * Removes the retained helper fragment and saves the fetched currencies in SharedPrefenreces.
+     * <p/>
+     * Sets the currency spinner to the exchange rate selected.
      *
-     * @param exchangeRates
+     * @param exchangeRates the fetched exchange rates
      */
-    public void onRatesFetched(Map<String, Float> exchangeRates) {
+    public void onRatesFetched(@NonNull Map<String, Float> exchangeRates) {
         HelperUtils.removeHelper(getFragmentManager(), RATES_HELPER);
 
         mIsFetchingExchangeRates = false;
@@ -503,9 +523,10 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     /**
      * Adds a new item row and sets the appropriate listeners.
      *
-     * @param idCounter int that is used to give the views unique ids.
-     * @return the newly created Item Object
+     * @param idCounter the number used to give the views unique ids
+     * @return the newly instantiated {@link ItemRow}
      */
+    @NonNull
     final ItemRow addNewItemRow(int idCounter) {
         View itemRowView = getActivity().getLayoutInflater()
                 .inflate(R.layout.row_add_purchase, mLayoutTotalItemRow, false);
@@ -548,7 +569,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         ListCheckBox cbEnabled = (ListCheckBox) itemRowView.findViewById(R.id.cb_item_enabled);
         cbEnabled.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(@NonNull View v) {
                 ListCheckBox cb = (ListCheckBox) v;
                 mSelectedItemPosition = Utils.getViewPositionFromTag(v);
 
@@ -561,12 +582,14 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         });
         cbEnabled.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public boolean onLongClick(View v) {
+            public boolean onLongClick(@NonNull View v) {
                 ListCheckBox cb = (ListCheckBox) v;
                 mSelectedItemPosition = Utils.getViewPositionFromTag(v);
 
                 boolean[] usersChecked = cb.getUsersChecked();
-                showUserPickerDialog(mUsersAvailableNicknames, usersChecked);
+                if (usersChecked != null) {
+                    showUserPickerDialog(mUsersAvailableNicknames, usersChecked);
+                }
 
                 return true;
             }
@@ -582,7 +605,8 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
             cbEnabled.updateUsersCheckedAfterCheckedChange(buyerPosition, mPurchaseUsersInvolved);
         }
 
-        itemRowView.setOnClickListener(null); // SwipeDismissTouchListener doesn't work without an OnClickListener
+        // SwipeDismissTouchListener doesn't work without an OnClickListener
+        itemRowView.setOnClickListener(null);
         itemRowView.setOnTouchListener(new SwipeDismissTouchListener(itemRowView, null,
                 new SwipeDismissTouchListener.DismissCallbacks() {
                     @Override
@@ -591,7 +615,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
                     }
 
                     @Override
-                    public void onDismiss(View view, Object token) {
+                    public void onDismiss(@NonNull View view, Object token) {
                         int position = Utils.getViewPositionFromTag(view);
 
                         mLayoutTotalItemRow.removeView(view);
@@ -612,7 +636,8 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         return itemRow;
     }
 
-    private void showUserPickerDialog(CharSequence[] usersAvailable, boolean[] usersChecked) {
+    private void showUserPickerDialog(@NonNull CharSequence[] usersAvailable,
+                                      @NonNull boolean[] usersChecked) {
         PurchaseUserSelectionDialogFragment purchaseUserSelectionDialogFragment =
                 PurchaseUserSelectionDialogFragment.newInstance(usersAvailable, usersChecked);
         purchaseUserSelectionDialogFragment.show(getFragmentManager(), "user_picker");
@@ -620,7 +645,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
 
     /**
      * Renumbers ids and tags after a row was dismissed. Needed for proper recreation and correct
-     * determination of itemRow position
+     * determination of the position of an item row.
      */
     private void resetIdsAndTags() {
         for (int i = 0; i < mItemRows.size(); i++) {
@@ -668,8 +693,10 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         for (ItemRow itemRow : mItemRows) {
             itemRow.setPriceImeOptions(EditorInfo.IME_ACTION_NEXT);
         }
-        ItemRow lastItemRow = Utils.getLastInNonEmptyList(mItemRows);
-        lastItemRow.setPriceImeOptions(EditorInfo.IME_ACTION_DONE);
+        ItemRow lastItemRow = Utils.getLastInList(mItemRows);
+        if (lastItemRow != null) {
+            lastItemRow.setPriceImeOptions(EditorInfo.IME_ACTION_DONE);
+        }
     }
 
     final void fetchUsersAvailable() {
@@ -677,17 +704,12 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     @Override
-    public void onUsersLocalQueried(List<ParseUser> users) {
+    public void onUsersLocalQueried(@NonNull List<ParseUser> users) {
         setupUserLists(users);
     }
 
-    /**
-     * sets up the class wide users lists
-     *
-     * @param users
-     */
     @CallSuper
-    void setupUserLists(List<ParseUser> users) {
+    void setupUserLists(@NonNull List<ParseUser> users) {
         List<ParseUser> usersSorted = sortUserList(users);
         setupUsersAvailable(usersSorted);
         if (mPurchaseUsersInvolved == null) {
@@ -697,7 +719,8 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         mRecyclerAdapter.notifyDataSetChanged();
     }
 
-    private List<ParseUser> sortUserList(List<ParseUser> users) {
+    @NonNull
+    private List<ParseUser> sortUserList(@NonNull List<ParseUser> users) {
         users.remove(mCurrentUser);
         Collections.sort(users, new ComparatorParseUserIgnoreCase());
         users.add(0, mCurrentUser);
@@ -705,7 +728,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         return users;
     }
 
-    private void setupUsersAvailable(List<ParseUser> users) {
+    private void setupUsersAvailable(@NonNull List<ParseUser> users) {
         // list with user names and list with ParseUser objects
         mUsersAvailableParse.clear();
         int usersSize = users.size();
@@ -718,17 +741,13 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     /**
-     * Different implementations in Add- and EditFragment. In AddFragment the default purchase wide
-     * usersInvolved will equal to the usersAvailable. in the EditFragment they will be set
-     * according to the values in the original purchase.
+     * Different implementations in Add- and EditFragment. In {@link PurchaseAddFragment} the
+     * default purchase wide usersInvolved will equal to the usersAvailable. in the
+     * {@link PurchaseEditFragment} they  will be set according to the values in the original
+     * purchase.
      */
     protected abstract void setupPurchaseUsersInvolved();
 
-    /**
-     * Callback when a user avatar is clicked. Adds/deletes user to the purchase wide usersInvolved
-     *
-     * @param position
-     */
     @Override
     public void onPurchaseUserClick(int position) {
         if (mPurchaseUsersInvolved[position]) {
@@ -757,7 +776,8 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     /**
-     * The user needs to have at least one user selected.
+     * Returns whether the user clicked is the last one checked. The user needs to select at least
+     * one user.
      *
      * @return whether a clicked checked user is the only one checked
      */
@@ -772,12 +792,12 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     /**
-     * Gets called from the activity when the dialog for setting the usersInvolved for an item is
-     * closed.
+     * Sets the users involved for an item row that were selected by the user in the dialog.
+     * Infers the correct users from the users available member variable.
      *
-     * @param usersInvolvedInt the users selected in the dialog
+     * @param usersInvolvedInt the users involved to set for the item row
      */
-    public void onItemUsersInvolvedSet(List<Integer> usersInvolvedInt) {
+    public void onItemUsersInvolvedSet(@NonNull List<Integer> usersInvolvedInt) {
         List<ParseUser> usersInvolved = new ArrayList<>(usersInvolvedInt.size());
         for (Integer i : usersInvolvedInt) {
             usersInvolved.add(mUsersAvailableParse.get(i));
@@ -799,9 +819,9 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     /**
-     * Checks if a user is unselected in ALL items' usersInvolved. If yes, unselect user from
-     * purchase wide usersInvolved. If user is selected in at least one item, select him in
-     * purchase wide usersInvolved as well.
+     * Checks if a user is unselected in ALL items' users involved. If yes, un-selects user from
+     * purchase wide users involved. If user is selected in at least one item, selects him in
+     * purchase wide users involved as well.
      */
     private void updatePurchaseUsersInvolved() {
         boolean[] usersInvolved = new boolean[mUsersAvailableParse.size()];
@@ -837,22 +857,23 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     /**
-     * Sets the datePicker to the given date and update the class wide DateSelected variable.
+     * Sets the date picker to the given date and updates the class wide date selected variable.
      *
-     * @param dateSelected
+     * @param dateSelected the selected date
      */
-    public void setDate(Date dateSelected) {
+    public void setDate(@NonNull Date dateSelected) {
         mTextViewPickDate.setText(DateUtils.formatDateLong(dateSelected));
         mDateSelected = dateSelected;
     }
 
     /**
-     * Sets the Store TextView to the selected date and updates the class wide StoreSelected
-     * variable.
+     * Sets the store {@link TextView} to the selected date and updates the class wide store
+     * selected variable. If the stores was added by manually by the user, it will save it in the
+     * user's list of stores.
      *
-     * @param storeSelected
+     * @param storeSelected the selected store
      */
-    public void setStore(String storeSelected, boolean manuallyEntered) {
+    public void setStore(@NonNull String storeSelected, boolean manuallyEntered) {
         mTextViewPickStore.setText(storeSelected);
         mStoreSelected = storeSelected;
 
@@ -888,6 +909,10 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         }
     }
 
+    /**
+     * Checks whether the permission to take an image are granted and if yes initiates the creation
+     * of the image file.
+     */
     public void captureImage() {
         if (!hasCameraHardware()) {
             MessageUtils.showBasicSnackbar(mButtonAddRow, getString(R.string.toast_no_camera));
@@ -1000,7 +1025,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, @NonNull Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
@@ -1021,7 +1046,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         }
     }
 
-    private void setReceiptImagePaths(List<String> receiptImagePaths) {
+    private void setReceiptImagePaths(@NonNull List<String> receiptImagePaths) {
         mReceiptImagePaths.clear();
 
         if (!receiptImagePaths.isEmpty()) {
@@ -1043,6 +1068,9 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         }
     }
 
+    /**
+     * Replaces the current fragment with a new instance of {@link PurchaseReceiptBaseFragment}.
+     */
     public void showReceiptFragment() {
         FragmentManager fragmentManager = getFragmentManager();
         PurchaseReceiptBaseFragment receiptFragment = getReceiptFragment();
@@ -1055,11 +1083,14 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
 
     protected abstract PurchaseReceiptBaseFragment getReceiptFragment();
 
+    /**
+     * Deletes the receipt file of the purchase.
+     */
     public abstract void deleteReceipt();
 
     /**
-     * Gets called from the activity when the "save" action item is clicked. Initiates the save of
-     * the purchase.
+     * Initiates the save of the purchase if there is not currently a save ongoing and exchange
+     * rate data is available for foreign currencies.
      */
     public void savePurchase(boolean saveAsDraft) {
         if (mIsFetchingExchangeRates) {
@@ -1099,9 +1130,11 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     /**
-     * Reads values in editTexts and saves them in the Item objects.
+     * Returns whether all the fields in the item rows have a valid value.
      *
-     * @return true if all required fields have a value, false if not
+     * @param acceptEmptyFields whether to accept empty fields or not, useful for drafts where
+     *                          empty fields are allowed
+     * @return whether all required fields have a valid value
      */
     private boolean setItemValues(boolean acceptEmptyFields) {
         // Read values from editTexts, check if items are complete and enabled. If they are, add
@@ -1144,12 +1177,19 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     /**
-     * AddFragment creates a new purchase and EditFragment updates the original one
+     * {@link PurchaseAddFragment} creates a new purchase and {@link PurchaseEditFragment} updates
+     * the original one.
      */
     protected abstract void setPurchase();
 
+    /**
+     * Provides an error handler for {@link ParseException}. Passes the expection to the generic
+     * error handler, shows the user an appropriate error message andhides loading indicators.
+     *
+     * @param e the {@link ParseException} to handle
+     */
     @CallSuper
-    public void onParseError(ParseException e) {
+    public void onParseError(@NonNull ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
 
@@ -1157,12 +1197,12 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         mListener.progressCircleHide();
     }
 
-    void showErrorSnackbar(String message) {
+    void showErrorSnackbar(@NonNull String message) {
         MessageUtils.showBasicSnackbar(mButtonAddRow, message);
     }
 
     /**
-     * Called from activity when helper saved and pinned new purchase
+     * Sets the activity result and starts the final animation of the {@link FABProgressCircle}.
      */
     public void onPurchaseSavedAndPinned() {
         mIsSaving = false;
@@ -1176,7 +1216,10 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     /**
-     * Called from activity when helper fails to save purchase
+     * Passes the {@link ParseException} to the error handler and removes the retained helper
+     * fragment
+     *
+     * @param e the {@link ParseException} thrown in the process
      */
     public void onPurchaseSaveFailed(ParseException e) {
         onParseError(e);
@@ -1184,8 +1227,9 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     /**
-     * Save purchase as local draft in AddFragment. Save changes to draft in EditDraftFragment.
-     * Do nothing in EditFragment (option so save as draft n/a)
+     * Saves the purchase as local draft in {@link PurchaseAddFragment}. Saves changes to draft in
+     * {@link PurchaseEditDraftFragment}. Does nothing in {@link PurchaseEditFragment} (option so
+     * save as draft n/a).
      */
     protected abstract void savePurchaseAsDraft();
 
@@ -1196,7 +1240,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
                 .centerCrop()
                 .into(new SimpleTarget<byte[]>(Receipt.WIDTH, Receipt.HEIGHT) {
                     @Override
-                    public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
+                    public void onResourceReady(@NonNull byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
                         mPurchase.setReceiptData(resource);
                         pinPurchaseAsDraft();
                     }
@@ -1204,13 +1248,14 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     /**
-     * Sets new random draft id if not already set and swaps parsefile to bytearray.
+     * Sets new random draft id of the purchase if is not already set and swaps the parse file to a
+     * byte array.
      */
     final void pinPurchaseAsDraft() {
         mPurchase.setRandomDraftId();
         mPurchase.pinInBackground(new SaveCallback() {
             @Override
-            public void done(ParseException e) {
+            public void done(@Nullable ParseException e) {
                 if (e != null) {
                     onParseError(e);
                     return;
@@ -1226,6 +1271,9 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         finishPurchase();
     }
 
+    /**
+     * Sets the activity result to discarded and finishes.
+     */
     public void onDiscardPurchaseSelected() {
         setResultForSnackbar(PURCHASE_DISCARDED);
         finishPurchase();
@@ -1257,6 +1305,10 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         }
     }
 
+    /**
+     * Finishes the activity after the return transition and delete all images the might have
+     * taken.
+     */
     public final void finishPurchase() {
         ActivityCompat.finishAfterTransition(getActivity());
         deleteTakenImages();
@@ -1281,13 +1333,14 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     /**
-     * Gets the ParseUsers for a given boolean array. Needed because the usersInvolved (both
-     * purchase wide and for each item) are stored in boolean arrays.
+     * Returns the {@link User} objects for a given boolean array. Needed because the users involved
+     * (both purchase wide and for each item) are stored in boolean arrays.
      *
-     * @param usersInvolvedBoolean
-     * @return List with ParseUser objects
+     * @param usersInvolvedBoolean the users involved as booleans
+     * @return the corresponding {@link User} objects for the booleans
      */
-    final List<ParseUser> getParseUsersInvolvedFromBoolean(boolean[] usersInvolvedBoolean) {
+    @NonNull
+    final List<ParseUser> getParseUsersInvolvedFromBoolean(@NonNull boolean[] usersInvolvedBoolean) {
         final List<ParseUser> usersInvolved = new ArrayList<>();
         for (int i = 0, mUsersAvailableParseSize = mUsersAvailableParse.size();
              i < mUsersAvailableParseSize; i++) {
@@ -1305,15 +1358,38 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         mListener = null;
     }
 
+    /**
+     * Defines the interaction with the hosting {@link Activity}.
+     */
     public interface FragmentInteractionListener extends BaseFragmentInteractionListener {
+        /**
+         * Handles the update of action bar menu of the activity.
+         *
+         * @param hasReceiptFile whether to show the option to show the receipt file or not
+         */
         void updateActionBarMenu(boolean hasReceiptFile);
 
+        /**
+         * Indicates that the {@link FloatingActionButton} should be revealed and if or without the
+         * loading animation
+         *
+         * @param isSaving whether to show the loading animation or not
+         */
         void showFab(boolean isSaving);
 
+        /**
+         * Indicates to start the loading animation of the {@link FABProgressCircle}.
+         */
         void progressCircleShow();
 
+        /**
+         * Indicates to start the final loading animation of the {@link FABProgressCircle}.
+         */
         void progressCircleStartFinal();
 
+        /**
+         * Indicates to hide the loading animation of the {@link FABProgressCircle}.
+         */
         void progressCircleHide();
     }
 }

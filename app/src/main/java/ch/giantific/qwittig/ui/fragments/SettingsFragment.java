@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 
@@ -16,6 +20,8 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.text.TextUtils;
 import android.view.View;
@@ -52,6 +58,13 @@ import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
+/**
+ * Displays the main settings of the app and listens for changes.
+ * <p/>
+ * Subclass of {@link PreferenceFragment}.
+ * <p/>
+ * Implements {@link SharedPreferences.OnSharedPreferenceChangeListener}.
+ */
 public class SettingsFragment extends PreferenceFragment implements
         SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -90,13 +103,13 @@ public class SettingsFragment extends PreferenceFragment implements
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
             mListener = (FragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
+                    + " must implement DialogInteractionListener");
         }
     }
 
@@ -172,11 +185,14 @@ public class SettingsFragment extends PreferenceFragment implements
         });
     }
 
+    /**
+     * Checks if the user is the last one in the group, if yes, tells him/her that the group will
+     * be deleted.
+     */
     private void showGroupLeaveDialog() {
-        // check if user is the only one in the group, if yes delete the group
         LocalQuery.queryUsers(new LocalQuery.UserLocalQueryListener() {
             @Override
-            public void onUsersLocalQueried(List<ParseUser> users) {
+            public void onUsersLocalQueried(@NonNull List<ParseUser> users) {
                 String message = users.size() == 1 &&
                         users.get(0).getObjectId().equals(mCurrentUser.getObjectId()) ?
                         getString(R.string.dialog_group_leave_delete_message) :
@@ -190,7 +206,8 @@ public class SettingsFragment extends PreferenceFragment implements
     }
 
     /**
-     * Deletes the currentUser from the currentGroup.
+     * Removes the current user from the current group if he/she is not a test user and his/her
+     * balance is zero.
      */
     public void onLeaveGroupSelected() {
         if (ParseUtils.isTestUser(mCurrentUser)) {
@@ -254,8 +271,8 @@ public class SettingsFragment extends PreferenceFragment implements
     }
 
     /**
-     * Starts a new settlement in reaction to the user wanting to leave the group with a non-zero
-     * balance.
+     * Starts {@link FinanceActivity} to calculate a new settlement in reaction to the user wanting
+     * to leave the group with a non-zero balance.
      */
     public void onStartSettlementSelected() {
         Intent intent = new Intent(getActivity(), FinanceActivity.class);
@@ -325,7 +342,8 @@ public class SettingsFragment extends PreferenceFragment implements
         }
     }
 
-    private void setupListPreference(final ListPreference pref, String selectedValue) {
+    private void setupListPreference(@NonNull final ListPreference pref,
+                                     @Nullable String selectedValue) {
         // Set selected value from parse.com database.
         if (selectedValue != null) {
             pref.setValue(selectedValue);
@@ -337,7 +355,7 @@ public class SettingsFragment extends PreferenceFragment implements
         // Update the summary with currently selected value
         pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
-            public boolean onPreferenceChange(Preference preference, Object o) {
+            public boolean onPreferenceChange(@NonNull Preference preference, @NonNull Object o) {
                 int index = pref.findIndexOfValue(o.toString());
 
                 if (index >= 0) {
@@ -389,11 +407,10 @@ public class SettingsFragment extends PreferenceFragment implements
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, @NonNull Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         final View rootView = getView();
-
         switch (requestCode) {
             case BaseActivity.INTENT_REQUEST_SETTINGS_PROFILE:
                 switch (resultCode) {
@@ -424,7 +441,7 @@ public class SettingsFragment extends PreferenceFragment implements
     }
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, @NonNull String key) {
         switch (key) {
             case PREF_GROUP_CURRENT:
                 setCurrentGroupInParse(key);
@@ -466,7 +483,7 @@ public class SettingsFragment extends PreferenceFragment implements
     }
 
     /**
-     * Starts new helper fragment to log out the user.
+     * Logs the current user out with the help of a retained helper fragment.
      */
     public void logOutUser() {
         if (!Utils.isConnected(getActivity())) {
@@ -478,7 +495,7 @@ public class SettingsFragment extends PreferenceFragment implements
         logOutWithHelper();
     }
 
-    private void showProgressDialog(String message) {
+    private void showProgressDialog(@NonNull String message) {
         mProgressDialog = MessageUtils.getProgressDialog(getActivity(), message);
         mProgressDialog.show();
     }
@@ -499,7 +516,7 @@ public class SettingsFragment extends PreferenceFragment implements
     }
 
     /**
-     * Handles a successful logout attempt. Hides the progress bar and finishes.
+     * Hides the {@link ProgressDialog}, sets the activity result to logout and finishes.
      */
     public void onLoggedOut() {
         dismissProgressDialog();
@@ -525,11 +542,14 @@ public class SettingsFragment extends PreferenceFragment implements
         HelperUtils.removeHelper(getFragmentManager(), LOGOUT_HELPER);
     }
 
-    private void onParseError(String errorMessage) {
+    private void onParseError(@NonNull String errorMessage) {
         dismissProgressDialog();
         MessageUtils.showBasicSnackbar(getView(), errorMessage);
     }
 
+    /**
+     * Shows a dialog that asks the user if he/she really wants to delete the account.
+     */
     public void deleteAccount() {
         if (ParseUtils.isTestUser(mCurrentUser)) {
             mListener.showAccountCreateDialog();
@@ -545,7 +565,7 @@ public class SettingsFragment extends PreferenceFragment implements
     }
 
     /**
-     * Deletes the account of a user by using a helper fragment for the task.
+     * Deletes the account of a user by using a retained helper fragment for the task.
      */
     public void onDeleteAccountSelected() {
         if (ParseUtils.isTestUser(mCurrentUser)) {
@@ -579,7 +599,8 @@ public class SettingsFragment extends PreferenceFragment implements
 
     /**
      * Handles the failed attempt to delete a user. Passes the error to the generic Parse error
-     * handler, hides the progress bar, removes the helper fragment and shows the user the error.
+     * handler, hides the progress bar, removes the retained helper fragment and shows the user the
+     * error.
      *
      * @param e the ParseException thrown during the delete attempt
      */
@@ -602,6 +623,13 @@ public class SettingsFragment extends PreferenceFragment implements
         mListener = null;
     }
 
+    /**
+     * Defines the interaction with the hosting {@link Activity}.
+     * <p/>
+     * Extends {@link BaseFragment.BaseFragmentInteractionListener}.
+     * <p/>
+     * Currently a stub.
+     */
     public interface FragmentInteractionListener extends BaseFragment.BaseFragmentInteractionListener {
     }
 }

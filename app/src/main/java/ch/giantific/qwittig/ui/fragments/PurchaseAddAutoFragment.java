@@ -1,14 +1,21 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +32,11 @@ import ch.giantific.qwittig.utils.Utils;
 
 
 /**
- * A placeholder fragment containing a simple view.
+ * Displays a {@link ProgressBar} until the ocr process has finished on the server and the results
+ * are populated in item rows. If the user is in trial mode, it will increase the trial counter
+ * when he/she saves the purchase.
+ * <p/>
+ * Subclass of {@link PurchaseAddFragment}.
  */
 public class PurchaseAddAutoFragment extends PurchaseAddFragment {
 
@@ -37,6 +48,13 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
     private boolean mOcrValuesAreSet;
     private boolean mInTrialMode;
 
+    /**
+     * Returns a new {@link PurchaseAddAutoFragment}.
+     *
+     * @param inTrialMode whether the user is in trial mode or not
+     * @return a new {@link PurchaseAddAutoFragment}
+     */
+    @NonNull
     public static PurchaseAddAutoFragment newInstance(boolean inTrialMode) {
         PurchaseAddAutoFragment purchaseAddAutoFragment = new PurchaseAddAutoFragment();
         Bundle args = new Bundle();
@@ -46,7 +64,7 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
@@ -66,14 +84,14 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         outState.putBoolean(STATE_ITEMS_SET, mOcrValuesAreSet);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_purchase_add_auto, container, false);
 
@@ -83,7 +101,7 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
     }
 
     @Override
-    void findViews(View rootView) {
+    void findViews(@NonNull View rootView) {
         super.findViews(rootView);
 
         mProgressView = rootView.findViewById(R.id.ll_progress);
@@ -107,7 +125,7 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         if (mOcrValuesAreSet) {
             super.onCreateOptionsMenu(menu, inflater);
         } else {
@@ -130,7 +148,7 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, @NonNull Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
@@ -173,16 +191,26 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
         }
     }
 
-    public void onOcrFinished(PurchaseRest purchaseRest) {
+    /**
+     * Populates the results from the server.
+     *
+     * @param purchaseRest the ocr result from the server
+     */
+    public void onOcrFinished(@NonNull PurchaseRest purchaseRest) {
         setValuesFromOcr(purchaseRest);
     }
 
-    public void onOcrFailed(String errorMessage) {
+    /**
+     * Displays an error message to user and shows the main screen.
+     *
+     * @param errorMessage the error message received from the server
+     */
+    public void onOcrFailed(@NonNull String errorMessage) {
         MessageUtils.showBasicSnackbar(mButtonAddRow, errorMessage);
         showMainScreen();
     }
 
-    private void setValuesFromOcr(PurchaseRest purchaseRest) {
+    private void setValuesFromOcr(@NonNull PurchaseRest purchaseRest) {
         // set date
         //setDateSelected(purchaseRest.getDate());
         // set store

@@ -1,7 +1,13 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.helpers;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.parse.LogOutCallback;
 import com.parse.ParseException;
@@ -12,10 +18,13 @@ import com.parse.SaveCallback;
 import ch.giantific.qwittig.data.parse.models.Installation;
 
 /**
- * Created by fabio on 10.12.14.
+ * Resets the device's {@link ParseInstallation} object and logs out the current user.
+ * <p/>
+ * Subclass of {@link BaseHelper}.
  */
 public class LogoutHelper extends BaseHelper {
 
+    @Nullable
     private HelperInteractionListener mListener;
 
     public LogoutHelper() {
@@ -23,13 +32,13 @@ public class LogoutHelper extends BaseHelper {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
             mListener = (HelperInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
+                    + " must implement DialogInteractionListener");
         }
     }
 
@@ -44,13 +53,15 @@ public class LogoutHelper extends BaseHelper {
         handleInstallation();
     }
 
+    /**
+     * Un-subscribes the device from all notification channels and removes the current user from the
+     * installation object, so that the device does not keep receiving push notifications.
+     */
     final void handleInstallation() {
-        // Unsubscribe from all notification channels and remove currentUser from installation
-        // object, so that the device does not keep receiving push notifications.
         ParseInstallation installation = Installation.getResetInstallation();
         installation.saveInBackground(new SaveCallback() {
             @Override
-            public void done(ParseException e) {
+            public void done(@Nullable ParseException e) {
                 if (e != null) {
                     onInstallationSaveFailed(e);
                     return;
@@ -61,7 +72,7 @@ public class LogoutHelper extends BaseHelper {
         });
     }
 
-    void onInstallationSaveFailed(ParseException e) {
+    void onInstallationSaveFailed(@NonNull ParseException e) {
         if (mListener != null) {
             mListener.onLogoutFailed(e);
         }
@@ -93,9 +104,20 @@ public class LogoutHelper extends BaseHelper {
         mListener = null;
     }
 
+    /**
+     * Defines the actions to take after the user was logged out or the logout failed
+     */
     public interface HelperInteractionListener {
-        void onLogoutFailed(ParseException e);
+        /**
+         * Handles the failed logout of a user.
+         *
+         * @param e the {@link ParseException} thrown during the process
+         */
+        void onLogoutFailed(@NonNull ParseException e);
 
+        /**
+         * Handles a successful logout of the user.
+         */
         void onLoggedOut();
     }
 }

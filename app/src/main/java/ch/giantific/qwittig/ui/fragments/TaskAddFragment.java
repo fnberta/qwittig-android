@@ -1,12 +1,18 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -43,7 +49,11 @@ import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 
 /**
- * A placeholder fragment containing a simple view.
+ * Provides an interface for the user to add a new {@link Task}. Allows the selection of the time
+ * frame, the deadline and the users involved. The title of the task is set in the {@link Toolbar}
+ * of the hosting {@link Activity}.
+ * <p/>
+ * Subclass of {@link BaseFragment}.
  */
 public class TaskAddFragment extends BaseFragment implements
         LocalQuery.UserLocalQueryListener,
@@ -65,28 +75,30 @@ public class TaskAddFragment extends BaseFragment implements
     Date mDeadlineSelected;
     ArrayList<TaskUser> mUsersInvolved;
     StringResSpinnerAdapter mTimeFrameAdapter;
+    @NonNull
     private List<ParseUser> mUsersAvailable = new ArrayList<>();
     private TextView mTextViewDeadline;
     private RecyclerView mRecyclerViewUsers;
     private ItemTouchHelper mUsersItemTouchHelper;
     private User mCurrentUser;
     private Group mCurrentGroup;
+
     public TaskAddFragment() {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
             mListener = (FragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
+                    + " must implement DialogInteractionListener");
         }
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mCurrentUser = (User) ParseUser.getCurrentUser();
@@ -94,7 +106,8 @@ public class TaskAddFragment extends BaseFragment implements
 
         if (savedInstanceState != null) {
             mDeadlineSelected = DateUtils.parseLongToDate(savedInstanceState.getLong(STATE_DEADLINE_SELECTED));
-            mUsersInvolved = savedInstanceState.getParcelableArrayList(STATE_USERS_INVOLVED);
+            ArrayList<TaskUser> usersInvolved = savedInstanceState.getParcelableArrayList(STATE_USERS_INVOLVED);
+            mUsersInvolved = usersInvolved != null ? usersInvolved : new ArrayList<TaskUser>();
         } else {
             mDeadlineSelected = new Date();
             mUsersInvolved = new ArrayList<>();
@@ -102,7 +115,7 @@ public class TaskAddFragment extends BaseFragment implements
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         outState.putLong(STATE_DEADLINE_SELECTED, DateUtils.parseDateToLong(mDeadlineSelected));
@@ -110,7 +123,7 @@ public class TaskAddFragment extends BaseFragment implements
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_task_add, container, false);
 
@@ -144,7 +157,12 @@ public class TaskAddFragment extends BaseFragment implements
         datePickerDialogFragment.show(getFragmentManager(), "date_picker");
     }
 
-    public void setDeadline(Date deadline) {
+    /**
+     * Sets the deadline for the new task.
+     *
+     * @param deadline the deadline to set
+     */
+    public void setDeadline(@NonNull Date deadline) {
         mTextViewDeadline.setText(DateUtils.formatDateLong(deadline));
         mDeadlineSelected = deadline;
     }
@@ -153,14 +171,14 @@ public class TaskAddFragment extends BaseFragment implements
         mRecyclerViewUsers.setHasFixedSize(true);
         mRecyclerViewUsers.setLayoutManager(new LinearLayoutManager(getActivity()));
         mUsersRecyclerAdapter = new TaskUsersInvolvedRecyclerAdapter(getActivity(),
-                R.layout.row_task_users_involved, mUsersAvailable, mUsersInvolved, this);
+                mUsersAvailable, mUsersInvolved, this);
         mRecyclerViewUsers.setAdapter(mUsersRecyclerAdapter);
 
         mUsersItemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
                 ItemTouchHelper.UP | ItemTouchHelper.DOWN,
                 ItemTouchHelper.START | ItemTouchHelper.END) {
             @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder source, RecyclerView.ViewHolder target) {
+            public boolean onMove(RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder source, @NonNull RecyclerView.ViewHolder target) {
                 if (source.getItemViewType() != target.getItemViewType()) {
                     return false;
                 }
@@ -170,7 +188,7 @@ public class TaskAddFragment extends BaseFragment implements
             }
 
             @Override
-            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 mUsersRecyclerAdapter.onItemDismiss(viewHolder.getAdapterPosition());
             }
 
@@ -194,7 +212,7 @@ public class TaskAddFragment extends BaseFragment implements
         mSpinnerTimeFrame.setAdapter(mTimeFrameAdapter);
         mSpinnerTimeFrame.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemSelected(@NonNull AdapterView<?> parent, View view, int position, long id) {
                 int timeFrame = (int) parent.getItemAtPosition(position);
                 mTextViewDeadline.setVisibility(timeFrame == R.string.time_frame_as_needed ?
                         View.GONE : View.VISIBLE);
@@ -216,7 +234,7 @@ public class TaskAddFragment extends BaseFragment implements
     }
 
     @Override
-    public void onUsersLocalQueried(List<ParseUser> users) {
+    public void onUsersLocalQueried(@NonNull List<ParseUser> users) {
         mUsersAvailable.clear();
 
         if (!users.isEmpty()) {
@@ -261,7 +279,14 @@ public class TaskAddFragment extends BaseFragment implements
         mUsersRecyclerAdapter.notifyDataSetChanged();
     }
 
-    public void saveTask(String title) {
+    /**
+     * Saves the new {@link Task} object to the online Parse.com database and pins it to the local
+     * data store if the user is not a test user and the title is not empty. If it is a one-time
+     * task, checks if there is exactly one user involved selected.
+     *
+     * @param title the title of the new task
+     */
+    public void saveTask(@NonNull String title) {
         if (ParseUtils.isTestUser(mCurrentUser)) {
             mListener.showAccountCreateDialog();
             return;
@@ -284,15 +309,17 @@ public class TaskAddFragment extends BaseFragment implements
     }
 
     @NonNull
-    Task getTask(String title, String timeFrame, List<ParseUser> usersInvolved) {
+    Task getTask(@NonNull String title,
+                 @NonNull String timeFrame,
+                 @NonNull List<ParseUser> usersInvolved) {
         return new Task(mCurrentUser, title, mCurrentGroup, timeFrame, mDeadlineSelected,
                 usersInvolved);
     }
 
-    private void pinTask(final Task task) {
+    private void pinTask(@NonNull final Task task) {
         task.pinInBackground(Task.PIN_LABEL, new SaveCallback() {
             @Override
-            public void done(ParseException e) {
+            public void done(@Nullable ParseException e) {
                 if (e == null) {
                     task.saveEventually();
                     finish(TASK_SAVED);
@@ -321,6 +348,7 @@ public class TaskAddFragment extends BaseFragment implements
         }
     }
 
+    @NonNull
     final List<ParseUser> getUsersInvolved() {
         final List<ParseUser> parseUsers = new ArrayList<>();
 
@@ -334,6 +362,12 @@ public class TaskAddFragment extends BaseFragment implements
         return parseUsers;
     }
 
+    /**
+     * Sets the activity result depending on the action taken and finishes the hosting
+     * {@link Activity}.
+     *
+     * @param taskAction the task according to which to set the activity result
+     */
     public void finish(@TaskAction int taskAction) {
         Activity activity = getActivity();
         switch (taskAction) {
@@ -368,7 +402,7 @@ public class TaskAddFragment extends BaseFragment implements
     }
 
     /**
-     * The user needs to have at least one user selected.
+     * Returns whether the user has at least one user involved selected.
      *
      * @return whether a clicked checked user is the only one checked
      */
@@ -388,10 +422,14 @@ public class TaskAddFragment extends BaseFragment implements
     }
 
     @Override
-    public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+    public void onStartDrag(@NonNull RecyclerView.ViewHolder viewHolder) {
         mUsersItemTouchHelper.startDrag(viewHolder);
     }
 
+    /**
+     * Checks whether the user has made an changes to the data on the screen. If yes shows a
+     * dialog that asks if the changes should be discarded. If no, finishes.
+     */
     public void checkForChangesAndExit() {
         if (changesWereMade()) {
             showDiscardChangesDialog();
@@ -416,9 +454,25 @@ public class TaskAddFragment extends BaseFragment implements
         mListener = null;
     }
 
+    /**
+     * Defines the interaction with the hosting {@link Activity}.
+     * </p>
+     * Extends {@link BaseFragmentInteractionListener}.
+     */
     public interface FragmentInteractionListener extends BaseFragmentInteractionListener {
+        /**
+         * Gets the title of task.
+         *
+         * @return the title of the task
+         */
+        @NonNull
         String getTaskTitle();
 
+        /**
+         * Sets the title of the task.
+         *
+         * @param title the title to set
+         */
         void setTaskTitle(String title);
     }
 }

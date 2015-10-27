@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.activities;
 
 import android.annotation.TargetApi;
@@ -5,6 +9,8 @@ import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.transition.Transition;
@@ -21,13 +27,23 @@ import ch.giantific.qwittig.ui.fragments.SettingsGroupNewFragment;
 import ch.giantific.qwittig.ui.listeners.TransitionListenerAdapter;
 import ch.giantific.qwittig.utils.Utils;
 
+/**
+ * Hosts {@link SettingsGroupNewFragment} that allows to user to create a new group.
+ * <p/>
+ * Mostly handles transition animations and communication between dialogs and fragments. Handles
+ * the circle loading animation of the {@link FloatingActionButton}.
+ * <p/>
+ * Subclass of {@link BaseActivity}.
+ *
+ * @see FABProgressCircle
+ */
 public class SettingsGroupNewActivity extends BaseActivity implements
         SettingsGroupNewFragment.FragmentInteractionListener,
         FABProgressListener,
         CreateGroupHelper.HelperInteractionListener {
 
-    private static final String STATE_GROUP_NEW_FRAGMENT = "STATE_GROUP_NEW_FRAGMENT";
     public static final String RESULT_DATA_GROUP = "RESULT_DATA_GROUP";
+    private static final String STATE_GROUP_NEW_FRAGMENT = "STATE_GROUP_NEW_FRAGMENT";
     private static final String LOG_TAG = SettingsGroupNewActivity.class.getSimpleName();
     private SettingsGroupNewFragment mSettingsGroupNewFragment;
     private FloatingActionButton mFab;
@@ -35,7 +51,7 @@ public class SettingsGroupNewActivity extends BaseActivity implements
     private String mNewGroupName;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings_group_new);
 
@@ -74,7 +90,7 @@ public class SettingsGroupNewActivity extends BaseActivity implements
         Transition enter = getWindow().getEnterTransition();
         enter.addListener(new TransitionListenerAdapter() {
             @Override
-            public void onTransitionEnd(Transition transition) {
+            public void onTransitionEnd(@NonNull Transition transition) {
                 super.onTransitionEnd(transition);
                 transition.removeListener(this);
 
@@ -111,12 +127,12 @@ public class SettingsGroupNewActivity extends BaseActivity implements
     }
 
     @Override
-    public void onNewGroupCreated(Group newGroup, boolean invitingUser) {
+    public void onNewGroupCreated(@NonNull Group newGroup, boolean invitingUser) {
         mSettingsGroupNewFragment.onNewGroupCreated(newGroup, invitingUser);
     }
 
     @Override
-    public void onCreateNewGroupFailed(ParseException e) {
+    public void onCreateNewGroupFailed(@NonNull ParseException e) {
         mSettingsGroupNewFragment.onCreateNewGroupFailed(e);
     }
 
@@ -126,12 +142,12 @@ public class SettingsGroupNewActivity extends BaseActivity implements
     }
 
     @Override
-    public void onInviteUsersFailed(ParseException e) {
+    public void onInviteUsersFailed(@NonNull ParseException e) {
         mSettingsGroupNewFragment.onInviteUsersFailed(e);
     }
 
     @Override
-    public void finishGroupCreation(String newGroupName) {
+    public void finishGroupCreation(@NonNull String newGroupName) {
         mNewGroupName = newGroupName;
         mFabProgressCircle.beginFinalAnimation();
     }

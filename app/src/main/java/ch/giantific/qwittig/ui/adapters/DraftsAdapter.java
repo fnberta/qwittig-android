@@ -1,5 +1,11 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.adapters;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,18 +23,24 @@ import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 
 /**
- * Created by fabio on 15.03.15.
+ * Handles the display of open drafts.
+ * <p/>
+ * Subclass of {@link BaseAdapter}.
  */
 public class DraftsAdapter extends BaseAdapter {
 
-    private int mViewResource;
+    private static final int VIEW_RESOURCE = R.layout.row_drafts;
     private List<ParseObject> mDrafts;
     private String mCurrentGroupCurrency;
 
-    public DraftsAdapter(int viewResource, List<ParseObject> drafts) {
+    /**
+     * Constructs a new {@link DraftsAdapter}.
+     *
+     * @param drafts the drafts to to display
+     */
+    public DraftsAdapter(@NonNull List<ParseObject> drafts) {
         super();
 
-        mViewResource = viewResource;
         mDrafts = drafts;
     }
 
@@ -47,15 +59,23 @@ public class DraftsAdapter extends BaseAdapter {
         return position;
     }
 
+    /**
+     * Sets the current group currency field. As long this is not set, nothing will be displayed
+     * in the adapter.
+     *
+     * @param currentGroupCurrency the currency code to set
+     */
     public void setCurrentGroupCurrency(String currentGroupCurrency) {
         mCurrentGroupCurrency = currentGroupCurrency;
     }
 
+    @Nullable
     @Override
-    public View getView(final int position, View convertView, final ViewGroup parent) {
+    public View getView(final int position, @Nullable View convertView,
+                        @NonNull final ViewGroup parent) {
         final DraftRow draftRow;
         if (convertView == null) {
-            convertView = LayoutInflater.from(parent.getContext()).inflate(mViewResource, parent,
+            convertView = LayoutInflater.from(parent.getContext()).inflate(VIEW_RESOURCE, parent,
                     false);
             draftRow = new DraftRow(convertView);
             convertView.setTag(draftRow);
@@ -74,26 +94,49 @@ public class DraftsAdapter extends BaseAdapter {
         return convertView;
     }
 
+    /**
+     * Provides an adapter row that displays drafts.
+     */
     private static class DraftRow {
         private TextView mTextViewDate;
         private TextView mTextViewStore;
         private TextView mTestViewTotal;
 
-        public DraftRow(View view) {
+        /**
+         * Constructs a new {@link DraftRow}.
+         *
+         * @param view the inflated view
+         */
+        public DraftRow(@NonNull View view) {
             mTextViewDate = (TextView) view.findViewById(R.id.tv_date);
             mTextViewStore = (TextView) view.findViewById(R.id.tv_store);
             mTestViewTotal = (TextView) view.findViewById(R.id.tv_total_value);
         }
 
-        public void setDate(Date date) {
+        /**
+         * Sets the date of the draft.
+         *
+         * @param date the date to set
+         */
+        public void setDate(@NonNull Date date) {
             mTextViewDate.setText(DateUtils.formatMonthDayLineSeparated(date));
         }
 
-        public void setStore(String store) {
+        /**
+         * Sets the store of the draft.
+         *
+         * @param store the store to set
+         */
+        public void setStore(@NonNull String store) {
             mTextViewStore.setText(store);
         }
 
-        public void setTotal(String total) {
+        /**
+         * Sets the total price of the draft.
+         *
+         * @param total the total price to set
+         */
+        public void setTotal(@NonNull String total) {
             mTestViewTotal.setText(total);
         }
     }

@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.data.models;
 
 import android.support.annotation.NonNull;
@@ -6,10 +10,12 @@ import com.parse.ParseUser;
 
 import java.util.Date;
 
+import ch.giantific.qwittig.data.parse.models.Task;
 import ch.giantific.qwittig.data.parse.models.User;
 
 /**
- * Created by fabio on 13.09.15.
+ * Represents a history entry of a {@link Task} including a {@link User} and the {@link Date}
+ * he/she completed the task.
  */
 public class TaskHistory implements Comparable<TaskHistory> {
 
@@ -20,7 +26,7 @@ public class TaskHistory implements Comparable<TaskHistory> {
         return mUser;
     }
 
-    public void setUser(ParseUser user) {
+    public void setUser(@NonNull ParseUser user) {
         mUser = (User) user;
     }
 
@@ -28,11 +34,11 @@ public class TaskHistory implements Comparable<TaskHistory> {
         return mDate;
     }
 
-    public void setDate(Date date) {
+    public void setDate(@NonNull Date date) {
         mDate = date;
     }
 
-    public TaskHistory(ParseUser user, Date date) {
+    public TaskHistory(@NonNull ParseUser user, @NonNull Date date) {
         mUser = (User) user;
         mDate = date;
     }

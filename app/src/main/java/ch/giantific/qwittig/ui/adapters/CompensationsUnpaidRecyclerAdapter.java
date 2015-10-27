@@ -1,7 +1,12 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.adapters;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -27,41 +32,49 @@ import ch.giantific.qwittig.utils.MoneyUtils;
 
 
 /**
- * Created by fabio on 12.10.14.
+ * Handles the display of different unpaid compensations.
+ * <p/>
+ * Subclass of {@link RecyclerView.Adapter}.
  */
 public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int TYPE_POS = 0;
     private static final int TYPE_NEG = 1;
+    private static final int VIEW_RESOURCE_POS = R.layout.row_compensations_unpaid_pos;
+    private static final int VIEW_RESOURCE_NEG = R.layout.row_compensations_unpaid_neg;
     private AdapterInteractionListener mListener;
-    private int mViewResourcePos;
-    private int mViewResourceNeg;
     private Context mContext;
     private List<ParseObject> mCompensations;
     private String mCurrentGroupCurrency;
 
-    public CompensationsUnpaidRecyclerAdapter(Context context, int viewResourcePos, int viewResourceNeg,
-                                              List<ParseObject> compensations,
-                                              AdapterInteractionListener listener) {
+    /**
+     * Constructs a new {@link CompensationsUnpaidRecyclerAdapter}.
+     *
+     * @param context       the context to use in the adapter
+     * @param compensations the compensations to display
+     * @param listener      the callback for user user clicks on compensations
+     */
+    public CompensationsUnpaidRecyclerAdapter(@NonNull Context context,
+                                              @NonNull List<ParseObject> compensations,
+                                              @NonNull AdapterInteractionListener listener) {
         super();
 
         mListener = listener;
         mContext = context;
-        mViewResourcePos = viewResourcePos;
-        mViewResourceNeg = viewResourceNeg;
         mCompensations = compensations;
     }
 
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         switch (viewType) {
             case TYPE_POS: {
-                View view = LayoutInflater.from(parent.getContext()).inflate(mViewResourcePos,
+                View view = LayoutInflater.from(parent.getContext()).inflate(VIEW_RESOURCE_POS,
                         parent, false);
                 return new CompensationPosRow(view, mListener);
             }
             case TYPE_NEG: {
-                View view = LayoutInflater.from(parent.getContext()).inflate(mViewResourceNeg,
+                View view = LayoutInflater.from(parent.getContext()).inflate(VIEW_RESOURCE_NEG,
                         parent, false);
                 return new CompensationNegRow(view, mListener);
             }
@@ -85,13 +98,13 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<Rec
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
         CompensationRow compensationRow = (CompensationRow) viewHolder;
         Compensation compensation = (Compensation) mCompensations.get(position);
 
         compensationRow.setProgressBarVisibility(compensation.isLoading());
 
-        String amount = MoneyUtils.formatMoney(compensation.getAmount().doubleValue(),
+        String amount = MoneyUtils.formatMoney(compensation.getAmountFraction().doubleValue(),
                 mCurrentGroupCurrency);
         byte[] avatar;
         String nickname;
@@ -119,8 +132,8 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<Rec
                         position + " + make sure your using types correctly");
         }
 
-        compensationRow.setAvatar(avatar, mContext);
-        compensationRow.setUsername(nickname);
+        compensationRow.setAvatar(mContext, avatar);
+        compensationRow.setNickname(nickname);
         compensationRow.setAmountMessage(message);
     }
 
@@ -129,31 +142,82 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<Rec
         return mCompensations.size();
     }
 
+    /**
+     * Sets the current group currency field. As long this is not set, nothing will be displayed
+     * in the adapter.
+     *
+     * @param currentGroupCurrency the currency code to set
+     */
     public void setCurrentGroupCurrency(String currentGroupCurrency) {
         mCurrentGroupCurrency = currentGroupCurrency;
     }
 
+    /**
+     * Defines the actions to take when user clicks on the compensations.
+     */
     public interface AdapterInteractionListener {
+        /**
+         * Handles the click on the compensation card itself.
+         *
+         * @param position the adapter position of the compensation
+         */
         void onCompensationRowClick(int position);
 
+        /**
+         * Handles the click on the done button of a compensation.
+         *
+         * @param position the adapter position of the compensation
+         */
         void onDoneButtonClick(int position);
 
+        /**
+         * Handles the click on the remind to pay button of a compensation.
+         *
+         * @param position the adapter position of the compensation
+         */
         void onRemindButtonClick(int position);
 
+        /**
+         * Handles the click on the remind that already paid button of a compensation.
+         *
+         * @param position the adapter position of the compensation
+         */
         void onRemindPaidButtonClick(int position);
 
+        /**
+         * Handles the click on the not now overflow menu item of a compensation.
+         *
+         * @param position the adapter position of the compensation
+         */
         void onNotNowMenuClick(int position);
 
+        /**
+         * Handles the click on the change amount overflow menu item of a compensation.
+         *
+         * @param position the adapter position of the compensation
+         */
         void onChangeAmountMenuClick(int position);
     }
 
+    /**
+     * Provides a {@link RecyclerView} row that displays unpaid compensations.
+     * <p/>
+     * Subclass of {@link RecyclerView.ViewHolder}.
+     */
     private static class CompensationRow extends RecyclerView.ViewHolder {
         ImageView mImageViewAvatar;
         TextView mTextViewUser;
         TextView mTextViewAmount;
         ProgressBar mProgressBar;
 
-        public CompensationRow(View view, final AdapterInteractionListener listener) {
+        /**
+         * Constructs a new {@link CompensationRow}.
+         *
+         * @param view     the inflated view
+         * @param listener the callback for user clicks on the compensations
+         */
+        public CompensationRow(@NonNull View view,
+                               @NonNull final AdapterInteractionListener listener) {
             super(view);
 
             view.setOnClickListener(new View.OnClickListener() {
@@ -169,39 +233,71 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<Rec
             mProgressBar = (ProgressBar) view.findViewById(R.id.pb_card);
         }
 
-        public void setAvatar(byte[] avatarBytes, Context context) {
+        /**
+         * Loads the avatar image into the image view if the user has an avatar, if not it loads a
+         * fallback drawable.
+         *
+         * @param context     the context to use to load the image
+         * @param avatarBytes the user's avatar image
+         */
+        public void setAvatar(@NonNull Context context, @Nullable byte[] avatarBytes) {
             if (avatarBytes != null) {
                 Glide.with(context)
                         .load(avatarBytes)
                         .into(mImageViewAvatar);
             } else {
-                setAvatar(Avatar.getFallbackDrawable(context, true, false));
+                mImageViewAvatar.setImageDrawable(Avatar.getFallbackDrawable(context, true, false));
             }
         }
 
-        public void setAvatar(Drawable avatar) {
-            mImageViewAvatar.setImageDrawable(avatar);
+        /**
+         * Sets the nickname of the payer or beneficiary of the compensation.
+         *
+         * @param nickname the nickname to set
+         */
+        public void setNickname(@NonNull String nickname) {
+            mTextViewUser.setText(nickname);
         }
 
-        public void setUsername(String username) {
-            mTextViewUser.setText(username);
-        }
-
-        public void setAmountMessage(String amount) {
+        /**
+         * Sets the amount message of the compensation.
+         *
+         * @param amount the message to set, includes the amount as a number and a description
+         */
+        public void setAmountMessage(@NonNull String amount) {
             mTextViewAmount.setText(amount);
         }
 
+        /**
+         * Sets the visibility of the progress bar indicating that a process is ongoing for the
+         * compensation.
+         *
+         * @param show whether to show the progress bar or not
+         */
         public void setProgressBarVisibility(boolean show) {
             mProgressBar.setVisibility(show ? View.VISIBLE : View.GONE);
         }
     }
 
+    /**
+     * Provides a {@link RecyclerView} row that displays unpaid compensations, where the current
+     * user receives money.
+     * <p/>
+     * Subclass of {@link CompensationRow}.
+     */
     private static class CompensationPosRow extends CompensationRow {
 
         private Button mButtonDone;
         private Button mButtonRemind;
 
-        public CompensationPosRow(View view, final AdapterInteractionListener listener) {
+        /**
+         * Constructs a new {@link CompensationPosRow} and sets click listeners.
+         *
+         * @param view     the inflated view
+         * @param listener the callback for user clicks on the compensation
+         */
+        public CompensationPosRow(@NonNull View view,
+                                  @NonNull final AdapterInteractionListener listener) {
             super(view, listener);
 
             mButtonDone = (Button) view.findViewById(R.id.bt_done);
@@ -220,21 +316,44 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<Rec
             });
         }
 
+        /**
+         * Sets the description text of the done button.
+         *
+         * @param buttonDone the description to set for the button
+         */
         public void setButtonDone(String buttonDone) {
             mButtonDone.setText(buttonDone);
         }
 
+        /**
+         * Sets the description text of the remind button.
+         *
+         * @param buttonRemind the description to set for the button
+         */
         public void setButtonRemind(String buttonRemind) {
             mButtonRemind.setText(buttonRemind);
         }
     }
 
+    /**
+     * Provides a {@link RecyclerView} row that displays unpaid compensations, where the current
+     * user owes money.
+     * <p/>
+     * Subclass of {@link CompensationRow}.
+     */
     private static class CompensationNegRow extends CompensationRow {
 
         private Button mButtonRemindPaid;
         private Toolbar mToolbar;
 
-        public CompensationNegRow(View view, final AdapterInteractionListener listener) {
+        /**
+         * Constructs a new {@link CompensationNegRow} and sets the click listeners.
+         *
+         * @param view     the inflated view
+         * @param listener the callback for user clicks on the compensation
+         */
+        public CompensationNegRow(@NonNull View view,
+                                  @NonNull final AdapterInteractionListener listener) {
             super(view, listener);
 
             mButtonRemindPaid = (Button) view.findViewById(R.id.bt_remind_paid);
@@ -249,7 +368,7 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<Rec
             mToolbar.inflateMenu(R.menu.menu_compensation_card_neg);
             mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
                 @Override
-                public boolean onMenuItemClick(MenuItem menuItem) {
+                public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
                     switch (menuItem.getItemId()) {
                         case R.id.action_compensation_not_now:
                             listener.onNotNowMenuClick(getAdapterPosition());
@@ -264,6 +383,11 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<Rec
             });
         }
 
+        /**
+         * Sets the description text of the remind that paid button.
+         *
+         * @param buttonRemindPaid the description to set for the button
+         */
         public void setButtonRemindPaid(String buttonRemindPaid) {
             mButtonRemindPaid.setText(buttonRemindPaid);
         }

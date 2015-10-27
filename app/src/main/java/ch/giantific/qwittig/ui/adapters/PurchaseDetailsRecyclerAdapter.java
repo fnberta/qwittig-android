@@ -1,6 +1,12 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.adapters;
 
 import android.content.Context;
+import android.support.annotation.FloatRange;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,7 +33,10 @@ import static ch.giantific.qwittig.utils.AnimUtils.DISABLED_ALPHA;
 import static ch.giantific.qwittig.utils.AnimUtils.DISABLED_ALPHA_RGB;
 
 /**
- * Created by fabio on 09.11.14.
+ * Handles the display of the detail view of a purchase including the different headers,
+ * the users involved, the items and the total value.
+ * <p/>
+ * Subclass of {@link RecyclerView.Adapter}.
  */
 public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -42,44 +51,48 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
     private static final int HEADER_POSITION_USER = 0;
     private static final int HEADER_POSITION_ITEMS = 2;
     private static final String LOG_TAG = PurchaseDetailsRecyclerAdapter.class.getSimpleName();
+    private static final int VIEW_RESOURCE_ITEM = R.layout.row_details_item_list;
+    private static final int VIEW_RESOURCE_RECYCLER_USER = R.layout.row_recycler_user;
+    private static final int VIEW_RESOURCE_TOTAL = R.layout.row_purchase_details_total;
+    private static final int VIEW_RESOURCE_MY_SHARE = R.layout.row_purchase_details_my_share;
     private Context mContext;
-    private int mItemsViewResource;
     private Purchase mPurchase;
     private List<ParseObject> mItems;
     private String mCurrentGroupCurrency = ParseUtils.getGroupCurrency();
 
-    public PurchaseDetailsRecyclerAdapter(Context context, int itemsViewResource) {
+    public PurchaseDetailsRecyclerAdapter(Context context) {
+        super();
 
         mContext = context;
-        mItemsViewResource = itemsViewResource;
     }
 
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         switch (viewType) {
             case TYPE_ITEM: {
                 View v = LayoutInflater.from(parent.getContext())
-                        .inflate(mItemsViewResource, parent, false);
+                        .inflate(VIEW_RESOURCE_ITEM, parent, false);
                 return new ItemRow(v, mContext);
             }
             case TYPE_HEADER: {
                 View v = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.row_header, parent, false);
+                        .inflate(HeaderRow.VIEW_RESOURCE, parent, false);
                 return new HeaderRow(v);
             }
             case TYPE_USER_RECYCLER: {
                 View v = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.row_recycler_user, parent, false);
+                        .inflate(VIEW_RESOURCE_RECYCLER_USER, parent, false);
                 return new UserRecyclerRow(v, mContext);
             }
             case TYPE_TOTAL: {
                 View v = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.row_purchase_details_total, parent, false);
+                        .inflate(VIEW_RESOURCE_TOTAL, parent, false);
                 return new TotalRow(v);
             }
             case TYPE_MY_SHARE: {
                 View v = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.row_purchase_details_my_share, parent, false);
+                        .inflate(VIEW_RESOURCE_MY_SHARE, parent, false);
                 return new MyShareRow(v);
             }
             default:
@@ -94,7 +107,8 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
             return;
         }
 
-        switch (getItemViewType(position)) {
+        int viewType = getItemViewType(position);
+        switch (viewType) {
             case TYPE_ITEM: {
                 ItemRow itemRow = (ItemRow) viewHolder;
                 Item item = (Item) mItems.get(position - NUMBER_OF_USER_ROWS -
@@ -171,22 +185,39 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
     @Override
     public int getItemCount() {
         int numberOfExtraRows = NUMBER_OF_USER_ROWS + NUMBER_OF_HEADER_ROWS + NUMBER_OF_TOTAL_ROWS;
-        return mItems == null ? numberOfExtraRows : mItems.size() + numberOfExtraRows ;
+        return mItems == null ? numberOfExtraRows : mItems.size() + numberOfExtraRows;
     }
 
-    public void setPurchase(ParseObject purchase) {
+    /**
+     * Sets the purchase for the adapter. Until this is set, nothing is displayed in the adapter.
+     *
+     * @param purchase the purchase to set for the adapter
+     */
+    public void setPurchase(@NonNull ParseObject purchase) {
         mPurchase = (Purchase) purchase;
         mItems = mPurchase.getItems();
     }
 
-    public static class ItemRow extends RecyclerView.ViewHolder {
+    /**
+     * Provides a {@link RecyclerView} row that displays the details for an item of a purchase.
+     * <p/>
+     * Subclass of {@link RecyclerView.ViewHolder}.
+     */
+    private static class ItemRow extends RecyclerView.ViewHolder {
 
         private Context mContext;
         private TextView mTextViewName;
         private CircleDisplay mCircleDisplayPercentage;
         private TextView mTextViewPrice;
 
-        public ItemRow(View view, Context context) {
+        /**
+         * Constructs a new {@link ItemRow} and sets the default values for the
+         * {@link CircleDisplay} that represents the share of the current user.
+         *
+         * @param view    the inflated view
+         * @param context the context to use in the adapter
+         */
+        public ItemRow(@NonNull View view, @NonNull Context context) {
             super(view);
 
             mContext = context;
@@ -200,16 +231,33 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
             mCircleDisplayPercentage.setDimAlpha(DISABLED_ALPHA_RGB);
         }
 
-        public void setName(String name) {
+        /**
+         * Sets the name of the item.
+         *
+         * @param name the name of the item to set
+         */
+        public void setName(@NonNull String name) {
             mTextViewName.setText(name);
         }
 
-        public void setPrice (double price, String currencyCode) {
+        /**
+         * Sets the properly formatted price of the item
+         *
+         * @param price        the price of the item to set
+         * @param currencyCode the currency code to use to format the price
+         */
+        public void setPrice(double price, @NonNull String currencyCode) {
             String priceFormatted = MoneyUtils.formatMoney(price, currencyCode);
             mTextViewPrice.setText(priceFormatted);
         }
 
-        public void setAlpha(List<ParseUser> usersInvolved) {
+        /**
+         * Sets the alpha of the item view, depending on whether the current user is involved in
+         * the item or not.
+         *
+         * @param usersInvolved the users involved for the item
+         */
+        public void setAlpha(@NonNull List<ParseUser> usersInvolved) {
             User currentUser = (User) ParseUser.getCurrentUser();
             int usersInvolvedCount = usersInvolved.size();
 
@@ -224,53 +272,95 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
             setAlpha(alpha, percentageCurrentUser, false);
         }
 
-        private void setAlpha(float alpha, float circlePercentage, boolean animate) {
+        private void setAlpha(@FloatRange(from = 0.0, to = 1.0f) float alpha,
+                              float circlePercentage, boolean animate) {
             itemView.setAlpha(alpha);
             mCircleDisplayPercentage.showValue(circlePercentage, 100f, animate);
         }
     }
 
-    public static class UserRecyclerRow extends RecyclerView.ViewHolder {
+    /**
+     * Provides a {@link RecyclerView} row that displays the users involved in the purchase by
+     * displaying them in another {@link RecyclerView}.
+     * <p/>
+     * Subclass of {@link RecyclerView.ViewHolder}.
+     */
+    private static class UserRecyclerRow extends RecyclerView.ViewHolder {
         private RecyclerView mUsersInvolvedView;
         private PurchaseDetailsUsersInvolvedRecyclerAdapter mUsersInvolvedAdapter;
 
-        public UserRecyclerRow(View view, Context context) {
+        /**
+         * Constructs a new {@link UserRecyclerRow} by initialising a new
+         * {@link PurchaseDetailsUsersInvolvedRecyclerAdapter}.
+         *
+         * @param view    the inflated view
+         * @param context the context to use in the adapter
+         */
+        public UserRecyclerRow(@NonNull View view, @NonNull Context context) {
             super(view);
 
             mUsersInvolvedView = (RecyclerView) view.findViewById(R.id.rv_users_involved);
-            mUsersInvolvedAdapter = new PurchaseDetailsUsersInvolvedRecyclerAdapter(context,
-                    R.layout.row_users_involved_list);
+            mUsersInvolvedAdapter = new PurchaseDetailsUsersInvolvedRecyclerAdapter(context);
             mUsersInvolvedView.setHasFixedSize(true);
             mUsersInvolvedView.setLayoutManager(new LinearLayoutManager(context,
                     LinearLayoutManager.HORIZONTAL, false));
             mUsersInvolvedView.setAdapter(mUsersInvolvedAdapter);
         }
 
-        public void setPurchase(ParseObject purchase) {
+        /**
+         * Sets the purchase in the {@link PurchaseDetailsUsersInvolvedRecyclerAdapter}.
+         *
+         * @param purchase the purchase to set
+         */
+        public void setPurchase(@NonNull ParseObject purchase) {
             mUsersInvolvedAdapter.setPurchase(purchase);
             mUsersInvolvedAdapter.notifyDataSetChanged();
         }
     }
 
-    public static class TotalRow extends RecyclerView.ViewHolder {
+    /**
+     * Provides a {@link RecyclerView} row that displays the total value of the purchase in the
+     * group's currency and if available in the foregin one the purchase was saved with.
+     * <p/>
+     * Subclass of {@link RecyclerView.ViewHolder}.
+     */
+    private static class TotalRow extends RecyclerView.ViewHolder {
 
         private TextView mTextViewTotalValue;
         private TextView mTextViewTotalValueForeign;
 
-        public TotalRow(View view) {
+        /**
+         * Constructs a new {@link TotalRow}.
+         *
+         * @param view the inflated view
+         */
+        public TotalRow(@NonNull View view) {
             super(view);
 
             mTextViewTotalValue = (TextView) view.findViewById(R.id.tv_total_value);
             mTextViewTotalValueForeign = (TextView) view.findViewById(R.id.tv_total_value_foreign);
         }
 
-        public void setTotalValue(double totalPrice, String currencyCode) {
+        /**
+         * Sets the properly formatted total value in the group's currency.
+         *
+         * @param totalPrice   the total price value to set
+         * @param currencyCode the currency code to use to format the value
+         */
+        public void setTotalValue(double totalPrice, @NonNull String currencyCode) {
             String totalFormatted = MoneyUtils.formatMoney(totalPrice, currencyCode);
             mTextViewTotalValue.setText(totalFormatted);
         }
 
-        public void setTotalValueForeign(double totalPriceForeign, String groupCurrency,
-                                         String purchaseCurrency) {
+        /**
+         * Sets the properly formatted total value in foreign currency.
+         *
+         * @param totalPriceForeign the total price value to set
+         * @param groupCurrency     the group's currency
+         * @param purchaseCurrency  the foreign currency of the purchase
+         */
+        public void setTotalValueForeign(double totalPriceForeign, @NonNull String groupCurrency,
+                                         @NonNull String purchaseCurrency) {
             if (!groupCurrency.equals(purchaseCurrency)) {
                 setTotalValueForeignVisibility(true);
                 String foreignFormatted = MoneyUtils.formatMoney(totalPriceForeign, purchaseCurrency);
@@ -285,19 +375,38 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
         }
     }
 
-    public static class MyShareRow extends RecyclerView.ViewHolder {
+    /**
+     * Provides a {@link RecyclerView} row that displays the share of the current user of the
+     * purchase.
+     * <p/>
+     * Subclass of {@link RecyclerView.ViewHolder}.
+     */
+    private static class MyShareRow extends RecyclerView.ViewHolder {
 
         private TextView mTextViewMyShare;
         private TextView mTextViewMyShareForeign;
 
-        public MyShareRow(View view) {
+        /**
+         * Constructs a new {@link MyShareRow}.
+         *
+         * @param view the inflated view
+         */
+        public MyShareRow(@NonNull View view) {
             super(view);
 
             mTextViewMyShare = (TextView) view.findViewById(R.id.tv_my_share_value);
             mTextViewMyShareForeign = (TextView) view.findViewById(R.id.tv_my_share_value_foreign);
         }
 
-        public void setMyShare(double myShare, double totalPrice, String currencyCode) {
+        /**
+         * Sets the properly formatted my share value of the purchase or hides the view if the my
+         * share value is equal to the purchases' total price.
+         *
+         * @param myShare      the my share value to set
+         * @param totalPrice   the total price of the purchase
+         * @param currencyCode the currency code to use to format the my share value
+         */
+        public void setMyShare(double myShare, double totalPrice, @NonNull String currencyCode) {
             if (myShare != totalPrice) {
                 String shareFormatted = MoneyUtils.formatMoney(myShare, currencyCode);
                 mTextViewMyShare.setText(shareFormatted);
@@ -310,8 +419,17 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
             itemView.setVisibility(View.GONE);
         }
 
-        public void setMyShareForeign(double myShare, double exchangeRate, String groupCurrency,
-                                      String purchaseCurrency) {
+        /**
+         * Sets the properly formatted my share value of the purchase in the foreign currency of
+         * the purchase or hides the view currency of the purchase equals the group's currency.
+         *
+         * @param myShare          the my share value to set
+         * @param exchangeRate     the currency exchange rate to use to calculate the foreign value
+         * @param groupCurrency    the group's currency
+         * @param purchaseCurrency the purchases' currency
+         */
+        public void setMyShareForeign(double myShare, double exchangeRate, @NonNull String groupCurrency,
+                                      @NonNull String purchaseCurrency) {
             if (!groupCurrency.equals(purchaseCurrency)) {
                 setMyShareForeignVisibility(true);
                 String shareFormatted = MoneyUtils.formatMoney(myShare / exchangeRate, purchaseCurrency);

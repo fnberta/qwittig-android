@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.app.Activity;
@@ -5,6 +9,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -26,9 +31,11 @@ import ch.giantific.qwittig.helpers.PurchaseSaveHelper;
 import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 
-
 /**
- * A placeholder fragment containing a simple view.
+ * Displays the interface where the user can add a new purchase by setting store, date, users
+ * involved and the different items.
+ * <p/>
+ * Subclass of {@link PurchaseBaseFragment}.
  */
 public class PurchaseAddFragment extends PurchaseBaseFragment {
 
@@ -49,12 +56,12 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_purchase_add, menu);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         switch (id) {
             case R.id.action_purchase_save_draft:
@@ -75,7 +82,7 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
     }
 
     @Override
-    void setupUserLists(List<ParseUser> users) {
+    void setupUserLists(@NonNull List<ParseUser> users) {
         super.setupUserLists(users);
 
         setFirstRowItemUsersChecked();
@@ -95,7 +102,7 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, @NonNull Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == INTENT_REQUEST_IMAGE_CAPTURE) {
@@ -118,9 +125,8 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
     }
 
     /**
-     * Creates a new purchase Object, with or without a receipt photo and saves it to Parse and
-     * pins it to local datastore. If there is no connection, it will only pin it to the local
-     * datastore
+     * Creates a new {@link Purchase}, with or without a receipt photo, saves it to the Parse.com
+     * online data base and pins it to local data store.
      */
     @Override
     protected void setPurchase() {
@@ -151,7 +157,7 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
     }
 
     @Override
-    void showErrorSnackbar(String message) {
+    void showErrorSnackbar(@NonNull String message) {
         Snackbar snackbar = MessageUtils.getBasicSnackbar(mButtonAddRow, message);
         snackbar.setAction(R.string.action_purchase_save_draft, new View.OnClickListener() {
             @Override
@@ -161,7 +167,7 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
                     if (receipt != null) {
                         receipt.getDataInBackground(new GetDataCallback() {
                             @Override
-                            public void done(byte[] data, ParseException e) {
+                            public void done(@NonNull byte[] data, ParseException e) {
                                 mPurchase.swapReceiptParseFileToData(data);
                                 pinPurchaseAsDraft();
                             }
@@ -178,9 +184,6 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
         snackbar.show();
     }
 
-    /**
-     * Creates new purchase object and calls method to pin it to local datastore.
-     */
     @Override
     protected void savePurchaseAsDraft() {
         List<ParseUser> purchaseUsersInvolved = getParseUsersInvolvedFromBoolean(mPurchaseUsersInvolved);

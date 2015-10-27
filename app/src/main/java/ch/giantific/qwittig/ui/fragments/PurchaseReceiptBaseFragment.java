@@ -1,6 +1,9 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
-import android.app.Fragment;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -17,9 +20,10 @@ import com.parse.ParseFile;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 
-
 /**
- * A simple {@link Fragment} subclass.
+ * Provides an abstract base class for screens that display purchase receipt images.
+ * <p/>
+ * Subclass of {@link BaseFragment}.
  */
 public abstract class PurchaseReceiptBaseFragment extends BaseFragment {
 
@@ -70,6 +74,11 @@ public abstract class PurchaseReceiptBaseFragment extends BaseFragment {
         }
     }
 
+    /**
+     * Sets the image to the {@link ImageView}.
+     *
+     * @param receiptPath the path to the receipt image
+     */
     public void setImage(String receiptPath) {
         Glide.with(this)
                 .load(receiptPath)

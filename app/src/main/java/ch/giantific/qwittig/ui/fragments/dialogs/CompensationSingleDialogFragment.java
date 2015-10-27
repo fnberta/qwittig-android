@@ -1,11 +1,17 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments.dialogs;
 
 import android.app.Activity;
-import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,16 +26,30 @@ import ch.giantific.qwittig.data.models.ItemUserPicker;
 import ch.giantific.qwittig.ui.adapters.RecipientsArrayAdapter;
 
 /**
- * Created by fabio on 20.11.14.
+ * Provides a dialog that allows the user to choose a recipient and set an amount for a single
+ * compensation payment.
+ * <p/>
+ * The dialog will only accept a proper amount value, therefore overrides the standard
+ * onClickListener which calls dismiss() in any case.
+ * <p/>
+ * Subclass of {@link DialogFragment}.
  */
 public class CompensationSingleDialogFragment extends DialogFragment {
 
     private static final String BUNDLE_USERS = "BUNDLE_USERS";
+    @Nullable
     private List<ItemUserPicker> mUsers;
     private DialogInteractionListener mListener;
     private Spinner mSpinnerUsers;
     private TextInputLayout mTextInputLayoutAmount;
 
+    /**
+     * Returns a new instance of {@link CompensationSingleDialogFragment}.
+     *
+     * @param users the users available as recipients
+     * @return a new instance of {@link CompensationSingleDialogFragment}
+     */
+    @NonNull
     public static CompensationSingleDialogFragment newInstance(ArrayList<ItemUserPicker> users) {
         CompensationSingleDialogFragment fragment = new CompensationSingleDialogFragment();
 
@@ -41,7 +61,7 @@ public class CompensationSingleDialogFragment extends DialogFragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
 
         try {
@@ -79,9 +99,10 @@ public class CompensationSingleDialogFragment extends DialogFragment {
     }
 
     private void setupSpinner() {
-        RecipientsArrayAdapter spinnerAdapter = new RecipientsArrayAdapter(getActivity(),
-                R.layout.spinner_item_with_image, R.layout.row_spinner_recipients, mUsers);
-        mSpinnerUsers.setAdapter(spinnerAdapter);
+        if (mUsers != null) {
+            RecipientsArrayAdapter spinnerAdapter = new RecipientsArrayAdapter(getActivity(), mUsers);
+            mSpinnerUsers.setAdapter(spinnerAdapter);
+        }
     }
 
     @Override
@@ -107,14 +128,23 @@ public class CompensationSingleDialogFragment extends DialogFragment {
         if (!TextUtils.isEmpty(amountString)) {
             mTextInputLayoutAmount.setErrorEnabled(false);
             ItemUserPicker recipientSelected = (ItemUserPicker) mSpinnerUsers.getSelectedItem();
-            mListener.onManualPaymentValuesSet(recipientSelected, amountString);
+            mListener.onSinglePaymentValuesSet(recipientSelected, amountString);
             dismiss();
         } else {
             mTextInputLayoutAmount.setError(getActivity().getString(R.string.error_valid_amount));
         }
     }
 
+    /**
+     * Defines the actions to take when user clicks on one of the dialog's buttons.
+     */
     public interface DialogInteractionListener {
-        void onManualPaymentValuesSet(ItemUserPicker recipient, String amount);
+        /**
+         * Handles the click on the save single payment button
+         *
+         * @param recipient the recipient chosen for the payment
+         * @param amount    the amount set for the payment
+         */
+        void onSinglePaymentValuesSet(@NonNull ItemUserPicker recipient, @NonNull String amount);
     }
 }

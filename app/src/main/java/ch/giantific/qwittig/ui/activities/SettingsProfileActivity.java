@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.activities;
 
 import android.app.FragmentManager;
@@ -6,6 +10,8 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
@@ -28,10 +34,20 @@ import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.ui.fragments.SettingsProfileFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.DiscardChangesDialogFragment;
 
+/**
+ * Hosts {@link SettingsProfileFragment} that allows to user to change his profile information.
+ * <p/>
+ * Shows the user's avatar as backdrop image in the toolbar with a parallax collapse animation on
+ * scroll.
+ * <p/>
+ * Subclass of {@link BaseActivity}.
+ * <p/>
+ *
+ * @see android.support.design.widget.CollapsingToolbarLayout
+ */
 public class SettingsProfileActivity extends BaseActivity implements
         SettingsProfileFragment.FragmentInteractionListener,
         DiscardChangesDialogFragment.DialogInteractionListener {
-
 
     @IntDef({CHANGES_SAVED, CHANGES_DISCARDED, NO_CHANGES})
     @Retention(RetentionPolicy.SOURCE)
@@ -39,7 +55,6 @@ public class SettingsProfileActivity extends BaseActivity implements
     public static final int CHANGES_SAVED = 0;
     public static final int CHANGES_DISCARDED = 1;
     public static final int NO_CHANGES = 2;
-
     public static final int RESULT_CHANGES_DISCARDED = 2;
     private static final String STATE_PROFILE_FRAGMENT = "STATE_PROFILE_FRAGMENT";
     private static final String DISCARD_CHANGES_DIALOG = "DISCARD_CHANGES_DIALOG";
@@ -49,7 +64,7 @@ public class SettingsProfileActivity extends BaseActivity implements
     private SettingsProfileFragment mSettingsProfileFragment;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings_profile);
         supportPostponeEnterTransition();
@@ -114,7 +129,7 @@ public class SettingsProfileActivity extends BaseActivity implements
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(@NonNull Menu menu) {
         getMenuInflater().inflate(R.menu.menu_settings_profile, menu);
         MenuItem deleteAvatar = menu.findItem(R.id.action_settings_profile_avatar_delete);
         deleteAvatar.setVisible(mHasAvatarSet);
@@ -123,7 +138,7 @@ public class SettingsProfileActivity extends BaseActivity implements
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home:
@@ -166,7 +181,7 @@ public class SettingsProfileActivity extends BaseActivity implements
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, @NonNull Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {

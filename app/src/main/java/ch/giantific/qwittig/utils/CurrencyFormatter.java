@@ -1,20 +1,32 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.utils;
+
+import android.support.annotation.NonNull;
 
 import com.github.mikephil.charting.utils.ValueFormatter;
 
-import ch.giantific.qwittig.utils.MoneyUtils;
-
 /**
- * Created by fabio on 20.07.15.
+ * Formats stats value types as currencies without decimals.
+ * <p/>
+ * Implements {@link ValueFormatter}.
  */
 public class CurrencyFormatter implements ValueFormatter {
 
     private String mCurrencyCode;
 
-    public CurrencyFormatter(String currencyCode) {
+    /**
+     * Constructs new {@link CurrencyFormatter} with the currency code specified.
+     *
+     * @param currencyCode the currency code to use for the formatting
+     */
+    public CurrencyFormatter(@NonNull String currencyCode) {
         mCurrencyCode = currencyCode;
     }
 
+    @NonNull
     @Override
     public String getFormattedValue(float value) {
         return MoneyUtils.formatMoneyNoDecimals(value, mCurrencyCode);

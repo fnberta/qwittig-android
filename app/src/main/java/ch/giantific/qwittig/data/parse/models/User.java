@@ -1,6 +1,12 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.data.parse.models;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.parse.ParseConfig;
 import com.parse.ParseObject;
@@ -19,7 +25,8 @@ import ch.giantific.qwittig.R;
 
 
 /**
- * Created by fabio on 12.10.14.
+ * Represents a user in a group that shares their purchases and tasks and wishes to balance
+ * everything.
  */
 public class User extends ParseUser {
 
@@ -40,6 +47,23 @@ public class User extends ParseUser {
     public static final String USERNAME_PREFIX_DELETED = "DELETED_";
     public static final String USERNAME_PREFIX_TEST = "TEST_";
 
+
+    public User() {
+        // A default constructor is required.
+    }
+
+    public User(String email, String password, String nickname, byte[] avatar) {
+        this(email, password, nickname);
+        setAvatar(avatar);
+    }
+
+    public User(String email, String password, String nickname) {
+        this.setUsername(email);
+        this.setPassword(password);
+        setDeleted(false);
+        setNickname(nickname);
+        setStoresFavorites(getDefaultStores());
+    }
 
     public boolean isDeleted() {
         return getBoolean(IS_DELETED);
@@ -65,6 +89,7 @@ public class User extends ParseUser {
         put(CURRENT_GROUP, currentGroup);
     }
 
+    @NonNull
     public List<ParseObject> getGroups() {
         List<ParseObject> groups = getList(GROUPS);
         if (groups != null) {
@@ -86,6 +111,7 @@ public class User extends ParseUser {
         put(AVATAR, avatar);
     }
 
+    @NonNull
     public List<String> getStoresAdded() {
         List<String> storesAdded = getList(STORES_ADDED);
         if (storesAdded != null) {
@@ -122,23 +148,6 @@ public class User extends ParseUser {
         put(FREE_PURCHASES_COUNT, count);
     }
 
-    public User() {
-        // A default constructor is required.
-    }
-
-    public User(String email, String password, String nickname, byte[] avatar) {
-        this(email, password, nickname);
-        setAvatar(avatar);
-    }
-
-    public User(String email, String password, String nickname) {
-        this.setUsername(email);
-        this.setPassword(password);
-        setDeleted(false);
-        setNickname(nickname);
-        setStoresFavorites(getDefaultStores());
-    }
-
     private List<String> getDefaultStores() {
         ParseConfig config = ParseConfig.getCurrentConfig();
 
@@ -146,20 +155,32 @@ public class User extends ParseUser {
     }
 
     /**
-     * Sets deleted flag to true and username to deleted. NOTE: the rest of the
-     * user fields will get emptied by CloudCode on the server
+     * Sets the deleted flag to true and the username to deleted.
+     * <p/>
+     * The rest of the user fields will get emptied by CloudCode on the server
      */
     public void deleteUserFields() {
         setDeleted(true);
         setUsername(USERNAME_PREFIX_DELETED + UUID.randomUUID().toString());
     }
 
+    /**
+     * Sets deleted flag to false and the username to the string provided.
+     *
+     * @param username the username to set
+     */
     public void undeleteUserFields(String username) {
         setDeleted(false);
         setUsername(username);
     }
 
-    public String getNicknameOrMe(Context context) {
+    /**
+     * Returns the nickname or "Me" if it's the current user.
+     *
+     * @param context the context to use to get the "Me" string
+     * @return the nickname or localized "me"
+     */
+    public String getNicknameOrMe(@NonNull Context context) {
         String nickname;
         if (this == ParseUser.getCurrentUser()) {
             nickname = context.getString(R.string.nickname_me);
@@ -173,7 +194,12 @@ public class User extends ParseUser {
         remove(CURRENT_GROUP);
     }
 
-
+    /**
+     * Returns the object ids of the user's groups.
+     *
+     * @return the object ids of the user's groups
+     */
+    @NonNull
     public List<String> getGroupIds() {
         List<String> groupIds = new ArrayList<>();
         List<ParseObject> groups = getGroups();
@@ -184,6 +210,11 @@ public class User extends ParseUser {
         return groupIds;
     }
 
+    /**
+     * Returns the number of groups a user is in.
+     *
+     * @return the number of groups a user is in
+     */
     public int getGroupsCount() {
         List<ParseObject> groups = getGroups();
         return groups.size();
@@ -197,16 +228,21 @@ public class User extends ParseUser {
         addUnique(GROUPS, group);
     }
 
+    /**
+     * Removes a group from the user's list of groups and also removes the corresponding balance
+     * entry
+     *
+     * @param group the group to remove
+     */
     public void removeGroup(ParseObject group) {
         List<ParseObject> groupList = new ArrayList<>();
         groupList.add(group);
         removeAll(GROUPS, groupList);
 
-
         removeBalanceForGroup(group);
     }
 
-    private void removeBalanceForGroup(ParseObject group) {
+    private void removeBalanceForGroup(@Nullable ParseObject group) {
         Map<String, List<Integer>> balanceMap = getMap(BALANCE);
         if (balanceMap != null && !balanceMap.isEmpty() && group != null) {
             balanceMap.remove(group.getObjectId());
@@ -222,7 +258,13 @@ public class User extends ParseUser {
         remove(AVATAR);
     }
 
-    public BigFraction getBalance(ParseObject group) {
+    /**
+     * Returns the current user's balance for a group as {@link BigFraction}.
+     *
+     * @param group the group for which the balance should be returned
+     * @return the balance for the group
+     */
+    public BigFraction getBalance(@Nullable ParseObject group) {
         if (group == null) {
             return BigFraction.ZERO;
         }
@@ -243,7 +285,13 @@ public class User extends ParseUser {
         return new BigFraction(numerator, denominator);
     }
 
-    public void setBalance(BigFraction balance, ParseObject group) {
+    /**
+     * Sets a user's balance for the specified group.
+     *
+     * @param balance the balance to set
+     * @param group   the group for which the balance should be set
+     */
+    public void setBalance(@NonNull BigFraction balance, @Nullable ParseObject group) {
         BigInteger num = balance.getNumerator();
         BigInteger den = balance.getDenominator();
 
@@ -266,11 +314,13 @@ public class User extends ParseUser {
         add(STORES_ADDED, store);
     }
 
-    public String getStoresFavoriteFirstInList(String otherStore) {
+    /**
+     * Returns the first entry of an alphabetically sorted list of the user's stores.
+     *
+     * @return the first store
+     */
+    public String getStoresFavoriteFirstInList() {
         List<String> stores = getStoresFavorites();
-        if (stores.contains(otherStore)) {
-            stores.remove(otherStore);
-        }
         Collections.sort(stores, String.CASE_INSENSITIVE_ORDER);
         return stores.get(0);
     }

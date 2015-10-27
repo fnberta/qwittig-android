@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui;
 
 import android.content.Context;
@@ -9,25 +13,32 @@ import android.view.SurfaceView;
 import java.io.IOException;
 
 /**
- * Created by fabio on 24.09.15.
+ * Provides a custom camera preview that is locked to portrait orientation.
+ * <p/>
+ * Subclass of {@link SurfaceView}.
  */
 @SuppressWarnings("deprecation")
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
 
     private static final String LOG_TAG = CameraPreview.class.getSimpleName();
-    private SurfaceHolder mHolder;
     private Camera mCamera;
 
-    public void setCamera(Camera camera) {
-        mCamera = camera;
-    }
-
+    /**
+     * Constructs a new {@link CameraPreview} and sets the holders callback to it.
+     *
+     * @param context the context to pass to super
+     * @param camera  the camera to use for the preview
+     */
     public CameraPreview(Context context, Camera camera) {
         super(context);
 
         mCamera = camera;
-        mHolder = getHolder();
-        mHolder.addCallback(this);
+        SurfaceHolder holder = getHolder();
+        holder.addCallback(this);
+    }
+
+    public void setCamera(Camera camera) {
+        mCamera = camera;
     }
 
     @Override
@@ -44,7 +55,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        Log.e(LOG_TAG, "width " + width + " height " + height);
         // we are locked to portrait, hence the surface should not able to be changed
     }
 

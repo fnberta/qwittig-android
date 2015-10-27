@@ -1,12 +1,18 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments.dialogs;
 
 import android.app.Activity;
-import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,19 +30,34 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.parse.models.User;
 
 /**
- * Created by fabio on 20.11.14.
+ * Provides a dialog that allows the user to make the store selection for a purchase by either
+ * selecting one in the list or adding a new one.
+ * <p/>
+ * If the user chose to add a new store, a valid name must be entered. Otherwise the dialog will
+ * only be dismissed by the cancel action. Therefore overrides the default positive button
+ * onClickListener because the default behaviour is to always call dismiss().
+ * <p/>
+ * Subclass of {@link DialogFragment}.
  */
 public class StoreSelectionDialogFragment extends DialogFragment {
 
     private static final String LOG_TAG = StoreSelectionDialogFragment.class.getSimpleName();
     private static final String BUNDLE_STORE = "BUNDLE_STORE";
     private DialogInteractionListener mListener;
+    @Nullable
     private String mStoreSelected;
     private TextInputLayout mTextInputLayoutStoreManual;
     private Spinner mSpinnerStore;
     private String mOtherStore;
 
-    public static StoreSelectionDialogFragment newInstance(String store) {
+    /**
+     * Returns a new instance of {@link StoreSelectionDialogFragment}.
+     *
+     * @param store the currently selected store
+     * @return a new instance of {@link StoreSelectionDialogFragment}
+     */
+    @NonNull
+    public static StoreSelectionDialogFragment newInstance(@NonNull String store) {
         StoreSelectionDialogFragment fragment = new StoreSelectionDialogFragment();
 
         Bundle args = new Bundle();
@@ -47,7 +68,7 @@ public class StoreSelectionDialogFragment extends DialogFragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
 
         try {
@@ -81,7 +102,7 @@ public class StoreSelectionDialogFragment extends DialogFragment {
                 .setPositiveButton(android.R.string.yes, null)
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                    public void onClick(@NonNull DialogInterface dialog, int which) {
                         dialog.cancel();
                     }
                 });
@@ -164,7 +185,16 @@ public class StoreSelectionDialogFragment extends DialogFragment {
         }
     }
 
+    /**
+     * Defines the actions to take when user clicks on one of the dialog's buttons.
+     */
     public interface DialogInteractionListener {
-        void onStoreSet(String store, boolean manuallyEntered);
+        /**
+         * Handles the click on the store selected button
+         *
+         * @param store           the store selected
+         * @param manuallyEntered whether the store was newly added manually or chosen from the list
+         */
+        void onStoreSet(@NonNull String store, boolean manuallyEntered);
     }
 }

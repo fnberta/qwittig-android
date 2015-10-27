@@ -1,16 +1,24 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments.dialogs;
 
 import android.app.Activity;
-import android.support.v7.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 
 import ch.giantific.qwittig.R;
 
 /**
- * Created by fabio on 20.11.14.
+ * Provides a dialog that tells the use he needs to create a group in order to perform the
+ * requested action.
+ * <p/>
+ * Subclass of {@link DialogFragment}.
  */
 public class GroupCreateDialogFragment extends DialogFragment {
 
@@ -18,6 +26,13 @@ public class GroupCreateDialogFragment extends DialogFragment {
     private DialogInteractionListener mListener;
     private int mMessage;
 
+    /**
+     * Returns a new instance of {@link GroupCreateDialogFragment} with the message set.
+     *
+     * @param message the message to show in the dialog
+     * @return a new instance of {@link GroupCreateDialogFragment}
+     */
+    @NonNull
     public static GroupCreateDialogFragment newInstance(int message) {
         GroupCreateDialogFragment fragment = new GroupCreateDialogFragment();
         Bundle args = new Bundle();
@@ -28,14 +43,14 @@ public class GroupCreateDialogFragment extends DialogFragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
 
         try {
             mListener = (DialogInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
+                    + " must implement DialogInteractionListener");
         }
     }
 
@@ -61,14 +76,20 @@ public class GroupCreateDialogFragment extends DialogFragment {
                 })
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                    public void onClick(@NonNull DialogInterface dialog, int which) {
                         dialog.cancel();
                     }
                 });
         return dialogBuilder.create();
     }
 
+    /**
+     * Defines the actions to take when user clicks on one of the dialog's buttons.
+     */
     public interface DialogInteractionListener {
+        /**
+         * Handles the click on the create new group button.
+         */
         void onCreateGroupSelected();
     }
 }

@@ -1,15 +1,21 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 
 import com.parse.ParseObject;
 
 import ch.giantific.qwittig.data.parse.LocalQuery;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 
-
 /**
- * A simple {@link android.app.Fragment} subclass.
+ * Shows the receipt image taken by the user when editing a purchase.
+ * <p/>
+ * Subclass of {@link PurchaseReceiptBaseFragment}.
  */
 public class PurchaseReceiptEditFragment extends PurchaseReceiptAddFragment {
 
@@ -21,7 +27,16 @@ public class PurchaseReceiptEditFragment extends PurchaseReceiptAddFragment {
     public PurchaseReceiptEditFragment() {
     }
 
-    public static PurchaseReceiptEditFragment newInstance(String purchaseId, boolean isDraft) {
+    /**
+     * Returns a new instance of {@link PurchaseReceiptEditFragment}.
+     *
+     * @param purchaseId the object id of the purchase of which the receipt image should be shown
+     * @param isDraft    whether the purchase is a draft or not
+     * @return a new instance of {@link PurchaseReceiptEditFragment}
+     */
+    @NonNull
+    public static PurchaseReceiptEditFragment newInstance(@NonNull String purchaseId,
+                                                          boolean isDraft) {
         PurchaseReceiptEditFragment fragment = new PurchaseReceiptEditFragment();
 
         Bundle args = new Bundle();
@@ -36,7 +51,7 @@ public class PurchaseReceiptEditFragment extends PurchaseReceiptAddFragment {
     void getDataFromBundle() {
         Bundle args = getArguments();
         if (args != null) {
-            mPurchaseId = args.getString(BUNDLE_PURCHASE_ID);
+            mPurchaseId = args.getString(BUNDLE_PURCHASE_ID, "");
             mIsDraft = args.getBoolean(BUNDLE_IS_DRAFT);
         }
     }
@@ -46,7 +61,7 @@ public class PurchaseReceiptEditFragment extends PurchaseReceiptAddFragment {
         if (mIsDraft) {
             LocalQuery.queryDraft(mPurchaseId, new LocalQuery.ObjectLocalFetchListener() {
                 @Override
-                public void onObjectFetched(ParseObject object) {
+                public void onObjectFetched(@NonNull ParseObject object) {
                     Purchase purchase = (Purchase) object;
                     setImage(purchase.getReceiptData());
                 }
@@ -54,7 +69,7 @@ public class PurchaseReceiptEditFragment extends PurchaseReceiptAddFragment {
         } else {
             LocalQuery.fetchObjectFromId(Purchase.CLASS, mPurchaseId, new LocalQuery.ObjectLocalFetchListener() {
                 @Override
-                public void onObjectFetched(ParseObject object) {
+                public void onObjectFetched(@NonNull ParseObject object) {
                     Purchase purchase = (Purchase) object;
                     setReceiptImage(purchase.getReceiptParseFile());
                 }

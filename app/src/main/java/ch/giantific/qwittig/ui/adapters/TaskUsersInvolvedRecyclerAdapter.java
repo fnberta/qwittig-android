@@ -1,6 +1,11 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.adapters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,35 +28,45 @@ import static ch.giantific.qwittig.utils.AnimUtils.DISABLED_ALPHA;
 
 
 /**
- * Created by fabio on 12.10.14.
+ * Handles the display of the users involved in a task including the reordering of the different
+ * users.
+ * <p/>
+ * Subclass of {@link RecyclerView.Adapter}.
  */
 public class TaskUsersInvolvedRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         implements ItemTouchHelperAdapter {
 
     private static final String LOG_TAG = TaskUsersInvolvedRecyclerAdapter.class.getSimpleName();
-
+    private static final int VIEW_RESOURCE = R.layout.row_task_users_involved;
     private AdapterInteractionListener mListener;
-    private int mViewResource;
     private List<ParseUser> mUsersAvailable;
     private List<TaskUser> mUsersInvolved;
     private Context mContext;
 
-    public TaskUsersInvolvedRecyclerAdapter(Context context, int viewResource,
-                                            List<ParseUser> usersAvailable,
-                                            List<TaskUser> usersInvolved,
-                                            AdapterInteractionListener listener) {
+    /**
+     * Constructs a new {@link TaskUsersInvolvedRecyclerAdapter}.
+     *
+     * @param context        the context to use in the adapter
+     * @param usersAvailable the users available from the user can make a selection
+     * @param usersInvolved  the actual users involved in the task
+     * @param listener       the callback for user clicks on the users available
+     */
+    public TaskUsersInvolvedRecyclerAdapter(@NonNull Context context,
+                                            @NonNull List<ParseUser> usersAvailable,
+                                            @NonNull List<TaskUser> usersInvolved,
+                                            @NonNull AdapterInteractionListener listener) {
         super();
 
         mListener = listener;
         mContext = context;
-        mViewResource = viewResource;
         mUsersAvailable = usersAvailable;
         mUsersInvolved = usersInvolved;
     }
 
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(mViewResource, parent,
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(VIEW_RESOURCE, parent,
                 false);
 
         return new UsersRow(view, mContext, mListener);
@@ -85,17 +100,42 @@ public class TaskUsersInvolvedRecyclerAdapter extends RecyclerView.Adapter<Recyc
         notifyItemRemoved(position);
     }
 
+    /**
+     * Defines the actions to take when a user clicks on a user or drags it to change the order.
+     */
     public interface AdapterInteractionListener {
+        /**
+         * Handles the click on the user row itself.
+         *
+         * @param position the adapter position of the user row
+         */
         void onUsersRowItemClick(int position);
 
-        void onStartDrag(RecyclerView.ViewHolder viewHolder);
+        /**
+         * Handles the start of a user drag of the user row.
+         *
+         * @param viewHolder the view holder for the user row
+         */
+        void onStartDrag(@NonNull RecyclerView.ViewHolder viewHolder);
     }
 
+    /**
+     * Provides a {@link RecyclerView} row that displays the user's avatar, the nickname and a
+     * drag handler.
+     */
     private static class UsersRow extends BaseUserAvatarRow {
 
         private ImageView mImageViewReorder;
 
-        public UsersRow(final View view, Context context, final AdapterInteractionListener listener) {
+        /**
+         * Constructs a new {@link UsersRow} and sets the click and drag listeners.
+         *
+         * @param view     the inflated view
+         * @param context  the context to use in the row
+         * @param listener the callback for user clicks and drags
+         */
+        public UsersRow(@NonNull final View view, @NonNull Context context,
+                        @NonNull final AdapterInteractionListener listener) {
             super(view, context);
 
             view.setOnClickListener(new View.OnClickListener() {
@@ -109,7 +149,7 @@ public class TaskUsersInvolvedRecyclerAdapter extends RecyclerView.Adapter<Recyc
             final UsersRow usersRow = this;
             mImageViewReorder.setOnTouchListener(new View.OnTouchListener() {
                 @Override
-                public boolean onTouch(View v, MotionEvent event) {
+                public boolean onTouch(View v, @NonNull MotionEvent event) {
                     if (MotionEventCompat.getActionMasked(event) ==
                             MotionEvent.ACTION_DOWN) {
                         listener.onStartDrag(usersRow);

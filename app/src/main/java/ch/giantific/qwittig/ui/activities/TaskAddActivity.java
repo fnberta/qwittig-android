@@ -1,12 +1,19 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.activities;
 
 import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.transition.Transition;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,6 +28,13 @@ import ch.giantific.qwittig.ui.listeners.TransitionListenerAdapter;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.Utils;
 
+/**
+ * Hosts {@link TaskAddFragment} that allows the user to create a new task.
+ * <p/>
+ * Handles transition animations and displays the task's title in the {@link Toolbar}.
+ * <p/>
+ * Subclass of {@link BaseActivity}.
+ */
 public class TaskAddActivity extends BaseActivity implements
         TaskAddFragment.FragmentInteractionListener,
         DatePickerDialog.OnDateSetListener,
@@ -31,6 +45,7 @@ public class TaskAddActivity extends BaseActivity implements
     private TextInputLayout mTextInputLayoutTitle;
     private FloatingActionButton mFab;
 
+    @NonNull
     @Override
     public String getTaskTitle() {
         return mTextInputLayoutTitle.getEditText().getText().toString();
@@ -42,7 +57,7 @@ public class TaskAddActivity extends BaseActivity implements
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_add);
 
@@ -89,7 +104,7 @@ public class TaskAddActivity extends BaseActivity implements
         Transition enter = getWindow().getEnterTransition();
         enter.addListener(new TransitionListenerAdapter() {
             @Override
-            public void onTransitionEnd(Transition transition) {
+            public void onTransitionEnd(@NonNull Transition transition) {
                 super.onTransitionEnd(transition);
                 transition.removeListener(this);
 
@@ -106,7 +121,7 @@ public class TaskAddActivity extends BaseActivity implements
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home:

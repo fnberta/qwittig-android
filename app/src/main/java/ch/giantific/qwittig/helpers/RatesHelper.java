@@ -1,7 +1,13 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.helpers;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import java.util.Map;
@@ -13,19 +19,29 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 /**
- * Created by fabio on 10.12.14.
+ * Fetches the newest currency exchange rates online using {@link RestClient.ExchangeRates}.
+ * <p/>
+ * Subclass of {@link BaseHelper}.
  */
 public class RatesHelper extends BaseHelper {
 
     private static final String LOG_TAG = RatesHelper.class.getSimpleName();
     private static final String BUNDLE_BASE_CURRENCY = "BUNDLE_BASE_CURRENCY";
+    @Nullable
     private HelperInteractionListener mListener;
 
     public RatesHelper() {
         // empty default constructor
     }
 
-    public static RatesHelper newInstance(String baseCurrency) {
+    /**
+     * Returns a new instance of {@link RatesHelper} with a base currency code as an argument.
+     *
+     * @param baseCurrency the currency to use as a base for the foreign currencies
+     * @return a new instance of {@link RatesHelper}
+     */
+    @NonNull
+    public static RatesHelper newInstance(@NonNull String baseCurrency) {
         RatesHelper fragment = new RatesHelper();
         Bundle args = new Bundle();
         args.putString(BUNDLE_BASE_CURRENCY, baseCurrency);
@@ -34,13 +50,13 @@ public class RatesHelper extends BaseHelper {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
             mListener = (HelperInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
+                    + " must implement DialogInteractionListener");
         }
     }
 
@@ -59,10 +75,10 @@ public class RatesHelper extends BaseHelper {
         }
     }
 
-    private void getRates(String baseCurrency) {
+    private void getRates(@NonNull String baseCurrency) {
         RestClient.getService().getRates(baseCurrency, new Callback<CurrencyRates>() {
             @Override
-            public void success(CurrencyRates currencyRates, Response response) {
+            public void success(@NonNull CurrencyRates currencyRates, Response response) {
                 Map<String, Float> exchangeRates = currencyRates.getRates();
                 if (mListener != null) {
                     mListener.onRatesFetched(exchangeRates);
@@ -70,7 +86,7 @@ public class RatesHelper extends BaseHelper {
             }
 
             @Override
-            public void failure(RetrofitError error) {
+            public void failure(@NonNull RetrofitError error) {
                 if (mListener != null) {
                     mListener.onRatesFetchFailed(error.getLocalizedMessage());
                 }
@@ -84,9 +100,22 @@ public class RatesHelper extends BaseHelper {
         mListener = null;
     }
 
+    /**
+     * Defines the actions to take after the rates were fetched or after the fetch failed.
+     */
     public interface HelperInteractionListener {
-        void onRatesFetched(Map<String, Float> exchangeRates);
+        /**
+         * Handles the successful fetch of current currency exchange rates.
+         *
+         * @param exchangeRates the fetched currency exchange rates
+         */
+        void onRatesFetched(@NonNull Map<String, Float> exchangeRates);
 
-        void onRatesFetchFailed(String errorMessage);
+        /**
+         * Handles the failed fetch of current currency exchange rates.
+         *
+         * @param errorMessage the error message received from the server
+         */
+        void onRatesFetchFailed(@NonNull String errorMessage);
     }
 }

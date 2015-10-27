@@ -1,9 +1,16 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.services;
 
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.StringDef;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -26,13 +33,20 @@ import ch.giantific.qwittig.data.parse.models.User;
 import ch.giantific.qwittig.utils.ParseUtils;
 
 /**
- * An {@link IntentService} subclass for handling asynchronous task requests in
- * a service on a separate handler thread.
+ * Handles the various background tasks to query, pin or unpin objects.
+ * <p/>
+ * Subclass of {@link IntentService}, used for handling asynchronous task requests in a service on
+ * a separate handler thread.
  */
 public class ParseQueryService extends IntentService {
+
     public static final String INTENT_FILTER_DATA_NEW = "ch.giantific.qwittig.push.DATA_NEW";
     public static final String INTENT_DATA_TYPE = "INTENT_DATA_TYPE";
     public static final String INTENT_COMPENSATION_PAID = "INTENT_COMPENSATION_PAID";
+
+    @StringDef({User.CLASS, Group.CLASS, Purchase.CLASS, Compensation.CLASS, Group.CLASS, Task.CLASS})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface ClassType {}
 
     @IntDef({DATA_TYPE_ALL, DATA_TYPE_PURCHASE, DATA_TYPE_USER, DATA_TYPE_COMPENSATION,
             DATA_TYPE_GROUP, DATA_TYPE_TASK})
@@ -47,33 +61,50 @@ public class ParseQueryService extends IntentService {
 
     private static final String SERVICE_NAME = "ParseQueryService";
     private static final String LOG_TAG = ParseQueryService.class.getSimpleName();
-
     private static final String ACTION_UNPIN_OBJECT = "ch.giantific.qwittig.services.action.UNPIN_OBJECT";
     private static final String ACTION_QUERY_OBJECT = "ch.giantific.qwittig.services.action.QUERY_OBJECT";
     private static final String ACTION_QUERY_USERS = "ch.giantific.qwittig.services.action.QUERY_USERS";
     private static final String ACTION_QUERY_ALL = "ch.giantific.qwittig.services.action.QUERY_ALL";
     private static final String ACTION_QUERY_TASK_DONE = "ch.giantific.qwittig.services.action.TASK_DONE";
-
     private static final String EXTRA_OBJECT_CLASS = "ch.giantific.qwittig.services.extra.OBJECT_CLASS";
     private static final String EXTRA_OBJECT_ID = "ch.giantific.qwittig.services.extra.OBJECT_ID";
     private static final String EXTRA_OBJECT_IS_NEW = "ch.giantific.qwittig.services.extra.OBJECT_IS_NEW";
     private static final String EXTRA_OBJECT_GROUP_ID = "ch.giantific.qwittig.services.extra.GROUP_ID";
 
+    /**
+     * Constructs a new {@link ParseQueryService}.
+     */
     public ParseQueryService() {
         super(SERVICE_NAME);
     }
 
     /**
-     * Starts this service to unpin a specific ParseObject
+     * Starts this service to unpin a specific ParseObject.
      *
+     * @param context   the context to use to construct the intent
+     * @param className the class of the object to unpin
+     * @param objectId  the id of the object to unpin
      * @see IntentService
      */
-    public static void startUnpinObject(Context context, String className, String objectId) {
+    public static void startUnpinObject(@NonNull Context context,
+                                        @NonNull @ClassType String className,
+                                        @NonNull String objectId) {
         startUnpinObject(context, className, objectId, "");
     }
 
-    public static void startUnpinObject(Context context, String className, String objectId,
-                                        String groupId) {
+    /**
+     * Starts this service to unpin a specific ParseObject.
+     *
+     * @param context   the context to use to construct the intent
+     * @param className the class of the object to unpin
+     * @param objectId  the id of the object to unpin
+     * @param groupId   the group id used to construct the correct pin label
+     * @see IntentService
+     */
+    public static void startUnpinObject(@NonNull Context context,
+                                        @NonNull @ClassType String className,
+                                        @NonNull String objectId,
+                                        @NonNull String groupId) {
         Intent intent = new Intent(context, ParseQueryService.class);
         intent.setAction(ACTION_UNPIN_OBJECT);
         intent.putExtra(EXTRA_OBJECT_CLASS, className);
@@ -83,11 +114,17 @@ public class ParseQueryService extends IntentService {
     }
 
     /**
-     * Starts this service to query a specific ParseObject
+     * Starts this service to query a specific ParseObject.
      *
+     * @param context   the context to use to construct the intent
+     * @param className the class of the object to query
+     * @param objectId  the id of the object to query
+     * @param isNew     whether the object was already queried once
      * @see IntentService
      */
-    public static void startQueryObject(Context context, String className, String objectId,
+    public static void startQueryObject(@NonNull Context context,
+                                        @NonNull @ClassType String className,
+                                        @NonNull String objectId,
                                         boolean isNew) {
         Intent intent = new Intent(context, ParseQueryService.class);
         intent.setAction(ACTION_QUERY_OBJECT);
@@ -98,33 +135,37 @@ public class ParseQueryService extends IntentService {
     }
 
     /**
-     * Starts this service to perform to query all users
+     * Starts this service to query all users.
      *
+     * @param context the context to use to construct the intent
      * @see IntentService
      */
-    public static void startQueryUsers(Context context) {
+    public static void startQueryUsers(@NonNull Context context) {
         Intent intent = new Intent(context, ParseQueryService.class);
         intent.setAction(ACTION_QUERY_USERS);
         context.startService(intent);
     }
 
     /**
-     * Starts this service to perform to query all users, purchases and compensations
+     * Starts this service to query all users, purchases, compensations and tasks.
      *
+     * @param context the context to use to construct the intent
      * @see IntentService
      */
-    public static void startQueryAll(Context context) {
+    public static void startQueryAll(@NonNull Context context) {
         Intent intent = new Intent(context, ParseQueryService.class);
         intent.setAction(ACTION_QUERY_ALL);
         context.startService(intent);
     }
 
     /**
-     * Starts this service to query a task and rotate usersInvolved
+     * Starts this service to query a task and rotate the users involved
      *
+     * @param context the context to use to construct the intent
+     * @param taskId  the object id of the task to query
      * @see IntentService
      */
-    public static void startTaskDone(Context context, String taskId) {
+    public static void startTaskDone(@NonNull Context context, @NonNull String taskId) {
         Intent intent = new Intent(context, ParseQueryService.class);
         intent.setAction(ACTION_QUERY_TASK_DONE);
         intent.putExtra(EXTRA_OBJECT_ID, taskId);
@@ -132,7 +173,7 @@ public class ParseQueryService extends IntentService {
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
+    protected void onHandleIntent(@Nullable Intent intent) {
         if (intent == null) {
             return;
         }
@@ -194,7 +235,8 @@ public class ParseQueryService extends IntentService {
         }
     }
 
-    private void unpinObject(String className, String objectId, String groupId) throws ParseException {
+    private void unpinObject(@NonNull String className, @NonNull String objectId,
+                             @NonNull String groupId) throws ParseException {
         switch (className) {
             case Purchase.CLASS: {
                 ParseObject purchase = ParseObject.createWithoutData(Purchase.CLASS, objectId);
@@ -217,7 +259,8 @@ public class ParseQueryService extends IntentService {
         }
     }
 
-    private void queryObject(String className, String objectId, boolean isNew) throws ParseException {
+    private void queryObject(@NonNull String className, @NonNull String objectId, boolean isNew)
+            throws ParseException {
         if (isNew && objectIsAlreadyPinned(className, objectId)) {
             Log.e(LOG_TAG, "object already pinned");
             return;
@@ -242,7 +285,7 @@ public class ParseQueryService extends IntentService {
         }
     }
 
-    private boolean objectIsAlreadyPinned(String className, String objectId) {
+    private boolean objectIsAlreadyPinned(@NonNull String className, @NonNull String objectId) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(className);
         query.ignoreACLs();
         query.fromLocalDatastore();
@@ -255,7 +298,7 @@ public class ParseQueryService extends IntentService {
         return true;
     }
 
-    private void queryPurchase(String objectId, boolean isNew) throws ParseException {
+    private void queryPurchase(@NonNull String objectId, boolean isNew) throws ParseException {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Purchase.CLASS);
         query.include(Purchase.ITEMS);
         query.include(Purchase.USERS_INVOLVED);
@@ -275,7 +318,8 @@ public class ParseQueryService extends IntentService {
         }
     }
 
-    private boolean queryCompensation(String compensationId, boolean isNew) throws ParseException {
+    private boolean queryCompensation(@NonNull String compensationId, boolean isNew)
+            throws ParseException {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Compensation.CLASS);
         Compensation compensation = (Compensation) query.get(compensationId);
 
@@ -301,7 +345,7 @@ public class ParseQueryService extends IntentService {
         return isPaid;
     }
 
-    private void queryGroup(String groupId) throws ParseException {
+    private void queryGroup(@NonNull String groupId) throws ParseException {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Group.CLASS);
         query.get(groupId);
     }
@@ -354,7 +398,7 @@ public class ParseQueryService extends IntentService {
         sendLocalBroadcastCompensation(true);
     }
 
-    private void queryCompensationsUnpaid(List<ParseObject> groups) throws ParseException {
+    private void queryCompensationsUnpaid(@NonNull List<ParseObject> groups) throws ParseException {
         ParseQuery<ParseObject> query = OnlineQuery.getCompensationsQuery();
         query.whereContainedIn(Compensation.GROUP, groups);
         query.whereEqualTo(Compensation.IS_PAID, false);
@@ -364,7 +408,7 @@ public class ParseQueryService extends IntentService {
         ParseObject.pinAll(Compensation.PIN_LABEL_UNPAID, compensationsUnpaid);
     }
 
-    private void queryCompensationsPaid(final ParseObject group) throws ParseException {
+    private void queryCompensationsPaid(@NonNull final ParseObject group) throws ParseException {
         ParseQuery<ParseObject> query = OnlineQuery.getCompensationsQuery();
         query.whereEqualTo(Compensation.GROUP, group);
         query.whereEqualTo(Compensation.IS_PAID, true);
@@ -377,7 +421,7 @@ public class ParseQueryService extends IntentService {
         ParseObject.pinAll(pinLabel, compensationsPaid);
     }
 
-    private void queryTask(String taskId, boolean isNew) throws ParseException {
+    private void queryTask(@NonNull String taskId, boolean isNew) throws ParseException {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Task.CLASS);
         query.include(Task.USERS_INVOLVED);
         Task task = (Task) query.get(taskId);
@@ -386,7 +430,7 @@ public class ParseQueryService extends IntentService {
         }
     }
 
-    private void setTaskDone(String taskId) throws ParseException {
+    private void setTaskDone(@NonNull String taskId) throws ParseException {
         Task task = (Task) ParseObject.createWithoutData(Task.CLASS, taskId);
         task.fetchFromLocalDatastore();
         List<ParseUser> usersInvolved = task.getUsersInvolved();

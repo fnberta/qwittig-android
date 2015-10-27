@@ -1,11 +1,17 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments.dialogs;
 
 import android.app.Activity;
-import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,15 +21,30 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
- * Created by fabio on 20.11.14.
+ * Provides a dialog that allows the user to enter his/her email address in order to request a
+ * password reset.
+ * <p/>
+ * If no valid email address is entered, the dialog is only be dismissed by the cancel action.
+ * Therefore overrides the default positive button onClickListener because the default behaviour is
+ * to always call dismiss().
+ * <p/>
+ * Subclass of {@link DialogFragment}.
  */
 public class ResetPasswordDialogFragment extends DialogFragment {
 
     private static final String BUNDLE_EMAIL = "BUNDLE_EMAIL";
-    private FragmentInteractionListener mListener;
+    private DialogInteractionListener mListener;
     private String mEmail;
     private TextInputLayout mTextInputLayoutEmail;
 
+    /**
+     * Returns a new instance of {@link ResetPasswordDialogFragment}.
+     *
+     * @param email the email address of the user if he/she already entered it in the email field
+     *              of the login screen
+     * @return a new instance of {@link ResetPasswordDialogFragment}
+     */
+    @NonNull
     public static ResetPasswordDialogFragment newInstance(String email) {
         ResetPasswordDialogFragment fragment = new ResetPasswordDialogFragment();
 
@@ -35,11 +56,11 @@ public class ResetPasswordDialogFragment extends DialogFragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
 
         try {
-            mListener = (FragmentInteractionListener) activity;
+            mListener = (DialogInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement SeparateBillFragmentCallback");
@@ -51,7 +72,7 @@ public class ResetPasswordDialogFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            mEmail = getArguments().getString(BUNDLE_EMAIL);
+            mEmail = getArguments().getString(BUNDLE_EMAIL, "");
         }
     }
 
@@ -99,7 +120,15 @@ public class ResetPasswordDialogFragment extends DialogFragment {
         }
     }
 
-    public interface FragmentInteractionListener {
-        void onResetPasswordSelected(String email);
+    /**
+     * Defines the actions to take when user clicks on one of the dialog's buttons.
+     */
+    public interface DialogInteractionListener {
+        /**
+         * Defines the click on the reset password button.
+         *
+         * @param email the email address to send the reset password link to
+         */
+        void onResetPasswordSelected(@NonNull String email);
     }
 }

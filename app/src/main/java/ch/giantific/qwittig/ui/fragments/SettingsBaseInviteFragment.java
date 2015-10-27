@@ -1,7 +1,13 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.view.View;
 import android.widget.Button;
@@ -16,20 +22,25 @@ import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
- * Created by fabio on 09.06.15.
+ * Provides an abstract base class for screens that deal with the invitation of users to a group.
+ * <p/>
+ * Subclass of {@link BaseFragment}.
  */
 public abstract class SettingsBaseInviteFragment extends BaseFragment {
 
     private static final String STATE_ROW_COUNT = "STATE_ROW_COUNT";
+    @NonNull
     List<TextInputLayout> mUsersToInviteFields = new ArrayList<>();
+    @NonNull
     ArrayList<String> mUsersToInviteEmails = new ArrayList<>();
     private int mInvitedUsersRowCount;
     private LinearLayout mLinearLayoutUsers;
     private Button mButtonAddUser;
+    @NonNull
     private List<View> mUsersToInviteRows = new ArrayList<>();
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null) {
@@ -40,13 +51,13 @@ public abstract class SettingsBaseInviteFragment extends BaseFragment {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         outState.putInt(STATE_ROW_COUNT, mInvitedUsersRowCount);
     }
 
-    final void findUsersToInviteViews(View rootView) {
+    final void findUsersToInviteViews(@NonNull View rootView) {
         mLinearLayoutUsers = (LinearLayout) rootView.findViewById(R.id.ll_users);
         mButtonAddUser = (Button) rootView.findViewById(R.id.bt_user_add);
     }
@@ -78,7 +89,7 @@ public abstract class SettingsBaseInviteFragment extends BaseFragment {
                     }
 
                     @Override
-                    public void onDismiss(View view, Object token) {
+                    public void onDismiss(@NonNull View view, Object token) {
                         int position = Utils.getViewPositionFromTag(view);
 
                         mInvitedUsersRowCount--;
@@ -126,9 +137,9 @@ public abstract class SettingsBaseInviteFragment extends BaseFragment {
     }
 
     @CallSuper
-    void onParseError(String errorMessage) {
+    void onParseError(@NonNull String errorMessage) {
         hideProgressCircle();
-        MessageUtils.showBasicSnackbar(getView(), errorMessage);
+        MessageUtils.showBasicSnackbar(mButtonAddUser, errorMessage);
     }
 
     protected abstract void hideProgressCircle();

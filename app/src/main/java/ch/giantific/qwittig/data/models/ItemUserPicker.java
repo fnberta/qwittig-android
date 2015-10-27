@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.data.models;
 
 import android.os.Parcel;
@@ -5,19 +9,45 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 /**
- * Created by fabio on 20.03.15.
+ * Represents a user with a name and avatar image.
+ * <p/>
+ * Can be passed around android components by implementing {@link Parcelable}.
  */
 public class ItemUserPicker implements Parcelable, Comparable<ItemUserPicker> {
 
+    public static final Parcelable.Creator<ItemUserPicker> CREATOR = new Parcelable.Creator<ItemUserPicker>() {
+        @NonNull
+        public ItemUserPicker createFromParcel(@NonNull Parcel source) {
+            return new ItemUserPicker(source);
+        }
+
+        @NonNull
+        public ItemUserPicker[] newArray(int size) {
+            return new ItemUserPicker[size];
+        }
+    };
     private String mObjectId;
     private String mNickname;
     private byte[] mAvatar;
+
+    public ItemUserPicker(@NonNull String objectId, @NonNull String nickname,
+                          @NonNull byte[] avatar) {
+        mObjectId = objectId;
+        mNickname = nickname;
+        mAvatar = avatar;
+    }
+
+    private ItemUserPicker(@NonNull Parcel in) {
+        this.mObjectId = in.readString();
+        this.mNickname = in.readString();
+        this.mAvatar = in.createByteArray();
+    }
 
     public String getObjectId() {
         return mObjectId;
     }
 
-    public void setObjectId(String objectId) {
+    public void setObjectId(@NonNull String objectId) {
         mObjectId = objectId;
     }
 
@@ -25,7 +55,7 @@ public class ItemUserPicker implements Parcelable, Comparable<ItemUserPicker> {
         return mNickname;
     }
 
-    public void setNickname(String nickname) {
+    public void setNickname(@NonNull String nickname) {
         mNickname = nickname;
     }
 
@@ -33,13 +63,7 @@ public class ItemUserPicker implements Parcelable, Comparable<ItemUserPicker> {
         return mAvatar;
     }
 
-    public void setAvatar(byte[] avatar) {
-        mAvatar = avatar;
-    }
-
-    public ItemUserPicker(String objectId, String nickname, byte[] avatar) {
-        mObjectId = objectId;
-        mNickname = nickname;
+    public void setAvatar(@NonNull byte[] avatar) {
         mAvatar = avatar;
     }
 
@@ -54,25 +78,9 @@ public class ItemUserPicker implements Parcelable, Comparable<ItemUserPicker> {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(this.mObjectId);
         dest.writeString(this.mNickname);
         dest.writeByteArray(this.mAvatar);
     }
-
-    private ItemUserPicker(Parcel in) {
-        this.mObjectId = in.readString();
-        this.mNickname = in.readString();
-        this.mAvatar = in.createByteArray();
-    }
-
-    public static final Parcelable.Creator<ItemUserPicker> CREATOR = new Parcelable.Creator<ItemUserPicker>() {
-        public ItemUserPicker createFromParcel(Parcel source) {
-            return new ItemUserPicker(source);
-        }
-
-        public ItemUserPicker[] newArray(int size) {
-            return new ItemUserPicker[size];
-        }
-    };
 }

@@ -1,7 +1,14 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.data.ocr.models;
 
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Represents an item of a purchase with a name and a price.
+ */
 public class ItemRest {
 
     @SerializedName("name")

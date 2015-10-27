@@ -1,7 +1,13 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.helpers;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.parse.LogInCallback;
@@ -13,7 +19,15 @@ import com.parse.SignUpCallback;
 import ch.giantific.qwittig.data.parse.models.User;
 
 /**
- * Created by fabio on 10.12.14.
+ * Handles the different use-cases connected with the account of a user (log-in, create account,
+ * reset passowrd)
+ * <p/>
+ * Has three specific purposes:
+ * <ol>
+ * <li>Log in a user</li>
+ * <li>Create a new account and then log him/she in</li>
+ * <li>Reset the password of a user</li>
+ * </ol>
  */
 public class LoginHelper extends BaseHelper {
 
@@ -21,14 +35,24 @@ public class LoginHelper extends BaseHelper {
     private static final String BUNDLE_PASSWORD = "BUNDLE_PASSWORD";
     private static final String BUNDLE_NICKNAME = "BUNDLE_NICKNAME";
     private static final String BUNDLE_AVATAR = "BUNDLE_AVATAR";
+    @Nullable
     private HelperInteractionListener mListener;
+    @Nullable
     private byte[] mAvatar;
 
     public LoginHelper() {
         // empty default constructor
     }
 
-    public static LoginHelper newInstance(String username) {
+    /**
+     * Returns a new instance of {@link LoginHelper} with a username as an argument. This will
+     * reset the password of the user.
+     *
+     * @param username the name of the user
+     * @return a new instance of {@link LoginHelper} that will reset the password of the user
+     */
+    @NonNull
+    public static LoginHelper newInstance(@NonNull String username) {
         LoginHelper fragment = new LoginHelper();
         Bundle args = new Bundle();
         args.putString(BUNDLE_USERNAME, username);
@@ -36,7 +60,16 @@ public class LoginHelper extends BaseHelper {
         return fragment;
     }
 
-    public static LoginHelper newInstance(String username, String password) {
+    /**
+     * Returns a new instance of {@link LoginHelper} with a username and a password as arguments.
+     * This will log in the user.
+     *
+     * @param username the name of the user
+     * @param password the password of the user
+     * @return a new instance of {@link LoginHelper} that will log in the user
+     */
+    @NonNull
+    public static LoginHelper newInstance(@NonNull String username, @NonNull String password) {
         LoginHelper fragment = new LoginHelper();
         Bundle args = new Bundle();
         args.putString(BUNDLE_USERNAME, username);
@@ -45,8 +78,21 @@ public class LoginHelper extends BaseHelper {
         return fragment;
     }
 
-    public static LoginHelper newInstance(String username, String password, String nickname,
-                                          byte[] avatar) {
+    /**
+     * Returns a new instance of {@link LoginHelper} with a username, a password, a nickname and
+     * optionally an avatar image. This will create a new account for the user and then log him/her
+     * in.
+     *
+     * @param username the name of the user
+     * @param password the password of the user
+     * @param nickname the nickname of the user
+     * @param avatar   the avatar image of the user
+     * @return a new instance of {@link LoginHelper} that will create a new account for the user
+     * and log him/her in
+     */
+    @NonNull
+    public static LoginHelper newInstance(@NonNull String username, @NonNull String password,
+                                          @NonNull String nickname, @Nullable byte[] avatar) {
         LoginHelper fragment = new LoginHelper();
         Bundle args = new Bundle();
         args.putString(BUNDLE_USERNAME, username);
@@ -58,13 +104,13 @@ public class LoginHelper extends BaseHelper {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
             mListener = (HelperInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
+                    + " must implement DialogInteractionListener");
         }
     }
 
@@ -83,19 +129,23 @@ public class LoginHelper extends BaseHelper {
             mAvatar = args.getByteArray(BUNDLE_AVATAR);
         }
 
-        if (TextUtils.isEmpty(password)) {
+        final boolean usernameIsEmpty = TextUtils.isEmpty(username);
+        final boolean passwordIsEmpty = TextUtils.isEmpty(password);
+        final boolean nicknameIsEmpty = TextUtils.isEmpty(nickname);
+
+        if (!usernameIsEmpty && passwordIsEmpty) {
             resetPassword(username);
-        } else if (TextUtils.isEmpty(nickname)) {
+        } else if (!usernameIsEmpty && nicknameIsEmpty) {
             loginUser(username, password);
-        } else {
+        } else if (!usernameIsEmpty) {
             createAccount(username, password, nickname);
         }
     }
 
-    private void resetPassword(String email) {
+    private void resetPassword(@NonNull String email) {
         ParseUser.requestPasswordResetInBackground(email, new RequestPasswordResetCallback() {
             @Override
-            public void done(ParseException e) {
+            public void done(@Nullable ParseException e) {
                 if (e != null) {
                     if (mListener != null) {
                         mListener.onLoginFailed(e);
@@ -110,10 +160,10 @@ public class LoginHelper extends BaseHelper {
         });
     }
 
-    private void loginUser(String username, String password) {
+    private void loginUser(@NonNull String username, @NonNull String password) {
         ParseUser.logInInBackground(username, password, new LogInCallback() {
             @Override
-            public void done(ParseUser parseUser, ParseException e) {
+            public void done(@Nullable ParseUser parseUser, @Nullable ParseException e) {
                 if (e != null) {
                     if (mListener != null) {
                         mListener.onLoginFailed(e);
@@ -128,7 +178,8 @@ public class LoginHelper extends BaseHelper {
         });
     }
 
-    private void createAccount(String username, String password, String nickname) {
+    private void createAccount(@NonNull String username, @NonNull String password,
+                               @NonNull String nickname) {
         // if avatar is null, don't set one in parse.com
         if (mAvatar != null) {
             User user = new User(username, password, nickname, mAvatar);
@@ -139,10 +190,11 @@ public class LoginHelper extends BaseHelper {
         }
     }
 
-    private void signUpUser(User user, final String email, final String password) {
+    private void signUpUser(@NonNull User user, @NonNull final String email,
+                            @NonNull final String password) {
         user.signUpInBackground(new SignUpCallback() {
             @Override
-            public void done(ParseException e) {
+            public void done(@Nullable ParseException e) {
                 if (e != null) {
                     if (mListener != null) {
                         mListener.onLoginFailed(e);
@@ -161,11 +213,28 @@ public class LoginHelper extends BaseHelper {
         mListener = null;
     }
 
+    /**
+     * Defines the actions to take after a successful login, a failed login or the reset of a
+     * password.
+     */
     public interface HelperInteractionListener {
-        void onLoginFailed(ParseException e);
+        /**
+         * Handles successful login of a user
+         *
+         * @param user the now logged {@link User} object
+         */
+        void onLoggedIn(@NonNull ParseUser user);
 
-        void onLoggedIn(ParseUser parseUser);
+        /**
+         * Handles the failure to log in a user
+         *
+         * @param e the {@link ParseException} thrown during the process
+         */
+        void onLoginFailed(@NonNull ParseException e);
 
+        /**
+         * Handles the case when the link to reset a password was successfully sent.
+         */
         void onPasswordReset();
     }
 }

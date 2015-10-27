@@ -1,23 +1,38 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments.dialogs;
 
 import android.app.Activity;
-import android.support.v7.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 
 import ch.giantific.qwittig.R;
 
 /**
- * Created by fabio on 20.11.14.
+ * Provides a dialog that asks the user if he really wants to leave the group.
+ * <p/>
+ * Subclass of {@link DialogFragment}.
  */
 public class GroupLeaveDialogFragment extends DialogFragment {
 
     private static final String BUNDLE_MESSAGE = "BUNDLE_MESSAGE";
-    private FragmentInteractionListener mListener;
+    private DialogInteractionListener mListener;
     private String mMessage;
 
+    /**
+     * Returns a new instance of {@link GroupLeaveDialogFragment}.
+     *
+     * @param message the message to display in the dialog
+     * @return a new instance of {@link GroupLeaveDialogFragment}
+     */
+    @NonNull
     public static GroupLeaveDialogFragment newInstance(String message) {
         GroupLeaveDialogFragment fragment = new GroupLeaveDialogFragment();
 
@@ -29,11 +44,11 @@ public class GroupLeaveDialogFragment extends DialogFragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
 
         try {
-            mListener = (FragmentInteractionListener) activity;
+            mListener = (DialogInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement SeparateBillFragmentCallback");
@@ -45,7 +60,7 @@ public class GroupLeaveDialogFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            mMessage = getArguments().getString(BUNDLE_MESSAGE);
+            mMessage = getArguments().getString(BUNDLE_MESSAGE, "");
         }
     }
 
@@ -63,7 +78,13 @@ public class GroupLeaveDialogFragment extends DialogFragment {
         return dialogBuilder.create();
     }
 
-    public interface FragmentInteractionListener {
+    /**
+     * Defines the actions to take when user clicks on one of the dialog's buttons.
+     */
+    public interface DialogInteractionListener {
+        /**
+         * Handles the click on the leave group button.
+         */
         void onLeaveGroupSelected();
     }
 }

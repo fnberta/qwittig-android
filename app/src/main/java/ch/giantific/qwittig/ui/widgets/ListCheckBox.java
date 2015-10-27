@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.widgets;
 
 import android.annotation.TargetApi;
@@ -6,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.widget.CheckBox;
@@ -16,12 +21,16 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
- * Created by fabio on 12.08.15.
+ * Provides a check box that allows to save a list of users involved and changes its checked status
+ * and color according to whether this list differs from a purchases' list of users involved.
+ * <p/>
+ * Subclass of {@link CheckBox}.
  */
 public class ListCheckBox extends CheckBox {
 
     private static final String STATE_SUPER = "STATE_SUPER";
     private static final String STATE_USERS_CHECKED = "STATE_USERS_CHECKED";
+    @Nullable
     private boolean[] mUsersChecked;
 
     public ListCheckBox(Context context) {
@@ -36,16 +45,12 @@ public class ListCheckBox extends CheckBox {
         super(context, attrs, defStyleAttr);
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public ListCheckBox(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-    }
-
+    @Nullable
     public boolean[] getUsersChecked() {
         return mUsersChecked;
     }
 
-    public void setUsersChecked(boolean[] usersChecked) {
+    public void setUsersChecked(@Nullable boolean[] usersChecked) {
         mUsersChecked = usersChecked;
     }
 
@@ -56,7 +61,7 @@ public class ListCheckBox extends CheckBox {
      * @param purchaseUsersInvolved list with purchase wide usersInvolved
      */
     public void updateUsersCheckedAfterCheckedChange(int buyerPosition,
-                                                     boolean[] purchaseUsersInvolved) {
+                                                     @NonNull boolean[] purchaseUsersInvolved) {
         if (isChecked()) {
             boolean onlyBuyerIsChecked = true;
             int purchaseUsersInvolvedSize = purchaseUsersInvolved.length;
@@ -91,12 +96,13 @@ public class ListCheckBox extends CheckBox {
     }
 
     /**
-     * Unchecks all users except the buyer of the purchase
+     * Un-checks all users except the buyer of the purchase
      *
      * @param buyerPosition the position of the buyer
      */
     private void unCheckAllUsersExceptBuyer(int buyerPosition) {
-        for (int i = 0, mUsersCheckedLength = mUsersChecked.length; i < mUsersCheckedLength; i++) {
+        for (int i = 0, mUsersCheckedLength = mUsersChecked != null ? mUsersChecked.length : 0;
+             i < mUsersCheckedLength; i++) {
             mUsersChecked[i] = i == buyerPosition;
         }
     }
@@ -104,11 +110,16 @@ public class ListCheckBox extends CheckBox {
     /**
      * Checks if the given user is selected/unselected and changes it accordingly
      *
-     * @param purchaseUserPosition  the position of the user that was clicked in the purchase wide selection
+     * @param purchaseUserPosition  the position of the user that was clicked in the purchase wide
+     *                              selection
      * @param purchaseUserIsChecked whether the user is now checked or unchecked
      */
-    public void updateUsersCheckedAfterPurchaseUserClick(int purchaseUserPosition, boolean purchaseUserIsChecked) {
+    public void updateUsersCheckedAfterPurchaseUserClick(int purchaseUserPosition,
+                                                         boolean purchaseUserIsChecked) {
         boolean[] usersChecked = getUsersChecked();
+        if (usersChecked == null) {
+            return;
+        }
 
         if (purchaseUserIsChecked) {
             if (!usersChecked[purchaseUserPosition]) {
@@ -123,12 +134,15 @@ public class ListCheckBox extends CheckBox {
 
     /**
      * Updates the checked status, depending on how many users are enabled. Sets to unchecked if
-     * only buyer is enabled.
+     * only the buyer is enabled.
      *
      * @param buyerPosition position of the buyer
      */
     public void updateCheckedStatus(int buyerPosition) {
         boolean[] usersChecked = getUsersChecked();
+        if (usersChecked == null) {
+            return;
+        }
 
         boolean onlyBuyerIsCheckedInPurchase = true;
         for (int i = 0, usersCheckedLength = usersChecked.length; i < usersCheckedLength; i++) {
@@ -146,11 +160,11 @@ public class ListCheckBox extends CheckBox {
     }
 
     /**
-     * Checks whether the usersChecked for the checkbox item are equal to the purchase wide
-     * usersInvolved. If yes, set color to normal, if no set it to special.
-     * If checkbox is unchecked, set it to normal in any case.
+     * Checks whether the users checked for the checkbox item are equal to the purchase wide
+     * users involved. If yes, sets the color to normal, if no sets it to special (red).
+     * If checkbox is unchecked, sets it to normal in any case.
      */
-    public void setCheckBoxColor(boolean[] purchaseUsersInvolved) {
+    public void setCheckBoxColor(@NonNull boolean[] purchaseUsersInvolved) {
         boolean[] usersChecked = getUsersChecked();
         boolean isSpecial = false;
 
@@ -164,9 +178,9 @@ public class ListCheckBox extends CheckBox {
     }
 
     /**
-     * Sets the color depending on the users checked differ from the purchase wide or not
+     * Sets the color depending on whether the users checked differ from the purchase wide or not.
      *
-     * @param isSpecial whether users checked differ from the purchase wide or not
+     * @param isSpecial whether the users checked differ from the purchase wide or not
      */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void setListStatus(boolean isSpecial) {

@@ -1,7 +1,12 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.activities;
 
 import android.app.FragmentManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.MenuItem;
 
 import ch.giantific.qwittig.R;
@@ -12,7 +17,13 @@ import ch.giantific.qwittig.ui.fragments.PurchaseAddFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseBaseFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.PurchaseDiscardDialogFragment;
 
-
+/**
+ * Hosts {@link PurchaseAddFragment} that handles the creation of a new purchase.
+ * <p/>
+ * Asks the user if he wants to discard the new purchase when dismissing the activity.
+ * <p/>
+ * Subclass of {@link PurchaseBaseActivity}.
+ */
 public class PurchaseAddActivity extends PurchaseBaseActivity implements
         PurchaseDiscardDialogFragment.DialogInteractionListener,
         OcrHelper.HelperInteractionListener {
@@ -20,6 +31,7 @@ public class PurchaseAddActivity extends PurchaseBaseActivity implements
     public static final String INTENT_PURCHASE_NEW_AUTO = "INTENT_PURCHASE_NEW_AUTO";
     public static final String INTENT_PURCHASE_NEW_TRIAL_MODE = "INTENT_PURCHASE_NEW_TRIAL_MODE";
     private static final String LOG_TAG = PurchaseAddActivity.class.getSimpleName();
+    private static final String DISCARD_PURCHASE_DIALOG = "DISCARD_PURCHASE_DIALOG";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,19 +56,19 @@ public class PurchaseAddActivity extends PurchaseBaseActivity implements
     }
 
     @Override
-    public void onOcrFinished(PurchaseRest purchaseRest) {
+    public void onOcrFinished(@NonNull PurchaseRest purchaseRest) {
         ((PurchaseAddAutoFragment) mPurchaseFragment).onOcrFinished(purchaseRest);
         showFab();
     }
 
     @Override
-    public void onOcrFailed(String errorMessage) {
+    public void onOcrFailed(@NonNull String errorMessage) {
         ((PurchaseAddAutoFragment) mPurchaseFragment).onOcrFailed(errorMessage);
         showFab();
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home:
@@ -70,7 +82,7 @@ public class PurchaseAddActivity extends PurchaseBaseActivity implements
     private void showPurchaseDiscardDialog() {
         PurchaseDiscardDialogFragment purchaseDiscardDialogFragment =
                 new PurchaseDiscardDialogFragment();
-        purchaseDiscardDialogFragment.show(getFragmentManager(), "discard_purchase");
+        purchaseDiscardDialogFragment.show(getFragmentManager(), DISCARD_PURCHASE_DIALOG);
     }
 
     @Override

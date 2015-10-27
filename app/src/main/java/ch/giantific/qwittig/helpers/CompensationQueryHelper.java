@@ -1,25 +1,42 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.helpers;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.parse.ParseException;
 import com.parse.ParseObject;
 
 /**
- * Created by fabio on 10.12.14.
+ * Performs an online query to the Parse.com database to query either paid or unpaid compensations.
+ * <p/>
+ * Subclass of {@link BaseQueryHelper}.
  */
 public class CompensationQueryHelper extends BaseQueryHelper {
 
     private static final String LOG_TAG = CompensationQueryHelper.class.getSimpleName();
     private static final String BUNDLE_QUERY_PAID = "BUNDLE_QUERY_PAID";
     private boolean mQueryPaid;
+    @Nullable
     private HelperInteractionListener mListener;
 
     public CompensationQueryHelper() {
         // empty default constructor
     }
 
+    /**
+     * Returns a new instance of {@link CompensationQueryHelper} with an argument whether to
+     * query for paid or unpaid compensations.
+     *
+     * @param queryPaid whether to query paid compensations
+     * @return a new instance of {@link CompensationQueryHelper}
+     */
+    @NonNull
     public static CompensationQueryHelper newInstance(boolean queryPaid) {
         CompensationQueryHelper fragment = new CompensationQueryHelper();
         Bundle args = new Bundle();
@@ -29,13 +46,13 @@ public class CompensationQueryHelper extends BaseQueryHelper {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
             mListener = (HelperInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
+                    + " must implement DialogInteractionListener");
         }
     }
 
@@ -90,7 +107,7 @@ public class CompensationQueryHelper extends BaseQueryHelper {
     }
 
     @Override
-    void onCompensationsPaidPinned(String groupId) {
+    void onCompensationsPaidPinned(@NonNull String groupId) {
         super.onCompensationsPaidPinned(groupId);
 
         if (mListener != null && mCurrentGroup != null &&
@@ -107,11 +124,30 @@ public class CompensationQueryHelper extends BaseQueryHelper {
         mListener = null;
     }
 
+    /**
+     * Defines the actions to take after a query finished.
+     */
     public interface HelperInteractionListener {
+        /**
+         * Handles the successful query and pin to the local data store.
+         *
+         * @param isPaid whether the compensations are paid or unpaid
+         */
         void onCompensationsPinned(boolean isPaid);
 
-        void onCompensationsPinFailed(ParseException e, boolean isPaid);
+        /**
+         * Handles the failed query or pin.
+         *
+         * @param e      the {@link ParseException} thrown in the process
+         * @param isPaid whether the compensations are paid or unpaid
+         */
+        void onCompensationsPinFailed(@NonNull ParseException e, boolean isPaid);
 
+        /**
+         * Handles the completion of all queries.
+         *
+         * @param isPaid whether the compensations are paid or unpaid
+         */
         void onAllCompensationsQueried(boolean isPaid);
     }
 }

@@ -1,6 +1,12 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.adapters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,34 +28,44 @@ import ch.giantific.qwittig.utils.ComparatorParseUserIgnoreCase;
 import static ch.giantific.qwittig.utils.AnimUtils.DISABLED_ALPHA;
 
 /**
- * Created by fabio on 09.11.14.
+ * Handles the display of users' avatars and nicknames inside of a
+ * {@link PurchaseDetailsRecyclerAdapter}.
+ * <p/>
+ * Subclass of {@link RecyclerView.Adapter}.
  */
 public class PurchaseDetailsUsersInvolvedRecyclerAdapter extends
         RecyclerView.Adapter<UserInvolvedRow> {
 
     private static final String LOG_TAG = PurchaseDetailsUsersInvolvedRecyclerAdapter.class.getSimpleName();
+    private static final int VIEW_RESOURCE = R.layout.row_users_involved_list;
     private Context mContext;
-    private int mViewResource;
     private Purchase mPurchase;
     private List<ParseUser> mUsersInvolved;
+    @NonNull
     private List<ParseUser> mUsersInvolvedSorted = new ArrayList<>();
     private User mBuyer;
 
-    public PurchaseDetailsUsersInvolvedRecyclerAdapter(Context context, int viewResource) {
+    /**
+     * Constructs a new {@link PurchaseDetailsUsersInvolvedRecyclerAdapter}.
+     *
+     * @param context the context to use in the adapters
+     */
+    public PurchaseDetailsUsersInvolvedRecyclerAdapter(@NonNull Context context) {
+        super();
 
         mContext = context;
-        mViewResource = viewResource;
+    }
+
+    @Nullable
+    @Override
+    public UserInvolvedRow onCreateViewHolder(@NonNull ViewGroup parent, int i) {
+        View v = LayoutInflater.from(parent.getContext()).inflate(VIEW_RESOURCE, parent, false);
+
+        return new UserInvolvedRow(mContext, v, null);
     }
 
     @Override
-    public UserInvolvedRow onCreateViewHolder(ViewGroup parent, int i) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(mViewResource, parent, false);
-
-        return new UserInvolvedRow(v, mContext, null);
-    }
-
-    @Override
-    public void onBindViewHolder(final UserInvolvedRow viewHolder, int position) {
+    public void onBindViewHolder(@NonNull final UserInvolvedRow viewHolder, int position) {
         if (mPurchase == null) {
             return;
         }
@@ -72,7 +88,7 @@ public class PurchaseDetailsUsersInvolvedRecyclerAdapter extends
         }
     }
 
-    private boolean userIsInGroup(User user) {
+    private boolean userIsInGroup(@NonNull User user) {
         return user.getGroupIds().contains(mPurchase.getGroup().getObjectId());
     }
 
@@ -81,7 +97,13 @@ public class PurchaseDetailsUsersInvolvedRecyclerAdapter extends
         return mUsersInvolvedSorted.size();
     }
 
-    public void setPurchase(ParseObject purchase) {
+    /**
+     * Sets the purchase of the adapter. As long as this is not set, nothing will be displayed in
+     * the adapter.
+     *
+     * @param purchase the purchase to set
+     */
+    public void setPurchase(@NonNull ParseObject purchase) {
         mPurchase = (Purchase) purchase;
         mBuyer = mPurchase.getBuyer();
         setupUsersInvolved();

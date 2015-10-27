@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.app.Activity;
@@ -7,6 +11,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -30,13 +36,17 @@ import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Displays the sign up screen asking the user for an email, password, nickname and optionally an
+ * avatar image.
+ * <p/>
+ * Subclass of {@link LoginBaseFragment}.
  */
 public class LoginSignUpFragment extends LoginBaseFragment {
 
     private static final String BUNDLE_EMAIL = "BUNDLE_EMAIL";
     private static final int NICKNAME_MAX_CHARACTERS = 10;
     private static final int INTENT_REQUEST_IMAGE = 1;
+    @Nullable
     private String mEmail;
     private TextInputLayout mTextInputLayoutEmail;
     private TextInputLayout mTextInputLayoutPassword;
@@ -54,9 +64,11 @@ public class LoginSignUpFragment extends LoginBaseFragment {
 
     /**
      * Returns a new instance of a {@link LoginSignUpFragment} with an email address as an argument.
-     * @param email the email to be used as an argument
+     *
+     * @param email the email to be used for the sign up
      * @return a new instance of a {@link LoginSignUpFragment}
      */
+    @NonNull
     public static LoginSignUpFragment newInstance(String email) {
         LoginSignUpFragment fragment = new LoginSignUpFragment();
         Bundle args = new Bundle();
@@ -75,18 +87,18 @@ public class LoginSignUpFragment extends LoginBaseFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_login_sign_up, container, false);
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         mTextInputLayoutEmail = (TextInputLayout) view.findViewById(R.id.til_login_signup_email);
         mEditTextEmail = (AutoCompleteTextView) mTextInputLayoutEmail.getEditText();
-        if (mEmail.length() > 0) {
+        if (!TextUtils.isEmpty(mEmail)) {
             mEditTextEmail.setText(mEmail);
         }
 
@@ -122,7 +134,7 @@ public class LoginSignUpFragment extends LoginBaseFragment {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, @NonNull Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == LoginSignUpFragment.INTENT_REQUEST_IMAGE &&
@@ -151,7 +163,7 @@ public class LoginSignUpFragment extends LoginBaseFragment {
                 .centerCrop()
                 .into(new BitmapImageViewTarget(mImageButtonAvatar) {
                     @Override
-                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                    public void onResourceReady(@NonNull Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                         view.setImageDrawable(Avatar.getRoundedDrawable(getActivity(), resource, true));
                     }
                 });
@@ -209,7 +221,9 @@ public class LoginSignUpFragment extends LoginBaseFragment {
         }
     }
 
-    private void createAccountWithHelper(final String email, final String password, final String nickname) {
+    private void createAccountWithHelper(@NonNull final String email,
+                                         @NonNull final String password,
+                                         @NonNull final String nickname) {
         if (!Utils.isConnected(getActivity())) {
             MessageUtils.showBasicSnackbar(mButtonSignUp, getString(R.string.toast_no_connection));
             return;
@@ -224,7 +238,6 @@ public class LoginSignUpFragment extends LoginBaseFragment {
         // retained across a configuration change.
         if (loginHelper == null) {
             loginHelper = LoginHelper.newInstance(email, password, nickname, mAvatar);
-
             fragmentManager.beginTransaction()
                     .add(loginHelper, LoginFragment.LOGIN_HELPER)
                     .commit();

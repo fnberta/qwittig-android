@@ -1,13 +1,19 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
@@ -40,7 +46,11 @@ import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 
 /**
- * A placeholder fragment containing a simple view.
+ * Shows the details of a {@link Task}. Most of the information gets displayed in the
+ * {@link Toolbar} of the hosting {@link Activity}. The fragment itself shows a list of users that
+ * have previously finished the task.
+ * <p/>
+ * Subclass of {@link BaseFragment}.
  */
 public class TaskDetailsFragment extends BaseFragment implements
         LocalQuery.ObjectLocalFetchListener,
@@ -52,6 +62,7 @@ public class TaskDetailsFragment extends BaseFragment implements
     private String mTaskId;
     private User mCurrentUser;
     private Group mCurrentGroup;
+    @NonNull
     private List<TaskHistory> mTaskHistory = new ArrayList<>();
     private RecyclerView mRecyclerViewHistory;
     private TaskHistoryRecyclerAdapter mRecyclerAdapter;
@@ -61,6 +72,13 @@ public class TaskDetailsFragment extends BaseFragment implements
     public TaskDetailsFragment() {
     }
 
+    /**
+     * Returns a new instance of {@link TaskDetailsFragment}.
+     *
+     * @param taskId the object id of the task for which the details should be displayed
+     * @return a new instance of {@link TaskDetailsFragment}
+     */
+    @NonNull
     public static TaskDetailsFragment newInstance(String taskId) {
         TaskDetailsFragment fragment = new TaskDetailsFragment();
 
@@ -72,13 +90,13 @@ public class TaskDetailsFragment extends BaseFragment implements
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
             mListener = (FragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
+                    + " must implement DialogInteractionListener");
         }
     }
 
@@ -88,12 +106,12 @@ public class TaskDetailsFragment extends BaseFragment implements
 
         Bundle args = getArguments();
         if (args != null) {
-            mTaskId = args.getString(BUNDLE_TASK_ID);
+            mTaskId = args.getString(BUNDLE_TASK_ID, "");
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_task_details, container, false);
 
@@ -110,8 +128,7 @@ public class TaskDetailsFragment extends BaseFragment implements
 
         mRecyclerViewHistory.setHasFixedSize(true);
         mRecyclerViewHistory.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerAdapter = new TaskHistoryRecyclerAdapter(getActivity(),
-                R.layout.row_task_details_history, mTaskHistory);
+        mRecyclerAdapter = new TaskHistoryRecyclerAdapter(getActivity(), mTaskHistory);
         mRecyclerViewHistory.setAdapter(mRecyclerAdapter);
     }
 
@@ -131,13 +148,18 @@ public class TaskDetailsFragment extends BaseFragment implements
         }
     }
 
+    /**
+     * Queries the local data store for the data of the task for which to show details for.
+     * <p/>
+     * Uses a  query instead of a fetchFromLocalDatastore because this would not include the data
+     * for the pointers.
+     */
     public void queryData() {
-        // user query instead of fetch because fetch would not include data for the pointers
         LocalQuery.queryTask(mTaskId, this);
     }
 
     @Override
-    public void onObjectFetched(ParseObject object) {
+    public void onObjectFetched(@NonNull ParseObject object) {
         mTask = (Task) object;
 
         updateToolbarHeader();
@@ -151,7 +173,7 @@ public class TaskDetailsFragment extends BaseFragment implements
     }
 
     @Override
-    public void onUsersLocalQueried(List<ParseUser> users) {
+    public void onUsersLocalQueried(@NonNull List<ParseUser> users) {
         mTaskHistory.clear();
 
         Map<String, List<Date>> taskHistory = mTask.getHistory();
@@ -224,7 +246,7 @@ public class TaskDetailsFragment extends BaseFragment implements
 
     /**
      * Checks if user is the initiator of the task. If yes and task does not contain deleted user,
-     * show edit option.
+     * shows edit option in the action bar of the hosting {@link Activity}.
      */
     private void updateToolbarMenu() {
         User initiator = mTask.getInitiator();
@@ -256,6 +278,9 @@ public class TaskDetailsFragment extends BaseFragment implements
         }
     }
 
+    /**
+     * Deletes the task if the user is not a test user and finishes.
+     */
     public void deleteTask() {
         if (!ParseUtils.isTestUser(ParseUser.getCurrentUser())) {
             mTask.deleteEventually();
@@ -272,6 +297,9 @@ public class TaskDetailsFragment extends BaseFragment implements
         activity.finish();
     }
 
+    /**
+     * Starts {@link TaskEditActivity} to edit the task.
+     */
     public void editTask() {
         Intent intent = new Intent(getActivity(), TaskEditActivity.class);
         intent.putExtra(TasksFragment.INTENT_TASK_ID, mTaskId);
@@ -280,6 +308,14 @@ public class TaskDetailsFragment extends BaseFragment implements
         startActivityForResult(intent, BaseActivity.INTENT_REQUEST_TASK_MODIFY, options.toBundle());
     }
 
+    /**
+     * Sets the task to finished for the current user and sets the next user involved in line as
+     * responsible.
+     * <p/>
+     * If task was a one-time thing, deletes it.
+     * <p/>
+     * TODO: send notification to the group
+     */
     public void setTaskDone() {
         String timeFrame = mTask.getTimeFrame();
 
@@ -325,10 +361,30 @@ public class TaskDetailsFragment extends BaseFragment implements
         mListener = null;
     }
 
+    /**
+     * Defines the interaction with the hosting {@link Activity}.
+     * <p/>
+     * Extends {@link BaseFragmentInteractionListener}.
+     */
     public interface FragmentInteractionListener extends BaseFragmentInteractionListener {
-        void setToolbarHeader(String title, String timeFrame, SpannableStringBuilder usersInvolved,
+        /**
+         * Sets what to show in the {@link Toolbar} of the hosting {@link Activity}.
+         *
+         * @param title                    the title to show
+         * @param timeFrame                the time frame to show
+         * @param usersInvolved            the users involved to show
+         * @param currentUserIsResponsible whether it's the current user's turn to finish the task
+         */
+        void setToolbarHeader(@NonNull String title, @NonNull String timeFrame,
+                              @NonNull SpannableStringBuilder usersInvolved,
                               boolean currentUserIsResponsible);
 
+        /**
+         * Sets whether the edit option for the task should be shown in the action bar menu of the
+         * hosting {@link Activity}.
+         *
+         * @param show whether to show the edit option or not
+         */
         void showEditOptions(boolean show);
     }
 }

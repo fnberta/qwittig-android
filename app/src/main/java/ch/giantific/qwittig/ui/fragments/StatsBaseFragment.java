@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.app.Activity;
@@ -5,6 +9,8 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -31,7 +37,9 @@ import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Provides an abstract base class for the display of statistical information related to a group.
+ * <p/>
+ * Subclass of {@link BaseFragment}.
  */
 public abstract class StatsBaseFragment extends BaseFragment implements
         LocalQuery.ObjectLocalFetchListener {
@@ -41,13 +49,14 @@ public abstract class StatsBaseFragment extends BaseFragment implements
     private static final String STATE_STATS_DATA = "STATE_STATS_DATA";
     private static final String STATE_PERIOD_TYPE = "STATE_PERIOD_TYPE";
     private static final String LOG_TAG = StatsBaseFragment.class.getSimpleName();
-    private FragmentInteractionListener mListener;
-    private User mCurrentUser;
     Group mCurrentGroup;
     int mPeriodType;
     boolean mIsLoading;
+    @Nullable
     Stats mStatsData;
     boolean mDataIsLoaded;
+    private FragmentInteractionListener mListener;
+    private User mCurrentUser;
     private TextView mTextViewEmptyView;
     private ProgressBar mProgressBar;
     private boolean mIsRecreating;
@@ -57,18 +66,18 @@ public abstract class StatsBaseFragment extends BaseFragment implements
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
             mListener = (FragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
+                    + " must implement DialogInteractionListener");
         }
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null) {
@@ -79,7 +88,7 @@ public abstract class StatsBaseFragment extends BaseFragment implements
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         if (mStatsData != null) {
@@ -89,7 +98,7 @@ public abstract class StatsBaseFragment extends BaseFragment implements
     }
 
     @CallSuper
-    void findBaseViews(View rootView) {
+    void findBaseViews(@NonNull View rootView) {
         mTextViewEmptyView = (TextView) rootView.findViewById(R.id.tv_empty_view);
         mProgressBar = (ProgressBar) rootView.findViewById(R.id.pb_stats);
     }
@@ -101,6 +110,10 @@ public abstract class StatsBaseFragment extends BaseFragment implements
         updateData();
     }
 
+    /**
+     * Update the current user and current group fields and checks whether data is available for
+     * the current group.
+     */
     @CallSuper
     public void updateData() {
         updateCurrentUserAndGroup();
@@ -120,7 +133,7 @@ public abstract class StatsBaseFragment extends BaseFragment implements
                 setStuffWithGroupData();
                 loadData();
             } else {
-                LocalQuery.fetchObjectData(this, mCurrentGroup);
+                LocalQuery.fetchObjectData(mCurrentGroup, this);
             }
         } else {
             setEmptyViewVisibility(true);
@@ -134,7 +147,7 @@ public abstract class StatsBaseFragment extends BaseFragment implements
     }
 
     @Override
-    public void onObjectFetched(ParseObject object) {
+    public void onObjectFetched(@NonNull ParseObject object) {
         setStuffWithGroupData();
         loadData();
     }
@@ -143,6 +156,9 @@ public abstract class StatsBaseFragment extends BaseFragment implements
         return mCurrentUser != null && mCurrentGroup != null;
     }
 
+    /**
+     * Reads the user set year and month and calls method to load the stats data from the server.
+     */
     public void loadData() {
         if (mIsLoading) {
             return;
@@ -208,6 +224,7 @@ public abstract class StatsBaseFragment extends BaseFragment implements
         }
     }
 
+    @NonNull
     final List<Integer> getColors() {
         List<Integer> colors = new ArrayList<>();
 
@@ -231,7 +248,7 @@ public abstract class StatsBaseFragment extends BaseFragment implements
     }
 
     final void calcStatsWithHelper(@StatsHelper.StatsType int statsType,
-                                     String year, int month) {
+                                   @NonNull String year, int month) {
         FragmentManager fragmentManager = getFragmentManager();
         Fragment statsHelper = HelperUtils.findHelper(fragmentManager, getHelperTag());
 
@@ -249,11 +266,12 @@ public abstract class StatsBaseFragment extends BaseFragment implements
     protected abstract String getHelperTag();
 
     /**
-     * Called from activity when helper successfully calculated new stats
-     * @param stats
+     * Removes the retained helper fragment und sets the loaded chart data for display to the user.
+     *
+     * @param stats the stats data to set
      */
     @CallSuper
-    public void onStatsCalculated(Stats stats) {
+    public void onStatsCalculated(@Nullable Stats stats) {
         HelperUtils.removeHelper(getFragmentManager(), getHelperTag());
 
         if (stats == null) {
@@ -271,21 +289,23 @@ public abstract class StatsBaseFragment extends BaseFragment implements
     protected abstract void setChartData();
 
     /**
-     * Called from activity when helper failed to calculate stats
-     * @param e
+     * Passes the {@link ParseException} to the generic error handler, shows the user an error
+     * message and removes the retained helper fragment and loading indicators.
+     *
+     * @param e the {@link ParseException} thrown during the process
      */
     @CallSuper
     public void onStatsCalculationFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
         HelperUtils.removeHelper(getFragmentManager(), getHelperTag());
-                
+
         mIsLoading = false;
         toggleProgressBarVisibility();
         setEmptyViewVisibility(true);
     }
 
-    private void showErrorSnackbar(String message) {
+    private void showErrorSnackbar(@NonNull String message) {
         Snackbar snackbar = MessageUtils.getBasicSnackbar(mTextViewEmptyView, message);
         snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
             @Override
@@ -302,9 +322,24 @@ public abstract class StatsBaseFragment extends BaseFragment implements
         mListener = null;
     }
 
+    /**
+     * Defines the interaction with the hosting {@link Activity}.
+     */
     public interface FragmentInteractionListener {
+        /**
+         * Gets the year the user selected to calculate stats for.
+         *
+         * @return the year to calculate stats for
+         */
+        @NonNull
         String getYear();
 
+        /**
+         * Gets the month the user selected to calculate stats for.
+         *
+         * @return the month to calculate stats for
+         */
+        @NonNull
         Month getMonth();
     }
 

@@ -1,3 +1,7 @@
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
 <resources>
 
     <style name="BaseThemeDark" parent="Theme.AppCompat.NoActionBar">

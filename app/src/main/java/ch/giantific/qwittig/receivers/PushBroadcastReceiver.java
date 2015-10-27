@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.receivers;
 
 import android.app.Activity;
@@ -9,7 +13,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.StringDef;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.parse.ParseObject;
@@ -20,8 +25,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -43,10 +46,12 @@ import ch.giantific.qwittig.ui.activities.TasksActivity;
 import ch.giantific.qwittig.utils.MoneyUtils;
 
 /**
- * Created by fabio on 07.12.14.
+ * Handles incoming push messages sent through the Parse.com framework which leverages the Google
+ * Cloud Messaging service.
+ * <p/>
+ * Subclass of {@link ParsePushBroadcastReceiver}.
  */
 public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
-
 
     public static final String NOTIFICATION_TYPE = "type";
     public static final String PUSH_PARAM_PURCHASE = "purchase";
@@ -71,14 +76,6 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     public static final int ACTION_INVITATION_ACCEPTED = 1;
     public static final int ACTION_INVITATION_DISCARDED = 2;
 
-    @StringDef({TYPE_PURCHASE_NEW, TYPE_PURCHASE_EDIT, TYPE_PURCHASE_DELETE,
-            TYPE_SETTLEMENT_NEW, TYPE_COMPENSATION_NEW_PAID, TYPE_COMPENSATION_NEW_UNPAID,
-            TYPE_COMPENSATION_REMIND_USER, TYPE_COMPENSATION_REMIND_USER_HAS_PAID,
-            TYPE_COMPENSATION_EXISTING_NOT_NOW, TYPE_COMPENSATION_EXISTING_PAID, TYPE_USER_INVITED,
-            TYPE_USER_JOINED, TYPE_USER_LEFT, TYPE_USER_DELETED, TYPE_GROUP_USERS_INVITED_CHANGED,
-            TYPE_TASK_NEW, TYPE_TASK_EDIT, TYPE_TASK_DELETE, TYPE_TASK_REMIND_USER})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface NotificationType {}
     public static final String TYPE_USER_INVITED = "userInvited";
     private static final String TYPE_PURCHASE_NEW = "purchaseNew";
     private static final String TYPE_PURCHASE_EDIT = "purchaseEdit";
@@ -109,9 +106,17 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     private static final String LOG_TAG = PushBroadcastReceiver.class.getSimpleName();
     private SharedPreferences mSharedPreferences;
     private NotificationManager mNotificationManager;
+    @Nullable
     private Set<String> mPurchaseNotifications;
 
-    public static JSONObject getData(Intent intent) throws JSONException {
+    /**
+     * Returns the specific data of an intent in the extra <code>KEY_PUSH_DATA</code>
+     *
+     * @param intent the intent from which to extract the data from
+     * @return the extracted data as a {@link JSONObject}
+     * @throws JSONException if the intent does not contain data in <code>KEY_PUSH_DATA</code>
+     */
+    public static JSONObject getData(@NonNull Intent intent) throws JSONException {
         JSONObject extras;
         if (intent.hasExtra(KEY_PUSH_DATA)) {
             extras = new JSONObject(intent.getStringExtra(KEY_PUSH_DATA));
@@ -122,7 +127,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     }
 
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(@NonNull Context context, @NonNull Intent intent) {
         mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -195,23 +200,24 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
         }
     }
 
-    private Compensation getCompensation(JSONObject jsonExtras) {
+    @NonNull
+    private Compensation getCompensation(@NonNull JSONObject jsonExtras) {
         String compensationId = jsonExtras.optString(PUSH_PARAM_COMPENSATION);
         return (Compensation) ParseObject.createWithoutData(Compensation.CLASS, compensationId);
     }
 
-    private void cancelNotification(Intent intent) {
+    private void cancelNotification(@NonNull Intent intent) {
         int notificationId = intent.getIntExtra(NOTIFICATION_ID, 0);
         mNotificationManager.cancel(notificationId);
     }
 
-    private void closeShade(Context context) {
+    private void closeShade(@NonNull Context context) {
         Intent closeShade = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
         context.sendBroadcast(closeShade);
     }
 
     @Override
-    protected void onPushReceive(Context context, Intent intent) {
+    protected void onPushReceive(@NonNull Context context, @NonNull Intent intent) {
         Log.e(LOG_TAG, "onPushReceive");
 
         // return immediately if on user is logged in
@@ -410,25 +416,25 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
         }
     }
 
-    private void queryCompensation(Context context, JSONObject jsonExtras, boolean isNew) {
+    private void queryCompensation(@NonNull Context context, @NonNull JSONObject jsonExtras, boolean isNew) {
         String compensationId = jsonExtras.optString(PUSH_PARAM_COMPENSATION);
         ParseQueryService.startQueryObject(context, Compensation.CLASS, compensationId, isNew);
     }
 
-    private String getAmount(JSONObject jsonExtras) {
+    private String getAmount(@NonNull JSONObject jsonExtras) {
         String currencyCode = jsonExtras.optString(PUSH_PARAM_CURRENCY_CODE);
         double amount = jsonExtras.optDouble(PUSH_PARAM_AMOUNT);
         return MoneyUtils.formatMoney(amount, currencyCode);
     }
 
-    private boolean isSilentNotification(String type) {
+    private boolean isSilentNotification(@NonNull String type) {
         return type.equals(TYPE_PURCHASE_EDIT) || type.equals(TYPE_PURCHASE_DELETE) ||
                 type.equals(TYPE_COMPENSATION_NEW_PAID) || type.equals(TYPE_COMPENSATION_NEW_UNPAID) ||
                 type.equals(TYPE_GROUP_NAME_CHANGED) || type.equals(TYPE_GROUP_USERS_INVITED_CHANGED) ||
                 type.equals(TYPE_TASK_EDIT);
     }
 
-    private String getNotificationType(Intent intent) {
+    private String getNotificationType(@NonNull Intent intent) {
         JSONObject jsonExtras;
         try {
             jsonExtras = getData(intent);
@@ -438,13 +444,13 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
         }
     }
 
-    private boolean userIsInUsersInvolved(JSONObject jsonExtras) {
+    private boolean userIsInUsersInvolved(@NonNull JSONObject jsonExtras) {
         JSONArray usersInvolvedIds = jsonExtras.optJSONArray(PUSH_PARAM_USERS_INVOLVED);
         return usersInvolvedIds.toString().contains(ParseUser.getCurrentUser().getObjectId());
     }
 
     @Override
-    protected Notification getNotification(Context context, Intent intent) {
+    protected Notification getNotification(@NonNull Context context, @NonNull Intent intent) {
         JSONObject jsonExtras;
         try {
             jsonExtras = getData(intent);
@@ -711,7 +717,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     }
 
     @Override
-    protected void onPushOpen(Context context, Intent intent) {
+    protected void onPushOpen(Context context, @NonNull Intent intent) {
         String type = getNotificationType(intent);
         if (!isSilentNotification(type) && !type.equals(TYPE_USER_INVITED)) {
             String groupId;
@@ -737,18 +743,18 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
         super.onPushOpen(context, intent);
     }
 
-    private String getGroupId(Intent intent) throws JSONException {
+    private String getGroupId(@NonNull Intent intent) throws JSONException {
         JSONObject jsonExtras = getData(intent);
         return jsonExtras.optString(PUSH_PARAM_GROUP);
     }
 
-    private boolean isInPurchaseGroup(User currentUser, String purchaseGroupId) {
+    private boolean isInPurchaseGroup(@NonNull User currentUser, String purchaseGroupId) {
         List<String> groupIds = currentUser.getGroupIds();
         return groupIds.contains(purchaseGroupId);
     }
 
     @Override
-    protected Class<? extends Activity> getActivity(Context context, Intent intent) {
+    protected Class<? extends Activity> getActivity(@NonNull Context context, @NonNull Intent intent) {
         String type = getNotificationType(intent);
         switch (type) {
             case TYPE_PURCHASE_NEW: {
@@ -764,7 +770,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                         STORED_PURCHASE_NOTIFICATIONS + groupId, new LinkedHashSet<String>());
                 if (mPurchaseNotifications.size() > 1) {
                     clearStoredPurchaseNotifications(groupId);
-                    
+
                     return HomeActivity.class;
                 } else {
                     clearStoredPurchaseNotifications(groupId);
@@ -821,7 +827,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     }
 
     @Override
-    protected void onPushDismiss(Context context, Intent intent) {
+    protected void onPushDismiss(Context context, @NonNull Intent intent) {
         String type = getNotificationType(intent);
         if (type.equals(TYPE_PURCHASE_NEW)) {
             String groupId;

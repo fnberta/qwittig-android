@@ -1,8 +1,13 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -31,39 +36,47 @@ import ch.giantific.qwittig.ui.adapters.rows.HeaderRow;
 import ch.giantific.qwittig.utils.DateUtils;
 
 /**
- * Created by fabio on 09.11.14.
+ * Handles the display of recent tasks assigned to users in a group.
+ * <p/>
+ * Subclass of {@link RecyclerView.Adapter}.
  */
 public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int TYPE_ITEM = 0;
     private static final int TYPE_HEADER = 1;
+    private static final String LOG_TAG = TasksRecyclerAdapter.class.getSimpleName();
+    private static final int VIEW_RESOURCE = R.layout.row_tasks;
     private AdapterInteractionListener mListener;
     private Context mContext;
-    private int mViewResource;
     private List<ParseObject> mTasks;
 
-    private static final String LOG_TAG = TasksRecyclerAdapter.class.getSimpleName();
-
-    public TasksRecyclerAdapter(Context context, AdapterInteractionListener listener,
-                                int viewResource, List<ParseObject> tasks) {
+    /**
+     * Constructs a new {@link TasksRecyclerAdapter}.
+     *
+     * @param context  the context to use in the adapter
+     * @param tasks    the tasks to display
+     * @param listener the callback for user clicks on the tasks
+     */
+    public TasksRecyclerAdapter(@NonNull Context context, @NonNull List<ParseObject> tasks,
+                                @NonNull AdapterInteractionListener listener) {
 
         mContext = context;
         mListener = listener;
-        mViewResource = viewResource;
         mTasks = tasks;
     }
 
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         switch (viewType) {
             case TYPE_ITEM: {
                 View v = LayoutInflater.from(parent.getContext())
-                        .inflate(mViewResource, parent, false);
+                        .inflate(VIEW_RESOURCE, parent, false);
                 return new TaskRow(v, mContext, mListener);
             }
             case TYPE_HEADER: {
                 View v = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.row_header, parent, false);
+                        .inflate(HeaderRow.VIEW_RESOURCE, parent, false);
                 return new HeaderRow(v);
             }
             default:
@@ -116,15 +129,38 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
         return mTasks.size();
     }
 
+    /**
+     * Defines the actions to take when a user clicks on a task.
+     */
     public interface AdapterInteractionListener {
+        /**
+         * Handles the click on the task row itself.
+         *
+         * @param position the adapter postition of the task
+         */
         void onTaskRowClicked(int position);
 
+        /**
+         * Handles the click on the mark task as done button.
+         *
+         * @param position the adapter postition of the task
+         */
         void onDoneButtonClicked(int position);
 
+        /**
+         * Handles the click on the remind user to finish a task button.
+         *
+         * @param position the adapter postition of the task
+         */
         void onRemindButtonClicked(int position);
     }
 
-    public static class TaskRow extends RecyclerView.ViewHolder {
+    /**
+     * Provides a {@link RecyclerView} row that displays a task with all its information.
+     * <p/>
+     * Subclass of {@link RecyclerView.ViewHolder}.
+     */
+    private static class TaskRow extends RecyclerView.ViewHolder {
 
         private Context mContext;
         private ImageView mImageViewAvatar;
@@ -137,7 +173,16 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
         private Button mButtonRemind;
         private ProgressBar mProgressBar;
 
-        public TaskRow(View view, Context context, final AdapterInteractionListener listener) {
+        /**
+         * Constructs a new {@link TaskRow} and sets the click listeners.
+         *
+         * @param view     the inflated view
+         * @param context  the context to use in the row
+         * @param listener the callback for user clicks on the task and its buttons
+         */
+        public TaskRow(@NonNull View view,
+                       @NonNull Context context,
+                       @NonNull final AdapterInteractionListener listener) {
             super(view);
 
             view.setOnClickListener(new View.OnClickListener() {
@@ -171,31 +216,45 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
             mProgressBar = (ProgressBar) view.findViewById(R.id.pb_card);
         }
 
-        public void setAvatar(byte[] avatar) {
+        /**
+         * Loads the avatar image into the image view if the user has an avatar, if not it loads a
+         * fallback drawable.
+         *
+         * @param avatar the user's avatar image
+         */
+        public void setAvatar(@Nullable byte[] avatar) {
             if (avatar != null) {
                 Glide.with(mContext)
                         .load(avatar)
                         .asBitmap()
                         .into(new BitmapImageViewTarget(mImageViewAvatar) {
                             @Override
-                            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                            public void onResourceReady(@NonNull Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                                 view.setImageDrawable(Avatar.getRoundedDrawable(mContext, resource, false));
                             }
                         });
             } else {
-                setAvatar(Avatar.getFallbackDrawable(mContext, false, false));
+                mImageViewAvatar.setImageDrawable(
+                        Avatar.getFallbackDrawable(mContext, false, false));
             }
         }
 
-        public void setAvatar(Drawable avatar) {
-            mImageViewAvatar.setImageDrawable(avatar);
-        }
-
-        public void setTitle(String title) {
+        /**
+         * Sets the title of the task.
+         *
+         * @param title the title to set
+         */
+        public void setTitle(@NonNull String title) {
             mTexViewTitle.setText(title);
         }
 
-        public void setDeadline(Date deadline) {
+        /**
+         * Sets the deadline when a task needs to be finished the next time. If null is passed in,
+         * the deadline will be removed.
+         *
+         * @param deadline the deadline to set
+         */
+        public void setDeadline(@Nullable Date deadline) {
             String deadlineString;
             int color = 0;
             if (deadline == null) {
@@ -224,7 +283,13 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
             }
         }
 
-        private int getDaysToDeadline(Date deadlineDate) {
+        /**
+         * Calculates the days it takes from today until the deadline of the task is reached.
+         *
+         * @param deadlineDate the deadline of the task
+         * @return the number of days until the deadline is reached
+         */
+        private int getDaysToDeadline(@NonNull Date deadlineDate) {
             Calendar today = DateUtils.getCalendarInstanceUTC();
             Calendar deadline = DateUtils.getCalendarInstanceUTC();
             deadline.setTime(deadlineDate);
@@ -256,7 +321,12 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
             return 0;
         }
 
-        public void setTimeFrame(String timeFrame) {
+        /**
+         * Sets the time frame of the task, must be one of {@link Task.TimeFrame}.
+         *
+         * @param timeFrame the time frame to set
+         */
+        public void setTimeFrame(@NonNull @Task.TimeFrame String timeFrame) {
             String timeFrameLocalized = "";
             String doneButtonText = mContext.getString(R.string.task_done_single);
             switch (timeFrame) {
@@ -293,7 +363,12 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
             }
         }
 
-        public void setUsersInvolved(List<ParseUser> usersInvolved) {
+        /**
+         * Sets the users involved in the task.
+         *
+         * @param usersInvolved the users involved to set
+         */
+        public void setUsersInvolved(@NonNull List<ParseUser> usersInvolved) {
             User userResponsible = (User) usersInvolved.get(0);
             String nickname = userResponsible.getNicknameOrMe(mContext);
             if (!nickname.equals(mTextViewUserResponsible.getText().toString())) {
@@ -323,7 +398,7 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
             toggleButtons(userResponsible);
         }
 
-        private void toggleButtons(User userResponsible) {
+        private void toggleButtons(@NonNull User userResponsible) {
             ParseUser currentUser = ParseUser.getCurrentUser();
 
             if (currentUser.getObjectId().equals(userResponsible.getObjectId())) {
@@ -339,6 +414,12 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
             }
         }
 
+        /**
+         * Sets the visibility of the progress bar indicating that a process is ongoing for the
+         * task.
+         *
+         * @param show whether to show the progress bar or not
+         */
         public void setProgressBarVisibility(boolean show) {
             mProgressBar.setVisibility(show ? View.VISIBLE : View.GONE);
         }

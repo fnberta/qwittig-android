@@ -1,10 +1,21 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.data.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+
+import ch.giantific.qwittig.data.parse.models.Task;
+import ch.giantific.qwittig.data.parse.models.User;
 
 /**
- * Created by fabio on 16.09.15.
+ * Represents a user available for selection in a {@link Task}. Includes the id of the
+ * corresponding {@link User} object, whether it is involved or not and its position.
+ *
+ * Implements {@link Parcelable}.
  */
 public class TaskUser implements Parcelable {
 
@@ -24,7 +35,7 @@ public class TaskUser implements Parcelable {
         return mUserId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(@NonNull String userId) {
         mUserId = userId;
     }
 
@@ -36,13 +47,7 @@ public class TaskUser implements Parcelable {
         mPosition = position;
     }
 
-    public TaskUser(String userId, boolean isInvolved, int position) {
-        mUserId = userId;
-        mIsInvolved = isInvolved;
-        mPosition = position;
-    }
-
-    public TaskUser(String userId, boolean isInvolved) {
+    public TaskUser(@NonNull String userId, boolean isInvolved) {
         mUserId = userId;
         mIsInvolved = isInvolved;
     }
@@ -53,23 +58,25 @@ public class TaskUser implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(this.mUserId);
         dest.writeByte(mIsInvolved ? (byte) 1 : (byte) 0);
         dest.writeInt(this.mPosition);
     }
 
-    protected TaskUser(Parcel in) {
+    protected TaskUser(@NonNull Parcel in) {
         this.mUserId = in.readString();
         this.mIsInvolved = in.readByte() != 0;
         this.mPosition = in.readInt();
     }
 
     public static final Creator<TaskUser> CREATOR = new Creator<TaskUser>() {
-        public TaskUser createFromParcel(Parcel source) {
+        @NonNull
+        public TaskUser createFromParcel(@NonNull Parcel source) {
             return new TaskUser(source);
         }
 
+        @NonNull
         public TaskUser[] newArray(int size) {
             return new TaskUser[size];
         }

@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig;
 
 import android.app.Application;
@@ -16,7 +20,9 @@ import ch.giantific.qwittig.data.parse.models.Task;
 import ch.giantific.qwittig.data.parse.models.User;
 
 /**
- * A subclass of {@link android.app.Application} to register Parse.com database.
+ * Handles the initialisation of the Parse.com framework.
+ * <p/>
+ * Subclass of {@link android.app.Application}.
  */
 public class Qwittig extends Application {
 
@@ -32,7 +38,7 @@ public class Qwittig extends Application {
         ParseObject.registerSubclass(Compensation.class);
         ParseObject.registerSubclass(Task.class);
 
-        // enable local datastore
+        // enable local data store
         Parse.enableLocalDatastore(this);
 
         // Enable Crash Reporting

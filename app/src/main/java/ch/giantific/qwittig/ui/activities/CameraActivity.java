@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.activities;
 
 import android.content.Intent;
@@ -5,6 +9,7 @@ import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -32,6 +37,20 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.ui.CameraPreview;
 import ch.giantific.qwittig.utils.MessageUtils;
 
+/**
+ * Provides a custom camera interface that is locked to portrait orientation and allows the user
+ * to take multiple images before finishing.
+ * <p/>
+ * The idea is that for long receipts, the user takes multiple images of the receipt instead of
+ * just one.
+ * <p/>
+ * Uses the deprecated {@link Camera} api because {@link android.hardware.camera2} is only
+ * available on api >21 and currently we support api >19.
+ * <p/>
+ *
+ * @see CameraPreview
+ * Subclass of {@link AppCompatActivity}.
+ */
 @SuppressWarnings("deprecation")
 public class CameraActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -43,10 +62,12 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     private LinearLayout mLinearLayoutTaken;
     private FloatingActionButton mFabCapture;
     private View mViewBottom;
+    @NonNull
     private List<File> mImageFiles = new ArrayList<>();
+    @NonNull
     private Camera.PictureCallback mPicture = new Camera.PictureCallback() {
         @Override
-        public void onPictureTaken(byte[] data, Camera camera) {
+        public void onPictureTaken(@NonNull byte[] data, Camera camera) {
             File imageFile;
             try {
                 imageFile = createImageFile();
@@ -62,6 +83,16 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
             toggleBottomVisibility();
         }
     };
+
+    /**
+     * Returns a safe instance of the {@link Camera} object.
+     *
+     * @return an instance of the {@link Camera} object
+     * @throws Exception if the camera is not available (e.g. already in use)
+     */
+    public static Camera getCameraInstance() throws Exception {
+        return Camera.open(0);
+    }
 
     private File createImageFile() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
@@ -86,13 +117,6 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
             mFabCapture.setVisibility(View.VISIBLE);
             mViewBottom.setVisibility(View.GONE);
         }
-    }
-
-    /**
-     * A safe way to get an instance of the Camera object.
-     */
-    public static Camera getCameraInstance() throws Exception {
-        return Camera.open(0);
     }
 
     @Override
@@ -142,7 +166,8 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         mCamera.setParameters(params);
     }
 
-    private Camera.Parameters setRotation(Camera.Parameters params, int orientation) {
+    @NonNull
+    private Camera.Parameters setRotation(@NonNull Camera.Parameters params, int orientation) {
         if (orientation == OrientationEventListener.ORIENTATION_UNKNOWN) {
             return params;
         }
@@ -192,7 +217,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     @Override
-    public void onClick(View v) {
+    public void onClick(@NonNull View v) {
         int id = v.getId();
         switch (id) {
             case R.id.fab_camera_capture:

@@ -1,9 +1,16 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.RecyclerView;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -35,7 +42,14 @@ import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 
 /**
- * A placeholder fragment containing a simple view.
+ * Displays the currently open drafts of the current user in an {@link ListView} list.
+ * <p/>
+ * Long-click on a draft will start selection mode, allowing the user to select more drafts and
+ * deleting them via the contextual {@link ActionBar}.
+ * <p/>
+ * TODO: switch to {@link RecyclerView} and implement selection mode
+ * <p/>
+ * Subclass of {@link BaseFragment}.
  */
 public class HomeDraftsFragment extends BaseFragment implements
         LocalQuery.PurchaseLocalQueryListener,
@@ -47,13 +61,14 @@ public class HomeDraftsFragment extends BaseFragment implements
     private TextView mTextViewEmpty;
     private ListView mListView;
     private DraftsAdapter mDraftsAdapter;
+    @NonNull
     private List<ParseObject> mDrafts = new ArrayList<>();
 
     public HomeDraftsFragment() {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_home_drafts, container, false);
 
@@ -67,12 +82,12 @@ public class HomeDraftsFragment extends BaseFragment implements
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mDraftsAdapter = new DraftsAdapter(R.layout.row_drafts, mDrafts);
+        mDraftsAdapter = new DraftsAdapter(mDrafts);
         mListView.setAdapter(mDraftsAdapter);
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         mListView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
             @Override
-            public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
+            public void onItemCheckedStateChanged(@NonNull ActionMode mode, int position, long id,
                                                   boolean checked) {
                 mode.setTitle(getString(R.string.cab_title_selected,
                         mListView.getCheckedItemCount()));
@@ -80,7 +95,7 @@ public class HomeDraftsFragment extends BaseFragment implements
             }
 
             @Override
-            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            public boolean onCreateActionMode(@NonNull ActionMode mode, Menu menu) {
                 MenuInflater inflater = mode.getMenuInflater();
                 inflater.inflate(R.menu.menu_cab_drafts, menu);
                 return true;
@@ -92,7 +107,7 @@ public class HomeDraftsFragment extends BaseFragment implements
             }
 
             @Override
-            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            public boolean onActionItemClicked(@NonNull ActionMode mode, @NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.action_draft_delete:
                         deleteSelectedDrafts();
@@ -157,6 +172,9 @@ public class HomeDraftsFragment extends BaseFragment implements
         updateAdapter();
     }
 
+    /**
+     * Re-queries the data and loads it in the adapter.
+     */
     public void updateAdapter() {
         updateCurrentUserGroup();
         if (mCurrentUser != null) {
@@ -172,11 +190,11 @@ public class HomeDraftsFragment extends BaseFragment implements
     }
 
     @Override
-    public void onPurchasesLocalQueried(List<ParseObject> purchases) {
+    public void onPurchasesLocalQueried(@NonNull List<ParseObject> purchases) {
         updateDrafts(purchases);
     }
 
-    private void updateDrafts(List<ParseObject> drafts) {
+    private void updateDrafts(@NonNull List<ParseObject> drafts) {
         mDrafts.clear();
 
         if (!drafts.isEmpty()) {
@@ -191,7 +209,7 @@ public class HomeDraftsFragment extends BaseFragment implements
             if (mCurrentGroup.isDataAvailable()) {
                 updateView();
             } else {
-                LocalQuery.fetchObjectData(this, mCurrentGroup);
+                LocalQuery.fetchObjectData(mCurrentGroup, this);
             }
         } else {
             updateView();
@@ -199,7 +217,7 @@ public class HomeDraftsFragment extends BaseFragment implements
     }
 
     @Override
-    public void onObjectFetched(ParseObject object) {
+    public void onObjectFetched(@NonNull ParseObject object) {
         updateView();
     }
 

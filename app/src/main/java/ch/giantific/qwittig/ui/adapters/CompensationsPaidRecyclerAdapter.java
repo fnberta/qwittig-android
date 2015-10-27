@@ -1,8 +1,14 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.ColorInt;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -32,36 +38,45 @@ import ch.giantific.qwittig.utils.MoneyUtils;
 
 
 /**
- * Created by fabio on 12.10.14.
+ * Handles the display of different paid compensations.
+ * <p/>
+ * Subclass of {@link RecyclerView.Adapter}.
  */
 public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int TYPE_ITEM = 0;
     private static final int TYPE_PROGRESS = 1;
-    private int mViewResource;
+    private static final int VIEW_RESOURCE = R.layout.row_compensations_paid;
     private Context mContext;
     private List<ParseObject> mCompensations;
     private String mCurrentGroupCurrency;
 
-    public CompensationsPaidRecyclerAdapter(Context context, int viewResource,
-                                            List<ParseObject> compensations) {
+    /**
+     * Constructs a new {@link CompensationsPaidRecyclerAdapter}.
+     *
+     * @param context       the context to use in the adapter
+     * @param compensations the compensations to display
+     */
+    public CompensationsPaidRecyclerAdapter(@NonNull Context context,
+                                            @NonNull List<ParseObject> compensations) {
         super();
 
         mContext = context;
-        mViewResource = viewResource;
         mCompensations = compensations;
     }
 
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         switch (viewType) {
             case TYPE_ITEM: {
-                View view = LayoutInflater.from(parent.getContext()).inflate(mViewResource, parent, false);
+                View view = LayoutInflater.from(parent.getContext())
+                        .inflate(VIEW_RESOURCE, parent, false);
                 return new CompensationHistoryRow(view, mContext);
             }
             case TYPE_PROGRESS: {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_progress, parent,
-                        false);
+                View view = LayoutInflater.from(parent.getContext())
+                        .inflate(ProgressRow.VIEW_RESOURCE, parent, false);
                 return new ProgressRow(view);
             }
             default:
@@ -73,51 +88,37 @@ public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<Recyc
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         int viewType = getItemViewType(position);
-        switch (viewType) {
-            case TYPE_ITEM: {
-                CompensationHistoryRow compensationHistoryRow = (CompensationHistoryRow) viewHolder;
-                Compensation compensation = (Compensation) mCompensations.get(position);
-
-                Date date = compensation.getCreatedAt();
-                compensationHistoryRow.setDate(date);
-
-                BigFraction amount = compensation.getAmount();
-                String amountString;
-                String nickname;
-                byte[] avatar;
-                int color;
-
-                User currentUser = (User) ParseUser.getCurrentUser();
-                User beneficiary = compensation.getBeneficiary();
-                if (beneficiary.getObjectId().equals(currentUser.getObjectId())) {
-                    // positive
-                    User payer = compensation.getPayer();
-                    nickname = payer.getGroupIds().contains(currentUser.getCurrentGroup().getObjectId()) ?
-                            payer.getNickname() : mContext.getString(R.string.user_deleted);
-                    avatar = payer.getAvatar();
-                    color = R.color.green;
-                    amountString = MoneyUtils.formatMoney(amount, mCurrentGroupCurrency);
-                } else {
-                    // negative
-                    nickname = beneficiary.getGroupIds().contains(currentUser.getCurrentGroup().getObjectId()) ?
-                            beneficiary.getNickname() : mContext.getString(R.string.user_deleted);
-                    avatar = beneficiary.getAvatar();
-                    color = R.color.red;
-                    amountString = MoneyUtils.formatMoney(amount.negate(), mCurrentGroupCurrency);
-                }
-
-                compensationHistoryRow.setAvatar(avatar);
-                compensationHistoryRow.setUser(nickname);
-                compensationHistoryRow.setAmount(amountString, ContextCompat.getColor(mContext, color));
-
-//                int showDivider = position == getItemCount() - 1 ? View.GONE : View.VISIBLE;
-//                compensationHistoryRow.toggleDividerVisibility(showDivider);
-
-                break;
+        if (viewType == TYPE_ITEM) {
+            CompensationHistoryRow compensationHistoryRow = (CompensationHistoryRow) viewHolder;
+            Compensation compensation = (Compensation) mCompensations.get(position);
+            Date date = compensation.getCreatedAt();
+            compensationHistoryRow.setDate(date);
+            BigFraction amount = compensation.getAmountFraction();
+            String amountString;
+            String nickname;
+            byte[] avatar;
+            int color;
+            User currentUser = (User) ParseUser.getCurrentUser();
+            User beneficiary = compensation.getBeneficiary();
+            if (beneficiary.getObjectId().equals(currentUser.getObjectId())) {
+                // positive
+                User payer = compensation.getPayer();
+                nickname = payer.getGroupIds().contains(currentUser.getCurrentGroup().getObjectId()) ?
+                        payer.getNickname() : mContext.getString(R.string.user_deleted);
+                avatar = payer.getAvatar();
+                color = R.color.green;
+                amountString = MoneyUtils.formatMoney(amount, mCurrentGroupCurrency);
+            } else {
+                // negative
+                nickname = beneficiary.getGroupIds().contains(currentUser.getCurrentGroup().getObjectId()) ?
+                        beneficiary.getNickname() : mContext.getString(R.string.user_deleted);
+                avatar = beneficiary.getAvatar();
+                color = R.color.red;
+                amountString = MoneyUtils.formatMoney(amount.negate(), mCurrentGroupCurrency);
             }
-            case TYPE_PROGRESS:
-                // do nothing
-                break;
+            compensationHistoryRow.setAvatar(avatar);
+            compensationHistoryRow.setUser(nickname);
+            compensationHistoryRow.setAmount(amountString, ContextCompat.getColor(mContext, color));
         }
     }
 
@@ -153,7 +154,7 @@ public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<Recyc
      *
      * @param compensations the compensations to be added
      */
-    public void addCompensations(List<ParseObject> compensations) {
+    public void addCompensations(@NonNull List<ParseObject> compensations) {
         if (!compensations.isEmpty()) {
             mCompensations.addAll(compensations);
             notifyItemRangeInserted(getItemCount(), compensations.size());
@@ -161,7 +162,7 @@ public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<Recyc
     }
 
     /**
-     * Shows a progressbar in the last row as an indicator that more objects are being fetched.
+     * Shows a progress bar in the last row as an indicator that more objects are being fetched.
      */
     public void showLoadMoreIndicator() {
         mCompensations.add(null);
@@ -169,7 +170,7 @@ public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<Recyc
     }
 
     /**
-     * Hides the progressbar in the last row.
+     * Hides the progress bar in the last row.
      */
     public void hideLoadMoreIndicator() {
         int position = getLastPosition();
@@ -177,38 +178,49 @@ public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<Recyc
         notifyItemRemoved(position);
     }
 
+    /**
+     * Provides a {@link RecyclerView} row that displays paid compensations.
+     * <p/>
+     * Subclass of {@link RecyclerView.ViewHolder}.
+     */
     private static class CompensationHistoryRow extends RecyclerView.ViewHolder {
 
         private Context mContext;
-        private View mDivider;
         private ImageView mImageViewAvatar;
         private TextView mTextViewDate;
         private TextView mTextViewUser;
         private TextView mTextViewAmount;
 
-        public CompensationHistoryRow(View view, Context context) {
+        /**
+         * Constructs a new {@link CompensationHistoryRow}.
+         *
+         * @param view    the inflated view
+         * @param context the context to use in the row
+         */
+        public CompensationHistoryRow(@NonNull View view, @NonNull Context context) {
             super(view);
 
             mContext = context;
-            mDivider = view.findViewById(R.id.divider);
             mImageViewAvatar = (ImageView) view.findViewById(R.id.iv_avatar);
             mTextViewDate = (TextView) view.findViewById(R.id.tv_date);
             mTextViewUser = (TextView) view.findViewById(R.id.tv_user);
             mTextViewAmount = (TextView) view.findViewById(R.id.tv_amount);
         }
 
-        public void toggleDividerVisibility(int visibility) {
-            mDivider.setVisibility(visibility);
-        }
-
-        public void setAvatar(byte[] avatar) {
+        /**
+         * Loads the avatar image into the image view if the user has an avatar, if not it loads a
+         * fallback drawable.
+         *
+         * @param avatar the user's avatar image
+         */
+        public void setAvatar(@Nullable byte[] avatar) {
             if (avatar != null) {
                 Glide.with(mContext)
                         .load(avatar)
                         .asBitmap()
                         .into(new BitmapImageViewTarget(mImageViewAvatar) {
                             @Override
-                            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                            public void onResourceReady(@NonNull Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                                 view.setImageDrawable(Avatar.getRoundedDrawable(mContext, resource, false));
                             }
                         });
@@ -217,15 +229,32 @@ public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<Recyc
             }
         }
 
-        public void setDate(Date date) {
+        /**
+         * Sets the date of the compensation.
+         *
+         * @param date the date to set
+         */
+        public void setDate(@NonNull Date date) {
             mTextViewDate.setText(DateUtils.formatDateShort(date));
         }
 
-        public void setUser(String user) {
-            mTextViewUser.setText(user);
+        /**
+         * Sets the nickname of the payer or beneficiary
+         *
+         * @param nickname the nickname to set
+         */
+        public void setUser(@NonNull String nickname) {
+            mTextViewUser.setText(nickname);
         }
 
-        public void setAmount(String amount, @ColorInt int color) {
+        /**
+         * Sets the amount of the compensation
+         *
+         * @param amount the amount to set
+         * @param color  the color to mark the text, red if user owes money or green if he receives
+         *               money
+         */
+        public void setAmount(@NonNull String amount, @ColorInt int color) {
             mTextViewAmount.setText(amount);
             mTextViewAmount.setTextColor(color);
         }

@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.activities;
 
 import android.app.Fragment;
@@ -7,6 +11,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -28,7 +33,7 @@ import java.util.List;
 
 import ch.berta.fabio.fabspeeddial.FabMenu;
 import ch.giantific.qwittig.BuildConfig;
-import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.parse.models.Config;
 import ch.giantific.qwittig.data.parse.models.Group;
@@ -36,10 +41,11 @@ import ch.giantific.qwittig.helpers.FullQueryHelper;
 import ch.giantific.qwittig.helpers.InvitedGroupHelper;
 import ch.giantific.qwittig.helpers.MoreQueryHelper;
 import ch.giantific.qwittig.helpers.PurchaseQueryHelper;
+import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
+import ch.giantific.qwittig.ui.adapters.TabsAdapter;
 import ch.giantific.qwittig.ui.fragments.HomeDraftsFragment;
 import ch.giantific.qwittig.ui.fragments.HomePurchasesFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseAddFragment;
-import ch.giantific.qwittig.ui.adapters.TabsAdapter;
 import ch.giantific.qwittig.ui.fragments.dialogs.GoPremiumDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupJoinDialogFragment;
@@ -49,7 +55,16 @@ import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.Utils;
 
-
+/**
+ * Provides the launcher activity for {@link Qwittig}, hosts a viewpager with
+ * {@link HomePurchasesFragment} and {@link HomeDraftsFragment} that display lists of recent
+ * purchases and open drafts. Only loads the fragments if the  user is logged in.
+ * <p/>
+ * Handles the case when a user is invited to a group and he/she wants to join it or declines the
+ * invitation.
+ * <p/>
+ * Subclass of {@link BaseNavDrawerActivity}.
+ */
 public class HomeActivity extends BaseNavDrawerActivity implements
         View.OnClickListener,
         HomePurchasesFragment.FragmentInteractionListener,
@@ -67,6 +82,9 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     private static final String STATE_PURCHASE_FRAGMENT = "STATE_PURCHASE_FRAGMENT";
     private static final String STATE_DRAFTS_FRAGMENT = "STATE_DRAFTS_FRAGMENT";
     private static final String FULL_QUERY_HELPER = "FULL_QUERY_HELPER";
+    private static final String GROUP_JOIN_DIALOG = "GROUP_JOIN_DIALOG";
+    private static final String CREATE_GROUP_DIALOG = "CREATE_GROUP_DIALOG";
+    private static final String GO_PREMIUM_DIALOG = "GO_PREMIUM_DIALOG";
     private Group mInvitedGroup;
     private String mInviteInitiator;
     private String mInvitedGroupId;
@@ -232,7 +250,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onInvitedGroupQueryFailed(ParseException e) {
+    public void onInvitedGroupQueryFailed(@NonNull ParseException e) {
         ParseErrorHandler.handleParseError(this, e);
         MessageUtils.showBasicSnackbar(mFabMenu, ParseErrorHandler.getErrorMessage(this, e));
         HelperUtils.removeHelper(getFragmentManager(), INVITED_GROUP_HELPER);
@@ -245,7 +263,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onInvitedGroupQueried(ParseObject parseObject) {
+    public void onInvitedGroupQueried(@NonNull ParseObject parseObject) {
         mInvitedGroup = (Group) parseObject;
 
         switch (mInvitationAction) {
@@ -264,7 +282,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     private void showGroupJoinDialog(String groupName) {
         GroupJoinDialogFragment groupJoinDialogFragment =
                 GroupJoinDialogFragment.newInstance(groupName, mInviteInitiator);
-        groupJoinDialogFragment.show(getFragmentManager(), "group_join");
+        groupJoinDialogFragment.show(getFragmentManager(), GROUP_JOIN_DIALOG);
     }
 
     @Override
@@ -298,7 +316,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onUserJoinGroupFailed(ParseException e) {
+    public void onUserJoinGroupFailed(@NonNull ParseException e) {
         ParseErrorHandler.handleParseError(this, e);
         MessageUtils.getBasicSnackbar(mFabMenu, ParseErrorHandler.getErrorMessage(this, e));
         HelperUtils.removeHelper(getFragmentManager(), INVITED_GROUP_HELPER);
@@ -357,7 +375,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onPinFailed(ParseException e) {
+    public void onPinFailed(@NonNull ParseException e) {
         ParseErrorHandler.handleParseError(this, e);
         showFullOnlineQueryErrorSnackbar();
         HelperUtils.removeHelper(getFragmentManager(), FULL_QUERY_HELPER);
@@ -440,13 +458,9 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
     private void showCreateGroupDialog() {
         GroupCreateDialogFragment groupCreateDialogFragment = GroupCreateDialogFragment.newInstance(R.string.dialog_group_create_purchases);
-        groupCreateDialogFragment.show(getFragmentManager(), "create_group");
+        groupCreateDialogFragment.show(getFragmentManager(), CREATE_GROUP_DIALOG);
     }
 
-    /**
-     * Called from dialog that is shown when user tries to add new purchase and is not yet part of
-     * any group.
-     */
     @Override
     public void onCreateGroupSelected() {
         Intent intent = new Intent(this, SettingsGroupNewActivity.class);
@@ -455,13 +469,16 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
     private void showGoPremiumDialog() {
         GoPremiumDialogFragment goPremiumDialogFragment = new GoPremiumDialogFragment();
-        goPremiumDialogFragment.show(getFragmentManager(), "go_premium");
-
-        // onGoPremiumSelected() is handled in BaseNavDrawerActivity
+        goPremiumDialogFragment.show(getFragmentManager(), GO_PREMIUM_DIALOG);
     }
 
     @Override
-    public void onPurchasesPinFailed(ParseException e) {
+    public void onGoPremiumSelected() {
+        goPremium();
+    }
+
+    @Override
+    public void onPurchasesPinFailed(@NonNull ParseException e) {
         mHomePurchasesFragment.onPurchasesPinFailed(e);
     }
 
@@ -481,12 +498,12 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onMoreObjectsPinned(List<ParseObject> objects) {
+    public void onMoreObjectsPinned(@NonNull List<ParseObject> objects) {
         mHomePurchasesFragment.onMoreObjectsPinned(objects);
     }
 
     @Override
-    public void onMoreObjectsPinFailed(ParseException e) {
+    public void onMoreObjectsPinFailed(@NonNull ParseException e) {
         mHomePurchasesFragment.onMoreObjectsPinFailed(e);
     }
 

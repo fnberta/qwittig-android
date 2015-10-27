@@ -1,7 +1,11 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.data.models;
 
 /**
- * Created by fabio on 13.12.14.
+ * Provides constants for the handling of user taken receipt images.
  */
 public class Receipt {
 

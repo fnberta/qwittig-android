@@ -1,9 +1,15 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.activities;
 
 import android.annotation.TargetApi;
 import android.app.FragmentManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.transition.Transition;
 import android.view.View;
@@ -14,6 +20,12 @@ import ch.giantific.qwittig.ui.fragments.dialogs.StoreAddDialogFragment;
 import ch.giantific.qwittig.ui.listeners.TransitionListenerAdapter;
 import ch.giantific.qwittig.utils.Utils;
 
+/**
+ * Hosts {@link SettingsStoresFragment} that allows the user to change his preferred stores and
+ * add new ones.
+ * <p/>
+ * Subclass of {@link BaseActivity}.
+ */
 public class SettingsStoresActivity extends BaseActivity implements
         SettingsStoresFragment.FragmentInteractionListener,
         StoreAddDialogFragment.DialogInteractionListener {
@@ -24,7 +36,7 @@ public class SettingsStoresActivity extends BaseActivity implements
     private FloatingActionButton mFab;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings_stores);
 
@@ -61,7 +73,7 @@ public class SettingsStoresActivity extends BaseActivity implements
         Transition enter = getWindow().getEnterTransition();
         enter.addListener(new TransitionListenerAdapter() {
             @Override
-            public void onTransitionEnd(Transition transition) {
+            public void onTransitionEnd(@NonNull Transition transition) {
                 super.onTransitionEnd(transition);
                 transition.removeListener(this);
 
@@ -84,7 +96,7 @@ public class SettingsStoresActivity extends BaseActivity implements
     }
 
     @Override
-    public void onNewStoreSet(String store) {
+    public void onNewStoreSet(@NonNull String store) {
         mSettingsStoresFragment.onNewStoreSet(store);
     }
 

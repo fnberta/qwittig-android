@@ -1,10 +1,15 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 
-import android.app.Fragment;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -28,7 +33,9 @@ import ch.giantific.qwittig.ui.adapters.StatsPieChartRecyclerAdapter;
 import ch.giantific.qwittig.ui.widgets.PieChart;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Provides an abstract base class for the display of stats data in a {@link PieChart}.
+ * <p/>
+ * Subclass of {@link StatsBaseFragment}.
  */
 public abstract class StatsPieBaseFragment extends StatsBaseFragment {
 
@@ -38,7 +45,9 @@ public abstract class StatsPieBaseFragment extends StatsBaseFragment {
     StatsPieChartRecyclerAdapter mRecyclerAdapter;
     boolean mSortByUser;
     private RecyclerView mRecyclerView;
+    @NonNull
     private List<PieData> mUserPieData = new ArrayList<>();
+    @NonNull
     private List<String> mUserNicknames = new ArrayList<>();
 
     public StatsPieBaseFragment() {
@@ -46,7 +55,7 @@ public abstract class StatsPieBaseFragment extends StatsBaseFragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
@@ -57,14 +66,15 @@ public abstract class StatsPieBaseFragment extends StatsBaseFragment {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         outState.putBoolean(STATE_SORT_BY_USER, mSortByUser);
     }
 
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_stats_pie, container, false);
 
@@ -74,7 +84,7 @@ public abstract class StatsPieBaseFragment extends StatsBaseFragment {
     }
 
     @Override
-    void findBaseViews(View rootView) {
+    void findBaseViews(@NonNull View rootView) {
         super.findBaseViews(rootView);
 
         mPieChart = (PieChart) rootView.findViewById(R.id.pc_stores);
@@ -85,21 +95,20 @@ public abstract class StatsPieBaseFragment extends StatsBaseFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mRecyclerAdapter = new StatsPieChartRecyclerAdapter(R.layout.row_stats_stores_user,
-                mUserPieData, mUserNicknames);
+        mRecyclerAdapter = new StatsPieChartRecyclerAdapter(mUserPieData, mUserNicknames);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mRecyclerAdapter);
     }
 
     @CallSuper
-    void setMenuValues(Menu menu) {
+    void setMenuValues(@NonNull Menu menu) {
         MenuItem sortByUsers = menu.findItem(R.id.action_sort_by_user);
         sortByUsers.setChecked(mSortByUser);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         switch (id) {
             case R.id.action_sort_by_user:
@@ -130,7 +139,7 @@ public abstract class StatsPieBaseFragment extends StatsBaseFragment {
     }
 
     protected void setChartData() {
-        if (!mDataIsLoaded) {
+        if (!mDataIsLoaded || mStatsData == null) {
             return;
         }
 
@@ -144,7 +153,7 @@ public abstract class StatsPieBaseFragment extends StatsBaseFragment {
         }
     }
 
-    private void setUserChartData(List<Stats.Member> userData) {
+    private void setUserChartData(@NonNull List<Stats.Member> userData) {
         mUserPieData.clear();
         mUserNicknames.clear();
         boolean hasNoData = true;
@@ -190,11 +199,11 @@ public abstract class StatsPieBaseFragment extends StatsBaseFragment {
         }
     }
 
-    float getValue(Stats.Unit unit) {
+    float getValue(@NonNull Stats.Unit unit) {
         return unit.getTotal();
     }
 
-    private void setGroupChartData(Stats.Group groupData) {
+    private void setGroupChartData(@NonNull Stats.Group groupData) {
         List<Entry> yVals = new ArrayList<>();
         List<String> xVals = new ArrayList<>();
 
@@ -230,13 +239,13 @@ public abstract class StatsPieBaseFragment extends StatsBaseFragment {
         }
     }
 
-    private void setDataOptions(PieData pieData) {
+    private void setDataOptions(@NonNull PieData pieData) {
         pieData.setValueTextSize(14f);
         pieData.setValueTextColor(Color.WHITE);
     }
 
     @CallSuper
-    void setDataSetOptions(PieDataSet pieDataSet) {
+    void setDataSetOptions(@NonNull PieDataSet pieDataSet) {
         pieDataSet.setColors(getColors());
         pieDataSet.setSliceSpace(3f);
     }

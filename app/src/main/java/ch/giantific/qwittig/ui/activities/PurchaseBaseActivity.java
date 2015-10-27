@@ -1,9 +1,15 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.activities;
 
 import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewCompat;
 import android.transition.Transition;
@@ -34,12 +40,15 @@ import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
- * Created by fabio on 13.12.14.
+ * Provides an abstract base class for the creation and editing of purchases. Mostly deals with
+ * transition animations and the communication between the different hosted fragments.
+ * <p/>
+ * Subclass of {@link BaseActivity}.
  */
 public abstract class PurchaseBaseActivity extends BaseActivity implements
         PurchaseBaseFragment.FragmentInteractionListener,
         DatePickerDialog.OnDateSetListener,
-        PurchaseUserSelectionDialogFragment.FragmentInteractionListener,
+        PurchaseUserSelectionDialogFragment.DialogInteractionListener,
         StoreSelectionDialogFragment.DialogInteractionListener,
         PurchaseReceiptAddFragment.FragmentInteractionListener,
         RatesHelper.HelperInteractionListener,
@@ -56,7 +65,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     private FABProgressCircle mFabProgressCircle;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_purchase_add_edit);
 
@@ -87,7 +96,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         outState.putBoolean(STATE_HAS_RECEIPT_FILE, mHasReceiptFile);
@@ -99,7 +108,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         Transition enter = getWindow().getEnterTransition();
         enter.addListener(new TransitionListenerAdapter() {
             @Override
-            public void onTransitionEnd(Transition transition) {
+            public void onTransitionEnd(@NonNull Transition transition) {
                 super.onTransitionEnd(transition);
                 transition.removeListener(this);
 
@@ -119,7 +128,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         } else {
             mFabPurchaseSave.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
                 @Override
-                public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                public void onLayoutChange(@NonNull View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
                     v.removeOnLayoutChangeListener(this);
                     revealFab(isSaving);
                 }
@@ -135,7 +144,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(@NonNull Menu menu) {
         getMenuInflater().inflate(R.menu.menu_purchase_add_edit, menu);
 
         if (mHasReceiptFile) {
@@ -146,7 +155,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_purchase_add_edit_receipt_show:
                 mPurchaseFragment.showReceiptFragment();
@@ -177,12 +186,12 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     }
 
     @Override
-    public void onStoreSet(String store, boolean manuallyEntered) {
+    public void onStoreSet(@NonNull String store, boolean manuallyEntered) {
         mPurchaseFragment.setStore(store, manuallyEntered);
     }
 
     @Override
-    public void onItemUsersInvolvedSet(List<Integer> usersInvolved) {
+    public void onItemUsersInvolvedSet(@NonNull List<Integer> usersInvolved) {
         mPurchaseFragment.onItemUsersInvolvedSet(usersInvolved);
     }
 
@@ -202,12 +211,12 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     }
 
     @Override
-    public void onRatesFetched(Map<String, Float> exchangeRates) {
+    public void onRatesFetched(@NonNull Map<String, Float> exchangeRates) {
         mPurchaseFragment.onRatesFetched(exchangeRates);
     }
 
     @Override
-    public void onRatesFetchFailed(String errorMessage) {
+    public void onRatesFetchFailed(@NonNull String errorMessage) {
         mPurchaseFragment.onRatesFetchFailed(errorMessage);
     }
 
@@ -217,7 +226,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     }
 
     @Override
-    public void onPurchaseSaveFailed(ParseException e) {
+    public void onPurchaseSaveFailed(@NonNull ParseException e) {
         mPurchaseFragment.onPurchaseSaveFailed(e);
     }
 

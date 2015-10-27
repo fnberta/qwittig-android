@@ -1,10 +1,17 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.text.SpannableStringBuilder;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,12 +21,19 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.ui.fragments.TaskDetailsFragment;
 import ch.giantific.qwittig.ui.fragments.TasksFragment;
 import ch.giantific.qwittig.utils.MessageUtils;
 
+/**
+ * Hosts {@link TaskDetailsFragment} that shows the details of a task.
+ * <p/>
+ * Displays the title, the time frame and the users involved in the {@link Toolbar}.
+ * <p/>
+ * Subclass of {@link BaseNavDrawerActivity}.
+ */
 public class TaskDetailsActivity extends BaseNavDrawerActivity implements
         TaskDetailsFragment.FragmentInteractionListener {
 
@@ -35,7 +49,7 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
     private String mTaskId;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_details);
 
@@ -82,9 +96,6 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
         fetchCurrentUserGroups();
     }
 
-    /**
-     * Gets data passed on in intent from HomeActivity or Push Notification
-     */
     private void getTaskObjectId() {
         final Intent intent = getIntent();
         mTaskId = intent.getStringExtra(TasksFragment.INTENT_TASK_ID); // started from TaskFragment
@@ -107,7 +118,7 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(@NonNull Menu menu) {
         getMenuInflater().inflate(R.menu.menu_task_details, menu);
         if (mShowEditOptions) {
             menu.findItem(R.id.action_task_edit).setVisible(true);
@@ -117,7 +128,7 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         switch (id) {
             case R.id.action_task_delete:
@@ -132,8 +143,8 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void setToolbarHeader(String title, String timeFrame,
-                                 SpannableStringBuilder usersInvolved,
+    public void setToolbarHeader(@NonNull String title, @NonNull String timeFrame,
+                                 @NonNull SpannableStringBuilder usersInvolved,
                                  boolean currentUserIsResponsible) {
         mTextViewTitle.setText(title);
         mTextViewTimeFrame.setText(timeFrame);

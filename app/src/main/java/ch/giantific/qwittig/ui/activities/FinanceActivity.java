@@ -1,8 +1,14 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.activities;
 
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
@@ -34,25 +40,33 @@ import ch.giantific.qwittig.helpers.CompensationSaveHelper;
 import ch.giantific.qwittig.helpers.MoreQueryHelper;
 import ch.giantific.qwittig.helpers.SettlementHelper;
 import ch.giantific.qwittig.helpers.UserQueryHelper;
+import ch.giantific.qwittig.ui.adapters.TabsAdapter;
 import ch.giantific.qwittig.ui.fragments.FinanceCompensationsBaseFragment;
 import ch.giantific.qwittig.ui.fragments.FinanceCompensationsPaidFragment;
 import ch.giantific.qwittig.ui.fragments.FinanceCompensationsUnpaidFragment;
 import ch.giantific.qwittig.ui.fragments.FinanceUserBalancesFragment;
-import ch.giantific.qwittig.ui.adapters.TabsAdapter;
-import ch.giantific.qwittig.ui.fragments.dialogs.CompensationSingleDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.CompensationChangeAmountDialogFragment;
+import ch.giantific.qwittig.ui.fragments.dialogs.CompensationSingleDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
+/**
+ * Handles tasks related to financial state of the users.
+ * <p/>
+ * Hosts a view pager with different fragments dealing with balances, unpaid and paid compensations.
+ * Only loads the fragments if the user is logged in. Also allows the user to make single payments.
+ * <p/>
+ * Subclass of {@link BaseNavDrawerActivity}.
+ */
 public class FinanceActivity extends BaseNavDrawerActivity implements
         FinanceCompensationsBaseFragment.FragmentInteractionListener,
         LocalQuery.UserLocalQueryListener,
         CompensationSingleDialogFragment.DialogInteractionListener,
         GroupCreateDialogFragment.DialogInteractionListener,
-        CompensationChangeAmountDialogFragment.FragmentInteractionListener,
+        CompensationChangeAmountDialogFragment.DialogInteractionListener,
         UserQueryHelper.HelperInteractionListener,
         CompensationQueryHelper.HelperInteractionListener,
         MoreQueryHelper.HelperInteractionListener,
@@ -65,6 +79,7 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     private static final String STATE_COMPENSATIONS_UNPAID_FRAGMENT = "STATE_COMPENSATIONS_UNPAID_FRAGMENT";
     private static final String STATE_COMPENSATIONS_PAID_FRAGMENT = "STATE_COMPENSATIONS_PAID_FRAGMENT";
     private static final String LOG_TAG = FinanceActivity.class.getSimpleName();
+    private static final String RECIPIENT_PICKER_DIALOG = "RECIPIENT_PICKER_DIALOG";
     private TabLayout mTabLayout;
     private TextView mTextViewBalance;
     private FinanceUserBalancesFragment mUserBalancesFragment;
@@ -74,7 +89,7 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     private List<ParseUser> mSinglePaymentUsers;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_finance);
 
@@ -195,7 +210,7 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_compensation_add_manual:
                 if (userIsInGroup()) {
@@ -230,7 +245,7 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onUsersLocalQueried(List<ParseUser> users) {
+    public void onUsersLocalQueried(@NonNull List<ParseUser> users) {
         mSinglePaymentUsers = users;
         ArrayList<ItemUserPicker> recipients;
 
@@ -255,11 +270,11 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     private void showAddManualDialog(ArrayList<ItemUserPicker> users) {
         CompensationSingleDialogFragment userPickerDialogFragment =
                 CompensationSingleDialogFragment.newInstance(users);
-        userPickerDialogFragment.show(getFragmentManager(), "recipient_picker");
+        userPickerDialogFragment.show(getFragmentManager(), RECIPIENT_PICKER_DIALOG);
     }
 
     @Override
-    public void onManualPaymentValuesSet(ItemUserPicker recipient, String amountString) {
+    public void onSinglePaymentValuesSet(@NonNull ItemUserPicker recipient, @NonNull String amountString) {
         if (ParseUtils.isTestUser(mCurrentUser)) {
             showAccountCreateDialog();
             return;
@@ -283,13 +298,14 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
         }
     }
 
-    private void saveSingleCompensation(User recipientSelected, BigFraction amountSelected,
-                                        final String recipientNickname) {
+    private void saveSingleCompensation(@NonNull User recipientSelected,
+                                        @NonNull BigFraction amountSelected,
+                                        @NonNull final String recipientNickname) {
         final Compensation compensation = new Compensation(mCurrentGroup, mCurrentUser, recipientSelected,
                 amountSelected, false);
         compensation.pinInBackground(Compensation.PIN_LABEL_UNPAID, new SaveCallback() {
             @Override
-            public void done(ParseException e) {
+            public void done(@Nullable ParseException e) {
                 if (e == null) {
                     mCompensationsUnpaidFragment.onCompensationsPinned();
                     compensation.saveEventually();
@@ -301,12 +317,12 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onChangedAmountSet(BigFraction amount) {
+    public void onChangedAmountSet(@NonNull BigFraction amount) {
         mCompensationsUnpaidFragment.onChangedAmountSet(amount);
     }
 
     @Override
-    public void onUsersPinFailed(ParseException e) {
+    public void onUsersPinFailed(@NonNull ParseException e) {
         mUserBalancesFragment.onUsersPinFailed(e);
     }
 
@@ -324,7 +340,7 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onCompensationsPinFailed(ParseException e, boolean isPaid) {
+    public void onCompensationsPinFailed(@NonNull ParseException e, boolean isPaid) {
         if (isPaid) {
             mCompensationsPaidFragment.onCompensationsPinFailed(e);
         } else {
@@ -353,42 +369,42 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onNewSettlementCreated(Object result) {
+    public void onNewSettlementCreated(@NonNull Object result) {
         mCompensationsUnpaidFragment.onNewSettlementCreated(result);
     }
 
     @Override
-    public void onNewSettlementCreationFailed(ParseException e) {
+    public void onNewSettlementCreationFailed(@NonNull ParseException e) {
         mCompensationsUnpaidFragment.onNewSettlementCreationFailed(e);
     }
 
     @Override
-    public void onCompensationSaved(ParseObject compensation) {
+    public void onCompensationSaved(@NonNull ParseObject compensation) {
         mCompensationsUnpaidFragment.onCompensationSaved(compensation);
     }
 
     @Override
-    public void onCompensationSaveFailed(ParseObject compensation, ParseException e) {
+    public void onCompensationSaveFailed(@NonNull ParseObject compensation, @NonNull ParseException e) {
         mCompensationsUnpaidFragment.onCompensationSaveFailed(compensation, e);
     }
 
     @Override
-    public void onUserReminded(int remindType, String compensationId) {
+    public void onUserReminded(int remindType, @NonNull String compensationId) {
         mCompensationsUnpaidFragment.onUserReminded(remindType, compensationId);
     }
 
     @Override
-    public void onUserRemindFailed(int remindType, ParseException e, String compensationId) {
+    public void onUserRemindFailed(int remindType, @NonNull String compensationId, @NonNull ParseException e) {
         mCompensationsUnpaidFragment.onUserRemindFailed(remindType, e, compensationId);
     }
 
     @Override
-    public void onMoreObjectsPinned(List<ParseObject> objects) {
+    public void onMoreObjectsPinned(@NonNull List<ParseObject> objects) {
         mCompensationsPaidFragment.onMoreObjectsPinned(objects);
     }
 
     @Override
-    public void onMoreObjectsPinFailed(ParseException e) {
+    public void onMoreObjectsPinFailed(@NonNull ParseException e) {
         mCompensationsPaidFragment.onMoreObjectsPinFailed(e);
     }
 

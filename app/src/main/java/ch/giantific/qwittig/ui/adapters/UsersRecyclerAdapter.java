@@ -1,6 +1,11 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.adapters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,29 +28,38 @@ import ch.giantific.qwittig.utils.Utils;
 
 
 /**
- * Created by fabio on 12.10.14.
+ * Handles the display of users with their avatar images, nicknames and current balances.
+ * <p/>
+ * Subclass of {@link RecyclerView.Adapter}.
  */
 public class UsersRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    private static final int VIEW_RESOURCE = R.layout.row_users;
     private AdapterInteractionListener mListener;
-    private int mUsersViewResource;
     private List<ParseUser> mUsers;
     private Context mContext;
     private String mCurrentGroupCurrency;
 
-    public UsersRecyclerAdapter(Context context, int usersViewResource, List<ParseUser> users,
-                                AdapterInteractionListener listener) {
+    /**
+     * Constructs a new {@link UsersRecyclerAdapter}.
+     *
+     * @param context  the context to use in the adapter
+     * @param users    the users to display
+     * @param listener the callback for user clicks on the users
+     */
+    public UsersRecyclerAdapter(@NonNull Context context, @NonNull List<ParseUser> users,
+                                @NonNull AdapterInteractionListener listener) {
         super();
 
         mListener = listener;
         mContext = context;
-        mUsersViewResource = usersViewResource;
         mUsers = users;
     }
 
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(mUsersViewResource, parent,
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(VIEW_RESOURCE, parent,
                 false);
 
         return new UsersRow(view, mContext, mListener);
@@ -72,19 +86,47 @@ public class UsersRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
         return mUsers.size();
     }
 
-    public void setCurrentGroupCurrency(String currentGroupCurrency) {
+    /**
+     * Sets the current group currency field. As long this is not set, nothing will be displayed
+     * in the adapter.
+     *
+     * @param currentGroupCurrency the currency code to set
+     */
+    public void setCurrentGroupCurrency(@NonNull String currentGroupCurrency) {
         mCurrentGroupCurrency = currentGroupCurrency;
     }
 
+    /**
+     * Defines the action to take when the user clicks on a user.
+     */
     public interface AdapterInteractionListener {
+        /**
+         * Handles the click on the user row itself.
+         *
+         * @param position the adapter position of the user row
+         */
         void onUsersRowItemClick(int position);
     }
 
+    /**
+     * Provides a {@link RecyclerView} row that displays the user's avatar image, the nickname and
+     * the current balance.
+     * <p/>
+     * Subclass of {@link BaseUserAvatarRow}.
+     */
     private static class UsersRow extends BaseUserAvatarRow {
 
         private TextView mTextViewBalance;
 
-        public UsersRow(View view, Context context, final AdapterInteractionListener listener) {
+        /**
+         * Constructs a new {@link UsersRow} and sets the click listener.
+         *
+         * @param view     the inflated view
+         * @param context  the context to use in the row
+         * @param listener the callback for user clicks
+         */
+        public UsersRow(@NonNull View view, @NonNull Context context,
+                        @NonNull final AdapterInteractionListener listener) {
             super(view, context);
 
             view.setOnClickListener(new View.OnClickListener() {
@@ -97,7 +139,13 @@ public class UsersRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
             mTextViewBalance = (TextView) view.findViewById(R.id.user_balance);
         }
 
-        public void setBalance(BigFraction balance, String currency) {
+        /**
+         * Sets the properly formatted balance of the user.
+         *
+         * @param balance  the balance to set
+         * @param currency the currency code to use to format the balance
+         */
+        public void setBalance(@NonNull BigFraction balance, @NonNull String currency) {
             mTextViewBalance.setTextColor(Utils.isPositive(balance) ?
                     ContextCompat.getColor(mContext, R.color.green) :
                     ContextCompat.getColor(mContext, R.color.red));

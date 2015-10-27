@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.data.models;
 
 import android.annotation.TargetApi;
@@ -17,7 +21,7 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
- * Created by fabio on 03.12.14.
+ * Provides useful methods to properly format a user's avatar image.
  */
 public class Avatar {
 
@@ -29,14 +33,31 @@ public class Avatar {
         // class cannot be instantiated
     }
 
-    public static Drawable getFallbackDrawableRect(Context context, boolean withRipple) {
+    /**
+     * Returns a rectangle fallback avatar drawable.
+     *
+     * @param context    the context to use to get the fallback drawable
+     * @param withRipple whether to use a ripple effect on click
+     * @return a rectangle fallback avatar drawable
+     */
+    @NonNull
+    public static Drawable getFallbackDrawableRect(@NonNull Context context, boolean withRipple) {
         Drawable avatar = ContextCompat.getDrawable(context, R.drawable.ic_account_box_black_144dp);
 
         return withRipple && Utils.isRunningLollipopAndHigher() ?
                 createRippleDrawable(context, avatar) : avatar;
     }
 
-    public static Drawable getFallbackDrawable(Context context, boolean getBigSize,
+    /**
+     * Returns a rounded fallback avatar drawable.
+     *
+     * @param context    the context to use to get the fallback drawable
+     * @param getBigSize whether to use 80dp drawable or 40dp
+     * @param withRipple whether to use a ripple effect on click
+     * @return a round fallback avatar drawable
+     */
+    @NonNull
+    public static Drawable getFallbackDrawable(@NonNull Context context, boolean getBigSize,
                                                boolean withRipple) {
         int drawableId = getBigSize ? R.drawable.ic_account_circle_black_80dp :
                 R.drawable.ic_account_circle_black_40dp;
@@ -48,7 +69,8 @@ public class Avatar {
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @NonNull
-    private static RippleDrawable createRippleDrawable(Context context, Drawable drawable) {
+    private static RippleDrawable createRippleDrawable(@NonNull Context context,
+                                                       @NonNull Drawable drawable) {
         int[] attrs = new int[]{R.attr.colorControlHighlight};
         TypedArray typedArray = context.obtainStyledAttributes(attrs);
         int rippleColor = typedArray.getResourceId(0, 0);
@@ -57,7 +79,16 @@ public class Avatar {
         return new RippleDrawable(ColorStateList.valueOf(rippleColor), drawable, null);
     }
 
-    public static Drawable getRoundedDrawable(Context context, Bitmap bitmap,
+    /**
+     * Returns a rounded drawable version of the inputted bitmap
+     *
+     * @param context    the context to use to get the resources
+     * @param bitmap     the bitmap of which a rounded drawable should be created
+     * @param withRipple whether to use a ripple effect on click
+     * @return a rounded drawable
+     */
+    @NonNull
+    public static Drawable getRoundedDrawable(@NonNull Context context, @NonNull Bitmap bitmap,
                                               boolean withRipple) {
         RoundedBitmapDrawable roundedDrawable = RoundedBitmapDrawableFactory.create(
                 context.getResources(), bitmap);

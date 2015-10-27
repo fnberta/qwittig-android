@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments.dialogs;
 
 import android.app.Activity;
@@ -5,6 +9,8 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -18,21 +24,39 @@ import java.util.List;
 import ch.giantific.qwittig.R;
 
 /**
- * Created by fabio on 27.10.14.
+ * Provides a dialog that allows the user to select the users involved for an item of a purchase.
+ * <p/>
+ * At least one user needs to be selected, otherwise the dialog will only be dismissed by the
+ * cancel action. Therefore overrides the default positive button onClickListener because the
+ * default behaviour is to always call dismiss().
+ * <p/>
+ * Subclass of {@link DialogFragment}.
  */
 public class PurchaseUserSelectionDialogFragment extends DialogFragment {
 
     private static final String BUNDLE_USERS_AVAILABLE = "BUNDLE_USERS_AVAILABLE";
     private static final String BUNDLE_USERS_CHECKED = "BUNDLE_USERS_CHECKED";
-    private FragmentInteractionListener mListener;
+    private DialogInteractionListener mListener;
+    @NonNull
     private List<Integer> mUsersSelected = new ArrayList<>();
+    @NonNull
     private List<Integer> mUsersSelectedStatusQuo = new ArrayList<>();
+    @Nullable
     private CharSequence[] mUsersAvailable;
+    @Nullable
     private boolean[] mUsersChecked;
     private TextView mTextViewError;
 
+    /**
+     * Returns a new instance of {@link PurchaseUserSelectionDialogFragment}.
+     *
+     * @param usersAvailable the users available for selection
+     * @param usersChecked   the currently selected users for the item
+     * @return a new instance of {@link PurchaseUserSelectionDialogFragment}
+     */
+    @NonNull
     public static PurchaseUserSelectionDialogFragment newInstance(
-            CharSequence[] usersAvailable, boolean[] usersChecked) {
+            @NonNull CharSequence[] usersAvailable, @NonNull boolean[] usersChecked) {
         PurchaseUserSelectionDialogFragment fragment = new PurchaseUserSelectionDialogFragment();
 
         Bundle args = new Bundle();
@@ -44,13 +68,13 @@ public class PurchaseUserSelectionDialogFragment extends DialogFragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (FragmentInteractionListener) activity;
+            mListener = (DialogInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
+                    + " must implement DialogInteractionListener");
         }
     }
 
@@ -67,11 +91,13 @@ public class PurchaseUserSelectionDialogFragment extends DialogFragment {
     }
 
     private void setupDefaultUsersSelected() {
-        for (int i = 0; i < mUsersChecked.length; i++) {
-            boolean isChecked = mUsersChecked[i];
-            if (isChecked) {
-                mUsersSelected.add(i);
-                mUsersSelectedStatusQuo.add(i);
+        if (mUsersChecked != null) {
+            for (int i = 0; i < mUsersChecked.length; i++) {
+                boolean isChecked = mUsersChecked[i];
+                if (isChecked) {
+                    mUsersSelected.add(i);
+                    mUsersSelectedStatusQuo.add(i);
+                }
             }
         }
     }
@@ -92,7 +118,7 @@ public class PurchaseUserSelectionDialogFragment extends DialogFragment {
                                 if (isChecked) {
                                     mUsersSelected.add(which);
                                     if (mTextViewError.getCurrentTextColor() == ContextCompat.getColor(getActivity(), R.color.red_error)) {
-                                        mTextViewError.setTextAppearance(R.style.TextAppearance_AppCompat_Caption);
+                                        mTextViewError.setTextAppearance(getActivity(), R.style.TextAppearance_AppCompat_Caption);
                                     }
                                 } else if (mUsersSelected.contains(which)) {
                                     mUsersSelected.remove(Integer.valueOf(which));
@@ -105,7 +131,7 @@ public class PurchaseUserSelectionDialogFragment extends DialogFragment {
                 .setPositiveButton(android.R.string.ok, null)
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int id) {
+                    public void onClick(@NonNull DialogInterface dialog, int id) {
                         dialog.cancel();
                     }
                 });
@@ -138,13 +164,21 @@ public class PurchaseUserSelectionDialogFragment extends DialogFragment {
     public void onCancel(DialogInterface dialog) {
         super.onCancel(dialog);
 
-        //For "no fucking idea why" reasons, we need to call onItemUsersInvolvedSet also onCancel
+        // For no sensible reason, we need to call onItemUsersInvolvedSet also onCancel
         // with the original usersSelected. Otherwise, cancel would behave the same way as pressing ok
         // (although no method in the calling activity or fragment gets called that sets the users...)
         mListener.onItemUsersInvolvedSet(mUsersSelectedStatusQuo);
     }
 
-    public interface FragmentInteractionListener {
-        void onItemUsersInvolvedSet(List<Integer> userInvolved);
+    /**
+     * Defines the actions to take when user clicks on one of the dialog's buttons.
+     */
+    public interface DialogInteractionListener {
+        /**
+         * Handles the click on the set new users involved button.
+         *
+         * @param userInvolved the selected users involved
+         */
+        void onItemUsersInvolvedSet(@NonNull List<Integer> userInvolved);
     }
 }

@@ -1,5 +1,11 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.data.parse;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.parse.FindCallback;
@@ -20,7 +26,7 @@ import ch.giantific.qwittig.data.parse.models.Task;
 import ch.giantific.qwittig.data.parse.models.User;
 
 /**
- * Created by fabio on 31.12.14.
+ * Provides the static methods used to perform queries from the parse.com local data store.
  */
 public class LocalQuery {
 
@@ -30,7 +36,12 @@ public class LocalQuery {
         // Class cannot be instantiated
     }
 
-    public static void queryPurchases(final PurchaseLocalQueryListener listener) {
+    /**
+     * Queries the local data store for purchases of the user's current group.
+     *
+     * @param listener the callback called when the query finishes
+     */
+    public static void queryPurchases(@Nullable final PurchaseLocalQueryListener listener) {
         final Group group = getCurrentGroup();
 
         ParseQuery<ParseObject> query = getPurchasesQuery();
@@ -38,7 +49,7 @@ public class LocalQuery {
         query.whereDoesNotExist(Purchase.DRAFT_ID);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(List<ParseObject> parseObjects, ParseException e) {
+            public void done(List<ParseObject> parseObjects, @Nullable ParseException e) {
                 if (e != null) {
                     Log.e(LOG_TAG, "queryPurchases " + e.toString());
                     return;
@@ -51,6 +62,7 @@ public class LocalQuery {
         });
     }
 
+    @NonNull
     private static ParseQuery<ParseObject> getPurchasesQuery() {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Purchase.CLASS);
         query.fromLocalDatastore();
@@ -62,11 +74,18 @@ public class LocalQuery {
         return query;
     }
 
-    public static void queryPurchase(String purchaseId, final ObjectLocalFetchListener listener) {
+    /**
+     * Queries the local data store for a single purchase.
+     *
+     * @param purchaseId the object id of the purchase to query
+     * @param listener   the callback called when the query finishes
+     */
+    public static void queryPurchase(@NonNull String purchaseId,
+                                     @Nullable final ObjectLocalFetchListener listener) {
         ParseQuery<ParseObject> query = getPurchasesQuery();
         query.getInBackground(purchaseId, new GetCallback<ParseObject>() {
             @Override
-            public void done(ParseObject parseObject, ParseException e) {
+            public void done(ParseObject parseObject, @Nullable ParseException e) {
                 if (e != null) {
                     Log.e(LOG_TAG, "queryPurchase " + e.toString());
                     return;
@@ -79,7 +98,12 @@ public class LocalQuery {
         });
     }
 
-    public static void queryUsers(final UserLocalQueryListener listener) {
+    /**
+     * Queries the local data store for the users of the current group.
+     *
+     * @param listener the callback called when the query finishes
+     */
+    public static void queryUsers(@Nullable final UserLocalQueryListener listener) {
         ParseQuery<ParseUser> query = ParseUser.getQuery();
         query.fromLocalDatastore();
         query.whereEqualTo(User.GROUPS, getCurrentGroup());
@@ -87,7 +111,7 @@ public class LocalQuery {
         query.ignoreACLs();
         query.findInBackground(new FindCallback<ParseUser>() {
             @Override
-            public void done(List<ParseUser> parseUsers, ParseException e) {
+            public void done(List<ParseUser> parseUsers, @Nullable ParseException e) {
                 if (e != null) {
                     Log.e(LOG_TAG, "queryUsers " + e.toString());
                     return;
@@ -100,12 +124,17 @@ public class LocalQuery {
         });
     }
 
-    public static void queryDrafts(final PurchaseLocalQueryListener listener) {
+    /**
+     * Queries the local data store for all the draft purchase object of the current group.
+     *
+     * @param listener the callback called when the query finishes
+     */
+    public static void queryDrafts(@Nullable final PurchaseLocalQueryListener listener) {
         ParseQuery<ParseObject> query = getDraftsQuery();
         query.whereEqualTo(Purchase.BUYER, ParseUser.getCurrentUser());
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(List<ParseObject> parseObjects, ParseException e) {
+            public void done(List<ParseObject> parseObjects, @Nullable ParseException e) {
                 if (e != null) {
                     Log.e(LOG_TAG, "queryDrafts " + e.toString());
                     return;
@@ -118,6 +147,7 @@ public class LocalQuery {
         });
     }
 
+    @NonNull
     private static ParseQuery<ParseObject> getDraftsQuery() {
         ParseQuery<ParseObject> query = getPurchasesQuery();
         query.whereEqualTo(Purchase.GROUP, getCurrentGroup());
@@ -125,12 +155,19 @@ public class LocalQuery {
         return query;
     }
 
-    public static void queryDraft(String draftId, final ObjectLocalFetchListener listener) {
+    /**
+     * Queries the local data store for a single draft.
+     *
+     * @param draftId  the draft id of the purchase to query
+     * @param listener the callback called when the query finishes
+     */
+    public static void queryDraft(@NonNull String draftId,
+                                  @Nullable final ObjectLocalFetchListener listener) {
         ParseQuery<ParseObject> query = getDraftsQuery();
         query.whereEqualTo(Purchase.DRAFT_ID, draftId);
         query.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
-            public void done(ParseObject parseObject, ParseException e) {
+            public void done(ParseObject parseObject, @Nullable ParseException e) {
                 if (e != null) {
                     Log.e(LOG_TAG, "queryDraft " + e.toString());
                     return;
@@ -143,7 +180,12 @@ public class LocalQuery {
         });
     }
 
-    public static void queryCompensationsUnpaid(final CompensationLocalQueryListener listener) {
+    /**
+     * Queries the local data store for unpaid compensations  of the user's current group.
+     *
+     * @param listener the callback called when the query finishes
+     */
+    public static void queryCompensationsUnpaid(@Nullable final CompensationLocalQueryListener listener) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Compensation.CLASS);
         query.fromLocalDatastore();
         query.ignoreACLs();
@@ -152,7 +194,7 @@ public class LocalQuery {
         query.orderByAscending(OnlineQuery.DATE_CREATED);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(List<ParseObject> parseObjects, ParseException e) {
+            public void done(List<ParseObject> parseObjects, @Nullable ParseException e) {
                 if (e != null) {
                     Log.e(LOG_TAG, "queryCompensationsUnpaid " + e.toString());
                     return;
@@ -165,7 +207,12 @@ public class LocalQuery {
         });
     }
 
-    public static void queryCompensationsPaid(final CompensationLocalQueryListener listener) {
+    /**
+     * Queries the local data store for paid compensations of the user's current group.
+     *
+     * @param listener the callback called when the query finishes
+     */
+    public static void queryCompensationsPaid(@Nullable final CompensationLocalQueryListener listener) {
         User currentUser = (User) ParseUser.getCurrentUser();
 
         ParseQuery<ParseObject> payerQuery = ParseQuery.getQuery(Compensation.CLASS);
@@ -186,7 +233,7 @@ public class LocalQuery {
         query.orderByDescending(OnlineQuery.DATE_UPDATED);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(List<ParseObject> parseObjects, ParseException e) {
+            public void done(List<ParseObject> parseObjects, @Nullable ParseException e) {
                 if (e != null) {
                     Log.e(LOG_TAG, "queryCompensationsPaid " + e.toString());
                     return;
@@ -199,7 +246,13 @@ public class LocalQuery {
         });
     }
 
-    public static void queryTasks(Date deadline, final TaskLocalQueryListener listener) {
+    /**
+     * Queries the local data store for tasks of the user's current group.
+     *
+     * @param listener the callback called when the query finishes
+     */
+    public static void queryTasks(@NonNull Date deadline,
+                                  @Nullable final TaskLocalQueryListener listener) {
         ParseQuery<ParseObject> deadlineQuery = ParseQuery.getQuery(Task.CLASS);
         deadlineQuery.whereLessThan(Task.DEADLINE, deadline);
 
@@ -218,7 +271,7 @@ public class LocalQuery {
         query.orderByAscending(Task.DEADLINE);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(List<ParseObject> parseObjects, ParseException e) {
+            public void done(List<ParseObject> parseObjects, @Nullable ParseException e) {
                 if (e != null) {
                     Log.e(LOG_TAG, "queryTasks " + e.toString());
                     return;
@@ -231,14 +284,21 @@ public class LocalQuery {
         });
     }
 
-    public static void queryTask(String taskId, final ObjectLocalFetchListener listener) {
+    /**
+     * Queries the local data store for a single task.
+     *
+     * @param taskId   the object id of the task to query
+     * @param listener the callback called when the query finishes
+     */
+    public static void queryTask(@NonNull String taskId,
+                                 @Nullable final ObjectLocalFetchListener listener) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Task.CLASS);
         query.fromLocalDatastore();
         query.ignoreACLs();
         query.include(Task.USERS_INVOLVED);
         query.getInBackground(taskId, new GetCallback<ParseObject>() {
             @Override
-            public void done(ParseObject object, ParseException e) {
+            public void done(ParseObject object, @Nullable ParseException e) {
                 if (e != null) {
                     Log.e(LOG_TAG, "queryTask " + e.toString());
                     return;
@@ -251,15 +311,22 @@ public class LocalQuery {
         });
     }
 
-    public static void fetchObjectData(final ObjectLocalFetchListener listener,
-                                       final ParseObject parseObjectToFetch) {
+    /**
+     * Fetches the data of an object from the local data store. If there is no data available in
+     * the local data store it will try to fetch the data online.
+     *
+     * @param parseObjectToFetch the object to fetch the data for
+     * @param listener           the callback called when the query finishes
+     */
+    public static void fetchObjectData(@NonNull final ParseObject parseObjectToFetch,
+                                       @NonNull final ObjectLocalFetchListener listener) {
         parseObjectToFetch.fetchFromLocalDatastoreInBackground(new GetCallback<ParseObject>() {
             @Override
-            public void done(ParseObject parseObject, ParseException e) {
+            public void done(ParseObject parseObject, @Nullable ParseException e) {
                 if (e != null) {
                     parseObjectToFetch.fetchIfNeededInBackground(new GetCallback<ParseObject>() {
                         @Override
-                        public void done(ParseObject parseObject, ParseException e) {
+                        public void done(ParseObject parseObject, @Nullable ParseException e) {
                             if (e == null) {
                                 listener.onObjectFetched(parseObject);
                             }
@@ -273,11 +340,18 @@ public class LocalQuery {
         });
     }
 
-    public static void fetchObjectFromId(String objectType, String objectId,
-                                         final ObjectLocalFetchListener listener) {
+    /**
+     * Fetches the data of an object from the local data store.
+     *
+     * @param objectType the class type of the object
+     * @param objectId   the object id
+     * @param listener   the callback called when the query finishes
+     */
+    public static void fetchObjectFromId(@NonNull String objectType, @NonNull String objectId,
+                                         @Nullable final ObjectLocalFetchListener listener) {
         ParseObject parseObject = ParseObject.createWithoutData(objectType, objectId);
         parseObject.fetchFromLocalDatastoreInBackground(new GetCallback<ParseObject>() {
-            public void done(ParseObject parseObject, ParseException e) {
+            public void done(ParseObject parseObject, @Nullable ParseException e) {
                 if (e != null) {
                     Log.e(LOG_TAG, "fetchObject " + e.toString());
                     return;
@@ -299,23 +373,63 @@ public class LocalQuery {
         return currentUser.getCurrentGroup();
     }
 
+    /**
+     * Defines the callback when a purchase query finishes.
+     */
     public interface PurchaseLocalQueryListener {
-        void onPurchasesLocalQueried(List<ParseObject> purchases);
+        /**
+         * Called when a query finished without error.
+         *
+         * @param purchases the queried purchases
+         */
+        void onPurchasesLocalQueried(@NonNull List<ParseObject> purchases);
     }
 
+    /**
+     * Defines the callback when a compensation query finishes.
+     */
     public interface CompensationLocalQueryListener {
-        void onCompensationsLocalQueried(List<ParseObject> compensations);
+        /**
+         * Called when a query finished without error.
+         *
+         * @param compensations the queried compensations
+         */
+        void onCompensationsLocalQueried(@NonNull List<ParseObject> compensations);
     }
 
+    /**
+     * Defines the callback when a user query finishes.
+     */
     public interface UserLocalQueryListener {
-        void onUsersLocalQueried(List<ParseUser> users);
+        /**
+         * Called when a query finished without error.
+         *
+         * @param users the queried users
+         */
+        void onUsersLocalQueried(@NonNull List<ParseUser> users);
     }
 
+    /**
+     * Defines the callback when a task query finishes.
+     */
     public interface TaskLocalQueryListener {
-        void onTasksLocalQueried(List<ParseObject> tasks);
+        /**
+         * Called when a query finished without error.
+         *
+         * @param tasks the queried tasks
+         */
+        void onTasksLocalQueried(@NonNull List<ParseObject> tasks);
     }
 
+    /**
+     * Defines the callback when a generic object query finishes.
+     */
     public interface ObjectLocalFetchListener {
-        void onObjectFetched(ParseObject object);
+        /**
+         * Called when a query finished without error.
+         *
+         * @param object the queried object
+         */
+        void onObjectFetched(@NonNull ParseObject object);
     }
 }

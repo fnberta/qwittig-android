@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.activities;
 
 import android.animation.Animator;
@@ -6,9 +10,12 @@ import android.annotation.TargetApi;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
@@ -18,26 +25,35 @@ import com.parse.ParseException;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.helpers.TaskQueryHelper;
 import ch.giantific.qwittig.helpers.TaskRemindHelper;
-import ch.giantific.qwittig.ui.fragments.TasksFragment;
 import ch.giantific.qwittig.ui.adapters.StringResSpinnerAdapter;
+import ch.giantific.qwittig.ui.fragments.TasksFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.utils.AnimUtils;
 import ch.giantific.qwittig.utils.Utils;
 
+/**
+ * Hosts {@link TasksFragment} that displays a list of recent tasks. Only loads the fragment if the
+ * user is logged in.
+ * <p/>
+ * Allows the user to change the tasks display by changing the value of the spinner in the
+ * {@link Toolbar}.
+ * <p/>
+ * Subclass of {@link BaseNavDrawerActivity}.
+ */
 public class TasksActivity extends BaseNavDrawerActivity implements
         TasksFragment.FragmentInteractionListener,
         TaskQueryHelper.HelperInteractionListener,
         TaskRemindHelper.HelperInteractionListener,
         GroupCreateDialogFragment.DialogInteractionListener {
 
+    private static final String STATE_TASKS_FRAGMENT = "STATE_TASKS_FRAGMENT";
+    private static final String LOG_TAG = TasksActivity.class.getSimpleName();
     private Spinner mSpinnerDeadline;
     private TasksFragment mTaskFragment;
     private FloatingActionButton mFab;
-    private static final String STATE_TASKS_FRAGMENT = "STATE_TASKS_FRAGMENT";
-    private static final String LOG_TAG = TasksActivity.class.getSimpleName();
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tasks);
 
@@ -80,7 +96,7 @@ public class TasksActivity extends BaseNavDrawerActivity implements
             } else {
                 mFab.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
                     @Override
-                    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                    public void onLayoutChange(@NonNull View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
                         v.removeOnLayoutChangeListener(this);
                         circularRevealFab();
                     }
@@ -96,7 +112,7 @@ public class TasksActivity extends BaseNavDrawerActivity implements
         Animator reveal = AnimUtils.getCircularRevealAnimator(mFab);
         reveal.addListener(new AnimatorListenerAdapter() {
             @Override
-            public void onAnimationStart(Animator animation) {
+            public void onAnimationStart(@NonNull Animator animation) {
                 super.onAnimationStart(animation);
                 animation.removeListener(this);
 
@@ -151,7 +167,7 @@ public class TasksActivity extends BaseNavDrawerActivity implements
     private void setDeadlineListener() {
         mSpinnerDeadline.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemSelected(@NonNull AdapterView<?> parent, View view, int position, long id) {
                 int deadline = (int) parent.getItemAtPosition(position);
                 mTaskFragment.onDeadlineSelected(deadline);
             }
@@ -172,7 +188,7 @@ public class TasksActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onTasksPinFailed(ParseException e) {
+    public void onTasksPinFailed(@NonNull ParseException e) {
         mTaskFragment.onTasksPinFailed(e);
     }
 
@@ -189,19 +205,15 @@ public class TasksActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onUserReminded(String taskId) {
+    public void onUserReminded(@NonNull String taskId) {
         mTaskFragment.onUserReminded(taskId);
     }
 
     @Override
-    public void onUserRemindFailed(ParseException e, String taskId) {
-        mTaskFragment.onUserRemindFailed(e, taskId);
+    public void onUserRemindFailed(@NonNull String taskId, @NonNull ParseException e) {
+        mTaskFragment.onUserRemindFailed(taskId, e);
     }
 
-    /**
-     * Called from dialog that is shown when user tries to add new task and is not yet part of
-     * any group.
-     */
     @Override
     public void onCreateGroupSelected() {
         Intent intent = new Intent(this, SettingsGroupNewActivity.class);

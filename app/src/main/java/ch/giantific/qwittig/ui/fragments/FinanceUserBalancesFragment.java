@@ -1,8 +1,16 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,20 +32,27 @@ import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
-
+/**
+ * Displays the users of a group and their current balances in a {@link RecyclerView} list. Does not
+ * include the current user whose balance is displayed in the {@link Toolbar} of the hosting
+ * {@link Activity}.
+ * <p/>
+ * Subclass of {@link BaseRecyclerViewFragment}.
+ */
 public class FinanceUserBalancesFragment extends BaseRecyclerViewFragment implements
         LocalQuery.UserLocalQueryListener,
         UsersRecyclerAdapter.AdapterInteractionListener {
 
     private static final String USER_QUERY_HELPER = "USER_QUERY_HELPER";
     private UsersRecyclerAdapter mRecyclerAdapter;
+    @NonNull
     private List<ParseUser> mUsers = new ArrayList<>();
 
     public FinanceUserBalancesFragment() {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_finance_users, container, false);
         findBaseViews(rootView);
 
@@ -48,8 +63,7 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewFragment implem
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mRecyclerAdapter = new UsersRecyclerAdapter(getActivity(),
-                R.layout.row_users, mUsers, this);
+        mRecyclerAdapter = new UsersRecyclerAdapter(getActivity(), mUsers, this);
         mRecyclerView.setAdapter(mRecyclerAdapter);
     }
 
@@ -68,7 +82,6 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewFragment implem
         // retained across a configuration change.
         if (userQueryHelper == null) {
             userQueryHelper = new UserQueryHelper();
-
             fragmentManager.beginTransaction()
                     .add(userQueryHelper, USER_QUERY_HELPER)
                     .commit();
@@ -76,10 +89,12 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewFragment implem
     }
 
     /**
-     * Called from activity when helper fails to pin new purchases
-     * @param e
+     * Passes the {@link ParseException} to the generic error handler, shows the user an error
+     * message and removes the retained helper fragment and loading indicators.
+     *
+     * @param e the {@link ParseException} thrown in the process
      */
-    public void onUsersPinFailed(ParseException e) {
+    public void onUsersPinFailed(@NonNull ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         showOnlineQueryErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
         HelperUtils.removeHelper(getFragmentManager(), USER_QUERY_HELPER);
@@ -88,14 +103,14 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewFragment implem
     }
 
     /**
-     * Called from activity when helper finished pinning new users
+     * Tells the adapter of the {@link RecyclerView} to re-query its data.
      */
     public void onUsersPinned() {
         updateAdapter();
     }
 
     /**
-     * Called from activity when all purchases queries are finished
+     * Removes the retained helper fragment and removes loading indicators.
      */
     public void onAllUsersQueried() {
         HelperUtils.removeHelper(getFragmentManager(), USER_QUERY_HELPER);
@@ -112,7 +127,7 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewFragment implem
     }
 
     @Override
-    public void onUsersLocalQueried(List<ParseUser> users) {
+    public void onUsersLocalQueried(@NonNull List<ParseUser> users) {
         mUsers.clear();
 
         if (!users.isEmpty()) {
@@ -143,7 +158,7 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewFragment implem
     protected void updateView() {
         mRecyclerAdapter.setCurrentGroupCurrency(ParseUtils.getGroupCurrency());
         mRecyclerAdapter.notifyDataSetChanged();
-        toggleMainVisibility();
+        showMainView();
     }
 
     @Override

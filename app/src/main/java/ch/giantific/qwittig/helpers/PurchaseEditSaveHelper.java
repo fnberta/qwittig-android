@@ -1,6 +1,12 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.helpers;
 
 import android.annotation.SuppressLint;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.parse.DeleteCallback;
@@ -16,11 +22,15 @@ import ch.giantific.qwittig.data.parse.CloudCode;
 import ch.giantific.qwittig.data.parse.models.Purchase;
 
 /**
- * Created by fabio on 10.12.14.
+ * Saves an edited {@link Purchase} object and if there is a new receipt image, deletes the old
+ * {@link ParseFile} if there was one.
+ * <p/>
+ * Subclass of {@link PurchaseSaveHelper}.
  */
 public class PurchaseEditSaveHelper extends PurchaseSaveHelper {
 
     private static final String LOG_TAG = PurchaseEditSaveHelper.class.getSimpleName();
+    @Nullable
     private ParseFile mReceiptParseFileOld;
     private boolean mIsDraft;
     private boolean mDeleteOldReceipt;
@@ -29,18 +39,47 @@ public class PurchaseEditSaveHelper extends PurchaseSaveHelper {
         // empty default constructor
     }
 
+    /**
+     * Constructs a new {@link PurchaseEditSaveHelper} with a {@link Purchase} object, whether
+     * the purchase was a draft or an already saved purchase and optionally the old receipt image
+     * as parameters.
+     * <p/>
+     * Using a non empty constructor to be able to pass a {@link com.parse.ParseObject}.
+     * Because the fragment  is retained across configuration changes, there is no risk that the
+     * system will recreate it with the default empty constructor.
+     *
+     * @param purchase            the {@link Purchase} object to save
+     * @param isDraft             whether we are saving a draft or an already saved purchase
+     * @param receiptParseFileOld the old receipt image
+     */
     @SuppressLint("ValidFragment")
-    public PurchaseEditSaveHelper(Purchase purchase, boolean isDraft, ParseFile receiptParseFileOld) {
+    public PurchaseEditSaveHelper(@NonNull Purchase purchase, boolean isDraft,
+                                  @Nullable ParseFile receiptParseFileOld) {
         this(purchase, isDraft, receiptParseFileOld, "");
 
         mDeleteOldReceipt = true;
     }
 
+    /**
+     * Constructs a new {@link PurchaseEditSaveHelper} with a {@link Purchase} object, whether
+     * the purchase was a draft or an already saved purchase and optionally the old receipt image
+     * and the path to the new one as parameters.
+     * <p/>
+     * Using a non empty constructor to be able to pass a {@link com.parse.ParseObject}.
+     * Because the fragment  is retained across configuration changes, there is no risk that the
+     * system will recreate it with the default empty constructor.
+     *
+     * @param purchase            the {@link Purchase} object to save
+     * @param isDraft             whether we are saving a draft or an already saved purchase
+     * @param receiptParseFileOld the old receipt image
+     * @param receiptNewPath      the path to the new receipt image
+     */
     @SuppressLint("ValidFragment")
-    public PurchaseEditSaveHelper(Purchase purchase, boolean isDraft, ParseFile receiptParseFileOld,
-                                  String receiptNewPath) {
+    public PurchaseEditSaveHelper(@NonNull Purchase purchase, boolean isDraft,
+                                  @Nullable ParseFile receiptParseFileOld,
+                                  @Nullable String receiptNewPath) {
         super(purchase, receiptNewPath);
-        
+
         mReceiptParseFileOld = receiptParseFileOld;
         mIsDraft = isDraft;
     }
@@ -68,12 +107,12 @@ public class PurchaseEditSaveHelper extends PurchaseSaveHelper {
         }
     }
 
-    private void deleteParseFileInCloud(String fileName) {
+    private void deleteParseFileInCloud(@NonNull String fileName) {
         Map<String, Object> params = new HashMap<>();
         params.put(CloudCode.PARAM_FILE_NAME, fileName);
         ParseCloud.callFunctionInBackground(CloudCode.DELETE_PARSE_FILE, params, new FunctionCallback<Object>() {
             @Override
-            public void done(Object o, ParseException e) {
+            public void done(Object o, @Nullable ParseException e) {
                 if (e != null) {
                     if (mListener != null) {
                         mListener.onPurchaseSaveFailed(e);
@@ -104,7 +143,7 @@ public class PurchaseEditSaveHelper extends PurchaseSaveHelper {
         if (mIsDraft) {
             mPurchase.unpinInBackground(new DeleteCallback() {
                 @Override
-                public void done(ParseException e) {
+                public void done(@Nullable ParseException e) {
                     if (e != null) {
                         return;
                     }

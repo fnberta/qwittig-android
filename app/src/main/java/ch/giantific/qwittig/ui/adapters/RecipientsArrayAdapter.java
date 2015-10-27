@@ -1,8 +1,13 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,44 +24,54 @@ import java.util.List;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.Avatar;
 import ch.giantific.qwittig.data.models.ItemUserPicker;
+import ch.giantific.qwittig.ui.fragments.dialogs.CompensationSingleDialogFragment;
 
 
 /**
- * Created by fabio on 12.10.14.
+ * Handles the display of the recipients in the {@link CompensationSingleDialogFragment}, includes
+ * the avatar image and the nickname of the user
+ * <p/>
+ * Subclass of {@link ArrayAdapter}.
  */
 public class RecipientsArrayAdapter extends ArrayAdapter<ItemUserPicker> {
 
-    private int mViewResource;
-    private int mDropDownViewResource;
+    private static final int VIEW_RESOURCE = R.layout.spinner_item_with_image;
+    private static final int DROP_DOWN_VIEW_RESOURCE = R.layout.row_spinner_recipients;
     private List<ItemUserPicker> mUsers;
     private Context mContext;
 
-    public RecipientsArrayAdapter(Context context, int viewResource, int dropDownViewResource,
-                                  List<ItemUserPicker> users) {
-        super(context, viewResource, users);
+    /**
+     * Constructs a new {@link RecipientsArrayAdapter}.
+     *
+     * @param context the context to use in the adapter
+     * @param users   the users (recipients) to display
+     */
+    public RecipientsArrayAdapter(@NonNull Context context, @NonNull List<ItemUserPicker> users) {
+        super(context, VIEW_RESOURCE, users);
 
         mContext = context;
-        mViewResource = viewResource;
-        mDropDownViewResource = dropDownViewResource;
         mUsers = users;
     }
 
+    @Nullable
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         return getCustomView(position, convertView, parent, false);
     }
 
+    @Nullable
     @Override
-    public View getDropDownView(int position, View convertView, ViewGroup parent) {
+    public View getDropDownView(int position, View convertView, @NonNull ViewGroup parent) {
         return getCustomView(position, convertView, parent, true);
     }
 
-    private View getCustomView(int position, View convertView, ViewGroup parent,
+    @Nullable
+    private View getCustomView(int position, @Nullable View convertView, @NonNull ViewGroup parent,
                                boolean isDropDown) {
         final RecipientRow recipientRow;
         if (convertView == null) {
             convertView = LayoutInflater.from(parent.getContext()).inflate(
-                    isDropDown ? mDropDownViewResource : mViewResource, parent, false);
+                    isDropDown ? DROP_DOWN_VIEW_RESOURCE : VIEW_RESOURCE, parent, false);
             recipientRow = new RecipientRow(convertView);
             convertView.setTag(recipientRow);
         } else {
@@ -64,7 +79,7 @@ public class RecipientsArrayAdapter extends ArrayAdapter<ItemUserPicker> {
         }
 
         ItemUserPicker user = mUsers.get(position);
-        recipientRow.setUsername(user.getNickname());
+        recipientRow.setNickname(user.getNickname());
 
         byte[] avatarByteArray = user.getAvatar();
         recipientRow.setAvatar(avatarByteArray, mContext, false);
@@ -72,38 +87,57 @@ public class RecipientsArrayAdapter extends ArrayAdapter<ItemUserPicker> {
         return convertView;
     }
 
+    /**
+     * Provides an adapter row that displays a recipient's avatar image and nickname.
+     */
     private static class RecipientRow {
 
         private ImageView mImageViewAvatar;
         private TextView mTextViewName;
 
-        public RecipientRow(View view) {
+        /**
+         * Constructs a new {@link RecipientRow}.
+         *
+         * @param view the inflated view
+         */
+        public RecipientRow(@NonNull View view) {
             mImageViewAvatar = (ImageView) view.findViewById(R.id.list_avatar);
             mTextViewName = (TextView) view.findViewById(R.id.list_name);
         }
 
-        public void setUsername(String username) {
-            mTextViewName.setText(username);
+        /**
+         * Sets the nickname of the recipient.
+         *
+         * @param nickname the nickname to set
+         */
+        public void setNickname(@NonNull String nickname) {
+            mTextViewName.setText(nickname);
         }
 
-        public void setAvatar(byte[] avatarBytes, final Context context, final boolean withRipple) {
+        /**
+         * Loads the avatar image into the image view if the user has an avatar, if not it loads a
+         * fallback drawable.
+         *
+         * @param avatarBytes the avatar image of the user
+         * @param context     the context to use to load the image
+         * @param withRipple  whether to use a ripple effect on click or not
+         */
+        public void setAvatar(@Nullable byte[] avatarBytes, @NonNull final Context context,
+                              final boolean withRipple) {
             if (avatarBytes != null) {
                 Glide.with(context)
                         .load(avatarBytes)
                         .asBitmap()
                         .into(new BitmapImageViewTarget(mImageViewAvatar) {
                             @Override
-                            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                            public void onResourceReady(@NonNull Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                                 view.setImageDrawable(Avatar.getRoundedDrawable(context, resource, withRipple));
                             }
                         });
             } else {
-                setAvatar(Avatar.getFallbackDrawable(context, false, withRipple));
+                mImageViewAvatar.setImageDrawable(
+                        Avatar.getFallbackDrawable(context, false, withRipple));
             }
-        }
-
-        public void setAvatar(Drawable avatar) {
-            mImageViewAvatar.setImageDrawable(avatar);
         }
     }
 }

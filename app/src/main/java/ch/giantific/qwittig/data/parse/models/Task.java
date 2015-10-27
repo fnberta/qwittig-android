@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.data.parse.models;
 
 import android.support.annotation.NonNull;
@@ -23,7 +27,9 @@ import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 
 /**
- * Created by fabio on 12.10.14.
+ * Represents a task that is defined within a {@link Group} and assigned to specific users
+ * <p/>
+ * Subclass of {@link ParseObject}.
  */
 @ParseClassName("Task")
 public class Task extends ParseObject {
@@ -48,14 +54,36 @@ public class Task extends ParseObject {
     public static final String TIME_FRAME_MONTHLY = "monthly";
     public static final String TIME_FRAME_YEARLY = "yearly";
     public static final String TIME_FRAME_AS_NEEDED = "asNeeded";
-
     private boolean mIsLoading;
+
+    public Task() {
+        // A default constructor is required.
+    }
+
+    public Task(@NonNull ParseUser initiator, @NonNull String title, @NonNull ParseObject group,
+                @NonNull @TimeFrame String timeFrame, @Nullable Date deadline,
+                @NonNull List<ParseUser> usersInvolved) {
+        setInitiator(initiator);
+        setTitle(title);
+        setGroup(group);
+        setTimeFrame(timeFrame);
+        if (deadline != null) {
+            setDeadline(deadline);
+        }
+        setUsersInvolved(usersInvolved);
+        setAccessRights(group);
+    }
+
+    private void setAccessRights(@NonNull ParseObject group) {
+        ParseACL acl = ParseUtils.getDefaultAcl(group);
+        setACL(acl);
+    }
 
     public User getInitiator() {
         return (User) getParseUser(INITIATOR);
     }
 
-    public void setInititator(@NonNull ParseUser initiator) {
+    public void setInitiator(@NonNull ParseUser initiator) {
         put(INITIATOR, initiator);
     }
 
@@ -88,62 +116,11 @@ public class Task extends ParseObject {
         return getDate(DEADLINE);
     }
 
-    public void setDeadline(Calendar calendar) {
-        put(DEADLINE, calendar.getTime());
-    }
-    
-    public List<ParseUser> getUsersInvolved() {
-        List<ParseUser> usersInvolved = getList(USERS_INVOLVED);
-        if (usersInvolved == null) {
-            return Collections.emptyList();
-        }
-
-        return usersInvolved;
-    }
-
-    public void setUsersInvolved(List<ParseUser> usersInvolved) {
-        put(USERS_INVOLVED, usersInvolved);
-    }
-
-    public Map<String, List<Date>> getHistory() {
-        Map<String, List<Date>> history = getMap(HISTORY);
-        if (history == null) {
-            return Collections.emptyMap();
-        }
-
-        return history;
-    }
-
-    public void setHistory(Map<String, List<Date>> history) {
-        put(HISTORY, history);
-    }
-
-    public boolean isLoading() {
-        return mIsLoading;
-    }
-
-    public void setLoading(boolean isLoading) {
-        mIsLoading = isLoading;
-    }
-
-    public Task() {
-        // A default constructor is required.
-    }
-
-    public Task(@NonNull ParseUser initiator, @NonNull String title, @NonNull ParseObject group,
-                @NonNull @TimeFrame String timeFrame, @Nullable Date deadline,
-                List<ParseUser> usersInvolved) {
-        setInititator(initiator);
-        setTitle(title);
-        setGroup(group);
-        setTimeFrame(timeFrame);
-        if (deadline != null) {
-            setDeadline(deadline);
-        }
-        setUsersInvolved(usersInvolved);
-        setAccessRights(group);
-    }
-
+    /**
+     * Sets the specified deadline or removes it if it is null.
+     *
+     * @param deadline the deadline to set
+     */
     public void setDeadline(@Nullable Date deadline) {
         if (deadline == null) {
             remove(DEADLINE);
@@ -156,11 +133,52 @@ public class Task extends ParseObject {
         }
     }
 
-    private void setAccessRights(@NonNull ParseObject group) {
-        ParseACL acl = ParseUtils.getDefaultAcl(group);
-        setACL(acl);
+    public void setDeadline(@NonNull Calendar calendar) {
+        put(DEADLINE, calendar.getTime());
     }
 
+    @NonNull
+    public List<ParseUser> getUsersInvolved() {
+        List<ParseUser> usersInvolved = getList(USERS_INVOLVED);
+        if (usersInvolved == null) {
+            return Collections.emptyList();
+        }
+
+        return usersInvolved;
+    }
+
+    public void setUsersInvolved(@NonNull List<ParseUser> usersInvolved) {
+        put(USERS_INVOLVED, usersInvolved);
+    }
+
+    @NonNull
+    public Map<String, List<Date>> getHistory() {
+        Map<String, List<Date>> history = getMap(HISTORY);
+        if (history == null) {
+            return Collections.emptyMap();
+        }
+
+        return history;
+    }
+
+    public void setHistory(@NonNull Map<String, List<Date>> history) {
+        put(HISTORY, history);
+    }
+
+    public boolean isLoading() {
+        return mIsLoading;
+    }
+
+    public void setLoading(boolean isLoading) {
+        mIsLoading = isLoading;
+    }
+
+    /**
+     * Adds a history event to the task.
+     * <p/>
+     * A history event simply contains the object id of the user who completed the task and the
+     * date on which he/she did.
+     */
     public void addHistoryEvent() {
         ParseUser currentUser = ParseUser.getCurrentUser();
         if (currentUser == null) {

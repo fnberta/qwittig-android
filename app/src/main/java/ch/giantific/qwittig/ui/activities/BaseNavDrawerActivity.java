@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.activities;
 
 import android.content.BroadcastReceiver;
@@ -9,6 +13,8 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -34,7 +40,7 @@ import com.parse.ParseUser;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.giantific.qwittig.BlurTransformation;
+import ch.giantific.qwittig.utils.BlurTransformation;
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.models.Avatar;
@@ -53,7 +59,12 @@ import ch.giantific.qwittig.utils.inappbilling.Inventory;
 import ch.giantific.qwittig.utils.inappbilling.Purchase;
 
 /**
- * Created by fabio on 10.01.15.
+ * Provides an abstract base class that sets up the navigation drawer and implements a couple of
+ * default empty methods.
+ * <p/>
+ * Also initialises the in-app billing framework.
+ * <p/>
+ * Subclass of {@link BaseActivity}.
  */
 public abstract class BaseNavDrawerActivity extends BaseActivity implements
         LocalQuery.ObjectLocalFetchListener {
@@ -67,6 +78,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
     User mCurrentUser;
     Group mCurrentGroup;
     boolean mUserIsLoggedIn;
+    @Nullable
     IabHelper mIabHelper;
     boolean mIsPremium;
     boolean mInTrialMode;
@@ -81,11 +93,13 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
     private ImageView mImageViewHeaderAvatar;
     private Spinner mSpinnerGroups;
     private NavHeaderGroupsArrayAdapter mSpinnerGroupsAdapter;
+    @NonNull
     private List<ParseObject> mGroups = new ArrayList<>();
 
+    @NonNull
     private BroadcastReceiver mLocalBroadcastReceiver = new BroadcastReceiver() {
         @Override
-        public void onReceive(Context context, Intent intent) {
+        public void onReceive(Context context, @NonNull Intent intent) {
             int dataType = intent.getIntExtra(ParseQueryService.INTENT_DATA_TYPE, 0);
             switch (dataType) {
                 case ParseQueryService.DATA_TYPE_PURCHASE:
@@ -107,9 +121,10 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
             }
         }
     };
+    @NonNull
     private IabHelper.QueryInventoryFinishedListener mQueryInventoryFinishedListener = new IabHelper.QueryInventoryFinishedListener() {
         @Override
-        public void onQueryInventoryFinished(IabResult result, Inventory inv) {
+        public void onQueryInventoryFinished(@NonNull IabResult result, @NonNull Inventory inv) {
             if (result.isFailure()) {
                 return;
             }
@@ -120,9 +135,10 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
             toggleGoPremiumVisibility();
         }
     };
+    @NonNull
     private IabHelper.OnIabPurchaseFinishedListener mIabPurchaseFinishedListener = new IabHelper.OnIabPurchaseFinishedListener() {
         @Override
-        public void onIabPurchaseFinished(IabResult result, Purchase info) {
+        public void onIabPurchaseFinished(@NonNull IabResult result, @NonNull Purchase info) {
             if (!result.isFailure() && developerPayloadIsValid(info) &&
                     info.getSku().equals(SKU_PREMIUM)) {
                 mIsPremium = true;
@@ -139,7 +155,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
     /**
      * Verifies the developer payload of a purchase.
      */
-    private boolean developerPayloadIsValid(Purchase iabPurchase) {
+    private boolean developerPayloadIsValid(@NonNull Purchase iabPurchase) {
         String payload = iabPurchase.getDeveloperPayload();
         return payload.equals(mCurrentUser.getObjectId());
     }
@@ -231,7 +247,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
         NavigationView navigationView = (NavigationView) findViewById(R.id.navdrawer_view);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public boolean onNavigationItemSelected(MenuItem menuItem) {
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 menuItem.setChecked(true);
 
                 mSelectedNavDrawerItem = menuItem.getItemId();
@@ -282,13 +298,13 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
                 mFetchCounter++;
                 checkFetchesFinished();
             } else {
-                LocalQuery.fetchObjectData(this, group);
+                LocalQuery.fetchObjectData(group, this);
             }
         }
     }
 
     @Override
-    public void onObjectFetched(ParseObject object) {
+    public void onObjectFetched(@NonNull ParseObject object) {
         mFetchCounter++;
         checkFetchesFinished();
     }
@@ -353,7 +369,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
                     .asBitmap()
                     .into(new BitmapImageViewTarget(mImageViewHeaderAvatar) {
                         @Override
-                        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                        public void onResourceReady(@NonNull Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                             view.setImageDrawable(Avatar.getRoundedDrawable(context, resource, true));
                         }
                     });
@@ -369,12 +385,11 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
 
     private void setupNavDrawerHeaderGroupSpinner() {
         mSpinnerGroups = (Spinner) findViewById(R.id.sp_drawer_group);
-        mSpinnerGroupsAdapter = new NavHeaderGroupsArrayAdapter(this,
-                R.layout.spinner_item_nav, android.R.layout.simple_spinner_dropdown_item, mGroups);
+        mSpinnerGroupsAdapter = new NavHeaderGroupsArrayAdapter(this, mGroups);
         mSpinnerGroups.setAdapter(mSpinnerGroupsAdapter);
         mSpinnerGroups.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemSelected(@NonNull AdapterView<?> parent, View view, int position, long id) {
                 Group groupSelected = (Group) parent.getItemAtPosition(position);
                 onGroupChanged(groupSelected);
             }
@@ -411,7 +426,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
         mSpinnerGroups.setSelection(position);
     }
 
-    private void onGroupChanged(ParseObject group) {
+    private void onGroupChanged(@NonNull ParseObject group) {
         Group oldGroup = mCurrentUser.getCurrentGroup();
         if (oldGroup.getObjectId().equals(group.getObjectId())) {
             return;
@@ -431,7 +446,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
         mIabHelper = new IabHelper(this, base64EncodedPublicKey);
         mIabHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
             @Override
-            public void onIabSetupFinished(IabResult result) {
+            public void onIabSetupFinished(@NonNull IabResult result) {
                 if (result.isSuccess()) {
                     mIabHelper.queryInventoryAsync(true, mQueryInventoryFinishedListener);
                 } else {
@@ -473,7 +488,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
     }
 
     /**
-     * Uncheck all enabled items in the NavDrawer.
+     * Un-check all enabled items in the NavDrawer.
      */
     final void uncheckNavDrawerItems() {
         mNavigationViewMenu.setGroupCheckable(R.id.nav_group_main, false, true);
@@ -482,7 +497,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
     /**
      * Check newly selected item in the NavDrawer.
      *
-     * @param itemId The newly selected item.
+     * @param itemId the id of the newly selected item
      */
     final void checkNavDrawerItem(int itemId) {
         MenuItem item = mNavigationViewMenu.findItem(itemId);
@@ -521,7 +536,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
                 startActivity(intent);
                 break;
             case R.id.nav_go_premium:
-                onGoPremiumSelected();
+                goPremium();
                 break;
         }
     }
@@ -553,7 +568,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
                         break;
                 }
                 break;
-            case BaseActivity.INTENT_REQUEST_SETTINGS_PROFILE:
+            case INTENT_REQUEST_SETTINGS_PROFILE:
                 switch (resultCode) {
                     case RESULT_OK:
                         MessageUtils.showBasicSnackbar(mSpinnerGroups,
@@ -577,8 +592,8 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
         // subclasses are free to add stuff here
     }
 
-    final public void onGoPremiumSelected() {
-        if (!mIabHelper.subscriptionsSupported()) {
+    final void goPremium() {
+        if (mIabHelper == null || !mIabHelper.subscriptionsSupported()) {
             MessageUtils.showBasicSnackbar(mToolbar, getString(R.string.toast_not_supported));
             return;
         }

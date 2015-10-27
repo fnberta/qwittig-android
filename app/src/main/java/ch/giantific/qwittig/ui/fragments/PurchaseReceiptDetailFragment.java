@@ -1,6 +1,11 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.parse.ParseFile;
@@ -11,7 +16,9 @@ import ch.giantific.qwittig.data.parse.models.Purchase;
 
 
 /**
- * A simple {@link android.app.Fragment} subclass.
+ * Shows the receipt image of a purchase when viewing its details.
+ * <p/>
+ * Subclass of {@link PurchaseReceiptBaseFragment}.
  */
 public class PurchaseReceiptDetailFragment extends PurchaseReceiptBaseFragment implements
         LocalQuery.ObjectLocalFetchListener {
@@ -22,7 +29,15 @@ public class PurchaseReceiptDetailFragment extends PurchaseReceiptBaseFragment i
     public PurchaseReceiptDetailFragment() {
     }
 
-    public static PurchaseReceiptDetailFragment newInstance(String purchaseId) {
+    /**
+     * Returns a new instance of {@link PurchaseReceiptDetailFragment}.
+     *
+     * @param purchaseId the object id of the purchase of which the receipt image should be
+     *                   displayed
+     * @return a new instance of {@link PurchaseReceiptDetailFragment}
+     */
+    @NonNull
+    public static PurchaseReceiptDetailFragment newInstance(@NonNull String purchaseId) {
         PurchaseReceiptDetailFragment fragment = new PurchaseReceiptDetailFragment();
         Bundle args = new Bundle();
         args.putString(BUNDLE_PURCHASE_ID, purchaseId);
@@ -36,7 +51,7 @@ public class PurchaseReceiptDetailFragment extends PurchaseReceiptBaseFragment i
 
         Bundle args = getArguments();
         if (args != null) {
-            mPurchaseId = args.getString(BUNDLE_PURCHASE_ID);
+            mPurchaseId = args.getString(BUNDLE_PURCHASE_ID, "");
         }
     }
 
@@ -48,7 +63,7 @@ public class PurchaseReceiptDetailFragment extends PurchaseReceiptBaseFragment i
     }
 
     @Override
-    public void onObjectFetched(ParseObject object) {
+    public void onObjectFetched(@NonNull ParseObject object) {
         Purchase purchase = (Purchase) object;
         ParseFile receiptFile = purchase.getReceiptParseFile();
         setReceiptImage(receiptFile);

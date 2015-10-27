@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.widgets;
 
 import android.content.Context;
@@ -6,7 +10,9 @@ import android.util.AttributeSet;
 import com.github.mikephil.charting.components.Legend;
 
 /**
- * Created by fabio on 17.07.15.
+ * Provides a pie char with sensible default settings already set.
+ * <p/>
+ * Subclass of {@link com.github.mikephil.charting.charts.PieChart}
  */
 public class PieChart extends com.github.mikephil.charting.charts.PieChart {
 

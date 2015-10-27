@@ -1,10 +1,15 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
-import android.app.Fragment;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -13,7 +18,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
+import com.github.jorgecastilloprz.FABProgressCircle;
 import com.parse.ParseException;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
 import com.parse.ParseUser;
@@ -32,7 +39,9 @@ import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Displays the settings screen that allows the user to create a new group and invite users to it.
+ * <p/>
+ * Subclass of {@link SettingsBaseInviteFragment}.
  */
 public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
 
@@ -43,27 +52,27 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
     private String mGroupNewName;
     private boolean mIsCreatingNew;
 
-    public void setIsCreatingNew(boolean isCreatingNew) {
-        mIsCreatingNew = isCreatingNew;
-    }
-
     public SettingsGroupNewFragment() {
         // Required empty public constructor
     }
 
+    public void setIsCreatingNew(boolean isCreatingNew) {
+        mIsCreatingNew = isCreatingNew;
+    }
+
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
             mListener = (FragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
+                    + " must implement DialogInteractionListener");
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_settings_group_new, container, false);
 
@@ -88,6 +97,10 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
         setupUsersToInviteRows();
     }
 
+    /**
+     * Reads the name the user has entered for the new group, checks if the user already has a
+     * group with same name and if not creates the new group with a retained helper fragment.
+     */
     public void addNewGroup() {
         final User currentUser = (User) ParseUser.getCurrentUser();
 
@@ -138,7 +151,7 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
         createNewGroupWithHelper(currency);
     }
 
-    private void createNewGroupWithHelper(String newGroupCurrency) {
+    private void createNewGroupWithHelper(@NonNull String newGroupCurrency) {
         FragmentManager fragmentManager = getFragmentManager();
         Fragment createGroupHelper = HelperUtils.findHelper(fragmentManager, CREATE_GROUP_HELPER);
 
@@ -155,21 +168,25 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
     }
 
     /**
-     * Called from activity when helper fails to create new group
-     * @param e
+     * Passes the {@link ParseException} to the generic error handler, shows the user an error
+     * message and removes the retained helper fragment and loading indicators.
+     *
+     * @param e the {@link ParseException} thrown during the process
      */
-    public void onCreateNewGroupFailed(ParseException e) {
+    public void onCreateNewGroupFailed(@NonNull ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         onParseError(ParseErrorHandler.getErrorMessage(getActivity(), e));
         HelperUtils.removeHelper(getFragmentManager(), CREATE_GROUP_HELPER);
     }
 
     /**
-     * Called from activity when helper finished creating new group
-     * @param newGroup
-     * @param invitingUser if the helper is also inviting users to the new group
+     * Adds the object id of the new group to the {@link ParseInstallation} object and finishes if
+     * the user has not entered users to invite.
+     *
+     * @param newGroup     the newly created troup
+     * @param invitingUser whether the helper is also inviting users to the new group
      */
-    public void onNewGroupCreated(Group newGroup, boolean invitingUser) {
+    public void onNewGroupCreated(@NonNull Group newGroup, boolean invitingUser) {
         // register for notifications for the new group
         ParsePush.subscribeInBackground(newGroup.getObjectId());
 
@@ -179,22 +196,24 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
     }
 
     /**
-     * Called from activity when helper finished inviting user
+     * Finishes with the name of the new group in the result intent.
      */
     public void onUsersInvited() {
         mListener.finishGroupCreation(mGroupNewName);
     }
 
     /**
-     * Called from activity when helper fails to invite new users to newly created group
-     * @param e
+     * Passes the {@link ParseException} to the generic error handler, shows the user an error
+     * message and removes the retained helper fragment and loading indicators.
+     * <p/>
+     * TODO: new group is created but users not invited, finish activity but tell the user
+     *
+     * @param e the {@link ParseException} thrown during the process
      */
-    public void onInviteUsersFailed(ParseException e) {
+    public void onInviteUsersFailed(@NonNull ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         onParseError(ParseErrorHandler.getErrorMessage(getActivity(), e));
         HelperUtils.removeHelper(getFragmentManager(), CREATE_GROUP_HELPER);
-
-        // TODO: new group is created but users not invited, finish activity but tell the user
     }
 
     @Override
@@ -209,11 +228,26 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
         mListener = null;
     }
 
+    /**
+     * Defines the interaction with the hosting {@link Activity}.
+     */
     public interface FragmentInteractionListener extends BaseFragmentInteractionListener {
+        /**
+         * Indicates to start the loading animation of the {@link FABProgressCircle}.
+         */
         void progressCircleShow();
 
+        /**
+         * Indicates to hide the loading animation of the {@link FABProgressCircle}.
+         */
         void progressCircleHide();
 
-        void finishGroupCreation(String newGroupName);
+        /**
+         * Indicates that the activity should be finished with the name of new group in the result
+         * data intent.
+         *
+         * @param newGroupName the name of the new group
+         */
+        void finishGroupCreation(@NonNull String newGroupName);
     }
 }

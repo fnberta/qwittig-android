@@ -1,6 +1,12 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,7 +22,10 @@ import ch.giantific.qwittig.data.models.Receipt;
 import ch.giantific.qwittig.data.parse.LocalQuery;
 
 /**
- * A placeholder fragment containing a simple view.
+ * Displays the interface where the user can edit a purchase draft. The user can either save the
+ * changes again in the draft or save the purchase online to the Parse.com database.
+ * <p/>
+ * Subclass of {@link PurchaseEditFragment}.
  */
 public class PurchaseEditDraftFragment extends PurchaseEditFragment implements
         LocalQuery.ObjectLocalFetchListener {
@@ -24,7 +33,14 @@ public class PurchaseEditDraftFragment extends PurchaseEditFragment implements
     public PurchaseEditDraftFragment() {
     }
 
-    public static PurchaseEditDraftFragment newInstance(String draftId) {
+    /**
+     * Returns a new instance of {@link PurchaseEditDraftFragment}.
+     *
+     * @param draftId the id of the draft to edit
+     * @return a new instance of {@link PurchaseEditDraftFragment}
+     */
+    @NonNull
+    public static PurchaseEditDraftFragment newInstance(@NonNull String draftId) {
         PurchaseEditDraftFragment fragment = new PurchaseEditDraftFragment();
 
         Bundle args = new Bundle();
@@ -42,14 +58,14 @@ public class PurchaseEditDraftFragment extends PurchaseEditFragment implements
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_purchase_edit_draft, menu);
 
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_purchase_edit_save_changes_draft:
                 savePurchase(true);
@@ -64,7 +80,7 @@ public class PurchaseEditDraftFragment extends PurchaseEditFragment implements
     private void deleteDraft() {
         mPurchase.unpinInBackground(new DeleteCallback() {
             @Override
-            public void done(ParseException e) {
+            public void done(@Nullable ParseException e) {
                 if (e == null) {
                     setResultForSnackbar(PURCHASE_DRAFT_DELETED);
                     finishPurchase();
@@ -79,12 +95,13 @@ public class PurchaseEditDraftFragment extends PurchaseEditFragment implements
     }
 
     @Override
-    public void onObjectFetched(ParseObject object) {
+    public void onObjectFetched(@NonNull ParseObject object) {
         super.onObjectFetched(object);
 
         processOldPurchase(object);
     }
 
+    @Nullable
     @Override
     ParseFile getOldReceiptFile() {
         byte[] receiptData = mPurchase.getReceiptData();
@@ -108,7 +125,7 @@ public class PurchaseEditDraftFragment extends PurchaseEditFragment implements
     }
 
     @Override
-    public void onParseError(ParseException e) {
+    public void onParseError(@NonNull ParseException e) {
         mPurchase.setDraftId(mEditPurchaseId);
         super.onParseError(e);
     }

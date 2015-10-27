@@ -1,7 +1,12 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,7 +32,10 @@ import ch.giantific.qwittig.utils.CurrencyFormatter;
 import ch.giantific.qwittig.utils.DateUtils;
 
 /**
- * A placeholder fragment containing a simple view.
+ * Displays the spending statistics in a {@link BarChart}. Shows which user spent how much money in
+ * a specified period of time.
+ * <p/>
+ * Subclass of {@link StatsBaseFragment}.
  */
 public class StatsSpendingFragment extends StatsBaseFragment {
 
@@ -45,7 +53,7 @@ public class StatsSpendingFragment extends StatsBaseFragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
@@ -57,7 +65,7 @@ public class StatsSpendingFragment extends StatsBaseFragment {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         outState.putBoolean(STATE_SHOW_GROUP, mShowGroup);
@@ -65,7 +73,7 @@ public class StatsSpendingFragment extends StatsBaseFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_stats_spending, container, false);
 
@@ -84,7 +92,7 @@ public class StatsSpendingFragment extends StatsBaseFragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_stats_spending, menu);
 
         MenuItem sortByUsers = menu.findItem(R.id.action_show_average);
@@ -95,7 +103,7 @@ public class StatsSpendingFragment extends StatsBaseFragment {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         switch (id) {
             case R.id.action_show_group:
@@ -113,13 +121,14 @@ public class StatsSpendingFragment extends StatsBaseFragment {
         }
     }
 
+    @NonNull
     @Override
     protected String getHelperTag() {
         return STATS_HELPER_SPENDING;
     }
 
     @Override
-    void calcStats(String year, int month) {
+    void calcStats(@NonNull String year, int month) {
         super.calcStats(year, month);
 
         calcStatsWithHelper(StatsHelper.TYPE_SPENDING, year, month);
@@ -136,7 +145,7 @@ public class StatsSpendingFragment extends StatsBaseFragment {
     }
 
     protected void setChartData() {
-        if (!mDataIsLoaded) {
+        if (!mDataIsLoaded || mStatsData == null) {
             return;
         }
 
@@ -145,12 +154,9 @@ public class StatsSpendingFragment extends StatsBaseFragment {
         int unitSize = mStatsData.getNumberOfUnits();
         List<String> xVals = getXvals(unitSize);
 
-        BarData dataToShow;
-        if (!mShowGroup) {
-            dataToShow = getUserBarData(userData, xVals);
-        } else {
-            dataToShow = getGroupBarData(groupData, xVals);
-        }
+        BarData dataToShow = mShowGroup ?
+                getGroupBarData(groupData, xVals) :
+                getUserBarData(userData, xVals);
 
         mBarChart.setData(dataToShow);
 
@@ -182,7 +188,8 @@ public class StatsSpendingFragment extends StatsBaseFragment {
         return xVals;
     }
 
-    private BarData getUserBarData(List<Stats.Member> userData, List<String> xVals) {
+    @NonNull
+    private BarData getUserBarData(@NonNull List<Stats.Member> userData, List<String> xVals) {
         int userDataSize = userData.size();
         List<BarDataSet> barDataSets = new ArrayList<>(userDataSize);
         for (int i = 0; i < userDataSize; i++) {
@@ -202,7 +209,7 @@ public class StatsSpendingFragment extends StatsBaseFragment {
     }
 
     @NonNull
-    private List<BarEntry> getBarEntries(List<Stats.Unit> units) {
+    private List<BarEntry> getBarEntries(@NonNull List<Stats.Unit> units) {
         List<BarEntry> barEntries = new ArrayList<>(units.size());
 
         for (Stats.Unit unit : units) {
@@ -219,7 +226,8 @@ public class StatsSpendingFragment extends StatsBaseFragment {
         return barEntries;
     }
 
-    private BarData getGroupBarData(Stats.Group groupData, List<String> xVals) {
+    @NonNull
+    private BarData getGroupBarData(@NonNull Stats.Group groupData, List<String> xVals) {
         List<Stats.Unit> units = groupData.getUnits();
         List<BarEntry> barEntries = getBarEntries(units);
 

@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.activities;
 
 import android.content.Intent;
@@ -15,7 +19,9 @@ import ch.giantific.qwittig.data.parse.models.Config;
 import ch.giantific.qwittig.ui.fragments.dialogs.AccountCreateDialogFragment;
 
 /**
- * BaseActivity that extends the Android ActionBarActivity Class.
+ * Provides an abstract base class that sets up the {@link Toolbar} and commonly used methods.
+ * <p/>
+ * Subclass of {@link AppCompatActivity}.
  */
 public abstract class BaseActivity extends AppCompatActivity implements
         AccountCreateDialogFragment.DialogInteractionListener {
@@ -60,6 +66,9 @@ public abstract class BaseActivity extends AppCompatActivity implements
         }
     }
 
+    /**
+     * Displays a dialog to the user asking him to create a new account.
+     */
     public void showAccountCreateDialog() {
         AccountCreateDialogFragment accountCreateDialogFragment =
                 new AccountCreateDialogFragment();

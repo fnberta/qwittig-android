@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments.dialogs;
 
 import android.app.Activity;
@@ -10,7 +14,9 @@ import android.support.v7.app.AlertDialog;
 import ch.giantific.qwittig.R;
 
 /**
- * Created by fabio on 20.11.14.
+ * Provides a dialog that asks the user if he really wants to discard the changes made on a screen.
+ * <p/>
+ * Subclass of {@link DialogFragment}.
  */
 public class DiscardChangesDialogFragment extends DialogFragment {
 
@@ -47,7 +53,13 @@ public class DiscardChangesDialogFragment extends DialogFragment {
         return dialogBuilder.create();
     }
 
+    /**
+     * Defines the actions to take when user clicks on one of the dialog's buttons.
+     */
     public interface DialogInteractionListener {
+        /**
+         * Handles the click on the discard changes button.
+         */
         void onDiscardChangesSelected();
     }
 }

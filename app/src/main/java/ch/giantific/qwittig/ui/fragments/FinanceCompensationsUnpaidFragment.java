@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.animation.Animator;
@@ -8,9 +12,11 @@ import android.app.FragmentManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +49,12 @@ import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
- * A placeholder fragment containing a simple view.
+ * Displays all currently open unpaid compensations in the group in card based {@link RecyclerView}
+ * list.
+ * <p/>
+ * Allows the user to create a new settlement if there are no open unpaid compensations.
+ * <p/>
+ * Subclass of {@link FinanceCompensationsBaseFragment}.
  */
 public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBaseFragment implements
         CompensationsUnpaidRecyclerAdapter.AdapterInteractionListener,
@@ -63,6 +74,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     private FABProgressCircle mFabProgressCircle;
     private FloatingActionButton mFabNew;
     private CompensationsUnpaidRecyclerAdapter mRecyclerAdapter;
+    @NonNull
     private List<ParseObject> mCompensations = new ArrayList<>();
     private List<ParseObject> mCompensationsAll;
     private boolean mAutoStartNew;
@@ -74,6 +86,13 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         // Required empty public constructor
     }
 
+    /**
+     * Returns a new instance of {@link FinanceCompensationsUnpaidFragment}.
+     *
+     * @param autoStartNew whether to automatically start a new settlement
+     * @return a new instance of {@link FinanceCompensationsUnpaidFragment}
+     */
+    @NonNull
     public static FinanceCompensationsUnpaidFragment newInstance(boolean autoStartNew) {
         FinanceCompensationsUnpaidFragment fragment = new FinanceCompensationsUnpaidFragment();
         Bundle args = new Bundle();
@@ -83,7 +102,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
@@ -91,8 +110,9 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         }
 
         if (savedInstanceState != null) {
-            mLoadingCompensations = savedInstanceState.getStringArrayList(
+            ArrayList<String> compsLoading = savedInstanceState.getStringArrayList(
                     STATE_COMPENSATIONS_LOADING);
+            mLoadingCompensations = compsLoading != null ? compsLoading : new ArrayList<String>();
             mIsCalculatingNew = savedInstanceState.getBoolean(STATE_IS_CALCULATING_NEW);
         } else {
             mLoadingCompensations = new ArrayList<>();
@@ -100,7 +120,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         outState.putStringArrayList(STATE_COMPENSATIONS_LOADING, mLoadingCompensations);
@@ -108,7 +128,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_finance_compensations_unpaid, container, false);
         findBaseViews(rootView);
@@ -125,8 +145,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mRecyclerAdapter = new CompensationsUnpaidRecyclerAdapter(getActivity(),
-                R.layout.row_compensations_unpaid_pos, R.layout.row_compensations_unpaid_neg, mCompensations,
+        mRecyclerAdapter = new CompensationsUnpaidRecyclerAdapter(getActivity(), mCompensations,
                 this);
         mRecyclerView.setAdapter(mRecyclerAdapter);
         mFabNew.setOnClickListener(new View.OnClickListener() {
@@ -138,6 +157,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         mFabProgressCircle.attachListener(this);
     }
 
+    @NonNull
     @Override
     protected String getQueryHelperTag() {
         return COMPENSATION_QUERY_HELPER;
@@ -156,7 +176,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     }
 
     @Override
-    public void onCompensationsLocalQueried(List<ParseObject> compensations) {
+    public void onCompensationsLocalQueried(@NonNull List<ParseObject> compensations) {
         mCompensationsAll = compensations;
         updateCompensations(compensations);
 
@@ -166,7 +186,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         }
     }
 
-    private void updateCompensations(List<ParseObject> parseObjects) {
+    private void updateCompensations(@NonNull List<ParseObject> parseObjects) {
         mCompensations.clear();
 
         if (!parseObjects.isEmpty()) {
@@ -194,7 +214,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
             mFabProgressCircle.beginFinalAnimation();
         } else {
             mRecyclerAdapter.notifyDataSetChanged();
-            toggleMainVisibility();
+            showMainView();
         }
     }
 
@@ -234,7 +254,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
             } else {
                 mFabNew.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
                     @Override
-                    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                    public void onLayoutChange(@NonNull View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
                         v.removeOnLayoutChangeListener(this);
                         circularRevealFab();
                     }
@@ -250,7 +270,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         Animator reveal = AnimUtils.getCircularRevealAnimator(mFabNew);
         reveal.addListener(new AnimatorListenerAdapter() {
             @Override
-            public void onAnimationStart(Animator animation) {
+            public void onAnimationStart(@NonNull Animator animation) {
                 super.onAnimationStart(animation);
                 animation.removeListener(this);
 
@@ -299,18 +319,19 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     }
 
     /**
-     * Called from activity when helper created new settlement
+     * Removes the retained helper fragment after a new settlement was created.
      *
-     * @param result object returned from CloudCode
+     * @param result the result returned from the cloud code call
      */
     public void onNewSettlementCreated(Object result) {
         HelperUtils.removeHelper(getFragmentManager(), SETTLEMENT_HELPER);
     }
 
     /**
-     * Called from activity when helper failed to create a new settlement
+     * Passes the {@link ParseException} to the generic error handler, shows the user an error
+     * message and removes the retained helper fragment and loading indicators.
      *
-     * @param e
+     * @param e the {@link ParseException} thrown in the process
      */
     public void onNewSettlementCreationFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
@@ -320,7 +341,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         mFabProgressCircle.hide();
     }
 
-    private void showSettlementErrorSnackbar(String errorMessage) {
+    private void showSettlementErrorSnackbar(@NonNull String errorMessage) {
         Snackbar snackbar = MessageUtils.getBasicSnackbar(mRecyclerView, errorMessage);
         snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
             @Override
@@ -331,7 +352,8 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         snackbar.show();
     }
 
-    private Compensation setCompensationLoading(String objectId, boolean isLoading) {
+    @Nullable
+    private Compensation setCompensationLoading(@NonNull String objectId, boolean isLoading) {
         Compensation compensationLoading = null;
 
         for (int i = 0, mCompensationsSize = mCompensations.size(); i < mCompensationsSize; i++) {
@@ -345,7 +367,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         return compensationLoading;
     }
 
-    private void setCompensationLoading(Compensation compensation, String objectId, int position,
+    private void setCompensationLoading(@NonNull Compensation compensation, String objectId, int position,
                                         boolean isLoading) {
         compensation.setIsLoading(isLoading);
         mRecyclerAdapter.notifyItemChanged(position);
@@ -385,7 +407,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         saveCompensationWithHelper(compensation);
     }
 
-    private void saveCompensationWithHelper(ParseObject compensation) {
+    private void saveCompensationWithHelper(@NonNull ParseObject compensation) {
         FragmentManager fragmentManager = getFragmentManager();
         String compensationId = compensation.getObjectId();
         Fragment saveHelper = HelperUtils.findHelper(fragmentManager, getSaveHelperTag(compensationId));
@@ -407,12 +429,14 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     }
 
     /**
-     * Called from activity when helper failed to save compensation
+     * Passes the {@link ParseException} to the generic error handler, shows the user an error
+     * message and removes the retained helper fragment and loading indicators. Also removes the
+     * compensation from the list of loading compensations.
      *
-     * @param compensation
-     * @param e
+     * @param compensation the compensation which failed to save
+     * @param e            the {@link ParseException} thrown in the process
      */
-    public void onCompensationSaveFailed(ParseObject compensation, ParseException e) {
+    public void onCompensationSaveFailed(@NonNull ParseObject compensation, ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         MessageUtils.showBasicSnackbar(mFabNew, ParseErrorHandler.getErrorMessage(getActivity(), e));
         String compensationId = compensation.getObjectId();
@@ -424,11 +448,12 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     }
 
     /**
-     * Called from activity when helper successfully saved compensation
+     * Removes the retained helper fragment and removes the compensation from the list of loading
+     * compensations and also from the main {@link RecyclerView} list as it is now paid.
      *
-     * @param compensation
+     * @param compensation the now paid compensation
      */
-    public void onCompensationSaved(ParseObject compensation) {
+    public void onCompensationSaved(@NonNull ParseObject compensation) {
         String compensationId = compensation.getObjectId();
         HelperUtils.removeHelper(getFragmentManager(), getSaveHelperTag(compensationId));
 
@@ -470,7 +495,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     }
 
     private void remindUserWithHelper(@CompensationRemindHelper.RemindType int remindType,
-                                      String compensationId) {
+                                      @NonNull String compensationId) {
         FragmentManager fragmentManager = getFragmentManager();
         Fragment compensationRemindHelper = HelperUtils.findHelper(fragmentManager,
                 getRemindHelperTag(compensationId));
@@ -486,17 +511,18 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         }
     }
 
+    @NonNull
     private String getRemindHelperTag(String compensationId) {
         return COMPENSATION_REMIND_HELPER + compensationId;
     }
 
     /**
-     * Called from activity when helper successfully reminded user
+     * Removes the retained helper fragment and displays a confirmation message to the user.
      *
-     * @param remindType     remind to pay or remind that paid
-     * @param compensationId
+     * @param remindType     the type of the reminder, remind to pay or remind that paid
+     * @param compensationId the compensation for which a reminder was sent
      */
-    public void onUserReminded(int remindType, String compensationId) {
+    public void onUserReminded(int remindType, @NonNull String compensationId) {
         HelperUtils.removeHelper(getFragmentManager(), getRemindHelperTag(compensationId));
 
         switch (remindType) {
@@ -525,12 +551,14 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     }
 
     /**
-     * Called from activity when helper failed to remind user
+     * Passes the {@link ParseException} to the generic error handler, shows the user an error
+     * message and removes the retained helper fragment and loading indicators. Also removes the
+     * compensation from the list of loading compensations.
      *
      * @param remindType remind to pay or remind that paid
-     * @param e
+     * @param e          the {@link ParseException} thrown in the process
      */
-    public void onUserRemindFailed(int remindType, ParseException e, String compensationId) {
+    public void onUserRemindFailed(int remindType, ParseException e, @NonNull String compensationId) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         MessageUtils.showBasicSnackbar(mRecyclerView, ParseErrorHandler.getErrorMessage(getActivity(), e));
         HelperUtils.removeHelper(getFragmentManager(), getRemindHelperTag(compensationId));
@@ -584,7 +612,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         }
 
         mCompensationChangeAmount = (Compensation) mCompensations.get(position);
-        BigFraction amount = mCompensationChangeAmount.getAmount();
+        BigFraction amount = mCompensationChangeAmount.getAmountFraction();
         String currency = mCurrentGroup.getCurrency();
         showChangeAmountDialog(amount, currency);
     }
@@ -596,12 +624,12 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     }
 
     /**
-     * Called from activity when change amount dialog is closed.
+     * Sets the amount of the purchase and updates the list.
      *
      * @param amount the new amount to be set in the compensation
      */
-    public void onChangedAmountSet(BigFraction amount) {
-        mCompensationChangeAmount.setAmount(amount);
+    public void onChangedAmountSet(@NonNull BigFraction amount) {
+        mCompensationChangeAmount.setAmountFraction(amount);
         int position = mCompensations.indexOf(mCompensationChangeAmount);
         mRecyclerAdapter.notifyItemChanged(position);
         mCompensationChangeAmount.saveEventually();

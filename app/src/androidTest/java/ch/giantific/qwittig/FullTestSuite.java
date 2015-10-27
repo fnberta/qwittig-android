@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig;
 
 import android.test.suitebuilder.TestSuiteBuilder;

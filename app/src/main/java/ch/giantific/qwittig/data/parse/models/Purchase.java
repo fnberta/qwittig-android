@@ -1,5 +1,10 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.data.parse.models;
 
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.parse.ParseACL;
@@ -19,7 +24,9 @@ import ch.giantific.qwittig.utils.ParseUtils;
 
 
 /**
- * Created by fabio on 12.10.14.
+ * Represents a purchase a user makes in a store.
+ * <p/>
+ * Subclass of {@link ParseObject}.
  */
 @ParseClassName("Purchase")
 public class Purchase extends ParseObject {
@@ -40,11 +47,43 @@ public class Purchase extends ParseObject {
     public static final String DRAFT_ID = "draftId";
     public static final String PIN_LABEL = "purchasesPinLabel";
 
+    public Purchase() {
+        // A default constructor is required.
+    }
+
+    public Purchase(@NonNull ParseObject group, @NonNull Date date, @NonNull String store,
+                    @NonNull List<ParseObject> items, double totalPrice,
+                    @NonNull List<ParseUser> usersInvolved, @NonNull String currency) {
+        this(group, date, store, items, totalPrice, usersInvolved, currency, 1);
+    }
+
+    public Purchase(@NonNull ParseObject group, @NonNull Date date, @NonNull String store,
+                    @NonNull List<ParseObject> items, double totalPrice,
+                    @NonNull List<ParseUser> usersInvolved, @NonNull String currency,
+                    float exchangeRate) {
+        setBuyer(ParseUser.getCurrentUser());
+        setGroup(group);
+        setDate(date);
+        setStore(store);
+        setItems(items);
+        setTotalPrice(totalPrice);
+        setUsersInvolved(usersInvolved);
+        setCurrency(currency);
+        setExchangeRate(exchangeRate);
+        addCurrentUserToReadBy();
+        setAccessRights(group);
+    }
+
+    private void setAccessRights(ParseObject group) {
+        ParseACL acl = ParseUtils.getDefaultAcl(group);
+        setACL(acl);
+    }
+
     public Group getGroup() {
         return (Group) getParseObject(GROUP);
     }
 
-    public void setGroup(ParseObject group) {
+    public void setGroup(@NonNull ParseObject group) {
         put(GROUP, group);
     }
 
@@ -52,7 +91,7 @@ public class Purchase extends ParseObject {
         return (User) getParseUser(BUYER);
     }
 
-    public void setBuyer(ParseUser buyer) {
+    public void setBuyer(@NonNull ParseUser buyer) {
         put(BUYER, buyer);
     }
 
@@ -60,7 +99,7 @@ public class Purchase extends ParseObject {
         return getDate(DATE);
     }
 
-    public void setDate(Date date) {
+    public void setDate(@NonNull Date date) {
         put(DATE, date);
     }
 
@@ -68,7 +107,7 @@ public class Purchase extends ParseObject {
         return getString(STORE);
     }
 
-    public void setStore(String store) {
+    public void setStore(@NonNull String store) {
         put(STORE, store);
     }
 
@@ -76,7 +115,7 @@ public class Purchase extends ParseObject {
         return getList(ITEMS);
     }
 
-    public void setItems(List<ParseObject> items) {
+    public void setItems(@NonNull List<ParseObject> items) {
         put(ITEMS, items);
     }
 
@@ -84,7 +123,7 @@ public class Purchase extends ParseObject {
         return getList(USERS_INVOLVED);
     }
 
-    public void setUsersInvolved(List<ParseUser> usersInvolved) {
+    public void setUsersInvolved(@NonNull List<ParseUser> usersInvolved) {
         put(USERS_INVOLVED, usersInvolved);
     }
 
@@ -92,7 +131,7 @@ public class Purchase extends ParseObject {
         return getDouble(TOTAL_PRICE);
     }
 
-    public void setTotalPrice(Number totalPrice) {
+    public void setTotalPrice(@NonNull Number totalPrice) {
         put(TOTAL_PRICE, totalPrice);
     }
 
@@ -100,7 +139,7 @@ public class Purchase extends ParseObject {
         return getString(CURRENCY);
     }
 
-    public void setCurrency(String currency) {
+    public void setCurrency(@NonNull String currency) {
         put(CURRENCY, currency);
     }
 
@@ -116,7 +155,7 @@ public class Purchase extends ParseObject {
         return getParseFile(RECEIPT);
     }
 
-    public void setReceiptParseFile(ParseFile file) {
+    public void setReceiptParseFile(@NonNull ParseFile file) {
         put(RECEIPT, file);
     }
 
@@ -124,7 +163,7 @@ public class Purchase extends ParseObject {
         return getBytes(RECEIPT_BYTE);
     }
 
-    public void setReceiptData(byte[] bytes) {
+    public void setReceiptData(@NonNull byte[] bytes) {
         put(RECEIPT_BYTE, bytes);
     }
 
@@ -132,10 +171,11 @@ public class Purchase extends ParseObject {
         return getString(DRAFT_ID);
     }
 
-    public void setDraftId(String draftId) {
+    public void setDraftId(@NonNull String draftId) {
         put(DRAFT_ID, draftId);
     }
 
+    @NonNull
     public List<ParseUser> getReadBy() {
         List<ParseUser> readBy = getList(READ_BY);
         if (readBy == null) {
@@ -147,55 +187,6 @@ public class Purchase extends ParseObject {
 
     public void setReadBy(List<ParseUser> users) {
         put(READ_BY, users);
-    }
-
-    public Purchase() {
-        // A default constructor is required.
-    }
-
-    public Purchase(ParseObject wg, Date date, String store, List<ParseObject> items,
-                    double totalPrice, List<ParseUser> usersInvolved, String currency,
-                    float exchangeRate, ParseFile receipt) {
-        this(wg, date, store, items, totalPrice, usersInvolved, currency, exchangeRate);
-        setReceiptParseFile(receipt);
-    }
-
-    public Purchase(ParseObject wg, Date date, String store, List<ParseObject> items,
-                    double totalPrice, List<ParseUser> usersInvolved, String currency,
-                    ParseFile receipt) {
-        this(wg, date, store, items, totalPrice, usersInvolved, currency, 1);
-        setReceiptParseFile(receipt);
-    }
-
-    public Purchase(ParseObject wg, Date date, String store, List<ParseObject> items,
-                    double totalPrice, List<ParseUser> usersInvolved, String currency) {
-        this(wg, date, store, items, totalPrice, usersInvolved, currency, 1);
-    }
-
-    public Purchase(ParseObject wg, Date date, String store, List<ParseObject> items,
-                    double totalPrice, List<ParseUser> usersInvolved, String currency,
-                    float exchangeRate) {
-        setBuyer(ParseUser.getCurrentUser());
-        setGroup(wg);
-        setDate(date);
-        setStore(store);
-        setItems(items);
-        setTotalPrice(totalPrice);
-        setUsersInvolved(usersInvolved);
-        setCurrency(currency);
-        setExchangeRate(exchangeRate);
-        addCurrentUserToReadBy();
-        setAccessRights(getCurrentGroup());
-    }
-
-    private ParseObject getCurrentGroup() {
-        User currentUser = (User) ParseUser.getCurrentUser();
-        return currentUser.getCurrentGroup();
-    }
-
-    private void setAccessRights(ParseObject group) {
-        ParseACL acl = ParseUtils.getDefaultAcl(group);
-        setACL(acl);
     }
 
     public void addItems(List<ParseObject> items) {
@@ -214,6 +205,12 @@ public class Purchase extends ParseObject {
         add(ITEMS, item);
     }
 
+    /**
+     * Returns the object ids of the purchase's involved users.
+     *
+     * @return the object ids of the involved users
+     */
+    @NonNull
     public List<String> getUsersInvolvedIds() {
         List<String> listIds = new ArrayList<>();
         List<ParseUser> list = getUsersInvolved();
@@ -224,14 +221,19 @@ public class Purchase extends ParseObject {
     }
 
 
-    public void addUsersInvolved(List<ParseUser> usersInvolved) {
+    public void addUsersInvolved(@NonNull List<ParseUser> usersInvolved) {
         addAll(USERS_INVOLVED, usersInvolved);
     }
 
-    public void removeUsersInvolved(List<ParseUser> usersInvolved) {
+    public void removeUsersInvolved(@NonNull List<ParseUser> usersInvolved) {
         removeAll(USERS_INVOLVED, usersInvolved);
     }
 
+    /**
+     * Returns whether the user has already read the purchase or not.
+     *
+     * @return whether the user has read the purchase or not
+     */
     public boolean currentUserHasReadPurchase() {
         List<String> readByIds = getReadByIds();
         User currentUser = (User) ParseUser.getCurrentUser();
@@ -239,6 +241,12 @@ public class Purchase extends ParseObject {
         return currentUser != null && readByIds.contains(currentUser.getObjectId());
     }
 
+    /**
+     * Returns the object ids of the users that have already read the purchase.
+     *
+     * @return the object ids of the users that read the purchase
+     */
+    @NonNull
     public List<String> getReadByIds() {
         List<String> readByIds = new ArrayList<>();
         List<ParseUser> readBy = getReadBy();
@@ -255,10 +263,13 @@ public class Purchase extends ParseObject {
         addReadBy(ParseUser.getCurrentUser());
     }
 
-    public void addReadBy(ParseUser user) {
+    public void addReadBy(@NonNull ParseUser user) {
         addUnique(READ_BY, user);
     }
 
+    /**
+     * Resets the read by field to only the current user.
+     */
     public void resetReadBy() {
         List<ParseUser> readBy = new ArrayList<>();
         readBy.add(ParseUser.getCurrentUser());
@@ -269,7 +280,12 @@ public class Purchase extends ParseObject {
         remove(RECEIPT);
     }
 
-    public void swapReceiptParseFileToData(byte[] bytes) {
+    /**
+     * Removes the receipt parse file and instead sets the provided byte array.
+     *
+     * @param bytes the byte array representation of the receipt
+     */
+    public void swapReceiptParseFileToData(@NonNull byte[] bytes) {
         put(RECEIPT_BYTE, bytes);
         removeReceiptParseFile();
     }
@@ -278,6 +294,15 @@ public class Purchase extends ParseObject {
         remove(RECEIPT_BYTE);
     }
 
+    /**
+     * Returns and sets a random id for purchase, identifying it as draft.
+     * <p/>
+     * This is needed because {@link ParseObject} and its subclasses only receive an object id when
+     * they are saved online in the database. Because we need to be able to reference drafts, which
+     * are only stored in the local datastore, we assign random draft id.
+     *
+     * @return a random id
+     */
     public String setRandomDraftId() {
         String draftId = getDraftId();
 
@@ -293,6 +318,12 @@ public class Purchase extends ParseObject {
         remove(DRAFT_ID);
     }
 
+    /**
+     * Converts the purchase's total price either to the group's currency or the foreign currency
+     * using the exchange rate of the purchase.
+     *
+     * @param toGroupCurrency whether to convert to the group's currency or to a foreign one
+     */
     public void convertTotalPrice(boolean toGroupCurrency) {
         double totalPrice = getTotalPrice();
         double exchangeRate = getExchangeRate();
@@ -300,6 +331,11 @@ public class Purchase extends ParseObject {
         setTotalPrice(MoneyUtils.roundToFractionDigits(4, totalPriceConverted));
     }
 
+    /**
+     * Returns the total price converted to foreign currency using the provided exchange rate.
+     *
+     * @return the total price in foreign currency
+     */
     public double getTotalPriceForeign() {
         double totalPrice = getTotalPrice();
         double exchangeRate = getExchangeRate();

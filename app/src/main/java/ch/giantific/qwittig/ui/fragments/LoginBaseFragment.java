@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.Manifest;
@@ -11,6 +15,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v13.app.FragmentCompat;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -35,7 +40,12 @@ import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 
 /**
- * A placeholder fragment containing a simple view.
+ * Provides an abstract base class for the login screen views.
+ * <p/>
+ * Subclass of {@link BaseFragment}.
+ * <p/>
+ * Implements {@link LoaderManager.LoaderCallbacks} to provide the user with email propositions
+ * from this address book.
  */
 public abstract class LoginBaseFragment extends BaseFragment implements
         LoaderManager.LoaderCallbacks<Cursor> {
@@ -56,7 +66,7 @@ public abstract class LoginBaseFragment extends BaseFragment implements
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         mViewMain = view.findViewById(R.id.ll_login_main);
@@ -95,7 +105,7 @@ public abstract class LoginBaseFragment extends BaseFragment implements
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         boolean isLoading = mViewProgress.getVisibility() == View.VISIBLE;
@@ -161,6 +171,7 @@ public abstract class LoginBaseFragment extends BaseFragment implements
         getLoaderManager().initLoader(0, null, this);
     }
 
+    @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(getActivity(),
@@ -182,7 +193,7 @@ public abstract class LoginBaseFragment extends BaseFragment implements
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+    public void onLoadFinished(Loader<Cursor> loader, @NonNull Cursor cursor) {
         List<String> emails = new ArrayList<>();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -193,7 +204,7 @@ public abstract class LoginBaseFragment extends BaseFragment implements
         populateEmailField(emails);
     }
 
-    private void populateEmailField(List<String> emails) {
+    private void populateEmailField(@NonNull List<String> emails) {
         //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
                 android.R.layout.simple_dropdown_item_1line, emails);
@@ -214,7 +225,7 @@ public abstract class LoginBaseFragment extends BaseFragment implements
      */
     public void onLoginFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
-        MessageUtils.showBasicSnackbar(getView(), ParseErrorHandler.getErrorMessage(getActivity(), e));
+        MessageUtils.showBasicSnackbar(mViewMain, ParseErrorHandler.getErrorMessage(getActivity(), e));
         setLoading(false);
 
         HelperUtils.removeHelper(getFragmentManager(), LOGIN_HELPER);
@@ -226,12 +237,12 @@ public abstract class LoginBaseFragment extends BaseFragment implements
      *
      * @param parseUser the now authenticated ParseUser
      */
-    public void onLoggedIn(ParseUser parseUser) {
+    public void onLoggedIn(@NonNull ParseUser parseUser) {
         addUserToInstallation(parseUser);
         finishLogin();
     }
 
-    private void addUserToInstallation(ParseUser parseUser) {
+    private void addUserToInstallation(@NonNull ParseUser parseUser) {
         if (ParseUtils.isTestUser(parseUser)) {
             return;
         }

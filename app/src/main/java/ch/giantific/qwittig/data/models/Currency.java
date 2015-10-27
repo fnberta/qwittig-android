@@ -1,7 +1,13 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.data.models;
 
+import android.support.annotation.NonNull;
+
 /**
- * Created by fabio on 25.01.15.
+ * Represents a simple currency with a name and a currency code.
  */
 public class Currency {
 
@@ -12,11 +18,12 @@ public class Currency {
         return mCode;
     }
 
-    public Currency(String name, String code) {
+    public Currency(@NonNull String name, @NonNull String code) {
         mName = name;
         mCode = code;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return mName + " (" + mCode + ")";

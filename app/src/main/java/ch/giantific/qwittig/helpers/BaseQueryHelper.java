@@ -1,7 +1,13 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.helpers;
 
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
@@ -26,7 +32,10 @@ import ch.giantific.qwittig.data.parse.models.Task;
 import ch.giantific.qwittig.data.parse.models.User;
 
 /**
- * Created by fabio on 10.12.14.
+ * Provides an abstract base class for helper fragments whose task it is to query data from the
+ * online Parse.com database.
+ * <p/>
+ * Subclass of {@link BaseHelper}.
  */
 public abstract class BaseQueryHelper extends BaseHelper {
 
@@ -59,7 +68,7 @@ public abstract class BaseQueryHelper extends BaseHelper {
         Map<String, Object> params = new HashMap<>();
         ParseCloud.callFunctionInBackground(CloudCode.CALCULATE_BALANCE, params, new FunctionCallback<Object>() {
             @Override
-            public void done(Object o, ParseException e) {
+            public void done(Object o, @Nullable ParseException e) {
                 if (e != null) {
                     onParseError(e);
                     return;
@@ -81,7 +90,7 @@ public abstract class BaseQueryHelper extends BaseHelper {
         query.whereEqualTo(User.IS_DELETED, false);
         query.findInBackground(new FindCallback<ParseUser>() {
             @Override
-            public void done(final List<ParseUser> userList, ParseException e) {
+            public void done(@NonNull final List<ParseUser> userList, @Nullable ParseException e) {
                 if (e != null) {
                     onParseError(e);
                     return;
@@ -89,7 +98,7 @@ public abstract class BaseQueryHelper extends BaseHelper {
 
                 // Release any objects previously pinned for this query.
                 ParseObject.unpinAllInBackground(User.PIN_LABEL, new DeleteCallback() {
-                    public void done(ParseException e) {
+                    public void done(@Nullable ParseException e) {
                         if (e != null) {
                             onParseError(e);
                             return;
@@ -98,7 +107,7 @@ public abstract class BaseQueryHelper extends BaseHelper {
                         // Add the latest results for this query to the cache.
                         ParseObject.pinAllInBackground(User.PIN_LABEL, userList, new SaveCallback() {
                             @Override
-                            public void done(ParseException e) {
+                            public void done(@Nullable ParseException e) {
                                 if (e == null) {
                                     onUsersPinned();
                                 }
@@ -121,7 +130,7 @@ public abstract class BaseQueryHelper extends BaseHelper {
             query.whereEqualTo(Purchase.GROUP, group);
             query.findInBackground(new FindCallback<ParseObject>() {
                 @Override
-                public void done(final List<ParseObject> parseObjects, ParseException e) {
+                public void done(@NonNull final List<ParseObject> parseObjects, @Nullable ParseException e) {
                     if (e != null) {
                         onParseError(e);
                         return;
@@ -133,7 +142,7 @@ public abstract class BaseQueryHelper extends BaseHelper {
                     // Release any objects previously pinned for the purchase pin label
                     ParseObject.unpinAllInBackground(label, new DeleteCallback() {
                         @Override
-                        public void done(ParseException e) {
+                        public void done(@Nullable ParseException e) {
                             if (e != null) {
                                 onParseError(e);
                                 return;
@@ -142,7 +151,7 @@ public abstract class BaseQueryHelper extends BaseHelper {
                             // Add the latest results for this query to the cache
                             ParseObject.pinAllInBackground(label, parseObjects, new SaveCallback() {
                                 @Override
-                                public void done(ParseException e) {
+                                public void done(@Nullable ParseException e) {
                                     if (e == null) {
                                         onPurchasesPinned(groupId);
                                     }
@@ -168,20 +177,20 @@ public abstract class BaseQueryHelper extends BaseHelper {
         }
     }
 
-    final void queryCompensationsUnpaid(List<ParseObject> groups) {
+    final void queryCompensationsUnpaid(@NonNull List<ParseObject> groups) {
         ParseQuery<ParseObject> query = OnlineQuery.getCompensationsQuery();
         query.whereContainedIn(Compensation.GROUP, groups);
         query.whereEqualTo(Compensation.IS_PAID, false);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(final List<ParseObject> parseObjects, ParseException e) {
+            public void done(@NonNull final List<ParseObject> parseObjects, @Nullable ParseException e) {
                 if (e != null) {
                     onParseError(e);
                     return;
                 }
 
                 ParseObject.unpinAllInBackground(Compensation.PIN_LABEL_UNPAID, new DeleteCallback() {
-                    public void done(ParseException e) {
+                    public void done(@Nullable ParseException e) {
                         if (e != null) {
                             onParseError(e);
                             return;
@@ -189,7 +198,7 @@ public abstract class BaseQueryHelper extends BaseHelper {
 
                         ParseObject.pinAllInBackground(Compensation.PIN_LABEL_UNPAID, parseObjects, new SaveCallback() {
                             @Override
-                            public void done(ParseException e) {
+                            public void done(@Nullable ParseException e) {
                                 if (e == null) {
                                     onCompensationsUnpaidPinned();
                                 }
@@ -206,14 +215,14 @@ public abstract class BaseQueryHelper extends BaseHelper {
         // empty default implementation
     }
 
-    final void queryCompensationsPaid(final ParseObject group) {
+    final void queryCompensationsPaid(@NonNull final ParseObject group) {
         ParseQuery<ParseObject> query = OnlineQuery.getCompensationsQuery();
         query.whereEqualTo(Compensation.GROUP, group);
         query.whereEqualTo(Compensation.IS_PAID, true);
         query.setLimit(OnlineQuery.QUERY_ITEMS_PER_PAGE);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(final List<ParseObject> parseObjects, ParseException e) {
+            public void done(@NonNull final List<ParseObject> parseObjects, @Nullable ParseException e) {
                 if (e != null) {
                     onParseError(e);
                     return;
@@ -223,14 +232,14 @@ public abstract class BaseQueryHelper extends BaseHelper {
                 final String pinLabel = Compensation.PIN_LABEL_PAID + groupId;
 
                 ParseObject.unpinAllInBackground(pinLabel, new DeleteCallback() {
-                    public void done(ParseException e) {
+                    public void done(@Nullable ParseException e) {
                         if (e != null) {
                             return;
                         }
 
                         ParseObject.pinAllInBackground(pinLabel, parseObjects, new SaveCallback() {
                             @Override
-                            public void done(ParseException e) {
+                            public void done(@Nullable ParseException e) {
                                 if (e == null) {
                                     onCompensationsPaidPinned(groupId);
                                 }
@@ -253,7 +262,7 @@ public abstract class BaseQueryHelper extends BaseHelper {
         query.include(Task.USERS_INVOLVED);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(final List<ParseObject> parseObjects, ParseException e) {
+            public void done(@NonNull final List<ParseObject> parseObjects, @Nullable ParseException e) {
                 if (e != null) {
                     onParseError(e);
                     return;
@@ -261,7 +270,7 @@ public abstract class BaseQueryHelper extends BaseHelper {
 
                 // Release any objects previously pinned for this query.
                 ParseObject.unpinAllInBackground(Task.PIN_LABEL, new DeleteCallback() {
-                    public void done(ParseException e) {
+                    public void done(@Nullable ParseException e) {
                         if (e != null) {
                             onParseError(e);
                             return;
@@ -270,7 +279,7 @@ public abstract class BaseQueryHelper extends BaseHelper {
                         // Add the latest results for this query to the cache.
                         ParseObject.pinAllInBackground(Task.PIN_LABEL, parseObjects, new SaveCallback() {
                             @Override
-                            public void done(ParseException e) {
+                            public void done(@Nullable ParseException e) {
                                 if (e == null) {
                                     onTasksPinned();
                                 }

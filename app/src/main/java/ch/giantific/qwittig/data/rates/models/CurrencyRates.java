@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.data.rates.models;
 
 import com.google.gson.annotations.SerializedName;
@@ -5,7 +9,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Map;
 
 /**
- * Created by fabio on 28.04.15.
+ * Represents a collection of currency rates stored in a {@link Map}.
  */
 public class CurrencyRates {
 

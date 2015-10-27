@@ -1,7 +1,13 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.activities;
 
 import android.app.FragmentManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 
@@ -13,12 +19,18 @@ import ch.giantific.qwittig.ui.fragments.PurchaseEditDraftFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseEditFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.DiscardChangesDialogFragment;
 
-
+/**
+ * Hosts {@link PurchaseEditFragment} that handles the editing of a new purchase.
+ * <p/>
+ * Asks the user if he wants to discard the possible changes when dismissing the activity.
+ * <p/>
+ * Subclass of {@link PurchaseBaseActivity}.
+ */
 public class PurchaseEditActivity extends PurchaseBaseActivity implements
         DiscardChangesDialogFragment.DialogInteractionListener {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         ActionBar actionBar = getSupportActionBar();
@@ -46,7 +58,7 @@ public class PurchaseEditActivity extends PurchaseBaseActivity implements
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 ((PurchaseEditFragment) mPurchaseFragment).checkForChangesAndExit();

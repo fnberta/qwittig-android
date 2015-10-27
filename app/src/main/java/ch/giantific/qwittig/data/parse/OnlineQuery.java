@@ -1,4 +1,10 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.data.parse;
+
+import android.support.annotation.NonNull;
 
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -12,7 +18,7 @@ import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.data.parse.models.User;
 
 /**
- * Created by fabio on 31.12.14.
+ * Provides useful constants and static methods for queries to the parse.com online database
  */
 public class OnlineQuery {
 
@@ -26,6 +32,11 @@ public class OnlineQuery {
         // Class cannot be instantiated
     }
 
+    /**
+     * Returns a {@link ParseQuery} that queries the appropriate {@link Purchase} objects.
+     * @return a properly set {@link ParseQuery}
+     */
+    @NonNull
     public static ParseQuery<ParseObject> getPurchasesQuery() {
         User currentUser = (User) ParseUser.getCurrentUser();
 
@@ -48,6 +59,11 @@ public class OnlineQuery {
         return query;
     }
 
+    /**
+     * Returns a {@link ParseQuery} that queries the appropriate {@link Compensation} objects.
+     * @return a properly set {@link ParseQuery}
+     */
+    @NonNull
     public static ParseQuery<ParseObject> getCompensationsQuery() {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(Compensation.CLASS);
         query.orderByDescending(DATE_CREATED);

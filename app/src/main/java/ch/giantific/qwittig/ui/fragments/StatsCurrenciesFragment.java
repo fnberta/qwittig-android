@@ -1,8 +1,12 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 
-import android.app.Fragment;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,9 +18,13 @@ import com.github.mikephil.charting.utils.PercentFormatter;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.helpers.StatsHelper;
+import ch.giantific.qwittig.ui.widgets.PieChart;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Displays the currency statistics in a {@link PieChart}. Shows the percentages of the currencies
+ * used in all purchases.
+ * <p/>
+ * Subclass of {@link StatsPieBaseFragment}.
  */
 public class StatsCurrenciesFragment extends StatsPieBaseFragment {
 
@@ -28,7 +36,7 @@ public class StatsCurrenciesFragment extends StatsPieBaseFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_stats_pie, container, false);
 
@@ -38,19 +46,20 @@ public class StatsCurrenciesFragment extends StatsPieBaseFragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_stats_currencies, menu);
 
         setMenuValues(menu);
     }
 
+    @NonNull
     @Override
     protected String getHelperTag() {
         return STATS_HELPER_CURRENCIES;
     }
 
     @Override
-    void calcStats(String year, int month) {
+    void calcStats(@NonNull String year, int month) {
         super.calcStats(year, month);
 
         calcStatsWithHelper(StatsHelper.TYPE_CURRENCIES, year, month);
@@ -68,7 +77,7 @@ public class StatsCurrenciesFragment extends StatsPieBaseFragment {
     }
 
     @Override
-    void setDataSetOptions(PieDataSet pieDataSet) {
+    void setDataSetOptions(@NonNull PieDataSet pieDataSet) {
         super.setDataSetOptions(pieDataSet);
 
         pieDataSet.setValueFormatter(new PercentFormatter());

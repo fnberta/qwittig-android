@@ -1,16 +1,28 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.helpers;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.parse.ParseException;
 
 /**
- * Created by fabio on 10.12.14.
+ * Performs online queries to Parse.com database to download all information related to the current
+ * user.
+ * <p/>
+ * Every query starts only after the previous query finished successfully.
+ * <p/>
+ * Subclass of {@link BaseQueryHelper}.
  */
 public class FullQueryHelper extends BaseQueryHelper {
 
     private static final String LOG_TAG = FullQueryHelper.class.getSimpleName();
+    @Nullable
     private HelperInteractionListener mListener;
 
     public FullQueryHelper() {
@@ -18,13 +30,13 @@ public class FullQueryHelper extends BaseQueryHelper {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
             mListener = (HelperInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
+                    + " must implement DialogInteractionListener");
         }
     }
 
@@ -33,7 +45,9 @@ public class FullQueryHelper extends BaseQueryHelper {
         super.onCreate(savedInstanceState);
 
         if (mCurrentGroup == null || mCurrentUserGroups == null) {
-            mListener.onFullQueryFinished(true);
+            if (mListener != null) {
+                mListener.onFullQueryFinished(true);
+            }
             return;
         }
 
@@ -77,7 +91,7 @@ public class FullQueryHelper extends BaseQueryHelper {
     }
 
     @Override
-    void onPurchasesPinned(String groupId) {
+    void onPurchasesPinned(@NonNull String groupId) {
         super.onPurchasesPinned(groupId);
 
         if (mListener != null && mCurrentGroup != null &&
@@ -115,7 +129,7 @@ public class FullQueryHelper extends BaseQueryHelper {
     }
 
     @Override
-    void onCompensationsPaidPinned(String groupId) {
+    void onCompensationsPaidPinned(@NonNull String groupId) {
         super.onCompensationsPaidPinned(groupId);
 
         if (mListener != null && mCurrentGroup != null &&
@@ -132,17 +146,43 @@ public class FullQueryHelper extends BaseQueryHelper {
         mListener = null;
     }
 
+    /**
+     * Defines the action to be taken after the different queries either finish or fail.
+     */
     public interface HelperInteractionListener {
+        /**
+         * Handles the successful pin of the users to the local data store.
+         */
         void onUsersPinned();
 
+        /**
+         * Handles the successful pin of the purchases to the local data store.
+         */
         void onPurchasesPinned();
 
+        /**
+         *  Handles the successful pin of the compensations to the local data store.
+         */
         void onCompensationsPinned(boolean isPaid);
 
+        /**
+         * Handles the successful pin of the tasks to the local data store.
+         */
         void onTasksPinned();
 
+        /**
+         * Handles the case when all queries are finished.
+         *
+         * @param failedEarly whether the process failed early because the current user or current
+         *                    group were null or it finished as planned
+         */
         void onFullQueryFinished(boolean failedEarly);
 
-        void onPinFailed(ParseException e);
+        /**
+         * Handles the failure of one of the attempts to pin to the local data store.
+         *
+         * @param e the {@link ParseException} thrown during the process
+         */
+        void onPinFailed(@NonNull ParseException e);
     }
 }

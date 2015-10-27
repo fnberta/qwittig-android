@@ -1,9 +1,16 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +35,9 @@ import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Displays recent paid compensations in a {@link RecyclerView} list.
+ * <p/>
+ * Subclass of {@link FinanceCompensationsBaseFragment}.
  */
 public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFragment implements
         LocalQuery.CompensationLocalQueryListener {
@@ -37,6 +46,7 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
     private static final String STATE_IS_LOADING_MORE = "STATE_IS_LOADING_MORE";
     private static final String LOG_TAG = FinanceCompensationsPaidFragment.class.getSimpleName();
     private CompensationsPaidRecyclerAdapter mRecyclerAdapter;
+    @NonNull
     private List<ParseObject> mCompensations = new ArrayList<>();
     private boolean mIsLoadingMore;
 
@@ -45,7 +55,7 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null) {
@@ -54,14 +64,14 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         outState.putBoolean(STATE_IS_LOADING_MORE, mIsLoadingMore);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_finance_compensations_paid, container, false);
         findBaseViews(rootView);
@@ -73,8 +83,7 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mRecyclerAdapter = new CompensationsPaidRecyclerAdapter(getActivity(),
-                R.layout.row_compensations_paid, mCompensations);
+        mRecyclerAdapter = new CompensationsPaidRecyclerAdapter(getActivity(), mCompensations);
         mRecyclerView.setAdapter(mRecyclerAdapter);
         Mugen.with(mRecyclerView, new MugenCallbacks() {
             @Override
@@ -95,6 +104,7 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
         }).start();
     }
 
+    @NonNull
     @Override
     protected String getQueryHelperTag() {
         return COMPENSATION_QUERY_HELPER;
@@ -105,14 +115,6 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
         onlineQuery(true);
     }
 
-    /**
-     * Called from activity when helper finished pinning new compensations
-     */
-    public void onCompensationsPinned() {
-        setLoading(false);
-        updateAdapter();
-    }
-
     @Override
     public void updateAdapter() {
         super.updateAdapter();
@@ -121,7 +123,7 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
     }
 
     @Override
-    public void onCompensationsLocalQueried(List<ParseObject> compensations) {
+    public void onCompensationsLocalQueried(@NonNull List<ParseObject> compensations) {
         mCompensations.clear();
         for (ParseObject compensation : compensations) {
             mCompensations.add(compensation);
@@ -134,7 +136,7 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
     protected void updateView() {
         mRecyclerAdapter.setCurrentGroupCurrency(ParseUtils.getGroupCurrency());
         mRecyclerAdapter.notifyDataSetChanged();
-        toggleMainVisibility();
+        showMainView();
 
         if (mIsLoadingMore) {
             mRecyclerAdapter.showLoadMoreIndicator();
@@ -173,15 +175,27 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
         }
     }
 
-    public void onMoreObjectsPinned(List<ParseObject> objects) {
+    /**
+     * Adds the newly pinned compensations to the list, removes the retained helper fragment and
+     * loading indicators.
+     *
+     * @param compensations the newly pinned compensations
+     */
+    public void onMoreObjectsPinned(@NonNull List<ParseObject> compensations) {
         HelperUtils.removeHelper(getFragmentManager(), MoreQueryHelper.MORE_QUERY_HELPER);
 
         mIsLoadingMore = false;
         mRecyclerAdapter.hideLoadMoreIndicator();
-        mRecyclerAdapter.addCompensations(objects);
+        mRecyclerAdapter.addCompensations(compensations);
     }
 
-    public void onMoreObjectsPinFailed(ParseException e) {
+    /**
+     * Passes the {@link ParseException} to the generic error handler, showing the user an error
+     * message and removing the retained helper fragment and loading indicators.
+     *
+     * @param e the {@link ParseException} thrown during the process
+     */
+    public void onMoreObjectsPinFailed(@NonNull ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         showLoadMoreErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
         HelperUtils.removeHelper(getFragmentManager(), MoreQueryHelper.MORE_QUERY_HELPER);
@@ -190,7 +204,7 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
         mRecyclerAdapter.hideLoadMoreIndicator();
     }
 
-    private void showLoadMoreErrorSnackbar(String errorMessage) {
+    private void showLoadMoreErrorSnackbar(@NonNull String errorMessage) {
         Snackbar snackbar = MessageUtils.getBasicSnackbar(mRecyclerView, errorMessage);
         snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
             @Override

@@ -1,7 +1,13 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.helpers;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.parse.FunctionCallback;
@@ -11,23 +17,33 @@ import com.parse.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
-import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.data.parse.CloudCode;
+import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 
 /**
- * Created by fabio on 10.12.14.
+ * Calls Parse.com cloud functions to remind a user that he/she should finish a task.
+ * <p/>
+ * Subclass of {@link BaseHelper}.
  */
 public class TaskRemindHelper extends BaseHelper {
 
     private static final String BUNDLE_TASK_ID = "BUNDLE_TASK_ID";
     private static final String LOG_TAG = TaskRemindHelper.class.getSimpleName();
+    @Nullable
     private HelperInteractionListener mListener;
 
     public TaskRemindHelper() {
         // empty default constructor
     }
 
-    public static TaskRemindHelper newInstance(String taskId) {
+    /**
+     * Returns a new instance of {@link TaskRemindHelper} with an argument.
+     *
+     * @param taskId the object id of the task that should be finished
+     * @return a new instance of {@link TaskRemindHelper}
+     */
+    @NonNull
+    public static TaskRemindHelper newInstance(@NonNull String taskId) {
         TaskRemindHelper fragment = new TaskRemindHelper();
         Bundle args = new Bundle();
         args.putString(BUNDLE_TASK_ID, taskId);
@@ -36,13 +52,13 @@ public class TaskRemindHelper extends BaseHelper {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
             mListener = (HelperInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
+                    + " must implement DialogInteractionListener");
         }
     }
 
@@ -61,12 +77,12 @@ public class TaskRemindHelper extends BaseHelper {
         }
     }
 
-    private void pushTaskRemind(final String taskId) {
+    private void pushTaskRemind(@NonNull final String taskId) {
         Map<String, Object> params = new HashMap<>();
         params.put(PushBroadcastReceiver.PUSH_PARAM_TASK, taskId);
         ParseCloud.callFunctionInBackground(CloudCode.PUSH_TASK_REMIND, params, new FunctionCallback<Object>() {
             @Override
-            public void done(Object object, ParseException e) {
+            public void done(Object object, @Nullable ParseException e) {
                 if (e != null) {
                     onParseError(e, taskId);
                     return;
@@ -81,7 +97,7 @@ public class TaskRemindHelper extends BaseHelper {
 
     private void onParseError(ParseException e, String taskId) {
         if (mListener != null) {
-            mListener.onUserRemindFailed(e, taskId);
+            mListener.onUserRemindFailed(taskId, e);
         }
     }
 
@@ -91,9 +107,21 @@ public class TaskRemindHelper extends BaseHelper {
         mListener = null;
     }
 
+    /**
+     * Defines the actions to take after a user was reminded or after the process failed.
+     */
     public interface HelperInteractionListener {
-        void onUserReminded(String taskId);
+        /**
+         * Handles the successful reminder of a user to finish a task.
+         * @param taskId the object id of the task to be finished
+         */
+        void onUserReminded(@NonNull String taskId);
 
-        void onUserRemindFailed(ParseException e, String taskId);
+        /**
+         * Handles the failed reminder of a user to finish a task.
+         * @param taskId the object id of the task to be finished
+         * @param e the {@link ParseException} thrown during the process
+         */
+        void onUserRemindFailed(@NonNull String taskId, @NonNull ParseException e);
     }
 }

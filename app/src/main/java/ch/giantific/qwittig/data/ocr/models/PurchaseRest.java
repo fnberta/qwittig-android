@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.data.ocr.models;
 
 import com.google.gson.annotations.SerializedName;
@@ -5,6 +9,10 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a purchase with a store name, a total price, a date and the list of items included in
+ * the purchase.
+ */
 public class PurchaseRest {
 
     @SerializedName("store")

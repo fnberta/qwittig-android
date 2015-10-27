@@ -1,9 +1,13 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.data.parse.models;
 
 import com.parse.ParseConfig;
 
 /**
- * Created by fabio on 14.03.15.
+ * Provides static references to the {@link ParseConfig} values used in this project.
  */
 public class Config {
 
@@ -16,12 +20,13 @@ public class Config {
     private static final long CONFIG_REFRESH_INTERVAL = 12 * 60 * 60 * 1000;
     private static long LAST_FETCHED_TIME;
 
-
     private Config() {
         // class cannot be instantiated
     }
 
-    // Fetches the config at most once every 12 hours per app runtime
+    /**
+     * Fetches the {@link ParseConfig} at most once every 12 hours per app runtime.
+     */
     public static void refreshConfig() {
         long currentTime = System.currentTimeMillis();
         if (currentTime - LAST_FETCHED_TIME > CONFIG_REFRESH_INTERVAL) {

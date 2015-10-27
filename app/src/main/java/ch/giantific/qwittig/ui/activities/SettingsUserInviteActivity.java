@@ -1,9 +1,15 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.activities;
 
 import android.annotation.TargetApi;
 import android.app.FragmentManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.transition.Transition;
 import android.view.View;
@@ -18,6 +24,16 @@ import ch.giantific.qwittig.ui.fragments.SettingsUserInviteFragment;
 import ch.giantific.qwittig.ui.listeners.TransitionListenerAdapter;
 import ch.giantific.qwittig.utils.Utils;
 
+/**
+ * Hosts {@link SettingsUserInviteFragment} that allows the user to invite users to his/her current
+ * group.
+ * <p/>
+ * Handles the circle loading animation of the {@link FloatingActionButton}.
+ * <p/>
+ * Subclass of {@link BaseActivity}.
+ *
+ * @see FABProgressCircle
+ */
 public class SettingsUserInviteActivity extends BaseActivity implements
         SettingsUserInviteFragment.FragmentInteractionListener,
         FABProgressListener,
@@ -29,7 +45,7 @@ public class SettingsUserInviteActivity extends BaseActivity implements
     private FABProgressCircle mFabProgressCircle;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings_user_invite);
 
@@ -68,7 +84,7 @@ public class SettingsUserInviteActivity extends BaseActivity implements
         Transition enter = getWindow().getEnterTransition();
         enter.addListener(new TransitionListenerAdapter() {
             @Override
-            public void onTransitionEnd(Transition transition) {
+            public void onTransitionEnd(@NonNull Transition transition) {
                 super.onTransitionEnd(transition);
                 transition.removeListener(this);
 
@@ -111,7 +127,7 @@ public class SettingsUserInviteActivity extends BaseActivity implements
     }
 
     @Override
-    public void onInviteUsersFailed(ParseException e) {
+    public void onInviteUsersFailed(@NonNull ParseException e) {
         mSettingsUserInviteFragment.onInviteUsersFailed(e);
     }
 }

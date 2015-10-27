@@ -1,7 +1,12 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.adapters;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,37 +19,46 @@ import ch.giantific.qwittig.data.models.HelpItem;
 import ch.giantific.qwittig.ui.adapters.rows.HeaderRow;
 
 /**
- * Created by fabio on 09.11.14.
+ * Handles the display of help and feedback items.
+ * <p/>
+ * Subclass of {@link RecyclerView.Adapter}.
  */
 public class HelpFeedbackRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int TYPE_ITEM = 0;
     private static final int TYPE_HEADER = 1;
+    private static final int VIEW_RESOURCE = R.layout.row_help_feedback;
     private AdapterInteractionListener mListener;
     private Context mContext;
-    private int mItemsViewResource;
     private HelpItem[] mItems;
 
-    public HelpFeedbackRecyclerAdapter(Context context, AdapterInteractionListener listener,
-                                       int itemsViewResource, HelpItem[] items) {
+    /**
+     * Constructs a new {@link HelpFeedbackRecyclerAdapter}.
+     *
+     * @param context  the context to use in the adapter
+     * @param items    the help and feedback items to display
+     * @param listener the callback for user clicks on an item
+     */
+    public HelpFeedbackRecyclerAdapter(@NonNull Context context, @NonNull HelpItem[] items,
+                                       @NonNull AdapterInteractionListener listener) {
 
         mContext = context;
         mListener = listener;
-        mItemsViewResource = itemsViewResource;
         mItems = items;
     }
 
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         switch (viewType) {
             case TYPE_ITEM: {
                 View v = LayoutInflater.from(parent.getContext())
-                        .inflate(mItemsViewResource, parent, false);
+                        .inflate(VIEW_RESOURCE, parent, false);
                 return new ItemRow(v, mListener);
             }
             case TYPE_HEADER: {
                 View v = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.row_header, parent, false);
+                        .inflate(HeaderRow.VIEW_RESOURCE, parent, false);
                 return new HeaderRow(v);
             }
             default:
@@ -57,7 +71,8 @@ public class HelpFeedbackRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         HelpItem item = mItems[position];
 
-        switch (getItemViewType(position)) {
+        int viewType = getItemViewType(position);
+        switch (viewType) {
             case TYPE_ITEM: {
                 ItemRow itemRow = (ItemRow) viewHolder;
 
@@ -87,15 +102,34 @@ public class HelpFeedbackRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
         return mItems.length;
     }
 
+    /**
+     * Defines the actions to take when the user clicks on an item.
+     */
     public interface AdapterInteractionListener {
+        /**
+         * Handles the click on an item
+         *
+         * @param position the adapter position of the item
+         */
         void onHelpFeedbackItemClicked(int position);
     }
 
-    public static class ItemRow extends RecyclerView.ViewHolder {
+    /**
+     * Provides a {@link RecyclerView} row that displays help and feedback items.
+     * <p/>
+     * Subclass of {@link RecyclerView.ViewHolder}.
+     */
+    private static class ItemRow extends RecyclerView.ViewHolder {
 
         private TextView mTextViewTitle;
 
-        public ItemRow(View view, final AdapterInteractionListener listener) {
+        /**
+         * Constructs a new {@link ItemRow} and sets the click listener.
+         *
+         * @param view     the inflated view
+         * @param listener the callback for user clicks on the item
+         */
+        public ItemRow(@NonNull View view, @NonNull final AdapterInteractionListener listener) {
             super(view);
 
             view.setOnClickListener(new View.OnClickListener() {
@@ -108,6 +142,12 @@ public class HelpFeedbackRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
             mTextViewTitle = (TextView) view.findViewById(R.id.tv_help_title);
         }
 
+        /**
+         * Sets the title of an item and its corresponding icon as a compound drawable
+         *
+         * @param title    the title to set
+         * @param drawable the drawable to set as a compound drawable
+         */
         public void setTitleWithDrawable(String title, Drawable drawable) {
             mTextViewTitle.setText(title);
             mTextViewTitle.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);

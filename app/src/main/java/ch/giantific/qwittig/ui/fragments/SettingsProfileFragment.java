@@ -1,10 +1,14 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -27,10 +31,13 @@ import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
- * A placeholder fragment containing a simple view.
+ * Displays the profile details of the current user, allowing him/her to edit them.
+ * <p/>
+ * Subclass of {@link BaseFragment}.
  */
-public class SettingsProfileFragment extends Fragment {
+public class SettingsProfileFragment extends BaseFragment {
 
+    private FragmentInteractionListener mListener;
     private TextInputLayout mTextInputLayoutEmail;
     private EditText mEditTextEmail;
     private TextInputLayout mTextInputLayoutNickname;
@@ -39,7 +46,6 @@ public class SettingsProfileFragment extends Fragment {
     private EditText mEditTextPassword;
     private TextInputLayout mTextInputLayoutPasswordRepeat;
     private EditText mEditTextPasswordRepeat;
-
     private User mCurrentUser;
     private String mCurrentEmail;
     private String mCurrentNickname;
@@ -50,24 +56,22 @@ public class SettingsProfileFragment extends Fragment {
     private byte[] mAvatar;
     private boolean mDeleteAvatar;
 
-    private FragmentInteractionListener mListener;
-
     public SettingsProfileFragment() {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
             mListener = (FragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
+                    + " must implement DialogInteractionListener");
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_settings_profile, container, false);
 
@@ -96,6 +100,11 @@ public class SettingsProfileFragment extends Fragment {
         mEditTextNickname.setText(mCurrentNickname);
     }
 
+    /**
+     * Returns whether the user made any changes.
+     *
+     * @return whether changes were made by the user
+     */
     public boolean changesWereMade() {
         readFields();
 
@@ -112,6 +121,9 @@ public class SettingsProfileFragment extends Fragment {
         mPasswordRepeat = mEditTextPasswordRepeat.getText().toString();
     }
 
+    /**
+     * Saves the changes made by the user to his/her profile if all fields contain valid values.
+     */
     public void saveChanges() {
         final User currentUser = (User) ParseUser.getCurrentUser();
 
@@ -161,10 +173,18 @@ public class SettingsProfileFragment extends Fragment {
         }
     }
 
+    /**
+     * Deletes the user's avatar image when the changes are saved.
+     */
     public void deleteAvatar() {
         mDeleteAvatar = true;
     }
 
+    /**
+     * Sets the user's avatar iamge
+     *
+     * @param imageUri the {@link Uri} to the image
+     */
     public void setAvatar(Uri imageUri) {
         mDeleteAvatar = false;
 
@@ -187,9 +207,22 @@ public class SettingsProfileFragment extends Fragment {
         mListener = null;
     }
 
+    /**
+     * Defines the interaction with the hosting {@link Activity}.
+     * <p/>
+     * Extends {@link BaseFragmentInteractionListener}.
+     */
     public interface FragmentInteractionListener extends BaseFragment.BaseFragmentInteractionListener {
+        /**
+         * Indicates that a new avatar image should be taken.
+         */
         void pickAvatar();
 
+        /**
+         * Indicates that the hosting {@link Activity} should finish with a specific result
+         *
+         * @param editAction the action to set the result with
+         */
         void finishEdit(@SettingsProfileActivity.EditAction int editAction);
     }
 }

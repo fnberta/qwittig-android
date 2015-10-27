@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.app.Activity;
@@ -5,7 +9,10 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,7 +47,9 @@ import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
- * A placeholder fragment containing a simple view.
+ * Displays a {@link RecyclerView} list of all the ongoing tasks in a group in card base interface.
+ * <p/>
+ * Subclass {@link BaseRecyclerViewFragment}.
  */
 public class TasksFragment extends BaseRecyclerViewFragment implements
         LocalQuery.TaskLocalQueryListener,
@@ -54,7 +63,9 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
     private static final String CREATE_GROUP_DIALOG = "CREATE_GROUP_DIALOG";
 
     private FragmentInteractionListener mListener;
+    @NonNull
     private Date mDeadlineSelected = new Date(Long.MAX_VALUE);
+    @NonNull
     private List<ParseObject> mTasks = new ArrayList<>();
     private TasksRecyclerAdapter mRecyclerAdapter;
     private ArrayList<String> mLoadingTasks;
@@ -62,37 +73,61 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
     public TasksFragment() {
     }
 
+    public static void setTaskDeadline(@NonNull Task task, @NonNull String timeFrame) {
+        if (!timeFrame.equals(Task.TIME_FRAME_AS_NEEDED)) {
+            Date deadline = task.getDeadline();
+            Calendar deadlineNew = DateUtils.getCalendarInstanceUTC();
+            deadlineNew.setTime(deadline);
+            switch (timeFrame) {
+                case Task.TIME_FRAME_DAILY:
+                    deadlineNew.add(Calendar.DAY_OF_YEAR, 1);
+                    break;
+                case Task.TIME_FRAME_WEEKLY:
+                    deadlineNew.add(Calendar.WEEK_OF_YEAR, 1);
+                    break;
+                case Task.TIME_FRAME_MONTHLY:
+                    deadlineNew.add(Calendar.MONTH, 1);
+                    break;
+                case Task.TIME_FRAME_YEARLY:
+                    deadlineNew.add(Calendar.YEAR, 1);
+                    break;
+            }
+            task.setDeadline(deadlineNew.getTime());
+        }
+    }
+
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
             mListener = (FragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
+                    + " must implement DialogInteractionListener");
         }
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null) {
-            mLoadingTasks = savedInstanceState.getStringArrayList(STATE_TASKS_LOADING);
+            ArrayList<String> loadingTasks = savedInstanceState.getStringArrayList(STATE_TASKS_LOADING);
+            mLoadingTasks = loadingTasks != null ? loadingTasks : new ArrayList<String>();
         } else {
             mLoadingTasks = new ArrayList<>();
         }
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         outState.putStringArrayList(STATE_TASKS_LOADING, mLoadingTasks);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_tasks, container, false);
         findBaseViews(rootView);
@@ -104,7 +139,7 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mRecyclerAdapter = new TasksRecyclerAdapter(getActivity(), this, R.layout.row_tasks, mTasks);
+        mRecyclerAdapter = new TasksRecyclerAdapter(getActivity(), mTasks, this);
         mRecyclerView.setAdapter(mRecyclerAdapter);
     }
 
@@ -131,9 +166,10 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
     }
 
     /**
-     * Called from activity when helper fails to pin tasks
+     * Passes the {@link ParseException} to the generic error handler, shows the user an error
+     * message and removes the retained helper fragment and loading indicators.
      *
-     * @param e
+     * @param e the {@link ParseException} thrown in the process
      */
     public void onTasksPinFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
@@ -144,14 +180,14 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
     }
 
     /**
-     * Called from activity when helper pinned all tasks
+     * Updates the adapter to reload data from the local data store after new purchases were pinned.
      */
     public void onTasksPinned() {
         updateAdapter();
     }
 
     /**
-     * Called from activity when all tasks queries are finished
+     * Removes the retained helper fragment and hides the loading indicator.
      */
     public void onAllTasksQueried() {
         HelperUtils.removeHelper(getFragmentManager(), TASK_QUERY_HELPER);
@@ -166,7 +202,7 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
     }
 
     @Override
-    public void onTasksLocalQueried(List<ParseObject> tasks) {
+    public void onTasksLocalQueried(@NonNull List<ParseObject> tasks) {
         mTasks.clear();
 
         if (!tasks.isEmpty()) {
@@ -197,7 +233,7 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
     @Override
     protected void updateView() {
         mRecyclerAdapter.notifyDataSetChanged();
-        toggleMainVisibility();
+        showMainView();
     }
 
     @Override
@@ -209,6 +245,11 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
         }
     }
 
+    /**
+     * Sets what tasks are shown in the list depending on the deadline selected
+     *
+     * @param deadline the type of deadline selected: all, today, this week, this month or this year
+     */
     public void onDeadlineSelected(int deadline) {
         if (deadline == R.string.deadline_all) {
             mDeadlineSelected = new Date(Long.MAX_VALUE);
@@ -245,6 +286,9 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
         updateAdapter();
     }
 
+    /**
+     * Starts {@link TaskAddActivity} to let the user add a new {@link Task}.
+     */
     public void addNewTask() {
         if (userIsInGroup()) {
             Activity activity = getActivity();
@@ -342,29 +386,6 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
         }
     }
 
-    public static void setTaskDeadline(Task task, String timeFrame) {
-        if (!timeFrame.equals(Task.TIME_FRAME_AS_NEEDED)) {
-            Date deadline = task.getDeadline();
-            Calendar deadlineNew = DateUtils.getCalendarInstanceUTC();
-            deadlineNew.setTime(deadline);
-            switch (timeFrame) {
-                case Task.TIME_FRAME_DAILY:
-                    deadlineNew.add(Calendar.DAY_OF_YEAR, 1);
-                    break;
-                case Task.TIME_FRAME_WEEKLY:
-                    deadlineNew.add(Calendar.WEEK_OF_YEAR, 1);
-                    break;
-                case Task.TIME_FRAME_MONTHLY:
-                    deadlineNew.add(Calendar.MONTH, 1);
-                    break;
-                case Task.TIME_FRAME_YEARLY:
-                    deadlineNew.add(Calendar.YEAR, 1);
-                    break;
-            }
-            task.setDeadline(deadlineNew.getTime());
-        }
-    }
-
     @Override
     public void onRemindButtonClicked(int position) {
         if (ParseUtils.isTestUser(mCurrentUser)) {
@@ -387,7 +408,8 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
         remindUserWithHelper(taskId);
     }
 
-    private Task setTaskLoading(String objectId, boolean isLoading) {
+    @Nullable
+    private Task setTaskLoading(@NonNull String objectId, boolean isLoading) {
         Task taskLoading = null;
 
         for (int i = 0, tasksSize = mTasks.size(); i < tasksSize; i++) {
@@ -401,8 +423,8 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
         return taskLoading;
     }
 
-    private void setTaskLoading(Task task, String objectId, int position,
-                                        boolean isLoading) {
+    private void setTaskLoading(@NonNull Task task, String objectId, int position,
+                                boolean isLoading) {
         task.setLoading(isLoading);
         mRecyclerAdapter.notifyItemChanged(position);
 
@@ -413,7 +435,7 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
         }
     }
 
-    private void remindUserWithHelper(String taskId) {
+    private void remindUserWithHelper(@NonNull String taskId) {
         FragmentManager fragmentManager = getFragmentManager();
         Fragment taskRemindHelper = HelperUtils.findHelper(fragmentManager, getTaskHelperTag(taskId));
 
@@ -428,11 +450,18 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
         }
     }
 
+    @NonNull
     private String getTaskHelperTag(String taskId) {
         return TASK_REMIND_HELPER + taskId;
     }
 
-    public void onUserReminded(String taskId) {
+    /**
+     * Removes the retained helper fragment and disables the loading indicator of the task card.
+     * Displays a message to the user that the reminder was sent.
+     *
+     * @param taskId the object id of the task for which a reminder was sent
+     */
+    public void onUserReminded(@NonNull String taskId) {
         HelperUtils.removeHelper(getFragmentManager(), getTaskHelperTag(taskId));
 
         Task task = setTaskLoading(taskId, false);
@@ -444,7 +473,14 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
         }
     }
 
-    public void onUserRemindFailed(ParseException e, String taskId) {
+    /**
+     * Passes the {@link ParseException} to the generic error handler, shows the user an error
+     * message and removes the retained helper fragment and loading indicators.
+     *
+     * @param taskId the object id of the task for which an attempt was amde to send a reminder
+     * @param e      the {@link ParseException} thrown in the process
+     */
+    public void onUserRemindFailed(@NonNull String taskId, @NonNull ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
         MessageUtils.showBasicSnackbar(mRecyclerView, ParseErrorHandler.getErrorMessage(getActivity(), e));
         HelperUtils.removeHelper(getFragmentManager(), getTaskHelperTag(taskId));
@@ -458,6 +494,13 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
         mListener = null;
     }
 
+    /**
+     * Defines the interaction with the hosting {@link Activity}.
+     * <p/>
+     * Currently a stub.
+     * <p/>
+     * Extends {@link BaseFragmentInteractionListener}.
+     */
     public interface FragmentInteractionListener extends BaseFragmentInteractionListener {
     }
 }

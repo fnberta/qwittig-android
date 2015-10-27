@@ -1,28 +1,49 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments.dialogs;
 
 import android.app.Activity;
-import android.support.v7.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 
 import ch.giantific.qwittig.R;
 
 /**
- * Created by fabio on 20.11.14.
+ * Provides a dialog that asks the user if he wants to join a specific group he was invited to.
+ * <p/>
+ * TODO: implement later button
+ * <p/>
+ * Subclass of {@link DialogFragment}.
  */
 public class GroupJoinDialogFragment extends DialogFragment {
 
     private static final String BUNDLE_GROUP_NAME = "BUNDLE_GROUP_NAME";
     private static final String BUNDLE_INVITE_INITIATOR = "BUNDLE_INVITE_INITIATOR";
+    @Nullable
     private String mGroupName;
+    @Nullable
     private String mInviteInitiator;
     private DialogInteractionListener mListener;
     private String mMessage;
 
-    public static GroupJoinDialogFragment newInstance(String groupName, String initiator) {
+    /**
+     * Returns a new instance of {@link GroupJoinDialogFragment}.
+     *
+     * @param groupName the name of the group the user was invited to
+     * @param initiator the nickname of the user who invited the user
+     * @return a new intsance of {@link GroupJoinDialogFragment}
+     */
+    @NonNull
+    public static GroupJoinDialogFragment newInstance(@NonNull String groupName,
+                                                      @NonNull String initiator) {
         GroupJoinDialogFragment fragment = new GroupJoinDialogFragment();
 
         Bundle args = new Bundle();
@@ -34,7 +55,7 @@ public class GroupJoinDialogFragment extends DialogFragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
 
         try {
@@ -81,16 +102,25 @@ public class GroupJoinDialogFragment extends DialogFragment {
                 })
                 .setNeutralButton(R.string.dialog_neutral_decide_later, new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                    public void onClick(@NonNull DialogInterface dialog, int which) {
                         dialog.cancel();
                     }
                 });
         return dialogBuilder.create();
     }
 
+    /**
+     * Defines the actions to take when user clicks on one of the dialog's buttons.
+     */
     public interface DialogInteractionListener {
+        /**
+         * Handles the click on the join group button.
+         */
         void onJoinInvitedGroupSelected();
 
+        /**
+         * Handles the click on the discard invitation button.
+         */
         void onDiscardInvitationSelected();
     }
 }

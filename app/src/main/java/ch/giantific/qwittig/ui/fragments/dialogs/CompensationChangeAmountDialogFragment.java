@@ -1,9 +1,15 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments.dialogs;
 
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -15,21 +21,36 @@ import org.apache.commons.math3.fraction.BigFraction;
 import java.math.BigDecimal;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.parse.models.Compensation;
 import ch.giantific.qwittig.utils.MoneyUtils;
 
 /**
- * Created by fabio on 20.11.14.
+ * Provides a dialog that allows the user to change the amount of a {@link Compensation}.
+ * <p/>
+ * The dialog will only accept a proper new amount value, therefore overrides the standard
+ * onClickListener which calls dismiss() in any case.
+ * <p/>
+ * Subclass of {@link DialogFragment}.
  */
 public class CompensationChangeAmountDialogFragment extends DialogFragment {
 
     private static final String BUNDLE_AMOUNT_OLD = "BUNDLE_AMOUNT_OLD";
     private static final String BUNDLE_CURRENCY = "BUNDLE_CURRENCY";
-    private FragmentInteractionListener mListener;
+    private DialogInteractionListener mListener;
     private double mAmountOld;
+    @Nullable
     private String mCurrentGroupCurrency;
     private TextInputLayout mTextInputLayoutAmount;
 
-    public static CompensationChangeAmountDialogFragment newInstance(BigFraction amountOld,
+    /**
+     * Returns a new instance of {@link CompensationChangeAmountDialogFragment}.
+     *
+     * @param amountOld the amount currently set for the compensation
+     * @param currency  the currency code to use to format the amount
+     * @return a new instance of {@link CompensationChangeAmountDialogFragment}
+     */
+    @NonNull
+    public static CompensationChangeAmountDialogFragment newInstance(@NonNull BigFraction amountOld,
                                                                      String currency) {
         CompensationChangeAmountDialogFragment fragment = new CompensationChangeAmountDialogFragment();
 
@@ -42,11 +63,11 @@ public class CompensationChangeAmountDialogFragment extends DialogFragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
 
         try {
-            mListener = (FragmentInteractionListener) activity;
+            mListener = (DialogInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement SeparateBillFragmentCallback");
@@ -112,7 +133,15 @@ public class CompensationChangeAmountDialogFragment extends DialogFragment {
         }
     }
 
-    public interface FragmentInteractionListener {
-        void onChangedAmountSet(BigFraction amount);
+    /**
+     * Defines the actions to take when user clicks on one of the dialog's buttons.
+     */
+    public interface DialogInteractionListener {
+        /**
+         * Handles the click on the save new amount button.
+         *
+         * @param amount the new amount
+         */
+        void onChangedAmountSet(@NonNull BigFraction amount);
     }
 }

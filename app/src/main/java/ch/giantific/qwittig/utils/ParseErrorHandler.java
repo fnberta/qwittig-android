@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.utils;
 
 
@@ -13,7 +17,7 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.ui.activities.HomeActivity;
 
 /**
- * Created by fabio on 07.05.15.
+ * Provides a generic error handler for exceptions thrown by the Parse.com framework.
  */
 public class ParseErrorHandler {
 
@@ -23,6 +27,13 @@ public class ParseErrorHandler {
         // class cannot be instantiated
     }
 
+    /**
+     * Handles {@link ParseException} errors. Currently only handles
+     * {@link ParseException#INVALID_SESSION_TOKEN}, for which it forces the user to log in again.
+     *
+     * @param context the context to use
+     * @param e       the exception to handle
+     */
     public static void handleParseError(final Context context, ParseException e) {
         int code = e.getCode();
         switch (code) {
@@ -35,7 +46,13 @@ public class ParseErrorHandler {
         }
     }
 
-    public static void forceNewLogin(final Context context) {
+    /**
+     * Forces the user to the login screen because his/her session token is no longer valid and a
+     * new login is required.
+     *
+     * @param context the context used to construct the intent
+     */
+    private static void forceNewLogin(final Context context) {
         ParseUser.logOutInBackground(new LogOutCallback() {
             @Override
             public void done(ParseException e) {
@@ -47,6 +64,13 @@ public class ParseErrorHandler {
         });
     }
 
+    /**
+     * Returns an appropriate error message for different {@link ParseException}.
+     *
+     * @param context the context to use to resolve the string resource
+     * @param e       the exception to get the error message for
+     * @return an appropriate error message
+     */
     public static String getErrorMessage(Context context, ParseException e) {
         String errorMessage;
         int type = e.getCode();

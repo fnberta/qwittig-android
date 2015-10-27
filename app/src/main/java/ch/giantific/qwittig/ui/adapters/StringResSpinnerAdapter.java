@@ -1,7 +1,12 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.adapters;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.ThemedSpinnerAdapter;
 import android.view.LayoutInflater;
@@ -12,16 +17,29 @@ import android.widget.TextView;
 
 
 /**
- * Created by fabio on 28.08.15.
+ * Handles the display of android string resources.
+ * <p/>
+ * Subclass of {@link BaseAdapter}.
+ * <p/>
+ * Implements {@link ThemedSpinnerAdapter} in order to show a themed dropdown menu.
  */
 public class StringResSpinnerAdapter extends BaseAdapter implements ThemedSpinnerAdapter {
 
+    @NonNull
     private final ThemedSpinnerAdapter.Helper mDropDownHelper;
     private Context mContext;
     private int mViewResource;
     private int[] mStringRes;
 
-    public StringResSpinnerAdapter(Context context, int resource, int[] stringRes) {
+    /**
+     * Constructs a new {@link StringResSpinnerAdapter}.
+     *
+     * @param context   the context to use in the adapter
+     * @param resource  the view resource layout to use to display the items
+     * @param stringRes the string resources to display
+     */
+    public StringResSpinnerAdapter(@NonNull Context context, int resource,
+                                   @NonNull int[] stringRes) {
         super();
 
         mDropDownHelper = new ThemedSpinnerAdapter.Helper(context);
@@ -45,12 +63,14 @@ public class StringResSpinnerAdapter extends BaseAdapter implements ThemedSpinne
         return 0;
     }
 
+    @Nullable
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         return getCustomView(position, convertView, parent, false);
     }
 
-    private View getCustomView(int position, View convertView, ViewGroup parent,
+    @Nullable
+    private View getCustomView(int position, @Nullable View convertView, @NonNull ViewGroup parent,
                                boolean isDropDown) {
         final TypeRow typeRow;
         if (convertView == null) {
@@ -69,11 +89,19 @@ public class StringResSpinnerAdapter extends BaseAdapter implements ThemedSpinne
         return convertView;
     }
 
+    @Nullable
     @Override
-    public View getDropDownView(int position, View convertView, ViewGroup parent) {
+    public View getDropDownView(int position, View convertView, @NonNull ViewGroup parent) {
         return getCustomView(position, convertView, parent, true);
     }
 
+    /**
+     * Returns the adapter position of the passed in string resources or -1 if it does not exist
+     * in the adapter
+     *
+     * @param stringRes the string resource the position should be returned for
+     * @return the adapter position of the string resources or -1 if it does not exist
+     */
     public int getPosition(int stringRes) {
         for (int i = 0, stringResLength = mStringRes.length; i < stringResLength; i++) {
             if (mStringRes[i] == stringRes) {
@@ -84,25 +112,41 @@ public class StringResSpinnerAdapter extends BaseAdapter implements ThemedSpinne
         return -1;
     }
 
-    @Override
-    public void setDropDownViewTheme(Resources.Theme theme) {
-        mDropDownHelper.setDropDownViewTheme(theme);
-    }
-
     @Nullable
     @Override
     public Resources.Theme getDropDownViewTheme() {
         return mDropDownHelper.getDropDownViewTheme();
     }
 
+    @Override
+    public void setDropDownViewTheme(Resources.Theme theme) {
+        mDropDownHelper.setDropDownViewTheme(theme);
+    }
+
+    /**
+     * Provides an adapter row that displays a resolved android string resource as a simple title.
+     * <p/>
+     * Expects the title {@link TextView} to use the standard <code>android.R.id.text1</code> as
+     * its id.
+     */
     private static class TypeRow {
         private TextView mTextViewTitle;
 
-        public TypeRow(View view) {
+        /**
+         * Constructs a new {@link TypeRow}.
+         *
+         * @param view the inflated view
+         */
+        public TypeRow(@NonNull View view) {
             mTextViewTitle = (TextView) view.findViewById(android.R.id.text1);
         }
 
-        public void setTitle(String title) {
+        /**
+         * Sets the title text.
+         *
+         * @param title the title text to set
+         */
+        public void setTitle(@NonNull String title) {
             mTextViewTitle.setText(title);
         }
     }

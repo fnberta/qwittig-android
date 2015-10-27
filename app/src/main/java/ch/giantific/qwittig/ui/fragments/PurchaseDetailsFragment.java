@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.app.Activity;
@@ -5,6 +9,8 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -38,12 +44,18 @@ import ch.giantific.qwittig.utils.ParseUtils;
 
 
 /**
- * A placeholder fragment containing a simple view.
+ * Displays all items of a purchase, the users involved the total price and the share of the
+ * current user. The store and date of the purchase are displayed in the hosting activity.
+ * <p/>
+ * Subclass of {@link PurchaseDetailsFragment}.
+ *
+ * @see PurchaseDetailsActivity
  */
 public class PurchaseDetailsFragment extends BaseFragment implements
         LocalQuery.ObjectLocalFetchListener {
 
     private static final String PURCHASE_RECEIPT_FRAGMENT = "PURCHASE_RECEIPT_FRAGMENT";
+    private static final String LOG_TAG = PurchaseDetailsFragment.class.getSimpleName();
     private FragmentInteractionListener mListener;
     private RecyclerView mRecyclerView;
     private ProgressBar mProgressBar;
@@ -54,12 +66,17 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     private Group mCurrentGroup;
     private boolean mHasReceiptFile;
 
-    private static final String LOG_TAG = PurchaseDetailsFragment.class.getSimpleName();
-
     public PurchaseDetailsFragment() {
     }
 
-    public static PurchaseDetailsFragment newInstance(String purchaseId) {
+    /**
+     * Returns a new instance of {@link PurchaseDetailsFragment}.
+     *
+     * @param purchaseId the object id of the purchase
+     * @return a new instance of {@link PurchaseDetailsFragment}
+     */
+    @NonNull
+    public static PurchaseDetailsFragment newInstance(@NonNull String purchaseId) {
         PurchaseDetailsFragment fragment = new PurchaseDetailsFragment();
 
         Bundle args = new Bundle();
@@ -70,13 +87,13 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
             mListener = (FragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
+                    + " must implement DialogInteractionListener");
         }
     }
 
@@ -88,12 +105,12 @@ public class PurchaseDetailsFragment extends BaseFragment implements
 
         Bundle args = getArguments();
         if (args != null) {
-            mPurchaseId = args.getString(HomePurchasesFragment.INTENT_PURCHASE_ID);
+            mPurchaseId = args.getString(HomePurchasesFragment.INTENT_PURCHASE_ID, "");
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_purchase_details, container, false);
 
@@ -107,8 +124,7 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mRecyclerAdapter = new PurchaseDetailsRecyclerAdapter(getActivity(),
-                R.layout.row_details_item_list);
+        mRecyclerAdapter = new PurchaseDetailsRecyclerAdapter(getActivity());
         mRecyclerView.setAdapter(mRecyclerAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setHasFixedSize(true);
@@ -131,16 +147,18 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     }
 
     /**
-     * Queries data needed to display the purchase. Calls method to query the currentGroup users
-     * which will call the method to query the actual purchase in its done callback.
+     * Queries the data of the purchase from the local data store in order to display it to the
+     * user.
+     * <p/>
+     * Uses a query instead of a fetchFromLocalDatastore because a fetch would not include
+     * the data for the pointers.
      */
     public void queryData() {
-        // user query instead of fetch because fetch would not include data for the pointers
         LocalQuery.queryPurchase(mPurchaseId, this);
     }
 
     @Override
-    public void onObjectFetched(ParseObject object) {
+    public void onObjectFetched(@NonNull ParseObject object) {
         mPurchase = (Purchase) object;
 
         updateToolbarTitle();
@@ -156,13 +174,13 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     }
 
     private void updateToolbarTitle() {
-        mListener.setToolbarStoreDate(mPurchase.getStore(), mPurchase.getDate());
+        mListener.setToolbarStoreAndDate(mPurchase.getStore(), mPurchase.getDate());
     }
 
     /**
-     * Checks if the currentUser is the buyer of the purchase, if yes shows the delete/edit options
-     * in the ActionBar. Checks if the purchase has a receipt file, if yes show option to display
-     * it in the ActionBar.
+     * Checks if the current user is the buyer of the purchase, if yes shows the delete/edit options
+     * in the ActionBar of the hosting activity. Checks also if the purchase has a receipt file,
+     * if yes shows option to display it in the ActionBar of the hosting activity.
      */
     private void updateActionBarMenu() {
         List<ParseUser> usersInvolved = mPurchase.getUsersInvolved();
@@ -203,7 +221,7 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_purchase_details_frag, menu);
 
         if (mHasReceiptFile) {
@@ -212,7 +230,7 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         switch (id) {
             case R.id.action_purchase_show_receipt:
@@ -235,7 +253,7 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     }
 
     /**
-     * Launches {@link PurchaseEditActivity} to edit the opened purchase.
+     * Starts {@link PurchaseEditActivity} to edit the purchase.
      */
     public void editPurchase() {
         Intent intent = new Intent(getActivity(), PurchaseEditActivity.class);
@@ -247,7 +265,7 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     }
 
     /**
-     * Deletes purchase and all its items.
+     * Deletes the purchase and all of its items and finishes if the user is not a test user.
      */
     public void deletePurchase() {
         if (!ParseUtils.isTestUser(ParseUser.getCurrentUser())) {
@@ -266,7 +284,7 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     }
 
     /**
-     * Shows snackbar with exchange rate.
+     * Shows the user a {@link Snackbar} with the currency exchange rate used in the purchase.
      */
     public void showExchangeRate() {
         float exchangeRate = mPurchase.getExchangeRate();
@@ -282,9 +300,24 @@ public class PurchaseDetailsFragment extends BaseFragment implements
         mListener = null;
     }
 
+    /**
+     * Defines the interaction with the hosting {@link Activity}.
+     */
     public interface FragmentInteractionListener extends BaseFragmentInteractionListener {
-        void setToolbarStoreDate(String store, Date date);
+        /**
+         * Sets the store name and the date of the purchase.
+         *
+         * @param store the store name to set
+         * @param date  the date to set
+         */
+        void setToolbarStoreAndDate(String store, Date date);
 
+        /**
+         * Toggles whether the edit/delete and show currency exchange rate should be shown or not.
+         *
+         * @param showEditOptions    whether to show the edit/delete options or not
+         * @param hasForeignCurrency whether the purchase was saved with a foreign currency
+         */
         void toggleActionBarOptions(boolean showEditOptions, boolean hasForeignCurrency);
     }
 }

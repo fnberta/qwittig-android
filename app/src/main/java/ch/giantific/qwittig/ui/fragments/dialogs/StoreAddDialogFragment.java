@@ -1,12 +1,17 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments.dialogs;
 
 import android.app.Activity;
-import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +19,9 @@ import android.view.View;
 import ch.giantific.qwittig.R;
 
 /**
- * Created by fabio on 20.11.14.
+ * Provides a dialog that allows the user to add a new store to the database.
+ * <p/>
+ * Subclass of {@link DialogFragment}.
  */
 public class StoreAddDialogFragment extends DialogFragment {
 
@@ -22,7 +29,7 @@ public class StoreAddDialogFragment extends DialogFragment {
     private TextInputLayout mTextInputLayoutStore;
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
 
         try {
@@ -56,7 +63,15 @@ public class StoreAddDialogFragment extends DialogFragment {
         return dialogBuilder.create();
     }
 
+    /**
+     * Defines the actions to take when user clicks on one of the dialog's buttons.
+     */
     public interface DialogInteractionListener {
-        void onNewStoreSet(String storeName);
+        /**
+         * Handles the click on the add new store button.
+         *
+         * @param storeName the new store to add
+         */
+        void onNewStoreSet(@NonNull String storeName);
     }
 }

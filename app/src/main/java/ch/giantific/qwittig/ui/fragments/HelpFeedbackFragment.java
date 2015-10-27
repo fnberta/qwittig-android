@@ -1,9 +1,14 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.app.Fragment;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,7 +21,7 @@ import ch.giantific.qwittig.data.models.HelpItem;
 import ch.giantific.qwittig.ui.adapters.HelpFeedbackRecyclerAdapter;
 
 /**
- * A placeholder fragment containing a simple view.
+ * Displays help and feedback items in a {@link RecyclerView} list.
  */
 public class HelpFeedbackFragment extends Fragment implements
         HelpFeedbackRecyclerAdapter.AdapterInteractionListener {
@@ -47,7 +52,7 @@ public class HelpFeedbackFragment extends Fragment implements
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_help_feedback, container, false);
 
@@ -60,8 +65,8 @@ public class HelpFeedbackFragment extends Fragment implements
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        HelpFeedbackRecyclerAdapter recyclerAdapter = new HelpFeedbackRecyclerAdapter(getActivity(), this,
-                R.layout.row_help_feedback, HELP_ITEMS);
+        HelpFeedbackRecyclerAdapter recyclerAdapter = new HelpFeedbackRecyclerAdapter(
+                getActivity(), HELP_ITEMS, this);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(recyclerAdapter);
@@ -96,12 +101,14 @@ public class HelpFeedbackFragment extends Fragment implements
         }
     }
 
-    private void openWebsite(String url) {
+    private void openWebsite(@NonNull String url) {
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         startActivity(intent);
     }
 
-    private void sendEmail(String recipient, String subject, String body) {
+    private void sendEmail(@NonNull String recipient,
+                           @NonNull String subject,
+                           @NonNull String body) {
         Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"));
         intent.putExtra(Intent.EXTRA_EMAIL, new String[]{recipient});
         intent.putExtra(Intent.EXTRA_SUBJECT, subject);

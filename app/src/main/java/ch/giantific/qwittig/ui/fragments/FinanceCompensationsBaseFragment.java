@@ -1,8 +1,13 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.support.v7.widget.RecyclerView;
 
 import com.parse.ParseException;
 
@@ -14,10 +19,13 @@ import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
- * A placeholder fragment containing a simple view.
+ * Provides an abstract base class for screens displaying a list of compensations using a
+ * {@link RecyclerView}.
+ * <p/>
+ * Subclass of {@link BaseRecyclerViewFragment}.
  */
 public abstract class FinanceCompensationsBaseFragment extends BaseRecyclerViewFragment implements
-    LocalQuery.ObjectLocalFetchListener {
+        LocalQuery.ObjectLocalFetchListener {
 
     private static final String LOG_TAG = FinanceCompensationsBaseFragment.class.getSimpleName();
     FragmentInteractionListener mListener;
@@ -33,7 +41,7 @@ public abstract class FinanceCompensationsBaseFragment extends BaseRecyclerViewF
             mListener = (FragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
+                    + " must implement DialogInteractionListener");
         }
     }
 
@@ -61,8 +69,10 @@ public abstract class FinanceCompensationsBaseFragment extends BaseRecyclerViewF
     protected abstract String getQueryHelperTag();
 
     /**
-     * Called from activity when compensation query failed
-     * @param e the ParseException thrown
+     * Passes the {@link ParseException} to the generic error handler, shows the user an error
+     * message and removes the retained helper fragment and loading indicators.
+     *
+     * @param e the {@link ParseException} thrown in the process
      */
     public void onCompensationsPinFailed(ParseException e) {
         ParseErrorHandler.handleParseError(getActivity(), e);
@@ -73,7 +83,7 @@ public abstract class FinanceCompensationsBaseFragment extends BaseRecyclerViewF
     }
 
     /**
-     * Called from activity when all compensations queries are finished
+     * Removes the retained helper fragment and and loading indicators.
      */
     public void onAllCompensationsQueried() {
         HelperUtils.removeHelper(getFragmentManager(), getQueryHelperTag());
@@ -81,7 +91,7 @@ public abstract class FinanceCompensationsBaseFragment extends BaseRecyclerViewF
     }
 
     /**
-     * Called from activity when helper finished pinning new compensations
+     * Tells the adapter of the {@link RecyclerView} to re-query its data.
      */
     public void onCompensationsPinned() {
         updateAdapter();
@@ -93,6 +103,13 @@ public abstract class FinanceCompensationsBaseFragment extends BaseRecyclerViewF
         mListener = null;
     }
 
+    /**
+     * Defines the interaction with the hosting {@link Activity}.
+     * <p/>
+     * Currently a stub.
+     * <p/>
+     * Extends {@link BaseFragmentInteractionListener}.
+     */
     public interface FragmentInteractionListener extends BaseFragmentInteractionListener {
     }
 }

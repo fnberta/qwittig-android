@@ -1,8 +1,17 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.listeners;
 
 /**
- * Created by fabio on 18.03.15.
+ * Provides empty default implementations for
+ * {@link android.transition.Transition.TransitionListener} to allow subclasses to only implement
+ * the specific method needed.
+ * <p/>
+ * Implements {@link android.transition.Transition.TransitionListener}.
  */
+
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.transition.Transition;

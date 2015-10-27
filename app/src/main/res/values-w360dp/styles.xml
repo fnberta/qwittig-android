@@ -1,3 +1,7 @@
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
 <resources>
     <style name="HomeToolbarTitle">
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.Display2</item>

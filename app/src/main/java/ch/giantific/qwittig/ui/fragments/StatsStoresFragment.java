@@ -1,8 +1,13 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments;
 
 
-import android.app.Fragment;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,10 +21,14 @@ import com.github.mikephil.charting.utils.PercentFormatter;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.stats.models.Stats;
 import ch.giantific.qwittig.helpers.StatsHelper;
+import ch.giantific.qwittig.ui.widgets.PieChart;
 import ch.giantific.qwittig.utils.CurrencyFormatter;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Displays the stores statistics in a {@link PieChart}. Shows the percentages of the stores
+ * used in all purchases.
+ * <p/>
+ * Subclass of {@link StatsPieBaseFragment}.
  */
 public class StatsStoresFragment extends StatsPieBaseFragment {
 
@@ -35,7 +44,7 @@ public class StatsStoresFragment extends StatsPieBaseFragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
@@ -47,7 +56,7 @@ public class StatsStoresFragment extends StatsPieBaseFragment {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         outState.putBoolean(STATE_SHOW_PERCENT, mShowPercent);
@@ -55,7 +64,7 @@ public class StatsStoresFragment extends StatsPieBaseFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_stats_pie, container, false);
 
@@ -65,14 +74,14 @@ public class StatsStoresFragment extends StatsPieBaseFragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_stats_stores, menu);
 
         setMenuValues(menu);
     }
 
     @Override
-    void setMenuValues(Menu menu) {
+    void setMenuValues(@NonNull Menu menu) {
         super.setMenuValues(menu);
 
         MenuItem showPercent = menu.findItem(R.id.action_show_percent);
@@ -83,7 +92,7 @@ public class StatsStoresFragment extends StatsPieBaseFragment {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         switch (id) {
             case R.id.action_show_percent:
@@ -101,20 +110,21 @@ public class StatsStoresFragment extends StatsPieBaseFragment {
         }
     }
 
+    @NonNull
     @Override
     protected String getHelperTag() {
         return STATS_HELPER_STORES;
     }
 
     @Override
-    void calcStats(String year, int month) {
+    void calcStats(@NonNull String year, int month) {
         super.calcStats(year, month);
 
         calcStatsWithHelper(StatsHelper.TYPE_STORES, year, month);
     }
 
     @Override
-    float getValue(Stats.Unit unit) {
+    float getValue(@NonNull Stats.Unit unit) {
         if (mShowAverage) {
             return unit.getAverage();
         } else {
@@ -123,7 +133,7 @@ public class StatsStoresFragment extends StatsPieBaseFragment {
     }
 
     @Override
-    void setDataSetOptions(PieDataSet pieDataSet) {
+    void setDataSetOptions(@NonNull PieDataSet pieDataSet) {
         super.setDataSetOptions(pieDataSet);
 
         if (mShowPercent) {

@@ -1,7 +1,13 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.activities;
 
 import android.app.FragmentManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -15,10 +21,15 @@ import ch.giantific.qwittig.ui.fragments.dialogs.AccountDeleteDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupLeaveBalanceNotZeroDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupLeaveDialogFragment;
 
+/**
+ * Hosts {@link SettingsFragment} containing the main settings options.
+ * <p/>
+ * Subclass of {@link BaseActivity}.
+ */
 public class SettingsActivity extends BaseActivity implements
-        GroupLeaveDialogFragment.FragmentInteractionListener,
+        GroupLeaveDialogFragment.DialogInteractionListener,
         SettingsFragment.FragmentInteractionListener,
-        GroupLeaveBalanceNotZeroDialogFragment.FragmentInteractionListener,
+        GroupLeaveBalanceNotZeroDialogFragment.DialogInteractionListener,
         AccountDeleteDialogFragment.DialogInteractionListener,
         LogoutHelper.HelperInteractionListener,
         DeleteAccountHelper.HelperInteractionListener {
@@ -28,7 +39,7 @@ public class SettingsActivity extends BaseActivity implements
     private SettingsFragment mSettingsFragment;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
@@ -72,7 +83,7 @@ public class SettingsActivity extends BaseActivity implements
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_logout:
                 mSettingsFragment.logOutUser();
@@ -91,7 +102,7 @@ public class SettingsActivity extends BaseActivity implements
     }
 
     @Override
-    public void onLogoutFailed(ParseException e) {
+    public void onLogoutFailed(@NonNull ParseException e) {
         mSettingsFragment.onLogoutFailed(e);
     }
 
@@ -101,7 +112,7 @@ public class SettingsActivity extends BaseActivity implements
     }
 
     @Override
-    public void onDeleteUserFailed(ParseException e) {
+    public void onDeleteUserFailed(@NonNull ParseException e) {
         mSettingsFragment.onDeleteUserFailed(e);
     }
 }

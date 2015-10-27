@@ -1,4 +1,11 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.helpers;
+
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.parse.FunctionCallback;
 import com.parse.ParseCloud;
@@ -8,11 +15,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.data.parse.CloudCode;
+import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 
 /**
- * Created by fabio on 10.12.14.
+ * Provides an abstract base class for helper fragments that deal with the task of inviting users
+ * to a group.
+ * <p/>
+ * Subclass of {@link BaseHelper}.
  */
 public abstract class BaseInviteHelper extends BaseHelper {
 
@@ -22,13 +32,13 @@ public abstract class BaseInviteHelper extends BaseHelper {
         // empty default constructor
     }
 
-    final void inviteUsers(List<String> emails, String groupName) {
+    final void inviteUsers(@NonNull List<String> emails, @NonNull String groupName) {
         Map<String, Object> params = new HashMap<>();
         params.put(CloudCode.PARAM_EMAIL, emails);
         params.put(PushBroadcastReceiver.PUSH_PARAM_GROUP_NAME, groupName);
         ParseCloud.callFunctionInBackground(CloudCode.INVITE_USER, params, new FunctionCallback<Object>() {
             @Override
-            public void done(Object o, ParseException e) {
+            public void done(Object o, @Nullable ParseException e) {
                 if (e != null) {
                     onInviteUsersFailed(e);
                     return;

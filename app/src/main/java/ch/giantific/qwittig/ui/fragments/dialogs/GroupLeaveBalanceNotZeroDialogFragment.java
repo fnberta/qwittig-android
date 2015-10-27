@@ -1,30 +1,38 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 package ch.giantific.qwittig.ui.fragments.dialogs;
 
 import android.app.Activity;
-import android.support.v7.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 
 import ch.giantific.qwittig.R;
 
 /**
- * Created by fabio on 20.11.14.
+ * Provides a dialog that tells the user that he/she can only leave a group if his/her balance is
+ * zero and offers to create a new settlement.
+ * <p/>
+ * Subclass of {@link DialogFragment}.
  */
 public class GroupLeaveBalanceNotZeroDialogFragment extends DialogFragment {
 
-    private FragmentInteractionListener mListener;
+    private DialogInteractionListener mListener;
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
 
         try {
-            mListener = (FragmentInteractionListener) activity;
+            mListener = (DialogInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement FragmentInteractionListener");
+                    + " must implement DialogInteractionListener");
         }
     }
 
@@ -40,14 +48,20 @@ public class GroupLeaveBalanceNotZeroDialogFragment extends DialogFragment {
                 })
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                    public void onClick(@NonNull DialogInterface dialog, int which) {
                         dialog.cancel();
                     }
                 });
         return dialogBuilder.create();
     }
 
-    public interface FragmentInteractionListener {
+    /**
+     * Defines the actions to take when user clicks on one of the dialog's buttons.
+     */
+    public interface DialogInteractionListener {
+        /**
+         * Handles the click on the create new settlement button.
+         */
         void onStartSettlementSelected();
     }
 }
