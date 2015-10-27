@@ -1030,9 +1030,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         mReceiptImagePaths.clear();
 
         if (!receiptImagePaths.isEmpty()) {
-            for (String path : receiptImagePaths) {
-                mReceiptImagePaths.add(path);
-            }
+            mReceiptImagePaths.addAll(receiptImagePaths);
         }
 
         mReceiptImagePath = mReceiptImagePaths.get(0);

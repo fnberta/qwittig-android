@@ -122,9 +122,7 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
     @Override
     public void onCompensationsLocalQueried(@NonNull List<ParseObject> compensations) {
         mCompensations.clear();
-        for (ParseObject compensation : compensations) {
-            mCompensations.add(compensation);
-        }
+        mCompensations.addAll(compensations);
 
         checkCurrentGroup();
     }

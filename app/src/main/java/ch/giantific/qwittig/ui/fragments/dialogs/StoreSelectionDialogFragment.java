@@ -116,9 +116,7 @@ public class StoreSelectionDialogFragment extends DialogFragment {
         List<String> storesFavorites = currentUser.getStoresFavorites();
         if (!storesFavorites.isEmpty()) {
             stores = new ArrayList<>(storesFavorites.size() + 1);
-            for (String store : storesFavorites) {
-                stores.add(store);
-            }
+            stores.addAll(storesFavorites);
         } else {
             stores = new ArrayList<>(1);
         }

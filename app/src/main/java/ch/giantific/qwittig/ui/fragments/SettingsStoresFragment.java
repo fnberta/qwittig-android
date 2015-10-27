@@ -85,16 +85,12 @@ public class SettingsStoresFragment extends BaseFragment {
     private void setupStoreList() {
         List<String> storeFavorites = mCurrentUser.getStoresFavorites();
         if (!storeFavorites.isEmpty()) {
-            for (String store : storeFavorites) {
-                mStoresFavorites.add(store);
-            }
+            mStoresFavorites.addAll(storeFavorites);
         }
 
         List<String> storesAdded = mCurrentUser.getStoresAdded();
         if (!storesAdded.isEmpty()) {
-            for (String store : storesAdded) {
-                mStoresAdded.add(store);
-            }
+            mStoresAdded.addAll(storesAdded);
         }
     }
 

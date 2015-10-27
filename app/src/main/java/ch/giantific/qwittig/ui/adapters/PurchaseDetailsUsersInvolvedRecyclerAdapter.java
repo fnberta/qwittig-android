@@ -113,9 +113,7 @@ public class PurchaseDetailsUsersInvolvedRecyclerAdapter extends
         mUsersInvolvedSorted.clear();
         mUsersInvolved = mPurchase.getUsersInvolved();
 
-        for (ParseUser parseUser : mUsersInvolved) {
-            mUsersInvolvedSorted.add(parseUser);
-        }
+        mUsersInvolvedSorted.addAll(mUsersInvolved);
 
         if (mUsersInvolvedSorted.contains(mBuyer)) {
             mUsersInvolvedSorted.remove(mBuyer);
