@@ -15,7 +15,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.CallSuper;
@@ -125,6 +124,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     public static final int RESULT_PURCHASE_DRAFT_DELETED = 7;
     static final String PURCHASE_SAVE_HELPER = "PURCHASE_SAVE_HELPER";
     static final int INTENT_REQUEST_IMAGE_CAPTURE = 1;
+    // add permission to manifest when enabling!
     static final boolean USE_CUSTOM_CAMERA = false;
     private static final String DATE_PICKER_DIALOG = "DATE_PICKER_DIALOG";
     private static final String STORE_SELECTOR_DIALOG = "STORE_SELECTOR_DIALOG";
@@ -921,28 +921,16 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     private boolean permissionsAreGranted() {
-        Activity activity = getActivity();
-        List<String> permissions = new ArrayList<>();
-
-        int hasExternalStoragePerm = ContextCompat.checkSelfPermission(activity,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        if (hasExternalStoragePerm != PackageManager.PERMISSION_GRANTED) {
-            permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        }
-
         if (USE_CUSTOM_CAMERA) {
-            int hasCameraPerm = ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
+            int hasCameraPerm = ContextCompat.checkSelfPermission(
+                    getActivity(), Manifest.permission.CAMERA);
             if (hasCameraPerm != PackageManager.PERMISSION_GRANTED) {
-                permissions.add(Manifest.permission.CAMERA);
+                FragmentCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
+                        PERMISSIONS_REQUEST_CAPTURE_IMAGES);
+                return false;
             }
-        }
 
-        if (!permissions.isEmpty()) {
-            FragmentCompat.requestPermissions(this,
-                    permissions.toArray(new String[permissions.size()]),
-                    PERMISSIONS_REQUEST_CAPTURE_IMAGES);
-
-            return false;
+            return true;
         }
 
         return true;
@@ -1002,7 +990,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     private File createImageFile() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File storageDir = getActivity().getFilesDir();
         return File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",         /* suffix */
