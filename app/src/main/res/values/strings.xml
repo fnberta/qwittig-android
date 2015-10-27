@@ -311,5 +311,6 @@
     <string name="camera_add">Add photo</string>
     <string name="toast_no_camera">Your device has no camera</string>
     <string name="hint_image_taken">Taken image</string>
+    <string name="toast_only_user_in_group">You are the only one in the group</string>
 
 </resources>

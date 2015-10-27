@@ -80,6 +80,7 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     private static final String STATE_COMPENSATIONS_PAID_FRAGMENT = "STATE_COMPENSATIONS_PAID_FRAGMENT";
     private static final String LOG_TAG = FinanceActivity.class.getSimpleName();
     private static final String RECIPIENT_PICKER_DIALOG = "RECIPIENT_PICKER_DIALOG";
+    private static final String CREATE_GROUP_DIALOG = "CREATE_GROUP_DIALOG";
     private TabLayout mTabLayout;
     private TextView mTextViewBalance;
     private FinanceUserBalancesFragment mUserBalancesFragment;
@@ -231,7 +232,7 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     private void showCreateGroupDialog() {
         GroupCreateDialogFragment groupCreateDialogFragment =
                 GroupCreateDialogFragment.newInstance(R.string.dialog_group_create_finance);
-        groupCreateDialogFragment.show(getFragmentManager(), "create_group");
+        groupCreateDialogFragment.show(getFragmentManager(), CREATE_GROUP_DIALOG);
     }
 
     /**
@@ -249,7 +250,7 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
         mSinglePaymentUsers = users;
         ArrayList<ItemUserPicker> recipients;
 
-        if (!users.isEmpty()) {
+        if (users.size() > 1) { // size = 1 would mean only the current user is in the group
             recipients = new ArrayList<>(users.size() - 1); // -1 as currentUser will not be included
             for (ParseUser parseUser : users) {
                 User user = (User) parseUser;
@@ -260,11 +261,11 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
             }
 
             Collections.sort(recipients);
+            showAddManualDialog(recipients);
         } else {
-            recipients = new ArrayList<>();
+            MessageUtils.showBasicSnackbar(mToolbar, getString(R.string.toast_only_user_in_group));
         }
 
-        showAddManualDialog(recipients);
     }
 
     private void showAddManualDialog(ArrayList<ItemUserPicker> users) {

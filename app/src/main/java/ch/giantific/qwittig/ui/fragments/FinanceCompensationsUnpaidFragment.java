@@ -26,6 +26,7 @@ import com.github.jorgecastilloprz.FABProgressCircle;
 import com.github.jorgecastilloprz.listeners.FABProgressListener;
 import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
@@ -290,16 +291,28 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
             return;
         }
 
-        if (!mIsCalculatingNew) {
-            if (mCompensationsAll.isEmpty()) {
-                mIsCalculatingNew = true;
-                mFabProgressCircle.show();
-                calculateNewSettlementWithHelper();
-            } else {
-                MessageUtils.showBasicSnackbar(mRecyclerView,
-                        getString(R.string.toast_compensation_finish_old));
-            }
+        if (mIsCalculatingNew) {
+            return;
         }
+
+        LocalQuery.queryUsers(new LocalQuery.UserLocalQueryListener() {
+            @Override
+            public void onUsersLocalQueried(@NonNull List<ParseUser> users) {
+                if (users.size() > 1) { // size = 1 would mean current user is the only one in the group
+                    if (mCompensationsAll.isEmpty()) {
+                        mIsCalculatingNew = true;
+                        mFabProgressCircle.show();
+                        calculateNewSettlementWithHelper();
+                    } else {
+                        MessageUtils.showBasicSnackbar(mRecyclerView,
+                                getString(R.string.toast_compensation_finish_old));
+                    }
+                } else {
+                    MessageUtils.showBasicSnackbar(mRecyclerView,
+                            getString(R.string.toast_only_user_in_group));
+                }
+            }
+        });
     }
 
     private void calculateNewSettlementWithHelper() {

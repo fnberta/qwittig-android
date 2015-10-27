@@ -304,5 +304,6 @@
     <string name="camera_add">Foto hinzufügen</string>
     <string name="toast_no_camera">Dein Gerät hat keine Kamera</string>
     <string name="hint_image_taken">Aufgenommenes Photo</string>
+    <string name="toast_only_user_in_group">Du bist alleine in der Gruppe</string>
 
 </resources>
