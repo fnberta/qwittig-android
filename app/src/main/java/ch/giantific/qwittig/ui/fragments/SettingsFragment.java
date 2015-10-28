@@ -24,6 +24,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.parse.ParseException;
@@ -116,6 +119,8 @@ public class SettingsFragment extends PreferenceFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setHasOptionsMenu(true);
 
         final Context context = getActivity();
         PreferenceManager.setDefaultValues(context, R.xml.preferences, false);
@@ -479,6 +484,25 @@ public class SettingsFragment extends PreferenceFragment implements
 
             // update group list in SettingsFragment
             updateSettings(UPDATE_LIST_NAME);
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_settings, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_logout:
+                logOutUser();
+                return true;
+            case R.id.action_account_delete:
+                deleteAccount();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 

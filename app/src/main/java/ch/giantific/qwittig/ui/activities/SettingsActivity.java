@@ -77,26 +77,6 @@ public class SettingsActivity extends BaseActivity implements
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_settings, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_logout:
-                mSettingsFragment.logOutUser();
-                return true;
-            case R.id.action_account_delete:
-                mSettingsFragment.deleteAccount();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
     public void onLoggedOut() {
         mSettingsFragment.onLoggedOut();
     }

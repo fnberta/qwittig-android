@@ -214,14 +214,18 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_compensation_add_manual:
-                if (userIsInGroup()) {
-                    LocalQuery.queryUsers(this);
-                } else {
-                    showCreateGroupDialog();
-                }
+                addSinglePayment();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void addSinglePayment() {
+        if (userIsInGroup()) {
+            LocalQuery.queryUsers(this);
+        } else {
+            showCreateGroupDialog();
         }
     }
 
@@ -261,17 +265,17 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
             }
 
             Collections.sort(recipients);
-            showAddManualDialog(recipients);
+            showAddSingleCompensationDialog(recipients);
         } else {
             MessageUtils.showBasicSnackbar(mToolbar, getString(R.string.toast_only_user_in_group));
         }
 
     }
 
-    private void showAddManualDialog(ArrayList<ItemUserPicker> users) {
-        CompensationSingleDialogFragment userPickerDialogFragment =
+    private void showAddSingleCompensationDialog(ArrayList<ItemUserPicker> users) {
+        CompensationSingleDialogFragment dialog =
                 CompensationSingleDialogFragment.newInstance(users);
-        userPickerDialogFragment.show(getFragmentManager(), RECIPIENT_PICKER_DIALOG);
+        dialog.show(getFragmentManager(), RECIPIENT_PICKER_DIALOG);
     }
 
     @Override
