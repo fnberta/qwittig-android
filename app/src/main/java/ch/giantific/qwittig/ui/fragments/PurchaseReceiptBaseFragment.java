@@ -27,7 +27,7 @@ import ch.giantific.qwittig.utils.ParseErrorHandler;
  */
 public abstract class PurchaseReceiptBaseFragment extends BaseFragment {
 
-    private ImageView mImageViewReceipt;
+    ImageView mImageViewReceipt;
     private ProgressBar mProgressBar;
 
     public PurchaseReceiptBaseFragment() {
@@ -36,7 +36,7 @@ public abstract class PurchaseReceiptBaseFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_show_receipt, container, false);
+        return inflater.inflate(R.layout.fragment_purchase_show_receipt, container, false);
     }
 
     @Override

@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -46,6 +47,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     private static final String STATE_OLD_DATE = "STATE_OLD_DATE";
     private static final String STATE_OLD_CURRENCY = "STATE_OLD_CURRENCY";
     private static final String STATE_OLD_EXCHANGE_RATE = "STATE_OLD_EXCHANGE_RATE";
+    private static final String STATE_OLD_NOTE = "STATE_OLD_NOTE";
     private static final String LOG_TAG = PurchaseEditFragment.class.getSimpleName();
     private static final String DISCARD_CHANGES_DIALOG = "DISCARD_CHANGES_DIALOG";
     String mEditPurchaseId;
@@ -56,6 +58,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     private Date mOldDate;
     private String mOldCurrency;
     private float mOldExchangeRate;
+    private String mOldNote;
     private boolean mDeleteOldReceipt;
 
     public PurchaseEditFragment() {
@@ -94,6 +97,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
             mOldDate = DateUtils.parseLongToDate(savedInstanceState.getLong(STATE_OLD_DATE));
             mOldCurrency = savedInstanceState.getString(STATE_OLD_CURRENCY, "");
             mOldExchangeRate = savedInstanceState.getFloat(STATE_OLD_EXCHANGE_RATE);
+            mOldNote = savedInstanceState.getString(STATE_OLD_NOTE, "");
         } else {
             mOldValuesAreSet = false;
             mOldItemIds = new ArrayList<>();
@@ -111,6 +115,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
         outState.putLong(STATE_OLD_DATE, DateUtils.parseDateToLong(mOldDate));
         outState.putString(STATE_OLD_CURRENCY, mOldCurrency);
         outState.putFloat(STATE_OLD_EXCHANGE_RATE, mOldExchangeRate);
+        outState.putString(STATE_OLD_NOTE, mOldNote);
     }
 
     @Override
@@ -148,7 +153,14 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
             fetchUsersAvailable();
 
             // check if there is a receipt image file and update action bar menu accordingly
-            mListener.updateActionBarMenu(getOldReceiptFile() != null);
+            mListener.setHasReceiptFile(getOldReceiptFile() != null);
+
+            // set note to value from original purchase
+            String oldNote = mPurchase.getNote();
+            mOldNote = oldNote != null ? oldNote : "";
+            mNote = mOldNote;
+            // check if purchase has a note and update action bar menu accordingly
+            mListener.setHasNote(!TextUtils.isEmpty(mOldNote));
 
             // set store to value from original purchase
             mOldStore = mPurchase.getStore();
@@ -255,23 +267,6 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @NonNull Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == INTENT_REQUEST_IMAGE_CAPTURE) {
-            if (resultCode == Activity.RESULT_OK) {
-                String message;
-                if (getOldReceiptFile() != null) {
-                    message = getString(R.string.toast_receipt_changed);
-                } else {
-                    message = getString(R.string.toast_receipt_added);
-                }
-                MessageUtils.showBasicSnackbar(mButtonAddRow, message);
-            }
-        }
-    }
-
-    @Override
     public void deleteReceipt() {
         mDeleteOldReceipt = true;
     }
@@ -310,10 +305,11 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
         // retained across a configuration change.
         if (purchaseEditSaveHelper == null) {
             if (mDeleteOldReceipt) {
-                purchaseEditSaveHelper = new PurchaseEditSaveHelper(mPurchase, isDraft(), getOldReceiptFile());
+                purchaseEditSaveHelper = new PurchaseEditSaveHelper(mPurchase, isDraft(),
+                        getOldReceiptFile(), mNote);
             } else {
                 purchaseEditSaveHelper = new PurchaseEditSaveHelper(mPurchase, isDraft(),
-                        getOldReceiptFile(), mReceiptImagePath);
+                        getOldReceiptFile(), mReceiptImagePath, mNote);
             }
 
             fragmentManager.beginTransaction()
@@ -366,7 +362,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
 
     private boolean changesWereMade() {
         if (mOldDate.compareTo(mDateSelected) != 0 || !mOldStore.equals(mStoreSelected) ||
-                !mOldCurrency.equals(mCurrencySelected)) {
+                !mOldCurrency.equals(mCurrencySelected) || !mOldNote.equals(mNote)) {
             return true;
         }
 
@@ -432,6 +428,10 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
 
     @Override
     protected PurchaseReceiptBaseFragment getReceiptFragment() {
-        return PurchaseReceiptEditFragment.newInstance(mPurchase.getObjectId(), isDraft());
+        final boolean isDraft = isDraft();
+        final String objectId = isDraft ? mPurchase.getDraftId() : mPurchase.getObjectId();
+        return TextUtils.isEmpty(mReceiptImagePath) ?
+                PurchaseReceiptEditFragment.newInstance(objectId, isDraft) :
+                PurchaseReceiptAddFragment.newInstance(mReceiptImagePath);
     }
 }

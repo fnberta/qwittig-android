@@ -30,8 +30,10 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.helpers.PurchaseSaveHelper;
 import ch.giantific.qwittig.helpers.RatesHelper;
 import ch.giantific.qwittig.ui.fragments.PurchaseBaseFragment;
+import ch.giantific.qwittig.ui.fragments.PurchaseNoteFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseReceiptAddFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.ManualExchangeRateDialogFragment;
+import ch.giantific.qwittig.ui.fragments.dialogs.PurchaseNoteEditDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.PurchaseUserSelectionDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.StoreSelectionDialogFragment;
 import ch.giantific.qwittig.ui.listeners.TransitionListenerAdapter;
@@ -53,7 +55,9 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         PurchaseReceiptAddFragment.FragmentInteractionListener,
         RatesHelper.HelperInteractionListener,
         PurchaseSaveHelper.HelperInteractionListener,
-        ManualExchangeRateDialogFragment.DialogInteractionListener {
+        ManualExchangeRateDialogFragment.DialogInteractionListener,
+        PurchaseNoteFragment.FragmentInteractionListener,
+        PurchaseNoteEditDialogFragment.DialogInteractionListener {
 
     static final String STATE_PURCHASE_FRAGMENT = "STATE_PURCHASE_FRAGMENT";
     private static final String STATE_HAS_RECEIPT_FILE = "STATE_HAS_RECEIPT_FILE";
@@ -61,6 +65,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
 
     PurchaseBaseFragment mPurchaseFragment;
     private boolean mHasReceiptFile;
+    private boolean mHasNote;
     private FloatingActionButton mFabPurchaseSave;
     private FABProgressCircle mFabProgressCircle;
 
@@ -151,6 +156,12 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
             menu.findItem(R.id.action_purchase_add_edit_receipt_show).setVisible(true);
             menu.findItem(R.id.action_purchase_add_edit_receipt_add).setVisible(false);
         }
+
+        if (mHasNote) {
+            menu.findItem(R.id.action_purchase_add_edit_note_show).setVisible(true);
+            menu.findItem(R.id.action_purchase_add_edit_note_add).setVisible(false);
+        }
+
         return true;
     }
 
@@ -163,19 +174,41 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
             case R.id.action_purchase_add_edit_receipt_add:
                 mPurchaseFragment.captureImage();
                 return true;
+            case R.id.action_purchase_add_edit_note_show:
+                mPurchaseFragment.showNoteFragment();
+                return true;
+            case R.id.action_purchase_add_edit_note_add:
+                mPurchaseFragment.editNote();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
     @Override
-    public void captureImage() {
-        mPurchaseFragment.captureImage();
+    public void setHasReceiptFile(boolean hasReceiptFile) {
+        mHasReceiptFile = hasReceiptFile;
+        invalidateOptionsMenu();
     }
 
     @Override
-    public void updateActionBarMenu(boolean hasReceiptFile) {
-        mHasReceiptFile = hasReceiptFile;
+    public void deleteReceipt() {
+        mPurchaseFragment.deleteReceipt();
+        setHasReceiptFile(false);
+        getFragmentManager().popBackStack();
+        MessageUtils.showBasicSnackbar(mFabPurchaseSave, getString(R.string.toast_receipt_deleted));
+
+        // TODO: really delete receipt
+    }
+
+    @Override
+    public void setReceiptImagePath(@NonNull String path) {
+        mPurchaseFragment.setReceiptImagePath(path);
+    }
+
+    @Override
+    public void setHasNote(boolean hasNote) {
+        mHasNote = hasNote;
         invalidateOptionsMenu();
     }
 
@@ -196,13 +229,34 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     }
 
     @Override
-    public void deleteReceipt() {
-        mPurchaseFragment.deleteReceipt();
-        updateActionBarMenu(false);
-        getFragmentManager().popBackStack();
-        MessageUtils.showBasicSnackbar(mFabPurchaseSave, getString(R.string.toast_receipt_deleted));
+    public void editNote() {
+        mPurchaseFragment.editNote();
+    }
 
-        // TODO: really delete receipt
+    @Override
+    public void onNoteSet(@NonNull String note) {
+        mPurchaseFragment.onNoteSet(note);
+        setHasNote(true);
+
+        PurchaseNoteFragment fragment = findPurchaseNoteFragment();
+        if (fragment != null) {
+            fragment.updateNote(note);
+        } else {
+            MessageUtils.showBasicSnackbar(mFabPurchaseSave, getString(R.string.toast_note_added));
+        }
+    }
+
+    private PurchaseNoteFragment findPurchaseNoteFragment() {
+        return (PurchaseNoteFragment) getFragmentManager()
+                    .findFragmentByTag(PurchaseBaseFragment.PURCHASE_NOTE_FRAGMENT);
+    }
+
+    @Override
+    public void deleteNote() {
+        mPurchaseFragment.deleteNote();
+        setHasNote(false);
+        getFragmentManager().popBackStack();
+        MessageUtils.showBasicSnackbar(mFabPurchaseSave, getString(R.string.toast_note_deleted));
     }
 
     @Override

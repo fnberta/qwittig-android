@@ -305,5 +305,13 @@
     <string name="toast_no_camera">Dein Gerät hat keine Kamera</string>
     <string name="hint_image_taken">Aufgenommenes Photo</string>
     <string name="toast_only_user_in_group">Du bist alleine in der Gruppe</string>
+    <string name="header_note">Notiz</string>
+    <string name="action_purchase_show_note">Notiz zeigen</string>
+    <string name="action_purchase_add_edit_note_add">Notiz hinzufügen</string>
+    <string name="action_purchase_add_edit_note_delete">Notiz löschen</string>
+    <string name="action_purchase_add_edit_note_edit">Notiz ändern</string>
+    <string name="toast_note_deleted">Notiz gelöscht</string>
+    <string name="toast_note_added">Notiz hinzugefügt</string>
+    <string name="toast_note_edited">Notiz geändert</string>
 
 </resources>

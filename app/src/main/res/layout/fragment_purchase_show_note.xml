@@ -1,0 +1,42 @@
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:paddingBottom="@dimen/small_space"
+    tools:context="ch.giantific.qwittig.ui.fragments.PurchaseReceiptDetailFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:orientation="vertical"
+        >
+
+        <TextView
+            style="@style/SubHeader"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/subheader_height"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/key_line_1"
+            android:paddingStart="@dimen/key_line_1"
+            android:text="@string/header_note"
+            tools:text="Note"/>
+
+        <TextView
+            android:id="@+id/tv_purchase_note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/key_line_1"
+            android:layout_marginStart="@dimen/key_line_1"
+            tools:text="Dies ist eine Notiz"
+            />
+    </LinearLayout>
+
+</ScrollView>
+

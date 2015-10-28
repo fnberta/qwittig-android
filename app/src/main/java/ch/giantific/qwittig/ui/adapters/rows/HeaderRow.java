@@ -40,4 +40,11 @@ public class HeaderRow extends RecyclerView.ViewHolder {
     public void setHeader(@NonNull String header) {
         mTextViewHeader.setText(header);
     }
+
+    /**
+     * Hides the whole row.
+     */
+    public void hideRow() {
+        itemView.setVisibility(View.GONE);
+    }
 }

@@ -42,6 +42,8 @@ public class PurchaseSaveHelper extends BaseHelper {
     Purchase mPurchase;
     @Nullable
     String mReceiptPath;
+    @NonNull
+    String mNote;
 
     public PurchaseSaveHelper() {
         // empty default constructor
@@ -59,9 +61,11 @@ public class PurchaseSaveHelper extends BaseHelper {
      * @param receiptPath the path to the receipt image
      */
     @SuppressLint("ValidFragment")
-    public PurchaseSaveHelper(@NonNull Purchase purchase, @Nullable String receiptPath) {
+    public PurchaseSaveHelper(@NonNull Purchase purchase, @Nullable String receiptPath,
+                              @NonNull String note) {
         mPurchase = purchase;
         mReceiptPath = receiptPath;
+        mNote = note;
     }
 
     @Override
@@ -79,7 +83,16 @@ public class PurchaseSaveHelper extends BaseHelper {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        checkNote();
         checkReceiptImage();
+    }
+
+    private void checkNote() {
+        if (TextUtils.isEmpty(mNote)) {
+            mPurchase.removeNote();
+        } else {
+            mPurchase.setNote(mNote);
+        }
     }
 
     void checkReceiptImage() {

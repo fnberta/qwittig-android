@@ -312,5 +312,13 @@
     <string name="toast_no_camera">Your device has no camera</string>
     <string name="hint_image_taken">Taken image</string>
     <string name="toast_only_user_in_group">You are the only one in the group</string>
+    <string name="header_note">Note</string>
+    <string name="action_purchase_show_note">Show note</string>
+    <string name="action_purchase_add_edit_note_add">Add note</string>
+    <string name="action_purchase_add_edit_note_delete">Delete note</string>
+    <string name="action_purchase_add_edit_note_edit">Edit note</string>
+    <string name="toast_note_deleted">Deleted note</string>
+    <string name="toast_note_added">Added note</string>
+    <string name="toast_note_edited">Edited note</string>
 
 </resources>

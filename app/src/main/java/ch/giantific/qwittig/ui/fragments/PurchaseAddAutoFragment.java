@@ -158,7 +158,7 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
     }
 
     @Override
-    void showReceiptAddedSnackbar() {
+    void showImageTakenSnackbar() {
         // don't show anything in auto mode
     }
 

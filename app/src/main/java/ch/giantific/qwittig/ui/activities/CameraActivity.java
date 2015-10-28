@@ -35,6 +35,7 @@ import java.util.Locale;
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.ui.CameraPreview;
+import ch.giantific.qwittig.utils.CameraUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 
 /**
@@ -83,16 +84,6 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
             toggleBottomVisibility();
         }
     };
-
-    /**
-     * Returns a safe instance of the {@link Camera} object.
-     *
-     * @return an instance of the {@link Camera} object
-     * @throws Exception if the camera is not available (e.g. already in use)
-     */
-    public static Camera getCameraInstance() throws Exception {
-        return Camera.open(0);
-    }
 
     private File createImageFile() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
@@ -151,7 +142,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void loadCamera() throws Exception {
-        mCamera = getCameraInstance();
+        mCamera = CameraUtils.getCameraInstance();
 
         Camera.Parameters params = mCamera.getParameters();
         List<String> focusModes = params.getSupportedFocusModes();

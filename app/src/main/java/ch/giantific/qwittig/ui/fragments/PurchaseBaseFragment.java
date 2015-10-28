@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -16,7 +17,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
 import android.support.annotation.CallSuper;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
@@ -60,12 +60,10 @@ import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import ch.giantific.qwittig.BuildConfig;
@@ -83,10 +81,12 @@ import ch.giantific.qwittig.ui.activities.CameraActivity;
 import ch.giantific.qwittig.ui.adapters.PurchaseUsersInvolvedRecyclerAdapter;
 import ch.giantific.qwittig.ui.fragments.dialogs.DatePickerDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.ManualExchangeRateDialogFragment;
+import ch.giantific.qwittig.ui.fragments.dialogs.PurchaseNoteEditDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.PurchaseUserSelectionDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.StoreSelectionDialogFragment;
 import ch.giantific.qwittig.ui.listeners.SwipeDismissTouchListener;
 import ch.giantific.qwittig.ui.widgets.ListCheckBox;
+import ch.giantific.qwittig.utils.CameraUtils;
 import ch.giantific.qwittig.utils.ComparatorParseUserIgnoreCase;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.HelperUtils;
@@ -128,9 +128,12 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     static final boolean USE_CUSTOM_CAMERA = false;
     private static final String DATE_PICKER_DIALOG = "DATE_PICKER_DIALOG";
     private static final String STORE_SELECTOR_DIALOG = "STORE_SELECTOR_DIALOG";
+    private static final String USER_PICKER_DIALOG = "USER_PICKER_DIALOG";
     private static final String MANUAL_EXCHANGE_RATE_DIALOG = "MANUAL_EXCHANGE_RATE_DIALOG";
+    private static final String EDIT_NOTE_DIALOG = "EDIT_NOTE_DIALOG";
     private static final String RATES_HELPER = "RATES_HELPER";
     private static final String PURCHASE_RECEIPT_FRAGMENT = "PURCHASE_RECEIPT_FRAGMENT";
+    public static final String PURCHASE_NOTE_FRAGMENT = "PURCHASE_NOTE_FRAGMENT";
     private static final String STATE_ROW_COUNT = "STATE_ROW_COUNT";
     private static final String STATE_STORE_SELECTED = "STATE_STORE_SELECTED";
     private static final String STATE_DATE_SELECTED = "STATE_DATE_SELECTED";
@@ -165,6 +168,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     float mExchangeRate;
     ArrayList<String> mReceiptImagePaths;
     String mReceiptImagePath;
+    String mNote;
     private TextView mTextViewPickStore;
     private boolean mIsSaving;
     private boolean mIsFetchingExchangeRates;
@@ -632,7 +636,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
                                       @NonNull boolean[] usersChecked) {
         PurchaseUserSelectionDialogFragment purchaseUserSelectionDialogFragment =
                 PurchaseUserSelectionDialogFragment.newInstance(usersAvailable, usersChecked);
-        purchaseUserSelectionDialogFragment.show(getFragmentManager(), "user_picker");
+        purchaseUserSelectionDialogFragment.show(getFragmentManager(), USER_PICKER_DIALOG);
     }
 
     /**
@@ -902,11 +906,11 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     /**
-     * Checks whether the permission to take an image are granted and if yes initiates the creation
+     * Checks whether the permissions to take an image are granted and if yes initiates the creation
      * of the image file.
      */
     public void captureImage() {
-        if (!hasCameraHardware()) {
+        if (!CameraUtils.hasCameraHardware(getActivity())) {
             MessageUtils.showBasicSnackbar(mButtonAddRow, getString(R.string.toast_no_camera));
             return;
         }
@@ -914,10 +918,6 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         if (permissionsAreGranted()) {
             getImage();
         }
-    }
-
-    private boolean hasCameraHardware() {
-        return getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
     }
 
     private boolean permissionsAreGranted() {
@@ -953,7 +953,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
                         public void onClick(View v) {
                             startSystemSettings();
                         }
-                    });
+                    }).show();
                 }
 
                 break;
@@ -967,35 +967,23 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
             Intent intent = new Intent(getActivity(), CameraActivity.class);
             startActivityForResult(intent, INTENT_REQUEST_IMAGE_CAPTURE);
         } else {
-            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            if (cameraIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-                File imageFile;
-                // Create the File where the photo should go
-                try {
-                    imageFile = createImageFile();
-                } catch (IOException ex) {
-                    // Error occurred while creating the File
-                    setResultForSnackbar(PURCHASE_ERROR);
-                    finishPurchase();
-                    return;
-                }
+            final Context context = getActivity();
+            File imageFile;
+            try {
+                imageFile = CameraUtils.createImageFile(context);
+            } catch (IOException e) {
+                // Error occurred while creating the File
+                setResultForSnackbar(PURCHASE_ERROR);
+                finishPurchase();
+                return;
+            }
 
-                mReceiptImagePath = imageFile.getAbsolutePath();
-                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(imageFile));
+            mReceiptImagePath = imageFile.getAbsolutePath();
+            Intent cameraIntent = CameraUtils.getCameraIntent(context, imageFile);
+            if (cameraIntent != null) {
                 startActivityForResult(cameraIntent, INTENT_REQUEST_IMAGE_CAPTURE);
             }
         }
-    }
-
-    private File createImageFile() throws IOException {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getActivity().getFilesDir();
-        return File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
     }
 
     private void startSystemSettings() {
@@ -1012,20 +1000,30 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
             case INTENT_REQUEST_IMAGE_CAPTURE:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
-                        mListener.updateActionBarMenu(true);
+                        mListener.setHasReceiptFile(true);
 
                         if (USE_CUSTOM_CAMERA) {
                             List<String> paths = data.getStringArrayListExtra(CameraActivity.INTENT_EXTRA_PATHS);
                             setReceiptImagePaths(paths);
                         }
 
-                        updateReceiptFragment();
+                        showImageTakenSnackbar();
+
                         break;
                 }
                 break;
         }
     }
 
+    void showImageTakenSnackbar() {
+        MessageUtils.showBasicSnackbar(mButtonAddRow, getString(R.string.toast_receipt_added));
+    }
+
+    /**
+     * Sets the receipt image paths, only used when custom camera is enabled
+     *
+     * @param receiptImagePaths the paths of the receipt images
+     */
     private void setReceiptImagePaths(@NonNull List<String> receiptImagePaths) {
         mReceiptImagePaths.clear();
 
@@ -1036,14 +1034,14 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         mReceiptImagePath = mReceiptImagePaths.get(0);
     }
 
-    private void updateReceiptFragment() {
-        PurchaseReceiptBaseFragment receiptFragment =
-                (PurchaseReceiptAddFragment) getFragmentManager()
-                        .findFragmentByTag(PurchaseBaseFragment.PURCHASE_RECEIPT_FRAGMENT);
-
-        if (receiptFragment != null) {
-            receiptFragment.setImage(mReceiptImagePath);
-        }
+    /**
+     * Sets the receipt image path field. Call from hosting {@link Activity} when receipt image
+     * was changed in {@link PurchaseReceiptAddFragment}.
+     *
+     * @param receiptImagePath the path to the receipt image
+     */
+    public void setReceiptImagePath(String receiptImagePath) {
+        mReceiptImagePath = receiptImagePath;
     }
 
     /**
@@ -1065,6 +1063,42 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      * Deletes the receipt file of the purchase.
      */
     public abstract void deleteReceipt();
+
+    /**
+     * Sets the note for the purchase and displays a message to the user that it was added.
+     */
+    public void onNoteSet(@NonNull String note) {
+        mNote = note;
+    }
+
+    /**
+     * Sets the note field to an empty string. When the user saves the purchase it will get deleted
+     * in the Parse.com online database.
+     */
+    public void deleteNote() {
+        mNote = "";
+    }
+
+    /**
+     * Opens a dialog that allows the user to edit the note.
+     */
+    public void editNote() {
+        PurchaseNoteEditDialogFragment dialog = PurchaseNoteEditDialogFragment.newInstance(mNote);
+        dialog.show(getFragmentManager(), EDIT_NOTE_DIALOG);
+    }
+
+    /**
+     * Replaces the current fragment with a new instance of {@link PurchaseNoteFragment}.
+     */
+    public void showNoteFragment() {
+        FragmentManager fragmentManager = getFragmentManager();
+        PurchaseNoteFragment noteFragment = PurchaseNoteFragment.newInstance(mNote);
+        fragmentManager.beginTransaction()
+                .replace(R.id.container, noteFragment, PURCHASE_NOTE_FRAGMENT)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .addToBackStack(null)
+                .commit();
+    }
 
     /**
      * Initiates the save of the purchase if there is not currently a save ongoing and exchange
@@ -1341,11 +1375,19 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      */
     public interface FragmentInteractionListener extends BaseFragmentInteractionListener {
         /**
-         * Handles the update of action bar menu of the activity.
+         * Handles the update of action bar menu of the activity regarding the receipt file menu
+         * option.
          *
          * @param hasReceiptFile whether to show the option to show the receipt file or not
          */
-        void updateActionBarMenu(boolean hasReceiptFile);
+        void setHasReceiptFile(boolean hasReceiptFile);
+
+        /**
+         * Handles the update of action bar menu of the activity regarding the note file menu
+         * option.
+         * @param hasNote whether to show the option to show the note or not
+         */
+        void setHasNote(boolean hasNote);
 
         /**
          * Indicates that the {@link FloatingActionButton} should be revealed and if or without the

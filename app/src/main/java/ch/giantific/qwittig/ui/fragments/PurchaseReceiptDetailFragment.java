@@ -20,8 +20,7 @@ import ch.giantific.qwittig.data.parse.models.Purchase;
  * <p/>
  * Subclass of {@link PurchaseReceiptBaseFragment}.
  */
-public class PurchaseReceiptDetailFragment extends PurchaseReceiptBaseFragment implements
-        LocalQuery.ObjectLocalFetchListener {
+public class PurchaseReceiptDetailFragment extends PurchaseReceiptBaseFragment {
 
     static final String BUNDLE_PURCHASE_ID = "BUNDLE_PURCHASE_ID";
     private String mPurchaseId;
@@ -56,16 +55,23 @@ public class PurchaseReceiptDetailFragment extends PurchaseReceiptBaseFragment i
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onStart() {
+        super.onStart();
 
-        LocalQuery.fetchObjectFromId(Purchase.CLASS, mPurchaseId, this);
+        loadData();
     }
 
-    @Override
-    public void onObjectFetched(@NonNull ParseObject object) {
-        Purchase purchase = (Purchase) object;
-        ParseFile receiptFile = purchase.getReceiptParseFile();
-        setReceiptImage(receiptFile);
+    /**
+     * Fetches the purchase from the object id and displays the receipt.
+     */
+    public void loadData() {
+        LocalQuery.fetchObjectFromId(Purchase.CLASS, mPurchaseId, new LocalQuery.ObjectLocalFetchListener() {
+            @Override
+            public void onObjectFetched(@NonNull ParseObject object) {
+                Purchase purchase = (Purchase) object;
+                ParseFile receiptFile = purchase.getReceiptParseFile();
+                setReceiptImage(receiptFile);
+            }
+        });
     }
 }

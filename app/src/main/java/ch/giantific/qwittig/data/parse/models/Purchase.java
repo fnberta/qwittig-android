@@ -44,6 +44,7 @@ public class Purchase extends ParseObject {
     public static final String READ_BY = "readBy";
     public static final String RECEIPT = "receipt";
     public static final String RECEIPT_BYTE = "receiptByte";
+    public static final String NOTE = "note";
     public static final String DRAFT_ID = "draftId";
     public static final String PIN_LABEL = "purchasesPinLabel";
 
@@ -165,6 +166,14 @@ public class Purchase extends ParseObject {
 
     public void setReceiptData(@NonNull byte[] bytes) {
         put(RECEIPT_BYTE, bytes);
+    }
+
+    public String getNote() {
+        return getString(NOTE);
+    }
+
+    public void setNote(@NonNull String note) {
+        put(NOTE, note);
     }
 
     public String getDraftId() {
@@ -292,6 +301,10 @@ public class Purchase extends ParseObject {
 
     public void removeReceiptData() {
         remove(RECEIPT_BYTE);
+    }
+
+    public void removeNote() {
+        remove(NOTE);
     }
 
     /**

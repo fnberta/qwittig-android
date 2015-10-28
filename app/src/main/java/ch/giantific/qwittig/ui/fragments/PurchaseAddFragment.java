@@ -102,21 +102,6 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @NonNull Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == INTENT_REQUEST_IMAGE_CAPTURE) {
-            if (resultCode == Activity.RESULT_OK) {
-                showReceiptAddedSnackbar();
-            }
-        }
-    }
-
-    void showReceiptAddedSnackbar() {
-        MessageUtils.showBasicSnackbar(mButtonAddRow, getString(R.string.toast_receipt_added));
-    }
-
-    @Override
     public void deleteReceipt() {
         deleteTakenImages();
         if (USE_CUSTOM_CAMERA) {
@@ -148,7 +133,7 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
         if (purchaseSaveHelper == null) {
-            purchaseSaveHelper = new PurchaseSaveHelper(mPurchase, mReceiptImagePath);
+            purchaseSaveHelper = new PurchaseSaveHelper(mPurchase, mReceiptImagePath, mNote);
 
             fragmentManager.beginTransaction()
                     .add(purchaseSaveHelper, PURCHASE_SAVE_HELPER)

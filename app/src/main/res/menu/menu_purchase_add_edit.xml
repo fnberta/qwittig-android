@@ -17,4 +17,15 @@
         android:title="@string/action_purchase_add_edit_receipt_add"
         android:orderInCategory="1"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_purchase_add_edit_note_show"
+        android:title="@string/action_purchase_show_note"
+        android:orderInCategory="2"
+        android:visible="false"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_purchase_add_edit_note_add"
+        android:title="@string/action_purchase_add_edit_note_add"
+        android:orderInCategory="2"
+        app:showAsAction="never"/>
 </menu>

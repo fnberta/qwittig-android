@@ -7,9 +7,11 @@ package ch.giantific.qwittig.ui.adapters;
 import android.content.Context;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,9 +47,10 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
     private static final int TYPE_USER_RECYCLER = 2;
     private static final int TYPE_TOTAL = 3;
     private static final int TYPE_MY_SHARE = 4;
-    private static final int NUMBER_OF_HEADER_ROWS = 2;
-    private static final int NUMBER_OF_USER_ROWS = 1;
-    private static final int NUMBER_OF_TOTAL_ROWS = 2;
+    private static final int TYPE_NOTE = 5;
+    private static final int ROWS_UNTIL_ITEMS_START = 3;
+    private static final int TOTAL_ROWS = 2;
+    private static final int NOTE_ROWS = 2;
     private static final int HEADER_POSITION_USER = 0;
     private static final int HEADER_POSITION_ITEMS = 2;
     private static final String LOG_TAG = PurchaseDetailsRecyclerAdapter.class.getSimpleName();
@@ -55,9 +58,11 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
     private static final int VIEW_RESOURCE_RECYCLER_USER = R.layout.row_recycler_user;
     private static final int VIEW_RESOURCE_TOTAL = R.layout.row_purchase_details_total;
     private static final int VIEW_RESOURCE_MY_SHARE = R.layout.row_purchase_details_my_share;
+    private static final int VIEW_RESOURCE_NOTE = R.layout.row_purchase_details_note;
     private Context mContext;
     private Purchase mPurchase;
     private List<ParseObject> mItems;
+    private boolean mHasNote;
     private String mCurrentGroupCurrency = ParseUtils.getGroupCurrency();
 
     public PurchaseDetailsRecyclerAdapter(Context context) {
@@ -69,31 +74,31 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         switch (viewType) {
             case TYPE_ITEM: {
-                View v = LayoutInflater.from(parent.getContext())
-                        .inflate(VIEW_RESOURCE_ITEM, parent, false);
+                View v = inflater.inflate(VIEW_RESOURCE_ITEM, parent, false);
                 return new ItemRow(v, mContext);
             }
             case TYPE_HEADER: {
-                View v = LayoutInflater.from(parent.getContext())
-                        .inflate(HeaderRow.VIEW_RESOURCE, parent, false);
+                View v = inflater.inflate(HeaderRow.VIEW_RESOURCE, parent, false);
                 return new HeaderRow(v);
             }
             case TYPE_USER_RECYCLER: {
-                View v = LayoutInflater.from(parent.getContext())
-                        .inflate(VIEW_RESOURCE_RECYCLER_USER, parent, false);
+                View v = inflater.inflate(VIEW_RESOURCE_RECYCLER_USER, parent, false);
                 return new UserRecyclerRow(v, mContext);
             }
             case TYPE_TOTAL: {
-                View v = LayoutInflater.from(parent.getContext())
-                        .inflate(VIEW_RESOURCE_TOTAL, parent, false);
+                View v = inflater.inflate(VIEW_RESOURCE_TOTAL, parent, false);
                 return new TotalRow(v);
             }
             case TYPE_MY_SHARE: {
-                View v = LayoutInflater.from(parent.getContext())
-                        .inflate(VIEW_RESOURCE_MY_SHARE, parent, false);
+                View v = inflater.inflate(VIEW_RESOURCE_MY_SHARE, parent, false);
                 return new MyShareRow(v);
+            }
+            case TYPE_NOTE: {
+                View v = inflater.inflate(VIEW_RESOURCE_NOTE, parent, false);
+                return new NoteRow(v);
             }
             default:
                 throw new RuntimeException("there is no type that matches the type " + viewType +
@@ -111,8 +116,7 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
         switch (viewType) {
             case TYPE_ITEM: {
                 ItemRow itemRow = (ItemRow) viewHolder;
-                Item item = (Item) mItems.get(position - NUMBER_OF_USER_ROWS -
-                        NUMBER_OF_HEADER_ROWS);
+                Item item = (Item) mItems.get(position - ROWS_UNTIL_ITEMS_START);
 
                 itemRow.setName(item.getName());
                 itemRow.setPrice(item.getPrice(), mCurrentGroupCurrency);
@@ -122,16 +126,17 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
             }
             case TYPE_HEADER: {
                 HeaderRow headerRow = (HeaderRow) viewHolder;
-                String header = "";
-                switch (position) {
-                    case HEADER_POSITION_USER:
-                        header = mContext.getString(R.string.header_users);
-                        break;
-                    case HEADER_POSITION_ITEMS:
-                        header = mContext.getString(R.string.header_items);
-                        break;
+                if (position == HEADER_POSITION_USER) {
+                    headerRow.setHeader(mContext.getString(R.string.header_users));
+                } else if (position == HEADER_POSITION_ITEMS) {
+                    headerRow.setHeader(mContext.getString(R.string.header_items));
+                } else if (position == getLastPosition() - 1) {
+                    if (mHasNote) {
+                        headerRow.setHeader(mContext.getString(R.string.header_note));
+                    } else {
+                        headerRow.hideRow();
+                    }
                 }
-                headerRow.setHeader(header);
 
                 break;
             }
@@ -159,11 +164,33 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
 
                 break;
             }
+            case TYPE_NOTE: {
+                NoteRow noteRow = (NoteRow) viewHolder;
+                if (mHasNote) {
+                    noteRow.setNote(mPurchase.getNote());
+                } else {
+                    noteRow.hideRow();
+                }
+
+                break;
+            }
         }
+    }
+
+    /**
+     * Returns the last position of the adapter..
+     *
+     * @return the last position of the adapter
+     */
+    private int getLastPosition() {
+        return getItemCount() - 1;
     }
 
     @Override
     public int getItemViewType(int position) {
+        // first position is 0, not 1
+        final int lastPosition = getLastPosition();
+
         if (position == HEADER_POSITION_USER) {
             return TYPE_HEADER;
         }
@@ -173,18 +200,29 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
         if (position == HEADER_POSITION_ITEMS) {
             return TYPE_HEADER;
         }
-        if (position == getItemCount() - 2) { // -1 because first position is 0, not 1
+        if (position == lastPosition - (mHasNote ? NOTE_ROWS + 1 : 1)) {
             return TYPE_TOTAL;
         }
-        if (position == getItemCount() - 1) {
+        if (position == (mHasNote ? (lastPosition - NOTE_ROWS) : lastPosition)) {
             return TYPE_MY_SHARE;
         }
+
+        if (mHasNote) {
+            if (position == lastPosition - 1) {
+                return TYPE_HEADER;
+            }
+            if (position == lastPosition) {
+                return TYPE_NOTE;
+            }
+        }
+
         return TYPE_ITEM;
     }
 
     @Override
     public int getItemCount() {
-        int numberOfExtraRows = NUMBER_OF_USER_ROWS + NUMBER_OF_HEADER_ROWS + NUMBER_OF_TOTAL_ROWS;
+        int numberOfExtraRows = ROWS_UNTIL_ITEMS_START + TOTAL_ROWS
+                + (mHasNote ? NOTE_ROWS : 0);
         return mItems == null ? numberOfExtraRows : mItems.size() + numberOfExtraRows;
     }
 
@@ -196,6 +234,7 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
     public void setPurchase(@NonNull ParseObject purchase) {
         mPurchase = (Purchase) purchase;
         mItems = mPurchase.getItems();
+        mHasNote = !TextUtils.isEmpty(mPurchase.getNote());
     }
 
     /**
@@ -441,6 +480,38 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
 
         private void setMyShareForeignVisibility(boolean show) {
             mTextViewMyShareForeign.setVisibility(show ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    /**
+     * Provides a {@link RecyclerView} row that displays the optional note of a purchase.
+     */
+    private static class NoteRow extends RecyclerView.ViewHolder {
+
+        private TextView mTextViewNote;
+
+        /**
+         * Constructs a new {@link NoteRow}.
+         *
+         * @param view the inflated view
+         */
+        public NoteRow(@NonNull View view) {
+            super(view);
+
+            mTextViewNote = (TextView) view.findViewById(R.id.tv_purchase_details_note);
+        }
+
+        /**
+         * Sets the note text.
+         *
+         * @param note the note to set
+         */
+        public void setNote(@NonNull String note) {
+            mTextViewNote.setText(note);
+        }
+
+        public void hideRow() {
+            itemView.setVisibility(View.GONE);
         }
     }
 }

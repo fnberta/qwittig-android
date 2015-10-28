@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -17,12 +19,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.parse.ParseObject;
+import com.parse.ParseUser;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Date;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.parse.models.Purchase;
 import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.ui.fragments.HomePurchasesFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseDetailsFragment;
@@ -30,6 +36,8 @@ import ch.giantific.qwittig.ui.fragments.PurchaseEditFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseReceiptDetailFragment;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
+import ch.giantific.qwittig.utils.MoneyUtils;
+import ch.giantific.qwittig.utils.ParseUtils;
 
 /**
  * Hosts {@link PurchaseDetailsFragment} that displays the details of a purchase and
@@ -145,16 +153,54 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_purchase_edit:
-                mPurchaseDetailsFragment.editPurchase();
+                editPurchase();
                 return true;
             case R.id.action_purchase_delete:
-                mPurchaseDetailsFragment.deletePurchase();
+                deletePurchase();
                 return true;
             case R.id.action_purchase_show_exchange_rate:
-                mPurchaseDetailsFragment.showExchangeRate();
+                showExchangeRate();
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    /**
+     * Starts {@link PurchaseEditActivity} to edit the purchase.
+     */
+    private void editPurchase() {
+        Intent intent = new Intent(this, PurchaseEditActivity.class);
+        intent.putExtra(HomePurchasesFragment.INTENT_PURCHASE_ID, mPurchaseId);
+        ActivityOptionsCompat activityOptionsCompat =
+                ActivityOptionsCompat.makeSceneTransitionAnimation(this);
+        startActivityForResult(intent, INTENT_REQUEST_PURCHASE_MODIFY,
+                activityOptionsCompat.toBundle());
+    }
+
+    /**
+     * Deletes the purchase and all of its items and finishes if the user is not a test user.
+     */
+    private void deletePurchase() {
+        if (!ParseUtils.isTestUser(ParseUser.getCurrentUser())) {
+            Purchase purchase = (Purchase) ParseObject.createWithoutData(Purchase.CLASS, mPurchaseId);
+            purchase.deleteEventually();
+
+            setResult(RESULT_PURCHASE_DELETED);
+            finish();
+        } else {
+            showAccountCreateDialog();
+        }
+    }
+
+    /**
+     * Shows the user a {@link Snackbar} with the currency exchange rate used in the purchase.
+     */
+    private void showExchangeRate() {
+        float exchangeRate = mPurchaseDetailsFragment.getExchangeRate();
+        String message = getString(R.string.toast_exchange_rate_value,
+                MoneyUtils.formatMoneyNoSymbol(exchangeRate,
+                        MoneyUtils.EXCHANGE_RATE_FRACTION_DIGITS));
+        MessageUtils.showBasicSnackbar(mToolbar, message);
     }
 
     @Override
