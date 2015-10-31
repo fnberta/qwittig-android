@@ -7,6 +7,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     >
 
@@ -23,7 +24,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/header_note"
-            android:inputType="textCapSentences"
+            android:inputType="textMultiLine"
+            tools:text="Die ist eine Test, die hoffentlich über eine Zeile hinausgeht. Falls nicht, füge ich gleich nochmals eine Zeile an."
             />
 
     </android.support.design.widget.TextInputLayout>
