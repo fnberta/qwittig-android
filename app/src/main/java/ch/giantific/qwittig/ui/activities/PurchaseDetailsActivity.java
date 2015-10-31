@@ -129,7 +129,7 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
         if (mPurchaseId == null) { // started via Push Notification
             try {
                 JSONObject jsonExtras = PushBroadcastReceiver.getData(intent);
-                mPurchaseId = jsonExtras.optString(PushBroadcastReceiver.PUSH_PARAM_PURCHASE);
+                mPurchaseId = jsonExtras.optString(PushBroadcastReceiver.PUSH_PARAM_PURCHASE_ID);
             } catch (JSONException e) {
                 MessageUtils.showBasicSnackbar(mToolbar, getString(R.string.toast_error_purchase_details_load));
             }

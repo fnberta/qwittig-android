@@ -101,7 +101,7 @@ public class CloudCodeClient {
     public void pushTaskReminder(@NonNull final String taskId,
                                  @NonNull final CloudCodeListener listener) {
         Map<String, Object> params = new HashMap<>();
-        params.put(PushBroadcastReceiver.PUSH_PARAM_TASK, taskId);
+        params.put(PushBroadcastReceiver.PUSH_PARAM_TASK_ID, taskId);
         ParseCloud.callFunctionInBackground(PUSH_TASK_REMIND, params, new FunctionCallback<Object>() {
             @Override
             public void done(Object o, @Nullable ParseException e) {
@@ -153,7 +153,7 @@ public class CloudCodeClient {
     private Map<String, Object> getCompensationPushParams(@NonNull String compensationId,
                                                           @NonNull String currencyCode) {
         Map<String, Object> params = new HashMap<>();
-        params.put(PushBroadcastReceiver.PUSH_PARAM_COMPENSATION, compensationId);
+        params.put(PushBroadcastReceiver.PUSH_PARAM_COMPENSATION_ID, compensationId);
         params.put(PushBroadcastReceiver.PUSH_PARAM_CURRENCY_CODE, currencyCode);
 
         return params;
@@ -171,7 +171,7 @@ public class CloudCodeClient {
                                    boolean doSingleUserSettlement,
                                    @NonNull final CloudCodeListener listener) {
         Map<String, Object> params = new HashMap<>();
-        params.put(PushBroadcastReceiver.PUSH_PARAM_GROUP, groupToBalanceId);
+        params.put(PushBroadcastReceiver.PUSH_PARAM_GROUP_ID, groupToBalanceId);
         params.put(PARAM_SETTLEMENT_SINGLE_USER, doSingleUserSettlement);
         ParseCloud.callFunctionInBackground(SETTLEMENT_NEW, params, new FunctionCallback<Object>() {
             @Override
@@ -191,7 +191,7 @@ public class CloudCodeClient {
     public void addUserToGroupRole(@NonNull final String groupId,
                                    @NonNull final CloudCodeListener listener) {
         Map<String, Object> params = new HashMap<>();
-        params.put(PushBroadcastReceiver.PUSH_PARAM_GROUP, groupId);
+        params.put(PushBroadcastReceiver.PUSH_PARAM_GROUP_ID, groupId);
         ParseCloud.callFunctionInBackground(GROUP_ROLE_ADD_USER, params, new FunctionCallback<Object>() {
             @Override
             public void done(Object o, @Nullable ParseException e) {
@@ -208,7 +208,7 @@ public class CloudCodeClient {
      */
     public void removeUserFromGroupRole(@NonNull final String groupId) {
         Map<String, Object> params = new HashMap<>();
-        params.put(PushBroadcastReceiver.PUSH_PARAM_GROUP, groupId);
+        params.put(PushBroadcastReceiver.PUSH_PARAM_GROUP_ID, groupId);
         ParseCloud.callFunctionInBackground(GROUP_ROLE_REMOVE_USER, params);
     }
 
@@ -308,7 +308,7 @@ public class CloudCodeClient {
     private Map<String, Object> getStatsPushParams(@NonNull String groupId, @NonNull String year,
                                                    int month) {
         Map<String, Object> params = new HashMap<>();
-        params.put(PushBroadcastReceiver.PUSH_PARAM_GROUP, groupId);
+        params.put(PushBroadcastReceiver.PUSH_PARAM_GROUP_ID, groupId);
         params.put(PARAM_YEAR, year);
         if (month != 0) {
             params.put(PARAM_MONTH, month - 1);

@@ -210,7 +210,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
                 JSONObject jsonExtras = PushBroadcastReceiver.getData(intent);
                 String notificationType = jsonExtras.optString(PushBroadcastReceiver.NOTIFICATION_TYPE);
                 if (PushBroadcastReceiver.TYPE_USER_INVITED.equals(notificationType)) {
-                    mInvitedGroupId = jsonExtras.optString(PushBroadcastReceiver.PUSH_PARAM_GROUP);
+                    mInvitedGroupId = jsonExtras.optString(PushBroadcastReceiver.PUSH_PARAM_GROUP_ID);
                     mInviteInitiator = jsonExtras.optString(PushBroadcastReceiver.PUSH_PARAM_USER);
                     mInvitationAction = intent.getIntExtra(
                             PushBroadcastReceiver.INTENT_ACTION_INVITATION, 0);

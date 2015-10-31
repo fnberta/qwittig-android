@@ -103,7 +103,7 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
         if (mTaskId == null) { // started via Push Notification
             try {
                 JSONObject jsonExtras = PushBroadcastReceiver.getData(intent);
-                mTaskId = jsonExtras.optString(PushBroadcastReceiver.PUSH_PARAM_TASK);
+                mTaskId = jsonExtras.optString(PushBroadcastReceiver.PUSH_PARAM_TASK_ID);
             } catch (JSONException e) {
                 MessageUtils.showBasicSnackbar(mToolbar, getString(R.string.toast_error_task_details_load));
             }

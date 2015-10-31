@@ -54,22 +54,23 @@ import ch.giantific.qwittig.utils.MoneyUtils;
 public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
 
     public static final String NOTIFICATION_TYPE = "type";
-    public static final String PUSH_PARAM_PURCHASE = "purchase";
-    public static final String PUSH_PARAM_COMPENSATION = "compensation";
-    public static final String PUSH_PARAM_GROUP = "group";
-    public static final String PUSH_PARAM_PAYER = "payer";
-    public static final String PUSH_PARAM_BENEFICIARY = "beneficiary";
     public static final String PUSH_PARAM_TITLE = "title";
     public static final String PUSH_PARAM_ALERT = "alert";
+
+    public static final String PUSH_PARAM_PURCHASE_ID = "purchaseId";
+    public static final String PUSH_PARAM_COMPENSATION_ID = "compensationId";
+    public static final String PUSH_PARAM_GROUP_ID = "groupId";
+    public static final String PUSH_PARAM_PAYER_ID = "payerId";
+    public static final String PUSH_PARAM_BENEFICIARY_ID = "beneficiaryId";
+    public static final String PUSH_PARAM_BUYER_ID = "buyerId";
+    public static final String PUSH_PARAM_INITIATOR_ID = "initiatorId";
+    public static final String PUSH_PARAM_TASK_ID = "taskId";
     public static final String PUSH_PARAM_USER = "user";
-    public static final String PUSH_PARAM_BUYER = "buyer";
     public static final String PUSH_PARAM_AMOUNT = "amount";
     public static final String PUSH_PARAM_STORE = "store";
     public static final String PUSH_PARAM_USERS_INVOLVED = "usersInvolved";
-    public static final String PUSH_PARAM_INITIATOR = "initiator";
     public static final String PUSH_PARAM_GROUP_NAME = "groupName";
     public static final String PUSH_PARAM_CURRENCY_CODE = "currencyCode";
-    public static final String PUSH_PARAM_TASK = "task";
     public static final String PUSH_PARAM_TASK_TITLE = "taskTitle";
 
     public static final String INTENT_ACTION_INVITATION = "INTENT_ACTION_INVITATION";
@@ -161,7 +162,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                         break;
                     }
                     case TYPE_TASK_REMIND_USER:
-                        String taskId = jsonExtras.optString(PUSH_PARAM_TASK);
+                        String taskId = jsonExtras.optString(PUSH_PARAM_TASK_ID);
                         ParseQueryService.startTaskDone(context, taskId);
 
                         cancelNotification(intent);
@@ -202,7 +203,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
 
     @NonNull
     private Compensation getCompensation(@NonNull JSONObject jsonExtras) {
-        String compensationId = jsonExtras.optString(PUSH_PARAM_COMPENSATION);
+        String compensationId = jsonExtras.optString(PUSH_PARAM_COMPENSATION_ID);
         return (Compensation) ParseObject.createWithoutData(Compensation.CLASS, compensationId);
     }
 
@@ -242,7 +243,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
             case TYPE_PURCHASE_NEW: {
                 // set notification id and tag
                 notificationId = NEW_PURCHASE_NOTIFICATION_ID;
-                notificationTag = jsonExtras.optString(PUSH_PARAM_GROUP);
+                notificationTag = jsonExtras.optString(PUSH_PARAM_GROUP_ID);
 
                 // update balance for all users
                 ParseQueryService.startQueryUsers(context);
@@ -251,11 +252,11 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 if (!userIsInUsersInvolved(jsonExtras)) {
                     return;
                 }
-                String purchaseId = jsonExtras.optString(PUSH_PARAM_PURCHASE);
+                String purchaseId = jsonExtras.optString(PUSH_PARAM_PURCHASE_ID);
                 ParseQueryService.startQueryObject(context, Purchase.CLASS, purchaseId, true);
 
                 // don't show notification for buyer
-                String buyerId = jsonExtras.optString(PUSH_PARAM_BUYER);
+                String buyerId = jsonExtras.optString(PUSH_PARAM_BUYER_ID);
                 if (buyerId.equals(ParseUser.getCurrentUser().getObjectId())) {
                     return;
                 }
@@ -281,7 +282,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 if (!userIsInUsersInvolved(jsonExtras)) {
                     return;
                 }
-                String purchaseId = jsonExtras.optString(PUSH_PARAM_PURCHASE);
+                String purchaseId = jsonExtras.optString(PUSH_PARAM_PURCHASE_ID);
                 ParseQueryService.startQueryObject(context, Purchase.CLASS, purchaseId, false);
                 break;
             }
@@ -293,13 +294,13 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 if (!userIsInUsersInvolved(jsonExtras)) {
                     return;
                 }
-                String purchaseId = jsonExtras.optString(PUSH_PARAM_PURCHASE);
-                String groupId = jsonExtras.optString(PUSH_PARAM_GROUP);
+                String purchaseId = jsonExtras.optString(PUSH_PARAM_PURCHASE_ID);
+                String groupId = jsonExtras.optString(PUSH_PARAM_GROUP_ID);
                 ParseQueryService.startUnpinObject(context, Purchase.CLASS, purchaseId, groupId);
                 break;
             }
             case TYPE_SETTLEMENT_NEW: {
-                String initiatorId = jsonExtras.optString(PUSH_PARAM_INITIATOR);
+                String initiatorId = jsonExtras.optString(PUSH_PARAM_INITIATOR_ID);
                 if (initiatorId.equals(ParseUser.getCurrentUser().getObjectId())) {
                     return;
                 }
@@ -326,7 +327,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 queryCompensation(context, jsonExtras, false);
 
                 // only show notification for payer
-                String payerId = jsonExtras.optString(PUSH_PARAM_PAYER);
+                String payerId = jsonExtras.optString(PUSH_PARAM_PAYER_ID);
                 if (!payerId.equals(ParseUser.getCurrentUser().getObjectId())) {
                     return;
                 }
@@ -337,11 +338,11 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 ParseQueryService.startQueryUsers(context);
 
                 // unpin compensation for all users
-                String compensationId = jsonExtras.optString(PUSH_PARAM_COMPENSATION);
+                String compensationId = jsonExtras.optString(PUSH_PARAM_COMPENSATION_ID);
                 ParseQueryService.startUnpinObject(context, Compensation.CLASS, compensationId);
 
                 // only show notification for beneficiary
-                String beneficiaryId = jsonExtras.optString(PUSH_PARAM_BENEFICIARY);
+                String beneficiaryId = jsonExtras.optString(PUSH_PARAM_BENEFICIARY_ID);
                 if (!beneficiaryId.equals(ParseUser.getCurrentUser().getObjectId())) {
                     return;
                 }
@@ -352,36 +353,36 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 queryCompensation(context, jsonExtras, false);
 
                 // only show notification for beneficiary
-                String beneficiaryId = jsonExtras.optString(PUSH_PARAM_BENEFICIARY);
+                String beneficiaryId = jsonExtras.optString(PUSH_PARAM_BENEFICIARY_ID);
                 if (!beneficiaryId.equals(ParseUser.getCurrentUser().getObjectId())) {
                     return;
                 }
                 break;
             }
             case TYPE_TASK_NEW: {
-                String taskId = jsonExtras.optString(PUSH_PARAM_TASK);
+                String taskId = jsonExtras.optString(PUSH_PARAM_TASK_ID);
                 ParseQueryService.startQueryObject(context, Task.CLASS, taskId, true);
 
                 // don't show notification for initiator of task
-                String initiatorId = jsonExtras.optString(PUSH_PARAM_INITIATOR);
+                String initiatorId = jsonExtras.optString(PUSH_PARAM_INITIATOR_ID);
                 if (initiatorId.equals(ParseUser.getCurrentUser().getObjectId())) {
                     return;
                 }
                 break;
             }
             case TYPE_TASK_EDIT: {
-                String taskId = jsonExtras.optString(PUSH_PARAM_TASK);
+                String taskId = jsonExtras.optString(PUSH_PARAM_TASK_ID);
                 ParseQueryService.startQueryObject(context, Task.CLASS, taskId, false);
                 break;
             }
             case TYPE_TASK_DELETE: {
-                String taskId = jsonExtras.optString(PUSH_PARAM_TASK);
-                String groupId = jsonExtras.optString(PUSH_PARAM_GROUP);
+                String taskId = jsonExtras.optString(PUSH_PARAM_TASK_ID);
+                String groupId = jsonExtras.optString(PUSH_PARAM_GROUP_ID);
                 ParseQueryService.startUnpinObject(context, Task.CLASS, taskId, groupId);
 
                 // don't show notification for initiator of task,
                 // TODO: actually we don't want to show for the user that deleted the task / finished a one-time task
-                String initiatorId = jsonExtras.optString(PUSH_PARAM_INITIATOR);
+                String initiatorId = jsonExtras.optString(PUSH_PARAM_INITIATOR_ID);
                 if (initiatorId.equals(ParseUser.getCurrentUser().getObjectId())) {
                     return;
                 }
@@ -402,7 +403,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
             case TYPE_GROUP_NAME_CHANGED:
                 // fall through
             case TYPE_GROUP_USERS_INVITED_CHANGED: {
-                String groupId = jsonExtras.optString(PUSH_PARAM_GROUP);
+                String groupId = jsonExtras.optString(PUSH_PARAM_GROUP_ID);
                 ParseQueryService.startQueryObject(context, Group.CLASS, groupId, false);
                 break;
             }
@@ -417,7 +418,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     }
 
     private void queryCompensation(@NonNull Context context, @NonNull JSONObject jsonExtras, boolean isNew) {
-        String compensationId = jsonExtras.optString(PUSH_PARAM_COMPENSATION);
+        String compensationId = jsonExtras.optString(PUSH_PARAM_COMPENSATION_ID);
         ParseQueryService.startQueryObject(context, Compensation.CLASS, compensationId, isNew);
     }
 
@@ -745,7 +746,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
 
     private String getGroupId(@NonNull Intent intent) throws JSONException {
         JSONObject jsonExtras = getData(intent);
-        return jsonExtras.optString(PUSH_PARAM_GROUP);
+        return jsonExtras.optString(PUSH_PARAM_GROUP_ID);
     }
 
     private boolean isInPurchaseGroup(@NonNull User currentUser, String purchaseGroupId) {
