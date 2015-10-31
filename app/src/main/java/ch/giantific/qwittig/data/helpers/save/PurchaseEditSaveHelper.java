@@ -50,8 +50,8 @@ public class PurchaseEditSaveHelper extends PurchaseSaveHelper implements
      */
     @SuppressLint("ValidFragment")
     public PurchaseEditSaveHelper(@NonNull Purchase purchase, boolean isDraft,
-                                  @Nullable ParseFile receiptParseFileOld, @NonNull String note) {
-        this(purchase, isDraft, receiptParseFileOld, "", note);
+                                  @Nullable ParseFile receiptParseFileOld) {
+        this(purchase, isDraft, receiptParseFileOld, "");
 
         mDeleteOldReceipt = true;
     }
@@ -73,8 +73,8 @@ public class PurchaseEditSaveHelper extends PurchaseSaveHelper implements
     @SuppressLint("ValidFragment")
     public PurchaseEditSaveHelper(@NonNull Purchase purchase, boolean isDraft,
                                   @Nullable ParseFile receiptParseFileOld,
-                                  @Nullable String receiptNewPath, @NonNull String note) {
-        super(purchase, receiptNewPath, note);
+                                  @Nullable String receiptNewPath) {
+        super(purchase, receiptNewPath);
 
         mReceiptParseFileOld = receiptParseFileOld;
         mIsDraft = isDraft;

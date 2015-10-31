@@ -288,6 +288,11 @@ public class PurchaseEditFragment extends PurchaseBaseFragment {
         mPurchase.setTotalPrice(mTotalPrice);
         mPurchase.setCurrency(mCurrencySelected);
         mPurchase.setExchangeRate(mExchangeRate);
+        if (TextUtils.isEmpty(mNote)) {
+            mPurchase.removeNote();
+        } else {
+            mPurchase.setNote(mNote);
+        }
     }
 
     private void resetReadBy() {
@@ -304,10 +309,10 @@ public class PurchaseEditFragment extends PurchaseBaseFragment {
         if (purchaseEditSaveHelper == null) {
             if (mDeleteOldReceipt) {
                 purchaseEditSaveHelper = new PurchaseEditSaveHelper(mPurchase, isDraft(),
-                        getOldReceiptFile(), mNote);
+                        getOldReceiptFile());
             } else {
                 purchaseEditSaveHelper = new PurchaseEditSaveHelper(mPurchase, isDraft(),
-                        getOldReceiptFile(), mReceiptImagePath, mNote);
+                        getOldReceiptFile(), mReceiptImagePath);
             }
 
             fragmentManager.beginTransaction()

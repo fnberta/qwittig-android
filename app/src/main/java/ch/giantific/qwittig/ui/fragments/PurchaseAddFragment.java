@@ -113,13 +113,12 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
      */
     @Override
     protected void setPurchase() {
-        createNewPurchase();
-    }
-
-    private void createNewPurchase() {
         List<ParseUser> purchaseUsersInvolved = getParseUsersInvolvedFromBoolean(mPurchaseUsersInvolved);
         mPurchase = new Purchase(mCurrentGroup, mDateSelected, mStoreSelected,
                 mItems, mTotalPrice, purchaseUsersInvolved, mCurrencySelected, mExchangeRate);
+        if (!TextUtils.isEmpty(mNote)) {
+            mPurchase.setNote(mNote);
+        }
 
         savePurchaseWithHelper();
     }
@@ -131,7 +130,7 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
         if (purchaseSaveHelper == null) {
-            purchaseSaveHelper = new PurchaseSaveHelper(mPurchase, mReceiptImagePath, mNote);
+            purchaseSaveHelper = new PurchaseSaveHelper(mPurchase, mReceiptImagePath);
 
             fragmentManager.beginTransaction()
                     .add(purchaseSaveHelper, PURCHASE_SAVE_HELPER)
