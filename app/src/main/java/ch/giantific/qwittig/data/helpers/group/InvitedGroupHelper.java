@@ -38,6 +38,7 @@ public class InvitedGroupHelper extends BaseHelper implements
     private HelperInteractionListener mListener;
     private String mGroupId;
     private CloudCodeClient mCloudCode;
+    private User mCurrentUser;
 
     public InvitedGroupHelper() {
         // empty default constructor
@@ -87,6 +88,7 @@ public class InvitedGroupHelper extends BaseHelper implements
             return;
         }
 
+        mCurrentUser = (User) ParseUser.getCurrentUser();
         mCloudCode = new CloudCodeClient();
         mCloudCode.addUserToGroupRole(mGroupId, this);
     }
@@ -110,8 +112,7 @@ public class InvitedGroupHelper extends BaseHelper implements
 
     @Override
     public void onGroupOnlineLoaded(@NonNull Group group) {
-        User currentUser = (User) ParseUser.getCurrentUser();
-        if (currentUser != null && group.getUsersInvited().contains(currentUser.getUsername())) {
+        if (group.getUsersInvited().contains(mCurrentUser.getUsername())) {
             if (mListener != null) {
                 mListener.onInvitedGroupQueried(group);
             }
@@ -139,18 +140,17 @@ public class InvitedGroupHelper extends BaseHelper implements
      * @param invitedGroup the group the user wants to join
      */
     public void joinInvitedGroup(final ParseObject invitedGroup) {
-        final User currentUser = (User) ParseUser.getCurrentUser();
-        final Group currentGroup = currentUser.getCurrentGroup();
+        final Group currentGroup = mCurrentUser.getCurrentGroup();
         // user needs to be saved before group, otherwise check in CloudCode will fail and user
         // will be removed from group Role!
-        currentUser.addGroup(invitedGroup);
-        currentUser.setCurrentGroup(invitedGroup);
-        currentUser.saveInBackground(new SaveCallback() {
+        mCurrentUser.addGroup(invitedGroup);
+        mCurrentUser.setCurrentGroup(invitedGroup);
+        mCurrentUser.saveInBackground(new SaveCallback() {
             @Override
             public void done(@Nullable ParseException e) {
                 if (e != null) {
-                    currentUser.removeGroup(invitedGroup);
-                    currentUser.setCurrentGroup(currentGroup);
+                    mCurrentUser.removeGroup(invitedGroup);
+                    mCurrentUser.setCurrentGroup(currentGroup);
 
                     if (mListener != null) {
                         mListener.onUserJoinGroupFailed(e.getCode());
