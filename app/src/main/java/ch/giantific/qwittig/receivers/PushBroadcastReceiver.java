@@ -65,10 +65,10 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     public static final String PUSH_PARAM_BUYER_ID = "buyerId";
     public static final String PUSH_PARAM_INITIATOR_ID = "initiatorId";
     public static final String PUSH_PARAM_TASK_ID = "taskId";
+    public static final String PUSH_PARAM_USERS_INVOLVED_IDS = "usersInvolvedIds";
     public static final String PUSH_PARAM_USER = "user";
     public static final String PUSH_PARAM_AMOUNT = "amount";
     public static final String PUSH_PARAM_STORE = "store";
-    public static final String PUSH_PARAM_USERS_INVOLVED = "usersInvolved";
     public static final String PUSH_PARAM_GROUP_NAME = "groupName";
     public static final String PUSH_PARAM_CURRENCY_CODE = "currencyCode";
     public static final String PUSH_PARAM_TASK_TITLE = "taskTitle";
@@ -446,7 +446,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     }
 
     private boolean userIsInUsersInvolved(@NonNull JSONObject jsonExtras) {
-        JSONArray usersInvolvedIds = jsonExtras.optJSONArray(PUSH_PARAM_USERS_INVOLVED);
+        JSONArray usersInvolvedIds = jsonExtras.optJSONArray(PUSH_PARAM_USERS_INVOLVED_IDS);
         return usersInvolvedIds.toString().contains(ParseUser.getCurrentUser().getObjectId());
     }
 
