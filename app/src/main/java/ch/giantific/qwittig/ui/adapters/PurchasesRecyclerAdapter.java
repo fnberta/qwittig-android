@@ -68,28 +68,6 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
         mPurchases = purchases;
     }
 
-    /**
-     * Returns the current user's share of the specified purchase.
-     *
-     * @param purchase the purchase to calculate the share for
-     * @return the current user's share of the specified purchase
-     */
-    public static double calculateMyShare(@NonNull Purchase purchase) {
-        double myShare = 0;
-        double exchangeRate = purchase.getExchangeRate();
-        User currentUser = (User) ParseUser.getCurrentUser();
-        List<ParseObject> items = purchase.getItems();
-        for (ParseObject parseObject : items) {
-            Item item = (Item) parseObject;
-            List<ParseUser> usersInvolved = item.getUsersInvolved();
-            if (usersInvolved.contains(currentUser)) {
-                myShare += (item.getPrice() * exchangeRate / usersInvolved.size());
-            }
-        }
-
-        return myShare;
-    }
-
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -138,7 +116,7 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
 
                 double totalPrice = purchase.getTotalPrice();
                 purchaseRow.setTotal(MoneyUtils.formatMoneyNoSymbol(totalPrice, mCurrentGroupCurrency));
-                double myShare = calculateMyShare(purchase);
+                double myShare = purchase.calculateUserShare(currentUser);
                 purchaseRow.setMyShare(MoneyUtils.formatMoneyNoSymbol(myShare, mCurrentGroupCurrency));
 
                 if (!purchase.currentUserHasReadPurchase()) {

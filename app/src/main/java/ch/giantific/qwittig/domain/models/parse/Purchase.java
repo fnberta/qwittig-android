@@ -358,5 +358,26 @@ public class Purchase extends ParseObject {
 
         return totalPrice / getExchangeRate();
     }
+
+    /**
+     * Returns a user's share from the purchase.
+     *
+     * @param user the user to calculate the share for
+     * @return the share of the user
+     */
+    public double calculateUserShare(@NonNull ParseUser user) {
+        double userShare = 0;
+        double exchangeRate = getExchangeRate();
+        List<ParseObject> items = getItems();
+        for (ParseObject parseObject : items) {
+            Item item = (Item) parseObject;
+            List<ParseUser> usersInvolved = item.getUsersInvolved();
+            if (usersInvolved.contains(user)) {
+                userShare += (item.getPrice() * exchangeRate / usersInvolved.size());
+            }
+        }
+
+        return userShare;
+    }
 }
 

@@ -156,7 +156,7 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
             case TYPE_MY_SHARE: {
                 MyShareRow myShareRow = (MyShareRow) viewHolder;
 
-                double myShare = PurchasesRecyclerAdapter.calculateMyShare(mPurchase);
+                double myShare = mPurchase.calculateUserShare(ParseUser.getCurrentUser());
                 myShareRow.setMyShare(myShare, mPurchase.getTotalPrice(), mCurrentGroupCurrency);
                 myShareRow.setMyShareForeign(myShare, mPurchase.getExchangeRate(),
                         mCurrentGroupCurrency, mPurchase.getCurrency());
