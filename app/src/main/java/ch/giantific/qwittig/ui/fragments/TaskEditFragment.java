@@ -8,16 +8,16 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.util.Date;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.TaskUser;
-import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.data.parse.models.Task;
+import ch.giantific.qwittig.domain.models.TaskUser;
+import ch.giantific.qwittig.domain.models.parse.Task;
+import ch.giantific.qwittig.data.repositories.ParseTaskRepository;
+import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.utils.DateUtils;
 
 /**
@@ -25,7 +25,8 @@ import ch.giantific.qwittig.utils.DateUtils;
  * <p/>
  * Subclass of {@link TaskAddFragment}.
  */
-public class TaskEditFragment extends TaskAddFragment {
+public class TaskEditFragment extends TaskAddFragment implements
+        TaskRepository.GetTaskLocalListener {
 
     private static final String BUNDLE_EDIT_TASK_ID = "BUNDLE_EDIT_TASK_ID";
     private static final String STATE_ITEMS_SET = "STATE_ITEMS_SET";
@@ -46,6 +47,7 @@ public class TaskEditFragment extends TaskAddFragment {
 
     /**
      * Returns a new instance of {@link TaskEditFragment}.
+     *
      * @param taskId the object id of the task to edit
      * @return a new instance of {@link TaskEditFragment}
      */
@@ -93,18 +95,19 @@ public class TaskEditFragment extends TaskAddFragment {
     }
 
     private void fetchOldTask() {
-        LocalQuery.fetchObjectFromId(Task.CLASS, mEditTaskId, new LocalQuery.ObjectLocalFetchListener() {
-            @Override
-            public void onObjectFetched(@NonNull ParseObject object) {
-                mEditTask = (Task) object;
+        TaskRepository repo = new ParseTaskRepository();
+        repo.fetchTaskDataLocalAsync(mEditTaskId, this);
+    }
 
-                if (!mOldValuesSet) {
-                    restoreOldValues();
-                }
+    @Override
+    public void onTaskLocalLoaded(@NonNull Task task) {
+        mEditTask = task;
 
-                queryUsers();
-            }
-        });
+        if (!mOldValuesSet) {
+            restoreOldValues();
+        }
+
+        queryUsers();
     }
 
     private void restoreOldValues() {

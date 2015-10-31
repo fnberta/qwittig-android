@@ -22,7 +22,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
@@ -33,11 +32,14 @@ import java.util.Map;
 import java.util.Set;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.TaskHistory;
-import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.data.parse.models.Group;
-import ch.giantific.qwittig.data.parse.models.Task;
-import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.domain.models.TaskHistory;
+import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.Task;
+import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.data.repositories.ParseTaskRepository;
+import ch.giantific.qwittig.data.repositories.ParseUserRepository;
+import ch.giantific.qwittig.domain.repositories.TaskRepository;
+import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.ui.activities.BaseActivity;
 import ch.giantific.qwittig.ui.activities.TaskDetailsActivity;
 import ch.giantific.qwittig.ui.activities.TaskEditActivity;
@@ -53,8 +55,8 @@ import ch.giantific.qwittig.utils.ParseUtils;
  * Subclass of {@link BaseFragment}.
  */
 public class TaskDetailsFragment extends BaseFragment implements
-        LocalQuery.ObjectLocalFetchListener,
-        LocalQuery.UserLocalQueryListener {
+        TaskRepository.GetTaskLocalListener,
+        UserRepository.GetUsersLocalListener {
 
     private static final String BUNDLE_TASK_ID = "BUNDLE_TASK_ID";
     private FragmentInteractionListener mListener;
@@ -68,6 +70,8 @@ public class TaskDetailsFragment extends BaseFragment implements
     private TaskHistoryRecyclerAdapter mRecyclerAdapter;
     private View mEmptyView;
     private ProgressBar mProgressBar;
+    private TaskRepository mTaskRepo;
+    private UserRepository mUserRepo;
 
     public TaskDetailsFragment() {
     }
@@ -103,6 +107,9 @@ public class TaskDetailsFragment extends BaseFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mTaskRepo = new ParseTaskRepository();
+        mUserRepo = new ParseUserRepository();
 
         Bundle args = getArguments();
         if (args != null) {
@@ -153,12 +160,12 @@ public class TaskDetailsFragment extends BaseFragment implements
      * for the pointers.
      */
     public void queryData() {
-        LocalQuery.queryTask(mTaskId, this);
+        mTaskRepo.getTaskLocalAsync(mTaskId, this);
     }
 
     @Override
-    public void onObjectFetched(@NonNull ParseObject object) {
-        mTask = (Task) object;
+    public void onTaskLocalLoaded(@NonNull Task task) {
+        mTask = task;
 
         updateToolbarHeader();
         updateToolbarMenu();
@@ -167,11 +174,11 @@ public class TaskDetailsFragment extends BaseFragment implements
     }
 
     private void queryUsers() {
-        LocalQuery.queryUsers(this);
+        mUserRepo.getUsersLocalAsync(mCurrentGroup, this);
     }
 
     @Override
-    public void onUsersLocalQueried(@NonNull List<ParseUser> users) {
+    public void onUsersLocalLoaded(@NonNull List<ParseUser> users) {
         mTaskHistory.clear();
 
         Map<String, List<Date>> taskHistory = mTask.getHistory();
@@ -323,14 +330,12 @@ public class TaskDetailsFragment extends BaseFragment implements
             return;
         }
 
-        TasksFragment.setTaskDeadline(mTask, timeFrame);
-
-        List<ParseUser> usersInvolved = mTask.getUsersInvolved();
-        Collections.rotate(usersInvolved, -1);
-
+        if (!timeFrame.equals(Task.TIME_FRAME_AS_NEEDED)) {
+            mTask.updateDeadline(timeFrame);
+        }
         mTask.addHistoryEvent();
-
         mTask.saveEventually();
+
         updateToolbarHeader();
         queryUsers();
     }

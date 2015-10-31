@@ -19,9 +19,9 @@ import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
 
-import ch.giantific.qwittig.data.parse.models.Config;
-import ch.giantific.qwittig.data.parse.models.Group;
-import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.domain.models.parse.Config;
+import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.User;
 
 /**
  * Provides useful static utility methods related to the Parse.com framework.
@@ -114,22 +114,22 @@ public class ParseUtils {
 
     /**
      * Returns the currently supported currencies as
-     * {@link ch.giantific.qwittig.data.models.Currency} objects with a name and currency code.
+     * {@link ch.giantific.qwittig.domain.models.Currency} objects with a name and currency code.
      * Reads the information from {@link ParseConfig}.
      *
      * @return the currently supported currencies
      */
     @NonNull
-    public static List<ch.giantific.qwittig.data.models.Currency> getSupportedCurrencies() {
+    public static List<ch.giantific.qwittig.domain.models.Currency> getSupportedCurrencies() {
         ParseConfig config = ParseConfig.getCurrentConfig();
         List<String> currencyCodes = config.getList(Config.SUPPORTED_CURRENCIES);
         List<String> currencyNames = MoneyUtils.getCurrencyDisplayNames(currencyCodes);
 
         int currencyNamesLength = currencyNames.size();
-        List<ch.giantific.qwittig.data.models.Currency> currencies =
+        List<ch.giantific.qwittig.domain.models.Currency> currencies =
                 new ArrayList<>(currencyNamesLength);
         for (int i = 0; i < currencyNamesLength; i++) {
-            currencies.add(new ch.giantific.qwittig.data.models.Currency(currencyNames.get(i),
+            currencies.add(new ch.giantific.qwittig.domain.models.Currency(currencyNames.get(i),
                     currencyCodes.get(i)));
         }
 

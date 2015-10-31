@@ -20,11 +20,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
 
-import com.parse.ParseException;
-
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.helpers.TaskQueryHelper;
-import ch.giantific.qwittig.helpers.TaskRemindHelper;
+import ch.giantific.qwittig.data.helpers.query.TaskQueryHelper;
+import ch.giantific.qwittig.data.helpers.reminder.TaskRemindHelper;
 import ch.giantific.qwittig.ui.adapters.StringResSpinnerAdapter;
 import ch.giantific.qwittig.ui.fragments.TasksFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupCreateDialogFragment;
@@ -188,20 +186,15 @@ public class TasksActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onTasksPinFailed(@NonNull ParseException e) {
-        mTaskFragment.onTasksPinFailed(e);
+    public void onTasksUpdated() {
+        super.onTasksUpdated();
+
+        mTaskFragment.onTasksUpdated();
     }
 
     @Override
-    public void onTasksPinned() {
-        super.onTasksPinned();
-
-        mTaskFragment.onTasksPinned();
-    }
-
-    @Override
-    public void onAllTasksQueried() {
-        mTaskFragment.onAllTasksQueried();
+    public void onTasksUpdatedFailed(int errorCode) {
+        mTaskFragment.onTasksUpdatedFailed(errorCode);
     }
 
     @Override
@@ -210,8 +203,8 @@ public class TasksActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onUserRemindFailed(@NonNull String taskId, @NonNull ParseException e) {
-        mTaskFragment.onUserRemindFailed(taskId, e);
+    public void onUserRemindFailed(@NonNull String taskId, int errorCode) {
+        mTaskFragment.onUserRemindFailed(taskId, errorCode);
     }
 
     @Override

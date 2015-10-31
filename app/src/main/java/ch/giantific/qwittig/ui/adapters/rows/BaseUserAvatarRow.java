@@ -20,7 +20,7 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.Avatar;
+import ch.giantific.qwittig.domain.models.Avatar;
 
 /**
  * Provides an abstract base class for a {@link RecyclerView} row with a user's avatar and nickname.

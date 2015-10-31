@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.domain.models.parse.User;
 
 /**
  * Provides a dialog that allows the user to make the store selection for a purchase by either

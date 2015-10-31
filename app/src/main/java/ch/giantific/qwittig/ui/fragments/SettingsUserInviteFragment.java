@@ -24,24 +24,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.data.parse.models.Group;
-import ch.giantific.qwittig.data.parse.models.User;
-import ch.giantific.qwittig.helpers.InviteUsersHelper;
+import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.data.repositories.ParseUserRepository;
+import ch.giantific.qwittig.data.helpers.group.InviteUsersHelper;
+import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
-import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
  * Displays the user invite screen, where the user can invite new users to the group and sees
  * everybody that is currently invited but has not yet accepted/declined the invitation.
- *
+ * <p/>
  * Subclass of {@link SettingsBaseInviteFragment}.
  */
 public class SettingsUserInviteFragment extends SettingsBaseInviteFragment implements
-        LocalQuery.UserLocalQueryListener {
+        UserRepository.GetUsersLocalListener {
 
     private static final String INVITE_HELPER = "INVITE_HELPER";
     private static final String LOG_TAG = SettingsUserInviteFragment.class.getSimpleName();
@@ -184,7 +184,8 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
             return;
         }
 
-        LocalQuery.queryUsers(this);
+        UserRepository repo = new ParseUserRepository();
+        repo.getUsersLocalAsync(mCurrentGroup, this);
     }
 
     private boolean allEmailsAreNotAlreadyInvited() {
@@ -205,7 +206,7 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
     }
 
     @Override
-    public void onUsersLocalQueried(@NonNull List<ParseUser> users) {
+    public void onUsersLocalLoaded(@NonNull List<ParseUser> users) {
         if (allEmailsAreNotAlreadyInGroup(users)) {
             inviteNewUsers();
         }
@@ -259,12 +260,10 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
      * Passes the {@link ParseException} to the generic error handler, shows the user an error
      * message and removes the retained helper fragment and loading indicators.
      *
-     * @param e the {@link ParseException} thrown in the process
+     * @param errorCode the error Code thrown in the process
      */
-    public void onInviteUsersFailed(@NonNull ParseException e) {
-        ParseErrorHandler.handleParseError(getActivity(), e);
-        onParseError(ParseErrorHandler.getErrorMessage(getActivity(), e));
-        HelperUtils.removeHelper(getFragmentManager(), INVITE_HELPER);
+    public void onInviteUsersFailed(int errorCode) {
+        onInviteError(errorCode, INVITE_HELPER);
     }
 
     /**

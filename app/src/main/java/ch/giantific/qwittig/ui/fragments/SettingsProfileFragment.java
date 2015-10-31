@@ -24,8 +24,8 @@ import com.parse.ParseUser;
 import java.util.Arrays;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.Avatar;
-import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.domain.models.Avatar;
+import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.ui.activities.SettingsProfileActivity;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;

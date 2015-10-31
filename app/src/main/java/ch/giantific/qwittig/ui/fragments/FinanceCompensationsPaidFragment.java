@@ -17,20 +17,19 @@ import android.view.ViewGroup;
 
 import com.mugen.Mugen;
 import com.mugen.MugenCallbacks;
-import com.parse.ParseException;
 import com.parse.ParseObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.data.parse.models.Compensation;
-import ch.giantific.qwittig.helpers.MoreQueryHelper;
+import ch.giantific.qwittig.domain.models.parse.Compensation;
+import ch.giantific.qwittig.data.helpers.query.MoreQueryHelper;
+import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.ui.adapters.CompensationsPaidRecyclerAdapter;
 import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
-import ch.giantific.qwittig.utils.ParseErrorHandler;
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -40,9 +39,9 @@ import ch.giantific.qwittig.utils.Utils;
  * Subclass of {@link FinanceCompensationsBaseFragment}.
  */
 public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFragment implements
-        LocalQuery.CompensationLocalQueryListener {
+        CompensationRepository.GetCompensationsLocalListener {
 
-    private static final String COMPENSATION_QUERY_HELPER = "COMPENSATION_QUERY_HELPER";
+    private static final String COMPENSATION_PAID_QUERY_HELPER = "COMPENSATION_PAID_QUERY_HELPER";
     private static final String STATE_IS_LOADING_MORE = "STATE_IS_LOADING_MORE";
     private static final String LOG_TAG = FinanceCompensationsPaidFragment.class.getSimpleName();
     private CompensationsPaidRecyclerAdapter mRecyclerAdapter;
@@ -104,7 +103,7 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
     @NonNull
     @Override
     protected String getQueryHelperTag() {
-        return COMPENSATION_QUERY_HELPER;
+        return COMPENSATION_PAID_QUERY_HELPER;
     }
 
     @Override
@@ -116,11 +115,11 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
     public void updateAdapter() {
         super.updateAdapter();
 
-        LocalQuery.queryCompensationsPaid(this);
+        mCompsRepo.getCompensationsLocalPaidAsync(mCurrentUser, mCurrentGroup, this);
     }
 
     @Override
-    public void onCompensationsLocalQueried(@NonNull List<ParseObject> compensations) {
+    public void onCompensationsLocalLoaded(@NonNull List<ParseObject> compensations) {
         mCompensations.clear();
         mCompensations.addAll(compensations);
 
@@ -146,6 +145,14 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
         } else {
             mEmptyView.setVisibility(View.GONE);
         }
+    }
+
+    /**
+     * Removes the retained helper fragment and and loading indicators.
+     */
+    public void onAllCompensationsUpdated() {
+        HelperUtils.removeHelper(getFragmentManager(), COMPENSATION_PAID_QUERY_HELPER);
+        setLoading(false);
     }
 
     private void loadMoreData() {
@@ -176,7 +183,7 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
      *
      * @param compensations the newly pinned compensations
      */
-    public void onMoreObjectsPinned(@NonNull List<ParseObject> compensations) {
+    public void onMoreObjectsLoaded(@NonNull List<ParseObject> compensations) {
         HelperUtils.removeHelper(getFragmentManager(), MoreQueryHelper.MORE_QUERY_HELPER);
 
         mIsLoadingMore = false;
@@ -185,14 +192,14 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
     }
 
     /**
-     * Passes the {@link ParseException} to the generic error handler, showing the user an error
-     * message and removing the retained helper fragment and loading indicators.
+     * Passes the error code to the generic error handler, shows the user an error message and
+     * removes the retained helper fragment and loading indicators.
      *
-     * @param e the {@link ParseException} thrown during the process
+     * @param errorCode the error code of the exception thrown during the process
      */
-    public void onMoreObjectsPinFailed(@NonNull ParseException e) {
-        ParseErrorHandler.handleParseError(getActivity(), e);
-        showLoadMoreErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
+    public void onMoreObjectsLoadFailed(int errorCode) {
+        ParseErrorHandler.handleParseError(getActivity(), errorCode);
+        showLoadMoreErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), errorCode));
         HelperUtils.removeHelper(getFragmentManager(), MoreQueryHelper.MORE_QUERY_HELPER);
 
         mIsLoadingMore = false;

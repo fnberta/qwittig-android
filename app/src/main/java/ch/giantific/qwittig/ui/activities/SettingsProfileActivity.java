@@ -29,8 +29,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.Avatar;
-import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.domain.models.Avatar;
+import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.ui.fragments.SettingsProfileFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.DiscardChangesDialogFragment;
 

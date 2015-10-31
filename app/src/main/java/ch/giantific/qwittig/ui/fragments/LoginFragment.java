@@ -30,14 +30,14 @@ import com.parse.ParseException;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.models.Config;
-import ch.giantific.qwittig.data.parse.models.User;
-import ch.giantific.qwittig.helpers.LoginHelper;
+import ch.giantific.qwittig.domain.models.parse.Config;
+import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.data.helpers.account.LoginHelper;
 import ch.giantific.qwittig.ui.activities.LoginActivity;
 import ch.giantific.qwittig.ui.fragments.dialogs.ResetPasswordDialogFragment;
 import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
-import ch.giantific.qwittig.utils.ParseErrorHandler;
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
@@ -179,7 +179,7 @@ public class LoginFragment extends LoginBaseFragment {
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
         if (loginHelper == null) {
-            loginHelper = LoginHelper.newInstance(email, password);
+            loginHelper = LoginHelper.newInstanceLogin(email, password);
 
             fragmentManager.beginTransaction()
                     .add(loginHelper, LOGIN_HELPER)
@@ -217,8 +217,7 @@ public class LoginFragment extends LoginBaseFragment {
         if (!TextUtils.isEmpty(testUsersPassword)) {
             logInUserToParseWithHelper(User.USERNAME_PREFIX_TEST + testUserNumber, testUsersPassword);
         } else {
-            ParseErrorHandler.handleParseError(getActivity(),
-                    new ParseException(ParseException.CONNECTION_FAILED, ""));
+            ParseErrorHandler.handleParseError(getActivity(), ParseException.CONNECTION_FAILED);
         }
     }
 
@@ -255,7 +254,7 @@ public class LoginFragment extends LoginBaseFragment {
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
         if (loginHelper == null) {
-            loginHelper = LoginHelper.newInstance(email);
+            loginHelper = LoginHelper.newInstanceResetPassword(email);
             fragmentManager.beginTransaction()
                     .add(loginHelper, LOGIN_HELPER)
                     .commit();

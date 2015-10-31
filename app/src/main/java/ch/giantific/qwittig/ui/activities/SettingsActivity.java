@@ -6,16 +6,11 @@ package ch.giantific.qwittig.ui.activities;
 
 import android.app.FragmentManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.view.Menu;
-import android.view.MenuItem;
-
-import com.parse.ParseException;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.helpers.DeleteAccountHelper;
-import ch.giantific.qwittig.helpers.LogoutHelper;
+import ch.giantific.qwittig.data.helpers.account.DeleteAccountHelper;
+import ch.giantific.qwittig.data.helpers.account.LogoutHelper;
 import ch.giantific.qwittig.ui.fragments.SettingsFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.AccountDeleteDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupLeaveBalanceNotZeroDialogFragment;
@@ -82,8 +77,8 @@ public class SettingsActivity extends BaseActivity implements
     }
 
     @Override
-    public void onLogoutFailed(@NonNull ParseException e) {
-        mSettingsFragment.onLogoutFailed(e);
+    public void onLogoutFailed(int errorCode) {
+        mSettingsFragment.onLogoutFailed(errorCode);
     }
 
     @Override
@@ -92,7 +87,7 @@ public class SettingsActivity extends BaseActivity implements
     }
 
     @Override
-    public void onDeleteUserFailed(@NonNull ParseException e) {
-        mSettingsFragment.onDeleteUserFailed(e);
+    public void onDeleteUserFailed(int errorCode) {
+        mSettingsFragment.onDeleteUserFailed(errorCode);
     }
 }

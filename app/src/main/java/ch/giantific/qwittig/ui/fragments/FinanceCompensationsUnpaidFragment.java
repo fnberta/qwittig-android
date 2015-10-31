@@ -7,6 +7,7 @@ package ch.giantific.qwittig.ui.fragments;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Build;
@@ -24,7 +25,6 @@ import android.widget.TextView;
 
 import com.github.jorgecastilloprz.FABProgressCircle;
 import com.github.jorgecastilloprz.listeners.FABProgressListener;
-import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
@@ -34,18 +34,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.data.parse.models.Compensation;
-import ch.giantific.qwittig.data.parse.models.User;
-import ch.giantific.qwittig.helpers.CompensationRemindHelper;
-import ch.giantific.qwittig.helpers.CompensationSaveHelper;
-import ch.giantific.qwittig.helpers.SettlementHelper;
+import ch.giantific.qwittig.domain.models.parse.Compensation;
+import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.data.repositories.ParseUserRepository;
+import ch.giantific.qwittig.data.helpers.reminder.CompensationRemindHelper;
+import ch.giantific.qwittig.data.helpers.save.CompensationSaveHelper;
+import ch.giantific.qwittig.data.helpers.group.SettlementHelper;
+import ch.giantific.qwittig.domain.repositories.CompensationRepository;
+import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.ui.adapters.CompensationsUnpaidRecyclerAdapter;
 import ch.giantific.qwittig.ui.fragments.dialogs.CompensationChangeAmountDialogFragment;
 import ch.giantific.qwittig.utils.AnimUtils;
 import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
-import ch.giantific.qwittig.utils.ParseErrorHandler;
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -59,14 +61,14 @@ import ch.giantific.qwittig.utils.Utils;
  */
 public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBaseFragment implements
         CompensationsUnpaidRecyclerAdapter.AdapterInteractionListener,
-        LocalQuery.CompensationLocalQueryListener,
+        CompensationRepository.GetCompensationsLocalListener,
         FABProgressListener {
 
     private static final String SETTLEMENT_HELPER = "SETTLEMENT_HELPER";
     private static final String BUNDLE_AUTO_START_NEW = "BUNDLE_AUTO_START_NEW";
     private static final String STATE_COMPENSATIONS_LOADING = "STATE_COMPENSATIONS_LOADING";
     private static final String STATE_IS_CALCULATING_NEW = "STATE_IS_CALCULATING_NEW";
-    private static final String COMPENSATION_QUERY_HELPER = "COMPENSATION_QUERY_HELPER";
+    private static final String COMPENSATION_UNPAID_QUERY_HELPER = "COMPENSATION_UNPAID_QUERY_HELPER";
     private static final String COMPENSATION_SAVE_HELPER = "COMPENSATION_SAVE_HELPER_";
     private static final String COMPENSATION_REMIND_HELPER = "COMPENSATION_REMIND_HELPER_";
     private static final String LOG_TAG = FinanceCompensationsUnpaidFragment.class.getSimpleName();
@@ -74,6 +76,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     private TextView mTextViewEmptySubtitle;
     private FABProgressCircle mFabProgressCircle;
     private FloatingActionButton mFabNew;
+    private UserRepository mUserRepo;
     private CompensationsUnpaidRecyclerAdapter mRecyclerAdapter;
     @NonNull
     private List<ParseObject> mCompensations = new ArrayList<>();
@@ -106,8 +109,11 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments() != null) {
-            mAutoStartNew = getArguments().getBoolean(BUNDLE_AUTO_START_NEW);
+        mUserRepo = new ParseUserRepository();
+
+        Bundle args = getArguments();
+        if (args != null) {
+            mAutoStartNew = args.getBoolean(BUNDLE_AUTO_START_NEW);
         }
 
         if (savedInstanceState != null) {
@@ -160,7 +166,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     @NonNull
     @Override
     protected String getQueryHelperTag() {
-        return COMPENSATION_QUERY_HELPER;
+        return COMPENSATION_UNPAID_QUERY_HELPER;
     }
 
     @Override
@@ -169,14 +175,22 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     }
 
     @Override
-    public void updateAdapter() {
-        super.updateAdapter();
+    public void onCompensationsUpdated() {
+        super.onCompensationsUpdated();
 
-        LocalQuery.queryCompensationsUnpaid(this);
+        HelperUtils.removeHelper(getFragmentManager(), COMPENSATION_UNPAID_QUERY_HELPER);
+        setLoading(false);
     }
 
     @Override
-    public void onCompensationsLocalQueried(@NonNull List<ParseObject> compensations) {
+    public void updateAdapter() {
+        super.updateAdapter();
+
+        mCompsRepo.getCompensationsLocalUnpaidAsync(mCurrentGroup, this);
+    }
+
+    @Override
+    public void onCompensationsLocalLoaded(@NonNull List<ParseObject> compensations) {
         mCompensationsAll = compensations;
         updateCompensations(compensations);
 
@@ -295,9 +309,9 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
             return;
         }
 
-        LocalQuery.queryUsers(new LocalQuery.UserLocalQueryListener() {
+        mUserRepo.getUsersLocalAsync(mCurrentGroup, new UserRepository.GetUsersLocalListener() {
             @Override
-            public void onUsersLocalQueried(@NonNull List<ParseUser> users) {
+            public void onUsersLocalLoaded(@NonNull List<ParseUser> users) {
                 if (users.size() > 1) { // size = 1 would mean current user is the only one in the group
                     if (mCompensationsAll.isEmpty()) {
                         mIsCalculatingNew = true;
@@ -332,22 +346,21 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
 
     /**
      * Removes the retained helper fragment after a new settlement was created.
-     *
-     * @param result the result returned from the cloud code call
      */
-    public void onNewSettlementCreated(Object result) {
+    public void onNewSettlementCreated() {
         HelperUtils.removeHelper(getFragmentManager(), SETTLEMENT_HELPER);
     }
 
     /**
-     * Passes the {@link ParseException} to the generic error handler, shows the user an error
-     * message and removes the retained helper fragment and loading indicators.
+     * Passes the error code to the generic error handler, shows the user an error message and
+     * removes the retained helper fragment and loading indicators.
      *
-     * @param e the {@link ParseException} thrown in the process
+     * @param errorCode the error code of the exception thrown in the process
      */
-    public void onNewSettlementCreationFailed(ParseException e) {
-        ParseErrorHandler.handleParseError(getActivity(), e);
-        showSettlementErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
+    public void onNewSettlementCreationFailed(int errorCode) {
+        final Activity context = getActivity();
+        ParseErrorHandler.handleParseError(context, errorCode);
+        showSettlementErrorSnackbar(ParseErrorHandler.getErrorMessage(context, errorCode));
         HelperUtils.removeHelper(getFragmentManager(), SETTLEMENT_HELPER);
 
         mFabProgressCircle.hide();
@@ -441,16 +454,17 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     }
 
     /**
-     * Passes the {@link ParseException} to the generic error handler, shows the user an error
-     * message and removes the retained helper fragment and loading indicators. Also removes the
-     * compensation from the list of loading compensations.
+     * Passes the error code to the generic error handler, shows the user an error message and
+     * removes the retained helper fragment and loading indicators. Also removes the compensation
+     * from the list of loading compensations.
      *
      * @param compensation the compensation which failed to save
-     * @param e            the {@link ParseException} thrown in the process
+     * @param errorCode    the error code of the exception thrown in the process
      */
-    public void onCompensationSaveFailed(@NonNull ParseObject compensation, ParseException e) {
-        ParseErrorHandler.handleParseError(getActivity(), e);
-        MessageUtils.showBasicSnackbar(mFabNew, ParseErrorHandler.getErrorMessage(getActivity(), e));
+    public void onCompensationSaveFailed(@NonNull ParseObject compensation, int errorCode) {
+        final Activity context = getActivity();
+        ParseErrorHandler.handleParseError(context, errorCode);
+        MessageUtils.showBasicSnackbar(mFabNew, ParseErrorHandler.getErrorMessage(context, errorCode));
         String compensationId = compensation.getObjectId();
         HelperUtils.removeHelper(getFragmentManager(), getSaveHelperTag(compensationId));
 
@@ -563,16 +577,17 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     }
 
     /**
-     * Passes the {@link ParseException} to the generic error handler, shows the user an error
-     * message and removes the retained helper fragment and loading indicators. Also removes the
-     * compensation from the list of loading compensations.
+     * Passes the error code to the generic error handler, shows the user an error message and
+     * removes the retained helper fragment and loading indicators. Also removes the compensation
+     * from the list of loading compensations.
      *
-     * @param remindType remind to pay or remind that paid
-     * @param e          the {@link ParseException} thrown in the process
+     * @param compensationId the object id of the compensation a reminder was sent
+     * @param errorCode      the error code of the exception thrown in the process
      */
-    public void onUserRemindFailed(int remindType, ParseException e, @NonNull String compensationId) {
-        ParseErrorHandler.handleParseError(getActivity(), e);
-        MessageUtils.showBasicSnackbar(mRecyclerView, ParseErrorHandler.getErrorMessage(getActivity(), e));
+    public void onUserRemindFailed(@NonNull String compensationId, int errorCode) {
+        final Activity context = getActivity();
+        ParseErrorHandler.handleParseError(context, errorCode);
+        MessageUtils.showBasicSnackbar(mRecyclerView, ParseErrorHandler.getErrorMessage(context, errorCode));
         HelperUtils.removeHelper(getFragmentManager(), getRemindHelperTag(compensationId));
 
         setCompensationLoading(compensationId, false);

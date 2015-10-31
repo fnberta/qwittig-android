@@ -14,17 +14,15 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
 
-import com.parse.ParseException;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.Month;
-import ch.giantific.qwittig.data.stats.models.Stats;
-import ch.giantific.qwittig.helpers.StatsHelper;
+import ch.giantific.qwittig.domain.models.Month;
+import ch.giantific.qwittig.domain.models.stats.Stats;
+import ch.giantific.qwittig.data.helpers.group.StatsHelper;
 import ch.giantific.qwittig.ui.adapters.StringResSpinnerAdapter;
 import ch.giantific.qwittig.ui.adapters.ThemedArrayAdapter;
 import ch.giantific.qwittig.ui.fragments.StatsBaseFragment;
@@ -275,9 +273,9 @@ public class StatsActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onStatsCalculationFailed(int statsType, @NonNull ParseException e) {
+    public void onStatsCalculationFailed(int statsType, int errorCode) {
         if (mStatsFragment != null) {
-            mStatsFragment.onStatsCalculationFailed(e);
+            mStatsFragment.onStatsCalculationFailed(errorCode);
         }
     }
 

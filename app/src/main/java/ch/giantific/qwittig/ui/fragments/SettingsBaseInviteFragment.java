@@ -4,8 +4,8 @@
 
 package ch.giantific.qwittig.ui.fragments;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
@@ -18,7 +18,9 @@ import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.ui.listeners.SwipeDismissTouchListener;
+import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
@@ -139,10 +141,14 @@ public abstract class SettingsBaseInviteFragment extends BaseFragment {
         return allEmailsAreValid;
     }
 
-    @CallSuper
-    void onParseError(@NonNull String errorMessage) {
+    final void onInviteError(int errorCode, String helperTag) {
+        final Activity context = getActivity();
+        ParseErrorHandler.handleParseError(context, errorCode);
+        HelperUtils.removeHelper(getFragmentManager(), helperTag);
+
         hideProgressCircle();
-        MessageUtils.showBasicSnackbar(mButtonAddUser, errorMessage);
+        MessageUtils.showBasicSnackbar(mButtonAddUser,
+                ParseErrorHandler.getErrorMessage(context, errorCode));
     }
 
     protected abstract void hideProgressCircle();

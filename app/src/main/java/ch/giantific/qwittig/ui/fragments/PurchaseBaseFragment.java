@@ -68,15 +68,16 @@ import java.util.Map;
 
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.ItemRow;
-import ch.giantific.qwittig.data.models.Receipt;
-import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.data.parse.models.Config;
-import ch.giantific.qwittig.data.parse.models.Group;
-import ch.giantific.qwittig.data.parse.models.Item;
-import ch.giantific.qwittig.data.parse.models.Purchase;
-import ch.giantific.qwittig.data.parse.models.User;
-import ch.giantific.qwittig.helpers.RatesHelper;
+import ch.giantific.qwittig.domain.models.ItemRow;
+import ch.giantific.qwittig.domain.models.Receipt;
+import ch.giantific.qwittig.domain.models.parse.Config;
+import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.Item;
+import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.data.repositories.ParseUserRepository;
+import ch.giantific.qwittig.data.helpers.RatesHelper;
+import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.ui.activities.CameraActivity;
 import ch.giantific.qwittig.ui.adapters.PurchaseUsersInvolvedRecyclerAdapter;
 import ch.giantific.qwittig.ui.fragments.dialogs.DatePickerDialogFragment;
@@ -87,12 +88,12 @@ import ch.giantific.qwittig.ui.fragments.dialogs.StoreSelectionDialogFragment;
 import ch.giantific.qwittig.ui.listeners.SwipeDismissTouchListener;
 import ch.giantific.qwittig.ui.widgets.ListCheckBox;
 import ch.giantific.qwittig.utils.CameraUtils;
-import ch.giantific.qwittig.utils.ComparatorParseUserIgnoreCase;
+import ch.giantific.qwittig.ComparatorParseUserIgnoreCase;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
-import ch.giantific.qwittig.utils.ParseErrorHandler;
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -102,8 +103,7 @@ import ch.giantific.qwittig.utils.Utils;
  * Subclass of {@link BaseFragment}.
  */
 public abstract class PurchaseBaseFragment extends BaseFragment implements
-        PurchaseUsersInvolvedRecyclerAdapter.AdapterInteractionListener,
-        LocalQuery.UserLocalQueryListener {
+        PurchaseUsersInvolvedRecyclerAdapter.AdapterInteractionListener {
 
     @IntDef({PURCHASE_SAVED, PURCHASE_SAVED_AUTO, PURCHASE_DISCARDED, PURCHASE_SAVED_AS_DRAFT,
             PURCHASE_DRAFT_DELETED, PURCHASE_ERROR, PURCHASE_NO_CHANGES})
@@ -122,6 +122,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     public static final int RESULT_PURCHASE_ERROR = 5;
     public static final int RESULT_PURCHASE_DISCARDED = 6;
     public static final int RESULT_PURCHASE_DRAFT_DELETED = 7;
+    public static final String PURCHASE_NOTE_FRAGMENT = "PURCHASE_NOTE_FRAGMENT";
     static final String PURCHASE_SAVE_HELPER = "PURCHASE_SAVE_HELPER";
     static final int INTENT_REQUEST_IMAGE_CAPTURE = 1;
     // add permission to manifest when enabling!
@@ -133,7 +134,6 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     private static final String EDIT_NOTE_DIALOG = "EDIT_NOTE_DIALOG";
     private static final String RATES_HELPER = "RATES_HELPER";
     private static final String PURCHASE_RECEIPT_FRAGMENT = "PURCHASE_RECEIPT_FRAGMENT";
-    public static final String PURCHASE_NOTE_FRAGMENT = "PURCHASE_NOTE_FRAGMENT";
     private static final String STATE_ROW_COUNT = "STATE_ROW_COUNT";
     private static final String STATE_STORE_SELECTED = "STATE_STORE_SELECTED";
     private static final String STATE_DATE_SELECTED = "STATE_DATE_SELECTED";
@@ -696,12 +696,13 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     final void fetchUsersAvailable() {
-        LocalQuery.queryUsers(this);
-    }
-
-    @Override
-    public void onUsersLocalQueried(@NonNull List<ParseUser> users) {
-        setupUserLists(users);
+        UserRepository repo = new ParseUserRepository();
+        repo.getUsersLocalAsync(mCurrentGroup, new UserRepository.GetUsersLocalListener() {
+            @Override
+            public void onUsersLocalLoaded(@NonNull List<ParseUser> users) {
+                setupUserLists(users);
+            }
+        });
     }
 
     @CallSuper
@@ -1131,7 +1132,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
                     mListener.showAccountCreateDialog();
                 } else if (!Utils.isConnected(getActivity())) {
                     showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(),
-                            ParseUtils.getNoConnectionException()));
+                            ParseException.CONNECTION_FAILED));
                 } else {
                     mIsSaving = true;
                     mListener.progressCircleShow();
@@ -1195,15 +1196,16 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     protected abstract void setPurchase();
 
     /**
-     * Provides an error handler for {@link ParseException}. Passes the expection to the generic
-     * error handler, shows the user an appropriate error message andhides loading indicators.
+     * Provides an error handler for error codes. Passes the code to the generic error handler,
+     * shows the user an appropriate error message and hides loading indicators.
      *
-     * @param e the {@link ParseException} to handle
+     * @param errorCode the error code of the exception to handle
      */
     @CallSuper
-    public void onParseError(@NonNull ParseException e) {
-        ParseErrorHandler.handleParseError(getActivity(), e);
-        showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
+    public void onSaveError(int errorCode) {
+        final Activity context = getActivity();
+        ParseErrorHandler.handleParseError(context, errorCode);
+        showErrorSnackbar(ParseErrorHandler.getErrorMessage(context, errorCode));
 
         mIsSaving = false;
         mListener.progressCircleHide();
@@ -1228,13 +1230,12 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     /**
-     * Passes the {@link ParseException} to the error handler and removes the retained helper
-     * fragment
+     * Passes the error code to the error handler and removes the retained helper fragment.
      *
-     * @param e the {@link ParseException} thrown in the process
+     * @param errorCode the error code of the exception thrown in the process
      */
-    public void onPurchaseSaveFailed(ParseException e) {
-        onParseError(e);
+    public void onPurchaseSaveFailed(int errorCode) {
+        onSaveError(errorCode);
         HelperUtils.removeHelper(getFragmentManager(), PURCHASE_SAVE_HELPER);
     }
 
@@ -1269,7 +1270,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
             @Override
             public void done(@Nullable ParseException e) {
                 if (e != null) {
-                    onParseError(e);
+                    onSaveError(e.getCode());
                     return;
                 }
 
@@ -1385,6 +1386,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         /**
          * Handles the update of action bar menu of the activity regarding the note file menu
          * option.
+         *
          * @param hasNote whether to show the option to show the note or not
          */
         void setHasNote(boolean hasNote);

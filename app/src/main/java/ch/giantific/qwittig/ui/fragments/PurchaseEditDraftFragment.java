@@ -15,11 +15,11 @@ import android.view.MenuItem;
 import com.parse.DeleteCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
-import com.parse.ParseObject;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.Receipt;
-import ch.giantific.qwittig.data.parse.LocalQuery;
+import ch.giantific.qwittig.domain.models.Receipt;
+import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 
 /**
  * Displays the interface where the user can edit a purchase draft. The user can either save the
@@ -27,8 +27,7 @@ import ch.giantific.qwittig.data.parse.LocalQuery;
  * <p/>
  * Subclass of {@link PurchaseEditFragment}.
  */
-public class PurchaseEditDraftFragment extends PurchaseEditFragment implements
-        LocalQuery.ObjectLocalFetchListener {
+public class PurchaseEditDraftFragment extends PurchaseEditFragment {
 
     public PurchaseEditDraftFragment() {
     }
@@ -91,14 +90,12 @@ public class PurchaseEditDraftFragment extends PurchaseEditFragment implements
 
     @Override
     void fetchPurchase() {
-        LocalQuery.queryDraft(mEditPurchaseId, this);
-    }
-
-    @Override
-    public void onObjectFetched(@NonNull ParseObject object) {
-        super.onObjectFetched(object);
-
-        processOldPurchase(object);
+        mPurchaseRepo.getPurchaseLocalAsync(mEditPurchaseId, true, new PurchaseRepository.GetPurchaseLocalListener() {
+            @Override
+            public void onPurchaseLocalLoaded(@NonNull Purchase purchase) {
+                processOldPurchase(purchase);
+            }
+        });
     }
 
     @Nullable
@@ -125,9 +122,9 @@ public class PurchaseEditDraftFragment extends PurchaseEditFragment implements
     }
 
     @Override
-    public void onParseError(@NonNull ParseException e) {
+    public void onSaveError(int errorCode) {
         mPurchase.setDraftId(mEditPurchaseId);
-        super.onParseError(e);
+        super.onSaveError(errorCode);
     }
 
     @Override

@@ -30,16 +30,17 @@ import java.util.Collections;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.ItemUserPicker;
-import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.data.parse.models.Compensation;
-import ch.giantific.qwittig.data.parse.models.User;
-import ch.giantific.qwittig.helpers.CompensationQueryHelper;
-import ch.giantific.qwittig.helpers.CompensationRemindHelper;
-import ch.giantific.qwittig.helpers.CompensationSaveHelper;
-import ch.giantific.qwittig.helpers.MoreQueryHelper;
-import ch.giantific.qwittig.helpers.SettlementHelper;
-import ch.giantific.qwittig.helpers.UserQueryHelper;
+import ch.giantific.qwittig.domain.models.ItemUserPicker;
+import ch.giantific.qwittig.domain.models.parse.Compensation;
+import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.data.repositories.ParseUserRepository;
+import ch.giantific.qwittig.data.helpers.query.CompensationQueryHelper;
+import ch.giantific.qwittig.data.helpers.reminder.CompensationRemindHelper;
+import ch.giantific.qwittig.data.helpers.save.CompensationSaveHelper;
+import ch.giantific.qwittig.data.helpers.query.MoreQueryHelper;
+import ch.giantific.qwittig.data.helpers.group.SettlementHelper;
+import ch.giantific.qwittig.data.helpers.query.UserQueryHelper;
+import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.ui.adapters.TabsAdapter;
 import ch.giantific.qwittig.ui.fragments.FinanceCompensationsBaseFragment;
 import ch.giantific.qwittig.ui.fragments.FinanceCompensationsPaidFragment;
@@ -63,7 +64,7 @@ import ch.giantific.qwittig.utils.Utils;
  */
 public class FinanceActivity extends BaseNavDrawerActivity implements
         FinanceCompensationsBaseFragment.FragmentInteractionListener,
-        LocalQuery.UserLocalQueryListener,
+        UserRepository.GetUsersLocalListener,
         CompensationSingleDialogFragment.DialogInteractionListener,
         GroupCreateDialogFragment.DialogInteractionListener,
         CompensationChangeAmountDialogFragment.DialogInteractionListener,
@@ -223,7 +224,8 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
 
     private void addSinglePayment() {
         if (userIsInGroup()) {
-            LocalQuery.queryUsers(this);
+            UserRepository repo = new ParseUserRepository();
+            repo.getUsersLocalAsync(mCurrentGroup, this);
         } else {
             showCreateGroupDialog();
         }
@@ -250,7 +252,7 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onUsersLocalQueried(@NonNull List<ParseUser> users) {
+    public void onUsersLocalLoaded(@NonNull List<ParseUser> users) {
         mSinglePaymentUsers = users;
         ArrayList<ItemUserPicker> recipients;
 
@@ -312,7 +314,7 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
             @Override
             public void done(@Nullable ParseException e) {
                 if (e == null) {
-                    mCompensationsUnpaidFragment.onCompensationsPinned();
+                    mCompensationsUnpaidFragment.onCompensationsUpdated();
                     compensation.saveEventually();
                     MessageUtils.showBasicSnackbar(mToolbar,
                             getString(R.string.toast_payment_saved, recipientNickname));
@@ -327,60 +329,51 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onUsersPinFailed(@NonNull ParseException e) {
-        mUserBalancesFragment.onUsersPinFailed(e);
+    public void onUserUpdateFailed(int errorCode) {
+        mUserBalancesFragment.onUserUpdateFailed(errorCode);
     }
 
     @Override
-    public void onUsersPinned() {
-        super.onUsersPinned();
+    public void onUsersUpdated() {
+        super.onUsersUpdated();
 
-        mUserBalancesFragment.onUsersPinned();
+        mUserBalancesFragment.onUsersUpdated();
         setToolbarHeader();
     }
 
     @Override
-    public void onAllUsersQueried() {
-        mUserBalancesFragment.onAllUsersQueried();
-    }
-
-    @Override
-    public void onCompensationsPinFailed(@NonNull ParseException e, boolean isPaid) {
+    public void onCompensationUpdateFailed(int errorCode, boolean isPaid) {
         if (isPaid) {
-            mCompensationsPaidFragment.onCompensationsPinFailed(e);
+            mCompensationsPaidFragment.onCompensationUpdateFailed(errorCode);
         } else {
-            mCompensationsUnpaidFragment.onCompensationsPinFailed(e);
+            mCompensationsUnpaidFragment.onCompensationUpdateFailed(errorCode);
         }
     }
 
     @Override
-    public void onAllCompensationsQueried(boolean isPaid) {
+    public void onAllCompensationsPaidUpdated() {
+        mCompensationsPaidFragment.onAllCompensationsUpdated();
+    }
+
+    @Override
+    public void onCompensationsUpdated(boolean isPaid) {
+        super.onCompensationsUpdated(isPaid);
+
         if (isPaid) {
-            mCompensationsPaidFragment.onAllCompensationsQueried();
+            mCompensationsPaidFragment.onCompensationsUpdated();
         } else {
-            mCompensationsUnpaidFragment.onAllCompensationsQueried();
+            mCompensationsUnpaidFragment.onCompensationsUpdated();
         }
     }
 
     @Override
-    public void onCompensationsPinned(boolean isPaid) {
-        super.onCompensationsPinned(isPaid);
-
-        if (isPaid) {
-            mCompensationsPaidFragment.onCompensationsPinned();
-        } else {
-            mCompensationsUnpaidFragment.onCompensationsPinned();
-        }
+    public void onNewSettlementCreated() {
+        mCompensationsUnpaidFragment.onNewSettlementCreated();
     }
 
     @Override
-    public void onNewSettlementCreated(@NonNull Object result) {
-        mCompensationsUnpaidFragment.onNewSettlementCreated(result);
-    }
-
-    @Override
-    public void onNewSettlementCreationFailed(@NonNull ParseException e) {
-        mCompensationsUnpaidFragment.onNewSettlementCreationFailed(e);
+    public void onNewSettlementCreationFailed(int errorCode) {
+        mCompensationsUnpaidFragment.onNewSettlementCreationFailed(errorCode);
     }
 
     @Override
@@ -389,8 +382,8 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onCompensationSaveFailed(@NonNull ParseObject compensation, @NonNull ParseException e) {
-        mCompensationsUnpaidFragment.onCompensationSaveFailed(compensation, e);
+    public void onCompensationSaveFailed(@NonNull ParseObject compensation, int errorCode) {
+        mCompensationsUnpaidFragment.onCompensationSaveFailed(compensation, errorCode);
     }
 
     @Override
@@ -399,18 +392,18 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onUserRemindFailed(int remindType, @NonNull String compensationId, @NonNull ParseException e) {
-        mCompensationsUnpaidFragment.onUserRemindFailed(remindType, e, compensationId);
+    public void onUserRemindFailed(int remindType, @NonNull String compensationId, int errorCode) {
+        mCompensationsUnpaidFragment.onUserRemindFailed(compensationId, errorCode);
     }
 
     @Override
-    public void onMoreObjectsPinned(@NonNull List<ParseObject> objects) {
-        mCompensationsPaidFragment.onMoreObjectsPinned(objects);
+    public void onMoreObjectsLoaded(@NonNull List<ParseObject> objects) {
+        mCompensationsPaidFragment.onMoreObjectsLoaded(objects);
     }
 
     @Override
-    public void onMoreObjectsPinFailed(@NonNull ParseException e) {
-        mCompensationsPaidFragment.onMoreObjectsPinFailed(e);
+    public void onMoreObjectsLoadFailed(int errorCode) {
+        mCompensationsPaidFragment.onMoreObjectsLoadFailed(errorCode);
     }
 
     @Override

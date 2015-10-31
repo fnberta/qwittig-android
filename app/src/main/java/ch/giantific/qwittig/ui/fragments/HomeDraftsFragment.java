@@ -31,10 +31,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.data.parse.models.Group;
-import ch.giantific.qwittig.data.parse.models.Purchase;
-import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.data.repositories.ParseGroupRepository;
+import ch.giantific.qwittig.data.repositories.ParsePurchaseRepository;
+import ch.giantific.qwittig.domain.repositories.GroupRepository;
+import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.ui.activities.HomeActivity;
 import ch.giantific.qwittig.ui.activities.PurchaseEditActivity;
 import ch.giantific.qwittig.ui.adapters.DraftsAdapter;
@@ -52,12 +55,13 @@ import ch.giantific.qwittig.utils.ParseUtils;
  * Subclass of {@link BaseFragment}.
  */
 public class HomeDraftsFragment extends BaseFragment implements
-        LocalQuery.PurchaseLocalQueryListener,
-        LocalQuery.ObjectLocalFetchListener {
+        PurchaseRepository.GetPurchasesLocalListener {
 
     public static final String INTENT_PURCHASE_EDIT_DRAFT = "INTENT_PURCHASE_EDIT_DRAFT";
     private User mCurrentUser;
     private Group mCurrentGroup;
+    private PurchaseRepository mPurchaseRepo;
+    private GroupRepository mGroupRepo;
     private TextView mTextViewEmpty;
     private ListView mListView;
     private DraftsAdapter mDraftsAdapter;
@@ -65,6 +69,14 @@ public class HomeDraftsFragment extends BaseFragment implements
     private List<ParseObject> mDrafts = new ArrayList<>();
 
     public HomeDraftsFragment() {
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mPurchaseRepo = new ParsePurchaseRepository();
+        mGroupRepo = new ParseGroupRepository();
     }
 
     @Override
@@ -175,9 +187,7 @@ public class HomeDraftsFragment extends BaseFragment implements
      */
     public void updateAdapter() {
         updateCurrentUserGroup();
-        if (mCurrentUser != null) {
-            LocalQuery.queryDrafts(this);
-        }
+        mPurchaseRepo.getPurchasesLocalAsync(mCurrentUser, true, this);
     }
 
     private void updateCurrentUserGroup() {
@@ -188,15 +198,11 @@ public class HomeDraftsFragment extends BaseFragment implements
     }
 
     @Override
-    public void onPurchasesLocalQueried(@NonNull List<ParseObject> purchases) {
-        updateDrafts(purchases);
-    }
-
-    private void updateDrafts(@NonNull List<ParseObject> drafts) {
+    public void onPurchasesLocalLoaded(@NonNull List<ParseObject> purchases) {
         mDrafts.clear();
 
-        if (!drafts.isEmpty()) {
-            mDrafts.addAll(drafts);
+        if (!purchases.isEmpty()) {
+            mDrafts.addAll(purchases);
         }
 
         checkCurrentGroup();
@@ -207,16 +213,16 @@ public class HomeDraftsFragment extends BaseFragment implements
             if (mCurrentGroup.isDataAvailable()) {
                 updateView();
             } else {
-                LocalQuery.fetchObjectData(mCurrentGroup, this);
+                mGroupRepo.fetchGroupDataAsync(mCurrentGroup, new GroupRepository.GetGroupLocalListener() {
+                    @Override
+                    public void onGroupLocalLoaded(@NonNull Group group) {
+                        updateView();
+                    }
+                });
             }
         } else {
             updateView();
         }
-    }
-
-    @Override
-    public void onObjectFetched(@NonNull ParseObject object) {
-        updateView();
     }
 
     private void updateView() {

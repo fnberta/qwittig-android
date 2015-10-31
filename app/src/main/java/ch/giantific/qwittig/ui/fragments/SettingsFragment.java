@@ -29,7 +29,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
 import com.parse.ParseUser;
@@ -40,11 +39,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.data.parse.models.Group;
-import ch.giantific.qwittig.data.parse.models.User;
-import ch.giantific.qwittig.helpers.DeleteAccountHelper;
-import ch.giantific.qwittig.helpers.LogoutHelper;
+import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.data.repositories.ParseUserRepository;
+import ch.giantific.qwittig.data.helpers.account.DeleteAccountHelper;
+import ch.giantific.qwittig.data.helpers.account.LogoutHelper;
+import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.ui.activities.BaseActivity;
 import ch.giantific.qwittig.ui.activities.FinanceActivity;
 import ch.giantific.qwittig.ui.activities.SettingsActivity;
@@ -57,7 +57,7 @@ import ch.giantific.qwittig.ui.fragments.dialogs.GroupLeaveBalanceNotZeroDialogF
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupLeaveDialogFragment;
 import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
-import ch.giantific.qwittig.utils.ParseErrorHandler;
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -89,6 +89,7 @@ public class SettingsFragment extends PreferenceFragment implements
     private static final String DELETE_ACCOUNT_HELPER = "DELETE_ACCOUNT_HELPER";
     private static final int UPDATE_LIST_NAME = 1;
     private static final int UPDATE_LIST_GROUP = 2;
+    private UserRepository mUserRepo;
     private FragmentInteractionListener mListener;
     private ProgressDialog mProgressDialog;
     private SharedPreferences mSharedPrefs;
@@ -121,6 +122,8 @@ public class SettingsFragment extends PreferenceFragment implements
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
+
+        mUserRepo = new ParseUserRepository();
 
         final Context context = getActivity();
         PreferenceManager.setDefaultValues(context, R.xml.preferences, false);
@@ -195,9 +198,9 @@ public class SettingsFragment extends PreferenceFragment implements
      * be deleted.
      */
     private void showGroupLeaveDialog() {
-        LocalQuery.queryUsers(new LocalQuery.UserLocalQueryListener() {
+        mUserRepo.getUsersLocalAsync(mCurrentGroup, new UserRepository.GetUsersLocalListener() {
             @Override
-            public void onUsersLocalQueried(@NonNull List<ParseUser> users) {
+            public void onUsersLocalLoaded(@NonNull List<ParseUser> users) {
                 String message = users.size() == 1 &&
                         users.get(0).getObjectId().equals(mCurrentUser.getObjectId()) ?
                         getString(R.string.dialog_group_leave_delete_message) :
@@ -555,14 +558,15 @@ public class SettingsFragment extends PreferenceFragment implements
     }
 
     /**
-     * Handles a failed logout attempt. Passes the exception to the generic Parse error handler
+     * Handles a failed logout attempt. Passes the error code to the generic Parse error handler
      * and removes the helper fragment.
      *
-     * @param e the ParseException thrown during the logout attempt
+     * @param errorCode the error code of the exception thrown during the logout attempt
      */
-    public void onLogoutFailed(ParseException e) {
-        ParseErrorHandler.handleParseError(getActivity(), e);
-        onParseError(ParseErrorHandler.getErrorMessage(getActivity(), e));
+    public void onLogoutFailed(int errorCode) {
+        final Activity context = getActivity();
+        ParseErrorHandler.handleParseError(context, errorCode);
+        onParseError(ParseErrorHandler.getErrorMessage(context, errorCode));
         HelperUtils.removeHelper(getFragmentManager(), LOGOUT_HELPER);
     }
 
@@ -626,11 +630,12 @@ public class SettingsFragment extends PreferenceFragment implements
      * handler, hides the progress bar, removes the retained helper fragment and shows the user the
      * error.
      *
-     * @param e the ParseException thrown during the delete attempt
+     * @param errorCode the error code of the exception thrown during the delete attempt
      */
-    public void onDeleteUserFailed(ParseException e) {
-        ParseErrorHandler.handleParseError(getActivity(), e);
-        onParseError(ParseErrorHandler.getErrorMessage(getActivity(), e));
+    public void onDeleteUserFailed(int errorCode) {
+        final Activity context = getActivity();
+        ParseErrorHandler.handleParseError(context, errorCode);
+        onParseError(ParseErrorHandler.getErrorMessage(context, errorCode));
         HelperUtils.removeHelper(getFragmentManager(), DELETE_ACCOUNT_HELPER);
     }
 

@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.ItemUserPicker;
+import ch.giantific.qwittig.domain.models.ItemUserPicker;
 import ch.giantific.qwittig.ui.adapters.RecipientsArrayAdapter;
 
 /**

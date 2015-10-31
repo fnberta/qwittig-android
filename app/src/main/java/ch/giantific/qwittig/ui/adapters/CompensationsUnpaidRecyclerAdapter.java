@@ -25,9 +25,9 @@ import com.parse.ParseUser;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.Avatar;
-import ch.giantific.qwittig.data.parse.models.Compensation;
-import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.domain.models.Avatar;
+import ch.giantific.qwittig.domain.models.parse.Compensation;
+import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.utils.MoneyUtils;
 
 

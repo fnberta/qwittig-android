@@ -163,8 +163,8 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onTasksPinned() {
-        super.onTasksPinned();
+    public void onTasksUpdated() {
+        super.onTasksUpdated();
 
         mTaskDetailsFragment.queryData();
     }

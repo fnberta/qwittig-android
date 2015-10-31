@@ -28,7 +28,7 @@ import org.json.JSONObject;
 import java.util.Date;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.models.Purchase;
+import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.ui.fragments.HomePurchasesFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseDetailsFragment;
@@ -240,8 +240,8 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onPurchasesPinned() {
-        super.onPurchasesPinned();
+    public void onPurchasesUpdated() {
+        super.onPurchasesUpdated();
 
         if (mPurchaseDetailsFragment.isAdded()) {
             mPurchaseDetailsFragment.queryData();

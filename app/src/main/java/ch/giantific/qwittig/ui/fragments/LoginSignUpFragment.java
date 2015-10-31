@@ -29,8 +29,8 @@ import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.bumptech.glide.request.target.SimpleTarget;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.Avatar;
-import ch.giantific.qwittig.helpers.LoginHelper;
+import ch.giantific.qwittig.domain.models.Avatar;
+import ch.giantific.qwittig.data.helpers.account.LoginHelper;
 import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.Utils;
@@ -237,7 +237,7 @@ public class LoginSignUpFragment extends LoginBaseFragment {
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
         if (loginHelper == null) {
-            loginHelper = LoginHelper.newInstance(email, password, nickname, mAvatar);
+            loginHelper = LoginHelper.newInstanceSignUp(email, password, nickname, mAvatar);
             fragmentManager.beginTransaction()
                     .add(loginHelper, LoginFragment.LOGIN_HELPER)
                     .commit();

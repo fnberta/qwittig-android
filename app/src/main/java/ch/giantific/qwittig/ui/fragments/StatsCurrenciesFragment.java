@@ -17,7 +17,7 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.utils.PercentFormatter;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.helpers.StatsHelper;
+import ch.giantific.qwittig.data.helpers.group.StatsHelper;
 import ch.giantific.qwittig.ui.widgets.PieChart;
 
 /**

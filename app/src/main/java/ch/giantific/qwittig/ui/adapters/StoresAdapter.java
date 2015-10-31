@@ -20,7 +20,7 @@ import com.parse.ParseConfig;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.models.Config;
+import ch.giantific.qwittig.domain.models.parse.Config;
 
 /**
  * Handles the display of the stores the user has saved in his/her profile.

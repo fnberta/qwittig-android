@@ -20,10 +20,10 @@ import java.util.Collections;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.models.Purchase;
-import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.ui.adapters.rows.UserInvolvedRow;
-import ch.giantific.qwittig.utils.ComparatorParseUserIgnoreCase;
+import ch.giantific.qwittig.ComparatorParseUserIgnoreCase;
 
 import static ch.giantific.qwittig.utils.AnimUtils.DISABLED_ALPHA;
 

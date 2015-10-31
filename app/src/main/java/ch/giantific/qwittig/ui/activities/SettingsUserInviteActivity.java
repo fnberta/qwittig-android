@@ -16,10 +16,9 @@ import android.view.View;
 
 import com.github.jorgecastilloprz.FABProgressCircle;
 import com.github.jorgecastilloprz.listeners.FABProgressListener;
-import com.parse.ParseException;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.helpers.InviteUsersHelper;
+import ch.giantific.qwittig.data.helpers.group.InviteUsersHelper;
 import ch.giantific.qwittig.ui.fragments.SettingsUserInviteFragment;
 import ch.giantific.qwittig.ui.listeners.TransitionListenerAdapter;
 import ch.giantific.qwittig.utils.Utils;
@@ -127,7 +126,7 @@ public class SettingsUserInviteActivity extends BaseActivity implements
     }
 
     @Override
-    public void onInviteUsersFailed(@NonNull ParseException e) {
-        mSettingsUserInviteFragment.onInviteUsersFailed(e);
+    public void onInviteUsersFailed(int errorCode) {
+        mSettingsUserInviteFragment.onInviteUsersFailed(errorCode);
     }
 }

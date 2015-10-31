@@ -6,13 +6,11 @@ package ch.giantific.qwittig.ui.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.view.View;
 
 import com.parse.ParseFile;
-import com.parse.ParseObject;
 
-import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.data.parse.models.Purchase;
+import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 
 
 /**
@@ -65,10 +63,9 @@ public class PurchaseReceiptDetailFragment extends PurchaseReceiptBaseFragment {
      * Fetches the purchase from the object id and displays the receipt.
      */
     public void loadData() {
-        LocalQuery.fetchObjectFromId(Purchase.CLASS, mPurchaseId, new LocalQuery.ObjectLocalFetchListener() {
+        mPurchaseRepo.fetchPurchaseDataLocalAsync(mPurchaseId, new PurchaseRepository.GetPurchaseLocalListener() {
             @Override
-            public void onObjectFetched(@NonNull ParseObject object) {
-                Purchase purchase = (Purchase) object;
+            public void onPurchaseLocalLoaded(@NonNull Purchase purchase) {
                 ParseFile receiptFile = purchase.getReceiptParseFile();
                 setReceiptImage(receiptFile);
             }

@@ -15,7 +15,7 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.models.Config;
+import ch.giantific.qwittig.domain.models.parse.Config;
 import ch.giantific.qwittig.ui.fragments.dialogs.AccountCreateDialogFragment;
 
 /**

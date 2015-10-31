@@ -17,23 +17,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.data.parse.models.Task;
-import ch.giantific.qwittig.data.parse.models.User;
-import ch.giantific.qwittig.helpers.TaskQueryHelper;
-import ch.giantific.qwittig.helpers.TaskRemindHelper;
+import ch.giantific.qwittig.domain.models.parse.Task;
+import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.data.repositories.ParseTaskRepository;
+import ch.giantific.qwittig.data.helpers.query.TaskQueryHelper;
+import ch.giantific.qwittig.data.helpers.reminder.TaskRemindHelper;
+import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.ui.activities.BaseActivity;
 import ch.giantific.qwittig.ui.activities.TaskAddActivity;
 import ch.giantific.qwittig.ui.activities.TaskDetailsActivity;
@@ -42,7 +41,7 @@ import ch.giantific.qwittig.ui.fragments.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
-import ch.giantific.qwittig.utils.ParseErrorHandler;
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -52,8 +51,8 @@ import ch.giantific.qwittig.utils.Utils;
  * Subclass {@link BaseRecyclerViewFragment}.
  */
 public class TasksFragment extends BaseRecyclerViewFragment implements
-        LocalQuery.TaskLocalQueryListener,
-        TasksRecyclerAdapter.AdapterInteractionListener {
+        TasksRecyclerAdapter.AdapterInteractionListener,
+        TaskRepository.GetTasksLocalListener {
 
     public static final String INTENT_TASK_ID = "ch.giantific.qwittig.INTENT_TASK_ID";
     private static final String LOG_TAG = TasksFragment.class.getSimpleName();
@@ -69,31 +68,9 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
     private List<ParseObject> mTasks = new ArrayList<>();
     private TasksRecyclerAdapter mRecyclerAdapter;
     private ArrayList<String> mLoadingTasks;
+    private TaskRepository mTaskRepo;
 
     public TasksFragment() {
-    }
-
-    public static void setTaskDeadline(@NonNull Task task, @NonNull String timeFrame) {
-        if (!timeFrame.equals(Task.TIME_FRAME_AS_NEEDED)) {
-            Date deadline = task.getDeadline();
-            Calendar deadlineNew = DateUtils.getCalendarInstanceUTC();
-            deadlineNew.setTime(deadline);
-            switch (timeFrame) {
-                case Task.TIME_FRAME_DAILY:
-                    deadlineNew.add(Calendar.DAY_OF_YEAR, 1);
-                    break;
-                case Task.TIME_FRAME_WEEKLY:
-                    deadlineNew.add(Calendar.WEEK_OF_YEAR, 1);
-                    break;
-                case Task.TIME_FRAME_MONTHLY:
-                    deadlineNew.add(Calendar.MONTH, 1);
-                    break;
-                case Task.TIME_FRAME_YEARLY:
-                    deadlineNew.add(Calendar.YEAR, 1);
-                    break;
-            }
-            task.setDeadline(deadlineNew.getTime());
-        }
     }
 
     @Override
@@ -110,6 +87,8 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mTaskRepo = new ParseTaskRepository();
 
         if (savedInstanceState != null) {
             ArrayList<String> loadingTasks = savedInstanceState.getStringArrayList(STATE_TASKS_LOADING);
@@ -163,43 +142,39 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
     }
 
     /**
-     * Passes the {@link ParseException} to the generic error handler, shows the user an error
-     * message and removes the retained helper fragment and loading indicators.
+     * Passes the error code to the generic error handler, shows the user an error message and
+     * removes the retained helper fragment and loading indicators.
      *
-     * @param e the {@link ParseException} thrown in the process
+     * @param errorCode the error code of the exception thrown in the process
      */
-    public void onTasksPinFailed(ParseException e) {
-        ParseErrorHandler.handleParseError(getActivity(), e);
-        showOnlineQueryErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
+    public void onTasksUpdatedFailed(int errorCode) {
+        ParseErrorHandler.handleParseError(getActivity(), errorCode);
+        showOnlineQueryErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), errorCode));
         HelperUtils.removeHelper(getFragmentManager(), TASK_QUERY_HELPER);
 
         setLoading(false);
     }
 
     /**
-     * Updates the adapter to reload data from the local data store after new purchases were pinned.
+     * Updates the adapter to reload data from the local data store after new purchases were pinned,
+     * removes the retained helper fragment and hides loading indicators.
      */
-    public void onTasksPinned() {
+    public void onTasksUpdated() {
+        HelperUtils.removeHelper(getFragmentManager(), TASK_QUERY_HELPER);
+        setLoading(false);
+
         updateAdapter();
-    }
-
-    /**
-     * Removes the retained helper fragment and hides the loading indicator.
-     */
-    public void onAllTasksQueried() {
-        HelperUtils.removeHelper(getFragmentManager(), TASK_QUERY_HELPER);
-        setLoading(false);
     }
 
     @Override
     public void updateAdapter() {
         super.updateAdapter();
 
-        LocalQuery.queryTasks(mDeadlineSelected, this);
+        mTaskRepo.getTasksLocalAsync(mCurrentGroup, mDeadlineSelected, this);
     }
 
     @Override
-    public void onTasksLocalQueried(@NonNull List<ParseObject> tasks) {
+    public void onTasksLocalLoaded(@NonNull List<ParseObject> tasks) {
         mTasks.clear();
 
         if (!tasks.isEmpty()) {
@@ -364,19 +339,18 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
             return;
         }
 
-        setTaskDeadline(task, timeFrame);
+        if (!timeFrame.equals(Task.TIME_FRAME_AS_NEEDED)) {
+            task.updateDeadline(timeFrame);
+        }
 
-        List<ParseUser> usersInvolved = task.getUsersInvolved();
-        final ParseUser userResponsible = usersInvolved.get(0);
-        Collections.rotate(usersInvolved, -1);
-        final ParseUser userResponsibleNew = usersInvolved.get(0);
-
-        task.addHistoryEvent();
-
+        final ParseUser userResponsible = task.getUserResponsible();
+        final ParseUser userResponsibleNew = task.addHistoryEvent();
         task.saveEventually();
+
         String currentUserId = mCurrentUser.getObjectId();
-        if (userResponsible.getObjectId().equals(currentUserId) ||
-                userResponsibleNew.getObjectId().equals(currentUserId)) {
+        if (userResponsible != null && userResponsible.getObjectId().equals(currentUserId) ||
+                userResponsibleNew != null &&
+                        userResponsibleNew.getObjectId().equals(currentUserId)) {
             updateAdapter();
         } else {
             mRecyclerAdapter.notifyItemChanged(position);
@@ -471,15 +445,17 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
     }
 
     /**
-     * Passes the {@link ParseException} to the generic error handler, shows the user an error
-     * message and removes the retained helper fragment and loading indicators.
+     * Passes the error codeto the generic error handler, shows the user an error message and
+     * removes the retained helper fragment and loading indicators.
      *
-     * @param taskId the object id of the task for which an attempt was amde to send a reminder
-     * @param e      the {@link ParseException} thrown in the process
+     * @param taskId    the object id of the task for which an attempt was amde to send a reminder
+     * @param errorCode the error code of the exception thrown in the process
      */
-    public void onUserRemindFailed(@NonNull String taskId, @NonNull ParseException e) {
-        ParseErrorHandler.handleParseError(getActivity(), e);
-        MessageUtils.showBasicSnackbar(mRecyclerView, ParseErrorHandler.getErrorMessage(getActivity(), e));
+    public void onUserRemindFailed(@NonNull String taskId, int errorCode) {
+        final Activity context = getActivity();
+        ParseErrorHandler.handleParseError(context, errorCode);
+        MessageUtils.showBasicSnackbar(mRecyclerView,
+                ParseErrorHandler.getErrorMessage(context, errorCode));
         HelperUtils.removeHelper(getFragmentManager(), getTaskHelperTag(taskId));
 
         setTaskLoading(taskId, false);

@@ -10,8 +10,8 @@ import android.support.annotation.NonNull;
 import android.view.MenuItem;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.ocr.models.PurchaseRest;
-import ch.giantific.qwittig.helpers.OcrHelper;
+import ch.giantific.qwittig.domain.models.ocr.OcrPurchase;
+import ch.giantific.qwittig.data.helpers.OcrHelper;
 import ch.giantific.qwittig.ui.fragments.PurchaseAddAutoFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseAddFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseBaseFragment;
@@ -56,8 +56,8 @@ public class PurchaseAddActivity extends PurchaseBaseActivity implements
     }
 
     @Override
-    public void onOcrFinished(@NonNull PurchaseRest purchaseRest) {
-        ((PurchaseAddAutoFragment) mPurchaseFragment).onOcrFinished(purchaseRest);
+    public void onOcrFinished(@NonNull OcrPurchase ocrPurchase) {
+        ((PurchaseAddAutoFragment) mPurchaseFragment).onOcrFinished(ocrPurchase);
         showFab();
     }
 

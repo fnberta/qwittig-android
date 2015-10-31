@@ -20,23 +20,23 @@ import android.view.ViewGroup;
 
 import com.mugen.Mugen;
 import com.mugen.MugenCallbacks;
-import com.parse.ParseException;
 import com.parse.ParseObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.data.parse.models.Purchase;
-import ch.giantific.qwittig.helpers.MoreQueryHelper;
-import ch.giantific.qwittig.helpers.PurchaseQueryHelper;
-import ch.giantific.qwittig.ui.activities.HomeActivity;
+import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.data.repositories.ParsePurchaseRepository;
+import ch.giantific.qwittig.data.helpers.query.MoreQueryHelper;
+import ch.giantific.qwittig.data.helpers.query.PurchaseQueryHelper;
+import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
+import ch.giantific.qwittig.ui.activities.BaseActivity;
 import ch.giantific.qwittig.ui.activities.PurchaseDetailsActivity;
 import ch.giantific.qwittig.ui.adapters.PurchasesRecyclerAdapter;
 import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
-import ch.giantific.qwittig.utils.ParseErrorHandler;
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -47,12 +47,13 @@ import ch.giantific.qwittig.utils.Utils;
  */
 public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
         PurchasesRecyclerAdapter.AdapterInteractionListener,
-        LocalQuery.PurchaseLocalQueryListener {
+        PurchaseRepository.GetPurchasesLocalListener {
 
     public static final String INTENT_PURCHASE_ID = "INTENT_PURCHASE_ID";
     private static final String STATE_IS_LOADING_MORE = "STATE_IS_LOADING_MORE";
     private static final String PURCHASE_QUERY_HELPER = "PURCHASE_QUERY_HELPER";
     private static final String LOG_TAG = HomePurchasesFragment.class.getSimpleName();
+    private PurchaseRepository mPurchaseRepo;
     private FragmentInteractionListener mListener;
     private PurchasesRecyclerAdapter mRecyclerAdapter;
     @NonNull
@@ -77,6 +78,8 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mPurchaseRepo = new ParsePurchaseRepository();
+
         if (savedInstanceState != null) {
             mIsLoadingMore = savedInstanceState.getBoolean(STATE_IS_LOADING_MORE, false);
         }
@@ -90,7 +93,8 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_home_purchases, container, false);
     }
 
@@ -142,14 +146,15 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
     }
 
     /**
-     * Passes the {@link ParseException} to the generic error handler, shows the user an error
-     * message and removes the retained helper fragment and loading indicators.
+     * Passes the error code to the generic error handler, shows the user an error message and
+     * removes the retained helper fragment and loading indicators.
      *
-     * @param e the {@link ParseException} thrown in the process
+     * @param errorCode the error code of the exception thrown in the process
      */
-    public void onPurchasesPinFailed(@NonNull ParseException e) {
-        ParseErrorHandler.handleParseError(getActivity(), e);
-        showOnlineQueryErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
+    public void onPurchaseUpdateFailed(int errorCode) {
+        Activity context = getActivity();
+        ParseErrorHandler.handleParseError(context, errorCode);
+        showOnlineQueryErrorSnackbar(ParseErrorHandler.getErrorMessage(context, errorCode));
         HelperUtils.removeHelper(getFragmentManager(), PURCHASE_QUERY_HELPER);
 
         setLoading(false);
@@ -158,14 +163,14 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
     /**
      * Re-queries the data and updates the adapter.
      */
-    public void onPurchasesPinned() {
+    public void onPurchasesUpdated() {
         updateAdapter();
     }
 
     /**
      * Removes the retained helper fragment and loading indicators.
      */
-    public void onAllPurchasesQueried() {
+    public void onAllPurchasesUpdated() {
         HelperUtils.removeHelper(getFragmentManager(), PURCHASE_QUERY_HELPER);
         setLoading(false);
     }
@@ -174,11 +179,11 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
     public void updateAdapter() {
         super.updateAdapter();
 
-        LocalQuery.queryPurchases(this);
+        mPurchaseRepo.getPurchasesLocalAsync(mCurrentUser, false, this);
     }
 
     @Override
-    public void onPurchasesLocalQueried(@NonNull List<ParseObject> purchases) {
+    public void onPurchasesLocalLoaded(@NonNull List<ParseObject> purchases) {
         mPurchases.clear();
 
         if (!purchases.isEmpty()) {
@@ -224,7 +229,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
 
         ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
                 getActivity());
-        getActivity().startActivityForResult(intent, HomeActivity.INTENT_REQUEST_PURCHASE_DETAILS,
+        getActivity().startActivityForResult(intent, BaseActivity.INTENT_REQUEST_PURCHASE_DETAILS,
                 options.toBundle());
     }
 
@@ -256,7 +261,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
      *
      * @param purchases the newly pinned purchases
      */
-    public void onMoreObjectsPinned(@NonNull List<ParseObject> purchases) {
+    public void onMoreObjectsLoaded(@NonNull List<ParseObject> purchases) {
         HelperUtils.removeHelper(getFragmentManager(), MoreQueryHelper.MORE_QUERY_HELPER);
 
         mIsLoadingMore = false;
@@ -265,14 +270,15 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
     }
 
     /**
-     * Passes the {@link ParseException} to the generic error handler, showing the user an error
-     * message and removing the retained helper fragment and loading indicators.
+     * Passes the error code to the generic error handler, shows the user an error message and
+     * removes the retained helper fragment and loading indicators.
      *
-     * @param e the {@link ParseException} thrown during the process
+     * @param errorCode the error code of the exception thrown during the process
      */
-    public void onMoreObjectsPinFailed(ParseException e) {
-        ParseErrorHandler.handleParseError(getActivity(), e);
-        showLoadMoreErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
+    public void onMoreObjectsLoadFailed(int errorCode) {
+        Activity context = getActivity();
+        ParseErrorHandler.handleParseError(context, errorCode);
+        showLoadMoreErrorSnackbar(ParseErrorHandler.getErrorMessage(context, errorCode));
         HelperUtils.removeHelper(getFragmentManager(), MoreQueryHelper.MORE_QUERY_HELPER);
 
         mIsLoadingMore = false;

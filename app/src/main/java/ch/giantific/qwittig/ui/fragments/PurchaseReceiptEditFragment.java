@@ -7,17 +7,16 @@ package ch.giantific.qwittig.ui.fragments;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-import com.parse.ParseObject;
-
-import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.data.parse.models.Purchase;
+import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 
 /**
  * Shows the receipt image taken by the user when editing a purchase.
  * <p/>
  * Subclass of {@link PurchaseReceiptBaseFragment}.
  */
-public class PurchaseReceiptEditFragment extends PurchaseReceiptAddFragment {
+public class PurchaseReceiptEditFragment extends PurchaseReceiptAddFragment implements
+        PurchaseRepository.GetPurchaseLocalListener {
 
     private static final String BUNDLE_PURCHASE_ID = "BUNDLE_PURCHASE_ID";
     private static final String BUNDLE_IS_DRAFT = "BUNDLE_IS_DRAFT";
@@ -59,21 +58,18 @@ public class PurchaseReceiptEditFragment extends PurchaseReceiptAddFragment {
     @Override
     void setData() {
         if (mIsDraft) {
-            LocalQuery.queryDraft(mPurchaseId, new LocalQuery.ObjectLocalFetchListener() {
-                @Override
-                public void onObjectFetched(@NonNull ParseObject object) {
-                    Purchase purchase = (Purchase) object;
-                    setImage(purchase.getReceiptData());
-                }
-            });
+            mPurchaseRepo.getPurchaseLocalAsync(mPurchaseId, true, this);
         } else {
-            LocalQuery.fetchObjectFromId(Purchase.CLASS, mPurchaseId, new LocalQuery.ObjectLocalFetchListener() {
-                @Override
-                public void onObjectFetched(@NonNull ParseObject object) {
-                    Purchase purchase = (Purchase) object;
-                    setReceiptImage(purchase.getReceiptParseFile());
-                }
-            });
+            mPurchaseRepo.fetchPurchaseDataLocalAsync(mPurchaseId, this);
+        }
+    }
+
+    @Override
+    public void onPurchaseLocalLoaded(@NonNull Purchase purchase) {
+        if (mIsDraft) {
+            setImage(purchase.getReceiptData());
+        } else {
+            setReceiptImage(purchase.getReceiptParseFile());
         }
     }
 }

@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.models.User;
-import ch.giantific.qwittig.data.stats.models.Stats;
+import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.models.stats.Stats;
 import ch.giantific.qwittig.ui.adapters.StatsPieChartRecyclerAdapter;
 import ch.giantific.qwittig.ui.widgets.PieChart;
 

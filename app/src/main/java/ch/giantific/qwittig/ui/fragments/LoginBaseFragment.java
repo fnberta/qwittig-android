@@ -24,7 +24,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 
-import com.parse.ParseException;
 import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 
@@ -32,11 +31,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.models.Installation;
-import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.domain.models.parse.Installation;
+import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
-import ch.giantific.qwittig.utils.ParseErrorHandler;
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 
 /**
@@ -221,11 +220,13 @@ public abstract class LoginBaseFragment extends BaseFragment implements
      * Handles a failed login attempt. Passes error to generic Parse error handler, hides the
      * progress bar and removes the helper fragment.
      *
-     * @param e the ParseException thrown during the login attempt
+     * @param errorCode the error code of th exception thrown during the login attempt
      */
-    public void onLoginFailed(ParseException e) {
-        ParseErrorHandler.handleParseError(getActivity(), e);
-        MessageUtils.showBasicSnackbar(mViewMain, ParseErrorHandler.getErrorMessage(getActivity(), e));
+    public void onLoginFailed(int errorCode) {
+        final Activity context = getActivity();
+        ParseErrorHandler.handleParseError(context, errorCode);
+        MessageUtils.showBasicSnackbar(mViewMain,
+                ParseErrorHandler.getErrorMessage(context, errorCode));
         setLoading(false);
 
         HelperUtils.removeHelper(getFragmentManager(), LOGIN_HELPER);

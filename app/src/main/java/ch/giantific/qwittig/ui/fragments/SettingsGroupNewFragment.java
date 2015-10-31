@@ -19,7 +19,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import com.github.jorgecastilloprz.FABProgressCircle;
-import com.parse.ParseException;
 import com.parse.ParseInstallation;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
@@ -28,13 +27,12 @@ import com.parse.ParseUser;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.Currency;
-import ch.giantific.qwittig.data.parse.models.Group;
-import ch.giantific.qwittig.data.parse.models.User;
-import ch.giantific.qwittig.helpers.CreateGroupHelper;
+import ch.giantific.qwittig.domain.models.Currency;
+import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.data.helpers.group.CreateGroupHelper;
 import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
-import ch.giantific.qwittig.utils.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -164,15 +162,13 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
     }
 
     /**
-     * Passes the {@link ParseException} to the generic error handler, shows the user an error
-     * message and removes the retained helper fragment and loading indicators.
+     * Passes the error code to the generic error handler, shows the user an error message and
+     * removes the retained helper fragment and loading indicators.
      *
-     * @param e the {@link ParseException} thrown during the process
+     * @param errorCode the error code of the exception thrown during the process
      */
-    public void onCreateNewGroupFailed(@NonNull ParseException e) {
-        ParseErrorHandler.handleParseError(getActivity(), e);
-        onParseError(ParseErrorHandler.getErrorMessage(getActivity(), e));
-        HelperUtils.removeHelper(getFragmentManager(), CREATE_GROUP_HELPER);
+    public void onCreateNewGroupFailed(int errorCode) {
+        onInviteError(errorCode, CREATE_GROUP_HELPER);
     }
 
     /**
@@ -199,17 +195,15 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
     }
 
     /**
-     * Passes the {@link ParseException} to the generic error handler, shows the user an error
-     * message and removes the retained helper fragment and loading indicators.
+     * Passes the error code to the generic error handler, shows the user an error  message and
+     * removes the retained helper fragment and loading indicators.
      * <p/>
      * TODO: new group is created but users not invited, finish activity but tell the user
      *
-     * @param e the {@link ParseException} thrown during the process
+     * @param errorCode the error code of the exception thrown during the process
      */
-    public void onInviteUsersFailed(@NonNull ParseException e) {
-        ParseErrorHandler.handleParseError(getActivity(), e);
-        onParseError(ParseErrorHandler.getErrorMessage(getActivity(), e));
-        HelperUtils.removeHelper(getFragmentManager(), CREATE_GROUP_HELPER);
+    public void onInviteUsersFailed(int errorCode) {
+        onInviteError(errorCode, CREATE_GROUP_HELPER);
     }
 
     @Override

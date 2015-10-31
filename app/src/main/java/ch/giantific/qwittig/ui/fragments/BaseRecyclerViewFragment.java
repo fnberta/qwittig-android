@@ -15,13 +15,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.data.parse.models.Group;
-import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.data.repositories.ParseGroupRepository;
+import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.utils.MessageUtils;
 
 /**
@@ -34,8 +34,7 @@ import ch.giantific.qwittig.utils.MessageUtils;
  * @see SwipeRefreshLayout
  * @see ProgressBar
  */
-public abstract class BaseRecyclerViewFragment extends BaseFragment implements
-        LocalQuery.ObjectLocalFetchListener {
+public abstract class BaseRecyclerViewFragment extends BaseFragment {
 
     private static final String STATE_IS_LOADING = "STATE_IS_LOADING";
     User mCurrentUser;
@@ -44,8 +43,16 @@ public abstract class BaseRecyclerViewFragment extends BaseFragment implements
     SwipeRefreshLayout mSwipeRefreshLayout;
     View mEmptyView;
     private ProgressBar mProgressBarLoading;
+    private GroupRepository mGroupRepository;
 
     public BaseRecyclerViewFragment() {
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mGroupRepository = new ParseGroupRepository();
     }
 
     @Override
@@ -142,16 +149,16 @@ public abstract class BaseRecyclerViewFragment extends BaseFragment implements
             if (mCurrentGroup.isDataAvailable()) {
                 updateView();
             } else {
-                LocalQuery.fetchObjectData(mCurrentGroup, this);
+                mGroupRepository.fetchGroupDataAsync(mCurrentGroup, new GroupRepository.GetGroupLocalListener() {
+                    @Override
+                    public void onGroupLocalLoaded(@NonNull Group group) {
+                        updateView();
+                    }
+                });
             }
         } else {
             updateView();
         }
-    }
-
-    @Override
-    public void onObjectFetched(@NonNull ParseObject object) {
-        updateView();
     }
 
     protected abstract void updateView();

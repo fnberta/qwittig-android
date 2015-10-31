@@ -12,24 +12,29 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
-import com.parse.ParseException;
 import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.Collections;
 import java.util.List;
 
-import ch.giantific.qwittig.data.parse.OnlineQuery;
-import ch.giantific.qwittig.data.parse.models.Compensation;
-import ch.giantific.qwittig.data.parse.models.Group;
-import ch.giantific.qwittig.data.parse.models.Purchase;
-import ch.giantific.qwittig.data.parse.models.Task;
-import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.data.repositories.ParseCompensationRepository;
+import ch.giantific.qwittig.data.repositories.ParseGenericRepository;
+import ch.giantific.qwittig.data.repositories.ParseGroupRepository;
+import ch.giantific.qwittig.data.repositories.ParsePurchaseRepository;
+import ch.giantific.qwittig.data.repositories.ParseTaskRepository;
+import ch.giantific.qwittig.data.repositories.ParseUserRepository;
+import ch.giantific.qwittig.domain.models.parse.Compensation;
+import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.domain.models.parse.Task;
+import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.repositories.CompensationRepository;
+import ch.giantific.qwittig.domain.repositories.GroupRepository;
+import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
+import ch.giantific.qwittig.domain.repositories.TaskRepository;
+import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.utils.ParseUtils;
 
 /**
@@ -43,22 +48,12 @@ public class ParseQueryService extends IntentService {
     public static final String INTENT_FILTER_DATA_NEW = "ch.giantific.qwittig.push.DATA_NEW";
     public static final String INTENT_DATA_TYPE = "INTENT_DATA_TYPE";
     public static final String INTENT_COMPENSATION_PAID = "INTENT_COMPENSATION_PAID";
-
-    @StringDef({User.CLASS, Group.CLASS, Purchase.CLASS, Compensation.CLASS, Group.CLASS, Task.CLASS})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface ClassType {}
-
-    @IntDef({DATA_TYPE_ALL, DATA_TYPE_PURCHASE, DATA_TYPE_USER, DATA_TYPE_COMPENSATION,
-            DATA_TYPE_GROUP, DATA_TYPE_TASK})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface DataType {}
     public static final int DATA_TYPE_ALL = 1;
     public static final int DATA_TYPE_PURCHASE = 2;
     public static final int DATA_TYPE_USER = 3;
     public static final int DATA_TYPE_COMPENSATION = 4;
     public static final int DATA_TYPE_GROUP = 5;
     public static final int DATA_TYPE_TASK = 6;
-
     private static final String SERVICE_NAME = "ParseQueryService";
     private static final String LOG_TAG = ParseQueryService.class.getSimpleName();
     private static final String ACTION_UNPIN_OBJECT = "ch.giantific.qwittig.services.action.UNPIN_OBJECT";
@@ -70,7 +65,7 @@ public class ParseQueryService extends IntentService {
     private static final String EXTRA_OBJECT_ID = "ch.giantific.qwittig.services.extra.OBJECT_ID";
     private static final String EXTRA_OBJECT_IS_NEW = "ch.giantific.qwittig.services.extra.OBJECT_IS_NEW";
     private static final String EXTRA_OBJECT_GROUP_ID = "ch.giantific.qwittig.services.extra.GROUP_ID";
-
+    private List<ParseObject> mCurrentUserGroups;
     /**
      * Constructs a new {@link ParseQueryService}.
      */
@@ -159,7 +154,7 @@ public class ParseQueryService extends IntentService {
     }
 
     /**
-     * Starts this service to query a task and rotate the users involved
+     * Starts this service to query a task and rotate the users involved.
      *
      * @param context the context to use to construct the intent
      * @param taskId  the object id of the task to query
@@ -178,266 +173,161 @@ public class ParseQueryService extends IntentService {
             return;
         }
 
+        mCurrentUserGroups = ParseUtils.getCurrentUserGroups();
         final String action = intent.getAction();
         switch (action) {
             case ACTION_UNPIN_OBJECT: {
                 final String className = intent.getStringExtra(EXTRA_OBJECT_CLASS);
                 final String objectId = intent.getStringExtra(EXTRA_OBJECT_ID);
                 final String groupId = intent.getStringExtra(EXTRA_OBJECT_GROUP_ID);
-                try {
-                    unpinObject(className, objectId, groupId);
-                } catch (ParseException e) {
-                    return;
-                }
-
+                unpinObject(className, objectId, groupId);
                 break;
             }
             case ACTION_QUERY_OBJECT: {
                 final String className = intent.getStringExtra(EXTRA_OBJECT_CLASS);
                 final String objectId = intent.getStringExtra(EXTRA_OBJECT_ID);
                 final boolean isNew = intent.getBooleanExtra(EXTRA_OBJECT_IS_NEW, false);
-                try {
-                    queryObject(className, objectId, isNew);
-                } catch (ParseException e) {
-                    return;
-                }
-
+                queryObject(className, objectId, isNew);
                 break;
             }
             case ACTION_QUERY_USERS: {
-                try {
-                    queryUsers();
-                } catch (ParseException ignored) {
-                    return;
-                }
-
+                queryUsers();
                 break;
             }
             case ACTION_QUERY_ALL: {
-                try {
-                    queryUsers();
-                    queryPurchases();
-                    queryCompensations();
-                } catch (ParseException e) {
-                    return;
-                }
-
+                queryAll();
                 break;
             }
             case ACTION_QUERY_TASK_DONE: {
                 final String taskId = intent.getStringExtra(EXTRA_OBJECT_ID);
-                try {
-                    setTaskDone(taskId);
-                } catch (ParseException e) {
-                    return;
-                }
+                setTaskDone(taskId);
+                break;
             }
         }
     }
 
     private void unpinObject(@NonNull String className, @NonNull String objectId,
-                             @NonNull String groupId) throws ParseException {
+                             @NonNull String groupId) {
         switch (className) {
             case Purchase.CLASS: {
-                ParseObject purchase = ParseObject.createWithoutData(Purchase.CLASS, objectId);
-                purchase.unpin(Purchase.PIN_LABEL + groupId);
-                sendLocalBroadcast(DATA_TYPE_PURCHASE);
+                PurchaseRepository repo = new ParsePurchaseRepository();
+                if (repo.removePurchaseLocal(objectId, groupId)) {
+                    sendLocalBroadcast(DATA_TYPE_PURCHASE);
+                }
                 break;
             }
             case Compensation.CLASS: {
-                ParseObject compensation = ParseObject.createWithoutData(Compensation.CLASS, objectId);
-                compensation.unpin(Compensation.PIN_LABEL_UNPAID);
-                sendLocalBroadcastCompensation(false);
+                CompensationRepository repo = new ParseCompensationRepository();
+                if (repo.removeCompensationLocal(objectId)) {
+                    sendLocalBroadcastCompensation(false);
+                }
                 break;
             }
             case Task.CLASS: {
-                ParseObject task = ParseObject.createWithoutData(Task.CLASS, objectId);
-                task.unpin(Task.PIN_LABEL);
-                sendLocalBroadcast(DATA_TYPE_TASK);
+                TaskRepository repo = new ParseTaskRepository();
+                if (repo.removeTaskLocal(objectId)) {
+                    sendLocalBroadcast(DATA_TYPE_TASK);
+                }
                 break;
             }
         }
     }
 
-    private void queryObject(@NonNull String className, @NonNull String objectId, boolean isNew)
-            throws ParseException {
-        if (isNew && objectIsAlreadyPinned(className, objectId)) {
-            Log.e(LOG_TAG, "object already pinned");
-            return;
+    private void queryObject(@NonNull String className, @NonNull String objectId, boolean isNew) {
+        if (isNew) {
+            ParseGenericRepository repo = new ParseGenericRepository();
+            if (repo.isAlreadySavedLocal(className, objectId)) {
+                return;
+            }
         }
 
         switch (className) {
             case Purchase.CLASS:
                 queryPurchase(objectId, isNew);
-                sendLocalBroadcast(DATA_TYPE_PURCHASE);
                 break;
             case Compensation.CLASS:
-                boolean isPaid = queryCompensation(objectId, isNew);
-                sendLocalBroadcastCompensation(isPaid);
+                queryCompensation(objectId, isNew);
                 break;
             case Group.CLASS:
                 queryGroup(objectId);
                 break;
             case Task.CLASS:
                 queryTask(objectId, isNew);
-                sendLocalBroadcast(DATA_TYPE_TASK);
                 break;
         }
     }
 
-    private boolean objectIsAlreadyPinned(@NonNull String className, @NonNull String objectId) {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(className);
-        query.ignoreACLs();
-        query.fromLocalDatastore();
-        try {
-            query.get(objectId);
-        } catch (ParseException e) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private void queryPurchase(@NonNull String objectId, boolean isNew) throws ParseException {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(Purchase.CLASS);
-        query.include(Purchase.ITEMS);
-        query.include(Purchase.USERS_INVOLVED);
-        query.include(Purchase.BUYER);
-        Purchase purchase = (Purchase) query.get(objectId);
-
-        final String groupId = purchase.getGroup().getObjectId();
-        final String pinLabel = Purchase.PIN_LABEL + groupId;
-
-        if (isNew) {
-            purchase.pin(pinLabel);
-        } else {
-            // although we only update an existing purchase, we need to unpin and repin it
-            // because the items have changed
-            purchase.unpin(pinLabel);
-            purchase.pin(pinLabel);
+    private void queryPurchase(@NonNull String objectId, boolean isNew) {
+        PurchaseRepository repo = new ParsePurchaseRepository();
+        if (repo.updatePurchase(objectId, isNew)) {
+            sendLocalBroadcast(DATA_TYPE_PURCHASE);
         }
     }
 
-    private boolean queryCompensation(@NonNull String compensationId, boolean isNew)
-            throws ParseException {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(Compensation.CLASS);
-        Compensation compensation = (Compensation) query.get(compensationId);
-
-        boolean isPaid = compensation.isPaid();
-        if (isNew) {
-            String groupId = compensation.getGroup().getObjectId();
-            String pinLabel;
-            if (isPaid) {
-                pinLabel = Compensation.PIN_LABEL_PAID + groupId;
-            } else {
-                pinLabel = Compensation.PIN_LABEL_UNPAID;
-            }
-
-            compensation.pin(pinLabel);
-        } else if (isPaid) {
-            compensation.unpin(Compensation.PIN_LABEL_UNPAID);
-
-            String groupId = compensation.getGroup().getObjectId();
-            String pinLabel = Compensation.PIN_LABEL_PAID + groupId;
-            compensation.pin(pinLabel);
-        }
-
-        return isPaid;
-    }
-
-    private void queryGroup(@NonNull String groupId) throws ParseException {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(Group.CLASS);
-        query.get(groupId);
-    }
-
-    private void queryPurchases() throws ParseException {
-        List<ParseObject> groups = ParseUtils.getCurrentUserGroups();
-        if (groups.isEmpty()) {
-            return;
-        }
-
-        for (final ParseObject group : groups) {
-            ParseQuery<ParseObject> query = OnlineQuery.getPurchasesQuery();
-            query.whereEqualTo(Purchase.GROUP, group);
-            List<ParseObject> purchases = query.find();
-
-            final String groupId = group.getObjectId();
-            final String label = Purchase.PIN_LABEL + groupId;
-
-            ParseObject.unpinAll(label);
-            ParseObject.pinAll(label, purchases);
-        }
-
-        sendLocalBroadcast(DATA_TYPE_PURCHASE);
-    }
-
-    private void queryUsers() throws ParseException {
-        ParseQuery<ParseUser> query = User.getQuery();
-        query.whereContainedIn(User.GROUPS, ParseUtils.getCurrentUserGroups());
-        query.whereEqualTo(User.IS_DELETED, false);
-        List<ParseUser> users = query.find();
-
-        ParseObject.unpinAll(User.PIN_LABEL);
-        ParseObject.pinAll(User.PIN_LABEL, users);
-
-        sendLocalBroadcast(DATA_TYPE_USER);
-    }
-
-    private void queryCompensations() throws ParseException {
-        List<ParseObject> groups = ParseUtils.getCurrentUserGroups();
-        if (groups.isEmpty()) {
-            return;
-        }
-
-        queryCompensationsUnpaid(groups);
-        sendLocalBroadcastCompensation(false);
-
-        for (ParseObject group : groups) {
-            queryCompensationsPaid(group);
-        }
-        sendLocalBroadcastCompensation(true);
-    }
-
-    private void queryCompensationsUnpaid(@NonNull List<ParseObject> groups) throws ParseException {
-        ParseQuery<ParseObject> query = OnlineQuery.getCompensationsQuery();
-        query.whereContainedIn(Compensation.GROUP, groups);
-        query.whereEqualTo(Compensation.IS_PAID, false);
-        List<ParseObject> compensationsUnpaid = query.find();
-
-        ParseObject.unpinAll(Compensation.PIN_LABEL_UNPAID);
-        ParseObject.pinAll(Compensation.PIN_LABEL_UNPAID, compensationsUnpaid);
-    }
-
-    private void queryCompensationsPaid(@NonNull final ParseObject group) throws ParseException {
-        ParseQuery<ParseObject> query = OnlineQuery.getCompensationsQuery();
-        query.whereEqualTo(Compensation.GROUP, group);
-        query.whereEqualTo(Compensation.IS_PAID, true);
-        query.setLimit(OnlineQuery.QUERY_ITEMS_PER_PAGE);
-        List<ParseObject> compensationsPaid = query.find();
-
-        final String groupId = group.getObjectId();
-        final String pinLabel = Compensation.PIN_LABEL_PAID + groupId;
-        ParseObject.unpinAll(pinLabel);
-        ParseObject.pinAll(pinLabel, compensationsPaid);
-    }
-
-    private void queryTask(@NonNull String taskId, boolean isNew) throws ParseException {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(Task.CLASS);
-        query.include(Task.USERS_INVOLVED);
-        Task task = (Task) query.get(taskId);
-        if (isNew) {
-            task.pin(Task.PIN_LABEL);
+    private void queryCompensation(@NonNull String compensationId, boolean isNew) {
+        CompensationRepository repo = new ParseCompensationRepository();
+        Boolean isPaid = repo.updateCompensation(compensationId, isNew);
+        if (isPaid != null) {
+            sendLocalBroadcastCompensation(isPaid);
         }
     }
 
-    private void setTaskDone(@NonNull String taskId) throws ParseException {
-        Task task = (Task) ParseObject.createWithoutData(Task.CLASS, taskId);
-        task.fetchFromLocalDatastore();
-        List<ParseUser> usersInvolved = task.getUsersInvolved();
-        Collections.rotate(usersInvolved, -1);
-        task.addHistoryEvent();
-        task.saveEventually();
-        sendLocalBroadcast(DATA_TYPE_TASK);
+    private void queryTask(@NonNull String taskId, boolean isNew) {
+        TaskRepository repo = new ParseTaskRepository();
+        if (repo.updateTask(taskId, isNew)) {
+            sendLocalBroadcast(DATA_TYPE_TASK);
+        }
+    }
+
+    private void setTaskDone(@NonNull String taskId) {
+        TaskRepository repo = new ParseTaskRepository();
+        Task task = repo.fetchTaskDataLocal(taskId);
+        if (task != null) {
+            task.addHistoryEvent();
+            task.saveEventually();
+            sendLocalBroadcast(DATA_TYPE_TASK);
+        }
+    }
+
+    private void queryGroup(@NonNull String groupId) {
+        GroupRepository repo = new ParseGroupRepository();
+        repo.getGroupOnline(groupId);
+    }
+
+    private void queryAll() {
+        queryUsers();
+        queryPurchases();
+        queryCompensations();
+        queryTasks();
+    }
+
+    private void queryPurchases() {
+        PurchaseRepository repo = new ParsePurchaseRepository();
+        if (repo.updatePurchases(mCurrentUserGroups)) {
+            sendLocalBroadcast(DATA_TYPE_PURCHASE);
+        }
+    }
+
+    private void queryUsers() {
+        UserRepository repo = new ParseUserRepository();
+        if (repo.updateUsers(mCurrentUserGroups)) {
+            sendLocalBroadcast(DATA_TYPE_USER);
+        }
+    }
+
+    private void queryCompensations() {
+        CompensationRepository repo = new ParseCompensationRepository();
+        if (repo.updateCompensations(mCurrentUserGroups)) {
+            sendLocalBroadcastCompensation(false);
+            sendLocalBroadcastCompensation(true);
+        }
+    }
+
+    private void queryTasks() {
+        TaskRepository repo = new ParseTaskRepository();
+        if (repo.updateTasks(mCurrentUserGroups)) {
+            sendLocalBroadcast(DATA_TYPE_TASK);
+        }
     }
 
     private void sendLocalBroadcast(@DataType int dataType) {
@@ -451,5 +341,16 @@ public class ParseQueryService extends IntentService {
         intent.putExtra(INTENT_DATA_TYPE, DATA_TYPE_COMPENSATION);
         intent.putExtra(INTENT_COMPENSATION_PAID, isPaid);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    @StringDef({User.CLASS, Group.CLASS, Purchase.CLASS, Compensation.CLASS, Group.CLASS, Task.CLASS})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface ClassType {
+    }
+
+    @IntDef({DATA_TYPE_ALL, DATA_TYPE_PURCHASE, DATA_TYPE_USER, DATA_TYPE_COMPENSATION,
+            DATA_TYPE_GROUP, DATA_TYPE_TASK})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface DataType {
     }
 }

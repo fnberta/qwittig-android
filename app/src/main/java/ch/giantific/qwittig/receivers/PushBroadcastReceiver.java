@@ -32,11 +32,11 @@ import java.util.Random;
 import java.util.Set;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.models.Compensation;
-import ch.giantific.qwittig.data.parse.models.Group;
-import ch.giantific.qwittig.data.parse.models.Purchase;
-import ch.giantific.qwittig.data.parse.models.Task;
-import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.domain.models.parse.Compensation;
+import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.domain.models.parse.Task;
+import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.services.ParseQueryService;
 import ch.giantific.qwittig.ui.activities.FinanceActivity;
 import ch.giantific.qwittig.ui.activities.HomeActivity;

@@ -16,7 +16,7 @@ import com.parse.ParseUser;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.ui.adapters.rows.UserInvolvedRow;
 import ch.giantific.qwittig.ui.fragments.PurchaseBaseFragment;
 

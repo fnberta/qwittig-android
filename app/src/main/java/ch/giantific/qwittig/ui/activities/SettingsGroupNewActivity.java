@@ -18,11 +18,10 @@ import android.view.View;
 
 import com.github.jorgecastilloprz.FABProgressCircle;
 import com.github.jorgecastilloprz.listeners.FABProgressListener;
-import com.parse.ParseException;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.models.Group;
-import ch.giantific.qwittig.helpers.CreateGroupHelper;
+import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.data.helpers.group.CreateGroupHelper;
 import ch.giantific.qwittig.ui.fragments.SettingsGroupNewFragment;
 import ch.giantific.qwittig.ui.listeners.TransitionListenerAdapter;
 import ch.giantific.qwittig.utils.Utils;
@@ -132,8 +131,8 @@ public class SettingsGroupNewActivity extends BaseActivity implements
     }
 
     @Override
-    public void onCreateNewGroupFailed(@NonNull ParseException e) {
-        mSettingsGroupNewFragment.onCreateNewGroupFailed(e);
+    public void onCreateNewGroupFailed(int errorCode) {
+        mSettingsGroupNewFragment.onCreateNewGroupFailed(errorCode);
     }
 
     @Override
@@ -142,8 +141,8 @@ public class SettingsGroupNewActivity extends BaseActivity implements
     }
 
     @Override
-    public void onInviteUsersFailed(@NonNull ParseException e) {
-        mSettingsGroupNewFragment.onInviteUsersFailed(e);
+    public void onInviteUsersFailed(int errorCode) {
+        mSettingsGroupNewFragment.onInviteUsersFailed(errorCode);
     }
 
     @Override

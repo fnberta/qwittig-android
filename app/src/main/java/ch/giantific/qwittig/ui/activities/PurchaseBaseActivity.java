@@ -20,15 +20,14 @@ import android.widget.DatePicker;
 
 import com.github.jorgecastilloprz.FABProgressCircle;
 import com.github.jorgecastilloprz.listeners.FABProgressListener;
-import com.parse.ParseException;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.helpers.PurchaseSaveHelper;
-import ch.giantific.qwittig.helpers.RatesHelper;
+import ch.giantific.qwittig.data.helpers.save.PurchaseSaveHelper;
+import ch.giantific.qwittig.data.helpers.RatesHelper;
 import ch.giantific.qwittig.ui.fragments.PurchaseBaseFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseNoteFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseReceiptAddFragment;
@@ -280,8 +279,8 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     }
 
     @Override
-    public void onPurchaseSaveFailed(@NonNull ParseException e) {
-        mPurchaseFragment.onPurchaseSaveFailed(e);
+    public void onPurchaseSaveFailed(int errorCode) {
+        mPurchaseFragment.onPurchaseSaveFailed(errorCode);
     }
 
     @Override

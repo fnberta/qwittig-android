@@ -17,7 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.HelpItem;
+import ch.giantific.qwittig.domain.models.HelpItem;
 import ch.giantific.qwittig.ui.adapters.HelpFeedbackRecyclerAdapter;
 
 /**

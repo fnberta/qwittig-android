@@ -15,7 +15,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.parse.ParseException;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
@@ -23,12 +22,13 @@ import java.util.Collections;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.helpers.UserQueryHelper;
+import ch.giantific.qwittig.data.repositories.ParseUserRepository;
+import ch.giantific.qwittig.data.helpers.query.UserQueryHelper;
+import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.ui.adapters.UsersRecyclerAdapter;
-import ch.giantific.qwittig.utils.ComparatorParseUserIgnoreCase;
+import ch.giantific.qwittig.ComparatorParseUserIgnoreCase;
 import ch.giantific.qwittig.utils.HelperUtils;
-import ch.giantific.qwittig.utils.ParseErrorHandler;
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -40,15 +40,23 @@ import ch.giantific.qwittig.utils.Utils;
  * Subclass of {@link BaseRecyclerViewFragment}.
  */
 public class FinanceUserBalancesFragment extends BaseRecyclerViewFragment implements
-        LocalQuery.UserLocalQueryListener,
+        UserRepository.GetUsersLocalListener,
         UsersRecyclerAdapter.AdapterInteractionListener {
 
     private static final String USER_QUERY_HELPER = "USER_QUERY_HELPER";
     private UsersRecyclerAdapter mRecyclerAdapter;
     @NonNull
     private List<ParseUser> mUsers = new ArrayList<>();
+    private UserRepository mUserRepo;
 
     public FinanceUserBalancesFragment() {
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mUserRepo = new ParseUserRepository();
     }
 
     @Override
@@ -86,45 +94,39 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewFragment implem
     }
 
     /**
-     * Passes the {@link ParseException} to the generic error handler, shows the user an error
-     * message and removes the retained helper fragment and loading indicators.
+     * Passes the error code to the generic error handler, shows the user an error message and
+     * removes the retained helper fragment and loading indicators.
      *
-     * @param e the {@link ParseException} thrown in the process
+     * @param errorCode the error code of the exception thrown in the process
      */
-    public void onUsersPinFailed(@NonNull ParseException e) {
-        ParseErrorHandler.handleParseError(getActivity(), e);
-        showOnlineQueryErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
+    public void onUserUpdateFailed(int errorCode) {
+        ParseErrorHandler.handleParseError(getActivity(), errorCode);
+        showOnlineQueryErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), errorCode));
         HelperUtils.removeHelper(getFragmentManager(), USER_QUERY_HELPER);
 
         setLoading(false);
     }
 
     /**
-     * Tells the adapter of the {@link RecyclerView} to re-query its data.
+     * Tells the adapter of the {@link RecyclerView} to re-query its data, removes the retained
+     * helper fragment and removes loading indicators.
      */
-    public void onUsersPinned() {
+    public void onUsersUpdated() {
+        HelperUtils.removeHelper(getFragmentManager(), USER_QUERY_HELPER);
+        setLoading(false);
+
         updateAdapter();
-    }
-
-    /**
-     * Removes the retained helper fragment and removes loading indicators.
-     */
-    public void onAllUsersQueried() {
-        HelperUtils.removeHelper(getFragmentManager(), USER_QUERY_HELPER);
-        setLoading(false);
     }
 
     @Override
     public void updateAdapter() {
         super.updateAdapter();
 
-        if (mCurrentUser != null) {
-            LocalQuery.queryUsers(this);
-        }
+        mUserRepo.getUsersLocalAsync(mCurrentGroup, this);
     }
 
     @Override
-    public void onUsersLocalQueried(@NonNull List<ParseUser> users) {
+    public void onUsersLocalLoaded(@NonNull List<ParseUser> users) {
         mUsers.clear();
 
         if (!users.isEmpty()) {

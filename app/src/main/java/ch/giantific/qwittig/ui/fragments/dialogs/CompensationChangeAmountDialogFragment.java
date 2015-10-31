@@ -21,7 +21,7 @@ import org.apache.commons.math3.fraction.BigFraction;
 import java.math.BigDecimal;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.models.Compensation;
+import ch.giantific.qwittig.domain.models.parse.Compensation;
 import ch.giantific.qwittig.utils.MoneyUtils;
 
 /**

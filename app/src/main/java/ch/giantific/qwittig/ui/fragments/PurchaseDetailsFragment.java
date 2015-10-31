@@ -21,17 +21,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.util.Date;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.data.parse.models.Group;
-import ch.giantific.qwittig.data.parse.models.Purchase;
-import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.data.repositories.ParsePurchaseRepository;
+import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.ui.activities.BaseActivity;
 import ch.giantific.qwittig.ui.activities.PurchaseDetailsActivity;
 import ch.giantific.qwittig.ui.adapters.PurchaseDetailsRecyclerAdapter;
@@ -48,7 +48,7 @@ import ch.giantific.qwittig.utils.ParseUtils;
  * @see PurchaseDetailsActivity
  */
 public class PurchaseDetailsFragment extends BaseFragment implements
-        LocalQuery.ObjectLocalFetchListener {
+        PurchaseRepository.GetPurchaseLocalListener {
 
     public static final String PURCHASE_RECEIPT_FRAGMENT = "PURCHASE_RECEIPT_FRAGMENT";
     private static final String LOG_TAG = PurchaseDetailsFragment.class.getSimpleName();
@@ -61,6 +61,7 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     private User mCurrentUser;
     private Group mCurrentGroup;
     private boolean mHasReceiptFile;
+    private PurchaseRepository mPurchaseRepo;
 
     public PurchaseDetailsFragment() {
     }
@@ -98,6 +99,8 @@ public class PurchaseDetailsFragment extends BaseFragment implements
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
+
+        mPurchaseRepo = new ParsePurchaseRepository();
 
         Bundle args = getArguments();
         if (args != null) {
@@ -148,17 +151,17 @@ public class PurchaseDetailsFragment extends BaseFragment implements
      * the data for the pointers.
      */
     public void queryData() {
-        LocalQuery.queryPurchase(mPurchaseId, this);
+        mPurchaseRepo.getPurchaseLocalAsync(mPurchaseId, false, this);
     }
 
     @Override
-    public void onObjectFetched(@NonNull ParseObject object) {
-        mPurchase = (Purchase) object;
+    public void onPurchaseLocalLoaded(@NonNull Purchase purchase) {
+        mPurchase = purchase;
 
         updateToolbarTitle();
         updateActionBarMenu();
 
-        mRecyclerAdapter.setPurchase(object);
+        mRecyclerAdapter.setPurchase(purchase);
         mRecyclerAdapter.notifyDataSetChanged();
 
         toggleMainViewVisibility();

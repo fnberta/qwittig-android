@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.ViewPager;
@@ -22,7 +21,6 @@ import android.text.TextUtils;
 import android.view.View;
 
 import com.parse.ParseConfig;
-import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
 
@@ -35,13 +33,13 @@ import ch.berta.fabio.fabspeeddial.FabMenu;
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.parse.models.Config;
-import ch.giantific.qwittig.data.parse.models.Group;
-import ch.giantific.qwittig.helpers.FullQueryHelper;
-import ch.giantific.qwittig.helpers.InvitedGroupHelper;
-import ch.giantific.qwittig.helpers.MoreQueryHelper;
-import ch.giantific.qwittig.helpers.PurchaseQueryHelper;
+import ch.giantific.qwittig.domain.models.parse.Config;
+import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.data.helpers.group.InvitedGroupHelper;
+import ch.giantific.qwittig.data.helpers.query.MoreQueryHelper;
+import ch.giantific.qwittig.data.helpers.query.PurchaseQueryHelper;
 import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
+import ch.giantific.qwittig.services.ParseQueryService;
 import ch.giantific.qwittig.ui.adapters.TabsAdapter;
 import ch.giantific.qwittig.ui.fragments.HomeDraftsFragment;
 import ch.giantific.qwittig.ui.fragments.HomePurchasesFragment;
@@ -52,7 +50,7 @@ import ch.giantific.qwittig.ui.fragments.dialogs.GroupJoinDialogFragment;
 import ch.giantific.qwittig.utils.AnimUtils;
 import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
-import ch.giantific.qwittig.utils.ParseErrorHandler;
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
@@ -73,15 +71,13 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         GoPremiumDialogFragment.DialogInteractionListener,
         PurchaseQueryHelper.HelperInteractionListener,
         InvitedGroupHelper.HelperInteractionListener,
-        FullQueryHelper.HelperInteractionListener,
         MoreQueryHelper.HelperInteractionListener {
 
     private static final String LOG_TAG = HomeActivity.class.getSimpleName();
     private static final String INVITED_GROUP_HELPER = "INVITED_GROUP_HELPER";
-    private static final String URI_INVITED_GROUP_ID = "URI_INVITED_GROUP_ID";
+    private static final String URI_INVITED_GROUP_ID = "group";
     private static final String STATE_PURCHASE_FRAGMENT = "STATE_PURCHASE_FRAGMENT";
     private static final String STATE_DRAFTS_FRAGMENT = "STATE_DRAFTS_FRAGMENT";
-    private static final String FULL_QUERY_HELPER = "FULL_QUERY_HELPER";
     private static final String GROUP_JOIN_DIALOG = "GROUP_JOIN_DIALOG";
     private static final String CREATE_GROUP_DIALOG = "CREATE_GROUP_DIALOG";
     private static final String GO_PREMIUM_DIALOG = "GO_PREMIUM_DIALOG";
@@ -183,7 +179,11 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         }
 
         if (mNewQueryNeeded) {
-            fullOnlineQueryWithHelper();
+            if (mCurrentGroup != null) {
+                ParseQueryService.startQueryAll(this);
+            } else {
+                mNewQueryNeeded = false;
+            }
         }
     }
 
@@ -250,9 +250,9 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onInvitedGroupQueryFailed(@NonNull ParseException e) {
-        ParseErrorHandler.handleParseError(this, e);
-        MessageUtils.showBasicSnackbar(mFabMenu, ParseErrorHandler.getErrorMessage(this, e));
+    public void onInvitedGroupQueryFailed(int errorCode) {
+        ParseErrorHandler.handleParseError(this, errorCode);
+        MessageUtils.showBasicSnackbar(mFabMenu, ParseErrorHandler.getErrorMessage(this, errorCode));
         HelperUtils.removeHelper(getFragmentManager(), INVITED_GROUP_HELPER);
     }
 
@@ -302,6 +302,9 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     @Override
     public void onUserJoinedGroup() {
         HelperUtils.removeHelper(getFragmentManager(), INVITED_GROUP_HELPER);
+        dismissProgressDialog();
+        MessageUtils.showBasicSnackbar(mFabMenu, getString(R.string.toast_group_added,
+                mInvitedGroup.getName()));
 
         // register for notifications for the new group
         ParsePush.subscribeInBackground(mInvitedGroup.getObjectId());
@@ -315,19 +318,19 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         fetchCurrentUserGroups();
     }
 
-    @Override
-    public void onUserJoinGroupFailed(@NonNull ParseException e) {
-        ParseErrorHandler.handleParseError(this, e);
-        MessageUtils.getBasicSnackbar(mFabMenu, ParseErrorHandler.getErrorMessage(this, e));
-        HelperUtils.removeHelper(getFragmentManager(), INVITED_GROUP_HELPER);
-
-        dismissProgressDialog();
-    }
-
     private void dismissProgressDialog() {
         if (mProgressDialog != null) {
             mProgressDialog.dismiss();
         }
+    }
+
+    @Override
+    public void onUserJoinGroupFailed(int errorCode) {
+        ParseErrorHandler.handleParseError(this, errorCode);
+        MessageUtils.showBasicSnackbar(mFabMenu, ParseErrorHandler.getErrorMessage(this, errorCode));
+        HelperUtils.removeHelper(getFragmentManager(), INVITED_GROUP_HELPER);
+
+        dismissProgressDialog();
     }
 
     @Override
@@ -338,61 +341,6 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         mInvitedGroup.saveEventually();
 
         MessageUtils.showBasicSnackbar(mFabMenu, getString(R.string.toast_invitation_discarded));
-    }
-
-    private void fullOnlineQueryWithHelper() {
-        if (!Utils.isConnected(this)) {
-            dismissProgressDialog();
-            showFullOnlineQueryErrorSnackbar();
-            return;
-        }
-
-        FragmentManager fragmentManager = getFragmentManager();
-        Fragment fullQueryHelper = HelperUtils.findHelper(fragmentManager, FULL_QUERY_HELPER);
-
-        // If the Fragment is non-null, then it is currently being
-        // retained across a configuration change.
-        if (fullQueryHelper == null) {
-            fullQueryHelper = new FullQueryHelper();
-
-            fragmentManager.beginTransaction()
-                    .add(fullQueryHelper, FULL_QUERY_HELPER)
-                    .commit();
-        }
-    }
-
-    private void showFullOnlineQueryErrorSnackbar() {
-        Snackbar snackbar = MessageUtils.getBasicSnackbar(mFabMenu, getString(R.string.toast_failed_load_new_group_data));
-        snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showProgressDialog(getString(R.string.progress_new_group_data));
-                fullOnlineQueryWithHelper();
-            }
-        });
-        snackbar.show();
-
-    }
-
-    @Override
-    public void onPinFailed(@NonNull ParseException e) {
-        ParseErrorHandler.handleParseError(this, e);
-        showFullOnlineQueryErrorSnackbar();
-        HelperUtils.removeHelper(getFragmentManager(), FULL_QUERY_HELPER);
-
-        dismissProgressDialog();
-    }
-
-    @Override
-    public void onFullQueryFinished(boolean failedEarly) {
-        HelperUtils.removeHelper(getFragmentManager(), FULL_QUERY_HELPER);
-
-        dismissProgressDialog();
-
-        if (failedEarly) {
-            mNewQueryNeeded = false;
-            updateFragmentAdapters();
-        }
     }
 
     private void updateFragmentAdapters() {
@@ -457,7 +405,8 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     private void showCreateGroupDialog() {
-        GroupCreateDialogFragment groupCreateDialogFragment = GroupCreateDialogFragment.newInstance(R.string.dialog_group_create_purchases);
+        GroupCreateDialogFragment groupCreateDialogFragment =
+                GroupCreateDialogFragment.newInstance(R.string.dialog_group_create_purchases);
         groupCreateDialogFragment.show(getFragmentManager(), CREATE_GROUP_DIALOG);
     }
 
@@ -478,33 +427,33 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onPurchasesPinFailed(@NonNull ParseException e) {
-        mHomePurchasesFragment.onPurchasesPinFailed(e);
+    public void onPurchaseUpdateFailed(int errorCode) {
+        mHomePurchasesFragment.onPurchaseUpdateFailed(errorCode);
     }
 
     @Override
-    public void onPurchasesPinned() {
-        super.onPurchasesPinned();
+    public void onPurchasesUpdated() {
+        super.onPurchasesUpdated();
 
         // will be set to true after login and group change
         mNewQueryNeeded = false;
 
-        mHomePurchasesFragment.onPurchasesPinned();
+        mHomePurchasesFragment.onPurchasesUpdated();
     }
 
     @Override
-    public void onAllPurchasesQueried() {
-        mHomePurchasesFragment.onAllPurchasesQueried();
+    public void onAllPurchasesUpdated() {
+        mHomePurchasesFragment.onAllPurchasesUpdated();
     }
 
     @Override
-    public void onMoreObjectsPinned(@NonNull List<ParseObject> objects) {
-        mHomePurchasesFragment.onMoreObjectsPinned(objects);
+    public void onMoreObjectsLoaded(@NonNull List<ParseObject> objects) {
+        mHomePurchasesFragment.onMoreObjectsLoaded(objects);
     }
 
     @Override
-    public void onMoreObjectsPinFailed(@NonNull ParseException e) {
-        mHomePurchasesFragment.onMoreObjectsPinFailed(e);
+    public void onMoreObjectsLoadFailed(int errorCode) {
+        mHomePurchasesFragment.onMoreObjectsLoadFailed(errorCode);
     }
 
     @Override

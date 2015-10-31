@@ -18,7 +18,9 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.utils.ParseErrorHandler;
+import ch.giantific.qwittig.data.repositories.ParsePurchaseRepository;
+import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
+import ch.giantific.qwittig.ParseErrorHandler;
 
 /**
  * Provides an abstract base class for screens that display purchase receipt images.
@@ -27,10 +29,18 @@ import ch.giantific.qwittig.utils.ParseErrorHandler;
  */
 public abstract class PurchaseReceiptBaseFragment extends BaseFragment {
 
+    PurchaseRepository mPurchaseRepo;
     ImageView mImageViewReceipt;
     private ProgressBar mProgressBar;
 
     public PurchaseReceiptBaseFragment() {
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mPurchaseRepo = new ParsePurchaseRepository();
     }
 
     @Override
@@ -55,7 +65,7 @@ public abstract class PurchaseReceiptBaseFragment extends BaseFragment {
                     mProgressBar.setVisibility(View.GONE);
 
                     if (e != null) {
-                        ParseErrorHandler.handleParseError(getActivity(), e);
+                        ParseErrorHandler.handleParseError(getActivity(), e.getCode());
                         return;
                     }
 

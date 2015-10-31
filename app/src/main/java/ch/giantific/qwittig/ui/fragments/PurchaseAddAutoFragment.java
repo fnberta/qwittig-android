@@ -21,10 +21,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.ItemRow;
-import ch.giantific.qwittig.data.ocr.models.ItemRest;
-import ch.giantific.qwittig.data.ocr.models.PurchaseRest;
-import ch.giantific.qwittig.helpers.OcrHelper;
+import ch.giantific.qwittig.domain.models.ItemRow;
+import ch.giantific.qwittig.domain.models.ocr.OcrItem;
+import ch.giantific.qwittig.domain.models.ocr.OcrPurchase;
+import ch.giantific.qwittig.data.helpers.OcrHelper;
 import ch.giantific.qwittig.ui.activities.PurchaseAddActivity;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
@@ -185,10 +185,10 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
     /**
      * Populates the results from the server.
      *
-     * @param purchaseRest the ocr result from the server
+     * @param ocrPurchase the ocr result from the server
      */
-    public void onOcrFinished(@NonNull PurchaseRest purchaseRest) {
-        setValuesFromOcr(purchaseRest);
+    public void onOcrFinished(@NonNull OcrPurchase ocrPurchase) {
+        setValuesFromOcr(ocrPurchase);
     }
 
     /**
@@ -201,21 +201,21 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
         showMainScreen();
     }
 
-    private void setValuesFromOcr(@NonNull PurchaseRest purchaseRest) {
+    private void setValuesFromOcr(@NonNull OcrPurchase ocrPurchase) {
         // set date
-        //setDateSelected(purchaseRest.getDate());
+        //setDateSelected(ocrPurchase.getDate());
         // set store
-        setStore(purchaseRest.getStore(), false);
+        setStore(ocrPurchase.getStore(), false);
 
         // set item rows
-        List<ItemRest> itemsRest = purchaseRest.getItems();
+        List<OcrItem> itemsRest = ocrPurchase.getItems();
         int itemsRestSize = itemsRest.size();
         List<ItemRow> itemRowsNew = new ArrayList<>(itemsRestSize);
         for (int i = 0; i < itemsRestSize; i++) {
-            final ItemRest itemRest = itemsRest.get(i);
+            final OcrItem ocrItem = itemsRest.get(i);
             final ItemRow itemRowNew = addNewItemRow(i + 1);
-            itemRowNew.setEditTextName(itemRest.getName());
-            String price = MoneyUtils.formatPrice(itemRest.getPrice(), mCurrencySelected);
+            itemRowNew.setEditTextName(ocrItem.getName());
+            String price = MoneyUtils.formatPrice(ocrItem.getPrice(), mCurrencySelected);
             itemRowNew.setEditTextPrice(price);
             itemRowsNew.add(itemRowNew);
 

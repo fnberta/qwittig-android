@@ -4,9 +4,7 @@
 
 package ch.giantific.qwittig.ui.fragments;
 
-import android.app.Activity;
 import android.app.FragmentManager;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,15 +19,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.ItemRow;
-import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.data.parse.models.Item;
-import ch.giantific.qwittig.data.parse.models.Purchase;
-import ch.giantific.qwittig.helpers.PurchaseEditSaveHelper;
+import ch.giantific.qwittig.domain.models.ItemRow;
+import ch.giantific.qwittig.domain.models.parse.Item;
+import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.data.repositories.ParsePurchaseRepository;
+import ch.giantific.qwittig.data.helpers.save.PurchaseEditSaveHelper;
+import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.ui.fragments.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.utils.DateUtils;
-import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 
 /**
@@ -37,8 +34,7 @@ import ch.giantific.qwittig.utils.MoneyUtils;
  * <p/>
  * Subclass of {@link PurchaseBaseFragment}.
  */
-public class PurchaseEditFragment extends PurchaseBaseFragment implements
-        LocalQuery.ObjectLocalFetchListener {
+public class PurchaseEditFragment extends PurchaseBaseFragment {
 
     static final String BUNDLE_EDIT_PURCHASE_ID = "BUNDLE_EDIT_PURCHASE_ID";
     private static final String STATE_ITEMS_SET = "STATE_ITEMS_SET";
@@ -51,6 +47,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     private static final String LOG_TAG = PurchaseEditFragment.class.getSimpleName();
     private static final String DISCARD_CHANGES_DIALOG = "DISCARD_CHANGES_DIALOG";
     String mEditPurchaseId;
+    PurchaseRepository mPurchaseRepo;
     private boolean mOldValuesAreSet;
     private List<ParseObject> mOldItems;
     private ArrayList<String> mOldItemIds;
@@ -87,6 +84,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
 
         setHasOptionsMenu(true);
 
+        mPurchaseRepo = new ParsePurchaseRepository();
         mEditPurchaseId = getArguments().getString(BUNDLE_EDIT_PURCHASE_ID, "");
 
         if (savedInstanceState != null) {
@@ -131,16 +129,16 @@ public class PurchaseEditFragment extends PurchaseBaseFragment implements
     }
 
     void fetchPurchase() {
-        LocalQuery.fetchObjectFromId(Purchase.CLASS, mEditPurchaseId, this);
+        mPurchaseRepo.fetchPurchaseDataLocalAsync(mEditPurchaseId, new PurchaseRepository.GetPurchaseLocalListener() {
+            @Override
+            public void onPurchaseLocalLoaded(@NonNull Purchase purchase) {
+                processOldPurchase(purchase);
+            }
+        });
     }
 
-    @Override
-    public void onObjectFetched(@NonNull ParseObject object) {
-        processOldPurchase(object);
-    }
-
-    void processOldPurchase(ParseObject parseObject) {
-        mPurchase = (Purchase) parseObject;
+    void processOldPurchase(Purchase purchase) {
+        mPurchase = purchase;
 
         if (!mOldValuesAreSet) {
             // get old items and save in class wide list

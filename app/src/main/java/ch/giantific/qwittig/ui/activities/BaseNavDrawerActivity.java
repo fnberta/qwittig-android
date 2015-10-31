@@ -40,23 +40,24 @@ import com.parse.ParseUser;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.giantific.qwittig.utils.BlurTransformation;
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.Avatar;
-import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.data.parse.models.Config;
-import ch.giantific.qwittig.data.parse.models.Group;
-import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.domain.models.Avatar;
+import ch.giantific.qwittig.domain.models.parse.Config;
+import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.data.repositories.ParseGroupRepository;
+import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.services.ParseQueryService;
 import ch.giantific.qwittig.ui.adapters.NavHeaderGroupsArrayAdapter;
 import ch.giantific.qwittig.ui.fragments.SettingsFragment;
+import ch.giantific.qwittig.BlurTransformation;
 import ch.giantific.qwittig.utils.MessageUtils;
-import ch.giantific.qwittig.utils.inappbilling.IabHelper;
-import ch.giantific.qwittig.utils.inappbilling.IabKey;
-import ch.giantific.qwittig.utils.inappbilling.IabResult;
-import ch.giantific.qwittig.utils.inappbilling.Inventory;
-import ch.giantific.qwittig.utils.inappbilling.Purchase;
+import ch.giantific.qwittig.inappbilling.IabHelper;
+import ch.giantific.qwittig.inappbilling.IabKey;
+import ch.giantific.qwittig.inappbilling.IabResult;
+import ch.giantific.qwittig.inappbilling.Inventory;
+import ch.giantific.qwittig.inappbilling.Purchase;
 
 /**
  * Provides an abstract base class that sets up the navigation drawer and implements a couple of
@@ -66,10 +67,9 @@ import ch.giantific.qwittig.utils.inappbilling.Purchase;
  * <p/>
  * Subclass of {@link BaseActivity}.
  */
-public abstract class BaseNavDrawerActivity extends BaseActivity implements
-        LocalQuery.ObjectLocalFetchListener {
+public abstract class BaseNavDrawerActivity extends BaseActivity {
 
-    static final String URI_INVITED_EMAIL = "URI_INVITED_EMAIL";
+    static final String URI_INVITED_EMAIL = "email";
     private static final int NAVDRAWER_ITEM_INVALID = -1;
     private static final String SKU_PREMIUM = "ch.giantific.qwittig.iab.premium";
     private static final int RC_REQUEST = 10001;
@@ -103,20 +103,20 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
             int dataType = intent.getIntExtra(ParseQueryService.INTENT_DATA_TYPE, 0);
             switch (dataType) {
                 case ParseQueryService.DATA_TYPE_PURCHASE:
-                    onPurchasesPinned();
+                    onPurchasesUpdated();
                     break;
                 case ParseQueryService.DATA_TYPE_USER:
-                    onUsersPinned();
+                    onUsersUpdated();
                     break;
                 case ParseQueryService.DATA_TYPE_COMPENSATION:
                     boolean isPaid = intent.getBooleanExtra(ParseQueryService.INTENT_COMPENSATION_PAID, false);
-                    onCompensationsPinned(isPaid);
+                    onCompensationsUpdated(isPaid);
                     break;
                 case ParseQueryService.DATA_TYPE_GROUP:
-                    onGroupQueried();
+                    onGroupLoaded();
                     break;
                 case ParseQueryService.DATA_TYPE_TASK:
-                    onTasksPinned();
+                    onTasksUpdated();
                     break;
             }
         }
@@ -176,27 +176,27 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
     }
 
     @CallSuper
-    public void onPurchasesPinned() {
+    public void onPurchasesUpdated() {
         // empty default implementation
     }
 
     @CallSuper
-    public void onUsersPinned() {
+    public void onUsersUpdated() {
         // empty default implementation
     }
 
     @CallSuper
-    public void onCompensationsPinned(boolean isPaid) {
+    public void onCompensationsUpdated(boolean isPaid) {
         // empty default implementation
     }
 
     @CallSuper
-    public void onTasksPinned() {
+    public void onTasksUpdated() {
         // empty default implementation
     }
 
     @CallSuper
-    public void onGroupQueried() {
+    public void onGroupLoaded() {
         updateGroupSpinnerList();
     }
 
@@ -292,21 +292,22 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
             return;
         }
 
+        GroupRepository repo = new ParseGroupRepository();
         mGroupsCount = groups.size();
         for (final ParseObject group : groups) {
             if (group.isDataAvailable()) {
                 mFetchCounter++;
                 checkFetchesFinished();
             } else {
-                LocalQuery.fetchObjectData(group, this);
+                repo.fetchGroupDataAsync(group, new GroupRepository.GetGroupLocalListener() {
+                    @Override
+                    public void onGroupLocalLoaded(@NonNull Group group) {
+                        mFetchCounter++;
+                        checkFetchesFinished();
+                    }
+                });
             }
         }
-    }
-
-    @Override
-    public void onObjectFetched(@NonNull ParseObject object) {
-        mFetchCounter++;
-        checkFetchesFinished();
     }
 
     private void checkFetchesFinished() {
@@ -327,7 +328,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity implements
         }
     }
 
-    final void setCurrentUserAndGroup() {
+    private void setCurrentUserAndGroup() {
         User currentUser = (User) ParseUser.getCurrentUser();
         if (currentUser != null) {
             mCurrentUser = currentUser;

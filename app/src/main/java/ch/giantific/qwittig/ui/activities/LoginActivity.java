@@ -10,11 +10,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
-import com.parse.ParseException;
 import com.parse.ParseUser;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.helpers.LoginHelper;
+import ch.giantific.qwittig.data.helpers.account.LoginHelper;
 import ch.giantific.qwittig.ui.fragments.LoginBaseFragment;
 import ch.giantific.qwittig.ui.fragments.LoginFragment;
 import ch.giantific.qwittig.ui.fragments.LoginSignUpFragment;
@@ -71,8 +70,8 @@ public class LoginActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onLoginFailed(@NonNull ParseException e) {
-        mLoginBaseFragment.onLoginFailed(e);
+    public void onLoginFailed(int errorCode) {
+        mLoginBaseFragment.onLoginFailed(errorCode);
     }
 
     @Override

@@ -22,8 +22,8 @@ import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.Avatar;
-import ch.giantific.qwittig.data.models.ItemUserPicker;
+import ch.giantific.qwittig.domain.models.Avatar;
+import ch.giantific.qwittig.domain.models.ItemUserPicker;
 import ch.giantific.qwittig.ui.fragments.dialogs.CompensationSingleDialogFragment;
 
 

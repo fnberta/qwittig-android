@@ -17,23 +17,22 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.Month;
-import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.data.parse.models.Group;
-import ch.giantific.qwittig.data.parse.models.User;
-import ch.giantific.qwittig.data.stats.models.Stats;
-import ch.giantific.qwittig.helpers.StatsHelper;
+import ch.giantific.qwittig.domain.models.Month;
+import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.models.stats.Stats;
+import ch.giantific.qwittig.data.repositories.ParseGroupRepository;
+import ch.giantific.qwittig.data.helpers.group.StatsHelper;
+import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
-import ch.giantific.qwittig.utils.ParseErrorHandler;
-import ch.giantific.qwittig.utils.ParseUtils;
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
@@ -41,8 +40,7 @@ import ch.giantific.qwittig.utils.Utils;
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public abstract class StatsBaseFragment extends BaseFragment implements
-        LocalQuery.ObjectLocalFetchListener {
+public abstract class StatsBaseFragment extends BaseFragment {
 
     static final int PERIOD_YEAR = 0;
     static final int PERIOD_MONTH = 1;
@@ -109,6 +107,7 @@ public abstract class StatsBaseFragment extends BaseFragment implements
     public void onStart() {
         super.onStart();
 
+        // TODO: move to onViewCreated?
         updateData();
     }
 
@@ -135,7 +134,14 @@ public abstract class StatsBaseFragment extends BaseFragment implements
                 setStuffWithGroupData();
                 loadData();
             } else {
-                LocalQuery.fetchObjectData(mCurrentGroup, this);
+                GroupRepository repo = new ParseGroupRepository();
+                repo.fetchGroupDataAsync(mCurrentGroup, new GroupRepository.GetGroupLocalListener() {
+                    @Override
+                    public void onGroupLocalLoaded(@NonNull Group group) {
+                        setStuffWithGroupData();
+                        loadData();
+                    }
+                });
             }
         } else {
             setEmptyViewVisibility(true);
@@ -146,12 +152,6 @@ public abstract class StatsBaseFragment extends BaseFragment implements
     @CallSuper
     void setStuffWithGroupData() {
         // empty default implementation
-    }
-
-    @Override
-    public void onObjectFetched(@NonNull ParseObject object) {
-        setStuffWithGroupData();
-        loadData();
     }
 
     private boolean userIsInGroup() {
@@ -190,7 +190,7 @@ public abstract class StatsBaseFragment extends BaseFragment implements
     void calcStats(String year, int month) {
         if (!Utils.isConnected(getActivity())) {
             showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(),
-                    ParseUtils.getNoConnectionException()));
+                    ParseException.CONNECTION_FAILED));
 
             setEmptyViewVisibility(true);
             toggleProgressBarVisibility();
@@ -291,15 +291,16 @@ public abstract class StatsBaseFragment extends BaseFragment implements
     protected abstract void setChartData();
 
     /**
-     * Passes the {@link ParseException} to the generic error handler, shows the user an error
-     * message and removes the retained helper fragment and loading indicators.
+     * Passes the error code to the generic error handler, shows the user an error message and
+     * removes the retained helper fragment and loading indicators.
      *
-     * @param e the {@link ParseException} thrown during the process
+     * @param errorCode the error code of the exception thrown during the process
      */
     @CallSuper
-    public void onStatsCalculationFailed(ParseException e) {
-        ParseErrorHandler.handleParseError(getActivity(), e);
-        showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), e));
+    public void onStatsCalculationFailed(int errorCode) {
+        final Activity context = getActivity();
+        ParseErrorHandler.handleParseError(context, errorCode);
+        showErrorSnackbar(ParseErrorHandler.getErrorMessage(context, errorCode));
         HelperUtils.removeHelper(getFragmentManager(), getHelperTag());
 
         mIsLoading = false;

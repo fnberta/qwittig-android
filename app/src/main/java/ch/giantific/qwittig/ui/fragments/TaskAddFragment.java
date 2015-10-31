@@ -35,11 +35,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.models.TaskUser;
-import ch.giantific.qwittig.data.parse.LocalQuery;
-import ch.giantific.qwittig.data.parse.models.Group;
-import ch.giantific.qwittig.data.parse.models.Task;
-import ch.giantific.qwittig.data.parse.models.User;
+import ch.giantific.qwittig.domain.models.TaskUser;
+import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.Task;
+import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.data.repositories.ParseUserRepository;
+import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.ui.adapters.StringResSpinnerAdapter;
 import ch.giantific.qwittig.ui.adapters.TaskUsersInvolvedRecyclerAdapter;
 import ch.giantific.qwittig.ui.fragments.dialogs.DatePickerDialogFragment;
@@ -56,12 +57,9 @@ import ch.giantific.qwittig.utils.ParseUtils;
  * Subclass of {@link BaseFragment}.
  */
 public class TaskAddFragment extends BaseFragment implements
-        LocalQuery.UserLocalQueryListener,
+        UserRepository.GetUsersLocalListener,
         TaskUsersInvolvedRecyclerAdapter.AdapterInteractionListener {
 
-    @IntDef({TASK_SAVED, TASK_DISCARDED, TASK_NO_CHANGES})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface TaskAction {}
     public static final int TASK_SAVED = 0;
     public static final int TASK_DISCARDED = 1;
     public static final int TASK_NO_CHANGES = 2;
@@ -82,7 +80,6 @@ public class TaskAddFragment extends BaseFragment implements
     private ItemTouchHelper mUsersItemTouchHelper;
     private User mCurrentUser;
     private Group mCurrentGroup;
-
     public TaskAddFragment() {
     }
 
@@ -228,11 +225,12 @@ public class TaskAddFragment extends BaseFragment implements
     }
 
     final void queryUsers() {
-        LocalQuery.queryUsers(this);
+        UserRepository repo = new ParseUserRepository();
+        repo.getUsersLocalAsync(mCurrentGroup, this);
     }
 
     @Override
-    public void onUsersLocalQueried(@NonNull List<ParseUser> users) {
+    public void onUsersLocalLoaded(@NonNull List<ParseUser> users) {
         mUsersAvailable.clear();
 
         if (!users.isEmpty()) {
@@ -450,6 +448,11 @@ public class TaskAddFragment extends BaseFragment implements
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @IntDef({TASK_SAVED, TASK_DISCARDED, TASK_NO_CHANGES})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface TaskAction {
     }
 
     /**
