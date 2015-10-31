@@ -24,7 +24,7 @@ import ch.giantific.qwittig.domain.models.TaskUser;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.ui.adapters.rows.BaseUserAvatarRow;
 
-import static ch.giantific.qwittig.utils.AnimUtils.DISABLED_ALPHA;
+import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;
 
 
 /**

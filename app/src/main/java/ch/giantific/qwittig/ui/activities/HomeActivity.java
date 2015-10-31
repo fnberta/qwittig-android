@@ -47,7 +47,7 @@ import ch.giantific.qwittig.ui.fragments.PurchaseAddFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GoPremiumDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupJoinDialogFragment;
-import ch.giantific.qwittig.utils.AnimUtils;
+import ch.giantific.qwittig.utils.ViewUtils;
 import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.ParseErrorHandler;
@@ -117,7 +117,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
             public void run() {
                 mFabMenu.showMenuButton(true);
             }
-        }, AnimUtils.FAB_CIRCULAR_REVEAL_DELAY * 4);
+        }, ViewUtils.FAB_CIRCULAR_REVEAL_DELAY * 4);
 
         FloatingActionButton fabAuto = (FloatingActionButton) findViewById(R.id.fab_auto);
         fabAuto.setOnClickListener(this);

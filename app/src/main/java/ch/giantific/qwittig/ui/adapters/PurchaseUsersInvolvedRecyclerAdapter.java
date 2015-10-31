@@ -20,7 +20,7 @@ import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.ui.adapters.rows.UserInvolvedRow;
 import ch.giantific.qwittig.ui.fragments.PurchaseBaseFragment;
 
-import static ch.giantific.qwittig.utils.AnimUtils.DISABLED_ALPHA;
+import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;
 
 /**
  * Handles the display of user avatars and nicknames in the user selection row of the

@@ -25,7 +25,7 @@ import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.ui.adapters.rows.UserInvolvedRow;
 import ch.giantific.qwittig.ComparatorParseUserIgnoreCase;
 
-import static ch.giantific.qwittig.utils.AnimUtils.DISABLED_ALPHA;
+import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;
 
 /**
  * Handles the display of users' avatars and nicknames inside of a

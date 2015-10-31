@@ -39,6 +39,7 @@ import ch.giantific.qwittig.ui.listeners.TransitionListenerAdapter;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.Utils;
+import ch.giantific.qwittig.utils.ViewUtils;
 
 /**
  * Provides an abstract base class for the creation and editing of purchases. Mostly deals with

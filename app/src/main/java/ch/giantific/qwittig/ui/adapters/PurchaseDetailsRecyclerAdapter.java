@@ -30,8 +30,8 @@ import ch.giantific.qwittig.ui.widgets.CircleDisplay;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 
-import static ch.giantific.qwittig.utils.AnimUtils.DISABLED_ALPHA;
-import static ch.giantific.qwittig.utils.AnimUtils.DISABLED_ALPHA_RGB;
+import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;
+import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA_RGB;
 
 /**
  * Handles the display of the detail view of a purchase including the different headers,

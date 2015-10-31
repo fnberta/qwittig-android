@@ -37,6 +37,7 @@ import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
+import ch.giantific.qwittig.utils.ViewUtils;
 
 /**
  * Provides an abstract base class for the login screen views.
@@ -78,29 +79,13 @@ public abstract class LoginBaseFragment extends BaseFragment implements
 
     final void setLoading(boolean isLoading) {
         if (isLoading) {
-            hideSoftKeyboard();
+            ViewUtils.hideSoftKeyboard(getActivity());
             mViewProgress.setVisibility(View.VISIBLE);
             mViewMain.setVisibility(View.GONE);
         } else {
             mViewProgress.setVisibility(View.GONE);
             mViewMain.setVisibility(View.VISIBLE);
         }
-    }
-
-    private void hideSoftKeyboard() {
-        Activity activity = getActivity();
-
-        InputMethodManager inputMethodManager = (InputMethodManager)
-                activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        // Find the currently focused view, so we can grab the correct window token from it.
-        View view = activity.getCurrentFocus();
-
-        // If no view currently has focus, create a new one, just so we can grab a window token from it
-        if (view == null) {
-            view = new View(activity);
-        }
-
-        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     @Override

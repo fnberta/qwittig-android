@@ -44,7 +44,7 @@ import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.ui.adapters.CompensationsUnpaidRecyclerAdapter;
 import ch.giantific.qwittig.ui.fragments.dialogs.CompensationChangeAmountDialogFragment;
-import ch.giantific.qwittig.utils.AnimUtils;
+import ch.giantific.qwittig.utils.ViewUtils;
 import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.ParseErrorHandler;
@@ -281,7 +281,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void circularRevealFab() {
-        Animator reveal = AnimUtils.getCircularRevealAnimator(mFabNew);
+        Animator reveal = ViewUtils.getCircularRevealAnimator(mFabNew);
         reveal.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(@NonNull Animator animation) {

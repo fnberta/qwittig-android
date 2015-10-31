@@ -26,7 +26,7 @@ import ch.giantific.qwittig.data.helpers.reminder.TaskRemindHelper;
 import ch.giantific.qwittig.ui.adapters.StringResSpinnerAdapter;
 import ch.giantific.qwittig.ui.fragments.TasksFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupCreateDialogFragment;
-import ch.giantific.qwittig.utils.AnimUtils;
+import ch.giantific.qwittig.utils.ViewUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
@@ -107,7 +107,7 @@ public class TasksActivity extends BaseNavDrawerActivity implements
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void circularRevealFab() {
-        Animator reveal = AnimUtils.getCircularRevealAnimator(mFab);
+        Animator reveal = ViewUtils.getCircularRevealAnimator(mFab);
         reveal.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(@NonNull Animator animation) {
