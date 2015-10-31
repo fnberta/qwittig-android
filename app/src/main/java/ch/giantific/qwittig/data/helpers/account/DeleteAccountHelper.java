@@ -90,8 +90,6 @@ public class DeleteAccountHelper extends LogoutHelper implements
                 logOut();
             }
         });
-
-        // TODO: check in CloudCode if user is the only member in his groups, if yes delete groups (tricky!!)
     }
 
     @Override

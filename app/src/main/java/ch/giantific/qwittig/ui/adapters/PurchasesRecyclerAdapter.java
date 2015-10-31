@@ -28,7 +28,6 @@ import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Avatar;
-import ch.giantific.qwittig.domain.models.parse.Item;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.ui.adapters.rows.ProgressRow;
@@ -104,14 +103,16 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
             case TYPE_ITEM: {
                 PurchaseRow purchaseRow = (PurchaseRow) viewHolder;
                 Purchase purchase = (Purchase) mPurchases.get(position);
-                User buyer = purchase.getBuyer();
 
-                purchaseRow.setAvatar(buyer.getAvatar());
+                final User buyer = purchase.getBuyer();
+                final User currentUser = (User) ParseUser.getCurrentUser();
+                final boolean buyerIsValid = buyer.getGroupIds().contains(
+                        currentUser.getCurrentGroup().getObjectId());
+
+                purchaseRow.setAvatar(buyerIsValid ? buyer.getAvatar() : null);
                 purchaseRow.setStore(purchase.getStore());
 
-                User currentUser = (User) ParseUser.getCurrentUser();
-                String nickname = buyer.getGroupIds().contains(currentUser.getCurrentGroup().getObjectId()) ?
-                        buyer.getNicknameOrMe(mContext) : mContext.getString(R.string.user_deleted);
+                String nickname = buyerIsValid ? buyer.getNicknameOrMe(mContext) : mContext.getString(R.string.user_deleted);
                 purchaseRow.setBuyerAndDate(nickname, purchase.getDate());
 
                 double totalPrice = purchase.getTotalPrice();
