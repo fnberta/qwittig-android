@@ -24,7 +24,7 @@ import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 public class CloudCodeClient {
 
     public static final String CALCULATE_BALANCE = "calculateBalance";
-    public static final String INVITE_USER = "inviteUser";
+    public static final String INVITE_USER = "inviteUsers";
     public static final String PUSH_TASK_REMIND = "pushTaskRemind";
     public static final String PUSH_COMPENSATION_REMIND = "pushCompensationRemind";
     public static final String PUSH_COMPENSATION_REMIND_PAID = "pushCompensationRemindPaid";
@@ -38,7 +38,7 @@ public class CloudCodeClient {
     public static final String STATS_CURRENCIES = "statsCurrencies";
 
     public static final String PARAM_SETTLEMENT_SINGLE_USER = "singleUser";
-    public static final String PARAM_EMAIL = "email";
+    public static final String PARAM_EMAIL = "emails";
     public static final String PARAM_FILE_NAME = "fileName";
     public static final String PARAM_YEAR = "year";
     public static final String PARAM_MONTH = "month";
