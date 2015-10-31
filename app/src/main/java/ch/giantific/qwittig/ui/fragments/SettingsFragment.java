@@ -425,7 +425,7 @@ public class SettingsFragment extends PreferenceFragment implements
                     case Activity.RESULT_OK:
                         MessageUtils.showBasicSnackbar(rootView, getString(R.string.toast_changes_saved));
                         break;
-                    case SettingsProfileActivity.RESULT_CHANGES_DISCARDED:
+                    case SettingsProfileFragment.RESULT_CHANGES_DISCARDED:
                         MessageUtils.showBasicSnackbar(rootView, getString(R.string.toast_changes_discarded));
                         break;
                 }

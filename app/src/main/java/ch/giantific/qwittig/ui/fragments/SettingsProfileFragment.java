@@ -5,13 +5,19 @@
 package ch.giantific.qwittig.ui.fragments;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -21,12 +27,14 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.parse.ParseUser;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.Arrays;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Avatar;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.ui.activities.SettingsProfileActivity;
+import ch.giantific.qwittig.ui.fragments.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -37,6 +45,15 @@ import ch.giantific.qwittig.utils.Utils;
  */
 public class SettingsProfileFragment extends BaseFragment {
 
+    @IntDef({CHANGES_SAVED, CHANGES_DISCARDED, NO_CHANGES})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface EditAction {}
+    public static final int CHANGES_SAVED = 0;
+    public static final int CHANGES_DISCARDED = 1;
+    public static final int NO_CHANGES = 2;
+    public static final int RESULT_CHANGES_DISCARDED = 2;
+    private static final String DISCARD_CHANGES_DIALOG = "DISCARD_CHANGES_DIALOG";
+    private static final int INTENT_REQUEST_IMAGE = 1;
     private FragmentInteractionListener mListener;
     private TextInputLayout mTextInputLayoutEmail;
     private EditText mEditTextEmail;
@@ -55,7 +72,7 @@ public class SettingsProfileFragment extends BaseFragment {
     private String mPasswordRepeat;
     private byte[] mAvatar;
     private boolean mDeleteAvatar;
-
+    private boolean mHasAvatarSet = true;
     public SettingsProfileFragment() {
     }
 
@@ -68,6 +85,13 @@ public class SettingsProfileFragment extends BaseFragment {
             throw new ClassCastException(activity.toString()
                     + " must implement DialogInteractionListener");
         }
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -99,14 +123,101 @@ public class SettingsProfileFragment extends BaseFragment {
 
         mTextInputLayoutPasswordRepeat = (TextInputLayout) view.findViewById(R.id.til_password_repeat);
         mEditTextPasswordRepeat = mTextInputLayoutPasswordRepeat.getEditText();
+
+        checkAvatar();
+    }
+
+    private void checkAvatar() {
+        byte[] avatar = mCurrentUser.getAvatar();
+        mHasAvatarSet = avatar != null;
+        getActivity().invalidateOptionsMenu();
+        mListener.setBackdropAvatar(avatar);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_settings_profile, menu);
+        MenuItem deleteAvatar = menu.findItem(R.id.action_settings_profile_avatar_delete);
+        deleteAvatar.setVisible(mHasAvatarSet);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.action_settings_profile_avatar_edit:
+                pickAvatar();
+                return true;
+            case R.id.action_settings_profile_avatar_delete:
+                deleteAvatar();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void pickAvatar() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        startActivityForResult(intent, INTENT_REQUEST_IMAGE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @NonNull Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case INTENT_REQUEST_IMAGE:
+                if (resultCode == Activity.RESULT_OK) {
+                    Uri imageUri = data.getData();
+                    onNewAvatarTaken(imageUri);
+                }
+        }
+    }
+
+    private void onNewAvatarTaken(Uri imageUri) {
+        setUserAvatar(imageUri);
+        mHasAvatarSet = true;
+        getActivity().invalidateOptionsMenu();
+
+        mListener.setBackdropAvatarFromUri(imageUri);
+    }
+
+    private void setUserAvatar(Uri imageUri) {
+        mDeleteAvatar = false;
+        Glide.with(this)
+                .load(imageUri)
+                .asBitmap()
+                .toBytes(Bitmap.CompressFormat.JPEG, Avatar.JPEG_COMPRESSION_RATE)
+                .centerCrop()
+                .into(new SimpleTarget<byte[]>(Avatar.WIDTH, Avatar.HEIGHT) {
+                    @Override
+                    public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
+                        mAvatar = resource;
+                    }
+                });
+    }
+
+    private void deleteAvatar() {
+        mDeleteAvatar = true;
+        mListener.setBackdropAvatar(null);
+        mHasAvatarSet = false;
+        getActivity().invalidateOptionsMenu();
     }
 
     /**
-     * Returns whether the user made any changes.
-     *
-     * @return whether changes were made by the user
+     * Checks whether the user made any changes and finishes if not. If yes show a dialog asking
+     * the user if he/she wants to discard the changes.
      */
-    public boolean changesWereMade() {
+    public void checkForChangesAndExit() {
+        if (changesWereMade()) {
+            showDiscardChangesDialog();
+        } else {
+            finishEdit(NO_CHANGES);
+        }
+    }
+
+    private boolean changesWereMade() {
         readFields();
 
         return !mEmail.equals(mCurrentEmail) && !ParseUtils.isTestUser(mCurrentUser) ||
@@ -120,6 +231,12 @@ public class SettingsProfileFragment extends BaseFragment {
         mNickname = mEditTextNickname.getText().toString().trim();
         mPassword = mEditTextPassword.getText().toString();
         mPasswordRepeat = mEditTextPasswordRepeat.getText().toString();
+    }
+
+    private void showDiscardChangesDialog() {
+        DiscardChangesDialogFragment discardChangesDialogFragment =
+                new DiscardChangesDialogFragment();
+        discardChangesDialogFragment.show(getFragmentManager(), DISCARD_CHANGES_DIALOG);
     }
 
     /**
@@ -170,36 +287,29 @@ public class SettingsProfileFragment extends BaseFragment {
 
         if (fieldsAreComplete) {
             currentUser.saveEventually();
-            mListener.finishEdit(SettingsProfileActivity.CHANGES_SAVED);
+            finishEdit(CHANGES_SAVED);
         }
     }
 
     /**
-     * Deletes the user's avatar image when the changes are saved.
-     */
-    public void deleteAvatar() {
-        mDeleteAvatar = true;
-    }
-
-    /**
-     * Sets the user's avatar iamge
+     * Sets the appropriate activity result and finishes the screen.
      *
-     * @param imageUri the {@link Uri} to the image
+     * @param editAction the action taken, used to set the activity results
      */
-    public void setAvatar(Uri imageUri) {
-        mDeleteAvatar = false;
+    public void finishEdit(@EditAction int editAction) {
+        final Activity activity = getActivity();
+        switch (editAction) {
+            case CHANGES_SAVED:
+                activity.setResult(Activity.RESULT_OK);
+                break;
+            case CHANGES_DISCARDED:
+                activity.setResult(RESULT_CHANGES_DISCARDED);
+                break;
+            case NO_CHANGES:
+                activity.setResult(Activity.RESULT_CANCELED);
+        }
 
-        Glide.with(this)
-                .load(imageUri)
-                .asBitmap()
-                .toBytes(Bitmap.CompressFormat.JPEG, Avatar.JPEG_COMPRESSION_RATE)
-                .centerCrop()
-                .into(new SimpleTarget<byte[]>(Avatar.WIDTH, Avatar.HEIGHT) {
-                    @Override
-                    public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
-                        mAvatar = resource;
-                    }
-                });
+        ActivityCompat.finishAfterTransition(activity);
     }
 
     @Override
@@ -215,15 +325,13 @@ public class SettingsProfileFragment extends BaseFragment {
      */
     public interface FragmentInteractionListener extends BaseFragment.BaseFragmentInteractionListener {
         /**
-         * Indicates that a new avatar image should be taken.
+         * Sets the avatar images as the toolbar backdrop image.
          */
-        void pickAvatar();
+        void setBackdropAvatar(byte[] avatar);
 
         /**
-         * Indicates that the hosting {@link Activity} should finish with a specific result
-         *
-         * @param editAction the action to set the result with
+         * Sets the avatar images as the toolbar backdrop image.
          */
-        void finishEdit(@SettingsProfileActivity.EditAction int editAction);
+        void setBackdropAvatarFromUri(Uri avatar);
     }
 }

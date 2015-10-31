@@ -52,6 +52,7 @@ import ch.giantific.qwittig.services.ParseQueryService;
 import ch.giantific.qwittig.ui.adapters.NavHeaderGroupsArrayAdapter;
 import ch.giantific.qwittig.ui.fragments.SettingsFragment;
 import ch.giantific.qwittig.BlurTransformation;
+import ch.giantific.qwittig.ui.fragments.SettingsProfileFragment;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.inappbilling.IabHelper;
 import ch.giantific.qwittig.inappbilling.IabKey;
@@ -576,7 +577,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity {
                                 getString(R.string.toast_changes_saved));
                         setAvatarAndNickname();
                         break;
-                    case SettingsProfileActivity.RESULT_CHANGES_DISCARDED:
+                    case SettingsProfileFragment.RESULT_CHANGES_DISCARDED:
                         MessageUtils.showBasicSnackbar(mSpinnerGroups,
                                 getString(R.string.toast_changes_discarded));
                         break;
