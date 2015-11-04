@@ -14,7 +14,6 @@ import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
@@ -36,48 +35,16 @@ public class ParseUtils {
      * Returns the currency code for the current group or the systems default if the current group
      * is null.
      *
+     * @param group the group to get the currency for
      * @return the currency code for the current group
      */
-    public static String getGroupCurrency() {
+    public static String getGroupCurrencyWithFallback(Group group) {
+        if (group != null) {
+            return group.getCurrency();
+        }
+
         Currency fallback = Currency.getInstance(Locale.getDefault());
-        String currencyCode = fallback.getCurrencyCode();
-
-        Group currentGroup = getCurrentGroup();
-        if (currentGroup != null) {
-            return currentGroup.getCurrency();
-        }
-
-        return currencyCode;
-    }
-
-    /**
-     * Returns the current group of the current user or null if either of them is null.
-     *
-     * @return the current group of the current user
-     */
-    @Nullable
-    public static Group getCurrentGroup() {
-        User currentUser = (User) ParseUser.getCurrentUser();
-        Group currentGroup = null;
-        if (currentUser != null) {
-            currentGroup = currentUser.getCurrentGroup();
-        }
-        return currentGroup;
-    }
-
-    /**
-     * Returns the groups of the current user or an empty list if the current user is null.
-     *
-     * @return the groups of the current user
-     */
-    @NonNull
-    public static List<ParseObject> getCurrentUserGroups() {
-        User currentUser = (User) ParseUser.getCurrentUser();
-        if (currentUser == null) {
-            return Collections.emptyList();
-        }
-
-        return currentUser.getGroups();
+        return fallback.getCurrencyCode();
     }
 
     /**

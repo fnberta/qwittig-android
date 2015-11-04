@@ -50,6 +50,7 @@ public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<Recyc
     private Context mContext;
     private List<ParseObject> mCompensations;
     private String mCurrentGroupCurrency;
+    private User mCurrentUser;
 
     /**
      * Constructs a new {@link CompensationsPaidRecyclerAdapter}.
@@ -58,11 +59,13 @@ public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<Recyc
      * @param compensations the compensations to display
      */
     public CompensationsPaidRecyclerAdapter(@NonNull Context context,
-                                            @NonNull List<ParseObject> compensations) {
+                                            @NonNull List<ParseObject> compensations,
+                                            @NonNull User currentUser) {
         super();
 
         mContext = context;
         mCompensations = compensations;
+        mCurrentUser = currentUser;
     }
 
     @NonNull
@@ -91,26 +94,27 @@ public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<Recyc
         if (viewType == TYPE_ITEM) {
             CompensationHistoryRow compensationHistoryRow = (CompensationHistoryRow) viewHolder;
             Compensation compensation = (Compensation) mCompensations.get(position);
+
             Date date = compensation.getCreatedAt();
             compensationHistoryRow.setDate(date);
+
             BigFraction amount = compensation.getAmountFraction();
             String amountString;
             String nickname;
             byte[] avatar;
             int color;
-            User currentUser = (User) ParseUser.getCurrentUser();
-            User beneficiary = compensation.getBeneficiary();
-            if (beneficiary.getObjectId().equals(currentUser.getObjectId())) {
+            final User beneficiary = compensation.getBeneficiary();
+            if (beneficiary.getObjectId().equals(mCurrentUser.getObjectId())) {
                 // positive
                 User payer = compensation.getPayer();
-                nickname = payer.getGroupIds().contains(currentUser.getCurrentGroup().getObjectId()) ?
+                nickname = payer.getGroupIds().contains(mCurrentUser.getCurrentGroup().getObjectId()) ?
                         payer.getNickname() : mContext.getString(R.string.user_deleted);
                 avatar = payer.getAvatar();
                 color = R.color.green;
                 amountString = MoneyUtils.formatMoney(amount, mCurrentGroupCurrency);
             } else {
                 // negative
-                nickname = beneficiary.getGroupIds().contains(currentUser.getCurrentGroup().getObjectId()) ?
+                nickname = beneficiary.getGroupIds().contains(mCurrentUser.getCurrentGroup().getObjectId()) ?
                         beneficiary.getNickname() : mContext.getString(R.string.user_deleted);
                 avatar = beneficiary.getAvatar();
                 color = R.color.red;

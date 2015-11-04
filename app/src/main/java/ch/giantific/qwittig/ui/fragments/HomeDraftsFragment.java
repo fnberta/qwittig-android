@@ -25,7 +25,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.parse.ParseObject;
-import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +32,6 @@ import java.util.List;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
-import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.data.repositories.ParseGroupRepository;
 import ch.giantific.qwittig.data.repositories.ParsePurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
@@ -58,8 +56,6 @@ public class HomeDraftsFragment extends BaseFragment implements
         PurchaseRepository.GetPurchasesLocalListener {
 
     public static final String INTENT_PURCHASE_EDIT_DRAFT = "INTENT_PURCHASE_EDIT_DRAFT";
-    private User mCurrentUser;
-    private Group mCurrentGroup;
     private PurchaseRepository mPurchaseRepo;
     private GroupRepository mGroupRepo;
     private TextView mTextViewEmpty;
@@ -75,6 +71,7 @@ public class HomeDraftsFragment extends BaseFragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        updateCurrentUserAndGroup();
         mPurchaseRepo = new ParsePurchaseRepository();
         mGroupRepo = new ParseGroupRepository();
     }
@@ -186,15 +183,7 @@ public class HomeDraftsFragment extends BaseFragment implements
      * Re-queries the data and loads it in the adapter.
      */
     public void updateAdapter() {
-        updateCurrentUserGroup();
         mPurchaseRepo.getPurchasesLocalAsync(mCurrentUser, true, this);
-    }
-
-    private void updateCurrentUserGroup() {
-        mCurrentUser = (User) ParseUser.getCurrentUser();
-        if (mCurrentUser != null) {
-            mCurrentGroup = mCurrentUser.getCurrentGroup();
-        }
     }
 
     @Override
@@ -226,7 +215,7 @@ public class HomeDraftsFragment extends BaseFragment implements
     }
 
     private void updateView() {
-        mDraftsAdapter.setCurrentGroupCurrency(ParseUtils.getGroupCurrency());
+        mDraftsAdapter.setCurrentGroupCurrency(ParseUtils.getGroupCurrencyWithFallback(mCurrentGroup));
         mDraftsAdapter.notifyDataSetChanged();
         toggleEmptyViewVisibility();
     }
@@ -252,5 +241,14 @@ public class HomeDraftsFragment extends BaseFragment implements
 
         toggleEmptyViewVisibility();
         mDraftsAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * Updates the current user and current group fields and tells the {@link RecyclerView} adapter
+     * to reload its data.
+     */
+    public void updateFragment() {
+        updateCurrentUserAndGroup();
+        updateAdapter();
     }
 }

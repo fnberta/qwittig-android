@@ -27,10 +27,9 @@ import java.util.Date;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.data.repositories.ParsePurchaseRepository;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.data.repositories.ParsePurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.ui.activities.BaseActivity;
 import ch.giantific.qwittig.ui.activities.PurchaseDetailsActivity;
@@ -58,8 +57,6 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     private String mPurchaseId;
     private Purchase mPurchase;
     private PurchaseDetailsRecyclerAdapter mRecyclerAdapter;
-    private User mCurrentUser;
-    private Group mCurrentGroup;
     private boolean mHasReceiptFile;
     private PurchaseRepository mPurchaseRepo;
 
@@ -100,6 +97,7 @@ public class PurchaseDetailsFragment extends BaseFragment implements
 
         setHasOptionsMenu(true);
 
+        updateCurrentUserAndGroup();
         mPurchaseRepo = new ParsePurchaseRepository();
 
         Bundle args = getArguments();
@@ -121,7 +119,7 @@ public class PurchaseDetailsFragment extends BaseFragment implements
         mProgressBar = (ProgressBar) view.findViewById(R.id.pb_purchase_details);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.rv_purchase_details);
-        mRecyclerAdapter = new PurchaseDetailsRecyclerAdapter(getActivity());
+        mRecyclerAdapter = new PurchaseDetailsRecyclerAdapter(getActivity(), mCurrentUser, mCurrentGroup);
         mRecyclerView.setAdapter(mRecyclerAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setHasFixedSize(true);
@@ -131,15 +129,11 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     public void onStart() {
         super.onStart();
 
-        mCurrentUser = (User) ParseUser.getCurrentUser();
-        if (mCurrentUser != null) {
-            mCurrentGroup = mCurrentUser.getCurrentGroup();
-            if (mCurrentGroup != null) {
-                queryData();
-            } else {
-                MessageUtils.showBasicSnackbar(mRecyclerView,
-                        getString(R.string.toast_error_purchase_details_group_not));
-            }
+        if (mCurrentGroup != null) {
+            queryData();
+        } else {
+            MessageUtils.showBasicSnackbar(mRecyclerView,
+                    getString(R.string.toast_error_purchase_details_group_not));
         }
     }
 
@@ -151,7 +145,7 @@ public class PurchaseDetailsFragment extends BaseFragment implements
      * the data for the pointers.
      */
     public void queryData() {
-        mPurchaseRepo.getPurchaseLocalAsync(mPurchaseId, false, this);
+        mPurchaseRepo.getPurchaseLocalAsync(mCurrentUser, mPurchaseId, false, this);
     }
 
     @Override
@@ -210,9 +204,9 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     }
 
     private void updateReadBy() {
-        if (!mPurchase.currentUserHasReadPurchase() &&
-                !ParseUtils.isTestUser(ParseUser.getCurrentUser())) {
-            mPurchase.addCurrentUserToReadBy();
+        if (!mPurchase.userHasReadPurchase(mCurrentUser) &&
+                !ParseUtils.isTestUser(mCurrentUser)) {
+            mPurchase.addUserToReadBy(mCurrentUser);
             mPurchase.saveEventually();
         }
     }

@@ -31,13 +31,14 @@ import java.util.List;
 
 import ch.berta.fabio.fabspeeddial.FabMenu;
 import ch.giantific.qwittig.BuildConfig;
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.Config;
-import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.data.helpers.group.InvitedGroupHelper;
 import ch.giantific.qwittig.data.helpers.query.MoreQueryHelper;
 import ch.giantific.qwittig.data.helpers.query.PurchaseQueryHelper;
+import ch.giantific.qwittig.domain.models.parse.Config;
+import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.services.ParseQueryService;
 import ch.giantific.qwittig.ui.adapters.TabsAdapter;
@@ -47,11 +48,10 @@ import ch.giantific.qwittig.ui.fragments.PurchaseAddFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GoPremiumDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupJoinDialogFragment;
-import ch.giantific.qwittig.utils.ViewUtils;
 import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
-import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.Utils;
+import ch.giantific.qwittig.utils.ViewUtils;
 
 /**
  * Provides the launcher activity for {@link Qwittig}, hosts a viewpager with
@@ -65,7 +65,6 @@ import ch.giantific.qwittig.utils.Utils;
  */
 public class HomeActivity extends BaseNavDrawerActivity implements
         View.OnClickListener,
-        HomePurchasesFragment.FragmentInteractionListener,
         GroupJoinDialogFragment.DialogInteractionListener,
         GroupCreateDialogFragment.DialogInteractionListener,
         GoPremiumDialogFragment.DialogInteractionListener,
@@ -88,14 +87,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     private HomePurchasesFragment mHomePurchasesFragment;
     private HomeDraftsFragment mHomeDraftsFragment;
     private FabMenu mFabMenu;
-    private boolean mNewQueryNeeded = false;
-    private boolean mCheckForInvitations = true;
     private int mInvitationAction;
-
-    @Override
-    public boolean isNewQueryNeeded() {
-        return mNewQueryNeeded;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,6 +119,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         if (mUserIsLoggedIn) {
             if (savedInstanceState == null) {
                 addViewPagerFragments();
+                checkForInvitations();
             } else {
                 mHomePurchasesFragment = (HomePurchasesFragment) getFragmentManager()
                         .getFragment(savedInstanceState, STATE_PURCHASE_FRAGMENT);
@@ -135,8 +128,6 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
                 setupTabs();
             }
-
-            fetchCurrentUserGroups();
         }
     }
 
@@ -167,23 +158,6 @@ public class HomeActivity extends BaseNavDrawerActivity implements
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.putFragment(outState, STATE_PURCHASE_FRAGMENT, mHomePurchasesFragment);
             fragmentManager.putFragment(outState, STATE_DRAFTS_FRAGMENT, mHomeDraftsFragment);
-        }
-    }
-
-    @Override
-    public void onGroupsFetched() {
-        super.onGroupsFetched();
-
-        if (mCheckForInvitations) {
-            checkForInvitations();
-        }
-
-        if (mNewQueryNeeded) {
-            if (mCurrentGroup != null) {
-                ParseQueryService.startQueryAll(this);
-            } else {
-                mNewQueryNeeded = false;
-            }
         }
     }
 
@@ -313,9 +287,14 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         mInvitedGroup.removeUserInvited(mCurrentUser.getUsername());
         mInvitedGroup.saveEventually();
 
-        mNewQueryNeeded = true;
-        mCheckForInvitations = false;
-        fetchCurrentUserGroups();
+        mCurrentGroup = mCurrentUser.getCurrentGroup();
+        updateGroupSpinner();
+        queryAll();
+    }
+
+    private void queryAll() {
+        mHomePurchasesFragment.setOnlineQueryInProgress(true);
+        ParseQueryService.startQueryAll(this);
     }
 
     private void dismissProgressDialog() {
@@ -343,17 +322,12 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         MessageUtils.showBasicSnackbar(mFabMenu, getString(R.string.toast_invitation_discarded));
     }
 
-    private void updateFragmentAdapters() {
-        mHomePurchasesFragment.updateAdapter();
-        mHomeDraftsFragment.updateAdapter();
-    }
-
     @Override
     void afterLoginSetup() {
-        mNewQueryNeeded = true;
-        addViewPagerFragments();
-
         super.afterLoginSetup();
+
+        addViewPagerFragments();
+        queryAll();
     }
 
     @Override
@@ -435,9 +409,8 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     public void onPurchasesUpdated() {
         super.onPurchasesUpdated();
 
-        // will be set to true after login and group change
-        mNewQueryNeeded = false;
-
+        // after login or user joined a new group, this will be set to true, hence set false
+        mHomePurchasesFragment.setOnlineQueryInProgress(false);
         mHomePurchasesFragment.onPurchasesUpdated();
     }
 
@@ -506,7 +479,8 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
     @Override
     protected void onNewGroupSet() {
-        updateFragmentAdapters();
+        mHomePurchasesFragment.updateFragment();
+        mHomeDraftsFragment.updateFragment();
     }
 
     @Override

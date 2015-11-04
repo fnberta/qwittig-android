@@ -102,8 +102,18 @@ public class StatsHelper extends BaseHelper implements
             return;
         }
 
+        final User currentUser = (User) ParseUser.getCurrentUser();
+        final Group currentGroup = currentUser.getCurrentGroup();
+        if (currentGroup == null) {
+            if (mListener != null) {
+                mListener.onStatsCalculationFailed(mStatsType, 0);
+            }
+
+            return;
+        }
+
         CloudCodeClient cloudCode = new CloudCodeClient();
-        String groupId = getCurrentGroupId();
+        String groupId = currentGroup.getObjectId();
         switch (mStatsType) {
             case TYPE_SPENDING:
                 cloudCode.calcStatsSpending(groupId, year, month, this);
@@ -115,12 +125,6 @@ public class StatsHelper extends BaseHelper implements
                 cloudCode.calcStatsCurrencies(groupId, year, month, this);
                 break;
         }
-    }
-
-    private String getCurrentGroupId() {
-        User currentUser = (User) ParseUser.getCurrentUser();
-        Group currentGroup = currentUser.getCurrentGroup();
-        return currentGroup.getObjectId();
     }
 
     @Override

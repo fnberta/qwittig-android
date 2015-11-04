@@ -50,6 +50,7 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
     private Context mContext;
     private List<ParseObject> mPurchases;
     private String mCurrentGroupCurrency;
+    private User mCurrentUser;
 
     /**
      * Constructs a new {@link PurchasesRecyclerAdapter}.
@@ -59,12 +60,14 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
      * @param listener  the callback for user clicks on the purchases
      */
     public PurchasesRecyclerAdapter(@NonNull Context context, @NonNull List<ParseObject> purchases,
+                                    @NonNull User currentUser,
                                     @NonNull AdapterInteractionListener listener) {
         super();
 
         mListener = listener;
         mContext = context;
         mPurchases = purchases;
+        mCurrentUser = currentUser;
     }
 
     @NonNull
@@ -105,22 +108,23 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
                 Purchase purchase = (Purchase) mPurchases.get(position);
 
                 final User buyer = purchase.getBuyer();
-                final User currentUser = (User) ParseUser.getCurrentUser();
                 final boolean buyerIsValid = buyer.getGroupIds().contains(
-                        currentUser.getCurrentGroup().getObjectId());
+                        mCurrentUser.getCurrentGroup().getObjectId());
 
                 purchaseRow.setAvatar(buyerIsValid ? buyer.getAvatar() : null);
                 purchaseRow.setStore(purchase.getStore());
 
-                String nickname = buyerIsValid ? buyer.getNicknameOrMe(mContext) : mContext.getString(R.string.user_deleted);
+                String nickname = buyerIsValid ?
+                        buyer.getNicknameOrMe(mContext, mCurrentUser) :
+                        mContext.getString(R.string.user_deleted);
                 purchaseRow.setBuyerAndDate(nickname, purchase.getDate());
 
                 double totalPrice = purchase.getTotalPrice();
                 purchaseRow.setTotal(MoneyUtils.formatMoneyNoSymbol(totalPrice, mCurrentGroupCurrency));
-                double myShare = purchase.calculateUserShare(currentUser);
+                double myShare = purchase.calculateUserShare(mCurrentUser);
                 purchaseRow.setMyShare(MoneyUtils.formatMoneyNoSymbol(myShare, mCurrentGroupCurrency));
 
-                if (!purchase.currentUserHasReadPurchase()) {
+                if (!purchase.userHasReadPurchase(mCurrentUser)) {
                     purchaseRow.setWhiteBackground();
                 } else {
                     purchaseRow.resetBackground();

@@ -21,7 +21,7 @@ public interface PurchaseRepository {
 
     /**
      * Queries the local data store for purchases .
-     *  @param group       the group for which to get purchases for
+     *
      * @param currentUser the current user
      * @param getDrafts   whether to query for drafts or purchases
      * @param listener    the callback when the query finishes
@@ -32,10 +32,11 @@ public interface PurchaseRepository {
     /**
      * Queries the local data store for a single purchase.
      *
-     * @param purchaseId the object id of the purchase to query
-     * @param listener   the callback when the query finishes
+     * @param currentUser the current user
+     * @param purchaseId  the object id of the purchase to query
+     * @param listener    the callback when the query finishes
      */
-    void getPurchaseLocalAsync(@NonNull String purchaseId, boolean isDraft,
+    void getPurchaseLocalAsync(@NonNull User currentUser, @NonNull String purchaseId, boolean isDraft,
                                @NonNull GetPurchaseLocalListener listener);
 
     /**
@@ -60,31 +61,35 @@ public interface PurchaseRepository {
      * Updates all purchases in the local data store by deleting all purchases from the local data
      * store, querying and saving new ones.
      *
+     * @param currentUser    the current user
      * @param groups         the groups for which to update the purchases
      * @param currentGroupId the object id of the user's current group
      * @param listener       the callback when a query finishes, fails or all queries are finished
      */
-    void updatePurchasesAsync(@NonNull List<ParseObject> groups,
+    void updatePurchasesAsync(@NonNull User currentUser, @NonNull List<ParseObject> groups,
                               @NonNull String currentGroupId,
                               @NonNull UpdatePurchasesListener listener);
 
     /**
      * Queries purchases from the online data store and saves them in the local data store.
      *
-     * @param group    the group for which to get purchases for
-     * @param skip     the number of purchases to skip for the query
-     * @param listener the callback when the new purchases are saved in the local data store
+     * @param currentUser the current user
+     * @param group       the group for which to get purchases for
+     * @param skip        the number of purchases to skip for the query
+     * @param listener    the callback when the new purchases are saved in the local data store
      */
-    void getPurchasesOnlineAsync(@NonNull Group group, int skip,
+    void getPurchasesOnlineAsync(@NonNull User currentUser, @NonNull Group group, int skip,
                                  @NonNull GetPurchasesOnlineListener listener);
 
     /**
      * Deletes all purchases from the local data store and saves new ones.
      *
+     *
+     * @param currentUser the current user
      * @param groups the groups for which to update the purchases
      * @return whether the update was successful or not
      */
-    boolean updatePurchases(@NonNull List<ParseObject> groups);
+    boolean updatePurchases(@NonNull User currentUser, @NonNull List<ParseObject> groups);
 
     /**
      * Updates a purchase if is already available in the local data store (by simply querying it) or

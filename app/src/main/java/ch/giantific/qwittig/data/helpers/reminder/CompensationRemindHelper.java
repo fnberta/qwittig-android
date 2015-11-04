@@ -20,6 +20,7 @@ import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.data.rest.CloudCodeClient;
 import ch.giantific.qwittig.data.helpers.BaseHelper;
+import ch.giantific.qwittig.utils.ParseUtils;
 
 /**
  * Calls Parse.com cloud functions to remind a user that he/she should either pay a compensation or
@@ -109,9 +110,9 @@ public class CompensationRemindHelper extends BaseHelper implements
     }
 
     private String getCurrencyCode() {
-        User currentUser = (User) ParseUser.getCurrentUser();
-        Group currentGroup = currentUser.getCurrentGroup();
-        return currentGroup.getCurrency();
+        final User currentUser = (User) ParseUser.getCurrentUser();
+        final Group currentGroup = currentUser.getCurrentGroup();
+        return ParseUtils.getGroupCurrencyWithFallback(currentGroup);
     }
 
     @Override

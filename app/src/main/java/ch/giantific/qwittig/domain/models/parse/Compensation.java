@@ -50,7 +50,7 @@ public class Compensation extends ParseObject {
         setBeneficiary(beneficiary);
         setAmountFraction(amount);
         setPaid(isPaid);
-        setAccessRights(getCurrentGroup());
+        setAccessRights(group);
     }
 
     public Group getGroup() {
@@ -99,11 +99,6 @@ public class Compensation extends ParseObject {
 
     public void setIsLoading(boolean isLoading) {
         mIsLoading = isLoading;
-    }
-
-    private Group getCurrentGroup() {
-        User currentUser = (User) ParseUser.getCurrentUser();
-        return currentUser.getCurrentGroup();
     }
 
     private void setAccessRights(@NonNull ParseObject group) {

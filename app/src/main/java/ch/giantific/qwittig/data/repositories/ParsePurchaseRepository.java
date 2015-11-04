@@ -13,7 +13,6 @@ import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.ArrayList;
@@ -58,12 +57,13 @@ public class ParsePurchaseRepository extends ParseGenericRepository implements P
     }
 
     @Override
-    public void getPurchaseLocalAsync(@NonNull String purchaseId, boolean isDraft,
+    public void getPurchaseLocalAsync(@NonNull User currentUser, @NonNull String purchaseId,
+                                      boolean isDraft,
                                       @NonNull final GetPurchaseLocalListener listener) {
         ParseQuery<ParseObject> query = getPurchasesLocalQuery();
         if (isDraft) {
             query.whereEqualTo(Purchase.DRAFT_ID, purchaseId);
-            query.whereEqualTo(Purchase.BUYER, ParseUser.getCurrentUser());
+            query.whereEqualTo(Purchase.BUYER, currentUser);
             query.getFirstInBackground(new GetCallback<ParseObject>() {
                 @Override
                 public void done(ParseObject parseObject, @Nullable ParseException e) {
@@ -123,13 +123,13 @@ public class ParsePurchaseRepository extends ParseGenericRepository implements P
     }
 
     @Override
-    public void updatePurchasesAsync(@NonNull List<ParseObject> groups,
+    public void updatePurchasesAsync(@NonNull User currentUser, @NonNull List<ParseObject> groups,
                                      @NonNull final String currentGroupId,
                                      @NonNull final UpdatePurchasesListener listener) {
         mNumberOfUpdatedQueries = groups.size();
 
         for (final ParseObject group : groups) {
-            ParseQuery<ParseObject> query = getPurchasesOnlineQuery();
+            ParseQuery<ParseObject> query = getPurchasesOnlineQuery(currentUser);
             query.whereEqualTo(Purchase.GROUP, group);
             query.findInBackground(new FindCallback<ParseObject>() {
                 @Override
@@ -174,9 +174,7 @@ public class ParsePurchaseRepository extends ParseGenericRepository implements P
     }
 
     @NonNull
-    private ParseQuery<ParseObject> getPurchasesOnlineQuery() {
-        User currentUser = (User) ParseUser.getCurrentUser();
-
+    private ParseQuery<ParseObject> getPurchasesOnlineQuery(@NonNull User currentUser) {
         ParseQuery<ParseObject> buyerQuery = ParseQuery.getQuery(Purchase.CLASS);
         buyerQuery.whereEqualTo(Purchase.BUYER, currentUser);
 
@@ -197,9 +195,9 @@ public class ParsePurchaseRepository extends ParseGenericRepository implements P
     }
 
     @Override
-    public void getPurchasesOnlineAsync(@NonNull final Group group, int skip,
+    public void getPurchasesOnlineAsync(@NonNull User currentUser, @NonNull final Group group, int skip,
                                         @NonNull final GetPurchasesOnlineListener listener) {
-        ParseQuery<ParseObject> query = getPurchasesOnlineQuery();
+        ParseQuery<ParseObject> query = getPurchasesOnlineQuery(currentUser);
         query.setSkip(skip);
         query.whereEqualTo(Purchase.GROUP, group);
         query.findInBackground(new FindCallback<ParseObject>() {
@@ -224,14 +222,14 @@ public class ParsePurchaseRepository extends ParseGenericRepository implements P
     }
 
     @Override
-    public boolean updatePurchases(@NonNull List<ParseObject> groups) {
+    public boolean updatePurchases(@NonNull User currentUser, @NonNull List<ParseObject> groups) {
         if (groups.isEmpty()) {
             return false;
         }
 
         for (ParseObject group : groups) {
             try {
-                List<ParseObject> purchases = getPurchasesForGroupOnline(group);
+                List<ParseObject> purchases = getPurchasesForGroupOnline(currentUser, group);
                 final String groupId = group.getObjectId();
                 final String label = Purchase.PIN_LABEL + groupId;
 
@@ -245,9 +243,10 @@ public class ParsePurchaseRepository extends ParseGenericRepository implements P
         return true;
     }
 
-    private List<ParseObject> getPurchasesForGroupOnline(@NonNull ParseObject group)
+    private List<ParseObject> getPurchasesForGroupOnline(@NonNull User currentUser,
+                                                         @NonNull ParseObject group)
             throws ParseException {
-        ParseQuery<ParseObject> query = getPurchasesOnlineQuery();
+        ParseQuery<ParseObject> query = getPurchasesOnlineQuery(currentUser);
         query.whereEqualTo(Purchase.GROUP, group);
         return query.find();
     }

@@ -161,7 +161,7 @@ public class PurchaseSaveHelper extends BaseHelper {
 
     final void pinPurchase() {
         final User currentUser = (User) ParseUser.getCurrentUser();
-        Group currentGroup = currentUser.getCurrentGroup();
+        final Group currentGroup = currentUser.getCurrentGroup();
 
         mPurchase.pinInBackground(Purchase.PIN_LABEL + currentGroup.getObjectId(), new SaveCallback() {
             @Override

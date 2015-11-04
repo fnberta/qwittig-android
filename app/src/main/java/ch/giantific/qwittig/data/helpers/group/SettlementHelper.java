@@ -9,10 +9,12 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.parse.ParseUser;
+
 import ch.giantific.qwittig.data.helpers.BaseHelper;
-import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.data.rest.CloudCodeClient;
-import ch.giantific.qwittig.utils.ParseUtils;
+import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.User;
 
 /**
  * Creates and saves a new user settlement by calling Parse.com cloud functions.
@@ -68,7 +70,8 @@ public class SettlementHelper extends BaseHelper implements
             doSingleUserSettlement = args.getBoolean(BUNDLE_SINGLE_USER, false);
         }
 
-        Group currentGroup = ParseUtils.getCurrentGroup();
+        final User currentUser = (User) ParseUser.getCurrentUser();
+        final Group currentGroup = currentUser.getCurrentGroup();
         if (currentGroup == null) {
             if (mListener != null) {
                 mListener.onNewSettlementCreationFailed(0);

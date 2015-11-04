@@ -83,6 +83,8 @@ public class StatsSpendingFragment extends StatsBaseFragment {
         super.onViewCreated(view, savedInstanceState);
 
         mBarChart = (BarChart) view.findViewById(R.id.bc_spending);
+
+        checkCurrentGroup();
     }
 
     @Override
@@ -201,7 +203,8 @@ public class StatsSpendingFragment extends StatsBaseFragment {
 
             String userId = user.getMemberId();
             User buyer = (User) ParseObject.createWithoutData(User.CLASS, userId);
-            BarDataSet barDataSet = new BarDataSet(barEntries, buyer.getNicknameOrMe(getActivity()));
+            BarDataSet barDataSet = new BarDataSet(barEntries,
+                    buyer.getNicknameOrMe(getActivity(), mCurrentUser));
             barDataSet.setColor(getColor(i));
 
             barDataSets.add(barDataSet);

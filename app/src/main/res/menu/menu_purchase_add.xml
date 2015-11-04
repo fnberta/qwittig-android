@@ -9,6 +9,6 @@
     <item
         android:id="@+id/action_purchase_save_draft"
         android:title="@string/action_purchase_save_draft"
-        android:orderInCategory="1"
+        android:orderInCategory="3"
         app:showAsAction="never"/>
 </menu>

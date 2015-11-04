@@ -36,6 +36,7 @@ public class PurchaseUsersInvolvedRecyclerAdapter extends
     private List<ParseUser> mUsersAvailable;
     private boolean[] mUsersInvolved;
     private AdapterInteractionListener mListener;
+    private User mCurrentUser;
 
     /**
      * Constructs a new {@link PurchaseUsersInvolvedRecyclerAdapter}.
@@ -46,11 +47,13 @@ public class PurchaseUsersInvolvedRecyclerAdapter extends
      */
     public PurchaseUsersInvolvedRecyclerAdapter(@NonNull Context context,
                                                 @NonNull List<ParseUser> usersAvailable,
+                                                @NonNull User currentUser,
                                                 @NonNull AdapterInteractionListener listener) {
         super();
 
         mContext = context;
         mUsersAvailable = usersAvailable;
+        mCurrentUser = currentUser;
         mListener = listener;
     }
 
@@ -70,7 +73,7 @@ public class PurchaseUsersInvolvedRecyclerAdapter extends
 
         User user = (User) mUsersAvailable.get(position);
 
-        viewHolder.setName(user.getNicknameOrMe(mContext));
+        viewHolder.setName(user.getNicknameOrMe(mContext, mCurrentUser));
 
         byte[] avatarByteArray = user.getAvatar();
         viewHolder.setAvatar(avatarByteArray, true);

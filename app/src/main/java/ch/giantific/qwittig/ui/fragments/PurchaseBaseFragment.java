@@ -71,7 +71,6 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.ItemRow;
 import ch.giantific.qwittig.domain.models.Receipt;
 import ch.giantific.qwittig.domain.models.parse.Config;
-import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.Item;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.models.parse.User;
@@ -158,10 +157,8 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     @NonNull
     List<ParseUser> mUsersAvailableParse = new ArrayList<>();
     boolean[] mPurchaseUsersInvolved;
-    Group mCurrentGroup;
     String mCurrencySelected;
     String mCurrentGroupCurrency;
-    User mCurrentUser;
     Button mButtonAddRow;
     @NonNull
     List<ItemRow> mItemRows = new ArrayList<>();
@@ -201,8 +198,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mCurrentUser = (User) ParseUser.getCurrentUser();
-        mCurrentGroup = mCurrentUser.getCurrentGroup();
+        updateCurrentUserAndGroup();
         mCurrentGroupCurrency = mCurrentGroup.getCurrency();
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -299,7 +295,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
 
         RecyclerView recyclerViewUsersInvolved = (RecyclerView) view.findViewById(R.id.rv_users_involved);
         mRecyclerAdapter = new PurchaseUsersInvolvedRecyclerAdapter(getActivity(),
-                mUsersAvailableParse, this);
+                mUsersAvailableParse, mCurrentUser, this);
         recyclerViewUsersInvolved.setLayoutManager(new LinearLayoutManager(getActivity(),
                 LinearLayoutManager.HORIZONTAL, false));
         recyclerViewUsersInvolved.setHasFixedSize(true);
@@ -569,7 +565,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
                 ListCheckBox cb = (ListCheckBox) v;
                 mSelectedItemPosition = Utils.getViewPositionFromTag(v);
 
-                int buyerPosition = mUsersAvailableParse.indexOf(ParseUser.getCurrentUser());
+                int buyerPosition = mUsersAvailableParse.indexOf(mCurrentUser);
                 cb.updateUsersCheckedAfterCheckedChange(buyerPosition, mPurchaseUsersInvolved);
                 cb.setCheckBoxColor(mPurchaseUsersInvolved);
                 updatePurchaseUsersInvolved();
@@ -597,7 +593,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         // mItemsUsersChecked will already be filled with values, hence no new values will be added
         // (size() will be bigger than idCounter)
         if (cbEnabled.getUsersChecked() == null && mPurchaseUsersInvolved != null) {
-            int buyerPosition = mUsersAvailableParse.indexOf(ParseUser.getCurrentUser());
+            int buyerPosition = mUsersAvailableParse.indexOf(mCurrentUser);
             cbEnabled.updateUsersCheckedAfterCheckedChange(buyerPosition, mPurchaseUsersInvolved);
         }
 
@@ -733,7 +729,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         for (int i = 0; i < usersSize; i++) {
             User user = (User) users.get(i);
             mUsersAvailableParse.add(user);
-            mUsersAvailableNicknames[i] = user.getNicknameOrMe(getActivity());
+            mUsersAvailableNicknames[i] = user.getNicknameOrMe(getActivity(), mCurrentUser);
         }
     }
 
@@ -767,7 +763,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     private void updateItemsUsersChecked(int purchaseUserPosition, boolean purchaseUserIsChecked) {
         for (ItemRow itemRow : mItemRows) {
             itemRow.updateUsersCheckedAfterPurchaseUserClick(purchaseUserPosition, purchaseUserIsChecked);
-            itemRow.updateCheckedStatus(mUsersAvailableParse.indexOf(ParseUser.getCurrentUser()));
+            itemRow.updateCheckedStatus(mUsersAvailableParse.indexOf(mCurrentUser));
             itemRow.setCheckBoxColor(mPurchaseUsersInvolved);
         }
     }
@@ -809,7 +805,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
 
         ItemRow itemRow = mItemRows.get(mSelectedItemPosition);
         itemRow.setUsersChecked(usersChecked);
-        itemRow.updateCheckedStatus(mUsersAvailableParse.indexOf(ParseUser.getCurrentUser()));
+        itemRow.updateCheckedStatus(mUsersAvailableParse.indexOf(mCurrentUser));
 
         updatePurchaseUsersInvolved();
         updateTotalAndMyShareValues();
@@ -1179,7 +1175,8 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
                 List<ParseUser> usersInvolved = getParseUsersInvolvedFromBoolean(usersChecked);
 
                 // create new Item object and add to list
-                Item item = new Item(itemRow.getName(), itemRow.getPrice(), usersInvolved);
+                Item item = new Item(itemRow.getName(), itemRow.getPrice(), usersInvolved,
+                        mCurrentGroup);
                 mItems.add(item);
             }
 

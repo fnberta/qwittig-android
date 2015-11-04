@@ -82,8 +82,6 @@ public class TasksActivity extends BaseNavDrawerActivity implements
                 mTaskFragment = (TasksFragment) getFragmentManager()
                         .getFragment(savedInstanceState, STATE_TASKS_FRAGMENT);
             }
-
-            fetchCurrentUserGroups();
         }
     }
 
@@ -215,7 +213,7 @@ public class TasksActivity extends BaseNavDrawerActivity implements
 
     @Override
     protected void onNewGroupSet() {
-        mTaskFragment.updateAdapter();
+        mTaskFragment.updateFragment();
     }
 
     @Override

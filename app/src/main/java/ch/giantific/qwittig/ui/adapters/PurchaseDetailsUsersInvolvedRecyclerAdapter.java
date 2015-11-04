@@ -44,16 +44,19 @@ public class PurchaseDetailsUsersInvolvedRecyclerAdapter extends
     @NonNull
     private List<ParseUser> mUsersInvolvedSorted = new ArrayList<>();
     private User mBuyer;
+    private User mCurrentUser;
 
     /**
      * Constructs a new {@link PurchaseDetailsUsersInvolvedRecyclerAdapter}.
      *
      * @param context the context to use in the adapters
      */
-    public PurchaseDetailsUsersInvolvedRecyclerAdapter(@NonNull Context context) {
+    public PurchaseDetailsUsersInvolvedRecyclerAdapter(@NonNull Context context,
+                                                       @NonNull User currentUser) {
         super();
 
         mContext = context;
+        mCurrentUser = currentUser;
     }
 
     @Nullable
@@ -76,7 +79,7 @@ public class PurchaseDetailsUsersInvolvedRecyclerAdapter extends
             viewHolder.setNameBold();
         }
 
-        String nickname = userIsInGroup(user) ? user.getNicknameOrMe(mContext) :
+        String nickname = userIsInGroup(user) ? user.getNicknameOrMe(mContext, mCurrentUser) :
                 mContext.getString(R.string.user_deleted);
         viewHolder.setName(nickname);
 

@@ -301,7 +301,9 @@ public class SettingsFragment extends PreferenceFragment implements
 
     private void updateCurrentUserAndGroup() {
         mCurrentUser = (User) ParseUser.getCurrentUser();
-        mCurrentGroup = mCurrentUser.getCurrentGroup();
+        if (mCurrentUser != null) {
+            mCurrentGroup = mCurrentUser.getCurrentGroup();
+        }
     }
 
     /**

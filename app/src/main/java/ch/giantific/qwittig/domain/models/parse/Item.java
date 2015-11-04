@@ -36,26 +36,16 @@ public class Item extends ParseObject {
     }
 
     public Item(@NonNull String name, @NonNull BigDecimal price,
-                @NonNull List<ParseUser> usersInvolved) {
-        this(name, price);
-        setUsersInvolved(usersInvolved);
-    }
-
-    public Item(@NonNull String name,
-                @NonNull BigDecimal price) {
+                @NonNull List<ParseUser> usersInvolved, ParseObject currentGroup) {
         setName(name);
         setPrice(price);
-        setAccessRights(getCurrentGroup());
+        setUsersInvolved(usersInvolved);
+        setAccessRights(currentGroup);
     }
 
     private void setAccessRights(@NonNull ParseObject group) {
         ParseACL acl = ParseUtils.getDefaultAcl(group);
         setACL(acl);
-    }
-
-    private Group getCurrentGroup() {
-        User currentUser = (User) ParseUser.getCurrentUser();
-        return currentUser.getCurrentGroup();
     }
 
     public String getName() {

@@ -148,7 +148,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         mTextViewEmptySubtitle = (TextView) view.findViewById(R.id.tv_empty_view_subtitle);
 
         mRecyclerAdapter = new CompensationsUnpaidRecyclerAdapter(getActivity(), mCompensations,
-                this);
+                mCurrentUser, this);
         mRecyclerView.setAdapter(mRecyclerAdapter);
 
         mFabNew = (FloatingActionButton) view.findViewById(R.id.fab_new_account_balance);
@@ -183,9 +183,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     }
 
     @Override
-    public void updateAdapter() {
-        super.updateAdapter();
-
+    protected void updateAdapter() {
         mCompsRepo.getCompensationsLocalUnpaidAsync(mCurrentGroup, this);
     }
 
@@ -223,7 +221,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
 
     @Override
     protected void updateView() {
-        mRecyclerAdapter.setCurrentGroupCurrency(ParseUtils.getGroupCurrency());
+        mRecyclerAdapter.setCurrentGroupCurrency(ParseUtils.getGroupCurrencyWithFallback(mCurrentGroup));
         if (mIsCalculatingNew) {
             mFabProgressCircle.beginFinalAnimation();
         } else {

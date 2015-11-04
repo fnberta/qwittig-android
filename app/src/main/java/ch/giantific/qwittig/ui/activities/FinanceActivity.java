@@ -118,7 +118,7 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
                 setupTabs();
             }
 
-            fetchCurrentUserGroups();
+            setToolbarHeader();
         }
     }
 
@@ -146,6 +146,12 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
         mTabLayout.setupWithViewPager(viewPager);
     }
 
+    private void setToolbarHeader() {
+        BigFraction balance = mCurrentUser.getBalance(mCurrentGroup);
+        mTextViewBalance.setText(MoneyUtils.formatMoney(balance, mCurrentGroupCurrency));
+        setColorTheme(balance);
+    }
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -165,18 +171,9 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     public void onGroupsFetched() {
         super.onGroupsFetched();
 
-        mCurrentGroupCurrency = ParseUtils.getGroupCurrency();
-        setToolbarHeader();
+        mCurrentGroupCurrency = ParseUtils.getGroupCurrencyWithFallback(mCurrentGroup);
     }
 
-    private void setToolbarHeader() {
-        BigFraction balance = BigFraction.ZERO;
-        if (mCurrentUser != null) {
-            balance = mCurrentUser.getBalance(mCurrentGroup);
-        }
-        mTextViewBalance.setText(MoneyUtils.formatMoney(balance, ParseUtils.getGroupCurrency()));
-        setColorTheme(balance);
-    }
 
     private void setColorTheme(BigFraction balance) {
         int color;
@@ -199,9 +196,10 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
 
     @Override
     void afterLoginSetup() {
-        addViewPagerFragments();
-
         super.afterLoginSetup();
+
+        addViewPagerFragments();
+        setToolbarHeader();
     }
 
     @Override
@@ -323,6 +321,8 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
         });
     }
 
+
+
     @Override
     public void onChangedAmountSet(@NonNull BigFraction amount) {
         mCompensationsUnpaidFragment.onChangedAmountSet(amount);
@@ -408,14 +408,14 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
 
     @Override
     protected void onNewGroupSet() {
-        updateFragmentAdapters();
+        updateFragments();
         setToolbarHeader();
     }
 
-    private void updateFragmentAdapters() {
-        mUserBalancesFragment.updateAdapter();
-        mCompensationsPaidFragment.updateAdapter();
-        mCompensationsUnpaidFragment.updateAdapter();
+    private void updateFragments() {
+        mUserBalancesFragment.updateFragment();
+        mCompensationsPaidFragment.updateFragment();
+        mCompensationsUnpaidFragment.updateFragment();
     }
 
     @Override

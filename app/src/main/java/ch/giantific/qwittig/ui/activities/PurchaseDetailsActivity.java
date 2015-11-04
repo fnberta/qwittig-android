@@ -20,7 +20,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.parse.ParseObject;
-import com.parse.ParseUser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -108,8 +107,6 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
             mDate = savedInstanceState.getLong(STATE_TOOLBAR_SUBTITLE);
             setToolbarTitleValues();
         }
-
-        fetchCurrentUserGroups();
     }
 
     @Override
@@ -126,7 +123,7 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
         final Intent intent = getIntent();
         mPurchaseId = intent.getStringExtra(HomePurchasesFragment.INTENT_PURCHASE_ID); // started from HomeActivity
 
-        if (mPurchaseId == null) { // started via Push Notification
+        if (mPurchaseId == null) { // started via push notification
             try {
                 JSONObject jsonExtras = PushBroadcastReceiver.getData(intent);
                 mPurchaseId = jsonExtras.optString(PushBroadcastReceiver.PUSH_PARAM_PURCHASE_ID);
@@ -181,7 +178,7 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
      * Deletes the purchase and all of its items and finishes if the user is not a test user.
      */
     private void deletePurchase() {
-        if (!ParseUtils.isTestUser(ParseUser.getCurrentUser())) {
+        if (!ParseUtils.isTestUser(mCurrentUser)) {
             Purchase purchase = (Purchase) ParseObject.createWithoutData(Purchase.CLASS, mPurchaseId);
             purchase.deleteEventually();
 

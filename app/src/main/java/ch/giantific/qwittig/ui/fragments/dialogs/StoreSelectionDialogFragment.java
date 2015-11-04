@@ -111,8 +111,8 @@ public class StoreSelectionDialogFragment extends DialogFragment {
     }
 
     private void setupSpinner() {
+        final User currentUser = (User) ParseUser.getCurrentUser();
         List<String> stores;
-        User currentUser = (User) ParseUser.getCurrentUser();
         List<String> storesFavorites = currentUser.getStoresFavorites();
         if (!storesFavorites.isEmpty()) {
             stores = new ArrayList<>(storesFavorites.size() + 1);

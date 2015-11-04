@@ -32,12 +32,11 @@ import java.util.Map;
 import java.util.Set;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.TaskHistory;
-import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.Task;
-import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.data.repositories.ParseTaskRepository;
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
+import ch.giantific.qwittig.domain.models.TaskHistory;
+import ch.giantific.qwittig.domain.models.parse.Task;
+import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.ui.activities.BaseActivity;
@@ -62,8 +61,6 @@ public class TaskDetailsFragment extends BaseFragment implements
     private FragmentInteractionListener mListener;
     private Task mTask;
     private String mTaskId;
-    private User mCurrentUser;
-    private Group mCurrentGroup;
     @NonNull
     private List<TaskHistory> mTaskHistory = new ArrayList<>();
     private RecyclerView mRecyclerViewHistory;
@@ -141,15 +138,12 @@ public class TaskDetailsFragment extends BaseFragment implements
     public void onStart() {
         super.onStart();
 
-        mCurrentUser = (User) ParseUser.getCurrentUser();
-        if (mCurrentUser != null) {
-            mCurrentGroup = mCurrentUser.getCurrentGroup();
-            if (mCurrentGroup != null) {
-                queryData();
-            } else {
-                MessageUtils.showBasicSnackbar(mRecyclerViewHistory,
-                        getString(R.string.toast_error_purchase_details_group_not));
-            }
+        updateCurrentUserAndGroup();
+        if (mCurrentGroup != null) {
+            queryData();
+        } else {
+            MessageUtils.showBasicSnackbar(mRecyclerViewHistory,
+                    getString(R.string.toast_error_purchase_details_group_not));
         }
     }
 
@@ -234,7 +228,7 @@ public class TaskDetailsFragment extends BaseFragment implements
 
         SpannableStringBuilder stringBuilder = new SpannableStringBuilder();
         int usersInvolvedSize = usersInvolved.size();
-        stringBuilder.append(userResponsible.getNicknameOrMe(getActivity()));
+        stringBuilder.append(userResponsible.getNicknameOrMe(getActivity(), mCurrentUser));
 
         if (usersInvolvedSize > 1) {
             int spanEnd = stringBuilder.length();
@@ -242,7 +236,7 @@ public class TaskDetailsFragment extends BaseFragment implements
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             for (int i = 1; i < usersInvolvedSize; i++) {
                 User user = (User) usersInvolved.get(i);
-                stringBuilder.append(" - ").append(user.getNicknameOrMe(getActivity()));
+                stringBuilder.append(" - ").append(user.getNicknameOrMe(getActivity(), mCurrentUser));
             }
         }
 
@@ -287,7 +281,7 @@ public class TaskDetailsFragment extends BaseFragment implements
      * Deletes the task if the user is not a test user and finishes.
      */
     public void deleteTask() {
-        if (!ParseUtils.isTestUser(ParseUser.getCurrentUser())) {
+        if (!ParseUtils.isTestUser(mCurrentUser)) {
             mTask.deleteEventually();
 
             finish(TaskDetailsActivity.RESULT_TASK_DELETED);
@@ -333,7 +327,7 @@ public class TaskDetailsFragment extends BaseFragment implements
         if (!timeFrame.equals(Task.TIME_FRAME_AS_NEEDED)) {
             mTask.updateDeadline(timeFrame);
         }
-        mTask.addHistoryEvent();
+        mTask.addHistoryEvent(mCurrentUser);
         mTask.saveEventually();
 
         updateToolbarHeader();

@@ -39,6 +39,7 @@ public class UsersRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
     private List<ParseUser> mUsers;
     private Context mContext;
     private String mCurrentGroupCurrency;
+    private User mCurrentUser;
 
     /**
      * Constructs a new {@link UsersRecyclerAdapter}.
@@ -48,12 +49,14 @@ public class UsersRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
      * @param listener the callback for user clicks on the users
      */
     public UsersRecyclerAdapter(@NonNull Context context, @NonNull List<ParseUser> users,
+                                @NonNull User currentUser,
                                 @NonNull AdapterInteractionListener listener) {
         super();
 
         mListener = listener;
         mContext = context;
         mUsers = users;
+        mCurrentUser = currentUser;
     }
 
     @NonNull
@@ -75,8 +78,7 @@ public class UsersRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
         byte[] avatarByteArray = user.getAvatar();
         usersRow.setAvatar(avatarByteArray, false);
 
-        User currentUser = (User) ParseUser.getCurrentUser();
-        Group currentGroup = currentUser.getCurrentGroup();
+        Group currentGroup = mCurrentUser.getCurrentGroup();
         BigFraction balance = user.getBalance(currentGroup);
         usersRow.setBalance(balance, mCurrentGroupCurrency);
     }

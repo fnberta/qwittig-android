@@ -68,7 +68,7 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewFragment implem
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mRecyclerAdapter = new UsersRecyclerAdapter(getActivity(), mUsers, this);
+        mRecyclerAdapter = new UsersRecyclerAdapter(getActivity(), mUsers, mCurrentUser, this);
         mRecyclerView.setAdapter(mRecyclerAdapter);
     }
 
@@ -119,9 +119,7 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewFragment implem
     }
 
     @Override
-    public void updateAdapter() {
-        super.updateAdapter();
-
+    protected void updateAdapter() {
         mUserRepo.getUsersLocalAsync(mCurrentGroup, this);
     }
 
@@ -155,7 +153,7 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewFragment implem
 
     @Override
     protected void updateView() {
-        mRecyclerAdapter.setCurrentGroupCurrency(ParseUtils.getGroupCurrency());
+        mRecyclerAdapter.setCurrentGroupCurrency(ParseUtils.getGroupCurrencyWithFallback(mCurrentGroup));
         mRecyclerAdapter.notifyDataSetChanged();
         showMainView();
     }

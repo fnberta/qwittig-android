@@ -115,7 +115,7 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mRecyclerAdapter = new TasksRecyclerAdapter(getActivity(), mTasks, this);
+        mRecyclerAdapter = new TasksRecyclerAdapter(getActivity(), mTasks, mCurrentUser, this);
         mRecyclerView.setAdapter(mRecyclerAdapter);
     }
 
@@ -167,9 +167,7 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
     }
 
     @Override
-    public void updateAdapter() {
-        super.updateAdapter();
-
+    protected void updateAdapter() {
         mTaskRepo.getTasksLocalAsync(mCurrentGroup, mDeadlineSelected, this);
     }
 
@@ -344,7 +342,7 @@ public class TasksFragment extends BaseRecyclerViewFragment implements
         }
 
         final ParseUser userResponsible = task.getUserResponsible();
-        final ParseUser userResponsibleNew = task.addHistoryEvent();
+        final ParseUser userResponsibleNew = task.addHistoryEvent(mCurrentUser);
         task.saveEventually();
 
         String currentUserId = mCurrentUser.getObjectId();

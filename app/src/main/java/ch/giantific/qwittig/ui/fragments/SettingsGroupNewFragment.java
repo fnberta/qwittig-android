@@ -88,6 +88,7 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
                 android.R.layout.simple_spinner_dropdown_item);
         mSpinnerCurrency.setAdapter(spinnerCurrencyAdapter);
 
+        updateCurrentUserAndGroup();
         setupUsersToInviteRows();
     }
 
@@ -96,9 +97,7 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
      * group with same name and if not creates the new group with a retained helper fragment.
      */
     public void addNewGroup() {
-        final User currentUser = (User) ParseUser.getCurrentUser();
-
-        if (ParseUtils.isTestUser(currentUser)) {
+        if (ParseUtils.isTestUser(mCurrentUser)) {
             mListener.showAccountCreateDialog();
             return;
         }
@@ -121,7 +120,7 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
         }
 
         boolean groupIsNew = true;
-        List<ParseObject> groups = currentUser.getGroups();
+        List<ParseObject> groups = mCurrentUser.getGroups();
         for (ParseObject parseObject : groups) {
             Group group = (Group) parseObject;
             if (name.equalsIgnoreCase(group.getName())) {

@@ -52,17 +52,17 @@ public class Purchase extends ParseObject {
         // A default constructor is required.
     }
 
-    public Purchase(@NonNull ParseObject group, @NonNull Date date, @NonNull String store,
-                    @NonNull List<ParseObject> items, double totalPrice,
+    public Purchase(@NonNull ParseUser currentUser, @NonNull ParseObject group, @NonNull Date date,
+                    @NonNull String store, @NonNull List<ParseObject> items, double totalPrice,
                     @NonNull List<ParseUser> usersInvolved, @NonNull String currency) {
-        this(group, date, store, items, totalPrice, usersInvolved, currency, 1);
+        this(currentUser, group, date, store, items, totalPrice, usersInvolved, currency, 1);
     }
 
-    public Purchase(@NonNull ParseObject group, @NonNull Date date, @NonNull String store,
-                    @NonNull List<ParseObject> items, double totalPrice,
+    public Purchase(@NonNull ParseUser currentUser, @NonNull ParseObject group, @NonNull Date date,
+                    @NonNull String store, @NonNull List<ParseObject> items, double totalPrice,
                     @NonNull List<ParseUser> usersInvolved, @NonNull String currency,
                     float exchangeRate) {
-        setBuyer(ParseUser.getCurrentUser());
+        setBuyer(currentUser);
         setGroup(group);
         setDate(date);
         setStore(store);
@@ -71,7 +71,7 @@ public class Purchase extends ParseObject {
         setUsersInvolved(usersInvolved);
         setCurrency(currency);
         setExchangeRate(exchangeRate);
-        addCurrentUserToReadBy();
+        addUserToReadBy(currentUser);
         setAccessRights(group);
     }
 
@@ -241,13 +241,12 @@ public class Purchase extends ParseObject {
     /**
      * Returns whether the user has already read the purchase or not.
      *
+     * @param user the user to check the read status for
      * @return whether the user has read the purchase or not
      */
-    public boolean currentUserHasReadPurchase() {
+    public boolean userHasReadPurchase(@NonNull ParseUser user) {
         List<String> readByIds = getReadByIds();
-        User currentUser = (User) ParseUser.getCurrentUser();
-
-        return currentUser != null && readByIds.contains(currentUser.getObjectId());
+        return readByIds.contains(user.getObjectId());
     }
 
     /**
@@ -268,8 +267,8 @@ public class Purchase extends ParseObject {
         return readByIds;
     }
 
-    public void addCurrentUserToReadBy() {
-        addReadBy(ParseUser.getCurrentUser());
+    public void addUserToReadBy(@NonNull ParseUser user) {
+        addReadBy(user);
     }
 
     public void addReadBy(@NonNull ParseUser user) {
@@ -277,11 +276,11 @@ public class Purchase extends ParseObject {
     }
 
     /**
-     * Resets the read by field to only the current user.
+     * Resets the read by field to only the user.
      */
-    public void resetReadBy() {
+    public void resetReadBy(@NonNull ParseUser user) {
         List<ParseUser> readBy = new ArrayList<>();
-        readBy.add(ParseUser.getCurrentUser());
+        readBy.add(user);
         put(READ_BY, readBy);
     }
 

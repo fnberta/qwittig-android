@@ -22,6 +22,7 @@ import ch.giantific.qwittig.domain.models.parse.User;
 public abstract class BaseQueryHelper extends BaseHelper {
 
     private static final String LOG_TAG = BaseQueryHelper.class.getSimpleName();
+    User mCurrentUser;
     Group mCurrentGroup;
     List<ParseObject> mCurrentUserGroups;
 
@@ -31,13 +32,13 @@ public abstract class BaseQueryHelper extends BaseHelper {
      * @return whether the current user's current group and groups are not null or empty
      */
     final boolean setCurrentGroups() {
-        User currentUser = (User) ParseUser.getCurrentUser();
-        if (currentUser != null) {
-            mCurrentGroup = currentUser.getCurrentGroup();
-            mCurrentUserGroups = currentUser.getGroups();
+        mCurrentUser = (User) ParseUser.getCurrentUser();
+        if (mCurrentUser != null) {
+            mCurrentGroup = mCurrentUser.getCurrentGroup();
+            mCurrentUserGroups = mCurrentUser.getGroups();
         }
 
-        return !(mCurrentGroup == null || mCurrentUserGroups == null || mCurrentUserGroups.isEmpty());
+        return mCurrentUser != null && mCurrentGroup != null && !mCurrentUserGroups.isEmpty();
 
     }
 }

@@ -98,7 +98,7 @@ public class MoreQueryHelper extends BaseQueryHelper {
         switch (className) {
             case Purchase.CLASS: {
                 PurchaseRepository repo = new ParsePurchaseRepository();
-                repo.getPurchasesOnlineAsync(mCurrentGroup, skip, new PurchaseRepository.GetPurchasesOnlineListener() {
+                repo.getPurchasesOnlineAsync(mCurrentUser, mCurrentGroup, skip, new PurchaseRepository.GetPurchasesOnlineListener() {
                     @Override
                     public void onPurchasesOnlineLoaded(@NonNull List<ParseObject> purchases) {
                         onLoaded(purchases);

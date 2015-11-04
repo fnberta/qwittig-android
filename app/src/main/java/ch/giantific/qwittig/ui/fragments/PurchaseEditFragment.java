@@ -246,9 +246,8 @@ public class PurchaseEditFragment extends PurchaseBaseFragment {
     }
 
     private boolean buyerIsOnlyUserInvolved(@NonNull List<ParseUser> usersInvolved) {
-        ParseUser currentUser = ParseUser.getCurrentUser();
         return usersInvolved.size() == 1 && usersInvolved.get(0).getObjectId()
-                .equals(currentUser.getObjectId());
+                .equals(mCurrentUser.getObjectId());
     }
 
     @NonNull
@@ -296,7 +295,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment {
     }
 
     private void resetReadBy() {
-        mPurchase.resetReadBy();
+        mPurchase.resetReadBy(mCurrentUser);
     }
 
     private void savePurchaseWithHelper() {

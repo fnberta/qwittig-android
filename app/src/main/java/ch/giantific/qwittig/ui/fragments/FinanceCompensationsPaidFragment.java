@@ -79,7 +79,8 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mRecyclerAdapter = new CompensationsPaidRecyclerAdapter(getActivity(), mCompensations);
+        mRecyclerAdapter = new CompensationsPaidRecyclerAdapter(getActivity(), mCompensations,
+                mCurrentUser);
         mRecyclerView.setAdapter(mRecyclerAdapter);
         Mugen.with(mRecyclerView, new MugenCallbacks() {
             @Override
@@ -112,9 +113,7 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
     }
 
     @Override
-    public void updateAdapter() {
-        super.updateAdapter();
-
+    protected void updateAdapter() {
         mCompsRepo.getCompensationsLocalPaidAsync(mCurrentUser, mCurrentGroup, this);
     }
 
@@ -128,7 +127,7 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
 
     @Override
     protected void updateView() {
-        mRecyclerAdapter.setCurrentGroupCurrency(ParseUtils.getGroupCurrency());
+        mRecyclerAdapter.setCurrentGroupCurrency(ParseUtils.getGroupCurrencyWithFallback(mCurrentGroup));
         mRecyclerAdapter.notifyDataSetChanged();
         showMainView();
 

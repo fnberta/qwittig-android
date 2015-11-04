@@ -58,7 +58,6 @@ public class SettingsStoresFragment extends BaseFragment {
     private List<String> mStoresAdded = new ArrayList<>();
     @NonNull
     private List<String> mStoresFavorites = new ArrayList<>();
-    private User mCurrentUser;
 
     public SettingsStoresFragment() {
     }
@@ -78,7 +77,7 @@ public class SettingsStoresFragment extends BaseFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mCurrentUser = (User) ParseUser.getCurrentUser();
+        updateCurrentUserAndGroup();
         setupStoreList();
     }
 

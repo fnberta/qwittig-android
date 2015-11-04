@@ -17,22 +17,20 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.parse.ParseException;
-import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.helpers.group.StatsHelper;
+import ch.giantific.qwittig.data.repositories.ParseGroupRepository;
 import ch.giantific.qwittig.domain.models.Month;
 import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.models.stats.Stats;
-import ch.giantific.qwittig.data.repositories.ParseGroupRepository;
-import ch.giantific.qwittig.data.helpers.group.StatsHelper;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
-import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
@@ -47,14 +45,12 @@ public abstract class StatsBaseFragment extends BaseFragment {
     private static final String STATE_STATS_DATA = "STATE_STATS_DATA";
     private static final String STATE_PERIOD_TYPE = "STATE_PERIOD_TYPE";
     private static final String LOG_TAG = StatsBaseFragment.class.getSimpleName();
-    Group mCurrentGroup;
     int mPeriodType;
     boolean mIsLoading;
     @Nullable
     Stats mStatsData;
     boolean mDataIsLoaded;
     private FragmentInteractionListener mListener;
-    private User mCurrentUser;
     private TextView mTextViewEmptyView;
     private ProgressBar mProgressBar;
     private boolean mIsRecreating;
@@ -77,6 +73,8 @@ public abstract class StatsBaseFragment extends BaseFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        updateCurrentUserAndGroup();
 
         if (savedInstanceState != null) {
             mStatsData = savedInstanceState.getParcelable(STATE_STATS_DATA);
@@ -103,32 +101,14 @@ public abstract class StatsBaseFragment extends BaseFragment {
         mProgressBar = (ProgressBar) view.findViewById(R.id.pb_stats);
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        // TODO: move to onViewCreated?
-        updateData();
-    }
-
     /**
-     * Update the current user and current group fields and checks whether data is available for
-     * the current group.
+     * Starts the stats loading process by checking if data is available for the current group. If
+     * yes, loads the stats data and if not, fetches the data for the group and then starts the
+     * stats data loading.
+     * <p/>
+     * Called in subclasses after their view is ready.
      */
-    @CallSuper
-    public void updateData() {
-        updateCurrentUserAndGroup();
-        checkCurrentGroup();
-    }
-
-    private void updateCurrentUserAndGroup() {
-        mCurrentUser = (User) ParseUser.getCurrentUser();
-        if (mCurrentUser != null) {
-            mCurrentGroup = mCurrentUser.getCurrentGroup();
-        }
-    }
-
-    private void checkCurrentGroup() {
+    final void checkCurrentGroup() {
         if (mCurrentGroup != null) {
             if (mCurrentGroup.isDataAvailable()) {
                 setStuffWithGroupData();
@@ -317,6 +297,14 @@ public abstract class StatsBaseFragment extends BaseFragment {
             }
         });
         snackbar.show();
+    }
+
+    /**
+     * Updates the current user and current group fields and loads the stats data.
+     */
+    public void updateFragment() {
+        updateCurrentUserAndGroup();
+        checkCurrentGroup();
     }
 
     @Override

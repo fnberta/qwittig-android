@@ -221,8 +221,9 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     protected void onPushReceive(@NonNull Context context, @NonNull Intent intent) {
         Log.e(LOG_TAG, "onPushReceive");
 
+        final User currentUser = (User) ParseUser.getCurrentUser();
         // return immediately if on user is logged in
-        if (ParseUser.getCurrentUser() == null) {
+        if (currentUser == null) {
             Log.e(LOG_TAG, "currentUser is null");
             return;
         }
@@ -249,7 +250,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 ParseQueryService.startQueryUsers(context);
 
                 // query purchase only for users in purchase's usersInvolved
-                if (!userIsInUsersInvolved(jsonExtras)) {
+                if (!userIsInUsersInvolved(currentUser, jsonExtras)) {
                     return;
                 }
                 String purchaseId = jsonExtras.optString(PUSH_PARAM_PURCHASE_ID);
@@ -257,7 +258,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
 
                 // don't show notification for buyer
                 String buyerId = jsonExtras.optString(PUSH_PARAM_BUYER_ID);
-                if (buyerId.equals(ParseUser.getCurrentUser().getObjectId())) {
+                if (buyerId.equals(currentUser.getObjectId())) {
                     return;
                 }
 
@@ -279,7 +280,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 ParseQueryService.startQueryUsers(context);
 
                 // only update purchase for users in purchase's usersInvolved
-                if (!userIsInUsersInvolved(jsonExtras)) {
+                if (!userIsInUsersInvolved(currentUser, jsonExtras)) {
                     return;
                 }
                 String purchaseId = jsonExtras.optString(PUSH_PARAM_PURCHASE_ID);
@@ -291,7 +292,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 ParseQueryService.startQueryUsers(context);
 
                 // only unpin local purchase for users in purchase's usersInvolved
-                if (!userIsInUsersInvolved(jsonExtras)) {
+                if (!userIsInUsersInvolved(currentUser, jsonExtras)) {
                     return;
                 }
                 String purchaseId = jsonExtras.optString(PUSH_PARAM_PURCHASE_ID);
@@ -301,7 +302,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
             }
             case TYPE_SETTLEMENT_NEW: {
                 String initiatorId = jsonExtras.optString(PUSH_PARAM_INITIATOR_ID);
-                if (initiatorId.equals(ParseUser.getCurrentUser().getObjectId())) {
+                if (initiatorId.equals(currentUser.getObjectId())) {
                     return;
                 }
                 break;
@@ -328,7 +329,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
 
                 // only show notification for payer
                 String payerId = jsonExtras.optString(PUSH_PARAM_PAYER_ID);
-                if (!payerId.equals(ParseUser.getCurrentUser().getObjectId())) {
+                if (!payerId.equals(currentUser.getObjectId())) {
                     return;
                 }
                 break;
@@ -343,7 +344,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
 
                 // only show notification for beneficiary
                 String beneficiaryId = jsonExtras.optString(PUSH_PARAM_BENEFICIARY_ID);
-                if (!beneficiaryId.equals(ParseUser.getCurrentUser().getObjectId())) {
+                if (!beneficiaryId.equals(currentUser.getObjectId())) {
                     return;
                 }
                 break;
@@ -354,7 +355,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
 
                 // only show notification for beneficiary
                 String beneficiaryId = jsonExtras.optString(PUSH_PARAM_BENEFICIARY_ID);
-                if (!beneficiaryId.equals(ParseUser.getCurrentUser().getObjectId())) {
+                if (!beneficiaryId.equals(currentUser.getObjectId())) {
                     return;
                 }
                 break;
@@ -365,7 +366,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
 
                 // don't show notification for initiator of task
                 String initiatorId = jsonExtras.optString(PUSH_PARAM_INITIATOR_ID);
-                if (initiatorId.equals(ParseUser.getCurrentUser().getObjectId())) {
+                if (initiatorId.equals(currentUser.getObjectId())) {
                     return;
                 }
                 break;
@@ -383,7 +384,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 // don't show notification for initiator of task,
                 // TODO: actually we don't want to show for the user that deleted the task / finished a one-time task
                 String initiatorId = jsonExtras.optString(PUSH_PARAM_INITIATOR_ID);
-                if (initiatorId.equals(ParseUser.getCurrentUser().getObjectId())) {
+                if (initiatorId.equals(currentUser.getObjectId())) {
                     return;
                 }
 
@@ -445,9 +446,9 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
         }
     }
 
-    private boolean userIsInUsersInvolved(@NonNull JSONObject jsonExtras) {
+    private boolean userIsInUsersInvolved(@NonNull User user, @NonNull JSONObject jsonExtras) {
         JSONArray usersInvolvedIds = jsonExtras.optJSONArray(PUSH_PARAM_USERS_INVOLVED_IDS);
-        return usersInvolvedIds.toString().contains(ParseUser.getCurrentUser().getObjectId());
+        return usersInvolvedIds.toString().contains(user.getObjectId());
     }
 
     @Override
@@ -729,9 +730,9 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 return;
             }
 
-            User currentUser = (User) ParseUser.getCurrentUser();
+            final User currentUser = (User) ParseUser.getCurrentUser();
             if (currentUser != null) {
-                Group oldGroup = currentUser.getCurrentGroup();
+                final Group oldGroup = currentUser.getCurrentGroup();
                 if (!oldGroup.getObjectId().equals(groupId) &&
                         isInPurchaseGroup(currentUser, groupId)) {
                     ParseObject group = ParseObject.createWithoutData(Group.CLASS, groupId);
@@ -776,7 +777,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 } else {
                     clearStoredPurchaseNotifications(groupId);
 
-                    User currentUser = (User) ParseUser.getCurrentUser();
+                    final User currentUser = (User) ParseUser.getCurrentUser();
                     if (currentUser != null && isInPurchaseGroup(currentUser, groupId)) {
                         return PurchaseDetailsActivity.class;
                     }
@@ -804,7 +805,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
 
                 }
 
-                User currentUser = (User) ParseUser.getCurrentUser();
+                final User currentUser = (User) ParseUser.getCurrentUser();
                 if (currentUser != null && isInPurchaseGroup(currentUser, groupId)) {
                     return TaskDetailsActivity.class;
                 }

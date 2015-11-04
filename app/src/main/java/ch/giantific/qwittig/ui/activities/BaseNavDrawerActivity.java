@@ -209,10 +209,12 @@ public abstract class BaseNavDrawerActivity extends BaseActivity {
     }
 
     private boolean checkUserLoggedIn() {
-        if (ParseUser.getCurrentUser() == null) {
+        mCurrentUser = (User) ParseUser.getCurrentUser();
+        if (mCurrentUser == null) {
             startLoginActivity();
             return false;
         } else {
+            mCurrentGroup = mCurrentUser.getCurrentGroup();
             return true;
         }
     }
@@ -241,6 +243,53 @@ public abstract class BaseNavDrawerActivity extends BaseActivity {
         super.setContentView(layoutResID);
 
         setupNavDrawer();
+        if (mUserIsLoggedIn) {
+            fetchCurrentUserGroups();
+        }
+    }
+
+    private void fetchCurrentUserGroups() {
+        List<ParseObject> groups = mCurrentUser.getGroups();
+        if (groups.isEmpty()) {
+            onGroupsFetched();
+            return;
+        }
+
+        GroupRepository repo = new ParseGroupRepository();
+        mGroupsCount = groups.size();
+        for (int i = 0; i < mGroupsCount; i++) {
+            final Group group = (Group) groups.get(i);
+
+            if (group.isDataAvailable()) {
+                mFetchCounter++;
+                checkFetchesFinished();
+            } else {
+                repo.fetchGroupDataAsync(group, new GroupRepository.GetGroupLocalListener() {
+                    @Override
+                    public void onGroupLocalLoaded(@NonNull Group group) {
+                        mFetchCounter++;
+                        checkFetchesFinished();
+                    }
+                });
+            }
+        }
+    }
+
+    private void checkFetchesFinished() {
+        if (mFetchCounter == mGroupsCount) {
+            mFetchCounter = 0;
+            onGroupsFetched();
+        }
+    }
+
+    @CallSuper
+    void onGroupsFetched() {
+        if (mCurrentUser != null) {
+            setupNavDrawerHeader();
+            if (!BuildConfig.DEBUG) {
+                setupIab();
+            }
+        }
     }
 
     private void setupNavDrawer() {
@@ -280,61 +329,6 @@ public abstract class BaseNavDrawerActivity extends BaseActivity {
         };
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-    }
-
-    final void fetchCurrentUserGroups() {
-        User currentUser = (User) ParseUser.getCurrentUser();
-        List<ParseObject> groups = null;
-        if (currentUser != null) {
-            groups = currentUser.getGroups();
-        }
-        if (groups == null || groups.isEmpty()) {
-            onGroupsFetched();
-            return;
-        }
-
-        GroupRepository repo = new ParseGroupRepository();
-        mGroupsCount = groups.size();
-        for (final ParseObject group : groups) {
-            if (group.isDataAvailable()) {
-                mFetchCounter++;
-                checkFetchesFinished();
-            } else {
-                repo.fetchGroupDataAsync(group, new GroupRepository.GetGroupLocalListener() {
-                    @Override
-                    public void onGroupLocalLoaded(@NonNull Group group) {
-                        mFetchCounter++;
-                        checkFetchesFinished();
-                    }
-                });
-            }
-        }
-    }
-
-    private void checkFetchesFinished() {
-        if (mFetchCounter == mGroupsCount) {
-            mFetchCounter = 0;
-            onGroupsFetched();
-        }
-    }
-
-    @CallSuper
-    void onGroupsFetched() {
-        setCurrentUserAndGroup();
-        if (mCurrentUser != null) {
-            setupNavDrawerHeader();
-            if (!BuildConfig.DEBUG) {
-                setupIab();
-            }
-        }
-    }
-
-    private void setCurrentUserAndGroup() {
-        User currentUser = (User) ParseUser.getCurrentUser();
-        if (currentUser != null) {
-            mCurrentUser = currentUser;
-            mCurrentGroup = currentUser.getCurrentGroup();
-        }
     }
 
     private void setupNavDrawerHeader() {
@@ -405,7 +399,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity {
         updateGroupSpinner();
     }
 
-    private void updateGroupSpinner() {
+    final void updateGroupSpinner() {
         updateGroupSpinnerList();
         updateGroupSpinnerPosition();
     }
@@ -413,8 +407,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity {
     private void updateGroupSpinnerList() {
         mGroups.clear();
 
-        User currentUser = (User) ParseUser.getCurrentUser();
-        List<ParseObject> groups = currentUser.getGroups();
+        List<ParseObject> groups = mCurrentUser.getGroups();
         if (!groups.isEmpty()) {
             mGroups.addAll(groups);
         }
@@ -423,13 +416,13 @@ public abstract class BaseNavDrawerActivity extends BaseActivity {
     }
 
     final void updateGroupSpinnerPosition() {
-        User currentUser = (User) ParseUser.getCurrentUser();
-        int position = mSpinnerGroupsAdapter.getPosition(currentUser.getCurrentGroup());
+
+        int position = mSpinnerGroupsAdapter.getPosition(mCurrentGroup);
         mSpinnerGroups.setSelection(position);
     }
 
     private void onGroupChanged(@NonNull ParseObject group) {
-        Group oldGroup = mCurrentUser.getCurrentGroup();
+        final Group oldGroup = mCurrentUser.getCurrentGroup();
         if (oldGroup.getObjectId().equals(group.getObjectId())) {
             return;
         }
@@ -588,10 +581,10 @@ public abstract class BaseNavDrawerActivity extends BaseActivity {
 
     @CallSuper
     void afterLoginSetup() {
-        mUserIsLoggedIn = true;
+        mUserIsLoggedIn = checkUserLoggedIn();
         fetchCurrentUserGroups();
 
-        // subclasses are free to add stuff here
+        // subclasses probably should add stuff here
     }
 
     final void goPremium() {

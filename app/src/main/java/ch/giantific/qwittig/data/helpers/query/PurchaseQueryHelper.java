@@ -45,7 +45,7 @@ public class PurchaseQueryHelper extends BaseQueryHelper implements
 
         if (setCurrentGroups()) {
             PurchaseRepository repo = new ParsePurchaseRepository();
-            repo.updatePurchasesAsync(mCurrentUserGroups, mCurrentGroup.getObjectId(), this);
+            repo.updatePurchasesAsync(mCurrentUser, mCurrentUserGroups, mCurrentGroup.getObjectId(), this);
         } else {
             if (mListener != null) {
                 mListener.onAllPurchasesUpdated();

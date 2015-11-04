@@ -115,25 +115,8 @@ public class Task extends ParseObject {
         return getDate(DEADLINE);
     }
 
-    public void setDeadline(@NonNull Calendar calendar) {
-        put(DEADLINE, calendar.getTime());
-    }
-
-    /**
-     * Sets the specified deadline or removes it if it is null.
-     *
-     * @param deadline the deadline to set
-     */
-    public void setDeadline(@Nullable Date deadline) {
-        if (deadline == null) {
-            remove(DEADLINE);
-        } else {
-            Calendar cal = DateUtils.getCalendarInstanceUTC();
-            cal.setTime(deadline);
-            cal = DateUtils.resetToMidnight(cal);
-
-            setDeadline(cal);
-        }
+    public void setDeadline(@NonNull Date deadline) {
+        put(DEADLINE, deadline);
     }
 
     @NonNull
@@ -172,6 +155,23 @@ public class Task extends ParseObject {
         mIsLoading = isLoading;
     }
 
+    /**
+     * Resets the specified deadline to midnight and sets it or removes it if it is null.
+     *
+     * @param deadline the deadline to reset and set
+     */
+    public void setDeadlineResetMidnight(@Nullable Date deadline) {
+        if (deadline == null) {
+            remove(DEADLINE);
+        } else {
+            Calendar cal = DateUtils.getCalendarInstanceUTC();
+            cal.setTime(deadline);
+            cal = DateUtils.resetToMidnight(cal);
+
+            setDeadline(cal.getTime());
+        }
+    }
+
     public void updateDeadline(@NonNull @TimeFrame String timeFrame) {
         Date deadline = getDeadline();
         Calendar deadlineNew = DateUtils.getCalendarInstanceUTC();
@@ -191,6 +191,7 @@ public class Task extends ParseObject {
                 break;
         }
 
+        deadlineNew = DateUtils.resetToMidnight(deadlineNew);
         setDeadline(deadlineNew.getTime());
     }
 
@@ -215,11 +216,11 @@ public class Task extends ParseObject {
      * A history event simply contains the object id of the user who completed the task and the
      * date on which he/she did.
      *
+     * @param currentUser the current user who just completed the task
      * @return the new user responsible
      */
     @Nullable
-    public User addHistoryEvent() {
-        ParseUser currentUser = ParseUser.getCurrentUser();
+    public User addHistoryEvent(@Nullable ParseUser currentUser) {
         if (currentUser == null) {
             return null;
         }

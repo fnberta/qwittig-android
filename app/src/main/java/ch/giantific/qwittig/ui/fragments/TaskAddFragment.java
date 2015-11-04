@@ -78,8 +78,6 @@ public class TaskAddFragment extends BaseFragment implements
     private TextView mTextViewDeadline;
     private RecyclerView mRecyclerViewUsers;
     private ItemTouchHelper mUsersItemTouchHelper;
-    private User mCurrentUser;
-    private Group mCurrentGroup;
     public TaskAddFragment() {
     }
 
@@ -98,8 +96,7 @@ public class TaskAddFragment extends BaseFragment implements
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mCurrentUser = (User) ParseUser.getCurrentUser();
-        mCurrentGroup = mCurrentUser.getCurrentGroup();
+        updateCurrentUserAndGroup();
 
         if (savedInstanceState != null) {
             mDeadlineSelected = DateUtils.parseLongToDate(savedInstanceState.getLong(STATE_DEADLINE_SELECTED));

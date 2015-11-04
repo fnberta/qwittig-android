@@ -90,6 +90,8 @@ public abstract class StatsPieBaseFragment extends StatsBaseFragment {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mRecyclerAdapter);
+
+        checkCurrentGroup();
     }
 
     @CallSuper
@@ -155,7 +157,7 @@ public abstract class StatsPieBaseFragment extends StatsBaseFragment {
 
             String userId = member.getMemberId();
             User user = (User) ParseObject.createWithoutData(User.CLASS, userId);
-            mUserNicknames.add(user.getNicknameOrMe(getActivity()));
+            mUserNicknames.add(user.getNicknameOrMe(getActivity(), mCurrentUser));
 
             List<Stats.Unit> units = member.getUnits();
             for (int i = 0, unitsSize = units.size(); i < unitsSize; i++) {

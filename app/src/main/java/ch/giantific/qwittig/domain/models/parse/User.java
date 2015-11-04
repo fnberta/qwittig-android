@@ -177,12 +177,13 @@ public class User extends ParseUser {
     /**
      * Returns the nickname or "Me" if it's the current user.
      *
-     * @param context the context to use to get the "Me" string
+     * @param context     the context to use to get the "Me" string
+     * @param currentUser the current user
      * @return the nickname or localized "me"
      */
-    public String getNicknameOrMe(@NonNull Context context) {
+    public String getNicknameOrMe(@NonNull Context context, @NonNull ParseUser currentUser) {
         String nickname;
-        if (this == ParseUser.getCurrentUser()) {
+        if (this == currentUser) {
             nickname = context.getString(R.string.nickname_me);
         } else {
             nickname = getNickname();
@@ -264,6 +265,7 @@ public class User extends ParseUser {
      * @param group the group for which the balance should be returned
      * @return the balance for the group
      */
+    @NonNull
     public BigFraction getBalance(@Nullable ParseObject group) {
         if (group == null) {
             return BigFraction.ZERO;

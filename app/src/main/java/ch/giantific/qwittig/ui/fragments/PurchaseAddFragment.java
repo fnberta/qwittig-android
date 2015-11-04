@@ -114,7 +114,7 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
     @Override
     protected void setPurchase() {
         List<ParseUser> purchaseUsersInvolved = getParseUsersInvolvedFromBoolean(mPurchaseUsersInvolved);
-        mPurchase = new Purchase(mCurrentGroup, mDateSelected, mStoreSelected,
+        mPurchase = new Purchase(mCurrentUser, mCurrentGroup, mDateSelected, mStoreSelected,
                 mItems, mTotalPrice, purchaseUsersInvolved, mCurrencySelected, mExchangeRate);
         if (!TextUtils.isEmpty(mNote)) {
             mPurchase.setNote(mNote);
@@ -169,7 +169,7 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
     @Override
     protected void savePurchaseAsDraft() {
         List<ParseUser> purchaseUsersInvolved = getParseUsersInvolvedFromBoolean(mPurchaseUsersInvolved);
-        mPurchase = new Purchase(mCurrentGroup, mDateSelected, mStoreSelected, mItems,
+        mPurchase = new Purchase(mCurrentUser, mCurrentGroup, mDateSelected, mStoreSelected, mItems,
                 mTotalPrice, purchaseUsersInvolved, mCurrencySelected);
 
         if (TextUtils.isEmpty(mReceiptImagePath)) {

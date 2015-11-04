@@ -49,6 +49,7 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
     private AdapterInteractionListener mListener;
     private Context mContext;
     private List<ParseObject> mTasks;
+    private User mCurrentUser;
 
     /**
      * Constructs a new {@link TasksRecyclerAdapter}.
@@ -58,11 +59,13 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
      * @param listener the callback for user clicks on the tasks
      */
     public TasksRecyclerAdapter(@NonNull Context context, @NonNull List<ParseObject> tasks,
+                                @NonNull User currentUser,
                                 @NonNull AdapterInteractionListener listener) {
 
         mContext = context;
         mListener = listener;
         mTasks = tasks;
+        mCurrentUser = currentUser;
     }
 
     @NonNull
@@ -93,7 +96,7 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
             case TYPE_ITEM: {
                 TaskRow taskRow = (TaskRow) viewHolder;
 
-                taskRow.setUsersInvolved(task.getUsersInvolved());
+                taskRow.setUsersInvolved(mCurrentUser, task.getUsersInvolved());
                 taskRow.setTitle(task.getTitle());
                 taskRow.setDeadline(task.getDeadline());
                 taskRow.setTimeFrame(task.getTimeFrame());
@@ -368,9 +371,10 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
          *
          * @param usersInvolved the users involved to set
          */
-        public void setUsersInvolved(@NonNull List<ParseUser> usersInvolved) {
+        public void setUsersInvolved(@NonNull User currentUser,
+                                     @NonNull List<ParseUser> usersInvolved) {
             User userResponsible = (User) usersInvolved.get(0);
-            String nickname = userResponsible.getNicknameOrMe(mContext);
+            String nickname = userResponsible.getNicknameOrMe(mContext, currentUser);
             if (!nickname.equals(mTextViewUserResponsible.getText().toString())) {
                 mTextViewUserResponsible.setText(nickname);
             }
@@ -383,7 +387,7 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
                 for (ParseUser parseUser : usersInvolved) {
                     User user = (User) parseUser;
                     if (!user.getObjectId().equals(userResponsible.getObjectId())) {
-                        stringBuilder.append(user.getNicknameOrMe(mContext)).append(" - ");
+                        stringBuilder.append(user.getNicknameOrMe(mContext, currentUser)).append(" - ");
                     }
                 }
                 // delete last -
@@ -395,12 +399,10 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
                 mTextViewUsersInvolved.setText(usersInvolvedString);
             }
 
-            toggleButtons(userResponsible);
+            toggleButtons(currentUser, userResponsible);
         }
 
-        private void toggleButtons(@NonNull User userResponsible) {
-            ParseUser currentUser = ParseUser.getCurrentUser();
-
+        private void toggleButtons(@NonNull User currentUser, @NonNull User userResponsible) {
             if (currentUser.getObjectId().equals(userResponsible.getObjectId())) {
                 mButtonDone.setVisibility(View.VISIBLE);
                 mButtonRemind.setVisibility(View.GONE);

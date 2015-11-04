@@ -37,8 +37,6 @@ import ch.giantific.qwittig.utils.MessageUtils;
 public abstract class BaseRecyclerViewFragment extends BaseFragment {
 
     private static final String STATE_IS_LOADING = "STATE_IS_LOADING";
-    User mCurrentUser;
-    Group mCurrentGroup;
     RecyclerView mRecyclerView;
     SwipeRefreshLayout mSwipeRefreshLayout;
     View mEmptyView;
@@ -52,6 +50,7 @@ public abstract class BaseRecyclerViewFragment extends BaseFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        updateCurrentUserAndGroup();
         mGroupRepository = new ParseGroupRepository();
     }
 
@@ -129,20 +128,7 @@ public abstract class BaseRecyclerViewFragment extends BaseFragment {
         updateAdapter();
     }
 
-    /**
-     * Updates the member variable for the current group and queries new data.
-     */
-    @CallSuper
-    public void updateAdapter() {
-        updateCurrentUserAndGroup();
-    }
-
-    private void updateCurrentUserAndGroup() {
-        mCurrentUser = (User) ParseUser.getCurrentUser();
-        if (mCurrentUser != null) {
-            mCurrentGroup = mCurrentUser.getCurrentGroup();
-        }
-    }
+    protected abstract void updateAdapter();
 
     final void checkCurrentGroup() {
         if (mCurrentGroup != null) {
@@ -174,4 +160,13 @@ public abstract class BaseRecyclerViewFragment extends BaseFragment {
     }
 
     protected abstract void toggleEmptyViewVisibility();
+
+    /**
+     * Updates the current user and current group fields and tells the {@link RecyclerView} adapter
+     * to reload its data.
+     */
+    public void updateFragment() {
+        updateCurrentUserAndGroup();
+        updateAdapter();
+    }
 }

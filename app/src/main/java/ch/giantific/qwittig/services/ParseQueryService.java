@@ -14,6 +14,7 @@ import android.support.annotation.StringDef;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -65,6 +66,7 @@ public class ParseQueryService extends IntentService {
     private static final String EXTRA_OBJECT_ID = "ch.giantific.qwittig.services.extra.OBJECT_ID";
     private static final String EXTRA_OBJECT_IS_NEW = "ch.giantific.qwittig.services.extra.OBJECT_IS_NEW";
     private static final String EXTRA_OBJECT_GROUP_ID = "ch.giantific.qwittig.services.extra.GROUP_ID";
+    private User mCurrentUser;
     private List<ParseObject> mCurrentUserGroups;
     /**
      * Constructs a new {@link ParseQueryService}.
@@ -173,7 +175,9 @@ public class ParseQueryService extends IntentService {
             return;
         }
 
-        mCurrentUserGroups = ParseUtils.getCurrentUserGroups();
+        mCurrentUser = (User) ParseUser.getCurrentUser();
+        mCurrentUserGroups = mCurrentUser.getGroups();
+
         final String action = intent.getAction();
         switch (action) {
             case ACTION_UNPIN_OBJECT: {
@@ -283,7 +287,7 @@ public class ParseQueryService extends IntentService {
         TaskRepository repo = new ParseTaskRepository();
         Task task = repo.fetchTaskDataLocal(taskId);
         if (task != null) {
-            task.addHistoryEvent();
+            task.addHistoryEvent(mCurrentUser);
             task.saveEventually();
             sendLocalBroadcast(DATA_TYPE_TASK);
         }
@@ -303,7 +307,7 @@ public class ParseQueryService extends IntentService {
 
     private void queryPurchases() {
         PurchaseRepository repo = new ParsePurchaseRepository();
-        if (repo.updatePurchases(mCurrentUserGroups)) {
+        if (repo.updatePurchases(mCurrentUser, mCurrentUserGroups)) {
             sendLocalBroadcast(DATA_TYPE_PURCHASE);
         }
     }

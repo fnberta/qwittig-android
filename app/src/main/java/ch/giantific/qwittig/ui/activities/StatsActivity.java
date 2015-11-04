@@ -79,8 +79,6 @@ public class StatsActivity extends BaseNavDrawerActivity implements
                 mStatsFragment = (StatsBaseFragment) getFragmentManager()
                         .getFragment(savedInstanceState, STATE_STATS_FRAGMENT);
             }
-
-            fetchCurrentUserGroups();
         }
     }
 
@@ -282,7 +280,7 @@ public class StatsActivity extends BaseNavDrawerActivity implements
     @Override
     protected void onNewGroupSet() {
         if (mStatsFragment != null) {
-            mStatsFragment.updateData();
+            mStatsFragment.updateFragment();
         }
     }
 }

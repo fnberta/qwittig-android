@@ -52,8 +52,6 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
     private List<String> mUsersInvitedEmails = new ArrayList<>();
     @NonNull
     private List<View> mUsersInvitedRows = new ArrayList<>();
-    private User mCurrentUser;
-    private Group mCurrentGroup;
     private boolean mIsInviting;
 
     public SettingsUserInviteFragment() {
@@ -87,14 +85,6 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
         updateCurrentUserAndGroup();
         setupInvitedUsers();
         setupUsersToInviteRows();
-    }
-
-    private void updateCurrentUserAndGroup() {
-        User currentUser = (User) ParseUser.getCurrentUser();
-        if (currentUser != null) {
-            mCurrentUser = currentUser;
-            mCurrentGroup = currentUser.getCurrentGroup();
-        }
     }
 
     private void setupInvitedUsers() {

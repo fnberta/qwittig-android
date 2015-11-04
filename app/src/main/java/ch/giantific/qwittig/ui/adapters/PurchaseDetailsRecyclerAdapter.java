@@ -7,6 +7,7 @@ package ch.giantific.qwittig.ui.adapters;
 import android.content.Context;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,6 +23,7 @@ import com.parse.ParseUser;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.Item;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.models.parse.User;
@@ -62,12 +64,16 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
     private Purchase mPurchase;
     private List<ParseObject> mItems;
     private boolean mHasNote;
-    private String mCurrentGroupCurrency = ParseUtils.getGroupCurrency();
+    private String mCurrentGroupCurrency;
+    private User mCurrentUser;
 
-    public PurchaseDetailsRecyclerAdapter(Context context) {
+    public PurchaseDetailsRecyclerAdapter(Context context, @NonNull User currentUser,
+                                          @Nullable Group currentGroup) {
         super();
 
         mContext = context;
+        mCurrentUser = currentUser;
+        mCurrentGroupCurrency = ParseUtils.getGroupCurrencyWithFallback(currentGroup);
     }
 
     @NonNull
@@ -85,7 +91,7 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
             }
             case TYPE_USER_RECYCLER: {
                 View v = inflater.inflate(VIEW_RESOURCE_RECYCLER_USER, parent, false);
-                return new UserRecyclerRow(v, mContext);
+                return new UserRecyclerRow(v, mContext, mCurrentUser);
             }
             case TYPE_TOTAL: {
                 View v = inflater.inflate(VIEW_RESOURCE_TOTAL, parent, false);
@@ -119,7 +125,7 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
 
                 itemRow.setName(item.getName());
                 itemRow.setPrice(item.getPrice(), mCurrentGroupCurrency);
-                itemRow.setAlpha(item.getUsersInvolved());
+                itemRow.setAlpha(mCurrentUser, item.getUsersInvolved());
 
                 break;
             }
@@ -156,7 +162,7 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
             case TYPE_MY_SHARE: {
                 MyShareRow myShareRow = (MyShareRow) viewHolder;
 
-                double myShare = mPurchase.calculateUserShare(ParseUser.getCurrentUser());
+                double myShare = mPurchase.calculateUserShare(mCurrentUser);
                 myShareRow.setMyShare(myShare, mPurchase.getTotalPrice(), mCurrentGroupCurrency);
                 myShareRow.setMyShareForeign(myShare, mPurchase.getExchangeRate(),
                         mCurrentGroupCurrency, mPurchase.getCurrency());
@@ -295,8 +301,7 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
          *
          * @param usersInvolved the users involved for the item
          */
-        public void setAlpha(@NonNull List<ParseUser> usersInvolved) {
-            User currentUser = (User) ParseUser.getCurrentUser();
+        public void setAlpha(@NonNull User currentUser, @NonNull List<ParseUser> usersInvolved) {
             int usersInvolvedCount = usersInvolved.size();
 
             float percentageCurrentUser = 0;
@@ -334,11 +339,12 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
          * @param view    the inflated view
          * @param context the context to use in the adapter
          */
-        public UserRecyclerRow(@NonNull View view, @NonNull Context context) {
+        public UserRecyclerRow(@NonNull View view, @NonNull Context context,
+                               @NonNull User currentUser) {
             super(view);
 
             mUsersInvolvedView = (RecyclerView) view.findViewById(R.id.rv_users_involved);
-            mUsersInvolvedAdapter = new PurchaseDetailsUsersInvolvedRecyclerAdapter(context);
+            mUsersInvolvedAdapter = new PurchaseDetailsUsersInvolvedRecyclerAdapter(context, currentUser);
             mUsersInvolvedView.setHasFixedSize(true);
             mUsersInvolvedView.setLayoutManager(new LinearLayoutManager(context,
                     LinearLayoutManager.HORIZONTAL, false));

@@ -25,18 +25,18 @@ import com.parse.ParseObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.Purchase;
-import ch.giantific.qwittig.data.repositories.ParsePurchaseRepository;
 import ch.giantific.qwittig.data.helpers.query.MoreQueryHelper;
 import ch.giantific.qwittig.data.helpers.query.PurchaseQueryHelper;
+import ch.giantific.qwittig.data.repositories.ParsePurchaseRepository;
+import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.ui.activities.BaseActivity;
 import ch.giantific.qwittig.ui.activities.PurchaseDetailsActivity;
 import ch.giantific.qwittig.ui.adapters.PurchasesRecyclerAdapter;
 import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
-import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -51,27 +51,21 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
 
     public static final String INTENT_PURCHASE_ID = "INTENT_PURCHASE_ID";
     private static final String STATE_IS_LOADING_MORE = "STATE_IS_LOADING_MORE";
+    private static final String STATE_ONLINE_QUERY = "STATE_ONLINE_QUERY";
     private static final String PURCHASE_QUERY_HELPER = "PURCHASE_QUERY_HELPER";
     private static final String LOG_TAG = HomePurchasesFragment.class.getSimpleName();
     private PurchaseRepository mPurchaseRepo;
-    private FragmentInteractionListener mListener;
     private PurchasesRecyclerAdapter mRecyclerAdapter;
     @NonNull
     private List<ParseObject> mPurchases = new ArrayList<>();
     private boolean mIsLoadingMore;
+    private boolean mOnlineQueryInProgress;
 
     public HomePurchasesFragment() {
     }
 
-    @Override
-    public void onAttach(@NonNull Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (FragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement DialogInteractionListener");
-        }
+    public void setOnlineQueryInProgress(boolean onlineQueryInProgress) {
+        mOnlineQueryInProgress = onlineQueryInProgress;
     }
 
     @Override
@@ -82,6 +76,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
 
         if (savedInstanceState != null) {
             mIsLoadingMore = savedInstanceState.getBoolean(STATE_IS_LOADING_MORE, false);
+            mOnlineQueryInProgress = savedInstanceState.getBoolean(STATE_ONLINE_QUERY, false);
         }
     }
 
@@ -90,6 +85,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
         super.onSaveInstanceState(outState);
 
         outState.putBoolean(STATE_IS_LOADING_MORE, mIsLoadingMore);
+        outState.putBoolean(STATE_ONLINE_QUERY, mOnlineQueryInProgress);
     }
 
     @Override
@@ -102,7 +98,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mRecyclerAdapter = new PurchasesRecyclerAdapter(getActivity(), mPurchases, this);
+        mRecyclerAdapter = new PurchasesRecyclerAdapter(getActivity(), mPurchases, mCurrentUser, this);
         mRecyclerView.setAdapter(mRecyclerAdapter);
         Mugen.with(mRecyclerView, new MugenCallbacks() {
             @Override
@@ -176,9 +172,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
     }
 
     @Override
-    public void updateAdapter() {
-        super.updateAdapter();
-
+    protected void updateAdapter() {
         mPurchaseRepo.getPurchasesLocalAsync(mCurrentUser, false, this);
     }
 
@@ -195,7 +189,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
 
     @Override
     protected void updateView() {
-        mRecyclerAdapter.setCurrentGroupCurrency(ParseUtils.getGroupCurrency());
+        mRecyclerAdapter.setCurrentGroupCurrency(ParseUtils.getGroupCurrencyWithFallback(mCurrentGroup));
         mRecyclerAdapter.notifyDataSetChanged();
         showMainView();
 
@@ -207,7 +201,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
 
     @Override
     void showMainView() {
-        if (!mListener.isNewQueryNeeded()) {
+        if (!mOnlineQueryInProgress) {
             super.showMainView();
         }
     }
@@ -294,23 +288,5 @@ public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
             }
         });
         snackbar.show();
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    /**
-     * Defines the interaction with the hosting {@link Activity}.
-     */
-    public interface FragmentInteractionListener extends BaseFragmentInteractionListener {
-        /**
-         * Gets the information whether a new online query is needed or not.
-         *
-         * @return whether a new online query is needed or not
-         */
-        boolean isNewQueryNeeded();
     }
 }

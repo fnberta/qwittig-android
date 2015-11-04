@@ -63,7 +63,6 @@ public class SettingsProfileFragment extends BaseFragment {
     private EditText mEditTextPassword;
     private TextInputLayout mTextInputLayoutPasswordRepeat;
     private EditText mEditTextPasswordRepeat;
-    private User mCurrentUser;
     private String mCurrentEmail;
     private String mCurrentNickname;
     private String mEmail;
@@ -104,7 +103,7 @@ public class SettingsProfileFragment extends BaseFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mCurrentUser = (User) ParseUser.getCurrentUser();
+        updateCurrentUserAndGroup();
         mCurrentEmail = mCurrentUser.getUsername();
         mCurrentNickname = mCurrentUser.getNickname();
 
@@ -243,9 +242,7 @@ public class SettingsProfileFragment extends BaseFragment {
      * Saves the changes made by the user to his/her profile if all fields contain valid values.
      */
     public void saveChanges() {
-        final User currentUser = (User) ParseUser.getCurrentUser();
-
-        if (ParseUtils.isTestUser(currentUser)) {
+        if (ParseUtils.isTestUser(mCurrentUser)) {
             mListener.showAccountCreateDialog();
             return;
         }
@@ -254,7 +251,7 @@ public class SettingsProfileFragment extends BaseFragment {
         readFields();
 
         if (Utils.emailIsValid(mEmail)) {
-            currentUser.setUsername(mEmail);
+            mCurrentUser.setUsername(mEmail);
             mTextInputLayoutEmail.setErrorEnabled(false);
         } else {
             fieldsAreComplete = false;
@@ -262,7 +259,7 @@ public class SettingsProfileFragment extends BaseFragment {
         }
 
         if (!TextUtils.isEmpty(mNickname)) {
-            currentUser.setNickname(mNickname);
+            mCurrentUser.setNickname(mNickname);
             mTextInputLayoutNickname.setErrorEnabled(false);
         } else {
             fieldsAreComplete = false;
@@ -271,7 +268,7 @@ public class SettingsProfileFragment extends BaseFragment {
 
         if (!TextUtils.isEmpty(mPassword)) {
             if (mPassword.equals(mPasswordRepeat)) {
-                currentUser.setPassword(mPassword);
+                mCurrentUser.setPassword(mPassword);
                 mTextInputLayoutPasswordRepeat.setErrorEnabled(false);
             } else {
                 fieldsAreComplete = false;
@@ -280,13 +277,13 @@ public class SettingsProfileFragment extends BaseFragment {
         }
 
         if (mDeleteAvatar) {
-            currentUser.removeAvatar();
+            mCurrentUser.removeAvatar();
         } else if (mAvatar != null) {
-            currentUser.setAvatar(mAvatar);
+            mCurrentUser.setAvatar(mAvatar);
         }
 
         if (fieldsAreComplete) {
-            currentUser.saveEventually();
+            mCurrentUser.saveEventually();
             finishEdit(CHANGES_SAVED);
         }
     }

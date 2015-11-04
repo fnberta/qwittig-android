@@ -194,10 +194,11 @@ public class TaskEditFragment extends TaskAddFragment implements
 
     @NonNull
     @Override
-    Task getTask(@NonNull String title, @NonNull String timeFrame, @NonNull List<ParseUser> usersInvolved) {
+    Task getTask(@NonNull String title, @NonNull String timeFrame,
+                 @NonNull List<ParseUser> usersInvolved) {
         mEditTask.setTitle(title);
         mEditTask.setTimeFrame(timeFrame);
-        mEditTask.setDeadline(mDeadlineSelected);
+        mEditTask.setDeadlineResetMidnight(mDeadlineSelected);
         mEditTask.setUsersInvolved(usersInvolved);
         return mEditTask;
     }

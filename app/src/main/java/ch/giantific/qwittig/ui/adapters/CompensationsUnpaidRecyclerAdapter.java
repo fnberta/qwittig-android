@@ -46,6 +46,7 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<Rec
     private Context mContext;
     private List<ParseObject> mCompensations;
     private String mCurrentGroupCurrency;
+    private User mCurrentUser;
 
     /**
      * Constructs a new {@link CompensationsUnpaidRecyclerAdapter}.
@@ -56,12 +57,14 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<Rec
      */
     public CompensationsUnpaidRecyclerAdapter(@NonNull Context context,
                                               @NonNull List<ParseObject> compensations,
+                                              @NonNull User currentUser,
                                               @NonNull AdapterInteractionListener listener) {
         super();
 
         mListener = listener;
         mContext = context;
         mCompensations = compensations;
+        mCurrentUser = currentUser;
     }
 
     @NonNull
@@ -88,9 +91,7 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<Rec
     public int getItemViewType(int position) {
         Compensation compensation = (Compensation) mCompensations.get(position);
         User beneficiary = compensation.getBeneficiary();
-        User currentUser = (User) ParseUser.getCurrentUser();
-
-        if (beneficiary.getObjectId().equals(currentUser.getObjectId())) {
+        if (beneficiary.getObjectId().equals(mCurrentUser.getObjectId())) {
             return TYPE_POS;
         }
 

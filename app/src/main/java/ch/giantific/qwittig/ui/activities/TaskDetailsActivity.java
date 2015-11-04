@@ -92,8 +92,6 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
             mTaskDetailsFragment = (TaskDetailsFragment) getFragmentManager()
                     .getFragment(savedInstanceState, STATE_TASK_DETAILS_FRAGMENT);
         }
-
-        fetchCurrentUserGroups();
     }
 
     private void getTaskObjectId() {
