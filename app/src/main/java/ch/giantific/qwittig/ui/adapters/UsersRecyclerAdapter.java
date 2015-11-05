@@ -30,15 +30,12 @@ import ch.giantific.qwittig.utils.Utils;
 /**
  * Handles the display of users with their avatar images, nicknames and current balances.
  * <p/>
- * Subclass of {@link RecyclerView.Adapter}.
+ * Subclass of {@link BaseRecyclerAdapter}.
  */
-public class UsersRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class UsersRecyclerAdapter extends BaseRecyclerAdapter<ParseUser> {
 
     private static final int VIEW_RESOURCE = R.layout.row_users;
     private AdapterInteractionListener mListener;
-    private List<ParseUser> mUsers;
-    private Context mContext;
-    private String mCurrentGroupCurrency;
     private User mCurrentUser;
 
     /**
@@ -51,27 +48,23 @@ public class UsersRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
     public UsersRecyclerAdapter(@NonNull Context context, @NonNull List<ParseUser> users,
                                 @NonNull User currentUser,
                                 @NonNull AdapterInteractionListener listener) {
-        super();
+        super(context, users);
 
         mListener = listener;
-        mContext = context;
-        mUsers = users;
         mCurrentUser = currentUser;
     }
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(VIEW_RESOURCE, parent,
-                false);
-
+        View view = LayoutInflater.from(parent.getContext()).inflate(VIEW_RESOURCE, parent, false);
         return new UsersRow(view, mContext, mListener);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         final UsersRow usersRow = (UsersRow) viewHolder;
-        User user = (User) mUsers.get(position);
+        User user = (User) mItems.get(position);
 
         usersRow.setName(user.getNickname());
 
@@ -81,21 +74,6 @@ public class UsersRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
         Group currentGroup = mCurrentUser.getCurrentGroup();
         BigFraction balance = user.getBalance(currentGroup);
         usersRow.setBalance(balance, mCurrentGroupCurrency);
-    }
-
-    @Override
-    public int getItemCount() {
-        return mUsers.size();
-    }
-
-    /**
-     * Sets the current group currency field. As long this is not set, nothing will be displayed
-     * in the adapter.
-     *
-     * @param currentGroupCurrency the currency code to set
-     */
-    public void setCurrentGroupCurrency(@NonNull String currentGroupCurrency) {
-        mCurrentGroupCurrency = currentGroupCurrency;
     }
 
     /**

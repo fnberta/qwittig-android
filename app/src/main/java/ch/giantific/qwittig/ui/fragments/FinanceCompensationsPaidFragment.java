@@ -187,7 +187,7 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
 
         mIsLoadingMore = false;
         mRecyclerAdapter.hideLoadMoreIndicator();
-        mRecyclerAdapter.addCompensations(compensations);
+        mRecyclerAdapter.addItems(compensations);
     }
 
     /**

@@ -20,7 +20,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.parse.ParseObject;
-import com.parse.ParseUser;
 
 import java.util.List;
 
@@ -34,18 +33,15 @@ import ch.giantific.qwittig.utils.MoneyUtils;
 /**
  * Handles the display of different unpaid compensations.
  * <p/>
- * Subclass of {@link RecyclerView.Adapter}.
+ * Subclass of {@link BaseRecyclerAdapter}.
  */
-public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class CompensationsUnpaidRecyclerAdapter extends BaseRecyclerAdapter<ParseObject> {
 
     private static final int TYPE_POS = 0;
     private static final int TYPE_NEG = 1;
     private static final int VIEW_RESOURCE_POS = R.layout.row_compensations_unpaid_pos;
     private static final int VIEW_RESOURCE_NEG = R.layout.row_compensations_unpaid_neg;
     private AdapterInteractionListener mListener;
-    private Context mContext;
-    private List<ParseObject> mCompensations;
-    private String mCurrentGroupCurrency;
     private User mCurrentUser;
 
     /**
@@ -59,11 +55,9 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<Rec
                                               @NonNull List<ParseObject> compensations,
                                               @NonNull User currentUser,
                                               @NonNull AdapterInteractionListener listener) {
-        super();
+        super(context, compensations);
 
         mListener = listener;
-        mContext = context;
-        mCompensations = compensations;
         mCurrentUser = currentUser;
     }
 
@@ -82,14 +76,13 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<Rec
                 return new CompensationNegRow(view, mListener);
             }
             default:
-                throw new RuntimeException("there is no type that matches the type " + viewType +
-                        " + make sure your using types correctly");
+                return super.onCreateViewHolder(parent, viewType);
         }
     }
 
     @Override
     public int getItemViewType(int position) {
-        Compensation compensation = (Compensation) mCompensations.get(position);
+        Compensation compensation = (Compensation) mItems.get(position);
         User beneficiary = compensation.getBeneficiary();
         if (beneficiary.getObjectId().equals(mCurrentUser.getObjectId())) {
             return TYPE_POS;
@@ -101,7 +94,7 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<Rec
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
         CompensationRow compensationRow = (CompensationRow) viewHolder;
-        Compensation compensation = (Compensation) mCompensations.get(position);
+        Compensation compensation = (Compensation) mItems.get(position);
 
         compensationRow.setProgressBarVisibility(compensation.isLoading());
 
@@ -136,21 +129,6 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter<Rec
         compensationRow.setAvatar(mContext, avatar);
         compensationRow.setNickname(nickname);
         compensationRow.setAmountMessage(message);
-    }
-
-    @Override
-    public int getItemCount() {
-        return mCompensations.size();
-    }
-
-    /**
-     * Sets the current group currency field. As long this is not set, nothing will be displayed
-     * in the adapter.
-     *
-     * @param currentGroupCurrency the currency code to set
-     */
-    public void setCurrentGroupCurrency(String currentGroupCurrency) {
-        mCurrentGroupCurrency = currentGroupCurrency;
     }
 
     /**

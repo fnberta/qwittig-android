@@ -4,10 +4,12 @@
 
 package ch.giantific.qwittig.ui.adapters;
 
+import android.support.v7.widget.RecyclerView;
+
 /**
- * Created by fabio on 04.11.15.
+ * Defines the needed methods for a {@link RecyclerView} adapter with state selection support.
  */
-public interface SelectionRecyclerAdapter {
+public interface SelectionAdapter {
 
     /**
      * Toggles the selection state of the item.

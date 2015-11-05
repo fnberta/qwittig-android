@@ -38,17 +38,15 @@ import ch.giantific.qwittig.utils.DateUtils;
 /**
  * Handles the display of recent tasks assigned to users in a group.
  * <p/>
- * Subclass of {@link RecyclerView.Adapter}.
+ * Subclass of {@link BaseRecyclerAdapter}.
  */
-public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class TasksRecyclerAdapter extends BaseRecyclerAdapter<ParseObject> {
 
     private static final int TYPE_ITEM = 0;
     private static final int TYPE_HEADER = 1;
     private static final String LOG_TAG = TasksRecyclerAdapter.class.getSimpleName();
     private static final int VIEW_RESOURCE = R.layout.row_tasks;
     private AdapterInteractionListener mListener;
-    private Context mContext;
-    private List<ParseObject> mTasks;
     private User mCurrentUser;
 
     /**
@@ -61,10 +59,9 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
     public TasksRecyclerAdapter(@NonNull Context context, @NonNull List<ParseObject> tasks,
                                 @NonNull User currentUser,
                                 @NonNull AdapterInteractionListener listener) {
+        super(context, tasks);
 
-        mContext = context;
         mListener = listener;
-        mTasks = tasks;
         mCurrentUser = currentUser;
     }
 
@@ -83,14 +80,13 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
                 return new HeaderRow(v);
             }
             default:
-                throw new RuntimeException("there is no type that matches the type " + viewType +
-                        " + make sure your using types correctly");
+                return super.onCreateViewHolder(parent, viewType);
         }
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        Task task = (Task) mTasks.get(position);
+        Task task = (Task) mItems.get(position);
 
         switch (getItemViewType(position)) {
             case TYPE_ITEM: {
@@ -120,16 +116,11 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     @Override
     public int getItemViewType(int position) {
-        if (mTasks.get(position) == null) {
+        if (mItems.get(position) == null) {
             return TYPE_HEADER;
         }
 
         return TYPE_ITEM;
-    }
-
-    @Override
-    public int getItemCount() {
-        return mTasks.size();
     }
 
     /**
