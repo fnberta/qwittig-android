@@ -104,7 +104,8 @@ public class Task extends ParseObject {
 
     @TimeFrame
     public String getTimeFrame() {
-        return getString(TIME_FRAME);
+        @TimeFrame String timeFrame = getString(TIME_FRAME);
+        return timeFrame;
     }
 
     public void setTimeFrame(@NonNull @TimeFrame String timeFrame) {

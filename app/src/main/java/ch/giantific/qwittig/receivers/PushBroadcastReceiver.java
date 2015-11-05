@@ -73,6 +73,8 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     public static final String PUSH_PARAM_CURRENCY_CODE = "currencyCode";
     public static final String PUSH_PARAM_TASK_TITLE = "taskTitle";
 
+    public static final String INTENT_EXTRA_FINANCE_FRAGMENT = "INTENT_EXTRA_FINANCE_FRAGMENT";
+
     public static final String INTENT_ACTION_INVITATION = "INTENT_ACTION_INVITATION";
     public static final int ACTION_INVITATION_ACCEPTED = 1;
     public static final int ACTION_INVITATION_DISCARDED = 2;
@@ -740,6 +742,23 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                     currentUser.saveEventually();
                 }
             }
+
+            switch (type) {
+                case TYPE_COMPENSATION_AMOUNT_CHANGED:
+                    // fall through
+                case TYPE_SETTLEMENT_NEW:
+                    // fall through
+                case TYPE_COMPENSATION_REMIND_USER:
+                    // fall through
+                case TYPE_COMPENSATION_EXISTING_NOT_NOW:
+                    // fall through
+                case TYPE_COMPENSATION_REMIND_USER_HAS_PAID:
+                    intent.putExtra(INTENT_EXTRA_FINANCE_FRAGMENT, FinanceActivity.TAB_COMPS_UNPAID);
+                    break;
+                case TYPE_COMPENSATION_EXISTING_PAID:
+                    intent.putExtra(INTENT_EXTRA_FINANCE_FRAGMENT, FinanceActivity.TAB_COMPS_PAID);
+                    break;
+            }
         }
 
         super.onPushOpen(context, intent);
@@ -789,6 +808,8 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
             case TYPE_COMPENSATION_REMIND_USER:
                 // fall through
             case TYPE_COMPENSATION_EXISTING_NOT_NOW:
+                // fall through
+            case TYPE_COMPENSATION_EXISTING_PAID:
                 // fall through
             case TYPE_COMPENSATION_REMIND_USER_HAS_PAID:
                 return FinanceActivity.class;

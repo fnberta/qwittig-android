@@ -7,6 +7,7 @@ package ch.giantific.qwittig.ui.activities;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -24,23 +25,26 @@ import com.parse.SaveCallback;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.helpers.group.SettlementHelper;
+import ch.giantific.qwittig.data.helpers.query.CompensationQueryHelper;
+import ch.giantific.qwittig.data.helpers.query.MoreQueryHelper;
+import ch.giantific.qwittig.data.helpers.query.UserQueryHelper;
+import ch.giantific.qwittig.data.helpers.reminder.CompensationRemindHelper;
+import ch.giantific.qwittig.data.helpers.save.CompensationSaveHelper;
+import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.domain.models.ItemUserPicker;
 import ch.giantific.qwittig.domain.models.parse.Compensation;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.data.repositories.ParseUserRepository;
-import ch.giantific.qwittig.data.helpers.query.CompensationQueryHelper;
-import ch.giantific.qwittig.data.helpers.reminder.CompensationRemindHelper;
-import ch.giantific.qwittig.data.helpers.save.CompensationSaveHelper;
-import ch.giantific.qwittig.data.helpers.query.MoreQueryHelper;
-import ch.giantific.qwittig.data.helpers.group.SettlementHelper;
-import ch.giantific.qwittig.data.helpers.query.UserQueryHelper;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.ui.adapters.TabsAdapter;
 import ch.giantific.qwittig.ui.fragments.FinanceCompensationsBaseFragment;
 import ch.giantific.qwittig.ui.fragments.FinanceCompensationsPaidFragment;
@@ -76,6 +80,13 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
         CompensationSaveHelper.HelperInteractionListener {
 
     public static final String INTENT_AUTO_START_NEW = "INTENT_AUTO_START_NEW";
+    @IntDef({TAB_NONE, TAB_USER_BALANCES, TAB_COMPS_UNPAID, TAB_COMPS_PAID})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface FragmentTabs {}
+    public static final int TAB_NONE = -1;
+    public static final int TAB_USER_BALANCES = 0;
+    public static final int TAB_COMPS_UNPAID = 1;
+    public static final int TAB_COMPS_PAID = 2;
     private static final String STATE_USER_BALANCES_FRAGMENT = "STATE_USER_BALANCES_FRAGMENT";
     private static final String STATE_COMPENSATIONS_UNPAID_FRAGMENT = "STATE_COMPENSATIONS_UNPAID_FRAGMENT";
     private static final String STATE_COMPENSATIONS_PAID_FRAGMENT = "STATE_COMPENSATIONS_PAID_FRAGMENT";
@@ -115,7 +126,7 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
                         .getFragment(savedInstanceState, STATE_COMPENSATIONS_UNPAID_FRAGMENT);
                 mCompensationsPaidFragment = (FinanceCompensationsPaidFragment) getFragmentManager()
                         .getFragment(savedInstanceState, STATE_COMPENSATIONS_PAID_FRAGMENT);
-                setupTabs();
+                setupTabs(TAB_NONE);
             }
 
             setToolbarHeader();
@@ -125,15 +136,17 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     private void addViewPagerFragments() {
         Intent intent = getIntent();
         boolean autoStartNew = intent.getBooleanExtra(INTENT_AUTO_START_NEW, false);
+        @FragmentTabs int fragmentToSelect = intent.getIntExtra(
+                PushBroadcastReceiver.INTENT_EXTRA_FINANCE_FRAGMENT, TAB_NONE);
 
         mUserBalancesFragment = new FinanceUserBalancesFragment();
         mCompensationsUnpaidFragment = FinanceCompensationsUnpaidFragment.newInstance(autoStartNew);
         mCompensationsPaidFragment = new FinanceCompensationsPaidFragment();
 
-        setupTabs();
+        setupTabs(fragmentToSelect);
     }
 
-    private void setupTabs() {
+    private void setupTabs(@FragmentTabs int fragmentToSelect) {
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         TabsAdapter tabsAdapter = new TabsAdapter(getFragmentManager());
         tabsAdapter.addFragment(mUserBalancesFragment, getString(R.string.tab_users));
@@ -141,6 +154,9 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
         tabsAdapter.addFragment(mCompensationsPaidFragment, getString(R.string.tab_compensations_history));
         viewPager.setAdapter(tabsAdapter);
         viewPager.setOffscreenPageLimit(2); // TODO: do we really want this?
+        if (fragmentToSelect > TAB_NONE) {
+            viewPager.setCurrentItem(fragmentToSelect);
+        }
 
         mTabLayout = (TabLayout) findViewById(R.id.tabs);
         mTabLayout.setupWithViewPager(viewPager);
@@ -173,7 +189,6 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
 
         mCurrentGroupCurrency = ParseUtils.getGroupCurrencyWithFallback(mCurrentGroup);
     }
-
 
     private void setColorTheme(BigFraction balance) {
         int color;
@@ -320,7 +335,6 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
             }
         });
     }
-
 
 
     @Override
