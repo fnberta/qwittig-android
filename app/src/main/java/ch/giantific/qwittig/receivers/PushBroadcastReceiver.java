@@ -765,14 +765,12 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                     groupId = getGroupId(intent);
                 } catch (JSONException e) {
                     return HomeActivity.class;
-
                 }
 
                 mPurchaseNotifications = mSharedPreferences.getStringSet(
                         STORED_PURCHASE_NOTIFICATIONS + groupId, new LinkedHashSet<String>());
                 if (mPurchaseNotifications.size() > 1) {
                     clearStoredPurchaseNotifications(groupId);
-
                     return HomeActivity.class;
                 } else {
                     clearStoredPurchaseNotifications(groupId);
@@ -802,7 +800,6 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                     groupId = getGroupId(intent);
                 } catch (JSONException e) {
                     return TasksActivity.class;
-
                 }
 
                 final User currentUser = (User) ParseUser.getCurrentUser();
