@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Defines the needed methods for a {@link RecyclerView} adapter with infinite scrolling support.
  */
-public interface LoadMoreRecyclerAdapter<T> {
+public interface LoadMoreAdapter<T> {
 
     /**
      * Adds items to the adapter.

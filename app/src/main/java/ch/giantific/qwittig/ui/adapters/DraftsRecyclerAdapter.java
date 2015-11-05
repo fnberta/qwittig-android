@@ -28,7 +28,7 @@ import ch.giantific.qwittig.utils.MoneyUtils;
  * Subclass of {@link BaseRecyclerAdapter}.
  */
 public class DraftsRecyclerAdapter extends BaseRecyclerAdapter<ParseObject>
-        implements SelectionRecyclerAdapter {
+        implements SelectionAdapter {
 
     private static final String LOG_TAG = DraftsRecyclerAdapter.class.getSimpleName();
     private static final int VIEW_RESOURCE = R.layout.row_drafts;

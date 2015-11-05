@@ -27,7 +27,7 @@ import ch.giantific.qwittig.ui.adapters.rows.HeaderRow;
  * Subclass of {@link RecyclerView.Adapter}.
  */
 public class StoresRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
-        implements SelectionRecyclerAdapter {
+        implements SelectionAdapter {
 
     private static final String LOG_TAG = StoresRecyclerAdapter.class.getSimpleName();
     private static final int TYPE_HEADER = 0;

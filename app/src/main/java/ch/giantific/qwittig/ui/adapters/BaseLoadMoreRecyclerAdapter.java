@@ -16,10 +16,10 @@ import java.util.List;
  * <p/>
  * Subclass of {@link RecyclerView.Adapter}.
  * <p/>
- * Implements {@link LoadMoreRecyclerAdapter}.
+ * Implements {@link LoadMoreAdapter}.
  */
 public abstract class BaseLoadMoreRecyclerAdapter<T> extends BaseRecyclerAdapter<T> implements
-        LoadMoreRecyclerAdapter<T> {
+        LoadMoreAdapter<T> {
 
     private static final String LOG_TAG = BaseLoadMoreRecyclerAdapter.class.getSimpleName();
 

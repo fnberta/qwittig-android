@@ -9,7 +9,7 @@ import android.support.v7.widget.RecyclerView;
 /**
  * Defines the needed methods for a {@link RecyclerView} adapter with state selection support.
  */
-public interface SelectionRecyclerAdapter {
+public interface SelectionAdapter {
 
     /**
      * Toggles the selection state of the item.
