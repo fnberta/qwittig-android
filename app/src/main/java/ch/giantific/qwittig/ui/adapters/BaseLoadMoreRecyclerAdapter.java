@@ -23,6 +23,12 @@ public abstract class BaseLoadMoreRecyclerAdapter<T> extends BaseRecyclerAdapter
 
     private static final String LOG_TAG = BaseLoadMoreRecyclerAdapter.class.getSimpleName();
 
+    /**
+     * Constructs a new {@link BaseLoadMoreRecyclerAdapter}.
+     *
+     * @param context the context to use in the adapter
+     * @param items   the items to show in the adapter
+     */
     public BaseLoadMoreRecyclerAdapter(@NonNull Context context, @NonNull List<T> items) {
         super(context, items);
     }
