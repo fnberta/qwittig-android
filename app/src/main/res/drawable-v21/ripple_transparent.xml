@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<ripple
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="?android:colorControlHighlight"
+    >
+
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="?android:windowBackground"/>
+        </shape>
+    </item>
+
+</ripple>

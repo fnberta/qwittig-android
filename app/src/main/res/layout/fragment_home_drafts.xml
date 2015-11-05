@@ -10,27 +10,36 @@
     tools:context="ch.giantific.qwittig.ui.fragments.HomeDraftsFragment"
     >
 
-    <ListView
-        android:id="@+id/lv_drafts"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_base"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="@dimen/small_space"
         android:clipToPadding="false"
-        android:divider="@null"
-        android:nestedScrollingEnabled="true"
+        android:paddingBottom="@dimen/small_space"
+        android:scrollbars="vertical"
+        android:visibility="gone"
         />
 
     <TextView
-        android:id="@+id/tv_empty_view"
+        android:id="@+id/empty_view"
         style="@style/TextAppearance.AppCompat.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:drawablePadding="@dimen/small_space"
+        android:drawableTop="@drawable/ic_shopping_cart_black_144dp"
+        android:gravity="center_horizontal"
+        android:text="@string/no_purchases"
         android:visibility="gone"
-        android:text="@string/no_drafts"
-        android:drawableTop="@drawable/ic_folder_open_black_144dp"
-        tools:visibility="visible"
+        tools:visibility="visible"/>
+
+    <ProgressBar
+        android:id="@+id/pb_base"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:indeterminate="true"
         />
 
 </FrameLayout>

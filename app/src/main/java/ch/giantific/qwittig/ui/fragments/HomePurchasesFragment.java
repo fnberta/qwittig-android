@@ -43,9 +43,9 @@ import ch.giantific.qwittig.utils.Utils;
 /**
  * Displays recent purchases in a {@link RecyclerView} list.
  * <p/>
- * Subclass of {@link BaseRecyclerViewFragment}.
+ * Subclass of {@link BaseRecyclerViewOnlineFragment}.
  */
-public class HomePurchasesFragment extends BaseRecyclerViewFragment implements
+public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment implements
         PurchasesRecyclerAdapter.AdapterInteractionListener,
         PurchaseRepository.GetPurchasesLocalListener {
 

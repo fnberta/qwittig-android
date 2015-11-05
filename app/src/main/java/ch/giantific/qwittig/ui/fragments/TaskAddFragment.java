@@ -60,6 +60,9 @@ public class TaskAddFragment extends BaseFragment implements
         UserRepository.GetUsersLocalListener,
         TaskUsersInvolvedRecyclerAdapter.AdapterInteractionListener {
 
+    @IntDef({TASK_SAVED, TASK_DISCARDED, TASK_NO_CHANGES})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface TaskAction {}
     public static final int TASK_SAVED = 0;
     public static final int TASK_DISCARDED = 1;
     public static final int TASK_NO_CHANGES = 2;
@@ -445,11 +448,6 @@ public class TaskAddFragment extends BaseFragment implements
     public void onDetach() {
         super.onDetach();
         mListener = null;
-    }
-
-    @IntDef({TASK_SAVED, TASK_DISCARDED, TASK_NO_CHANGES})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface TaskAction {
     }
 
     /**

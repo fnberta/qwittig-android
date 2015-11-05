@@ -48,9 +48,9 @@ import ch.giantific.qwittig.utils.Utils;
 /**
  * Displays a {@link RecyclerView} list of all the ongoing tasks in a group in card base interface.
  * <p/>
- * Subclass {@link BaseRecyclerViewFragment}.
+ * Subclass {@link BaseRecyclerViewOnlineFragment}.
  */
-public class TasksFragment extends BaseRecyclerViewFragment implements
+public class TasksFragment extends BaseRecyclerViewOnlineFragment implements
         TasksRecyclerAdapter.AdapterInteractionListener,
         TaskRepository.GetTasksLocalListener {
 

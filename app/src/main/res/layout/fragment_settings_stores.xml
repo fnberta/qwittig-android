@@ -2,14 +2,12 @@
   ~ Copyright (c) 2015 Fabio Berta
   -->
 
-<ListView
+<android.support.v7.widget.RecyclerView
+    android:id="@+id/rv_stores"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="ch.giantific.qwittig.ui.fragments.SettingsStoresFragment"
-    android:id="@+id/lv_stores"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/small_space"
     android:clipToPadding="false"
-    android:divider="@null"
-    android:transitionGroup="true"/>
+    android:paddingBottom="@dimen/small_space"
+    android:scrollbars="vertical"
+    />

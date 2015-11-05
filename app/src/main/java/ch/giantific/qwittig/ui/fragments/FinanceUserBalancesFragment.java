@@ -37,9 +37,9 @@ import ch.giantific.qwittig.utils.Utils;
  * include the current user whose balance is displayed in the {@link Toolbar} of the hosting
  * {@link Activity}.
  * <p/>
- * Subclass of {@link BaseRecyclerViewFragment}.
+ * Subclass of {@link BaseRecyclerViewOnlineFragment}.
  */
-public class FinanceUserBalancesFragment extends BaseRecyclerViewFragment implements
+public class FinanceUserBalancesFragment extends BaseRecyclerViewOnlineFragment implements
         UserRepository.GetUsersLocalListener,
         UsersRecyclerAdapter.AdapterInteractionListener {
 
