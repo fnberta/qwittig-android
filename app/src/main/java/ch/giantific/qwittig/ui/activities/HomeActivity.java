@@ -18,6 +18,7 @@ import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
+import android.view.ActionMode;
 import android.view.View;
 
 import com.parse.ParseConfig;
@@ -65,6 +66,7 @@ import ch.giantific.qwittig.utils.ViewUtils;
  */
 public class HomeActivity extends BaseNavDrawerActivity implements
         View.OnClickListener,
+        HomeDraftsFragment.FragmentInteractionListener,
         GroupJoinDialogFragment.DialogInteractionListener,
         GroupCreateDialogFragment.DialogInteractionListener,
         GoPremiumDialogFragment.DialogInteractionListener,
@@ -475,6 +477,11 @@ public class HomeActivity extends BaseNavDrawerActivity implements
                 }
                 break;
         }
+    }
+
+    @Override
+    public ActionMode startActionMode() {
+        return mToolbar.startActionMode(mHomeDraftsFragment);
     }
 
     @Override

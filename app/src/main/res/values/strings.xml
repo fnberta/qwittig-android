@@ -25,12 +25,12 @@
     <string name="action_logout">Log out</string>
     <string name="login_button_log_in">Log in</string>
     <string name="login_button_sign_up">Create new account</string>
-    <string name="no_purchases">No purchases</string>
+    <string name="no_purchases">No items</string>
     <string name="no_users">No users</string>
     <string name="action_purchase_delete">Delete purchase</string>
     <string name="toast_purchase_deleted">Purchase deleted</string>
     <string name="title_activity_settings_group_new">Add new group</string>
-    <string name="desc_group_add_new">All purchases in the new group will be displayed in the chosen currency. If you add a new purchase with another currency, the prices will automatically be converted to this default currency. Note that you cannot change a group\'s default currency later.</string>
+    <string name="desc_group_add_new">All items in the new group will be displayed in the chosen currency. If you add a new purchase with another currency, the prices will automatically be converted to this default currency. Note that you cannot change a group\'s default currency later.</string>
     <string name="hint_group_name">Group name</string>
     <string name="toast_no_connection">No network available</string>
     <string name="toast_group_added">Added and switched to %1$s</string>
@@ -149,7 +149,7 @@
     <string name="user_deleted" translatable="false">n/a</string>
     <string name="add_store">Add store</string>
     <string name="dialog_positive_add">Add</string>
-    <string name="dialog_group_create_purchases">You have to be in a group to add purchases. Would you like to a create a new group?</string>
+    <string name="dialog_group_create_purchases">You have to be in a group to add items. Would you like to a create a new group?</string>
     <string name="dialog_positive_create">Create</string>
     <string name="nickname_me">Me</string>
     <string name="progress_account_delete">Deleting account…</string>
@@ -163,14 +163,14 @@
     <string name="progress_switch_groups">Switching group…</string>
     <string name="pref_group_name_hint">New group name</string>
     <string name="toast_create_image_file_failed">Failed to open camera. Maybe your disk space is full?</string>
-    <string name="no_drafts">No open drafts</string>
+    <string name="no_drafts">No open items</string>
     <string name="no_compensations_subhead">To start a new settlement, click on the button!</string>
     <string name="dialog_account_create">Please create an account to make any changes.</string>
     <string name="header_stores_own">Manually added</string>
     <string name="header_stores_default">Default</string>
     <string name="toast_store_already_in_list">Store is already in your list</string>
     <string name="toast_group_already_in_list">Group already exists</string>
-    <string name="dialog_group_leave_delete_message">You are the last member of this group. Leaving it will delete the group and all its purchases!</string>
+    <string name="dialog_group_leave_delete_message">You are the last member of this group. Leaving it will delete the group and all its items!</string>
     <string name="dialog_compensation_single_title">Single payment</string>
     <string name="error_valid_amount">Please enter a valid amount</string>
     <string name="dialog_positive_pay">Pay</string>
@@ -198,7 +198,7 @@
     <string name="help_facebook">Find Qwittig on Facebook</string>
     <string name="help_twitter">Find Qwittig on Twitter</string>
     <string name="push_action_confirm">Confirm</string>
-    <string name="push_purchase_new_multiple_title">new purchases</string>
+    <string name="push_purchase_new_multiple_title">new items</string>
     <string name="push_purchase_new_multiple_more">more</string>
     <string name="action_retry">Retry</string>
     <string name="toast_emails_no_match">Invited email does not match logged in email</string>
@@ -212,7 +212,7 @@
     <string name="go_premium">Go premium</string>
     <string name="toast_not_supported">Not supported on your device</string>
     <string name="dialog_go_premium">You need to go premium to be able to automatically scan receipts.</string>
-    <string name="toast_free_purchases_left">%1$d free auto purchases left.</string>
+    <string name="toast_free_purchases_left">%1$d free auto items left.</string>
     <string name="toast_new_settlement">Calculated new Settlement</string>
     <string name="toast_not_now_done">Payment to %1$s deleted</string>
     <string name="dialog_store_other">Other…</string>

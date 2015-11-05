@@ -23,9 +23,9 @@ import ch.giantific.qwittig.utils.Utils;
  * Provides an abstract base class for screens displaying a list of compensations using a
  * {@link RecyclerView}.
  * <p/>
- * Subclass of {@link BaseRecyclerViewFragment}.
+ * Subclass of {@link BaseRecyclerViewOnlineFragment}.
  */
-public abstract class FinanceCompensationsBaseFragment extends BaseRecyclerViewFragment {
+public abstract class FinanceCompensationsBaseFragment extends BaseRecyclerViewOnlineFragment {
 
     private static final String LOG_TAG = FinanceCompensationsBaseFragment.class.getSimpleName();
     FragmentInteractionListener mListener;

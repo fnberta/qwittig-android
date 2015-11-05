@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.transition.Transition;
+import android.view.ActionMode;
 import android.view.View;
 
 import ch.giantific.qwittig.R;
@@ -98,6 +99,11 @@ public class SettingsStoresActivity extends BaseActivity implements
     @Override
     public void onNewStoreSet(@NonNull String store) {
         mSettingsStoresFragment.onNewStoreSet(store);
+    }
+
+    @Override
+    public ActionMode startActionMode() {
+        return mToolbar.startActionMode(mSettingsStoresFragment);
     }
 
     @Override

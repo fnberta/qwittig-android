@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <!--
   ~ Copyright (c) 2015 Fabio Berta
   -->
 
-<RelativeLayout
+<merge
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/rl_store"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/list_with_text"
-    android:background="?android:attr/activatedBackgroundIndicator">
+    android:layout_height="match_parent"
+    >
 
     <TextView
         android:id="@+id/tv_store_name"
         style="@style/ListTextSubhead"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_marginStart="@dimen/key_line_1"
-        android:layout_marginEnd="@dimen/normal_space"
         android:layout_alignParentStart="true"
+        android:layout_marginEnd="@dimen/normal_space"
+        android:layout_marginStart="@dimen/key_line_1"
         android:layout_toStartOf="@+id/cb_store_favorite"
         android:gravity="center_vertical"
-        tools:text="Denner"/>
+        tools:text="Denner"
+        />
 
     <CheckBox
         android:id="@id/cb_store_favorite"
         style="?android:attr/starStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/key_line_1"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:focusable="false"/>
-</RelativeLayout>
+        android:layout_marginEnd="@dimen/key_line_1"
+        />
+
+</merge>

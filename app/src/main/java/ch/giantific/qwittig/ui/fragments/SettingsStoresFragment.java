@@ -10,8 +10,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,13 +19,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.CheckBox;
-import android.widget.ListView;
 
 import com.parse.ParseConfig;
-import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,8 +29,7 @@ import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.parse.Config;
-import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.ui.adapters.StoresAdapter;
+import ch.giantific.qwittig.ui.adapters.StoresRecyclerAdapter;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 
@@ -49,15 +44,24 @@ import ch.giantific.qwittig.utils.ParseUtils;
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public class SettingsStoresFragment extends BaseFragment {
+public class SettingsStoresFragment extends BaseFragment implements
+        StoresRecyclerAdapter.AdapterInteractionListener,
+        ActionMode.Callback {
 
+    private static final String STATE_DRAFTS_SELECTED = "STATE_DRAFTS_SELECTED";
+    private static final String STATE_ACTION_MODE = "STATE_ACTION_MODE";
+    private static final String LOG_TAG = SettingsStoresFragment.class.getSimpleName();
+    private ActionMode mActionMode;
     private FragmentInteractionListener mListener;
-    private StoresAdapter mStoresAdapter;
-    private ListView mListView;
+    private RecyclerView mRecyclerView;
+    private StoresRecyclerAdapter mRecyclerAdapter;
     @NonNull
     private List<String> mStoresAdded = new ArrayList<>();
     @NonNull
     private List<String> mStoresFavorites = new ArrayList<>();
+    private ArrayList<String> mStoresSelected;
+    private boolean mInActionMode;
+    private boolean mDeleteSelectedStores;
 
     public SettingsStoresFragment() {
     }
@@ -77,11 +81,18 @@ public class SettingsStoresFragment extends BaseFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (savedInstanceState != null) {
+            mStoresSelected = savedInstanceState.getStringArrayList(STATE_DRAFTS_SELECTED);
+            mInActionMode = savedInstanceState.getBoolean(STATE_ACTION_MODE, false);
+        } else {
+            mStoresSelected = new ArrayList<>();
+        }
+
         updateCurrentUserAndGroup();
-        setupStoreList();
+        setupStoreLists();
     }
 
-    private void setupStoreList() {
+    private void setupStoreLists() {
         List<String> storeFavorites = mCurrentUser.getStoresFavorites();
         if (!storeFavorites.isEmpty()) {
             mStoresFavorites.addAll(storeFavorites);
@@ -94,6 +105,14 @@ public class SettingsStoresFragment extends BaseFragment {
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putStringArrayList(STATE_DRAFTS_SELECTED, mStoresSelected);
+        outState.putBoolean(STATE_ACTION_MODE, mActionMode != null);
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_settings_stores, container, false);
@@ -103,88 +122,124 @@ public class SettingsStoresFragment extends BaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mListView = (ListView) view.findViewById(R.id.lv_stores);
-        mStoresAdapter = new StoresAdapter(getActivity(), mStoresAdded, mStoresFavorites);
-        mListView.setAdapter(mStoresAdapter);
-        mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-        mListView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
-            @Override
-            public void onItemCheckedStateChanged(@NonNull ActionMode mode, int position, long id,
-                                                  boolean checked) {
-                mode.setTitle(getString(R.string.cab_title_selected,
-                        mListView.getCheckedItemCount()));
-                mStoresAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public boolean onCreateActionMode(@NonNull ActionMode mode, Menu menu) {
-                mListener.toggleFabVisibility();
-
-                MenuInflater inflater = mode.getMenuInflater();
-                inflater.inflate(R.menu.menu_cab_stores, menu);
-                return true;
-            }
-
-            @Override
-            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                return false;
-            }
-
-            @Override
-            public boolean onActionItemClicked(@NonNull ActionMode mode, @NonNull MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.action_store_delete:
-                        deleteSelectedStores();
-                        mode.finish(); // Action picked, so close the CAB
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-
-            @Override
-            public void onDestroyActionMode(ActionMode mode) {
-                mListener.toggleFabVisibility();
-            }
-        });
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, @NonNull View view, int position, long id) {
-                long viewId = view.getId();
-
-                if (viewId == R.id.cb_store_favorite) {
-                    onStoreChecked(position, ((CheckBox) view));
-                }
-            }
-        });
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.rv_stores);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerAdapter = new StoresRecyclerAdapter(getActivity(), mStoresAdded, mStoresFavorites,
+                mStoresSelected, this);
+        mRecyclerView.setAdapter(mRecyclerAdapter);
     }
 
-    private void deleteSelectedStores() {
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if (mInActionMode) {
+            startActionMode();
+            if (!mStoresSelected.isEmpty()) {
+                // scroll to the first selected item
+                String firstSelected = mStoresSelected.get(0);
+                final int position = mStoresAdded.indexOf(firstSelected);
+                // let RecyclerView layout its items first
+                mRecyclerView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mRecyclerView.scrollToPosition(
+                                mRecyclerAdapter.getAdjustedStoreAddedPosition(position));
+                    }
+                });
+            }
+        }
+    }
+
+    private void startActionMode() {
+        mActionMode = mListener.startActionMode();
+        setActionModeTitle();
+    }
+
+    private void setActionModeTitle() {
+        mActionMode.setTitle(getString(R.string.cab_title_selected, mStoresSelected.size()));
+    }
+
+    @Override
+    public void onStoreRowStarClick(int position, CheckBox checkBox) {
+        boolean isChecked = checkBox.isChecked();
+
         if (ParseUtils.isTestUser(mCurrentUser)) {
             mListener.showAccountCreateDialog();
+            checkBox.setChecked(!isChecked);
             return;
         }
 
-        // remove selected stores from list
-        SparseBooleanArray checkedItemPositions = mListView.getCheckedItemPositions();
-        int storesSize = mStoresAdded.size();
-        for (int i = storesSize - 1; i >= 0; i--) {
-            int adjustedPosition = mStoresAdapter.getAdjustedStoreAddedPosition(i);
-            if (checkedItemPositions.get(adjustedPosition)) {
-                String store = (String) mListView.getItemAtPosition(adjustedPosition);
-                mStoresAdded.remove(store);
-                if (mStoresFavorites.contains(store)) {
-                    mStoresFavorites.remove(store);
-                }
+        String store = mRecyclerAdapter.getItem(position);
+        if (isChecked) {
+            if (!mStoresFavorites.contains(store)) {
+                mStoresFavorites.add(store);
             }
+        } else if (mStoresFavorites.contains(store)) {
+            mStoresFavorites.remove(store);
         }
-        mStoresAdapter.notifyDataSetChanged();
 
         // update store lists in Parse database
-        saveStoreListInParse();
+        onStoresSet();
     }
 
-    private void saveStoreListInParse() {
+    @Override
+    public void onStoreRowClick(int position) {
+        if (mActionMode != null) {
+            mRecyclerAdapter.toggleSelection(position);
+            setActionModeTitle();
+        }
+    }
+
+    @Override
+    public void onStoreRowLongClick(int position) {
+        if (mActionMode == null) {
+            mRecyclerAdapter.toggleSelection(position);
+            startActionMode();
+        }
+    }
+
+    @Override
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        return false;
+    }
+
+    @Override
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        mListener.toggleFabVisibility();
+        MenuInflater inflater = mode.getMenuInflater();
+        inflater.inflate(R.menu.menu_cab_stores, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_store_delete:
+                if (ParseUtils.isTestUser(mCurrentUser)) {
+                    mListener.showAccountCreateDialog();
+                    return true;
+                }
+
+                mDeleteSelectedStores = true;
+                mode.finish(); // Action picked, so close the CAB
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    @Override
+    public void onDestroyActionMode(ActionMode mode) {
+        mActionMode = null;
+        mRecyclerAdapter.clearSelection(mDeleteSelectedStores);
+        mListener.toggleFabVisibility();
+    }
+
+    @Override
+    public void onStoresSet() {
         mCurrentUser.setStoresAdded(mStoresAdded);
         mCurrentUser.setStoresFavorites(mStoresFavorites);
         mCurrentUser.saveEventually();
@@ -222,39 +277,17 @@ public class SettingsStoresFragment extends BaseFragment {
             mStoresAdded.add(store);
             Collections.sort(mStoresAdded, String.CASE_INSENSITIVE_ORDER);
             mStoresFavorites.add(store);
-            mStoresAdapter.notifyDataSetChanged();
+            mRecyclerAdapter.notifyDataSetChanged();
 
             // update store lists in Parse database
-            saveStoreListInParse();
+            onStoresSet();
         } else {
             showSnackbar(getString(R.string.toast_store_already_in_list));
         }
     }
 
-    private void onStoreChecked(int position, @NonNull CheckBox checkBox) {
-        boolean isChecked = checkBox.isChecked();
-
-        if (ParseUtils.isTestUser(mCurrentUser)) {
-            mListener.showAccountCreateDialog();
-            checkBox.setChecked(!isChecked);
-            return;
-        }
-
-        String store = (String) mListView.getItemAtPosition(position);
-        if (isChecked) {
-            if (!mStoresFavorites.contains(store)) {
-                mStoresFavorites.add(store);
-            }
-        } else if (mStoresFavorites.contains(store)) {
-            mStoresFavorites.remove(store);
-        }
-
-        // update store lists in Parse database
-        saveStoreListInParse();
-    }
-
     private void showSnackbar(@NonNull String message) {
-        MessageUtils.showBasicSnackbar(mListView, message);
+        MessageUtils.showBasicSnackbar(mRecyclerView, message);
     }
 
     @Override
@@ -273,5 +306,7 @@ public class SettingsStoresFragment extends BaseFragment {
          * Handles the visibility change of the {@link FloatingActionButton}.
          */
         void toggleFabVisibility();
+
+        ActionMode startActionMode();
     }
 }
