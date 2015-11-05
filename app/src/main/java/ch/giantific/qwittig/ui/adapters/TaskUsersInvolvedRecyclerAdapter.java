@@ -31,17 +31,15 @@ import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;
  * Handles the display of the users involved in a task including the reordering of the different
  * users.
  * <p/>
- * Subclass of {@link RecyclerView.Adapter}.
+ * Subclass of {@link BaseRecyclerAdapter}.
  */
-public class TaskUsersInvolvedRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
+public class TaskUsersInvolvedRecyclerAdapter extends BaseRecyclerAdapter<ParseUser>
         implements ItemTouchHelperAdapter {
 
     private static final String LOG_TAG = TaskUsersInvolvedRecyclerAdapter.class.getSimpleName();
     private static final int VIEW_RESOURCE = R.layout.row_task_users_involved;
     private AdapterInteractionListener mListener;
-    private List<ParseUser> mUsersAvailable;
     private List<TaskUser> mUsersInvolved;
-    private Context mContext;
 
     /**
      * Constructs a new {@link TaskUsersInvolvedRecyclerAdapter}.
@@ -55,47 +53,38 @@ public class TaskUsersInvolvedRecyclerAdapter extends RecyclerView.Adapter<Recyc
                                             @NonNull List<ParseUser> usersAvailable,
                                             @NonNull List<TaskUser> usersInvolved,
                                             @NonNull AdapterInteractionListener listener) {
-        super();
+        super(context, usersAvailable);
 
         mListener = listener;
-        mContext = context;
-        mUsersAvailable = usersAvailable;
         mUsersInvolved = usersInvolved;
     }
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(VIEW_RESOURCE, parent,
-                false);
-
+        View view = LayoutInflater.from(parent.getContext()).inflate(VIEW_RESOURCE, parent, false);
         return new UsersRow(view, mContext, mListener);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         final UsersRow usersRow = (UsersRow) viewHolder;
-        User user = (User) mUsersAvailable.get(position);
+        User user = (User) mItems.get(position);
         usersRow.setName(user.getNickname());
         usersRow.setAvatar(user.getAvatar(), false);
         usersRow.setAlpha(mUsersInvolved.get(position).isInvolved() ? 1f : DISABLED_ALPHA);
     }
 
     @Override
-    public int getItemCount() {
-        return mUsersAvailable.size();
-    }
-
-    @Override
     public void onItemMove(int fromPosition, int toPosition) {
-        Collections.swap(mUsersAvailable, fromPosition, toPosition);
+        Collections.swap(mItems, fromPosition, toPosition);
         Collections.swap(mUsersInvolved, fromPosition, toPosition);
         notifyItemMoved(fromPosition, toPosition);
     }
 
     @Override
     public void onItemDismiss(int position) {
-        mUsersAvailable.remove(position);
+        mItems.remove(position);
         mUsersInvolved.remove(position);
         notifyItemRemoved(position);
     }

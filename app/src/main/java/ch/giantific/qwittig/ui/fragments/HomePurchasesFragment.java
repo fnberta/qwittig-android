@@ -260,7 +260,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment implem
 
         mIsLoadingMore = false;
         mRecyclerAdapter.hideLoadMoreIndicator();
-        mRecyclerAdapter.addPurchases(purchases);
+        mRecyclerAdapter.addItems(purchases);
     }
 
     /**

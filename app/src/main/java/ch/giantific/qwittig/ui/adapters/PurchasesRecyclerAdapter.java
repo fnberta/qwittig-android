@@ -21,7 +21,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.parse.ParseObject;
-import com.parse.ParseUser;
 
 import java.util.Date;
 import java.util.List;
@@ -38,18 +37,15 @@ import ch.giantific.qwittig.utils.Utils;
 /**
  * Handles the display of recent purchases.
  * <p/>
- * Subclass of {@link RecyclerView.Adapter}.
+ * Subclass of {@link BaseLoadMoreRecyclerAdapter}.
  */
-public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class PurchasesRecyclerAdapter extends BaseLoadMoreRecyclerAdapter<ParseObject> {
 
     private static final int TYPE_ITEM = 0;
     private static final int TYPE_PROGRESS = 1;
     private static final String LOG_TAG = PurchasesRecyclerAdapter.class.getSimpleName();
     private static final int VIEW_RESOURCE = R.layout.row_purchases;
     private AdapterInteractionListener mListener;
-    private Context mContext;
-    private List<ParseObject> mPurchases;
-    private String mCurrentGroupCurrency;
     private User mCurrentUser;
 
     /**
@@ -62,11 +58,9 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
     public PurchasesRecyclerAdapter(@NonNull Context context, @NonNull List<ParseObject> purchases,
                                     @NonNull User currentUser,
                                     @NonNull AdapterInteractionListener listener) {
-        super();
+        super(context, purchases);
 
         mListener = listener;
-        mContext = context;
-        mPurchases = purchases;
         mCurrentUser = currentUser;
     }
 
@@ -85,14 +79,13 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
                 return new ProgressRow(view);
             }
             default:
-                throw new RuntimeException("there is no type that matches the type " + viewType +
-                        " + make sure your using types correctly");
+                return super.onCreateViewHolder(parent, viewType);
         }
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (mPurchases.get(position) == null) {
+        if (mItems.get(position) == null) {
             return TYPE_PROGRESS;
         }
 
@@ -105,7 +98,7 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
         switch (viewType) {
             case TYPE_ITEM: {
                 PurchaseRow purchaseRow = (PurchaseRow) viewHolder;
-                Purchase purchase = (Purchase) mPurchases.get(position);
+                Purchase purchase = (Purchase) mItems.get(position);
 
                 final User buyer = purchase.getBuyer();
                 final boolean buyerIsValid = buyer.getGroupIds().contains(
@@ -136,59 +129,6 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
                 // do nothing
                 break;
         }
-    }
-
-    @Override
-    public int getItemCount() {
-        return mPurchases.size();
-    }
-
-    /**
-     * Returns the position of the last purchase in the adapter.
-     *
-     * @return the position of the last purchase, -1 if there are no purchases
-     */
-    public int getLastPosition() {
-        return getItemCount() - 1;
-    }
-
-    /**
-     * Sets the current group currency field. As long this is not set, nothing will be displayed
-     * in the adapter.
-     *
-     * @param currentGroupCurrency the currency code to set
-     */
-    public void setCurrentGroupCurrency(@NonNull String currentGroupCurrency) {
-        mCurrentGroupCurrency = currentGroupCurrency;
-    }
-
-    /**
-     * Adds purchases to the adapter.
-     *
-     * @param purchases the purchases to be added
-     */
-    public void addPurchases(@NonNull List<ParseObject> purchases) {
-        if (!purchases.isEmpty()) {
-            mPurchases.addAll(purchases);
-            notifyItemRangeInserted(getItemCount(), purchases.size());
-        }
-    }
-
-    /**
-     * Shows a progressbar in the last row as an indicator that more objects are being fetched.
-     */
-    public void showLoadMoreIndicator() {
-        mPurchases.add(null);
-        notifyItemInserted(getLastPosition());
-    }
-
-    /**
-     * Hides the progressbar in the last row.
-     */
-    public void hideLoadMoreIndicator() {
-        int position = getLastPosition();
-        mPurchases.remove(position);
-        notifyItemRemoved(position);
     }
 
     /**

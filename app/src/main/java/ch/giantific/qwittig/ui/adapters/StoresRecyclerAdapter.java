@@ -44,7 +44,7 @@ public class StoresRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     private List<String> mStoresSelected;
 
     /**
-     * Constructs a new {@link StoresAdapter}.
+     * Constructs a new {@link StoresRecyclerAdapter}.
      *
      * @param context         the context to use in the adapter
      * @param storesAdded     the stores the user has added himself

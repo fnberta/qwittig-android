@@ -107,7 +107,7 @@ public class HomeDraftsFragment extends BaseRecyclerViewFragment implements
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mRecyclerAdapter = new DraftsRecyclerAdapter(mDrafts, mDraftsSelected, this);
+        mRecyclerAdapter = new DraftsRecyclerAdapter(getActivity(), mDrafts, mDraftsSelected, this);
         mRecyclerView.setAdapter(mRecyclerAdapter);
     }
 

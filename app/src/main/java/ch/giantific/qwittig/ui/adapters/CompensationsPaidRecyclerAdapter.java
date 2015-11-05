@@ -21,7 +21,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.parse.ParseObject;
-import com.parse.ParseUser;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
@@ -40,16 +39,13 @@ import ch.giantific.qwittig.utils.MoneyUtils;
 /**
  * Handles the display of different paid compensations.
  * <p/>
- * Subclass of {@link RecyclerView.Adapter}.
+ * Subclass of {@link BaseLoadMoreRecyclerAdapter}.
  */
-public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class CompensationsPaidRecyclerAdapter extends BaseLoadMoreRecyclerAdapter<ParseObject> {
 
     private static final int TYPE_ITEM = 0;
     private static final int TYPE_PROGRESS = 1;
     private static final int VIEW_RESOURCE = R.layout.row_compensations_paid;
-    private Context mContext;
-    private List<ParseObject> mCompensations;
-    private String mCurrentGroupCurrency;
     private User mCurrentUser;
 
     /**
@@ -61,10 +57,8 @@ public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<Recyc
     public CompensationsPaidRecyclerAdapter(@NonNull Context context,
                                             @NonNull List<ParseObject> compensations,
                                             @NonNull User currentUser) {
-        super();
+        super(context, compensations);
 
-        mContext = context;
-        mCompensations = compensations;
         mCurrentUser = currentUser;
     }
 
@@ -83,8 +77,7 @@ public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<Recyc
                 return new ProgressRow(view);
             }
             default:
-                throw new RuntimeException("there is no type that matches the type " + viewType +
-                        " + make sure your using types correctly");
+                return super.onCreateViewHolder(parent, viewType);
         }
     }
 
@@ -93,7 +86,7 @@ public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<Recyc
         int viewType = getItemViewType(position);
         if (viewType == TYPE_ITEM) {
             CompensationHistoryRow compensationHistoryRow = (CompensationHistoryRow) viewHolder;
-            Compensation compensation = (Compensation) mCompensations.get(position);
+            Compensation compensation = (Compensation) mItems.get(position);
 
             Date date = compensation.getCreatedAt();
             compensationHistoryRow.setDate(date);
@@ -128,58 +121,11 @@ public class CompensationsPaidRecyclerAdapter extends RecyclerView.Adapter<Recyc
 
     @Override
     public int getItemViewType(int position) {
-        if (mCompensations.get(position) == null) {
+        if (mItems.get(position) == null) {
             return TYPE_PROGRESS;
         }
 
         return TYPE_ITEM;
-    }
-
-    @Override
-    public int getItemCount() {
-        return mCompensations.size();
-    }
-
-    /**
-     * Returns the position of the last movie in the adapter.
-     *
-     * @return the position of the last movie, -1 if there are no movies
-     */
-    public int getLastPosition() {
-        return getItemCount() - 1;
-    }
-
-    public void setCurrentGroupCurrency(String currentGroupCurrency) {
-        mCurrentGroupCurrency = currentGroupCurrency;
-    }
-
-    /**
-     * Adds compensations to the adapter.
-     *
-     * @param compensations the compensations to be added
-     */
-    public void addCompensations(@NonNull List<ParseObject> compensations) {
-        if (!compensations.isEmpty()) {
-            mCompensations.addAll(compensations);
-            notifyItemRangeInserted(getItemCount(), compensations.size());
-        }
-    }
-
-    /**
-     * Shows a progress bar in the last row as an indicator that more objects are being fetched.
-     */
-    public void showLoadMoreIndicator() {
-        mCompensations.add(null);
-        notifyItemInserted(getLastPosition());
-    }
-
-    /**
-     * Hides the progress bar in the last row.
-     */
-    public void hideLoadMoreIndicator() {
-        int position = getLastPosition();
-        mCompensations.remove(position);
-        notifyItemRemoved(position);
     }
 
     /**

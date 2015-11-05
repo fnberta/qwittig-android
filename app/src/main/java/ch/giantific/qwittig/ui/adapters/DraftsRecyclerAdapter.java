@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.ui.adapters;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -24,17 +25,15 @@ import ch.giantific.qwittig.utils.MoneyUtils;
 /**
  * Handles the display of recent purchases.
  * <p/>
- * Subclass of {@link RecyclerView.Adapter}.
+ * Subclass of {@link BaseRecyclerAdapter}.
  */
-public class DraftsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
+public class DraftsRecyclerAdapter extends BaseRecyclerAdapter<ParseObject>
         implements SelectionRecyclerAdapter {
 
     private static final String LOG_TAG = DraftsRecyclerAdapter.class.getSimpleName();
     private static final int VIEW_RESOURCE = R.layout.row_drafts;
     private AdapterInteractionListener mListener;
-    private List<ParseObject> mDrafts;
-    private List<String> mDraftsSelected;
-    private String mCurrentGroupCurrency;
+    private List<String> mItemsSelected;
 
     /**
      * Constructs a new {@link DraftsRecyclerAdapter}.
@@ -42,13 +41,12 @@ public class DraftsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
      * @param drafts   the drafts to display
      * @param listener the callback for user clicks on the drafts
      */
-    public DraftsRecyclerAdapter(@NonNull List<ParseObject> drafts,
+    public DraftsRecyclerAdapter(@NonNull Context context, @NonNull List<ParseObject> drafts,
                                  @NonNull List<String> draftsSelected,
                                  @NonNull AdapterInteractionListener listener) {
-        super();
+        super(context, drafts);
 
-        mDrafts = drafts;
-        mDraftsSelected = draftsSelected;
+        mItemsSelected = draftsSelected;
         mListener = listener;
     }
 
@@ -62,7 +60,7 @@ public class DraftsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         DraftRow draftRow = (DraftRow) viewHolder;
-        Purchase draft = (Purchase) mDrafts.get(position);
+        Purchase draft = (Purchase) mItems.get(position);
 
         draftRow.setDate(draft.getDate());
         draftRow.setStore(draft.getStore());
@@ -72,28 +70,13 @@ public class DraftsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     }
 
     @Override
-    public int getItemCount() {
-        return mDrafts.size();
-    }
-
-    /**
-     * Sets the current group currency field. As long this is not set, nothing will be displayed
-     * in the adapter.
-     *
-     * @param currentGroupCurrency the currency code to set
-     */
-    public void setCurrentGroupCurrency(@NonNull String currentGroupCurrency) {
-        mCurrentGroupCurrency = currentGroupCurrency;
-    }
-
-    @Override
     public void toggleSelection(int position) {
-        Purchase draft = (Purchase) mDrafts.get(position);
+        Purchase draft = (Purchase) mItems.get(position);
         String draftId = draft.getDraftId();
-        if (mDraftsSelected.contains(draftId)) {
-            mDraftsSelected.remove(draftId);
+        if (mItemsSelected.contains(draftId)) {
+            mItemsSelected.remove(draftId);
         } else {
-            mDraftsSelected.add(draftId);
+            mItemsSelected.add(draftId);
         }
 
         notifyItemChanged(position);
@@ -101,15 +84,15 @@ public class DraftsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     @Override
     public void clearSelection(boolean deleteSelectedItems) {
-        for (int i = mDrafts.size() - 1; i >= 0; i--) {
-            final Purchase draft = (Purchase) mDrafts.get(i);
+        for (int i = mItems.size() - 1; i >= 0; i--) {
+            final Purchase draft = (Purchase) mItems.get(i);
             final String draftId = draft.getDraftId();
             if (isSelected(draftId)) {
-                mDraftsSelected.remove(draftId);
+                mItemsSelected.remove(draftId);
 
                 if (deleteSelectedItems) {
                     draft.unpinInBackground();
-                    mDrafts.remove(i);
+                    mItems.remove(i);
                     notifyItemRemoved(i);
                 } else {
                     notifyItemChanged(i);
@@ -120,7 +103,7 @@ public class DraftsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     @Override
     public boolean isSelected(String draftId) {
-        return mDraftsSelected.contains(draftId);
+        return mItemsSelected.contains(draftId);
     }
 
     /**
