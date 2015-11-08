@@ -214,9 +214,8 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
         for (int i = 0; i < itemsRestSize; i++) {
             final OcrItem ocrItem = itemsRest.get(i);
             final ItemRow itemRowNew = addNewItemRow(i + 1);
-            itemRowNew.setEditTextName(ocrItem.getName());
             String price = MoneyUtils.formatPrice(ocrItem.getPrice(), mCurrencySelected);
-            itemRowNew.setEditTextPrice(price);
+            itemRowNew.fillValues(ocrItem.getName(), price);
             itemRowsNew.add(itemRowNew);
 
             // update ImeOptions

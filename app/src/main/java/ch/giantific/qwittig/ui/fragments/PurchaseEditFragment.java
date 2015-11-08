@@ -221,10 +221,9 @@ public class PurchaseEditFragment extends PurchaseBaseFragment {
         for (int i = 0; i < oldItemsSize; i++) {
             final Item itemOld = (Item) mOldItems.get(i);
             final ItemRow itemRowNew = addNewItemRow(i + 1);
-            itemRowNew.setEditTextName(itemOld.getName());
             String price = MoneyUtils.formatMoneyNoSymbol(itemOld.getPriceForeign(mOldExchangeRate),
                     mCurrencySelected);
-            itemRowNew.setEditTextPrice(price);
+            itemRowNew.fillValues(itemOld.getName(), price);
             itemRowsNew.add(itemRowNew);
 
             // update ImeOptions

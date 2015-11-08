@@ -92,14 +92,6 @@ public class ItemRow {
         return mEditTextName.getText().toString().trim();
     }
 
-    /**
-     * Sets the name of the EditText.
-     *
-     * @param name the name to set
-     */
-    public void setEditTextName(@NonNull String name) {
-        mEditTextName.setText(name);
-    }
 
     /**
      * Returns a {@link BigDecimal} of the user input data of the price EditText.
@@ -118,15 +110,6 @@ public class ItemRow {
         }
 
         return price;
-    }
-
-    /**
-     * Sets the price of the EditText.
-     *
-     * @param price the price to set
-     */
-    public void setEditTextPrice(@NonNull String price) {
-        mEditTextPrice.setText(price);
     }
 
     public void setCheckBoxChecked(boolean isEnabled) {
@@ -156,6 +139,23 @@ public class ItemRow {
 
     public void setPriceImeOptions(int imeOption) {
         mEditTextPrice.setImeOptions(imeOption);
+    }
+
+    /**
+     * Sets the name and price of the item row.
+     *
+     * @param name  the name to set
+     * @param price the price to set
+     */
+    public void fillValues(String name, String price) {
+        setFloatingAnimationEnabled(false);
+        mEditTextName.setText(name);
+        mEditTextPrice.setText(price);
+    }
+
+    private void setFloatingAnimationEnabled(boolean enable) {
+        mTextInputLayoutName.setHintAnimationEnabled(enable);
+        mTextInputLayoutPrice.setHintAnimationEnabled(enable);
     }
 
     /**
@@ -213,6 +213,9 @@ public class ItemRow {
         return isComplete;
     }
 
+    /**
+     * Requests the focus for the name edit text.
+     */
     public void requestFocusForName() {
         mEditTextName.requestFocus();
     }

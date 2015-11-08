@@ -3,40 +3,46 @@
   -->
 
 <LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/ll_add_purchase_row"
-    android:orientation="horizontal"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/small_space">
+    android:layout_marginBottom="@dimen/small_space"
+    android:orientation="horizontal"
+    >
 
     <ch.giantific.qwittig.ui.widgets.ListCheckBox
         android:id="@+id/cb_item_enabled"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/key_line_1_minus_checkbox_margin"
-        android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_checkbox"
         android:layout_gravity="center_vertical"
-        android:checked="true"/>
+        android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_checkbox"
+        android:layout_marginStart="@dimen/key_line_1_minus_checkbox_margin"
+        android:checked="true"
+        />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:baselineAligned="false"
         android:orientation="horizontal"
-        android:baselineAligned="false">
+        >
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/til_item_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.7">
+            android:layout_weight="0.7"
+            android:transitionGroup="true"
+            >
 
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="text|textCapSentences"
+                android:hint="@string/hint_item_name"
                 android:imeOptions="actionNext"
-                android:hint="@string/hint_item_name"/>
+                android:inputType="text|textCapSentences"
+                />
 
         </android.support.design.widget.TextInputLayout>
 
@@ -44,16 +50,19 @@
             android:id="@+id/til_item_price"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/normal_space"
             android:layout_weight="0.3"
-            android:layout_marginEnd="@dimen/normal_space">
+            android:transitionGroup="true"
+            >
 
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="end"
+                android:hint="@string/hint_item_price"
                 android:inputType="numberDecimal"
                 android:maxLength="9"
-                android:hint="@string/hint_item_price"/>
+                />
 
         </android.support.design.widget.TextInputLayout>
 

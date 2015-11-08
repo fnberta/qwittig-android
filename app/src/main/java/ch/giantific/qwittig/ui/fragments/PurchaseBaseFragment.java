@@ -543,7 +543,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     @NonNull
     private View setupItemRow(int idCounter) {
         View itemRowView = getActivity().getLayoutInflater()
-                .inflate(R.layout.row_add_purchase, mLayoutTotalItemRow, false);
+                .inflate(R.layout.row_purchase_add, mLayoutTotalItemRow, false);
         itemRowView.setTag(idCounter - 1); // tag will be used in the ClickListener to get the position of the row, -1 because List index starts at 0
         itemRowView.setOnClickListener(null); // SwipeDismissTouchListener doesn't work without an OnClickListener
         itemRowView.setOnTouchListener(new SwipeDismissTouchListener(itemRowView, null,
