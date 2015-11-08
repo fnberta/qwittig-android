@@ -147,7 +147,8 @@
         android:layout_marginStart="@dimen/key_line_2"
         android:layout_marginTop="@dimen/my_share_neg_margin"
         android:text="@string/purchase_my_share"
-        android:textColor="?attr/colorAccent"/>
+        android:textColor="?android:textColorSecondary"
+        />
 
     <TextView
         android:id="@+id/tv_my_share_value"
@@ -157,7 +158,7 @@
         android:layout_alignEnd="@id/tv_total_value"
         android:layout_below="@id/tv_total_value"
         android:layout_marginTop="@dimen/my_share_neg_margin"
-        android:textColor="?attr/colorAccent"
+        android:textColor="?android:textColorSecondary"
         tools:text="124.50"/>
 
     <TextView
@@ -168,7 +169,7 @@
         android:layout_alignStart="@id/sp_currency"
         android:layout_below="@id/tv_total_value"
         android:layout_marginTop="@dimen/my_share_neg_margin"
-        android:textColor="?attr/colorAccent"
+        android:textColor="?android:textColorSecondary"
         tools:text="CHF"/>
 
     <TextView
