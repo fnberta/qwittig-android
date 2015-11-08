@@ -294,6 +294,5 @@
     <color name="green_dark">@color/green_700</color>
     <color name="green_light">@color/green_50</color>
 
-    <color name="grey_default_control_control_normal">#6d6d6d</color>
     <color name="grey_light">@color/grey_300</color>
 </resources>
