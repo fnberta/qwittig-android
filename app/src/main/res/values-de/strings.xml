@@ -196,7 +196,7 @@
     <string name="help_facebook">Finde Qwittig auf Facebook</string>
     <string name="help_twitter">Finde Qwittig auf Twitter</string>
     <string name="push_action_confirm">Bestätigen</string>
-    <string name="push_purchase_new_multiple_title">neue Einkäufe</string>
+    <string name="push_purchase_new_multiple_title">%1$d neue Einkäufe</string>
     <string name="push_purchase_new_multiple_more">weitere</string>
     <string name="action_retry">Wiederholen</string>
     <string name="toast_emails_no_match">Eingeladene Email Adresse stimmt nicht mit eingeloggter überein</string>

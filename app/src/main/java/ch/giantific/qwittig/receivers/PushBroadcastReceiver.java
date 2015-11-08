@@ -113,7 +113,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     private Set<String> mPurchaseNotifications;
 
     /**
-     * Returns the specific data of an intent in the extra <code>KEY_PUSH_DATA</code>
+     * Returns the specific data of an intent in the extra {@link #KEY_PUSH_DATA}.
      *
      * @param intent the intent from which to extract the data from
      * @return the extracted data as a {@link JSONObject}
@@ -224,7 +224,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
         Log.e(LOG_TAG, "onPushReceive");
 
         final User currentUser = (User) ParseUser.getCurrentUser();
-        // return immediately if on user is logged in
+        // return immediately if no user is logged in
         if (currentUser == null) {
             Log.e(LOG_TAG, "currentUser is null");
             return;
@@ -269,7 +269,8 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 String totalAmountFormatted = getAmount(jsonExtras);
                 mPurchaseNotifications = mSharedPreferences.getStringSet(
                         STORED_PURCHASE_NOTIFICATIONS + notificationTag, new LinkedHashSet<String>());
-                mPurchaseNotifications.add(store + ": " + totalAmountFormatted);
+                mPurchaseNotifications.add(String.format(Locale.getDefault(), "%s: %s",store,
+                        totalAmountFormatted));
 
                 // save set in sharedPreferences
                 SharedPreferences.Editor editor = mSharedPreferences.edit();
@@ -531,7 +532,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                     inboxStyle.setSummaryText(summaryText);
 
                     // set style, title and text to builder
-                    builder.setContentTitle(size + " " + context.getString(R.string.push_purchase_new_multiple_title))
+                    builder.setContentTitle(context.getString(R.string.push_purchase_new_multiple_title, size))
                             .setContentText(groupName)
                             .setStyle(inboxStyle);
                 }

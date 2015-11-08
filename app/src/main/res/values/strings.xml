@@ -198,7 +198,7 @@
     <string name="help_facebook">Find Qwittig on Facebook</string>
     <string name="help_twitter">Find Qwittig on Twitter</string>
     <string name="push_action_confirm">Confirm</string>
-    <string name="push_purchase_new_multiple_title">new items</string>
+    <string name="push_purchase_new_multiple_title">%1$d new items</string>
     <string name="push_purchase_new_multiple_more">more</string>
     <string name="action_retry">Retry</string>
     <string name="toast_emails_no_match">Invited email does not match logged in email</string>
