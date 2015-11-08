@@ -20,12 +20,13 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
 
+import java.util.Arrays;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.helpers.save.PurchaseSaveHelper;
 import ch.giantific.qwittig.domain.models.ItemRow;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
-import ch.giantific.qwittig.data.helpers.save.PurchaseSaveHelper;
 import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 
@@ -84,7 +85,6 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
         super.setupUserLists(users);
 
         setFirstRowItemUsersChecked();
-        updateCheckBoxesColor();
     }
 
     /**
@@ -95,7 +95,8 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
     void setFirstRowItemUsersChecked() {
         ItemRow firstItemRow = mItemRows.get(0);
         if (mItemRows.size() == 1 && firstItemRow.getUsersChecked() == null) {
-            firstItemRow.setUsersChecked(mPurchaseUsersInvolved);
+            firstItemRow.setUsersChecked(Arrays.copyOf(mPurchaseUsersInvolved,
+                    mPurchaseUsersInvolved.length));
         }
     }
 

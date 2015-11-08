@@ -22,7 +22,7 @@ import java.util.List;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.TaskUser;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.ui.adapters.rows.BaseUserAvatarRow;
+import ch.giantific.qwittig.ui.adapters.rows.UserAvatarRow;
 
 import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;
 
@@ -112,7 +112,7 @@ public class TaskUsersInvolvedRecyclerAdapter extends BaseRecyclerAdapter<ParseU
      * Provides a {@link RecyclerView} row that displays the user's avatar, the nickname and a
      * drag handler.
      */
-    private static class UsersRow extends BaseUserAvatarRow {
+    private static class UsersRow extends UserAvatarRow {
 
         private ImageView mImageViewReorder;
 

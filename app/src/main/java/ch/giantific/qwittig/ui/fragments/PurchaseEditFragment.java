@@ -213,7 +213,6 @@ public class PurchaseEditFragment extends PurchaseBaseFragment {
             // old values are transferred, use normal procedure on recreation
             mOldValuesAreSet = true;
         }
-        updateCheckBoxesColor();
     }
 
     private void restoreOldItemValues() {
@@ -233,7 +232,9 @@ public class PurchaseEditFragment extends PurchaseBaseFragment {
 
             // update usersInvolved for each item
             List<ParseUser> usersInvolved = itemOld.getUsersInvolved();
-            itemRowNew.setUsersChecked(ParseUserToBoolean(usersInvolved));
+            boolean[] usersChecked = getBooleansFromParseUsers(usersInvolved);
+            itemRowNew.setUsersChecked(usersChecked);
+            itemRowNew.setCheckBoxColor(usersChecked);
             if (buyerIsOnlyUserInvolved(usersInvolved)) {
                 itemRowNew.setCheckBoxChecked(false);
             }
@@ -251,7 +252,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment {
     }
 
     @NonNull
-    private boolean[] ParseUserToBoolean(@NonNull List<ParseUser> usersInvolved) {
+    private boolean[] getBooleansFromParseUsers(@NonNull List<ParseUser> usersInvolved) {
         int usersAvailableParseSize = mUsersAvailableParse.size();
         boolean[] usersInvolvedBoolean = new boolean[usersAvailableParseSize];
 

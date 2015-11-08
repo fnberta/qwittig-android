@@ -45,10 +45,6 @@ public class ItemRow {
         setIds(id);
     }
 
-    public View getItemRowView() {
-        return mItemRowView;
-    }
-
     public String getName() {
         return mName;
     }
@@ -75,6 +71,15 @@ public class ItemRow {
         mEditTextPrice.setId(id + 1000);
         mCheckBoxEnabled.setId(id + 2000);
         mCheckBoxEnabled.setTag(id - 1);
+    }
+
+    /**
+     * Sets the view tag of the item row view.
+     *
+     * @param tag the tag to set
+     */
+    public void setViewTag(int tag) {
+        mItemRowView.setTag(tag);
     }
 
     /**
@@ -155,6 +160,7 @@ public class ItemRow {
 
     /**
      * Formats the value of the price EditText with currency style
+     *
      * @param currencyCode the currency code to use for the formatting
      */
     public void formatPrice(@NonNull String currencyCode) {
@@ -167,8 +173,9 @@ public class ItemRow {
     /**
      * Sets the values from the EditTexts to the global fields and returns <code>true</code> if
      * they are not empty and <code>false</code> if the are.
+     *
      * @param acceptEmptyFields whether to accept empty fields or not
-     * @param currencySelected the currency code of the selected currency
+     * @param currencySelected  the currency code of the selected currency
      * @return whether the name and price are both non empty or not
      */
     public boolean setValuesFromEditTexts(boolean acceptEmptyFields, @NonNull String currencySelected) {

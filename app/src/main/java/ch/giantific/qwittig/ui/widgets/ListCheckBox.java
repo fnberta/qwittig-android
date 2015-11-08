@@ -30,8 +30,10 @@ public class ListCheckBox extends CheckBox {
 
     private static final String STATE_SUPER = "STATE_SUPER";
     private static final String STATE_USERS_CHECKED = "STATE_USERS_CHECKED";
+    private static final String STATE_IS_SPECIAL = "STATE_IS_SPECIAL";
     @Nullable
     private boolean[] mUsersChecked;
+    private boolean mIsSpecial;
 
     public ListCheckBox(Context context) {
         super(context);
@@ -74,7 +76,7 @@ public class ListCheckBox extends CheckBox {
             if (onlyBuyerIsChecked) {
                 checkAllUsers(purchaseUsersInvolvedSize);
             } else {
-                setUsersChecked(purchaseUsersInvolved);
+                mUsersChecked = Arrays.copyOf(purchaseUsersInvolved, purchaseUsersInvolvedSize);
             }
         } else {
             unCheckAllUsersExceptBuyer(buyerPosition);
@@ -116,20 +118,19 @@ public class ListCheckBox extends CheckBox {
      */
     public void updateUsersCheckedAfterPurchaseUserClick(int purchaseUserPosition,
                                                          boolean purchaseUserIsChecked) {
-        boolean[] usersChecked = getUsersChecked();
-        if (usersChecked == null) {
+        if (mUsersChecked == null) {
             return;
         }
 
         if (purchaseUserIsChecked) {
-            if (!usersChecked[purchaseUserPosition]) {
-                usersChecked[purchaseUserPosition] = true;
+            if (!mUsersChecked[purchaseUserPosition]) {
+                mUsersChecked[purchaseUserPosition] = true;
             }
-        } else if (usersChecked[purchaseUserPosition]) {
-            usersChecked[purchaseUserPosition] = false;
+        } else {
+            if (mUsersChecked[purchaseUserPosition]) {
+                mUsersChecked[purchaseUserPosition] = false;
+            }
         }
-
-        setUsersChecked(usersChecked);
     }
 
     /**
@@ -139,14 +140,13 @@ public class ListCheckBox extends CheckBox {
      * @param buyerPosition position of the buyer
      */
     public void updateCheckedStatus(int buyerPosition) {
-        boolean[] usersChecked = getUsersChecked();
-        if (usersChecked == null) {
+        if (mUsersChecked == null) {
             return;
         }
 
         boolean onlyBuyerIsCheckedInPurchase = true;
-        for (int i = 0, usersCheckedLength = usersChecked.length; i < usersCheckedLength; i++) {
-            if (usersChecked[i]) {
+        for (int i = 0, usersCheckedLength = mUsersChecked.length; i < usersCheckedLength; i++) {
+            if (mUsersChecked[i]) {
                 if (i != buyerPosition) {
                     onlyBuyerIsCheckedInPurchase = false;
                 }
@@ -165,26 +165,23 @@ public class ListCheckBox extends CheckBox {
      * If checkbox is unchecked, sets it to normal in any case.
      */
     public void setCheckBoxColor(@NonNull boolean[] purchaseUsersInvolved) {
-        boolean[] usersChecked = getUsersChecked();
-        boolean isSpecial = false;
+        final boolean newIsSpecial = isChecked() && !Arrays.equals(mUsersChecked, purchaseUsersInvolved);
+        if (mIsSpecial != newIsSpecial) {
+            mIsSpecial = newIsSpecial;
 
-        if (isChecked() && !Arrays.equals(usersChecked, purchaseUsersInvolved)) {
-            isSpecial = true;
-        }
-
-        if (Utils.isRunningLollipopAndHigher()) {
-            setListStatus(isSpecial);
+            if (Utils.isRunningLollipopAndHigher()) {
+                setButtonTintList();
+            }
         }
     }
 
     /**
-     * Sets the color depending on whether the users checked differ from the purchase wide or not.
-     *
-     * @param isSpecial whether the users checked differ from the purchase wide or not
+     * Sets the button color tint list depending on whether the users checked differ from the
+     * purchase wide or not.
      */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void setListStatus(boolean isSpecial) {
-        if (isSpecial) {
+    private void setButtonTintList() {
+        if (mIsSpecial) {
             setButtonTintList(ContextCompat.getColorStateList(getContext(), R.color.checkbox_color_red));
         } else {
             setButtonTintList(ContextCompat.getColorStateList(getContext(), R.color.checkbox_color_accent));
@@ -200,6 +197,7 @@ public class ListCheckBox extends CheckBox {
 
         bundle.putParcelable(STATE_SUPER, super.onSaveInstanceState());
         bundle.putBooleanArray(STATE_USERS_CHECKED, mUsersChecked);
+        bundle.putBoolean(STATE_IS_SPECIAL, mIsSpecial);
 
         return bundle;
     }
@@ -210,6 +208,10 @@ public class ListCheckBox extends CheckBox {
             Bundle bundle = (Bundle) state;
 
             mUsersChecked = bundle.getBooleanArray(STATE_USERS_CHECKED);
+            mIsSpecial = bundle.getBoolean(STATE_IS_SPECIAL);
+            if (mIsSpecial) {
+                setButtonTintList();
+            }
             state = bundle.getParcelable(STATE_SUPER);
         }
 

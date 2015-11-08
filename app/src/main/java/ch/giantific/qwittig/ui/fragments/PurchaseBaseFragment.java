@@ -104,6 +104,8 @@ import ch.giantific.qwittig.utils.Utils;
 public abstract class PurchaseBaseFragment extends BaseFragment implements
         PurchaseUsersInvolvedRecyclerAdapter.AdapterInteractionListener {
 
+    private UserRepository mUserRepo;
+
     @IntDef({PURCHASE_SAVED, PURCHASE_SAVED_AUTO, PURCHASE_DISCARDED, PURCHASE_SAVED_AS_DRAFT,
             PURCHASE_DRAFT_DELETED, PURCHASE_ERROR, PURCHASE_NO_CHANGES})
     @Retention(RetentionPolicy.SOURCE)
@@ -198,9 +200,9 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mUserRepo = new ParseUserRepository();
         updateCurrentUserAndGroup();
         mCurrentGroupCurrency = mCurrentGroup.getCurrency();
-
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         if (savedInstanceState != null) {
@@ -330,11 +332,16 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
             }
         });
 
+        setupRows();
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
         if (savedInstanceState != null) {
             revealFab();
         }
-
-        setupRows();
     }
 
     private void showDatePickerDialog() {
@@ -520,15 +527,63 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      */
     @NonNull
     final ItemRow addNewItemRow(int idCounter) {
+        View itemRowView = setupItemRow(idCounter);
+        TextInputLayout tilItemName = setupItemRowName(itemRowView);
+        TextInputLayout tilItemPrice = setupItemRowPrice(itemRowView);
+        ListCheckBox cbEnabled = setupItemRowCheckbox(itemRowView);
+        mLayoutTotalItemRow.addView(itemRowView);
+
+        ItemRow itemRow = new ItemRow(getActivity().getApplicationContext(), itemRowView,
+                idCounter, tilItemName, tilItemPrice, cbEnabled);
+        mItemRows.add(itemRow);
+
+        return itemRow;
+    }
+
+    @NonNull
+    private View setupItemRow(int idCounter) {
         View itemRowView = getActivity().getLayoutInflater()
                 .inflate(R.layout.row_add_purchase, mLayoutTotalItemRow, false);
         itemRowView.setTag(idCounter - 1); // tag will be used in the ClickListener to get the position of the row, -1 because List index starts at 0
+        itemRowView.setOnClickListener(null); // SwipeDismissTouchListener doesn't work without an OnClickListener
+        itemRowView.setOnTouchListener(new SwipeDismissTouchListener(itemRowView, null,
+                new SwipeDismissTouchListener.DismissCallbacks() {
+                    @Override
+                    public boolean canDismiss(Object token) {
+                        return true;
+                    }
 
+                    @Override
+                    public void onDismiss(@NonNull View view, Object token) {
+                        int position = Utils.getViewPositionFromTag(view);
+
+                        mLayoutTotalItemRow.removeView(view);
+                        mItemRows.remove(position);
+                        mItemRowCount--;
+                        resetIdsAndTags();
+                        updatePurchaseUsersInvolved();
+                        updateCheckBoxesColor();
+                        updateTotalAndMyShareValues();
+                    }
+                }));
+        return itemRowView;
+    }
+
+    @NonNull
+    private TextInputLayout setupItemRowName(View itemRowView) {
         TextInputLayout tilItemName = (TextInputLayout) itemRowView.findViewById(R.id.til_item_name);
         tilItemName.requestFocus(); // somehow needed on Android 5.0+, otherwise etItemPrice gets focused
+        return tilItemName;
+    }
 
+    @NonNull
+    private TextInputLayout setupItemRowPrice(View itemRowView) {
         TextInputLayout tilItemPrice = (TextInputLayout) itemRowView.findViewById(R.id.til_item_price);
         EditText etItemPrice = tilItemPrice.getEditText();
+        if (etItemPrice == null) {
+            return tilItemPrice;
+        }
+
         etItemPrice.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -558,8 +613,13 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
             }
         });
 
-        ListCheckBox cbEnabled = (ListCheckBox) itemRowView.findViewById(R.id.cb_item_enabled);
-        cbEnabled.setOnClickListener(new View.OnClickListener() {
+        return tilItemPrice;
+    }
+
+    @NonNull
+    private ListCheckBox setupItemRowCheckbox(View itemRowView) {
+        ListCheckBox cbUsersInvolved = (ListCheckBox) itemRowView.findViewById(R.id.cb_item_enabled);
+        cbUsersInvolved.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(@NonNull View v) {
                 ListCheckBox cb = (ListCheckBox) v;
@@ -569,10 +629,11 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
                 cb.updateUsersCheckedAfterCheckedChange(buyerPosition, mPurchaseUsersInvolved);
                 cb.setCheckBoxColor(mPurchaseUsersInvolved);
                 updatePurchaseUsersInvolved();
+                updateCheckBoxesColor();
                 updateTotalAndMyShareValues();
             }
         });
-        cbEnabled.setOnLongClickListener(new View.OnLongClickListener() {
+        cbUsersInvolved.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(@NonNull View v) {
                 ListCheckBox cb = (ListCheckBox) v;
@@ -590,42 +651,14 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         // set a default value for the usersInvolved, this would fail for the first row in AddFragment
         // because the user lists are not yet setup. Hence we call another method in AddFragment to set
         // a default value for the first row when the user lists are ready. On recreation,
-        // mItemsUsersChecked will already be filled with values, hence no new values will be added
-        // (size() will be bigger than idCounter)
-        if (cbEnabled.getUsersChecked() == null && mPurchaseUsersInvolved != null) {
+        // usersChecked of the checkbox will already be filled with values, hence no new values will
+        // be added
+        if (cbUsersInvolved.getUsersChecked() == null && mPurchaseUsersInvolved != null) {
             int buyerPosition = mUsersAvailableParse.indexOf(mCurrentUser);
-            cbEnabled.updateUsersCheckedAfterCheckedChange(buyerPosition, mPurchaseUsersInvolved);
+            cbUsersInvolved.updateUsersCheckedAfterCheckedChange(buyerPosition, mPurchaseUsersInvolved);
         }
 
-        // SwipeDismissTouchListener doesn't work without an OnClickListener
-        itemRowView.setOnClickListener(null);
-        itemRowView.setOnTouchListener(new SwipeDismissTouchListener(itemRowView, null,
-                new SwipeDismissTouchListener.DismissCallbacks() {
-                    @Override
-                    public boolean canDismiss(Object token) {
-                        return true;
-                    }
-
-                    @Override
-                    public void onDismiss(@NonNull View view, Object token) {
-                        int position = Utils.getViewPositionFromTag(view);
-
-                        mLayoutTotalItemRow.removeView(view);
-                        mItemRows.remove(position);
-                        mItemRowCount--;
-                        resetIdsAndTags();
-                        updatePurchaseUsersInvolved();
-                        updateTotalAndMyShareValues();
-                    }
-                }));
-
-        mLayoutTotalItemRow.addView(itemRowView);
-
-        ItemRow itemRow = new ItemRow(getActivity().getApplicationContext(), itemRowView,
-                idCounter, tilItemName, tilItemPrice, cbEnabled);
-        mItemRows.add(itemRow);
-
-        return itemRow;
+        return cbUsersInvolved;
     }
 
     private void showUserPickerDialog(@NonNull CharSequence[] usersAvailable,
@@ -643,9 +676,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         for (int i = 0; i < mItemRows.size(); i++) {
             ItemRow itemRow = mItemRows.get(i);
             itemRow.setIds(i + 1);
-
-            View itemRowView = itemRow.getItemRowView();
-            itemRowView.setTag(i);
+            itemRow.setViewTag(i);
         }
     }
 
@@ -692,8 +723,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     final void fetchUsersAvailable() {
-        UserRepository repo = new ParseUserRepository();
-        repo.getUsersLocalAsync(mCurrentGroup, new UserRepository.GetUsersLocalListener() {
+        mUserRepo.getUsersLocalAsync(mCurrentGroup, new UserRepository.GetUsersLocalListener() {
             @Override
             public void onUsersLocalLoaded(@NonNull List<ParseUser> users) {
                 setupUserLists(users);
@@ -726,10 +756,11 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         mUsersAvailableParse.clear();
         int usersSize = users.size();
         mUsersAvailableNicknames = new CharSequence[usersSize];
+        final Activity context = getActivity();
         for (int i = 0; i < usersSize; i++) {
             User user = (User) users.get(i);
             mUsersAvailableParse.add(user);
-            mUsersAvailableNicknames[i] = user.getNicknameOrMe(getActivity(), mCurrentUser);
+            mUsersAvailableNicknames[i] = user.getNicknameOrMe(context, mCurrentUser);
         }
     }
 
@@ -776,7 +807,6 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      */
     private boolean userIsLastOneChecked() {
         int countUsersChecked = Utils.countTrue(mPurchaseUsersInvolved);
-
         return countUsersChecked < 2;
     }
 
@@ -796,18 +826,17 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
             usersInvolved.add(mUsersAvailableParse.get(i));
         }
 
+        ItemRow itemRow = mItemRows.get(mSelectedItemPosition);
+        boolean[] usersChecked = itemRow.getUsersChecked();
         int usersAvailableParseSize = mUsersAvailableParse.size();
-        boolean[] usersChecked = new boolean[usersAvailableParseSize];
         for (int i = 0; i < usersAvailableParseSize; i++) {
             ParseUser parseUser = mUsersAvailableParse.get(i);
             usersChecked[i] = usersInvolved.contains(parseUser);
         }
-
-        ItemRow itemRow = mItemRows.get(mSelectedItemPosition);
-        itemRow.setUsersChecked(usersChecked);
         itemRow.updateCheckedStatus(mUsersAvailableParse.indexOf(mCurrentUser));
 
         updatePurchaseUsersInvolved();
+        updateCheckBoxesColor();
         updateTotalAndMyShareValues();
     }
 
@@ -817,33 +846,29 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      * purchase wide users involved as well.
      */
     private void updatePurchaseUsersInvolved() {
-        boolean[] usersInvolved = new boolean[mUsersAvailableParse.size()];
-
-        for (int i = 0, mUsersAvailableParseSize = mUsersAvailableParse.size();
-             i < mUsersAvailableParseSize; i++) {
-            usersInvolved[i] = false;
+        for (int i = 0, usersAvailableSize = mUsersAvailableParse.size(); i < usersAvailableSize; i++) {
+            final boolean currentIsChecked = mPurchaseUsersInvolved[i];
+            boolean newIsChecked = false;
 
             for (ItemRow itemRow : mItemRows) {
-                boolean[] usersChecked = itemRow.getUsersChecked();
+                final boolean[] usersChecked = itemRow.getUsersChecked();
 
                 if (usersChecked[i]) {
-                    usersInvolved[i] = true;
+                    newIsChecked = true;
                 }
             }
-        }
 
-        for (int i = 0, usersInvolvedLength = usersInvolved.length; i < usersInvolvedLength; i++) {
-            mPurchaseUsersInvolved[i] = usersInvolved[i];
-            mRecyclerAdapter.notifyItemChanged(i);
+            if (currentIsChecked != newIsChecked) {
+                mPurchaseUsersInvolved[i] = newIsChecked;
+                mRecyclerAdapter.notifyItemChanged(i);
+            }
         }
-
-        updateCheckBoxesColor();
     }
 
     /**
      * Iterates trough all items and sets their checkbox' color appropriately
      */
-    final void updateCheckBoxesColor() {
+    private void updateCheckBoxesColor() {
         for (ItemRow itemRow : mItemRows) {
             itemRow.setCheckBoxColor(mPurchaseUsersInvolved);
         }
@@ -870,10 +895,12 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         mTextViewPickStore.setText(storeSelected);
         mStoreSelected = storeSelected;
 
-        if (!manuallyEntered || ParseUtils.isTestUser(mCurrentUser)) {
-            return;
+        if (manuallyEntered && !ParseUtils.isTestUser(mCurrentUser)) {
+            addNewStore(storeSelected);
         }
+    }
 
+    private void addNewStore(@NonNull String storeSelected) {
         ParseConfig config = ParseConfig.getCurrentConfig();
         List<String> defaultStores = config.getList(Config.DEFAULT_STORES);
         List<String> addedStores = mCurrentUser.getStoresAdded();

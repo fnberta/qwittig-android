@@ -17,7 +17,7 @@ import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.ui.adapters.rows.UserInvolvedRow;
+import ch.giantific.qwittig.ui.adapters.rows.UserAvatarRow;
 import ch.giantific.qwittig.ui.fragments.PurchaseBaseFragment;
 
 import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;
@@ -28,8 +28,7 @@ import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;
  * <p/>
  * Subclass of {@link RecyclerView.Adapter}.
  */
-public class PurchaseUsersInvolvedRecyclerAdapter extends
-        RecyclerView.Adapter<UserInvolvedRow> {
+public class PurchaseUsersInvolvedRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int VIEW_RESOURCE = R.layout.row_users_involved_list;
     private Context mContext;
@@ -59,26 +58,25 @@ public class PurchaseUsersInvolvedRecyclerAdapter extends
 
     @NonNull
     @Override
-    public UserInvolvedRow onCreateViewHolder(@NonNull ViewGroup parent, int i) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
         View v = LayoutInflater.from(parent.getContext()).inflate(VIEW_RESOURCE, parent, false);
 
-        return new UserInvolvedRow(mContext, v, mListener);
+        return new UserInvolvedRow(v, mContext, mListener);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull UserInvolvedRow viewHolder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
         if (mUsersInvolved == null) {
             return;
         }
 
+        UserInvolvedRow involvedRow = (UserInvolvedRow) viewHolder;
         User user = (User) mUsersAvailable.get(position);
 
-        viewHolder.setName(user.getNicknameOrMe(mContext, mCurrentUser));
-
+        involvedRow.setName(user.getNicknameOrMe(mContext, mCurrentUser));
         byte[] avatarByteArray = user.getAvatar();
-        viewHolder.setAvatar(avatarByteArray, true);
-
-        viewHolder.setAlpha(!mUsersInvolved[position] ? DISABLED_ALPHA : 1f);
+        involvedRow.setAvatar(avatarByteArray, true);
+        involvedRow.setAlpha(!mUsersInvolved[position] ? DISABLED_ALPHA : 1f);
     }
 
     @Override
@@ -106,6 +104,34 @@ public class PurchaseUsersInvolvedRecyclerAdapter extends
          * @param position the adapter position of the user item
          */
         void onPurchaseUserClick(int position);
+    }
+
+    /**
+     * Provides a {@link RecyclerView} row that displays a user's avatar image and name and listens to
+     * clicks on the items.
+     * <p/>
+     * Subclass of {@link UserAvatarRow}.
+     */
+    private static class UserInvolvedRow extends UserAvatarRow {
+
+        /**
+         * Constructs a new {@link UserInvolvedRow} and sets the click listener.
+         *
+         * @param view     the inflated view
+         * @param context  the context to use in the row
+         * @param listener the callback for when an item is clicked
+         */
+        public UserInvolvedRow(@NonNull View view, @NonNull Context context,
+                               @NonNull final AdapterInteractionListener listener) {
+            super(view, context);
+
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onPurchaseUserClick(getAdapterPosition());
+                }
+            });
+        }
     }
 
 }

@@ -19,11 +19,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import ch.giantific.qwittig.ComparatorParseUserIgnoreCase;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.ui.adapters.rows.UserInvolvedRow;
-import ch.giantific.qwittig.ComparatorParseUserIgnoreCase;
+import ch.giantific.qwittig.ui.adapters.rows.UserAvatarRow;
 
 import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;
 
@@ -34,7 +34,7 @@ import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;
  * Subclass of {@link RecyclerView.Adapter}.
  */
 public class PurchaseDetailsUsersInvolvedRecyclerAdapter extends
-        RecyclerView.Adapter<UserInvolvedRow> {
+        RecyclerView.Adapter<UserAvatarRow> {
 
     private static final String LOG_TAG = PurchaseDetailsUsersInvolvedRecyclerAdapter.class.getSimpleName();
     private static final int VIEW_RESOURCE = R.layout.row_users_involved_list;
@@ -61,14 +61,14 @@ public class PurchaseDetailsUsersInvolvedRecyclerAdapter extends
 
     @Nullable
     @Override
-    public UserInvolvedRow onCreateViewHolder(@NonNull ViewGroup parent, int i) {
+    public UserAvatarRow onCreateViewHolder(@NonNull ViewGroup parent, int i) {
         View v = LayoutInflater.from(parent.getContext()).inflate(VIEW_RESOURCE, parent, false);
 
-        return new UserInvolvedRow(mContext, v, null);
+        return new UserAvatarRow(v, mContext);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final UserInvolvedRow viewHolder, int position) {
+    public void onBindViewHolder(@NonNull final UserAvatarRow viewHolder, int position) {
         if (mPurchase == null) {
             return;
         }

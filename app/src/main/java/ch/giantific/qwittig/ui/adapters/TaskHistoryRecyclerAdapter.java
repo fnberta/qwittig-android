@@ -18,7 +18,7 @@ import java.util.List;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.TaskHistory;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.ui.adapters.rows.BaseUserAvatarRow;
+import ch.giantific.qwittig.ui.adapters.rows.UserAvatarRow;
 import ch.giantific.qwittig.ui.adapters.rows.HeaderRow;
 import ch.giantific.qwittig.utils.DateUtils;
 
@@ -111,9 +111,9 @@ public class TaskHistoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerVie
      * Provides a {@link RecyclerView} row that displays a user's avatar image, the nickname
      * and the date he/she completed the task on.
      * <p/>
-     * Subclass of {@link BaseUserAvatarRow}.
+     * Subclass of {@link UserAvatarRow}.
      */
-    private static class TaskHistoryRow extends BaseUserAvatarRow {
+    private static class TaskHistoryRow extends UserAvatarRow {
 
         private TextView mTextViewDate;
 

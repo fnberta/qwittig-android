@@ -27,19 +27,19 @@ import ch.giantific.qwittig.domain.models.Avatar;
  * <p/>
  * Subclass of {@link RecyclerView.ViewHolder}.
  */
-public abstract class BaseUserAvatarRow extends RecyclerView.ViewHolder {
+public class UserAvatarRow extends RecyclerView.ViewHolder {
 
     protected Context mContext;
     private TextView mTextViewName;
     private ImageView mImageViewAvatar;
 
     /**
-     * Constructs a new {@link BaseUserAvatarRow}.
+     * Constructs a new {@link UserAvatarRow}.
      *
      * @param view    the inflated view
      * @param context the context to use in the row
      */
-    public BaseUserAvatarRow(@NonNull View view, @NonNull Context context) {
+    public UserAvatarRow(@NonNull View view, @NonNull Context context) {
         super(view);
 
         mContext = context;

@@ -22,7 +22,7 @@ import java.util.List;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.ui.adapters.rows.BaseUserAvatarRow;
+import ch.giantific.qwittig.ui.adapters.rows.UserAvatarRow;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -92,9 +92,9 @@ public class UsersRecyclerAdapter extends BaseRecyclerAdapter<ParseUser> {
      * Provides a {@link RecyclerView} row that displays the user's avatar image, the nickname and
      * the current balance.
      * <p/>
-     * Subclass of {@link BaseUserAvatarRow}.
+     * Subclass of {@link UserAvatarRow}.
      */
-    private static class UsersRow extends BaseUserAvatarRow {
+    private static class UsersRow extends UserAvatarRow {
 
         private TextView mTextViewBalance;
 
