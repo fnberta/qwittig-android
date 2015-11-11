@@ -19,11 +19,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import ch.giantific.qwittig.data.helpers.save.PurchaseEditSaveHelper;
+import ch.giantific.qwittig.data.repositories.ParsePurchaseRepository;
 import ch.giantific.qwittig.domain.models.ItemRow;
 import ch.giantific.qwittig.domain.models.parse.Item;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
-import ch.giantific.qwittig.data.repositories.ParsePurchaseRepository;
-import ch.giantific.qwittig.data.helpers.save.PurchaseEditSaveHelper;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.ui.fragments.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.utils.DateUtils;
@@ -231,9 +231,8 @@ public class PurchaseEditFragment extends PurchaseBaseFragment {
 
             // update usersInvolved for each item
             List<ParseUser> usersInvolved = itemOld.getUsersInvolved();
-            boolean[] usersChecked = getBooleansFromParseUsers(usersInvolved);
-            itemRowNew.setUsersChecked(usersChecked);
-            itemRowNew.setCheckBoxColor(usersChecked);
+            itemRowNew.setUsersChecked(getBooleansFromParseUsers(usersInvolved));
+            itemRowNew.setCheckBoxColor(mPurchaseUsersInvolved);
             if (buyerIsOnlyUserInvolved(usersInvolved)) {
                 itemRowNew.setCheckBoxChecked(false);
             }
@@ -392,35 +391,16 @@ public class PurchaseEditFragment extends PurchaseBaseFragment {
             }
 
             List<String> usersInvolvedOld = itemOld.getUsersInvolvedIds();
-            List<String> usersInvolvedNew = getParseUsersInvolvedIdsFromItemRow(itemRowNew);
+            List<String> usersInvolvedNew = itemRowNew.getParseUsersInvolvedIds(mUsersAvailableParse);
             if (usersInvolvedOld.size() != usersInvolvedNew.size() ||
                     !usersInvolvedOld.equals(usersInvolvedNew)) {
                 return true;
             }
         }
 
-        // TODO: fix
-//        if (receiptNew == null && mReceiptFileOld != null ||
-//                receiptNew != null && !receiptNew.equals(mReceiptFileOld)) {
-//            return true;
-//        }
+        // TODO: check if receipt images changed, difficult as new parse file gets created in save helper
 
         return false;
-    }
-
-    @NonNull
-    private List<String> getParseUsersInvolvedIdsFromItemRow(@NonNull ItemRow itemRow) {
-        int usersAvailableParseSize = mUsersAvailableParse.size();
-        final List<String> usersInvolved = new ArrayList<>(usersAvailableParseSize);
-
-        boolean[] usersChecked = itemRow.getUsersChecked();
-        for (int i = 0; i < usersAvailableParseSize; i++) {
-            ParseUser parseUser = mUsersAvailableParse.get(i);
-            if (usersChecked[i]) {
-                usersInvolved.add(parseUser.getObjectId());
-            }
-        }
-        return usersInvolved;
     }
 
     @Override

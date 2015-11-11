@@ -37,10 +37,8 @@ import ch.giantific.qwittig.utils.ParseUtils;
  * Displays the settings screen where the user sees all stores added for his/her account and can
  * add/delete new ones or un-star existing ones.
  * <p/>
- * Long-click on a user-added drafstoret will start selection mode, allowing the user to select
+ * Long-click on a user-added store will start selection mode, allowing the user to select
  * more stores and deleting them via the contextual {@link ActionBar}.
- * <p/>
- * TODO: switch to {@link RecyclerView} and implement selection mode.
  * <p/>
  * Subclass of {@link BaseFragment}.
  */

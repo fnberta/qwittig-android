@@ -90,7 +90,7 @@ public class PurchaseEditDraftFragment extends PurchaseEditFragment {
 
     @Override
     void fetchPurchase() {
-        mPurchaseRepo.getPurchaseLocalAsync(mCurrentUser, mEditPurchaseId, true, new PurchaseRepository.GetPurchaseLocalListener() {
+        mPurchaseRepo.getPurchaseLocalAsync(mEditPurchaseId, true, new PurchaseRepository.GetPurchaseLocalListener() {
             @Override
             public void onPurchaseLocalLoaded(@NonNull Purchase purchase) {
                 processOldPurchase(purchase);

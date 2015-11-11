@@ -153,7 +153,7 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
         tabsAdapter.addFragment(mCompensationsUnpaidFragment, getString(R.string.tab_compensations_new));
         tabsAdapter.addFragment(mCompensationsPaidFragment, getString(R.string.tab_compensations_history));
         viewPager.setAdapter(tabsAdapter);
-        viewPager.setOffscreenPageLimit(2); // TODO: do we really want this?
+        viewPager.setOffscreenPageLimit(2);
         if (fragmentToSelect > TAB_NONE) {
             viewPager.setCurrentItem(fragmentToSelect);
         }

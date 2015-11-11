@@ -58,7 +58,7 @@ public class PurchaseReceiptEditFragment extends PurchaseReceiptAddFragment impl
     @Override
     void setData() {
         if (mIsDraft) {
-            mPurchaseRepo.getPurchaseLocalAsync(mCurrentUser, mPurchaseId, true, this);
+            mPurchaseRepo.getPurchaseLocalAsync(mPurchaseId, true, this);
         } else {
             mPurchaseRepo.fetchPurchaseDataLocalAsync(mPurchaseId, this);
         }

@@ -67,15 +67,17 @@ import java.util.List;
 import java.util.Map;
 
 import ch.giantific.qwittig.BuildConfig;
+import ch.giantific.qwittig.ComparatorParseUserIgnoreCase;
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.helpers.RatesHelper;
+import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.domain.models.ItemRow;
 import ch.giantific.qwittig.domain.models.Receipt;
 import ch.giantific.qwittig.domain.models.parse.Config;
 import ch.giantific.qwittig.domain.models.parse.Item;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.data.repositories.ParseUserRepository;
-import ch.giantific.qwittig.data.helpers.RatesHelper;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.ui.activities.CameraActivity;
 import ch.giantific.qwittig.ui.adapters.PurchaseUsersInvolvedRecyclerAdapter;
@@ -87,12 +89,10 @@ import ch.giantific.qwittig.ui.fragments.dialogs.StoreSelectionDialogFragment;
 import ch.giantific.qwittig.ui.listeners.SwipeDismissTouchListener;
 import ch.giantific.qwittig.ui.widgets.ListCheckBox;
 import ch.giantific.qwittig.utils.CameraUtils;
-import ch.giantific.qwittig.ComparatorParseUserIgnoreCase;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
-import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -103,8 +103,6 @@ import ch.giantific.qwittig.utils.Utils;
  */
 public abstract class PurchaseBaseFragment extends BaseFragment implements
         PurchaseUsersInvolvedRecyclerAdapter.AdapterInteractionListener {
-
-    private UserRepository mUserRepo;
 
     @IntDef({PURCHASE_SAVED, PURCHASE_SAVED_AUTO, PURCHASE_DISCARDED, PURCHASE_SAVED_AS_DRAFT,
             PURCHASE_DRAFT_DELETED, PURCHASE_ERROR, PURCHASE_NO_CHANGES})
@@ -168,6 +166,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     ArrayList<String> mReceiptImagePaths;
     String mReceiptImagePath;
     String mNote;
+    private UserRepository mUserRepo;
     private TextView mTextViewPickStore;
     private boolean mIsSaving;
     private boolean mIsFetchingExchangeRates;
@@ -1166,15 +1165,14 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     /**
-     * Returns whether all the fields in the item rows have a valid value.
+     * Returns whether all the fields in the item rows have a valid value. Reads values from the
+     * item rows and creates new {@link Item} objects if they are valid.
      *
      * @param acceptEmptyFields whether to accept empty fields or not, useful for drafts where
      *                          empty fields are allowed
      * @return whether all required fields have a valid value
      */
     private boolean setItemValues(boolean acceptEmptyFields) {
-        // Read values from editTexts, check if items are complete and enabled. If they are, add
-        // them to totalPrice. If there are no items, immediately return false.
         if (mItemRows.size() < 1) {
             MessageUtils.showBasicSnackbar(mButtonAddRow, getString(R.string.toast_min_one_item));
             return false;

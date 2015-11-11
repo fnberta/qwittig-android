@@ -57,13 +57,11 @@ public class ParsePurchaseRepository extends ParseGenericRepository implements P
     }
 
     @Override
-    public void getPurchaseLocalAsync(@NonNull User currentUser, @NonNull String purchaseId,
-                                      boolean isDraft,
+    public void getPurchaseLocalAsync(@NonNull String purchaseId, boolean isDraft,
                                       @NonNull final GetPurchaseLocalListener listener) {
         ParseQuery<ParseObject> query = getPurchasesLocalQuery();
         if (isDraft) {
             query.whereEqualTo(Purchase.DRAFT_ID, purchaseId);
-            query.whereEqualTo(Purchase.BUYER, currentUser);
             query.getFirstInBackground(new GetCallback<ParseObject>() {
                 @Override
                 public void done(ParseObject parseObject, @Nullable ParseException e) {

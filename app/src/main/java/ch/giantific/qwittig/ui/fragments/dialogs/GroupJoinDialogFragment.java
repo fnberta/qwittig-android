@@ -19,8 +19,6 @@ import ch.giantific.qwittig.R;
 /**
  * Provides a dialog that asks the user if he wants to join a specific group he was invited to.
  * <p/>
- * TODO: implement later button
- * <p/>
  * Subclass of {@link DialogFragment}.
  */
 public class GroupJoinDialogFragment extends DialogFragment {

@@ -32,11 +32,10 @@ public interface PurchaseRepository {
     /**
      * Queries the local data store for a single purchase.
      *
-     * @param currentUser the current user
-     * @param purchaseId  the object id of the purchase to query
-     * @param listener    the callback when the query finishes
+     * @param purchaseId the object id of the purchase to query
+     * @param listener   the callback when the query finishes
      */
-    void getPurchaseLocalAsync(@NonNull User currentUser, @NonNull String purchaseId, boolean isDraft,
+    void getPurchaseLocalAsync(@NonNull String purchaseId, boolean isDraft,
                                @NonNull GetPurchaseLocalListener listener);
 
     /**
@@ -84,9 +83,8 @@ public interface PurchaseRepository {
     /**
      * Deletes all purchases from the local data store and saves new ones.
      *
-     *
      * @param currentUser the current user
-     * @param groups the groups for which to update the purchases
+     * @param groups      the groups for which to update the purchases
      * @return whether the update was successful or not
      */
     boolean updatePurchases(@NonNull User currentUser, @NonNull List<ParseObject> groups);

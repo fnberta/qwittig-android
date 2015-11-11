@@ -192,7 +192,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
                             PushBroadcastReceiver.INTENT_ACTION_INVITATION, 0);
                 }
             } catch (JSONException e) {
-                // TODO: do we need to handle this?
+                return;
             }
         } else {
             return;

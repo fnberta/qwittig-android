@@ -179,7 +179,7 @@
     <string name="hint_clear">Entfernen</string>
     <string name="no_invitations">Keine offenen Einladungen</string>
     <string name="hint_store_new">Neues Geschäft</string>
-    <string name="header_purchase">Einkauf</string>
+    <string name="header_purchase">Details</string>
     <string name="action_purchase_edit_save_changes_draft">Speichere Änderungen im Entwurf</string>
     <string name="toast_changes_saved_as_draft">Änderungen im Entwurf gespeichert</string>
     <string name="dialog_discard_changes_message">Änderungen verwerfen?</string>

@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Map;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.save.PurchaseSaveHelper;
 import ch.giantific.qwittig.data.helpers.RatesHelper;
+import ch.giantific.qwittig.data.helpers.save.PurchaseSaveHelper;
 import ch.giantific.qwittig.ui.fragments.PurchaseBaseFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseNoteFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseReceiptAddFragment;
@@ -39,7 +39,6 @@ import ch.giantific.qwittig.ui.listeners.TransitionListenerAdapter;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.Utils;
-import ch.giantific.qwittig.utils.ViewUtils;
 
 /**
  * Provides an abstract base class for the creation and editing of purchases. Mostly deals with
@@ -197,8 +196,6 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         setHasReceiptFile(false);
         getFragmentManager().popBackStack();
         MessageUtils.showBasicSnackbar(mFabPurchaseSave, getString(R.string.toast_receipt_deleted));
-
-        // TODO: really delete receipt
     }
 
     @Override
@@ -248,7 +245,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
 
     private PurchaseNoteFragment findPurchaseNoteFragment() {
         return (PurchaseNoteFragment) getFragmentManager()
-                    .findFragmentByTag(PurchaseBaseFragment.PURCHASE_NOTE_FRAGMENT);
+                .findFragmentByTag(PurchaseBaseFragment.PURCHASE_NOTE_FRAGMENT);
     }
 
     @Override

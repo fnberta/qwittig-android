@@ -11,7 +11,11 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 
+import com.parse.ParseUser;
+
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.ui.widgets.ListCheckBox;
@@ -218,5 +222,26 @@ public class ItemRow {
      */
     public void requestFocusForName() {
         mEditTextName.requestFocus();
+    }
+
+    /**
+     * Returns the object ids of the users checked in this row
+     *
+     * @param usersAvailable the parse users available
+     * @return the object ids of the users checked in this row
+     */
+    @NonNull
+    public List<String> getParseUsersInvolvedIds(@NonNull List<ParseUser> usersAvailable) {
+        int usersAvailableParseSize = usersAvailable.size();
+        final List<String> usersInvolved = new ArrayList<>(usersAvailableParseSize);
+
+        boolean[] usersChecked = getUsersChecked();
+        for (int i = 0; i < usersAvailableParseSize; i++) {
+            ParseUser parseUser = usersAvailable.get(i);
+            if (usersChecked[i]) {
+                usersInvolved.add(parseUser.getObjectId());
+            }
+        }
+        return usersInvolved;
     }
 }

@@ -181,7 +181,7 @@
     <string name="tab_compensations_new">Unsettled payments</string>
     <string name="tab_compensations_history">Past payments</string>
     <string name="hint_store_new">New store</string>
-    <string name="header_purchase">Purchase</string>
+    <string name="header_purchase">Details</string>
     <string name="action_purchase_edit_save_changes_draft">Save changes in draft</string>
     <string name="toast_changes_saved_as_draft">Changes saved in draft</string>
     <string name="dialog_discard_changes_message">Discard changes?</string>

@@ -145,7 +145,7 @@ public class PurchaseDetailsFragment extends BaseFragment implements
      * the data for the pointers.
      */
     public void queryData() {
-        mPurchaseRepo.getPurchaseLocalAsync(mCurrentUser, mPurchaseId, false, this);
+        mPurchaseRepo.getPurchaseLocalAsync(mPurchaseId, false, this);
     }
 
     @Override
