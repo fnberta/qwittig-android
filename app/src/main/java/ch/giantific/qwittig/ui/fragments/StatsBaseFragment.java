@@ -12,6 +12,7 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.ContentLoadingProgressBar;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -52,7 +53,7 @@ public abstract class StatsBaseFragment extends BaseFragment {
     boolean mDataIsLoaded;
     private FragmentInteractionListener mListener;
     private TextView mTextViewEmptyView;
-    private ProgressBar mProgressBar;
+    private ContentLoadingProgressBar mProgressBar;
     private boolean mIsRecreating;
 
     public StatsBaseFragment() {
@@ -98,7 +99,7 @@ public abstract class StatsBaseFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
 
         mTextViewEmptyView = (TextView) view.findViewById(R.id.tv_empty_view);
-        mProgressBar = (ProgressBar) view.findViewById(R.id.pb_stats);
+        mProgressBar = (ContentLoadingProgressBar) view.findViewById(R.id.pb_base);
     }
 
     /**
@@ -183,11 +184,11 @@ public abstract class StatsBaseFragment extends BaseFragment {
 
     final void toggleProgressBarVisibility() {
         if (mIsLoading) {
-            mProgressBar.setVisibility(View.VISIBLE);
+            mProgressBar.show();
             mTextViewEmptyView.setVisibility(View.GONE);
             hideChart();
         } else {
-            mProgressBar.setVisibility(View.GONE);
+            mProgressBar.hide();
         }
     }
 

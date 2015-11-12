@@ -10,13 +10,7 @@
     android:animateLayoutChanges="true"
     tools:context="ch.giantific.qwittig.ui.fragments.PurchaseReceiptDetailFragment">
 
-    <ProgressBar
-        android:id="@+id/pb_receipt"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:indeterminate="true"/>
+    <include layout="@layout/include_progress"/>
 
     <ScrollView
         android:layout_width="match_parent"

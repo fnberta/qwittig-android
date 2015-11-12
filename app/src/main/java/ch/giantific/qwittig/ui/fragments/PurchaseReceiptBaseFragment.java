@@ -5,6 +5,7 @@
 package ch.giantific.qwittig.ui.fragments;
 
 import android.os.Bundle;
+import android.support.v4.widget.ContentLoadingProgressBar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,10 +18,10 @@ import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.ParsePurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
-import ch.giantific.qwittig.ParseErrorHandler;
 
 /**
  * Provides an abstract base class for screens that display purchase receipt images.
@@ -31,7 +32,7 @@ public abstract class PurchaseReceiptBaseFragment extends BaseFragment {
 
     PurchaseRepository mPurchaseRepo;
     ImageView mImageViewReceipt;
-    private ProgressBar mProgressBar;
+    private ContentLoadingProgressBar mProgressBar;
 
     public PurchaseReceiptBaseFragment() {
     }
@@ -54,7 +55,7 @@ public abstract class PurchaseReceiptBaseFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
 
         mImageViewReceipt = (ImageView) view.findViewById(R.id.iv_receipt);
-        mProgressBar = (ProgressBar) view.findViewById(R.id.pb_receipt);
+        mProgressBar = (ContentLoadingProgressBar) view.findViewById(R.id.pb_base);
     }
 
     void setReceiptImage(ParseFile receiptFile) {
@@ -62,9 +63,8 @@ public abstract class PurchaseReceiptBaseFragment extends BaseFragment {
             receiptFile.getDataInBackground(new GetDataCallback() {
                 @Override
                 public void done(byte[] bytes, ParseException e) {
-                    mProgressBar.setVisibility(View.GONE);
-
                     if (e != null) {
+                        mProgressBar.hide();
                         ParseErrorHandler.handleParseError(getActivity(), e.getCode());
                         return;
                     }
@@ -76,6 +76,7 @@ public abstract class PurchaseReceiptBaseFragment extends BaseFragment {
     }
 
     void setImage(byte[] receiptBytes) {
+        mProgressBar.hide();
         Glide.with(this)
                 .load(receiptBytes)
                 .into(mImageViewReceipt);

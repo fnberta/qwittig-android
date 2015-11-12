@@ -28,14 +28,7 @@
         android:orientation="vertical"
         android:layout_gravity="center">
 
-        <ProgressBar
-            android:id="@+id/pb_purchase_add_auto"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="@dimen/small_space"
-            android:indeterminate="true"/>
+        <include layout="@layout/include_progress"/>
 
         <TextView
             android:id="@+id/tv_progress_message"
@@ -43,6 +36,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/small_space"
             android:text="@string/progress_purchase_auto"/>
     </LinearLayout>
 

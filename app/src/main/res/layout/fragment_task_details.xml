@@ -33,12 +33,6 @@
         tools:visibility="visible"
         />
 
-    <ProgressBar
-        android:id="@+id/pb_task_details"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:indeterminate="true"/>
+    <include layout="@layout/include_progress"/>
 
 </FrameLayout>

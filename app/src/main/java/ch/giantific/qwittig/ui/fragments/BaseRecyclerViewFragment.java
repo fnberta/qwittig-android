@@ -8,8 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -19,7 +18,6 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.ParseGroupRepository;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
-import ch.giantific.qwittig.utils.MessageUtils;
 
 /**
  * Provides a an abstract base class for screens with a {@link RecyclerView} and shows a progress
@@ -34,7 +32,7 @@ public abstract class BaseRecyclerViewFragment extends BaseFragment {
 
     RecyclerView mRecyclerView;
     View mEmptyView;
-    private ProgressBar mProgressBarLoading;
+    private ContentLoadingProgressBar mProgressBarLoading;
     private GroupRepository mGroupRepository;
 
     public BaseRecyclerViewFragment() {
@@ -52,7 +50,7 @@ public abstract class BaseRecyclerViewFragment extends BaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mProgressBarLoading = (ProgressBar) view.findViewById(R.id.pb_base);
+        mProgressBarLoading = (ContentLoadingProgressBar) view.findViewById(R.id.pb_base);
         mEmptyView = view.findViewById(R.id.empty_view);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.rv_base);
@@ -95,7 +93,7 @@ public abstract class BaseRecyclerViewFragment extends BaseFragment {
     @CallSuper
     void showMainView() {
         mRecyclerView.setVisibility(View.VISIBLE);
-        mProgressBarLoading.setVisibility(View.GONE);
+        mProgressBarLoading.hide();
         toggleEmptyViewVisibility();
     }
 

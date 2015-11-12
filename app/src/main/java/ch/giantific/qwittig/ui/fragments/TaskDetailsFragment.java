@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -66,7 +67,7 @@ public class TaskDetailsFragment extends BaseFragment implements
     private RecyclerView mRecyclerViewHistory;
     private TaskHistoryRecyclerAdapter mRecyclerAdapter;
     private View mEmptyView;
-    private ProgressBar mProgressBar;
+    private ContentLoadingProgressBar mProgressBar;
     private TaskRepository mTaskRepo;
     private UserRepository mUserRepo;
 
@@ -125,7 +126,7 @@ public class TaskDetailsFragment extends BaseFragment implements
         super.onViewCreated(view, savedInstanceState);
 
         mEmptyView = view.findViewById(R.id.empty_view);
-        mProgressBar = (ProgressBar) view.findViewById(R.id.pb_task_details);
+        mProgressBar = (ContentLoadingProgressBar) view.findViewById(R.id.pb_base);
 
         mRecyclerViewHistory = (RecyclerView) view.findViewById(R.id.rv_task_details_history);
         mRecyclerViewHistory.setHasFixedSize(true);
@@ -266,7 +267,7 @@ public class TaskDetailsFragment extends BaseFragment implements
     }
 
     private void toggleMainVisibility() {
-        mProgressBar.setVisibility(View.GONE);
+        mProgressBar.hide();
 
         if (!mTaskHistory.isEmpty()) {
             mRecyclerViewHistory.setVisibility(View.VISIBLE);

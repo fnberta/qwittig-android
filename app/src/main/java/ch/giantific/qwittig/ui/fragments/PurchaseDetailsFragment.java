@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -53,7 +54,7 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     private static final String LOG_TAG = PurchaseDetailsFragment.class.getSimpleName();
     private FragmentInteractionListener mListener;
     private RecyclerView mRecyclerView;
-    private ProgressBar mProgressBar;
+    private ContentLoadingProgressBar mProgressBar;
     private String mPurchaseId;
     private Purchase mPurchase;
     private PurchaseDetailsRecyclerAdapter mRecyclerAdapter;
@@ -116,7 +117,7 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mProgressBar = (ProgressBar) view.findViewById(R.id.pb_purchase_details);
+        mProgressBar = (ContentLoadingProgressBar) view.findViewById(R.id.pb_base);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.rv_purchase_details);
         mRecyclerAdapter = new PurchaseDetailsRecyclerAdapter(getActivity(), mCurrentUser, mCurrentGroup);
@@ -199,8 +200,13 @@ public class PurchaseDetailsFragment extends BaseFragment implements
 
     private void toggleMainViewVisibility() {
         boolean purchaseIsNull = mPurchase == null;
-        mRecyclerView.setVisibility(purchaseIsNull ? View.GONE : View.VISIBLE);
-        mProgressBar.setVisibility(purchaseIsNull ? View.VISIBLE : View.GONE);
+        if (purchaseIsNull) {
+            mRecyclerView.setVisibility(View.GONE);
+            mProgressBar.show();
+        } else {
+            mRecyclerView.setVisibility(View.VISIBLE);
+            mProgressBar.hide();
+        }
     }
 
     private void updateReadBy() {
