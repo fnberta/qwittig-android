@@ -337,12 +337,9 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment implements
             return;
         }
 
-        if (!timeFrame.equals(Task.TIME_FRAME_AS_NEEDED)) {
-            task.updateDeadline(timeFrame);
-        }
-
-        final ParseUser userResponsible = task.getUserResponsible();
-        final ParseUser userResponsibleNew = task.addHistoryEvent(mCurrentUser);
+        task.updateDeadline();
+        final User userResponsible = task.getUserResponsible();
+        final User userResponsibleNew = task.addHistoryEvent(mCurrentUser);
         task.saveEventually();
 
         String currentUserId = mCurrentUser.getObjectId();

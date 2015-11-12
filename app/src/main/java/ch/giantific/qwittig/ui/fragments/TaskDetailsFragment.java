@@ -325,9 +325,7 @@ public class TaskDetailsFragment extends BaseFragment implements
             return;
         }
 
-        if (!timeFrame.equals(Task.TIME_FRAME_AS_NEEDED)) {
-            mTask.updateDeadline(timeFrame);
-        }
+        mTask.updateDeadline();
         mTask.addHistoryEvent(mCurrentUser);
         mTask.saveEventually();
 

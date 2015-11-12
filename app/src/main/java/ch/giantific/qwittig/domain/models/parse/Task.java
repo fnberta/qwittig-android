@@ -173,27 +173,37 @@ public class Task extends ParseObject {
         }
     }
 
-    public void updateDeadline(@NonNull @TimeFrame String timeFrame) {
-        Date deadline = getDeadline();
-        Calendar deadlineNew = DateUtils.getCalendarInstanceUTC();
-        deadlineNew.setTime(deadline);
+    /**
+     * Updates the task's deadline to the next time the task needs to be finished. Adds the time
+     * frame to the date the task was finished and not to the date when it was supposed to be
+     * finished.
+     */
+    public void updateDeadline() {
+        String timeFrame = getTimeFrame();
+        if (timeFrame.equals(Task.TIME_FRAME_AS_NEEDED)) {
+            // as needed tasks have no deadline
+            return;
+        }
+
+        Calendar deadline = DateUtils.getCalendarInstanceUTC();
+        deadline.setTime(new Date());
         switch (timeFrame) {
             case Task.TIME_FRAME_DAILY:
-                deadlineNew.add(Calendar.DAY_OF_YEAR, 1);
+                deadline.add(Calendar.DAY_OF_YEAR, 1);
                 break;
             case Task.TIME_FRAME_WEEKLY:
-                deadlineNew.add(Calendar.WEEK_OF_YEAR, 1);
+                deadline.add(Calendar.WEEK_OF_YEAR, 1);
                 break;
             case Task.TIME_FRAME_MONTHLY:
-                deadlineNew.add(Calendar.MONTH, 1);
+                deadline.add(Calendar.MONTH, 1);
                 break;
             case Task.TIME_FRAME_YEARLY:
-                deadlineNew.add(Calendar.YEAR, 1);
+                deadline.add(Calendar.YEAR, 1);
                 break;
         }
 
-        deadlineNew = DateUtils.resetToMidnight(deadlineNew);
-        setDeadline(deadlineNew.getTime());
+        deadline = DateUtils.resetToMidnight(deadline);
+        setDeadline(deadline.getTime());
     }
 
     /**
