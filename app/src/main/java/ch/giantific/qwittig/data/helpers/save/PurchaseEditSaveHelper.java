@@ -13,8 +13,8 @@ import com.parse.DeleteCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 
-import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.data.rest.CloudCodeClient;
+import ch.giantific.qwittig.domain.models.parse.Purchase;
 
 /**
  * Saves an edited {@link Purchase} object and if there is a new receipt image, deletes the old

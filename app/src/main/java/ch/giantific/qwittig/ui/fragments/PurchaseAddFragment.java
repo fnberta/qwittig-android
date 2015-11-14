@@ -4,8 +4,6 @@
 
 package ch.giantific.qwittig.ui.fragments;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -27,7 +25,6 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.helpers.save.PurchaseSaveHelper;
 import ch.giantific.qwittig.domain.models.ItemRow;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
-import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 
 /**
