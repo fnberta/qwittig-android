@@ -123,7 +123,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment implem
     protected void onlineQuery() {
         if (!Utils.isConnected(getActivity())) {
             setLoading(false);
-            showOnlineQueryErrorSnackbar(getString(R.string.toast_no_connection));
+            showErrorSnackbar(getString(R.string.toast_no_connection), getOnlineQueryRetryAction());
             return;
         }
 
@@ -150,7 +150,8 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment implem
     public void onPurchaseUpdateFailed(int errorCode) {
         Activity context = getActivity();
         ParseErrorHandler.handleParseError(context, errorCode);
-        showOnlineQueryErrorSnackbar(ParseErrorHandler.getErrorMessage(context, errorCode));
+        showErrorSnackbar(ParseErrorHandler.getErrorMessage(context, errorCode),
+                getOnlineQueryRetryAction());
         HelperUtils.removeHelper(getFragmentManager(), PURCHASE_QUERY_HELPER);
 
         setLoading(false);
@@ -272,21 +273,15 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment implem
     public void onMoreObjectsLoadFailed(int errorCode) {
         Activity context = getActivity();
         ParseErrorHandler.handleParseError(context, errorCode);
-        showLoadMoreErrorSnackbar(ParseErrorHandler.getErrorMessage(context, errorCode));
-        HelperUtils.removeHelper(getFragmentManager(), MoreQueryHelper.MORE_QUERY_HELPER);
-
-        mIsLoadingMore = false;
-        mRecyclerAdapter.hideLoadMoreIndicator();
-    }
-
-    private void showLoadMoreErrorSnackbar(@NonNull String errorMessage) {
-        Snackbar snackbar = MessageUtils.getBasicSnackbar(mRecyclerView, errorMessage);
-        snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
+        showErrorSnackbar(ParseErrorHandler.getErrorMessage(context, errorCode), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 loadMoreData();
             }
         });
-        snackbar.show();
+        HelperUtils.removeHelper(getFragmentManager(), MoreQueryHelper.MORE_QUERY_HELPER);
+
+        mIsLoadingMore = false;
+        mRecyclerAdapter.hideLoadMoreIndicator();
     }
 }

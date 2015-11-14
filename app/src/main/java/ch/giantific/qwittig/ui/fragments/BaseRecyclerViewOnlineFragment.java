@@ -64,16 +64,23 @@ public abstract class BaseRecyclerViewOnlineFragment extends BaseRecyclerViewFra
 
     protected abstract void onlineQuery();
 
-    final void showOnlineQueryErrorSnackbar(@NonNull String errorMessage) {
+    final void showErrorSnackbar(@NonNull String errorMessage,
+                                 @Nullable View.OnClickListener retryAction) {
         Snackbar snackbar = MessageUtils.getBasicSnackbar(mRecyclerView, errorMessage);
-        snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
+        if (retryAction != null) {
+            snackbar.setAction(R.string.action_retry, retryAction);
+        }
+        snackbar.show();
+    }
+
+    final View.OnClickListener getOnlineQueryRetryAction() {
+        return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setLoading(true);
                 onlineQuery();
             }
-        });
-        snackbar.show();
+        };
     }
 
     @Override

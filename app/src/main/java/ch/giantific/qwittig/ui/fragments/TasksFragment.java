@@ -123,7 +123,7 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment implements
     protected void onlineQuery() {
         if (!Utils.isConnected(getActivity())) {
             setLoading(false);
-            showOnlineQueryErrorSnackbar(getString(R.string.toast_no_connection));
+            showErrorSnackbar(getString(R.string.toast_no_connection), getOnlineQueryRetryAction());
             return;
         }
 
@@ -149,7 +149,8 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment implements
      */
     public void onTasksUpdatedFailed(int errorCode) {
         ParseErrorHandler.handleParseError(getActivity(), errorCode);
-        showOnlineQueryErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), errorCode));
+        showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), errorCode),
+                getOnlineQueryRetryAction());
         HelperUtils.removeHelper(getFragmentManager(), TASK_QUERY_HELPER);
 
         setLoading(false);

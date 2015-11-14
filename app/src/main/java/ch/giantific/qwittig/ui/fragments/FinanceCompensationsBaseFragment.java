@@ -57,7 +57,7 @@ public abstract class FinanceCompensationsBaseFragment extends BaseRecyclerViewO
     final void onlineQuery(boolean queryPaid) {
         if (!Utils.isConnected(getActivity())) {
             setLoading(false);
-            showOnlineQueryErrorSnackbar(getString(R.string.toast_no_connection));
+            showErrorSnackbar(getString(R.string.toast_no_connection), getOnlineQueryRetryAction());
             return;
         }
 
@@ -94,7 +94,7 @@ public abstract class FinanceCompensationsBaseFragment extends BaseRecyclerViewO
     public void onCompensationUpdateFailed(int errorCode) {
         final Activity context = getActivity();
         ParseErrorHandler.handleParseError(context, errorCode);
-        showOnlineQueryErrorSnackbar(ParseErrorHandler.getErrorMessage(context, errorCode));
+        showErrorSnackbar(ParseErrorHandler.getErrorMessage(context, errorCode), getOnlineQueryRetryAction());
         HelperUtils.removeHelper(getFragmentManager(), getQueryHelperTag());
 
         setLoading(false);

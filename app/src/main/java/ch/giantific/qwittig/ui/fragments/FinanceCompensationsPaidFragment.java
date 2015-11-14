@@ -198,21 +198,15 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
      */
     public void onMoreObjectsLoadFailed(int errorCode) {
         ParseErrorHandler.handleParseError(getActivity(), errorCode);
-        showLoadMoreErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), errorCode));
-        HelperUtils.removeHelper(getFragmentManager(), MoreQueryHelper.MORE_QUERY_HELPER);
-
-        mIsLoadingMore = false;
-        mRecyclerAdapter.hideLoadMoreIndicator();
-    }
-
-    private void showLoadMoreErrorSnackbar(@NonNull String errorMessage) {
-        Snackbar snackbar = MessageUtils.getBasicSnackbar(mRecyclerView, errorMessage);
-        snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
+        showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), errorCode), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 loadMoreData();
             }
         });
-        snackbar.show();
+        HelperUtils.removeHelper(getFragmentManager(), MoreQueryHelper.MORE_QUERY_HELPER);
+
+        mIsLoadingMore = false;
+        mRecyclerAdapter.hideLoadMoreIndicator();
     }
 }

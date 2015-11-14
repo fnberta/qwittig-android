@@ -299,7 +299,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         }
 
         if (!Utils.isConnected(getActivity())) {
-            showSettlementErrorSnackbar(getString(R.string.toast_no_connection));
+            showErrorSnackbar(getString(R.string.toast_no_connection), getSettlementErrorRetryAction());
             return;
         }
 
@@ -325,6 +325,15 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
                 }
             }
         });
+    }
+
+    private View.OnClickListener getSettlementErrorRetryAction() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                newSettlement();
+            }
+        };
     }
 
     private void calculateNewSettlementWithHelper() {
@@ -358,21 +367,11 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     public void onNewSettlementCreationFailed(int errorCode) {
         final Activity context = getActivity();
         ParseErrorHandler.handleParseError(context, errorCode);
-        showSettlementErrorSnackbar(ParseErrorHandler.getErrorMessage(context, errorCode));
+        showErrorSnackbar(ParseErrorHandler.getErrorMessage(context, errorCode),
+                getSettlementErrorRetryAction());
         HelperUtils.removeHelper(getFragmentManager(), SETTLEMENT_HELPER);
 
         mFabProgressCircle.hide();
-    }
-
-    private void showSettlementErrorSnackbar(@NonNull String errorMessage) {
-        Snackbar snackbar = MessageUtils.getBasicSnackbar(mRecyclerView, errorMessage);
-        snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                newSettlement();
-            }
-        });
-        snackbar.show();
     }
 
     @Nullable

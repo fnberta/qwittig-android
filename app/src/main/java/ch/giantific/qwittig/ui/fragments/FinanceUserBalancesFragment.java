@@ -76,7 +76,7 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewOnlineFragment 
     protected void onlineQuery() {
         if (!Utils.isConnected(getActivity())) {
             setLoading(false);
-            showOnlineQueryErrorSnackbar(getString(R.string.toast_no_connection));
+            showErrorSnackbar(getString(R.string.toast_no_connection), getOnlineQueryRetryAction());
             return;
         }
 
@@ -101,7 +101,8 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewOnlineFragment 
      */
     public void onUserUpdateFailed(int errorCode) {
         ParseErrorHandler.handleParseError(getActivity(), errorCode);
-        showOnlineQueryErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), errorCode));
+        showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), errorCode),
+                getOnlineQueryRetryAction());
         HelperUtils.removeHelper(getFragmentManager(), USER_QUERY_HELPER);
 
         setLoading(false);
