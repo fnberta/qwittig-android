@@ -38,27 +38,6 @@ public class PurchaseEditSaveHelper extends PurchaseSaveHelper implements
     /**
      * Constructs a new {@link PurchaseEditSaveHelper} with a {@link Purchase} object, whether
      * the purchase was a draft or an already saved purchase and optionally the old receipt image
-     * as parameters.
-     * <p/>
-     * Using a non empty constructor to be able to pass a {@link com.parse.ParseObject}.
-     * Because the fragment  is retained across configuration changes, there is no risk that the
-     * system will recreate it with the default empty constructor.
-     *
-     * @param purchase            the {@link Purchase} object to save
-     * @param isDraft             whether we are saving a draft or an already saved purchase
-     * @param receiptParseFileOld the old receipt image
-     */
-    @SuppressLint("ValidFragment")
-    public PurchaseEditSaveHelper(@NonNull Purchase purchase, boolean isDraft,
-                                  @Nullable ParseFile receiptParseFileOld) {
-        this(purchase, isDraft, receiptParseFileOld, "");
-
-        mDeleteOldReceipt = true;
-    }
-
-    /**
-     * Constructs a new {@link PurchaseEditSaveHelper} with a {@link Purchase} object, whether
-     * the purchase was a draft or an already saved purchase and optionally the old receipt image
      * and the path to the new one as parameters.
      * <p/>
      * Using a non empty constructor to be able to pass a {@link com.parse.ParseObject}.
@@ -72,10 +51,11 @@ public class PurchaseEditSaveHelper extends PurchaseSaveHelper implements
      */
     @SuppressLint("ValidFragment")
     public PurchaseEditSaveHelper(@NonNull Purchase purchase, boolean isDraft,
-                                  @Nullable ParseFile receiptParseFileOld,
+                                  @Nullable ParseFile receiptParseFileOld, boolean deleteOldReceipt,
                                   @Nullable String receiptNewPath) {
         super(purchase, receiptNewPath);
 
+        mDeleteOldReceipt = deleteOldReceipt;
         mReceiptParseFileOld = receiptParseFileOld;
         mIsDraft = isDraft;
     }

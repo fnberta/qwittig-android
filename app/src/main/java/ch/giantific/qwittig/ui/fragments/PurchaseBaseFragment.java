@@ -71,6 +71,7 @@ import ch.giantific.qwittig.ComparatorParseUserIgnoreCase;
 import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.helpers.RatesHelper;
+import ch.giantific.qwittig.data.helpers.save.PurchaseSaveHelper;
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.domain.models.ItemRow;
 import ch.giantific.qwittig.domain.models.Receipt;
@@ -1162,6 +1163,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
                     mIsSaving = true;
                     mListener.progressCircleShow();
                     setPurchase();
+                    savePurchaseWithHelper();
                 }
             }
         }
@@ -1219,6 +1221,23 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      * the original one.
      */
     protected abstract void setPurchase();
+
+    private void savePurchaseWithHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        Fragment purchaseSaveHelper = HelperUtils.findHelper(fragmentManager, PURCHASE_SAVE_HELPER);
+
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (purchaseSaveHelper == null) {
+            purchaseSaveHelper = getSaveHelper();
+
+            fragmentManager.beginTransaction()
+                    .add(purchaseSaveHelper, PURCHASE_SAVE_HELPER)
+                    .commit();
+        }
+    }
+
+    protected abstract PurchaseSaveHelper getSaveHelper();
 
     /**
      * Provides an error handler for error codes. Passes the code to the generic error handler,

@@ -120,23 +120,11 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
         if (!TextUtils.isEmpty(mNote)) {
             mPurchase.setNote(mNote);
         }
-
-        savePurchaseWithHelper();
     }
 
-    private void savePurchaseWithHelper() {
-        FragmentManager fragmentManager = getFragmentManager();
-        Fragment purchaseSaveHelper = HelperUtils.findHelper(fragmentManager, PURCHASE_SAVE_HELPER);
-
-        // If the Fragment is non-null, then it is currently being
-        // retained across a configuration change.
-        if (purchaseSaveHelper == null) {
-            purchaseSaveHelper = new PurchaseSaveHelper(mPurchase, mReceiptImagePath);
-
-            fragmentManager.beginTransaction()
-                    .add(purchaseSaveHelper, PURCHASE_SAVE_HELPER)
-                    .commit();
-        }
+    @Override
+    protected PurchaseSaveHelper getSaveHelper() {
+        return new PurchaseSaveHelper(mPurchase, mReceiptImagePath);
     }
 
     @Override
