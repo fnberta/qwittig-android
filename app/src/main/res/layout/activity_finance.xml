@@ -33,7 +33,7 @@
                 android:background="?attr/colorPrimary"
                 android:gravity="bottom"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:layout_scrollFlags="scroll|enterAlways"
+                app:layout_scrollFlags="scroll|enterAlways|snap"
                 >
 
                 <TextView

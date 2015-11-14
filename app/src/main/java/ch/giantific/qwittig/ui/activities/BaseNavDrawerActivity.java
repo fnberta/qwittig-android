@@ -94,6 +94,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity {
     private ImageView mImageViewHeaderAvatar;
     private Spinner mSpinnerGroups;
     private NavHeaderGroupsArrayAdapter mSpinnerGroupsAdapter;
+    private View mNavigationViewHeader;
     @NonNull
     private List<ParseObject> mGroups = new ArrayList<>();
 
@@ -294,7 +295,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity {
 
     private void setupNavDrawer() {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        NavigationView navigationView = (NavigationView) findViewById(R.id.navdrawer_view);
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.navdrawer_view);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
@@ -306,6 +307,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity {
             }
         });
         mNavigationViewMenu = navigationView.getMenu();
+        mNavigationViewHeader = navigationView.getHeaderView(0);
 
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar,
                 R.string.drawer_open, R.string.drawer_close) {
@@ -332,9 +334,9 @@ public abstract class BaseNavDrawerActivity extends BaseActivity {
     }
 
     private void setupNavDrawerHeader() {
-        mTextViewHeaderNickname = (TextView) findViewById(R.id.tv_drawer_nickname);
-        mImageViewHeader = (ImageView) findViewById(R.id.iv_header_background);
-        mImageViewHeaderAvatar = (ImageView) findViewById(R.id.iv_drawer_avatar);
+        mTextViewHeaderNickname = (TextView) mNavigationViewHeader.findViewById(R.id.tv_drawer_nickname);
+        mImageViewHeader = (ImageView) mNavigationViewHeader.findViewById(R.id.iv_header_background);
+        mImageViewHeaderAvatar = (ImageView) mNavigationViewHeader.findViewById(R.id.iv_drawer_avatar);
         mImageViewHeaderAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -380,7 +382,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity {
     }
 
     private void setupNavDrawerHeaderGroupSpinner() {
-        mSpinnerGroups = (Spinner) findViewById(R.id.sp_drawer_group);
+        mSpinnerGroups = (Spinner) mNavigationViewHeader.findViewById(R.id.sp_drawer_group);
         mSpinnerGroupsAdapter = new NavHeaderGroupsArrayAdapter(this, mGroups);
         mSpinnerGroups.setAdapter(mSpinnerGroupsAdapter);
         mSpinnerGroups.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
