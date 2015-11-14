@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -355,12 +356,6 @@ public class PurchaseEditFragment extends PurchaseBaseFragment {
         }
     }
 
-    private void showDiscardChangesDialog() {
-        DiscardChangesDialogFragment discardChangesDialogFragment =
-                new DiscardChangesDialogFragment();
-        discardChangesDialogFragment.show(getFragmentManager(), DISCARD_CHANGES_DIALOG);
-    }
-
     private boolean changesWereMade() {
         if (mOldDate.compareTo(mDateSelected) != 0 || !mOldStore.equals(mStoreSelected) ||
                 !mOldCurrency.equals(mCurrencySelected) || !mOldNote.equals(mNote)) {
@@ -392,8 +387,8 @@ public class PurchaseEditFragment extends PurchaseBaseFragment {
 
             List<String> usersInvolvedOld = itemOld.getUsersInvolvedIds();
             List<String> usersInvolvedNew = itemRowNew.getParseUsersInvolvedIds(mUsersAvailableParse);
-            if (usersInvolvedOld.size() != usersInvolvedNew.size() ||
-                    !usersInvolvedOld.equals(usersInvolvedNew)) {
+            if (!usersInvolvedNew.containsAll(usersInvolvedOld) ||
+                    !usersInvolvedOld.containsAll(usersInvolvedNew)) {
                 return true;
             }
         }
@@ -401,6 +396,12 @@ public class PurchaseEditFragment extends PurchaseBaseFragment {
         // TODO: check if receipt images changed, difficult as new parse file gets created in save helper
 
         return false;
+    }
+
+    private void showDiscardChangesDialog() {
+        DiscardChangesDialogFragment discardChangesDialogFragment =
+                new DiscardChangesDialogFragment();
+        discardChangesDialogFragment.show(getFragmentManager(), DISCARD_CHANGES_DIALOG);
     }
 
     @Override

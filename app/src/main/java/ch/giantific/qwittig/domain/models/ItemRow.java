@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.ui.widgets.ListCheckBox;
 import ch.giantific.qwittig.utils.MoneyUtils;
 
@@ -232,14 +233,12 @@ public class ItemRow {
      */
     @NonNull
     public List<String> getParseUsersInvolvedIds(@NonNull List<ParseUser> usersAvailable) {
-        int usersAvailableParseSize = usersAvailable.size();
-        final List<String> usersInvolved = new ArrayList<>(usersAvailableParseSize);
-
+        final List<String> usersInvolved = new ArrayList<>();
         boolean[] usersChecked = getUsersChecked();
-        for (int i = 0; i < usersAvailableParseSize; i++) {
-            ParseUser parseUser = usersAvailable.get(i);
+        for (int i = 0, usersSize = usersAvailable.size(); i < usersSize; i++) {
+            User user = (User) usersAvailable.get(i);
             if (usersChecked[i]) {
-                usersInvolved.add(parseUser.getObjectId());
+                usersInvolved.add(user.getObjectId());
             }
         }
         return usersInvolved;
