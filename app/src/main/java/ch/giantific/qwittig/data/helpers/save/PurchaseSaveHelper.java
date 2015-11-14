@@ -85,13 +85,13 @@ public class PurchaseSaveHelper extends BaseHelper {
 
     void checkReceiptImage() {
         if (!TextUtils.isEmpty(mReceiptPath)) {
-            saveReceiptFile();
+            getReceiptFile();
         } else {
             savePurchase();
         }
     }
 
-    final void saveReceiptFile() {
+    final void getReceiptFile() {
         Glide.with(this).load(mReceiptPath)
                 .asBitmap()
                 .toBytes(Bitmap.CompressFormat.JPEG, Receipt.JPEG_COMPRESSION_RATE)
@@ -100,24 +100,27 @@ public class PurchaseSaveHelper extends BaseHelper {
                     @Override
                     public void onResourceReady(@NonNull byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
                         ParseFile file = new ParseFile(Receipt.PARSE_FILE_NAME, resource);
-                        mPurchase.setReceiptParseFile(file);
-
-                        file.saveInBackground(new SaveCallback() {
-                            @Override
-                            public void done(@Nullable ParseException e) {
-                                if (e != null && mListener != null) {
-                                    mListener.onPurchaseSaveFailed(e.getCode());
-                                    return;
-                                }
-
-                                onReceiptFileSaved();
-                            }
-                        });
+                        saveReceiptParseFile(file);
                     }
                 });
     }
 
-    void onReceiptFileSaved() {
+    final void saveReceiptParseFile(final ParseFile receipt) {
+        receipt.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(@Nullable ParseException e) {
+                if (e != null && mListener != null) {
+                    mListener.onPurchaseSaveFailed(e.getCode());
+                    return;
+                }
+
+                onReceiptFileSaved(receipt);
+            }
+        });
+    }
+
+    void onReceiptFileSaved(ParseFile receipt) {
+        mPurchase.setReceiptParseFile(receipt);
         savePurchase();
     }
 

@@ -4,8 +4,6 @@
 
 package ch.giantific.qwittig.ui.fragments;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -27,7 +25,6 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.helpers.save.PurchaseSaveHelper;
 import ch.giantific.qwittig.domain.models.ItemRow;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
-import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 
 /**
@@ -120,23 +117,11 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
         if (!TextUtils.isEmpty(mNote)) {
             mPurchase.setNote(mNote);
         }
-
-        savePurchaseWithHelper();
     }
 
-    private void savePurchaseWithHelper() {
-        FragmentManager fragmentManager = getFragmentManager();
-        Fragment purchaseSaveHelper = HelperUtils.findHelper(fragmentManager, PURCHASE_SAVE_HELPER);
-
-        // If the Fragment is non-null, then it is currently being
-        // retained across a configuration change.
-        if (purchaseSaveHelper == null) {
-            purchaseSaveHelper = new PurchaseSaveHelper(mPurchase, mReceiptImagePath);
-
-            fragmentManager.beginTransaction()
-                    .add(purchaseSaveHelper, PURCHASE_SAVE_HELPER)
-                    .commit();
-        }
+    @Override
+    protected PurchaseSaveHelper getSaveHelper() {
+        return new PurchaseSaveHelper(mPurchase, mReceiptImagePath);
     }
 
     @Override

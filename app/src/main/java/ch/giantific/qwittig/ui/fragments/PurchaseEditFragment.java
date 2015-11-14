@@ -4,12 +4,10 @@
 
 package ch.giantific.qwittig.ui.fragments;
 
-import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -21,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 
 import ch.giantific.qwittig.data.helpers.save.PurchaseEditSaveHelper;
+import ch.giantific.qwittig.data.helpers.save.PurchaseSaveHelper;
 import ch.giantific.qwittig.data.repositories.ParsePurchaseRepository;
 import ch.giantific.qwittig.domain.models.ItemRow;
 import ch.giantific.qwittig.domain.models.parse.Item;
@@ -152,7 +151,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment {
             fetchUsersAvailable();
 
             // check if there is a receipt image file and update action bar menu accordingly
-            mListener.setHasReceiptFile(getOldReceiptFile() != null);
+            mListener.setHasReceiptFile(hasOldReceiptFile());
 
             // set note to value from original purchase
             String oldNote = mPurchase.getNote();
@@ -178,6 +177,14 @@ public class PurchaseEditFragment extends PurchaseBaseFragment {
         }
     }
 
+    boolean hasOldReceiptFile() {
+        return getOldReceiptFile() != null;
+    }
+
+    ParseFile getOldReceiptFile() {
+        return mPurchase.getReceiptParseFile();
+    }
+
     @Override
     void updateExchangeRate() {
         if (!mOldValuesAreSet && !mOldCurrency.equals(mCurrentGroupCurrency)) {
@@ -186,10 +193,6 @@ public class PurchaseEditFragment extends PurchaseBaseFragment {
         } else {
             super.updateExchangeRate();
         }
-    }
-
-    ParseFile getOldReceiptFile() {
-        return mPurchase.getReceiptParseFile();
     }
 
     @Override
@@ -272,7 +275,6 @@ public class PurchaseEditFragment extends PurchaseBaseFragment {
     protected void setPurchase() {
         replacePurchaseData();
         resetReadBy();
-        savePurchaseWithHelper();
     }
 
     final void replacePurchaseData() {
@@ -298,26 +300,10 @@ public class PurchaseEditFragment extends PurchaseBaseFragment {
         mPurchase.resetReadBy(mCurrentUser);
     }
 
-    private void savePurchaseWithHelper() {
-        FragmentManager fragmentManager = getFragmentManager();
-        PurchaseEditSaveHelper purchaseEditSaveHelper = (PurchaseEditSaveHelper)
-                fragmentManager.findFragmentByTag(PURCHASE_SAVE_HELPER);
-
-        // If the Fragment is non-null, then it is currently being
-        // retained across a configuration change.
-        if (purchaseEditSaveHelper == null) {
-            if (mDeleteOldReceipt) {
-                purchaseEditSaveHelper = new PurchaseEditSaveHelper(mPurchase, isDraft(),
-                        getOldReceiptFile());
-            } else {
-                purchaseEditSaveHelper = new PurchaseEditSaveHelper(mPurchase, isDraft(),
-                        getOldReceiptFile(), mReceiptImagePath);
-            }
-
-            fragmentManager.beginTransaction()
-                    .add(purchaseEditSaveHelper, PURCHASE_SAVE_HELPER)
-                    .commit();
-        }
+    @Override
+    protected PurchaseSaveHelper getSaveHelper() {
+        return new PurchaseEditSaveHelper(mPurchase, isDraft(), getOldReceiptFile(),
+                mDeleteOldReceipt, mReceiptImagePath);
     }
 
     boolean isDraft() {

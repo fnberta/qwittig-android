@@ -13,8 +13,8 @@ import com.parse.DeleteCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 
-import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.data.rest.CloudCodeClient;
+import ch.giantific.qwittig.domain.models.parse.Purchase;
 
 /**
  * Saves an edited {@link Purchase} object and if there is a new receipt image, deletes the old
@@ -38,27 +38,6 @@ public class PurchaseEditSaveHelper extends PurchaseSaveHelper implements
     /**
      * Constructs a new {@link PurchaseEditSaveHelper} with a {@link Purchase} object, whether
      * the purchase was a draft or an already saved purchase and optionally the old receipt image
-     * as parameters.
-     * <p/>
-     * Using a non empty constructor to be able to pass a {@link com.parse.ParseObject}.
-     * Because the fragment  is retained across configuration changes, there is no risk that the
-     * system will recreate it with the default empty constructor.
-     *
-     * @param purchase            the {@link Purchase} object to save
-     * @param isDraft             whether we are saving a draft or an already saved purchase
-     * @param receiptParseFileOld the old receipt image
-     */
-    @SuppressLint("ValidFragment")
-    public PurchaseEditSaveHelper(@NonNull Purchase purchase, boolean isDraft,
-                                  @Nullable ParseFile receiptParseFileOld) {
-        this(purchase, isDraft, receiptParseFileOld, "");
-
-        mDeleteOldReceipt = true;
-    }
-
-    /**
-     * Constructs a new {@link PurchaseEditSaveHelper} with a {@link Purchase} object, whether
-     * the purchase was a draft or an already saved purchase and optionally the old receipt image
      * and the path to the new one as parameters.
      * <p/>
      * Using a non empty constructor to be able to pass a {@link com.parse.ParseObject}.
@@ -72,10 +51,11 @@ public class PurchaseEditSaveHelper extends PurchaseSaveHelper implements
      */
     @SuppressLint("ValidFragment")
     public PurchaseEditSaveHelper(@NonNull Purchase purchase, boolean isDraft,
-                                  @Nullable ParseFile receiptParseFileOld,
+                                  @Nullable ParseFile receiptParseFileOld, boolean deleteOldReceipt,
                                   @Nullable String receiptNewPath) {
         super(purchase, receiptNewPath);
 
+        mDeleteOldReceipt = deleteOldReceipt;
         mReceiptParseFileOld = receiptParseFileOld;
         mIsDraft = isDraft;
     }
@@ -83,21 +63,27 @@ public class PurchaseEditSaveHelper extends PurchaseSaveHelper implements
     @Override
     void checkReceiptImage() {
         if (!TextUtils.isEmpty(mReceiptPath)) {
-            if (mReceiptParseFileOld != null) {
+            if (mReceiptParseFileOld != null && !mIsDraft) {
                 deleteOldReceiptFile();
             } else {
-                saveReceiptFile();
+                getReceiptFile();
             }
-        } else if (mDeleteOldReceipt && mReceiptParseFileOld != null) {
-            deleteOldReceiptFile();
-            mPurchase.removeReceiptParseFile();
+        } else if (mReceiptParseFileOld != null) {
+            if (mIsDraft) {
+                saveReceiptParseFile(mReceiptParseFileOld);
+            } else if (mDeleteOldReceipt) {
+                deleteOldReceiptFile();
+                mPurchase.removeReceiptParseFile();
+            } else {
+                savePurchase();
+            }
         } else {
             savePurchase();
         }
     }
 
     private void deleteOldReceiptFile() {
-        String fileName = mReceiptParseFileOld.getName();
+        final String fileName = mReceiptParseFileOld.getName();
         if (!TextUtils.isEmpty(fileName)) {
             CloudCodeClient cloudCode = new CloudCodeClient();
             cloudCode.deleteParseFile(fileName, this);
@@ -117,12 +103,12 @@ public class PurchaseEditSaveHelper extends PurchaseSaveHelper implements
     }
 
     @Override
-    void onReceiptFileSaved() {
+    void onReceiptFileSaved(ParseFile receipt) {
         if (mIsDraft) {
             mPurchase.removeReceiptData();
         }
 
-        super.onReceiptFileSaved();
+        super.onReceiptFileSaved(receipt);
     }
 
     @Override

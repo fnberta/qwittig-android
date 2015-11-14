@@ -71,6 +71,7 @@ import ch.giantific.qwittig.ComparatorParseUserIgnoreCase;
 import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.helpers.RatesHelper;
+import ch.giantific.qwittig.data.helpers.save.PurchaseSaveHelper;
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.domain.models.ItemRow;
 import ch.giantific.qwittig.domain.models.Receipt;
@@ -138,6 +139,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     private static final String STATE_DATE_SELECTED = "STATE_DATE_SELECTED";
     private static final String STATE_PURCHASE_USERS_INVOLVED = "STATE_PURCHASE_USERS_INVOLVED";
     private static final String STATE_CURRENCY_SELECTED = "STATE_CURRENCY_SELECTED";
+    private static final String STATE_NOTE = "STATE_NOTE";
     private static final String STATE_IS_SAVING = "STATE_IS_SAVING";
     private static final String STATE_IS_FETCHING_RATES = "STATE_IS_FETCHING_RATES";
     private static final String STATE_RECEIPT_IMAGES_PATHS = "STATE_RECEIPT_IMAGES_PATHS";
@@ -210,6 +212,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
             mPurchaseUsersInvolved = savedInstanceState.getBooleanArray(STATE_PURCHASE_USERS_INVOLVED);
             mCurrencySelected = savedInstanceState.getString(STATE_CURRENCY_SELECTED, mCurrentGroupCurrency);
             mStoreSelected = savedInstanceState.getString(STATE_STORE_SELECTED, "");
+            mNote = savedInstanceState.getString(STATE_NOTE, "");
             mIsSaving = savedInstanceState.getBoolean(STATE_IS_SAVING);
             mIsFetchingExchangeRates = savedInstanceState.getBoolean(STATE_IS_FETCHING_RATES);
             if (USE_CUSTOM_CAMERA) {
@@ -236,6 +239,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         outState.putString(STATE_STORE_SELECTED, mStoreSelected);
         outState.putBooleanArray(STATE_PURCHASE_USERS_INVOLVED, mPurchaseUsersInvolved);
         outState.putString(STATE_CURRENCY_SELECTED, mCurrencySelected);
+        outState.putString(STATE_NOTE, mNote);
         outState.putBoolean(STATE_IS_SAVING, mIsSaving);
         outState.putBoolean(STATE_IS_FETCHING_RATES, mIsFetchingExchangeRates);
         if (USE_CUSTOM_CAMERA) {
@@ -1159,6 +1163,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
                     mIsSaving = true;
                     mListener.progressCircleShow();
                     setPurchase();
+                    savePurchaseWithHelper();
                 }
             }
         }
@@ -1216,6 +1221,23 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      * the original one.
      */
     protected abstract void setPurchase();
+
+    private void savePurchaseWithHelper() {
+        FragmentManager fragmentManager = getFragmentManager();
+        Fragment purchaseSaveHelper = HelperUtils.findHelper(fragmentManager, PURCHASE_SAVE_HELPER);
+
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (purchaseSaveHelper == null) {
+            purchaseSaveHelper = getSaveHelper();
+
+            fragmentManager.beginTransaction()
+                    .add(purchaseSaveHelper, PURCHASE_SAVE_HELPER)
+                    .commit();
+        }
+    }
+
+    protected abstract PurchaseSaveHelper getSaveHelper();
 
     /**
      * Provides an error handler for error codes. Passes the code to the generic error handler,
