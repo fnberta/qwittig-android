@@ -105,17 +105,10 @@ import ch.giantific.qwittig.utils.Utils;
 public abstract class PurchaseBaseFragment extends BaseFragment implements
         PurchaseUsersInvolvedRecyclerAdapter.AdapterInteractionListener {
 
-    @IntDef({PURCHASE_SAVED, PURCHASE_SAVED_AUTO, PURCHASE_DISCARDED, PURCHASE_SAVED_AS_DRAFT,
-            PURCHASE_DRAFT_DELETED, PURCHASE_ERROR, PURCHASE_NO_CHANGES})
+    @IntDef({RESULT_PURCHASE_SAVED, RESULT_PURCHASE_SAVED_AUTO, RESULT_PURCHASE_DRAFT, RESULT_PURCHASE_ERROR,
+            RESULT_PURCHASE_DISCARDED, RESULT_PURCHASE_DRAFT_DELETED, Activity.RESULT_CANCELED})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface PurchaseAction {}
-    public static final int PURCHASE_SAVED = 0;
-    public static final int PURCHASE_SAVED_AUTO = 1;
-    public static final int PURCHASE_DISCARDED = 2;
-    public static final int PURCHASE_SAVED_AS_DRAFT = 3;
-    public static final int PURCHASE_DRAFT_DELETED = 4;
-    public static final int PURCHASE_ERROR = 5;
-    public static final int PURCHASE_NO_CHANGES = 6;
+    public @interface PurchaseResults {}
     public static final int RESULT_PURCHASE_SAVED = 2;
     public static final int RESULT_PURCHASE_SAVED_AUTO = 3;
     public static final int RESULT_PURCHASE_DRAFT = 4;
@@ -1000,7 +993,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
                 imageFile = CameraUtils.createImageFile(context);
             } catch (IOException e) {
                 // Error occurred while creating the File
-                setResultForSnackbar(PURCHASE_ERROR);
+                setResultForSnackbar(RESULT_PURCHASE_ERROR);
                 finishPurchase();
                 return;
             }
@@ -1268,9 +1261,9 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         mListener.progressCircleStartFinal();
     }
 
-    @PurchaseAction
+    @PurchaseResults
     int getPurchaseSavedAction() {
-        return PURCHASE_SAVED;
+        return RESULT_PURCHASE_SAVED;
     }
 
     /**
@@ -1324,7 +1317,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     private void onPinAsDraftSucceeded() {
-        setResultForSnackbar(PURCHASE_SAVED_AS_DRAFT);
+        setResultForSnackbar(RESULT_PURCHASE_DRAFT);
         finishPurchase();
     }
 
@@ -1332,34 +1325,12 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      * Sets the activity result to discarded and finishes.
      */
     public void onDiscardPurchaseSelected() {
-        setResultForSnackbar(PURCHASE_DISCARDED);
+        setResultForSnackbar(RESULT_PURCHASE_DISCARDED);
         finishPurchase();
     }
 
-    final void setResultForSnackbar(@PurchaseAction int purchaseAction) {
-        switch (purchaseAction) {
-            case PURCHASE_SAVED:
-                getActivity().setResult(RESULT_PURCHASE_SAVED);
-                break;
-            case PURCHASE_SAVED_AUTO:
-                getActivity().setResult(RESULT_PURCHASE_SAVED_AUTO);
-                break;
-            case PURCHASE_DISCARDED:
-                getActivity().setResult(RESULT_PURCHASE_DISCARDED);
-                break;
-            case PURCHASE_SAVED_AS_DRAFT:
-                getActivity().setResult(RESULT_PURCHASE_DRAFT);
-                break;
-            case PURCHASE_DRAFT_DELETED:
-                getActivity().setResult(RESULT_PURCHASE_DRAFT_DELETED);
-                break;
-            case PURCHASE_ERROR:
-                getActivity().setResult(RESULT_PURCHASE_ERROR);
-                break;
-            case PURCHASE_NO_CHANGES:
-                getActivity().setResult(Activity.RESULT_CANCELED);
-                break;
-        }
+    final void setResultForSnackbar(@PurchaseResults int resultCode) {
+        getActivity().setResult(resultCode);
     }
 
     /**

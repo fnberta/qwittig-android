@@ -36,9 +36,7 @@ import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.TaskUser;
-import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.Task;
-import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.ui.adapters.StringResSpinnerAdapter;
@@ -60,12 +58,9 @@ public class TaskAddFragment extends BaseFragment implements
         UserRepository.GetUsersLocalListener,
         TaskUsersInvolvedRecyclerAdapter.AdapterInteractionListener {
 
-    @IntDef({TASK_SAVED, TASK_DISCARDED, TASK_NO_CHANGES})
+    @IntDef({RESULT_TASK_SAVED, RESULT_TASK_DISCARDED, Activity.RESULT_CANCELED})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface TaskAction {}
-    public static final int TASK_SAVED = 0;
-    public static final int TASK_DISCARDED = 1;
-    public static final int TASK_NO_CHANGES = 2;
+    public @interface TaskResult {}
     public static final int RESULT_TASK_SAVED = 2;
     public static final int RESULT_TASK_DISCARDED = 3;
     private static final String STATE_DEADLINE_SELECTED = "STATE_DEADLINE_SELECTED";
@@ -318,7 +313,7 @@ public class TaskAddFragment extends BaseFragment implements
             public void done(@Nullable ParseException e) {
                 if (e == null) {
                     task.saveEventually();
-                    finish(TASK_SAVED);
+                    finish(RESULT_TASK_SAVED);
                 }
             }
         });
@@ -362,21 +357,11 @@ public class TaskAddFragment extends BaseFragment implements
      * Sets the activity result depending on the action taken and finishes the hosting
      * {@link Activity}.
      *
-     * @param taskAction the task according to which to set the activity result
+     * @param taskResult the task according to which to set the activity result
      */
-    public void finish(@TaskAction int taskAction) {
-        Activity activity = getActivity();
-        switch (taskAction) {
-            case TASK_SAVED:
-                activity.setResult(RESULT_TASK_SAVED);
-                break;
-            case TASK_DISCARDED:
-                activity.setResult(RESULT_TASK_DISCARDED);
-                break;
-            case TASK_NO_CHANGES:
-                activity.setResult(Activity.RESULT_CANCELED);
-                break;
-        }
+    public void finish(@TaskResult int taskResult) {
+        final Activity activity = getActivity();
+        activity.setResult(taskResult);
         ActivityCompat.finishAfterTransition(activity);
     }
 
@@ -430,7 +415,7 @@ public class TaskAddFragment extends BaseFragment implements
         if (changesWereMade()) {
             showDiscardChangesDialog();
         } else {
-            finish(TASK_NO_CHANGES);
+            finish(Activity.RESULT_CANCELED);
         }
     }
 

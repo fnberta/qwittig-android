@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.ui.fragments;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -337,7 +338,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment {
         if (changesWereMade()) {
             showDiscardChangesDialog();
         } else {
-            setResultForSnackbar(PURCHASE_NO_CHANGES);
+            setResultForSnackbar(Activity.RESULT_CANCELED);
             finishPurchase();
         }
     }

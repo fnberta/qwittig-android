@@ -81,7 +81,7 @@ public class PurchaseEditDraftFragment extends PurchaseEditFragment {
             @Override
             public void done(@Nullable ParseException e) {
                 if (e == null) {
-                    setResultForSnackbar(PURCHASE_DRAFT_DELETED);
+                    setResultForSnackbar(RESULT_PURCHASE_DRAFT_DELETED);
                     finishPurchase();
                 }
             }

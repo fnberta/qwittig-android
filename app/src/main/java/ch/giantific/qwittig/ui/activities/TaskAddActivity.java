@@ -134,7 +134,7 @@ public class TaskAddActivity extends BaseActivity implements
 
     @Override
     public void onDiscardChangesSelected() {
-        mTaskAddFragment.finish(TaskAddFragment.TASK_DISCARDED);
+        mTaskAddFragment.finish(TaskAddFragment.RESULT_TASK_DISCARDED);
     }
 
     @Override

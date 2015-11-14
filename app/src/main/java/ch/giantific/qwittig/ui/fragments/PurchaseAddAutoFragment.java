@@ -149,7 +149,7 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
                         doReceiptOcrWithHelper();
                         break;
                     case Activity.RESULT_CANCELED:
-                        setResultForSnackbar(PURCHASE_DISCARDED);
+                        setResultForSnackbar(RESULT_PURCHASE_DISCARDED);
                         getActivity().finish();
                         break;
                 }
@@ -249,8 +249,8 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
     }
 
     @Override
-    @PurchaseAction
+    @PurchaseResults
     int getPurchaseSavedAction() {
-        return PURCHASE_SAVED_AUTO;
+        return RESULT_PURCHASE_SAVED_AUTO;
     }
 }
