@@ -138,6 +138,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     private static final String STATE_DATE_SELECTED = "STATE_DATE_SELECTED";
     private static final String STATE_PURCHASE_USERS_INVOLVED = "STATE_PURCHASE_USERS_INVOLVED";
     private static final String STATE_CURRENCY_SELECTED = "STATE_CURRENCY_SELECTED";
+    private static final String STATE_NOTE = "STATE_NOTE";
     private static final String STATE_IS_SAVING = "STATE_IS_SAVING";
     private static final String STATE_IS_FETCHING_RATES = "STATE_IS_FETCHING_RATES";
     private static final String STATE_RECEIPT_IMAGES_PATHS = "STATE_RECEIPT_IMAGES_PATHS";
@@ -210,6 +211,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
             mPurchaseUsersInvolved = savedInstanceState.getBooleanArray(STATE_PURCHASE_USERS_INVOLVED);
             mCurrencySelected = savedInstanceState.getString(STATE_CURRENCY_SELECTED, mCurrentGroupCurrency);
             mStoreSelected = savedInstanceState.getString(STATE_STORE_SELECTED, "");
+            mNote = savedInstanceState.getString(STATE_NOTE, "");
             mIsSaving = savedInstanceState.getBoolean(STATE_IS_SAVING);
             mIsFetchingExchangeRates = savedInstanceState.getBoolean(STATE_IS_FETCHING_RATES);
             if (USE_CUSTOM_CAMERA) {
@@ -236,6 +238,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         outState.putString(STATE_STORE_SELECTED, mStoreSelected);
         outState.putBooleanArray(STATE_PURCHASE_USERS_INVOLVED, mPurchaseUsersInvolved);
         outState.putString(STATE_CURRENCY_SELECTED, mCurrencySelected);
+        outState.putString(STATE_NOTE, mNote);
         outState.putBoolean(STATE_IS_SAVING, mIsSaving);
         outState.putBoolean(STATE_IS_FETCHING_RATES, mIsFetchingExchangeRates);
         if (USE_CUSTOM_CAMERA) {

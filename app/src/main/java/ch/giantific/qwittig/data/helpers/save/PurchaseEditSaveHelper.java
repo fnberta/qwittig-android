@@ -83,21 +83,27 @@ public class PurchaseEditSaveHelper extends PurchaseSaveHelper implements
     @Override
     void checkReceiptImage() {
         if (!TextUtils.isEmpty(mReceiptPath)) {
-            if (mReceiptParseFileOld != null) {
+            if (mReceiptParseFileOld != null && !mIsDraft) {
                 deleteOldReceiptFile();
             } else {
-                saveReceiptFile();
+                getReceiptFile();
             }
-        } else if (mDeleteOldReceipt && mReceiptParseFileOld != null) {
-            deleteOldReceiptFile();
-            mPurchase.removeReceiptParseFile();
+        } else if (mReceiptParseFileOld != null) {
+            if (mIsDraft) {
+                saveReceiptParseFile(mReceiptParseFileOld);
+            } else if (mDeleteOldReceipt) {
+                deleteOldReceiptFile();
+                mPurchase.removeReceiptParseFile();
+            } else {
+                savePurchase();
+            }
         } else {
             savePurchase();
         }
     }
 
     private void deleteOldReceiptFile() {
-        String fileName = mReceiptParseFileOld.getName();
+        final String fileName = mReceiptParseFileOld.getName();
         if (!TextUtils.isEmpty(fileName)) {
             CloudCodeClient cloudCode = new CloudCodeClient();
             cloudCode.deleteParseFile(fileName, this);
@@ -117,12 +123,12 @@ public class PurchaseEditSaveHelper extends PurchaseSaveHelper implements
     }
 
     @Override
-    void onReceiptFileSaved() {
+    void onReceiptFileSaved(ParseFile receipt) {
         if (mIsDraft) {
             mPurchase.removeReceiptData();
         }
 
-        super.onReceiptFileSaved();
+        super.onReceiptFileSaved(receipt);
     }
 
     @Override

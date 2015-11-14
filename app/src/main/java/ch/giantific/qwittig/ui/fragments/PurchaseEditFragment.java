@@ -152,7 +152,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment {
             fetchUsersAvailable();
 
             // check if there is a receipt image file and update action bar menu accordingly
-            mListener.setHasReceiptFile(getOldReceiptFile() != null);
+            mListener.setHasReceiptFile(hasOldReceiptFile());
 
             // set note to value from original purchase
             String oldNote = mPurchase.getNote();
@@ -178,6 +178,14 @@ public class PurchaseEditFragment extends PurchaseBaseFragment {
         }
     }
 
+    boolean hasOldReceiptFile() {
+        return getOldReceiptFile() != null;
+    }
+
+    ParseFile getOldReceiptFile() {
+        return mPurchase.getReceiptParseFile();
+    }
+
     @Override
     void updateExchangeRate() {
         if (!mOldValuesAreSet && !mOldCurrency.equals(mCurrentGroupCurrency)) {
@@ -186,10 +194,6 @@ public class PurchaseEditFragment extends PurchaseBaseFragment {
         } else {
             super.updateExchangeRate();
         }
-    }
-
-    ParseFile getOldReceiptFile() {
-        return mPurchase.getReceiptParseFile();
     }
 
     @Override

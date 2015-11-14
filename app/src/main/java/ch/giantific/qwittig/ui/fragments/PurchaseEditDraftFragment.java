@@ -98,15 +98,10 @@ public class PurchaseEditDraftFragment extends PurchaseEditFragment {
         });
     }
 
-    @Nullable
     @Override
-    ParseFile getOldReceiptFile() {
+    boolean hasOldReceiptFile() {
         byte[] receiptData = mPurchase.getReceiptData();
-        if (receiptData != null) {
-            return new ParseFile(Receipt.PARSE_FILE_NAME, receiptData);
-        }
-
-        return null;
+        return receiptData != null;
     }
 
     @Override
@@ -114,6 +109,17 @@ public class PurchaseEditDraftFragment extends PurchaseEditFragment {
         mPurchase.removeDraftId();
 
         super.setPurchase();
+    }
+
+    @Override
+    @Nullable
+    ParseFile getOldReceiptFile() {
+        byte[] receiptData = mPurchase.getReceiptData();
+        if (receiptData != null) {
+            return new ParseFile(Receipt.PARSE_FILE_NAME, receiptData);
+        }
+
+        return null;
     }
 
     @Override
