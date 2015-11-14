@@ -380,7 +380,9 @@ public class PurchaseEditFragment extends PurchaseBaseFragment {
             }
         }
 
-        // TODO: check if receipt images changed, difficult as new parse file gets created in save helper
+        if (mDeleteOldReceipt || !TextUtils.isEmpty(mReceiptImagePath)) {
+            return true;
+        }
 
         return false;
     }
