@@ -60,6 +60,8 @@
     <!-- FAB -->
     <dimen name="fab_elevation">6dp</dimen>
     <dimen name="fab_margin_toolbar_x4">196dp</dimen>
+    <dimen name="fab_margin_toolbar_x2">84dp</dimen>
+    <dimen name="fab_mini_margin_toolbar_x2">92dp</dimen>
 
     <!-- CardView -->
     <dimen name="card_elevation">2dp</dimen>

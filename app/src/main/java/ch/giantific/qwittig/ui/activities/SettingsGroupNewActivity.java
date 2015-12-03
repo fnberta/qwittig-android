@@ -12,16 +12,17 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.transition.Transition;
+import android.view.MenuItem;
 import android.view.View;
 
-import com.github.jorgecastilloprz.FABProgressCircle;
-import com.github.jorgecastilloprz.listeners.FABProgressListener;
-
+import ch.berta.fabio.fabprogress.FabProgress;
+import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.data.helpers.group.CreateGroupHelper;
+import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.ui.fragments.SettingsGroupNewFragment;
 import ch.giantific.qwittig.ui.listeners.TransitionListenerAdapter;
 import ch.giantific.qwittig.utils.Utils;
@@ -33,20 +34,16 @@ import ch.giantific.qwittig.utils.Utils;
  * the circle loading animation of the {@link FloatingActionButton}.
  * <p/>
  * Subclass of {@link BaseActivity}.
- *
- * @see FABProgressCircle
  */
 public class SettingsGroupNewActivity extends BaseActivity implements
         SettingsGroupNewFragment.FragmentInteractionListener,
-        FABProgressListener,
         CreateGroupHelper.HelperInteractionListener {
 
     public static final String RESULT_DATA_GROUP = "RESULT_DATA_GROUP";
     private static final String STATE_GROUP_NEW_FRAGMENT = "STATE_GROUP_NEW_FRAGMENT";
     private static final String LOG_TAG = SettingsGroupNewActivity.class.getSimpleName();
     private SettingsGroupNewFragment mSettingsGroupNewFragment;
-    private FloatingActionButton mFab;
-    private FABProgressCircle mFabProgressCircle;
+    private FabProgress mFabProgress;
     private String mNewGroupName;
 
     @Override
@@ -54,22 +51,32 @@ public class SettingsGroupNewActivity extends BaseActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings_group_new);
 
-        mFab = (FloatingActionButton) findViewById(R.id.fab_group_new);
-        mFab.setOnClickListener(new View.OnClickListener() {
+        mFabProgress = (FabProgress) findViewById(R.id.fab_group_new);
+        mFabProgress.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mSettingsGroupNewFragment.addNewGroup();
             }
         });
-        mFabProgressCircle = (FABProgressCircle) findViewById(R.id.fab_group_new_circle);
-        mFabProgressCircle.attachListener(this);
+        final SettingsGroupNewActivity activity = this;
+        mFabProgress.setProgressFinalAnimationListener(new ProgressFinalAnimationListener() {
+            @Override
+            public void onProgressFinalAnimationComplete() {
+                mSettingsGroupNewFragment.setIsCreatingNew(false);
+
+                Intent intentNewGroupName = new Intent();
+                intentNewGroupName.putExtra(RESULT_DATA_GROUP, mNewGroupName);
+                setResult(RESULT_OK, intentNewGroupName);
+                ActivityCompat.finishAfterTransition(activity);
+            }
+        });
 
         FragmentManager fragmentManager = getFragmentManager();
         if (savedInstanceState == null) {
             if (Utils.isRunningLollipopAndHigher()) {
                 addActivityTransitionListener();
             } else {
-                mFab.show();
+                mFabProgress.show();
             }
 
             mSettingsGroupNewFragment = new SettingsGroupNewFragment();
@@ -77,10 +84,10 @@ public class SettingsGroupNewActivity extends BaseActivity implements
                     .add(R.id.container, mSettingsGroupNewFragment)
                     .commit();
         } else {
+            mFabProgress.show();
+
             mSettingsGroupNewFragment = (SettingsGroupNewFragment) fragmentManager
                     .getFragment(savedInstanceState, STATE_GROUP_NEW_FRAGMENT);
-
-            mFab.show();
         }
     }
 
@@ -93,7 +100,7 @@ public class SettingsGroupNewActivity extends BaseActivity implements
                 super.onTransitionEnd(transition);
                 transition.removeListener(this);
 
-                mFab.show();
+                mFabProgress.show();
             }
         });
     }
@@ -106,23 +113,32 @@ public class SettingsGroupNewActivity extends BaseActivity implements
     }
 
     @Override
-    public void progressCircleShow() {
-        mFabProgressCircle.show();
+    public boolean onOptionsItemSelected(MenuItem item) {
+        final int id = item.getItemId();
+        if (id == android.R.id.home) {
+            return checkIfCreatingNew() || super.onOptionsItemSelected(item);
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private boolean checkIfCreatingNew() {
+        if (mSettingsGroupNewFragment.isCreatingNew()) {
+            Snackbar.make(mToolbar, R.string.toast_creating_group, Snackbar.LENGTH_LONG).show();
+            return true;
+        }
+
+        return false;
     }
 
     @Override
-    public void progressCircleHide() {
-        mFabProgressCircle.hide();
+    public void startProgressAnim() {
+        mFabProgress.startProgress();
     }
 
     @Override
-    public void onFABProgressAnimationEnd() {
-        mSettingsGroupNewFragment.setIsCreatingNew(false);
-
-        Intent intentNewGroupName = new Intent();
-        intentNewGroupName.putExtra(RESULT_DATA_GROUP, mNewGroupName);
-        setResult(RESULT_OK, intentNewGroupName);
-        ActivityCompat.finishAfterTransition(this);
+    public void stopProgressAnim() {
+        mFabProgress.stopProgress();
     }
 
     @Override
@@ -148,6 +164,13 @@ public class SettingsGroupNewActivity extends BaseActivity implements
     @Override
     public void finishGroupCreation(@NonNull String newGroupName) {
         mNewGroupName = newGroupName;
-        mFabProgressCircle.beginFinalAnimation();
+        mFabProgress.beginProgressFinalAnimation();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!checkIfCreatingNew()) {
+            super.onBackPressed();
+        }
     }
 }

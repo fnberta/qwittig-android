@@ -320,5 +320,19 @@
     <string name="toast_note_deleted">Deleted note</string>
     <string name="toast_note_added">Added note</string>
     <string name="toast_note_edited">Edited note</string>
+    <string name="login_button_email">Log in</string>
+    <string name="login_disclaimer">By using Qwittig, you agree to the terms of use and the data privacy statement.</string>
+    <string name="facebook_app_id" translatable="false">1525413547783898</string>
+    <string name="dialog_login_email_title">Email required</string>
+    <string name="dialog_login_email_message">Please enter a valid email address. Other users will be able to invite you to groups with this address.</string>
+    <string name="action_settings_profile_unlink_facebook">Unlink from Facebook</string>
+    <string name="action_settings_profile_unlink_google">Unlink from Google</string>
+    <string name="toast_profile_update">Profile updated</string>
+    <string name="toast_unlink_failed">Unlink failed</string>
+    <string name="toast_unlink_password_required">Set a password to unlink your account</string>
+    <string name="toast_saving_profile">Saving profile…</string>
+    <string name="toast_saving_purchase">Still saving Purchase…</string>
+    <string name="toast_inviting_user">Still inviting user…</string>
+    <string name="toast_creating_group">Still creating group…</string>
 
 </resources>

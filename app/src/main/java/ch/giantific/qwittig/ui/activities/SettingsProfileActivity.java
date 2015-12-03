@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,7 +19,10 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
+import ch.berta.fabio.fabprogress.FabProgress;
+import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.helpers.account.UnlinkThirdPartyHelper;
 import ch.giantific.qwittig.domain.models.Avatar;
 import ch.giantific.qwittig.ui.fragments.SettingsProfileFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.DiscardChangesDialogFragment;
@@ -38,12 +40,14 @@ import ch.giantific.qwittig.ui.fragments.dialogs.DiscardChangesDialogFragment;
  */
 public class SettingsProfileActivity extends BaseActivity implements
         SettingsProfileFragment.FragmentInteractionListener,
-        DiscardChangesDialogFragment.DialogInteractionListener {
-
+        DiscardChangesDialogFragment.DialogInteractionListener,
+        UnlinkThirdPartyHelper.HelperInteractionListener {
 
     private static final String STATE_PROFILE_FRAGMENT = "STATE_PROFILE_FRAGMENT";
+    private static final String LOG_TAG = SettingsProfileActivity.class.getSimpleName();
     private ImageView mImageViewAvatar;
     private SettingsProfileFragment mSettingsProfileFragment;
+    private FabProgress mFabProgress;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -58,11 +62,17 @@ public class SettingsProfileActivity extends BaseActivity implements
 
         mImageViewAvatar = (ImageView) findViewById(R.id.iv_avatar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_save);
-        fab.setOnClickListener(new View.OnClickListener() {
+        mFabProgress = (FabProgress) findViewById(R.id.fab_save);
+        mFabProgress.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mSettingsProfileFragment.saveChanges();
+            }
+        });
+        mFabProgress.setProgressFinalAnimationListener(new ProgressFinalAnimationListener() {
+            @Override
+            public void onProgressFinalAnimationComplete() {
+                mSettingsProfileFragment.finishEdit(RESULT_OK);
             }
         });
 
@@ -124,8 +134,23 @@ public class SettingsProfileActivity extends BaseActivity implements
     }
 
     @Override
+    public void startProgressAnim() {
+        mFabProgress.startProgress();
+    }
+
+    @Override
     public void onDiscardChangesSelected() {
-        mSettingsProfileFragment.finishEdit(SettingsProfileFragment.CHANGES_DISCARDED);
+        mSettingsProfileFragment.finishEdit(SettingsProfileFragment.RESULT_CHANGES_DISCARDED);
+    }
+
+    @Override
+    public void onThirdPartyUnlinked() {
+        mFabProgress.beginProgressFinalAnimation();
+    }
+
+    @Override
+    public void onThirdPartyUnlinkFailed(int errorCode) {
+        mSettingsProfileFragment.onThirdPartyUnlinkFailed(errorCode);
     }
 
     @Override

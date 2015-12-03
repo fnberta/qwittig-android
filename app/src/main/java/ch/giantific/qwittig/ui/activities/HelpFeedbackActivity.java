@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.ui.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import ch.giantific.qwittig.R;

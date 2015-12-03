@@ -90,9 +90,9 @@ public class StatsHelper extends BaseHelper implements
         int month = 0;
         Bundle args = getArguments();
         if (args != null) {
-            mStatsType = args.getInt(BUNDLE_STATS_TYPE);
-            year = args.getString(BUNDLE_YEAR);
-            month = args.getInt(BUNDLE_MONTH);
+            mStatsType = args.getInt(BUNDLE_STATS_TYPE, 0);
+            year = args.getString(BUNDLE_YEAR, "");
+            month = args.getInt(BUNDLE_MONTH, 0);
         }
 
         if (TextUtils.isEmpty(year)) {
@@ -108,7 +108,6 @@ public class StatsHelper extends BaseHelper implements
             if (mListener != null) {
                 mListener.onStatsCalculationFailed(mStatsType, 0);
             }
-
             return;
         }
 

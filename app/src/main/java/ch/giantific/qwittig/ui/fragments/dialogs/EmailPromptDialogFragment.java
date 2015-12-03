@@ -7,15 +7,17 @@ package ch.giantific.qwittig.ui.fragments.dialogs;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.utils.Utils;
@@ -30,26 +32,54 @@ import ch.giantific.qwittig.utils.Utils;
  * <p/>
  * Subclass of {@link DialogFragment}.
  */
-public class ResetPasswordDialogFragment extends DialogFragment {
+public class EmailPromptDialogFragment extends DialogFragment {
 
     private static final String BUNDLE_EMAIL = "BUNDLE_EMAIL";
+    private static final String BUNDLE_TITLE = "BUNDLE_TITLE";
+    private static final String BUNDLE_MESSAGE = "BUNDLE_MESSAGE";
+    private static final String BUNDLE_POS_ACTION = "BUNDLE_POS_ACTION";
     private DialogInteractionListener mListener;
+    private int mTitle;
+    private int mMessage;
+    private int mPosAction;
     private String mEmail;
     private TextInputLayout mTextInputLayoutEmail;
+    private EditText mEditTextEmail;
 
     /**
-     * Returns a new instance of {@link ResetPasswordDialogFragment}.
+     * Returns a new instance of {@link EmailPromptDialogFragment}.
      *
      * @param email the email address of the user if he/she already entered it in the email field
      *              of the login screen
-     * @return a new instance of {@link ResetPasswordDialogFragment}
+     * @return a new instance of {@link EmailPromptDialogFragment}
      */
     @NonNull
-    public static ResetPasswordDialogFragment newInstance(String email) {
-        ResetPasswordDialogFragment fragment = new ResetPasswordDialogFragment();
+    public static EmailPromptDialogFragment newInstance(@StringRes int title,
+                                                        @StringRes int message,
+                                                        @StringRes int posAction,
+                                                        @NonNull String email) {
+        EmailPromptDialogFragment fragment = new EmailPromptDialogFragment();
 
         Bundle args = new Bundle();
+        args.putInt(BUNDLE_TITLE, title);
+        args.putInt(BUNDLE_MESSAGE, message);
+        args.putInt(BUNDLE_POS_ACTION, posAction);
         args.putString(BUNDLE_EMAIL, email);
+        fragment.setArguments(args);
+
+        return fragment;
+    }
+
+    @NonNull
+    public static EmailPromptDialogFragment newInstance(@StringRes int title,
+                                                        @StringRes int message,
+                                                        @StringRes int posAction) {
+        EmailPromptDialogFragment fragment = new EmailPromptDialogFragment();
+
+        Bundle args = new Bundle();
+        args.putInt(BUNDLE_TITLE, title);
+        args.putInt(BUNDLE_MESSAGE, message);
+        args.putInt(BUNDLE_POS_ACTION, posAction);
         fragment.setArguments(args);
 
         return fragment;
@@ -71,8 +101,12 @@ public class ResetPasswordDialogFragment extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments() != null) {
-            mEmail = getArguments().getString(BUNDLE_EMAIL, "");
+        Bundle args = getArguments();
+        if (args != null) {
+            mTitle = args.getInt(BUNDLE_TITLE);
+            mMessage = args.getInt(BUNDLE_MESSAGE);
+            mPosAction = args.getInt(BUNDLE_POS_ACTION);
+            mEmail = args.getString(BUNDLE_EMAIL, "");
         }
     }
 
@@ -80,17 +114,24 @@ public class ResetPasswordDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.dialog_reset_password, null);
+        View view = inflater.inflate(R.layout.dialog_prompt_email, null);
+
         mTextInputLayoutEmail = (TextInputLayout) view.findViewById(R.id.til_email);
+        mEditTextEmail = mTextInputLayoutEmail.getEditText();
         if (!TextUtils.isEmpty(mEmail)) {
-            mTextInputLayoutEmail.getEditText().setText(mEmail);
+            mEditTextEmail.setText(mEmail);
         }
 
-        dialogBuilder.setTitle(R.string.dialog_login_reset_password_title)
-                .setMessage(R.string.dialog_login_reset_password_message)
+        dialogBuilder.setTitle(mTitle)
+                .setMessage(mMessage)
                 .setView(view)
-                .setPositiveButton(R.string.dialog_positive_reset, null)
-                .setNegativeButton(android.R.string.no, null);
+                .setPositiveButton(mPosAction, null)
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
 
         return dialogBuilder.create();
     }
@@ -107,10 +148,10 @@ public class ResetPasswordDialogFragment extends DialogFragment {
             positiveButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mEmail = mTextInputLayoutEmail.getEditText().getText().toString();
+                    mEmail = mEditTextEmail.getText().toString();
                     if (Utils.emailIsValid(mEmail)) {
                         mTextInputLayoutEmail.setErrorEnabled(false);
-                        mListener.onResetPasswordSelected(mEmail);
+                        mListener.onValidEmailEntered(mEmail);
                         dismiss();
                     } else {
                         mTextInputLayoutEmail.setError(getString(R.string.error_email));
@@ -120,15 +161,28 @@ public class ResetPasswordDialogFragment extends DialogFragment {
         }
     }
 
+    @Override
+    public void onCancel(DialogInterface dialog) {
+        super.onCancel(dialog);
+
+        mListener.onNoEmailEntered();
+    }
+
     /**
      * Defines the actions to take when user clicks on one of the dialog's buttons.
      */
     public interface DialogInteractionListener {
         /**
-         * Defines the click on the reset password button.
+         * Defines the action to take after the user entered a valid email address and hit enter.
          *
-         * @param email the email address to send the reset password link to
+         * @param email the email address entered
          */
-        void onResetPasswordSelected(@NonNull String email);
+        void onValidEmailEntered(@NonNull String email);
+
+        /**
+         * Defines the action to take when user cancels the dialog by pressing cancel, back or
+         * anywhere outside the dialog.
+         */
+        void onNoEmailEntered();
     }
 }

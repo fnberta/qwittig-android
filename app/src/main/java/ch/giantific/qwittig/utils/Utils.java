@@ -46,6 +46,17 @@ public class Utils {
     }
 
     /**
+     * Returns whether the passed string is a valid password or not.
+     *
+     * @param password the password to test
+     * @return whether the password is valid or not
+     */
+    public static boolean passwordIsValid(@NonNull String password) {
+        // TODO: add real validation
+        return !TextUtils.isEmpty(password);
+    }
+
+    /**
      * Returns whether the passed number is positive, i.e. bigger or equal to zero.
      *
      * @param number the number to test

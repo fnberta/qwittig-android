@@ -18,7 +18,6 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -41,14 +40,11 @@ import ch.giantific.qwittig.utils.Utils;
  * <p/>
  * Subclass of {@link LoginBaseFragment}.
  */
-public class LoginSignUpFragment extends LoginBaseFragment {
+public class LoginEmailSignUpFragment extends LoginEmailBaseFragment {
 
-    private static final String BUNDLE_EMAIL = "BUNDLE_EMAIL";
     private static final int NICKNAME_MAX_CHARACTERS = 10;
     private static final int INTENT_REQUEST_IMAGE = 1;
     @Nullable
-    private String mEmail;
-    private TextInputLayout mTextInputLayoutEmail;
     private TextInputLayout mTextInputLayoutPassword;
     private EditText mEditTextPassword;
     private TextInputLayout mTextInputLayoutPasswordRepeat;
@@ -59,18 +55,18 @@ public class LoginSignUpFragment extends LoginBaseFragment {
     private Button mButtonSignUp;
     private byte[] mAvatar;
 
-    public LoginSignUpFragment() {
+    public LoginEmailSignUpFragment() {
     }
 
     /**
-     * Returns a new instance of a {@link LoginSignUpFragment} with an email address as an argument.
+     * Returns a new instance of a {@link LoginEmailSignUpFragment} with an email address as an argument.
      *
      * @param email the email to be used for the sign up
-     * @return a new instance of a {@link LoginSignUpFragment}
+     * @return a new instance of a {@link LoginEmailSignUpFragment}
      */
     @NonNull
-    public static LoginSignUpFragment newInstance(String email) {
-        LoginSignUpFragment fragment = new LoginSignUpFragment();
+    public static LoginEmailSignUpFragment newInstance(String email) {
+        LoginEmailSignUpFragment fragment = new LoginEmailSignUpFragment();
         Bundle args = new Bundle();
         args.putString(BUNDLE_EMAIL, email);
         fragment.setArguments(args);
@@ -78,29 +74,14 @@ public class LoginSignUpFragment extends LoginBaseFragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        if (getArguments() != null) {
-            mEmail = getArguments().getString(BUNDLE_EMAIL);
-        }
-    }
-
-    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_login_sign_up, container, false);
+        return inflater.inflate(R.layout.fragment_login_email_sign_up, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        mTextInputLayoutEmail = (TextInputLayout) view.findViewById(R.id.til_login_signup_email);
-        mEditTextEmail = (AutoCompleteTextView) mTextInputLayoutEmail.getEditText();
-        if (!TextUtils.isEmpty(mEmail)) {
-            mEditTextEmail.setText(mEmail);
-        }
 
         mTextInputLayoutPassword = (TextInputLayout) view.findViewById(R.id.til_login_signup_password);
         mEditTextPassword = mTextInputLayoutPassword.getEditText();
@@ -137,7 +118,7 @@ public class LoginSignUpFragment extends LoginBaseFragment {
     public void onActivityResult(int requestCode, int resultCode, @NonNull Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == LoginSignUpFragment.INTENT_REQUEST_IMAGE &&
+        if (requestCode == LoginEmailSignUpFragment.INTENT_REQUEST_IMAGE &&
                 resultCode == Activity.RESULT_OK) {
             final Uri imageUri = data.getData();
             setAvatar(imageUri);
@@ -232,14 +213,14 @@ public class LoginSignUpFragment extends LoginBaseFragment {
         setLoading(true);
 
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment loginHelper = HelperUtils.findHelper(fragmentManager, LoginFragment.LOGIN_HELPER);
+        Fragment loginHelper = HelperUtils.findHelper(fragmentManager, LoginEmailFragment.LOGIN_HELPER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
         if (loginHelper == null) {
             loginHelper = LoginHelper.newInstanceSignUp(email, password, nickname, mAvatar);
             fragmentManager.beginTransaction()
-                    .add(loginHelper, LoginFragment.LOGIN_HELPER)
+                    .add(loginHelper, LoginEmailFragment.LOGIN_HELPER)
                     .commit();
         }
     }

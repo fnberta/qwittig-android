@@ -9,12 +9,11 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.account.DeleteAccountHelper;
 import ch.giantific.qwittig.data.helpers.account.LogoutHelper;
 import ch.giantific.qwittig.ui.fragments.SettingsFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.AccountDeleteDialogFragment;
+import ch.giantific.qwittig.ui.fragments.dialogs.ConfirmationDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupLeaveBalanceNotZeroDialogFragment;
-import ch.giantific.qwittig.ui.fragments.dialogs.GroupLeaveDialogFragment;
 
 /**
  * Hosts {@link SettingsFragment} containing the main settings options.
@@ -22,12 +21,11 @@ import ch.giantific.qwittig.ui.fragments.dialogs.GroupLeaveDialogFragment;
  * Subclass of {@link BaseActivity}.
  */
 public class SettingsActivity extends BaseActivity implements
-        GroupLeaveDialogFragment.DialogInteractionListener,
+        ConfirmationDialogFragment.DialogInteractionListener,
         SettingsFragment.FragmentInteractionListener,
         GroupLeaveBalanceNotZeroDialogFragment.DialogInteractionListener,
         AccountDeleteDialogFragment.DialogInteractionListener,
-        LogoutHelper.HelperInteractionListener,
-        DeleteAccountHelper.HelperInteractionListener {
+        LogoutHelper.HelperInteractionListener {
 
     private static final String STATE_SETTINGS_FRAGMENT = "STATE_SETTINGS_FRAGMENT";
     private static final String LOG_TAG = SettingsActivity.class.getSimpleName();
@@ -62,7 +60,7 @@ public class SettingsActivity extends BaseActivity implements
     }
 
     @Override
-    public void onLeaveGroupSelected() {
+    public void onActionConfirmed() {
         mSettingsFragment.onLeaveGroupSelected();
     }
 
@@ -84,10 +82,5 @@ public class SettingsActivity extends BaseActivity implements
     @Override
     public void onDeleteAccountSelected() {
         mSettingsFragment.onDeleteAccountSelected();
-    }
-
-    @Override
-    public void onDeleteUserFailed(int errorCode) {
-        mSettingsFragment.onDeleteUserFailed(errorCode);
     }
 }

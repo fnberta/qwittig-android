@@ -7,11 +7,9 @@ package ch.giantific.qwittig.services;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
-import android.support.v4.content.LocalBroadcastManager;
 
 import com.parse.ParseObject;
 import com.parse.ParseUser;
@@ -20,6 +18,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.List;
 
+import ch.giantific.qwittig.LocalBroadcast;
 import ch.giantific.qwittig.data.repositories.ParseCompensationRepository;
 import ch.giantific.qwittig.data.repositories.ParseGenericRepository;
 import ch.giantific.qwittig.data.repositories.ParseGroupRepository;
@@ -36,7 +35,6 @@ import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.utils.ParseUtils;
 
 /**
  * Handles the various background tasks to query, pin or unpin objects.
@@ -46,15 +44,6 @@ import ch.giantific.qwittig.utils.ParseUtils;
  */
 public class ParseQueryService extends IntentService {
 
-    public static final String INTENT_FILTER_DATA_NEW = "ch.giantific.qwittig.push.DATA_NEW";
-    public static final String INTENT_DATA_TYPE = "INTENT_DATA_TYPE";
-    public static final String INTENT_COMPENSATION_PAID = "INTENT_COMPENSATION_PAID";
-    public static final int DATA_TYPE_ALL = 1;
-    public static final int DATA_TYPE_PURCHASE = 2;
-    public static final int DATA_TYPE_USER = 3;
-    public static final int DATA_TYPE_COMPENSATION = 4;
-    public static final int DATA_TYPE_GROUP = 5;
-    public static final int DATA_TYPE_TASK = 6;
     private static final String SERVICE_NAME = "ParseQueryService";
     private static final String LOG_TAG = ParseQueryService.class.getSimpleName();
     private static final String ACTION_UNPIN_OBJECT = "ch.giantific.qwittig.services.action.UNPIN_OBJECT";
@@ -68,6 +57,8 @@ public class ParseQueryService extends IntentService {
     private static final String EXTRA_OBJECT_GROUP_ID = "ch.giantific.qwittig.services.extra.GROUP_ID";
     private User mCurrentUser;
     private List<ParseObject> mCurrentUserGroups;
+    private LocalBroadcast mLocalBroadcast;
+
     /**
      * Constructs a new {@link ParseQueryService}.
      */
@@ -177,6 +168,7 @@ public class ParseQueryService extends IntentService {
 
         mCurrentUser = (User) ParseUser.getCurrentUser();
         mCurrentUserGroups = mCurrentUser.getGroups();
+        mLocalBroadcast = new LocalBroadcast(this);
 
         final String action = intent.getAction();
         switch (action) {
@@ -216,21 +208,21 @@ public class ParseQueryService extends IntentService {
             case Purchase.CLASS: {
                 PurchaseRepository repo = new ParsePurchaseRepository();
                 if (repo.removePurchaseLocal(objectId, groupId)) {
-                    sendLocalBroadcast(DATA_TYPE_PURCHASE);
+                    mLocalBroadcast.sendLocalBroadcastPurchasesUpdated();
                 }
                 break;
             }
             case Compensation.CLASS: {
                 CompensationRepository repo = new ParseCompensationRepository();
                 if (repo.removeCompensationLocal(objectId)) {
-                    sendLocalBroadcastCompensation(false);
+                    mLocalBroadcast.sendLocalBroadcastCompensationsUpdated(false);
                 }
                 break;
             }
             case Task.CLASS: {
                 TaskRepository repo = new ParseTaskRepository();
                 if (repo.removeTaskLocal(objectId)) {
-                    sendLocalBroadcast(DATA_TYPE_TASK);
+                    mLocalBroadcast.sendLocalBroadcastTasksUpdated();
                 }
                 break;
             }
@@ -264,7 +256,7 @@ public class ParseQueryService extends IntentService {
     private void queryPurchase(@NonNull String objectId, boolean isNew) {
         PurchaseRepository repo = new ParsePurchaseRepository();
         if (repo.updatePurchase(objectId, isNew)) {
-            sendLocalBroadcast(DATA_TYPE_PURCHASE);
+            mLocalBroadcast.sendLocalBroadcastPurchasesUpdated();
         }
     }
 
@@ -272,14 +264,14 @@ public class ParseQueryService extends IntentService {
         CompensationRepository repo = new ParseCompensationRepository();
         Boolean isPaid = repo.updateCompensation(compensationId, isNew);
         if (isPaid != null) {
-            sendLocalBroadcastCompensation(isPaid);
+            mLocalBroadcast.sendLocalBroadcastCompensationsUpdated(isPaid);
         }
     }
 
     private void queryTask(@NonNull String taskId, boolean isNew) {
         TaskRepository repo = new ParseTaskRepository();
         if (repo.updateTask(taskId, isNew)) {
-            sendLocalBroadcast(DATA_TYPE_TASK);
+            mLocalBroadcast.sendLocalBroadcastTasksUpdated();
         }
     }
 
@@ -289,18 +281,21 @@ public class ParseQueryService extends IntentService {
         if (task != null) {
             task.addHistoryEvent(mCurrentUser);
             task.saveEventually();
-            sendLocalBroadcast(DATA_TYPE_TASK);
+            mLocalBroadcast.sendLocalBroadcastTasksUpdated();
         }
     }
 
     private void queryGroup(@NonNull String groupId) {
         GroupRepository repo = new ParseGroupRepository();
-        repo.getGroupOnline(groupId);
+        Group group = repo.getGroupOnline(groupId);
+        if (group != null) {
+            mLocalBroadcast.sendLocalBroadcastGroupUpdated();
+        }
     }
 
     private void queryAll() {
-        queryUsers();
         queryPurchases();
+        queryUsers();
         queryCompensations();
         queryTasks();
     }
@@ -308,53 +303,34 @@ public class ParseQueryService extends IntentService {
     private void queryPurchases() {
         PurchaseRepository repo = new ParsePurchaseRepository();
         if (repo.updatePurchases(mCurrentUser, mCurrentUserGroups)) {
-            sendLocalBroadcast(DATA_TYPE_PURCHASE);
+            mLocalBroadcast.sendLocalBroadcastPurchasesUpdated();
         }
     }
 
     private void queryUsers() {
         UserRepository repo = new ParseUserRepository();
         if (repo.updateUsers(mCurrentUserGroups)) {
-            sendLocalBroadcast(DATA_TYPE_USER);
+            mLocalBroadcast.sendLocalBroadcastUsersUpdated();
         }
     }
 
     private void queryCompensations() {
         CompensationRepository repo = new ParseCompensationRepository();
         if (repo.updateCompensations(mCurrentUserGroups)) {
-            sendLocalBroadcastCompensation(false);
-            sendLocalBroadcastCompensation(true);
+            mLocalBroadcast.sendLocalBroadcastCompensationsUpdated(false);
+            mLocalBroadcast.sendLocalBroadcastCompensationsUpdated(true);
         }
     }
 
     private void queryTasks() {
         TaskRepository repo = new ParseTaskRepository();
         if (repo.updateTasks(mCurrentUserGroups)) {
-            sendLocalBroadcast(DATA_TYPE_TASK);
+            mLocalBroadcast.sendLocalBroadcastTasksUpdated();
         }
-    }
-
-    private void sendLocalBroadcast(@DataType int dataType) {
-        Intent intent = new Intent(INTENT_FILTER_DATA_NEW);
-        intent.putExtra(INTENT_DATA_TYPE, dataType);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-    }
-
-    private void sendLocalBroadcastCompensation(boolean isPaid) {
-        Intent intent = new Intent(INTENT_FILTER_DATA_NEW);
-        intent.putExtra(INTENT_DATA_TYPE, DATA_TYPE_COMPENSATION);
-        intent.putExtra(INTENT_COMPENSATION_PAID, isPaid);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     @StringDef({User.CLASS, Group.CLASS, Purchase.CLASS, Compensation.CLASS, Group.CLASS, Task.CLASS})
     @Retention(RetentionPolicy.SOURCE)
     public @interface ClassType {
-    }
-
-    @IntDef({DATA_TYPE_ALL, DATA_TYPE_PURCHASE, DATA_TYPE_USER, DATA_TYPE_COMPENSATION,
-            DATA_TYPE_GROUP, DATA_TYPE_TASK})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface DataType {
     }
 }

@@ -21,6 +21,7 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import ch.giantific.qwittig.LocalBroadcast;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.ui.fragments.TaskDetailsFragment;
@@ -47,6 +48,15 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
     private FloatingActionButton mFab;
     private boolean mShowEditOptions;
     private String mTaskId;
+
+    @Override
+    void handleLocalBroadcast(Intent intent, int dataType) {
+        super.handleLocalBroadcast(intent, dataType);
+
+        if (dataType == LocalBroadcast.DATA_TYPE_TASKS_UPDATED) {
+            updateFragment();
+        }
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -160,10 +170,7 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
         invalidateOptionsMenu();
     }
 
-    @Override
-    public void onTasksUpdated() {
-        super.onTasksUpdated();
-
+    private void updateFragment() {
         mTaskDetailsFragment.queryData();
     }
 

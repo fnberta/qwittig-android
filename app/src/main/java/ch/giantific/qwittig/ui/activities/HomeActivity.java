@@ -32,6 +32,7 @@ import java.util.List;
 
 import ch.berta.fabio.fabspeeddial.FabMenu;
 import ch.giantific.qwittig.BuildConfig;
+import ch.giantific.qwittig.LocalBroadcast;
 import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
@@ -90,6 +91,15 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     private HomeDraftsFragment mHomeDraftsFragment;
     private FabMenu mFabMenu;
     private int mInvitationAction;
+
+    @Override
+    void handleLocalBroadcast(Intent intent, int dataType) {
+        super.handleLocalBroadcast(intent, dataType);
+
+        if (dataType == LocalBroadcast.DATA_TYPE_PURCHASES_UPDATED) {
+            onPurchasesUpdated();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -295,8 +305,10 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     private void queryAll() {
-        mHomePurchasesFragment.setOnlineQueryInProgress(true);
-        ParseQueryService.startQueryAll(this);
+        if (userIsInGroup()) {
+            mHomePurchasesFragment.setOnlineQueryInProgress(true);
+            ParseQueryService.startQueryAll(this);
+        }
     }
 
     private void dismissProgressDialog() {
@@ -347,6 +359,8 @@ public class HomeActivity extends BaseNavDrawerActivity implements
                     } else {
                         showGoPremiumDialog();
                     }
+                } else {
+                    showCreateGroupDialog();
                 }
                 break;
             }
@@ -359,25 +373,14 @@ public class HomeActivity extends BaseNavDrawerActivity implements
                     startActivityForResult(intent,
                             HomeActivity.INTENT_REQUEST_PURCHASE_MODIFY,
                             activityOptionsCompat.toBundle());
+                } else {
+                    showCreateGroupDialog();
                 }
                 break;
             }
         }
 
         mFabMenu.close();
-    }
-
-    private boolean userIsInGroup() {
-        if (mCurrentUser == null) {
-            return false;
-        }
-
-        if (mCurrentGroup == null) {
-            showCreateGroupDialog();
-            return false;
-        }
-
-        return true;
     }
 
     private void showCreateGroupDialog() {
@@ -409,8 +412,6 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
     @Override
     public void onPurchasesUpdated() {
-        super.onPurchasesUpdated();
-
         // after login or user joined a new group, this will be set to true, hence set false
         mHomePurchasesFragment.setOnlineQueryInProgress(false);
         mHomePurchasesFragment.onPurchasesUpdated();

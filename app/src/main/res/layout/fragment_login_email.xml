@@ -7,8 +7,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
+    android:animateLayoutChanges="true"
     android:transitionGroup="true"
-    tools:context="ch.giantific.qwittig.ui.fragments.LoginFragment"
+    tools:context="ch.giantific.qwittig.ui.fragments.LoginEmailFragment"
     >
 
     <LinearLayout
@@ -21,7 +22,7 @@
         >
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/til_login_email"
+            android:id="@+id/til_login_email_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/small_space"
@@ -55,8 +56,8 @@
         </android.support.design.widget.TextInputLayout>
 
         <Button
-            android:id="@+id/bt_login_login"
-            android:theme="@style/ColoredRaisedButton"
+            android:id="@+id/bt_login_email"
+            android:theme="@style/Widget.AppCompat.Button.AccentColor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/login_button_log_in"/>
@@ -69,24 +70,6 @@
             android:layout_gravity="center_horizontal"
             android:gravity="center_vertical"
             android:text="@string/login_text_forgot_credentials"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
-        </View>
-
-        <Button
-            android:id="@+id/bt_login_signup"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/login_button_sign_up"/>
-
-        <Button
-            android:id="@+id/bt_login_tryout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/login_button_tryout"/>
 
     </LinearLayout>
 

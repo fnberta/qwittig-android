@@ -5,24 +5,24 @@
 
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="ch.giantific.qwittig.ui.fragments.FinanceCompensationsUnpaidFragment">
 
-    <include layout="@layout/include_srl_recycler_view" />
+    <include layout="@layout/include_srl_recycler_view"/>
 
     <LinearLayout
         android:id="@+id/empty_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginStart="@dimen/key_line_1"
         android:layout_marginEnd="@dimen/key_line_1"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:visibility="invisible"
+        android:layout_marginStart="@dimen/key_line_1"
         android:clipChildren="false"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="invisible"
         tools:visibility="visible">
 
         <TextView
@@ -31,9 +31,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/small_space"
-            android:gravity="center_horizontal"
             android:drawablePadding="@dimen/small_space"
             android:drawableTop="@drawable/ic_attach_money_black_144dp"
+            android:gravity="center_horizontal"
             tools:text="@string/no_compensations"/>
 
         <TextView
@@ -45,23 +45,17 @@
             android:gravity="center_horizontal"
             tools:text="@string/no_compensations_subhead"/>
 
-        <com.github.jorgecastilloprz.FABProgressCircle
-            android:id="@+id/fab_new_account_balance_circle"
+        <ch.berta.fabio.fabprogress.FabProgress
+            android:id="@+id/fab_new_account_balance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:reusable="true"
-            app:finalIcon="@drawable/ic_done_black_24dp"
-            app:arcColor="@color/red">
-
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/fab_new_account_balance"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_swap_horiz_black_24dp"
-                android:visibility="invisible"
-                tools:visibility="visible"/>
-
-        </com.github.jorgecastilloprz.FABProgressCircle>
+            android:src="@drawable/ic_swap_horiz_black_24dp"
+            android:visibility="gone"
+            app:fb_arcColor="@color/green"
+            app:fb_finalIcon="@drawable/ic_done_black_24dp"
+            app:fb_reusable="true"
+            tools:visibility="visible"
+            />
     </LinearLayout>
 
 </FrameLayout>

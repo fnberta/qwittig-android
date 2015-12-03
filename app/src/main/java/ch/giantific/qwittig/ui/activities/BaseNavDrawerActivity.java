@@ -4,10 +4,8 @@
 
 package ch.giantific.qwittig.ui.activities;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -17,7 +15,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -41,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.BuildConfig;
+import ch.giantific.qwittig.LocalBroadcast;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Avatar;
 import ch.giantific.qwittig.domain.models.parse.Config;
@@ -48,7 +46,6 @@ import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.data.repositories.ParseGroupRepository;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
-import ch.giantific.qwittig.services.ParseQueryService;
 import ch.giantific.qwittig.ui.adapters.NavHeaderGroupsArrayAdapter;
 import ch.giantific.qwittig.ui.fragments.SettingsFragment;
 import ch.giantific.qwittig.BlurTransformation;
@@ -99,31 +96,6 @@ public abstract class BaseNavDrawerActivity extends BaseActivity {
     private List<ParseObject> mGroups = new ArrayList<>();
 
     @NonNull
-    private BroadcastReceiver mLocalBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, @NonNull Intent intent) {
-            int dataType = intent.getIntExtra(ParseQueryService.INTENT_DATA_TYPE, 0);
-            switch (dataType) {
-                case ParseQueryService.DATA_TYPE_PURCHASE:
-                    onPurchasesUpdated();
-                    break;
-                case ParseQueryService.DATA_TYPE_USER:
-                    onUsersUpdated();
-                    break;
-                case ParseQueryService.DATA_TYPE_COMPENSATION:
-                    boolean isPaid = intent.getBooleanExtra(ParseQueryService.INTENT_COMPENSATION_PAID, false);
-                    onCompensationsUpdated(isPaid);
-                    break;
-                case ParseQueryService.DATA_TYPE_GROUP:
-                    onGroupLoaded();
-                    break;
-                case ParseQueryService.DATA_TYPE_TASK:
-                    onTasksUpdated();
-                    break;
-            }
-        }
-    };
-    @NonNull
     private IabHelper.QueryInventoryFinishedListener mQueryInventoryFinishedListener = new IabHelper.QueryInventoryFinishedListener() {
         @Override
         public void onQueryInventoryFinished(@NonNull IabResult result, @NonNull Inventory inv) {
@@ -154,6 +126,18 @@ public abstract class BaseNavDrawerActivity extends BaseActivity {
         }
     };
 
+    @Override
+    @CallSuper
+    void handleLocalBroadcast(Intent intent, int dataType) {
+        super.handleLocalBroadcast(intent, dataType);
+
+        switch (dataType) {
+            case LocalBroadcast.DATA_TYPE_GROUP_UPDATED:
+                updateGroupSpinnerList();
+                break;
+        }
+    }
+
     /**
      * Verifies the developer payload of a purchase.
      */
@@ -175,31 +159,6 @@ public abstract class BaseNavDrawerActivity extends BaseActivity {
         } else {
             item.setVisible(true);
         }
-    }
-
-    @CallSuper
-    public void onPurchasesUpdated() {
-        // empty default implementation
-    }
-
-    @CallSuper
-    public void onUsersUpdated() {
-        // empty default implementation
-    }
-
-    @CallSuper
-    public void onCompensationsUpdated(boolean isPaid) {
-        // empty default implementation
-    }
-
-    @CallSuper
-    public void onTasksUpdated() {
-        // empty default implementation
-    }
-
-    @CallSuper
-    public void onGroupLoaded() {
-        updateGroupSpinnerList();
     }
 
     @Override
@@ -227,9 +186,6 @@ public abstract class BaseNavDrawerActivity extends BaseActivity {
         if (uri != null) {
             String invitedEmail = uri.getQueryParameter(URI_INVITED_EMAIL);
             intentLogin.putExtra(LoginActivity.INTENT_URI_EMAIL, invitedEmail);
-        }
-        if (intent.hasExtra(LoginActivity.INTENT_EXTRA_SIGN_UP)) {
-            intentLogin.putExtra(LoginActivity.INTENT_EXTRA_SIGN_UP, true);
         }
 
 //        Starting an activity with forResult and transitions during a lifecycle method results on
@@ -568,8 +524,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity {
             case INTENT_REQUEST_SETTINGS_PROFILE:
                 switch (resultCode) {
                     case RESULT_OK:
-                        MessageUtils.showBasicSnackbar(mSpinnerGroups,
-                                getString(R.string.toast_changes_saved));
+                        MessageUtils.showBasicSnackbar(mSpinnerGroups, getString(R.string.toast_profile_update));
                         setAvatarAndNickname();
                         break;
                     case SettingsProfileFragment.RESULT_CHANGES_DISCARDED:
@@ -586,7 +541,11 @@ public abstract class BaseNavDrawerActivity extends BaseActivity {
         mUserIsLoggedIn = checkUserLoggedIn();
         fetchCurrentUserGroups();
 
-        // subclasses probably should add stuff here
+        // subclasses should probably add stuff here
+    }
+
+    final boolean userIsInGroup() {
+        return mCurrentGroup != null;
     }
 
     final void goPremium() {
@@ -599,22 +558,6 @@ public abstract class BaseNavDrawerActivity extends BaseActivity {
         mIabHelper.launchSubscriptionPurchaseFlow(this, SKU_PREMIUM, RC_REQUEST,
                 mIabPurchaseFinishedListener, payload);
     }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        LocalBroadcastManager.getInstance(this).registerReceiver(mLocalBroadcastReceiver,
-                new IntentFilter(ParseQueryService.INTENT_FILTER_DATA_NEW));
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mLocalBroadcastReceiver);
-    }
-
 
     @Override
     public void onDestroy() {

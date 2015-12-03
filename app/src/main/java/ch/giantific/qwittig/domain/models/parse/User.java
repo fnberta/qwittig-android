@@ -7,8 +7,10 @@ package ch.giantific.qwittig.domain.models.parse;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.parse.ParseConfig;
+import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
@@ -42,6 +44,7 @@ public class User extends ParseUser {
     public static final String STORES_ADDED = "storesAdded";
     public static final String STORES_FAVORITES = "storesFavorites";
     public static final String FREE_PURCHASES_COUNT = "freePurchasesCount";
+    public static final String GOOGLE_ID = "googleId";
     public static final String PIN_LABEL = "usersPinLabel";
 
     public static final String USERNAME_PREFIX_DELETED = "DELETED_";
@@ -63,6 +66,17 @@ public class User extends ParseUser {
         setDeleted(false);
         setNickname(nickname);
         setStoresFavorites(getDefaultStores());
+    }
+
+    /**
+     * Returns the default stores defined in Parse.com Config.
+     *
+     * @return the default stores
+     */
+    public List<String> getDefaultStores() {
+        ParseConfig config = ParseConfig.getCurrentConfig();
+
+        return config.getList(Config.DEFAULT_STORES);
     }
 
     public boolean isDeleted() {
@@ -148,10 +162,8 @@ public class User extends ParseUser {
         put(FREE_PURCHASES_COUNT, count);
     }
 
-    private List<String> getDefaultStores() {
-        ParseConfig config = ParseConfig.getCurrentConfig();
-
-        return config.getList(Config.DEFAULT_STORES);
+    public String getGoogleId() {
+        return getString(GOOGLE_ID);
     }
 
     /**
@@ -337,6 +349,18 @@ public class User extends ParseUser {
 
     public void resetPremiumCount() {
         put(FREE_PURCHASES_COUNT, 0);
+    }
+
+    public boolean isGoogleUser() {
+        return !TextUtils.isEmpty(getGoogleId());
+    }
+
+    public void removeGoogleId() {
+        remove(GOOGLE_ID);
+    }
+
+    public boolean isFacebookUser() {
+        return ParseFacebookUtils.isLinked(this);
     }
 }
 

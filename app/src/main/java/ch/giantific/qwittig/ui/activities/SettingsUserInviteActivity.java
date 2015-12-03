@@ -11,12 +11,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.transition.Transition;
+import android.view.MenuItem;
 import android.view.View;
 
-import com.github.jorgecastilloprz.FABProgressCircle;
-import com.github.jorgecastilloprz.listeners.FABProgressListener;
-
+import ch.berta.fabio.fabprogress.FabProgress;
+import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.helpers.group.InviteUsersHelper;
 import ch.giantific.qwittig.ui.fragments.SettingsUserInviteFragment;
@@ -30,40 +31,40 @@ import ch.giantific.qwittig.utils.Utils;
  * Handles the circle loading animation of the {@link FloatingActionButton}.
  * <p/>
  * Subclass of {@link BaseActivity}.
- *
- * @see FABProgressCircle
  */
 public class SettingsUserInviteActivity extends BaseActivity implements
         SettingsUserInviteFragment.FragmentInteractionListener,
-        FABProgressListener,
         InviteUsersHelper.HelperInteractionListener {
 
     private static final String STATE_USER_INVITE_FRAGMENT = "STATE_USER_INVITE_FRAGMENT";
     private SettingsUserInviteFragment mSettingsUserInviteFragment;
-    private FloatingActionButton mFab;
-    private FABProgressCircle mFabProgressCircle;
+    private FabProgress mFabProgress;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings_user_invite);
 
-        mFab = (FloatingActionButton) findViewById(R.id.fab_user_invite);
-        mFab.setOnClickListener(new View.OnClickListener() {
+        mFabProgress = (FabProgress) findViewById(R.id.fab_user_invite);
+        mFabProgress.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mSettingsUserInviteFragment.startInvitation();
             }
         });
-        mFabProgressCircle = (FABProgressCircle) findViewById(R.id.fab_user_invite_circle);
-        mFabProgressCircle.attachListener(this);
+        mFabProgress.setProgressFinalAnimationListener(new ProgressFinalAnimationListener() {
+            @Override
+            public void onProgressFinalAnimationComplete() {
+                mSettingsUserInviteFragment.finishInvitations();
+            }
+        });
 
         FragmentManager fragmentManager = getFragmentManager();
         if (savedInstanceState == null) {
             if (Utils.isRunningLollipopAndHigher()) {
                 addActivityTransitionListener();
             } else {
-                mFab.show();
+                mFabProgress.show();
             }
 
             mSettingsUserInviteFragment = new SettingsUserInviteFragment();
@@ -71,7 +72,7 @@ public class SettingsUserInviteActivity extends BaseActivity implements
                     .add(R.id.container, mSettingsUserInviteFragment)
                     .commit();
         } else {
-            mFab.show();
+            mFabProgress.show();
 
             mSettingsUserInviteFragment = (SettingsUserInviteFragment) fragmentManager
                     .getFragment(savedInstanceState, STATE_USER_INVITE_FRAGMENT);
@@ -87,7 +88,7 @@ public class SettingsUserInviteActivity extends BaseActivity implements
                 super.onTransitionEnd(transition);
                 transition.removeListener(this);
 
-                mFab.show();
+                mFabProgress.show();
             }
         });
     }
@@ -101,23 +102,37 @@ public class SettingsUserInviteActivity extends BaseActivity implements
     }
 
     @Override
-    public void onFABProgressAnimationEnd() {
-        mSettingsUserInviteFragment.finishInvitations();
+    public boolean onOptionsItemSelected(MenuItem item) {
+        final int id = item.getItemId();
+        if (id == android.R.id.home) {
+            return checkIfInviting() || super.onOptionsItemSelected(item);
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private boolean checkIfInviting() {
+        if (mSettingsUserInviteFragment.isInviting()) {
+            Snackbar.make(mToolbar, R.string.toast_inviting_user, Snackbar.LENGTH_LONG).show();
+            return true;
+        }
+
+        return false;
     }
 
     @Override
-    public void progressCircleShow() {
-        mFabProgressCircle.show();
+    public void startProgressAnim() {
+        mFabProgress.startProgress();
     }
 
     @Override
-    public void progressCircleStartFinal() {
-        mFabProgressCircle.beginFinalAnimation();
+    public void startFinalProgressAnim() {
+        mFabProgress.beginProgressFinalAnimation();
     }
 
     @Override
-    public void progressCircleHide() {
-        mFabProgressCircle.hide();
+    public void stopProgressAnim() {
+        mFabProgress.startProgress();
     }
 
     @Override
@@ -128,5 +143,12 @@ public class SettingsUserInviteActivity extends BaseActivity implements
     @Override
     public void onInviteUsersFailed(int errorCode) {
         mSettingsUserInviteFragment.onInviteUsersFailed(errorCode);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!checkIfInviting()) {
+            super.onBackPressed();
+        }
     }
 }

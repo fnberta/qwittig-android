@@ -81,8 +81,8 @@ public class MoreQueryHelper extends BaseQueryHelper {
         int skip = 0;
         Bundle args = getArguments();
         if (args != null) {
-            className = args.getString(BUNDLE_CLASS_NAME);
-            skip = args.getInt(BUNDLE_SKIP);
+            className = args.getString(BUNDLE_CLASS_NAME, "");
+            skip = args.getInt(BUNDLE_SKIP, 0);
         }
 
         if (TextUtils.isEmpty(className)) {

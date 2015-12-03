@@ -23,6 +23,7 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Month;
 import ch.giantific.qwittig.domain.models.stats.Stats;
 import ch.giantific.qwittig.data.helpers.group.StatsHelper;
+import ch.giantific.qwittig.services.ParseQueryService;
 import ch.giantific.qwittig.ui.adapters.StringResSpinnerAdapter;
 import ch.giantific.qwittig.ui.adapters.ThemedArrayAdapter;
 import ch.giantific.qwittig.ui.fragments.StatsBaseFragment;
@@ -249,6 +250,9 @@ public class StatsActivity extends BaseNavDrawerActivity implements
 
         addFirstFragment();
         setSpinnerListeners();
+        if (userIsInGroup()) {
+            ParseQueryService.startQueryAll(this);
+        }
     }
 
     @NonNull

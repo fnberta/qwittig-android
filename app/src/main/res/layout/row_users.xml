@@ -22,7 +22,7 @@
 
     <TextView
         android:id="@+id/user_name"
-        style="@style/ListTextSubhead"
+        style="@style/TextAppearance.AppCompat.Subhead.List"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
@@ -31,7 +31,7 @@
 
     <TextView
         android:id="@+id/user_balance"
-        style="@style/ListTextSubhead"
+        style="@style/TextAppearance.AppCompat.Subhead.List"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_marginEnd="@dimen/key_line_1"

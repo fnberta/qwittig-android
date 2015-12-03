@@ -4,27 +4,18 @@
 
 package ch.giantific.qwittig.ui.fragments;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.github.jorgecastilloprz.FABProgressCircle;
-import com.github.jorgecastilloprz.listeners.FABProgressListener;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
@@ -33,21 +24,22 @@ import org.apache.commons.math3.fraction.BigFraction;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.berta.fabio.fabprogress.FabProgress;
+import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.Compensation;
-import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.data.repositories.ParseUserRepository;
+import ch.giantific.qwittig.data.helpers.group.SettlementHelper;
 import ch.giantific.qwittig.data.helpers.reminder.CompensationRemindHelper;
 import ch.giantific.qwittig.data.helpers.save.CompensationSaveHelper;
-import ch.giantific.qwittig.data.helpers.group.SettlementHelper;
+import ch.giantific.qwittig.data.repositories.ParseUserRepository;
+import ch.giantific.qwittig.domain.models.parse.Compensation;
+import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.ui.adapters.CompensationsUnpaidRecyclerAdapter;
 import ch.giantific.qwittig.ui.fragments.dialogs.CompensationChangeAmountDialogFragment;
-import ch.giantific.qwittig.utils.ViewUtils;
 import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
-import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -61,8 +53,7 @@ import ch.giantific.qwittig.utils.Utils;
  */
 public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBaseFragment implements
         CompensationsUnpaidRecyclerAdapter.AdapterInteractionListener,
-        CompensationRepository.GetCompensationsLocalListener,
-        FABProgressListener {
+        CompensationRepository.GetCompensationsLocalListener {
 
     private static final String SETTLEMENT_HELPER = "SETTLEMENT_HELPER";
     private static final String BUNDLE_AUTO_START_NEW = "BUNDLE_AUTO_START_NEW";
@@ -74,8 +65,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     private static final String LOG_TAG = FinanceCompensationsUnpaidFragment.class.getSimpleName();
     private TextView mTextViewEmptyTitle;
     private TextView mTextViewEmptySubtitle;
-    private FABProgressCircle mFabProgressCircle;
-    private FloatingActionButton mFabNew;
+    private FabProgress mFabProgressNewSettlement;
     private UserRepository mUserRepo;
     private CompensationsUnpaidRecyclerAdapter mRecyclerAdapter;
     @NonNull
@@ -151,16 +141,23 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
                 mCurrentUser, this);
         mRecyclerView.setAdapter(mRecyclerAdapter);
 
-        mFabNew = (FloatingActionButton) view.findViewById(R.id.fab_new_account_balance);
-        mFabNew.setOnClickListener(new View.OnClickListener() {
+        mFabProgressNewSettlement = (FabProgress) view.findViewById(R.id.fab_new_account_balance);
+        mFabProgressNewSettlement.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 newSettlement();
             }
         });
+        mFabProgressNewSettlement.setProgressFinalAnimationListener(new ProgressFinalAnimationListener() {
+            @Override
+            public void onProgressFinalAnimationComplete() {
+                mIsCalculatingNew = false;
+                mRecyclerAdapter.notifyDataSetChanged();
+                toggleEmptyViewVisibility();
 
-        mFabProgressCircle = (FABProgressCircle) view.findViewById(R.id.fab_new_account_balance_circle);
-        mFabProgressCircle.attachListener(this);
+                MessageUtils.showBasicSnackbar(mRecyclerView, getString(R.string.toast_new_settlement));
+            }
+        });
     }
 
     @NonNull
@@ -223,20 +220,11 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     protected void updateView() {
         mRecyclerAdapter.setCurrentGroupCurrency(ParseUtils.getGroupCurrencyWithFallback(mCurrentGroup));
         if (mIsCalculatingNew) {
-            mFabProgressCircle.beginFinalAnimation();
+            mFabProgressNewSettlement.beginProgressFinalAnimation();
         } else {
             mRecyclerAdapter.notifyDataSetChanged();
             showMainView();
         }
-    }
-
-    @Override
-    public void onFABProgressAnimationEnd() {
-        mIsCalculatingNew = false;
-        mRecyclerAdapter.notifyDataSetChanged();
-        toggleEmptyViewVisibility();
-
-        MessageUtils.showBasicSnackbar(mRecyclerView, getString(R.string.toast_new_settlement));
     }
 
     @Override
@@ -247,49 +235,16 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
             if (!ParseUtils.isTestUser(mCurrentUser) && mCurrentGroup != null) {
                 mTextViewEmptyTitle.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
                 mTextViewEmptySubtitle.setText(R.string.no_compensations_subhead);
-                showFab();
+                mFabProgressNewSettlement.show();
             }
         } else if (mCompensations.isEmpty()) {
             mEmptyView.setVisibility(View.VISIBLE);
             mTextViewEmptyTitle.setText(R.string.no_compensations);
             mTextViewEmptySubtitle.setText(R.string.no_compensations_subhead_group_has);
-            mFabNew.setVisibility(View.INVISIBLE);
+            mFabProgressNewSettlement.setVisibility(View.INVISIBLE);
         } else {
             mEmptyView.setVisibility(View.GONE);
         }
-    }
-
-    private void showFab() {
-        if (Utils.isRunningLollipopAndHigher()) {
-            if (ViewCompat.isLaidOut(mFabNew)) {
-                circularRevealFab();
-            } else {
-                mFabNew.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-                    @Override
-                    public void onLayoutChange(@NonNull View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                        v.removeOnLayoutChangeListener(this);
-                        circularRevealFab();
-                    }
-                });
-            }
-        } else {
-            mFabNew.show();
-        }
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void circularRevealFab() {
-        Animator reveal = ViewUtils.getCircularRevealAnimator(mFabNew);
-        reveal.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(@NonNull Animator animation) {
-                super.onAnimationStart(animation);
-                animation.removeListener(this);
-
-                mFabNew.setVisibility(View.VISIBLE);
-            }
-        });
-        reveal.start();
     }
 
     private void newSettlement() {
@@ -313,7 +268,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
                 if (users.size() > 1) { // size = 1 would mean current user is the only one in the group
                     if (mCompensationsAll.isEmpty()) {
                         mIsCalculatingNew = true;
-                        mFabProgressCircle.show();
+                        mFabProgressNewSettlement.startProgress();
                         calculateNewSettlementWithHelper();
                     } else {
                         MessageUtils.showBasicSnackbar(mRecyclerView,
@@ -371,7 +326,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
                 getSettlementErrorRetryAction());
         HelperUtils.removeHelper(getFragmentManager(), SETTLEMENT_HELPER);
 
-        mFabProgressCircle.hide();
+        mFabProgressNewSettlement.stopProgress();
     }
 
     @Nullable
@@ -414,7 +369,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         }
 
         if (!Utils.isConnected(getActivity())) {
-            MessageUtils.showBasicSnackbar(mFabNew, getString(R.string.toast_no_connection));
+            MessageUtils.showBasicSnackbar(mFabProgressNewSettlement, getString(R.string.toast_no_connection));
             return;
         }
 
@@ -461,7 +416,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     public void onCompensationSaveFailed(@NonNull ParseObject compensation, int errorCode) {
         final Activity context = getActivity();
         ParseErrorHandler.handleParseError(context, errorCode);
-        MessageUtils.showBasicSnackbar(mFabNew, ParseErrorHandler.getErrorMessage(context, errorCode));
+        MessageUtils.showBasicSnackbar(mFabProgressNewSettlement, ParseErrorHandler.getErrorMessage(context, errorCode));
         String compensationId = compensation.getObjectId();
         HelperUtils.removeHelper(getFragmentManager(), getSaveHelperTag(compensationId));
 
@@ -503,7 +458,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         }
 
         if (!Utils.isConnected(getActivity())) {
-            MessageUtils.showBasicSnackbar(mFabNew, getString(R.string.toast_no_connection));
+            MessageUtils.showBasicSnackbar(mFabProgressNewSettlement, getString(R.string.toast_no_connection));
             return;
         }
 
@@ -598,7 +553,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         }
 
         if (!Utils.isConnected(getActivity())) {
-            MessageUtils.showBasicSnackbar(mFabNew, getString(R.string.toast_no_connection));
+            MessageUtils.showBasicSnackbar(mFabProgressNewSettlement, getString(R.string.toast_no_connection));
             return;
         }
 

@@ -6,26 +6,29 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/list_avatar_with_text">
+    android:layout_height="@dimen/list_avatar_with_text"
+    android:orientation="horizontal"
+    >
 
     <ImageView
         android:id="@+id/list_avatar"
         android:layout_width="@dimen/avatar_size"
         android:layout_height="@dimen/avatar_size"
         android:layout_gravity="center_vertical"
-        android:contentDescription="@string/user_avatar"/>
+        android:contentDescription="@string/user_avatar"
+        />
 
     <TextView
         android:id="@+id/list_name"
-        style="@style/ListTextSubhead"
+        style="@style/TextAppearance.AppCompat.Subhead.List"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginStart="@dimen/normal_space"
+        android:ellipsize="marquee"
         android:gravity="center_vertical"
         android:lines="1"
-        android:ellipsize="marquee"
-        tools:text="Vera"/>
+        tools:text="Vera"
+        />
 
 </LinearLayout>

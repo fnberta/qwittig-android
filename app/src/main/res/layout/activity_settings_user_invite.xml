@@ -3,13 +3,16 @@
   -->
 
 <android.support.design.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipChildren="false"
     tools:context="ch.giantific.qwittig.ui.activities.SettingsUserInviteActivity">
+
+    <include layout="@layout/include_appbar_x2"/>
 
     <FrameLayout
         android:id="@+id/container"
@@ -18,29 +21,20 @@
         android:layout_marginTop="@dimen/toolbar_height_x2"
         tools:ignore="MergeRootFrame"/>
 
-    <include layout="@layout/include_appbar_x2"/>
-
-    <com.github.jorgecastilloprz.FABProgressCircle
-        android:id="@+id/fab_user_invite_circle"
+    <ch.berta.fabio.fabprogress.FabProgress
+        android:id="@+id/fab_user_invite"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:elevation="@dimen/fab_elevation"
-        app:layout_anchor="@id/appbar"
-        app:layout_anchorGravity="bottom|start"
-        app:finalIcon="@drawable/ic_done_black_24dp"
-        app:arcColor="@color/red"
-        app:circleSize="mini"
-        app:reusable="true">
+        android:layout_gravity="top|start"
+        android:layout_marginStart="@dimen/key_line_1"
+        android:layout_marginTop="@dimen/fab_mini_margin_toolbar_x2"
+        android:src="@drawable/ic_person_add_black_24dp"
+        android:visibility="gone"
+        app:fabSize="mini"
+        app:fb_arcColor="@color/green"
+        app:fb_finalIcon="@drawable/ic_done_black_24dp"
+        app:fb_reusable="true"
+        tools:visibility="visible"
+        />
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_user_invite"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/normal_space"
-            android:src="@drawable/ic_person_add_black_24dp"
-            android:visibility="invisible"
-            app:fabSize="mini"
-            tools:visibility="visible"/>
-
-    </com.github.jorgecastilloprz.FABProgressCircle>
 </android.support.design.widget.CoordinatorLayout>

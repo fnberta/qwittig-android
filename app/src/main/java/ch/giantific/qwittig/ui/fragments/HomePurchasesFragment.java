@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -36,7 +35,6 @@ import ch.giantific.qwittig.ui.activities.BaseActivity;
 import ch.giantific.qwittig.ui.activities.PurchaseDetailsActivity;
 import ch.giantific.qwittig.ui.adapters.PurchasesRecyclerAdapter;
 import ch.giantific.qwittig.utils.HelperUtils;
-import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -51,7 +49,6 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment implem
 
     public static final String INTENT_PURCHASE_ID = "INTENT_PURCHASE_ID";
     private static final String STATE_IS_LOADING_MORE = "STATE_IS_LOADING_MORE";
-    private static final String STATE_ONLINE_QUERY = "STATE_ONLINE_QUERY";
     private static final String PURCHASE_QUERY_HELPER = "PURCHASE_QUERY_HELPER";
     private static final String LOG_TAG = HomePurchasesFragment.class.getSimpleName();
     private PurchaseRepository mPurchaseRepo;
@@ -59,13 +56,8 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment implem
     @NonNull
     private List<ParseObject> mPurchases = new ArrayList<>();
     private boolean mIsLoadingMore;
-    private boolean mOnlineQueryInProgress;
 
     public HomePurchasesFragment() {
-    }
-
-    public void setOnlineQueryInProgress(boolean onlineQueryInProgress) {
-        mOnlineQueryInProgress = onlineQueryInProgress;
     }
 
     @Override
@@ -76,7 +68,6 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment implem
 
         if (savedInstanceState != null) {
             mIsLoadingMore = savedInstanceState.getBoolean(STATE_IS_LOADING_MORE, false);
-            mOnlineQueryInProgress = savedInstanceState.getBoolean(STATE_ONLINE_QUERY, false);
         }
     }
 
@@ -85,7 +76,6 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment implem
         super.onSaveInstanceState(outState);
 
         outState.putBoolean(STATE_IS_LOADING_MORE, mIsLoadingMore);
-        outState.putBoolean(STATE_ONLINE_QUERY, mOnlineQueryInProgress);
     }
 
     @Override
@@ -197,13 +187,6 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment implem
         if (mIsLoadingMore) {
             mRecyclerAdapter.showLoadMoreIndicator();
             mRecyclerView.scrollToPosition(mRecyclerAdapter.getLastPosition());
-        }
-    }
-
-    @Override
-    void showMainView() {
-        if (!mOnlineQueryInProgress) {
-            super.showMainView();
         }
     }
 

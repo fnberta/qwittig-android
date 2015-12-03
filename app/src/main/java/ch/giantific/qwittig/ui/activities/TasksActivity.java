@@ -20,14 +20,16 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
 
+import ch.giantific.qwittig.LocalBroadcast;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.helpers.query.TaskQueryHelper;
 import ch.giantific.qwittig.data.helpers.reminder.TaskRemindHelper;
+import ch.giantific.qwittig.services.ParseQueryService;
 import ch.giantific.qwittig.ui.adapters.StringResSpinnerAdapter;
 import ch.giantific.qwittig.ui.fragments.TasksFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupCreateDialogFragment;
-import ch.giantific.qwittig.utils.ViewUtils;
 import ch.giantific.qwittig.utils.Utils;
+import ch.giantific.qwittig.utils.ViewUtils;
 
 /**
  * Hosts {@link TasksFragment} that displays a list of recent tasks. Only loads the fragment if the
@@ -49,6 +51,15 @@ public class TasksActivity extends BaseNavDrawerActivity implements
     private Spinner mSpinnerDeadline;
     private TasksFragment mTaskFragment;
     private FloatingActionButton mFab;
+
+    @Override
+    void handleLocalBroadcast(Intent intent, int dataType) {
+        super.handleLocalBroadcast(intent, dataType);
+
+        if (dataType == LocalBroadcast.DATA_TYPE_TASKS_UPDATED) {
+            onTasksUpdated();
+        }
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -181,12 +192,18 @@ public class TasksActivity extends BaseNavDrawerActivity implements
 
         addTasksFragment();
         setDeadlineListener();
+        queryAll();
+    }
+
+    private void queryAll() {
+        if (userIsInGroup()) {
+            mTaskFragment.setOnlineQueryInProgress(true);
+            ParseQueryService.startQueryAll(this);
+        }
     }
 
     @Override
     public void onTasksUpdated() {
-        super.onTasksUpdated();
-
         mTaskFragment.onTasksUpdated();
     }
 

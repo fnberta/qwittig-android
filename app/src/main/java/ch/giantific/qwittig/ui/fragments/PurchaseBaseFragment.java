@@ -48,7 +48,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
-import com.github.jorgecastilloprz.FABProgressCircle;
 import com.parse.ParseConfig;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -66,6 +65,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import ch.berta.fabio.fabprogress.FabProgress;
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.ComparatorParseUserIgnoreCase;
 import ch.giantific.qwittig.ParseErrorHandler;
@@ -178,6 +178,10 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     private PurchaseUsersInvolvedRecyclerAdapter mRecyclerAdapter;
     private int mSelectedItemPosition;
     private CharSequence[] mUsersAvailableNicknames;
+
+    public boolean isSaving() {
+        return mIsSaving;
+    }
 
     @Override
     public void onAttach(@NonNull Activity activity) {
@@ -358,7 +362,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     void revealFab() {
-        mListener.showFab(mIsSaving);
+        mListener.showFab();
     }
 
     /**
@@ -1154,7 +1158,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
                             ParseException.CONNECTION_FAILED));
                 } else {
                     mIsSaving = true;
-                    mListener.progressCircleShow();
+                    mListener.startProgressAnim();
                     setPurchase();
                     savePurchaseWithHelper();
                 }
@@ -1245,7 +1249,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         showErrorSnackbar(ParseErrorHandler.getErrorMessage(context, errorCode));
 
         mIsSaving = false;
-        mListener.progressCircleHide();
+        mListener.stopProgressAnim();
     }
 
     void showErrorSnackbar(@NonNull String message) {
@@ -1258,7 +1262,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     public void onPurchaseSavedAndPinned() {
         mIsSaving = false;
         setResultForSnackbar(getPurchaseSavedAction());
-        mListener.progressCircleStartFinal();
+        mListener.startFinalProgressAnim();
     }
 
     @PurchaseResults
@@ -1407,26 +1411,23 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         void setHasNote(boolean hasNote);
 
         /**
-         * Indicates that the {@link FloatingActionButton} should be revealed and if or without the
-         * loading animation
-         *
-         * @param isSaving whether to show the loading animation or not
+         * Indicates that the {@link FloatingActionButton} should be revealed.
          */
-        void showFab(boolean isSaving);
+        void showFab();
 
         /**
-         * Indicates to start the loading animation of the {@link FABProgressCircle}.
+         * Indicates to start the loading animation of the {@link FabProgress}.
          */
-        void progressCircleShow();
+        void startProgressAnim();
 
         /**
-         * Indicates to start the final loading animation of the {@link FABProgressCircle}.
+         * Indicates to start the final loading animation of the {@link FabProgress}.
          */
-        void progressCircleStartFinal();
+        void startFinalProgressAnim();
 
         /**
-         * Indicates to hide the loading animation of the {@link FABProgressCircle}.
+         * Indicates to hide the loading animation of the {@link FabProgress}.
          */
-        void progressCircleHide();
+        void stopProgressAnim();
     }
 }

@@ -10,7 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewCompat;
 import android.transition.Transition;
 import android.view.Menu;
@@ -18,13 +18,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
 
-import com.github.jorgecastilloprz.FABProgressCircle;
-import com.github.jorgecastilloprz.listeners.FABProgressListener;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import ch.berta.fabio.fabprogress.FabProgress;
+import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.helpers.RatesHelper;
 import ch.giantific.qwittig.data.helpers.save.PurchaseSaveHelper;
@@ -65,25 +64,23 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     PurchaseBaseFragment mPurchaseFragment;
     private boolean mHasReceiptFile;
     private boolean mHasNote;
-    private FloatingActionButton mFabPurchaseSave;
-    private FABProgressCircle mFabProgressCircle;
+    private FabProgress mFabProgress;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_purchase_add_edit);
 
-        mFabPurchaseSave = (FloatingActionButton) findViewById(R.id.fab_purchase_save);
-        mFabPurchaseSave.setOnClickListener(new View.OnClickListener() {
+        mFabProgress = (FabProgress) findViewById(R.id.fab_purchase_save);
+        mFabProgress.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mPurchaseFragment.savePurchase(false);
             }
         });
-        mFabProgressCircle = (FABProgressCircle) findViewById(R.id.fab_purchase_save_circle);
-        mFabProgressCircle.attachListener(new FABProgressListener() {
+        mFabProgress.setProgressFinalAnimationListener(new ProgressFinalAnimationListener() {
             @Override
-            public void onFABProgressAnimationEnd() {
+            public void onProgressFinalAnimationComplete() {
                 mPurchaseFragment.finishPurchase();
             }
         });
@@ -121,29 +118,18 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         });
     }
 
-    public void showFab() {
-        showFab(false);
-    }
-
     @Override
-    public void showFab(final boolean isSaving) {
-        if (ViewCompat.isLaidOut(mFabPurchaseSave)) {
-            revealFab(isSaving);
+    public void showFab() {
+        if (ViewCompat.isLaidOut(mFabProgress)) {
+            mFabProgress.show();
         } else {
-            mFabPurchaseSave.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            mFabProgress.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
                 @Override
                 public void onLayoutChange(@NonNull View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
                     v.removeOnLayoutChangeListener(this);
-                    revealFab(isSaving);
+                    mFabProgress.show();
                 }
             });
-        }
-    }
-
-    private void revealFab(boolean isSaving) {
-        mFabPurchaseSave.show();
-        if (isSaving) {
-            mFabProgressCircle.show();
         }
     }
 
@@ -167,6 +153,8 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                return checkIfSaving() || super.onOptionsItemSelected(item);
             case R.id.action_purchase_add_edit_receipt_show:
                 mPurchaseFragment.showReceiptFragment();
                 return true;
@@ -184,6 +172,15 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         }
     }
 
+    private boolean checkIfSaving() {
+        if (mPurchaseFragment.isSaving()) {
+            Snackbar.make(mToolbar, R.string.toast_saving_purchase, Snackbar.LENGTH_LONG).show();
+            return true;
+        }
+
+        return false;
+    }
+
     @Override
     public void setHasReceiptFile(boolean hasReceiptFile) {
         mHasReceiptFile = hasReceiptFile;
@@ -195,7 +192,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         mPurchaseFragment.deleteReceipt();
         setHasReceiptFile(false);
         getFragmentManager().popBackStack();
-        MessageUtils.showBasicSnackbar(mFabPurchaseSave, getString(R.string.toast_receipt_deleted));
+        MessageUtils.showBasicSnackbar(mFabProgress, getString(R.string.toast_receipt_deleted));
     }
 
     @Override
@@ -239,7 +236,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         if (fragment != null) {
             fragment.updateNote(note);
         } else {
-            MessageUtils.showBasicSnackbar(mFabPurchaseSave, getString(R.string.toast_note_added));
+            MessageUtils.showBasicSnackbar(mFabProgress, getString(R.string.toast_note_added));
         }
     }
 
@@ -253,7 +250,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         mPurchaseFragment.deleteNote();
         setHasNote(false);
         getFragmentManager().popBackStack();
-        MessageUtils.showBasicSnackbar(mFabPurchaseSave, getString(R.string.toast_note_deleted));
+        MessageUtils.showBasicSnackbar(mFabProgress, getString(R.string.toast_note_deleted));
     }
 
     @Override
@@ -282,17 +279,24 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     }
 
     @Override
-    public void progressCircleShow() {
-        mFabProgressCircle.show();
+    public void startProgressAnim() {
+        mFabProgress.startProgress();
     }
 
     @Override
-    public void progressCircleStartFinal() {
-        mFabProgressCircle.beginFinalAnimation();
+    public void startFinalProgressAnim() {
+        mFabProgress.beginProgressFinalAnimation();
     }
 
     @Override
-    public void progressCircleHide() {
-        mFabProgressCircle.hide();
+    public void stopProgressAnim() {
+        mFabProgress.stopProgress();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!checkIfSaving()) {
+            super.onBackPressed();
+        }
     }
 }

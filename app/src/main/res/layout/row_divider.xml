@@ -10,4 +10,5 @@
     android:layout_height="1dp"
     android:layout_marginTop="@dimen/small_space"
     android:layout_marginBottom="@dimen/small_space"
-    android:background="?android:attr/listDivider"/>
+    android:background="?android:attr/listDivider"
+    />

@@ -16,18 +16,18 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.github.jorgecastilloprz.FABProgressCircle;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.berta.fabio.fabprogress.FabProgress;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.helpers.group.InviteUsersHelper;
+import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.data.repositories.ParseUserRepository;
-import ch.giantific.qwittig.data.helpers.group.InviteUsersHelper;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
@@ -56,6 +56,10 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
 
     public SettingsUserInviteFragment() {
         // Required empty public constructor
+    }
+
+    public boolean isInviting() {
+        return mIsInviting;
     }
 
     @Override
@@ -226,7 +230,7 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
 
     private void inviteNewUsers() {
         mIsInviting = true;
-        mListener.progressCircleShow();
+        mListener.startProgressAnim();
 
         inviteUsersWithHelper(mCurrentGroup);
     }
@@ -257,11 +261,11 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
     }
 
     /**
-     * Starts the {@link FABProgressCircle} final animation and removes the retained helper
+     * Starts the {@link FabProgress} final animation and removes the retained helper
      * fragment.
      */
     public void onUsersInvited() {
-        mListener.progressCircleStartFinal();
+        mListener.startFinalProgressAnim();
         HelperUtils.removeHelper(getFragmentManager(), INVITE_HELPER);
 
     }
@@ -283,7 +287,7 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
     @Override
     protected void hideProgressCircle() {
         mIsInviting = false;
-        mListener.progressCircleHide();
+        mListener.stopProgressAnim();
     }
 
     @Override
@@ -300,19 +304,19 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
     public interface FragmentInteractionListener extends BaseFragmentInteractionListener {
 
         /**
-         * Handles the start of the loading animation of the {@link FABProgressCircle}.
+         * Handles the start of the loading animation of the {@link FabProgress}.
          */
-        void progressCircleShow();
+        void startProgressAnim();
 
         /**
-         * Handles the start of the final loading animation of the {@link FABProgressCircle}.
+         * Handles the start of the final loading animation of the {@link FabProgress}.
          */
-        void progressCircleStartFinal();
+        void startFinalProgressAnim();
 
         /**
-         * Handles the action to hide the loading animation of the {@link FABProgressCircle}.
+         * Handles the action to hide the loading animation of the {@link FabProgress}.
          */
-        void progressCircleHide();
+        void stopProgressAnim();
     }
 
 }

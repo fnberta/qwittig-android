@@ -7,6 +7,7 @@ package ch.giantific.qwittig;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.parse.LogOutCallback;
 import com.parse.ParseException;
@@ -81,6 +82,7 @@ public class ParseErrorHandler {
                 errorMessage = context.getString(R.string.toast_no_connection);
                 break;
             default:
+                Log.e(LOG_TAG, "unknown error " + errorCode);
                 errorMessage = context.getString(R.string.toast_unknown_error);
         }
 

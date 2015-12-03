@@ -67,7 +67,7 @@ public class RatesHelper extends BaseHelper {
         String baseCurrency = "";
         Bundle args = getArguments();
         if (args != null) {
-            baseCurrency = args.getString(BUNDLE_BASE_CURRENCY);
+            baseCurrency = args.getString(BUNDLE_BASE_CURRENCY, "");
         }
 
         if (TextUtils.isEmpty(baseCurrency)) {

@@ -5,10 +5,13 @@
 package ch.giantific.qwittig;
 
 import android.app.Application;
+import android.util.Log;
 
+import com.facebook.FacebookSdk;
 import com.parse.Parse;
 import com.parse.ParseACL;
 import com.parse.ParseCrashReporting;
+import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
 
@@ -30,6 +33,9 @@ public class Qwittig extends Application {
     public void onCreate() {
         super.onCreate();
 
+        // initialise Facebook SDK
+        FacebookSdk.sdkInitialize(getApplicationContext());
+
         // register ParseObject subclasses
         ParseObject.registerSubclass(Group.class);
         ParseObject.registerSubclass(User.class);
@@ -47,6 +53,9 @@ public class Qwittig extends Application {
         // initialise Parse
         Parse.initialize(this, "yLuL6xJB2dUD2hjfh4W2EcZizcPsJZKDgDzbrPji",
                 "XByv1XfsM9lwxAFw7KnAIGDoz2XxfES7cfd43q5t");
+
+        // initialize Parse Facebook Utils
+        ParseFacebookUtils.initialize(this);
 
         // set default ACL with read/write access only for the user that creates an object
         ParseACL acl = new ParseACL();

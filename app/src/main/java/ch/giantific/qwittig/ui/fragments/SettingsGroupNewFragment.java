@@ -18,19 +18,17 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import com.github.jorgecastilloprz.FABProgressCircle;
 import com.parse.ParseInstallation;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
-import com.parse.ParseUser;
 
 import java.util.List;
 
+import ch.berta.fabio.fabprogress.FabProgress;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.helpers.group.CreateGroupHelper;
 import ch.giantific.qwittig.domain.models.Currency;
 import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.data.helpers.group.CreateGroupHelper;
 import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
@@ -52,6 +50,10 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
 
     public SettingsGroupNewFragment() {
         // Required empty public constructor
+    }
+
+    public boolean isCreatingNew() {
+        return mIsCreatingNew;
     }
 
     public void setIsCreatingNew(boolean isCreatingNew) {
@@ -136,7 +138,7 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
             return;
         }
 
-        mListener.progressCircleShow();
+        mListener.startProgressAnim();
         mIsCreatingNew = true;
         mGroupNewName = name;
 
@@ -208,7 +210,7 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
     @Override
     protected void hideProgressCircle() {
         mIsCreatingNew = false;
-        mListener.progressCircleHide();
+        mListener.stopProgressAnim();
     }
 
     @Override
@@ -222,14 +224,14 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
      */
     public interface FragmentInteractionListener extends BaseFragmentInteractionListener {
         /**
-         * Indicates to start the loading animation of the {@link FABProgressCircle}.
+         * Indicates to start the loading animation of the {@link FabProgress}.
          */
-        void progressCircleShow();
+        void startProgressAnim();
 
         /**
-         * Indicates to hide the loading animation of the {@link FABProgressCircle}.
+         * Indicates to hide the loading animation of the {@link FabProgress}.
          */
-        void progressCircleHide();
+        void stopProgressAnim();
 
         /**
          * Indicates that the activity should be finished with the name of new group in the result

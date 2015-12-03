@@ -42,6 +42,8 @@ public class CloudCodeClient {
     public static final String PARAM_FILE_NAME = "fileName";
     public static final String PARAM_YEAR = "year";
     public static final String PARAM_MONTH = "month";
+    public static final String PARAM_ID_TOKEN = "idToken";
+    public static final String LOGIN_WITH_GOOGLE = "loginWithGoogle";
 
     public CloudCodeClient() {
     }
@@ -314,6 +316,24 @@ public class CloudCodeClient {
             params.put(PARAM_MONTH, month - 1);
         }
         return params;
+    }
+
+    /**
+     * Verifies the idToken obtained from Google and if successful logs in the user attached to the
+     * email address in the token. If no such user exists yet, creates a new one.
+     *
+     * @param idToken  the token obtained from the Google login
+     * @param listener the callback for when the Cloud Code function returns
+     */
+    public void loginWithGoogle(@NonNull String idToken, @NonNull final CloudCodeListener listener) {
+        Map<String, Object> params = new HashMap<>();
+        params.put(PARAM_ID_TOKEN, idToken);
+        ParseCloud.callFunctionInBackground(LOGIN_WITH_GOOGLE, params, new FunctionCallback<Object>() {
+            @Override
+            public void done(Object o, ParseException e) {
+                onFunctionReturned(o, e, listener);
+            }
+        });
     }
 
     /**

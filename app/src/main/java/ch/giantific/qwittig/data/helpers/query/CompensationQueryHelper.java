@@ -73,13 +73,11 @@ public class CompensationQueryHelper extends BaseQueryHelper implements
             } else {
                 repo.updateCompensationsUnpaidAsync(mCurrentUserGroups, this);
             }
-        } else {
-            if (mListener != null) {
-                if (mQueryPaid) {
-                    mListener.onAllCompensationsPaidUpdated();
-                } else {
-                    mListener.onCompensationsUpdated(false);
-                }
+        } else if (mListener != null) {
+            if (mQueryPaid) {
+                mListener.onAllCompensationsPaidUpdated();
+            } else {
+                mListener.onCompensationsUpdated(false);
             }
         }
     }

@@ -46,7 +46,7 @@ public interface GroupRepository {
     /**
      * Defines the callback when a group is loaded from the local data store.
      */
-    public interface GetGroupLocalListener {
+    interface GetGroupLocalListener {
         /**
          * Called when a local group was successfully loaded.
          *
@@ -58,7 +58,7 @@ public interface GroupRepository {
     /**
      * Defines the callback when a group is loaded from the online data store.
      */
-    public interface GetGroupOnlineListener {
+    interface GetGroupOnlineListener {
         /**
          * Called when online group was successfully loaded.
          *

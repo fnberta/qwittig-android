@@ -36,7 +36,7 @@
 
         <TextView
             android:id="@+id/tv_user"
-            style="@style/ListTextSubhead"
+            style="@style/TextAppearance.AppCompat.Subhead.List"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
@@ -54,7 +54,7 @@
 
     <TextView
         android:id="@+id/tv_amount"
-        style="@style/ListTextSubhead"
+        style="@style/TextAppearance.AppCompat.Subhead.List"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentEnd="true"

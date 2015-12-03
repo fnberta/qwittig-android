@@ -3,10 +3,10 @@
   -->
 
 <android.support.design.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
@@ -27,10 +27,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:contentScrim="?attr/colorPrimary"
-            app:expandedTitleMarginStart="@dimen/key_line_1"
             app:expandedTitleMarginEnd="@dimen/key_line_1"
+            app:expandedTitleMarginStart="@dimen/key_line_1"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
             >
 
             <FrameLayout
@@ -60,9 +60,9 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 app:contentInsetStart="@dimen/key_line_2"
-                app:layout_collapseMode="pin"/>
+                app:layout_collapseMode="pin"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
         </android.support.design.widget.CollapsingToolbarLayout>
 
@@ -73,15 +73,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:ignore="MergeRootFrame" />
+        tools:ignore="MergeRootFrame"/>
 
-    <android.support.design.widget.FloatingActionButton
+    <ch.berta.fabio.fabprogress.FabProgress
         android:id="@+id/fab_save"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/normal_space"
         android:src="@drawable/ic_save_black_24dp"
+        app:fb_arcColor="@color/green"
+        app:fb_finalIcon="@drawable/ic_done_black_24dp"
         app:layout_anchor="@id/appbar"
-        app:layout_anchorGravity="bottom|end"/>
+        app:layout_anchorGravity="bottom|end"
+        />
 
 </android.support.design.widget.CoordinatorLayout>

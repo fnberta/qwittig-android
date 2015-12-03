@@ -14,5 +14,7 @@
 
     <!-- FAB -->
     <dimen name="fab_margin_toolbar_x4">132dp</dimen>
+    <dimen name="fab_margin_toolbar_x2">52dp</dimen>
+    <dimen name="fab_mini_margin_toolbar_x2">60dp</dimen>
 
 </resources>

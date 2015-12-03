@@ -29,11 +29,33 @@ import ch.giantific.qwittig.utils.MessageUtils;
 public abstract class BaseRecyclerViewOnlineFragment extends BaseRecyclerViewFragment {
 
     private static final String STATE_IS_LOADING = "STATE_IS_LOADING";
+    private static final String STATE_ONLINE_QUERY = "STATE_ONLINE_QUERY";
     SwipeRefreshLayout mSwipeRefreshLayout;
+    private boolean mOnlineQueryInProgress;
 
     public BaseRecyclerViewOnlineFragment() {
     }
 
+    public void setOnlineQueryInProgress(boolean onlineQueryInProgress) {
+        mOnlineQueryInProgress = onlineQueryInProgress;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            mOnlineQueryInProgress = savedInstanceState.getBoolean(STATE_ONLINE_QUERY, false);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putBoolean(STATE_IS_LOADING, mSwipeRefreshLayout.isRefreshing());
+        outState.putBoolean(STATE_ONLINE_QUERY, mOnlineQueryInProgress);
+    }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -83,13 +105,6 @@ public abstract class BaseRecyclerViewOnlineFragment extends BaseRecyclerViewFra
         };
     }
 
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putBoolean(STATE_IS_LOADING, mSwipeRefreshLayout.isRefreshing());
-    }
-
     /**
      * Sets the loading state of the {@link SwipeRefreshLayout}.
      *
@@ -98,6 +113,13 @@ public abstract class BaseRecyclerViewOnlineFragment extends BaseRecyclerViewFra
     public void setLoading(boolean isLoading) {
         if (mSwipeRefreshLayout != null) {
             mSwipeRefreshLayout.setRefreshing(isLoading);
+        }
+    }
+
+    @Override
+    void showMainView() {
+        if (!mOnlineQueryInProgress) {
+            super.showMainView();
         }
     }
 }

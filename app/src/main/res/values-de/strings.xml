@@ -23,7 +23,7 @@
     <string name="action_logout">Abmelden</string>
     <string name="title_activity_login">Anmelden</string>
     <string name="login_button_log_in">Anmelden</string>
-    <string name="login_button_sign_up">Neuen Account erstellen</string>
+    <string name="login_button_sign_up">Registrieren</string>
     <string name="login_button_tryout">Ohne Account testen</string>
     <string name="no_purchases">Keine Einkäufe vorhanden</string>
     <string name="no_users">Keine Nutzer vorhanden</string>
@@ -313,5 +313,18 @@
     <string name="toast_note_deleted">Notiz gelöscht</string>
     <string name="toast_note_added">Notiz hinzugefügt</string>
     <string name="toast_note_edited">Notiz geändert</string>
+    <string name="login_button_email">Anmelden</string>
+    <string name="login_disclaimer">Durch die Nutzung von Qwittig bist Du mit den Nutzungsbedingungen und der Datenschutzerklärung einverstanden.</string>
+    <string name="dialog_login_email_title">Email benötigt</string>
+    <string name="dialog_login_email_message">Bitte gib eine gültige Email Adresse an. Andere Nutzer werden dich über diese Adresse in Gruppen einladen können.</string>
+    <string name="action_settings_profile_unlink_facebook">Facebook Verbindung aufheben</string>
+    <string name="action_settings_profile_unlink_google">Google Verbindung aufheben</string>
+    <string name="toast_profile_update">Profil aktualisiert</string>
+    <string name="toast_unlink_failed">Verbindung aufheben fehlgeschlagen</string>
+    <string name="toast_unlink_password_required">Setze ein Passwort um die Verbindung aufzuheben</string>
+    <string name="toast_saving_profile">Speichere Profil…</string>
+    <string name="toast_saving_purchase">Speichere Einkauf…</string>
+    <string name="toast_inviting_user">Lade Nutzer ein…</string>
+    <string name="toast_creating_group">Erstelle Gruppe…</string>
 
 </resources>

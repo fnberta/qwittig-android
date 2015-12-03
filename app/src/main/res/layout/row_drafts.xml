@@ -31,7 +31,7 @@
 
     <TextView
         android:id="@+id/tv_store"
-        style="@style/ListTextSubhead"
+        style="@style/TextAppearance.AppCompat.Subhead.List"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
@@ -42,7 +42,7 @@
 
     <TextView
         android:id="@id/tv_total_value"
-        style="@style/ListTextSubhead"
+        style="@style/TextAppearance.AppCompat.Subhead.List"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentEnd="true"

@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import ch.giantific.qwittig.LocalBroadcast;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.helpers.group.SettlementHelper;
 import ch.giantific.qwittig.data.helpers.query.CompensationQueryHelper;
@@ -45,6 +46,7 @@ import ch.giantific.qwittig.domain.models.parse.Compensation;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
+import ch.giantific.qwittig.services.ParseQueryService;
 import ch.giantific.qwittig.ui.adapters.TabsAdapter;
 import ch.giantific.qwittig.ui.fragments.FinanceCompensationsBaseFragment;
 import ch.giantific.qwittig.ui.fragments.FinanceCompensationsPaidFragment;
@@ -79,7 +81,6 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
         CompensationRemindHelper.HelperInteractionListener,
         CompensationSaveHelper.HelperInteractionListener {
 
-    public static final String INTENT_AUTO_START_NEW = "INTENT_AUTO_START_NEW";
     @IntDef({TAB_NONE, TAB_USER_BALANCES, TAB_COMPS_UNPAID, TAB_COMPS_PAID})
     @Retention(RetentionPolicy.SOURCE)
     public @interface FragmentTabs {}
@@ -87,6 +88,7 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     public static final int TAB_USER_BALANCES = 0;
     public static final int TAB_COMPS_UNPAID = 1;
     public static final int TAB_COMPS_PAID = 2;
+    public static final String INTENT_AUTO_START_NEW = "INTENT_AUTO_START_NEW";
     private static final String STATE_USER_BALANCES_FRAGMENT = "STATE_USER_BALANCES_FRAGMENT";
     private static final String STATE_COMPENSATIONS_UNPAID_FRAGMENT = "STATE_COMPENSATIONS_UNPAID_FRAGMENT";
     private static final String STATE_COMPENSATIONS_PAID_FRAGMENT = "STATE_COMPENSATIONS_PAID_FRAGMENT";
@@ -100,6 +102,20 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     private FinanceCompensationsPaidFragment mCompensationsPaidFragment;
     private String mCurrentGroupCurrency;
     private List<ParseUser> mSinglePaymentUsers;
+
+    @Override
+    void handleLocalBroadcast(Intent intent, int dataType) {
+        super.handleLocalBroadcast(intent, dataType);
+        switch (dataType) {
+            case LocalBroadcast.DATA_TYPE_USERS_UPDATED:
+                onUsersUpdated();
+                break;
+            case LocalBroadcast.DATA_TYPE_COMPENSATIONS_UPDATED:
+                boolean isPaid = intent.getBooleanExtra(LocalBroadcast.INTENT_EXTRA_COMPENSATION_PAID, false);
+                onCompensationsUpdated(isPaid);
+                break;
+        }
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -154,7 +170,7 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
         tabsAdapter.addFragment(mCompensationsPaidFragment, getString(R.string.tab_compensations_history));
         viewPager.setAdapter(tabsAdapter);
         viewPager.setOffscreenPageLimit(2);
-        if (fragmentToSelect > TAB_NONE) {
+        if (fragmentToSelect != TAB_NONE) {
             viewPager.setCurrentItem(fragmentToSelect);
         }
 
@@ -215,12 +231,19 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
 
         addViewPagerFragments();
         setToolbarHeader();
+        queryAll();
+    }
+
+    private void queryAll() {
+        if (userIsInGroup()) {
+            mCompensationsUnpaidFragment.setOnlineQueryInProgress(true);
+            ParseQueryService.startQueryAll(this);
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_compensations, menu);
-
         return true;
     }
 
@@ -242,10 +265,6 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
         } else {
             showCreateGroupDialog();
         }
-    }
-
-    private boolean userIsInGroup() {
-        return mCurrentGroup != null;
     }
 
     private void showCreateGroupDialog() {
@@ -305,6 +324,7 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
             User user = (User) parseUser;
             if (recipient.getObjectId().equals(user.getObjectId())) {
                 recipientSelected = user;
+                break;
             }
         }
 
@@ -336,7 +356,6 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
         });
     }
 
-
     @Override
     public void onChangedAmountSet(@NonNull BigFraction amount) {
         mCompensationsUnpaidFragment.onChangedAmountSet(amount);
@@ -349,8 +368,6 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
 
     @Override
     public void onUsersUpdated() {
-        super.onUsersUpdated();
-
         mUserBalancesFragment.onUsersUpdated();
         setToolbarHeader();
     }
@@ -371,8 +388,6 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
 
     @Override
     public void onCompensationsUpdated(boolean isPaid) {
-        super.onCompensationsUpdated(isPaid);
-
         if (isPaid) {
             mCompensationsPaidFragment.onCompensationsUpdated();
         } else {

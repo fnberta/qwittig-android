@@ -7,8 +7,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     android:transitionGroup="true"
-    tools:context="ch.giantific.qwittig.ui.fragments.LoginSignUpFragment"
+    tools:context="ch.giantific.qwittig.ui.fragments.LoginEmailSignUpFragment"
     >
 
     <LinearLayout
@@ -41,7 +42,7 @@
             android:text="@string/user_avatar"/>
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/til_login_signup_email"
+            android:id="@+id/til_login_email_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/small_space"
@@ -111,7 +112,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/login_button_sign_up"
-            android:theme="@style/ColoredRaisedButton"/>
+            android:theme="@style/Widget.AppCompat.Button.AccentColor"/>
 
     </LinearLayout>
 
