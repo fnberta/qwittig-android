@@ -13,9 +13,9 @@ import android.support.v7.widget.RecyclerView;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.ParseCompensationRepository;
-import ch.giantific.qwittig.data.helpers.query.CompensationQueryHelper;
+import ch.giantific.qwittig.workerfragments.query.CompensationQueryWorker;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
-import ch.giantific.qwittig.utils.HelperUtils;
+import ch.giantific.qwittig.utils.WorkerUtils;
 import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -62,20 +62,20 @@ public abstract class FinanceCompensationsBaseFragment extends BaseRecyclerViewO
         }
 
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment queryHelper = HelperUtils.findHelper(fragmentManager, getQueryHelperTag());
+        Fragment queryWorker = WorkerUtils.findWorker(fragmentManager, getQueryWorkerTag());
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-        if (queryHelper == null) {
-            queryHelper = CompensationQueryHelper.newInstance(queryPaid);
+        if (queryWorker == null) {
+            queryWorker = CompensationQueryWorker.newInstance(queryPaid);
 
             fragmentManager.beginTransaction()
-                    .add(queryHelper, getQueryHelperTag())
+                    .add(queryWorker, getQueryWorkerTag())
                     .commit();
         }
     }
 
-    protected abstract String getQueryHelperTag();
+    protected abstract String getQueryWorkerTag();
 
     /**
      * Tells the adapter of the {@link RecyclerView} to re-query its data.
@@ -87,7 +87,7 @@ public abstract class FinanceCompensationsBaseFragment extends BaseRecyclerViewO
 
     /**
      * Passes the error code to the generic error handler, shows the user an error message and
-     * removes the retained helper fragment and loading indicators.
+     * removes the retained worker fragment and loading indicators.
      *
      * @param errorCode the error code of the exception thrown in the process
      */
@@ -95,7 +95,7 @@ public abstract class FinanceCompensationsBaseFragment extends BaseRecyclerViewO
         final Activity context = getActivity();
         ParseErrorHandler.handleParseError(context, errorCode);
         showErrorSnackbar(ParseErrorHandler.getErrorMessage(context, errorCode), getOnlineQueryRetryAction());
-        HelperUtils.removeHelper(getFragmentManager(), getQueryHelperTag());
+        WorkerUtils.removeWorker(getFragmentManager(), getQueryWorkerTag());
 
         setLoading(false);
     }

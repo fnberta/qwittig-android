@@ -35,12 +35,12 @@ import java.util.List;
 
 import ch.giantific.qwittig.LocalBroadcast;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.group.SettlementHelper;
-import ch.giantific.qwittig.data.helpers.query.CompensationQueryHelper;
-import ch.giantific.qwittig.data.helpers.query.MoreQueryHelper;
-import ch.giantific.qwittig.data.helpers.query.UserQueryHelper;
-import ch.giantific.qwittig.data.helpers.reminder.CompensationRemindHelper;
-import ch.giantific.qwittig.data.helpers.save.CompensationSaveHelper;
+import ch.giantific.qwittig.workerfragments.group.SettlementWorker;
+import ch.giantific.qwittig.workerfragments.query.CompensationQueryWorker;
+import ch.giantific.qwittig.workerfragments.query.MoreQueryWorker;
+import ch.giantific.qwittig.workerfragments.query.UserQueryWorker;
+import ch.giantific.qwittig.workerfragments.reminder.CompensationRemindWorker;
+import ch.giantific.qwittig.workerfragments.save.CompensationSaveWorker;
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.domain.models.ItemUserPicker;
 import ch.giantific.qwittig.domain.models.parse.Compensation;
@@ -74,12 +74,12 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
         CompensationSingleDialogFragment.DialogInteractionListener,
         GroupCreateDialogFragment.DialogInteractionListener,
         CompensationChangeAmountDialogFragment.DialogInteractionListener,
-        UserQueryHelper.HelperInteractionListener,
-        CompensationQueryHelper.HelperInteractionListener,
-        MoreQueryHelper.HelperInteractionListener,
-        SettlementHelper.HelperInteractionListener,
-        CompensationRemindHelper.HelperInteractionListener,
-        CompensationSaveHelper.HelperInteractionListener {
+        UserQueryWorker.WorkerInteractionListener,
+        CompensationQueryWorker.WorkerInteractionListener,
+        MoreQueryWorker.WorkerInteractionListener,
+        SettlementWorker.WorkerInteractionListener,
+        CompensationRemindWorker.WorkerInteractionListener,
+        CompensationSaveWorker.WorkerInteractionListener {
 
     @IntDef({TAB_NONE, TAB_USER_BALANCES, TAB_COMPS_UNPAID, TAB_COMPS_PAID})
     @Retention(RetentionPolicy.SOURCE)

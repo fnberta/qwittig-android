@@ -19,7 +19,7 @@ import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.ui.listeners.SwipeDismissTouchListener;
-import ch.giantific.qwittig.utils.HelperUtils;
+import ch.giantific.qwittig.utils.WorkerUtils;
 import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -141,10 +141,10 @@ public abstract class SettingsBaseInviteFragment extends BaseFragment {
         return allEmailsAreValid;
     }
 
-    final void onInviteError(int errorCode, String helperTag) {
+    final void onInviteError(int errorCode, String workerTag) {
         final Activity context = getActivity();
         ParseErrorHandler.handleParseError(context, errorCode);
-        HelperUtils.removeHelper(getFragmentManager(), helperTag);
+        WorkerUtils.removeWorker(getFragmentManager(), workerTag);
 
         hideProgressCircle();
         Snackbar.make(mButtonAddUser,

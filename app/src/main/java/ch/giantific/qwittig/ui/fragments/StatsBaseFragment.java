@@ -14,7 +14,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.ContentLoadingProgressBar;
 import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.parse.ParseException;
@@ -24,13 +23,13 @@ import java.util.List;
 
 import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.group.StatsHelper;
+import ch.giantific.qwittig.workerfragments.group.StatsWorker;
 import ch.giantific.qwittig.data.repositories.ParseGroupRepository;
 import ch.giantific.qwittig.domain.models.Month;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.stats.Stats;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
-import ch.giantific.qwittig.utils.HelperUtils;
+import ch.giantific.qwittig.utils.WorkerUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
@@ -229,32 +228,32 @@ public abstract class StatsBaseFragment extends BaseFragment {
         return -1;
     }
 
-    final void calcStatsWithHelper(@StatsHelper.StatsType int statsType,
+    final void calcStatsWithWorker(@StatsWorker.StatsType int statsType,
                                    @NonNull String year, int month) {
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment statsHelper = HelperUtils.findHelper(fragmentManager, getHelperTag());
+        Fragment statsWorker = WorkerUtils.findWorker(fragmentManager, getWorkerTag());
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-        if (statsHelper == null) {
-            statsHelper = StatsHelper.newInstance(statsType, year, month);
+        if (statsWorker == null) {
+            statsWorker = StatsWorker.newInstance(statsType, year, month);
 
             fragmentManager.beginTransaction()
-                    .add(statsHelper, getHelperTag())
+                    .add(statsWorker, getWorkerTag())
                     .commit();
         }
     }
 
-    protected abstract String getHelperTag();
+    protected abstract String getWorkerTag();
 
     /**
-     * Removes the retained helper fragment und sets the loaded chart data for display to the user.
+     * Removes the retained worker fragment und sets the loaded chart data for display to the user.
      *
      * @param stats the stats data to set
      */
     @CallSuper
     public void onStatsCalculated(@Nullable Stats stats) {
-        HelperUtils.removeHelper(getFragmentManager(), getHelperTag());
+        WorkerUtils.removeWorker(getFragmentManager(), getWorkerTag());
 
         if (stats == null) {
             mIsLoading = false;
@@ -272,7 +271,7 @@ public abstract class StatsBaseFragment extends BaseFragment {
 
     /**
      * Passes the error code to the generic error handler, shows the user an error message and
-     * removes the retained helper fragment and loading indicators.
+     * removes the retained worker fragment and loading indicators.
      *
      * @param errorCode the error code of the exception thrown during the process
      */
@@ -281,7 +280,7 @@ public abstract class StatsBaseFragment extends BaseFragment {
         final Activity context = getActivity();
         ParseErrorHandler.handleParseError(context, errorCode);
         showErrorSnackbar(ParseErrorHandler.getErrorMessage(context, errorCode));
-        HelperUtils.removeHelper(getFragmentManager(), getHelperTag());
+        WorkerUtils.removeWorker(getFragmentManager(), getWorkerTag());
 
         mIsLoading = false;
         toggleProgressBarVisibility();

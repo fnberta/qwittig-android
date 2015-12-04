@@ -11,7 +11,7 @@ import android.view.MenuItem;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.ocr.OcrPurchase;
-import ch.giantific.qwittig.data.helpers.OcrHelper;
+import ch.giantific.qwittig.workerfragments.OcrWorker;
 import ch.giantific.qwittig.ui.fragments.PurchaseAddAutoFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseAddFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseBaseFragment;
@@ -26,7 +26,7 @@ import ch.giantific.qwittig.ui.fragments.dialogs.PurchaseDiscardDialogFragment;
  */
 public class PurchaseAddActivity extends PurchaseBaseActivity implements
         PurchaseDiscardDialogFragment.DialogInteractionListener,
-        OcrHelper.HelperInteractionListener {
+        OcrWorker.WorkerInteractionListener {
 
     public static final String INTENT_PURCHASE_NEW_AUTO = "INTENT_PURCHASE_NEW_AUTO";
     public static final String INTENT_PURCHASE_NEW_TRIAL_MODE = "INTENT_PURCHASE_NEW_TRIAL_MODE";

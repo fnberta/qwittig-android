@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.helpers.query;
+package ch.giantific.qwittig.workerfragments.query;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -16,17 +16,17 @@ import ch.giantific.qwittig.domain.repositories.UserRepository;
 /**
  * Performs an online query to the Parse.com database to query users.
  * <p/>
- * Subclass of {@link BaseQueryHelper}.
+ * Subclass of {@link BaseQueryWorker}.
  */
-public class UserQueryHelper extends BaseQueryHelper implements
+public class UserQueryWorker extends BaseQueryWorker implements
         CloudCodeClient.CloudCodeListener,
         UserRepository.UpdateUsersListener {
 
-    private static final String LOG_TAG = UserQueryHelper.class.getSimpleName();
+    private static final String LOG_TAG = UserQueryWorker.class.getSimpleName();
     @Nullable
-    private HelperInteractionListener mListener;
+    private WorkerInteractionListener mListener;
 
-    public UserQueryHelper() {
+    public UserQueryWorker() {
         // empty default constructor
     }
 
@@ -34,7 +34,7 @@ public class UserQueryHelper extends BaseQueryHelper implements
     public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (HelperInteractionListener) activity;
+            mListener = (WorkerInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement DialogInteractionListener");
@@ -91,7 +91,7 @@ public class UserQueryHelper extends BaseQueryHelper implements
     /**
      * Defines the actions to take after users are updated.
      */
-    public interface HelperInteractionListener {
+    public interface WorkerInteractionListener {
         /**
          * Handles the successful update of local users including the re-calcuation of their
          * balances.

@@ -41,7 +41,7 @@ import java.util.List;
 
 import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.account.LogoutHelper;
+import ch.giantific.qwittig.workerfragments.account.LogoutWorker;
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
@@ -56,7 +56,7 @@ import ch.giantific.qwittig.ui.activities.SettingsUserInviteActivity;
 import ch.giantific.qwittig.ui.fragments.dialogs.AccountDeleteDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.ConfirmationDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupLeaveBalanceNotZeroDialogFragment;
-import ch.giantific.qwittig.utils.HelperUtils;
+import ch.giantific.qwittig.utils.WorkerUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -84,7 +84,7 @@ public class SettingsFragment extends PreferenceFragment implements
     private static final String GROUP_LEAVE_DIALOG = "GROUP_LEAVE_DIALOG";
     private static final String GROUP_LEAVE_BALANCE_NOT_ZERO_DIALOG = "GROUP_LEAVE_BALANCE_NOT_ZERO_DIALOG";
     private static final String ACCOUNT_DELETE_DIALOG = "ACCOUNT_DELETE_DIALOG";
-    private static final String LOGOUT_HELPER = "LOGOUT_HELPER";
+    private static final String LOGOUT_WORKER = "LOGOUT_WORKER";
     private static final int UPDATE_LIST_NAME = 1;
     private static final int UPDATE_LIST_GROUP = 2;
     private UserRepository mUserRepo;
@@ -512,7 +512,7 @@ public class SettingsFragment extends PreferenceFragment implements
     }
 
     /**
-     * Logs the current user out with the help of a retained helper fragment.
+     * Logs the current user out with the help of a retained worker fragment.
      */
     public void logOutUser() {
         if (!Utils.isConnected(getActivity())) {
@@ -521,24 +521,24 @@ public class SettingsFragment extends PreferenceFragment implements
         }
 
         showProgressDialog(getString(R.string.progress_logout));
-        logOutWithHelper(false);
+        logOutWithWorker(false);
     }
 
     private void showProgressDialog(@NonNull String message) {
         mProgressDialog = ProgressDialog.show(getActivity(), null, message);
     }
 
-    private void logOutWithHelper(boolean deleteUser) {
+    private void logOutWithWorker(boolean deleteUser) {
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment logoutHelper = HelperUtils.findHelper(fragmentManager, LOGOUT_HELPER);
+        Fragment logoutWorker = WorkerUtils.findWorker(fragmentManager, LOGOUT_WORKER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-        if (logoutHelper == null) {
-            logoutHelper = LogoutHelper.newInstance(deleteUser);
+        if (logoutWorker == null) {
+            logoutWorker = LogoutWorker.newInstance(deleteUser);
 
             fragmentManager.beginTransaction()
-                    .add(logoutHelper, LOGOUT_HELPER)
+                    .add(logoutWorker, LOGOUT_WORKER)
                     .commit();
         }
     }
@@ -560,7 +560,7 @@ public class SettingsFragment extends PreferenceFragment implements
 
     /**
      * Handles a failed logout attempt. Passes the error code to the generic Parse error handler
-     * and removes the helper fragment.
+     * and removes the worker fragment.
      *
      * @param errorCode the error code of the exception thrown during the logout attempt
      */
@@ -568,7 +568,7 @@ public class SettingsFragment extends PreferenceFragment implements
         final Activity context = getActivity();
         ParseErrorHandler.handleParseError(context, errorCode);
         onParseError(ParseErrorHandler.getErrorMessage(context, errorCode));
-        HelperUtils.removeHelper(getFragmentManager(), LOGOUT_HELPER);
+        WorkerUtils.removeWorker(getFragmentManager(), LOGOUT_WORKER);
     }
 
     private void onParseError(@NonNull String errorMessage) {
@@ -594,7 +594,7 @@ public class SettingsFragment extends PreferenceFragment implements
     }
 
     /**
-     * Deletes the account of a user by using a retained helper fragment for the task.
+     * Deletes the account of a user by using a retained worker fragment for the task.
      */
     public void onDeleteAccountSelected() {
         if (ParseUtils.isTestUser(mCurrentUser)) {
@@ -608,7 +608,7 @@ public class SettingsFragment extends PreferenceFragment implements
         }
 
         showProgressDialog(getString(R.string.progress_account_delete));
-        logOutWithHelper(true);
+        logOutWithWorker(true);
     }
 
     @Override

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.helpers.query;
+package ch.giantific.qwittig.workerfragments.query;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -15,31 +15,31 @@ import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 /**
  * Performs an online query to the Parse.com database to query either paid or unpaid compensations.
  * <p/>
- * Subclass of {@link BaseQueryHelper}.
+ * Subclass of {@link BaseQueryWorker}.
  */
-public class CompensationQueryHelper extends BaseQueryHelper implements
+public class CompensationQueryWorker extends BaseQueryWorker implements
         CompensationRepository.UpdateCompensationsListener {
 
-    private static final String LOG_TAG = CompensationQueryHelper.class.getSimpleName();
+    private static final String LOG_TAG = CompensationQueryWorker.class.getSimpleName();
     private static final String BUNDLE_QUERY_PAID = "BUNDLE_QUERY_PAID";
     private boolean mQueryPaid;
     @Nullable
-    private HelperInteractionListener mListener;
+    private WorkerInteractionListener mListener;
 
-    public CompensationQueryHelper() {
+    public CompensationQueryWorker() {
         // empty default constructor
     }
 
     /**
-     * Returns a new instance of {@link CompensationQueryHelper} with an argument whether to
+     * Returns a new instance of {@link CompensationQueryWorker} with an argument whether to
      * query for paid or unpaid compensations.
      *
      * @param queryPaid whether to query paid compensations
-     * @return a new instance of {@link CompensationQueryHelper}
+     * @return a new instance of {@link CompensationQueryWorker}
      */
     @NonNull
-    public static CompensationQueryHelper newInstance(boolean queryPaid) {
-        CompensationQueryHelper fragment = new CompensationQueryHelper();
+    public static CompensationQueryWorker newInstance(boolean queryPaid) {
+        CompensationQueryWorker fragment = new CompensationQueryWorker();
         Bundle args = new Bundle();
         args.putBoolean(BUNDLE_QUERY_PAID, queryPaid);
         fragment.setArguments(args);
@@ -50,7 +50,7 @@ public class CompensationQueryHelper extends BaseQueryHelper implements
     public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (HelperInteractionListener) activity;
+            mListener = (WorkerInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement DialogInteractionListener");
@@ -119,7 +119,7 @@ public class CompensationQueryHelper extends BaseQueryHelper implements
     /**
      * Defines the actions to take after compensations are updated.
      */
-    public interface HelperInteractionListener {
+    public interface WorkerInteractionListener {
         /**
          * Handles the successful update of local compensations.
          *

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.helpers.reminder;
+package ch.giantific.qwittig.workerfragments.reminder;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -19,16 +19,16 @@ import java.lang.annotation.RetentionPolicy;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.data.rest.CloudCodeClient;
-import ch.giantific.qwittig.data.helpers.BaseHelper;
+import ch.giantific.qwittig.workerfragments.BaseWorker;
 import ch.giantific.qwittig.utils.ParseUtils;
 
 /**
  * Calls Parse.com cloud functions to remind a user that he/she should either pay a compensation or
  * that he should accept an already paid one.
  * <p/>
- * Subclass of {@link BaseHelper}.
+ * Subclass of {@link BaseWorker}.
  */
-public class CompensationRemindHelper extends BaseHelper implements
+public class CompensationRemindWorker extends BaseWorker implements
         CloudCodeClient.CloudCodeListener{
 
 
@@ -39,28 +39,28 @@ public class CompensationRemindHelper extends BaseHelper implements
     public static final int TYPE_REMIND_PAID = 2;
     private static final String BUNDLE_REMIND_TYPE = "BUNDLE_REMIND_TYPE";
     private static final String BUNDLE_COMPENSATION_ID = "BUNDLE_COMPENSATION_ID";
-    private static final String LOG_TAG = CompensationRemindHelper.class.getSimpleName();
+    private static final String LOG_TAG = CompensationRemindWorker.class.getSimpleName();
     @Nullable
-    private HelperInteractionListener mListener;
+    private WorkerInteractionListener mListener;
     private int mRemindType;
     private String mCompensationId;
-    public CompensationRemindHelper() {
+    public CompensationRemindWorker() {
         // empty default constructor
     }
 
     /**
-     * Returns a new instance of {@link CompensationRemindHelper} with the reminder type and
+     * Returns a new instance of {@link CompensationRemindWorker} with the reminder type and
      * the compensation object id as arguments.
      *
      * @param remindType     the type of reminder to send, either to pay a compensation or to
      *                       accept an already paid one
      * @param compensationId the object id of the compensation
-     * @return a new instance of {@link CompensationRemindHelper}
+     * @return a new instance of {@link CompensationRemindWorker}
      */
     @NonNull
-    public static CompensationRemindHelper newInstance(@RemindType int remindType,
+    public static CompensationRemindWorker newInstance(@RemindType int remindType,
                                                        @NonNull String compensationId) {
-        CompensationRemindHelper fragment = new CompensationRemindHelper();
+        CompensationRemindWorker fragment = new CompensationRemindWorker();
         Bundle args = new Bundle();
         args.putInt(BUNDLE_REMIND_TYPE, remindType);
         args.putString(BUNDLE_COMPENSATION_ID, compensationId);
@@ -72,7 +72,7 @@ public class CompensationRemindHelper extends BaseHelper implements
     public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (HelperInteractionListener) activity;
+            mListener = (WorkerInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement DialogInteractionListener");
@@ -138,7 +138,7 @@ public class CompensationRemindHelper extends BaseHelper implements
     /**
      * Defines the action to take after a user was reminded or the action failed.
      */
-    public interface HelperInteractionListener {
+    public interface WorkerInteractionListener {
         /**
          * Handles the case when the user was successfully reminded.
          *

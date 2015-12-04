@@ -26,7 +26,7 @@ import java.util.List;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.models.stats.Stats;
-import ch.giantific.qwittig.data.helpers.group.StatsHelper;
+import ch.giantific.qwittig.workerfragments.group.StatsWorker;
 import ch.giantific.qwittig.ui.widgets.BarChart;
 import ch.giantific.qwittig.CurrencyFormatter;
 import ch.giantific.qwittig.utils.DateUtils;
@@ -40,7 +40,7 @@ import ch.giantific.qwittig.utils.DateUtils;
 public class StatsSpendingFragment extends StatsBaseFragment {
 
     private static final String LOG_TAG = StatsSpendingFragment.class.getSimpleName();
-    private static final String STATS_HELPER_SPENDING = "STATS_HELPER_SPENDING";
+    private static final String STATS_WORKER_SPENDING = "STATS_WORKER_SPENDING";
     private static final String STATE_SHOW_GROUP = "STATE_SHOW_GROUP";
     private static final String STATE_SHOW_AVERAGE = "STATE_SHOW_AVERAGE";
     private BarChart mBarChart;
@@ -127,15 +127,15 @@ public class StatsSpendingFragment extends StatsBaseFragment {
 
     @NonNull
     @Override
-    protected String getHelperTag() {
-        return STATS_HELPER_SPENDING;
+    protected String getWorkerTag() {
+        return STATS_WORKER_SPENDING;
     }
 
     @Override
     void calcStats(@NonNull String year, int month) {
         super.calcStats(year, month);
 
-        calcStatsWithHelper(StatsHelper.TYPE_SPENDING, year, month);
+        calcStatsWithWorker(StatsWorker.TYPE_SPENDING, year, month);
     }
 
     @Override

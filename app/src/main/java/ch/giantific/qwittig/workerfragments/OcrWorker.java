@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.helpers;
+package ch.giantific.qwittig.workerfragments;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -30,31 +30,31 @@ import retrofit.mime.TypedString;
  * Sends the image of receipt to the server to analyse and ocr it using
  * {@link OcrClient.ReceiptOcr}.
  * <p/>
- * Subclass of {@link BaseHelper}.
+ * Subclass of {@link BaseWorker}.
  */
-public class OcrHelper extends BaseHelper {
+public class OcrWorker extends BaseWorker {
 
-    private static final String LOG_TAG = OcrHelper.class.getSimpleName();
+    private static final String LOG_TAG = OcrWorker.class.getSimpleName();
     private static final String BUNDLE_RECEIPT_PATH = "BUNDLE_RECEIPT_PATH";
     private static final int MAX_RETRIES = 0;
     @Nullable
-    private HelperInteractionListener mListener;
+    private WorkerInteractionListener mListener;
     private String mReceiptPath;
     private int mRetries;
 
-    public OcrHelper() {
+    public OcrWorker() {
         // empty default constructor
     }
 
     /**
-     * Returns a new instance of {@link OcrHelper} with the path to a receipt image as an argument.
+     * Returns a new instance of {@link OcrWorker} with the path to a receipt image as an argument.
      *
      * @param receiptPath the path to the image of the receipt to perform ocr on
-     * @return a new instance of {@link OcrHelper}
+     * @return a new instance of {@link OcrWorker}
      */
     @NonNull
-    public static OcrHelper newInstance(@NonNull String receiptPath) {
-        OcrHelper fragment = new OcrHelper();
+    public static OcrWorker newInstance(@NonNull String receiptPath) {
+        OcrWorker fragment = new OcrWorker();
         Bundle args = new Bundle();
         args.putString(BUNDLE_RECEIPT_PATH, receiptPath);
         fragment.setArguments(args);
@@ -65,7 +65,7 @@ public class OcrHelper extends BaseHelper {
     public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (HelperInteractionListener) activity;
+            mListener = (WorkerInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement DialogInteractionListener");
@@ -145,7 +145,7 @@ public class OcrHelper extends BaseHelper {
     /**
      * Defines the action to take after the image has been ocr or after the process failed.
      */
-    public interface HelperInteractionListener {
+    public interface WorkerInteractionListener {
         /**
          * Handles the successful ocr analysis of an image.
          *

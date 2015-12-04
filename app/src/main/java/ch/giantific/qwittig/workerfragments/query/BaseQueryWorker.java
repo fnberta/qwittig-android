@@ -2,26 +2,26 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.helpers.query;
+package ch.giantific.qwittig.workerfragments.query;
 
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.util.List;
 
-import ch.giantific.qwittig.data.helpers.BaseHelper;
+import ch.giantific.qwittig.workerfragments.BaseWorker;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
 
 /**
- * Provides an abstract base class for helper fragments whose task it is to query data from the
+ * Provides an abstract base class for worker fragments whose task it is to query data from the
  * online data store.
  * <p/>
- * Subclass of {@link BaseHelper}.
+ * Subclass of {@link BaseWorker}.
  */
-public abstract class BaseQueryHelper extends BaseHelper {
+public abstract class BaseQueryWorker extends BaseWorker {
 
-    private static final String LOG_TAG = BaseQueryHelper.class.getSimpleName();
+    private static final String LOG_TAG = BaseQueryWorker.class.getSimpleName();
     User mCurrentUser;
     Group mCurrentGroup;
     List<ParseObject> mCurrentUserGroups;

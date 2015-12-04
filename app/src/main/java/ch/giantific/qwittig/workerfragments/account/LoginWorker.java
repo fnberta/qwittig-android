@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.helpers.account;
+package ch.giantific.qwittig.workerfragments.account;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -35,7 +35,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.BaseHelper;
+import ch.giantific.qwittig.workerfragments.BaseWorker;
 import ch.giantific.qwittig.data.rest.CloudCodeClient;
 import ch.giantific.qwittig.domain.models.Avatar;
 import ch.giantific.qwittig.domain.models.parse.User;
@@ -52,7 +52,7 @@ import ch.giantific.qwittig.ui.fragments.dialogs.EmailPromptDialogFragment;
  * <li>Reset the password of a user</li>
  * </ol>
  */
-public class LoginHelper extends BaseHelper {
+public class LoginWorker extends BaseWorker {
 
     private static final String BUNDLE_USERNAME = "BUNDLE_USERNAME";
     private static final String BUNDLE_PASSWORD = "BUNDLE_PASSWORD";
@@ -65,26 +65,26 @@ public class LoginHelper extends BaseHelper {
     private static final int TYPE_LOGIN_GOOGLE = 3;
     private static final int TYPE_SIGN_UP = 4;
     private static final int TYPE_RESET_PASSWORD = 5;
-    private static final String LOG_TAG = LoginHelper.class.getSimpleName();
+    private static final String LOG_TAG = LoginWorker.class.getSimpleName();
     private static final String PROMPT_EMAIL_DIALOG = "PROMPT_EMAIL_DIALOG";
     @Nullable
-    private HelperInteractionListener mListener;
+    private WorkerInteractionListener mListener;
     private User mFacebookUser;
 
-    public LoginHelper() {
+    public LoginWorker() {
         // empty default constructor
     }
 
     /**
-     * Returns a new instance of {@link LoginHelper} with a username as an argument. This will
+     * Returns a new instance of {@link LoginWorker} with a username as an argument. This will
      * reset the password of the user.
      *
      * @param username the name of the user
-     * @return a new instance of {@link LoginHelper} that will reset the password of the user
+     * @return a new instance of {@link LoginWorker} that will reset the password of the user
      */
     @NonNull
-    public static LoginHelper newInstanceResetPassword(@NonNull String username) {
-        LoginHelper fragment = new LoginHelper();
+    public static LoginWorker newInstanceResetPassword(@NonNull String username) {
+        LoginWorker fragment = new LoginWorker();
         Bundle args = new Bundle();
         args.putInt(BUNDLE_TYPE, TYPE_RESET_PASSWORD);
         args.putString(BUNDLE_USERNAME, username);
@@ -93,16 +93,16 @@ public class LoginHelper extends BaseHelper {
     }
 
     /**
-     * Returns a new instance of {@link LoginHelper} with a username and a password as arguments.
+     * Returns a new instance of {@link LoginWorker} with a username and a password as arguments.
      * This will log in the user.
      *
      * @param username the name of the user
      * @param password the password of the user
-     * @return a new instance of {@link LoginHelper} that will log in the user
+     * @return a new instance of {@link LoginWorker} that will log in the user
      */
     @NonNull
-    public static LoginHelper newInstanceLogin(@NonNull String username, @NonNull String password) {
-        LoginHelper fragment = new LoginHelper();
+    public static LoginWorker newInstanceLogin(@NonNull String username, @NonNull String password) {
+        LoginWorker fragment = new LoginWorker();
         Bundle args = new Bundle();
         args.putInt(BUNDLE_TYPE, TYPE_LOGIN_EMAIL);
         args.putString(BUNDLE_USERNAME, username);
@@ -112,14 +112,14 @@ public class LoginHelper extends BaseHelper {
     }
 
     /**
-     * Returns a new instance of {@link LoginHelper} that logs in the user with his facebook
+     * Returns a new instance of {@link LoginWorker} that logs in the user with his facebook
      * credentials. If the login was successful, sets the email address and profile image the user
      * has set in facebook.
      *
-     * @return a new instance of {@link LoginHelper} that logs in the user with facebook
+     * @return a new instance of {@link LoginWorker} that logs in the user with facebook
      */
-    public static LoginHelper newInstanceFacebookLogin() {
-        LoginHelper fragment = new LoginHelper();
+    public static LoginWorker newInstanceFacebookLogin() {
+        LoginWorker fragment = new LoginWorker();
         Bundle args = new Bundle();
         args.putInt(BUNDLE_TYPE, TYPE_LOGIN_FACEBOOK);
         fragment.setArguments(args);
@@ -127,17 +127,17 @@ public class LoginHelper extends BaseHelper {
     }
 
     /**
-     * Returns a new instance of {@link LoginHelper} that logs in the user with his Google
+     * Returns a new instance of {@link LoginWorker} that logs in the user with his Google
      * credentials. Sends the idToken received form GoogleApiClient to the server where it gets
      * verified and the user gets logged in (or a new account is created).
      *
      * @param idToken the token received from GoogleApiClient
-     * @return a new instance of {@link LoginHelper} that logs in the user with Google
+     * @return a new instance of {@link LoginWorker} that logs in the user with Google
      */
-    public static LoginHelper newInstanceGoogleLogin(@NonNull String idToken,
+    public static LoginWorker newInstanceGoogleLogin(@NonNull String idToken,
                                                      @NonNull String displayName,
                                                      @NonNull Uri photoUrl) {
-        LoginHelper fragment = new LoginHelper();
+        LoginWorker fragment = new LoginWorker();
         Bundle args = new Bundle();
         args.putInt(BUNDLE_TYPE, TYPE_LOGIN_GOOGLE);
         args.putString(BUNDLE_ID_TOKEN, idToken);
@@ -148,7 +148,7 @@ public class LoginHelper extends BaseHelper {
     }
 
     /**
-     * Returns a new instance of {@link LoginHelper} with a username, a password, a nickname and
+     * Returns a new instance of {@link LoginWorker} with a username, a password, a nickname and
      * optionally an avatar image. This will create a new account for the user and then log him/her
      * in.
      *
@@ -156,13 +156,13 @@ public class LoginHelper extends BaseHelper {
      * @param password the password of the user
      * @param nickname the nickname of the user
      * @param avatar   the avatar image of the user
-     * @return a new instance of {@link LoginHelper} that will create a new account for the user
+     * @return a new instance of {@link LoginWorker} that will create a new account for the user
      * and log him/her in
      */
     @NonNull
-    public static LoginHelper newInstanceSignUp(@NonNull String username, @NonNull String password,
+    public static LoginWorker newInstanceSignUp(@NonNull String username, @NonNull String password,
                                                 @NonNull String nickname, @Nullable byte[] avatar) {
-        LoginHelper fragment = new LoginHelper();
+        LoginWorker fragment = new LoginWorker();
         Bundle args = new Bundle();
         args.putInt(BUNDLE_TYPE, TYPE_SIGN_UP);
         args.putString(BUNDLE_USERNAME, username);
@@ -177,7 +177,7 @@ public class LoginHelper extends BaseHelper {
     public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (HelperInteractionListener) activity;
+            mListener = (WorkerInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement DialogInteractionListener");
@@ -523,7 +523,7 @@ public class LoginHelper extends BaseHelper {
      * Defines the actions to take after a successful login, a failed login or the reset of a
      * password.
      */
-    public interface HelperInteractionListener {
+    public interface WorkerInteractionListener {
         /**
          * Handles successful login of a user
          *

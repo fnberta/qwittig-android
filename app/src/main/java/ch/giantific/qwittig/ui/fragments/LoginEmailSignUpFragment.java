@@ -30,8 +30,8 @@ import com.bumptech.glide.request.target.SimpleTarget;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Avatar;
-import ch.giantific.qwittig.data.helpers.account.LoginHelper;
-import ch.giantific.qwittig.utils.HelperUtils;
+import ch.giantific.qwittig.workerfragments.account.LoginWorker;
+import ch.giantific.qwittig.utils.WorkerUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
@@ -196,13 +196,13 @@ public class LoginEmailSignUpFragment extends LoginEmailBaseFragment {
         }
 
         if (fieldsAreComplete) {
-            createAccountWithHelper(email, password, nickname);
+            createAccountWithWorker(email, password, nickname);
         } else {
             focusView.requestFocus();
         }
     }
 
-    private void createAccountWithHelper(@NonNull final String email,
+    private void createAccountWithWorker(@NonNull final String email,
                                          @NonNull final String password,
                                          @NonNull final String nickname) {
         if (!Utils.isConnected(getActivity())) {
@@ -213,14 +213,14 @@ public class LoginEmailSignUpFragment extends LoginEmailBaseFragment {
         setLoading(true);
 
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment loginHelper = HelperUtils.findHelper(fragmentManager, LoginEmailFragment.LOGIN_HELPER);
+        Fragment loginWorker = WorkerUtils.findWorker(fragmentManager, LoginEmailFragment.LOGIN_WORKER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-        if (loginHelper == null) {
-            loginHelper = LoginHelper.newInstanceSignUp(email, password, nickname, mAvatar);
+        if (loginWorker == null) {
+            loginWorker = LoginWorker.newInstanceSignUp(email, password, nickname, mAvatar);
             fragmentManager.beginTransaction()
-                    .add(loginHelper, LoginEmailFragment.LOGIN_HELPER)
+                    .add(loginWorker, LoginEmailFragment.LOGIN_WORKER)
                     .commit();
         }
     }

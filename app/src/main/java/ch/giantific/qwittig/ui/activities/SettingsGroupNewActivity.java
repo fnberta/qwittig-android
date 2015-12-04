@@ -21,7 +21,7 @@ import android.view.View;
 import ch.berta.fabio.fabprogress.FabProgress;
 import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.group.CreateGroupHelper;
+import ch.giantific.qwittig.workerfragments.group.CreateGroupWorker;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.ui.fragments.SettingsGroupNewFragment;
 import ch.giantific.qwittig.ui.listeners.TransitionListenerAdapter;
@@ -37,7 +37,7 @@ import ch.giantific.qwittig.utils.Utils;
  */
 public class SettingsGroupNewActivity extends BaseActivity implements
         SettingsGroupNewFragment.FragmentInteractionListener,
-        CreateGroupHelper.HelperInteractionListener {
+        CreateGroupWorker.WorkerInteractionListener {
 
     public static final String RESULT_DATA_GROUP = "RESULT_DATA_GROUP";
     private static final String STATE_GROUP_NEW_FRAGMENT = "STATE_GROUP_NEW_FRAGMENT";

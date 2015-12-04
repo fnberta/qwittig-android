@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.helpers;
+package ch.giantific.qwittig.workerfragments;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -21,28 +21,28 @@ import retrofit.client.Response;
 /**
  * Fetches the newest currency exchange rates online using {@link ExchangeRatesClient.ExchangeRates}.
  * <p/>
- * Subclass of {@link BaseHelper}.
+ * Subclass of {@link BaseWorker}.
  */
-public class RatesHelper extends BaseHelper {
+public class RatesWorker extends BaseWorker {
 
-    private static final String LOG_TAG = RatesHelper.class.getSimpleName();
+    private static final String LOG_TAG = RatesWorker.class.getSimpleName();
     private static final String BUNDLE_BASE_CURRENCY = "BUNDLE_BASE_CURRENCY";
     @Nullable
-    private HelperInteractionListener mListener;
+    private WorkerInteractionListener mListener;
 
-    public RatesHelper() {
+    public RatesWorker() {
         // empty default constructor
     }
 
     /**
-     * Returns a new instance of {@link RatesHelper} with a base currency code as an argument.
+     * Returns a new instance of {@link RatesWorker} with a base currency code as an argument.
      *
      * @param baseCurrency the currency to use as a base for the foreign currencies
-     * @return a new instance of {@link RatesHelper}
+     * @return a new instance of {@link RatesWorker}
      */
     @NonNull
-    public static RatesHelper newInstance(@NonNull String baseCurrency) {
-        RatesHelper fragment = new RatesHelper();
+    public static RatesWorker newInstance(@NonNull String baseCurrency) {
+        RatesWorker fragment = new RatesWorker();
         Bundle args = new Bundle();
         args.putString(BUNDLE_BASE_CURRENCY, baseCurrency);
         fragment.setArguments(args);
@@ -53,7 +53,7 @@ public class RatesHelper extends BaseHelper {
     public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (HelperInteractionListener) activity;
+            mListener = (WorkerInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement DialogInteractionListener");
@@ -109,7 +109,7 @@ public class RatesHelper extends BaseHelper {
     /**
      * Defines the actions to take after the rates were fetched or after the fetch failed.
      */
-    public interface HelperInteractionListener {
+    public interface WorkerInteractionListener {
         /**
          * Handles the successful fetch of current currency exchange rates.
          *

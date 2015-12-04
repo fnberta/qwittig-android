@@ -22,8 +22,8 @@ import android.widget.Spinner;
 
 import ch.giantific.qwittig.LocalBroadcast;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.query.TaskQueryHelper;
-import ch.giantific.qwittig.data.helpers.reminder.TaskRemindHelper;
+import ch.giantific.qwittig.workerfragments.query.TaskQueryWorker;
+import ch.giantific.qwittig.workerfragments.reminder.TaskRemindWorker;
 import ch.giantific.qwittig.services.ParseQueryService;
 import ch.giantific.qwittig.ui.adapters.StringResSpinnerAdapter;
 import ch.giantific.qwittig.ui.fragments.TasksFragment;
@@ -42,8 +42,8 @@ import ch.giantific.qwittig.utils.ViewUtils;
  */
 public class TasksActivity extends BaseNavDrawerActivity implements
         TasksFragment.FragmentInteractionListener,
-        TaskQueryHelper.HelperInteractionListener,
-        TaskRemindHelper.HelperInteractionListener,
+        TaskQueryWorker.WorkerInteractionListener,
+        TaskRemindWorker.WorkerInteractionListener,
         GroupCreateDialogFragment.DialogInteractionListener {
 
     private static final String STATE_TASKS_FRAGMENT = "STATE_TASKS_FRAGMENT";

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.helpers.query;
+package ch.giantific.qwittig.workerfragments.query;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -15,16 +15,16 @@ import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 /**
  * Performs an online query to the Parse.com database to query purchases.
  * <p/>
- * Subclass of {@link BaseQueryHelper}.
+ * Subclass of {@link BaseQueryWorker}.
  */
-public class PurchaseQueryHelper extends BaseQueryHelper implements
+public class PurchaseQueryWorker extends BaseQueryWorker implements
         PurchaseRepository.UpdatePurchasesListener {
 
-    private static final String LOG_TAG = PurchaseQueryHelper.class.getSimpleName();
+    private static final String LOG_TAG = PurchaseQueryWorker.class.getSimpleName();
     @Nullable
-    private HelperInteractionListener mListener;
+    private WorkerInteractionListener mListener;
 
-    public PurchaseQueryHelper() {
+    public PurchaseQueryWorker() {
         // empty default constructor
     }
 
@@ -32,7 +32,7 @@ public class PurchaseQueryHelper extends BaseQueryHelper implements
     public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (HelperInteractionListener) activity;
+            mListener = (WorkerInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement DialogInteractionListener");
@@ -83,7 +83,7 @@ public class PurchaseQueryHelper extends BaseQueryHelper implements
     /**
      * Defines the actions to take after purchases are updated.
      */
-    public interface HelperInteractionListener {
+    public interface WorkerInteractionListener {
         /**
          * Handles the successful update of local purchases.
          */

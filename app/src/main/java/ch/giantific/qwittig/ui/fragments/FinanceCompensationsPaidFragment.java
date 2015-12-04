@@ -23,10 +23,10 @@ import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.parse.Compensation;
-import ch.giantific.qwittig.data.helpers.query.MoreQueryHelper;
+import ch.giantific.qwittig.workerfragments.query.MoreQueryWorker;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.ui.adapters.CompensationsPaidRecyclerAdapter;
-import ch.giantific.qwittig.utils.HelperUtils;
+import ch.giantific.qwittig.utils.WorkerUtils;
 import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
@@ -39,7 +39,7 @@ import ch.giantific.qwittig.utils.Utils;
 public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFragment implements
         CompensationRepository.GetCompensationsLocalListener {
 
-    private static final String COMPENSATION_PAID_QUERY_HELPER = "COMPENSATION_PAID_QUERY_HELPER";
+    private static final String COMPENSATION_PAID_QUERY_WORKER = "COMPENSATION_PAID_QUERY_WORKER";
     private static final String STATE_IS_LOADING_MORE = "STATE_IS_LOADING_MORE";
     private static final String LOG_TAG = FinanceCompensationsPaidFragment.class.getSimpleName();
     private CompensationsPaidRecyclerAdapter mRecyclerAdapter;
@@ -101,8 +101,8 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
 
     @NonNull
     @Override
-    protected String getQueryHelperTag() {
-        return COMPENSATION_PAID_QUERY_HELPER;
+    protected String getQueryWorkerTag() {
+        return COMPENSATION_PAID_QUERY_WORKER;
     }
 
     @Override
@@ -145,10 +145,10 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
     }
 
     /**
-     * Removes the retained helper fragment and and loading indicators.
+     * Removes the retained worker fragment and and loading indicators.
      */
     public void onAllCompensationsUpdated() {
-        HelperUtils.removeHelper(getFragmentManager(), COMPENSATION_PAID_QUERY_HELPER);
+        WorkerUtils.removeWorker(getFragmentManager(), COMPENSATION_PAID_QUERY_WORKER);
         setLoading(false);
     }
 
@@ -156,32 +156,32 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
         mIsLoadingMore = true;
         final int skip = mCompensations.size();
         mRecyclerAdapter.showLoadMoreIndicator();
-        loadMoreDataWithHelper(skip);
+        loadMoreDataWithWorker(skip);
     }
 
-    private void loadMoreDataWithHelper(int skip) {
+    private void loadMoreDataWithWorker(int skip) {
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment moreQueryHelper = HelperUtils.findHelper(fragmentManager, MoreQueryHelper.MORE_QUERY_HELPER);
+        Fragment moreQueryWorker = WorkerUtils.findWorker(fragmentManager, MoreQueryWorker.MORE_QUERY_WORKER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-        if (moreQueryHelper == null) {
-            moreQueryHelper = MoreQueryHelper.newInstance(Compensation.CLASS, skip);
+        if (moreQueryWorker == null) {
+            moreQueryWorker = MoreQueryWorker.newInstance(Compensation.CLASS, skip);
 
             fragmentManager.beginTransaction()
-                    .add(moreQueryHelper, MoreQueryHelper.MORE_QUERY_HELPER)
+                    .add(moreQueryWorker, MoreQueryWorker.MORE_QUERY_WORKER)
                     .commit();
         }
     }
 
     /**
-     * Adds the newly pinned compensations to the list, removes the retained helper fragment and
+     * Adds the newly pinned compensations to the list, removes the retained worker fragment and
      * loading indicators.
      *
      * @param compensations the newly pinned compensations
      */
     public void onMoreObjectsLoaded(@NonNull List<ParseObject> compensations) {
-        HelperUtils.removeHelper(getFragmentManager(), MoreQueryHelper.MORE_QUERY_HELPER);
+        WorkerUtils.removeWorker(getFragmentManager(), MoreQueryWorker.MORE_QUERY_WORKER);
 
         mIsLoadingMore = false;
         mRecyclerAdapter.hideLoadMoreIndicator();
@@ -190,7 +190,7 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
 
     /**
      * Passes the error code to the generic error handler, shows the user an error message and
-     * removes the retained helper fragment and loading indicators.
+     * removes the retained worker fragment and loading indicators.
      *
      * @param errorCode the error code of the exception thrown during the process
      */
@@ -202,7 +202,7 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
                 loadMoreData();
             }
         });
-        HelperUtils.removeHelper(getFragmentManager(), MoreQueryHelper.MORE_QUERY_HELPER);
+        WorkerUtils.removeWorker(getFragmentManager(), MoreQueryWorker.MORE_QUERY_WORKER);
 
         mIsLoadingMore = false;
         mRecyclerAdapter.hideLoadMoreIndicator();

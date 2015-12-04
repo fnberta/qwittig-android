@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.helpers.reminder;
+package ch.giantific.qwittig.workerfragments.reminder;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -11,35 +11,35 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import ch.giantific.qwittig.data.rest.CloudCodeClient;
-import ch.giantific.qwittig.data.helpers.BaseHelper;
+import ch.giantific.qwittig.workerfragments.BaseWorker;
 
 /**
  * Calls Parse.com cloud functions to remind a user that he/she should finish a task.
  * <p/>
- * Subclass of {@link BaseHelper}.
+ * Subclass of {@link BaseWorker}.
  */
-public class TaskRemindHelper extends BaseHelper implements
+public class TaskRemindWorker extends BaseWorker implements
         CloudCodeClient.CloudCodeListener {
 
     private static final String BUNDLE_TASK_ID = "BUNDLE_TASK_ID";
-    private static final String LOG_TAG = TaskRemindHelper.class.getSimpleName();
+    private static final String LOG_TAG = TaskRemindWorker.class.getSimpleName();
     @Nullable
-    private HelperInteractionListener mListener;
+    private WorkerInteractionListener mListener;
     private String mTaskId;
 
-    public TaskRemindHelper() {
+    public TaskRemindWorker() {
         // empty default constructor
     }
 
     /**
-     * Returns a new instance of {@link TaskRemindHelper} with an argument.
+     * Returns a new instance of {@link TaskRemindWorker} with an argument.
      *
      * @param taskId the object id of the task that should be finished
-     * @return a new instance of {@link TaskRemindHelper}
+     * @return a new instance of {@link TaskRemindWorker}
      */
     @NonNull
-    public static TaskRemindHelper newInstance(@NonNull String taskId) {
-        TaskRemindHelper fragment = new TaskRemindHelper();
+    public static TaskRemindWorker newInstance(@NonNull String taskId) {
+        TaskRemindWorker fragment = new TaskRemindWorker();
         Bundle args = new Bundle();
         args.putString(BUNDLE_TASK_ID, taskId);
         fragment.setArguments(args);
@@ -50,7 +50,7 @@ public class TaskRemindHelper extends BaseHelper implements
     public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (HelperInteractionListener) activity;
+            mListener = (WorkerInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement DialogInteractionListener");
@@ -101,7 +101,7 @@ public class TaskRemindHelper extends BaseHelper implements
     /**
      * Defines the actions to take after a user was reminded or after the process failed.
      */
-    public interface HelperInteractionListener {
+    public interface WorkerInteractionListener {
         /**
          * Handles the successful reminder of a user to finish a task.
          *

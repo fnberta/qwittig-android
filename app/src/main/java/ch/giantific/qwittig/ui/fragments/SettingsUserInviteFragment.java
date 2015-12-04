@@ -25,12 +25,12 @@ import java.util.List;
 
 import ch.berta.fabio.fabprogress.FabProgress;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.group.InviteUsersHelper;
+import ch.giantific.qwittig.workerfragments.group.InviteUsersWorker;
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.utils.HelperUtils;
+import ch.giantific.qwittig.utils.WorkerUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -43,7 +43,7 @@ import ch.giantific.qwittig.utils.Utils;
 public class SettingsUserInviteFragment extends SettingsBaseInviteFragment implements
         UserRepository.GetUsersLocalListener {
 
-    private static final String INVITE_HELPER = "INVITE_HELPER";
+    private static final String INVITE_WORKER = "INVITE_WORKER";
     private static final String LOG_TAG = SettingsUserInviteFragment.class.getSimpleName();
     private FragmentInteractionListener mListener;
     private LinearLayout mLinearLayoutUsersInvited;
@@ -233,41 +233,41 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
         mIsInviting = true;
         mListener.startProgressAnim();
 
-        inviteUsersWithHelper(mCurrentGroup);
+        inviteUsersWithWorker(mCurrentGroup);
     }
 
-    private void inviteUsersWithHelper(@NonNull Group group) {
+    private void inviteUsersWithWorker(@NonNull Group group) {
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment inviteUsersHelper = HelperUtils.findHelper(fragmentManager, INVITE_HELPER);
+        Fragment inviteUsersWorker = WorkerUtils.findWorker(fragmentManager, INVITE_WORKER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-        if (inviteUsersHelper == null) {
-            inviteUsersHelper = InviteUsersHelper.newInstance(mUsersToInviteEmails, group.getName());
+        if (inviteUsersWorker == null) {
+            inviteUsersWorker = InviteUsersWorker.newInstance(mUsersToInviteEmails, group.getName());
 
             fragmentManager.beginTransaction()
-                    .add(inviteUsersHelper, INVITE_HELPER)
+                    .add(inviteUsersWorker, INVITE_WORKER)
                     .commit();
         }
     }
 
     /**
      * Passes the {@link ParseException} to the generic error handler, shows the user an error
-     * message and removes the retained helper fragment and loading indicators.
+     * message and removes the retained worker fragment and loading indicators.
      *
      * @param errorCode the error Code thrown in the process
      */
     public void onInviteUsersFailed(int errorCode) {
-        onInviteError(errorCode, INVITE_HELPER);
+        onInviteError(errorCode, INVITE_WORKER);
     }
 
     /**
-     * Starts the {@link FabProgress} final animation and removes the retained helper
+     * Starts the {@link FabProgress} final animation and removes the retained worker fragment
      * fragment.
      */
     public void onUsersInvited() {
         mListener.startFinalProgressAnim();
-        HelperUtils.removeHelper(getFragmentManager(), INVITE_HELPER);
+        WorkerUtils.removeWorker(getFragmentManager(), INVITE_WORKER);
 
     }
 

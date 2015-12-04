@@ -21,9 +21,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.account.LoginHelper;
+import ch.giantific.qwittig.workerfragments.account.LoginWorker;
 import ch.giantific.qwittig.ui.fragments.dialogs.EmailPromptDialogFragment;
-import ch.giantific.qwittig.utils.HelperUtils;
+import ch.giantific.qwittig.utils.WorkerUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
@@ -113,7 +113,7 @@ public class LoginEmailFragment extends LoginEmailBaseFragment {
         }
 
         if (fieldsAreComplete) {
-            loginWithEmailWithHelper(email, password);
+            loginWithEmailWithWorker(email, password);
         } else {
             focusView.requestFocus();
         }
@@ -131,35 +131,35 @@ public class LoginEmailFragment extends LoginEmailBaseFragment {
     }
 
     /**
-     * Starts a helper fragment that sends the user and email to reset his/her password.
+     * Starts a worker fragment that sends the user and email to reset his/her password.
      *
      * @param email the email of the user whose password should be reset
      */
-    public void resetPasswordWithHelper(@NonNull String email) {
+    public void resetPasswordWithWorker(@NonNull String email) {
         if (!Utils.isConnected(getActivity())) {
             Snackbar.make(mButtonLogIn, R.string.toast_no_connection, Snackbar.LENGTH_LONG).show();
             return;
         }
 
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment loginHelper = HelperUtils.findHelper(fragmentManager, LOGIN_HELPER);
+        Fragment loginWorker = WorkerUtils.findWorker(fragmentManager, LOGIN_WORKER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-        if (loginHelper == null) {
-            loginHelper = LoginHelper.newInstanceResetPassword(email);
+        if (loginWorker == null) {
+            loginWorker = LoginWorker.newInstanceResetPassword(email);
             fragmentManager.beginTransaction()
-                    .add(loginHelper, LOGIN_HELPER)
+                    .add(loginWorker, LOGIN_WORKER)
                     .commit();
         }
     }
 
     /**
-     * Handles the successful reset of a password. Removes the helper fragment and tells the user
+     * Handles the successful reset of a password. Removes the worker fragment and tells the user
      * he needs to click on the link he/she received by email in order to reset the password.
      */
     public void onPasswordReset() {
-        HelperUtils.removeHelper(getFragmentManager(), LOGIN_HELPER);
+        WorkerUtils.removeWorker(getFragmentManager(), LOGIN_WORKER);
         Snackbar.make(mButtonLogIn, R.string.toast_reset_password_link, Snackbar.LENGTH_LONG).show();
     }
 }

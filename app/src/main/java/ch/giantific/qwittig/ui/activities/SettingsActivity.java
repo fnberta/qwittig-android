@@ -9,7 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.account.LogoutHelper;
+import ch.giantific.qwittig.workerfragments.account.LogoutWorker;
 import ch.giantific.qwittig.ui.fragments.SettingsFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.AccountDeleteDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.ConfirmationDialogFragment;
@@ -25,7 +25,7 @@ public class SettingsActivity extends BaseActivity implements
         SettingsFragment.FragmentInteractionListener,
         GroupLeaveBalanceNotZeroDialogFragment.DialogInteractionListener,
         AccountDeleteDialogFragment.DialogInteractionListener,
-        LogoutHelper.HelperInteractionListener {
+        LogoutWorker.WorkerInteractionListener {
 
     private static final String STATE_SETTINGS_FRAGMENT = "STATE_SETTINGS_FRAGMENT";
     private static final String LOG_TAG = SettingsActivity.class.getSimpleName();

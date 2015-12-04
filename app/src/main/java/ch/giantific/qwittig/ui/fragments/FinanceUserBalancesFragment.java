@@ -23,11 +23,11 @@ import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
-import ch.giantific.qwittig.data.helpers.query.UserQueryHelper;
+import ch.giantific.qwittig.workerfragments.query.UserQueryWorker;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.ui.adapters.UsersRecyclerAdapter;
 import ch.giantific.qwittig.ComparatorParseUserIgnoreCase;
-import ch.giantific.qwittig.utils.HelperUtils;
+import ch.giantific.qwittig.utils.WorkerUtils;
 import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
@@ -43,7 +43,7 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewOnlineFragment 
         UserRepository.GetUsersLocalListener,
         UsersRecyclerAdapter.AdapterInteractionListener {
 
-    private static final String USER_QUERY_HELPER = "USER_QUERY_HELPER";
+    private static final String USER_QUERY_WORKER = "USER_QUERY_WORKER";
     private UsersRecyclerAdapter mRecyclerAdapter;
     @NonNull
     private List<ParseUser> mUsers = new ArrayList<>();
@@ -81,21 +81,21 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewOnlineFragment 
         }
 
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment userQueryHelper = HelperUtils.findHelper(fragmentManager, USER_QUERY_HELPER);
+        Fragment userQueryWorker = WorkerUtils.findWorker(fragmentManager, USER_QUERY_WORKER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-        if (userQueryHelper == null) {
-            userQueryHelper = new UserQueryHelper();
+        if (userQueryWorker == null) {
+            userQueryWorker = new UserQueryWorker();
             fragmentManager.beginTransaction()
-                    .add(userQueryHelper, USER_QUERY_HELPER)
+                    .add(userQueryWorker, USER_QUERY_WORKER)
                     .commit();
         }
     }
 
     /**
      * Passes the error code to the generic error handler, shows the user an error message and
-     * removes the retained helper fragment and loading indicators.
+     * removes the retained worker fragment and loading indicators.
      *
      * @param errorCode the error code of the exception thrown in the process
      */
@@ -103,17 +103,17 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewOnlineFragment 
         ParseErrorHandler.handleParseError(getActivity(), errorCode);
         showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), errorCode),
                 getOnlineQueryRetryAction());
-        HelperUtils.removeHelper(getFragmentManager(), USER_QUERY_HELPER);
+        WorkerUtils.removeWorker(getFragmentManager(), USER_QUERY_WORKER);
 
         setLoading(false);
     }
 
     /**
      * Tells the adapter of the {@link RecyclerView} to re-query its data, removes the retained
-     * helper fragment and removes loading indicators.
+     * worker fragment and removes loading indicators.
      */
     public void onUsersUpdated() {
-        HelperUtils.removeHelper(getFragmentManager(), USER_QUERY_HELPER);
+        WorkerUtils.removeWorker(getFragmentManager(), USER_QUERY_WORKER);
         setLoading(false);
 
         updateAdapter();

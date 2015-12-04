@@ -17,7 +17,7 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.utils.PercentFormatter;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.group.StatsHelper;
+import ch.giantific.qwittig.workerfragments.group.StatsWorker;
 import ch.giantific.qwittig.ui.widgets.PieChart;
 
 /**
@@ -29,7 +29,7 @@ import ch.giantific.qwittig.ui.widgets.PieChart;
 public class StatsCurrenciesFragment extends StatsPieBaseFragment {
 
     private static final String LOG_TAG = StatsCurrenciesFragment.class.getSimpleName();
-    private static final String STATS_HELPER_CURRENCIES = "STATS_HELPER_CURRENCIES";
+    private static final String STATS_WORKER_CURRENCIES = "STATS_WORKER_CURRENCIES";
 
     public StatsCurrenciesFragment() {
         // Required empty public constructor
@@ -50,15 +50,15 @@ public class StatsCurrenciesFragment extends StatsPieBaseFragment {
 
     @NonNull
     @Override
-    protected String getHelperTag() {
-        return STATS_HELPER_CURRENCIES;
+    protected String getWorkerTag() {
+        return STATS_WORKER_CURRENCIES;
     }
 
     @Override
     void calcStats(@NonNull String year, int month) {
         super.calcStats(year, month);
 
-        calcStatsWithHelper(StatsHelper.TYPE_CURRENCIES, year, month);
+        calcStatsWithWorker(StatsWorker.TYPE_CURRENCIES, year, month);
     }
 
     @Override

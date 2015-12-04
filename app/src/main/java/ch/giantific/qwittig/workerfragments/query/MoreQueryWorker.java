@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.helpers.query;
+package ch.giantific.qwittig.workerfragments.query;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -29,32 +29,32 @@ import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
  * Queries for more items of one of the types defined in {@link ClassName} and pins them to the
  * local data store.
  * <p/>
- * Subclass of {@link BaseQueryHelper}.
+ * Subclass of {@link BaseQueryWorker}.
  */
-public class MoreQueryHelper extends BaseQueryHelper {
+public class MoreQueryWorker extends BaseQueryWorker {
 
-    public static final String MORE_QUERY_HELPER = "MORE_QUERY_HELPER";
+    public static final String MORE_QUERY_WORKER = "MORE_QUERY_WORKER";
     private static final String BUNDLE_CLASS_NAME = "BUNDLE_CLASS_NAME";
     private static final String BUNDLE_SKIP = "BUNDLE_SKIP";
-    private static final String LOG_TAG = MoreQueryHelper.class.getSimpleName();
+    private static final String LOG_TAG = MoreQueryWorker.class.getSimpleName();
     @Nullable
-    private HelperInteractionListener mListener;
+    private WorkerInteractionListener mListener;
 
-    public MoreQueryHelper() {
+    public MoreQueryWorker() {
         // empty default constructor
     }
 
     /**
-     * Return a new instance of {@link MoreQueryHelper} with the class name of the items to query
+     * Return a new instance of {@link MoreQueryWorker} with the class name of the items to query
      * and number of items to skip as arguments.
      *
      * @param className the class name of the items to query, must be defined in {@link ClassName}
      * @param skip      the number of items to skip
-     * @return a new instance of {@link MoreQueryHelper}
+     * @return a new instance of {@link MoreQueryWorker}
      */
     @NonNull
-    public static MoreQueryHelper newInstance(@NonNull @ClassName String className, int skip) {
-        MoreQueryHelper fragment = new MoreQueryHelper();
+    public static MoreQueryWorker newInstance(@NonNull @ClassName String className, int skip) {
+        MoreQueryWorker fragment = new MoreQueryWorker();
         Bundle args = new Bundle();
         args.putString(BUNDLE_CLASS_NAME, className);
         args.putInt(BUNDLE_SKIP, skip);
@@ -66,7 +66,7 @@ public class MoreQueryHelper extends BaseQueryHelper {
     public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (HelperInteractionListener) activity;
+            mListener = (WorkerInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement DialogInteractionListener");
@@ -163,7 +163,7 @@ public class MoreQueryHelper extends BaseQueryHelper {
      * Defines the actions to take after more objects were queried and pinned to the local data
      * store or after the query failed.
      */
-    public interface HelperInteractionListener {
+    public interface WorkerInteractionListener {
         /**
          * Handles the successful pin of new objects.
          *

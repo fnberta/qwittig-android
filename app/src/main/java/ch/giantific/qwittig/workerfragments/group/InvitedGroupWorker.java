@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.helpers.group;
+package ch.giantific.qwittig.workerfragments.group;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -15,7 +15,7 @@ import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-import ch.giantific.qwittig.data.helpers.BaseHelper;
+import ch.giantific.qwittig.workerfragments.BaseWorker;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.data.repositories.ParseGroupRepository;
@@ -26,34 +26,34 @@ import ch.giantific.qwittig.domain.repositories.GroupRepository;
  * Handles the process of a user being invited to a group and he/she accepting the invitation and
  * joining the group.
  * <p/>
- * Subclass of {@link BaseHelper}.
+ * Subclass of {@link BaseWorker}.
  */
-public class InvitedGroupHelper extends BaseHelper implements
+public class InvitedGroupWorker extends BaseWorker implements
         CloudCodeClient.CloudCodeListener,
         GroupRepository.GetGroupOnlineListener {
 
     private static final String BUNDLE_GROUP_ID = "BUNDLE_GROUP_ID";
-    private static final String LOG_TAG = InvitedGroupHelper.class.getSimpleName();
+    private static final String LOG_TAG = InvitedGroupWorker.class.getSimpleName();
     @Nullable
-    private HelperInteractionListener mListener;
+    private WorkerInteractionListener mListener;
     private String mGroupId;
     private CloudCodeClient mCloudCode;
     private User mCurrentUser;
 
-    public InvitedGroupHelper() {
+    public InvitedGroupWorker() {
         // empty default constructor
     }
 
     /**
-     * Returns a new instance of {@link InvitedGroupHelper} with the object id of the group the
+     * Returns a new instance of {@link InvitedGroupWorker} with the object id of the group the
      * user is invited to as an argument.
      *
      * @param groupId the object id of the group the user is invited to
-     * @return a new instance of {@link InvitedGroupHelper}
+     * @return a new instance of {@link InvitedGroupWorker}
      */
     @NonNull
-    public static InvitedGroupHelper newInstance(String groupId) {
-        InvitedGroupHelper fragment = new InvitedGroupHelper();
+    public static InvitedGroupWorker newInstance(String groupId) {
+        InvitedGroupWorker fragment = new InvitedGroupWorker();
         Bundle args = new Bundle();
         args.putString(BUNDLE_GROUP_ID, groupId);
         fragment.setArguments(args);
@@ -64,7 +64,7 @@ public class InvitedGroupHelper extends BaseHelper implements
     public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (HelperInteractionListener) activity;
+            mListener = (WorkerInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement DialogInteractionListener");
@@ -173,7 +173,7 @@ public class InvitedGroupHelper extends BaseHelper implements
     /**
      * Defines actions to be taken during the invited group querying and joining process.
      */
-    public interface HelperInteractionListener {
+    public interface WorkerInteractionListener {
         /**
          * Handles the successful query of the group the user is invited to
          *

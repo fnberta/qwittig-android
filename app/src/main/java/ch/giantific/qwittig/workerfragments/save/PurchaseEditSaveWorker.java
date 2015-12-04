@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.helpers.save;
+package ch.giantific.qwittig.workerfragments.save;
 
 import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
@@ -20,23 +20,23 @@ import ch.giantific.qwittig.domain.models.parse.Purchase;
  * Saves an edited {@link Purchase} object and if there is a new receipt image, deletes the old
  * {@link ParseFile} if there was one.
  * <p/>
- * Subclass of {@link PurchaseSaveHelper}.
+ * Subclass of {@link PurchaseSaveWorker}.
  */
-public class PurchaseEditSaveHelper extends PurchaseSaveHelper implements
+public class PurchaseEditSaveWorker extends PurchaseSaveWorker implements
         CloudCodeClient.CloudCodeListener {
 
-    private static final String LOG_TAG = PurchaseEditSaveHelper.class.getSimpleName();
+    private static final String LOG_TAG = PurchaseEditSaveWorker.class.getSimpleName();
     @Nullable
     private ParseFile mReceiptParseFileOld;
     private boolean mIsDraft;
     private boolean mDeleteOldReceipt;
 
-    public PurchaseEditSaveHelper() {
+    public PurchaseEditSaveWorker() {
         // empty default constructor
     }
 
     /**
-     * Constructs a new {@link PurchaseEditSaveHelper} with a {@link Purchase} object, whether
+     * Constructs a new {@link PurchaseEditSaveWorker} with a {@link Purchase} object, whether
      * the purchase was a draft or an already saved purchase and optionally the old receipt image
      * and the path to the new one as parameters.
      * <p/>
@@ -50,7 +50,7 @@ public class PurchaseEditSaveHelper extends PurchaseSaveHelper implements
      * @param receiptNewPath      the path to the new receipt image
      */
     @SuppressLint("ValidFragment")
-    public PurchaseEditSaveHelper(@NonNull Purchase purchase, boolean isDraft,
+    public PurchaseEditSaveWorker(@NonNull Purchase purchase, boolean isDraft,
                                   @Nullable ParseFile receiptParseFileOld, boolean deleteOldReceipt,
                                   @Nullable String receiptNewPath) {
         super(purchase, receiptNewPath);

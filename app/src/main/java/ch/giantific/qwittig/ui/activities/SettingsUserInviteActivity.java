@@ -19,7 +19,7 @@ import android.view.View;
 import ch.berta.fabio.fabprogress.FabProgress;
 import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.group.InviteUsersHelper;
+import ch.giantific.qwittig.workerfragments.group.InviteUsersWorker;
 import ch.giantific.qwittig.ui.fragments.SettingsUserInviteFragment;
 import ch.giantific.qwittig.ui.listeners.TransitionListenerAdapter;
 import ch.giantific.qwittig.utils.Utils;
@@ -34,7 +34,7 @@ import ch.giantific.qwittig.utils.Utils;
  */
 public class SettingsUserInviteActivity extends BaseActivity implements
         SettingsUserInviteFragment.FragmentInteractionListener,
-        InviteUsersHelper.HelperInteractionListener {
+        InviteUsersWorker.WorkerInteractionListener {
 
     private static final String STATE_USER_INVITE_FRAGMENT = "STATE_USER_INVITE_FRAGMENT";
     private SettingsUserInviteFragment mSettingsUserInviteFragment;

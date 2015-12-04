@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.helpers.group;
+package ch.giantific.qwittig.workerfragments.group;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -17,7 +17,7 @@ import com.parse.SaveCallback;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.giantific.qwittig.data.helpers.BaseHelper;
+import ch.giantific.qwittig.workerfragments.BaseWorker;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.data.rest.CloudCodeClient;
@@ -26,38 +26,38 @@ import ch.giantific.qwittig.data.rest.CloudCodeClient;
  * Creates a new {@link Group}, saves it to the online Parse.com database and invites the users
  * specified.
  * <p/>
- * Subclass of {@link BaseHelper}.
+ * Subclass of {@link BaseWorker}.
  */
-public class CreateGroupHelper extends BaseHelper implements
+public class CreateGroupWorker extends BaseWorker implements
         CloudCodeClient.CloudCodeListener {
 
     private static final String BUNDLE_GROUP_NAME = "BUNDLE_GROUP_NAME";
     private static final String BUNDLE_GROUP_CURRENCY = "BUNDLE_GROUP_CURRENCY";
     private static final String BUNDLE_USERS_TO_INVITE = "BUNDLE_USERS_TO_INVITE";
-    private static final String LOG_TAG = CreateGroupHelper.class.getSimpleName();
+    private static final String LOG_TAG = CreateGroupWorker.class.getSimpleName();
     @Nullable
-    private HelperInteractionListener mListener;
+    private WorkerInteractionListener mListener;
     @Nullable
     private List<String> mUsersToInvite;
 
-    public CreateGroupHelper() {
+    public CreateGroupWorker() {
         // empty default constructor
     }
 
     /**
-     * Returns a new instance of {@link CreateGroupHelper} with the group name, currency and the
+     * Returns a new instance of {@link CreateGroupWorker} with the group name, currency and the
      * users to invite as arguments.
      *
      * @param groupName     the name of the new group to create
      * @param groupCurrency the currency of the new group to create
      * @param usersToInvite the users to invite into the newly crated group
-     * @return a new instance of {@link CreateGroupHelper}
+     * @return a new instance of {@link CreateGroupWorker}
      */
     @NonNull
-    public static CreateGroupHelper newInstance(@NonNull String groupName,
+    public static CreateGroupWorker newInstance(@NonNull String groupName,
                                                 @NonNull String groupCurrency,
                                                 @NonNull ArrayList<String> usersToInvite) {
-        CreateGroupHelper fragment = new CreateGroupHelper();
+        CreateGroupWorker fragment = new CreateGroupWorker();
         Bundle args = new Bundle();
         args.putString(BUNDLE_GROUP_NAME, groupName);
         args.putString(BUNDLE_GROUP_CURRENCY, groupCurrency);
@@ -70,7 +70,7 @@ public class CreateGroupHelper extends BaseHelper implements
     public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (HelperInteractionListener) activity;
+            mListener = (WorkerInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement DialogInteractionListener");
@@ -164,7 +164,7 @@ public class CreateGroupHelper extends BaseHelper implements
      * Defines the actions to take after a new group was successfully created or when the creation
      * failed.
      */
-    public interface HelperInteractionListener {
+    public interface WorkerInteractionListener {
         /**
          * Handles the successul creation of the new group.
          *

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.helpers.account;
+package ch.giantific.qwittig.workerfragments.account;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -19,7 +19,7 @@ import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-import ch.giantific.qwittig.data.helpers.BaseHelper;
+import ch.giantific.qwittig.workerfragments.BaseWorker;
 import ch.giantific.qwittig.data.rest.CloudCodeClient;
 import ch.giantific.qwittig.domain.models.parse.Installation;
 import ch.giantific.qwittig.domain.models.parse.User;
@@ -27,22 +27,22 @@ import ch.giantific.qwittig.domain.models.parse.User;
 /**
  * Resets the device's {@link ParseInstallation} object and logs out the current user.
  * <p/>
- * Subclass of {@link BaseHelper}.
+ * Subclass of {@link BaseWorker}.
  */
-public class LogoutHelper extends BaseGoogleApiLoginHelper {
+public class LogoutWorker extends BaseGoogleApiLoginWorker {
 
     private static final String BUNDLE_DELETE_USER = "BUNDLE_DELETE_USER";
 
     @Nullable
-    private HelperInteractionListener mListener;
+    private WorkerInteractionListener mListener;
     private boolean mDeleteUser;
 
-    public LogoutHelper() {
+    public LogoutWorker() {
         // empty default constructor
     }
 
-    public static LogoutHelper newInstance(boolean deleteUser) {
-        LogoutHelper fragment = new LogoutHelper();
+    public static LogoutWorker newInstance(boolean deleteUser) {
+        LogoutWorker fragment = new LogoutWorker();
         Bundle args = new Bundle();
         args.putBoolean(BUNDLE_DELETE_USER, deleteUser);
         fragment.setArguments(args);
@@ -53,7 +53,7 @@ public class LogoutHelper extends BaseGoogleApiLoginHelper {
     public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (HelperInteractionListener) activity;
+            mListener = (WorkerInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement DialogInteractionListener");
@@ -222,7 +222,7 @@ public class LogoutHelper extends BaseGoogleApiLoginHelper {
     /**
      * Defines the actions to take after the user was logged out or the logout failed
      */
-    public interface HelperInteractionListener {
+    public interface WorkerInteractionListener {
         /**
          * Handles the failed logout of a user.
          *

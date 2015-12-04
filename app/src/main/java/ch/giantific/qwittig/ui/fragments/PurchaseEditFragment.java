@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import ch.giantific.qwittig.data.helpers.save.PurchaseEditSaveHelper;
-import ch.giantific.qwittig.data.helpers.save.PurchaseSaveHelper;
+import ch.giantific.qwittig.workerfragments.save.PurchaseEditSaveWorker;
+import ch.giantific.qwittig.workerfragments.save.PurchaseSaveWorker;
 import ch.giantific.qwittig.data.repositories.ParsePurchaseRepository;
 import ch.giantific.qwittig.domain.models.ItemRow;
 import ch.giantific.qwittig.domain.models.parse.Item;
@@ -302,8 +302,8 @@ public class PurchaseEditFragment extends PurchaseBaseFragment {
     }
 
     @Override
-    protected PurchaseSaveHelper getSaveHelper() {
-        return new PurchaseEditSaveHelper(mPurchase, isDraft(), getOldReceiptFile(),
+    protected PurchaseSaveWorker getSaveWorker() {
+        return new PurchaseEditSaveWorker(mPurchase, isDraft(), getOldReceiptFile(),
                 mDeleteOldReceipt, mReceiptImagePath);
     }
 
