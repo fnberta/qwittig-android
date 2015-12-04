@@ -10,6 +10,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -30,7 +31,6 @@ import ch.giantific.qwittig.data.helpers.group.CreateGroupHelper;
 import ch.giantific.qwittig.domain.models.Currency;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.utils.HelperUtils;
-import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -109,7 +109,8 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
         }
 
         if (!Utils.isConnected(getActivity())) {
-            MessageUtils.showBasicSnackbar(mTextInputLayoutName, getString(R.string.toast_no_connection));
+            Snackbar.make(mTextInputLayoutName, R.string.toast_no_connection,
+                    Snackbar.LENGTH_LONG).show();
             return;
         }
 
@@ -130,7 +131,8 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
             }
         }
         if (!groupIsNew) {
-            MessageUtils.showBasicSnackbar(mTextInputLayoutName, getString(R.string.toast_group_already_in_list));
+            Snackbar.make(mTextInputLayoutName, R.string.toast_group_already_in_list,
+                    Snackbar.LENGTH_LONG).show();
             return;
         }
 

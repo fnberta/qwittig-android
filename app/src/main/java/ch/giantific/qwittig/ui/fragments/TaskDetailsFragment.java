@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.ContentLoadingProgressBar;
@@ -21,7 +22,6 @@ import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 
 import com.parse.ParseUser;
 
@@ -44,7 +44,6 @@ import ch.giantific.qwittig.ui.activities.BaseActivity;
 import ch.giantific.qwittig.ui.activities.TaskDetailsActivity;
 import ch.giantific.qwittig.ui.activities.TaskEditActivity;
 import ch.giantific.qwittig.ui.adapters.TaskHistoryRecyclerAdapter;
-import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 
 /**
@@ -143,8 +142,8 @@ public class TaskDetailsFragment extends BaseFragment implements
         if (mCurrentGroup != null) {
             queryData();
         } else {
-            MessageUtils.showBasicSnackbar(mRecyclerViewHistory,
-                    getString(R.string.toast_error_purchase_details_group_not));
+            Snackbar.make(mRecyclerViewHistory, R.string.toast_error_purchase_details_group_not,
+                    Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -341,10 +340,12 @@ public class TaskDetailsFragment extends BaseFragment implements
             case BaseActivity.INTENT_REQUEST_TASK_MODIFY:
                 switch (resultCode) {
                     case TaskEditFragment.RESULT_TASK_DISCARDED:
-                        MessageUtils.showBasicSnackbar(mRecyclerViewHistory, getString(R.string.toast_changes_discarded));
+                        Snackbar.make(mRecyclerViewHistory, R.string.toast_changes_discarded,
+                                Snackbar.LENGTH_LONG).show();
                         break;
                     case TaskAddFragment.RESULT_TASK_SAVED:
-                        MessageUtils.showBasicSnackbar(mRecyclerViewHistory, getString(R.string.toast_changes_saved));
+                        Snackbar.make(mRecyclerViewHistory, R.string.toast_changes_saved,
+                                Snackbar.LENGTH_LONG).show();
                         break;
                 }
                 break;

@@ -36,7 +36,6 @@ import ch.giantific.qwittig.ui.fragments.dialogs.PurchaseUserSelectionDialogFrag
 import ch.giantific.qwittig.ui.fragments.dialogs.StoreSelectionDialogFragment;
 import ch.giantific.qwittig.ui.listeners.TransitionListenerAdapter;
 import ch.giantific.qwittig.utils.DateUtils;
-import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
@@ -192,7 +191,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         mPurchaseFragment.deleteReceipt();
         setHasReceiptFile(false);
         getFragmentManager().popBackStack();
-        MessageUtils.showBasicSnackbar(mFabProgress, getString(R.string.toast_receipt_deleted));
+        Snackbar.make(mFabProgress, R.string.toast_receipt_deleted, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
@@ -236,7 +235,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         if (fragment != null) {
             fragment.updateNote(note);
         } else {
-            MessageUtils.showBasicSnackbar(mFabProgress, getString(R.string.toast_note_added));
+            Snackbar.make(mFabProgress, R.string.toast_note_added, Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -250,7 +249,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         mPurchaseFragment.deleteNote();
         setHasNote(false);
         getFragmentManager().popBackStack();
-        MessageUtils.showBasicSnackbar(mFabProgress, getString(R.string.toast_note_deleted));
+        Snackbar.make(mFabProgress, R.string.toast_note_deleted, Snackbar.LENGTH_LONG).show();
     }
 
     @Override

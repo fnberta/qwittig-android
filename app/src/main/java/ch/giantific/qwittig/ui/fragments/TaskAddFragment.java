@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -44,7 +45,6 @@ import ch.giantific.qwittig.ui.adapters.TaskUsersInvolvedRecyclerAdapter;
 import ch.giantific.qwittig.ui.fragments.dialogs.DatePickerDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.utils.DateUtils;
-import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 
 /**
@@ -284,14 +284,15 @@ public class TaskAddFragment extends BaseFragment implements
         }
 
         if (TextUtils.isEmpty(title)) {
-            MessageUtils.showBasicSnackbar(mRecyclerViewUsers, getString(R.string.error_task_title));
+            Snackbar.make(mRecyclerViewUsers, R.string.error_task_title, Snackbar.LENGTH_LONG).show();
             return;
         }
 
         String timeFrame = getTimeFrameSelected();
         List<ParseUser> usersInvolved = getUsersInvolved();
         if (timeFrame.equals(Task.TIME_FRAME_ONE_TIME) && usersInvolved.size() > 1) {
-            MessageUtils.showBasicSnackbar(mRecyclerViewUsers, getString(R.string.toast_task_max_one_user_one_time));
+            Snackbar.make(mRecyclerViewUsers, R.string.toast_task_max_one_user_one_time,
+                    Snackbar.LENGTH_LONG).show();
             return;
         }
 
@@ -373,8 +374,7 @@ public class TaskAddFragment extends BaseFragment implements
                 taskUser.setIsInvolved(false);
                 mUsersRecyclerAdapter.notifyItemChanged(position);
             } else {
-                MessageUtils.showBasicSnackbar(mRecyclerViewUsers,
-                        getString(R.string.toast_min_one_user));
+                Snackbar.make(mRecyclerViewUsers, R.string.toast_min_one_user, Snackbar.LENGTH_LONG).show();
             }
         } else {
             taskUser.setIsInvolved(true);

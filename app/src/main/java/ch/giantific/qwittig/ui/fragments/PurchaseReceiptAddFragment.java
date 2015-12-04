@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,7 +20,6 @@ import java.io.IOException;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.utils.CameraUtils;
-import ch.giantific.qwittig.utils.MessageUtils;
 
 /**
  * Shows the receipt image taken by the user when adding a new purchase.
@@ -116,7 +116,7 @@ public class PurchaseReceiptAddFragment extends PurchaseReceiptBaseFragment {
      */
     public void captureImage() {
         if (!CameraUtils.hasCameraHardware(getActivity())) {
-            MessageUtils.showBasicSnackbar(mImageViewReceipt, getString(R.string.toast_no_camera));
+            Snackbar.make(mImageViewReceipt, R.string.toast_no_camera, Snackbar.LENGTH_LONG).show();
             return;
         }
 
@@ -143,7 +143,8 @@ public class PurchaseReceiptAddFragment extends PurchaseReceiptBaseFragment {
             if (resultCode == Activity.RESULT_OK) {
                 setImage(mReceiptPath);
                 mListener.setReceiptImagePath(mReceiptPath);
-                MessageUtils.showBasicSnackbar(mImageViewReceipt, getString(R.string.toast_receipt_changed));
+                Snackbar.make(mImageViewReceipt, R.string.toast_receipt_changed,
+                        Snackbar.LENGTH_LONG).show();
             }
         }
     }

@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
@@ -32,7 +33,6 @@ import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.ui.activities.HomeActivity;
 import ch.giantific.qwittig.ui.activities.PurchaseEditActivity;
 import ch.giantific.qwittig.ui.adapters.DraftsRecyclerAdapter;
-import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 
 /**
@@ -210,16 +210,20 @@ public class HomeDraftsFragment extends BaseRecyclerViewFragment implements
         if (requestCode == HomeActivity.INTENT_REQUEST_PURCHASE_MODIFY) {
             switch (resultCode) {
                 case PurchaseEditFragment.RESULT_PURCHASE_SAVED:
-                    MessageUtils.showBasicSnackbar(mRecyclerView, getString(R.string.toast_purchase_added));
+                    Snackbar.make(mRecyclerView, R.string.toast_purchase_added,
+                            Snackbar.LENGTH_LONG).show();
                     break;
                 case PurchaseEditFragment.RESULT_PURCHASE_DISCARDED:
-                    MessageUtils.showBasicSnackbar(mRecyclerView, getString(R.string.toast_changes_discarded));
+                    Snackbar.make(mRecyclerView, R.string.toast_changes_discarded,
+                            Snackbar.LENGTH_LONG).show();
                     break;
                 case PurchaseEditFragment.RESULT_PURCHASE_DRAFT:
-                    MessageUtils.showBasicSnackbar(mRecyclerView, getString(R.string.toast_changes_saved_as_draft));
+                    Snackbar.make(mRecyclerView, R.string.toast_changes_saved_as_draft,
+                            Snackbar.LENGTH_LONG).show();
                     break;
                 case PurchaseEditFragment.RESULT_PURCHASE_DRAFT_DELETED:
-                    MessageUtils.showBasicSnackbar(mRecyclerView, getString(R.string.toast_draft_deleted));
+                    Snackbar.make(mRecyclerView, R.string.toast_draft_deleted,
+                            Snackbar.LENGTH_LONG).show();
                     break;
             }
         }

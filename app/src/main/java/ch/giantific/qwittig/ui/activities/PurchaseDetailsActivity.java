@@ -35,7 +35,6 @@ import ch.giantific.qwittig.ui.fragments.PurchaseDetailsFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseEditFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseReceiptDetailFragment;
 import ch.giantific.qwittig.utils.DateUtils;
-import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 
@@ -138,7 +137,8 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
                 JSONObject jsonExtras = PushBroadcastReceiver.getData(intent);
                 mPurchaseId = jsonExtras.optString(PushBroadcastReceiver.PUSH_PARAM_PURCHASE_ID);
             } catch (JSONException e) {
-                MessageUtils.showBasicSnackbar(mToolbar, getString(R.string.toast_error_purchase_details_load));
+                Snackbar.make(mToolbar, R.string.toast_error_purchase_details_load,
+                        Snackbar.LENGTH_LONG).show();
             }
         }
     }
@@ -207,7 +207,7 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
         String message = getString(R.string.toast_exchange_rate_value,
                 MoneyUtils.formatMoneyNoSymbol(exchangeRate,
                         MoneyUtils.EXCHANGE_RATE_FRACTION_DIGITS));
-        MessageUtils.showBasicSnackbar(mToolbar, message);
+        Snackbar.make(mToolbar, message, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
@@ -217,10 +217,10 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
         if (requestCode == INTENT_REQUEST_PURCHASE_MODIFY) {
             switch (resultCode) {
                 case PurchaseEditFragment.RESULT_PURCHASE_SAVED:
-                    MessageUtils.showBasicSnackbar(mToolbar, getString(R.string.toast_changes_saved));
+                    Snackbar.make(mToolbar, R.string.toast_changes_saved, Snackbar.LENGTH_LONG).show();
                     break;
                 case PurchaseEditFragment.RESULT_PURCHASE_DISCARDED:
-                    MessageUtils.showBasicSnackbar(mToolbar, getString(R.string.toast_changes_discarded));
+                    Snackbar.make(mToolbar, R.string.toast_changes_discarded, Snackbar.LENGTH_LONG).show();
                     break;
             }
         }

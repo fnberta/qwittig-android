@@ -57,7 +57,6 @@ import ch.giantific.qwittig.ui.fragments.dialogs.AccountDeleteDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.ConfirmationDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupLeaveBalanceNotZeroDialogFragment;
 import ch.giantific.qwittig.utils.HelperUtils;
-import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -517,7 +516,7 @@ public class SettingsFragment extends PreferenceFragment implements
      */
     public void logOutUser() {
         if (!Utils.isConnected(getActivity())) {
-            MessageUtils.showBasicSnackbar(getView(), getString(R.string.toast_no_connection));
+            Snackbar.make(getView(), R.string.toast_no_connection, Snackbar.LENGTH_LONG).show();
             return;
         }
 
@@ -526,8 +525,7 @@ public class SettingsFragment extends PreferenceFragment implements
     }
 
     private void showProgressDialog(@NonNull String message) {
-        mProgressDialog = MessageUtils.getProgressDialog(getActivity(), message);
-        mProgressDialog.show();
+        mProgressDialog = ProgressDialog.show(getActivity(), null, message);
     }
 
     private void logOutWithHelper(boolean deleteUser) {
@@ -575,7 +573,7 @@ public class SettingsFragment extends PreferenceFragment implements
 
     private void onParseError(@NonNull String errorMessage) {
         dismissProgressDialog();
-        MessageUtils.showBasicSnackbar(getView(), errorMessage);
+        Snackbar.make(getView(), errorMessage, Snackbar.LENGTH_LONG).show();
     }
 
     /**
@@ -605,7 +603,7 @@ public class SettingsFragment extends PreferenceFragment implements
         }
 
         if (!Utils.isConnected(getActivity())) {
-            MessageUtils.showBasicSnackbar(getView(), getString(R.string.toast_no_connection));
+            Snackbar.make(getView(), R.string.toast_no_connection, Snackbar.LENGTH_LONG).show();
             return;
         }
 

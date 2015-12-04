@@ -5,7 +5,6 @@
 package ch.giantific.qwittig.ui.fragments;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Loader;
@@ -18,27 +17,16 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v13.app.FragmentCompat;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 
-import com.parse.ParseInstallation;
-import com.parse.ParseUser;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.Installation;
-import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.utils.HelperUtils;
-import ch.giantific.qwittig.utils.MessageUtils;
-import ch.giantific.qwittig.utils.ParseUtils;
-import ch.giantific.qwittig.utils.ViewUtils;
 
 /**
  * Provides an abstract base class for the login screen views.

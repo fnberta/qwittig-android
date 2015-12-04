@@ -14,6 +14,7 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -50,7 +51,6 @@ import ch.giantific.qwittig.ui.adapters.NavHeaderGroupsArrayAdapter;
 import ch.giantific.qwittig.ui.fragments.SettingsFragment;
 import ch.giantific.qwittig.BlurTransformation;
 import ch.giantific.qwittig.ui.fragments.SettingsProfileFragment;
-import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.inappbilling.IabHelper;
 import ch.giantific.qwittig.inappbilling.IabKey;
 import ch.giantific.qwittig.inappbilling.IabResult;
@@ -524,12 +524,13 @@ public abstract class BaseNavDrawerActivity extends BaseActivity {
             case INTENT_REQUEST_SETTINGS_PROFILE:
                 switch (resultCode) {
                     case RESULT_OK:
-                        MessageUtils.showBasicSnackbar(mSpinnerGroups, getString(R.string.toast_profile_update));
+                        Snackbar.make(mSpinnerGroups, R.string.toast_profile_update,
+                                Snackbar.LENGTH_LONG).show();
                         setAvatarAndNickname();
                         break;
                     case SettingsProfileFragment.RESULT_CHANGES_DISCARDED:
-                        MessageUtils.showBasicSnackbar(mSpinnerGroups,
-                                getString(R.string.toast_changes_discarded));
+                        Snackbar.make(mSpinnerGroups, R.string.toast_changes_discarded,
+                                Snackbar.LENGTH_LONG).show();
                         break;
                 }
                 break;
@@ -550,7 +551,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity {
 
     final void goPremium() {
         if (mIabHelper == null || !mIabHelper.subscriptionsSupported()) {
-            MessageUtils.showBasicSnackbar(mToolbar, getString(R.string.toast_not_supported));
+            Snackbar.make(mToolbar, R.string.toast_not_supported, Snackbar.LENGTH_LONG).show();
             return;
         }
 

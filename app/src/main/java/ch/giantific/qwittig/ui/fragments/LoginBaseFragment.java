@@ -8,10 +8,10 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.LoaderManager;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.view.View;
 
@@ -26,7 +26,6 @@ import ch.giantific.qwittig.data.helpers.account.LoginHelper;
 import ch.giantific.qwittig.domain.models.parse.Installation;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.utils.HelperUtils;
-import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.ViewUtils;
@@ -82,7 +81,7 @@ public abstract class LoginBaseFragment extends BaseFragment {
 
     final void loginWithEmailWithHelper(@NonNull final String email, @NonNull String password) {
         if (!Utils.isConnected(getActivity())) {
-            MessageUtils.showBasicSnackbar(mViewMain, getString(R.string.toast_no_connection));
+            Snackbar.make(mViewMain, R.string.toast_no_connection, Snackbar.LENGTH_LONG).show();
             return;
         }
 
@@ -111,8 +110,8 @@ public abstract class LoginBaseFragment extends BaseFragment {
     public void onLoginFailed(int errorCode) {
         final Activity context = getActivity();
         ParseErrorHandler.handleParseError(context, errorCode);
-        MessageUtils.showBasicSnackbar(mViewMain,
-                ParseErrorHandler.getErrorMessage(context, errorCode));
+        Snackbar.make(mViewMain,
+                ParseErrorHandler.getErrorMessage(context, errorCode), Snackbar.LENGTH_LONG).show();
         setLoading(false);
 
         HelperUtils.removeHelper(getFragmentManager(), LOGIN_HELPER);

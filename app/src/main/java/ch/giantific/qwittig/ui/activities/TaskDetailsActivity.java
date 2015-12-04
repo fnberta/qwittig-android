@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -26,7 +27,6 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.ui.fragments.TaskDetailsFragment;
 import ch.giantific.qwittig.ui.fragments.TasksFragment;
-import ch.giantific.qwittig.utils.MessageUtils;
 
 /**
  * Hosts {@link TaskDetailsFragment} that shows the details of a task.
@@ -113,7 +113,8 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity implements
                 JSONObject jsonExtras = PushBroadcastReceiver.getData(intent);
                 mTaskId = jsonExtras.optString(PushBroadcastReceiver.PUSH_PARAM_TASK_ID);
             } catch (JSONException e) {
-                MessageUtils.showBasicSnackbar(mToolbar, getString(R.string.toast_error_task_details_load));
+                Snackbar.make(mToolbar, R.string.toast_error_task_details_load,
+                        Snackbar.LENGTH_LONG).show();
             }
         }
     }

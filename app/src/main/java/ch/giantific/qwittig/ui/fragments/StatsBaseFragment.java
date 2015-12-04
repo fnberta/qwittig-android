@@ -31,7 +31,6 @@ import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.stats.Stats;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.utils.HelperUtils;
-import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
@@ -290,7 +289,7 @@ public abstract class StatsBaseFragment extends BaseFragment {
     }
 
     private void showErrorSnackbar(@NonNull String message) {
-        Snackbar snackbar = MessageUtils.getBasicSnackbar(mTextViewEmptyView, message);
+        Snackbar snackbar = Snackbar.make(mTextViewEmptyView, message, Snackbar.LENGTH_LONG);
         snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
             @Override
             public void onClick(View v) {

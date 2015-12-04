@@ -14,7 +14,6 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.utils.MessageUtils;
 
 /**
  * Provides a an abstract base class for screens with a {@link RecyclerView} that is refreshable on
@@ -88,7 +87,7 @@ public abstract class BaseRecyclerViewOnlineFragment extends BaseRecyclerViewFra
 
     final void showErrorSnackbar(@NonNull String errorMessage,
                                  @Nullable View.OnClickListener retryAction) {
-        Snackbar snackbar = MessageUtils.getBasicSnackbar(mRecyclerView, errorMessage);
+        Snackbar snackbar = Snackbar.make(mRecyclerView, errorMessage, Snackbar.LENGTH_LONG);
         if (retryAction != null) {
             snackbar.setAction(R.string.action_retry, retryAction);
         }

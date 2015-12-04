@@ -92,7 +92,6 @@ import ch.giantific.qwittig.ui.widgets.ListCheckBox;
 import ch.giantific.qwittig.utils.CameraUtils;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.HelperUtils;
-import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
@@ -811,7 +810,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     private void selectMinOneUser() {
-        MessageUtils.showBasicSnackbar(mButtonAddRow, getString(R.string.toast_min_one_user));
+        Snackbar.make(mButtonAddRow, R.string.toast_min_one_user, Snackbar.LENGTH_LONG).show();
     }
 
     /**
@@ -935,7 +934,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      */
     public void captureImage() {
         if (!CameraUtils.hasCameraHardware(getActivity())) {
-            MessageUtils.showBasicSnackbar(mButtonAddRow, getString(R.string.toast_no_camera));
+            Snackbar.make(mButtonAddRow, R.string.toast_no_camera, Snackbar.LENGTH_LONG).show();
             return;
         }
 
@@ -970,8 +969,8 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
                 if (Utils.verifyPermissions(grantResults)) {
                     getImage();
                 } else {
-                    Snackbar snackbar = MessageUtils.getBasicSnackbar(mButtonAddRow,
-                            getString(R.string.snackbar_permission_storage_denied));
+                    Snackbar snackbar = Snackbar.make(mButtonAddRow,
+                            R.string.snackbar_permission_storage_denied, Snackbar.LENGTH_LONG);
                     snackbar.setAction(R.string.snackbar_action_open_settings, new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -1040,7 +1039,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     void showImageTakenSnackbar() {
-        MessageUtils.showBasicSnackbar(mButtonAddRow, getString(R.string.toast_receipt_added));
+        Snackbar.make(mButtonAddRow, R.string.toast_receipt_added, Snackbar.LENGTH_LONG).show();
     }
 
     /**
@@ -1130,12 +1129,14 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      */
     public void savePurchase(boolean saveAsDraft) {
         if (mIsFetchingExchangeRates) {
-            MessageUtils.showBasicSnackbar(mButtonAddRow, getString(R.string.toast_exchange_rate_fetching));
+            Snackbar.make(mButtonAddRow, R.string.toast_exchange_rate_fetching,
+                    Snackbar.LENGTH_LONG).show();
             return;
         }
 
         if (!saveAsDraft && !mCurrencySelected.equals(mCurrentGroupCurrency) && mExchangeRate == 1) {
-            Snackbar snackbar = MessageUtils.getBasicSnackbar(mButtonAddRow, getString(R.string.toast_exchange_no_data));
+            Snackbar snackbar = Snackbar.make(mButtonAddRow, R.string.toast_exchange_no_data,
+                    Snackbar.LENGTH_LONG);
             snackbar.setAction(R.string.action_purchase_save_draft, new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -1176,7 +1177,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      */
     private boolean setItemValues(boolean acceptEmptyFields) {
         if (mItemRows.size() < 1) {
-            MessageUtils.showBasicSnackbar(mButtonAddRow, getString(R.string.toast_min_one_item));
+            Snackbar.make(mButtonAddRow, R.string.toast_min_one_item, Snackbar.LENGTH_LONG).show();
             return false;
         }
 
@@ -1253,11 +1254,11 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     void showErrorSnackbar(@NonNull String message) {
-        MessageUtils.showBasicSnackbar(mButtonAddRow, message);
+        Snackbar.make(mButtonAddRow, message, Snackbar.LENGTH_LONG).show();
     }
 
     /**
-     * Sets the activity result and starts the final animation of the {@link FABProgressCircle}.
+     * Sets the activity result and starts the final animation of the {@link FabProgress}.
      */
     public void onPurchaseSavedAndPinned() {
         mIsSaving = false;

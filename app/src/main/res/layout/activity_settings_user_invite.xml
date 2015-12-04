@@ -31,9 +31,9 @@
         android:src="@drawable/ic_person_add_black_24dp"
         android:visibility="gone"
         app:fabSize="mini"
-        app:fb_arcColor="@color/green"
-        app:fb_finalIcon="@drawable/ic_done_black_24dp"
-        app:fb_reusable="true"
+        app:fp_arcColor="@color/green"
+        app:fp_finalIcon="@drawable/ic_done_black_24dp"
+        app:fp_reusable="true"
         tools:visibility="visible"
         />
 

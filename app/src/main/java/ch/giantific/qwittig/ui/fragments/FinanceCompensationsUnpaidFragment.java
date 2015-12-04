@@ -10,6 +10,7 @@ import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,7 +40,6 @@ import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.ui.adapters.CompensationsUnpaidRecyclerAdapter;
 import ch.giantific.qwittig.ui.fragments.dialogs.CompensationChangeAmountDialogFragment;
 import ch.giantific.qwittig.utils.HelperUtils;
-import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -155,7 +155,8 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
                 mRecyclerAdapter.notifyDataSetChanged();
                 toggleEmptyViewVisibility();
 
-                MessageUtils.showBasicSnackbar(mRecyclerView, getString(R.string.toast_new_settlement));
+                Snackbar.make(mRecyclerView, R.string.toast_new_settlement,
+                        Snackbar.LENGTH_LONG).show();
             }
         });
     }
@@ -271,12 +272,12 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
                         mFabProgressNewSettlement.startProgress();
                         calculateNewSettlementWithHelper();
                     } else {
-                        MessageUtils.showBasicSnackbar(mRecyclerView,
-                                getString(R.string.toast_compensation_finish_old));
+                        Snackbar.make(mRecyclerView, R.string.toast_compensation_finish_old,
+                                        Snackbar.LENGTH_LONG).show();
                     }
                 } else {
-                    MessageUtils.showBasicSnackbar(mRecyclerView,
-                            getString(R.string.toast_only_user_in_group));
+                    Snackbar.make(mRecyclerView, R.string.toast_only_user_in_group,
+                            Snackbar.LENGTH_LONG).show();
                 }
             }
         });
@@ -369,7 +370,8 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         }
 
         if (!Utils.isConnected(getActivity())) {
-            MessageUtils.showBasicSnackbar(mFabProgressNewSettlement, getString(R.string.toast_no_connection));
+            Snackbar.make(mFabProgressNewSettlement, R.string.toast_no_connection,
+                    Snackbar.LENGTH_LONG).show();
             return;
         }
 
@@ -416,7 +418,8 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     public void onCompensationSaveFailed(@NonNull ParseObject compensation, int errorCode) {
         final Activity context = getActivity();
         ParseErrorHandler.handleParseError(context, errorCode);
-        MessageUtils.showBasicSnackbar(mFabProgressNewSettlement, ParseErrorHandler.getErrorMessage(context, errorCode));
+        Snackbar.make(mFabProgressNewSettlement, ParseErrorHandler.getErrorMessage(context, errorCode),
+                Snackbar.LENGTH_LONG).show();
         String compensationId = compensation.getObjectId();
         HelperUtils.removeHelper(getFragmentManager(), getSaveHelperTag(compensationId));
 
@@ -458,7 +461,8 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         }
 
         if (!Utils.isConnected(getActivity())) {
-            MessageUtils.showBasicSnackbar(mFabProgressNewSettlement, getString(R.string.toast_no_connection));
+            Snackbar.make(mFabProgressNewSettlement, R.string.toast_no_connection,
+                    Snackbar.LENGTH_LONG).show();
             return;
         }
 
@@ -510,8 +514,9 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
                     User payer = compensation.getPayer();
                     String nickname = payer.getNickname();
 
-                    MessageUtils.showBasicSnackbar(mRecyclerView,
-                            getString(R.string.toast_compensation_reminded_user, nickname));
+                    Snackbar.make(mRecyclerView,
+                            getString(R.string.toast_compensation_reminded_user, nickname),
+                            Snackbar.LENGTH_LONG).show();
                 }
                 break;
             }
@@ -520,8 +525,9 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
                 if (compensation != null) {
                     User beneficiary = compensation.getBeneficiary();
                     String nickname = beneficiary.getNickname();
-                    MessageUtils.showBasicSnackbar(mRecyclerView,
-                            getString(R.string.toast_compensation_reminded_user_paid, nickname));
+                    Snackbar.make(mRecyclerView,
+                            getString(R.string.toast_compensation_reminded_user_paid, nickname),
+                            Snackbar.LENGTH_LONG).show();
                 }
                 break;
             }
@@ -539,7 +545,8 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     public void onUserRemindFailed(@NonNull String compensationId, int errorCode) {
         final Activity context = getActivity();
         ParseErrorHandler.handleParseError(context, errorCode);
-        MessageUtils.showBasicSnackbar(mRecyclerView, ParseErrorHandler.getErrorMessage(context, errorCode));
+        Snackbar.make(mRecyclerView, ParseErrorHandler.getErrorMessage(context, errorCode),
+                Snackbar.LENGTH_LONG).show();
         HelperUtils.removeHelper(getFragmentManager(), getRemindHelperTag(compensationId));
 
         setCompensationLoading(compensationId, false);
@@ -553,7 +560,8 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         }
 
         if (!Utils.isConnected(getActivity())) {
-            MessageUtils.showBasicSnackbar(mFabProgressNewSettlement, getString(R.string.toast_no_connection));
+            Snackbar.make(mFabProgressNewSettlement, R.string.toast_no_connection,
+                    Snackbar.LENGTH_LONG).show();
             return;
         }
 
@@ -580,7 +588,8 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         compensation.deleteEventually();
         removeItemFromList(compensation);
 
-        MessageUtils.showBasicSnackbar(mRecyclerView, getString(R.string.toast_not_now_done, beneficiaryName));
+        Snackbar.make(mRecyclerView, getString(R.string.toast_not_now_done, beneficiaryName),
+                Snackbar.LENGTH_LONG).show();
     }
 
     @Override

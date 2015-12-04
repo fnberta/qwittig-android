@@ -25,7 +25,6 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.helpers.save.PurchaseSaveHelper;
 import ch.giantific.qwittig.domain.models.ItemRow;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
-import ch.giantific.qwittig.utils.MessageUtils;
 
 /**
  * Displays the interface where the user can add a new purchase by setting store, date, users
@@ -126,7 +125,7 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
 
     @Override
     void showErrorSnackbar(@NonNull String message) {
-        Snackbar snackbar = MessageUtils.getBasicSnackbar(mButtonAddRow, message);
+        Snackbar snackbar = Snackbar.make(mButtonAddRow, message, Snackbar.LENGTH_LONG);
         snackbar.setAction(R.string.action_purchase_save_draft, new View.OnClickListener() {
             @Override
             public void onClick(View v) {

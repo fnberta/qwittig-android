@@ -81,8 +81,8 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/normal_space"
         android:src="@drawable/ic_save_black_24dp"
-        app:fb_arcColor="@color/green"
-        app:fb_finalIcon="@drawable/ic_done_black_24dp"
+        app:fp_arcColor="@color/green"
+        app:fp_finalIcon="@drawable/ic_done_black_24dp"
         app:layout_anchor="@id/appbar"
         app:layout_anchorGravity="bottom|end"
         />

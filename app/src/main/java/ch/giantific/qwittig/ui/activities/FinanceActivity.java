@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
@@ -55,7 +56,6 @@ import ch.giantific.qwittig.ui.fragments.FinanceUserBalancesFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.CompensationChangeAmountDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.CompensationSingleDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupCreateDialogFragment;
-import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
@@ -301,7 +301,7 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
             Collections.sort(recipients);
             showAddSingleCompensationDialog(recipients);
         } else {
-            MessageUtils.showBasicSnackbar(mToolbar, getString(R.string.toast_only_user_in_group));
+            Snackbar.make(mToolbar, R.string.toast_only_user_in_group, Snackbar.LENGTH_LONG).show();
         }
 
     }
@@ -349,8 +349,8 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
                 if (e == null) {
                     mCompensationsUnpaidFragment.onCompensationsUpdated();
                     compensation.saveEventually();
-                    MessageUtils.showBasicSnackbar(mToolbar,
-                            getString(R.string.toast_payment_saved, recipientNickname));
+                    Snackbar.make(mToolbar, getString(R.string.toast_payment_saved,
+                            recipientNickname), Snackbar.LENGTH_LONG).show();
                 }
             }
         });

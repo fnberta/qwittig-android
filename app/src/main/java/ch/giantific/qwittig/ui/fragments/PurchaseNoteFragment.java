@@ -7,6 +7,7 @@ package ch.giantific.qwittig.ui.fragments;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.utils.MessageUtils;
 
 /**
  * Displays the note of a purchase.
@@ -95,7 +95,7 @@ public class PurchaseNoteFragment extends BaseFragment {
      */
     public void updateNote(@NonNull String note) {
         setNote(note);
-        MessageUtils.showBasicSnackbar(mTextViewNote, getString(R.string.toast_note_edited));
+        Snackbar.make(mTextViewNote, R.string.toast_note_edited, Snackbar.LENGTH_LONG).show();
     }
 
     @Override

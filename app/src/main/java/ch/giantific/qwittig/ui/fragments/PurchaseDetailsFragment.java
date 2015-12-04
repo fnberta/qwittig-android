@@ -10,6 +10,7 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,7 +21,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 
 import com.parse.ParseUser;
 
@@ -35,7 +35,6 @@ import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.ui.activities.BaseActivity;
 import ch.giantific.qwittig.ui.activities.PurchaseDetailsActivity;
 import ch.giantific.qwittig.ui.adapters.PurchaseDetailsRecyclerAdapter;
-import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 
 
@@ -133,8 +132,8 @@ public class PurchaseDetailsFragment extends BaseFragment implements
         if (mCurrentGroup != null) {
             queryData();
         } else {
-            MessageUtils.showBasicSnackbar(mRecyclerView,
-                    getString(R.string.toast_error_purchase_details_group_not));
+            Snackbar.make(mRecyclerView, R.string.toast_error_purchase_details_group_not,
+                    Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -265,10 +264,12 @@ public class PurchaseDetailsFragment extends BaseFragment implements
         if (requestCode == BaseActivity.INTENT_REQUEST_PURCHASE_MODIFY) {
             switch (resultCode) {
                 case PurchaseEditFragment.RESULT_PURCHASE_SAVED:
-                    MessageUtils.showBasicSnackbar(mRecyclerView, getString(R.string.toast_changes_saved));
+                    Snackbar.make(mRecyclerView, R.string.toast_changes_saved,
+                            Snackbar.LENGTH_LONG).show();
                     break;
                 case PurchaseEditFragment.RESULT_PURCHASE_DISCARDED:
-                    MessageUtils.showBasicSnackbar(mRecyclerView, getString(R.string.toast_changes_discarded));
+                    Snackbar.make(mRecyclerView, R.string.toast_changes_discarded,
+                            Snackbar.LENGTH_LONG).show();
                     break;
             }
         }

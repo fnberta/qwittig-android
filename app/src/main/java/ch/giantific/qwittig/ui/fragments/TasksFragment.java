@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -40,7 +41,6 @@ import ch.giantific.qwittig.ui.adapters.TasksRecyclerAdapter;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.HelperUtils;
-import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
@@ -306,20 +306,20 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment implements
             case BaseActivity.INTENT_REQUEST_TASK_DETAILS:
                 switch (resultCode) {
                     case TaskDetailsActivity.RESULT_TASK_DELETED:
-                        MessageUtils.showBasicSnackbar(mRecyclerView,
-                                getString(R.string.toast_task_deleted));
+                        Snackbar.make(mRecyclerView, R.string.toast_task_deleted,
+                                Snackbar.LENGTH_LONG).show();
                         break;
                 }
                 break;
             case BaseActivity.INTENT_REQUEST_TASK_NEW:
                 switch (resultCode) {
                     case TaskAddFragment.RESULT_TASK_SAVED:
-                        MessageUtils.showBasicSnackbar(mRecyclerView,
-                                getString(R.string.toast_task_added_new));
+                        Snackbar.make(mRecyclerView, R.string.toast_task_added_new,
+                                Snackbar.LENGTH_LONG).show();
                         break;
                     case TaskAddFragment.RESULT_TASK_DISCARDED:
-                        MessageUtils.showBasicSnackbar(mRecyclerView,
-                                getString(R.string.toast_task_discarded));
+                        Snackbar.make(mRecyclerView, R.string.toast_task_discarded,
+                                Snackbar.LENGTH_LONG).show();
                         break;
                 }
                 break;
@@ -361,7 +361,7 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment implements
         }
 
         if (!Utils.isConnected(getActivity())) {
-            MessageUtils.showBasicSnackbar(mRecyclerView, getString(R.string.toast_no_connection));
+            Snackbar.make(mRecyclerView, R.string.toast_no_connection, Snackbar.LENGTH_LONG).show();
             return;
         }
 
@@ -435,8 +435,8 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment implements
         if (task != null) {
             User userResponsible = (User) task.getUsersInvolved().get(0);
             String nickname = userResponsible.getNickname();
-            MessageUtils.showBasicSnackbar(mRecyclerView,
-                    getString(R.string.toast_task_reminded_user, nickname));
+            Snackbar.make(mRecyclerView,
+                    getString(R.string.toast_task_reminded_user, nickname), Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -450,8 +450,8 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment implements
     public void onUserRemindFailed(@NonNull String taskId, int errorCode) {
         final Activity context = getActivity();
         ParseErrorHandler.handleParseError(context, errorCode);
-        MessageUtils.showBasicSnackbar(mRecyclerView,
-                ParseErrorHandler.getErrorMessage(context, errorCode));
+        Snackbar.make(mRecyclerView,
+                ParseErrorHandler.getErrorMessage(context, errorCode), Snackbar.LENGTH_LONG).show();
         HelperUtils.removeHelper(getFragmentManager(), getTaskHelperTag(taskId));
 
         setTaskLoading(taskId, false);

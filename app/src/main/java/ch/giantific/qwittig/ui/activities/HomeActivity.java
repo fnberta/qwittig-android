@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.ViewPager;
@@ -51,7 +52,6 @@ import ch.giantific.qwittig.ui.fragments.dialogs.GoPremiumDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupJoinDialogFragment;
 import ch.giantific.qwittig.utils.HelperUtils;
-import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.ViewUtils;
 
@@ -187,7 +187,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
                 mInvitedGroupId = uri.getQueryParameter(URI_INVITED_GROUP_ID);
 
                 if (!email.equals(mCurrentUser.getUsername())) {
-                    MessageUtils.showBasicSnackbar(mFabMenu, getString(R.string.toast_emails_no_match));
+                    Snackbar.make(mFabMenu, R.string.toast_emails_no_match, Snackbar.LENGTH_LONG).show();
                     return;
                 }
             }
@@ -210,7 +210,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
         if (!TextUtils.isEmpty(mInvitedGroupId)) {
             if (!Utils.isConnected(this)) {
-                MessageUtils.showBasicSnackbar(mFabMenu, getString(R.string.toast_no_connection));
+                Snackbar.make(mFabMenu, R.string.toast_no_connection, Snackbar.LENGTH_LONG).show();
                 return;
             }
 
@@ -238,13 +238,15 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     @Override
     public void onInvitedGroupQueryFailed(int errorCode) {
         ParseErrorHandler.handleParseError(this, errorCode);
-        MessageUtils.showBasicSnackbar(mFabMenu, ParseErrorHandler.getErrorMessage(this, errorCode));
+        Snackbar.make(mFabMenu, ParseErrorHandler.getErrorMessage(this, errorCode),
+                Snackbar.LENGTH_LONG).show();
         HelperUtils.removeHelper(getFragmentManager(), INVITED_GROUP_HELPER);
     }
 
     @Override
     public void onEmailNotValid() {
-        MessageUtils.showBasicSnackbar(mFabMenu, getString(R.string.toast_group_invite_not_valid));
+        Snackbar.make(mFabMenu, getString(R.string.toast_group_invite_not_valid),
+                Snackbar.LENGTH_LONG).show();
         HelperUtils.removeHelper(getFragmentManager(), INVITED_GROUP_HELPER);
     }
 
@@ -281,16 +283,15 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     private void showProgressDialog(String message) {
-        mProgressDialog = MessageUtils.getProgressDialog(this, message);
-        mProgressDialog.show();
+        mProgressDialog = ProgressDialog.show(this, null, message);
     }
 
     @Override
     public void onUserJoinedGroup() {
         HelperUtils.removeHelper(getFragmentManager(), INVITED_GROUP_HELPER);
         dismissProgressDialog();
-        MessageUtils.showBasicSnackbar(mFabMenu, getString(R.string.toast_group_added,
-                mInvitedGroup.getName()));
+        Snackbar.make(mFabMenu, getString(R.string.toast_group_added, mInvitedGroup.getName()),
+                Snackbar.LENGTH_LONG).show();
 
         // register for notifications for the new group
         ParsePush.subscribeInBackground(mInvitedGroup.getObjectId());
@@ -320,7 +321,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     @Override
     public void onUserJoinGroupFailed(int errorCode) {
         ParseErrorHandler.handleParseError(this, errorCode);
-        MessageUtils.showBasicSnackbar(mFabMenu, ParseErrorHandler.getErrorMessage(this, errorCode));
+        Snackbar.make(mFabMenu, ParseErrorHandler.getErrorMessage(this, errorCode), Snackbar.LENGTH_LONG).show();
         HelperUtils.removeHelper(getFragmentManager(), INVITED_GROUP_HELPER);
 
         dismissProgressDialog();
@@ -333,7 +334,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         mInvitedGroup.removeUserInvited(mCurrentUser.getUsername());
         mInvitedGroup.saveEventually();
 
-        MessageUtils.showBasicSnackbar(mFabMenu, getString(R.string.toast_invitation_discarded));
+        Snackbar.make(mFabMenu, R.string.toast_invitation_discarded, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
@@ -440,7 +441,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
             case INTENT_REQUEST_PURCHASE_MODIFY:
                 switch (resultCode) {
                     case PurchaseAddFragment.RESULT_PURCHASE_SAVED:
-                        MessageUtils.showBasicSnackbar(mFabMenu, getString(R.string.toast_purchase_added));
+                        Snackbar.make(mFabMenu, R.string.toast_purchase_added, Snackbar.LENGTH_LONG).show();
                         break;
                     case PurchaseAddFragment.RESULT_PURCHASE_SAVED_AUTO:
                         String purchaseAdded = getString(R.string.toast_purchase_added);
@@ -450,27 +451,27 @@ public class HomeActivity extends BaseNavDrawerActivity implements
                             int freePurchasesLeft = freeAutoLimit - mCurrentUser.getPremiumCount();
                             purchaseAdded += ". " + getString(R.string.toast_free_purchases_left, freePurchasesLeft);
                         }
-                        MessageUtils.showBasicSnackbar(mFabMenu, purchaseAdded);
+                        Snackbar.make(mFabMenu, purchaseAdded, Snackbar.LENGTH_LONG).show();
                         break;
                     case PurchaseAddFragment.RESULT_PURCHASE_DRAFT:
-                        MessageUtils.showBasicSnackbar(mFabMenu,
-                                getString(R.string.toast_purchase_added_draft));
+                        Snackbar.make(mFabMenu, R.string.toast_purchase_added_draft,
+                                Snackbar.LENGTH_LONG).show();
                         break;
                     case PurchaseAddFragment.RESULT_PURCHASE_DISCARDED:
-                        MessageUtils.showBasicSnackbar(mFabMenu,
-                                getString(R.string.toast_purchase_discarded));
+                        Snackbar.make(mFabMenu, R.string.toast_purchase_discarded,
+                                Snackbar.LENGTH_LONG).show();
                         break;
                     case PurchaseAddFragment.RESULT_PURCHASE_ERROR:
-                        MessageUtils.showBasicSnackbar(mFabMenu,
-                                getString(R.string.toast_create_image_file_failed));
+                        Snackbar.make(mFabMenu, R.string.toast_create_image_file_failed,
+                                Snackbar.LENGTH_LONG).show();
                         break;
                 }
                 break;
             case INTENT_REQUEST_PURCHASE_DETAILS:
                 switch (resultCode) {
                     case PurchaseDetailsActivity.RESULT_PURCHASE_DELETED:
-                        MessageUtils.showBasicSnackbar(mFabMenu,
-                                getString(R.string.toast_purchase_deleted));
+                        Snackbar.make(mFabMenu, R.string.toast_purchase_deleted,
+                                Snackbar.LENGTH_LONG).show();
                         break;
                     case PurchaseDetailsActivity.RESULT_GROUP_CHANGED:
                         updateGroupSpinnerPosition();

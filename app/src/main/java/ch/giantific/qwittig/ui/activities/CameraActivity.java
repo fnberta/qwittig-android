@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
@@ -36,7 +37,6 @@ import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.ui.CameraPreview;
 import ch.giantific.qwittig.utils.CameraUtils;
-import ch.giantific.qwittig.utils.MessageUtils;
 
 /**
  * Provides a custom camera interface that is locked to portrait orientation and allows the user
@@ -97,7 +97,8 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void showErrorToast() {
-        MessageUtils.showToast(this, "Failed to capture the image. Pleas try again");
+        Toast.makeText(this, "Failed to capture the image. Pleas try again",
+                Toast.LENGTH_LONG).show();
     }
 
     private void toggleBottomVisibility() {
@@ -240,7 +241,8 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                     showPreview();
                     showImageThumbnail();
                 } else {
-                    MessageUtils.showToast(this, "You can maximally take 3 photos per receipt");
+                    Toast.makeText(this, "You can maximally take 3 photos per receipt",
+                            Toast.LENGTH_LONG).show();
                 }
                 break;
         }

@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +33,6 @@ import ch.giantific.qwittig.domain.models.parse.Config;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.ui.activities.LoginActivity;
 import ch.giantific.qwittig.utils.HelperUtils;
-import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
@@ -109,7 +109,7 @@ public class LoginAccountsFragment extends LoginBaseFragment implements
 
     private void loginWithFacebookWithHelper() {
         if (!Utils.isConnected(getActivity())) {
-            MessageUtils.showBasicSnackbar(mViewMain, getString(R.string.toast_no_connection));
+            Snackbar.make(mViewMain, R.string.toast_no_connection, Snackbar.LENGTH_LONG).show();
             return;
         }
 
@@ -131,7 +131,7 @@ public class LoginAccountsFragment extends LoginBaseFragment implements
 
     private void loginWithGoogle() {
         if (!Utils.isConnected(getActivity())) {
-            MessageUtils.showBasicSnackbar(mViewMain, getString(R.string.toast_no_connection));
+            Snackbar.make(mViewMain, R.string.toast_no_connection, Snackbar.LENGTH_LONG).show();
             return;
         }
 

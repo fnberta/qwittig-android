@@ -51,9 +51,9 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_swap_horiz_black_24dp"
             android:visibility="gone"
-            app:fb_arcColor="@color/green"
-            app:fb_finalIcon="@drawable/ic_done_black_24dp"
-            app:fb_reusable="true"
+            app:fp_arcColor="@color/green"
+            app:fp_finalIcon="@drawable/ic_done_black_24dp"
+            app:fp_reusable="true"
             tools:visibility="visible"
             />
     </LinearLayout>

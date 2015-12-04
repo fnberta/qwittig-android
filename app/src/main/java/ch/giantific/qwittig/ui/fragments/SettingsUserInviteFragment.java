@@ -9,6 +9,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,7 +31,6 @@ import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.utils.HelperUtils;
-import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -174,7 +174,8 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
         }
 
         if (!Utils.isConnected(getActivity())) {
-            MessageUtils.showBasicSnackbar(mTextViewNoInvitations, getString(R.string.toast_no_connection));
+            Snackbar.make(mTextViewNoInvitations, R.string.toast_no_connection,
+                    Snackbar.LENGTH_LONG).show();
             return;
         }
 
@@ -279,7 +280,8 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
         for (String email : mUsersToInviteEmails) {
             addInvitedRow(mUsersInvitedRows.size(), email);
         }
-        MessageUtils.showBasicSnackbar(mTextViewNoInvitations, getString(R.string.toast_user_invited));
+        Snackbar.make(mTextViewNoInvitations, R.string.toast_user_invited,
+                Snackbar.LENGTH_LONG).show();
 
         mIsInviting = false;
     }

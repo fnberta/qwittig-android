@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,7 +27,6 @@ import ch.giantific.qwittig.domain.models.ocr.OcrItem;
 import ch.giantific.qwittig.domain.models.ocr.OcrPurchase;
 import ch.giantific.qwittig.data.helpers.OcrHelper;
 import ch.giantific.qwittig.ui.activities.PurchaseAddActivity;
-import ch.giantific.qwittig.utils.MessageUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -197,7 +197,7 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
      * @param errorMessage the error message received from the server
      */
     public void onOcrFailed(@NonNull String errorMessage) {
-        MessageUtils.showBasicSnackbar(mButtonAddRow, errorMessage);
+        Snackbar.make(mButtonAddRow, errorMessage, Snackbar.LENGTH_LONG).show();
         showMainScreen();
     }
 
