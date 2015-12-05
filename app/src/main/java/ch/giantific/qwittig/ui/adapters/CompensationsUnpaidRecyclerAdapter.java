@@ -24,7 +24,7 @@ import com.parse.ParseObject;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.Avatar;
+import ch.giantific.qwittig.utils.AvatarUtils;
 import ch.giantific.qwittig.domain.models.parse.Compensation;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.utils.MoneyUtils;
@@ -225,7 +225,7 @@ public class CompensationsUnpaidRecyclerAdapter extends BaseRecyclerAdapter<Pars
                         .load(avatarBytes)
                         .into(mImageViewAvatar);
             } else {
-                mImageViewAvatar.setImageDrawable(Avatar.getFallbackDrawable(context, true, false));
+                mImageViewAvatar.setImageDrawable(AvatarUtils.getFallbackDrawable(context, true, false));
             }
         }
 

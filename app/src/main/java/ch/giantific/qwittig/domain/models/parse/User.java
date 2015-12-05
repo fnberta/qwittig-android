@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.utils.parse.ParseConfigUtils;
 
 
 /**
@@ -69,14 +70,14 @@ public class User extends ParseUser {
     }
 
     /**
-     * Returns the default stores defined in Parse.com Config.
+     * Returns the default stores defined in Parse.com ParseConfigUtils.
      *
      * @return the default stores
      */
     public List<String> getDefaultStores() {
         ParseConfig config = ParseConfig.getCurrentConfig();
 
-        return config.getList(Config.DEFAULT_STORES);
+        return config.getList(ParseConfigUtils.DEFAULT_STORES);
     }
 
     public boolean isDeleted() {

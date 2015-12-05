@@ -27,7 +27,7 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.ui.adapters.UsersRecyclerAdapter;
-import ch.giantific.qwittig.utils.ParseUtils;
+import ch.giantific.qwittig.utils.parse.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.WorkerUtils;
 import ch.giantific.qwittig.workerfragments.query.UserQueryWorker;

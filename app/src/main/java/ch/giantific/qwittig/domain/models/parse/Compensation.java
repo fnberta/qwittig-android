@@ -17,7 +17,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.giantific.qwittig.utils.ParseUtils;
+import ch.giantific.qwittig.utils.parse.ParseUtils;
 
 /**
  * Defines a compensation, a payment from one {@link User} to another. It includes the payer and

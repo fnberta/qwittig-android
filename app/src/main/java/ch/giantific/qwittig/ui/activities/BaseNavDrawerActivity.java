@@ -41,8 +41,8 @@ import java.util.List;
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.LocalBroadcast;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.Avatar;
-import ch.giantific.qwittig.domain.models.parse.Config;
+import ch.giantific.qwittig.utils.AvatarUtils;
+import ch.giantific.qwittig.utils.parse.ParseConfigUtils;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.data.repositories.ParseGroupRepository;
@@ -148,7 +148,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity {
 
     private boolean freeAutoPurchasesAvailable() {
         ParseConfig config = ParseConfig.getCurrentConfig();
-        int freeAutoLimit = config.getInt(Config.FREE_PURCHASES_LIMIT);
+        int freeAutoLimit = config.getInt(ParseConfigUtils.FREE_PURCHASES_LIMIT);
         return mCurrentUser.getPremiumCount() < freeAutoLimit;
     }
 
@@ -322,7 +322,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity {
                     .into(new BitmapImageViewTarget(mImageViewHeaderAvatar) {
                         @Override
                         public void onResourceReady(@NonNull Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                            view.setImageDrawable(Avatar.getRoundedDrawable(context, resource, true));
+                            view.setImageDrawable(AvatarUtils.getRoundedDrawable(context, resource, true));
                         }
                     });
 
@@ -331,7 +331,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity {
                     .bitmapTransform(new BlurTransformation(context))
                     .into(mImageViewHeader);
         } else {
-            mImageViewHeaderAvatar.setImageDrawable(Avatar.getFallbackDrawable(context, true, true));
+            mImageViewHeaderAvatar.setImageDrawable(AvatarUtils.getFallbackDrawable(context, true, true));
         }
     }
 

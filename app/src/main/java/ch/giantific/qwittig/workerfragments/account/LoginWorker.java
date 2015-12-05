@@ -39,7 +39,7 @@ import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.workerfragments.BaseWorker;
 import ch.giantific.qwittig.data.rest.CloudCodeClient;
-import ch.giantific.qwittig.domain.models.Avatar;
+import ch.giantific.qwittig.utils.AvatarUtils;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.ui.fragments.dialogs.EmailPromptDialogFragment;
 
@@ -338,9 +338,9 @@ public class LoginWorker extends BaseWorker {
             Glide.with(this)
                     .load(pictureUrl)
                     .asBitmap()
-                    .toBytes(Bitmap.CompressFormat.JPEG, Avatar.JPEG_COMPRESSION_RATE)
+                    .toBytes(Bitmap.CompressFormat.JPEG, AvatarUtils.JPEG_COMPRESSION_RATE)
                     .centerCrop()
-                    .into(new SimpleTarget<byte[]>(Avatar.WIDTH, Avatar.HEIGHT) {
+                    .into(new SimpleTarget<byte[]>(AvatarUtils.WIDTH, AvatarUtils.HEIGHT) {
                         @Override
                         public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
                             mFacebookUser.setAvatar(resource);
@@ -498,9 +498,9 @@ public class LoginWorker extends BaseWorker {
         Glide.with(this)
                 .load(photoUrl)
                 .asBitmap()
-                .toBytes(Bitmap.CompressFormat.JPEG, Avatar.JPEG_COMPRESSION_RATE)
+                .toBytes(Bitmap.CompressFormat.JPEG, AvatarUtils.JPEG_COMPRESSION_RATE)
                 .centerCrop()
-                .into(new SimpleTarget<byte[]>(Avatar.WIDTH, Avatar.HEIGHT) {
+                .into(new SimpleTarget<byte[]>(AvatarUtils.WIDTH, AvatarUtils.HEIGHT) {
                     @Override
                     public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
                         user.setAvatar(resource);

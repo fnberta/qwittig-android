@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.domain.models.parse;
+package ch.giantific.qwittig.utils.parse;
 
 import com.parse.ParseInstallation;
 
@@ -12,11 +12,11 @@ import java.util.List;
 /**
  * Provides static references to values used in {@link ParseInstallation} entries.
  */
-public class Installation {
+public class ParseInstallationUtils {
 
     public static final String USER = "user";
     public static final String CHANNELS = "channels";
-    private Installation() {
+    private ParseInstallationUtils() {
         // class cannot be instantiated
     }
 
@@ -29,8 +29,8 @@ public class Installation {
         ParseInstallation installation = ParseInstallation.getCurrentInstallation();
         List<String> defaultChannels = new ArrayList<>();
         defaultChannels.add("");
-        installation.put(Installation.CHANNELS, defaultChannels);
-        installation.remove(Installation.USER);
+        installation.put(ParseInstallationUtils.CHANNELS, defaultChannels);
+        installation.remove(ParseInstallationUtils.USER);
 
         return installation;
     }

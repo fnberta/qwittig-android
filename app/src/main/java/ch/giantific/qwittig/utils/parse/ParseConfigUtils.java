@@ -2,14 +2,16 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.domain.models.parse;
+package ch.giantific.qwittig.utils.parse;
 
+import com.parse.ConfigCallback;
 import com.parse.ParseConfig;
+import com.parse.ParseException;
 
 /**
  * Provides static references to the {@link ParseConfig} values used in this project.
  */
-public class Config {
+public class ParseConfigUtils {
 
     public static final String TEST_USERS_PASSWORD = "testUsersPassword";
     public static final String TEST_USERS_NICKNAMES = "testUsersNicknames";
@@ -18,9 +20,9 @@ public class Config {
     public static final String FREE_PURCHASES_LIMIT = "freePurchasesLimit";
 
     private static final long CONFIG_REFRESH_INTERVAL = 12 * 60 * 60 * 1000;
-    private static long LAST_FETCHED_TIME;
+    private static long sLastFetchedTime;
 
-    private Config() {
+    private ParseConfigUtils() {
         // class cannot be instantiated
     }
 
@@ -28,10 +30,18 @@ public class Config {
      * Fetches the {@link ParseConfig} at most once every 12 hours per app runtime.
      */
     public static void refreshConfig() {
-        long currentTime = System.currentTimeMillis();
-        if (currentTime - LAST_FETCHED_TIME > CONFIG_REFRESH_INTERVAL) {
-            LAST_FETCHED_TIME = currentTime;
-            ParseConfig.getInBackground();
+        final long currentTime = System.currentTimeMillis();
+        if (currentTime - sLastFetchedTime > CONFIG_REFRESH_INTERVAL) {
+            ParseConfig.getInBackground(new ConfigCallback() {
+                @Override
+                public void done(ParseConfig config, ParseException e) {
+                    if (e == null) {
+                        sLastFetchedTime = currentTime;
+                    } else {
+                        sLastFetchedTime = 0;
+                    }
+                }
+            });
         }
     }
 }

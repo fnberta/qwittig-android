@@ -24,7 +24,7 @@ import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.workerfragments.BaseWorker;
 import ch.giantific.qwittig.data.rest.CloudCodeClient;
-import ch.giantific.qwittig.domain.models.parse.Installation;
+import ch.giantific.qwittig.utils.parse.ParseInstallationUtils;
 import ch.giantific.qwittig.domain.models.parse.User;
 
 /**
@@ -146,7 +146,7 @@ public class LogoutWorker extends BaseGoogleApiLoginWorker {
      * installation object, so that the device does not keep receiving push notifications.
      */
     private void handleInstallation() {
-        ParseInstallation installation = Installation.getResetInstallation();
+        ParseInstallation installation = ParseInstallationUtils.getResetInstallation();
         installation.saveInBackground(new SaveCallback() {
             @Override
             public void done(@Nullable ParseException e) {

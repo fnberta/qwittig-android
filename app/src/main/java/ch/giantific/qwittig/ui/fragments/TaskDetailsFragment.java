@@ -5,7 +5,6 @@
 package ch.giantific.qwittig.ui.fragments;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -45,7 +44,7 @@ import ch.giantific.qwittig.ui.activities.BaseActivity;
 import ch.giantific.qwittig.ui.activities.TaskDetailsActivity;
 import ch.giantific.qwittig.ui.activities.TaskEditActivity;
 import ch.giantific.qwittig.ui.adapters.TaskHistoryRecyclerAdapter;
-import ch.giantific.qwittig.utils.ParseUtils;
+import ch.giantific.qwittig.utils.parse.ParseUtils;
 
 /**
  * Shows the details of a {@link Task}. Most of the information gets displayed in the

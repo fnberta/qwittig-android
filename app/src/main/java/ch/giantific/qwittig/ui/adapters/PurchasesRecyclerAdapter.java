@@ -26,7 +26,7 @@ import java.util.Date;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.Avatar;
+import ch.giantific.qwittig.utils.AvatarUtils;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.ui.adapters.rows.ProgressRow;
@@ -222,11 +222,11 @@ public class PurchasesRecyclerAdapter extends BaseLoadMoreRecyclerAdapter<ParseO
                         .into(new BitmapImageViewTarget(mImageViewAvatar) {
                             @Override
                             public void onResourceReady(@NonNull Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                                view.setImageDrawable(Avatar.getRoundedDrawable(mContext, resource, false));
+                                view.setImageDrawable(AvatarUtils.getRoundedDrawable(mContext, resource, false));
                             }
                         });
             } else {
-                mImageViewAvatar.setImageDrawable(Avatar.getFallbackDrawable(mContext, false, false));
+                mImageViewAvatar.setImageDrawable(AvatarUtils.getFallbackDrawable(mContext, false, false));
             }
         }
 

@@ -2,10 +2,9 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.utils;
+package ch.giantific.qwittig.utils.parse;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.parse.ParseACL;
 import com.parse.ParseConfig;
@@ -18,9 +17,9 @@ import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
 
-import ch.giantific.qwittig.domain.models.parse.Config;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.utils.MoneyUtils;
 
 /**
  * Provides useful static utility methods related to the Parse.com framework.
@@ -89,7 +88,7 @@ public class ParseUtils {
     @NonNull
     public static List<ch.giantific.qwittig.domain.models.Currency> getSupportedCurrencies() {
         ParseConfig config = ParseConfig.getCurrentConfig();
-        List<String> currencyCodes = config.getList(Config.SUPPORTED_CURRENCIES);
+        List<String> currencyCodes = config.getList(ParseConfigUtils.SUPPORTED_CURRENCIES);
         List<String> currencyNames = MoneyUtils.getCurrencyDisplayNames(currencyCodes);
 
         int currencyNamesLength = currencyNames.size();
@@ -112,7 +111,7 @@ public class ParseUtils {
     public static List<String> getSupportedCurrencyCodes() {
         ParseConfig config = ParseConfig.getCurrentConfig();
 
-        return config.getList(Config.SUPPORTED_CURRENCIES);
+        return config.getList(ParseConfigUtils.SUPPORTED_CURRENCIES);
     }
 
     /**

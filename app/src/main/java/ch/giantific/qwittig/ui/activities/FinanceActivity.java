@@ -58,7 +58,7 @@ import ch.giantific.qwittig.ui.fragments.dialogs.CompensationChangeAmountDialogF
 import ch.giantific.qwittig.ui.fragments.dialogs.CompensationSingleDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.utils.MoneyUtils;
-import ch.giantific.qwittig.utils.ParseUtils;
+import ch.giantific.qwittig.utils.parse.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**

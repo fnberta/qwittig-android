@@ -45,7 +45,7 @@ import ch.giantific.qwittig.ui.adapters.TaskUsersInvolvedRecyclerAdapter;
 import ch.giantific.qwittig.ui.fragments.dialogs.DatePickerDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.utils.DateUtils;
-import ch.giantific.qwittig.utils.ParseUtils;
+import ch.giantific.qwittig.utils.parse.ParseUtils;
 
 /**
  * Provides an interface for the user to add a new {@link Task}. Allows the selection of the time

@@ -20,7 +20,7 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.Avatar;
+import ch.giantific.qwittig.utils.AvatarUtils;
 
 /**
  * Provides an abstract base class for a {@link RecyclerView} row with a user's avatar and nickname.
@@ -78,11 +78,11 @@ public class UserAvatarRow extends RecyclerView.ViewHolder {
                     .into(new BitmapImageViewTarget(mImageViewAvatar) {
                         @Override
                         public void onResourceReady(@NonNull Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                            view.setImageDrawable(Avatar.getRoundedDrawable(mContext, resource, withRipple));
+                            view.setImageDrawable(AvatarUtils.getRoundedDrawable(mContext, resource, withRipple));
                         }
                     });
         } else {
-            mImageViewAvatar.setImageDrawable(Avatar.getFallbackDrawable(mContext, false, withRipple));
+            mImageViewAvatar.setImageDrawable(AvatarUtils.getFallbackDrawable(mContext, false, withRipple));
         }
     }
 

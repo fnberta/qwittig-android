@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.utils.MoneyUtils;
-import ch.giantific.qwittig.utils.ParseUtils;
+import ch.giantific.qwittig.utils.parse.ParseUtils;
 
 /**
  * Represents an item of a purchase with a name, a price and the users involved.

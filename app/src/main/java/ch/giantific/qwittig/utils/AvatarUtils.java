@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.domain.models;
+package ch.giantific.qwittig.utils;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -23,13 +23,13 @@ import ch.giantific.qwittig.utils.Utils;
 /**
  * Provides useful methods to properly format a user's avatar image.
  */
-public class Avatar {
+public class AvatarUtils {
 
     public static final int JPEG_COMPRESSION_RATE = 60;
     public static final int HEIGHT = 720;
     public static final int WIDTH = 720;
 
-    private Avatar() {
+    private AvatarUtils() {
         // class cannot be instantiated
     }
 

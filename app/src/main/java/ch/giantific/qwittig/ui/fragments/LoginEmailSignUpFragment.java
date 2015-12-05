@@ -29,7 +29,7 @@ import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.bumptech.glide.request.target.SimpleTarget;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.Avatar;
+import ch.giantific.qwittig.utils.AvatarUtils;
 import ch.giantific.qwittig.workerfragments.account.LoginWorker;
 import ch.giantific.qwittig.utils.WorkerUtils;
 import ch.giantific.qwittig.utils.Utils;
@@ -91,7 +91,7 @@ public class LoginEmailSignUpFragment extends LoginEmailBaseFragment {
         mEditTextNickname = mTextInputLayoutNickname.getEditText();
 
         mImageButtonAvatar = (ImageView) view.findViewById(R.id.ibt_login_signup_avatar);
-        mImageButtonAvatar.setImageDrawable(Avatar.getFallbackDrawable(getActivity(), true, true));
+        mImageButtonAvatar.setImageDrawable(AvatarUtils.getFallbackDrawable(getActivity(), true, true));
         mImageButtonAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -129,9 +129,9 @@ public class LoginEmailSignUpFragment extends LoginEmailBaseFragment {
         Glide.with(this)
                 .load(imageUri)
                 .asBitmap()
-                .toBytes(Bitmap.CompressFormat.JPEG, Avatar.JPEG_COMPRESSION_RATE)
+                .toBytes(Bitmap.CompressFormat.JPEG, AvatarUtils.JPEG_COMPRESSION_RATE)
                 .centerCrop()
-                .into(new SimpleTarget<byte[]>(Avatar.WIDTH, Avatar.HEIGHT) {
+                .into(new SimpleTarget<byte[]>(AvatarUtils.WIDTH, AvatarUtils.HEIGHT) {
                     @Override
                     public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
                         mAvatar = resource;
@@ -145,7 +145,7 @@ public class LoginEmailSignUpFragment extends LoginEmailBaseFragment {
                 .into(new BitmapImageViewTarget(mImageButtonAvatar) {
                     @Override
                     public void onResourceReady(@NonNull Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                        view.setImageDrawable(Avatar.getRoundedDrawable(getActivity(), resource, true));
+                        view.setImageDrawable(AvatarUtils.getRoundedDrawable(getActivity(), resource, true));
                     }
                 });
     }

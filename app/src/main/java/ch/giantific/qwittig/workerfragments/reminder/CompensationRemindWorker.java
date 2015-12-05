@@ -21,7 +21,7 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.rest.CloudCodeClient;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.utils.ParseUtils;
+import ch.giantific.qwittig.utils.parse.ParseUtils;
 import ch.giantific.qwittig.workerfragments.BaseWorker;
 
 /**

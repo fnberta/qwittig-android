@@ -26,7 +26,7 @@ import com.parse.ParseConfig;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.Config;
+import ch.giantific.qwittig.utils.parse.ParseConfigUtils;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.ui.activities.LoginActivity;
 import ch.giantific.qwittig.utils.Utils;
@@ -173,8 +173,8 @@ public class LoginAccountsFragment extends LoginBaseFragment implements
 
     private void tryWithoutAccount() {
         ParseConfig config = ParseConfig.getCurrentConfig();
-        String testUsersPassword = config.getString(Config.TEST_USERS_PASSWORD);
-        List<String> testUsersNicknames = config.getList(Config.TEST_USERS_NICKNAMES);
+        String testUsersPassword = config.getString(ParseConfigUtils.TEST_USERS_PASSWORD);
+        List<String> testUsersNicknames = config.getList(ParseConfigUtils.TEST_USERS_NICKNAMES);
         int testUserNumber = Utils.getRandomInt(testUsersNicknames.size());
 
         if (!TextUtils.isEmpty(testUsersPassword)) {

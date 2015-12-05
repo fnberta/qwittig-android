@@ -4,7 +4,6 @@
 
 package ch.giantific.qwittig.ui.fragments;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
@@ -25,7 +24,6 @@ import com.parse.ParseObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.workerfragments.query.MoreQueryWorker;
 import ch.giantific.qwittig.workerfragments.query.PurchaseQueryWorker;
@@ -36,7 +34,7 @@ import ch.giantific.qwittig.ui.activities.BaseActivity;
 import ch.giantific.qwittig.ui.activities.PurchaseDetailsActivity;
 import ch.giantific.qwittig.ui.adapters.PurchasesRecyclerAdapter;
 import ch.giantific.qwittig.utils.WorkerUtils;
-import ch.giantific.qwittig.utils.ParseUtils;
+import ch.giantific.qwittig.utils.parse.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**

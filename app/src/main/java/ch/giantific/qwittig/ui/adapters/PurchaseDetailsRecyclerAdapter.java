@@ -30,7 +30,7 @@ import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.ui.adapters.rows.HeaderRow;
 import ch.giantific.qwittig.ui.widgets.CircleDisplay;
 import ch.giantific.qwittig.utils.MoneyUtils;
-import ch.giantific.qwittig.utils.ParseUtils;
+import ch.giantific.qwittig.utils.parse.ParseUtils;
 
 import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;
 import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA_RGB;

@@ -40,7 +40,6 @@ import org.apache.commons.math3.fraction.BigFraction;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.workerfragments.account.LogoutWorker;
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
@@ -58,7 +57,7 @@ import ch.giantific.qwittig.ui.fragments.dialogs.AccountDeleteDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.ConfirmationDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupLeaveBalanceNotZeroDialogFragment;
 import ch.giantific.qwittig.utils.WorkerUtils;
-import ch.giantific.qwittig.utils.ParseUtils;
+import ch.giantific.qwittig.utils.parse.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**

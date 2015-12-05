@@ -40,7 +40,7 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.workerfragments.group.InvitedGroupWorker;
 import ch.giantific.qwittig.workerfragments.query.MoreQueryWorker;
 import ch.giantific.qwittig.workerfragments.query.PurchaseQueryWorker;
-import ch.giantific.qwittig.domain.models.parse.Config;
+import ch.giantific.qwittig.utils.parse.ParseConfigUtils;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.services.ParseQueryService;
@@ -444,7 +444,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
                         String purchaseAdded = getString(R.string.toast_purchase_added);
                         if (mInTrialMode) {
                             ParseConfig config = ParseConfig.getCurrentConfig();
-                            int freeAutoLimit = config.getInt(Config.FREE_PURCHASES_LIMIT);
+                            int freeAutoLimit = config.getInt(ParseConfigUtils.FREE_PURCHASES_LIMIT);
                             int freePurchasesLeft = freeAutoLimit - mCurrentUser.getPremiumCount();
                             purchaseAdded += ". " + getString(R.string.toast_free_purchases_left, freePurchasesLeft);
                         }

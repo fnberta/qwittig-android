@@ -23,8 +23,8 @@ import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import ch.berta.fabio.fabprogress.FabProgress;
 import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.utils.AvatarUtils;
 import ch.giantific.qwittig.workerfragments.account.UnlinkThirdPartyWorker;
-import ch.giantific.qwittig.domain.models.Avatar;
 import ch.giantific.qwittig.ui.fragments.SettingsProfileFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.DiscardChangesDialogFragment;
 
@@ -122,7 +122,7 @@ public class SettingsProfileActivity extends BaseActivity implements
                         }
                     });
         } else {
-            mImageViewAvatar.setImageDrawable(Avatar.getFallbackDrawableRect(this, false));
+            mImageViewAvatar.setImageDrawable(AvatarUtils.getFallbackDrawableRect(this, false));
             supportStartPostponedEnterTransition();
         }
     }

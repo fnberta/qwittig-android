@@ -29,9 +29,9 @@ import java.util.Collections;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.Config;
+import ch.giantific.qwittig.utils.parse.ParseConfigUtils;
 import ch.giantific.qwittig.ui.adapters.StoresRecyclerAdapter;
-import ch.giantific.qwittig.utils.ParseUtils;
+import ch.giantific.qwittig.utils.parse.ParseUtils;
 
 /**
  * Displays the settings screen where the user sees all stores added for his/her account and can
@@ -256,7 +256,7 @@ public class SettingsStoresFragment extends BaseFragment implements
         }
 
         ParseConfig config = ParseConfig.getCurrentConfig();
-        List<String> defaultStores = config.getList(Config.DEFAULT_STORES);
+        List<String> defaultStores = config.getList(ParseConfigUtils.DEFAULT_STORES);
         boolean storeIsNew = true;
 
         for (String defaultStore : defaultStores) {

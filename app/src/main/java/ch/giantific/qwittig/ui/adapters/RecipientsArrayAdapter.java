@@ -22,7 +22,7 @@ import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.Avatar;
+import ch.giantific.qwittig.utils.AvatarUtils;
 import ch.giantific.qwittig.domain.models.ItemUserPicker;
 import ch.giantific.qwittig.ui.fragments.dialogs.CompensationSingleDialogFragment;
 
@@ -131,12 +131,12 @@ public class RecipientsArrayAdapter extends ArrayAdapter<ItemUserPicker> {
                         .into(new BitmapImageViewTarget(mImageViewAvatar) {
                             @Override
                             public void onResourceReady(@NonNull Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                                view.setImageDrawable(Avatar.getRoundedDrawable(context, resource, withRipple));
+                                view.setImageDrawable(AvatarUtils.getRoundedDrawable(context, resource, withRipple));
                             }
                         });
             } else {
                 mImageViewAvatar.setImageDrawable(
-                        Avatar.getFallbackDrawable(context, false, withRipple));
+                        AvatarUtils.getFallbackDrawable(context, false, withRipple));
             }
         }
     }

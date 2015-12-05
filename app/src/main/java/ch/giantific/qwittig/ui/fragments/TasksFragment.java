@@ -28,7 +28,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.ParseTaskRepository;
 import ch.giantific.qwittig.domain.models.parse.Task;
@@ -40,7 +39,7 @@ import ch.giantific.qwittig.ui.activities.TaskDetailsActivity;
 import ch.giantific.qwittig.ui.adapters.TasksRecyclerAdapter;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.utils.DateUtils;
-import ch.giantific.qwittig.utils.ParseUtils;
+import ch.giantific.qwittig.utils.parse.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.WorkerUtils;
 import ch.giantific.qwittig.workerfragments.query.TaskQueryWorker;

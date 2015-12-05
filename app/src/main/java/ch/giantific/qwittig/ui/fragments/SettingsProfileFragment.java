@@ -37,13 +37,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.Arrays;
 
 import ch.berta.fabio.fabprogress.FabProgress;
-import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.utils.AvatarUtils;
 import ch.giantific.qwittig.workerfragments.account.UnlinkThirdPartyWorker;
-import ch.giantific.qwittig.domain.models.Avatar;
 import ch.giantific.qwittig.ui.fragments.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.utils.WorkerUtils;
-import ch.giantific.qwittig.utils.ParseUtils;
+import ch.giantific.qwittig.utils.parse.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
@@ -300,9 +299,9 @@ public class SettingsProfileFragment extends BaseFragment {
         Glide.with(this)
                 .load(imageUri)
                 .asBitmap()
-                .toBytes(Bitmap.CompressFormat.JPEG, Avatar.JPEG_COMPRESSION_RATE)
+                .toBytes(Bitmap.CompressFormat.JPEG, AvatarUtils.JPEG_COMPRESSION_RATE)
                 .centerCrop()
-                .into(new SimpleTarget<byte[]>(Avatar.WIDTH, Avatar.HEIGHT) {
+                .into(new SimpleTarget<byte[]>(AvatarUtils.WIDTH, AvatarUtils.HEIGHT) {
                     @Override
                     public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
                         mAvatar = resource;

@@ -35,7 +35,7 @@ import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.ui.activities.BaseActivity;
 import ch.giantific.qwittig.ui.activities.PurchaseDetailsActivity;
 import ch.giantific.qwittig.ui.adapters.PurchaseDetailsRecyclerAdapter;
-import ch.giantific.qwittig.utils.ParseUtils;
+import ch.giantific.qwittig.utils.parse.ParseUtils;
 
 
 /**

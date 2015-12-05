@@ -21,9 +21,9 @@ import com.parse.ParseUser;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.Installation;
+import ch.giantific.qwittig.utils.parse.ParseInstallationUtils;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.utils.ParseUtils;
+import ch.giantific.qwittig.utils.parse.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.ViewUtils;
 import ch.giantific.qwittig.utils.WorkerUtils;
@@ -131,8 +131,8 @@ public abstract class LoginBaseFragment extends BaseFragment {
         User user = (User) parseUser;
         List<String> channels = user.getGroupIds();
         ParseInstallation installation = ParseInstallation.getCurrentInstallation();
-        installation.addAllUnique(Installation.CHANNELS, channels);
-        installation.put(Installation.USER, parseUser);
+        installation.addAllUnique(ParseInstallationUtils.CHANNELS, channels);
+        installation.put(ParseInstallationUtils.USER, parseUser);
         installation.saveEventually();
     }
 }

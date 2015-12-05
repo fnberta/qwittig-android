@@ -36,7 +36,7 @@ import ch.giantific.qwittig.ui.fragments.PurchaseEditFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseReceiptDetailFragment;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
-import ch.giantific.qwittig.utils.ParseUtils;
+import ch.giantific.qwittig.utils.parse.ParseUtils;
 
 /**
  * Hosts {@link PurchaseDetailsFragment} that displays the details of a purchase and

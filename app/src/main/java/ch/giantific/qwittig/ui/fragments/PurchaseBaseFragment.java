@@ -71,12 +71,12 @@ import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.ComparatorParseUserIgnoreCase;
 import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.utils.parse.ParseConfigUtils;
 import ch.giantific.qwittig.workerfragments.RatesWorker;
 import ch.giantific.qwittig.workerfragments.save.PurchaseSaveWorker;
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.domain.models.ItemRow;
 import ch.giantific.qwittig.domain.models.Receipt;
-import ch.giantific.qwittig.domain.models.parse.Config;
 import ch.giantific.qwittig.domain.models.parse.Item;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.models.parse.User;
@@ -94,7 +94,7 @@ import ch.giantific.qwittig.utils.CameraUtils;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.WorkerUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
-import ch.giantific.qwittig.utils.ParseUtils;
+import ch.giantific.qwittig.utils.parse.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
@@ -902,7 +902,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
 
     private void addNewStore(@NonNull String storeSelected) {
         ParseConfig config = ParseConfig.getCurrentConfig();
-        List<String> defaultStores = config.getList(Config.DEFAULT_STORES);
+        List<String> defaultStores = config.getList(ParseConfigUtils.DEFAULT_STORES);
         List<String> addedStores = mCurrentUser.getStoresAdded();
         boolean storeIsNew = true;
 

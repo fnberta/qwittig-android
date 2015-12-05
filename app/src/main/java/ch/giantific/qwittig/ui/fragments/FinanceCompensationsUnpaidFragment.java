@@ -4,7 +4,6 @@
 
 package ch.giantific.qwittig.ui.fragments;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
@@ -28,7 +27,6 @@ import java.util.List;
 
 import ch.berta.fabio.fabprogress.FabProgress;
 import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
-import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.domain.models.parse.Compensation;
@@ -37,7 +35,7 @@ import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.ui.adapters.CompensationsUnpaidRecyclerAdapter;
 import ch.giantific.qwittig.ui.fragments.dialogs.CompensationChangeAmountDialogFragment;
-import ch.giantific.qwittig.utils.ParseUtils;
+import ch.giantific.qwittig.utils.parse.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.WorkerUtils;
 import ch.giantific.qwittig.workerfragments.group.SettlementWorker;

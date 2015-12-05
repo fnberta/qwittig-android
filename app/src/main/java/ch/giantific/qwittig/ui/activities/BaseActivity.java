@@ -22,7 +22,7 @@ import com.parse.ParseUser;
 
 import ch.giantific.qwittig.LocalBroadcast;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.Config;
+import ch.giantific.qwittig.utils.parse.ParseConfigUtils;
 import ch.giantific.qwittig.ui.fragments.dialogs.AccountCreateDialogFragment;
 
 /**
@@ -56,14 +56,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
     @CallSuper
     void handleLocalBroadcast(Intent intent, int dataType) {
         // empty default implementation
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        // refresh ParseConfig
-        Config.refreshConfig();
     }
 
     @Override
@@ -107,6 +99,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         ParseUser.logOutInBackground(new LogOutCallback() {
             @Override
             public void done(ParseException e) {
+                // ignore possible exception, currentUser will always be null now
                 goToHomeScreen();
             }
         });

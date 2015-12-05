@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import ch.giantific.qwittig.utils.DateUtils;
-import ch.giantific.qwittig.utils.ParseUtils;
+import ch.giantific.qwittig.utils.parse.ParseUtils;
 
 /**
  * Represents a task that is defined within a {@link Group} and assigned to specific users

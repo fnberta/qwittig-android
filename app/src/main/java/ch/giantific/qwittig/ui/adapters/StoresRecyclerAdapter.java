@@ -18,7 +18,7 @@ import com.parse.ParseConfig;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.Config;
+import ch.giantific.qwittig.utils.parse.ParseConfigUtils;
 import ch.giantific.qwittig.ui.adapters.rows.HeaderRow;
 
 /**
@@ -67,7 +67,7 @@ public class StoresRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     private List<String> getDefaultStores() {
         ParseConfig config = ParseConfig.getCurrentConfig();
-        return config.getList(Config.DEFAULT_STORES);
+        return config.getList(ParseConfigUtils.DEFAULT_STORES);
     }
 
     @NonNull

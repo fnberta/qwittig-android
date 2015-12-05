@@ -33,7 +33,7 @@ import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.ui.activities.HomeActivity;
 import ch.giantific.qwittig.ui.activities.PurchaseEditActivity;
 import ch.giantific.qwittig.ui.adapters.DraftsRecyclerAdapter;
-import ch.giantific.qwittig.utils.ParseUtils;
+import ch.giantific.qwittig.utils.parse.ParseUtils;
 
 /**
  * Displays the currently open drafts of the current user in an {@link RecyclerView list.

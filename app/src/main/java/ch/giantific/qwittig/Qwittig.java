@@ -22,6 +22,7 @@ import ch.giantific.qwittig.domain.models.parse.Item;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.models.parse.Task;
 import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.utils.parse.ParseConfigUtils;
 
 /**
  * Handles the initialisation of the Parse.com framework.
@@ -68,5 +69,8 @@ public class Qwittig extends Application {
 
         // set up default channel for push notifications
         ParsePush.subscribeInBackground("");
+
+        // refresh ParseConfig
+        ParseConfigUtils.refreshConfig();
     }
 }
