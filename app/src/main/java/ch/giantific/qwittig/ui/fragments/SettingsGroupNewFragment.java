@@ -10,6 +10,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
@@ -165,13 +166,13 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
     }
 
     /**
-     * Passes the error code to the generic error handler, shows the user an error message and
-     * removes the retained worker fragment and loading indicators.
+     * Shows the user an error message and removes the retained worker fragment and loading
+     * indicators.
      *
-     * @param errorCode the error code of the exception thrown during the process
+     * @param errorMessage the error message from the exception thrown during the process
      */
-    public void onCreateNewGroupFailed(int errorCode) {
-        onInviteError(errorCode, CREATE_GROUP_WORKER);
+    public void onCreateNewGroupFailed(@StringRes int errorMessage) {
+        onInviteError(errorMessage, CREATE_GROUP_WORKER);
     }
 
     /**
@@ -198,15 +199,15 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
     }
 
     /**
-     * Passes the error code to the generic error handler, shows the user an error  message and
-     * removes the retained worker fragment and loading indicators.
+     * Shows the user an error message and removes the retained worker fragment and loading
+     * indicators.
      * <p/>
      * TODO: new group is created but users not invited, finish activity but tell the user
      *
-     * @param errorCode the error code of the exception thrown during the process
+     * @param errorMessage the error message from the exception thrown during the process
      */
-    public void onInviteUsersFailed(int errorCode) {
-        onInviteError(errorCode, CREATE_GROUP_WORKER);
+    public void onInviteUsersFailed(@StringRes int errorMessage) {
+        onInviteError(errorMessage, CREATE_GROUP_WORKER);
     }
 
     @Override

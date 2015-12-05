@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 
 import ch.giantific.qwittig.data.repositories.ParsePurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
@@ -44,7 +45,7 @@ public class PurchaseQueryWorker extends BaseQueryWorker implements
         super.onCreate(savedInstanceState);
 
         if (setCurrentGroups()) {
-            PurchaseRepository repo = new ParsePurchaseRepository();
+            PurchaseRepository repo = new ParsePurchaseRepository(getActivity());
             repo.updatePurchasesAsync(mCurrentUser, mCurrentUserGroups, mCurrentGroup.getObjectId(), this);
         } else {
             if (mListener != null) {
@@ -61,9 +62,9 @@ public class PurchaseQueryWorker extends BaseQueryWorker implements
     }
 
     @Override
-    public void onPurchaseUpdateFailed(int errorCode) {
+    public void onPurchaseUpdateFailed(@StringRes int errorMessage) {
         if (mListener != null) {
-            mListener.onPurchaseUpdateFailed(errorCode);
+            mListener.onPurchaseUpdateFailed(errorMessage);
         }
     }
 
@@ -94,7 +95,7 @@ public class PurchaseQueryWorker extends BaseQueryWorker implements
          *
          * @param errorCode the error code of the exception thrown in the process
          */
-        void onPurchaseUpdateFailed(int errorCode);
+        void onPurchaseUpdateFailed(@StringRes int errorCode);
 
         /**
          * Handles the successful update of all purchases from all groups.

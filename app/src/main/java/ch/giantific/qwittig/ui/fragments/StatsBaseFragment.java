@@ -11,26 +11,24 @@ import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.ContentLoadingProgressBar;
 import android.view.View;
 import android.widget.TextView;
 
-import com.parse.ParseException;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.workerfragments.group.StatsWorker;
 import ch.giantific.qwittig.data.repositories.ParseGroupRepository;
 import ch.giantific.qwittig.domain.models.Month;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.stats.Stats;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
-import ch.giantific.qwittig.utils.WorkerUtils;
 import ch.giantific.qwittig.utils.Utils;
+import ch.giantific.qwittig.utils.WorkerUtils;
+import ch.giantific.qwittig.workerfragments.group.StatsWorker;
 
 /**
  * Provides an abstract base class for the display of statistical information related to a group.
@@ -113,7 +111,7 @@ public abstract class StatsBaseFragment extends BaseFragment {
                 setStuffWithGroupData();
                 loadData();
             } else {
-                GroupRepository repo = new ParseGroupRepository();
+                GroupRepository repo = new ParseGroupRepository(getActivity());
                 repo.fetchGroupDataAsync(mCurrentGroup, new GroupRepository.GetGroupLocalListener() {
                     @Override
                     public void onGroupLocalLoaded(@NonNull Group group) {
@@ -168,8 +166,7 @@ public abstract class StatsBaseFragment extends BaseFragment {
     @CallSuper
     void calcStats(String year, int month) {
         if (!Utils.isConnected(getActivity())) {
-            showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(),
-                    ParseException.CONNECTION_FAILED));
+            showErrorSnackbar(R.string.toast_no_connection);
 
             setEmptyViewVisibility(true);
             toggleProgressBarVisibility();
@@ -270,16 +267,14 @@ public abstract class StatsBaseFragment extends BaseFragment {
     protected abstract void setChartData();
 
     /**
-     * Passes the error code to the generic error handler, shows the user an error message and
-     * removes the retained worker fragment and loading indicators.
+     * Shows the user the error message and removes the retained worker fragment and loading
+     * indicators.
      *
-     * @param errorCode the error code of the exception thrown during the process
+     * @param errorMessage the error message from the exception thrown during the process
      */
     @CallSuper
-    public void onStatsCalculationFailed(int errorCode) {
-        final Activity context = getActivity();
-        ParseErrorHandler.handleParseError(context, errorCode);
-        showErrorSnackbar(ParseErrorHandler.getErrorMessage(context, errorCode));
+    public void onStatsCalculationFailed(@StringRes int errorMessage) {
+        showErrorSnackbar(errorMessage);
         WorkerUtils.removeWorker(getFragmentManager(), getWorkerTag());
 
         mIsLoading = false;
@@ -287,7 +282,7 @@ public abstract class StatsBaseFragment extends BaseFragment {
         setEmptyViewVisibility(true);
     }
 
-    private void showErrorSnackbar(@NonNull String message) {
+    private void showErrorSnackbar(@StringRes int message) {
         Snackbar snackbar = Snackbar.make(mTextViewEmptyView, message, Snackbar.LENGTH_LONG);
         snackbar.setAction(R.string.action_retry, new View.OnClickListener() {
             @Override

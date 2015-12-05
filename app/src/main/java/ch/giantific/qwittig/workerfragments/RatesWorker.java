@@ -8,10 +8,12 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.text.TextUtils;
 
 import java.util.Map;
 
+import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.rest.ExchangeRatesClient;
 import ch.giantific.qwittig.domain.models.rates.CurrencyRates;
 import retrofit.Callback;
@@ -72,7 +74,7 @@ public class RatesWorker extends BaseWorker {
 
         if (TextUtils.isEmpty(baseCurrency)) {
             if (mListener != null) {
-                mListener.onRatesFetchFailed("");
+                mListener.onRatesFetchFailed(R.string.toast_unknown_error);
             }
 
             return;
@@ -94,7 +96,7 @@ public class RatesWorker extends BaseWorker {
             @Override
             public void failure(@NonNull RetrofitError error) {
                 if (mListener != null) {
-                    mListener.onRatesFetchFailed(error.getLocalizedMessage());
+                    mListener.onRatesFetchFailed(R.string.toast_unknown_error);
                 }
             }
         });
@@ -122,6 +124,6 @@ public class RatesWorker extends BaseWorker {
          *
          * @param errorMessage the error message received from the server
          */
-        void onRatesFetchFailed(@NonNull String errorMessage);
+        void onRatesFetchFailed(@StringRes int errorMessage);
     }
 }

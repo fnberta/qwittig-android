@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.RecyclerView;
@@ -27,12 +28,11 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.repositories.ParseTaskRepository;
 import ch.giantific.qwittig.domain.models.parse.Task;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.data.repositories.ParseTaskRepository;
-import ch.giantific.qwittig.workerfragments.query.TaskQueryWorker;
-import ch.giantific.qwittig.workerfragments.reminder.TaskRemindWorker;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.ui.activities.BaseActivity;
 import ch.giantific.qwittig.ui.activities.TaskAddActivity;
@@ -40,10 +40,11 @@ import ch.giantific.qwittig.ui.activities.TaskDetailsActivity;
 import ch.giantific.qwittig.ui.adapters.TasksRecyclerAdapter;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.utils.DateUtils;
-import ch.giantific.qwittig.utils.WorkerUtils;
-import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
+import ch.giantific.qwittig.utils.WorkerUtils;
+import ch.giantific.qwittig.workerfragments.query.TaskQueryWorker;
+import ch.giantific.qwittig.workerfragments.reminder.TaskRemindWorker;
 
 /**
  * Displays a {@link RecyclerView} list of all the ongoing tasks in a group in card base interface.
@@ -88,7 +89,7 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment implements
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mTaskRepo = new ParseTaskRepository();
+        mTaskRepo = new ParseTaskRepository(getActivity());
 
         if (savedInstanceState != null) {
             ArrayList<String> loadingTasks = savedInstanceState.getStringArrayList(STATE_TASKS_LOADING);
@@ -123,7 +124,7 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment implements
     protected void onlineQuery() {
         if (!Utils.isConnected(getActivity())) {
             setLoading(false);
-            showErrorSnackbar(getString(R.string.toast_no_connection), getOnlineQueryRetryAction());
+            showErrorSnackbar(R.string.toast_no_connection, getOnlineQueryRetryAction());
             return;
         }
 
@@ -142,15 +143,13 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment implements
     }
 
     /**
-     * Passes the error code to the generic error handler, shows the user an error message and
-     * removes the retained worker fragment and loading indicators.
+     * Shows the user an error message and removes the retained worker fragment and loading
+     * indicators.
      *
-     * @param errorCode the error code of the exception thrown in the process
+     * @param errorMessage the error message from the exception thrown in the process
      */
-    public void onTasksUpdatedFailed(int errorCode) {
-        ParseErrorHandler.handleParseError(getActivity(), errorCode);
-        showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), errorCode),
-                getOnlineQueryRetryAction());
+    public void onTasksUpdatedFailed(@StringRes int errorMessage) {
+        showErrorSnackbar(errorMessage, getOnlineQueryRetryAction());
         WorkerUtils.removeWorker(getFragmentManager(), TASK_QUERY_WORKER);
 
         setLoading(false);
@@ -441,17 +440,14 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment implements
     }
 
     /**
-     * Passes the error codeto the generic error handler, shows the user an error message and
-     * removes the retained worker fragment and loading indicators.
+     * Shows the user the error message and removes the retained worker fragment and loading
+     * indicators.
      *
-     * @param taskId    the object id of the task for which an attempt was amde to send a reminder
-     * @param errorCode the error code of the exception thrown in the process
+     * @param taskId       the object id of the task for which an attempt was amde to send a reminder
+     * @param errorMessage the error message from the exception thrown in the process
      */
-    public void onUserRemindFailed(@NonNull String taskId, int errorCode) {
-        final Activity context = getActivity();
-        ParseErrorHandler.handleParseError(context, errorCode);
-        Snackbar.make(mRecyclerView,
-                ParseErrorHandler.getErrorMessage(context, errorCode), Snackbar.LENGTH_LONG).show();
+    public void onUserRemindFailed(@NonNull String taskId, @StringRes int errorMessage) {
+        Snackbar.make(mRecyclerView, errorMessage, Snackbar.LENGTH_LONG).show();
         WorkerUtils.removeWorker(getFragmentManager(), getTaskWorkerTag(taskId));
 
         setTaskLoading(taskId, false);

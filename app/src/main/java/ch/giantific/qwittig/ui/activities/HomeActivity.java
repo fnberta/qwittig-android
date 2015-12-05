@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -34,7 +35,6 @@ import java.util.List;
 import ch.berta.fabio.fabspeeddial.FabMenu;
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.LocalBroadcast;
-import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.workerfragments.group.InvitedGroupWorker;
@@ -236,10 +236,8 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onInvitedGroupQueryFailed(int errorCode) {
-        ParseErrorHandler.handleParseError(this, errorCode);
-        Snackbar.make(mFabMenu, ParseErrorHandler.getErrorMessage(this, errorCode),
-                Snackbar.LENGTH_LONG).show();
+    public void onInvitedGroupQueryFailed(@StringRes int errorMessage) {
+        Snackbar.make(mFabMenu, errorMessage, Snackbar.LENGTH_LONG).show();
         WorkerUtils.removeWorker(getFragmentManager(), INVITED_GROUP_WORKER);
     }
 
@@ -319,9 +317,8 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onUserJoinGroupFailed(int errorCode) {
-        ParseErrorHandler.handleParseError(this, errorCode);
-        Snackbar.make(mFabMenu, ParseErrorHandler.getErrorMessage(this, errorCode), Snackbar.LENGTH_LONG).show();
+    public void onUserJoinGroupFailed(@StringRes int errorMessage) {
+        Snackbar.make(mFabMenu, errorMessage, Snackbar.LENGTH_LONG).show();
         WorkerUtils.removeWorker(getFragmentManager(), INVITED_GROUP_WORKER);
 
         dismissProgressDialog();
@@ -407,7 +404,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onPurchaseUpdateFailed(int errorCode) {
+    public void onPurchaseUpdateFailed(@StringRes int errorCode) {
         mHomePurchasesFragment.onPurchaseUpdateFailed(errorCode);
     }
 
@@ -429,8 +426,8 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onMoreObjectsLoadFailed(int errorCode) {
-        mHomePurchasesFragment.onMoreObjectsLoadFailed(errorCode);
+    public void onMoreObjectsLoadFailed(@StringRes int errorMessage) {
+        mHomePurchasesFragment.onMoreObjectsLoadFailed(errorMessage);
     }
 
     @Override

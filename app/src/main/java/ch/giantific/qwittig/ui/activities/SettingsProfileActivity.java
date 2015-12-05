@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 import android.view.View;
@@ -149,8 +150,8 @@ public class SettingsProfileActivity extends BaseActivity implements
     }
 
     @Override
-    public void onThirdPartyUnlinkFailed(int errorCode) {
-        mSettingsProfileFragment.onThirdPartyUnlinkFailed(errorCode);
+    public void onThirdPartyUnlinkFailed(@StringRes int errorMessage) {
+        mSettingsProfileFragment.onThirdPartyUnlinkFailed(errorMessage);
     }
 
     @Override

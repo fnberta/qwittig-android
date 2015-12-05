@@ -4,26 +4,25 @@
 
 package ch.giantific.qwittig.data.repositories;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.ParseUser;
-
-import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.User;
 
 /**
- * Created by fabio on 28.10.15.
+ * Provides a base class for repository implementations that use the Parse.com framework.
  */
 public class ParseGenericRepository {
 
     public static final int QUERY_ITEMS_PER_PAGE = 15;
     int mNumberOfUpdatedQueries;
     int mQueryCount;
+    Context mContext;
 
-    public ParseGenericRepository() {
+    public ParseGenericRepository(Context context) {
+        mContext = context.getApplicationContext();
     }
 
     final boolean allUpdatesDone() {

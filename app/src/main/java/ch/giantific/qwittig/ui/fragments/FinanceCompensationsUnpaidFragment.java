@@ -10,6 +10,7 @@ import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -29,9 +30,6 @@ import ch.berta.fabio.fabprogress.FabProgress;
 import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
 import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.workerfragments.group.SettlementWorker;
-import ch.giantific.qwittig.workerfragments.reminder.CompensationRemindWorker;
-import ch.giantific.qwittig.workerfragments.save.CompensationSaveWorker;
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.domain.models.parse.Compensation;
 import ch.giantific.qwittig.domain.models.parse.User;
@@ -39,9 +37,12 @@ import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.ui.adapters.CompensationsUnpaidRecyclerAdapter;
 import ch.giantific.qwittig.ui.fragments.dialogs.CompensationChangeAmountDialogFragment;
-import ch.giantific.qwittig.utils.WorkerUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
+import ch.giantific.qwittig.utils.WorkerUtils;
+import ch.giantific.qwittig.workerfragments.group.SettlementWorker;
+import ch.giantific.qwittig.workerfragments.reminder.CompensationRemindWorker;
+import ch.giantific.qwittig.workerfragments.save.CompensationSaveWorker;
 
 /**
  * Displays all currently open unpaid compensations in the group in card based {@link RecyclerView}
@@ -99,7 +100,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mUserRepo = new ParseUserRepository();
+        mUserRepo = new ParseUserRepository(getActivity());
 
         Bundle args = getArguments();
         if (args != null) {
@@ -255,7 +256,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         }
 
         if (!Utils.isConnected(getActivity())) {
-            showErrorSnackbar(getString(R.string.toast_no_connection), getSettlementErrorRetryAction());
+            showErrorSnackbar(R.string.toast_no_connection, getSettlementErrorRetryAction());
             return;
         }
 
@@ -273,7 +274,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
                         calculateNewSettlementWithWorker();
                     } else {
                         Snackbar.make(mRecyclerView, R.string.toast_compensation_finish_old,
-                                        Snackbar.LENGTH_LONG).show();
+                                Snackbar.LENGTH_LONG).show();
                     }
                 } else {
                     Snackbar.make(mRecyclerView, R.string.toast_only_user_in_group,
@@ -315,16 +316,13 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     }
 
     /**
-     * Passes the error code to the generic error handler, shows the user an error message and
-     * removes the retained worker fragment and loading indicators.
+     * Shows the user the error message and removes the retained worker fragment and loading
+     * indicators.
      *
-     * @param errorCode the error code of the exception thrown in the process
+     * @param errorMessage the error message from the exception thrown in the process
      */
-    public void onNewSettlementCreationFailed(int errorCode) {
-        final Activity context = getActivity();
-        ParseErrorHandler.handleParseError(context, errorCode);
-        showErrorSnackbar(ParseErrorHandler.getErrorMessage(context, errorCode),
-                getSettlementErrorRetryAction());
+    public void onNewSettlementCreationFailed(@StringRes int errorMessage) {
+        showErrorSnackbar(errorMessage, getSettlementErrorRetryAction());
         WorkerUtils.removeWorker(getFragmentManager(), SETTLEMENT_WORKER);
 
         mFabProgressNewSettlement.stopProgress();
@@ -408,18 +406,14 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     }
 
     /**
-     * Passes the error code to the generic error handler, shows the user an error message and
-     * removes the retained worker fragment and loading indicators. Also removes the compensation
-     * from the list of loading compensations.
+     * Shows the user an error message and removes the retained worker fragment and loading
+     * indicators. Also removes the compensation from the list of loading compensations.
      *
      * @param compensation the compensation which failed to save
-     * @param errorCode    the error code of the exception thrown in the process
+     * @param errorMessage the error message from the exception thrown in the process
      */
-    public void onCompensationSaveFailed(@NonNull ParseObject compensation, int errorCode) {
-        final Activity context = getActivity();
-        ParseErrorHandler.handleParseError(context, errorCode);
-        Snackbar.make(mFabProgressNewSettlement, ParseErrorHandler.getErrorMessage(context, errorCode),
-                Snackbar.LENGTH_LONG).show();
+    public void onCompensationSaveFailed(@NonNull ParseObject compensation, @StringRes int errorMessage) {
+        Snackbar.make(mFabProgressNewSettlement, errorMessage, Snackbar.LENGTH_LONG).show();
         String compensationId = compensation.getObjectId();
         WorkerUtils.removeWorker(getFragmentManager(), getSaveWorkerTag(compensationId));
 
@@ -535,18 +529,14 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     }
 
     /**
-     * Passes the error code to the generic error handler, shows the user an error message and
-     * removes the retained worker fragment and loading indicators. Also removes the compensation
-     * from the list of loading compensations.
+     * Shows the user an error message and removes the retained worker fragment and loading
+     * indicators. Also removes the compensation rom the list of loading compensations.
      *
      * @param compensationId the object id of the compensation a reminder was sent
-     * @param errorCode      the error code of the exception thrown in the process
+     * @param errorMessage   the error message from the exception thrown in the process
      */
-    public void onUserRemindFailed(@NonNull String compensationId, int errorCode) {
-        final Activity context = getActivity();
-        ParseErrorHandler.handleParseError(context, errorCode);
-        Snackbar.make(mRecyclerView, ParseErrorHandler.getErrorMessage(context, errorCode),
-                Snackbar.LENGTH_LONG).show();
+    public void onUserRemindFailed(@NonNull String compensationId, @StringRes int errorMessage) {
+        Snackbar.make(mRecyclerView, errorMessage, Snackbar.LENGTH_LONG).show();
         WorkerUtils.removeWorker(getFragmentManager(), getRemindWorkerTag(compensationId));
 
         setCompensationLoading(compensationId, false);

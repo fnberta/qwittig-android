@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
@@ -442,16 +443,14 @@ public class SettingsProfileFragment extends BaseFragment {
     }
 
     /**
-     * Passes the error code to the generic error handler, shows the user an error message and
-     * removes the retained worker fragment and loading indicators.
+     * Shows the user the error message and removes the retained worker fragment and loading
+     * indicators.
      *
-     * @param errorCode the error code of the exception thrown in the process
+     * @param errorMessage the error message from the exception thrown in the process
      */
-    public void onThirdPartyUnlinkFailed(int errorCode) {
-        ParseErrorHandler.handleParseError(getActivity(), errorCode);
+    public void onThirdPartyUnlinkFailed(@StringRes int errorMessage) {
         WorkerUtils.removeWorker(getFragmentManager(), UNLINK_WORKER);
-        Snackbar.make(mTextInputLayoutNickname, R.string.toast_unlink_failed,
-                Snackbar.LENGTH_LONG).show();
+        Snackbar.make(mTextInputLayoutNickname, errorMessage, Snackbar.LENGTH_LONG).show();
 
         mIsSaving = false;
     }

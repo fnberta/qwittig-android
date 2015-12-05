@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.text.TextUtils;
 
 import com.bumptech.glide.Glide;
@@ -34,6 +35,7 @@ import org.json.JSONObject;
 import java.util.Arrays;
 import java.util.List;
 
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.workerfragments.BaseWorker;
 import ch.giantific.qwittig.data.rest.CloudCodeClient;
@@ -188,16 +190,11 @@ public class LoginWorker extends BaseWorker {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        int type = 0;
         Bundle args = getArguments();
-        if (args == null) {
-            if (mListener != null) {
-                mListener.onLoginFailed(0);
-            }
-
-            return;
+        if (args != null) {
+            type = args.getInt(BUNDLE_TYPE, 0);
         }
-
-        final int type = args.getInt(BUNDLE_TYPE);
         switch (type) {
             case TYPE_LOGIN_EMAIL: {
                 final String username = args.getString(BUNDLE_USERNAME, "");
@@ -231,7 +228,7 @@ public class LoginWorker extends BaseWorker {
             }
             default:
                 if (mListener != null) {
-                    mListener.onLoginFailed(0);
+                    mListener.onLoginFailed(R.string.toast_unknown_error);
                 }
         }
     }
@@ -242,7 +239,7 @@ public class LoginWorker extends BaseWorker {
             public void done(@Nullable ParseException e) {
                 if (e != null) {
                     if (mListener != null) {
-                        mListener.onLoginFailed(e.getCode());
+                        mListener.onLoginFailed(ParseErrorHandler.handleParseError(getActivity(), e));
                     }
                     return;
                 }
@@ -260,7 +257,7 @@ public class LoginWorker extends BaseWorker {
             public void done(ParseUser parseUser, @Nullable ParseException e) {
                 if (e != null) {
                     if (mListener != null) {
-                        mListener.onLoginFailed(e.getCode());
+                        mListener.onLoginFailed(ParseErrorHandler.handleParseError(getActivity(), e));
                     }
                     return;
                 }
@@ -284,7 +281,7 @@ public class LoginWorker extends BaseWorker {
             public void done(@Nullable ParseException e) {
                 if (e != null) {
                     if (mListener != null) {
-                        mListener.onLoginFailed(e.getCode());
+                        mListener.onLoginFailed(ParseErrorHandler.handleParseError(getActivity(), e));
                     }
                     return;
                 }
@@ -301,7 +298,7 @@ public class LoginWorker extends BaseWorker {
             public void done(ParseUser user, ParseException err) {
                 if (user == null) {
                     if (mListener != null) {
-                        mListener.onLoginFailed(err != null ? err.getCode() : 0);
+                        mListener.onLoginFailed(R.string.toast_login_failed_facebook);
                     }
                     return;
                 }
@@ -381,7 +378,7 @@ public class LoginWorker extends BaseWorker {
                     deleteLoginUser(user);
 
                     if (mListener != null) {
-                        mListener.onLoginFailed(e.getCode());
+                        mListener.onLoginFailed(ParseErrorHandler.handleParseError(getActivity(), e));
                     }
                     return;
                 }
@@ -432,7 +429,7 @@ public class LoginWorker extends BaseWorker {
                     public void done(ParseException e) {
                         // ignore possible exception, currentUser will always be null now
                         if (mListener != null) {
-                            mListener.onLoginFailed(0);
+                            mListener.onLoginFailed(R.string.toast_unknown_error);
                         }
                     }
                 });
@@ -443,7 +440,7 @@ public class LoginWorker extends BaseWorker {
     private void loginWithGoogle(@NonNull String idToken,
                                  @NonNull final String displayName,
                                  @NonNull final Uri photoUrl) {
-        final CloudCodeClient cloudCode = new CloudCodeClient();
+        final CloudCodeClient cloudCode = new CloudCodeClient(getActivity());
         cloudCode.loginWithGoogle(idToken, new CloudCodeClient.CloudCodeListener() {
             @Override
             public void onCloudFunctionReturned(Object result) {
@@ -452,7 +449,7 @@ public class LoginWorker extends BaseWorker {
                     token = new JSONObject((String) result);
                 } catch (JSONException e) {
                     if (mListener != null) {
-                        mListener.onLoginFailed(0);
+                        mListener.onLoginFailed(R.string.toast_login_failed_google);
                     }
 
                     // TODO: user should also be deleted
@@ -465,10 +462,9 @@ public class LoginWorker extends BaseWorker {
             }
 
             @Override
-            public void onCloudFunctionFailed(int errorCode) {
-                // TODO: tell the user why it failed, handle error code appropriately
+            public void onCloudFunctionFailed(@StringRes int errorMessage) {
                 if (mListener != null) {
-                    mListener.onLoginFailed(errorCode);
+                    mListener.onLoginFailed(R.string.toast_login_failed_google);
                 }
             }
         });
@@ -482,7 +478,7 @@ public class LoginWorker extends BaseWorker {
             public void done(ParseUser user, ParseException e) {
                 if (e != null) {
                     if (mListener != null) {
-                        mListener.onLoginFailed(e.getCode());
+                        mListener.onLoginFailed(ParseErrorHandler.handleParseError(getActivity(), e));
                     }
                     return;
                 }
@@ -536,7 +532,7 @@ public class LoginWorker extends BaseWorker {
          *
          * @param errorCode the error code of the exception thrown during the process
          */
-        void onLoginFailed(int errorCode);
+        void onLoginFailed(@StringRes int errorCode);
 
         /**
          * Handles the case when the link to reset a password was successfully sent.

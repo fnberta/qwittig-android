@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.data.repositories;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -17,6 +18,8 @@ import com.parse.SaveCallback;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.giantific.qwittig.ParseErrorHandler;
+import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.parse.Compensation;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
@@ -31,6 +34,10 @@ public class ParseCompensationRepository extends ParseGenericRepository implemen
     private static final String DATE_CREATED = "createdAt";
     private static final String DATE_UPDATED = "updatedAt";
     private static final String LOG_TAG = ParseCompensationRepository.class.getSimpleName();
+
+    public ParseCompensationRepository(Context context) {
+        super(context);
+    }
 
     @Override
     public void getCompensationsLocalUnpaidAsync(@NonNull Group group,
@@ -102,7 +109,7 @@ public class ParseCompensationRepository extends ParseGenericRepository implemen
             @Override
             public void done(@NonNull final List<ParseObject> parseObjects, @Nullable ParseException e) {
                 if (e != null) {
-                    listener.onCompensationUpdateFailed(e.getCode());
+                    listener.onCompensationUpdateFailed(ParseErrorHandler.handleParseError(mContext, e));
                     return;
                 }
 
@@ -110,7 +117,7 @@ public class ParseCompensationRepository extends ParseGenericRepository implemen
                     @Override
                     public void done(@Nullable ParseException e) {
                         if (e != null) {
-                            listener.onCompensationUpdateFailed(e.getCode());
+                            listener.onCompensationUpdateFailed(ParseErrorHandler.handleParseError(mContext, e));
                             return;
                         }
 
@@ -134,7 +141,7 @@ public class ParseCompensationRepository extends ParseGenericRepository implemen
                                              @NonNull final UpdateCompensationsListener listener) {
         int groupsSize = groups.size();
         if (groupsSize == 0) {
-            listener.onCompensationUpdateFailed(0);
+            listener.onCompensationUpdateFailed(R.string.toast_unknown_error);
             return;
         }
 
@@ -148,7 +155,7 @@ public class ParseCompensationRepository extends ParseGenericRepository implemen
                 @Override
                 public void done(@NonNull final List<ParseObject> parseObjects, @Nullable ParseException e) {
                     if (e != null) {
-                        listener.onCompensationUpdateFailed(e.getCode());
+                        listener.onCompensationUpdateFailed(ParseErrorHandler.handleParseError(mContext, e));
                         return;
                     }
 
@@ -158,7 +165,7 @@ public class ParseCompensationRepository extends ParseGenericRepository implemen
                     ParseObject.unpinAllInBackground(pinLabel, new DeleteCallback() {
                         public void done(@Nullable ParseException e) {
                             if (e != null) {
-                                listener.onCompensationUpdateFailed(e.getCode());
+                                listener.onCompensationUpdateFailed(ParseErrorHandler.handleParseError(mContext, e));
                                 return;
                             }
 
@@ -166,7 +173,7 @@ public class ParseCompensationRepository extends ParseGenericRepository implemen
                                 @Override
                                 public void done(@Nullable ParseException e) {
                                     if (e != null) {
-                                        listener.onCompensationUpdateFailed(e.getCode());
+                                        listener.onCompensationUpdateFailed(ParseErrorHandler.handleParseError(mContext, e));
                                         return;
                                     }
 
@@ -197,7 +204,7 @@ public class ParseCompensationRepository extends ParseGenericRepository implemen
             @Override
             public void done(@NonNull final List<ParseObject> parseObjects, @Nullable ParseException e) {
                 if (e != null) {
-                    listener.onCompensationsPaidOnlineLoadFailed(e.getCode());
+                    listener.onCompensationsPaidOnlineLoadFailed(ParseErrorHandler.handleParseError(mContext, e));
                     return;
                 }
 

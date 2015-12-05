@@ -22,6 +22,7 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.text.TextUtils;
@@ -121,7 +122,7 @@ public class SettingsFragment extends PreferenceFragment implements
 
         setHasOptionsMenu(true);
 
-        mUserRepo = new ParseUserRepository();
+        mUserRepo = new ParseUserRepository(getActivity());
 
         final Context context = getActivity();
         PreferenceManager.setDefaultValues(context, R.xml.preferences, false);
@@ -559,20 +560,15 @@ public class SettingsFragment extends PreferenceFragment implements
     }
 
     /**
-     * Handles a failed logout attempt. Passes the error code to the generic Parse error handler
-     * and removes the worker fragment.
+     * Handles a failed logout attempt by showing the user the error, removing the worker
+     * fragment and removing any progress indicators.
      *
-     * @param errorCode the error code of the exception thrown during the logout attempt
+     * @param errorMessage the error message from the exception thrown during the logout attempt
      */
-    public void onLogoutFailed(int errorCode) {
-        final Activity context = getActivity();
-        ParseErrorHandler.handleParseError(context, errorCode);
-        onParseError(ParseErrorHandler.getErrorMessage(context, errorCode));
-        WorkerUtils.removeWorker(getFragmentManager(), LOGOUT_WORKER);
-    }
-
-    private void onParseError(@NonNull String errorMessage) {
+    public void onLogoutFailed(@StringRes int errorMessage) {
         dismissProgressDialog();
+        WorkerUtils.removeWorker(getFragmentManager(), LOGOUT_WORKER);
+
         Snackbar.make(getView(), errorMessage, Snackbar.LENGTH_LONG).show();
     }
 

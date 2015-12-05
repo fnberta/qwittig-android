@@ -5,9 +5,11 @@
 package ch.giantific.qwittig.workerfragments.group;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.text.TextUtils;
 
 import com.parse.ParseException;
@@ -15,6 +17,8 @@ import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import ch.giantific.qwittig.ParseErrorHandler;
+import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.workerfragments.BaseWorker;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
@@ -39,6 +43,7 @@ public class InvitedGroupWorker extends BaseWorker implements
     private String mGroupId;
     private CloudCodeClient mCloudCode;
     private User mCurrentUser;
+    private GroupRepository mGroupRepo;
 
     public InvitedGroupWorker() {
         // empty default constructor
@@ -82,14 +87,16 @@ public class InvitedGroupWorker extends BaseWorker implements
 
         if (TextUtils.isEmpty(mGroupId)) {
             if (mListener != null) {
-                mListener.onInvitedGroupQueryFailed(0);
+                mListener.onInvitedGroupQueryFailed(R.string.toast_unknown_error);
             }
 
             return;
         }
 
         mCurrentUser = (User) ParseUser.getCurrentUser();
-        mCloudCode = new CloudCodeClient();
+        final Context context = getActivity();
+        mGroupRepo = new ParseGroupRepository(context);
+        mCloudCode = new CloudCodeClient(context);
         mCloudCode.addUserToGroupRole(mGroupId, this);
     }
 
@@ -99,15 +106,14 @@ public class InvitedGroupWorker extends BaseWorker implements
     }
 
     @Override
-    public void onCloudFunctionFailed(int errorCode) {
+    public void onCloudFunctionFailed(@StringRes int errorMessage) {
         if (mListener != null) {
-            mListener.onInvitedGroupQueryFailed(errorCode);
+            mListener.onInvitedGroupQueryFailed(errorMessage);
         }
     }
 
     private void queryGroup() {
-        GroupRepository repo = new ParseGroupRepository();
-        repo.getGroupOnlineAsync(mGroupId, this);
+        mGroupRepo.getGroupOnlineAsync(mGroupId, this);
     }
 
     @Override
@@ -126,10 +132,10 @@ public class InvitedGroupWorker extends BaseWorker implements
     }
 
     @Override
-    public void onGroupOnlineLoadFailed(int errorCode) {
+    public void onGroupOnlineLoadFailed(@StringRes int errorMessage) {
         mCloudCode.removeUserFromGroupRole(mGroupId);
         if (mListener != null) {
-            mListener.onInvitedGroupQueryFailed(errorCode);
+            mListener.onInvitedGroupQueryFailed(errorMessage);
         }
     }
 
@@ -153,7 +159,7 @@ public class InvitedGroupWorker extends BaseWorker implements
                     mCurrentUser.setCurrentGroup(currentGroup);
 
                     if (mListener != null) {
-                        mListener.onUserJoinGroupFailed(e.getCode());
+                        mListener.onUserJoinGroupFailed(ParseErrorHandler.handleParseError(getActivity(), e));
                     }
                 }
 
@@ -184,9 +190,9 @@ public class InvitedGroupWorker extends BaseWorker implements
         /**
          * Handles the failure to query of the group the user is invited to.
          *
-         * @param errorCode the error code of the exception thrown during the process
+         * @param errorMessage the error message from the exception thrown during the process
          */
-        void onInvitedGroupQueryFailed(int errorCode);
+        void onInvitedGroupQueryFailed(@StringRes int errorMessage);
 
         /**
          * Handles the case when user's email was removed from the users invited to get group
@@ -201,8 +207,8 @@ public class InvitedGroupWorker extends BaseWorker implements
         /**
          * Handles the failure to join the new group.
          *
-         * @param errorCode the error code of the exception thrown during the process
+         * @param errorMessage the error message from the exception thrown during the process
          */
-        void onUserJoinGroupFailed(int errorCode);
+        void onUserJoinGroupFailed(@StringRes int errorMessage);
     }
 }

@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
+import android.support.annotation.StringRes;
 import android.text.TextUtils;
 
 import com.parse.ParseObject;
@@ -97,7 +98,7 @@ public class MoreQueryWorker extends BaseQueryWorker {
 
         switch (className) {
             case Purchase.CLASS: {
-                PurchaseRepository repo = new ParsePurchaseRepository();
+                PurchaseRepository repo = new ParsePurchaseRepository(getActivity());
                 repo.getPurchasesOnlineAsync(mCurrentUser, mCurrentGroup, skip, new PurchaseRepository.GetPurchasesOnlineListener() {
                     @Override
                     public void onPurchasesOnlineLoaded(@NonNull List<ParseObject> purchases) {
@@ -105,14 +106,14 @@ public class MoreQueryWorker extends BaseQueryWorker {
                     }
 
                     @Override
-                    public void onPurchaseOnlineLoadFailed(int errorCode) {
-                        onLoadFailed(errorCode);
+                    public void onPurchaseOnlineLoadFailed(@StringRes int errorMessage) {
+                        onLoadFailed(errorMessage);
                     }
                 });
                 break;
             }
             case Compensation.CLASS: {
-                CompensationRepository repo = new ParseCompensationRepository();
+                CompensationRepository repo = new ParseCompensationRepository(getActivity());
                 repo.getCompensationsPaidOnlineAsync(mCurrentGroup, skip, new CompensationRepository.GetCompensationsOnlineListener() {
                     @Override
                     public void onCompensationsPaidOnlineLoaded(@NonNull List<ParseObject> purchases) {
@@ -120,8 +121,8 @@ public class MoreQueryWorker extends BaseQueryWorker {
                     }
 
                     @Override
-                    public void onCompensationsPaidOnlineLoadFailed(int errorCode) {
-                        onLoadFailed(errorCode);
+                    public void onCompensationsPaidOnlineLoadFailed(int errorMessage) {
+                        onLoadFailed(errorMessage);
                     }
                 });
                 break;
@@ -142,9 +143,9 @@ public class MoreQueryWorker extends BaseQueryWorker {
         }
     }
 
-    private void onLoadFailed(int errorCode) {
+    private void onLoadFailed(int errorMessage) {
         if (mListener != null) {
-            mListener.onMoreObjectsLoadFailed(errorCode);
+            mListener.onMoreObjectsLoadFailed(errorMessage);
         }
     }
 
@@ -174,8 +175,8 @@ public class MoreQueryWorker extends BaseQueryWorker {
         /**
          * Handles the failed query or pin of new objects.
          *
-         * @param errorCode the error code of the exception thrown during the process
+         * @param errorMessage the error message from the exception thrown during the process
          */
-        void onMoreObjectsLoadFailed(int errorCode);
+        void onMoreObjectsLoadFailed(@StringRes int errorMessage);
     }
 }

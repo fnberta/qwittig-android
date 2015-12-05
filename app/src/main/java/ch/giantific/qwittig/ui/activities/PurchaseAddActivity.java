@@ -7,6 +7,7 @@ package ch.giantific.qwittig.ui.activities;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.view.MenuItem;
 
 import ch.giantific.qwittig.R;
@@ -62,7 +63,7 @@ public class PurchaseAddActivity extends PurchaseBaseActivity implements
     }
 
     @Override
-    public void onOcrFailed(@NonNull String errorMessage) {
+    public void onOcrFailed(@StringRes int errorMessage) {
         ((PurchaseAddAutoFragment) mPurchaseFragment).onOcrFailed(errorMessage);
         showFab();
     }

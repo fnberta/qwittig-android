@@ -6,6 +6,7 @@ package ch.giantific.qwittig.domain.repositories;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 
 import com.parse.ParseObject;
 
@@ -69,8 +70,8 @@ public interface GroupRepository {
         /**
          * Called when the group load failed.
          *
-         * @param errorCode the error code of the exception thrown in the process
+         * @param errorMessage the error message from the exception thrown in the process
          */
-        void onGroupOnlineLoadFailed(int errorCode);
+        void onGroupOnlineLoadFailed(@StringRes int errorMessage);
     }
 }

@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
@@ -17,6 +18,7 @@ import com.parse.ParseSession;
 
 import java.io.File;
 
+import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.ocr.OcrPurchase;
 import ch.giantific.qwittig.data.rest.OcrClient;
 import ch.giantific.qwittig.ParseErrorHandler;
@@ -83,7 +85,7 @@ public class OcrWorker extends BaseWorker {
 
         if (TextUtils.isEmpty(mReceiptPath)) {
             if (mListener != null) {
-                mListener.onOcrFailed("");
+                mListener.onOcrFailed(R.string.toast_unknown_error);
             }
 
             return;
@@ -98,8 +100,7 @@ public class OcrWorker extends BaseWorker {
             public void done(@NonNull ParseSession parseSession, @Nullable ParseException e) {
                 if (e != null) {
                     if (mListener != null) {
-                        ParseErrorHandler.handleParseError(getActivity(), e.getCode());
-                        mListener.onOcrFailed(ParseErrorHandler.getErrorMessage(getActivity(), e.getCode()));
+                        mListener.onOcrFailed(ParseErrorHandler.handleParseError(getActivity(), e));
                     }
 
                     return;
@@ -130,7 +131,7 @@ public class OcrWorker extends BaseWorker {
                             getSessionToken();
                             mRetries++;
                         } else if (mListener != null) {
-                            mListener.onOcrFailed(error.getLocalizedMessage());
+                            mListener.onOcrFailed(R.string.toast_unknown_error);
                         }
                     }
                 });
@@ -158,6 +159,6 @@ public class OcrWorker extends BaseWorker {
          *
          * @param errorMessage the error message received from the server
          */
-        void onOcrFailed(@NonNull String errorMessage);
+        void onOcrFailed(@StringRes int errorMessage);
     }
 }

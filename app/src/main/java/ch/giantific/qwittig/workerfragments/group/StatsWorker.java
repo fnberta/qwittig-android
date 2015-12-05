@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
@@ -111,7 +112,7 @@ public class StatsWorker extends BaseWorker implements
             return;
         }
 
-        CloudCodeClient cloudCode = new CloudCodeClient();
+        CloudCodeClient cloudCode = new CloudCodeClient(getActivity());
         String groupId = currentGroup.getObjectId();
         switch (mStatsType) {
             case TYPE_SPENDING:
@@ -139,9 +140,9 @@ public class StatsWorker extends BaseWorker implements
     }
 
     @Override
-    public void onCloudFunctionFailed(int errorCode) {
+    public void onCloudFunctionFailed(@StringRes int errorMessage) {
         if (mListener != null) {
-            mListener.onStatsCalculationFailed(mStatsType, errorCode);
+            mListener.onStatsCalculationFailed(mStatsType, errorMessage);
         }
     }
 
@@ -171,9 +172,9 @@ public class StatsWorker extends BaseWorker implements
         /**
          * Handles the failed calculation of statistics.
          *
-         * @param statsType the type of stats that failed to calculate, one of {@link StatsType}
-         * @param errorCode the error code of the exception thrown in the process
+         * @param statsType    the type of stats that failed to calculate, one of {@link StatsType}
+         * @param errorMessage the error message from the exception thrown in the process
          */
-        void onStatsCalculationFailed(int statsType, int errorCode);
+        void onStatsCalculationFailed(int statsType, @StringRes int errorMessage);
     }
 }

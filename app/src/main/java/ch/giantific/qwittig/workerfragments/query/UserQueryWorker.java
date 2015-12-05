@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.data.rest.CloudCodeClient;
@@ -25,6 +26,7 @@ public class UserQueryWorker extends BaseQueryWorker implements
     private static final String LOG_TAG = UserQueryWorker.class.getSimpleName();
     @Nullable
     private WorkerInteractionListener mListener;
+    private UserRepository mUserRepo;
 
     public UserQueryWorker() {
         // empty default constructor
@@ -46,7 +48,8 @@ public class UserQueryWorker extends BaseQueryWorker implements
         super.onCreate(savedInstanceState);
 
         if (setCurrentGroups()) {
-            CloudCodeClient cloudCode = new CloudCodeClient();
+            mUserRepo = new ParseUserRepository(getActivity());
+            CloudCodeClient cloudCode = new CloudCodeClient(getActivity());
             cloudCode.calcUserBalances(this);
         } else {
             if (mListener != null) {
@@ -57,14 +60,13 @@ public class UserQueryWorker extends BaseQueryWorker implements
 
     @Override
     public void onCloudFunctionReturned(Object result) {
-        UserRepository userRepo = new ParseUserRepository();
-        userRepo.updateUsersAsync(mCurrentUserGroups, this);
+        mUserRepo.updateUsersAsync(mCurrentUserGroups, this);
     }
 
     @Override
-    public void onCloudFunctionFailed(int errorCode) {
+    public void onCloudFunctionFailed(@StringRes int errorMessage) {
         if (mListener != null) {
-            mListener.onUserUpdateFailed(errorCode);
+            mListener.onUserUpdateFailed(errorMessage);
         }
     }
 
@@ -76,9 +78,9 @@ public class UserQueryWorker extends BaseQueryWorker implements
     }
 
     @Override
-    public void onUserUpdateFailed(int errorCode) {
+    public void onUserUpdateFailed(@StringRes int errorMessage) {
         if (mListener != null) {
-            mListener.onUserUpdateFailed(errorCode);
+            mListener.onUserUpdateFailed(errorMessage);
         }
     }
 
@@ -101,8 +103,8 @@ public class UserQueryWorker extends BaseQueryWorker implements
         /**
          * Handles the failed update of local users.
          *
-         * @param errorCode the error code of the exception thrown in the process
+         * @param errorMessage the error message from the exception thrown in the process
          */
-        void onUserUpdateFailed(int errorCode);
+        void onUserUpdateFailed(@StringRes int errorMessage);
     }
 }

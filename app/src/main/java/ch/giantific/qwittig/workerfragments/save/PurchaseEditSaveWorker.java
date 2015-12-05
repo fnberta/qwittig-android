@@ -5,8 +5,10 @@
 package ch.giantific.qwittig.workerfragments.save;
 
 import android.annotation.SuppressLint;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.text.TextUtils;
 
 import com.parse.DeleteCallback;
@@ -30,6 +32,7 @@ public class PurchaseEditSaveWorker extends PurchaseSaveWorker implements
     private ParseFile mReceiptParseFileOld;
     private boolean mIsDraft;
     private boolean mDeleteOldReceipt;
+    private CloudCodeClient mCloudClient;
 
     public PurchaseEditSaveWorker() {
         // empty default constructor
@@ -61,6 +64,13 @@ public class PurchaseEditSaveWorker extends PurchaseSaveWorker implements
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mCloudClient = new CloudCodeClient(getActivity());
+    }
+
+    @Override
     void checkReceiptImage() {
         if (!TextUtils.isEmpty(mReceiptPath)) {
             if (mReceiptParseFileOld != null && !mIsDraft) {
@@ -85,8 +95,7 @@ public class PurchaseEditSaveWorker extends PurchaseSaveWorker implements
     private void deleteOldReceiptFile() {
         final String fileName = mReceiptParseFileOld.getName();
         if (!TextUtils.isEmpty(fileName)) {
-            CloudCodeClient cloudCode = new CloudCodeClient();
-            cloudCode.deleteParseFile(fileName, this);
+            mCloudClient.deleteParseFile(fileName, this);
         }
     }
 
@@ -96,9 +105,9 @@ public class PurchaseEditSaveWorker extends PurchaseSaveWorker implements
     }
 
     @Override
-    public void onCloudFunctionFailed(int errorCode) {
+    public void onCloudFunctionFailed(@StringRes int errorMessage) {
         if (mListener != null) {
-            mListener.onPurchaseSaveFailed(errorCode);
+            mListener.onPurchaseSaveFailed(errorMessage);
         }
     }
 

@@ -6,6 +6,7 @@ package ch.giantific.qwittig.ui.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -124,7 +125,7 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
     }
 
     @Override
-    void showErrorSnackbar(@NonNull String message) {
+    void showErrorSnackbar(@StringRes int message) {
         Snackbar snackbar = Snackbar.make(mButtonAddRow, message, Snackbar.LENGTH_LONG);
         snackbar.setAction(R.string.action_purchase_save_draft, new View.OnClickListener() {
             @Override

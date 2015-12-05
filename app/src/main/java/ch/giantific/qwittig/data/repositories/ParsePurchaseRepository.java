@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.data.repositories;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -18,6 +19,7 @@ import com.parse.SaveCallback;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.models.parse.User;
@@ -31,8 +33,8 @@ public class ParsePurchaseRepository extends ParseGenericRepository implements P
 
     private static final String LOG_TAG = ParsePurchaseRepository.class.getSimpleName();
 
-    public ParsePurchaseRepository() {
-        super();
+    public ParsePurchaseRepository(Context context) {
+        super(context);
     }
 
     @Override
@@ -133,7 +135,7 @@ public class ParsePurchaseRepository extends ParseGenericRepository implements P
                 @Override
                 public void done(@NonNull final List<ParseObject> parseObjects, @Nullable ParseException e) {
                     if (e != null) {
-                        listener.onPurchaseUpdateFailed(e.getCode());
+                        listener.onPurchaseUpdateFailed(ParseErrorHandler.handleParseError(mContext, e));
                         return;
                     }
 
@@ -143,7 +145,7 @@ public class ParsePurchaseRepository extends ParseGenericRepository implements P
                         @Override
                         public void done(@Nullable ParseException e) {
                             if (e != null) {
-                                listener.onPurchaseUpdateFailed(e.getCode());
+                                listener.onPurchaseUpdateFailed(ParseErrorHandler.handleParseError(mContext, e));
                                 return;
                             }
 
@@ -151,7 +153,7 @@ public class ParsePurchaseRepository extends ParseGenericRepository implements P
                                 @Override
                                 public void done(@Nullable ParseException e) {
                                     if (e != null) {
-                                        listener.onPurchaseUpdateFailed(e.getCode());
+                                        listener.onPurchaseUpdateFailed(ParseErrorHandler.handleParseError(mContext, e));
                                         return;
                                     }
 
@@ -202,7 +204,7 @@ public class ParsePurchaseRepository extends ParseGenericRepository implements P
             @Override
             public void done(@NonNull final List<ParseObject> parseObjects, @Nullable ParseException e) {
                 if (e != null) {
-                    listener.onPurchaseOnlineLoadFailed(e.getCode());
+                    listener.onPurchaseOnlineLoadFailed(ParseErrorHandler.handleParseError(mContext, e));
                     return;
                 }
 

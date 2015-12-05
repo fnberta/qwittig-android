@@ -9,6 +9,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.view.LayoutInflater;
@@ -17,7 +18,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.parse.ParseException;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
@@ -25,14 +25,14 @@ import java.util.List;
 
 import ch.berta.fabio.fabprogress.FabProgress;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.workerfragments.group.InviteUsersWorker;
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.utils.WorkerUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
+import ch.giantific.qwittig.utils.WorkerUtils;
+import ch.giantific.qwittig.workerfragments.group.InviteUsersWorker;
 
 /**
  * Displays the user invite screen, where the user can invite new users to the group and sees
@@ -179,7 +179,7 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
             return;
         }
 
-        UserRepository repo = new ParseUserRepository();
+        UserRepository repo = new ParseUserRepository(getActivity());
         repo.getUsersLocalAsync(mCurrentGroup, this);
     }
 
@@ -252,13 +252,13 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
     }
 
     /**
-     * Passes the {@link ParseException} to the generic error handler, shows the user an error
-     * message and removes the retained worker fragment and loading indicators.
+     * Shows the user the error message and removes the retained worker fragment and loading
+     * indicators.
      *
-     * @param errorCode the error Code thrown in the process
+     * @param errorMessage the error message thrown in the process
      */
-    public void onInviteUsersFailed(int errorCode) {
-        onInviteError(errorCode, INVITE_WORKER);
+    public void onInviteUsersFailed(@StringRes int errorMessage) {
+        onInviteError(errorMessage, INVITE_WORKER);
     }
 
     /**

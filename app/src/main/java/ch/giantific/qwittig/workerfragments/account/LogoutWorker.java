@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.api.ResultCallback;
@@ -19,6 +20,8 @@ import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import ch.giantific.qwittig.ParseErrorHandler;
+import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.workerfragments.BaseWorker;
 import ch.giantific.qwittig.data.rest.CloudCodeClient;
 import ch.giantific.qwittig.domain.models.parse.Installation;
@@ -92,7 +95,7 @@ public class LogoutWorker extends BaseGoogleApiLoginWorker {
     @Override
     protected void onGoogleClientConnectionFailed() {
         if (mListener != null) {
-            mListener.onLogoutFailed(0);
+            mListener.onLogoutFailed(R.string.toast_no_connection);
         }
     }
 
@@ -102,9 +105,9 @@ public class LogoutWorker extends BaseGoogleApiLoginWorker {
     }
 
     @Override
-    protected void onGoogleUnlinkFailed(int errorCode) {
+    protected void onGoogleUnlinkFailed() {
         if (mListener != null) {
-            mListener.onLogoutFailed(errorCode);
+            mListener.onLogoutFailed(R.string.toast_unknown_error);
         }
     }
 
@@ -122,7 +125,7 @@ public class LogoutWorker extends BaseGoogleApiLoginWorker {
     }
 
     private void deleteUserInCloud() {
-        CloudCodeClient cloudCode = new CloudCodeClient();
+        CloudCodeClient cloudCode = new CloudCodeClient(getActivity());
         cloudCode.deleteAccount(new CloudCodeClient.CloudCodeListener() {
             @Override
             public void onCloudFunctionReturned(Object result) {
@@ -130,9 +133,9 @@ public class LogoutWorker extends BaseGoogleApiLoginWorker {
             }
 
             @Override
-            public void onCloudFunctionFailed(int errorCode) {
+            public void onCloudFunctionFailed(@StringRes int errorMessage) {
                 if (mListener != null) {
-                    mListener.onLogoutFailed(errorCode);
+                    mListener.onLogoutFailed(errorMessage);
                 }
             }
         });
@@ -149,7 +152,7 @@ public class LogoutWorker extends BaseGoogleApiLoginWorker {
             public void done(@Nullable ParseException e) {
                 if (e != null) {
                     if (mListener != null) {
-                        mListener.onLogoutFailed(e.getCode());
+                        mListener.onLogoutFailed(ParseErrorHandler.handleParseError(getActivity(), e));
                     }
                     return;
                 }
@@ -188,7 +191,7 @@ public class LogoutWorker extends BaseGoogleApiLoginWorker {
         if (e != null) {
             currentUser.undeleteUserFields(username);
             if (mListener != null) {
-                mListener.onLogoutFailed(e.getCode());
+                mListener.onLogoutFailed(ParseErrorHandler.handleParseError(getActivity(), e));
             }
 
             return;
@@ -226,9 +229,9 @@ public class LogoutWorker extends BaseGoogleApiLoginWorker {
         /**
          * Handles the failed logout of a user.
          *
-         * @param errorCode the error code of the exception thrown during the process
+         * @param errorMessage the error message from the exception thrown during the process
          */
-        void onLogoutFailed(int errorCode);
+        void onLogoutFailed(@StringRes int errorMessage);
 
         /**
          * Handles a successful logout of the user.

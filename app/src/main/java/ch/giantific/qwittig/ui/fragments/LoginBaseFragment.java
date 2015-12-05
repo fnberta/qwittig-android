@@ -4,13 +4,13 @@
 
 package ch.giantific.qwittig.ui.fragments;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.LoaderManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.view.View;
@@ -20,15 +20,14 @@ import com.parse.ParseUser;
 
 import java.util.List;
 
-import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.workerfragments.account.LoginWorker;
 import ch.giantific.qwittig.domain.models.parse.Installation;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.utils.WorkerUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.ViewUtils;
+import ch.giantific.qwittig.utils.WorkerUtils;
+import ch.giantific.qwittig.workerfragments.account.LoginWorker;
 
 /**
  * Provides an abstract base class for the login screen views.
@@ -102,16 +101,12 @@ public abstract class LoginBaseFragment extends BaseFragment {
     }
 
     /**
-     * Handles a failed login attempt. Passes error to generic Parse error handler, hides the
-     * progress bar and removes the worker fragment.
+     * Handles a failed login attempt. Hides the progress bar and removes the worker fragment.
      *
-     * @param errorCode the error code of th exception thrown during the login attempt
+     * @param errorMessage the error message from the exception thrown during the login attempt
      */
-    public void onLoginFailed(int errorCode) {
-        final Activity context = getActivity();
-        ParseErrorHandler.handleParseError(context, errorCode);
-        Snackbar.make(mViewMain,
-                ParseErrorHandler.getErrorMessage(context, errorCode), Snackbar.LENGTH_LONG).show();
+    public void onLoginFailed(@StringRes int errorMessage) {
+        Snackbar.make(mViewMain, errorMessage, Snackbar.LENGTH_LONG).show();
         setLoading(false);
 
         WorkerUtils.removeWorker(getFragmentManager(), LOGIN_WORKER);

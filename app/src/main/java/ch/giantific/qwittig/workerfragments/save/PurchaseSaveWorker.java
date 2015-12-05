@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.text.TextUtils;
 
 import com.bumptech.glide.Glide;
@@ -23,6 +24,7 @@ import com.parse.SaveCallback;
 
 import java.util.List;
 
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.domain.models.Receipt;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.Item;
@@ -110,7 +112,7 @@ public class PurchaseSaveWorker extends BaseWorker {
             @Override
             public void done(@Nullable ParseException e) {
                 if (e != null && mListener != null) {
-                    mListener.onPurchaseSaveFailed(e.getCode());
+                    mListener.onPurchaseSaveFailed(ParseErrorHandler.handleParseError(getActivity(), e));
                     return;
                 }
 
@@ -133,7 +135,7 @@ public class PurchaseSaveWorker extends BaseWorker {
                     convertPrices(false);
 
                     if (mListener != null) {
-                        mListener.onPurchaseSaveFailed(e.getCode());
+                        mListener.onPurchaseSaveFailed(ParseErrorHandler.handleParseError(getActivity(), e));
                     }
                     return;
                 }
@@ -195,8 +197,8 @@ public class PurchaseSaveWorker extends BaseWorker {
         /**
          * Handles the failed save or pin to the local data store.
          *
-         * @param errorCode the error code of the exception thrown in the process
+         * @param errorMessage the error message from the exception thrown in the process
          */
-        void onPurchaseSaveFailed(int errorCode);
+        void onPurchaseSaveFailed(@StringRes int errorMessage);
     }
 }

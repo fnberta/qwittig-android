@@ -22,18 +22,16 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.SignInButton;
 import com.parse.ParseConfig;
-import com.parse.ParseException;
 
 import java.util.List;
 
-import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.workerfragments.account.LoginWorker;
 import ch.giantific.qwittig.domain.models.parse.Config;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.ui.activities.LoginActivity;
-import ch.giantific.qwittig.utils.WorkerUtils;
 import ch.giantific.qwittig.utils.Utils;
+import ch.giantific.qwittig.utils.WorkerUtils;
+import ch.giantific.qwittig.workerfragments.account.LoginWorker;
 
 /**
  * Displays the login screen asking the user for the username and password.
@@ -152,8 +150,7 @@ public class LoginAccountsFragment extends LoginBaseFragment implements
             Uri photoUrl = acct.getPhotoUrl();
             verifyGoogleLoginTokenWithWorker(idToken, displayName, photoUrl);
         } else {
-            // TODO: fix error code
-            onLoginFailed(0);
+            onLoginFailed(R.string.toast_login_failed_google);
         }
     }
 
@@ -182,8 +179,6 @@ public class LoginAccountsFragment extends LoginBaseFragment implements
 
         if (!TextUtils.isEmpty(testUsersPassword)) {
             loginWithEmailWithWorker(User.USERNAME_PREFIX_TEST + testUserNumber, testUsersPassword);
-        } else {
-            ParseErrorHandler.handleParseError(getActivity(), ParseException.CONNECTION_FAILED);
         }
     }
 
@@ -212,9 +207,19 @@ public class LoginAccountsFragment extends LoginBaseFragment implements
         mListener = null;
     }
 
+    /**
+     * Defines the interaction with the hosting {@link Activity}.
+     */
     public interface FragmentInteractionListener {
+        /**
+         * Changes the fragment to the type specified.
+         * @param type the fragment type to change to
+         */
         void changeFragment(int type);
 
+        /**
+         * Starts the login with Google process.
+         */
         void loginWithGoogle();
     }
 }

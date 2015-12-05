@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
@@ -208,8 +209,8 @@ public class TasksActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onTasksUpdatedFailed(int errorCode) {
-        mTaskFragment.onTasksUpdatedFailed(errorCode);
+    public void onTasksUpdatedFailed(@StringRes int errorMessage) {
+        mTaskFragment.onTasksUpdatedFailed(errorMessage);
     }
 
     @Override
@@ -218,8 +219,8 @@ public class TasksActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onUserRemindFailed(@NonNull String taskId, int errorCode) {
-        mTaskFragment.onUserRemindFailed(taskId, errorCode);
+    public void onUserRemindFailed(@NonNull String taskId, @StringRes int errorMessage) {
+        mTaskFragment.onUserRemindFailed(taskId, errorMessage);
     }
 
     @Override

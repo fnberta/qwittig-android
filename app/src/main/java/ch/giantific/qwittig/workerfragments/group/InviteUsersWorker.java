@@ -8,11 +8,13 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.workerfragments.BaseWorker;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.data.rest.CloudCodeClient;
@@ -79,12 +81,12 @@ public class InviteUsersWorker extends BaseWorker implements
 
         if (usersToInvite == null || usersToInvite.isEmpty() || TextUtils.isEmpty(groupName)) {
             if (mListener != null) {
-                mListener.onInviteUsersFailed(0);
+                mListener.onInviteUsersFailed(R.string.toast_unknown_error);
             }
             return;
         }
 
-        CloudCodeClient cloudCode = new CloudCodeClient();
+        CloudCodeClient cloudCode = new CloudCodeClient(getActivity());
         cloudCode.inviteUsers(usersToInvite, groupName, this);
     }
 
@@ -96,9 +98,9 @@ public class InviteUsersWorker extends BaseWorker implements
     }
 
     @Override
-    public void onCloudFunctionFailed(int errorCode) {
+    public void onCloudFunctionFailed(@StringRes int errorMessage) {
         if (mListener != null) {
-            mListener.onInviteUsersFailed(errorCode);
+            mListener.onInviteUsersFailed(errorMessage);
         }
     }
 
@@ -120,8 +122,8 @@ public class InviteUsersWorker extends BaseWorker implements
         /**
          * Handles the failed invitation of new users.
          *
-         * @param errorCode the error code thrown during the process
+         * @param errorMessage the error message thrown during the process
          */
-        void onInviteUsersFailed(int errorCode);
+        void onInviteUsersFailed(@StringRes int errorMessage);
     }
 }

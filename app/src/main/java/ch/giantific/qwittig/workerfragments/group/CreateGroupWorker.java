@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.text.TextUtils;
 
 import com.parse.ParseException;
@@ -17,6 +18,8 @@ import com.parse.SaveCallback;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.giantific.qwittig.ParseErrorHandler;
+import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.workerfragments.BaseWorker;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
@@ -39,6 +42,7 @@ public class CreateGroupWorker extends BaseWorker implements
     private WorkerInteractionListener mListener;
     @Nullable
     private List<String> mUsersToInvite;
+    private CloudCodeClient mCloudCodeClient;
 
     public CreateGroupWorker() {
         // empty default constructor
@@ -93,11 +97,12 @@ public class CreateGroupWorker extends BaseWorker implements
 
         if (TextUtils.isEmpty(groupName) || TextUtils.isEmpty(groupCurrency)) {
             if (mListener != null) {
-                mListener.onCreateNewGroupFailed(0);
+                mListener.onCreateNewGroupFailed(R.string.toast_unknown_error);
             }
             return;
         }
 
+        mCloudCodeClient = new CloudCodeClient(getActivity());
         createNewGroup(groupName, groupCurrency);
     }
 
@@ -114,7 +119,7 @@ public class CreateGroupWorker extends BaseWorker implements
             public void done(@Nullable ParseException e) {
                 if (e != null) {
                     if (mListener != null) {
-                        mListener.onCreateNewGroupFailed(e.getCode());
+                        mListener.onCreateNewGroupFailed(ParseErrorHandler.handleParseError(getActivity(), e));
                     }
 
                     currentUser.removeGroup(groupNew);
@@ -136,8 +141,7 @@ public class CreateGroupWorker extends BaseWorker implements
     }
 
     private void inviteUsers(String groupName) {
-        CloudCodeClient cloudCode = new CloudCodeClient();
-        cloudCode.inviteUsers(mUsersToInvite, groupName, this);
+        mCloudCodeClient.inviteUsers(mUsersToInvite, groupName, this);
     }
 
     @Override
@@ -148,9 +152,9 @@ public class CreateGroupWorker extends BaseWorker implements
     }
 
     @Override
-    public void onCloudFunctionFailed(int errorCode) {
+    public void onCloudFunctionFailed(@StringRes int errorMessage) {
         if (mListener != null) {
-            mListener.onInviteUsersFailed(errorCode);
+            mListener.onInviteUsersFailed(errorMessage);
         }
     }
 
@@ -176,9 +180,9 @@ public class CreateGroupWorker extends BaseWorker implements
         /**
          * Handles the failure of the creation of the new group.
          *
-         * @param errorCode the error code thrown during the process
+         * @param errorMessage the error code thrown during the process
          */
-        void onCreateNewGroupFailed(int errorCode);
+        void onCreateNewGroupFailed(@StringRes int errorMessage);
 
         /**
          * Handles the successful invitation of the users to the new group.
@@ -188,8 +192,8 @@ public class CreateGroupWorker extends BaseWorker implements
         /**
          * Handles the case when the invitation of the users failed.
          *
-         * @param errorCode the error code thrown during the process
+         * @param errorMessage the error message thrown during the process
          */
-        void onInviteUsersFailed(int errorCode);
+        void onInviteUsersFailed(@StringRes int errorMessage);
     }
 }

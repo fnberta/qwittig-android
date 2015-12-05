@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
@@ -18,6 +19,8 @@ import com.parse.SaveCallback;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+import ch.giantific.qwittig.ParseErrorHandler;
+import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.parse.User;
 
 /**
@@ -72,17 +75,13 @@ public class UnlinkThirdPartyWorker extends BaseGoogleApiLoginWorker {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Bundle args = getArguments();
-        if (args == null) {
-            if (mListener != null) {
-                mListener.onThirdPartyUnlinkFailed(0);
-            }
-
-            return;
-        }
 
         mCurrentUser = (User) ParseUser.getCurrentUser();
-        final int type = args.getInt(BUNDLE_UNLINK_ACTION);
+        int type = 0;
+        Bundle args = getArguments();
+        if (args != null) {
+            type = args.getInt(BUNDLE_UNLINK_ACTION, 0);
+        }
         switch (type) {
             case UNLINK_FACEBOOK: {
                 unlinkFacebook();
@@ -94,7 +93,7 @@ public class UnlinkThirdPartyWorker extends BaseGoogleApiLoginWorker {
             }
             default:
                 if (mListener != null) {
-                    mListener.onThirdPartyUnlinkFailed(0);
+                    mListener.onThirdPartyUnlinkFailed(R.string.toast_unknown_error);
                 }
         }
     }
@@ -111,7 +110,7 @@ public class UnlinkThirdPartyWorker extends BaseGoogleApiLoginWorker {
     private void onUserSaved(ParseException e) {
         if (e != null) {
             if (mListener != null) {
-                mListener.onThirdPartyUnlinkFailed(e.getCode());
+                mListener.onThirdPartyUnlinkFailed(ParseErrorHandler.handleParseError(getActivity(), e));
             }
         }
 
@@ -128,7 +127,7 @@ public class UnlinkThirdPartyWorker extends BaseGoogleApiLoginWorker {
     @Override
     protected void onGoogleClientConnectionFailed() {
         if (mListener != null) {
-            mListener.onThirdPartyUnlinkFailed(0);
+            mListener.onThirdPartyUnlinkFailed(R.string.toast_no_connection);
         }
     }
 
@@ -144,9 +143,9 @@ public class UnlinkThirdPartyWorker extends BaseGoogleApiLoginWorker {
     }
 
     @Override
-    protected void onGoogleUnlinkFailed(int errorCode) {
+    protected void onGoogleUnlinkFailed() {
         if (mListener != null) {
-            mListener.onThirdPartyUnlinkFailed(errorCode);
+            mListener.onThirdPartyUnlinkFailed(R.string.toast_unlink_failed);
         }
     }
 
@@ -169,8 +168,8 @@ public class UnlinkThirdPartyWorker extends BaseGoogleApiLoginWorker {
         /**
          * Handles the failure to log in a user
          *
-         * @param errorCode the error code of the exception thrown during the process
+         * @param errorMessage the error message from the exception thrown during the process
          */
-        void onThirdPartyUnlinkFailed(int errorCode);
+        void onThirdPartyUnlinkFailed(@StringRes int errorMessage);
     }
 }

@@ -9,6 +9,7 @@ import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,13 +24,12 @@ import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.parse.Compensation;
-import ch.giantific.qwittig.workerfragments.query.MoreQueryWorker;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.ui.adapters.CompensationsPaidRecyclerAdapter;
-import ch.giantific.qwittig.utils.WorkerUtils;
-import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
+import ch.giantific.qwittig.utils.WorkerUtils;
+import ch.giantific.qwittig.workerfragments.query.MoreQueryWorker;
 
 /**
  * Displays recent paid compensations in a {@link RecyclerView} list.
@@ -189,14 +189,13 @@ public class FinanceCompensationsPaidFragment extends FinanceCompensationsBaseFr
     }
 
     /**
-     * Passes the error code to the generic error handler, shows the user an error message and
-     * removes the retained worker fragment and loading indicators.
+     * Shows the user an error message and removes the retained worker fragment and loading
+     * indicators.
      *
-     * @param errorCode the error code of the exception thrown during the process
+     * @param errorMessage the error message from the exception thrown during the process
      */
-    public void onMoreObjectsLoadFailed(int errorCode) {
-        ParseErrorHandler.handleParseError(getActivity(), errorCode);
-        showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), errorCode), new View.OnClickListener() {
+    public void onMoreObjectsLoadFailed(@StringRes int errorMessage) {
+        showErrorSnackbar(errorMessage, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 loadMoreData();

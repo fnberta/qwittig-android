@@ -5,6 +5,7 @@
 package ch.giantific.qwittig.domain.repositories;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 
 import com.parse.ParseObject;
 import com.parse.ParseUser;
@@ -69,8 +70,8 @@ public interface UserRepository {
         /**
          * Called when users update failed.
          *
-         * @param errorCode the error code from the exception thrown in the process
+         * @param errorMessage the error message from the exception thrown in the process
          */
-        void onUserUpdateFailed(int errorCode);
+        void onUserUpdateFailed(@StringRes int errorMessage);
     }
 }

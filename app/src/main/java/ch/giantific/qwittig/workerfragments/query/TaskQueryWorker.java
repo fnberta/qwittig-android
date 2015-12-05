@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 
 import ch.giantific.qwittig.data.repositories.ParseTaskRepository;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
@@ -44,7 +45,7 @@ public class TaskQueryWorker extends BaseQueryWorker implements
         super.onCreate(savedInstanceState);
 
         if (setCurrentGroups()) {
-            TaskRepository repo = new ParseTaskRepository();
+            TaskRepository repo = new ParseTaskRepository(getActivity());
             repo.updateTasksAsync(mCurrentUserGroups, this);
         } else {
             if (mListener != null) {
@@ -61,9 +62,9 @@ public class TaskQueryWorker extends BaseQueryWorker implements
     }
 
     @Override
-    public void onTaskUpdateFailed(int errorCode) {
+    public void onTaskUpdateFailed(@StringRes int errorMessage) {
         if (mListener != null) {
-            mListener.onTasksUpdatedFailed(errorCode);
+            mListener.onTasksUpdatedFailed(errorMessage);
         }
     }
 
@@ -85,8 +86,8 @@ public class TaskQueryWorker extends BaseQueryWorker implements
         /**
          * Handles the failed update of local tasks.
          *
-         * @param errorCode the error code of the exception thrown in the process
+         * @param errorMessage the error message from the exception thrown in the process
          */
-        void onTasksUpdatedFailed(int errorCode);
+        void onTasksUpdatedFailed(@StringRes int errorMessage);
     }
 }

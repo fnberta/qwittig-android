@@ -9,11 +9,13 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.SaveCallback;
 
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.domain.models.parse.Compensation;
 import ch.giantific.qwittig.workerfragments.BaseWorker;
 
@@ -74,7 +76,8 @@ public class CompensationSaveWorker extends BaseWorker {
                     mCompensation.setPaid(false);
 
                     if (mListener != null) {
-                        mListener.onCompensationSaveFailed(mCompensation, e.getCode());
+                        mListener.onCompensationSaveFailed(mCompensation,
+                                ParseErrorHandler.handleParseError(getActivity(), e));
                     }
 
                     return;
@@ -108,8 +111,8 @@ public class CompensationSaveWorker extends BaseWorker {
          * Handles the failure of saving the {@link Compensation} object.
          *
          * @param compensation the {@link Compensation} object that failed to save
-         * @param errorCode    the error code of the exception thrown during the save process
+         * @param errorMessage the error message from the exception thrown during the save process
          */
-        void onCompensationSaveFailed(@NonNull ParseObject compensation, int errorCode);
+        void onCompensationSaveFailed(@NonNull ParseObject compensation, @StringRes int errorMessage);
     }
 }

@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 
 import ch.giantific.qwittig.data.repositories.ParseCompensationRepository;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
@@ -67,7 +68,7 @@ public class CompensationQueryWorker extends BaseQueryWorker implements
         }
 
         if (setCurrentGroups()) {
-            CompensationRepository repo = new ParseCompensationRepository();
+            CompensationRepository repo = new ParseCompensationRepository(getActivity());
             if (mQueryPaid) {
                 repo.updateCompensationsPaidAsync(mCurrentUserGroups, mCurrentGroup.getObjectId(), this);
             } else {
@@ -104,9 +105,9 @@ public class CompensationQueryWorker extends BaseQueryWorker implements
     }
 
     @Override
-    public void onCompensationUpdateFailed(int errorCode) {
+    public void onCompensationUpdateFailed(@StringRes int errorMessage) {
         if (mListener != null) {
-            mListener.onCompensationUpdateFailed(errorCode, mQueryPaid);
+            mListener.onCompensationUpdateFailed(errorMessage, mQueryPaid);
         }
     }
 
@@ -130,10 +131,10 @@ public class CompensationQueryWorker extends BaseQueryWorker implements
         /**
          * Handles the failed update of local compensations.
          *
-         * @param errorCode the error code of the exception thrown in the process
+         * @param errorMessage the error message from the exception thrown in the process
          * @param isPaid    whether the compensations are paid or unpaid
          */
-        void onCompensationUpdateFailed(int errorCode, boolean isPaid);
+        void onCompensationUpdateFailed(@StringRes int errorMessage, boolean isPaid);
 
         /**
          * Handles the successful update of all paid or unpaid compensations from all groups.

@@ -326,5 +326,8 @@
     <string name="toast_saving_purchase">Speichere Einkauf…</string>
     <string name="toast_inviting_user">Lade Nutzer ein…</string>
     <string name="toast_creating_group">Erstelle Gruppe…</string>
+    <string name="toast_invalid_session">Deine Sitzung ist nicht mehr gültig</string>
+    <string name="toast_login_failed_google">Login mit Google ist fehlgeschlagen</string>
+    <string name="toast_login_failed_facebook">Login mit Facebook ist fehlgeschlagen</string>
 
 </resources>

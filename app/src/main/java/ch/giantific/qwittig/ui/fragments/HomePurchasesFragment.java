@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -64,7 +65,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment implem
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mPurchaseRepo = new ParsePurchaseRepository();
+        mPurchaseRepo = new ParsePurchaseRepository(getActivity());
 
         if (savedInstanceState != null) {
             mIsLoadingMore = savedInstanceState.getBoolean(STATE_IS_LOADING_MORE, false);
@@ -113,7 +114,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment implem
     protected void onlineQuery() {
         if (!Utils.isConnected(getActivity())) {
             setLoading(false);
-            showErrorSnackbar(getString(R.string.toast_no_connection), getOnlineQueryRetryAction());
+            showErrorSnackbar(R.string.toast_no_connection, getOnlineQueryRetryAction());
             return;
         }
 
@@ -132,16 +133,13 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment implem
     }
 
     /**
-     * Passes the error code to the generic error handler, shows the user an error message and
-     * removes the retained worker fragment and loading indicators.
+     * Shows the user the error message and removes the retained worker fragment and loading
+     * indicators.
      *
-     * @param errorCode the error code of the exception thrown in the process
+     * @param errorMessage the error message from the exception thrown in the process
      */
-    public void onPurchaseUpdateFailed(int errorCode) {
-        Activity context = getActivity();
-        ParseErrorHandler.handleParseError(context, errorCode);
-        showErrorSnackbar(ParseErrorHandler.getErrorMessage(context, errorCode),
-                getOnlineQueryRetryAction());
+    public void onPurchaseUpdateFailed(@StringRes int errorMessage) {
+        showErrorSnackbar(errorMessage, getOnlineQueryRetryAction());
         WorkerUtils.removeWorker(getFragmentManager(), PURCHASE_QUERY_WORKER);
 
         setLoading(false);
@@ -248,15 +246,13 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment implem
     }
 
     /**
-     * Passes the error code to the generic error handler, shows the user an error message and
-     * removes the retained worker fragment and loading indicators.
+     * Shows the user the error message and removes the retained worker fragment and loading
+     * indicators.
      *
-     * @param errorCode the error code of the exception thrown during the process
+     * @param errorMessage the error message from the exception thrown during the process
      */
-    public void onMoreObjectsLoadFailed(int errorCode) {
-        Activity context = getActivity();
-        ParseErrorHandler.handleParseError(context, errorCode);
-        showErrorSnackbar(ParseErrorHandler.getErrorMessage(context, errorCode), new View.OnClickListener() {
+    public void onMoreObjectsLoadFailed(@StringRes int errorMessage) {
+        showErrorSnackbar(errorMessage, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 loadMoreData();

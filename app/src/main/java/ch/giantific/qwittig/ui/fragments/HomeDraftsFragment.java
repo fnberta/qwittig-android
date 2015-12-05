@@ -86,7 +86,7 @@ public class HomeDraftsFragment extends BaseRecyclerViewFragment implements
             mDraftsSelected = new ArrayList<>();
         }
 
-        mDraftsRepo = new ParsePurchaseRepository();
+        mDraftsRepo = new ParsePurchaseRepository(getActivity());
     }
 
     @Override

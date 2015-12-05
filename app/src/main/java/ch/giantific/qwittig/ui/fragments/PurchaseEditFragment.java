@@ -85,7 +85,7 @@ public class PurchaseEditFragment extends PurchaseBaseFragment {
 
         setHasOptionsMenu(true);
 
-        mPurchaseRepo = new ParsePurchaseRepository();
+        mPurchaseRepo = new ParsePurchaseRepository(getActivity());
         mEditPurchaseId = getArguments().getString(BUNDLE_EDIT_PURCHASE_ID, "");
 
         if (savedInstanceState != null) {

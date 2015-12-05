@@ -9,6 +9,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -21,16 +22,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import ch.giantific.qwittig.ComparatorParseUserIgnoreCase;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
-import ch.giantific.qwittig.workerfragments.query.UserQueryWorker;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.ui.adapters.UsersRecyclerAdapter;
-import ch.giantific.qwittig.ComparatorParseUserIgnoreCase;
-import ch.giantific.qwittig.utils.WorkerUtils;
-import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
+import ch.giantific.qwittig.utils.WorkerUtils;
+import ch.giantific.qwittig.workerfragments.query.UserQueryWorker;
 
 /**
  * Displays the users of a group and their current balances in a {@link RecyclerView} list. Does not
@@ -56,7 +56,7 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewOnlineFragment 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mUserRepo = new ParseUserRepository();
+        mUserRepo = new ParseUserRepository(getActivity());
     }
 
     @Override
@@ -76,7 +76,7 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewOnlineFragment 
     protected void onlineQuery() {
         if (!Utils.isConnected(getActivity())) {
             setLoading(false);
-            showErrorSnackbar(getString(R.string.toast_no_connection), getOnlineQueryRetryAction());
+            showErrorSnackbar(R.string.toast_no_connection, getOnlineQueryRetryAction());
             return;
         }
 
@@ -94,15 +94,13 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewOnlineFragment 
     }
 
     /**
-     * Passes the error code to the generic error handler, shows the user an error message and
-     * removes the retained worker fragment and loading indicators.
+     * Shows the user the error message and removes the retained worker fragment and loading
+     * indicators.
      *
-     * @param errorCode the error code of the exception thrown in the process
+     * @param errorMessage the error message from the exception thrown in the process
      */
-    public void onUserUpdateFailed(int errorCode) {
-        ParseErrorHandler.handleParseError(getActivity(), errorCode);
-        showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), errorCode),
-                getOnlineQueryRetryAction());
+    public void onUserUpdateFailed(@StringRes int errorMessage) {
+        showErrorSnackbar(errorMessage, getOnlineQueryRetryAction());
         WorkerUtils.removeWorker(getFragmentManager(), USER_QUERY_WORKER);
 
         setLoading(false);

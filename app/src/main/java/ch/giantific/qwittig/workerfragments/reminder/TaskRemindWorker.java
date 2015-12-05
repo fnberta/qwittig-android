@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.text.TextUtils;
 
 import ch.giantific.qwittig.data.rest.CloudCodeClient;
@@ -74,7 +75,7 @@ public class TaskRemindWorker extends BaseWorker implements
             return;
         }
 
-        CloudCodeClient cloudCode = new CloudCodeClient();
+        CloudCodeClient cloudCode = new CloudCodeClient(getActivity());
         cloudCode.pushTaskReminder(mTaskId, this);
     }
 
@@ -86,9 +87,9 @@ public class TaskRemindWorker extends BaseWorker implements
     }
 
     @Override
-    public void onCloudFunctionFailed(int errorCode) {
+    public void onCloudFunctionFailed(@StringRes int errorMessage) {
         if (mListener != null) {
-            mListener.onUserRemindFailed(mTaskId, errorCode);
+            mListener.onUserRemindFailed(mTaskId, errorMessage);
         }
     }
 
@@ -112,9 +113,9 @@ public class TaskRemindWorker extends BaseWorker implements
         /**
          * Handles the failed reminder of a user to finish a task.
          *
-         * @param taskId    the object id of the task to be finished
-         * @param errorCode the error code of the exception thrown during the process
+         * @param taskId       the object id of the task to be finished
+         * @param errorMessage the error message from the exception thrown during the process
          */
-        void onUserRemindFailed(@NonNull String taskId, int errorCode);
+        void onUserRemindFailed(@NonNull String taskId, @StringRes int errorMessage);
     }
 }

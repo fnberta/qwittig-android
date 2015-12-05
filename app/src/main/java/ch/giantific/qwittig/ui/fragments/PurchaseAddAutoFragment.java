@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -164,7 +165,7 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
 
     private void doReceiptOcrWithWorker() {
         if (!Utils.isConnected(getActivity())) {
-            onOcrFailed(getString(R.string.toast_no_connection));
+            onOcrFailed(R.string.toast_no_connection);
             return;
         }
 
@@ -196,7 +197,7 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
      *
      * @param errorMessage the error message received from the server
      */
-    public void onOcrFailed(@NonNull String errorMessage) {
+    public void onOcrFailed(@StringRes int errorMessage) {
         Snackbar.make(mButtonAddRow, errorMessage, Snackbar.LENGTH_LONG).show();
         showMainScreen();
     }

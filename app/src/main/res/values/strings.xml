@@ -334,5 +334,8 @@
     <string name="toast_saving_purchase">Still saving Purchase…</string>
     <string name="toast_inviting_user">Still inviting user…</string>
     <string name="toast_creating_group">Still creating group…</string>
+    <string name="toast_invalid_session">Your session is no longer valid</string>
+    <string name="toast_login_failed_google">Login with Google failed</string>
+    <string name="toast_login_failed_facebook">Login with Facebook failed</string>
 
 </resources>

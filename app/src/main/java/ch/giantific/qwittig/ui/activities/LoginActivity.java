@@ -9,6 +9,7 @@ import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
 import android.view.Gravity;
@@ -143,8 +144,8 @@ public class LoginActivity extends BaseActivity implements
     }
 
     @Override
-    public void onLoginFailed(int errorCode) {
-        findLoginFragment().onLoginFailed(errorCode);
+    public void onLoginFailed(@StringRes int errorMessage) {
+        findLoginFragment().onLoginFailed(errorMessage);
     }
 
     @Override

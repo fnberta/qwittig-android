@@ -21,6 +21,7 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
@@ -197,7 +198,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mUserRepo = new ParseUserRepository();
+        mUserRepo = new ParseUserRepository(getActivity());
         updateCurrentUserAndGroup();
         mCurrentGroupCurrency = mCurrentGroup.getCurrency();
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -480,7 +481,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      *
      * @param errorMessage the network error message
      */
-    public void onRatesFetchFailed(@NonNull String errorMessage) {
+    public void onRatesFetchFailed(@StringRes int errorMessage) {
         WorkerUtils.removeWorker(getFragmentManager(), RATES_WORKER);
         mIsFetchingExchangeRates = false;
     }
@@ -532,8 +533,8 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         ListCheckBox cbEnabled = setupItemRowCheckbox(itemRowView);
         mLayoutTotalItemRow.addView(itemRowView);
 
-        ItemRow itemRow = new ItemRow(getActivity().getApplicationContext(), itemRowView,
-                idCounter, tilItemName, tilItemPrice, cbEnabled);
+        ItemRow itemRow = new ItemRow(getActivity(), itemRowView, idCounter, tilItemName,
+                tilItemPrice, cbEnabled);
         mItemRows.add(itemRow);
 
         return itemRow;
@@ -1155,8 +1156,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
                 } else if (ParseUtils.isTestUser(mCurrentUser)) {
                     mListener.showAccountCreateDialog();
                 } else if (!Utils.isConnected(getActivity())) {
-                    showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(),
-                            ParseException.CONNECTION_FAILED));
+                    showErrorSnackbar(R.string.toast_no_connection);
                 } else {
                     mIsSaving = true;
                     mListener.startProgressAnim();
@@ -1238,22 +1238,20 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     protected abstract PurchaseSaveWorker getSaveWorker();
 
     /**
-     * Provides an error handler for error codes. Passes the code to the generic error handler,
-     * shows the user an appropriate error message and hides loading indicators.
+     * Provides an error handler for error codes. Shows the user an appropriate error message and
+     * hides loading indicators.
      *
-     * @param errorCode the error code of the exception to handle
+     * @param errorMessage the error message from the exception to handle
      */
     @CallSuper
-    public void onSaveError(int errorCode) {
-        final Activity context = getActivity();
-        ParseErrorHandler.handleParseError(context, errorCode);
-        showErrorSnackbar(ParseErrorHandler.getErrorMessage(context, errorCode));
+    public void onSaveError(@StringRes int errorMessage) {
+        showErrorSnackbar(errorMessage);
 
         mIsSaving = false;
         mListener.stopProgressAnim();
     }
 
-    void showErrorSnackbar(@NonNull String message) {
+    void showErrorSnackbar(@StringRes int message) {
         Snackbar.make(mButtonAddRow, message, Snackbar.LENGTH_LONG).show();
     }
 
@@ -1272,12 +1270,12 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     /**
-     * Passes the error code to the error handler and removes the retained worker fragment.
+     * Removes the retained worker fragment.
      *
-     * @param errorCode the error code of the exception thrown in the process
+     * @param errorMessage the error code of the exception thrown in the process
      */
-    public void onPurchaseSaveFailed(int errorCode) {
-        onSaveError(errorCode);
+    public void onPurchaseSaveFailed(@StringRes int errorMessage) {
+        onSaveError(errorMessage);
         WorkerUtils.removeWorker(getFragmentManager(), PURCHASE_SAVE_WORKER);
     }
 
@@ -1312,7 +1310,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
             @Override
             public void done(@Nullable ParseException e) {
                 if (e != null) {
-                    onSaveError(e.getCode());
+                    onSaveError(ParseErrorHandler.handleParseError(getActivity(), e));
                     return;
                 }
 

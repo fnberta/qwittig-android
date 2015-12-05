@@ -8,9 +8,11 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 
 import com.parse.ParseUser;
 
+import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.workerfragments.BaseWorker;
 import ch.giantific.qwittig.data.rest.CloudCodeClient;
 import ch.giantific.qwittig.domain.models.parse.Group;
@@ -74,13 +76,13 @@ public class SettlementWorker extends BaseWorker implements
         final Group currentGroup = currentUser.getCurrentGroup();
         if (currentGroup == null) {
             if (mListener != null) {
-                mListener.onNewSettlementCreationFailed(0);
+                mListener.onNewSettlementCreationFailed(R.string.toast_unknown_error);
             }
 
             return;
         }
 
-        CloudCodeClient cloudCode = new CloudCodeClient();
+        CloudCodeClient cloudCode = new CloudCodeClient(getActivity());
         cloudCode.startNewSettlement(currentGroup.getObjectId(), doSingleUserSettlement, this);
     }
 
@@ -92,9 +94,9 @@ public class SettlementWorker extends BaseWorker implements
     }
 
     @Override
-    public void onCloudFunctionFailed(int errorCode) {
+    public void onCloudFunctionFailed(@StringRes int errorMessage) {
         if (mListener != null) {
-            mListener.onNewSettlementCreationFailed(errorCode);
+            mListener.onNewSettlementCreationFailed(errorMessage);
         }
     }
 
@@ -117,8 +119,8 @@ public class SettlementWorker extends BaseWorker implements
         /**
          * Handles the failed calculation of a new settlement.
          *
-         * @param errorCode the error code of the exception thrown during the process
+         * @param errorMessage the error message from the exception thrown during the process
          */
-        void onNewSettlementCreationFailed(int errorCode);
+        void onNewSettlementCreationFailed(@StringRes int errorMessage);
     }
 }

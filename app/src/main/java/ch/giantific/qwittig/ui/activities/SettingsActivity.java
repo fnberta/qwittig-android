@@ -7,6 +7,7 @@ package ch.giantific.qwittig.ui.activities;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.workerfragments.account.LogoutWorker;
@@ -75,8 +76,8 @@ public class SettingsActivity extends BaseActivity implements
     }
 
     @Override
-    public void onLogoutFailed(int errorCode) {
-        mSettingsFragment.onLogoutFailed(errorCode);
+    public void onLogoutFailed(@StringRes int errorMessage) {
+        mSettingsFragment.onLogoutFailed(errorMessage);
     }
 
     @Override

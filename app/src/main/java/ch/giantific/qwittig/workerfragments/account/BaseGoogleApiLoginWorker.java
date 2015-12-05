@@ -71,7 +71,7 @@ public abstract class BaseGoogleApiLoginWorker extends BaseWorker implements
                 if (status.isSuccess()) {
                     onGoogleUnlinkSuccessful();
                 } else {
-                    onGoogleUnlinkFailed(status.getStatusCode());
+                    onGoogleUnlinkFailed();
                 }
             }
         });
@@ -79,7 +79,7 @@ public abstract class BaseGoogleApiLoginWorker extends BaseWorker implements
 
     protected abstract void onGoogleUnlinkSuccessful();
 
-    protected abstract void onGoogleUnlinkFailed(int errorCode);
+    protected abstract void onGoogleUnlinkFailed();
 
     @Override
     public void onDestroy() {
