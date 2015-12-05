@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.RecyclerView;
@@ -27,12 +28,11 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.repositories.ParseTaskRepository;
 import ch.giantific.qwittig.domain.models.parse.Task;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.data.repositories.ParseTaskRepository;
-import ch.giantific.qwittig.data.helpers.query.TaskQueryHelper;
-import ch.giantific.qwittig.data.helpers.reminder.TaskRemindHelper;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.ui.activities.BaseActivity;
 import ch.giantific.qwittig.ui.activities.TaskAddActivity;
@@ -40,10 +40,11 @@ import ch.giantific.qwittig.ui.activities.TaskDetailsActivity;
 import ch.giantific.qwittig.ui.adapters.TasksRecyclerAdapter;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.utils.DateUtils;
-import ch.giantific.qwittig.utils.HelperUtils;
-import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
+import ch.giantific.qwittig.utils.WorkerUtils;
+import ch.giantific.qwittig.workerfragments.query.TaskQueryWorker;
+import ch.giantific.qwittig.workerfragments.reminder.TaskRemindWorker;
 
 /**
  * Displays a {@link RecyclerView} list of all the ongoing tasks in a group in card base interface.
@@ -57,8 +58,8 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment implements
     public static final String INTENT_TASK_ID = "ch.giantific.qwittig.INTENT_TASK_ID";
     private static final String LOG_TAG = TasksFragment.class.getSimpleName();
     private static final String STATE_TASKS_LOADING = "STATE_TASKS_LOADING";
-    private static final String TASK_QUERY_HELPER = "TASK_QUERY_HELPER";
-    private static final String TASK_REMIND_HELPER = "TASK_REMIND_HELPER_";
+    private static final String TASK_QUERY_WORKER = "TASK_QUERY_WORKER";
+    private static final String TASK_REMIND_WORKER = "TASK_REMIND_WORKER_";
     private static final String CREATE_GROUP_DIALOG = "CREATE_GROUP_DIALOG";
 
     private FragmentInteractionListener mListener;
@@ -88,7 +89,7 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment implements
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mTaskRepo = new ParseTaskRepository();
+        mTaskRepo = new ParseTaskRepository(getActivity());
 
         if (savedInstanceState != null) {
             ArrayList<String> loadingTasks = savedInstanceState.getStringArrayList(STATE_TASKS_LOADING);
@@ -123,45 +124,43 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment implements
     protected void onlineQuery() {
         if (!Utils.isConnected(getActivity())) {
             setLoading(false);
-            showErrorSnackbar(getString(R.string.toast_no_connection), getOnlineQueryRetryAction());
+            showErrorSnackbar(R.string.toast_no_connection, getOnlineQueryRetryAction());
             return;
         }
 
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment taskQueryHelper = HelperUtils.findHelper(fragmentManager, TASK_QUERY_HELPER);
+        Fragment taskQueryWorker = WorkerUtils.findWorker(fragmentManager, TASK_QUERY_WORKER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-        if (taskQueryHelper == null) {
-            taskQueryHelper = new TaskQueryHelper();
+        if (taskQueryWorker == null) {
+            taskQueryWorker = new TaskQueryWorker();
 
             fragmentManager.beginTransaction()
-                    .add(taskQueryHelper, TASK_QUERY_HELPER)
+                    .add(taskQueryWorker, TASK_QUERY_WORKER)
                     .commit();
         }
     }
 
     /**
-     * Passes the error code to the generic error handler, shows the user an error message and
-     * removes the retained helper fragment and loading indicators.
+     * Shows the user an error message and removes the retained worker fragment and loading
+     * indicators.
      *
-     * @param errorCode the error code of the exception thrown in the process
+     * @param errorMessage the error message from the exception thrown in the process
      */
-    public void onTasksUpdatedFailed(int errorCode) {
-        ParseErrorHandler.handleParseError(getActivity(), errorCode);
-        showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), errorCode),
-                getOnlineQueryRetryAction());
-        HelperUtils.removeHelper(getFragmentManager(), TASK_QUERY_HELPER);
+    public void onTasksUpdatedFailed(@StringRes int errorMessage) {
+        showErrorSnackbar(errorMessage, getOnlineQueryRetryAction());
+        WorkerUtils.removeWorker(getFragmentManager(), TASK_QUERY_WORKER);
 
         setLoading(false);
     }
 
     /**
      * Updates the adapter to reload data from the local data store after new purchases were pinned,
-     * removes the retained helper fragment and hides loading indicators.
+     * removes the retained worker fragment and hides loading indicators.
      */
     public void onTasksUpdated() {
-        HelperUtils.removeHelper(getFragmentManager(), TASK_QUERY_HELPER);
+        WorkerUtils.removeWorker(getFragmentManager(), TASK_QUERY_WORKER);
         setLoading(false);
 
         updateAdapter();
@@ -372,7 +371,7 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment implements
         }
 
         setTaskLoading(task, taskId, position, true);
-        remindUserWithHelper(taskId);
+        remindUserWithWorker(taskId);
     }
 
     @Nullable
@@ -402,34 +401,34 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment implements
         }
     }
 
-    private void remindUserWithHelper(@NonNull String taskId) {
+    private void remindUserWithWorker(@NonNull String taskId) {
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment taskRemindHelper = HelperUtils.findHelper(fragmentManager, getTaskHelperTag(taskId));
+        Fragment taskRemindWorker = WorkerUtils.findWorker(fragmentManager, getTaskWorkerTag(taskId));
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-        if (taskRemindHelper == null) {
-            taskRemindHelper = TaskRemindHelper.newInstance(taskId);
+        if (taskRemindWorker == null) {
+            taskRemindWorker = TaskRemindWorker.newInstance(taskId);
 
             fragmentManager.beginTransaction()
-                    .add(taskRemindHelper, TASK_REMIND_HELPER + taskId)
+                    .add(taskRemindWorker, TASK_REMIND_WORKER + taskId)
                     .commit();
         }
     }
 
     @NonNull
-    private String getTaskHelperTag(String taskId) {
-        return TASK_REMIND_HELPER + taskId;
+    private String getTaskWorkerTag(String taskId) {
+        return TASK_REMIND_WORKER + taskId;
     }
 
     /**
-     * Removes the retained helper fragment and disables the loading indicator of the task card.
+     * Removes the retained worker fragment and disables the loading indicator of the task card.
      * Displays a message to the user that the reminder was sent.
      *
      * @param taskId the object id of the task for which a reminder was sent
      */
     public void onUserReminded(@NonNull String taskId) {
-        HelperUtils.removeHelper(getFragmentManager(), getTaskHelperTag(taskId));
+        WorkerUtils.removeWorker(getFragmentManager(), getTaskWorkerTag(taskId));
 
         Task task = setTaskLoading(taskId, false);
         if (task != null) {
@@ -441,18 +440,15 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment implements
     }
 
     /**
-     * Passes the error codeto the generic error handler, shows the user an error message and
-     * removes the retained helper fragment and loading indicators.
+     * Shows the user the error message and removes the retained worker fragment and loading
+     * indicators.
      *
-     * @param taskId    the object id of the task for which an attempt was amde to send a reminder
-     * @param errorCode the error code of the exception thrown in the process
+     * @param taskId       the object id of the task for which an attempt was amde to send a reminder
+     * @param errorMessage the error message from the exception thrown in the process
      */
-    public void onUserRemindFailed(@NonNull String taskId, int errorCode) {
-        final Activity context = getActivity();
-        ParseErrorHandler.handleParseError(context, errorCode);
-        Snackbar.make(mRecyclerView,
-                ParseErrorHandler.getErrorMessage(context, errorCode), Snackbar.LENGTH_LONG).show();
-        HelperUtils.removeHelper(getFragmentManager(), getTaskHelperTag(taskId));
+    public void onUserRemindFailed(@NonNull String taskId, @StringRes int errorMessage) {
+        Snackbar.make(mRecyclerView, errorMessage, Snackbar.LENGTH_LONG).show();
+        WorkerUtils.removeWorker(getFragmentManager(), getTaskWorkerTag(taskId));
 
         setTaskLoading(taskId, false);
     }

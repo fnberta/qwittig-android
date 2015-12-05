@@ -5,6 +5,7 @@
 package ch.giantific.qwittig.domain.repositories;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 
 import com.parse.ParseObject;
 
@@ -138,9 +139,9 @@ public interface PurchaseRepository {
         /**
          * Called when the purchases load failed.
          *
-         * @param errorCode the error code from the exception thrown in the process
+         * @param errorMessage the error message from the exception thrown in the process
          */
-        void onPurchaseOnlineLoadFailed(int errorCode);
+        void onPurchaseOnlineLoadFailed(@StringRes int errorMessage);
     }
 
     /**
@@ -158,9 +159,9 @@ public interface PurchaseRepository {
         /**
          * Called when purchases update failed.
          *
-         * @param errorCode the error code from the exception thrown in the process
+         * @param errorMessage the error message from the exception thrown in the process
          */
-        void onPurchaseUpdateFailed(int errorCode);
+        void onPurchaseUpdateFailed(@StringRes int errorMessage);
 
         /**
          * Called when all purchases from all group were successfully updated.

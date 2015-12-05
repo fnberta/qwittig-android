@@ -14,6 +14,7 @@ import com.parse.ParseCrashReporting;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
+import com.squareup.leakcanary.LeakCanary;
 
 import ch.giantific.qwittig.domain.models.parse.Compensation;
 import ch.giantific.qwittig.domain.models.parse.Group;
@@ -32,6 +33,10 @@ public class Qwittig extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        if (BuildConfig.DEBUG) {
+            LeakCanary.install(this);
+        }
 
         // initialise Facebook SDK
         FacebookSdk.sdkInitialize(getApplicationContext());

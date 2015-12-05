@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
@@ -38,10 +39,10 @@ import java.util.Arrays;
 import ch.berta.fabio.fabprogress.FabProgress;
 import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.account.UnlinkThirdPartyHelper;
+import ch.giantific.qwittig.workerfragments.account.UnlinkThirdPartyWorker;
 import ch.giantific.qwittig.domain.models.Avatar;
 import ch.giantific.qwittig.ui.fragments.dialogs.DiscardChangesDialogFragment;
-import ch.giantific.qwittig.utils.HelperUtils;
+import ch.giantific.qwittig.utils.WorkerUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -61,7 +62,7 @@ public class SettingsProfileFragment extends BaseFragment {
     private static final int INTENT_REQUEST_IMAGE = 1;
     private static final String STATE_IS_SAVING = "STATE_IS_SAVING";
     private static final String STATE_UNLINK_THIRD_PARTY = "STATE_UNLINK_THIRD_PARTY";
-    private static final String UNLINK_HELPER = "UNLINK_HELPER";
+    private static final String UNLINK_WORKER = "UNLINK_WORKER";
     private View mViewPassword;
     private FragmentInteractionListener mListener;
     private TextInputLayout mTextInputLayoutEmail;
@@ -371,10 +372,10 @@ public class SettingsProfileFragment extends BaseFragment {
                 finishEdit(Activity.RESULT_OK);
             } else if (mIsGoogleUser) {
                 mListener.startProgressAnim();
-                unlinkThirdPartyWithHelper(UnlinkThirdPartyHelper.UNLINK_GOOGLE);
+                unlinkThirdPartyWithWorker(UnlinkThirdPartyWorker.UNLINK_GOOGLE);
             } else if (mIsFacebookUser) {
                 mListener.startProgressAnim();
-                unlinkThirdPartyWithHelper(UnlinkThirdPartyHelper.UNLINK_FACEBOOK);
+                unlinkThirdPartyWithWorker(UnlinkThirdPartyWorker.UNLINK_FACEBOOK);
             }
         }
     }
@@ -420,7 +421,7 @@ public class SettingsProfileFragment extends BaseFragment {
         }
     }
 
-    private void unlinkThirdPartyWithHelper(@UnlinkThirdPartyHelper.UnlinkAction int unlinkAction) {
+    private void unlinkThirdPartyWithWorker(@UnlinkThirdPartyWorker.UnlinkAction int unlinkAction) {
         if (!Utils.isConnected(getActivity())) {
             Snackbar.make(mTextInputLayoutNickname, getString(R.string.toast_no_connection),
                     Snackbar.LENGTH_LONG).show();;
@@ -428,30 +429,28 @@ public class SettingsProfileFragment extends BaseFragment {
         }
 
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment unlinkHelper = HelperUtils.findHelper(fragmentManager, UNLINK_HELPER);
+        Fragment unlinkWorker = WorkerUtils.findWorker(fragmentManager, UNLINK_WORKER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-        if (unlinkHelper == null) {
-            unlinkHelper = UnlinkThirdPartyHelper.newInstance(unlinkAction);
+        if (unlinkWorker == null) {
+            unlinkWorker = UnlinkThirdPartyWorker.newInstance(unlinkAction);
 
             fragmentManager.beginTransaction()
-                    .add(unlinkHelper, UNLINK_HELPER)
+                    .add(unlinkWorker, UNLINK_WORKER)
                     .commit();
         }
     }
 
     /**
-     * Passes the error code to the generic error handler, shows the user an error message and
-     * removes the retained helper fragment and loading indicators.
+     * Shows the user the error message and removes the retained worker fragment and loading
+     * indicators.
      *
-     * @param errorCode the error code of the exception thrown in the process
+     * @param errorMessage the error message from the exception thrown in the process
      */
-    public void onThirdPartyUnlinkFailed(int errorCode) {
-        ParseErrorHandler.handleParseError(getActivity(), errorCode);
-        HelperUtils.removeHelper(getFragmentManager(), UNLINK_HELPER);
-        Snackbar.make(mTextInputLayoutNickname, R.string.toast_unlink_failed,
-                Snackbar.LENGTH_LONG).show();
+    public void onThirdPartyUnlinkFailed(@StringRes int errorMessage) {
+        WorkerUtils.removeWorker(getFragmentManager(), UNLINK_WORKER);
+        Snackbar.make(mTextInputLayoutNickname, errorMessage, Snackbar.LENGTH_LONG).show();
 
         mIsSaving = false;
     }

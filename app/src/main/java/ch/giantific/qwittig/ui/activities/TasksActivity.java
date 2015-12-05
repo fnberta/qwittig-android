@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
@@ -22,8 +23,8 @@ import android.widget.Spinner;
 
 import ch.giantific.qwittig.LocalBroadcast;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.query.TaskQueryHelper;
-import ch.giantific.qwittig.data.helpers.reminder.TaskRemindHelper;
+import ch.giantific.qwittig.workerfragments.query.TaskQueryWorker;
+import ch.giantific.qwittig.workerfragments.reminder.TaskRemindWorker;
 import ch.giantific.qwittig.services.ParseQueryService;
 import ch.giantific.qwittig.ui.adapters.StringResSpinnerAdapter;
 import ch.giantific.qwittig.ui.fragments.TasksFragment;
@@ -42,8 +43,8 @@ import ch.giantific.qwittig.utils.ViewUtils;
  */
 public class TasksActivity extends BaseNavDrawerActivity implements
         TasksFragment.FragmentInteractionListener,
-        TaskQueryHelper.HelperInteractionListener,
-        TaskRemindHelper.HelperInteractionListener,
+        TaskQueryWorker.WorkerInteractionListener,
+        TaskRemindWorker.WorkerInteractionListener,
         GroupCreateDialogFragment.DialogInteractionListener {
 
     private static final String STATE_TASKS_FRAGMENT = "STATE_TASKS_FRAGMENT";
@@ -208,8 +209,8 @@ public class TasksActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onTasksUpdatedFailed(int errorCode) {
-        mTaskFragment.onTasksUpdatedFailed(errorCode);
+    public void onTasksUpdatedFailed(@StringRes int errorMessage) {
+        mTaskFragment.onTasksUpdatedFailed(errorMessage);
     }
 
     @Override
@@ -218,8 +219,8 @@ public class TasksActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onUserRemindFailed(@NonNull String taskId, int errorCode) {
-        mTaskFragment.onUserRemindFailed(taskId, errorCode);
+    public void onUserRemindFailed(@NonNull String taskId, @StringRes int errorMessage) {
+        mTaskFragment.onUserRemindFailed(taskId, errorMessage);
     }
 
     @Override

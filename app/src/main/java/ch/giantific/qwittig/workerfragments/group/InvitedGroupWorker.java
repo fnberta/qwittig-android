@@ -2,12 +2,14 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.helpers.group;
+package ch.giantific.qwittig.workerfragments.group;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.text.TextUtils;
 
 import com.parse.ParseException;
@@ -15,7 +17,9 @@ import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-import ch.giantific.qwittig.data.helpers.BaseHelper;
+import ch.giantific.qwittig.ParseErrorHandler;
+import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.workerfragments.BaseWorker;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.data.repositories.ParseGroupRepository;
@@ -26,34 +30,35 @@ import ch.giantific.qwittig.domain.repositories.GroupRepository;
  * Handles the process of a user being invited to a group and he/she accepting the invitation and
  * joining the group.
  * <p/>
- * Subclass of {@link BaseHelper}.
+ * Subclass of {@link BaseWorker}.
  */
-public class InvitedGroupHelper extends BaseHelper implements
+public class InvitedGroupWorker extends BaseWorker implements
         CloudCodeClient.CloudCodeListener,
         GroupRepository.GetGroupOnlineListener {
 
     private static final String BUNDLE_GROUP_ID = "BUNDLE_GROUP_ID";
-    private static final String LOG_TAG = InvitedGroupHelper.class.getSimpleName();
+    private static final String LOG_TAG = InvitedGroupWorker.class.getSimpleName();
     @Nullable
-    private HelperInteractionListener mListener;
+    private WorkerInteractionListener mListener;
     private String mGroupId;
     private CloudCodeClient mCloudCode;
     private User mCurrentUser;
+    private GroupRepository mGroupRepo;
 
-    public InvitedGroupHelper() {
+    public InvitedGroupWorker() {
         // empty default constructor
     }
 
     /**
-     * Returns a new instance of {@link InvitedGroupHelper} with the object id of the group the
+     * Returns a new instance of {@link InvitedGroupWorker} with the object id of the group the
      * user is invited to as an argument.
      *
      * @param groupId the object id of the group the user is invited to
-     * @return a new instance of {@link InvitedGroupHelper}
+     * @return a new instance of {@link InvitedGroupWorker}
      */
     @NonNull
-    public static InvitedGroupHelper newInstance(String groupId) {
-        InvitedGroupHelper fragment = new InvitedGroupHelper();
+    public static InvitedGroupWorker newInstance(String groupId) {
+        InvitedGroupWorker fragment = new InvitedGroupWorker();
         Bundle args = new Bundle();
         args.putString(BUNDLE_GROUP_ID, groupId);
         fragment.setArguments(args);
@@ -64,7 +69,7 @@ public class InvitedGroupHelper extends BaseHelper implements
     public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (HelperInteractionListener) activity;
+            mListener = (WorkerInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement DialogInteractionListener");
@@ -82,14 +87,16 @@ public class InvitedGroupHelper extends BaseHelper implements
 
         if (TextUtils.isEmpty(mGroupId)) {
             if (mListener != null) {
-                mListener.onInvitedGroupQueryFailed(0);
+                mListener.onInvitedGroupQueryFailed(R.string.toast_unknown_error);
             }
 
             return;
         }
 
         mCurrentUser = (User) ParseUser.getCurrentUser();
-        mCloudCode = new CloudCodeClient();
+        final Context context = getActivity();
+        mGroupRepo = new ParseGroupRepository(context);
+        mCloudCode = new CloudCodeClient(context);
         mCloudCode.addUserToGroupRole(mGroupId, this);
     }
 
@@ -99,15 +106,14 @@ public class InvitedGroupHelper extends BaseHelper implements
     }
 
     @Override
-    public void onCloudFunctionFailed(int errorCode) {
+    public void onCloudFunctionFailed(@StringRes int errorMessage) {
         if (mListener != null) {
-            mListener.onInvitedGroupQueryFailed(errorCode);
+            mListener.onInvitedGroupQueryFailed(errorMessage);
         }
     }
 
     private void queryGroup() {
-        GroupRepository repo = new ParseGroupRepository();
-        repo.getGroupOnlineAsync(mGroupId, this);
+        mGroupRepo.getGroupOnlineAsync(mGroupId, this);
     }
 
     @Override
@@ -126,10 +132,10 @@ public class InvitedGroupHelper extends BaseHelper implements
     }
 
     @Override
-    public void onGroupOnlineLoadFailed(int errorCode) {
+    public void onGroupOnlineLoadFailed(@StringRes int errorMessage) {
         mCloudCode.removeUserFromGroupRole(mGroupId);
         if (mListener != null) {
-            mListener.onInvitedGroupQueryFailed(errorCode);
+            mListener.onInvitedGroupQueryFailed(errorMessage);
         }
     }
 
@@ -153,7 +159,7 @@ public class InvitedGroupHelper extends BaseHelper implements
                     mCurrentUser.setCurrentGroup(currentGroup);
 
                     if (mListener != null) {
-                        mListener.onUserJoinGroupFailed(e.getCode());
+                        mListener.onUserJoinGroupFailed(ParseErrorHandler.handleParseError(getActivity(), e));
                     }
                 }
 
@@ -173,7 +179,7 @@ public class InvitedGroupHelper extends BaseHelper implements
     /**
      * Defines actions to be taken during the invited group querying and joining process.
      */
-    public interface HelperInteractionListener {
+    public interface WorkerInteractionListener {
         /**
          * Handles the successful query of the group the user is invited to
          *
@@ -184,9 +190,9 @@ public class InvitedGroupHelper extends BaseHelper implements
         /**
          * Handles the failure to query of the group the user is invited to.
          *
-         * @param errorCode the error code of the exception thrown during the process
+         * @param errorMessage the error message from the exception thrown during the process
          */
-        void onInvitedGroupQueryFailed(int errorCode);
+        void onInvitedGroupQueryFailed(@StringRes int errorMessage);
 
         /**
          * Handles the case when user's email was removed from the users invited to get group
@@ -201,8 +207,8 @@ public class InvitedGroupHelper extends BaseHelper implements
         /**
          * Handles the failure to join the new group.
          *
-         * @param errorCode the error code of the exception thrown during the process
+         * @param errorMessage the error message from the exception thrown during the process
          */
-        void onUserJoinGroupFailed(int errorCode);
+        void onUserJoinGroupFailed(@StringRes int errorMessage);
     }
 }

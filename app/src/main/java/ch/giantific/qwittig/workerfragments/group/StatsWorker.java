@@ -2,13 +2,14 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.helpers.group;
+package ch.giantific.qwittig.workerfragments.group;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
@@ -17,7 +18,7 @@ import com.parse.ParseUser;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import ch.giantific.qwittig.data.helpers.BaseHelper;
+import ch.giantific.qwittig.workerfragments.BaseWorker;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.models.stats.Stats;
@@ -28,9 +29,9 @@ import ch.giantific.qwittig.data.rest.CloudCodeClient;
  * <p/>
  * Currently handles spending, stores and currency statistics, as defined in {@link StatsType}.
  * <p/>
- * Subclass of {@link BaseHelper}.
+ * Subclass of {@link BaseWorker}.
  */
-public class StatsHelper extends BaseHelper implements
+public class StatsWorker extends BaseWorker implements
         CloudCodeClient.CloudCodeListener {
 
     @IntDef({TYPE_SPENDING, TYPE_STORES, TYPE_CURRENCIES})
@@ -42,27 +43,27 @@ public class StatsHelper extends BaseHelper implements
     private static final String BUNDLE_STATS_TYPE = "BUNDLE_STATS_TYPE";
     private static final String BUNDLE_YEAR = "BUNDLE_YEAR";
     private static final String BUNDLE_MONTH = "BUNDLE_MONTH";
-    private static final String LOG_TAG = StatsHelper.class.getSimpleName();
+    private static final String LOG_TAG = StatsWorker.class.getSimpleName();
     @Nullable
-    private HelperInteractionListener mListener;
+    private WorkerInteractionListener mListener;
     private int mStatsType;
-    public StatsHelper() {
+    public StatsWorker() {
         // empty default constructor
     }
 
     /**
-     * Returns a new instance of {@link StatsHelper}.
+     * Returns a new instance of {@link StatsWorker}.
      *
      * @param statsType the type of statistic to calculate
      * @param year      the year to calculate statistics for
      * @param month     the month to calculate statistics for (1-12), if 0 statistics for whole year
      *                  will be calculated
-     * @return a new instance of {@link StatsHelper}
+     * @return a new instance of {@link StatsWorker}
      */
     @NonNull
-    public static StatsHelper newInstance(@StatsType int statsType, @NonNull String year,
+    public static StatsWorker newInstance(@StatsType int statsType, @NonNull String year,
                                           int month) {
-        StatsHelper fragment = new StatsHelper();
+        StatsWorker fragment = new StatsWorker();
         Bundle args = new Bundle();
         args.putInt(BUNDLE_STATS_TYPE, statsType);
         args.putString(BUNDLE_YEAR, year);
@@ -75,7 +76,7 @@ public class StatsHelper extends BaseHelper implements
     public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (HelperInteractionListener) activity;
+            mListener = (WorkerInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement DialogInteractionListener");
@@ -111,7 +112,7 @@ public class StatsHelper extends BaseHelper implements
             return;
         }
 
-        CloudCodeClient cloudCode = new CloudCodeClient();
+        CloudCodeClient cloudCode = new CloudCodeClient(getActivity());
         String groupId = currentGroup.getObjectId();
         switch (mStatsType) {
             case TYPE_SPENDING:
@@ -139,9 +140,9 @@ public class StatsHelper extends BaseHelper implements
     }
 
     @Override
-    public void onCloudFunctionFailed(int errorCode) {
+    public void onCloudFunctionFailed(@StringRes int errorMessage) {
         if (mListener != null) {
-            mListener.onStatsCalculationFailed(mStatsType, errorCode);
+            mListener.onStatsCalculationFailed(mStatsType, errorMessage);
         }
     }
 
@@ -159,7 +160,7 @@ public class StatsHelper extends BaseHelper implements
     /**
      * Defines the actions to take after statistics were calculated or after the calculation failed.
      */
-    public interface HelperInteractionListener {
+    public interface WorkerInteractionListener {
         /**
          * Handles the successful calculation of statistics.
          *
@@ -171,9 +172,9 @@ public class StatsHelper extends BaseHelper implements
         /**
          * Handles the failed calculation of statistics.
          *
-         * @param statsType the type of stats that failed to calculate, one of {@link StatsType}
-         * @param errorCode the error code of the exception thrown in the process
+         * @param statsType    the type of stats that failed to calculate, one of {@link StatsType}
+         * @param errorMessage the error message from the exception thrown in the process
          */
-        void onStatsCalculationFailed(int statsType, int errorCode);
+        void onStatsCalculationFailed(int statsType, @StringRes int errorMessage);
     }
 }

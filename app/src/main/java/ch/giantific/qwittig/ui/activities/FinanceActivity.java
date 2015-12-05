@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
@@ -35,12 +36,12 @@ import java.util.List;
 
 import ch.giantific.qwittig.LocalBroadcast;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.group.SettlementHelper;
-import ch.giantific.qwittig.data.helpers.query.CompensationQueryHelper;
-import ch.giantific.qwittig.data.helpers.query.MoreQueryHelper;
-import ch.giantific.qwittig.data.helpers.query.UserQueryHelper;
-import ch.giantific.qwittig.data.helpers.reminder.CompensationRemindHelper;
-import ch.giantific.qwittig.data.helpers.save.CompensationSaveHelper;
+import ch.giantific.qwittig.workerfragments.group.SettlementWorker;
+import ch.giantific.qwittig.workerfragments.query.CompensationQueryWorker;
+import ch.giantific.qwittig.workerfragments.query.MoreQueryWorker;
+import ch.giantific.qwittig.workerfragments.query.UserQueryWorker;
+import ch.giantific.qwittig.workerfragments.reminder.CompensationRemindWorker;
+import ch.giantific.qwittig.workerfragments.save.CompensationSaveWorker;
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.domain.models.ItemUserPicker;
 import ch.giantific.qwittig.domain.models.parse.Compensation;
@@ -74,12 +75,12 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
         CompensationSingleDialogFragment.DialogInteractionListener,
         GroupCreateDialogFragment.DialogInteractionListener,
         CompensationChangeAmountDialogFragment.DialogInteractionListener,
-        UserQueryHelper.HelperInteractionListener,
-        CompensationQueryHelper.HelperInteractionListener,
-        MoreQueryHelper.HelperInteractionListener,
-        SettlementHelper.HelperInteractionListener,
-        CompensationRemindHelper.HelperInteractionListener,
-        CompensationSaveHelper.HelperInteractionListener {
+        UserQueryWorker.WorkerInteractionListener,
+        CompensationQueryWorker.WorkerInteractionListener,
+        MoreQueryWorker.WorkerInteractionListener,
+        SettlementWorker.WorkerInteractionListener,
+        CompensationRemindWorker.WorkerInteractionListener,
+        CompensationSaveWorker.WorkerInteractionListener {
 
     @IntDef({TAB_NONE, TAB_USER_BALANCES, TAB_COMPS_UNPAID, TAB_COMPS_PAID})
     @Retention(RetentionPolicy.SOURCE)
@@ -260,7 +261,7 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
 
     private void addSinglePayment() {
         if (userIsInGroup()) {
-            UserRepository repo = new ParseUserRepository();
+            UserRepository repo = new ParseUserRepository(this);
             repo.getUsersLocalAsync(mCurrentGroup, this);
         } else {
             showCreateGroupDialog();
@@ -362,8 +363,8 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onUserUpdateFailed(int errorCode) {
-        mUserBalancesFragment.onUserUpdateFailed(errorCode);
+    public void onUserUpdateFailed(@StringRes int errorMessage) {
+        mUserBalancesFragment.onUserUpdateFailed(errorMessage);
     }
 
     @Override
@@ -373,11 +374,11 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onCompensationUpdateFailed(int errorCode, boolean isPaid) {
+    public void onCompensationUpdateFailed(@StringRes int errorMessage, boolean isPaid) {
         if (isPaid) {
-            mCompensationsPaidFragment.onCompensationUpdateFailed(errorCode);
+            mCompensationsPaidFragment.onCompensationUpdateFailed(errorMessage);
         } else {
-            mCompensationsUnpaidFragment.onCompensationUpdateFailed(errorCode);
+            mCompensationsUnpaidFragment.onCompensationUpdateFailed(errorMessage);
         }
     }
 
@@ -401,8 +402,8 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onNewSettlementCreationFailed(int errorCode) {
-        mCompensationsUnpaidFragment.onNewSettlementCreationFailed(errorCode);
+    public void onNewSettlementCreationFailed(@StringRes int errorMessage) {
+        mCompensationsUnpaidFragment.onNewSettlementCreationFailed(errorMessage);
     }
 
     @Override
@@ -411,8 +412,8 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onCompensationSaveFailed(@NonNull ParseObject compensation, int errorCode) {
-        mCompensationsUnpaidFragment.onCompensationSaveFailed(compensation, errorCode);
+    public void onCompensationSaveFailed(@NonNull ParseObject compensation, @StringRes int errorMessage) {
+        mCompensationsUnpaidFragment.onCompensationSaveFailed(compensation, errorMessage);
     }
 
     @Override
@@ -421,8 +422,9 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onUserRemindFailed(int remindType, @NonNull String compensationId, int errorCode) {
-        mCompensationsUnpaidFragment.onUserRemindFailed(compensationId, errorCode);
+    public void onUserRemindFailed(int remindType, @NonNull String compensationId,
+                                   @StringRes int errorMessage) {
+        mCompensationsUnpaidFragment.onUserRemindFailed(compensationId, errorMessage);
     }
 
     @Override
@@ -431,8 +433,8 @@ public class FinanceActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onMoreObjectsLoadFailed(int errorCode) {
-        mCompensationsPaidFragment.onMoreObjectsLoadFailed(errorCode);
+    public void onMoreObjectsLoadFailed(@StringRes int errorMessage) {
+        mCompensationsPaidFragment.onMoreObjectsLoadFailed(errorMessage);
     }
 
     @Override

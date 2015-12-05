@@ -2,12 +2,13 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.helpers.query;
+package ch.giantific.qwittig.workerfragments.query;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 
 import ch.giantific.qwittig.data.repositories.ParseCompensationRepository;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
@@ -15,31 +16,31 @@ import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 /**
  * Performs an online query to the Parse.com database to query either paid or unpaid compensations.
  * <p/>
- * Subclass of {@link BaseQueryHelper}.
+ * Subclass of {@link BaseQueryWorker}.
  */
-public class CompensationQueryHelper extends BaseQueryHelper implements
+public class CompensationQueryWorker extends BaseQueryWorker implements
         CompensationRepository.UpdateCompensationsListener {
 
-    private static final String LOG_TAG = CompensationQueryHelper.class.getSimpleName();
+    private static final String LOG_TAG = CompensationQueryWorker.class.getSimpleName();
     private static final String BUNDLE_QUERY_PAID = "BUNDLE_QUERY_PAID";
     private boolean mQueryPaid;
     @Nullable
-    private HelperInteractionListener mListener;
+    private WorkerInteractionListener mListener;
 
-    public CompensationQueryHelper() {
+    public CompensationQueryWorker() {
         // empty default constructor
     }
 
     /**
-     * Returns a new instance of {@link CompensationQueryHelper} with an argument whether to
+     * Returns a new instance of {@link CompensationQueryWorker} with an argument whether to
      * query for paid or unpaid compensations.
      *
      * @param queryPaid whether to query paid compensations
-     * @return a new instance of {@link CompensationQueryHelper}
+     * @return a new instance of {@link CompensationQueryWorker}
      */
     @NonNull
-    public static CompensationQueryHelper newInstance(boolean queryPaid) {
-        CompensationQueryHelper fragment = new CompensationQueryHelper();
+    public static CompensationQueryWorker newInstance(boolean queryPaid) {
+        CompensationQueryWorker fragment = new CompensationQueryWorker();
         Bundle args = new Bundle();
         args.putBoolean(BUNDLE_QUERY_PAID, queryPaid);
         fragment.setArguments(args);
@@ -50,7 +51,7 @@ public class CompensationQueryHelper extends BaseQueryHelper implements
     public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (HelperInteractionListener) activity;
+            mListener = (WorkerInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement DialogInteractionListener");
@@ -67,7 +68,7 @@ public class CompensationQueryHelper extends BaseQueryHelper implements
         }
 
         if (setCurrentGroups()) {
-            CompensationRepository repo = new ParseCompensationRepository();
+            CompensationRepository repo = new ParseCompensationRepository(getActivity());
             if (mQueryPaid) {
                 repo.updateCompensationsPaidAsync(mCurrentUserGroups, mCurrentGroup.getObjectId(), this);
             } else {
@@ -104,9 +105,9 @@ public class CompensationQueryHelper extends BaseQueryHelper implements
     }
 
     @Override
-    public void onCompensationUpdateFailed(int errorCode) {
+    public void onCompensationUpdateFailed(@StringRes int errorMessage) {
         if (mListener != null) {
-            mListener.onCompensationUpdateFailed(errorCode, mQueryPaid);
+            mListener.onCompensationUpdateFailed(errorMessage, mQueryPaid);
         }
     }
 
@@ -119,7 +120,7 @@ public class CompensationQueryHelper extends BaseQueryHelper implements
     /**
      * Defines the actions to take after compensations are updated.
      */
-    public interface HelperInteractionListener {
+    public interface WorkerInteractionListener {
         /**
          * Handles the successful update of local compensations.
          *
@@ -130,10 +131,10 @@ public class CompensationQueryHelper extends BaseQueryHelper implements
         /**
          * Handles the failed update of local compensations.
          *
-         * @param errorCode the error code of the exception thrown in the process
+         * @param errorMessage the error message from the exception thrown in the process
          * @param isPaid    whether the compensations are paid or unpaid
          */
-        void onCompensationUpdateFailed(int errorCode, boolean isPaid);
+        void onCompensationUpdateFailed(@StringRes int errorMessage, boolean isPaid);
 
         /**
          * Handles the successful update of all paid or unpaid compensations from all groups.

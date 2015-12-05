@@ -9,22 +9,22 @@ import android.app.FragmentManager;
 import android.support.annotation.NonNull;
 
 /**
- * Provides useful static utility methods for the handling of retained headlines helper fragments.
+ * Provides useful static utility methods for the handling of retained headless worker fragments.
  */
-public class HelperUtils {
+public class WorkerUtils {
 
-    private HelperUtils() {
+    private WorkerUtils() {
         // class cannot be instantiated
     }
 
     /**
-     * Removes a helper fragment from the stack regardless of possible state loss.
+     * Removes a worker fragment from the stack regardless of possible state loss.
      *
      * @param fragmentManager the fragment manager to use to remove the fragment
      * @param tag             the tag to find the fragment
      */
-    public static void removeHelper(@NonNull FragmentManager fragmentManager, @NonNull String tag) {
-        Fragment fragment = findHelper(fragmentManager, tag);
+    public static void removeWorker(@NonNull FragmentManager fragmentManager, @NonNull String tag) {
+        Fragment fragment = findWorker(fragmentManager, tag);
 
         if (fragment != null) {
             fragmentManager.beginTransaction().remove(fragment).commitAllowingStateLoss();
@@ -32,13 +32,13 @@ public class HelperUtils {
     }
 
     /**
-     * Returns the helper fragment associated with the specified tag.
+     * Returns the worker fragment associated with the specified tag.
      *
      * @param fragmentManager the fragment manager to use to find the fragment
      * @param tag             the tag to find the fragment
-     * @return the helper fragment associated with the tag
+     * @return the worker fragment associated with the tag
      */
-    public static Fragment findHelper(@NonNull FragmentManager fragmentManager, @NonNull String tag) {
+    public static Fragment findWorker(@NonNull FragmentManager fragmentManager, @NonNull String tag) {
         return fragmentManager.findFragmentByTag(tag);
     }
 }

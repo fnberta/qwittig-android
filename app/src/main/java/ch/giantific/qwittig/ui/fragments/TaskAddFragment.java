@@ -220,7 +220,7 @@ public class TaskAddFragment extends BaseFragment implements
     }
 
     final void queryUsers() {
-        UserRepository repo = new ParseUserRepository();
+        UserRepository repo = new ParseUserRepository(getActivity());
         repo.getUsersLocalAsync(mCurrentGroup, this);
     }
 

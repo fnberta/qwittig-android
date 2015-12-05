@@ -40,7 +40,7 @@ public class ItemRow {
     public ItemRow(@NonNull Context context, @NonNull View itemRowView, int id,
                    @NonNull TextInputLayout tilName, @NonNull TextInputLayout tilPrice,
                    @NonNull ListCheckBox cbEnabled) {
-        mContext = context;
+        mContext = context.getApplicationContext();
         mItemRowView = itemRowView;
         mTextInputLayoutName = tilName;
         mEditTextName = mTextInputLayoutName.getEditText();

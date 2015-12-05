@@ -9,6 +9,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -21,16 +22,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import ch.giantific.qwittig.ComparatorParseUserIgnoreCase;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
-import ch.giantific.qwittig.data.helpers.query.UserQueryHelper;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.ui.adapters.UsersRecyclerAdapter;
-import ch.giantific.qwittig.ComparatorParseUserIgnoreCase;
-import ch.giantific.qwittig.utils.HelperUtils;
-import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
+import ch.giantific.qwittig.utils.WorkerUtils;
+import ch.giantific.qwittig.workerfragments.query.UserQueryWorker;
 
 /**
  * Displays the users of a group and their current balances in a {@link RecyclerView} list. Does not
@@ -43,7 +43,7 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewOnlineFragment 
         UserRepository.GetUsersLocalListener,
         UsersRecyclerAdapter.AdapterInteractionListener {
 
-    private static final String USER_QUERY_HELPER = "USER_QUERY_HELPER";
+    private static final String USER_QUERY_WORKER = "USER_QUERY_WORKER";
     private UsersRecyclerAdapter mRecyclerAdapter;
     @NonNull
     private List<ParseUser> mUsers = new ArrayList<>();
@@ -56,7 +56,7 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewOnlineFragment 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mUserRepo = new ParseUserRepository();
+        mUserRepo = new ParseUserRepository(getActivity());
     }
 
     @Override
@@ -76,44 +76,42 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewOnlineFragment 
     protected void onlineQuery() {
         if (!Utils.isConnected(getActivity())) {
             setLoading(false);
-            showErrorSnackbar(getString(R.string.toast_no_connection), getOnlineQueryRetryAction());
+            showErrorSnackbar(R.string.toast_no_connection, getOnlineQueryRetryAction());
             return;
         }
 
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment userQueryHelper = HelperUtils.findHelper(fragmentManager, USER_QUERY_HELPER);
+        Fragment userQueryWorker = WorkerUtils.findWorker(fragmentManager, USER_QUERY_WORKER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-        if (userQueryHelper == null) {
-            userQueryHelper = new UserQueryHelper();
+        if (userQueryWorker == null) {
+            userQueryWorker = new UserQueryWorker();
             fragmentManager.beginTransaction()
-                    .add(userQueryHelper, USER_QUERY_HELPER)
+                    .add(userQueryWorker, USER_QUERY_WORKER)
                     .commit();
         }
     }
 
     /**
-     * Passes the error code to the generic error handler, shows the user an error message and
-     * removes the retained helper fragment and loading indicators.
+     * Shows the user the error message and removes the retained worker fragment and loading
+     * indicators.
      *
-     * @param errorCode the error code of the exception thrown in the process
+     * @param errorMessage the error message from the exception thrown in the process
      */
-    public void onUserUpdateFailed(int errorCode) {
-        ParseErrorHandler.handleParseError(getActivity(), errorCode);
-        showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(), errorCode),
-                getOnlineQueryRetryAction());
-        HelperUtils.removeHelper(getFragmentManager(), USER_QUERY_HELPER);
+    public void onUserUpdateFailed(@StringRes int errorMessage) {
+        showErrorSnackbar(errorMessage, getOnlineQueryRetryAction());
+        WorkerUtils.removeWorker(getFragmentManager(), USER_QUERY_WORKER);
 
         setLoading(false);
     }
 
     /**
      * Tells the adapter of the {@link RecyclerView} to re-query its data, removes the retained
-     * helper fragment and removes loading indicators.
+     * worker fragment and removes loading indicators.
      */
     public void onUsersUpdated() {
-        HelperUtils.removeHelper(getFragmentManager(), USER_QUERY_HELPER);
+        WorkerUtils.removeWorker(getFragmentManager(), USER_QUERY_WORKER);
         setLoading(false);
 
         updateAdapter();

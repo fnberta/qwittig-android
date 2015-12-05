@@ -2,12 +2,13 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.helpers.query;
+package ch.giantific.qwittig.workerfragments.query;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 
 import ch.giantific.qwittig.data.repositories.ParsePurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
@@ -15,16 +16,16 @@ import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 /**
  * Performs an online query to the Parse.com database to query purchases.
  * <p/>
- * Subclass of {@link BaseQueryHelper}.
+ * Subclass of {@link BaseQueryWorker}.
  */
-public class PurchaseQueryHelper extends BaseQueryHelper implements
+public class PurchaseQueryWorker extends BaseQueryWorker implements
         PurchaseRepository.UpdatePurchasesListener {
 
-    private static final String LOG_TAG = PurchaseQueryHelper.class.getSimpleName();
+    private static final String LOG_TAG = PurchaseQueryWorker.class.getSimpleName();
     @Nullable
-    private HelperInteractionListener mListener;
+    private WorkerInteractionListener mListener;
 
-    public PurchaseQueryHelper() {
+    public PurchaseQueryWorker() {
         // empty default constructor
     }
 
@@ -32,7 +33,7 @@ public class PurchaseQueryHelper extends BaseQueryHelper implements
     public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (HelperInteractionListener) activity;
+            mListener = (WorkerInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement DialogInteractionListener");
@@ -44,7 +45,7 @@ public class PurchaseQueryHelper extends BaseQueryHelper implements
         super.onCreate(savedInstanceState);
 
         if (setCurrentGroups()) {
-            PurchaseRepository repo = new ParsePurchaseRepository();
+            PurchaseRepository repo = new ParsePurchaseRepository(getActivity());
             repo.updatePurchasesAsync(mCurrentUser, mCurrentUserGroups, mCurrentGroup.getObjectId(), this);
         } else {
             if (mListener != null) {
@@ -61,9 +62,9 @@ public class PurchaseQueryHelper extends BaseQueryHelper implements
     }
 
     @Override
-    public void onPurchaseUpdateFailed(int errorCode) {
+    public void onPurchaseUpdateFailed(@StringRes int errorMessage) {
         if (mListener != null) {
-            mListener.onPurchaseUpdateFailed(errorCode);
+            mListener.onPurchaseUpdateFailed(errorMessage);
         }
     }
 
@@ -83,7 +84,7 @@ public class PurchaseQueryHelper extends BaseQueryHelper implements
     /**
      * Defines the actions to take after purchases are updated.
      */
-    public interface HelperInteractionListener {
+    public interface WorkerInteractionListener {
         /**
          * Handles the successful update of local purchases.
          */
@@ -94,7 +95,7 @@ public class PurchaseQueryHelper extends BaseQueryHelper implements
          *
          * @param errorCode the error code of the exception thrown in the process
          */
-        void onPurchaseUpdateFailed(int errorCode);
+        void onPurchaseUpdateFailed(@StringRes int errorCode);
 
         /**
          * Handles the successful update of all purchases from all groups.

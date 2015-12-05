@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.data.repositories;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -12,6 +13,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 
@@ -21,8 +23,8 @@ import ch.giantific.qwittig.domain.repositories.GroupRepository;
  */
 public class ParseGroupRepository extends ParseGenericRepository implements GroupRepository {
 
-    public ParseGroupRepository() {
-        super();
+    public ParseGroupRepository(Context context) {
+        super(context);
     }
 
     @Override
@@ -55,7 +57,7 @@ public class ParseGroupRepository extends ParseGenericRepository implements Grou
             @Override
             public void done(ParseObject parseObject, @Nullable ParseException e) {
                 if (e != null) {
-                    listener.onGroupOnlineLoadFailed(e.getCode());
+                    listener.onGroupOnlineLoadFailed(ParseErrorHandler.handleParseError(mContext, e));
                     return;
                 }
 

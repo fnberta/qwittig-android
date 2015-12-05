@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.view.View;
@@ -19,7 +20,7 @@ import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.ui.listeners.SwipeDismissTouchListener;
-import ch.giantific.qwittig.utils.HelperUtils;
+import ch.giantific.qwittig.utils.WorkerUtils;
 import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -141,14 +142,11 @@ public abstract class SettingsBaseInviteFragment extends BaseFragment {
         return allEmailsAreValid;
     }
 
-    final void onInviteError(int errorCode, String helperTag) {
-        final Activity context = getActivity();
-        ParseErrorHandler.handleParseError(context, errorCode);
-        HelperUtils.removeHelper(getFragmentManager(), helperTag);
-
+    final void onInviteError(@StringRes int errorMessage, String workerTag) {
         hideProgressCircle();
-        Snackbar.make(mButtonAddUser,
-                ParseErrorHandler.getErrorMessage(context, errorCode), Snackbar.LENGTH_LONG).show();
+        WorkerUtils.removeWorker(getFragmentManager(), workerTag);
+
+        Snackbar.make(mButtonAddUser, errorMessage, Snackbar.LENGTH_LONG).show();
     }
 
     protected abstract void hideProgressCircle();

@@ -5,6 +5,7 @@
 package ch.giantific.qwittig.ui.fragments;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -105,8 +106,9 @@ public class TaskDetailsFragment extends BaseFragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mTaskRepo = new ParseTaskRepository();
-        mUserRepo = new ParseUserRepository();
+        final Activity activity = getActivity();
+        mTaskRepo = new ParseTaskRepository(activity);
+        mUserRepo = new ParseUserRepository(activity);
 
         Bundle args = getArguments();
         if (args != null) {

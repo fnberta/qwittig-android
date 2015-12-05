@@ -22,18 +22,16 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.SignInButton;
 import com.parse.ParseConfig;
-import com.parse.ParseException;
 
 import java.util.List;
 
-import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.account.LoginHelper;
 import ch.giantific.qwittig.domain.models.parse.Config;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.ui.activities.LoginActivity;
-import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.Utils;
+import ch.giantific.qwittig.utils.WorkerUtils;
+import ch.giantific.qwittig.workerfragments.account.LoginWorker;
 
 /**
  * Displays the login screen asking the user for the username and password.
@@ -90,7 +88,7 @@ public class LoginAccountsFragment extends LoginBaseFragment implements
         int id = v.getId();
         switch (id) {
             case R.id.bt_login_accounts_facebook:
-                loginWithFacebookWithHelper();
+                loginWithFacebookWithWorker();
                 break;
             case R.id.bt_login_accounts_google:
                 loginWithGoogle();
@@ -107,7 +105,7 @@ public class LoginAccountsFragment extends LoginBaseFragment implements
         }
     }
 
-    private void loginWithFacebookWithHelper() {
+    private void loginWithFacebookWithWorker() {
         if (!Utils.isConnected(getActivity())) {
             Snackbar.make(mViewMain, R.string.toast_no_connection, Snackbar.LENGTH_LONG).show();
             return;
@@ -116,15 +114,15 @@ public class LoginAccountsFragment extends LoginBaseFragment implements
         setLoading(true);
 
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment loginHelper = HelperUtils.findHelper(fragmentManager, LOGIN_HELPER);
+        Fragment loginWorker = WorkerUtils.findWorker(fragmentManager, LOGIN_WORKER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-        if (loginHelper == null) {
-            loginHelper = LoginHelper.newInstanceFacebookLogin();
+        if (loginWorker == null) {
+            loginWorker = LoginWorker.newInstanceFacebookLogin();
 
             fragmentManager.beginTransaction()
-                    .add(loginHelper, LOGIN_HELPER)
+                    .add(loginWorker, LOGIN_WORKER)
                     .commit();
         }
     }
@@ -150,26 +148,25 @@ public class LoginAccountsFragment extends LoginBaseFragment implements
             String idToken = acct.getIdToken();
             String displayName = acct.getDisplayName();
             Uri photoUrl = acct.getPhotoUrl();
-            verifyGoogleLoginTokenWithHelper(idToken, displayName, photoUrl);
+            verifyGoogleLoginTokenWithWorker(idToken, displayName, photoUrl);
         } else {
-            // TODO: fix error code
-            onLoginFailed(0);
+            onLoginFailed(R.string.toast_login_failed_google);
         }
     }
 
-    private void verifyGoogleLoginTokenWithHelper(@NonNull String idToken,
+    private void verifyGoogleLoginTokenWithWorker(@NonNull String idToken,
                                                   @NonNull String displayName,
                                                   @NonNull Uri photoUrl) {
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment loginHelper = HelperUtils.findHelper(fragmentManager, LOGIN_HELPER);
+        Fragment loginWorker = WorkerUtils.findWorker(fragmentManager, LOGIN_WORKER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-        if (loginHelper == null) {
-            loginHelper = LoginHelper.newInstanceGoogleLogin(idToken, displayName, photoUrl);
+        if (loginWorker == null) {
+            loginWorker = LoginWorker.newInstanceGoogleLogin(idToken, displayName, photoUrl);
 
             fragmentManager.beginTransaction()
-                    .add(loginHelper, LOGIN_HELPER)
+                    .add(loginWorker, LOGIN_WORKER)
                     .commit();
         }
     }
@@ -181,29 +178,27 @@ public class LoginAccountsFragment extends LoginBaseFragment implements
         int testUserNumber = Utils.getRandomInt(testUsersNicknames.size());
 
         if (!TextUtils.isEmpty(testUsersPassword)) {
-            loginWithEmailWithHelper(User.USERNAME_PREFIX_TEST + testUserNumber, testUsersPassword);
-        } else {
-            ParseErrorHandler.handleParseError(getActivity(), ParseException.CONNECTION_FAILED);
+            loginWithEmailWithWorker(User.USERNAME_PREFIX_TEST + testUserNumber, testUsersPassword);
         }
     }
 
     /**
-     * Finds the login helper fragment and passes the entered email address.
+     * Finds the login worker fragment and passes the entered email address.
      *
-     * @param email the email address to pass to the login helper fragment
+     * @param email the email address to pass to the login worker fragment
      */
     public void setEmail(String email) {
-        LoginHelper loginHelper = (LoginHelper) HelperUtils.findHelper(getFragmentManager(), LOGIN_HELPER);
-        loginHelper.onValidEmailSet(email);
+        LoginWorker loginWorker = (LoginWorker) WorkerUtils.findWorker(getFragmentManager(), LOGIN_WORKER);
+        loginWorker.onValidEmailSet(email);
     }
 
     /**
-     * Finds the login helper fragment and tells it to delete the newly created facebook user as
+     * Finds the login worker fragment and tells it to delete the newly created facebook user as
      * no valid email address was set.
      */
     public void onNoEmailEntered() {
-        LoginHelper loginHelper = (LoginHelper) HelperUtils.findHelper(getFragmentManager(), LOGIN_HELPER);
-        loginHelper.onNoEmailSet();
+        LoginWorker loginWorker = (LoginWorker) WorkerUtils.findWorker(getFragmentManager(), LOGIN_WORKER);
+        loginWorker.onNoEmailSet();
     }
 
     @Override
@@ -212,9 +207,19 @@ public class LoginAccountsFragment extends LoginBaseFragment implements
         mListener = null;
     }
 
+    /**
+     * Defines the interaction with the hosting {@link Activity}.
+     */
     public interface FragmentInteractionListener {
+        /**
+         * Changes the fragment to the type specified.
+         * @param type the fragment type to change to
+         */
         void changeFragment(int type);
 
+        /**
+         * Starts the login with Google process.
+         */
         void loginWithGoogle();
     }
 }

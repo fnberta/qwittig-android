@@ -21,6 +21,7 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
@@ -70,8 +71,8 @@ import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.ComparatorParseUserIgnoreCase;
 import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.RatesHelper;
-import ch.giantific.qwittig.data.helpers.save.PurchaseSaveHelper;
+import ch.giantific.qwittig.workerfragments.RatesWorker;
+import ch.giantific.qwittig.workerfragments.save.PurchaseSaveWorker;
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.domain.models.ItemRow;
 import ch.giantific.qwittig.domain.models.Receipt;
@@ -91,7 +92,7 @@ import ch.giantific.qwittig.ui.listeners.SwipeDismissTouchListener;
 import ch.giantific.qwittig.ui.widgets.ListCheckBox;
 import ch.giantific.qwittig.utils.CameraUtils;
 import ch.giantific.qwittig.utils.DateUtils;
-import ch.giantific.qwittig.utils.HelperUtils;
+import ch.giantific.qwittig.utils.WorkerUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
@@ -115,7 +116,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     public static final int RESULT_PURCHASE_DISCARDED = 6;
     public static final int RESULT_PURCHASE_DRAFT_DELETED = 7;
     public static final String PURCHASE_NOTE_FRAGMENT = "PURCHASE_NOTE_FRAGMENT";
-    static final String PURCHASE_SAVE_HELPER = "PURCHASE_SAVE_HELPER";
+    static final String PURCHASE_SAVE_WORKER = "PURCHASE_SAVE_WORKER";
     static final int INTENT_REQUEST_IMAGE_CAPTURE = 1;
     // add permission to manifest when enabling!
     static final boolean USE_CUSTOM_CAMERA = false;
@@ -124,7 +125,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     private static final String USER_PICKER_DIALOG = "USER_PICKER_DIALOG";
     private static final String MANUAL_EXCHANGE_RATE_DIALOG = "MANUAL_EXCHANGE_RATE_DIALOG";
     private static final String EDIT_NOTE_DIALOG = "EDIT_NOTE_DIALOG";
-    private static final String RATES_HELPER = "RATES_HELPER";
+    private static final String RATES_WORKER = "RATES_WORKER";
     private static final String PURCHASE_RECEIPT_FRAGMENT = "PURCHASE_RECEIPT_FRAGMENT";
     private static final String STATE_ROW_COUNT = "STATE_ROW_COUNT";
     private static final String STATE_STORE_SELECTED = "STATE_STORE_SELECTED";
@@ -197,7 +198,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mUserRepo = new ParseUserRepository();
+        mUserRepo = new ParseUserRepository(getActivity());
         updateCurrentUserAndGroup();
         mCurrentGroupCurrency = mCurrentGroup.getCurrency();
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -406,7 +407,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         } else {
             mExchangeRate = mSharedPreferences.getFloat(mCurrencySelected, 1);
             if (mExchangeRate == 1) {
-                fetchExchangeRateWithHelper();
+                fetchExchangeRateWithWorker();
             } else {
                 long lastFetched = mSharedPreferences.getLong(EXCHANGE_RATE_LAST_FETCHED_TIME, 0);
                 long currentTime = System.currentTimeMillis();
@@ -415,7 +416,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
                     editor.putLong(EXCHANGE_RATE_LAST_FETCHED_TIME, currentTime);
                     editor.apply();
 
-                    fetchExchangeRateWithHelper();
+                    fetchExchangeRateWithWorker();
                 } else {
                     setExchangeRate();
                 }
@@ -457,43 +458,43 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         setExchangeRate();
     }
 
-    private void fetchExchangeRateWithHelper() {
+    private void fetchExchangeRateWithWorker() {
         mIsFetchingExchangeRates = true;
 
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment ratesHelper = HelperUtils.findHelper(fragmentManager, RATES_HELPER);
+        Fragment ratesWorker = WorkerUtils.findWorker(fragmentManager, RATES_WORKER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-        if (ratesHelper == null) {
-            ratesHelper = RatesHelper.newInstance(mCurrentGroupCurrency);
+        if (ratesWorker == null) {
+            ratesWorker = RatesWorker.newInstance(mCurrentGroupCurrency);
 
             fragmentManager.beginTransaction()
-                    .add(ratesHelper, RATES_HELPER)
+                    .add(ratesWorker, RATES_WORKER)
                     .commit();
         }
     }
 
     /**
-     * Removes the retained helper fragment and indicates that there is no long a currency fetch
+     * Removes the retained worker fragment and indicates that there is no long a currency fetch
      * going on.
      *
      * @param errorMessage the network error message
      */
-    public void onRatesFetchFailed(@NonNull String errorMessage) {
-        HelperUtils.removeHelper(getFragmentManager(), RATES_HELPER);
+    public void onRatesFetchFailed(@StringRes int errorMessage) {
+        WorkerUtils.removeWorker(getFragmentManager(), RATES_WORKER);
         mIsFetchingExchangeRates = false;
     }
 
     /**
-     * Removes the retained helper fragment and saves the fetched currencies in SharedPrefenreces.
+     * Removes the retained worker fragment and saves the fetched currencies in SharedPrefenreces.
      * <p/>
      * Sets the currency spinner to the exchange rate selected.
      *
      * @param exchangeRates the fetched exchange rates
      */
     public void onRatesFetched(@NonNull Map<String, Float> exchangeRates) {
-        HelperUtils.removeHelper(getFragmentManager(), RATES_HELPER);
+        WorkerUtils.removeWorker(getFragmentManager(), RATES_WORKER);
 
         mIsFetchingExchangeRates = false;
         SharedPreferences.Editor editor = mSharedPreferences.edit();
@@ -532,8 +533,8 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
         ListCheckBox cbEnabled = setupItemRowCheckbox(itemRowView);
         mLayoutTotalItemRow.addView(itemRowView);
 
-        ItemRow itemRow = new ItemRow(getActivity().getApplicationContext(), itemRowView,
-                idCounter, tilItemName, tilItemPrice, cbEnabled);
+        ItemRow itemRow = new ItemRow(getActivity(), itemRowView, idCounter, tilItemName,
+                tilItemPrice, cbEnabled);
         mItemRows.add(itemRow);
 
         return itemRow;
@@ -1155,13 +1156,12 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
                 } else if (ParseUtils.isTestUser(mCurrentUser)) {
                     mListener.showAccountCreateDialog();
                 } else if (!Utils.isConnected(getActivity())) {
-                    showErrorSnackbar(ParseErrorHandler.getErrorMessage(getActivity(),
-                            ParseException.CONNECTION_FAILED));
+                    showErrorSnackbar(R.string.toast_no_connection);
                 } else {
                     mIsSaving = true;
                     mListener.startProgressAnim();
                     setPurchase();
-                    savePurchaseWithHelper();
+                    savePurchaseWithWorker();
                 }
             }
         }
@@ -1220,40 +1220,38 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
      */
     protected abstract void setPurchase();
 
-    private void savePurchaseWithHelper() {
+    private void savePurchaseWithWorker() {
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment purchaseSaveHelper = HelperUtils.findHelper(fragmentManager, PURCHASE_SAVE_HELPER);
+        Fragment purchaseSaveWorker = WorkerUtils.findWorker(fragmentManager, PURCHASE_SAVE_WORKER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-        if (purchaseSaveHelper == null) {
-            purchaseSaveHelper = getSaveHelper();
+        if (purchaseSaveWorker == null) {
+            purchaseSaveWorker = getSaveWorker();
 
             fragmentManager.beginTransaction()
-                    .add(purchaseSaveHelper, PURCHASE_SAVE_HELPER)
+                    .add(purchaseSaveWorker, PURCHASE_SAVE_WORKER)
                     .commit();
         }
     }
 
-    protected abstract PurchaseSaveHelper getSaveHelper();
+    protected abstract PurchaseSaveWorker getSaveWorker();
 
     /**
-     * Provides an error handler for error codes. Passes the code to the generic error handler,
-     * shows the user an appropriate error message and hides loading indicators.
+     * Provides an error handler for error codes. Shows the user an appropriate error message and
+     * hides loading indicators.
      *
-     * @param errorCode the error code of the exception to handle
+     * @param errorMessage the error message from the exception to handle
      */
     @CallSuper
-    public void onSaveError(int errorCode) {
-        final Activity context = getActivity();
-        ParseErrorHandler.handleParseError(context, errorCode);
-        showErrorSnackbar(ParseErrorHandler.getErrorMessage(context, errorCode));
+    public void onSaveError(@StringRes int errorMessage) {
+        showErrorSnackbar(errorMessage);
 
         mIsSaving = false;
         mListener.stopProgressAnim();
     }
 
-    void showErrorSnackbar(@NonNull String message) {
+    void showErrorSnackbar(@StringRes int message) {
         Snackbar.make(mButtonAddRow, message, Snackbar.LENGTH_LONG).show();
     }
 
@@ -1272,13 +1270,13 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     /**
-     * Passes the error code to the error handler and removes the retained helper fragment.
+     * Removes the retained worker fragment.
      *
-     * @param errorCode the error code of the exception thrown in the process
+     * @param errorMessage the error code of the exception thrown in the process
      */
-    public void onPurchaseSaveFailed(int errorCode) {
-        onSaveError(errorCode);
-        HelperUtils.removeHelper(getFragmentManager(), PURCHASE_SAVE_HELPER);
+    public void onPurchaseSaveFailed(@StringRes int errorMessage) {
+        onSaveError(errorMessage);
+        WorkerUtils.removeWorker(getFragmentManager(), PURCHASE_SAVE_WORKER);
     }
 
     /**
@@ -1312,7 +1310,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
             @Override
             public void done(@Nullable ParseException e) {
                 if (e != null) {
-                    onSaveError(e.getCode());
+                    onSaveError(ParseErrorHandler.handleParseError(getActivity(), e));
                     return;
                 }
 

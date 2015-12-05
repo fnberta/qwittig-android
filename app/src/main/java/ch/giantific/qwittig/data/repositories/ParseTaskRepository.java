@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.data.repositories;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.Task;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
@@ -29,8 +31,8 @@ import ch.giantific.qwittig.domain.repositories.TaskRepository;
  */
 public class ParseTaskRepository extends ParseGenericRepository implements TaskRepository {
 
-    public ParseTaskRepository() {
-        super();
+    public ParseTaskRepository(Context context) {
+        super(context);
     }
 
     @Override
@@ -113,7 +115,7 @@ public class ParseTaskRepository extends ParseGenericRepository implements TaskR
             @Override
             public void done(@NonNull final List<ParseObject> parseObjects, @Nullable ParseException e) {
                 if (e != null) {
-                    listener.onTaskUpdateFailed(e.getCode());
+                    listener.onTaskUpdateFailed(ParseErrorHandler.handleParseError(mContext, e));
                     return;
                 }
 
@@ -121,7 +123,7 @@ public class ParseTaskRepository extends ParseGenericRepository implements TaskR
                     @Override
                     public void done(@Nullable ParseException e) {
                         if (e != null) {
-                            listener.onTaskUpdateFailed(e.getCode());
+                            listener.onTaskUpdateFailed(ParseErrorHandler.handleParseError(mContext, e));
                             return;
                         }
 
@@ -129,7 +131,7 @@ public class ParseTaskRepository extends ParseGenericRepository implements TaskR
                             @Override
                             public void done(@Nullable ParseException e) {
                                 if (e != null) {
-                                    listener.onTaskUpdateFailed(e.getCode());
+                                    listener.onTaskUpdateFailed(ParseErrorHandler.handleParseError(mContext, e));
                                     return;
                                 }
 

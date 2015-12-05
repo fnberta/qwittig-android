@@ -95,7 +95,7 @@ public class TaskEditFragment extends TaskAddFragment implements
     }
 
     private void fetchOldTask() {
-        TaskRepository repo = new ParseTaskRepository();
+        TaskRepository repo = new ParseTaskRepository(getActivity());
         repo.fetchTaskDataLocalAsync(mEditTaskId, this);
     }
 

@@ -2,12 +2,13 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.helpers.query;
+package ch.giantific.qwittig.workerfragments.query;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.data.rest.CloudCodeClient;
@@ -16,17 +17,18 @@ import ch.giantific.qwittig.domain.repositories.UserRepository;
 /**
  * Performs an online query to the Parse.com database to query users.
  * <p/>
- * Subclass of {@link BaseQueryHelper}.
+ * Subclass of {@link BaseQueryWorker}.
  */
-public class UserQueryHelper extends BaseQueryHelper implements
+public class UserQueryWorker extends BaseQueryWorker implements
         CloudCodeClient.CloudCodeListener,
         UserRepository.UpdateUsersListener {
 
-    private static final String LOG_TAG = UserQueryHelper.class.getSimpleName();
+    private static final String LOG_TAG = UserQueryWorker.class.getSimpleName();
     @Nullable
-    private HelperInteractionListener mListener;
+    private WorkerInteractionListener mListener;
+    private UserRepository mUserRepo;
 
-    public UserQueryHelper() {
+    public UserQueryWorker() {
         // empty default constructor
     }
 
@@ -34,7 +36,7 @@ public class UserQueryHelper extends BaseQueryHelper implements
     public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (HelperInteractionListener) activity;
+            mListener = (WorkerInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement DialogInteractionListener");
@@ -46,7 +48,8 @@ public class UserQueryHelper extends BaseQueryHelper implements
         super.onCreate(savedInstanceState);
 
         if (setCurrentGroups()) {
-            CloudCodeClient cloudCode = new CloudCodeClient();
+            mUserRepo = new ParseUserRepository(getActivity());
+            CloudCodeClient cloudCode = new CloudCodeClient(getActivity());
             cloudCode.calcUserBalances(this);
         } else {
             if (mListener != null) {
@@ -57,14 +60,13 @@ public class UserQueryHelper extends BaseQueryHelper implements
 
     @Override
     public void onCloudFunctionReturned(Object result) {
-        UserRepository userRepo = new ParseUserRepository();
-        userRepo.updateUsersAsync(mCurrentUserGroups, this);
+        mUserRepo.updateUsersAsync(mCurrentUserGroups, this);
     }
 
     @Override
-    public void onCloudFunctionFailed(int errorCode) {
+    public void onCloudFunctionFailed(@StringRes int errorMessage) {
         if (mListener != null) {
-            mListener.onUserUpdateFailed(errorCode);
+            mListener.onUserUpdateFailed(errorMessage);
         }
     }
 
@@ -76,9 +78,9 @@ public class UserQueryHelper extends BaseQueryHelper implements
     }
 
     @Override
-    public void onUserUpdateFailed(int errorCode) {
+    public void onUserUpdateFailed(@StringRes int errorMessage) {
         if (mListener != null) {
-            mListener.onUserUpdateFailed(errorCode);
+            mListener.onUserUpdateFailed(errorMessage);
         }
     }
 
@@ -91,7 +93,7 @@ public class UserQueryHelper extends BaseQueryHelper implements
     /**
      * Defines the actions to take after users are updated.
      */
-    public interface HelperInteractionListener {
+    public interface WorkerInteractionListener {
         /**
          * Handles the successful update of local users including the re-calcuation of their
          * balances.
@@ -101,8 +103,8 @@ public class UserQueryHelper extends BaseQueryHelper implements
         /**
          * Handles the failed update of local users.
          *
-         * @param errorCode the error code of the exception thrown in the process
+         * @param errorMessage the error message from the exception thrown in the process
          */
-        void onUserUpdateFailed(int errorCode);
+        void onUserUpdateFailed(@StringRes int errorMessage);
     }
 }

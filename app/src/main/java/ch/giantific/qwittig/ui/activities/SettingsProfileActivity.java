@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,7 +23,7 @@ import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import ch.berta.fabio.fabprogress.FabProgress;
 import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.account.UnlinkThirdPartyHelper;
+import ch.giantific.qwittig.workerfragments.account.UnlinkThirdPartyWorker;
 import ch.giantific.qwittig.domain.models.Avatar;
 import ch.giantific.qwittig.ui.fragments.SettingsProfileFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.DiscardChangesDialogFragment;
@@ -41,7 +42,7 @@ import ch.giantific.qwittig.ui.fragments.dialogs.DiscardChangesDialogFragment;
 public class SettingsProfileActivity extends BaseActivity implements
         SettingsProfileFragment.FragmentInteractionListener,
         DiscardChangesDialogFragment.DialogInteractionListener,
-        UnlinkThirdPartyHelper.HelperInteractionListener {
+        UnlinkThirdPartyWorker.WorkerInteractionListener {
 
     private static final String STATE_PROFILE_FRAGMENT = "STATE_PROFILE_FRAGMENT";
     private static final String LOG_TAG = SettingsProfileActivity.class.getSimpleName();
@@ -149,8 +150,8 @@ public class SettingsProfileActivity extends BaseActivity implements
     }
 
     @Override
-    public void onThirdPartyUnlinkFailed(int errorCode) {
-        mSettingsProfileFragment.onThirdPartyUnlinkFailed(errorCode);
+    public void onThirdPartyUnlinkFailed(@StringRes int errorMessage) {
+        mSettingsProfileFragment.onThirdPartyUnlinkFailed(errorMessage);
     }
 
     @Override

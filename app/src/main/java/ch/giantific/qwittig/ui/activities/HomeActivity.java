@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -34,12 +35,11 @@ import java.util.List;
 import ch.berta.fabio.fabspeeddial.FabMenu;
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.LocalBroadcast;
-import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.group.InvitedGroupHelper;
-import ch.giantific.qwittig.data.helpers.query.MoreQueryHelper;
-import ch.giantific.qwittig.data.helpers.query.PurchaseQueryHelper;
+import ch.giantific.qwittig.workerfragments.group.InvitedGroupWorker;
+import ch.giantific.qwittig.workerfragments.query.MoreQueryWorker;
+import ch.giantific.qwittig.workerfragments.query.PurchaseQueryWorker;
 import ch.giantific.qwittig.domain.models.parse.Config;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
@@ -51,7 +51,7 @@ import ch.giantific.qwittig.ui.fragments.PurchaseAddFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GoPremiumDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.ui.fragments.dialogs.GroupJoinDialogFragment;
-import ch.giantific.qwittig.utils.HelperUtils;
+import ch.giantific.qwittig.utils.WorkerUtils;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.ViewUtils;
 
@@ -71,12 +71,12 @@ public class HomeActivity extends BaseNavDrawerActivity implements
         GroupJoinDialogFragment.DialogInteractionListener,
         GroupCreateDialogFragment.DialogInteractionListener,
         GoPremiumDialogFragment.DialogInteractionListener,
-        PurchaseQueryHelper.HelperInteractionListener,
-        InvitedGroupHelper.HelperInteractionListener,
-        MoreQueryHelper.HelperInteractionListener {
+        PurchaseQueryWorker.WorkerInteractionListener,
+        InvitedGroupWorker.WorkerInteractionListener,
+        MoreQueryWorker.WorkerInteractionListener {
 
     private static final String LOG_TAG = HomeActivity.class.getSimpleName();
-    private static final String INVITED_GROUP_HELPER = "INVITED_GROUP_HELPER";
+    private static final String INVITED_GROUP_WORKER = "INVITED_GROUP_WORKER";
     private static final String URI_INVITED_GROUP_ID = "group";
     private static final String STATE_PURCHASE_FRAGMENT = "STATE_PURCHASE_FRAGMENT";
     private static final String STATE_DRAFTS_FRAGMENT = "STATE_DRAFTS_FRAGMENT";
@@ -216,38 +216,36 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
             // add currentUser to the ACL and Role of the group he is invited to, otherwise we
             // won't be able to query the group
-            getInvitedGroupWithHelper();
+            getInvitedGroupWithWorker();
         }
     }
 
-    private void getInvitedGroupWithHelper() {
+    private void getInvitedGroupWithWorker() {
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment invitedGroupHelper = HelperUtils.findHelper(fragmentManager, INVITED_GROUP_HELPER);
+        Fragment invitedGroupWorker = WorkerUtils.findWorker(fragmentManager, INVITED_GROUP_WORKER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-        if (invitedGroupHelper == null) {
-            invitedGroupHelper = InvitedGroupHelper.newInstance(mInvitedGroupId);
+        if (invitedGroupWorker == null) {
+            invitedGroupWorker = InvitedGroupWorker.newInstance(mInvitedGroupId);
 
             fragmentManager.beginTransaction()
-                    .add(invitedGroupHelper, INVITED_GROUP_HELPER)
+                    .add(invitedGroupWorker, INVITED_GROUP_WORKER)
                     .commit();
         }
     }
 
     @Override
-    public void onInvitedGroupQueryFailed(int errorCode) {
-        ParseErrorHandler.handleParseError(this, errorCode);
-        Snackbar.make(mFabMenu, ParseErrorHandler.getErrorMessage(this, errorCode),
-                Snackbar.LENGTH_LONG).show();
-        HelperUtils.removeHelper(getFragmentManager(), INVITED_GROUP_HELPER);
+    public void onInvitedGroupQueryFailed(@StringRes int errorMessage) {
+        Snackbar.make(mFabMenu, errorMessage, Snackbar.LENGTH_LONG).show();
+        WorkerUtils.removeWorker(getFragmentManager(), INVITED_GROUP_WORKER);
     }
 
     @Override
     public void onEmailNotValid() {
         Snackbar.make(mFabMenu, getString(R.string.toast_group_invite_not_valid),
                 Snackbar.LENGTH_LONG).show();
-        HelperUtils.removeHelper(getFragmentManager(), INVITED_GROUP_HELPER);
+        WorkerUtils.removeWorker(getFragmentManager(), INVITED_GROUP_WORKER);
     }
 
     @Override
@@ -277,9 +275,9 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     public void onJoinInvitedGroupSelected() {
         showProgressDialog(getString(R.string.progress_switch_groups));
 
-        InvitedGroupHelper helper = (InvitedGroupHelper)
-                HelperUtils.findHelper(getFragmentManager(), INVITED_GROUP_HELPER);
-        helper.joinInvitedGroup(mInvitedGroup);
+        InvitedGroupWorker invitedGroupWorker = (InvitedGroupWorker)
+                WorkerUtils.findWorker(getFragmentManager(), INVITED_GROUP_WORKER);
+        invitedGroupWorker.joinInvitedGroup(mInvitedGroup);
     }
 
     private void showProgressDialog(String message) {
@@ -288,7 +286,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
     @Override
     public void onUserJoinedGroup() {
-        HelperUtils.removeHelper(getFragmentManager(), INVITED_GROUP_HELPER);
+        WorkerUtils.removeWorker(getFragmentManager(), INVITED_GROUP_WORKER);
         dismissProgressDialog();
         Snackbar.make(mFabMenu, getString(R.string.toast_group_added, mInvitedGroup.getName()),
                 Snackbar.LENGTH_LONG).show();
@@ -319,17 +317,16 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onUserJoinGroupFailed(int errorCode) {
-        ParseErrorHandler.handleParseError(this, errorCode);
-        Snackbar.make(mFabMenu, ParseErrorHandler.getErrorMessage(this, errorCode), Snackbar.LENGTH_LONG).show();
-        HelperUtils.removeHelper(getFragmentManager(), INVITED_GROUP_HELPER);
+    public void onUserJoinGroupFailed(@StringRes int errorMessage) {
+        Snackbar.make(mFabMenu, errorMessage, Snackbar.LENGTH_LONG).show();
+        WorkerUtils.removeWorker(getFragmentManager(), INVITED_GROUP_WORKER);
 
         dismissProgressDialog();
     }
 
     @Override
     public void onDiscardInvitationSelected() {
-        HelperUtils.removeHelper(getFragmentManager(), INVITED_GROUP_HELPER);
+        WorkerUtils.removeWorker(getFragmentManager(), INVITED_GROUP_WORKER);
 
         mInvitedGroup.removeUserInvited(mCurrentUser.getUsername());
         mInvitedGroup.saveEventually();
@@ -407,7 +404,7 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onPurchaseUpdateFailed(int errorCode) {
+    public void onPurchaseUpdateFailed(@StringRes int errorCode) {
         mHomePurchasesFragment.onPurchaseUpdateFailed(errorCode);
     }
 
@@ -429,8 +426,8 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onMoreObjectsLoadFailed(int errorCode) {
-        mHomePurchasesFragment.onMoreObjectsLoadFailed(errorCode);
+    public void onMoreObjectsLoadFailed(@StringRes int errorMessage) {
+        mHomePurchasesFragment.onMoreObjectsLoadFailed(errorMessage);
     }
 
     @Override

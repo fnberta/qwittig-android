@@ -2,12 +2,13 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.helpers.query;
+package ch.giantific.qwittig.workerfragments.query;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 
 import ch.giantific.qwittig.data.repositories.ParseTaskRepository;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
@@ -15,16 +16,16 @@ import ch.giantific.qwittig.domain.repositories.TaskRepository;
 /**
  * Performs an online query to the Parse.com database to query tasks.
  * <p/>
- * Subclass of {@link BaseQueryHelper}.
+ * Subclass of {@link BaseQueryWorker}.
  */
-public class TaskQueryHelper extends BaseQueryHelper implements
+public class TaskQueryWorker extends BaseQueryWorker implements
         TaskRepository.UpdateTasksListener {
 
-    private static final String LOG_TAG = TaskQueryHelper.class.getSimpleName();
+    private static final String LOG_TAG = TaskQueryWorker.class.getSimpleName();
     @Nullable
-    private HelperInteractionListener mListener;
+    private WorkerInteractionListener mListener;
 
-    public TaskQueryHelper() {
+    public TaskQueryWorker() {
         // empty default constructor
     }
 
@@ -32,7 +33,7 @@ public class TaskQueryHelper extends BaseQueryHelper implements
     public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (HelperInteractionListener) activity;
+            mListener = (WorkerInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement DialogInteractionListener");
@@ -44,7 +45,7 @@ public class TaskQueryHelper extends BaseQueryHelper implements
         super.onCreate(savedInstanceState);
 
         if (setCurrentGroups()) {
-            TaskRepository repo = new ParseTaskRepository();
+            TaskRepository repo = new ParseTaskRepository(getActivity());
             repo.updateTasksAsync(mCurrentUserGroups, this);
         } else {
             if (mListener != null) {
@@ -61,9 +62,9 @@ public class TaskQueryHelper extends BaseQueryHelper implements
     }
 
     @Override
-    public void onTaskUpdateFailed(int errorCode) {
+    public void onTaskUpdateFailed(@StringRes int errorMessage) {
         if (mListener != null) {
-            mListener.onTasksUpdatedFailed(errorCode);
+            mListener.onTasksUpdatedFailed(errorMessage);
         }
     }
 
@@ -76,7 +77,7 @@ public class TaskQueryHelper extends BaseQueryHelper implements
     /**
      * Defines the actions to take after tasks are updated.
      */
-    public interface HelperInteractionListener {
+    public interface WorkerInteractionListener {
         /**
          * Handles the successful update of local tasks.
          */
@@ -85,8 +86,8 @@ public class TaskQueryHelper extends BaseQueryHelper implements
         /**
          * Handles the failed update of local tasks.
          *
-         * @param errorCode the error code of the exception thrown in the process
+         * @param errorMessage the error message from the exception thrown in the process
          */
-        void onTasksUpdatedFailed(int errorCode);
+        void onTasksUpdatedFailed(@StringRes int errorMessage);
     }
 }

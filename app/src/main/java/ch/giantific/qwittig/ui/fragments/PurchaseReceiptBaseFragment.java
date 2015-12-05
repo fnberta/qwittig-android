@@ -5,6 +5,8 @@
 package ch.giantific.qwittig.ui.fragments;
 
 import android.os.Bundle;
+import android.support.annotation.StringRes;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.ContentLoadingProgressBar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -41,7 +43,7 @@ public abstract class PurchaseReceiptBaseFragment extends BaseFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mPurchaseRepo = new ParsePurchaseRepository();
+        mPurchaseRepo = new ParsePurchaseRepository(getActivity());
     }
 
     @Override
@@ -60,12 +62,15 @@ public abstract class PurchaseReceiptBaseFragment extends BaseFragment {
 
     void setReceiptImage(ParseFile receiptFile) {
         if (receiptFile != null) {
+            // TODO: does not handle configuration changes
             receiptFile.getDataInBackground(new GetDataCallback() {
                 @Override
                 public void done(byte[] bytes, ParseException e) {
                     if (e != null) {
                         mProgressBar.hide();
-                        ParseErrorHandler.handleParseError(getActivity(), e.getCode());
+                        Snackbar.make(mImageViewReceipt,
+                                ParseErrorHandler.handleParseError(getActivity(), e),
+                                Snackbar.LENGTH_LONG);
                         return;
                     }
 

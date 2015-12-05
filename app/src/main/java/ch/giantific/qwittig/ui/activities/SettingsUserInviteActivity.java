@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.transition.Transition;
@@ -19,7 +20,7 @@ import android.view.View;
 import ch.berta.fabio.fabprogress.FabProgress;
 import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.group.InviteUsersHelper;
+import ch.giantific.qwittig.workerfragments.group.InviteUsersWorker;
 import ch.giantific.qwittig.ui.fragments.SettingsUserInviteFragment;
 import ch.giantific.qwittig.ui.listeners.TransitionListenerAdapter;
 import ch.giantific.qwittig.utils.Utils;
@@ -34,7 +35,7 @@ import ch.giantific.qwittig.utils.Utils;
  */
 public class SettingsUserInviteActivity extends BaseActivity implements
         SettingsUserInviteFragment.FragmentInteractionListener,
-        InviteUsersHelper.HelperInteractionListener {
+        InviteUsersWorker.WorkerInteractionListener {
 
     private static final String STATE_USER_INVITE_FRAGMENT = "STATE_USER_INVITE_FRAGMENT";
     private SettingsUserInviteFragment mSettingsUserInviteFragment;
@@ -141,8 +142,8 @@ public class SettingsUserInviteActivity extends BaseActivity implements
     }
 
     @Override
-    public void onInviteUsersFailed(int errorCode) {
-        mSettingsUserInviteFragment.onInviteUsersFailed(errorCode);
+    public void onInviteUsersFailed(@StringRes int errorMessage) {
+        mSettingsUserInviteFragment.onInviteUsersFailed(errorMessage);
     }
 
     @Override

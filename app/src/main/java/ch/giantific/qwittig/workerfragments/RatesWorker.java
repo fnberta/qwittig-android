@@ -2,16 +2,18 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.helpers;
+package ch.giantific.qwittig.workerfragments;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.text.TextUtils;
 
 import java.util.Map;
 
+import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.rest.ExchangeRatesClient;
 import ch.giantific.qwittig.domain.models.rates.CurrencyRates;
 import retrofit.Callback;
@@ -21,28 +23,28 @@ import retrofit.client.Response;
 /**
  * Fetches the newest currency exchange rates online using {@link ExchangeRatesClient.ExchangeRates}.
  * <p/>
- * Subclass of {@link BaseHelper}.
+ * Subclass of {@link BaseWorker}.
  */
-public class RatesHelper extends BaseHelper {
+public class RatesWorker extends BaseWorker {
 
-    private static final String LOG_TAG = RatesHelper.class.getSimpleName();
+    private static final String LOG_TAG = RatesWorker.class.getSimpleName();
     private static final String BUNDLE_BASE_CURRENCY = "BUNDLE_BASE_CURRENCY";
     @Nullable
-    private HelperInteractionListener mListener;
+    private WorkerInteractionListener mListener;
 
-    public RatesHelper() {
+    public RatesWorker() {
         // empty default constructor
     }
 
     /**
-     * Returns a new instance of {@link RatesHelper} with a base currency code as an argument.
+     * Returns a new instance of {@link RatesWorker} with a base currency code as an argument.
      *
      * @param baseCurrency the currency to use as a base for the foreign currencies
-     * @return a new instance of {@link RatesHelper}
+     * @return a new instance of {@link RatesWorker}
      */
     @NonNull
-    public static RatesHelper newInstance(@NonNull String baseCurrency) {
-        RatesHelper fragment = new RatesHelper();
+    public static RatesWorker newInstance(@NonNull String baseCurrency) {
+        RatesWorker fragment = new RatesWorker();
         Bundle args = new Bundle();
         args.putString(BUNDLE_BASE_CURRENCY, baseCurrency);
         fragment.setArguments(args);
@@ -53,7 +55,7 @@ public class RatesHelper extends BaseHelper {
     public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (HelperInteractionListener) activity;
+            mListener = (WorkerInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement DialogInteractionListener");
@@ -72,7 +74,7 @@ public class RatesHelper extends BaseHelper {
 
         if (TextUtils.isEmpty(baseCurrency)) {
             if (mListener != null) {
-                mListener.onRatesFetchFailed("");
+                mListener.onRatesFetchFailed(R.string.toast_unknown_error);
             }
 
             return;
@@ -94,7 +96,7 @@ public class RatesHelper extends BaseHelper {
             @Override
             public void failure(@NonNull RetrofitError error) {
                 if (mListener != null) {
-                    mListener.onRatesFetchFailed(error.getLocalizedMessage());
+                    mListener.onRatesFetchFailed(R.string.toast_unknown_error);
                 }
             }
         });
@@ -109,7 +111,7 @@ public class RatesHelper extends BaseHelper {
     /**
      * Defines the actions to take after the rates were fetched or after the fetch failed.
      */
-    public interface HelperInteractionListener {
+    public interface WorkerInteractionListener {
         /**
          * Handles the successful fetch of current currency exchange rates.
          *
@@ -122,6 +124,6 @@ public class RatesHelper extends BaseHelper {
          *
          * @param errorMessage the error message received from the server
          */
-        void onRatesFetchFailed(@NonNull String errorMessage);
+        void onRatesFetchFailed(@StringRes int errorMessage);
     }
 }

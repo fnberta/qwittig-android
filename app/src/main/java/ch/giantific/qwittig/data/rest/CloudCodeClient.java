@@ -4,8 +4,10 @@
 
 package ch.giantific.qwittig.data.rest;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 
 import com.parse.FunctionCallback;
 import com.parse.ParseCloud;
@@ -16,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 
 /**
@@ -45,13 +48,16 @@ public class CloudCodeClient {
     public static final String PARAM_ID_TOKEN = "idToken";
     public static final String LOGIN_WITH_GOOGLE = "loginWithGoogle";
 
-    public CloudCodeClient() {
+    private Context mContext;
+
+    public CloudCodeClient(Context context) {
+        mContext = context.getApplicationContext();
     }
 
     private void onFunctionReturned(Object o, @Nullable ParseException e,
                                     @NonNull CloudCodeListener listener) {
         if (e != null) {
-            listener.onCloudFunctionFailed(e.getCode());
+            listener.onCloudFunctionFailed(ParseErrorHandler.handleParseError(mContext, e));
             return;
         }
 
@@ -351,8 +357,8 @@ public class CloudCodeClient {
         /**
          * Handles the case the function returned with an error.
          *
-         * @param errorCode the error code of the exception thrown by the function
+         * @param errorMessage the error message from the exception thrown by the function
          */
-        void onCloudFunctionFailed(int errorCode);
+        void onCloudFunctionFailed(@StringRes int errorMessage);
     }
 }

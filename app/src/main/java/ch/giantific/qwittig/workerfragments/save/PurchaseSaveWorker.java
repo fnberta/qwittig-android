@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.helpers.save;
+package ch.giantific.qwittig.workerfragments.save;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.text.TextUtils;
 
 import com.bumptech.glide.Glide;
@@ -23,33 +24,34 @@ import com.parse.SaveCallback;
 
 import java.util.List;
 
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.domain.models.Receipt;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.Item;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.data.helpers.BaseHelper;
+import ch.giantific.qwittig.workerfragments.BaseWorker;
 
 /**
  * Saves a {@link Purchase} object and its corresponding receipt image as a {@link ParseFile}.
  * <p/>
- * Subclass of {@link BaseHelper}.
+ * Subclass of {@link BaseWorker}.
  */
-public class PurchaseSaveHelper extends BaseHelper {
+public class PurchaseSaveWorker extends BaseWorker {
 
-    private static final String LOG_TAG = PurchaseSaveHelper.class.getSimpleName();
+    private static final String LOG_TAG = PurchaseSaveWorker.class.getSimpleName();
     @Nullable
-    HelperInteractionListener mListener;
+    WorkerInteractionListener mListener;
     Purchase mPurchase;
     @Nullable
     String mReceiptPath;
 
-    public PurchaseSaveHelper() {
+    public PurchaseSaveWorker() {
         // empty default constructor
     }
 
     /**
-     * Constructs a new {@link PurchaseSaveHelper} with a {@link Purchase} object and optionally
+     * Constructs a new {@link PurchaseSaveWorker} with a {@link Purchase} object and optionally
      * the path to the receipt image as parameters.
      * <p/>
      * Using a non empty constructor to be able to pass a {@link com.parse.ParseObject}.
@@ -60,7 +62,7 @@ public class PurchaseSaveHelper extends BaseHelper {
      * @param receiptPath the path to the receipt image
      */
     @SuppressLint("ValidFragment")
-    public PurchaseSaveHelper(@NonNull Purchase purchase, @Nullable String receiptPath) {
+    public PurchaseSaveWorker(@NonNull Purchase purchase, @Nullable String receiptPath) {
         mPurchase = purchase;
         mReceiptPath = receiptPath;
     }
@@ -69,7 +71,7 @@ public class PurchaseSaveHelper extends BaseHelper {
     public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (HelperInteractionListener) activity;
+            mListener = (WorkerInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement DialogInteractionListener");
@@ -110,7 +112,7 @@ public class PurchaseSaveHelper extends BaseHelper {
             @Override
             public void done(@Nullable ParseException e) {
                 if (e != null && mListener != null) {
-                    mListener.onPurchaseSaveFailed(e.getCode());
+                    mListener.onPurchaseSaveFailed(ParseErrorHandler.handleParseError(getActivity(), e));
                     return;
                 }
 
@@ -133,7 +135,7 @@ public class PurchaseSaveHelper extends BaseHelper {
                     convertPrices(false);
 
                     if (mListener != null) {
-                        mListener.onPurchaseSaveFailed(e.getCode());
+                        mListener.onPurchaseSaveFailed(ParseErrorHandler.handleParseError(getActivity(), e));
                     }
                     return;
                 }
@@ -186,7 +188,7 @@ public class PurchaseSaveHelper extends BaseHelper {
      * Defines the action to take after the purchases are saved and pinned to the local data store
      * or after the save process failed.
      */
-    public interface HelperInteractionListener {
+    public interface WorkerInteractionListener {
         /**
          * Handles the successful save and pin to the local data store.
          */
@@ -195,8 +197,8 @@ public class PurchaseSaveHelper extends BaseHelper {
         /**
          * Handles the failed save or pin to the local data store.
          *
-         * @param errorCode the error code of the exception thrown in the process
+         * @param errorMessage the error message from the exception thrown in the process
          */
-        void onPurchaseSaveFailed(int errorCode);
+        void onPurchaseSaveFailed(@StringRes int errorMessage);
     }
 }

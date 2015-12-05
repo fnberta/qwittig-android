@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -26,15 +27,15 @@ import java.util.List;
 
 import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.query.MoreQueryHelper;
-import ch.giantific.qwittig.data.helpers.query.PurchaseQueryHelper;
+import ch.giantific.qwittig.workerfragments.query.MoreQueryWorker;
+import ch.giantific.qwittig.workerfragments.query.PurchaseQueryWorker;
 import ch.giantific.qwittig.data.repositories.ParsePurchaseRepository;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.ui.activities.BaseActivity;
 import ch.giantific.qwittig.ui.activities.PurchaseDetailsActivity;
 import ch.giantific.qwittig.ui.adapters.PurchasesRecyclerAdapter;
-import ch.giantific.qwittig.utils.HelperUtils;
+import ch.giantific.qwittig.utils.WorkerUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -49,7 +50,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment implem
 
     public static final String INTENT_PURCHASE_ID = "INTENT_PURCHASE_ID";
     private static final String STATE_IS_LOADING_MORE = "STATE_IS_LOADING_MORE";
-    private static final String PURCHASE_QUERY_HELPER = "PURCHASE_QUERY_HELPER";
+    private static final String PURCHASE_QUERY_WORKER = "PURCHASE_QUERY_WORKER";
     private static final String LOG_TAG = HomePurchasesFragment.class.getSimpleName();
     private PurchaseRepository mPurchaseRepo;
     private PurchasesRecyclerAdapter mRecyclerAdapter;
@@ -64,7 +65,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment implem
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mPurchaseRepo = new ParsePurchaseRepository();
+        mPurchaseRepo = new ParsePurchaseRepository(getActivity());
 
         if (savedInstanceState != null) {
             mIsLoadingMore = savedInstanceState.getBoolean(STATE_IS_LOADING_MORE, false);
@@ -113,36 +114,33 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment implem
     protected void onlineQuery() {
         if (!Utils.isConnected(getActivity())) {
             setLoading(false);
-            showErrorSnackbar(getString(R.string.toast_no_connection), getOnlineQueryRetryAction());
+            showErrorSnackbar(R.string.toast_no_connection, getOnlineQueryRetryAction());
             return;
         }
 
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment PurchaseQueryHelper = HelperUtils.findHelper(fragmentManager, PURCHASE_QUERY_HELPER);
+        Fragment PurchaseQueryWorker = WorkerUtils.findWorker(fragmentManager, PURCHASE_QUERY_WORKER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-        if (PurchaseQueryHelper == null) {
-            PurchaseQueryHelper = new PurchaseQueryHelper();
+        if (PurchaseQueryWorker == null) {
+            PurchaseQueryWorker = new PurchaseQueryWorker();
 
             fragmentManager.beginTransaction()
-                    .add(PurchaseQueryHelper, PURCHASE_QUERY_HELPER)
+                    .add(PurchaseQueryWorker, PURCHASE_QUERY_WORKER)
                     .commit();
         }
     }
 
     /**
-     * Passes the error code to the generic error handler, shows the user an error message and
-     * removes the retained helper fragment and loading indicators.
+     * Shows the user the error message and removes the retained worker fragment and loading
+     * indicators.
      *
-     * @param errorCode the error code of the exception thrown in the process
+     * @param errorMessage the error message from the exception thrown in the process
      */
-    public void onPurchaseUpdateFailed(int errorCode) {
-        Activity context = getActivity();
-        ParseErrorHandler.handleParseError(context, errorCode);
-        showErrorSnackbar(ParseErrorHandler.getErrorMessage(context, errorCode),
-                getOnlineQueryRetryAction());
-        HelperUtils.removeHelper(getFragmentManager(), PURCHASE_QUERY_HELPER);
+    public void onPurchaseUpdateFailed(@StringRes int errorMessage) {
+        showErrorSnackbar(errorMessage, getOnlineQueryRetryAction());
+        WorkerUtils.removeWorker(getFragmentManager(), PURCHASE_QUERY_WORKER);
 
         setLoading(false);
     }
@@ -155,10 +153,10 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment implem
     }
 
     /**
-     * Removes the retained helper fragment and loading indicators.
+     * Removes the retained worker fragment and loading indicators.
      */
     public void onAllPurchasesUpdated() {
-        HelperUtils.removeHelper(getFragmentManager(), PURCHASE_QUERY_HELPER);
+        WorkerUtils.removeWorker(getFragmentManager(), PURCHASE_QUERY_WORKER);
         setLoading(false);
     }
 
@@ -215,32 +213,32 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment implem
         mIsLoadingMore = true;
         final int skip = mPurchases.size();
         mRecyclerAdapter.showLoadMoreIndicator();
-        loadMoreDataWithHelper(skip);
+        loadMoreDataWithWorker(skip);
     }
 
-    private void loadMoreDataWithHelper(int skip) {
+    private void loadMoreDataWithWorker(int skip) {
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment moreQueryHelper = HelperUtils.findHelper(fragmentManager,
-                MoreQueryHelper.MORE_QUERY_HELPER);
+        Fragment moreQueryWorker = WorkerUtils.findWorker(fragmentManager,
+                MoreQueryWorker.MORE_QUERY_WORKER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-        if (moreQueryHelper == null) {
-            moreQueryHelper = MoreQueryHelper.newInstance(Purchase.CLASS, skip);
+        if (moreQueryWorker == null) {
+            moreQueryWorker = MoreQueryWorker.newInstance(Purchase.CLASS, skip);
             fragmentManager.beginTransaction()
-                    .add(moreQueryHelper, MoreQueryHelper.MORE_QUERY_HELPER)
+                    .add(moreQueryWorker, MoreQueryWorker.MORE_QUERY_WORKER)
                     .commit();
         }
     }
 
     /**
-     * Adds the newly pinned purchases to the list, removes the retained helper fragment and
+     * Adds the newly pinned purchases to the list, removes the retained worker fragment and
      * loading indicators.
      *
      * @param purchases the newly pinned purchases
      */
     public void onMoreObjectsLoaded(@NonNull List<ParseObject> purchases) {
-        HelperUtils.removeHelper(getFragmentManager(), MoreQueryHelper.MORE_QUERY_HELPER);
+        WorkerUtils.removeWorker(getFragmentManager(), MoreQueryWorker.MORE_QUERY_WORKER);
 
         mIsLoadingMore = false;
         mRecyclerAdapter.hideLoadMoreIndicator();
@@ -248,21 +246,19 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment implem
     }
 
     /**
-     * Passes the error code to the generic error handler, shows the user an error message and
-     * removes the retained helper fragment and loading indicators.
+     * Shows the user the error message and removes the retained worker fragment and loading
+     * indicators.
      *
-     * @param errorCode the error code of the exception thrown during the process
+     * @param errorMessage the error message from the exception thrown during the process
      */
-    public void onMoreObjectsLoadFailed(int errorCode) {
-        Activity context = getActivity();
-        ParseErrorHandler.handleParseError(context, errorCode);
-        showErrorSnackbar(ParseErrorHandler.getErrorMessage(context, errorCode), new View.OnClickListener() {
+    public void onMoreObjectsLoadFailed(@StringRes int errorMessage) {
+        showErrorSnackbar(errorMessage, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 loadMoreData();
             }
         });
-        HelperUtils.removeHelper(getFragmentManager(), MoreQueryHelper.MORE_QUERY_HELPER);
+        WorkerUtils.removeWorker(getFragmentManager(), MoreQueryWorker.MORE_QUERY_WORKER);
 
         mIsLoadingMore = false;
         mRecyclerAdapter.hideLoadMoreIndicator();

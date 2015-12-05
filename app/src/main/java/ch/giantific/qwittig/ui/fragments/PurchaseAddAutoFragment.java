@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,7 +26,7 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.ItemRow;
 import ch.giantific.qwittig.domain.models.ocr.OcrItem;
 import ch.giantific.qwittig.domain.models.ocr.OcrPurchase;
-import ch.giantific.qwittig.data.helpers.OcrHelper;
+import ch.giantific.qwittig.workerfragments.OcrWorker;
 import ch.giantific.qwittig.ui.activities.PurchaseAddActivity;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.Utils;
@@ -42,7 +43,7 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
 
     private static final String STATE_ITEMS_SET = "STATE_ITEMS_SET";
     private static final String LOG_TAG = PurchaseAddAutoFragment.class.getSimpleName();
-    private static final String OCR_HELPER = "OCR_HELPER";
+    private static final String OCR_WORKER = "OCR_WORKER";
     private View mProgressView;
     private View mMainView;
     private boolean mOcrValuesAreSet;
@@ -146,7 +147,7 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
             case INTENT_REQUEST_IMAGE_CAPTURE:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
-                        doReceiptOcrWithHelper();
+                        doReceiptOcrWithWorker();
                         break;
                     case Activity.RESULT_CANCELED:
                         setResultForSnackbar(RESULT_PURCHASE_DISCARDED);
@@ -162,22 +163,22 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
         // don't show anything in auto mode
     }
 
-    private void doReceiptOcrWithHelper() {
+    private void doReceiptOcrWithWorker() {
         if (!Utils.isConnected(getActivity())) {
-            onOcrFailed(getString(R.string.toast_no_connection));
+            onOcrFailed(R.string.toast_no_connection);
             return;
         }
 
         FragmentManager fragmentManager = getFragmentManager();
-        OcrHelper ocrHelper = (OcrHelper) fragmentManager.findFragmentByTag(OCR_HELPER);
+        OcrWorker ocrWorker = (OcrWorker) fragmentManager.findFragmentByTag(OCR_WORKER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-        if (ocrHelper == null) {
-            ocrHelper = OcrHelper.newInstance(mReceiptImagePath);
+        if (ocrWorker == null) {
+            ocrWorker = OcrWorker.newInstance(mReceiptImagePath);
 
             fragmentManager.beginTransaction()
-                    .add(ocrHelper, OCR_HELPER)
+                    .add(ocrWorker, OCR_WORKER)
                     .commit();
         }
     }
@@ -196,7 +197,7 @@ public class PurchaseAddAutoFragment extends PurchaseAddFragment {
      *
      * @param errorMessage the error message received from the server
      */
-    public void onOcrFailed(@NonNull String errorMessage) {
+    public void onOcrFailed(@StringRes int errorMessage) {
         Snackbar.make(mButtonAddRow, errorMessage, Snackbar.LENGTH_LONG).show();
         showMainScreen();
     }

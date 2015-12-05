@@ -43,7 +43,7 @@ public abstract class BaseRecyclerViewFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
 
         updateCurrentUserAndGroup();
-        mGroupRepository = new ParseGroupRepository();
+        mGroupRepository = new ParseGroupRepository(getActivity());
     }
 
     @Override

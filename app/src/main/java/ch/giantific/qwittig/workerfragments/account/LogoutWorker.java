@@ -2,12 +2,13 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.helpers.account;
+package ch.giantific.qwittig.workerfragments.account;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.api.ResultCallback;
@@ -19,7 +20,9 @@ import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-import ch.giantific.qwittig.data.helpers.BaseHelper;
+import ch.giantific.qwittig.ParseErrorHandler;
+import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.workerfragments.BaseWorker;
 import ch.giantific.qwittig.data.rest.CloudCodeClient;
 import ch.giantific.qwittig.domain.models.parse.Installation;
 import ch.giantific.qwittig.domain.models.parse.User;
@@ -27,22 +30,22 @@ import ch.giantific.qwittig.domain.models.parse.User;
 /**
  * Resets the device's {@link ParseInstallation} object and logs out the current user.
  * <p/>
- * Subclass of {@link BaseHelper}.
+ * Subclass of {@link BaseWorker}.
  */
-public class LogoutHelper extends BaseGoogleApiLoginHelper {
+public class LogoutWorker extends BaseGoogleApiLoginWorker {
 
     private static final String BUNDLE_DELETE_USER = "BUNDLE_DELETE_USER";
 
     @Nullable
-    private HelperInteractionListener mListener;
+    private WorkerInteractionListener mListener;
     private boolean mDeleteUser;
 
-    public LogoutHelper() {
+    public LogoutWorker() {
         // empty default constructor
     }
 
-    public static LogoutHelper newInstance(boolean deleteUser) {
-        LogoutHelper fragment = new LogoutHelper();
+    public static LogoutWorker newInstance(boolean deleteUser) {
+        LogoutWorker fragment = new LogoutWorker();
         Bundle args = new Bundle();
         args.putBoolean(BUNDLE_DELETE_USER, deleteUser);
         fragment.setArguments(args);
@@ -53,7 +56,7 @@ public class LogoutHelper extends BaseGoogleApiLoginHelper {
     public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (HelperInteractionListener) activity;
+            mListener = (WorkerInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement DialogInteractionListener");
@@ -92,7 +95,7 @@ public class LogoutHelper extends BaseGoogleApiLoginHelper {
     @Override
     protected void onGoogleClientConnectionFailed() {
         if (mListener != null) {
-            mListener.onLogoutFailed(0);
+            mListener.onLogoutFailed(R.string.toast_no_connection);
         }
     }
 
@@ -102,9 +105,9 @@ public class LogoutHelper extends BaseGoogleApiLoginHelper {
     }
 
     @Override
-    protected void onGoogleUnlinkFailed(int errorCode) {
+    protected void onGoogleUnlinkFailed() {
         if (mListener != null) {
-            mListener.onLogoutFailed(errorCode);
+            mListener.onLogoutFailed(R.string.toast_unknown_error);
         }
     }
 
@@ -122,7 +125,7 @@ public class LogoutHelper extends BaseGoogleApiLoginHelper {
     }
 
     private void deleteUserInCloud() {
-        CloudCodeClient cloudCode = new CloudCodeClient();
+        CloudCodeClient cloudCode = new CloudCodeClient(getActivity());
         cloudCode.deleteAccount(new CloudCodeClient.CloudCodeListener() {
             @Override
             public void onCloudFunctionReturned(Object result) {
@@ -130,9 +133,9 @@ public class LogoutHelper extends BaseGoogleApiLoginHelper {
             }
 
             @Override
-            public void onCloudFunctionFailed(int errorCode) {
+            public void onCloudFunctionFailed(@StringRes int errorMessage) {
                 if (mListener != null) {
-                    mListener.onLogoutFailed(errorCode);
+                    mListener.onLogoutFailed(errorMessage);
                 }
             }
         });
@@ -149,7 +152,7 @@ public class LogoutHelper extends BaseGoogleApiLoginHelper {
             public void done(@Nullable ParseException e) {
                 if (e != null) {
                     if (mListener != null) {
-                        mListener.onLogoutFailed(e.getCode());
+                        mListener.onLogoutFailed(ParseErrorHandler.handleParseError(getActivity(), e));
                     }
                     return;
                 }
@@ -188,7 +191,7 @@ public class LogoutHelper extends BaseGoogleApiLoginHelper {
         if (e != null) {
             currentUser.undeleteUserFields(username);
             if (mListener != null) {
-                mListener.onLogoutFailed(e.getCode());
+                mListener.onLogoutFailed(ParseErrorHandler.handleParseError(getActivity(), e));
             }
 
             return;
@@ -222,13 +225,13 @@ public class LogoutHelper extends BaseGoogleApiLoginHelper {
     /**
      * Defines the actions to take after the user was logged out or the logout failed
      */
-    public interface HelperInteractionListener {
+    public interface WorkerInteractionListener {
         /**
          * Handles the failed logout of a user.
          *
-         * @param errorCode the error code of the exception thrown during the process
+         * @param errorMessage the error message from the exception thrown during the process
          */
-        void onLogoutFailed(int errorCode);
+        void onLogoutFailed(@StringRes int errorMessage);
 
         /**
          * Handles a successful logout of the user.

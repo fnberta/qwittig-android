@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.helpers.account;
+package ch.giantific.qwittig.workerfragments.account;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,20 +14,20 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
-import ch.giantific.qwittig.data.helpers.BaseHelper;
+import ch.giantific.qwittig.workerfragments.BaseWorker;
 
 /**
  * Handles the unlinking of the user's account from this Facebook or Google profile.
  */
-public abstract class BaseGoogleApiLoginHelper extends BaseHelper implements
+public abstract class BaseGoogleApiLoginWorker extends BaseWorker implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    private static final String LOG_TAG = BaseGoogleApiLoginHelper.class.getSimpleName();
+    private static final String LOG_TAG = BaseGoogleApiLoginWorker.class.getSimpleName();
     @Nullable
     GoogleApiClient mGoogleApiClient;
 
-    public BaseGoogleApiLoginHelper() {
+    public BaseGoogleApiLoginWorker() {
         // empty default constructor
     }
 
@@ -71,7 +71,7 @@ public abstract class BaseGoogleApiLoginHelper extends BaseHelper implements
                 if (status.isSuccess()) {
                     onGoogleUnlinkSuccessful();
                 } else {
-                    onGoogleUnlinkFailed(status.getStatusCode());
+                    onGoogleUnlinkFailed();
                 }
             }
         });
@@ -79,7 +79,7 @@ public abstract class BaseGoogleApiLoginHelper extends BaseHelper implements
 
     protected abstract void onGoogleUnlinkSuccessful();
 
-    protected abstract void onGoogleUnlinkFailed(int errorCode);
+    protected abstract void onGoogleUnlinkFailed();
 
     @Override
     public void onDestroy() {

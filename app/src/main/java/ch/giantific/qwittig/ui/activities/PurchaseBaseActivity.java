@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewCompat;
 import android.transition.Transition;
@@ -25,8 +26,8 @@ import java.util.Map;
 import ch.berta.fabio.fabprogress.FabProgress;
 import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.RatesHelper;
-import ch.giantific.qwittig.data.helpers.save.PurchaseSaveHelper;
+import ch.giantific.qwittig.workerfragments.RatesWorker;
+import ch.giantific.qwittig.workerfragments.save.PurchaseSaveWorker;
 import ch.giantific.qwittig.ui.fragments.PurchaseBaseFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseNoteFragment;
 import ch.giantific.qwittig.ui.fragments.PurchaseReceiptAddFragment;
@@ -50,8 +51,8 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         PurchaseUserSelectionDialogFragment.DialogInteractionListener,
         StoreSelectionDialogFragment.DialogInteractionListener,
         PurchaseReceiptAddFragment.FragmentInteractionListener,
-        RatesHelper.HelperInteractionListener,
-        PurchaseSaveHelper.HelperInteractionListener,
+        RatesWorker.WorkerInteractionListener,
+        PurchaseSaveWorker.WorkerInteractionListener,
         ManualExchangeRateDialogFragment.DialogInteractionListener,
         PurchaseNoteFragment.FragmentInteractionListener,
         PurchaseNoteEditDialogFragment.DialogInteractionListener {
@@ -263,7 +264,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     }
 
     @Override
-    public void onRatesFetchFailed(@NonNull String errorMessage) {
+    public void onRatesFetchFailed(@StringRes int errorMessage) {
         mPurchaseFragment.onRatesFetchFailed(errorMessage);
     }
 
@@ -273,8 +274,8 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
     }
 
     @Override
-    public void onPurchaseSaveFailed(int errorCode) {
-        mPurchaseFragment.onPurchaseSaveFailed(errorCode);
+    public void onPurchaseSaveFailed(@StringRes int errorMessage) {
+        mPurchaseFragment.onPurchaseSaveFailed(errorMessage);
     }
 
     @Override

@@ -8,6 +8,7 @@ import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -22,7 +23,7 @@ import java.util.List;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Month;
 import ch.giantific.qwittig.domain.models.stats.Stats;
-import ch.giantific.qwittig.data.helpers.group.StatsHelper;
+import ch.giantific.qwittig.workerfragments.group.StatsWorker;
 import ch.giantific.qwittig.services.ParseQueryService;
 import ch.giantific.qwittig.ui.adapters.StringResSpinnerAdapter;
 import ch.giantific.qwittig.ui.adapters.ThemedArrayAdapter;
@@ -42,7 +43,7 @@ import ch.giantific.qwittig.ui.fragments.StatsStoresFragment;
  */
 public class StatsActivity extends BaseNavDrawerActivity implements
         StatsBaseFragment.FragmentInteractionListener,
-        StatsHelper.HelperInteractionListener {
+        StatsWorker.WorkerInteractionListener {
 
     private static final String LOG_TAG = StatsActivity.class.getSimpleName();
     private static final String STATE_STATS_FRAGMENT = "STATE_STATS_FRAGMENT";
@@ -275,9 +276,9 @@ public class StatsActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onStatsCalculationFailed(int statsType, int errorCode) {
+    public void onStatsCalculationFailed(int statsType, @StringRes int errorMessage) {
         if (mStatsFragment != null) {
-            mStatsFragment.onStatsCalculationFailed(errorCode);
+            mStatsFragment.onStatsCalculationFailed(errorMessage);
         }
     }
 

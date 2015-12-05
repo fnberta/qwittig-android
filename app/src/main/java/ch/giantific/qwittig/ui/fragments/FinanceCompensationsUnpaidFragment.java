@@ -10,6 +10,7 @@ import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -29,9 +30,6 @@ import ch.berta.fabio.fabprogress.FabProgress;
 import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
 import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.group.SettlementHelper;
-import ch.giantific.qwittig.data.helpers.reminder.CompensationRemindHelper;
-import ch.giantific.qwittig.data.helpers.save.CompensationSaveHelper;
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.domain.models.parse.Compensation;
 import ch.giantific.qwittig.domain.models.parse.User;
@@ -39,9 +37,12 @@ import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.ui.adapters.CompensationsUnpaidRecyclerAdapter;
 import ch.giantific.qwittig.ui.fragments.dialogs.CompensationChangeAmountDialogFragment;
-import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
+import ch.giantific.qwittig.utils.WorkerUtils;
+import ch.giantific.qwittig.workerfragments.group.SettlementWorker;
+import ch.giantific.qwittig.workerfragments.reminder.CompensationRemindWorker;
+import ch.giantific.qwittig.workerfragments.save.CompensationSaveWorker;
 
 /**
  * Displays all currently open unpaid compensations in the group in card based {@link RecyclerView}
@@ -55,13 +56,13 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         CompensationsUnpaidRecyclerAdapter.AdapterInteractionListener,
         CompensationRepository.GetCompensationsLocalListener {
 
-    private static final String SETTLEMENT_HELPER = "SETTLEMENT_HELPER";
+    private static final String SETTLEMENT_WORKER = "SETTLEMENT_WORKER";
     private static final String BUNDLE_AUTO_START_NEW = "BUNDLE_AUTO_START_NEW";
     private static final String STATE_COMPENSATIONS_LOADING = "STATE_COMPENSATIONS_LOADING";
     private static final String STATE_IS_CALCULATING_NEW = "STATE_IS_CALCULATING_NEW";
-    private static final String COMPENSATION_UNPAID_QUERY_HELPER = "COMPENSATION_UNPAID_QUERY_HELPER";
-    private static final String COMPENSATION_SAVE_HELPER = "COMPENSATION_SAVE_HELPER_";
-    private static final String COMPENSATION_REMIND_HELPER = "COMPENSATION_REMIND_HELPER_";
+    private static final String COMPENSATION_UNPAID_QUERY_WORKER = "COMPENSATION_UNPAID_QUERY_WORKER";
+    private static final String COMPENSATION_SAVE_WORKER = "COMPENSATION_SAVE_WORKER_";
+    private static final String COMPENSATION_REMIND_WORKER = "COMPENSATION_REMIND_WORKER_";
     private static final String LOG_TAG = FinanceCompensationsUnpaidFragment.class.getSimpleName();
     private TextView mTextViewEmptyTitle;
     private TextView mTextViewEmptySubtitle;
@@ -99,7 +100,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mUserRepo = new ParseUserRepository();
+        mUserRepo = new ParseUserRepository(getActivity());
 
         Bundle args = getArguments();
         if (args != null) {
@@ -163,8 +164,8 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
 
     @NonNull
     @Override
-    protected String getQueryHelperTag() {
-        return COMPENSATION_UNPAID_QUERY_HELPER;
+    protected String getQueryWorkerTag() {
+        return COMPENSATION_UNPAID_QUERY_WORKER;
     }
 
     @Override
@@ -176,7 +177,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     public void onCompensationsUpdated() {
         super.onCompensationsUpdated();
 
-        HelperUtils.removeHelper(getFragmentManager(), COMPENSATION_UNPAID_QUERY_HELPER);
+        WorkerUtils.removeWorker(getFragmentManager(), COMPENSATION_UNPAID_QUERY_WORKER);
         setLoading(false);
     }
 
@@ -255,7 +256,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         }
 
         if (!Utils.isConnected(getActivity())) {
-            showErrorSnackbar(getString(R.string.toast_no_connection), getSettlementErrorRetryAction());
+            showErrorSnackbar(R.string.toast_no_connection, getSettlementErrorRetryAction());
             return;
         }
 
@@ -270,10 +271,10 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
                     if (mCompensationsAll.isEmpty()) {
                         mIsCalculatingNew = true;
                         mFabProgressNewSettlement.startProgress();
-                        calculateNewSettlementWithHelper();
+                        calculateNewSettlementWithWorker();
                     } else {
                         Snackbar.make(mRecyclerView, R.string.toast_compensation_finish_old,
-                                        Snackbar.LENGTH_LONG).show();
+                                Snackbar.LENGTH_LONG).show();
                     }
                 } else {
                     Snackbar.make(mRecyclerView, R.string.toast_only_user_in_group,
@@ -292,40 +293,37 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         };
     }
 
-    private void calculateNewSettlementWithHelper() {
+    private void calculateNewSettlementWithWorker() {
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment settlementHelper = HelperUtils.findHelper(fragmentManager, SETTLEMENT_HELPER);
+        Fragment settlementWorker = WorkerUtils.findWorker(fragmentManager, SETTLEMENT_WORKER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-        if (settlementHelper == null) {
-            settlementHelper = SettlementHelper.newInstance(false);
+        if (settlementWorker == null) {
+            settlementWorker = SettlementWorker.newInstance(false);
 
             fragmentManager.beginTransaction()
-                    .add(settlementHelper, SETTLEMENT_HELPER)
+                    .add(settlementWorker, SETTLEMENT_WORKER)
                     .commit();
         }
     }
 
     /**
-     * Removes the retained helper fragment after a new settlement was created.
+     * Removes the retained worker fragment after a new settlement was created.
      */
     public void onNewSettlementCreated() {
-        HelperUtils.removeHelper(getFragmentManager(), SETTLEMENT_HELPER);
+        WorkerUtils.removeWorker(getFragmentManager(), SETTLEMENT_WORKER);
     }
 
     /**
-     * Passes the error code to the generic error handler, shows the user an error message and
-     * removes the retained helper fragment and loading indicators.
+     * Shows the user the error message and removes the retained worker fragment and loading
+     * indicators.
      *
-     * @param errorCode the error code of the exception thrown in the process
+     * @param errorMessage the error message from the exception thrown in the process
      */
-    public void onNewSettlementCreationFailed(int errorCode) {
-        final Activity context = getActivity();
-        ParseErrorHandler.handleParseError(context, errorCode);
-        showErrorSnackbar(ParseErrorHandler.getErrorMessage(context, errorCode),
-                getSettlementErrorRetryAction());
-        HelperUtils.removeHelper(getFragmentManager(), SETTLEMENT_HELPER);
+    public void onNewSettlementCreationFailed(@StringRes int errorMessage) {
+        showErrorSnackbar(errorMessage, getSettlementErrorRetryAction());
+        WorkerUtils.removeWorker(getFragmentManager(), SETTLEMENT_WORKER);
 
         mFabProgressNewSettlement.stopProgress();
     }
@@ -383,45 +381,41 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
 
         setCompensationLoading(compensation, compensationId, position, true);
         compensation.setPaid(true);
-        saveCompensationWithHelper(compensation);
+        saveCompensationWithWorker(compensation);
     }
 
-    private void saveCompensationWithHelper(@NonNull ParseObject compensation) {
+    private void saveCompensationWithWorker(@NonNull ParseObject compensation) {
         FragmentManager fragmentManager = getFragmentManager();
         String compensationId = compensation.getObjectId();
-        Fragment saveHelper = HelperUtils.findHelper(fragmentManager, getSaveHelperTag(compensationId));
+        Fragment saveWorker = WorkerUtils.findWorker(fragmentManager, getSaveWorkerTag(compensationId));
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-        if (saveHelper == null) {
-            saveHelper = new CompensationSaveHelper(compensation);
+        if (saveWorker == null) {
+            saveWorker = new CompensationSaveWorker(compensation);
 
             fragmentManager.beginTransaction()
-                    .add(saveHelper, getSaveHelperTag(compensationId))
+                    .add(saveWorker, getSaveWorkerTag(compensationId))
                     .commit();
         }
     }
 
     @NonNull
-    private String getSaveHelperTag(String compensationId) {
-        return COMPENSATION_SAVE_HELPER + compensationId;
+    private String getSaveWorkerTag(String compensationId) {
+        return COMPENSATION_SAVE_WORKER + compensationId;
     }
 
     /**
-     * Passes the error code to the generic error handler, shows the user an error message and
-     * removes the retained helper fragment and loading indicators. Also removes the compensation
-     * from the list of loading compensations.
+     * Shows the user an error message and removes the retained worker fragment and loading
+     * indicators. Also removes the compensation from the list of loading compensations.
      *
      * @param compensation the compensation which failed to save
-     * @param errorCode    the error code of the exception thrown in the process
+     * @param errorMessage the error message from the exception thrown in the process
      */
-    public void onCompensationSaveFailed(@NonNull ParseObject compensation, int errorCode) {
-        final Activity context = getActivity();
-        ParseErrorHandler.handleParseError(context, errorCode);
-        Snackbar.make(mFabProgressNewSettlement, ParseErrorHandler.getErrorMessage(context, errorCode),
-                Snackbar.LENGTH_LONG).show();
+    public void onCompensationSaveFailed(@NonNull ParseObject compensation, @StringRes int errorMessage) {
+        Snackbar.make(mFabProgressNewSettlement, errorMessage, Snackbar.LENGTH_LONG).show();
         String compensationId = compensation.getObjectId();
-        HelperUtils.removeHelper(getFragmentManager(), getSaveHelperTag(compensationId));
+        WorkerUtils.removeWorker(getFragmentManager(), getSaveWorkerTag(compensationId));
 
         // position might have changed
         int compPosition = mCompensations.indexOf(compensation);
@@ -429,14 +423,14 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     }
 
     /**
-     * Removes the retained helper fragment and removes the compensation from the list of loading
+     * Removes the retained worker fragment and removes the compensation from the list of loading
      * compensations and also from the main {@link RecyclerView} list as it is now paid.
      *
      * @param compensation the now paid compensation
      */
     public void onCompensationSaved(@NonNull ParseObject compensation) {
         String compensationId = compensation.getObjectId();
-        HelperUtils.removeHelper(getFragmentManager(), getSaveHelperTag(compensationId));
+        WorkerUtils.removeWorker(getFragmentManager(), getSaveWorkerTag(compensationId));
 
         removeItemFromList(compensation);
         mLoadingCompensations.remove(compensationId);
@@ -473,42 +467,42 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         }
 
         setCompensationLoading(compensation, compensationId, position, true);
-        remindUserWithHelper(CompensationRemindHelper.TYPE_REMIND, compensationId);
+        remindUserWithWorker(CompensationRemindWorker.TYPE_REMIND, compensationId);
     }
 
-    private void remindUserWithHelper(@CompensationRemindHelper.RemindType int remindType,
+    private void remindUserWithWorker(@CompensationRemindWorker.RemindType int remindType,
                                       @NonNull String compensationId) {
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment compensationRemindHelper = HelperUtils.findHelper(fragmentManager,
-                getRemindHelperTag(compensationId));
+        Fragment compensationRemindWorker = WorkerUtils.findWorker(fragmentManager,
+                getRemindWorkerTag(compensationId));
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-        if (compensationRemindHelper == null) {
-            compensationRemindHelper = CompensationRemindHelper.newInstance(remindType, compensationId);
+        if (compensationRemindWorker == null) {
+            compensationRemindWorker = CompensationRemindWorker.newInstance(remindType, compensationId);
 
             fragmentManager.beginTransaction()
-                    .add(compensationRemindHelper, getRemindHelperTag(compensationId))
+                    .add(compensationRemindWorker, getRemindWorkerTag(compensationId))
                     .commit();
         }
     }
 
     @NonNull
-    private String getRemindHelperTag(String compensationId) {
-        return COMPENSATION_REMIND_HELPER + compensationId;
+    private String getRemindWorkerTag(String compensationId) {
+        return COMPENSATION_REMIND_WORKER + compensationId;
     }
 
     /**
-     * Removes the retained helper fragment and displays a confirmation message to the user.
+     * Removes the retained worker fragment and displays a confirmation message to the user.
      *
      * @param remindType     the type of the reminder, remind to pay or remind that paid
      * @param compensationId the compensation for which a reminder was sent
      */
     public void onUserReminded(int remindType, @NonNull String compensationId) {
-        HelperUtils.removeHelper(getFragmentManager(), getRemindHelperTag(compensationId));
+        WorkerUtils.removeWorker(getFragmentManager(), getRemindWorkerTag(compensationId));
 
         switch (remindType) {
-            case CompensationRemindHelper.TYPE_REMIND: {
+            case CompensationRemindWorker.TYPE_REMIND: {
                 Compensation compensation = setCompensationLoading(compensationId, false);
                 if (compensation != null) {
                     User payer = compensation.getPayer();
@@ -520,7 +514,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
                 }
                 break;
             }
-            case CompensationRemindHelper.TYPE_REMIND_PAID: {
+            case CompensationRemindWorker.TYPE_REMIND_PAID: {
                 Compensation compensation = setCompensationLoading(compensationId, false);
                 if (compensation != null) {
                     User beneficiary = compensation.getBeneficiary();
@@ -535,19 +529,15 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     }
 
     /**
-     * Passes the error code to the generic error handler, shows the user an error message and
-     * removes the retained helper fragment and loading indicators. Also removes the compensation
-     * from the list of loading compensations.
+     * Shows the user an error message and removes the retained worker fragment and loading
+     * indicators. Also removes the compensation rom the list of loading compensations.
      *
      * @param compensationId the object id of the compensation a reminder was sent
-     * @param errorCode      the error code of the exception thrown in the process
+     * @param errorMessage   the error message from the exception thrown in the process
      */
-    public void onUserRemindFailed(@NonNull String compensationId, int errorCode) {
-        final Activity context = getActivity();
-        ParseErrorHandler.handleParseError(context, errorCode);
-        Snackbar.make(mRecyclerView, ParseErrorHandler.getErrorMessage(context, errorCode),
-                Snackbar.LENGTH_LONG).show();
-        HelperUtils.removeHelper(getFragmentManager(), getRemindHelperTag(compensationId));
+    public void onUserRemindFailed(@NonNull String compensationId, @StringRes int errorMessage) {
+        Snackbar.make(mRecyclerView, errorMessage, Snackbar.LENGTH_LONG).show();
+        WorkerUtils.removeWorker(getFragmentManager(), getRemindWorkerTag(compensationId));
 
         setCompensationLoading(compensationId, false);
     }
@@ -572,7 +562,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
         }
 
         setCompensationLoading(compensation, compensationId, position, true);
-        remindUserWithHelper(CompensationRemindHelper.TYPE_REMIND_PAID, compensationId);
+        remindUserWithWorker(CompensationRemindWorker.TYPE_REMIND_PAID, compensationId);
     }
 
     @Override

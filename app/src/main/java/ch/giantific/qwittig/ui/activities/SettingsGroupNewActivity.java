@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -21,7 +22,7 @@ import android.view.View;
 import ch.berta.fabio.fabprogress.FabProgress;
 import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.group.CreateGroupHelper;
+import ch.giantific.qwittig.workerfragments.group.CreateGroupWorker;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.ui.fragments.SettingsGroupNewFragment;
 import ch.giantific.qwittig.ui.listeners.TransitionListenerAdapter;
@@ -37,7 +38,7 @@ import ch.giantific.qwittig.utils.Utils;
  */
 public class SettingsGroupNewActivity extends BaseActivity implements
         SettingsGroupNewFragment.FragmentInteractionListener,
-        CreateGroupHelper.HelperInteractionListener {
+        CreateGroupWorker.WorkerInteractionListener {
 
     public static final String RESULT_DATA_GROUP = "RESULT_DATA_GROUP";
     private static final String STATE_GROUP_NEW_FRAGMENT = "STATE_GROUP_NEW_FRAGMENT";
@@ -147,8 +148,8 @@ public class SettingsGroupNewActivity extends BaseActivity implements
     }
 
     @Override
-    public void onCreateNewGroupFailed(int errorCode) {
-        mSettingsGroupNewFragment.onCreateNewGroupFailed(errorCode);
+    public void onCreateNewGroupFailed(@StringRes int errorMessage) {
+        mSettingsGroupNewFragment.onCreateNewGroupFailed(errorMessage);
     }
 
     @Override
@@ -157,8 +158,8 @@ public class SettingsGroupNewActivity extends BaseActivity implements
     }
 
     @Override
-    public void onInviteUsersFailed(int errorCode) {
-        mSettingsGroupNewFragment.onInviteUsersFailed(errorCode);
+    public void onInviteUsersFailed(@StringRes int errorMessage) {
+        mSettingsGroupNewFragment.onInviteUsersFailed(errorMessage);
     }
 
     @Override

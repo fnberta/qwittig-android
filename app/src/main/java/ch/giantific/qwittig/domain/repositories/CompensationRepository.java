@@ -6,6 +6,7 @@ package ch.giantific.qwittig.domain.repositories;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 
 import com.parse.ParseObject;
 
@@ -125,9 +126,9 @@ public interface CompensationRepository {
         /**
          * Called when the compensations load failed.
          *
-         * @param errorCode the error code from the exception thrown in the process
+         * @param errorMessage the error message from the exception thrown in the process
          */
-        void onCompensationsPaidOnlineLoadFailed(int errorCode);
+        void onCompensationsPaidOnlineLoadFailed(@StringRes int errorMessage);
     }
 
     /**
@@ -155,8 +156,8 @@ public interface CompensationRepository {
         /**
          * Called when compensations update failed.
          *
-         * @param errorCode the error code from the exception thrown in the process
+         * @param errorMessage the error message from the exception thrown in the process
          */
-        void onCompensationUpdateFailed(int errorCode);
+        void onCompensationUpdateFailed(@StringRes int errorMessage);
     }
 }

@@ -4,13 +4,13 @@
 
 package ch.giantific.qwittig.ui.fragments;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.LoaderManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.view.View;
@@ -20,15 +20,14 @@ import com.parse.ParseUser;
 
 import java.util.List;
 
-import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.account.LoginHelper;
 import ch.giantific.qwittig.domain.models.parse.Installation;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.utils.HelperUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.ViewUtils;
+import ch.giantific.qwittig.utils.WorkerUtils;
+import ch.giantific.qwittig.workerfragments.account.LoginWorker;
 
 /**
  * Provides an abstract base class for the login screen views.
@@ -40,7 +39,7 @@ import ch.giantific.qwittig.utils.ViewUtils;
  */
 public abstract class LoginBaseFragment extends BaseFragment {
 
-    static final String LOGIN_HELPER = "LOGIN_HELPER";
+    static final String LOGIN_WORKER = "LOGIN_WORKER";
     private static final String STATE_LOADING = "STATE_LOADING";
     View mViewMain;
     private View mViewProgress;
@@ -79,7 +78,7 @@ public abstract class LoginBaseFragment extends BaseFragment {
         outState.putBoolean(STATE_LOADING, isLoading);
     }
 
-    final void loginWithEmailWithHelper(@NonNull final String email, @NonNull String password) {
+    final void loginWithEmailWithWorker(@NonNull final String email, @NonNull String password) {
         if (!Utils.isConnected(getActivity())) {
             Snackbar.make(mViewMain, R.string.toast_no_connection, Snackbar.LENGTH_LONG).show();
             return;
@@ -88,33 +87,29 @@ public abstract class LoginBaseFragment extends BaseFragment {
         setLoading(true);
 
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment loginHelper = HelperUtils.findHelper(fragmentManager, LOGIN_HELPER);
+        Fragment loginWorker = WorkerUtils.findWorker(fragmentManager, LOGIN_WORKER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-        if (loginHelper == null) {
-            loginHelper = LoginHelper.newInstanceLogin(email, password);
+        if (loginWorker == null) {
+            loginWorker = LoginWorker.newInstanceLogin(email, password);
 
             fragmentManager.beginTransaction()
-                    .add(loginHelper, LOGIN_HELPER)
+                    .add(loginWorker, LOGIN_WORKER)
                     .commit();
         }
     }
 
     /**
-     * Handles a failed login attempt. Passes error to generic Parse error handler, hides the
-     * progress bar and removes the helper fragment.
+     * Handles a failed login attempt. Hides the progress bar and removes the worker fragment.
      *
-     * @param errorCode the error code of th exception thrown during the login attempt
+     * @param errorMessage the error message from the exception thrown during the login attempt
      */
-    public void onLoginFailed(int errorCode) {
-        final Activity context = getActivity();
-        ParseErrorHandler.handleParseError(context, errorCode);
-        Snackbar.make(mViewMain,
-                ParseErrorHandler.getErrorMessage(context, errorCode), Snackbar.LENGTH_LONG).show();
+    public void onLoginFailed(@StringRes int errorMessage) {
+        Snackbar.make(mViewMain, errorMessage, Snackbar.LENGTH_LONG).show();
         setLoading(false);
 
-        HelperUtils.removeHelper(getFragmentManager(), LOGIN_HELPER);
+        WorkerUtils.removeWorker(getFragmentManager(), LOGIN_WORKER);
     }
 
     /**

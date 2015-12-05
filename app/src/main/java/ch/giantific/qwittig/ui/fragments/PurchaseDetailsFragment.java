@@ -98,7 +98,7 @@ public class PurchaseDetailsFragment extends BaseFragment implements
         setHasOptionsMenu(true);
 
         updateCurrentUserAndGroup();
-        mPurchaseRepo = new ParsePurchaseRepository();
+        mPurchaseRepo = new ParsePurchaseRepository(getActivity());
 
         Bundle args = getArguments();
         if (args != null) {

@@ -128,9 +128,9 @@ public class PurchaseEditDraftFragment extends PurchaseEditFragment {
     }
 
     @Override
-    public void onSaveError(int errorCode) {
+    public void onSaveError(int errorMessage) {
         mPurchase.setDraftId(mEditPurchaseId);
-        super.onSaveError(errorCode);
+        super.onSaveError(errorMessage);
     }
 
     @Override

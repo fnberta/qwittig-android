@@ -10,6 +10,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
@@ -27,10 +28,10 @@ import java.util.List;
 
 import ch.berta.fabio.fabprogress.FabProgress;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.group.CreateGroupHelper;
+import ch.giantific.qwittig.workerfragments.group.CreateGroupWorker;
 import ch.giantific.qwittig.domain.models.Currency;
 import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.utils.HelperUtils;
+import ch.giantific.qwittig.utils.WorkerUtils;
 import ch.giantific.qwittig.utils.ParseUtils;
 import ch.giantific.qwittig.utils.Utils;
 
@@ -41,7 +42,7 @@ import ch.giantific.qwittig.utils.Utils;
  */
 public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
 
-    private static final String CREATE_GROUP_HELPER = "CREATE_GROUP_HELPER";
+    private static final String CREATE_GROUP_WORKER = "CREATE_GROUP_WORKER";
     private FragmentInteractionListener mListener;
     private TextInputLayout mTextInputLayoutName;
     private Spinner mSpinnerCurrency;
@@ -96,7 +97,7 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
 
     /**
      * Reads the name the user has entered for the new group, checks if the user already has a
-     * group with same name and if not creates the new group with a retained helper fragment.
+     * group with same name and if not creates the new group with a retained worker fragment.
      */
     public void addNewGroup() {
         if (ParseUtils.isTestUser(mCurrentUser)) {
@@ -145,33 +146,33 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
         mGroupNewName = name;
 
         String currency = ((Currency) mSpinnerCurrency.getSelectedItem()).getCode();
-        createNewGroupWithHelper(currency);
+        createNewGroupWithWorker(currency);
     }
 
-    private void createNewGroupWithHelper(@NonNull String newGroupCurrency) {
+    private void createNewGroupWithWorker(@NonNull String newGroupCurrency) {
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment createGroupHelper = HelperUtils.findHelper(fragmentManager, CREATE_GROUP_HELPER);
+        Fragment createGroupWorker = WorkerUtils.findWorker(fragmentManager, CREATE_GROUP_WORKER);
 
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
-        if (createGroupHelper == null) {
-            createGroupHelper = CreateGroupHelper.newInstance(mGroupNewName, newGroupCurrency,
+        if (createGroupWorker == null) {
+            createGroupWorker = CreateGroupWorker.newInstance(mGroupNewName, newGroupCurrency,
                     mUsersToInviteEmails);
 
             fragmentManager.beginTransaction()
-                    .add(createGroupHelper, CREATE_GROUP_HELPER)
+                    .add(createGroupWorker, CREATE_GROUP_WORKER)
                     .commit();
         }
     }
 
     /**
-     * Passes the error code to the generic error handler, shows the user an error message and
-     * removes the retained helper fragment and loading indicators.
+     * Shows the user an error message and removes the retained worker fragment and loading
+     * indicators.
      *
-     * @param errorCode the error code of the exception thrown during the process
+     * @param errorMessage the error message from the exception thrown during the process
      */
-    public void onCreateNewGroupFailed(int errorCode) {
-        onInviteError(errorCode, CREATE_GROUP_HELPER);
+    public void onCreateNewGroupFailed(@StringRes int errorMessage) {
+        onInviteError(errorMessage, CREATE_GROUP_WORKER);
     }
 
     /**
@@ -179,7 +180,7 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
      * the user has not entered users to invite.
      *
      * @param newGroup     the newly created troup
-     * @param invitingUser whether the helper is also inviting users to the new group
+     * @param invitingUser whether the worker fragment is also inviting users to the new group
      */
     public void onNewGroupCreated(@NonNull Group newGroup, boolean invitingUser) {
         // register for notifications for the new group
@@ -198,15 +199,15 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
     }
 
     /**
-     * Passes the error code to the generic error handler, shows the user an error  message and
-     * removes the retained helper fragment and loading indicators.
+     * Shows the user an error message and removes the retained worker fragment and loading
+     * indicators.
      * <p/>
      * TODO: new group is created but users not invited, finish activity but tell the user
      *
-     * @param errorCode the error code of the exception thrown during the process
+     * @param errorMessage the error message from the exception thrown during the process
      */
-    public void onInviteUsersFailed(int errorCode) {
-        onInviteError(errorCode, CREATE_GROUP_HELPER);
+    public void onInviteUsersFailed(@StringRes int errorMessage) {
+        onInviteError(errorMessage, CREATE_GROUP_WORKER);
     }
 
     @Override

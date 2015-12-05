@@ -2,39 +2,41 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.helpers.save;
+package ch.giantific.qwittig.workerfragments.save;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.SaveCallback;
 
+import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.domain.models.parse.Compensation;
-import ch.giantific.qwittig.data.helpers.BaseHelper;
+import ch.giantific.qwittig.workerfragments.BaseWorker;
 
 /**
  * Saves a {@link Compensation} object to the online Parse.com database.
  * <p/>
- * Subclass of {@link BaseHelper}.
+ * Subclass of {@link BaseWorker}.
  */
-public class CompensationSaveHelper extends BaseHelper {
+public class CompensationSaveWorker extends BaseWorker {
 
-    private static final String LOG_TAG = CompensationSaveHelper.class.getSimpleName();
+    private static final String LOG_TAG = CompensationSaveWorker.class.getSimpleName();
     @Nullable
-    private HelperInteractionListener mListener;
+    private WorkerInteractionListener mListener;
     private Compensation mCompensation;
 
-    public CompensationSaveHelper() {
+    public CompensationSaveWorker() {
         // empty default constructor
     }
 
     /**
-     * Constructs a new {@link CompensationSaveHelper} with a {@link Compensation} object as a
+     * Constructs a new {@link CompensationSaveWorker} with a {@link Compensation} object as a
      * parameter.
      * <p/>
      * Using a non empty constructor to be able to pass a {@link ParseObject}. Because the fragment
@@ -44,7 +46,7 @@ public class CompensationSaveHelper extends BaseHelper {
      * @param compensation the {@link Compensation} to save
      */
     @SuppressLint("ValidFragment")
-    public CompensationSaveHelper(@NonNull ParseObject compensation) {
+    public CompensationSaveWorker(@NonNull ParseObject compensation) {
         mCompensation = (Compensation) compensation;
     }
 
@@ -52,7 +54,7 @@ public class CompensationSaveHelper extends BaseHelper {
     public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (HelperInteractionListener) activity;
+            mListener = (WorkerInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement DialogInteractionListener");
@@ -74,7 +76,8 @@ public class CompensationSaveHelper extends BaseHelper {
                     mCompensation.setPaid(false);
 
                     if (mListener != null) {
-                        mListener.onCompensationSaveFailed(mCompensation, e.getCode());
+                        mListener.onCompensationSaveFailed(mCompensation,
+                                ParseErrorHandler.handleParseError(getActivity(), e));
                     }
 
                     return;
@@ -96,7 +99,7 @@ public class CompensationSaveHelper extends BaseHelper {
     /**
      * Defines the actions to take after the compensation was saved or the action failed.
      */
-    public interface HelperInteractionListener {
+    public interface WorkerInteractionListener {
         /**
          * Handles the successful save of the {@link Compensation} object.
          *
@@ -108,8 +111,8 @@ public class CompensationSaveHelper extends BaseHelper {
          * Handles the failure of saving the {@link Compensation} object.
          *
          * @param compensation the {@link Compensation} object that failed to save
-         * @param errorCode    the error code of the exception thrown during the save process
+         * @param errorMessage the error message from the exception thrown during the save process
          */
-        void onCompensationSaveFailed(@NonNull ParseObject compensation, int errorCode);
+        void onCompensationSaveFailed(@NonNull ParseObject compensation, @StringRes int errorMessage);
     }
 }

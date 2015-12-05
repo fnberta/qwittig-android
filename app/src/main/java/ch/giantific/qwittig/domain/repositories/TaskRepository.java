@@ -5,6 +5,7 @@
 package ch.giantific.qwittig.domain.repositories;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 
 import com.parse.ParseObject;
 
@@ -128,8 +129,8 @@ public interface TaskRepository {
         /**
          * Called when tasks update failed.
          *
-         * @param errorCode the error code from the exception thrown in the process
+         * @param errorMessage the error message from the exception thrown in the process
          */
-        void onTaskUpdateFailed(int errorCode);
+        void onTaskUpdateFailed(@StringRes int errorMessage);
     }
 }

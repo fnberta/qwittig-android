@@ -6,6 +6,7 @@ package ch.giantific.qwittig.ui.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -22,7 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.save.PurchaseSaveHelper;
+import ch.giantific.qwittig.workerfragments.save.PurchaseSaveWorker;
 import ch.giantific.qwittig.domain.models.ItemRow;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 
@@ -119,12 +120,12 @@ public class PurchaseAddFragment extends PurchaseBaseFragment {
     }
 
     @Override
-    protected PurchaseSaveHelper getSaveHelper() {
-        return new PurchaseSaveHelper(mPurchase, mReceiptImagePath);
+    protected PurchaseSaveWorker getSaveWorker() {
+        return new PurchaseSaveWorker(mPurchase, mReceiptImagePath);
     }
 
     @Override
-    void showErrorSnackbar(@NonNull String message) {
+    void showErrorSnackbar(@StringRes int message) {
         Snackbar snackbar = Snackbar.make(mButtonAddRow, message, Snackbar.LENGTH_LONG);
         snackbar.setAction(R.string.action_purchase_save_draft, new View.OnClickListener() {
             @Override

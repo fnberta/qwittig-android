@@ -212,7 +212,7 @@ public abstract class BaseNavDrawerActivity extends BaseActivity {
             return;
         }
 
-        GroupRepository repo = new ParseGroupRepository();
+        GroupRepository repo = new ParseGroupRepository(this);
         mGroupsCount = groups.size();
         for (int i = 0; i < mGroupsCount; i++) {
             final Group group = (Group) groups.get(i);

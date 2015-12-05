@@ -20,7 +20,7 @@ import com.github.mikephil.charting.utils.PercentFormatter;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.stats.Stats;
-import ch.giantific.qwittig.data.helpers.group.StatsHelper;
+import ch.giantific.qwittig.workerfragments.group.StatsWorker;
 import ch.giantific.qwittig.ui.widgets.PieChart;
 import ch.giantific.qwittig.CurrencyFormatter;
 
@@ -33,7 +33,7 @@ import ch.giantific.qwittig.CurrencyFormatter;
 public class StatsStoresFragment extends StatsPieBaseFragment {
 
     private static final String LOG_TAG = StatsStoresFragment.class.getSimpleName();
-    private static final String STATS_HELPER_STORES = "STATS_HELPER_STORES";
+    private static final String STATS_WORKER_STORES = "STATS_WORKER_STORES";
     private static final String STATE_SHOW_PERCENT = "STATE_SHOW_PERCENT";
     private static final String STATE_SHOW_AVERAGE = "STATE_SHOW_AVERAGE";
     private boolean mShowPercent = true;
@@ -108,15 +108,15 @@ public class StatsStoresFragment extends StatsPieBaseFragment {
 
     @NonNull
     @Override
-    protected String getHelperTag() {
-        return STATS_HELPER_STORES;
+    protected String getWorkerTag() {
+        return STATS_WORKER_STORES;
     }
 
     @Override
     void calcStats(@NonNull String year, int month) {
         super.calcStats(year, month);
 
-        calcStatsWithHelper(StatsHelper.TYPE_STORES, year, month);
+        calcStatsWithWorker(StatsWorker.TYPE_STORES, year, month);
     }
 
     @Override

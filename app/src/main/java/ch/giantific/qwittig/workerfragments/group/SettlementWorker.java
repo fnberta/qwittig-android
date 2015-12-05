@@ -2,16 +2,18 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.helpers.group;
+package ch.giantific.qwittig.workerfragments.group;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 
 import com.parse.ParseUser;
 
-import ch.giantific.qwittig.data.helpers.BaseHelper;
+import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.workerfragments.BaseWorker;
 import ch.giantific.qwittig.data.rest.CloudCodeClient;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
@@ -19,30 +21,30 @@ import ch.giantific.qwittig.domain.models.parse.User;
 /**
  * Creates and saves a new user settlement by calling Parse.com cloud functions.
  * <p/>
- * Subclass of {@link BaseHelper}.
+ * Subclass of {@link BaseWorker}.
  */
-public class SettlementHelper extends BaseHelper implements
+public class SettlementWorker extends BaseWorker implements
         CloudCodeClient.CloudCodeListener {
 
     private static final String BUNDLE_SINGLE_USER = "BUNDLE_SINGLE_USER";
-    private static final String LOG_TAG = SettlementHelper.class.getSimpleName();
+    private static final String LOG_TAG = SettlementWorker.class.getSimpleName();
     @Nullable
-    private HelperInteractionListener mListener;
+    private WorkerInteractionListener mListener;
 
-    public SettlementHelper() {
+    public SettlementWorker() {
         // empty default constructor
     }
 
     /**
-     * Returns a new instance of {@link SettlementHelper}.
+     * Returns a new instance of {@link SettlementWorker}.
      *
      * @param doSingleUserSettlement whether the settlement should be calculated only for the
      *                               current user or for all users of the current group
-     * @return a new instance of {@link SettlementHelper}
+     * @return a new instance of {@link SettlementWorker}
      */
     @NonNull
-    public static SettlementHelper newInstance(boolean doSingleUserSettlement) {
-        SettlementHelper fragment = new SettlementHelper();
+    public static SettlementWorker newInstance(boolean doSingleUserSettlement) {
+        SettlementWorker fragment = new SettlementWorker();
         Bundle args = new Bundle();
         args.putBoolean(BUNDLE_SINGLE_USER, doSingleUserSettlement);
         fragment.setArguments(args);
@@ -53,7 +55,7 @@ public class SettlementHelper extends BaseHelper implements
     public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (HelperInteractionListener) activity;
+            mListener = (WorkerInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement DialogInteractionListener");
@@ -74,13 +76,13 @@ public class SettlementHelper extends BaseHelper implements
         final Group currentGroup = currentUser.getCurrentGroup();
         if (currentGroup == null) {
             if (mListener != null) {
-                mListener.onNewSettlementCreationFailed(0);
+                mListener.onNewSettlementCreationFailed(R.string.toast_unknown_error);
             }
 
             return;
         }
 
-        CloudCodeClient cloudCode = new CloudCodeClient();
+        CloudCodeClient cloudCode = new CloudCodeClient(getActivity());
         cloudCode.startNewSettlement(currentGroup.getObjectId(), doSingleUserSettlement, this);
     }
 
@@ -92,9 +94,9 @@ public class SettlementHelper extends BaseHelper implements
     }
 
     @Override
-    public void onCloudFunctionFailed(int errorCode) {
+    public void onCloudFunctionFailed(@StringRes int errorMessage) {
         if (mListener != null) {
-            mListener.onNewSettlementCreationFailed(errorCode);
+            mListener.onNewSettlementCreationFailed(errorMessage);
         }
     }
 
@@ -108,7 +110,7 @@ public class SettlementHelper extends BaseHelper implements
      * Defines the actions to take after a new settlement was calculated or after the calculation
      * failed.
      */
-    public interface HelperInteractionListener {
+    public interface WorkerInteractionListener {
         /**
          * Handles the successful calculation of a new settlement.
          */
@@ -117,8 +119,8 @@ public class SettlementHelper extends BaseHelper implements
         /**
          * Handles the failed calculation of a new settlement.
          *
-         * @param errorCode the error code of the exception thrown during the process
+         * @param errorMessage the error message from the exception thrown during the process
          */
-        void onNewSettlementCreationFailed(int errorCode);
+        void onNewSettlementCreationFailed(@StringRes int errorMessage);
     }
 }

@@ -9,6 +9,7 @@ import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
 import android.view.Gravity;
@@ -22,7 +23,7 @@ import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.helpers.account.LoginHelper;
+import ch.giantific.qwittig.workerfragments.account.LoginWorker;
 import ch.giantific.qwittig.ui.fragments.LoginAccountsFragment;
 import ch.giantific.qwittig.ui.fragments.LoginBaseFragment;
 import ch.giantific.qwittig.ui.fragments.LoginEmailFragment;
@@ -38,7 +39,7 @@ import ch.giantific.qwittig.utils.Utils;
  */
 public class LoginActivity extends BaseActivity implements
         EmailPromptDialogFragment.DialogInteractionListener,
-        LoginHelper.HelperInteractionListener,
+        LoginWorker.WorkerInteractionListener,
         LoginAccountsFragment.FragmentInteractionListener,
         GoogleApiClient.OnConnectionFailedListener {
 
@@ -143,8 +144,8 @@ public class LoginActivity extends BaseActivity implements
     }
 
     @Override
-    public void onLoginFailed(int errorCode) {
-        findLoginFragment().onLoginFailed(errorCode);
+    public void onLoginFailed(@StringRes int errorMessage) {
+        findLoginFragment().onLoginFailed(errorMessage);
     }
 
     @Override
@@ -157,7 +158,7 @@ public class LoginActivity extends BaseActivity implements
     public void onValidEmailEntered(@NonNull String email) {
         Fragment fragment = findLoginFragment();
         if (fragment instanceof LoginEmailFragment) {
-            ((LoginEmailFragment) fragment).resetPasswordWithHelper(email);
+            ((LoginEmailFragment) fragment).resetPasswordWithWorker(email);
         } else if (fragment instanceof LoginAccountsFragment) {
             ((LoginAccountsFragment) fragment).setEmail(email);
         }
