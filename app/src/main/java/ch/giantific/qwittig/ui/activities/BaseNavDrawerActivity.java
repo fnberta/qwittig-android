@@ -255,8 +255,6 @@ public abstract class BaseNavDrawerActivity extends BaseActivity {
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                menuItem.setChecked(true);
-
                 mSelectedNavDrawerItem = menuItem.getItemId();
                 mDrawerLayout.closeDrawer(GravityCompat.START);
                 return true;
