@@ -113,10 +113,6 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        if (mPurchase == null) {
-            return;
-        }
-
         int viewType = getItemViewType(position);
         switch (viewType) {
             case TYPE_ITEM: {
@@ -226,9 +222,13 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
 
     @Override
     public int getItemCount() {
-        int numberOfExtraRows = ROWS_UNTIL_ITEMS_START + TOTAL_ROWS
-                + (mHasNote ? NOTE_ROWS : 0);
-        return mItems == null ? numberOfExtraRows : mItems.size() + numberOfExtraRows;
+        if (mPurchase == null) {
+            return 0;
+        } else {
+            final int numberOfExtraRows = ROWS_UNTIL_ITEMS_START + TOTAL_ROWS
+                    + (mHasNote ? NOTE_ROWS : 0);
+            return mItems.size() + numberOfExtraRows;
+        }
     }
 
     /**

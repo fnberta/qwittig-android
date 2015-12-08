@@ -44,7 +44,7 @@ public abstract class BaseRecyclerAdapter<T> extends RecyclerView.Adapter<Recycl
 
     @Override
     public int getItemCount() {
-        return mItems.size();
+        return mCurrentGroupCurrency == null ? 0 : mItems.size();
     }
 
     /**

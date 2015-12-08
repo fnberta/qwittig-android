@@ -149,7 +149,7 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     }
 
     @Override
-    public void onPurchaseLocalLoaded(@NonNull Purchase purchase) {
+    public void onPurchaseLocalLoaded(final @NonNull Purchase purchase) {
         mPurchase = purchase;
 
         updateToolbarTitle();
@@ -198,8 +198,7 @@ public class PurchaseDetailsFragment extends BaseFragment implements
     }
 
     private void toggleMainViewVisibility() {
-        boolean purchaseIsNull = mPurchase == null;
-        if (purchaseIsNull) {
+        if (mPurchase == null) {
             mRecyclerView.setVisibility(View.GONE);
             mProgressBar.show();
         } else {

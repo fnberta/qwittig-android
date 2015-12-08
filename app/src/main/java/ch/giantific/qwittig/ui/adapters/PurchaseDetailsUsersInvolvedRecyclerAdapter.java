@@ -69,10 +69,6 @@ public class PurchaseDetailsUsersInvolvedRecyclerAdapter extends
 
     @Override
     public void onBindViewHolder(@NonNull final UserAvatarRow viewHolder, int position) {
-        if (mPurchase == null) {
-            return;
-        }
-
         User user = (User) mUsersInvolvedSorted.get(position);
 
         if (mBuyer.getObjectId().equals(user.getObjectId())) {
@@ -97,7 +93,7 @@ public class PurchaseDetailsUsersInvolvedRecyclerAdapter extends
 
     @Override
     public int getItemCount() {
-        return mUsersInvolvedSorted.size();
+        return mPurchase == null ? 0 : mUsersInvolvedSorted.size();
     }
 
     /**
