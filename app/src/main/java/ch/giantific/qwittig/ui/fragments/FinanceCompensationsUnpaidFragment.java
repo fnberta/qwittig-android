@@ -220,7 +220,7 @@ public class FinanceCompensationsUnpaidFragment extends FinanceCompensationsBase
     protected void updateView() {
         mRecyclerAdapter.setCurrentGroupCurrency(ParseUtils.getGroupCurrencyWithFallback(mCurrentGroup));
         if (mIsCalculatingNew) {
-            mFabProgressNewSettlement.beginProgressFinalAnimation();
+            mFabProgressNewSettlement.startProgressFinalAnimation();
         } else {
             mRecyclerAdapter.notifyDataSetChanged();
             showMainView();

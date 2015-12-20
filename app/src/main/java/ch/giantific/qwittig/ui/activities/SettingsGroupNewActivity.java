@@ -165,7 +165,7 @@ public class SettingsGroupNewActivity extends BaseActivity implements
     @Override
     public void finishGroupCreation(@NonNull String newGroupName) {
         mNewGroupName = newGroupName;
-        mFabProgress.beginProgressFinalAnimation();
+        mFabProgress.startProgressFinalAnimation();
     }
 
     @Override

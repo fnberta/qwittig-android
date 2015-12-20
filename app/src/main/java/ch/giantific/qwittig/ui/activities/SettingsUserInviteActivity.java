@@ -128,7 +128,7 @@ public class SettingsUserInviteActivity extends BaseActivity implements
 
     @Override
     public void startFinalProgressAnim() {
-        mFabProgress.beginProgressFinalAnimation();
+        mFabProgress.startProgressFinalAnimation();
     }
 
     @Override

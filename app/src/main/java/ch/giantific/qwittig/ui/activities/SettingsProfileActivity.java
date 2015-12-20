@@ -146,7 +146,7 @@ public class SettingsProfileActivity extends BaseActivity implements
 
     @Override
     public void onThirdPartyUnlinked() {
-        mFabProgress.beginProgressFinalAnimation();
+        mFabProgress.startProgressFinalAnimation();
     }
 
     @Override
