@@ -35,10 +35,6 @@ public class Qwittig extends Application {
     public void onCreate() {
         super.onCreate();
 
-//        if (BuildConfig.DEBUG) {
-//            LeakCanary.install(this);
-//        }
-
         // initialise Facebook SDK
         FacebookSdk.sdkInitialize(getApplicationContext());
 
