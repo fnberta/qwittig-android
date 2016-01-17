@@ -23,4 +23,12 @@
         <item>@color/blue_500</item>
         <item>@color/blue_grey_500</item>
     </integer-array>
+
+    <integer-array
+        name="srl_color_scheme">
+        <item>@color/primary</item>
+        <item>@color/accent</item>
+        <item>@color/green</item>
+        <item>@color/red</item>
+    </integer-array>
 </resources>

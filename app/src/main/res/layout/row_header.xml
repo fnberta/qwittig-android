@@ -3,15 +3,29 @@
   ~ Copyright (c) 2015 Fabio Berta
   -->
 
-<TextView
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/tv_header"
-    style="@style/SubHeader"
-    android:layout_width="match_parent"
-    android:layout_height="@dimen/subheader_height"
-    android:gravity="center_vertical"
-    android:paddingStart="@dimen/key_line_1"
-    android:paddingEnd="@dimen/key_line_1"
-    android:clickable="false"
-    tools:text="Items"/>
+    >
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.viewmodels.rows.HeaderRowViewModel"
+            />
+    </data>
+
+    <TextView
+        android:id="@+id/tv_header"
+        style="@style/SubHeader"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/subheader_height"
+        android:clickable="false"
+        android:gravity="center_vertical"
+        android:paddingEnd="@dimen/key_line_1"
+        android:paddingStart="@dimen/key_line_1"
+        android:text="@{viewModel.header}"
+        tools:text="Items"/>
+
+</layout>

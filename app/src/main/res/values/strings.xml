@@ -337,5 +337,7 @@
     <string name="toast_invalid_session">Your session is no longer valid</string>
     <string name="toast_login_failed_google">Login with Google failed</string>
     <string name="toast_login_failed_facebook">Login with Facebook failed</string>
+    <string name="toast_error_tasks_load">Failed to load tasks</string>
+    <string name="toast_error_task_save">Failed to save task</string>
 
 </resources>

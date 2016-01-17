@@ -15,7 +15,7 @@ import com.parse.LogOutCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
-import ch.giantific.qwittig.ui.activities.HomeActivity;
+import ch.giantific.qwittig.presentation.ui.activities.HomeActivity;
 
 /**
  * Provides a generic error handler for exceptions thrown by the Parse.com framework.

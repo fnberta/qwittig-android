@@ -2,69 +2,83 @@
   ~ Copyright (c) 2015 Fabio Berta
   -->
 
-<android.support.v4.widget.DrawerLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/drawer_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context="ch.giantific.qwittig.ui.activities.TasksActivity"
+    xmlns:tools="http://schemas.android.com/tools"
     >
 
-    <android.support.design.widget.CoordinatorLayout
+    <data>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.viewmodels.TasksViewModel"
+            />
+    </data>
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        tools:context=".presentation.ui.activities.TasksActivity"
         >
 
-        <FrameLayout
-            android:id="@+id/container"
+        <android.support.design.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="?attr/actionBarSize"
-            tools:ignore="MergeRootFrame"
-            />
-
-        <android.support.design.widget.AppBarLayout
-            android:id="@+id/appbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             >
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_height="?attr/actionBarSize"
+            <FrameLayout
+                android:id="@+id/container"
                 android:layout_width="match_parent"
-                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:contentInsetStart="@dimen/key_line_2"
+                android:layout_height="match_parent"
+                android:layout_marginTop="?attr/actionBarSize"
+                tools:ignore="MergeRootFrame"
+                />
+
+            <android.support.design.widget.AppBarLayout
+                android:id="@+id/appbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 >
 
-                <Spinner
-                    android:id="@+id/sp_tasks_deadline"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                    app:contentInsetStart="@dimen/key_line_2"
                     app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                    />
+                    >
 
-            </android.support.v7.widget.Toolbar>
+                    <Spinner
+                        android:id="@+id/sp_tasks_deadline"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                        />
 
-        </android.support.design.widget.AppBarLayout>
+                </android.support.v7.widget.Toolbar>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_task_add"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="@dimen/key_line_1"
-            android:src="@drawable/ic_add_black_24dp"
-            android:visibility="invisible"
-            tools:visibility="visible"
-            />
+            </android.support.design.widget.AppBarLayout>
 
-    </android.support.design.widget.CoordinatorLayout>
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab_task_add"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="@dimen/key_line_1"
+                android:src="@drawable/ic_add_black_24dp"
+                android:visibility="gone"
+                android:onClick="@{viewModel.onAddTaskFabClick}"
+                tools:visibility="visible"
+                />
 
-    <include layout="@layout/include_navdrawer"/>
+        </android.support.design.widget.CoordinatorLayout>
 
-</android.support.v4.widget.DrawerLayout>
+        <include layout="@layout/include_navdrawer"/>
+
+    </android.support.v4.widget.DrawerLayout>
+
+</layout>

@@ -5,6 +5,7 @@
 package ch.giantific.qwittig.utils.parse;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.parse.ParseACL;
 import com.parse.ParseConfig;
@@ -37,7 +38,7 @@ public class ParseUtils {
      * @param group the group to get the currency for
      * @return the currency code for the current group
      */
-    public static String getGroupCurrencyWithFallback(Group group) {
+    public static String getGroupCurrencyWithFallback(@Nullable Group group) {
         if (group != null) {
             return group.getCurrency();
         }

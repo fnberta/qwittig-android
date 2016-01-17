@@ -7,6 +7,7 @@ package ch.giantific.qwittig;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 
 import java.lang.annotation.Retention;
@@ -19,10 +20,6 @@ import java.lang.annotation.RetentionPolicy;
  */
 public class LocalBroadcast {
 
-    @IntDef({DATA_TYPE_ALL, DATA_TYPE_PURCHASES_UPDATED, DATA_TYPE_USERS_UPDATED, DATA_TYPE_COMPENSATIONS_UPDATED,
-            DATA_TYPE_GROUP_UPDATED, DATA_TYPE_TASKS_UPDATED})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface DataType {}
     public static final int DATA_TYPE_ALL = 1;
     public static final int DATA_TYPE_PURCHASES_UPDATED = 2;
     public static final int DATA_TYPE_USERS_UPDATED = 3;
@@ -33,6 +30,7 @@ public class LocalBroadcast {
     public static final String INTENT_DATA_TYPE = "ch.giantific.qwittig.intents.DATA_TYPE";
     public static final String INTENT_EXTRA_COMPENSATION_PAID = "ch.giantific.qwittig.intents.COMPENSATION_PAID";
     private Context mContext;
+
     public LocalBroadcast(Context context) {
         mContext = context;
     }
@@ -86,7 +84,13 @@ public class LocalBroadcast {
         return intent;
     }
 
-    private void sendLocalBroadcast(Intent intent) {
+    private void sendLocalBroadcast(@NonNull Intent intent) {
         LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+    }
+
+    @IntDef({DATA_TYPE_ALL, DATA_TYPE_PURCHASES_UPDATED, DATA_TYPE_USERS_UPDATED, DATA_TYPE_COMPENSATIONS_UPDATED,
+            DATA_TYPE_GROUP_UPDATED, DATA_TYPE_TASKS_UPDATED})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface DataType {
     }
 }

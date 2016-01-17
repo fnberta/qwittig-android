@@ -9,7 +9,7 @@
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
     android:transitionGroup="true"
-    tools:context="ch.giantific.qwittig.ui.fragments.LoginEmailSignUpFragment"
+    tools:context=".presentation.ui.fragments.LoginEmailSignUpFragment"
     >
 
     <LinearLayout

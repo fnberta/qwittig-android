@@ -4,6 +4,8 @@
 
 package ch.giantific.qwittig.domain.models;
 
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
 import android.support.annotation.NonNull;
 
 import com.parse.ParseUser;
@@ -17,7 +19,8 @@ import ch.giantific.qwittig.domain.models.parse.User;
  * Represents a history entry of a {@link Task} including a {@link User} and the {@link Date}
  * he/she completed the task.
  */
-public class TaskHistory implements Comparable<TaskHistory> {
+public class TaskHistory extends BaseObservable
+        implements Comparable<TaskHistory> {
 
     private User mUser;
     private Date mDate;
@@ -30,6 +33,17 @@ public class TaskHistory implements Comparable<TaskHistory> {
         mUser = (User) user;
     }
 
+    @Bindable
+    public String getUserNickname() {
+        return mUser.getNickname();
+    }
+
+    @Bindable
+    public byte[] getUserAvatar() {
+        return mUser.getAvatar();
+    }
+
+    @Bindable
     public Date getDate() {
         return mDate;
     }

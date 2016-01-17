@@ -7,11 +7,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ch.giantific.qwittig.ui.fragments.StatsSpendingFragment"
+    tools:context=".presentation.ui.fragments.StatsSpendingFragment"
     android:animateLayoutChanges="true"
     >
 
-    <ch.giantific.qwittig.ui.widgets.BarChart
+    <ch.giantific.qwittig.presentation.ui.widgets.BarChart
         android:id="@+id/bc_spending"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -8,7 +8,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ch.giantific.qwittig.ui.fragments.FinanceCompensationsPaidFragment">
+    tools:context=".presentation.ui.fragments.FinanceCompensationsPaidFragment">
 
     <include layout="@layout/include_srl_recycler_view" />
 

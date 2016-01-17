@@ -20,7 +20,6 @@ import java.util.List;
 
 import ch.giantific.qwittig.LocalBroadcast;
 import ch.giantific.qwittig.data.repositories.ParseCompensationRepository;
-import ch.giantific.qwittig.data.repositories.ParseGenericRepository;
 import ch.giantific.qwittig.data.repositories.ParseGroupRepository;
 import ch.giantific.qwittig.data.repositories.ParsePurchaseRepository;
 import ch.giantific.qwittig.data.repositories.ParseTaskRepository;
@@ -206,21 +205,21 @@ public class ParseQueryService extends IntentService {
                              @NonNull String groupId) {
         switch (className) {
             case Purchase.CLASS: {
-                PurchaseRepository repo = new ParsePurchaseRepository(this);
+                PurchaseRepository repo = new ParsePurchaseRepository();
                 if (repo.removePurchaseLocal(objectId, groupId)) {
                     mLocalBroadcast.sendLocalBroadcastPurchasesUpdated();
                 }
                 break;
             }
             case Compensation.CLASS: {
-                CompensationRepository repo = new ParseCompensationRepository(this);
+                CompensationRepository repo = new ParseCompensationRepository();
                 if (repo.removeCompensationLocal(objectId)) {
                     mLocalBroadcast.sendLocalBroadcastCompensationsUpdated(false);
                 }
                 break;
             }
             case Task.CLASS: {
-                TaskRepository repo = new ParseTaskRepository(this);
+                TaskRepository repo = new ParseTaskRepository();
                 if (repo.removeTaskLocal(objectId)) {
                     mLocalBroadcast.sendLocalBroadcastTasksUpdated();
                 }
@@ -230,13 +229,6 @@ public class ParseQueryService extends IntentService {
     }
 
     private void queryObject(@NonNull String className, @NonNull String objectId, boolean isNew) {
-        if (isNew) {
-            ParseGenericRepository repo = new ParseGenericRepository(this);
-            if (repo.isAlreadySavedLocal(className, objectId)) {
-                return;
-            }
-        }
-
         switch (className) {
             case Purchase.CLASS:
                 queryPurchase(objectId, isNew);
@@ -244,24 +236,32 @@ public class ParseQueryService extends IntentService {
             case Compensation.CLASS:
                 queryCompensation(objectId, isNew);
                 break;
-            case Group.CLASS:
-                queryGroup(objectId);
-                break;
             case Task.CLASS:
                 queryTask(objectId, isNew);
+                break;
+            case Group.CLASS:
+                queryGroup(objectId, isNew);
                 break;
         }
     }
 
-    private void queryPurchase(@NonNull String objectId, boolean isNew) {
-        PurchaseRepository repo = new ParsePurchaseRepository(this);
-        if (repo.updatePurchase(objectId, isNew)) {
+    private void queryPurchase(@NonNull String purchaseId, boolean isNew) {
+        PurchaseRepository repo = new ParsePurchaseRepository();
+        if (isNew && repo.isAlreadySavedLocal(purchaseId)) {
+            return;
+        }
+
+        if (repo.updatePurchase(purchaseId, isNew)) {
             mLocalBroadcast.sendLocalBroadcastPurchasesUpdated();
         }
     }
 
     private void queryCompensation(@NonNull String compensationId, boolean isNew) {
-        CompensationRepository repo = new ParseCompensationRepository(this);
+        CompensationRepository repo = new ParseCompensationRepository();
+        if (isNew && repo.isAlreadySavedLocal(compensationId)) {
+            return;
+        }
+
         Boolean isPaid = repo.updateCompensation(compensationId, isNew);
         if (isPaid != null) {
             mLocalBroadcast.sendLocalBroadcastCompensationsUpdated(isPaid);
@@ -269,14 +269,18 @@ public class ParseQueryService extends IntentService {
     }
 
     private void queryTask(@NonNull String taskId, boolean isNew) {
-        TaskRepository repo = new ParseTaskRepository(this);
+        TaskRepository repo = new ParseTaskRepository();
+        if (isNew && repo.isAlreadySavedLocal(taskId)) {
+            return;
+        }
+
         if (repo.updateTask(taskId, isNew)) {
             mLocalBroadcast.sendLocalBroadcastTasksUpdated();
         }
     }
 
     private void setTaskDone(@NonNull String taskId) {
-        TaskRepository repo = new ParseTaskRepository(this);
+        TaskRepository repo = new ParseTaskRepository();
         Task task = repo.fetchTaskDataLocal(taskId);
         if (task != null) {
             task.addHistoryEvent(mCurrentUser);
@@ -285,8 +289,12 @@ public class ParseQueryService extends IntentService {
         }
     }
 
-    private void queryGroup(@NonNull String groupId) {
-        GroupRepository repo = new ParseGroupRepository(this);
+    private void queryGroup(@NonNull String groupId, boolean isNew) {
+        GroupRepository repo = new ParseGroupRepository();
+        if (isNew && repo.isAlreadySavedLocal(groupId)) {
+            return;
+        }
+
         Group group = repo.getGroupOnline(groupId);
         if (group != null) {
             mLocalBroadcast.sendLocalBroadcastGroupUpdated();
@@ -301,21 +309,21 @@ public class ParseQueryService extends IntentService {
     }
 
     private void queryPurchases() {
-        PurchaseRepository repo = new ParsePurchaseRepository(this);
+        PurchaseRepository repo = new ParsePurchaseRepository();
         if (repo.updatePurchases(mCurrentUser, mCurrentUserGroups)) {
             mLocalBroadcast.sendLocalBroadcastPurchasesUpdated();
         }
     }
 
     private void queryUsers() {
-        UserRepository repo = new ParseUserRepository(this);
+        UserRepository repo = new ParseUserRepository();
         if (repo.updateUsers(mCurrentUserGroups)) {
             mLocalBroadcast.sendLocalBroadcastUsersUpdated();
         }
     }
 
     private void queryCompensations() {
-        CompensationRepository repo = new ParseCompensationRepository(this);
+        CompensationRepository repo = new ParseCompensationRepository();
         if (repo.updateCompensations(mCurrentUserGroups)) {
             mLocalBroadcast.sendLocalBroadcastCompensationsUpdated(false);
             mLocalBroadcast.sendLocalBroadcastCompensationsUpdated(true);
@@ -323,7 +331,7 @@ public class ParseQueryService extends IntentService {
     }
 
     private void queryTasks() {
-        TaskRepository repo = new ParseTaskRepository(this);
+        TaskRepository repo = new ParseTaskRepository();
         if (repo.updateTasks(mCurrentUserGroups)) {
             mLocalBroadcast.sendLocalBroadcastTasksUpdated();
         }

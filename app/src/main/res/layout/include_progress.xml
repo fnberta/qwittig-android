@@ -3,11 +3,28 @@
   ~ Copyright (c) 2015 Fabio Berta
   -->
 
-<android.support.v4.widget.ContentLoadingProgressBar
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/pb_base"
-    style="?android:attr/progressBarStyleLarge"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    android:indeterminate="true"/>
+    >
+
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.viewmodels.ListViewModel"
+            />
+    </data>
+
+    <android.support.v4.widget.ContentLoadingProgressBar
+        android:id="@+id/pb_base"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:visibility="@{viewModel.loading ? View.VISIBLE : View.GONE}"
+        />
+
+</layout>

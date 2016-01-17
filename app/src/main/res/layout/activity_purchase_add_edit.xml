@@ -11,7 +11,7 @@
     android:layout_height="match_parent"
     android:clipChildren="false"
     android:transitionGroup="true"
-    tools:context="ch.giantific.qwittig.ui.activities.PurchaseBaseActivity"
+    tools:context=".presentation.ui.activities.PurchaseBaseActivity"
     >
 
     <FrameLayout

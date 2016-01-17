@@ -9,7 +9,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ch.giantific.qwittig.ui.fragments.FinanceCompensationsUnpaidFragment">
+    tools:context=".presentation.ui.fragments.FinanceCompensationsUnpaidFragment">
 
     <include layout="@layout/include_srl_recycler_view"/>
 

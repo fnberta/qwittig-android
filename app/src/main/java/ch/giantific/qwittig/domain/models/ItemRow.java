@@ -19,7 +19,7 @@ import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.ui.widgets.ListCheckBox;
+import ch.giantific.qwittig.presentation.ui.widgets.ListCheckBox;
 import ch.giantific.qwittig.utils.MoneyUtils;
 
 /**

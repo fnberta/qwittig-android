@@ -5,7 +5,6 @@
 package ch.giantific.qwittig;
 
 import android.app.Application;
-import android.util.Log;
 
 import com.facebook.FacebookSdk;
 import com.parse.Parse;
@@ -14,7 +13,6 @@ import com.parse.ParseCrashReporting;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
-import com.squareup.leakcanary.LeakCanary;
 
 import ch.giantific.qwittig.domain.models.parse.Compensation;
 import ch.giantific.qwittig.domain.models.parse.Group;

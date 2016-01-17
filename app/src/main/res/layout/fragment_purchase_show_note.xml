@@ -9,7 +9,7 @@
     android:layout_height="match_parent"
     android:clipToPadding="false"
     android:paddingBottom="@dimen/small_space"
-    tools:context="ch.giantific.qwittig.ui.fragments.PurchaseReceiptDetailFragment">
+    tools:context=".presentation.ui.fragments.PurchaseReceiptDetailFragment">
 
     <LinearLayout
         android:layout_width="match_parent"

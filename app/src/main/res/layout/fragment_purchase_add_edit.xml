@@ -10,7 +10,7 @@
     android:fillViewport="true"
     android:paddingBottom="@dimen/small_space"
     android:clipToPadding="false"
-    tools:context="ch.giantific.qwittig.ui.fragments.PurchaseAddFragment">
+    tools:context=".presentation.ui.fragments.PurchaseAddFragment">
 
     <include layout="@layout/include_purchase_add_edit"/>
 

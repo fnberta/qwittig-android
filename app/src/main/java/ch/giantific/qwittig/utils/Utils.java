@@ -172,7 +172,7 @@ public class Utils {
      * @param context the context to use to get the {@link ConnectivityManager}
      * @return whether there is an active network connection or not
      */
-    public static boolean isConnected(@NonNull Context context) {
+    public static boolean isNetworkAvailable(@NonNull Context context) {
         ConnectivityManager cm =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 

@@ -2,103 +2,121 @@
   ~ Copyright (c) 2015 Fabio Berta
   -->
 
-<android.support.v4.widget.DrawerLayout
-    android:id="@+id/drawer_layout"
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context="ch.giantific.qwittig.ui.activities.TaskDetailsActivity"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     >
 
-    <FrameLayout
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.viewmodels.TaskDetailsViewModel"
+            />
+    </data>
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        tools:context=".presentation.ui.activities.TaskDetailsActivity"
         >
 
         <FrameLayout
-            android:id="@+id/container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="@dimen/toolbar_height_x4"
-            android:transitionGroup="true"
-            tools:ignore="MergeRootFrame"
-            />
-
-        <android.support.design.widget.AppBarLayout
-            android:id="@+id/appbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:transitionGroup="true"
             >
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
+            <FrameLayout
+                android:id="@+id/container"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/toolbar_height_x4"
-                android:minHeight="?attr/actionBarSize"
-                android:gravity="bottom"
-                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:contentInsetStart="@dimen/key_line_2"
+                android:layout_height="match_parent"
+                android:layout_marginTop="@dimen/toolbar_height_x4"
+                android:transitionGroup="true"
+                tools:ignore="MergeRootFrame"
+                />
+
+            <android.support.design.widget.AppBarLayout
+                android:id="@+id/appbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:transitionGroup="true"
                 >
 
-                <LinearLayout
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:theme="@style/ThemeOverlay.AppCompat.Dark"
+                    android:layout_height="@dimen/toolbar_height_x4"
+                    android:gravity="bottom"
+                    android:minHeight="?attr/actionBarSize"
+                    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                    app:contentInsetStart="@dimen/key_line_2"
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                     >
 
-                    <TextView
-                        android:id="@+id/tv_task_details_title"
-                        style="@style/TextAppearance.AppCompat.Display1"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/normal_space"
-                        android:maxLines="2"
-                        tools:text="Abfall rausbringen"
-                        />
+                        android:orientation="vertical"
+                        android:theme="@style/ThemeOverlay.AppCompat.Dark"
+                        >
 
-                    <TextView
-                        android:id="@+id/tv_task_details_subtitle"
-                        style="@style/TextAppearance.AppCompat.Title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:maxLines="1"
-                        tools:text="Täglich"
-                        />
+                        <TextView
+                            android:id="@+id/tv_task_details_title"
+                            style="@style/TextAppearance.AppCompat.Display1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="@dimen/normal_space"
+                            android:maxLines="2"
+                            android:text="@{viewModel.taskTitle}"
+                            tools:text="Abfall rausbringen"
+                            />
 
-                    <TextView
-                        android:id="@+id/tv_task_details_users_involved"
-                        style="@style/TextAppearance.AppCompat.Subhead"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:maxLines="2"
-                        tools:text="Ich - vera - lexli - sturzi"
-                        />
+                        <TextView
+                            android:id="@+id/tv_task_details_subtitle"
+                            style="@style/TextAppearance.AppCompat.Title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:maxLines="1"
+                            android:text="@{viewModel.taskTimeFrame}"
+                            tools:text="Täglich"
+                            />
 
-                </LinearLayout>
+                        <TextView
+                            android:id="@+id/tv_task_details_users_involved"
+                            style="@style/TextAppearance.AppCompat.Subhead"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:maxLines="2"
+                            android:text="@{viewModel.taskUsersInvolved}"
+                            tools:text="Ich - vera - lexli - sturzi"
+                            />
 
-            </android.support.v7.widget.Toolbar>
-        </android.support.design.widget.AppBarLayout>
+                    </LinearLayout>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_task_details_done"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginEnd="@dimen/key_line_1"
-            android:layout_marginTop="@dimen/fab_margin_toolbar_x4"
-            android:src="@drawable/ic_done_black_24dp"
-            android:visibility="gone"
-            tools:visibility="visible"
-            />
+                </android.support.v7.widget.Toolbar>
+            </android.support.design.widget.AppBarLayout>
 
-    </FrameLayout>
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab_task_details_done"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginEnd="@dimen/key_line_1"
+                android:layout_marginTop="@dimen/fab_margin_toolbar_x4"
+                android:src="@drawable/ic_done_black_24dp"
+                android:onClick="@{viewModel.onFabDoneClick}"
+                android:visibility="@{viewModel.currentUserResponsible ? View.VISIBLE : View.GONE}"
+                tools:visibility="visible"
+                />
 
-    <include layout="@layout/include_navdrawer"/>
+        </FrameLayout>
 
-</android.support.v4.widget.DrawerLayout>
+        <include layout="@layout/include_navdrawer"/>
+
+    </android.support.v4.widget.DrawerLayout>
+</layout>

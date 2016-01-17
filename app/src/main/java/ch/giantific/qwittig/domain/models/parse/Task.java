@@ -43,11 +43,6 @@ public class Task extends ParseObject {
     public static final String USERS_INVOLVED = "usersInvolved";
     public static final String HISTORY = "history";
     public static final String PIN_LABEL = "tasksPinLabel";
-
-    @StringDef({TIME_FRAME_ONE_TIME, TIME_FRAME_DAILY, TIME_FRAME_WEEKLY, TIME_FRAME_MONTHLY,
-            TIME_FRAME_YEARLY, TIME_FRAME_AS_NEEDED})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface TimeFrame {}
     public static final String TIME_FRAME_ONE_TIME = "oneTime";
     public static final String TIME_FRAME_DAILY = "daily";
     public static final String TIME_FRAME_WEEKLY = "weekly";
@@ -211,14 +206,8 @@ public class Task extends ParseObject {
      *
      * @return the user currently responsible for finishing the task
      */
-    @Nullable
     public User getUserResponsible() {
-        List<ParseUser> users = getUsersInvolved();
-        if (!users.isEmpty()) {
-            return (User) users.get(0);
-        }
-
-        return null;
+        return (User) getUsersInvolved().get(0);
     }
 
     /**
@@ -252,9 +241,15 @@ public class Task extends ParseObject {
             entries = new ArrayList<>();
         }
         entries.add(new Date());
-        historyNew.put(currentUser.getObjectId(), entries);
+        historyNew.put(currentUserId, entries);
         put(HISTORY, historyNew);
 
         return (User) usersInvolved.get(0);
+    }
+
+    @StringDef({TIME_FRAME_ONE_TIME, TIME_FRAME_DAILY, TIME_FRAME_WEEKLY, TIME_FRAME_MONTHLY,
+            TIME_FRAME_YEARLY, TIME_FRAME_AS_NEEDED})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface TimeFrame {
     }
 }

@@ -11,7 +11,7 @@
     android:layout_height="@dimen/list_with_text"
     android:layout_marginEnd="@dimen/key_line_1">
 
-    <ch.giantific.qwittig.ui.widgets.CircleDisplay
+    <ch.giantific.qwittig.presentation.ui.widgets.CircleDisplay
         android:id="@+id/list_item_percentage"
         android:layout_width="@dimen/icon_size"
         android:layout_height="@dimen/icon_size"

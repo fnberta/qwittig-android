@@ -1,30 +1,48 @@
 <!--
   ~ Copyright (c) 2015 Fabio Berta
   -->
-
-<FrameLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
-    tools:context="ch.giantific.qwittig.ui.fragments.TasksFragment"
     >
 
-    <include layout="@layout/include_srl_recycler_view" />
+    <data>
 
-    <TextView
-        android:id="@+id/empty_view"
-        style="@style/TextAppearance.AppCompat.Title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center_horizontal"
-        android:drawablePadding="@dimen/small_space"
-        android:drawableTop="@drawable/ic_assignment_black_144dp"
-        android:text="@string/no_tasks"
-        android:visibility="gone"
-        tools:visibility="visible"
-        />
+        <import type="android.view.View"/>
 
-</FrameLayout>
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.viewmodels.TasksViewModel"
+            />
+    </data>
+
+    <FrameLayout
+        android:id="@+id/fl_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        tools:context=".presentation.ui.fragments.TasksFragment"
+        >
+
+        <include
+            android:id="@+id/srl_rv"
+            layout="@layout/include_srl_recycler_view"
+            app:viewModel="@{viewModel}"
+            />
+
+        <TextView
+            android:id="@+id/empty_view"
+            style="@style/TextAppearance.AppCompat.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:drawablePadding="@dimen/small_space"
+            android:drawableTop="@drawable/ic_assignment_black_144dp"
+            android:gravity="center_horizontal"
+            android:text="@string/no_tasks"
+            android:visibility="@{!viewModel.empty ? View.GONE : viewModel.loading ? View.GONE : View.VISIBLE}"
+            />
+
+    </FrameLayout>
+</layout>
