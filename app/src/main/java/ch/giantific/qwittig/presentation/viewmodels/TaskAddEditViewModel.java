@@ -30,6 +30,11 @@ public interface TaskAddEditViewModel extends
         ItemTouchHelperAdapter {
 
     @Bindable
+    String getTaskTitle();
+
+    void setTaskTitle(@NonNull String taskTitle);
+
+    @Bindable
     Date getTaskDeadline();
 
     void setTaskDeadline(@NonNull Date deadline);
@@ -70,8 +75,6 @@ public interface TaskAddEditViewModel extends
         void showDatePickerDialog();
 
         String getTaskTitle();
-
-        void setTaskTitle(@NonNull String oldTaskTitle);
 
         /**
          * Sets the result depending on the action taken and finishes the screen

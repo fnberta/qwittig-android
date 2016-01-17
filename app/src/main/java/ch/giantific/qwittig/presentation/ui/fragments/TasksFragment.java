@@ -102,7 +102,7 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment<TasksViewModel
 
     @Override
     protected RecyclerView.Adapter getRecyclerAdapter() {
-        return new TasksRecyclerAdapter(getActivity(), mViewModel);
+        return new TasksRecyclerAdapter(mViewModel);
     }
 
     @Override

@@ -66,6 +66,7 @@
                         android:hint="@string/hint_new_task"
                         android:imeOptions="actionDone"
                         android:inputType="text|textCapSentences"
+                        android:text="@{viewModel.taskTitle}"
                         />
 
                 </android.support.design.widget.TextInputLayout>

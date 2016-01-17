@@ -47,11 +47,6 @@ public class TaskAddActivity extends BaseActivity<TaskAddEditViewModel>
     }
 
     @Override
-    public void setTaskTitle(String title) {
-        mBinding.etTaskAddTitle.setText(title);
-    }
-
-    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_task_add_edit);
@@ -78,7 +73,7 @@ public class TaskAddActivity extends BaseActivity<TaskAddEditViewModel>
     }
 
     TaskAddEditFragment getTaskFragment() {
-        return new TaskAddEditFragment();
+        return TaskAddEditFragment.newAddInstance();
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)

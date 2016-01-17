@@ -46,6 +46,7 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
     Date mTaskDeadline;
     ArrayList<TaskUser> mTaskUsersInvolved;
     TaskRepository mTaskRepo;
+    String mTaskTitle;
     private int mTaskTimeFrame;
     private List<ParseUser> mTaskUsersAvailable = new ArrayList<>();
 
@@ -140,6 +141,17 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
                     }
                 })
         );
+    }
+
+    @Override
+    public String getTaskTitle() {
+        return mTaskTitle;
+    }
+
+    @Override
+    public void setTaskTitle(@NonNull String taskTitle) {
+        mTaskTitle = taskTitle;
+        notifyPropertyChanged(BR.taskTitle);
     }
 
     @Override

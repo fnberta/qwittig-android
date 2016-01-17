@@ -93,7 +93,7 @@ public class TaskAddEditViewModelEditImpl extends TaskAddEditViewModelAddImpl {
 
     private void restoreOldValues() {
         mOldTaskTitle = mEditTask.getTitle();
-        mView.setTaskTitle(mOldTaskTitle);
+        setTaskTitle(mOldTaskTitle);
 
         mOldTaskTimeFrame = mEditTask.getTimeFrame();
         setTimeFrame(mOldTaskTimeFrame);

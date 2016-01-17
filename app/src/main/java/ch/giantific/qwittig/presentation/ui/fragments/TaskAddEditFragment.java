@@ -54,6 +54,7 @@ public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, Task
     TaskUsersInvolvedRecyclerAdapter mUsersRecyclerAdapter;
     private FragmentTaskAddBinding mBinding;
     private ItemTouchHelper mUsersItemTouchHelper;
+
     public TaskAddEditFragment() {
         // required empty constructor
     }
@@ -183,11 +184,6 @@ public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, Task
     }
 
     @Override
-    public void setTaskTitle(@NonNull String oldTaskTitle) {
-        mActivity.setTaskTitle(oldTaskTitle);
-    }
-
-    @Override
     public void finishScreen(@TaskResult int taskResult) {
         final Activity activity = getActivity();
         activity.setResult(taskResult);
@@ -249,12 +245,5 @@ public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, Task
          */
         @NonNull
         String getTaskTitle();
-
-        /**
-         * Sets the title of the task.
-         *
-         * @param title the title to set
-         */
-        void setTaskTitle(String title);
     }
 }
