@@ -29,6 +29,8 @@ public interface NavDrawerViewModel extends Observable, ViewInteraction<NavDrawe
     @Bindable
     int getSelectedGroup();
 
+    void notifySelectedGroupChanged();
+
     boolean isUserLoggedIn();
 
     void onLoginSuccessful();

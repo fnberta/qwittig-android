@@ -19,7 +19,7 @@ import com.parse.LogOutCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
-import ch.giantific.qwittig.LocalBroadcast;
+import ch.giantific.qwittig.LocalBroadcastImpl;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.ui.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.AccountCreateDialogFragment;
@@ -34,7 +34,7 @@ import ch.giantific.qwittig.presentation.workerfragments.BaseWorkerListener;
  */
 public abstract class BaseActivity<T extends ViewModel>
         extends AppCompatActivity
-        implements BaseFragment.ActivityListener<T>, BaseWorkerListener,
+        implements BaseFragment.ActivityListener, BaseWorkerListener,
         AccountCreateDialogFragment.DialogInteractionListener,
         GroupCreateDialogFragment.DialogInteractionListener {
 
@@ -54,7 +54,7 @@ public abstract class BaseActivity<T extends ViewModel>
     private BroadcastReceiver mLocalBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, @NonNull Intent intent) {
-            final int dataType = intent.getIntExtra(LocalBroadcast.INTENT_DATA_TYPE, 0);
+            final int dataType = intent.getIntExtra(LocalBroadcastImpl.INTENT_DATA_TYPE, 0);
             handleLocalBroadcast(intent, dataType);
         }
     };
@@ -88,16 +88,8 @@ public abstract class BaseActivity<T extends ViewModel>
         super.onResume();
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mLocalBroadcastReceiver,
-                new IntentFilter(LocalBroadcast.INTENT_FILTER_DATA_NEW));
+                new IntentFilter(LocalBroadcastImpl.INTENT_FILTER_DATA_NEW));
     }
-
-    @Override
-    public void setViewModel(@NonNull T viewModel) {
-        mViewModel = viewModel;
-        bindViewModel();
-    }
-
-    protected abstract void bindViewModel();
 
     @Override
     protected void onPause() {
@@ -113,7 +105,7 @@ public abstract class BaseActivity<T extends ViewModel>
             @Override
             public void done(ParseException e) {
                 // ignore possible exception, currentUser will always be null now
-                Intent intent = new Intent(context, HomeActivity.class);
+                final Intent intent = new Intent(context, HomeActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             }
@@ -122,7 +114,7 @@ public abstract class BaseActivity<T extends ViewModel>
 
     @Override
     public void onCreateGroupSelected() {
-        Intent intent = new Intent(this, SettingsGroupNewActivity.class);
+        final Intent intent = new Intent(this, SettingsGroupNewActivity.class);
         startActivity(intent);
     }
 

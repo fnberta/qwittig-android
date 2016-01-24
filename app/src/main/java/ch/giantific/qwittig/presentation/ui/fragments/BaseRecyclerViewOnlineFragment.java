@@ -28,7 +28,8 @@ import ch.giantific.qwittig.presentation.viewmodels.ViewModel;
  * @see SwipeRefreshLayout
  * @see ProgressBar
  */
-public abstract class BaseRecyclerViewOnlineFragment<T extends OnlineListViewModel, S extends BaseFragment.ActivityListener<T>> extends BaseRecyclerViewFragment<T, S> {
+public abstract class BaseRecyclerViewOnlineFragment<T extends OnlineListViewModel, S extends BaseFragment.ActivityListener>
+        extends BaseRecyclerViewFragment<T, S> {
 
     public BaseRecyclerViewOnlineFragment() {
     }

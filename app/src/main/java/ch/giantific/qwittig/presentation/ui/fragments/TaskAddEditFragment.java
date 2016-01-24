@@ -117,6 +117,11 @@ public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, Task
         setupTimeFrameSpinner();
     }
 
+    @Override
+    protected void setViewModelToActivity() {
+        mActivity.setViewModel(mViewModel);
+    }
+
     private void setupUsersInvolvedRecyclerView() {
         mBinding.rvTaskUsersInvolved.setHasFixedSize(true);
         mBinding.rvTaskUsersInvolved.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -237,7 +242,10 @@ public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, Task
      * </p>
      * Extends {@link BaseFragment.ActivityListener}.
      */
-    public interface ActivityListener extends BaseFragment.ActivityListener<TaskAddEditViewModel> {
+    public interface ActivityListener extends BaseFragment.ActivityListener {
+
+        void setViewModel(@NonNull TaskAddEditViewModel viewModel);
+
         /**
          * Gets the title of task.
          *

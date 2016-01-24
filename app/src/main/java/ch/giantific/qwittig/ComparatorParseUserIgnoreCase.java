@@ -28,8 +28,8 @@ public class ComparatorParseUserIgnoreCase implements Comparator<ParseUser> {
 
     @Override
     public int compare(@NonNull ParseUser lhs, @NonNull ParseUser rhs) {
-        String nicknameLhs = ((User) lhs).getNickname();
-        String nicknameRhs = ((User) rhs).getNickname();
+        final String nicknameLhs = ((User) lhs).getNickname();
+        final String nicknameRhs = ((User) rhs).getNickname();
         String compareLhs = NOT_AVAILABLE;
         String compareRhs = NOT_AVAILABLE;
         if (!TextUtils.isEmpty(nicknameLhs)) {

@@ -51,7 +51,7 @@ public abstract class BaseWorker<T, S extends BaseWorkerListener> extends Fragme
 
         final Bundle args = getArguments();
         if (args == null) {
-            mActivity.onWorkerError(getWorkerTag());
+            onError();
             return;
         }
 
@@ -59,7 +59,7 @@ public abstract class BaseWorker<T, S extends BaseWorkerListener> extends Fragme
         if (observable != null) {
             mSubscription = observable.subscribe(mSubject);
         } else {
-            mActivity.onWorkerError(getWorkerTag());
+            onError();
         }
     }
 
@@ -67,7 +67,7 @@ public abstract class BaseWorker<T, S extends BaseWorkerListener> extends Fragme
     public void onStart() {
         super.onStart();
 
-        setStream(mSubject.asObservable(), getWorkerTag());
+        setStream(mSubject.asObservable());
     }
 
 
@@ -87,10 +87,10 @@ public abstract class BaseWorker<T, S extends BaseWorkerListener> extends Fragme
         }
     }
 
-    protected abstract String getWorkerTag();
-
     @Nullable
     protected abstract Observable<T> getObservable(@NonNull Bundle args);
 
-    protected abstract void setStream(@NonNull Observable<T> observable, @NonNull String workerTag);
+    protected abstract void onError();
+
+    protected abstract void setStream(@NonNull Observable<T> observable);
 }

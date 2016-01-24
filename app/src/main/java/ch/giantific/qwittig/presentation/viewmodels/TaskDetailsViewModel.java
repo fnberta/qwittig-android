@@ -21,7 +21,7 @@ import ch.giantific.qwittig.domain.models.parse.User;
  * Created by fabio on 09.01.16.
  */
 public interface TaskDetailsViewModel extends
-        ListViewModel<TaskDetailsViewModel.ViewListener> {
+        ListViewModel<TaskHistory, TaskDetailsViewModel.ViewListener> {
 
     int RESULT_TASK_DELETED = 2;
     int RESULT_GROUP_CHANGED = 3;

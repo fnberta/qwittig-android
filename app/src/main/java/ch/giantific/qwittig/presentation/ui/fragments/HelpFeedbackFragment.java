@@ -5,6 +5,7 @@
 package ch.giantific.qwittig.presentation.ui.fragments;
 
 import android.app.Fragment;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -46,6 +47,9 @@ public class HelpFeedbackFragment extends Fragment implements
     private static final int HELP_RECOMMEND = 8;
     private static final String EMAIL_SUPPORT = "support@qwittig.ch";
     private static final String EMAIL_FEEDBACK = "feedback@qwittig.ch";
+    private static final String WEBSITE_URL = "http://www.qwittig.ch/faq";
+    private static final String FACEBOOK_URL = "http://facebook.com/qwittig";
+    private static final String TWITTER_URL = "http://twitter.com/qwittig";
 
     public HelpFeedbackFragment() {
     }
@@ -72,17 +76,17 @@ public class HelpFeedbackFragment extends Fragment implements
     public void onHelpFeedbackItemClicked(int position) {
         switch (position) {
             case HELP_TIPS:
-                openWebsite("http://www.qwittig.ch/faq");
+                openWebsite(WEBSITE_URL);
                 break;
             case HELP_CONTACT_SUPPORT:
                 sendEmail(EMAIL_SUPPORT, getString(R.string.email_support_subject),
                         getString(R.string.email_support_message));
                 break;
             case HELP_FACEBOOK:
-                openWebsite("http://facebook.com/qwittig");
+                openWebsite(FACEBOOK_URL);
                 break;
             case HELP_TWITTER:
-                openWebsite("http://twitter.com/qwittig");
+                openWebsite(TWITTER_URL);
                 break;
             case HELP_GIVE_FEEDBACK:
                 sendEmail(EMAIL_FEEDBACK, getString(R.string.email_feedback_subject), "");
@@ -119,7 +123,7 @@ public class HelpFeedbackFragment extends Fragment implements
             intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" +
                     appPackageName));
             startActivity(intent);
-        } catch (android.content.ActivityNotFoundException anfe) {
+        } catch (ActivityNotFoundException e) {
             intent = new Intent(Intent.ACTION_VIEW,
                     Uri.parse("http://play.google.com/store/apps/details?id=" + appPackageName));
             startActivity(intent);

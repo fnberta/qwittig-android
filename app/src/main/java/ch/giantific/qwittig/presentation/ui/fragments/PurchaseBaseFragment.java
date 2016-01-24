@@ -983,7 +983,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
 
     private void getImage() {
         if (USE_CUSTOM_CAMERA) {
-            Intent intent = new Intent(getActivity(), CameraActivity.class);
+            final Intent intent = new Intent(getActivity(), CameraActivity.class);
             startActivityForResult(intent, INTENT_REQUEST_IMAGE_CAPTURE);
         } else {
             final Context context = getActivity();
@@ -998,7 +998,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
             }
 
             mReceiptImagePath = imageFile.getAbsolutePath();
-            Intent cameraIntent = CameraUtils.getCameraIntent(context, imageFile);
+            final Intent cameraIntent = CameraUtils.getCameraIntent(context, imageFile);
             if (cameraIntent != null) {
                 startActivityForResult(cameraIntent, INTENT_REQUEST_IMAGE_CAPTURE);
             }
@@ -1006,7 +1006,7 @@ public abstract class PurchaseBaseFragment extends BaseFragment implements
     }
 
     private void startSystemSettings() {
-        Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        final Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         intent.setData(Uri.parse("package:" + getActivity().getPackageName()));
         startActivity(intent);
     }

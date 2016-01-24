@@ -5,13 +5,16 @@
 package ch.giantific.qwittig.utils;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.databinding.BindingAdapter;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -95,9 +98,9 @@ public class BindingUtils {
         view.setTextColor(ContextCompat.getColor(context, color));
     }
 
-    @BindingAdapter({"usersInvolved"})
-    public static void setTaskUsersInvolved(TextView view, User currentUser,
-                                            List<ParseUser> usersInvolved) {
+    @BindingAdapter({"usersInvolved", "currentUser"})
+    public static void setTaskUsersInvolved(TextView view, List<ParseUser> usersInvolved,
+                                            User currentUser) {
         final Context context = view.getContext();
         final User userResponsible = (User) usersInvolved.get(0);
         String usersInvolvedString = "";
@@ -117,5 +120,22 @@ public class BindingUtils {
         }
 
         view.setText(usersInvolvedString);
+    }
+
+    @BindingAdapter({"purchaseBackground"})
+    public static void setPurchaseBackground(View view, boolean read) {
+        final Context context = view.getContext();
+        if (read) {
+            int[] attrs = new int[]{R.attr.selectableItemBackground};
+            TypedArray typedArray = context.obtainStyledAttributes(attrs);
+            int backgroundResource = typedArray.getResourceId(0, 0);
+            typedArray.recycle();
+
+            view.setBackgroundResource(backgroundResource);
+        } else if (Utils.isRunningLollipopAndHigher()) {
+            view.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_white));
+        } else {
+            view.setBackgroundColor(ContextCompat.getColor(context, android.R.color.white));
+        }
     }
 }

@@ -4,65 +4,86 @@
   ~ Copyright (c) 2015 Fabio Berta
   -->
 
-<RelativeLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="@dimen/list_avatar_with_two_line_text">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
 
-    <ImageView
-        android:id="@+id/iv_avatar"
-        android:layout_width="@dimen/avatar_size"
-        android:layout_height="@dimen/avatar_size"
-        android:layout_marginStart="@dimen/key_line_1"
-        android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_avatar_size"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="true"
-        android:contentDescription="@string/user_avatar"
-        tools:src="@drawable/ic_account_circle_black_40dp"
-        />
+    <data>
 
-    <LinearLayout
-        android:id="@+id/ll_user_date"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@id/iv_avatar"
-        android:layout_toStartOf="@+id/tv_amount"
-        android:layout_marginEnd="@dimen/normal_space"
-        android:gravity="center_vertical"
-        >
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.viewmodels.rows.CompPaidRowViewModel"
+            />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/list_avatar_with_two_line_text">
+
+        <ImageView
+            android:id="@+id/iv_avatar"
+            android:layout_width="@dimen/avatar_size"
+            android:layout_height="@dimen/avatar_size"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_avatar_size"
+            android:layout_marginStart="@dimen/key_line_1"
+            android:contentDescription="@string/user_avatar"
+            app:avatar="@{viewModel.compUserAvatar}"
+            app:fallback="@{@drawable/ic_account_circle_black_40dp}"
+            app:withRipple="@{false}"
+            tools:src="@drawable/ic_account_circle_black_40dp"
+            />
+
+        <LinearLayout
+            android:id="@+id/ll_user_date"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_marginEnd="@dimen/normal_space"
+            android:layout_toEndOf="@id/iv_avatar"
+            android:layout_toStartOf="@+id/tv_amount"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            >
+
+            <TextView
+                android:id="@+id/tv_user"
+                style="@style/TextAppearance.AppCompat.Subhead.List"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:text="@{viewModel.compUserValid ? viewModel.compUsername : @string/user_deleted}"
+                tools:text="Vera"/>
+
+            <TextView
+                android:id="@+id/tv_date"
+                style="@style/TextAppearance.AppCompat.Body1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:text="@{viewModel.compDate}"
+                tools:text="23.02.2015"/>
+
+        </LinearLayout>
 
         <TextView
-            android:id="@+id/tv_user"
+            android:id="@+id/tv_amount"
             style="@style/TextAppearance.AppCompat.Subhead.List"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            tools:text="Vera"/>
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/key_line_1"
+            android:layout_marginStart="@dimen/normal_space"
+            android:gravity="center"
+            android:text="@{viewModel.compAmount}"
+            android:textColor="@{viewModel.compAmountPos ? @color/green : @color/red}"
+            tools:text="-50"
+            tools:textColor="@color/green"/>
 
-        <TextView
-            android:id="@+id/tv_date"
-            style="@style/TextAppearance.AppCompat.Body1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            tools:text="23.02.2015"/>
+    </RelativeLayout>
 
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/tv_amount"
-        style="@style/TextAppearance.AppCompat.Subhead.List"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
-        android:layout_marginStart="@dimen/normal_space"
-        android:layout_marginEnd="@dimen/key_line_1"
-        android:gravity="center"
-        tools:text="-50"
-        tools:textColor="@color/green"/>
-
-</RelativeLayout>
+</layout>

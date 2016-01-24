@@ -29,7 +29,7 @@
             android:contentDescription="@string/user_avatar"
             android:scaleType="centerCrop"
             app:backdrop="@{viewModel.userAvatar}"
-            tools:src="@drawable/ic_account_box_black_120dp"
+            tools:src="@drawable/ic_account_box_black_144dp"
             />
 
         <LinearLayout

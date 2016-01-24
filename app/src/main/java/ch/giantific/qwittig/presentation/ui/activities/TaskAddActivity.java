@@ -33,8 +33,7 @@ import ch.giantific.qwittig.utils.Utils;
  * Subclass of {@link BaseActivity}.
  */
 public class TaskAddActivity extends BaseActivity<TaskAddEditViewModel>
-        implements
-        TaskAddEditFragment.ActivityListener,
+        implements TaskAddEditFragment.ActivityListener,
         DatePickerDialog.OnDateSetListener,
         DiscardChangesDialogFragment.DialogInteractionListener {
 
@@ -91,8 +90,9 @@ public class TaskAddActivity extends BaseActivity<TaskAddEditViewModel>
     }
 
     @Override
-    protected void bindViewModel() {
-        mBinding.setViewModel(mViewModel);
+    public void setViewModel(@NonNull TaskAddEditViewModel viewModel) {
+        mViewModel = viewModel;
+        mBinding.setViewModel(viewModel);
     }
 
     @Override

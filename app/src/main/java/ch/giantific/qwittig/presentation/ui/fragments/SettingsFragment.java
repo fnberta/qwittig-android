@@ -87,7 +87,6 @@ public class SettingsFragment extends PreferenceFragment implements
     private static final int UPDATE_LIST_NAME = 1;
     private static final int UPDATE_LIST_GROUP = 2;
     private UserRepository mUserRepo;
-    private FragmentInteractionListener mListener;
     private ProgressDialog mProgressDialog;
     private SharedPreferences mSharedPrefs;
     private PreferenceCategory mCategoryMe;
@@ -101,26 +100,17 @@ public class SettingsFragment extends PreferenceFragment implements
     private Group mCurrentGroup;
 
     public SettingsFragment() {
+        // required empty constructor
     }
 
-    @Override
-    public void onAttach(@NonNull Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (FragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement DialogInteractionListener");
-        }
-    }
-
+    @SuppressWarnings("unchecked")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
 
-        mUserRepo = new ParseUserRepository(getActivity());
+        mUserRepo = new ParseUserRepository();
 
         final Context context = getActivity();
         PreferenceManager.setDefaultValues(context, R.xml.preferences, false);
@@ -146,8 +136,8 @@ public class SettingsFragment extends PreferenceFragment implements
         prefProfile.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                Intent intent = new Intent(context, SettingsProfileActivity.class);
-                ActivityOptionsCompat activityOptionsCompat =
+                final Intent intent = new Intent(context, SettingsProfileActivity.class);
+                final ActivityOptionsCompat activityOptionsCompat =
                         ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity());
                 startActivityForResult(intent, SettingsActivity.INTENT_REQUEST_SETTINGS_PROFILE,
                         activityOptionsCompat.toBundle());
@@ -158,8 +148,8 @@ public class SettingsFragment extends PreferenceFragment implements
         prefStores.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                Intent intent = new Intent(context, SettingsStoresActivity.class);
-                ActivityOptionsCompat activityOptionsCompat =
+                final Intent intent = new Intent(context, SettingsStoresActivity.class);
+                final ActivityOptionsCompat activityOptionsCompat =
                         ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity());
                 startActivity(intent, activityOptionsCompat.toBundle());
                 return true;
@@ -169,8 +159,8 @@ public class SettingsFragment extends PreferenceFragment implements
         prefGroupNew.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                Intent intent = new Intent(context, SettingsGroupNewActivity.class);
-                ActivityOptionsCompat activityOptionsCompat =
+                final Intent intent = new Intent(context, SettingsGroupNewActivity.class);
+                final ActivityOptionsCompat activityOptionsCompat =
                         ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity());
                 startActivityForResult(intent, SettingsActivity.INTENT_REQUEST_SETTINGS_GROUP_NEW,
                         activityOptionsCompat.toBundle());
@@ -203,11 +193,6 @@ public class SettingsFragment extends PreferenceFragment implements
      * balance is zero.
      */
     public void onLeaveGroupSelected() {
-        if (ParseUtils.isTestUser(mCurrentUser)) {
-            mListener.showAccountCreateDialog();
-            return;
-        }
-
         if (!balanceIsZero(mCurrentGroup)) {
             showBalanceNotZeroDialog();
             return;
@@ -562,15 +547,11 @@ public class SettingsFragment extends PreferenceFragment implements
      * Shows a dialog that asks the user if he/she really wants to delete the account.
      */
     public void deleteAccount() {
-        if (ParseUtils.isTestUser(mCurrentUser)) {
-            mListener.showAccountCreateDialog();
-        } else {
-            showAccountDeleteDialog();
-        }
+        showAccountDeleteDialog();
     }
 
     private void showAccountDeleteDialog() {
-        AccountDeleteDialogFragment accountDeleteDialogFragment =
+        final AccountDeleteDialogFragment accountDeleteDialogFragment =
                 new AccountDeleteDialogFragment();
         accountDeleteDialogFragment.show(getFragmentManager(), ACCOUNT_DELETE_DIALOG);
     }
@@ -579,11 +560,6 @@ public class SettingsFragment extends PreferenceFragment implements
      * Deletes the account of a user by using a retained worker fragment for the task.
      */
     public void onDeleteAccountSelected() {
-        if (ParseUtils.isTestUser(mCurrentUser)) {
-            mListener.showAccountCreateDialog();
-            return;
-        }
-
         if (!Utils.isNetworkAvailable(getActivity())) {
             Snackbar.make(getView(), R.string.toast_no_connection, Snackbar.LENGTH_LONG).show();
             return;
@@ -598,20 +574,5 @@ public class SettingsFragment extends PreferenceFragment implements
         super.onPause();
 
         mSharedPrefs.unregisterOnSharedPreferenceChangeListener(this);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    /**
-     * Defines the interaction with the hosting {@link Activity}.
-     * <p/>
-     * Extends {@link BaseFragment.BaseFragmentInteractionListener}.
-     */
-    public interface FragmentInteractionListener extends BaseFragment.BaseFragmentInteractionListener {
-
     }
 }

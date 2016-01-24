@@ -12,7 +12,6 @@ import android.support.annotation.StringRes;
 import java.util.Calendar;
 import java.util.Date;
 
-import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.parse.Task;
 import ch.giantific.qwittig.domain.models.parse.User;
@@ -21,34 +20,32 @@ import ch.giantific.qwittig.utils.DateUtils;
 /**
  * Created by fabio on 16.01.16.
  */
-public class TaskRowViewModel extends BaseObservable {
+public class TaskRowViewModel extends BaseObservable implements CardTopProgressViewModel {
 
     private Task mTask;
     private User mTaskUserResponsible;
     private User mCurrentUser;
 
+    // TODO: fix users involved (nothing displayed right now)
+
     public TaskRowViewModel(@NonNull Task task, @NonNull User currentUser) {
-        setTaskInfo(task, currentUser);
+        mCurrentUser = currentUser;
+        setTaskInfo(task);
+    }
+
+    private void setTaskInfo(@NonNull Task task) {
+        mTask = task;
+        mTaskUserResponsible = task.getUserResponsible();
     }
 
     /**
-     * Sets the task and the other info needed. Used to recycle view models.
+     * Updates the task and the other info needed. Used to recycle view models.
      *
-     * @param task        the task to display
-     * @param currentUser the current user
+     * @param task the task to display
      */
-    public void setTaskInfo(@NonNull Task task, @NonNull User currentUser) {
-        mTask = task;
-        mTaskUserResponsible = task.getUserResponsible();
-        mCurrentUser = currentUser;
-        notifyPropertyChanged(BR.taskTitle);
-        notifyPropertyChanged(BR.taskTimeFrame);
-        notifyPropertyChanged(BR.taskUserResponsibleNickname);
-        notifyPropertyChanged(BR.taskUserResponsibleAvatar);
-        notifyPropertyChanged(BR.daysToTaskDeadline);
-        notifyPropertyChanged(BR.taskLoading);
-        notifyPropertyChanged(BR.currentUserResponsible);
-        notifyPropertyChanged(BR.taskDoneText);
+    public void updateTaskInfo(@NonNull Task task) {
+        setTaskInfo(task);
+        notifyChange();
     }
 
     @Bindable
@@ -128,8 +125,9 @@ public class TaskRowViewModel extends BaseObservable {
         return 0;
     }
 
+    @Override
     @Bindable
-    public boolean isTaskLoading() {
+    public boolean isItemLoading() {
         return mTask.isLoading();
     }
 

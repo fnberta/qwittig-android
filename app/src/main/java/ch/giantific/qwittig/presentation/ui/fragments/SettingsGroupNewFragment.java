@@ -100,11 +100,6 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
      * group with same name and if not creates the new group with a retained worker fragment.
      */
     public void addNewGroup() {
-        if (ParseUtils.isTestUser(mCurrentUser)) {
-            mListener.showAccountCreateDialog();
-            return;
-        }
-
         if (mIsCreatingNew) {
             return;
         }

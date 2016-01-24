@@ -79,7 +79,7 @@
     <string name="title_activity_finance">Finanzen</string>
     <string name="hint_password_new">Neues Passwort</string>
     <string name="balance_owe_you">schuldet dir %1$s</string>
-    <string name="button_done">Erledigt</string>
+    <string name="comp_unpaid_button_confirm">Bestätigen</string>
     <string name="button_remind">Erinnere %1$s</string>
     <string name="balance_gets_from_you">erhält %1$s von dir</string>
     <string name="button_remind_paid">Erinnere %1$s an Zahlung</string>
@@ -227,7 +227,7 @@
     <string name="action_show_group">Zeige Gruppenwerte</string>
     <string name="action_show_percent">Zeige Prozentwerte</string>
     <string name="progress_purchase_auto">Hochladen und verarbeiten….</string>
-    <string name="action_compensation_change_amount">Betrag ändern</string>
+    <string name="comp_unpaid_button_change_amount">Betrag ändern</string>
     <string name="dialog_positive_change">Ändern</string>
     <string name="dialog_change_amount_message">Gib den gewünschten neuen Betrag ein.</string>
     <string name="push_compensation_amount_changed_title">Betrag geändert</string>
@@ -331,5 +331,13 @@
     <string name="toast_login_failed_facebook">Login mit Facebook ist fehlgeschlagen</string>
     <string name="toast_error_tasks_load">Laden der Aufgaben fehlgeschlagen</string>
     <string name="toast_error_task_save">Speichern der Aufgabe fehlgeschlagen</string>
+    <string name="toast_error_users_load">Laden der Nutzer fehlgeschlagen</string>
+    <string name="toast_error_comps_load">Laden der Abrechnungen fehlgeschlagen</string>
+    <string name="toast_compensation_accepted">Zahlung akzeptiert</string>
+    <string name="header_comps_pending">Pendent</string>
+    <string name="header_comps_suggestions">Vorschläge</string>
+    <string name="comp_unpaid_button_claim">Einfordern</string>
+    <string name="toast_error_purchases_load">Laden der Einkäufe fehlgeschlagen</string>
+    <string name="toast_error_drafts_load">Laden der Entwürfe fehlgeschlagen</string>
 
 </resources>

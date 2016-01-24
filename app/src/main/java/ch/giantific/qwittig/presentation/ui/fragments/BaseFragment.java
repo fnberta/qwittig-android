@@ -26,7 +26,7 @@ import ch.giantific.qwittig.utils.WorkerUtils;
  * <p/>
  * Subclass of {@link Fragment}.
  */
-public abstract class BaseFragment<T extends ViewModel, S extends BaseFragment.ActivityListener<T>>
+public abstract class BaseFragment<T extends ViewModel, S extends BaseFragment.ActivityListener>
         extends Fragment
         implements ViewModel.ViewListener {
 
@@ -62,7 +62,17 @@ public abstract class BaseFragment<T extends ViewModel, S extends BaseFragment.A
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mActivity.setViewModel(mViewModel);
+        setViewModelToActivity();
+    }
+
+    protected abstract void setViewModelToActivity();
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        mViewModel.attachView(this);
     }
 
     @Override
@@ -121,7 +131,6 @@ public abstract class BaseFragment<T extends ViewModel, S extends BaseFragment.A
         WorkerUtils.removeWorker(getFragmentManager(), workerTag);
     }
 
-    public interface ActivityListener<T extends ViewModel> {
-        void setViewModel(@NonNull T viewModel);
+    public interface ActivityListener {
     }
 }

@@ -22,12 +22,14 @@ import rx.Single;
 public interface PurchaseRepository extends Repository {
 
     /**
-     * Queries the local data store for purchases .
+     * Queries the local data store for purchases.
      *
      * @param currentUser the current user
+     * @param group       the group for which to get purchases for
      * @param getDrafts   whether to query for drafts or purchases
      */
-    Observable<Purchase> getPurchasesLocalAsync(@NonNull User currentUser, boolean getDrafts);
+    Observable<Purchase> getPurchasesLocalAsync(@NonNull User currentUser, @NonNull Group group,
+                                                boolean getDrafts);
 
     /**
      * Queries the local data store for a single purchase.

@@ -8,52 +8,48 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.view.ActionMode;
-import android.view.View;
 
-import com.parse.ParseConfig;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.List;
-
-import ch.berta.fabio.fabspeeddial.FabMenu;
-import ch.giantific.qwittig.BuildConfig;
-import ch.giantific.qwittig.LocalBroadcast;
+import ch.giantific.qwittig.LocalBroadcastImpl;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.presentation.workerfragments.group.InvitedGroupWorker;
-import ch.giantific.qwittig.presentation.workerfragments.query.MoreQueryWorker;
-import ch.giantific.qwittig.presentation.workerfragments.query.PurchasesUpdateListener;
-import ch.giantific.qwittig.utils.parse.ParseConfigUtils;
+import ch.giantific.qwittig.databinding.ActivityHomeBinding;
+import ch.giantific.qwittig.di.components.NavDrawerComponent;
 import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
-import ch.giantific.qwittig.services.ParseQueryService;
+import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.presentation.ui.adapters.TabsAdapter;
 import ch.giantific.qwittig.presentation.ui.fragments.HomeDraftsFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.HomePurchasesFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.PurchaseAddFragment;
-import ch.giantific.qwittig.presentation.ui.fragments.dialogs.GoPremiumDialogFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.GroupJoinDialogFragment;
-import ch.giantific.qwittig.utils.WorkerUtils;
+import ch.giantific.qwittig.presentation.viewmodels.HomeDraftsViewModel;
+import ch.giantific.qwittig.presentation.viewmodels.HomePurchasesViewModel;
+import ch.giantific.qwittig.presentation.viewmodels.HomeViewModel;
+import ch.giantific.qwittig.presentation.workerfragments.group.InvitedGroupWorker;
+import ch.giantific.qwittig.presentation.workerfragments.query.PurchasesQueryMoreListener;
+import ch.giantific.qwittig.presentation.workerfragments.query.PurchasesUpdateListener;
+import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
+import ch.giantific.qwittig.services.ParseQueryService;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.ViewUtils;
+import ch.giantific.qwittig.utils.WorkerUtils;
+import rx.Observable;
 
 /**
  * Provides the launcher activity for {@link Qwittig}, hosts a viewpager with
@@ -65,112 +61,130 @@ import ch.giantific.qwittig.utils.ViewUtils;
  * <p/>
  * Subclass of {@link BaseNavDrawerActivity}.
  */
-public class HomeActivity extends BaseNavDrawerActivity implements
-        View.OnClickListener,
-        HomeDraftsFragment.FragmentInteractionListener,
+public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implements
+        HomeViewModel.ViewListener,
+        HomePurchasesFragment.ActivityListener,
+        HomeDraftsFragment.ActivityListener,
+        PurchasesUpdateListener,
+        PurchasesQueryMoreListener,
         GroupJoinDialogFragment.DialogInteractionListener,
         GroupCreateDialogFragment.DialogInteractionListener,
-        GoPremiumDialogFragment.DialogInteractionListener,
-        PurchasesUpdateListener,
-        InvitedGroupWorker.WorkerInteractionListener,
-        MoreQueryWorker.WorkerInteractionListener {
+        InvitedGroupWorker.WorkerInteractionListener {
 
     private static final String LOG_TAG = HomeActivity.class.getSimpleName();
     private static final String INVITED_GROUP_WORKER = "INVITED_GROUP_WORKER";
     private static final String URI_INVITED_GROUP_ID = "group";
-    private static final String STATE_PURCHASE_FRAGMENT = "STATE_PURCHASE_FRAGMENT";
-    private static final String STATE_DRAFTS_FRAGMENT = "STATE_DRAFTS_FRAGMENT";
     private static final String GROUP_JOIN_DIALOG = "GROUP_JOIN_DIALOG";
-    private static final String CREATE_GROUP_DIALOG = "CREATE_GROUP_DIALOG";
-    private static final String GO_PREMIUM_DIALOG = "GO_PREMIUM_DIALOG";
+    private ActivityHomeBinding mBinding;
+    private HomePurchasesViewModel mPurchasesViewModel;
+    private HomeDraftsViewModel mDraftsViewModel;
+    private HomeDraftsFragment mDraftsFragment;
     private Group mInvitedGroup;
     private String mInviteInitiator;
     private String mInvitedGroupId;
     private ProgressDialog mProgressDialog;
-    private HomePurchasesFragment mHomePurchasesFragment;
-    private HomeDraftsFragment mHomeDraftsFragment;
-    private FabMenu mFabMenu;
     private int mInvitationAction;
 
     @Override
     void handleLocalBroadcast(Intent intent, int dataType) {
         super.handleLocalBroadcast(intent, dataType);
 
-        if (dataType == LocalBroadcast.DATA_TYPE_PURCHASES_UPDATED) {
-            onPurchasesUpdated();
+        if (dataType == LocalBroadcastImpl.DATA_TYPE_PURCHASES_UPDATED) {
+            mPurchasesViewModel.updateList();
         }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_home);
 
         // check item in NavDrawer
         checkNavDrawerItem(R.id.nav_home);
 
-        ActionBar actionBar = getSupportActionBar();
+        final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setTitle(R.string.title_activity_home);
         }
 
-        mFabMenu = (FabMenu) findViewById(R.id.fab_menu);
-        mFabMenu.hideMenuButton(false);
-        new Handler().postDelayed(new Runnable() {
+        mBinding.fabMenu.hideMenuButton(false);
+        mBinding.fabMenu.postDelayed(new Runnable() {
             @Override
             public void run() {
-                mFabMenu.showMenuButton(true);
+                mBinding.fabMenu.showMenuButton(true);
             }
         }, ViewUtils.FAB_CIRCULAR_REVEAL_DELAY * 4);
 
-        FloatingActionButton fabAuto = (FloatingActionButton) findViewById(R.id.fab_auto);
-        fabAuto.setOnClickListener(this);
-        FloatingActionButton fabManual = (FloatingActionButton) findViewById(R.id.fab_manual);
-        fabManual.setOnClickListener(this);
+        // TODO: inject home view model with get from component
 
-        if (mUserIsLoggedIn) {
+        if (isUserLoggedIn()) {
             if (savedInstanceState == null) {
                 addViewPagerFragments();
-                checkForInvitations();
+                //            checkForInvitations();
             } else {
-                mHomePurchasesFragment = (HomePurchasesFragment) getFragmentManager()
-                        .getFragment(savedInstanceState, STATE_PURCHASE_FRAGMENT);
-                mHomeDraftsFragment = (HomeDraftsFragment) getFragmentManager()
-                        .getFragment(savedInstanceState, STATE_DRAFTS_FRAGMENT);
-
-                setupTabs();
+                // TODO: get drafts fragment reference
             }
         }
     }
 
     private void addViewPagerFragments() {
-        mHomePurchasesFragment = new HomePurchasesFragment();
-        mHomeDraftsFragment = new HomeDraftsFragment();
+        mDraftsFragment = new HomeDraftsFragment();
 
-        setupTabs();
-    }
+        final TabsAdapter tabsAdapter = new TabsAdapter(getFragmentManager());
+        tabsAdapter.addFragment(new HomePurchasesFragment(), getString(R.string.tab_purchases));
+        tabsAdapter.addFragment(mDraftsFragment, getString(R.string.title_activity_purchase_drafts));
+        mBinding.viewpager.setAdapter(tabsAdapter);
 
-    private void setupTabs() {
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-        TabsAdapter tabsAdapter = new TabsAdapter(getFragmentManager());
-        tabsAdapter.addFragment(mHomePurchasesFragment, getString(R.string.tab_purchases));
-        tabsAdapter.addFragment(mHomeDraftsFragment, getString(R.string.title_activity_purchase_drafts));
-        viewPager.setAdapter(tabsAdapter);
-
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(viewPager);
+        mBinding.tabs.setupWithViewPager(mBinding.viewpager);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        // If user is logged in, fragments will be added, hence save them
-        if (mUserIsLoggedIn) {
-            FragmentManager fragmentManager = getFragmentManager();
-            fragmentManager.putFragment(outState, STATE_PURCHASE_FRAGMENT, mHomePurchasesFragment);
-            fragmentManager.putFragment(outState, STATE_DRAFTS_FRAGMENT, mHomeDraftsFragment);
+        // TODO: save drafts fragment reference
+    }
+
+    @Override
+    protected void injectNavDrawerDependencies(@NonNull NavDrawerComponent navComp) {
+        navComp.inject(this);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case INTENT_REQUEST_PURCHASE_MODIFY:
+                switch (resultCode) {
+                    case PurchaseAddFragment.RESULT_PURCHASE_SAVED:
+                        showMessage(R.string.toast_purchase_added);
+                        break;
+                    case PurchaseAddFragment.RESULT_PURCHASE_SAVED_AUTO:
+                        showMessage(R.string.toast_purchase_added);
+                        break;
+                    case PurchaseAddFragment.RESULT_PURCHASE_DRAFT:
+                        showMessage(R.string.toast_purchase_added_draft);
+                        break;
+                    case PurchaseAddFragment.RESULT_PURCHASE_DISCARDED:
+                        showMessage(R.string.toast_purchase_discarded);
+                        break;
+                    case PurchaseAddFragment.RESULT_PURCHASE_ERROR:
+                        showMessage(R.string.toast_create_image_file_failed);
+                        break;
+                }
+                break;
         }
+    }
+
+    @Override
+    public void setPurchasesViewModel(@NonNull HomePurchasesViewModel viewModel) {
+        mPurchasesViewModel = viewModel;
+    }
+
+    @Override
+    public void setDraftsViewModel(@NonNull HomeDraftsViewModel viewModel) {
+        mDraftsViewModel = viewModel;
     }
 
     private void checkForInvitations() {
@@ -221,16 +235,13 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     private void getInvitedGroupWithWorker() {
-        FragmentManager fragmentManager = getFragmentManager();
-        Fragment invitedGroupWorker = WorkerUtils.findWorker(fragmentManager, INVITED_GROUP_WORKER);
-
-        // If the Fragment is non-null, then it is currently being
-        // retained across a configuration change.
-        if (invitedGroupWorker == null) {
-            invitedGroupWorker = InvitedGroupWorker.newInstance(mInvitedGroupId);
+        final FragmentManager fragmentManager = getFragmentManager();
+        Fragment fragment = WorkerUtils.findWorker(fragmentManager, INVITED_GROUP_WORKER);
+        if (fragment == null) {
+            fragment = InvitedGroupWorker.newInstance(mInvitedGroupId);
 
             fragmentManager.beginTransaction()
-                    .add(invitedGroupWorker, INVITED_GROUP_WORKER)
+                    .add(fragment, INVITED_GROUP_WORKER)
                     .commit();
         }
     }
@@ -266,21 +277,21 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     private void showGroupJoinDialog(String groupName) {
-        GroupJoinDialogFragment groupJoinDialogFragment =
+        final GroupJoinDialogFragment dialog =
                 GroupJoinDialogFragment.newInstance(groupName, mInviteInitiator);
-        groupJoinDialogFragment.show(getFragmentManager(), GROUP_JOIN_DIALOG);
+        dialog.show(getFragmentManager(), GROUP_JOIN_DIALOG);
     }
 
     @Override
     public void onJoinInvitedGroupSelected() {
         showProgressDialog(getString(R.string.progress_switch_groups));
 
-        InvitedGroupWorker invitedGroupWorker = (InvitedGroupWorker)
+        final InvitedGroupWorker invitedGroupWorker = (InvitedGroupWorker)
                 WorkerUtils.findWorker(getFragmentManager(), INVITED_GROUP_WORKER);
         invitedGroupWorker.joinInvitedGroup(mInvitedGroup);
     }
 
-    private void showProgressDialog(String message) {
+    private void showProgressDialog(@NonNull String message) {
         mProgressDialog = ProgressDialog.show(this, null, message);
     }
 
@@ -300,14 +311,8 @@ public class HomeActivity extends BaseNavDrawerActivity implements
 
         mCurrentGroup = mCurrentUser.getCurrentGroup();
         updateGroupSpinner();
-        queryAll();
-    }
-
-    private void queryAll() {
-        if (userIsInGroup()) {
-            mHomePurchasesFragment.setOnlineQueryInProgress(true);
-            ParseQueryService.startQueryAll(this);
-        }
+        // TODO: set query in progress in fragment
+        ParseQueryService.startQueryAll(this);
     }
 
     private void dismissProgressDialog() {
@@ -335,158 +340,68 @@ public class HomeActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    void afterLoginSetup() {
-        super.afterLoginSetup();
+    void onLoginSuccessful() {
+        super.onLoginSuccessful();
 
+        // TODO: fix setLoading(true) because online query is still happening
         addViewPagerFragments();
-        queryAll();
     }
 
     @Override
-    public void onClick(View view) {
-        int id = view.getId();
-        switch (id) {
-            case R.id.fab_auto: {
-                if (userIsInGroup()) {
-                    if (mIsPremium || mInTrialMode || BuildConfig.DEBUG) {
-                        Intent intent = new Intent(this, PurchaseAddActivity.class);
-                        intent.putExtra(PurchaseAddActivity.INTENT_PURCHASE_NEW_AUTO, true);
-                        intent.putExtra(PurchaseAddActivity.INTENT_PURCHASE_NEW_TRIAL_MODE, mInTrialMode);
-                        startActivityForResult(intent,
-                                HomeActivity.INTENT_REQUEST_PURCHASE_MODIFY);
-                    } else {
-                        showGoPremiumDialog();
-                    }
-                } else {
-                    showCreateGroupDialog();
-                }
-                break;
-            }
-            case R.id.fab_manual: {
-                if (userIsInGroup()) {
-                    Intent intent = new Intent(this, PurchaseAddActivity.class);
-                    intent.putExtra(PurchaseAddActivity.INTENT_PURCHASE_NEW_AUTO, false);
-                    ActivityOptionsCompat activityOptionsCompat =
-                            ActivityOptionsCompat.makeSceneTransitionAnimation(this);
-                    startActivityForResult(intent,
-                            HomeActivity.INTENT_REQUEST_PURCHASE_MODIFY,
-                            activityOptionsCompat.toBundle());
-                } else {
-                    showCreateGroupDialog();
-                }
-                break;
-            }
-        }
+    public void onNewGroupSet() {
+        super.onNewGroupSet();
 
-        mFabMenu.close();
-    }
-
-    private void showCreateGroupDialog() {
-        GroupCreateDialogFragment groupCreateDialogFragment =
-                GroupCreateDialogFragment.newInstance(R.string.dialog_group_create_purchases);
-        groupCreateDialogFragment.show(getFragmentManager(), CREATE_GROUP_DIALOG);
+        mPurchasesViewModel.onNewGroupSet();
+        mDraftsViewModel.onNewGroupSet();
     }
 
     @Override
-    public void onCreateGroupSelected() {
-        Intent intent = new Intent(this, SettingsGroupNewActivity.class);
-        startActivity(intent);
-    }
-
-    private void showGoPremiumDialog() {
-        GoPremiumDialogFragment goPremiumDialogFragment = new GoPremiumDialogFragment();
-        goPremiumDialogFragment.show(getFragmentManager(), GO_PREMIUM_DIALOG);
-    }
-
-    @Override
-    public void onGoPremiumSelected() {
-        goPremium();
-    }
-
-    @Override
-    public void onPurchaseUpdateFailed(@StringRes int errorCode) {
-        mHomePurchasesFragment.onPurchaseUpdateFailed(errorCode);
-    }
-
-    @Override
-    public void onPurchasesUpdated() {
-        // after login or user joined a new group, this will be set to true, hence set false
-        mHomePurchasesFragment.setOnlineQueryInProgress(false);
-        mHomePurchasesFragment.onPurchasesUpdated();
-    }
-
-    @Override
-    public void onAllPurchasesUpdated() {
-        mHomePurchasesFragment.onAllPurchasesUpdated();
-    }
-
-    @Override
-    public void onMoreObjectsLoaded(@NonNull List<ParseObject> objects) {
-        mHomePurchasesFragment.onMoreObjectsLoaded(objects);
-    }
-
-    @Override
-    public void onMoreObjectsLoadFailed(@StringRes int errorMessage) {
-        mHomePurchasesFragment.onMoreObjectsLoadFailed(errorMessage);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        switch (requestCode) {
-            case INTENT_REQUEST_PURCHASE_MODIFY:
-                switch (resultCode) {
-                    case PurchaseAddFragment.RESULT_PURCHASE_SAVED:
-                        Snackbar.make(mFabMenu, R.string.toast_purchase_added, Snackbar.LENGTH_LONG).show();
-                        break;
-                    case PurchaseAddFragment.RESULT_PURCHASE_SAVED_AUTO:
-                        String purchaseAdded = getString(R.string.toast_purchase_added);
-                        if (mInTrialMode) {
-                            ParseConfig config = ParseConfig.getCurrentConfig();
-                            int freeAutoLimit = config.getInt(ParseConfigUtils.FREE_PURCHASES_LIMIT);
-                            int freePurchasesLeft = freeAutoLimit - mCurrentUser.getPremiumCount();
-                            purchaseAdded += ". " + getString(R.string.toast_free_purchases_left, freePurchasesLeft);
-                        }
-                        Snackbar.make(mFabMenu, purchaseAdded, Snackbar.LENGTH_LONG).show();
-                        break;
-                    case PurchaseAddFragment.RESULT_PURCHASE_DRAFT:
-                        Snackbar.make(mFabMenu, R.string.toast_purchase_added_draft,
-                                Snackbar.LENGTH_LONG).show();
-                        break;
-                    case PurchaseAddFragment.RESULT_PURCHASE_DISCARDED:
-                        Snackbar.make(mFabMenu, R.string.toast_purchase_discarded,
-                                Snackbar.LENGTH_LONG).show();
-                        break;
-                    case PurchaseAddFragment.RESULT_PURCHASE_ERROR:
-                        Snackbar.make(mFabMenu, R.string.toast_create_image_file_failed,
-                                Snackbar.LENGTH_LONG).show();
-                        break;
-                }
-                break;
-            case INTENT_REQUEST_PURCHASE_DETAILS:
-                switch (resultCode) {
-                    case PurchaseDetailsActivity.RESULT_PURCHASE_DELETED:
-                        Snackbar.make(mFabMenu, R.string.toast_purchase_deleted,
-                                Snackbar.LENGTH_LONG).show();
-                        break;
-                    case PurchaseDetailsActivity.RESULT_GROUP_CHANGED:
-                        updateGroupSpinnerPosition();
-                        break;
-                }
-                break;
-        }
+    public void updateNavDrawerSelectedGroup() {
+        mNavDrawerViewModel.notifySelectedGroupChanged();
     }
 
     @Override
     public ActionMode startActionMode() {
-        return mToolbar.startActionMode(mHomeDraftsFragment);
+        return mToolbar.startActionMode(mDraftsFragment);
     }
 
     @Override
-    protected void onGroupChanged() {
-        mHomePurchasesFragment.updateFragment();
-        mHomeDraftsFragment.updateFragment();
+    public void showCreateGroupDialog(@StringRes int message) {
+
+    }
+
+    @Override
+    public void onCreateGroupSelected() {
+        final Intent intent = new Intent(this, SettingsGroupNewActivity.class);
+        startActivity(intent);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void startPurchaseAddActivity(boolean autoMode) {
+        final Intent intent = new Intent(this, PurchaseAddActivity.class);
+        if (autoMode) {
+            intent.putExtra(PurchaseAddActivity.INTENT_PURCHASE_NEW_AUTO, true);
+            startActivityForResult(intent, HomeActivity.INTENT_REQUEST_PURCHASE_MODIFY);
+        } else {
+            intent.putExtra(PurchaseAddActivity.INTENT_PURCHASE_NEW_AUTO, false);
+            final ActivityOptionsCompat activityOptionsCompat =
+                    ActivityOptionsCompat.makeSceneTransitionAnimation(this);
+            startActivityForResult(intent, HomeActivity.INTENT_REQUEST_PURCHASE_MODIFY,
+                    activityOptionsCompat.toBundle());
+        }
+
+        mBinding.fabMenu.close();
+    }
+
+    @Override
+    public void setPurchasesUpdateStream(@NonNull Observable<Purchase> observable, @NonNull String workerTag) {
+        mPurchasesViewModel.setPurchasesUpdateStream(observable, workerTag);
+    }
+
+    @Override
+    public void setPurchasesQueryMoreStream(@NonNull Observable<Purchase> observable, @NonNull String workerTag) {
+        mPurchasesViewModel.setPurchasesQueryMoreStream(observable, workerTag);
     }
 
     @Override

@@ -59,6 +59,12 @@ public class TaskHistoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerVie
         }
     }
 
+
+    @Override
+    public int getItemCount() {
+        return mViewModel.getItemCount();
+    }
+
     @Override
     public int getItemViewType(int position) {
         return mViewModel.getItemViewType(position);
@@ -89,10 +95,5 @@ public class TaskHistoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerVie
                 break;
             }
         }
-    }
-
-    @Override
-    public int getItemCount() {
-        return mViewModel.getItemCount();
     }
 }

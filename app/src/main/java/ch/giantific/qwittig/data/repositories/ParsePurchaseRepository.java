@@ -43,7 +43,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository<Purchase> imple
     }
 
     @Override
-    public Observable<Purchase> getPurchasesLocalAsync(@NonNull User currentUser, boolean getDrafts) {
+    public Observable<Purchase> getPurchasesLocalAsync(@NonNull User currentUser, @NonNull Group group, boolean getDrafts) {
         ParseQuery<Purchase> query = getPurchasesLocalQuery();
         query.whereEqualTo(Purchase.GROUP, currentUser.getCurrentGroup());
         if (getDrafts) {

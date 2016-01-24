@@ -34,6 +34,7 @@ public class Compensation extends ParseObject {
     public static final String BENEFICIARY = "beneficiary";
     public static final String AMOUNT = "amount";
     public static final String IS_PAID = "isPaid";
+    public static final String IS_PENDING = "isPending";
     public static final String PIN_LABEL_PAID = "compensationPinLabelPaid";
     public static final String PIN_LABEL_UNPAID = "compensationPinLabelUnpaid";
     private boolean mIsLoading;
@@ -50,6 +51,7 @@ public class Compensation extends ParseObject {
         setBeneficiary(beneficiary);
         setAmountFraction(amount);
         setPaid(isPaid);
+        setPending(false);
         setAccessRights(group);
     }
 
@@ -91,6 +93,14 @@ public class Compensation extends ParseObject {
 
     public void setPaid(boolean isPaid) {
         put(IS_PAID, isPaid);
+    }
+
+    public boolean isPending() {
+        return getBoolean(IS_PENDING);
+    }
+
+    public void setPending(boolean isPending) {
+        put(IS_PENDING, isPending);
     }
 
     public boolean isLoading() {

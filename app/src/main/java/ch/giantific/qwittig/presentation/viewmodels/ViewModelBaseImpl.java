@@ -36,9 +36,8 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener> extend
         updateCurrentUserAndGroup();
     }
 
-    @Override
     @CallSuper
-    public void updateCurrentUserAndGroup() {
+    void updateCurrentUserAndGroup() {
         mCurrentUser = mUserRepo.getCurrentUser();
         if (mCurrentUser != null) {
             mCurrentGroup = mCurrentUser.getCurrentGroup();

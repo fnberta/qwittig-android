@@ -23,7 +23,7 @@ import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import rx.Subscriber;
+import rx.SingleSubscriber;
 
 /**
  * Created by fabio on 12.01.16.
@@ -59,24 +59,21 @@ public class NavDrawerViewModelImpl extends BaseObservable implements NavDrawerV
 
     private void loadUserGroups() {
         mUserGroups = mCurrentUser.getGroups();
-        mGroupRepo.fetchGroupsDataAsync(mUserGroups).subscribe(new Subscriber<Group>() {
-            @Override
-            public void onCompleted() {
-                mView.bindHeaderView();
-                mView.setupHeaderGroupSelection(mUserGroups);
-                updateGroupSelectionList();
-            }
+        mGroupRepo.fetchGroupsDataAsync(mUserGroups)
+                .toSingle()
+                .subscribe(new SingleSubscriber<Group>() {
+                    @Override
+                    public void onSuccess(Group value) {
+                        mView.bindHeaderView();
+                        mView.setupHeaderGroupSelection(mUserGroups);
+                        updateGroupSelectionList();
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onNext(Group group) {
-
-            }
-        });
+                    @Override
+                    public void onError(Throwable error) {
+                        // TODO: handle error
+                    }
+                });
     }
 
     private void updateGroupSelectionList() {
@@ -105,6 +102,11 @@ public class NavDrawerViewModelImpl extends BaseObservable implements NavDrawerV
     @Bindable
     public int getSelectedGroup() {
         return mUserGroups.indexOf(mCurrentUser.getCurrentGroup());
+    }
+
+    @Override
+    public void notifySelectedGroupChanged() {
+        notifyPropertyChanged(BR.selectedGroup);
     }
 
     @Override

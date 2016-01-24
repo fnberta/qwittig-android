@@ -28,9 +28,9 @@ import ch.giantific.qwittig.presentation.viewmodels.ViewModel;
  * @see RecyclerView
  * @see ProgressBar
  */
-public abstract class BaseRecyclerViewFragment<T extends ListViewModel, S extends BaseFragment.ActivityListener<T>> extends
-        BaseFragment<T, S> implements
-        ListViewModel.ViewListener {
+public abstract class BaseRecyclerViewFragment<T extends ListViewModel, S extends BaseFragment.ActivityListener>
+        extends BaseFragment<T, S>
+        implements ListViewModel.ViewListener {
 
     RecyclerView mRecyclerView;
     RecyclerView.Adapter mRecyclerAdapter;
@@ -71,5 +71,20 @@ public abstract class BaseRecyclerViewFragment<T extends ListViewModel, S extend
     @Override
     public void notifyItemRemoved(int position) {
         mRecyclerAdapter.notifyItemRemoved(position);
+    }
+
+    @Override
+    public void notifyItemInserted(int lastPosition) {
+        mRecyclerAdapter.notifyItemInserted(lastPosition);
+    }
+
+    @Override
+    public void notifyItemRangeInserted(int itemCount, int size) {
+        mRecyclerAdapter.notifyItemRangeInserted(itemCount, size);
+    }
+
+    @Override
+    public void scrollToPosition(int position) {
+        mRecyclerView.scrollToPosition(position);
     }
 }

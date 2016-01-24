@@ -46,11 +46,9 @@ public class ParseCompensationRepository extends ParseBaseRepository<Compensatio
     }
 
     @Override
-    public Observable<Compensation> getCompensationsLocalUnpaidAsync(@NonNull final Group group) {
-        final ParseQuery<Compensation> query = ParseQuery.getQuery(Compensation.CLASS);
-        query.fromLocalDatastore();
-        query.ignoreACLs();
-        query.whereEqualTo(Compensation.GROUP, group);
+    public Observable<Compensation> getCompensationsLocalUnpaidAsync(@NonNull User currentUser,
+                                                                     @NonNull final Group group) {
+        ParseQuery<Compensation> query = getCompensationsLocalQuery(currentUser, group);
         query.whereEqualTo(Compensation.IS_PAID, false);
         query.orderByAscending(DATE_CREATED);
 
@@ -65,6 +63,21 @@ public class ParseCompensationRepository extends ParseBaseRepository<Compensatio
     @Override
     public Observable<Compensation> getCompensationsLocalPaidAsync(@NonNull final User currentUser,
                                                                    @NonNull final Group group) {
+        ParseQuery<Compensation> query = getCompensationsLocalQuery(currentUser, group);
+        query.whereEqualTo(Compensation.IS_PAID, true);
+        query.orderByDescending(DATE_UPDATED);
+
+        return find(query).flatMap(new Func1<List<Compensation>, Observable<Compensation>>() {
+            @Override
+            public Observable<Compensation> call(List<Compensation> compensations) {
+                return Observable.from(compensations);
+            }
+        });
+    }
+
+    @NonNull
+    private ParseQuery<Compensation> getCompensationsLocalQuery(@NonNull User currentUser,
+                                                                @NonNull final Group group) {
         ParseQuery<Compensation> payerQuery = ParseQuery.getQuery(Compensation.CLASS);
         payerQuery.whereEqualTo(Compensation.PAYER, currentUser);
 
@@ -77,17 +90,9 @@ public class ParseCompensationRepository extends ParseBaseRepository<Compensatio
 
         ParseQuery<Compensation> query = ParseQuery.or(queries);
         query.fromLocalDatastore();
-        query.whereEqualTo(Compensation.GROUP, group);
-        query.whereEqualTo(Compensation.IS_PAID, true);
         query.ignoreACLs();
-        query.orderByDescending(DATE_UPDATED);
-
-        return find(query).flatMap(new Func1<List<Compensation>, Observable<Compensation>>() {
-            @Override
-            public Observable<Compensation> call(List<Compensation> compensations) {
-                return Observable.from(compensations);
-            }
-        });
+        query.whereEqualTo(Compensation.GROUP, group);
+        return query;
     }
 
     @Override

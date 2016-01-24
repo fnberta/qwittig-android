@@ -16,7 +16,7 @@ import ch.giantific.qwittig.databinding.RowTaskUsersInvolvedBinding;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.presentation.ui.adapters.rows.BindingRow;
 import ch.giantific.qwittig.presentation.viewmodels.TaskAddEditViewModel;
-import ch.giantific.qwittig.presentation.viewmodels.rows.UserAvatarRowViewModel;
+import ch.giantific.qwittig.presentation.viewmodels.rows.TaskUserInvolvedRowViewModel;
 
 import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;
 
@@ -52,12 +52,12 @@ public class TaskUsersInvolvedRecyclerAdapter extends RecyclerView.Adapter<TaskU
     @Override
     public void onBindViewHolder(TaskUserInvolvedRow holder, int position) {
         final RowTaskUsersInvolvedBinding binding = holder.getBinding();
-        final UserAvatarRowViewModel viewModel = binding.getViewModel();
+        final TaskUserInvolvedRowViewModel viewModel = binding.getViewModel();
 
         final User user = mViewModel.getUserAvailableAtPosition(position);
         final float userAlpha = mViewModel.isUserAtPositionInvolved(position) ? 1f : DISABLED_ALPHA;
         if (viewModel == null) {
-            binding.setViewModel(new UserAvatarRowViewModel(user, userAlpha, false));
+            binding.setViewModel(new TaskUserInvolvedRowViewModel(user, userAlpha, false));
         } else {
             viewModel.setUser(user);
             viewModel.setUserAlpha(userAlpha);

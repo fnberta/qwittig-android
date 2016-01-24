@@ -232,7 +232,7 @@ public class SettingsStoresFragment extends BaseFragment implements
     @Override
     public void onDestroyActionMode(ActionMode mode) {
         mActionMode = null;
-        mRecyclerAdapter.clearSelection(mDeleteSelectedStores);
+        mRecyclerAdapter.clearSelection();
         mListener.toggleFabVisibility();
     }
 

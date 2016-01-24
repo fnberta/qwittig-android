@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.text.SpannableStringBuilder;
+import android.view.View;
 
 import com.parse.ParseUser;
 
@@ -230,7 +231,7 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskHistory,
     }
 
     @Override
-    public void onFabDoneClick() {
+    public void onFabDoneClick(View view) {
         String timeFrame = mTask.getTimeFrame();
 
         if (timeFrame.equals(Task.TIME_FRAME_ONE_TIME)) {

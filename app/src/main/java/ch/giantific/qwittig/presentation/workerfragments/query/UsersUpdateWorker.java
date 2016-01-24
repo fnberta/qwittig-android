@@ -21,7 +21,7 @@ import rx.functions.Func1;
  * <p/>
  * Subclass of {@link BaseQueryWorker}.
  */
-public class UsersUpdateWorker extends BaseQueryWorker<User, UserUpdateListener> {
+public class UsersUpdateWorker extends BaseQueryWorker<User, UsersUpdateListener> {
 
     public static final String WORKER_TAG = "USER_UPDATE_WORKER";
     private static final String LOG_TAG = UsersUpdateWorker.class.getSimpleName();

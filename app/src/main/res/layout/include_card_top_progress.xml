@@ -13,7 +13,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.viewmodels.rows.TaskRowViewModel"
+            type="ch.giantific.qwittig.presentation.viewmodels.rows.CardTopProgressViewModel"
             />
     </data>
 
@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/pb_top_negative_margin"
         android:indeterminate="true"
-        android:visibility="@{viewModel.taskLoading ? View.VISIBLE : View.GONE}"
+        android:visibility="@{viewModel.itemLoading ? View.VISIBLE : View.GONE}"
         tools:visibility="visible"
         />
 </layout>

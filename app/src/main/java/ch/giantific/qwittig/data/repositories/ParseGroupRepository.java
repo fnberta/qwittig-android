@@ -41,13 +41,17 @@ public class ParseGroupRepository extends ParseBaseRepository<Group> implements 
 
     @Override
     public Single<Group> fetchGroupDataAsync(@NonNull final Group group) {
-        if (group.isDataAvailable()) {
-            return Single.just(group);
-        }
-
         return Single.create(new Single.OnSubscribe<Group>() {
             @Override
             public void call(final SingleSubscriber<? super Group> singleSubscriber) {
+                if (group.isDataAvailable()) {
+                    if (!singleSubscriber.isUnsubscribed()) {
+                        singleSubscriber.onSuccess(group);
+                    }
+
+                    return;
+                }
+
                 group.fetchFromLocalDatastoreInBackground(new GetCallback<Group>() {
                     @Override
                     public void done(Group group, @Nullable ParseException e) {

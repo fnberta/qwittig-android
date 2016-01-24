@@ -25,7 +25,7 @@
     <string name="action_logout">Log out</string>
     <string name="login_button_log_in">Log in</string>
     <string name="login_button_sign_up">Create new account</string>
-    <string name="no_purchases">No items</string>
+    <string name="no_purchases">No purchases</string>
     <string name="no_users">No users</string>
     <string name="action_purchase_delete">Delete purchase</string>
     <string name="toast_purchase_deleted">Purchase deleted</string>
@@ -76,7 +76,7 @@
     <string name="title_activity_finance">Finance</string>
     <string name="hint_password_new">New password</string>
     <string name="balance_owe_you">owes you %1$s</string>
-    <string name="button_done">Done</string>
+    <string name="comp_unpaid_button_confirm">Confirm</string>
     <string name="button_remind">Remind %1$s</string>
     <string name="balance_gets_from_you">gets %1$s from you</string>
     <string name="button_remind_paid">Remind %1$s you paid</string>
@@ -229,7 +229,7 @@
     <string name="action_show_group">Show group numbers</string>
     <string name="action_show_percent">Show percent Values</string>
     <string name="progress_purchase_auto">Uploading and processing image…</string>
-    <string name="action_compensation_change_amount">Change amount</string>
+    <string name="comp_unpaid_button_change_amount">Change amount</string>
     <string name="dialog_positive_change">Change</string>
     <string name="dialog_change_amount_message">Enter the desired new amount.</string>
     <string name="push_compensation_amount_changed_title">Amount changed</string>
@@ -339,5 +339,13 @@
     <string name="toast_login_failed_facebook">Login with Facebook failed</string>
     <string name="toast_error_tasks_load">Failed to load tasks</string>
     <string name="toast_error_task_save">Failed to save task</string>
+    <string name="toast_error_users_load">Failed to load users</string>
+    <string name="toast_error_comps_load">Failed to load compensations</string>
+    <string name="toast_compensation_accepted">Payment accepted</string>
+    <string name="header_comps_pending">Pending</string>
+    <string name="header_comps_suggestions">Suggestions</string>
+    <string name="comp_unpaid_button_claim">Claim</string>
+    <string name="toast_error_purchases_load">Failed to load purchases</string>
+    <string name="toast_error_drafts_load">Failed to load drafts</string>
 
 </resources>

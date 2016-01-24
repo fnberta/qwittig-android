@@ -26,7 +26,7 @@ import java.util.Map;
 import ch.berta.fabio.fabprogress.FabProgress;
 import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.presentation.workerfragments.RatesWorker;
+import ch.giantific.qwittig.presentation.workerfragments.RatesWorkerListener;
 import ch.giantific.qwittig.presentation.workerfragments.save.PurchaseSaveWorker;
 import ch.giantific.qwittig.presentation.ui.fragments.PurchaseBaseFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.PurchaseNoteFragment;
@@ -51,7 +51,7 @@ public abstract class PurchaseBaseActivity extends BaseActivity implements
         PurchaseUserSelectionDialogFragment.DialogInteractionListener,
         StoreSelectionDialogFragment.DialogInteractionListener,
         PurchaseReceiptAddFragment.FragmentInteractionListener,
-        RatesWorker.WorkerInteractionListener,
+        RatesWorkerListener,
         PurchaseSaveWorker.WorkerInteractionListener,
         ManualExchangeRateDialogFragment.DialogInteractionListener,
         PurchaseNoteFragment.FragmentInteractionListener,

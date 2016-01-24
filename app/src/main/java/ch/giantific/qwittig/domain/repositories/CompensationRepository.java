@@ -25,9 +25,10 @@ public interface CompensationRepository extends Repository {
     /**
      * Queries the local data store for unpaid compensations.
      *
+     * @param currentUser the current user
      * @param group the group for which to get compensations for
      */
-    Observable<Compensation> getCompensationsLocalUnpaidAsync(@NonNull Group group);
+    Observable<Compensation> getCompensationsLocalUnpaidAsync(@NonNull User currentUser, @NonNull Group group);
 
     /**
      * Queries the local data store for paid compensations where the current user is either the

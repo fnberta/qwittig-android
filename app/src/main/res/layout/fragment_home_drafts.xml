@@ -2,37 +2,55 @@
   ~ Copyright (c) 2015 Fabio Berta
   -->
 
-<FrameLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".presentation.ui.fragments.HomeDraftsFragment"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     >
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_base"
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.viewmodels.HomeDraftsViewModel"
+            />
+    </data>
+
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:paddingBottom="@dimen/small_space"
-        android:scrollbars="vertical"
-        android:visibility="gone"
-        />
+        tools:context=".presentation.ui.fragments.HomeDraftsFragment"
+        >
 
-    <TextView
-        android:id="@+id/empty_view"
-        style="@style/TextAppearance.AppCompat.Title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:drawablePadding="@dimen/small_space"
-        android:drawableTop="@drawable/ic_shopping_cart_black_144dp"
-        android:gravity="center_horizontal"
-        android:text="@string/no_purchases"
-        android:visibility="gone"
-        tools:visibility="visible"/>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_base"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="@dimen/small_space"
+            android:scrollbars="vertical"
+            android:visibility="@{viewModel.loading ? View.GONE : View.VISIBLE}"
+            />
 
-    <include layout="@layout/include_progress"/>
+        <TextView
+            android:id="@+id/empty_view"
+            style="@style/TextAppearance.AppCompat.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:drawablePadding="@dimen/small_space"
+            android:drawableTop="@drawable/ic_shopping_cart_black_144dp"
+            android:gravity="center_horizontal"
+            android:text="@string/no_purchases"
+            android:visibility="@{!viewModel.empty ? View.GONE : viewModel.loading ? View.GONE : View.VISIBLE}"
+            tools:visibility="visible"/>
 
-</FrameLayout>
+        <include
+            layout="@layout/include_progress"
+            app:viewModel="@{viewModel}"
+            />
+
+    </FrameLayout>
+</layout>

@@ -18,6 +18,7 @@ import com.parse.ParseConfig;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.presentation.viewmodels.SelectionModeViewModel;
 import ch.giantific.qwittig.utils.parse.ParseConfigUtils;
 import ch.giantific.qwittig.presentation.ui.adapters.rows.HeaderRow;
 
@@ -27,7 +28,7 @@ import ch.giantific.qwittig.presentation.ui.adapters.rows.HeaderRow;
  * Subclass of {@link RecyclerView.Adapter}.
  */
 public class StoresRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
-        implements SelectionAdapter {
+        implements SelectionModeViewModel {
 
     private static final String LOG_TAG = StoresRecyclerAdapter.class.getSimpleName();
     private static final int TYPE_HEADER = 0;
@@ -189,7 +190,7 @@ public class StoresRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     }
 
     @Override
-    public void clearSelection(boolean deleteSelectedItems) {
+    public void clearSelection() {
         for (int i = mStoresAdded.size() - 1; i >= 0; i--) {
             final String store = mStoresAdded.get(i);
             if (isSelected(store)) {
@@ -211,7 +212,7 @@ public class StoresRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     }
 
     @Override
-    public boolean isSelected(String store) {
+    public boolean isSelected(@NonNull String store) {
         return mStoresSelected.contains(store);
     }
 

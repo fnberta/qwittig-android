@@ -11,7 +11,6 @@ import android.support.annotation.VisibleForTesting;
 import android.view.View;
 import android.widget.AdapterView;
 
-import com.parse.ParseException;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
@@ -23,6 +22,7 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.MessageAction;
+import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.Task;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
@@ -84,7 +84,14 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<Task, TasksV
 
     @Override
     public void updateList() {
-        mSubscriptions.add(mTaskRepo.getTasksLocalAsync(mCurrentGroup, mDeadlineSelected)
+        mSubscriptions.add(mGroupRepo.fetchGroupDataAsync(mCurrentGroup)
+                .toObservable()
+                .flatMap(new Func1<Group, Observable<Task>>() {
+                    @Override
+                    public Observable<Task> call(Group group) {
+                        return mTaskRepo.getTasksLocalAsync(group, mDeadlineSelected);
+                    }
+                })
                 .filter(new Func1<Task, Boolean>() {
                     @Override
                     public Boolean call(Task task) {
@@ -111,7 +118,8 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<Task, TasksV
                         mItems.add(null);
                         mItems.addAll(tasksGroup);
 
-                        checkCurrentGroupData();
+                        setLoading(false);
+                        mView.notifyDataSetChanged();
                     }
 
                     @Override
@@ -121,14 +129,14 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<Task, TasksV
 
                     @Override
                     public void onNext(Task task) {
-                        task.setLoading(mLoadingTasks.contains(task.getObjectId()));
-
                         final User userResponsible = task.getUserResponsible();
                         if (mCurrentUser.getObjectId().equals(userResponsible.getObjectId())) {
                             tasksUser.add(task);
                         } else {
                             tasksGroup.add(task);
                         }
+
+                        task.setLoading(mLoadingTasks.contains(task.getObjectId()));
                     }
                 })
         );
@@ -194,7 +202,8 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<Task, TasksV
     protected void refreshItems() {
         if (!mView.isNetworkAvailable()) {
             setRefreshing(false);
-            mView.showMessageWithAction(R.string.toast_no_connection, getRefreshMessageAction());
+            mView.showMessageWithAction(R.string.toast_no_connection, getRefreshAction());
+            return;
         }
 
         setRefreshing(true);
@@ -203,29 +212,26 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<Task, TasksV
 
     @Override
     public void setTasksUpdateStream(@NonNull Observable<Task> observable, @NonNull final String workerTag) {
-        mSubscriptions.add(observable.subscribe(new Subscriber<Task>() {
+        mSubscriptions.add(observable.toSingle()
+                .subscribe(new SingleSubscriber<Task>() {
                     @Override
-                    public void onCompleted() {
+                    public void onSuccess(Task value) {
                         mView.removeWorker(workerTag);
                         updateList();
                     }
 
                     @Override
-                    public void onError(Throwable e) {
+                    public void onError(Throwable error) {
                         mView.removeWorker(workerTag);
-                        mView.showMessageWithAction(mTaskRepo.getErrorMessage((ParseException) e), getRefreshMessageAction());
-                    }
-
-                    @Override
-                    public void onNext(Task task) {
-
+                        mView.showMessageWithAction(mTaskRepo.getErrorMessage(error),
+                                getRefreshAction());
                     }
                 })
         );
     }
 
     @NonNull
-    private MessageAction getRefreshMessageAction() {
+    private MessageAction getRefreshAction() {
         return new MessageAction(R.string.action_retry) {
             @Override
             public void onClick(View v) {
@@ -307,10 +313,10 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<Task, TasksV
                     @Override
                     public void onSuccess(String value) {
                         mView.removeWorker(workerTag);
-                        Task task = stopTaskLoading(taskId);
+                        final Task task = stopTaskLoading(taskId);
                         if (task != null) {
-                            User userResponsible = (User) task.getUsersInvolved().get(0);
-                            String nickname = userResponsible.getNickname();
+                            final User userResponsible = (User) task.getUsersInvolved().get(0);
+                            final String nickname = userResponsible.getNickname();
                             mView.showMessage(R.string.toast_task_reminded_user, nickname);
                         }
                     }

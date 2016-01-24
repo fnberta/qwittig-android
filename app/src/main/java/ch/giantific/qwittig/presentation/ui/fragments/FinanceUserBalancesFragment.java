@@ -9,28 +9,21 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.parse.ParseUser;
+import org.apache.commons.math3.fraction.BigFraction;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import ch.giantific.qwittig.ComparatorParseUserIgnoreCase;
-import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.repositories.ParseUserRepository;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.databinding.FragmentFinanceUsersBinding;
+import ch.giantific.qwittig.di.components.DaggerFinanceComponent;
+import ch.giantific.qwittig.di.modules.FinanceViewModelModule;
 import ch.giantific.qwittig.presentation.ui.adapters.UsersRecyclerAdapter;
-import ch.giantific.qwittig.utils.parse.ParseUtils;
-import ch.giantific.qwittig.utils.Utils;
-import ch.giantific.qwittig.utils.WorkerUtils;
+import ch.giantific.qwittig.presentation.viewmodels.FinanceUsersViewModel;
 import ch.giantific.qwittig.presentation.workerfragments.query.UsersUpdateWorker;
+import ch.giantific.qwittig.utils.WorkerUtils;
 
 /**
  * Displays the users of a group and their current balances in a {@link RecyclerView} list. Does not
@@ -39,15 +32,10 @@ import ch.giantific.qwittig.presentation.workerfragments.query.UsersUpdateWorker
  * <p/>
  * Subclass of {@link BaseRecyclerViewOnlineFragment}.
  */
-public class FinanceUserBalancesFragment extends BaseRecyclerViewOnlineFragment implements
-        UserRepository.GetUsersLocalListener,
-        UsersRecyclerAdapter.AdapterInteractionListener {
+public class FinanceUserBalancesFragment extends BaseRecyclerViewOnlineFragment<FinanceUsersViewModel, FinanceUserBalancesFragment.ActivityListener>
+        implements FinanceUsersViewModel.ViewListener {
 
-    private static final String USER_QUERY_WORKER = "USER_QUERY_WORKER";
-    private UsersRecyclerAdapter mRecyclerAdapter;
-    @NonNull
-    private List<ParseUser> mUsers = new ArrayList<>();
-    private UserRepository mUserRepo;
+    private FragmentFinanceUsersBinding mBinding;
 
     public FinanceUserBalancesFragment() {
     }
@@ -56,109 +44,54 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewOnlineFragment 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mUserRepo = new ParseUserRepository(getActivity());
+        DaggerFinanceComponent.builder()
+                .financeViewModelModule(new FinanceViewModelModule(savedInstanceState))
+                .build()
+                .inject(this);
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_finance_users, container, false);
+        mBinding = FragmentFinanceUsersBinding.inflate(inflater, container, false);
+        return mBinding.getRoot();
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        mRecyclerAdapter = new UsersRecyclerAdapter(getActivity(), mUsers, mCurrentUser, this);
-        mRecyclerView.setAdapter(mRecyclerAdapter);
+    protected RecyclerView getRecyclerView() {
+        return mBinding.srlRv.rvBase;
     }
 
     @Override
-    protected void onlineQuery() {
-        if (!Utils.isNetworkAvailable(getActivity())) {
-            setLoading(false);
-            showErrorSnackbar(R.string.toast_no_connection, getOnlineQueryRetryAction());
-            return;
-        }
+    protected RecyclerView.Adapter getRecyclerAdapter() {
+        return new UsersRecyclerAdapter(mViewModel);
+    }
 
-        FragmentManager fragmentManager = getFragmentManager();
-        Fragment userQueryWorker = WorkerUtils.findWorker(fragmentManager, USER_QUERY_WORKER);
+    @Override
+    protected void setViewModelToActivity() {
+        mActivity.setUsersViewModel(mViewModel);
+    }
 
-        // If the Fragment is non-null, then it is currently being
-        // retained across a configuration change.
+    @Override
+    public void loadUpdateUsersWorker() {
+        final FragmentManager fragmentManager = getFragmentManager();
+        Fragment userQueryWorker = WorkerUtils.findWorker(fragmentManager, UsersUpdateWorker.WORKER_TAG);
         if (userQueryWorker == null) {
             userQueryWorker = new UsersUpdateWorker();
             fragmentManager.beginTransaction()
-                    .add(userQueryWorker, USER_QUERY_WORKER)
+                    .add(userQueryWorker, UsersUpdateWorker.WORKER_TAG)
                     .commit();
         }
     }
 
-    /**
-     * Shows the user the error message and removes the retained worker fragment and loading
-     * indicators.
-     *
-     * @param errorMessage the error message from the exception thrown in the process
-     */
-    public void onUserUpdateFailed(@StringRes int errorMessage) {
-        showErrorSnackbar(errorMessage, getOnlineQueryRetryAction());
-        WorkerUtils.removeWorker(getFragmentManager(), USER_QUERY_WORKER);
-
-        setLoading(false);
-    }
-
-    /**
-     * Tells the adapter of the {@link RecyclerView} to re-query its data, removes the retained
-     * worker fragment and removes loading indicators.
-     */
-    public void onUsersUpdated() {
-        WorkerUtils.removeWorker(getFragmentManager(), USER_QUERY_WORKER);
-        setLoading(false);
-
-        updateAdapter();
-    }
-
     @Override
-    protected void updateAdapter() {
-        mUserRepo.getUsersLocalAsync(mCurrentGroup);
+    public void setColorTheme(@NonNull BigFraction balance) {
+        mActivity.setColorTheme(balance);
     }
 
-    @Override
-    public void onUsersLocalLoaded(@NonNull List<ParseUser> users) {
-        mUsers.clear();
+    public interface ActivityListener extends BaseRecyclerViewOnlineFragment.ActivityListener {
 
-        if (!users.isEmpty()) {
-            for (ParseUser user : users) {
-                if (!user.getObjectId().equals(mCurrentUser.getObjectId())) {
-                    mUsers.add(user);
-                }
-            }
-        }
+        void setUsersViewModel(@NonNull FinanceUsersViewModel viewModel);
 
-        if (!mUsers.isEmpty()) {
-            Collections.sort(mUsers, new ComparatorParseUserIgnoreCase());
-        }
-
-        checkCurrentGroup();
-    }
-
-    @Override
-    protected void toggleEmptyViewVisibility() {
-        if (mUsers.isEmpty()) {
-            mEmptyView.setVisibility(View.VISIBLE);
-        } else {
-            mEmptyView.setVisibility(View.GONE);
-        }
-    }
-
-    @Override
-    protected void updateView() {
-        mRecyclerAdapter.setCurrentGroupCurrency(ParseUtils.getGroupCurrencyWithFallback(mCurrentGroup));
-        mRecyclerAdapter.notifyDataSetChanged();
-        showMainView();
-    }
-
-    @Override
-    public void onUsersRowItemClick(int position) {
-        // do nothing for the moment
+        void setColorTheme(@NonNull BigFraction balance);
     }
 }

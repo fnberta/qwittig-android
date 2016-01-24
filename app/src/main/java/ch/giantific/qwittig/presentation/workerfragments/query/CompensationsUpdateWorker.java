@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 
 import javax.inject.Inject;
 
+import ch.giantific.qwittig.di.components.WorkerComponent;
 import ch.giantific.qwittig.domain.models.parse.Compensation;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import rx.Observable;
@@ -23,7 +24,7 @@ public class CompensationsUpdateWorker extends BaseQueryWorker<Compensation, Com
 
     public static final String WORKER_TAG = "TASK_QUERY_WORKER";
     private static final String LOG_TAG = CompensationsUpdateWorker.class.getSimpleName();
-    private static final String BUNDLE_QUERY_PAID = "BUNDLE_QUERY_PAID";
+    private static final String KEY_QUERY_PAID = "QUERY_PAID";
     @Inject
     CompensationRepository mCompsRepo;
     private boolean mQueryPaid;
@@ -39,19 +40,21 @@ public class CompensationsUpdateWorker extends BaseQueryWorker<Compensation, Com
     public static CompensationsUpdateWorker newInstance(boolean queryPaid) {
         CompensationsUpdateWorker fragment = new CompensationsUpdateWorker();
         Bundle args = new Bundle();
-        args.putBoolean(BUNDLE_QUERY_PAID, queryPaid);
+        args.putBoolean(KEY_QUERY_PAID, queryPaid);
         fragment.setArguments(args);
         return fragment;
     }
 
     @Override
-    protected String getWorkerTag() {
-        return WORKER_TAG;
+    protected void injectQueryWorkerDependencies(@NonNull WorkerComponent component) {
+        component.inject(this);
     }
 
     @Nullable
     @Override
     protected Observable<Compensation> getObservable(@NonNull Bundle args) {
+        mQueryPaid = args.getBoolean(KEY_QUERY_PAID);
+
         if (setCurrentGroups()) {
             if (mQueryPaid) {
                 return mCompsRepo.updateCompensationsPaidAsync(mCurrentUserGroups, mCurrentGroup.getObjectId());
@@ -64,8 +67,12 @@ public class CompensationsUpdateWorker extends BaseQueryWorker<Compensation, Com
     }
 
     @Override
-    protected void setStream(@NonNull Observable<Compensation> observable,
-                             @NonNull String workerTag) {
-        mActivity.setCompensationsUpdateStream(observable, mQueryPaid, workerTag);
+    protected void onError() {
+        mActivity.onWorkerError(WORKER_TAG);
+    }
+
+    @Override
+    protected void setStream(@NonNull Observable<Compensation> observable) {
+        mActivity.setCompensationsUpdateStream(observable, mQueryPaid, WORKER_TAG);
     }
 }

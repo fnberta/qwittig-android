@@ -38,12 +38,12 @@ import java.util.Arrays;
 
 import ch.berta.fabio.fabprogress.FabProgress;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.utils.AvatarUtils;
-import ch.giantific.qwittig.presentation.workerfragments.account.UnlinkThirdPartyWorker;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.DiscardChangesDialogFragment;
+import ch.giantific.qwittig.presentation.workerfragments.account.UnlinkThirdPartyWorker;
+import ch.giantific.qwittig.utils.AvatarUtils;
+import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.WorkerUtils;
 import ch.giantific.qwittig.utils.parse.ParseUtils;
-import ch.giantific.qwittig.utils.Utils;
 
 /**
  * Displays the profile details of the current user, allowing him/her to edit them.
@@ -52,9 +52,6 @@ import ch.giantific.qwittig.utils.Utils;
  */
 public class SettingsProfileFragment extends BaseFragment {
 
-    @IntDef({Activity.RESULT_OK, Activity.RESULT_CANCELED, RESULT_CHANGES_DISCARDED})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface EditResult {}
     public static final int RESULT_CHANGES_DISCARDED = 2;
     private static final String LOG_TAG = SettingsProfileFragment.class.getSimpleName();
     private static final String DISCARD_CHANGES_DIALOG = "DISCARD_CHANGES_DIALOG";
@@ -86,7 +83,6 @@ public class SettingsProfileFragment extends BaseFragment {
     private boolean mUnlinkThirdPartyLogin;
     private boolean mIsSaving;
     private Snackbar mSnackbarSetPassword;
-
     public SettingsProfileFragment() {
     }
 
@@ -129,9 +125,7 @@ public class SettingsProfileFragment extends BaseFragment {
 
         mTextInputLayoutEmail = (TextInputLayout) view.findViewById(R.id.til_email);
         mEditTextEmail = mTextInputLayoutEmail.getEditText();
-        if (!ParseUtils.isTestUser(mCurrentUser)) {
-            mEditTextEmail.setText(mCurrentEmail);
-        }
+        mEditTextEmail.setText(mCurrentEmail);
 
         mTextInputLayoutNickname = (TextInputLayout) view.findViewById(R.id.til_nickname);
         mEditTextNickname = mTextInputLayoutNickname.getEditText();
@@ -423,7 +417,8 @@ public class SettingsProfileFragment extends BaseFragment {
     private void unlinkThirdPartyWithWorker(@UnlinkThirdPartyWorker.UnlinkAction int unlinkAction) {
         if (!Utils.isNetworkAvailable(getActivity())) {
             Snackbar.make(mTextInputLayoutNickname, getString(R.string.toast_no_connection),
-                    Snackbar.LENGTH_LONG).show();;
+                    Snackbar.LENGTH_LONG).show();
+            ;
             return;
         }
 
@@ -502,6 +497,11 @@ public class SettingsProfileFragment extends BaseFragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @IntDef({Activity.RESULT_OK, Activity.RESULT_CANCELED, RESULT_CHANGES_DISCARDED})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface EditResult {
     }
 
     /**

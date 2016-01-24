@@ -15,6 +15,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.giantific.qwittig.domain.models.RowItem;
+import ch.giantific.qwittig.domain.models.RowItemUser;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.parse.ParseUtils;
 
@@ -36,7 +38,7 @@ public class Item extends ParseObject {
     }
 
     public Item(@NonNull String name, @NonNull BigDecimal price,
-                @NonNull List<ParseUser> usersInvolved, ParseObject currentGroup) {
+                @NonNull List<ParseUser> usersInvolved, @NonNull ParseObject currentGroup) {
         setName(name);
         setPrice(price);
         setUsersInvolved(usersInvolved);
@@ -44,7 +46,7 @@ public class Item extends ParseObject {
     }
 
     private void setAccessRights(@NonNull ParseObject group) {
-        ParseACL acl = ParseUtils.getDefaultAcl(group);
+        final ParseACL acl = ParseUtils.getDefaultAcl(group);
         setACL(acl);
     }
 
@@ -107,8 +109,8 @@ public class Item extends ParseObject {
      */
     @NonNull
     public List<String> getUsersInvolvedIds() {
-        List<String> listIds = new ArrayList<>();
-        List<ParseUser> list = getUsersInvolved();
+        final List<String> listIds = new ArrayList<>();
+        final List<ParseUser> list = getUsersInvolved();
         for (ParseUser user : list) {
             listIds.add(user.getObjectId());
         }

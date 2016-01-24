@@ -4,27 +4,16 @@
 
 package ch.giantific.qwittig.presentation.ui.adapters;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import com.parse.ParseUser;
-
-import org.apache.commons.math3.fraction.BigFraction;
-
-import java.util.List;
-
-import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.databinding.RowUsersBinding;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.presentation.ui.adapters.rows.UserAvatarRow;
-import ch.giantific.qwittig.utils.MoneyUtils;
-import ch.giantific.qwittig.utils.Utils;
+import ch.giantific.qwittig.presentation.ui.adapters.rows.BindingRow;
+import ch.giantific.qwittig.presentation.viewmodels.FinanceUsersViewModel;
+import ch.giantific.qwittig.presentation.viewmodels.rows.UserRowViewModel;
 
 
 /**
@@ -32,104 +21,47 @@ import ch.giantific.qwittig.utils.Utils;
  * <p/>
  * Subclass of {@link BaseRecyclerAdapter}.
  */
-public class UsersRecyclerAdapter extends BaseRecyclerAdapter<ParseUser> {
+public class UsersRecyclerAdapter extends RecyclerView.Adapter<BindingRow> {
 
-    private static final int VIEW_RESOURCE = R.layout.row_users;
-    private AdapterInteractionListener mListener;
-    private User mCurrentUser;
+    private FinanceUsersViewModel mViewModel;
 
     /**
      * Constructs a new {@link UsersRecyclerAdapter}.
      *
-     * @param context  the context to use in the adapter
-     * @param users    the users to display
-     * @param listener the callback for user clicks on the users
+     * @param viewModel the model of the view
      */
-    public UsersRecyclerAdapter(@NonNull Context context, @NonNull List<ParseUser> users,
-                                @NonNull User currentUser,
-                                @NonNull AdapterInteractionListener listener) {
-        super(context, users);
+    public UsersRecyclerAdapter(@NonNull FinanceUsersViewModel viewModel) {
+        super();
 
-        mListener = listener;
-        mCurrentUser = currentUser;
+        mViewModel = viewModel;
     }
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(VIEW_RESOURCE, parent, false);
-        return new UsersRow(view, mContext, mListener);
+    public BindingRow onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        final RowUsersBinding binding = RowUsersBinding.inflate(inflater, parent, false);
+        return new BindingRow<>(binding);
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        final UsersRow usersRow = (UsersRow) viewHolder;
-        User user = (User) mItems.get(position);
+    public void onBindViewHolder(BindingRow holder, int position) {
+        final User user = mViewModel.getItemAtPosition(position);
+        final RowUsersBinding binding = (RowUsersBinding) holder.getBinding();
+        UserRowViewModel viewModel = binding.getViewModel();
 
-        usersRow.setName(user.getNickname());
-
-        byte[] avatarByteArray = user.getAvatar();
-        usersRow.setAvatar(avatarByteArray, false);
-
-        Group currentGroup = mCurrentUser.getCurrentGroup();
-        BigFraction balance = user.getBalance(currentGroup);
-        usersRow.setBalance(balance, mCurrentGroupCurrency);
-    }
-
-    /**
-     * Defines the action to take when the user clicks on a user.
-     */
-    public interface AdapterInteractionListener {
-        /**
-         * Handles the click on the user row itself.
-         *
-         * @param position the adapter position of the user row
-         */
-        void onUsersRowItemClick(int position);
-    }
-
-    /**
-     * Provides a {@link RecyclerView} row that displays the user's avatar image, the nickname and
-     * the current balance.
-     * <p/>
-     * Subclass of {@link UserAvatarRow}.
-     */
-    private static class UsersRow extends UserAvatarRow {
-
-        private TextView mTextViewBalance;
-
-        /**
-         * Constructs a new {@link UsersRow} and sets the click listener.
-         *
-         * @param view     the inflated view
-         * @param context  the context to use in the row
-         * @param listener the callback for user clicks
-         */
-        public UsersRow(@NonNull View view, @NonNull Context context,
-                        @NonNull final AdapterInteractionListener listener) {
-            super(view, context);
-
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    listener.onUsersRowItemClick(getAdapterPosition());
-                }
-            });
-
-            mTextViewBalance = (TextView) view.findViewById(R.id.user_balance);
+        if (viewModel == null) {
+            viewModel = new UserRowViewModel(user, mViewModel.getCurrentUser().getCurrentGroup());
+            binding.setViewModel(viewModel);
+        } else {
+            viewModel.setUser(user);
         }
 
-        /**
-         * Sets the properly formatted balance of the user.
-         *
-         * @param balance  the balance to set
-         * @param currency the currency code to use to format the balance
-         */
-        public void setBalance(@NonNull BigFraction balance, @NonNull String currency) {
-            mTextViewBalance.setTextColor(Utils.isPositive(balance) ?
-                    ContextCompat.getColor(mContext, R.color.green) :
-                    ContextCompat.getColor(mContext, R.color.red));
-            mTextViewBalance.setText(MoneyUtils.formatMoneyNoSymbol(balance, currency));
-        }
+        binding.executePendingBindings();
+    }
+
+    @Override
+    public int getItemCount() {
+        return mViewModel.getItemCount();
     }
 }

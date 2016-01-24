@@ -14,10 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.BR;
-import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import rx.functions.Action1;
 
 /**
  * Created by fabio on 10.01.16.
@@ -29,7 +27,7 @@ public abstract class ListViewModelBaseImpl<T, S extends ListViewModel.ViewListe
     private static final String STATE_LOADING = "STATE_LOADING";
 
     List<T> mItems;
-    private GroupRepository mGroupRepo;
+    GroupRepository mGroupRepo;
     private boolean mLoading;
 
     public ListViewModelBaseImpl(@Nullable Bundle savedState,
@@ -91,25 +89,8 @@ public abstract class ListViewModelBaseImpl<T, S extends ListViewModel.ViewListe
         return mItems.size();
     }
 
-    final void checkCurrentGroupData() {
-        if (mCurrentGroup != null) {
-            if (mCurrentGroup.isDataAvailable()) {
-                showView();
-            } else {
-                mGroupRepo.fetchGroupDataAsync(mCurrentGroup).subscribe(new Action1<Group>() {
-                    @Override
-                    public void call(Group group) {
-                        showView();
-                    }
-                });
-            }
-        } else {
-            showView();
-        }
-    }
-
-    private void showView() {
-        setLoading(false);
-        mView.notifyDataSetChanged();
+    @Override
+    public int getLastPosition() {
+        return getItemCount() - 1;
     }
 }

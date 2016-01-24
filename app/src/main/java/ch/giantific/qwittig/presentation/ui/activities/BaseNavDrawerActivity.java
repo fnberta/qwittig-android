@@ -29,7 +29,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import ch.giantific.qwittig.LocalBroadcast;
+import ch.giantific.qwittig.LocalBroadcastImpl;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.NavdrawerHeaderBinding;
 import ch.giantific.qwittig.di.components.NavDrawerComponent;
@@ -72,7 +72,7 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
         super.handleLocalBroadcast(intent, dataType);
 
         switch (dataType) {
-            case LocalBroadcast.DATA_TYPE_GROUP_UPDATED:
+            case LocalBroadcastImpl.DATA_TYPE_GROUP_UPDATED:
                 mNavDrawerViewModel.onGroupChanged();
                 break;
         }
@@ -231,6 +231,7 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
 
     @CallSuper
     void onLoginSuccessful() {
+        // TODO: check whether user is in group?
         ParseQueryService.startQueryAll(this);
     }
 
@@ -282,7 +283,7 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
     }
 
     final void checkNavDrawerItem(int itemId) {
-        MenuItem item = mNavigationViewMenu.findItem(itemId);
+        final MenuItem item = mNavigationViewMenu.findItem(itemId);
         item.setChecked(true);
     }
 
@@ -311,8 +312,8 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
     @SuppressWarnings("unchecked")
     @Override
     public void startProfileSettingsActivity() {
-        Intent intent = new Intent(this, SettingsProfileActivity.class);
-        ActivityOptionsCompat options =
+        final Intent intent = new Intent(this, SettingsProfileActivity.class);
+        final ActivityOptionsCompat options =
                 ActivityOptionsCompat.makeSceneTransitionAnimation(this);
         startActivityForResult(intent, SettingsActivity.INTENT_REQUEST_SETTINGS_PROFILE,
                 options.toBundle());

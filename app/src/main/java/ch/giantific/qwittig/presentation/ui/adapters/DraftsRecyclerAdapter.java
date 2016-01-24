@@ -4,106 +4,67 @@
 
 package ch.giantific.qwittig.presentation.ui.adapters;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import com.parse.ParseObject;
-
-import java.util.Date;
-import java.util.List;
-
-import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.databinding.RowDraftsBinding;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
-import ch.giantific.qwittig.utils.DateUtils;
-import ch.giantific.qwittig.utils.MoneyUtils;
+import ch.giantific.qwittig.presentation.ui.adapters.rows.BindingRow;
+import ch.giantific.qwittig.presentation.viewmodels.HomeDraftsViewModel;
+import ch.giantific.qwittig.presentation.viewmodels.rows.DraftsRowViewModel;
 
 /**
- * Handles the display of recent purchases.
+ * Handles the display of the user's drafts.
  * <p/>
- * Subclass of {@link BaseRecyclerAdapter}.
+ * Subclass of {@link android.support.v7.widget.RecyclerView.Adapter}.
  */
-public class DraftsRecyclerAdapter extends BaseRecyclerAdapter<ParseObject>
-        implements SelectionAdapter {
+public class DraftsRecyclerAdapter extends RecyclerView.Adapter<DraftsRecyclerAdapter.DraftRow> {
 
     private static final String LOG_TAG = DraftsRecyclerAdapter.class.getSimpleName();
-    private static final int VIEW_RESOURCE = R.layout.row_drafts;
-    private AdapterInteractionListener mListener;
-    private List<String> mItemsSelected;
+    private HomeDraftsViewModel mViewModel;
 
     /**
      * Constructs a new {@link DraftsRecyclerAdapter}.
      *
-     * @param drafts   the drafts to display
-     * @param listener the callback for user clicks on the drafts
+     * @param viewModel the view's model
      */
-    public DraftsRecyclerAdapter(@NonNull Context context, @NonNull List<ParseObject> drafts,
-                                 @NonNull List<String> draftsSelected,
-                                 @NonNull AdapterInteractionListener listener) {
-        super(context, drafts);
+    public DraftsRecyclerAdapter(@NonNull HomeDraftsViewModel viewModel) {
+        super();
 
-        mItemsSelected = draftsSelected;
-        mListener = listener;
+        mViewModel = viewModel;
     }
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(VIEW_RESOURCE, parent, false);
-        return new DraftRow(view, mListener);
+    public DraftRow onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        final RowDraftsBinding binding = RowDraftsBinding.inflate(inflater, parent, false);
+        return new DraftRow(binding, mViewModel);
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        DraftRow draftRow = (DraftRow) viewHolder;
-        Purchase draft = (Purchase) mItems.get(position);
+    public void onBindViewHolder(DraftRow draftRow, int position) {
+        final RowDraftsBinding binding = draftRow.getBinding();
+        final Purchase draft = mViewModel.getItemAtPosition(position);
 
-        draftRow.setDate(draft.getDate());
-        draftRow.setStore(draft.getStore());
-        double totalPrice = draft.getTotalPrice();
-        draftRow.setTotal(MoneyUtils.formatMoneyNoSymbol(totalPrice, mCurrentGroupCurrency));
-        draftRow.setIsSelected(isSelected(draft.getDraftId()));
-    }
-
-    @Override
-    public void toggleSelection(int position) {
-        Purchase draft = (Purchase) mItems.get(position);
-        String draftId = draft.getDraftId();
-        if (mItemsSelected.contains(draftId)) {
-            mItemsSelected.remove(draftId);
+        DraftsRowViewModel viewModel = binding.getViewModel();
+        if (viewModel == null) {
+            final String currency = mViewModel.getCurrentUser().getCurrentGroup().getCurrency();
+            viewModel = new DraftsRowViewModel(draft, mViewModel.isSelected(draft), currency);
+            binding.setViewModel(viewModel);
         } else {
-            mItemsSelected.add(draftId);
+            viewModel.updateDraftInfo(draft, mViewModel.isSelected(draft));
         }
 
-        notifyItemChanged(position);
+        binding.executePendingBindings();
     }
 
     @Override
-    public void clearSelection(boolean deleteSelectedItems) {
-        for (int i = mItems.size() - 1; i >= 0; i--) {
-            final Purchase draft = (Purchase) mItems.get(i);
-            final String draftId = draft.getDraftId();
-            if (isSelected(draftId)) {
-                mItemsSelected.remove(draftId);
-
-                if (deleteSelectedItems) {
-                    draft.unpinInBackground();
-                    mItems.remove(i);
-                    notifyItemRemoved(i);
-                } else {
-                    notifyItemChanged(i);
-                }
-            }
-        }
-    }
-
-    @Override
-    public boolean isSelected(String draftId) {
-        return mItemsSelected.contains(draftId);
+    public int getItemCount() {
+        return mViewModel.getItemCount();
     }
 
     /**
@@ -130,75 +91,32 @@ public class DraftsRecyclerAdapter extends BaseRecyclerAdapter<ParseObject>
      * <p/>
      * Subclass of {@link RecyclerView.ViewHolder}.
      */
-    private static class DraftRow extends RecyclerView.ViewHolder {
-
-        private TextView mTextViewDate;
-        private TextView mTextViewStore;
-        private TextView mTestViewTotal;
+    public static class DraftRow extends BindingRow<RowDraftsBinding> {
 
         /**
          * Constructs a new {@link DraftRow} and sets the click listener.
          *
-         * @param view     the inflated row
-         * @param listener the callback for user clicks on the purchase
+         * @param binding  the view's binding
+         * @param listener the callback for user clicks on the draft
          */
-        public DraftRow(@NonNull View view,
+        public DraftRow(@NonNull RowDraftsBinding binding,
                         @NonNull final AdapterInteractionListener listener) {
-            super(view);
+            super(binding);
 
-            view.setOnClickListener(new View.OnClickListener() {
+            final View root = binding.getRoot();
+            root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     listener.onDraftRowClick(getAdapterPosition());
                 }
             });
-            view.setOnLongClickListener(new View.OnLongClickListener() {
+            root.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
                     listener.onDraftRowLongClick(getAdapterPosition());
                     return true;
                 }
             });
-
-            mTextViewDate = (TextView) view.findViewById(R.id.tv_date);
-            mTextViewStore = (TextView) view.findViewById(R.id.tv_store);
-            mTestViewTotal = (TextView) view.findViewById(R.id.tv_total_value);
-        }
-
-        /**
-         * Sets the date of the draft.
-         *
-         * @param date the date to set
-         */
-        public void setDate(@NonNull Date date) {
-            mTextViewDate.setText(DateUtils.formatMonthDayLineSeparated(date));
-        }
-
-        /**
-         * Sets the store of the draft.
-         *
-         * @param store the store to set
-         */
-        public void setStore(@NonNull String store) {
-            mTextViewStore.setText(store);
-        }
-
-        /**
-         * Sets the total price of the draft.
-         *
-         * @param total the total price to set
-         */
-        public void setTotal(@NonNull String total) {
-            mTestViewTotal.setText(total);
-        }
-
-        /**
-         * Sets the selection state of the draft.
-         *
-         * @param isSelected whether the draft is selected or not
-         */
-        public void setIsSelected(boolean isSelected) {
-            itemView.setActivated(isSelected);
         }
     }
 }

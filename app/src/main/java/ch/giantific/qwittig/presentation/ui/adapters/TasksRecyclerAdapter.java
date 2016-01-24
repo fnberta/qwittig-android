@@ -76,7 +76,7 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter {
                     viewModel = new TaskRowViewModel(task, currentUser);
                     binding.setViewModel(viewModel);
                 } else {
-                    viewModel.setTaskInfo(task, currentUser);
+                    viewModel.updateTaskInfo(task);
                 }
                 binding.executePendingBindings();
 

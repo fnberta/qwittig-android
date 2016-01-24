@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2016 Fabio Berta
+  -->
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.viewmodels.rows.PurchaseAddDateViewModel"
+            />
+    </data>
+
+    <TextView
+        android:id="@+id/tv_date"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/touch_target_min"
+        android:background="?selectableItemBackground"
+        android:drawablePadding="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+        android:drawableStart="@drawable/ic_event_black_24dp"
+        android:gravity="center_vertical"
+        android:paddingEnd="@dimen/key_line_1"
+        android:paddingStart="@dimen/key_line_1"
+        android:text="@{viewModel.date}"
+        tools:text="27. November 2014"
+        />
+
+</layout>

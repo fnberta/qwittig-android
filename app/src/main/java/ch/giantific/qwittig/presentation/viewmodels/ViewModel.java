@@ -26,10 +26,16 @@ public interface ViewModel<T extends ViewModel.ViewListener>
      */
     void saveState(@NonNull Bundle outState);
 
-    void updateCurrentUserAndGroup();
-
+    /**
+     * Returns the current logged in user.
+     *
+     * @return the current logged in user
+     */
     User getCurrentUser();
 
+    /**
+     * Loads the appropriate data for the newly set group.
+     */
     void onNewGroupSet();
 
     interface ViewListener {

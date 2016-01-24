@@ -26,7 +26,7 @@ public class HeaderRowViewModel extends BaseObservable {
      * @param header the header to display
      */
     public HeaderRowViewModel(@StringRes int header) {
-        setHeader(header);
+        mHeader = header;
     }
 
     @StringRes

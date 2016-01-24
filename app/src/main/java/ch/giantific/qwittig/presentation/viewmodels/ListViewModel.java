@@ -41,6 +41,8 @@ public interface ListViewModel<T, S extends ListViewModel.ViewListener>
      */
     int getItemCount();
 
+    int getLastPosition();
+
     interface ViewListener extends ViewModel.ViewListener {
 
         void notifyDataSetChanged();
@@ -48,5 +50,11 @@ public interface ListViewModel<T, S extends ListViewModel.ViewListener>
         void notifyItemChanged(int position);
 
         void notifyItemRemoved(int position);
+
+        void notifyItemInserted(int lastPosition);
+
+        void notifyItemRangeInserted(int itemCount, int size);
+
+        void scrollToPosition(int position);
     }
 }

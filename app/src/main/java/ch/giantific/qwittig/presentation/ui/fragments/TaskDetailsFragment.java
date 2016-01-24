@@ -104,6 +104,11 @@ public class TaskDetailsFragment extends BaseRecyclerViewFragment<TaskDetailsVie
     }
 
     @Override
+    protected void setViewModelToActivity() {
+        mActivity.setViewModel(mViewModel);
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
@@ -205,6 +210,7 @@ public class TaskDetailsFragment extends BaseRecyclerViewFragment<TaskDetailsVie
      * <p/>
      * Extends {@link BaseFragment.ActivityListener}.
      */
-    public interface ActivityListener extends BaseFragment.ActivityListener<TaskDetailsViewModel> {
+    public interface ActivityListener extends BaseFragment.ActivityListener {
+        void setViewModel(@NonNull TaskDetailsViewModel viewModel);
     }
 }

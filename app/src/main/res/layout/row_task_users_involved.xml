@@ -14,7 +14,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.viewmodels.rows.UserAvatarRowViewModel"
+            type="ch.giantific.qwittig.presentation.viewmodels.rows.TaskUserInvolvedRowViewModel"
             />
     </data>
 

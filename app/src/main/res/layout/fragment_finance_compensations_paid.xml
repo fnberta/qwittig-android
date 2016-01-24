@@ -3,25 +3,48 @@
   ~ Copyright (c) 2015 Fabio Berta
   -->
 
-<FrameLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".presentation.ui.fragments.FinanceCompensationsPaidFragment">
+    >
 
-    <include layout="@layout/include_srl_recycler_view" />
+    <data>
 
-    <TextView
-        android:id="@+id/empty_view"
-        style="@style/TextAppearance.AppCompat.Title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="gone"
-        android:text="@string/no_compensations_history"
-        android:drawablePadding="@dimen/small_space"
-        android:drawableTop="@drawable/ic_attach_money_black_144dp"
-        tools:visibility="visible"/>
+        <import type="android.view.View"/>
 
-</FrameLayout>
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.viewmodels.FinanceCompsPaidViewModel"
+            />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".presentation.ui.fragments.FinanceCompensationsPaidFragment"
+        >
+
+        <include
+            android:id="@+id/srl_rv"
+            layout="@layout/include_srl_recycler_view"
+            app:viewModel="@{viewModel}"
+            />
+
+        <TextView
+            android:id="@+id/empty_view"
+            style="@style/TextAppearance.AppCompat.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:drawablePadding="@dimen/small_space"
+            android:drawableTop="@drawable/ic_attach_money_black_144dp"
+            android:gravity="center_horizontal"
+            android:text="@string/no_compensations_history"
+            android:visibility="@{!viewModel.empty ? View.GONE : viewModel.loading ? View.GONE : View.VISIBLE}"
+            tools:visibility="visible"
+            />
+
+    </FrameLayout>
+
+</layout>

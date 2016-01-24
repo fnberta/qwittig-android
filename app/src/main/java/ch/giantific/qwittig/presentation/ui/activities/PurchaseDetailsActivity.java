@@ -26,7 +26,7 @@ import org.json.JSONObject;
 
 import java.util.Date;
 
-import ch.giantific.qwittig.LocalBroadcast;
+import ch.giantific.qwittig.LocalBroadcastImpl;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
@@ -69,7 +69,7 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     void handleLocalBroadcast(Intent intent, int dataType) {
         super.handleLocalBroadcast(intent, dataType);
 
-        if (dataType == LocalBroadcast.DATA_TYPE_PURCHASES_UPDATED) {
+        if (dataType == LocalBroadcastImpl.DATA_TYPE_PURCHASES_UPDATED) {
             updateFragment();
         }
     }

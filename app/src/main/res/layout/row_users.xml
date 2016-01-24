@@ -3,13 +3,25 @@
 <!--
   ~ Copyright (c) 2015 Fabio Berta
   -->
-
-<LinearLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.viewmodels.rows.UserRowViewModel"
+            />
+    </data>
+
+<LinearLayout
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/list_avatar_with_text">
+    android:layout_height="@dimen/list_avatar_with_text"
+    >
 
     <ImageView
         android:id="@+id/user_avatar"
@@ -18,7 +30,11 @@
         android:layout_marginStart="@dimen/key_line_1"
         android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_avatar_size"
         android:layout_gravity="center_vertical"
-        android:contentDescription="@string/user_avatar"/>
+        android:contentDescription="@string/user_avatar"
+        app:avatar="@{viewModel.userAvatar}"
+        app:fallback="@{@drawable/ic_account_circle_black_40dp}"
+        app:withRipple="@{false}"
+        />
 
     <TextView
         android:id="@+id/user_name"
@@ -27,7 +43,9 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:gravity="center_vertical"
-        tools:text="Vera"/>
+        android:text="@{viewModel.userName}"
+        tools:text="Vera"
+        />
 
     <TextView
         android:id="@+id/user_balance"
@@ -36,6 +54,11 @@
         android:layout_height="match_parent"
         android:layout_marginEnd="@dimen/key_line_1"
         android:gravity="center_vertical"
-        tools:text="123.50"/>
+        android:text="@{viewModel.userBalance}"
+        android:textColor="@{viewModel.userBalancePositive ? @color/green : @color/red}"
+        tools:text="123.50"
+        />
 
 </LinearLayout>
+
+</layout>

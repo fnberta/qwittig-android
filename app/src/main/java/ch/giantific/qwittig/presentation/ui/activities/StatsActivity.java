@@ -84,6 +84,8 @@ public class StatsActivity extends BaseNavDrawerActivity implements
         }
     }
 
+
+
     private void setupTypeSpinner() {
         final int[] types = new int[]{
                 R.string.tab_stats_spending,

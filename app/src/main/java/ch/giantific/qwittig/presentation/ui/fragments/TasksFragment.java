@@ -64,10 +64,8 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment<TasksViewModel
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-
-        mViewModel.attachView(this);
+    protected void setViewModelToActivity() {
+        mActivity.setViewModel(mViewModel);
     }
 
     @Override
@@ -159,7 +157,7 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment<TasksViewModel
         }
     }
 
-    public interface ActivityListener extends BaseFragment.ActivityListener<TasksViewModel> {
-
+    public interface ActivityListener extends BaseFragment.ActivityListener {
+        void setViewModel(@NonNull TasksViewModel viewModel);
     }
 }

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2016 Fabio Berta
+  -->
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_purchase_add_item_users"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/avatar_plus_caption_plus_padding"
+        android:layout_marginStart="@dimen/key_line_2"
+        />
+</layout>

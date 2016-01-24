@@ -9,6 +9,8 @@ import ch.giantific.qwittig.di.modules.RepositoriesModule;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.di.scopes.PerActivity;
+import ch.giantific.qwittig.presentation.ui.activities.FinanceActivity;
+import ch.giantific.qwittig.presentation.ui.activities.HomeActivity;
 import ch.giantific.qwittig.presentation.ui.activities.TaskDetailsActivity;
 import ch.giantific.qwittig.presentation.ui.activities.TasksActivity;
 import dagger.Component;
@@ -19,6 +21,10 @@ import dagger.Component;
 @PerActivity
 @Component(modules = {NavDrawerViewModelModule.class, RepositoriesModule.class})
 public interface NavDrawerComponent {
+
+    void inject(HomeActivity homeActivity);
+
+    void inject(FinanceActivity financeActivity);
 
     void inject(TasksActivity tasksActivity);
 
