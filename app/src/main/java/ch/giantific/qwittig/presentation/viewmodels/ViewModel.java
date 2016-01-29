@@ -47,8 +47,6 @@ public interface ViewModel<T extends ViewModel.ViewListener>
 
         void showMessageWithAction(@StringRes int resId, @NonNull MessageAction action);
 
-        void showCreateAccountDialog();
-
         void showCreateGroupDialog(@StringRes int message);
 
         void removeWorker(@NonNull String workerTag);

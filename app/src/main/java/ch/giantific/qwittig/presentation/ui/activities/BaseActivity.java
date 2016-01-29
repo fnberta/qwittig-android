@@ -15,14 +15,9 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.parse.LogOutCallback;
-import com.parse.ParseException;
-import com.parse.ParseUser;
-
 import ch.giantific.qwittig.LocalBroadcastImpl;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.ui.fragments.BaseFragment;
-import ch.giantific.qwittig.presentation.ui.fragments.dialogs.AccountCreateDialogFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.presentation.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.workerfragments.BaseWorkerListener;
@@ -35,7 +30,6 @@ import ch.giantific.qwittig.presentation.workerfragments.BaseWorkerListener;
 public abstract class BaseActivity<T extends ViewModel>
         extends AppCompatActivity
         implements BaseFragment.ActivityListener, BaseWorkerListener,
-        AccountCreateDialogFragment.DialogInteractionListener,
         GroupCreateDialogFragment.DialogInteractionListener {
 
     public static final int INTENT_REQUEST_LOGIN = 1;
@@ -96,20 +90,6 @@ public abstract class BaseActivity<T extends ViewModel>
         super.onPause();
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mLocalBroadcastReceiver);
-    }
-
-    @Override
-    public void onCreateNewAccountSelected() {
-        final Context context = this;
-        ParseUser.logOutInBackground(new LogOutCallback() {
-            @Override
-            public void done(ParseException e) {
-                // ignore possible exception, currentUser will always be null now
-                final Intent intent = new Intent(context, HomeActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-            }
-        });
     }
 
     @Override

@@ -21,7 +21,14 @@ import rx.Single;
  */
 public interface TaskRepository extends Repository {
 
-    Single<Task> saveTaskLocalAsync(@NonNull Task task);
+    /**
+     * Saves the task to the local data store.
+     *
+     * @param task the task to save
+     * @param tag  the tag for the local data store
+     * @return a {@link Single} representing the save operation
+     */
+    Single<Task> saveTaskLocalAsync(@NonNull Task task, @NonNull String tag);
 
     /**
      * Queries the local data store for tasks.

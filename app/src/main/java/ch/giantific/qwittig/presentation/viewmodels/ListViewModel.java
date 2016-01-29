@@ -49,11 +49,13 @@ public interface ListViewModel<T, S extends ListViewModel.ViewListener>
 
         void notifyItemChanged(int position);
 
+        void notifyItemRangeChanged(int positionStart, int itemCount);
+
         void notifyItemRemoved(int position);
 
         void notifyItemInserted(int lastPosition);
 
-        void notifyItemRangeInserted(int itemCount, int size);
+        void notifyItemRangeInserted(int positionStart, int itemCount);
 
         void scrollToPosition(int position);
     }

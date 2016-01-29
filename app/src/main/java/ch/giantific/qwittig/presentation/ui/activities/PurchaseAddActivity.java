@@ -4,104 +4,304 @@
 
 package ch.giantific.qwittig.presentation.ui.activities;
 
-import android.app.FragmentManager;
+import android.annotation.TargetApi;
+import android.app.DatePickerDialog;
+import android.databinding.DataBindingUtil;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
+import android.support.design.widget.Snackbar;
+import android.support.v4.view.ViewCompat;
+import android.transition.Transition;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.DatePicker;
 
+import java.util.Date;
+
+import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.databinding.ActivityPurchaseAddEditBinding;
 import ch.giantific.qwittig.domain.models.ocr.OcrPurchase;
-import ch.giantific.qwittig.presentation.workerfragments.OcrWorker;
-import ch.giantific.qwittig.presentation.ui.fragments.PurchaseAddAutoFragment;
+import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.domain.models.rates.CurrencyRates;
+import ch.giantific.qwittig.presentation.ui.fragments.PurchaseAddEditBaseFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.PurchaseAddFragment;
-import ch.giantific.qwittig.presentation.ui.fragments.PurchaseBaseFragment;
+import ch.giantific.qwittig.presentation.ui.fragments.PurchaseEditFragment;
+import ch.giantific.qwittig.presentation.ui.fragments.PurchaseNoteFragment;
+import ch.giantific.qwittig.presentation.ui.fragments.PurchaseReceiptAddFragment;
+import ch.giantific.qwittig.presentation.ui.fragments.dialogs.ManualExchangeRateDialogFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.PurchaseDiscardDialogFragment;
+import ch.giantific.qwittig.presentation.ui.fragments.dialogs.PurchaseNoteAddEditDialogFragment;
+import ch.giantific.qwittig.presentation.ui.listeners.TransitionListenerAdapter;
+import ch.giantific.qwittig.presentation.viewmodels.PurchaseAddEditViewModel;
+import ch.giantific.qwittig.presentation.workerfragments.OcrWorkerListener;
+import ch.giantific.qwittig.presentation.workerfragments.RatesWorkerListener;
+import ch.giantific.qwittig.presentation.workerfragments.save.PurchaseSaveWorkerListener;
+import ch.giantific.qwittig.utils.DateUtils;
+import ch.giantific.qwittig.utils.Utils;
+import rx.Observable;
+import rx.Single;
 
 /**
  * Hosts {@link PurchaseAddFragment} that handles the creation of a new purchase.
  * <p/>
  * Asks the user if he wants to discard the new purchase when dismissing the activity.
- * <p/>
- * Subclass of {@link PurchaseBaseActivity}.
  */
-public class PurchaseAddActivity extends PurchaseBaseActivity implements
+public class PurchaseAddActivity extends BaseActivity<PurchaseAddEditViewModel> implements
+        PurchaseAddEditBaseFragment.ActivityListener,
+        PurchaseNoteFragment.FragmentInteractionListener,
+        PurchaseReceiptAddFragment.FragmentInteractionListener,
+        PurchaseSaveWorkerListener, RatesWorkerListener, DatePickerDialog.OnDateSetListener,
+        PurchaseNoteAddEditDialogFragment.DialogInteractionListener,
+        ManualExchangeRateDialogFragment.DialogInteractionListener,
         PurchaseDiscardDialogFragment.DialogInteractionListener,
-        OcrWorker.WorkerInteractionListener {
+        OcrWorkerListener {
 
     public static final String INTENT_PURCHASE_NEW_AUTO = "INTENT_PURCHASE_NEW_AUTO";
-    public static final String INTENT_PURCHASE_NEW_TRIAL_MODE = "INTENT_PURCHASE_NEW_TRIAL_MODE";
-    private static final String LOG_TAG = PurchaseAddActivity.class.getSimpleName();
-    private static final String DISCARD_PURCHASE_DIALOG = "DISCARD_PURCHASE_DIALOG";
+    private static final String STATE_HAS_RECEIPT_FILE = "STATE_HAS_RECEIPT_FILE";
+    private static final String STATE_HAS_NOTE = "STATE_HAS_NOTE";
+    private ActivityPurchaseAddEditBinding mBinding;
+    private boolean mHasReceiptFile;
+    private boolean mHasNote;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_purchase_add_edit);
 
-        boolean inAutoMode = getIntent().getBooleanExtra(INTENT_PURCHASE_NEW_AUTO, false);
-        boolean inTrialMode = getIntent().getBooleanExtra(INTENT_PURCHASE_NEW_TRIAL_MODE, false);
+        // TODO: move to data binding
+        mBinding.fabPurchaseSave.setProgressFinalAnimationListener(new ProgressFinalAnimationListener() {
+            @Override
+            public void onProgressFinalAnimationComplete() {
+                mViewModel.onProgressFinalAnimationComplete();
+            }
+        });
 
-        FragmentManager fragmentManager = getFragmentManager();
         if (savedInstanceState == null) {
-            mPurchaseFragment = inAutoMode ?
-                    PurchaseAddAutoFragment.newInstance(inTrialMode) :
-                    new PurchaseAddFragment();
+            if (Utils.isRunningLollipopAndHigher()) {
+                addActivityTransitionListener();
+            } else {
+                showFab();
+            }
 
-            fragmentManager.beginTransaction()
-                    .add(R.id.container, mPurchaseFragment)
+            getFragmentManager().beginTransaction()
+                    .add(R.id.container, getPurchaseAddEditFragment())
                     .commit();
         } else {
-            mPurchaseFragment = (PurchaseBaseFragment) fragmentManager
-                    .getFragment(savedInstanceState, STATE_PURCHASE_FRAGMENT);
+            mHasReceiptFile = savedInstanceState.getBoolean(STATE_HAS_RECEIPT_FILE);
+            mHasNote = savedInstanceState.getBoolean(STATE_HAS_NOTE);
         }
     }
 
     @Override
-    public void onOcrFinished(@NonNull OcrPurchase ocrPurchase) {
-        ((PurchaseAddAutoFragment) mPurchaseFragment).onOcrFinished(ocrPurchase);
-        showFab();
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putBoolean(STATE_HAS_RECEIPT_FILE, mHasReceiptFile);
+        outState.putBoolean(STATE_HAS_NOTE, mHasNote);
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void addActivityTransitionListener() {
+        final Transition enter = getWindow().getEnterTransition();
+        enter.addListener(new TransitionListenerAdapter() {
+            @Override
+            public void onTransitionEnd(@NonNull Transition transition) {
+                super.onTransitionEnd(transition);
+                transition.removeListener(this);
+
+                showFab();
+            }
+        });
     }
 
     @Override
-    public void onOcrFailed(@StringRes int errorMessage) {
-        ((PurchaseAddAutoFragment) mPurchaseFragment).onOcrFailed(errorMessage);
-        showFab();
+    public void showFab() {
+        if (ViewCompat.isLaidOut(mBinding.fabPurchaseSave)) {
+            mBinding.fabPurchaseSave.show();
+        } else {
+            mBinding.fabPurchaseSave.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                @Override
+                public void onLayoutChange(@NonNull View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                    v.removeOnLayoutChangeListener(this);
+                    mBinding.fabPurchaseSave.show();
+                }
+            });
+        }
+    }
+
+    @NonNull
+    PurchaseAddEditBaseFragment getPurchaseAddEditFragment() {
+        final boolean autoMode = getIntent().getBooleanExtra(INTENT_PURCHASE_NEW_AUTO, false);
+        return autoMode
+                ? PurchaseAddFragment.newAddAutoInstance()
+                : PurchaseAddFragment.newAddInstance();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(@NonNull Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_purchase_add_edit, menu);
+
+        if (mHasReceiptFile) {
+            menu.findItem(R.id.action_purchase_add_edit_receipt_show).setVisible(true);
+            menu.findItem(R.id.action_purchase_add_edit_receipt_add).setVisible(false);
+        }
+
+        if (mHasNote) {
+            menu.findItem(R.id.action_purchase_add_edit_note_show).setVisible(true);
+            menu.findItem(R.id.action_purchase_add_edit_note_add).setVisible(false);
+        }
+
+        return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
+        final int id = item.getItemId();
         switch (id) {
             case android.R.id.home:
-                showPurchaseDiscardDialog();
+                mViewModel.onUpOrBackClick();
+                return true;
+            case R.id.action_purchase_add_edit_receipt_show:
+                mViewModel.onShowReceiptImageClick();
+                return true;
+            case R.id.action_purchase_add_edit_receipt_add:
+                mViewModel.onAddReceiptImageClick();
+                return true;
+            case R.id.action_purchase_add_edit_note_show:
+                mViewModel.onShowNoteClick();
+                return true;
+            case R.id.action_purchase_add_edit_note_add:
+                mViewModel.onAddNoteClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void showPurchaseDiscardDialog() {
-        PurchaseDiscardDialogFragment purchaseDiscardDialogFragment =
-                new PurchaseDiscardDialogFragment();
-        purchaseDiscardDialogFragment.show(getFragmentManager(), DISCARD_PURCHASE_DIALOG);
+    @Override
+    public void setAddEditViewModel(@NonNull PurchaseAddEditViewModel viewModel) {
+        mViewModel = viewModel;
     }
 
     @Override
-    public void onSavePurchaseAsDraftSelected() {
-        mPurchaseFragment.savePurchase(true);
+    public void setReceiptImagePath(@NonNull String path) {
+        mViewModel.onReceiptImagePathSet(path);
+    }
+
+    @Override
+    public void deleteReceipt() {
+        mViewModel.onDeleteReceiptImageClick();
+        getFragmentManager().popBackStackImmediate();
+
+        toggleReceiptMenuOption(false);
+        Snackbar.make(mToolbar, R.string.toast_receipt_deleted, Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void editNote() {
+        mViewModel.onEditNoteClick();
+    }
+
+    @Override
+    public void deleteNote() {
+        mViewModel.onDeleteNoteClick();
+        getFragmentManager().popBackStack();
+
+        mHasNote = false;
+        invalidateOptionsMenu();
+        Snackbar.make(mToolbar, R.string.toast_note_deleted, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
     public void onDiscardPurchaseSelected() {
-        mPurchaseFragment.onDiscardPurchaseSelected();
+        mViewModel.onDiscardChangesSelected();
+    }
+
+    @Override
+    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+        final Date date = DateUtils.parseDateFromPicker(year, monthOfYear, dayOfMonth);
+        mViewModel.onDateSet(date);
+    }
+
+    @Override
+    public void onExchangeRateSet(float exchangeRate) {
+        mViewModel.onExchangeRateSet(exchangeRate);
+    }
+
+    @Override
+    public void setRatesFetchStream(@NonNull Observable<CurrencyRates> observable,
+                                    @NonNull String workerTag) {
+        mViewModel.setRatesFetchStream(observable, workerTag);
+    }
+
+    @Override
+    public void onNoteSet(@NonNull String note) {
+        mViewModel.onNoteSet(note);
+        mHasNote = true;
+        invalidateOptionsMenu();
+
+        final PurchaseNoteFragment fragment = findPurchaseNoteFragment();
+        if (fragment != null) {
+            fragment.updateNote(note);
+        } else {
+            Snackbar.make(mToolbar, R.string.toast_note_added, Snackbar.LENGTH_LONG).show();
+        }
+    }
+
+    private PurchaseNoteFragment findPurchaseNoteFragment() {
+        return (PurchaseNoteFragment) getFragmentManager()
+                .findFragmentByTag(PurchaseAddFragment.PURCHASE_NOTE_FRAGMENT);
+    }
+
+    @Override
+    public void toggleReceiptMenuOption(boolean show) {
+        mHasReceiptFile = show;
+        invalidateOptionsMenu();
+    }
+
+    @Override
+    public void toggleNoteMenuOption(boolean show) {
+        mHasNote = show;
+        invalidateOptionsMenu();
+    }
+
+    @Override
+    public void startProgressAnim() {
+        mBinding.fabPurchaseSave.startProgress();
+    }
+
+    @Override
+    public void startFinalProgressAnim() {
+        mBinding.fabPurchaseSave.startProgressFinalAnimation();
+    }
+
+    @Override
+    public void stopProgressAnim() {
+        mBinding.fabPurchaseSave.stopProgress();
+    }
+
+    @Override
+    public void setOcrStream(@NonNull Single<OcrPurchase> single, @NonNull String workerTag) {
+        mViewModel.setOcrStream(single, workerTag);
+    }
+
+    @Override
+    public void onSavePurchaseAsDraftSelected() {
+        mViewModel.onSavePurchaseAsDraftClick();
+    }
+
+    @Override
+    public void setPurchaseSaveStream(@NonNull Single<Purchase> single, @NonNull String workerTag) {
+        mViewModel.setPurchaseSaveStream(single, workerTag);
     }
 
     @Override
     public void onBackPressed() {
-        if (getFragmentManager().getBackStackEntryCount() > 0) {
-            getFragmentManager().popBackStack();
-        } else {
-            showPurchaseDiscardDialog();
+        if (!getFragmentManager().popBackStackImmediate()) {
+            mViewModel.onUpOrBackClick();
         }
     }
 }

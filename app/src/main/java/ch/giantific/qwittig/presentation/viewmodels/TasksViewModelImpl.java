@@ -274,11 +274,6 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<Task, TasksV
 
     @Override
     public void onRemindButtonClicked(int position) {
-        if (ParseUtils.isTestUser(mCurrentUser)) {
-            mView.showCreateAccountDialog();
-            return;
-        }
-
         if (!mView.isNetworkAvailable()) {
             mView.showMessage(R.string.toast_no_connection);
             return;

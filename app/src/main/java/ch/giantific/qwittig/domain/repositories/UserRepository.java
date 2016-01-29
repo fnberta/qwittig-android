@@ -34,9 +34,11 @@ public interface UserRepository extends Repository {
 
     Single<User> loginGoogle();
 
-    Single logOut();
+    Single<User> logOut(@NonNull User user);
 
-    void saveUser(@NonNull User user);
+    Observable<User> saveUserAsync(@NonNull User user);
+
+    Single<String> getUserSessionToken();
 
     /**
      * Queries the local data store for users.

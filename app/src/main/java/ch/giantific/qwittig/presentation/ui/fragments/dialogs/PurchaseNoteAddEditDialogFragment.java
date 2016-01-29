@@ -29,7 +29,7 @@ import ch.giantific.qwittig.R;
  * <p/>
  * Subclass of {@link DialogFragment}.
  */
-public class PurchaseNoteEditDialogFragment extends DialogFragment {
+public class PurchaseNoteAddEditDialogFragment extends DialogFragment {
 
     private static final String BUNDLE_NOTE = "BUNDLE_NOTE";
     private DialogInteractionListener mListener;
@@ -37,14 +37,14 @@ public class PurchaseNoteEditDialogFragment extends DialogFragment {
     private EditText mEditTextNote;
 
     /**
-     * Returns a new instance of {@link PurchaseNoteEditDialogFragment}.
+     * Returns a new instance of {@link PurchaseNoteAddEditDialogFragment}.
      *
      * @param note the note of the user if he/she already entered one
-     * @return a new instance of {@link PurchaseNoteEditDialogFragment}
+     * @return a new instance of {@link PurchaseNoteAddEditDialogFragment}
      */
     @NonNull
-    public static PurchaseNoteEditDialogFragment newInstance(String note) {
-        PurchaseNoteEditDialogFragment fragment = new PurchaseNoteEditDialogFragment();
+    public static PurchaseNoteAddEditDialogFragment newInstance(String note) {
+        PurchaseNoteAddEditDialogFragment fragment = new PurchaseNoteAddEditDialogFragment();
 
         Bundle args = new Bundle();
         args.putString(BUNDLE_NOTE, note);

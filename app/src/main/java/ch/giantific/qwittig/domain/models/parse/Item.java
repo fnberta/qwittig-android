@@ -38,7 +38,7 @@ public class Item extends ParseObject {
     }
 
     public Item(@NonNull String name, @NonNull BigDecimal price,
-                @NonNull List<ParseUser> usersInvolved, @NonNull ParseObject currentGroup) {
+                @NonNull List<User> usersInvolved, @NonNull ParseObject currentGroup) {
         setName(name);
         setPrice(price);
         setUsersInvolved(usersInvolved);
@@ -70,7 +70,7 @@ public class Item extends ParseObject {
         return getList(USERS_INVOLVED);
     }
 
-    public void setUsersInvolved(@NonNull List<ParseUser> usersInvolved) {
+    public void setUsersInvolved(@NonNull List<User> usersInvolved) {
         put(USERS_INVOLVED, usersInvolved);
     }
 

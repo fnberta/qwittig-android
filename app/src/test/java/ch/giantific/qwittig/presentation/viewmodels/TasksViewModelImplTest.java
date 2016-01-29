@@ -187,14 +187,6 @@ public class TasksViewModelImplTest {
     }
 
     @Test
-    public void onRemindUserClick_shouldShowCreateAccountDialogIfTestUser() throws Exception {
-        when(mCurrentUser.getUsername()).thenReturn(User.USERNAME_PREFIX_TEST);
-
-        mViewModel.onRemindButtonClicked(0);
-        verify(mView).showCreateAccountDialog();
-    }
-
-    @Test
     public void onRemindUserClick_shouldShowNoConnectionMessageIfNoConnection() throws Exception {
         when(mCurrentUser.getUsername()).thenReturn("James Bond");
         when(mView.isNetworkAvailable()).thenReturn(false);

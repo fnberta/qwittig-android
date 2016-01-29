@@ -11,9 +11,10 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.EditText;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.utils.MoneyUtils;
@@ -32,19 +33,24 @@ public class RowItem extends BaseObservable implements Parcelable {
             return new RowItem[size];
         }
     };
+    private PriceChangedListener mPriceChangedListener;
+    private String mCurrency;
     private boolean mValidate;
     private String mName;
     private String mPrice;
     private RowItemUser[] mUsers;
 
-    public RowItem(@NonNull RowItemUser[] users) {
+    public RowItem(@NonNull RowItemUser[] users, @NonNull String currency) {
         mUsers = users;
+        mCurrency = currency;
     }
 
-    public RowItem(@NonNull String name, @NonNull String price, @NonNull RowItemUser[] users) {
+    public RowItem(@NonNull String name, @NonNull String price, @NonNull RowItemUser[] users,
+                   @NonNull String currency) {
         mName = name;
         mPrice = price;
         mUsers = users;
+        mCurrency = currency;
     }
 
     protected RowItem(Parcel in) {
@@ -54,6 +60,15 @@ public class RowItem extends BaseObservable implements Parcelable {
         mUsers = (RowItemUser[]) in.readParcelableArray(RowItemUser.class.getClassLoader());
     }
 
+    public void setPriceChangedListener(@NonNull PriceChangedListener priceChangedListener) {
+        mPriceChangedListener = priceChangedListener;
+    }
+
+    public void updateCurrency(@NonNull String currency) {
+        mCurrency = currency;
+        setPrice(MoneyUtils.formatPrice(mPrice, mCurrency));
+    }
+
     @Bindable
     public String getName() {
         return mName;
@@ -61,6 +76,7 @@ public class RowItem extends BaseObservable implements Parcelable {
 
     public void setName(@NonNull String name) {
         mName = name;
+        notifyPropertyChanged(BR.name);
     }
 
     @Bindable
@@ -70,6 +86,7 @@ public class RowItem extends BaseObservable implements Parcelable {
 
     public void setPrice(@NonNull String price) {
         mPrice = price;
+        notifyPropertyChanged(BR.price);
     }
 
     public RowItemUser[] getUsers() {
@@ -97,6 +114,7 @@ public class RowItem extends BaseObservable implements Parcelable {
 
     public void onNameChanged(CharSequence s, int start, int before, int count) {
         mName = s.toString();
+
         if (mValidate) {
             notifyPropertyChanged(BR.validate);
         }
@@ -104,6 +122,8 @@ public class RowItem extends BaseObservable implements Parcelable {
 
     public void onPriceChanged(CharSequence s, int start, int before, int count) {
         mPrice = s.toString();
+        mPriceChangedListener.onRowPriceChanged();
+
         if (mValidate) {
             notifyPropertyChanged(BR.validate);
         }
@@ -111,10 +131,7 @@ public class RowItem extends BaseObservable implements Parcelable {
 
     public void onPriceFocusChange(View v, boolean hasFocus) {
         if (!hasFocus) {
-            EditText etPrice = (EditText) v;
-            if (isPriceComplete()) {
-//                etPrice.setText(MoneyUtils.formatPrice(price, mCurrencySelected));
-            }
+            setPrice(MoneyUtils.formatPrice(mPrice, mCurrency));
         }
     }
 
@@ -129,6 +146,14 @@ public class RowItem extends BaseObservable implements Parcelable {
         return MoneyUtils.parsePrice(mPrice).setScale(maxFractionDigits, BigDecimal.ROUND_HALF_UP);
     }
 
+    public List<String> getUserIds() {
+        final List<String> userIds = new ArrayList<>();
+        for (RowItemUser user : mUsers) {
+            userIds.add(user.getObjectId());
+        }
+        return userIds;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -140,5 +165,9 @@ public class RowItem extends BaseObservable implements Parcelable {
         dest.writeString(mName);
         dest.writeString(mPrice);
         dest.writeParcelableArray(mUsers, 0);
+    }
+
+    public interface PriceChangedListener {
+        void onRowPriceChanged();
     }
 }

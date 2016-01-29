@@ -13,11 +13,12 @@ import rx.Single;
 /**
  * Defines the actions to take after tasks are updated.
  */
-public interface CompensationSaveListener extends BaseWorkerListener {
+public interface CompensationSaveWorkerListener extends BaseWorkerListener {
     /**
      * Sets the {@link Single} that emits the saving of a compensation.
-     *  @param single the observable emitting the save stream
-     * @param workerTag  the tag of the worker fragment
+     *
+     * @param single    the observable emitting the save stream
+     * @param workerTag the tag of the worker fragment
      */
     void setCompensationSaveStream(@NonNull Single<Compensation> single,
                                    @NonNull String workerTag);

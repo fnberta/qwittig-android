@@ -5,46 +5,34 @@
 package ch.giantific.qwittig.presentation.workerfragments.save;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.text.TextUtils;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
-import com.parse.ParseException;
 import com.parse.ParseFile;
-import com.parse.ParseObject;
-import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
-import java.util.List;
+import javax.inject.Inject;
 
-import ch.giantific.qwittig.ParseErrorHandler;
-import ch.giantific.qwittig.domain.models.Receipt;
-import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.Item;
+import ch.giantific.qwittig.di.components.WorkerComponent;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.presentation.workerfragments.BaseWorker;
+import rx.Observable;
 
 /**
  * Saves a {@link Purchase} object and its corresponding receipt image as a {@link ParseFile}.
  * <p/>
  * Subclass of {@link BaseWorker}.
  */
-public class PurchaseSaveWorker extends BaseWorker {
+public class PurchaseSaveWorker extends BaseWorker<Purchase, PurchaseSaveWorkerListener> {
 
+    public static final String WORKER_TAG = "PURCHASE_SAVE_WORKER";
     private static final String LOG_TAG = PurchaseSaveWorker.class.getSimpleName();
-    @Nullable
-    WorkerInteractionListener mListener;
+    @Inject
+    PurchaseRepository mPurchaseRepo;
     Purchase mPurchase;
-    @Nullable
-    String mReceiptPath;
+    byte[] mReceiptImage;
 
     public PurchaseSaveWorker() {
         // empty default constructor
@@ -59,146 +47,43 @@ public class PurchaseSaveWorker extends BaseWorker {
      * system will recreate it with the default empty constructor.
      *
      * @param purchase    the {@link Purchase} object to save
-     * @param receiptPath the path to the receipt image
+     * @param receiptImage the receipt image to attach to the purchase
      */
     @SuppressLint("ValidFragment")
-    public PurchaseSaveWorker(@NonNull Purchase purchase, @Nullable String receiptPath) {
+    public PurchaseSaveWorker(@NonNull Purchase purchase, @Nullable byte[] receiptImage) {
         mPurchase = purchase;
-        mReceiptPath = receiptPath;
+        mReceiptImage = receiptImage;
     }
 
     @Override
-    public void onAttach(@NonNull Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (WorkerInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement DialogInteractionListener");
+    protected void injectWorkerDependencies(@NonNull WorkerComponent component) {
+        component.inject(this);
+    }
+
+    @Nullable
+    @Override
+    protected Observable<Purchase> getObservable(@NonNull Bundle args) {
+        final User currentUser = mUserRepo.getCurrentUser();
+        if (currentUser != null) {
+            final String tag = Purchase.PIN_LABEL + currentUser.getCurrentGroup().getObjectId();
+            return getPurchaseObservable(tag);
         }
+
+        return null;
+    }
+
+    @NonNull
+    Observable<Purchase> getPurchaseObservable(@NonNull String tag) {
+        return mPurchaseRepo.savePurchaseAsync(mPurchase, tag, mReceiptImage, false).toObservable();
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        checkReceiptImage();
-    }
-
-    void checkReceiptImage() {
-        if (!TextUtils.isEmpty(mReceiptPath)) {
-            getReceiptFile();
-        } else {
-            savePurchase();
-        }
-    }
-
-    final void getReceiptFile() {
-        Glide.with(this).load(mReceiptPath)
-                .asBitmap()
-                .toBytes(Bitmap.CompressFormat.JPEG, Receipt.JPEG_COMPRESSION_RATE)
-                .centerCrop()
-                .into(new SimpleTarget<byte[]>(Receipt.WIDTH, Receipt.HEIGHT) {
-                    @Override
-                    public void onResourceReady(@NonNull byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
-                        ParseFile file = new ParseFile(Receipt.PARSE_FILE_NAME, resource);
-                        saveReceiptParseFile(file);
-                    }
-                });
-    }
-
-    final void saveReceiptParseFile(final ParseFile receipt) {
-        receipt.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(@Nullable ParseException e) {
-                if (e != null && mListener != null) {
-                    mListener.onPurchaseSaveFailed(ParseErrorHandler.handleParseError(getActivity(), e));
-                    return;
-                }
-
-                onReceiptFileSaved(receipt);
-            }
-        });
-    }
-
-    void onReceiptFileSaved(ParseFile receipt) {
-        mPurchase.setReceiptParseFile(receipt);
-        savePurchase();
-    }
-
-    final void savePurchase() {
-        convertPrices(true);
-        mPurchase.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(@Nullable ParseException e) {
-                if (e != null) {
-                    convertPrices(false);
-
-                    if (mListener != null) {
-                        mListener.onPurchaseSaveFailed(ParseErrorHandler.handleParseError(getActivity(), e));
-                    }
-                    return;
-                }
-
-                onPurchaseSaved();
-            }
-        });
-    }
-
-    private void convertPrices(boolean toGroupCurrency) {
-        float exchangeRate = mPurchase.getExchangeRate();
-        if (exchangeRate == 1) {
-            return;
-        }
-
-        List<ParseObject> items = mPurchase.getItems();
-        for (ParseObject parseObject : items) {
-            Item item = (Item) parseObject;
-            item.convertPrice(exchangeRate, toGroupCurrency);
-        }
-
-        mPurchase.convertTotalPrice(toGroupCurrency);
-    }
-
-    void onPurchaseSaved() {
-        pinPurchase();
-    }
-
-    final void pinPurchase() {
-        final User currentUser = (User) ParseUser.getCurrentUser();
-        final Group currentGroup = currentUser.getCurrentGroup();
-
-        mPurchase.pinInBackground(Purchase.PIN_LABEL + currentGroup.getObjectId(), new SaveCallback() {
-            @Override
-            public void done(@Nullable ParseException e) {
-                if (e == null && mListener != null) {
-                    mListener.onPurchaseSavedAndPinned();
-                }
-            }
-        });
+    protected void onError() {
+        mActivity.onWorkerError(WORKER_TAG);
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    /**
-     * Defines the action to take after the purchases are saved and pinned to the local data store
-     * or after the save process failed.
-     */
-    public interface WorkerInteractionListener {
-        /**
-         * Handles the successful save and pin to the local data store.
-         */
-        void onPurchaseSavedAndPinned();
-
-        /**
-         * Handles the failed save or pin to the local data store.
-         *
-         * @param errorMessage the error message from the exception thrown in the process
-         */
-        void onPurchaseSaveFailed(@StringRes int errorMessage);
+    protected void setStream(@NonNull Observable<Purchase> observable) {
+        mActivity.setPurchaseSaveStream(observable.toSingle(), WORKER_TAG);
     }
 }

@@ -91,7 +91,7 @@ public class PurchaseReceiptAddFragment extends PurchaseReceiptBaseFragment {
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         menu.clear();
-        inflater.inflate(R.menu.menu_purchase_edit_receipt, menu);
+        inflater.inflate(R.menu.menu_purchase_edit_receipt_fragment, menu);
     }
 
     @Override
@@ -129,7 +129,7 @@ public class PurchaseReceiptAddFragment extends PurchaseReceiptBaseFragment {
         }
 
         mReceiptPath = imageFile.getAbsolutePath();
-        Intent cameraIntent = CameraUtils.getCameraIntent(context, imageFile);
+        final Intent cameraIntent = CameraUtils.getCameraIntent(context, imageFile);
         if (cameraIntent != null) {
             startActivityForResult(cameraIntent, INTENT_REQUEST_IMAGE_CAPTURE);
         }
@@ -143,8 +143,7 @@ public class PurchaseReceiptAddFragment extends PurchaseReceiptBaseFragment {
             if (resultCode == Activity.RESULT_OK) {
                 setImage(mReceiptPath);
                 mListener.setReceiptImagePath(mReceiptPath);
-                Snackbar.make(mImageViewReceipt, R.string.toast_receipt_changed,
-                        Snackbar.LENGTH_LONG).show();
+                Snackbar.make(mImageViewReceipt, R.string.toast_receipt_changed, Snackbar.LENGTH_LONG).show();
             }
         }
     }

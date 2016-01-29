@@ -12,8 +12,9 @@ import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.domain.models.MessageAction;
-import ch.giantific.qwittig.presentation.ui.fragments.dialogs.AccountCreateDialogFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.GroupCreateDialogFragment;
 import ch.giantific.qwittig.presentation.viewmodels.ViewModel;
 import ch.giantific.qwittig.utils.Utils;
@@ -30,9 +31,9 @@ public abstract class BaseFragment<T extends ViewModel, S extends BaseFragment.A
         extends Fragment
         implements ViewModel.ViewListener {
 
-    private static final String ACCOUNT_CREATE_DIALOG = "ACCOUNT_CREATE_DIALOG";
     private static final String CREATE_GROUP_DIALOG = "CREATE_GROUP_DIALOG";
     S mActivity;
+    @Inject
     T mViewModel;
 
     public BaseFragment() {
@@ -112,13 +113,6 @@ public abstract class BaseFragment<T extends ViewModel, S extends BaseFragment.A
     }
 
     protected abstract View getSnackbarView();
-
-    @Override
-    public void showCreateAccountDialog() {
-        AccountCreateDialogFragment accountCreateDialogFragment =
-                new AccountCreateDialogFragment();
-        accountCreateDialogFragment.show(getFragmentManager(), ACCOUNT_CREATE_DIALOG);
-    }
 
     @Override
     public void showCreateGroupDialog(@StringRes int message) {

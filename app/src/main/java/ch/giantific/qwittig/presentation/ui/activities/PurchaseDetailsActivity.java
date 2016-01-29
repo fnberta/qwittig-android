@@ -29,14 +29,13 @@ import java.util.Date;
 import ch.giantific.qwittig.LocalBroadcastImpl;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
-import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.presentation.ui.fragments.HomePurchasesFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.PurchaseDetailsFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.PurchaseEditFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.PurchaseReceiptDetailFragment;
+import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
-import ch.giantific.qwittig.utils.parse.ParseUtils;
 
 /**
  * Hosts {@link PurchaseDetailsFragment} that displays the details of a purchase and
@@ -175,6 +174,7 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
     /**
      * Starts {@link PurchaseEditActivity} to edit the purchase.
      */
+    @SuppressWarnings("unchecked")
     private void editPurchase() {
         Intent intent = new Intent(this, PurchaseEditActivity.class);
         intent.putExtra(HomePurchasesFragment.INTENT_PURCHASE_ID, mPurchaseId);
@@ -188,15 +188,11 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
      * Deletes the purchase and all of its items and finishes if the user is not a test user.
      */
     private void deletePurchase() {
-        if (!ParseUtils.isTestUser(mCurrentUser)) {
-            Purchase purchase = (Purchase) ParseObject.createWithoutData(Purchase.CLASS, mPurchaseId);
-            purchase.deleteEventually();
+        Purchase purchase = (Purchase) ParseObject.createWithoutData(Purchase.CLASS, mPurchaseId);
+        purchase.deleteEventually();
 
-            setResult(RESULT_PURCHASE_DELETED);
-            finish();
-        } else {
-            showAccountCreateDialog();
-        }
+        setResult(RESULT_PURCHASE_DELETED);
+        finish();
     }
 
     /**
@@ -254,9 +250,7 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity implements
 
     @Override
     public void onBackPressed() {
-        if (getFragmentManager().getBackStackEntryCount() > 0) {
-            getFragmentManager().popBackStack();
-        } else {
+        if (!getFragmentManager().popBackStackImmediate()) {
             super.onBackPressed();
         }
     }

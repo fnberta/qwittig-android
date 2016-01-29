@@ -43,7 +43,6 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment<HomePu
         implements HomePurchasesViewModel.ViewListener {
 
     public static final String INTENT_PURCHASE_ID = "INTENT_PURCHASE_ID";
-    private static final String LOG_TAG = HomePurchasesFragment.class.getSimpleName();
     private FragmentHomePurchasesBinding mBinding;
 
     public HomePurchasesFragment() {

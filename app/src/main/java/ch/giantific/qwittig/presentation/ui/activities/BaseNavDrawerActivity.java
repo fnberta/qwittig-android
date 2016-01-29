@@ -32,6 +32,7 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.LocalBroadcastImpl;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.NavdrawerHeaderBinding;
+import ch.giantific.qwittig.di.components.DaggerNavDrawerComponent;
 import ch.giantific.qwittig.di.components.NavDrawerComponent;
 import ch.giantific.qwittig.presentation.ui.adapters.NavHeaderGroupsArrayAdapter;
 import ch.giantific.qwittig.presentation.ui.fragments.SettingsFragment;

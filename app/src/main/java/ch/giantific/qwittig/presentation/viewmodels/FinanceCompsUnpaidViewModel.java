@@ -9,12 +9,10 @@ import android.support.annotation.NonNull;
 import org.apache.commons.math3.fraction.BigFraction;
 
 import ch.giantific.qwittig.domain.models.parse.Compensation;
-import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.presentation.ui.adapters.CompensationsUnpaidRecyclerAdapter;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.CompensationChangeAmountDialogFragment;
 import ch.giantific.qwittig.presentation.workerfragments.query.CompensationsUpdateListener;
 import ch.giantific.qwittig.presentation.workerfragments.reminder.CompensationReminderListener;
-import ch.giantific.qwittig.presentation.workerfragments.save.CompensationSaveListener;
 
 /**
  * Created by fabio on 18.01.16.

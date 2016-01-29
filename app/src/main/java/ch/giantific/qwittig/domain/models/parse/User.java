@@ -31,7 +31,7 @@ import ch.giantific.qwittig.utils.parse.ParseConfigUtils;
  * Represents a user in a group that shares their purchases and tasks and wishes to balance
  * everything.
  */
-public class User extends ParseUser {
+public class User extends ParseUser implements Comparable<User> {
 
     public static final String CLASS = "_User";
     public static final String IS_DELETED = "isDeleted";
@@ -362,6 +362,22 @@ public class User extends ParseUser {
 
     public boolean isFacebookUser() {
         return ParseFacebookUtils.isLinked(this);
+    }
+
+    @Override
+    public int compareTo(@NonNull User another) {
+        final String nicknameLhs = getNickname();
+        final String nicknameRhs = another.getNickname();
+        String compareLhs = "n/a";
+        String compareRhs = "n/a";
+        if (!TextUtils.isEmpty(nicknameLhs)) {
+            compareLhs = nicknameLhs;
+        }
+        if (!TextUtils.isEmpty(nicknameRhs)) {
+            compareRhs = nicknameRhs;
+        }
+
+        return compareLhs.compareToIgnoreCase(compareRhs.toLowerCase());
     }
 }
 

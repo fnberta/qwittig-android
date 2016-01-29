@@ -26,24 +26,26 @@ public abstract class ListViewModelBaseImpl<T, S extends ListViewModel.ViewListe
 
     private static final String STATE_LOADING = "STATE_LOADING";
 
-    List<T> mItems;
+    ArrayList<T> mItems;
     GroupRepository mGroupRepo;
-    private boolean mLoading;
+    boolean mLoading;
 
     public ListViewModelBaseImpl(@Nullable Bundle savedState,
                                  @NonNull GroupRepository groupRepo,
                                  @NonNull UserRepository userRepository) {
         super(savedState, userRepository);
 
+        mGroupRepo = groupRepo;
+
         if (savedState != null) {
             setLoading(savedState.getBoolean(STATE_LOADING, false));
+        } else {
+            mItems = new ArrayList<>();
         }
-        mGroupRepo = groupRepo;
-        mItems = new ArrayList<>();
     }
 
     @VisibleForTesting
-    public void setItems(List<T> items) {
+    public void setItems(ArrayList<T> items) {
         mItems = items;
     }
 

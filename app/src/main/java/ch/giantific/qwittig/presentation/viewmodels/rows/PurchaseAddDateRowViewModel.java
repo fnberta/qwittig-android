@@ -4,15 +4,22 @@
 
 package ch.giantific.qwittig.presentation.viewmodels.rows;
 
+import android.databinding.Bindable;
 import android.databinding.Observable;
 import android.support.annotation.NonNull;
 import android.view.View;
-import android.widget.AdapterView;
+
+import java.util.Date;
 
 /**
  * Created by fabio on 24.01.16.
  */
-public interface PurchaseAddCurrencyRowViewModel extends Observable {
+public interface PurchaseAddDateRowViewModel extends Observable {
 
-    void onCurrencySelected(@NonNull AdapterView<?> parent, View view, int position, long id);
+    @Bindable
+    String getDate();
+
+    void setDate(@NonNull Date date);
+
+    void onDateClick(View view);
 }

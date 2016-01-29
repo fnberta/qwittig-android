@@ -40,6 +40,11 @@ public class ParseTaskRepository extends ParseBaseRepository<Task> implements Ta
     }
 
     @Override
+    public Single<Task> saveTaskLocalAsync(@NonNull Task task, @NonNull String tag) {
+        return pin(task, tag);
+    }
+
+    @Override
     public Observable<Task> getTasksLocalAsync(@NonNull Group group, @NonNull Date deadline) {
         ParseQuery<Task> deadlineQuery = ParseQuery.getQuery(Task.CLASS);
         deadlineQuery.whereLessThan(Task.DEADLINE, deadline);
@@ -102,13 +107,13 @@ public class ParseTaskRepository extends ParseBaseRepository<Task> implements Ta
                 .concatMap(new Func1<List<Task>, Observable<List<Task>>>() {
                     @Override
                     public Observable<List<Task>> call(List<Task> tasks) {
-                        return unpin(tasks, Task.PIN_LABEL);
+                        return unpinAll(tasks, Task.PIN_LABEL);
                     }
                 })
                 .concatMap(new Func1<List<Task>, Observable<List<Task>>>() {
                     @Override
                     public Observable<List<Task>> call(List<Task> tasks) {
-                        return pin(tasks, Task.PIN_LABEL);
+                        return pinAll(tasks, Task.PIN_LABEL);
                     }
                 })
                 .concatMap(new Func1<List<Task>, Observable<Task>>() {

@@ -52,15 +52,15 @@ public class Purchase extends ParseObject {
         // A default constructor is required.
     }
 
-    public Purchase(@NonNull ParseUser currentUser, @NonNull ParseObject group, @NonNull Date date,
-                    @NonNull String store, @NonNull List<ParseObject> items, double totalPrice,
-                    @NonNull List<ParseUser> usersInvolved, @NonNull String currency) {
+    public Purchase(@NonNull ParseUser currentUser, @NonNull Group group, @NonNull Date date,
+                    @NonNull String store, @NonNull List<Item> items, double totalPrice,
+                    @NonNull List<User> usersInvolved, @NonNull String currency) {
         this(currentUser, group, date, store, items, totalPrice, usersInvolved, currency, 1);
     }
 
-    public Purchase(@NonNull ParseUser currentUser, @NonNull ParseObject group, @NonNull Date date,
-                    @NonNull String store, @NonNull List<ParseObject> items, double totalPrice,
-                    @NonNull List<ParseUser> usersInvolved, @NonNull String currency,
+    public Purchase(@NonNull ParseUser currentUser, @NonNull Group group, @NonNull Date date,
+                    @NonNull String store, @NonNull List<Item> items, double totalPrice,
+                    @NonNull List<User> usersInvolved, @NonNull String currency,
                     float exchangeRate) {
         setBuyer(currentUser);
         setGroup(group);
@@ -116,7 +116,7 @@ public class Purchase extends ParseObject {
         return getList(ITEMS);
     }
 
-    public void setItems(@NonNull List<ParseObject> items) {
+    public void setItems(@NonNull List<Item> items) {
         put(ITEMS, items);
     }
 
@@ -124,7 +124,7 @@ public class Purchase extends ParseObject {
         return getList(USERS_INVOLVED);
     }
 
-    public void setUsersInvolved(@NonNull List<ParseUser> usersInvolved) {
+    public void setUsersInvolved(@NonNull List<User> usersInvolved) {
         put(USERS_INVOLVED, usersInvolved);
     }
 
@@ -206,36 +206,12 @@ public class Purchase extends ParseObject {
         removeAll(ITEMS, items);
     }
 
-    public void replaceItems(List<ParseObject> items) {
+    public void replaceItems(List<Item> items) {
         put(ITEMS, items);
     }
 
     public void addItem(ParseObject item) {
         add(ITEMS, item);
-    }
-
-    /**
-     * Returns the object ids of the purchase's involved users.
-     *
-     * @return the object ids of the involved users
-     */
-    @NonNull
-    public List<String> getUsersInvolvedIds() {
-        List<String> listIds = new ArrayList<>();
-        List<ParseUser> list = getUsersInvolved();
-        for (ParseUser user : list) {
-            listIds.add(user.getObjectId());
-        }
-        return listIds;
-    }
-
-
-    public void addUsersInvolved(@NonNull List<ParseUser> usersInvolved) {
-        addAll(USERS_INVOLVED, usersInvolved);
-    }
-
-    public void removeUsersInvolved(@NonNull List<ParseUser> usersInvolved) {
-        removeAll(USERS_INVOLVED, usersInvolved);
     }
 
     /**

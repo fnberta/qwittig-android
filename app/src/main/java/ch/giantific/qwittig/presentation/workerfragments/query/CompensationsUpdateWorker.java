@@ -46,7 +46,7 @@ public class CompensationsUpdateWorker extends BaseQueryWorker<Compensation, Com
     }
 
     @Override
-    protected void injectQueryWorkerDependencies(@NonNull WorkerComponent component) {
+    protected void injectWorkerDependencies(@NonNull WorkerComponent component) {
         component.inject(this);
     }
 

@@ -233,18 +233,19 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
         }
 
         final Task task = getTask(taskTitle, timeFrame, usersInvolved);
-        mSubscriptions.add(mTaskRepo.saveTaskLocalAsync(task).subscribe(new SingleSubscriber<Task>() {
-            @Override
-            public void onSuccess(Task value) {
-                task.saveEventually();
-                mView.finishScreen(TaskAddEditFragment.RESULT_TASK_SAVED);
-            }
+        mSubscriptions.add(mTaskRepo.saveTaskLocalAsync(task, Task.PIN_LABEL)
+                .subscribe(new SingleSubscriber<Task>() {
+                    @Override
+                    public void onSuccess(Task value) {
+                        task.saveEventually();
+                        mView.finishScreen(TaskAddEditFragment.RESULT_TASK_SAVED);
+                    }
 
-            @Override
-            public void onError(Throwable error) {
-                mView.showMessage(R.string.toast_error_task_save);
-            }
-        }));
+                    @Override
+                    public void onError(Throwable error) {
+                        mView.showMessage(R.string.toast_error_task_save);
+                    }
+                }));
     }
 
     @Task.TimeFrame

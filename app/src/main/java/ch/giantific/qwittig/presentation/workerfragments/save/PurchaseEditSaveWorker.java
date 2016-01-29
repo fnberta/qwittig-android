@@ -5,18 +5,19 @@
 package ch.giantific.qwittig.presentation.workerfragments.save;
 
 import android.annotation.SuppressLint;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.text.TextUtils;
 
-import com.parse.DeleteCallback;
-import com.parse.ParseException;
 import com.parse.ParseFile;
 
-import ch.giantific.qwittig.domain.repositories.ApiRepository;
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.domain.repositories.ApiRepository;
+import rx.Observable;
+import rx.Single;
+import rx.functions.Action1;
+import rx.functions.Func1;
 
 /**
  * Saves an edited {@link Purchase} object and if there is a new receipt image, deletes the old
@@ -24,15 +25,14 @@ import ch.giantific.qwittig.domain.models.parse.Purchase;
  * <p/>
  * Subclass of {@link PurchaseSaveWorker}.
  */
-public class PurchaseEditSaveWorker extends PurchaseSaveWorker implements
-        ApiRepository.CloudCodeListener {
+public class PurchaseEditSaveWorker extends PurchaseSaveWorker {
 
     private static final String LOG_TAG = PurchaseEditSaveWorker.class.getSimpleName();
-    @Nullable
+    @Inject
+    ApiRepository mCloudClient;
     private ParseFile mReceiptParseFileOld;
-    private boolean mIsDraft;
+    private boolean mDraft;
     private boolean mDeleteOldReceipt;
-    private ApiRepository mCloudClient;
 
     public PurchaseEditSaveWorker() {
         // empty default constructor
@@ -48,93 +48,67 @@ public class PurchaseEditSaveWorker extends PurchaseSaveWorker implements
      * system will recreate it with the default empty constructor.
      *
      * @param purchase            the {@link Purchase} object to save
-     * @param isDraft             whether we are saving a draft or an already saved purchase
+     * @param receiptImage        the new receipt image
      * @param receiptParseFileOld the old receipt image
-     * @param receiptNewPath      the path to the new receipt image
+     * @param draft               whether we are saving a draft or an already saved purchase
      */
     @SuppressLint("ValidFragment")
-    public PurchaseEditSaveWorker(@NonNull Purchase purchase, boolean isDraft,
-                                  @Nullable ParseFile receiptParseFileOld, boolean deleteOldReceipt,
-                                  @Nullable String receiptNewPath) {
-        super(purchase, receiptNewPath);
+    public PurchaseEditSaveWorker(@NonNull Purchase purchase, @Nullable byte[] receiptImage,
+                                  @Nullable ParseFile receiptParseFileOld,
+                                  boolean deleteOldReceipt, boolean draft) {
+        super(purchase, receiptImage);
 
         mDeleteOldReceipt = deleteOldReceipt;
         mReceiptParseFileOld = receiptParseFileOld;
-        mIsDraft = isDraft;
+        mDraft = draft;
     }
 
+    @NonNull
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        mCloudClient = new ApiRepository(getActivity());
-    }
-
-    @Override
-    void checkReceiptImage() {
-        if (!TextUtils.isEmpty(mReceiptPath)) {
-            if (mReceiptParseFileOld != null && !mIsDraft) {
-                deleteOldReceiptFile();
-            } else {
-                getReceiptFile();
+    Observable<Purchase> getPurchaseObservable(@NonNull final String tag) {
+        if (mReceiptImage != null) {
+            if (mDraft) {
+                return mPurchaseRepo.savePurchaseAsync(mPurchase, tag, mReceiptImage, true).toObservable();
             }
-        } else if (mReceiptParseFileOld != null) {
-            if (mIsDraft) {
-                saveReceiptParseFile(mReceiptParseFileOld);
-            } else if (mDeleteOldReceipt) {
-                deleteOldReceiptFile();
-                mPurchase.removeReceiptParseFile();
-            } else {
-                savePurchase();
+
+            if (mReceiptParseFileOld != null) {
+                return deleteOldReceiptFile()
+                        .flatMap(new Func1<String, Single<? extends Purchase>>() {
+                            @Override
+                            public Single<? extends Purchase> call(String s) {
+                                return mPurchaseRepo.savePurchaseAsync(mPurchase, tag, mReceiptImage, false);
+                            }
+                        })
+                        .toObservable();
             }
-        } else {
-            savePurchase();
-        }
-    }
 
-    private void deleteOldReceiptFile() {
-        final String fileName = mReceiptParseFileOld.getName();
-        if (!TextUtils.isEmpty(fileName)) {
-            mCloudClient.deleteParseFile(fileName, this);
-        }
-    }
-
-    @Override
-    public void onCloudFunctionReturned(Object result) {
-        super.checkReceiptImage();
-    }
-
-    @Override
-    public void onCloudFunctionFailed(@StringRes int errorMessage) {
-        if (mListener != null) {
-            mListener.onPurchaseSaveFailed(errorMessage);
-        }
-    }
-
-    @Override
-    void onReceiptFileSaved(ParseFile receipt) {
-        if (mIsDraft) {
-            mPurchase.removeReceiptData();
+            return mPurchaseRepo.savePurchaseAsync(mPurchase, tag, mReceiptImage, false).toObservable();
         }
 
-        super.onReceiptFileSaved(receipt);
-    }
+        if (mDraft) {
+            return mPurchaseRepo.savePurchaseAsync(mPurchase, tag, null, true).toObservable();
+        }
 
-    @Override
-    void onPurchaseSaved() {
-        if (mIsDraft) {
-            mPurchase.unpinInBackground(new DeleteCallback() {
+        if (mReceiptParseFileOld != null && mDeleteOldReceipt) {
+            return deleteOldReceiptFile().flatMapObservable(new Func1<String, Observable<? extends Purchase>>() {
                 @Override
-                public void done(@Nullable ParseException e) {
-                    if (e != null) {
-                        return;
-                    }
-
-                    pinPurchase();
+                public Observable<? extends Purchase> call(String s) {
+                    return mPurchaseRepo.savePurchaseAsync(mPurchase, tag, null, false).toObservable();
                 }
             });
-        } else {
-            super.onPurchaseSaved();
         }
+
+        return mPurchaseRepo.savePurchaseAsync(mPurchase, tag, null, false).toObservable();
+
+    }
+
+    private Single<String> deleteOldReceiptFile() {
+        final String fileName = mReceiptParseFileOld.getName();
+        return mCloudClient.deleteParseFile(fileName).doOnSuccess(new Action1<String>() {
+            @Override
+            public void call(String s) {
+                mPurchase.removeReceiptParseFile();
+            }
+        });
     }
 }

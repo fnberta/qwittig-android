@@ -4,18 +4,12 @@
 
 package ch.giantific.qwittig.presentation.workerfragments.query;
 
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-
 import com.parse.ParseObject;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
-import ch.giantific.qwittig.di.components.DaggerWorkerComponent;
-import ch.giantific.qwittig.di.components.WorkerComponent;
-import ch.giantific.qwittig.di.modules.RepositoriesModule;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
@@ -32,21 +26,9 @@ public abstract class BaseQueryWorker<T, S extends BaseWorkerListener>
         extends BaseWorker<T, S> {
 
     private static final String LOG_TAG = BaseQueryWorker.class.getSimpleName();
-    @Inject
-    UserRepository mUserRepo;
     User mCurrentUser;
     Group mCurrentGroup;
     List<ParseObject> mCurrentUserGroups;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        final WorkerComponent component = DaggerWorkerComponent.create();
-        injectQueryWorkerDependencies(component);
-    }
-
-    protected abstract void injectQueryWorkerDependencies(@NonNull WorkerComponent component);
 
     /**
      * Returns if the current user's current group and groups are not null or empty.

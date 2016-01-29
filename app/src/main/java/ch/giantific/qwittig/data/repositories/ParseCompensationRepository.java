@@ -22,6 +22,7 @@ import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import rx.Observable;
 import rx.Single;
+import rx.functions.Action1;
 import rx.functions.Func1;
 
 /**
@@ -96,8 +97,13 @@ public class ParseCompensationRepository extends ParseBaseRepository<Compensatio
     }
 
     @Override
-    public Single<Compensation> saveCompensationAsync(@NonNull Compensation compensation) {
-        return save(compensation);
+    public Single<Compensation> saveCompensationAsync(@NonNull final Compensation compensation) {
+        return save(compensation).doOnError(new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+                compensation.setPaid(false);
+            }
+        });
     }
 
     @Override
@@ -121,13 +127,13 @@ public class ParseCompensationRepository extends ParseBaseRepository<Compensatio
                 .flatMap(new Func1<List<Compensation>, Observable<List<Compensation>>>() {
                     @Override
                     public Observable<List<Compensation>> call(List<Compensation> compensations) {
-                        return unpin(compensations, Compensation.PIN_LABEL_UNPAID);
+                        return unpinAll(compensations, Compensation.PIN_LABEL_UNPAID);
                     }
                 })
                 .flatMap(new Func1<List<Compensation>, Observable<List<Compensation>>>() {
                     @Override
                     public Observable<List<Compensation>> call(List<Compensation> compensations) {
-                        return pin(compensations, Compensation.PIN_LABEL_UNPAID);
+                        return pinAll(compensations, Compensation.PIN_LABEL_UNPAID);
                     }
                 })
                 .flatMap(new Func1<List<Compensation>, Observable<Compensation>>() {
@@ -156,13 +162,13 @@ public class ParseCompensationRepository extends ParseBaseRepository<Compensatio
                                 .flatMap(new Func1<List<Compensation>, Observable<List<Compensation>>>() {
                                     @Override
                                     public Observable<List<Compensation>> call(List<Compensation> compensations) {
-                                        return unpin(compensations, pinLabel);
+                                        return unpinAll(compensations, pinLabel);
                                     }
                                 })
                                 .flatMap(new Func1<List<Compensation>, Observable<List<Compensation>>>() {
                                     @Override
                                     public Observable<List<Compensation>> call(List<Compensation> compensations) {
-                                        return pin(compensations, pinLabel);
+                                        return pinAll(compensations, pinLabel);
                                     }
                                 })
                                 .flatMap(new Func1<List<Compensation>, Observable<Compensation>>() {
@@ -194,7 +200,7 @@ public class ParseCompensationRepository extends ParseBaseRepository<Compensatio
                     @Override
                     public Observable<List<Compensation>> call(List<Compensation> compensations) {
                         final String tag = Compensation.PIN_LABEL_PAID + group.getObjectId();
-                        return pin(compensations, tag);
+                        return pinAll(compensations, tag);
                     }
                 })
                 .flatMap(new Func1<List<Compensation>, Observable<Compensation>>() {

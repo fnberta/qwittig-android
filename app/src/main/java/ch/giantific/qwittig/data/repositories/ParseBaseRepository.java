@@ -7,6 +7,7 @@ package ch.giantific.qwittig.data.repositories;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.parse.DeleteCallback;
@@ -17,11 +18,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.SaveCallback;
 
-import org.apache.commons.math3.analysis.function.Sin;
-
 import java.util.List;
-
-import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.repositories.Repository;
@@ -146,8 +143,48 @@ public abstract class ParseBaseRepository<T extends ParseObject> implements Repo
     }
 
     @NonNull
-    final Observable<List<T>> unpin(@NonNull final List<T> objects,
-                                @NonNull final String tag) {
+    final Single<T> unpin(@NonNull final T object, @Nullable final String tag) {
+        return Single.create(new Single.OnSubscribe<T>() {
+            @Override
+            public void call(final SingleSubscriber<? super T> singleSubscriber) {
+                if (TextUtils.isEmpty(tag)) {
+                    object.unpinInBackground(new DeleteCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if (singleSubscriber.isUnsubscribed()) {
+                                return;
+                            }
+
+                            if (e != null) {
+                                singleSubscriber.onError(e);
+                            } else {
+                                singleSubscriber.onSuccess(object);
+                            }
+                        }
+                    });
+                } else {
+                    object.unpinInBackground(tag, new DeleteCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if (singleSubscriber.isUnsubscribed()) {
+                                return;
+                            }
+
+                            if (e != null) {
+                                singleSubscriber.onError(e);
+                            } else {
+                                singleSubscriber.onSuccess(object);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    @NonNull
+    final Observable<List<T>> unpinAll(@NonNull final List<T> objects,
+                                       @NonNull final String tag) {
         return Observable.create(new Observable.OnSubscribe<List<T>>() {
             @Override
             public void call(final Subscriber<? super List<T>> subscriber) {
@@ -171,8 +208,8 @@ public abstract class ParseBaseRepository<T extends ParseObject> implements Repo
     }
 
     @NonNull
-    final Observable<List<T>> pin(@NonNull final List<T> objects,
-                                  @NonNull final String tag) {
+    final Observable<List<T>> pinAll(@NonNull final List<T> objects,
+                                     @NonNull final String tag) {
         return Observable.create(new Observable.OnSubscribe<List<T>>() {
             @Override
             public void call(final Subscriber<? super List<T>> subscriber) {
@@ -188,6 +225,29 @@ public abstract class ParseBaseRepository<T extends ParseObject> implements Repo
                         } else {
                             subscriber.onNext(objects);
                             subscriber.onCompleted();
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    @NonNull
+    final Single<T> pin(@NonNull final T object, @NonNull final String tag) {
+        return Single.create(new Single.OnSubscribe<T>() {
+            @Override
+            public void call(final SingleSubscriber<? super T> singleSubscriber) {
+                object.pinInBackground(tag, new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (singleSubscriber.isUnsubscribed()) {
+                            return;
+                        }
+
+                        if (e != null) {
+                            singleSubscriber.onError(e);
+                        } else {
+                            singleSubscriber.onSuccess(object);
                         }
                     }
                 });

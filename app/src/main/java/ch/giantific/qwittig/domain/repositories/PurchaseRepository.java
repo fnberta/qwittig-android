@@ -5,6 +5,7 @@
 package ch.giantific.qwittig.domain.repositories;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.parse.ParseObject;
 
@@ -48,6 +49,15 @@ public interface PurchaseRepository extends Repository {
     /**
      * Removes a purchase from the local data store.
      *
+     * @param purchase the purchase to remove
+     * @param groupId  the object id of the group the purchase belongs to
+     * @return a {@link Single} representing the save action
+     */
+    Single<Purchase> removePurchaseLocalAsync(@NonNull Purchase purchase, @Nullable String groupId);
+
+    /**
+     * Removes a purchase from the local data store.
+     *
      * @param purchaseId the object id of the purchase to remove
      * @param groupId    the object id of the group the purchase belongs to
      * @return whether the removal was successful or not
@@ -62,7 +72,8 @@ public interface PurchaseRepository extends Repository {
      * @param groups         the groups for which to update the purchases
      * @param currentGroupId the object id of the user's current group
      */
-    Observable<Purchase> updatePurchasesAsync(@NonNull User currentUser, @NonNull List<ParseObject> groups,
+    Observable<Purchase> updatePurchasesAsync(@NonNull User currentUser,
+                                              @NonNull List<ParseObject> groups,
                                               @NonNull String currentGroupId);
 
     /**
@@ -72,7 +83,8 @@ public interface PurchaseRepository extends Repository {
      * @param group       the group for which to get purchases for
      * @param skip        the number of purchases to skip for the query
      */
-    Observable<Purchase> getPurchasesOnlineAsync(@NonNull User currentUser, @NonNull Group group, int skip);
+    Observable<Purchase> getPurchasesOnlineAsync(@NonNull User currentUser, @NonNull Group group,
+                                                 int skip);
 
     /**
      * Deletes all purchases from the local data store and saves new ones.
@@ -92,4 +104,27 @@ public interface PurchaseRepository extends Repository {
      * @return whether the update was successful or not
      */
     boolean updatePurchase(@NonNull String purchaseId, boolean isNew);
+
+    /**
+     * Saves a {@link Purchase} object to the online and offline storage.
+     *
+     * @param purchase     the purchase to save
+     * @param tag          the tag to save the purchase in the offline storage
+     * @param receiptImage the receipt image to attach to the purchase
+     * @param isDraft
+     * @return a {@link Single} emitting the save stream
+     */
+    Single<Purchase> savePurchaseAsync(@NonNull Purchase purchase, @NonNull String tag,
+                                       @Nullable byte[] receiptImage, boolean isDraft);
+
+    /**
+     * Saves a {@link Purchase} object as a draft, meaning only to the local offline datastore.
+     *
+     * @param purchase the purchase to save
+     * @param tag      the tag save the purche in the offline storage
+     * @return a {@link Single} emitting the save stream
+     */
+    Single<Purchase> savePurchaseAsDraftAsync(@NonNull Purchase purchase, @NonNull String tag);
+
+    void deleteItemsByIds(@NonNull List<String> itemIds);
 }

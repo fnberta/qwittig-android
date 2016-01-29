@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 
 import javax.inject.Inject;
 
+import ch.giantific.qwittig.di.components.WorkerComponent;
 import ch.giantific.qwittig.domain.models.parse.Compensation;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.presentation.workerfragments.BaseWorker;
@@ -21,13 +22,17 @@ import rx.Observable;
  * <p/>
  * Subclass of {@link BaseWorker}.
  */
-public class CompensationSaveWorker extends BaseWorker<Compensation, CompensationSaveListener> {
+public class CompensationSaveWorker extends BaseWorker<Compensation, CompensationSaveWorkerListener> {
 
     public static final String WORKER_TAG = "COMPENSATION_SAVE_WORKER";
     private static final String LOG_TAG = CompensationSaveWorker.class.getSimpleName();
     @Inject
     CompensationRepository mCompsRepo;
     private Compensation mCompensation;
+
+    public CompensationSaveWorker() {
+        // required empty constructor
+    }
 
     /**
      * Constructs a new {@link CompensationSaveWorker} with a {@link Compensation} object as a
@@ -44,24 +49,24 @@ public class CompensationSaveWorker extends BaseWorker<Compensation, Compensatio
         mCompensation = compensation;
     }
 
-    public CompensationSaveWorker() {
-        super();
+    @Override
+    protected void injectWorkerDependencies(@NonNull WorkerComponent component) {
+        component.inject(this);
     }
 
     @Override
-    protected String getWorkerTag() {
-        return WORKER_TAG;
+    protected void onError() {
+        mActivity.onWorkerError(WORKER_TAG);
     }
 
     @Nullable
     @Override
     protected Observable<Compensation> getObservable(@NonNull Bundle args) {
-        // TODO: mCompensation.setPaid(false) in error handling (if e != null)
         return mCompsRepo.saveCompensationAsync(mCompensation).toObservable();
     }
 
     @Override
-    protected void setStream(@NonNull Observable<Compensation> observable, @NonNull String workerTag) {
-        mActivity.setCompensationSaveStream(observable.toSingle(), workerTag);
+    protected void setStream(@NonNull Observable<Compensation> observable) {
+        mActivity.setCompensationSaveStream(observable.toSingle(), WORKER_TAG);
     }
 }

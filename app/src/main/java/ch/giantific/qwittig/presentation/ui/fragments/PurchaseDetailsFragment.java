@@ -226,7 +226,7 @@ public class PurchaseDetailsFragment extends BaseFragment implements
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_purchase_details_frag, menu);
+        inflater.inflate(R.menu.menu_purchase_details_fragment, menu);
 
         if (mHasReceiptFile) {
             menu.findItem(R.id.action_purchase_show_receipt).setVisible(true);

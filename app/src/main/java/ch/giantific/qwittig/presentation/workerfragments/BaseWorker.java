@@ -10,6 +10,11 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import javax.inject.Inject;
+
+import ch.giantific.qwittig.di.components.DaggerWorkerComponent;
+import ch.giantific.qwittig.di.components.WorkerComponent;
+import ch.giantific.qwittig.domain.repositories.UserRepository;
 import rx.Observable;
 import rx.Subscription;
 import rx.subjects.PublishSubject;
@@ -22,6 +27,8 @@ import rx.subjects.PublishSubject;
 public abstract class BaseWorker<T, S extends BaseWorkerListener> extends Fragment {
 
     protected S mActivity;
+    @Inject
+    protected UserRepository mUserRepo;
     private Subscription mSubscription;
     private PublishSubject<T> mSubject = PublishSubject.create();
 
@@ -49,6 +56,10 @@ public abstract class BaseWorker<T, S extends BaseWorkerListener> extends Fragme
         // Retain this fragment across configuration changes.
         setRetainInstance(true);
 
+        // inject dependencies
+        final WorkerComponent component = DaggerWorkerComponent.create();
+        injectWorkerDependencies(component);
+
         final Bundle args = getArguments();
         if (args == null) {
             onError();
@@ -62,6 +73,8 @@ public abstract class BaseWorker<T, S extends BaseWorkerListener> extends Fragme
             onError();
         }
     }
+
+    protected abstract void injectWorkerDependencies(@NonNull WorkerComponent component);
 
     @Override
     public void onStart() {

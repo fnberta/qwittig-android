@@ -33,7 +33,7 @@ public class TaskEditViewModelModule extends BaseViewModelModule {
 
     @PerFragment
     @Provides
-    TaskAddEditViewModel providesTaskAddViewModel(@NonNull UserRepository userRepository,
+    TaskAddEditViewModel providesTaskAddEditViewModel(@NonNull UserRepository userRepository,
                                                   @NonNull TaskRepository taskRepository) {
         return new TaskAddEditViewModelEditImpl(mSavedState, userRepository, taskRepository,
                 mEditTaskId);

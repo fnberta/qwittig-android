@@ -4,16 +4,23 @@
 
 package ch.giantific.qwittig.domain.models;
 
+import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.ViewUtils;
+import android.view.View;
+
+import ch.giantific.qwittig.BR;
+
+import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;
 
 /**
  * Created by fabio on 24.01.16.
  */
-public class RowItemUser implements Parcelable {
+public class RowItemUser extends BaseObservable implements Parcelable {
 
     public static final Creator<RowItemUser> CREATOR = new Creator<RowItemUser>() {
         public RowItemUser createFromParcel(Parcel source) {
@@ -75,12 +82,21 @@ public class RowItemUser implements Parcelable {
     }
 
     @Bindable
+    public float getAlpha() {
+        return mSelected ? 1f : DISABLED_ALPHA;
+    }
+
     public boolean isSelected() {
         return mSelected;
     }
 
     public void setSelected(boolean selected) {
         mSelected = selected;
+    }
+
+    public void toggleSelected() {
+        mSelected = !mSelected;
+        notifyPropertyChanged(BR.alpha);
     }
 
     @Override

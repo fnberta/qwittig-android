@@ -12,6 +12,7 @@ import android.text.TextUtils;
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.data.rest.ExchangeRates;
+import ch.giantific.qwittig.di.components.WorkerComponent;
 import ch.giantific.qwittig.domain.models.rates.CurrencyRates;
 import rx.Observable;
 
@@ -45,6 +46,11 @@ public class RatesWorker extends BaseWorker<CurrencyRates, RatesWorkerListener> 
         args.putString(BUNDLE_BASE_CURRENCY, baseCurrency);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    protected void injectWorkerDependencies(@NonNull WorkerComponent component) {
+        component.inject(this);
     }
 
     @Nullable

@@ -4,30 +4,23 @@
 
 package ch.giantific.qwittig.presentation.workerfragments;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.text.TextUtils;
-import android.webkit.MimeTypeMap;
 
-import com.parse.GetCallback;
-import com.parse.ParseException;
-import com.parse.ParseSession;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.RequestBody;
 
 import java.io.File;
 
-import ch.giantific.qwittig.R;
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.data.rest.ReceiptOcr;
+import ch.giantific.qwittig.di.components.WorkerComponent;
 import ch.giantific.qwittig.domain.models.ocr.OcrPurchase;
-import ch.giantific.qwittig.data.rest.OcrClient;
-import ch.giantific.qwittig.ParseErrorHandler;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-import retrofit.mime.TypedFile;
-import retrofit.mime.TypedString;
+import rx.Observable;
+import rx.functions.Func1;
 
 /**
  * Sends the image of receipt to the server to analyse and ocr it using
@@ -35,15 +28,14 @@ import retrofit.mime.TypedString;
  * <p/>
  * Subclass of {@link BaseWorker}.
  */
-public class OcrWorker extends BaseWorker {
+public class OcrWorker extends BaseWorker<OcrPurchase, OcrWorkerListener> {
 
+    public static final String WORKER_TAG = "OCR_WORKER";
     private static final String LOG_TAG = OcrWorker.class.getSimpleName();
     private static final String BUNDLE_RECEIPT_PATH = "BUNDLE_RECEIPT_PATH";
     private static final int MAX_RETRIES = 0;
-    @Nullable
-    private WorkerInteractionListener mListener;
-    private String mReceiptPath;
-    private int mRetries;
+    @Inject
+    ReceiptOcr mReceiptOcr;
 
     public OcrWorker() {
         // empty default constructor
@@ -65,101 +57,41 @@ public class OcrWorker extends BaseWorker {
     }
 
     @Override
-    public void onAttach(@NonNull Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (WorkerInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement DialogInteractionListener");
+    protected void injectWorkerDependencies(@NonNull WorkerComponent component) {
+        component.inject(this);
+    }
+
+    @Nullable
+    @Override
+    protected Observable<OcrPurchase> getObservable(@NonNull Bundle args) {
+        // TODO: implement retries
+
+        final String receiptPath = args.getString(BUNDLE_RECEIPT_PATH, "");
+        if (!TextUtils.isEmpty(receiptPath)) {
+            return mUserRepo.getUserSessionToken()
+                    .flatMapObservable(new Func1<String, Observable<OcrPurchase>>() {
+                        @Override
+                        public Observable<OcrPurchase> call(String sessionToken) {
+                            final RequestBody tokenPart = RequestBody.create(
+                                    MediaType.parse("text/plain"), sessionToken);
+                            final RequestBody receiptPart = RequestBody.create(
+                                    MediaType.parse("image/jpeg"), new File(receiptPath));
+
+                            return mReceiptOcr.uploadReceipt(tokenPart, receiptPart);
+                        }
+                    });
         }
+
+        return null;
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        Bundle args = getArguments();
-        if (args != null) {
-            mReceiptPath = args.getString(BUNDLE_RECEIPT_PATH, "");
-        }
-
-        if (TextUtils.isEmpty(mReceiptPath)) {
-            if (mListener != null) {
-                mListener.onOcrFailed(R.string.toast_unknown_error);
-            }
-
-            return;
-        }
-
-        getSessionToken();
-    }
-
-    private void getSessionToken() {
-        ParseSession.getCurrentSessionInBackground(new GetCallback<ParseSession>() {
-            @Override
-            public void done(@NonNull ParseSession parseSession, @Nullable ParseException e) {
-                if (e != null) {
-                    if (mListener != null) {
-                        mListener.onOcrFailed(ParseErrorHandler.handleParseError(getActivity(), e));
-                    }
-
-                    return;
-                }
-
-                String sessionToken = parseSession.getSessionToken();
-                doReceiptOcr(sessionToken);
-            }
-        });
-    }
-
-    private void doReceiptOcr(@NonNull String sessionToken) {
-        String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("jpg");
-        OcrClient.getService().uploadReceipt(new TypedString(sessionToken),
-                new TypedFile(mimeType, new File(mReceiptPath)),
-                new Callback<OcrPurchase>() {
-                    @Override
-                    public void success(OcrPurchase ocrPurchase, Response response) {
-                        mRetries = 0;
-                        if (mListener != null) {
-                            mListener.onOcrFinished(ocrPurchase);
-                        }
-                    }
-
-                    @Override
-                    public void failure(@NonNull RetrofitError error) {
-                        if (mRetries < MAX_RETRIES) {
-                            getSessionToken();
-                            mRetries++;
-                        } else if (mListener != null) {
-                            mListener.onOcrFailed(R.string.toast_unknown_error);
-                        }
-                    }
-                });
+    protected void onError() {
+        mActivity.onWorkerError(WORKER_TAG);
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    /**
-     * Defines the action to take after the image has been ocr or after the process failed.
-     */
-    public interface WorkerInteractionListener {
-        /**
-         * Handles the successful ocr analysis of an image.
-         *
-         * @param ocrPurchase the parsed data from the ocr analysis
-         */
-        void onOcrFinished(@NonNull OcrPurchase ocrPurchase);
-
-        /**
-         * Handles the failed ocr analysis of an image.
-         *
-         * @param errorMessage the error message received from the server
-         */
-        void onOcrFailed(@StringRes int errorMessage);
+    protected void setStream(@NonNull Observable<OcrPurchase> observable) {
+        mActivity.setOcrStream(observable.toSingle(), WORKER_TAG);
     }
 }

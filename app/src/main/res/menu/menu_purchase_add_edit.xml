@@ -2,30 +2,37 @@
   ~ Copyright (c) 2015 Fabio Berta
   -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".presentation.ui.activities.PurchaseBaseActivity">
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".presentation.ui.activities.PurchaseBaseActivity"
+    >
+
     <item
         android:id="@+id/action_purchase_add_edit_receipt_show"
-        android:title="@string/action_purchase_show_receipt"
         android:orderInCategory="1"
+        android:title="@string/action_purchase_show_receipt"
         android:visible="false"
-        app:showAsAction="never"/>
+        app:showAsAction="never"
+        />
     <item
         android:id="@+id/action_purchase_add_edit_receipt_add"
-        android:title="@string/action_purchase_add_edit_receipt_add"
         android:orderInCategory="1"
-        app:showAsAction="never"/>
+        android:title="@string/action_purchase_add_edit_receipt_add"
+        app:showAsAction="never"
+        />
     <item
         android:id="@+id/action_purchase_add_edit_note_show"
-        android:title="@string/action_purchase_show_note"
         android:orderInCategory="2"
+        android:title="@string/action_purchase_show_note"
         android:visible="false"
-        app:showAsAction="never"/>
+        app:showAsAction="never"
+        />
     <item
         android:id="@+id/action_purchase_add_edit_note_add"
-        android:title="@string/action_purchase_add_edit_note_add"
         android:orderInCategory="2"
-        app:showAsAction="never"/>
+        android:title="@string/action_purchase_add_edit_note_add"
+        app:showAsAction="never"
+        />
 </menu>

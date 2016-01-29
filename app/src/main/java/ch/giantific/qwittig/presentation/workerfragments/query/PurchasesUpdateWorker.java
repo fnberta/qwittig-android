@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 
 import javax.inject.Inject;
 
+import ch.giantific.qwittig.di.components.WorkerComponent;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import rx.Observable;
@@ -26,9 +27,18 @@ public class PurchasesUpdateWorker extends BaseQueryWorker<Purchase, PurchasesUp
     @Inject
     PurchaseRepository mPurchaseRepo;
 
+    public PurchasesUpdateWorker() {
+        // required empty constructor
+    }
+
     @Override
-    protected String getWorkerTag() {
-        return WORKER_TAG;
+    protected void injectWorkerDependencies(@NonNull WorkerComponent component) {
+        component.inject(this);
+    }
+
+    @Override
+    protected void onError() {
+        mActivity.onWorkerError(WORKER_TAG);
     }
 
     @Nullable
@@ -42,7 +52,7 @@ public class PurchasesUpdateWorker extends BaseQueryWorker<Purchase, PurchasesUp
     }
 
     @Override
-    protected void setStream(@NonNull Observable<Purchase> observable, @NonNull String workerTag) {
-        mActivity.setPurchasesUpdateStream(observable, workerTag);
+    protected void setStream(@NonNull Observable<Purchase> observable) {
+        mActivity.setPurchasesUpdateStream(observable, WORKER_TAG);
     }
 }

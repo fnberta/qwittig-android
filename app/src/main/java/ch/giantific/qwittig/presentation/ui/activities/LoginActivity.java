@@ -23,12 +23,12 @@ import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.presentation.workerfragments.account.LoginWorker;
 import ch.giantific.qwittig.presentation.ui.fragments.LoginAccountsFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.LoginBaseFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.LoginEmailFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.LoginEmailSignUpFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.EmailPromptDialogFragment;
+import ch.giantific.qwittig.presentation.workerfragments.account.LoginWorker;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
@@ -87,7 +87,7 @@ public class LoginActivity extends BaseActivity implements
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         findLoginFragment().onLoginFailed(connectionResult.getErrorCode());
     }
 
@@ -176,9 +176,7 @@ public class LoginActivity extends BaseActivity implements
 
     @Override
     public void onBackPressed() {
-        if (getFragmentManager().getBackStackEntryCount() > 0) {
-            getFragmentManager().popBackStack();
-        } else {
+        if (!getFragmentManager().popBackStackImmediate()) {
             super.onBackPressed();
         }
     }
