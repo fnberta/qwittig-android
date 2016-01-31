@@ -18,16 +18,17 @@ import java.util.Date;
 import java.util.List;
 
 import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
+import ch.giantific.qwittig.domain.models.PurchaseAddEditItem;
 import ch.giantific.qwittig.domain.models.RowItem;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.presentation.ui.adapters.PurchaseAddEditRecyclerAdapter;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.ManualExchangeRateDialogFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.PurchaseNoteAddEditDialogFragment;
-import ch.giantific.qwittig.presentation.viewmodels.rows.PurchaseAddDateRowViewModel;
-import ch.giantific.qwittig.presentation.viewmodels.rows.PurchaseAddExchangeRateRowViewModel;
-import ch.giantific.qwittig.presentation.viewmodels.rows.PurchaseAddStoreRowViewModel;
-import ch.giantific.qwittig.presentation.viewmodels.rows.PurchaseAddTotalRowViewModel;
+import ch.giantific.qwittig.presentation.viewmodels.rows.PurchaseAddEditDateRowViewModel;
+import ch.giantific.qwittig.presentation.viewmodels.rows.PurchaseAddEditExchangeRateRowViewModel;
+import ch.giantific.qwittig.presentation.viewmodels.rows.PurchaseAddEditStoreRowViewModel;
+import ch.giantific.qwittig.presentation.viewmodels.rows.PurchaseAddEditTotalRowViewModel;
 import ch.giantific.qwittig.presentation.workerfragments.OcrWorkerListener;
 import ch.giantific.qwittig.presentation.workerfragments.RatesWorkerListener;
 import ch.giantific.qwittig.presentation.workerfragments.save.PurchaseSaveWorkerListener;
@@ -36,23 +37,14 @@ import rx.Single;
 /**
  * Created by fabio on 24.01.16.
  */
-public interface PurchaseAddEditViewModel extends ListViewModel<RowItem, PurchaseAddEditViewModel.ViewListener>,
+public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditItem, PurchaseAddEditViewModel.ViewListener>,
         PurchaseAddEditRecyclerAdapter.AdapterListener, RowItem.PriceChangedListener,
-        PurchaseAddDateRowViewModel, PurchaseAddStoreRowViewModel, PurchaseAddTotalRowViewModel,
-        PurchaseAddExchangeRateRowViewModel, PurchaseNoteAddEditDialogFragment.DialogInteractionListener,
+        PurchaseAddEditDateRowViewModel, PurchaseAddEditStoreRowViewModel, PurchaseAddEditTotalRowViewModel,
+        PurchaseAddEditExchangeRateRowViewModel, PurchaseNoteAddEditDialogFragment.DialogInteractionListener,
         DiscardChangesDialogFragment.DialogInteractionListener, OcrWorkerListener,
         ManualExchangeRateDialogFragment.DialogInteractionListener, RatesWorkerListener, PurchaseSaveWorkerListener,
         ProgressFinalAnimationListener {
 
-    int TYPE_HEADER = 0;
-    int TYPE_DATE = 1;
-    int TYPE_STORE = 2;
-    int TYPE_ITEM = 3;
-    int TYPE_USERS = 4;
-    int TYPE_ADD_ROW = 5;
-    int TYPE_TOTAL = 6;
-    int TYPE_EXCHANGE_RATE = 7;
-    int ROWS_BEFORE_ITEMS = 4;
     int RESULT_PURCHASE_SAVED = 2;
     int RESULT_PURCHASE_SAVED_AUTO = 3;
     int RESULT_PURCHASE_DRAFT = 4;
@@ -81,10 +73,6 @@ public interface PurchaseAddEditViewModel extends ListViewModel<RowItem, Purchas
      * @param receiptImagePaths the paths of the receipt images
      */
     void onReceiptImagesTaken(@NonNull List<String> receiptImagePaths);
-
-    int getAdjustedPosition(int position);
-
-    int adjustPosition(int position);
 
     void onItemDismissed(int position);
 

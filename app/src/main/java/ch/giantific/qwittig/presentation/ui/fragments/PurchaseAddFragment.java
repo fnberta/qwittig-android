@@ -10,9 +10,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.di.components.DaggerPurchaseAddEditComponent;
-import ch.giantific.qwittig.di.components.PurchaseAddEditComponent;
+import ch.giantific.qwittig.di.components.DaggerPurchaseAddAutoComponent;
+import ch.giantific.qwittig.di.components.DaggerPurchaseAddComponent;
 import ch.giantific.qwittig.di.modules.PurchaseAddAutoViewModelModule;
 import ch.giantific.qwittig.di.modules.PurchaseAddViewModelModule;
 import ch.giantific.qwittig.presentation.viewmodels.PurchaseAddEditViewModel;
@@ -67,17 +68,19 @@ public class PurchaseAddFragment extends PurchaseAddEditBaseFragment<PurchaseAdd
         setHasOptionsMenu(true);
 
         final boolean auto = getArguments().getBoolean(KEY_AUTO_MODE, false);
-        final PurchaseAddEditComponent component;
         if (auto) {
-            component = DaggerPurchaseAddEditComponent.builder()
+            DaggerPurchaseAddAutoComponent.builder()
+                    .applicationComponent(Qwittig.getAppComponent(getActivity()))
                     .purchaseAddAutoViewModelModule(new PurchaseAddAutoViewModelModule(savedInstanceState))
-                    .build();
+                    .build()
+                    .inject(this);
         } else {
-            component = DaggerPurchaseAddEditComponent.builder()
+            DaggerPurchaseAddComponent.builder()
+                    .applicationComponent(Qwittig.getAppComponent(getActivity()))
                     .purchaseAddViewModelModule(new PurchaseAddViewModelModule(savedInstanceState))
-                    .build();
+                    .build()
+                    .inject(this);
         }
-        component.inject(this);
     }
 
     @Override

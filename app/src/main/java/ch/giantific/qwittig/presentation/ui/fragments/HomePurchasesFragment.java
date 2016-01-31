@@ -30,6 +30,7 @@ import ch.giantific.qwittig.presentation.ui.activities.HomeActivity;
 import ch.giantific.qwittig.presentation.ui.activities.PurchaseDetailsActivity;
 import ch.giantific.qwittig.presentation.ui.adapters.PurchasesRecyclerAdapter;
 import ch.giantific.qwittig.presentation.viewmodels.HomePurchasesViewModel;
+import ch.giantific.qwittig.presentation.viewmodels.PurchaseDetailsViewModel;
 import ch.giantific.qwittig.presentation.workerfragments.query.PurchasesQueryMoreWorker;
 import ch.giantific.qwittig.presentation.workerfragments.query.PurchasesUpdateWorker;
 import ch.giantific.qwittig.utils.WorkerUtils;
@@ -63,6 +64,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment<HomePu
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentHomePurchasesBinding.inflate(inflater, container, false);
+        mBinding.setViewModel(mViewModel);
         return mBinding.getRoot();
     }
 
@@ -95,10 +97,10 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment<HomePu
         switch (requestCode) {
             case HomeActivity.INTENT_REQUEST_PURCHASE_DETAILS:
                 switch (resultCode) {
-                    case PurchaseDetailsActivity.RESULT_PURCHASE_DELETED:
+                    case PurchaseDetailsViewModel.RESULT_PURCHASE_DELETED:
                         showMessage(R.string.toast_purchase_deleted);
                         break;
-                    case PurchaseDetailsActivity.RESULT_GROUP_CHANGED:
+                    case PurchaseDetailsViewModel.RESULT_GROUP_CHANGED:
                         mActivity.updateNavDrawerSelectedGroup();
                         break;
                 }

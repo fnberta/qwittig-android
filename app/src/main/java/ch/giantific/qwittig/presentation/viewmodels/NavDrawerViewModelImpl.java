@@ -36,7 +36,6 @@ public class NavDrawerViewModelImpl extends BaseObservable implements NavDrawerV
     private UserRepository mUserRepo;
     private List<ParseObject> mUserGroups;
 
-    @Inject
     public NavDrawerViewModelImpl(@NonNull GroupRepository groupRepository,
                                   @NonNull UserRepository userRepository) {
         mGroupRepo = groupRepository;
@@ -115,7 +114,6 @@ public class NavDrawerViewModelImpl extends BaseObservable implements NavDrawerV
     }
 
     @Override
-    @CallSuper
     public void onLoginSuccessful() {
         mCurrentUser = mUserRepo.getCurrentUser();
     }

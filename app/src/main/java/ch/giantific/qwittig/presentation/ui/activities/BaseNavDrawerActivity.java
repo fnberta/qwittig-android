@@ -55,7 +55,6 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
 
     static final String URI_INVITED_EMAIL = "email";
     private static final int NAVDRAWER_ITEM_INVALID = -1;
-    private static final String LOG_TAG = BaseNavDrawerActivity.class.getSimpleName();
 
     @Inject
     NavDrawerViewModel mNavDrawerViewModel;

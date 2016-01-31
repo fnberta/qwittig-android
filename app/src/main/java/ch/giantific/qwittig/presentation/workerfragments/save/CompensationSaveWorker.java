@@ -25,7 +25,6 @@ import rx.Observable;
 public class CompensationSaveWorker extends BaseWorker<Compensation, CompensationSaveWorkerListener> {
 
     public static final String WORKER_TAG = "COMPENSATION_SAVE_WORKER";
-    private static final String LOG_TAG = CompensationSaveWorker.class.getSimpleName();
     @Inject
     CompensationRepository mCompsRepo;
     private Compensation mCompensation;

@@ -12,10 +12,9 @@ import android.view.View;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
-import java.util.Collections;
+import java.util.List;
 
 import ch.giantific.qwittig.BR;
-import ch.giantific.qwittig.ComparatorParseUserIgnoreCase;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.MessageAction;
 import ch.giantific.qwittig.domain.models.parse.Group;
@@ -25,7 +24,6 @@ import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Observable;
 import rx.SingleSubscriber;
-import rx.Subscriber;
 import rx.functions.Func1;
 
 /**
@@ -34,15 +32,10 @@ import rx.functions.Func1;
 public class FinanceUsersViewModelImpl extends OnlineListViewModelBaseImpl<User, FinanceUsersViewModel.ViewListener>
         implements FinanceUsersViewModel {
 
-    private ComparatorParseUserIgnoreCase mUserComparator;
-
     public FinanceUsersViewModelImpl(@Nullable Bundle savedState,
                                      @NonNull GroupRepository groupRepo,
-                                     @NonNull UserRepository userRepository,
-                                     @NonNull ComparatorParseUserIgnoreCase userComparator) {
+                                     @NonNull UserRepository userRepository) {
         super(savedState, groupRepo, userRepository);
-
-        mUserComparator = userComparator;
     }
 
     @Override
@@ -69,28 +62,20 @@ public class FinanceUsersViewModelImpl extends OnlineListViewModelBaseImpl<User,
                         return !user.getObjectId().equals(mCurrentUser.getObjectId());
                     }
                 })
-                .subscribe(new Subscriber<User>() {
+                .toSortedList()
+                .toSingle()
+                .subscribe(new SingleSubscriber<List<User>>() {
                     @Override
-                    public void onStart() {
-                        super.onStart();
+                    public void onSuccess(List<User> users) {
                         mItems.clear();
-                    }
-
-                    @Override
-                    public void onCompleted() {
-                        Collections.sort(mItems, mUserComparator);
+                        mItems.addAll(users);
                         setLoading(false);
                         mView.notifyDataSetChanged();
                     }
 
                     @Override
-                    public void onError(Throwable e) {
+                    public void onError(Throwable error) {
                         mView.showMessage(R.string.toast_error_users_load);
-                    }
-
-                    @Override
-                    public void onNext(User user) {
-                        mItems.add(user);
                     }
                 })
         );

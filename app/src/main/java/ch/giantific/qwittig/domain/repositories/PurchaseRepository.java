@@ -126,5 +126,9 @@ public interface PurchaseRepository extends Repository {
      */
     Single<Purchase> savePurchaseAsDraftAsync(@NonNull Purchase purchase, @NonNull String tag);
 
+    Single<byte[]> getPurchaseReceiptImageAsync(@NonNull Purchase purchase);
+
     void deleteItemsByIds(@NonNull List<String> itemIds);
+
+    void deletePurchase(@NonNull Purchase purchase);
 }

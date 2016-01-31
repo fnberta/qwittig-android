@@ -63,7 +63,6 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceUsersViewModel
     public static final int TAB_USER_BALANCES = 0;
     public static final int TAB_COMPS_UNPAID = 1;
     public static final int TAB_COMPS_PAID = 2;
-    private static final String LOG_TAG = FinanceActivity.class.getSimpleName();
     private ActivityFinanceBinding mBinding;
     private FinanceCompsUnpaidViewModel mCompsUnpaidViewModel;
     private FinanceCompsPaidViewModel mCompsPaidViewModel;

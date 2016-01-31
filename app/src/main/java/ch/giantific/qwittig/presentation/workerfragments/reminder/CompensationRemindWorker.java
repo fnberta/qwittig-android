@@ -11,6 +11,7 @@ import android.text.TextUtils;
 
 import javax.inject.Inject;
 
+import ch.giantific.qwittig.di.components.WorkerComponent;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.repositories.ApiRepository;
@@ -27,12 +28,9 @@ import rx.Observable;
 public class CompensationRemindWorker extends BaseWorker<String, CompensationReminderListener> {
 
     public static final String WORKER_TAG = "COMPENSATION_REMIND_WORKER";
-    private static final String BUNDLE_COMPENSATION_ID = "BUNDLE_COMPENSATION_ID";
-    private static final String LOG_TAG = CompensationRemindWorker.class.getSimpleName();
+    private static final String KEY_COMPENSATION_ID = "COMPENSATION_ID";
     @Inject
     ApiRepository mApiRepo;
-    @Inject
-    User mCurrentUser;
     private String mCompensationId;
 
     /**
@@ -46,22 +44,29 @@ public class CompensationRemindWorker extends BaseWorker<String, CompensationRem
     public static CompensationRemindWorker newInstance(@NonNull String compensationId) {
         CompensationRemindWorker fragment = new CompensationRemindWorker();
         Bundle args = new Bundle();
-        args.putString(BUNDLE_COMPENSATION_ID, compensationId);
+        args.putString(KEY_COMPENSATION_ID, compensationId);
         fragment.setArguments(args);
         return fragment;
     }
 
     @Override
-    protected String getWorkerTag() {
-        return WORKER_TAG;
+    protected void injectWorkerDependencies(@NonNull WorkerComponent component) {
+        component.inject(this);
+    }
+
+    @Override
+    protected void onError() {
+        // TODO: check tag
+        mActivity.onWorkerError(WORKER_TAG);
     }
 
     @Nullable
     @Override
     protected Observable<String> getObservable(@NonNull Bundle args) {
-        mCompensationId = args.getString(BUNDLE_COMPENSATION_ID, "");
-        if (!TextUtils.isEmpty(mCompensationId)) {
-            final Group currentGroup = mCurrentUser.getCurrentGroup();
+        mCompensationId = args.getString(KEY_COMPENSATION_ID, "");
+        final User currentUser = mUserRepo.getCurrentUser();
+        if (!TextUtils.isEmpty(mCompensationId) && currentUser != null) {
+            final Group currentGroup = currentUser.getCurrentGroup();
             final String currencyCode = ParseUtils.getGroupCurrencyWithFallback(currentGroup);
             return mApiRepo.pushCompensationReminder(mCompensationId, currencyCode).toObservable();
         }
@@ -70,7 +75,7 @@ public class CompensationRemindWorker extends BaseWorker<String, CompensationRem
     }
 
     @Override
-    protected void setStream(@NonNull Observable<String> observable, @NonNull String workerTag) {
-        mActivity.setCompensationReminderStream(observable.toSingle(), mCompensationId, workerTag);
+    protected void setStream(@NonNull Observable<String> observable) {
+        mActivity.setCompensationReminderStream(observable.toSingle(), mCompensationId, WORKER_TAG);
     }
 }

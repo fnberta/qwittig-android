@@ -28,6 +28,7 @@ import java.util.List;
 import ch.giantific.qwittig.BlurTransformation;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.presentation.ui.widgets.CircleDisplay;
 
 /**
  * Contains generic binding adapters.
@@ -47,6 +48,8 @@ public class BindingUtils {
     public static void setTextBold(TextView view, boolean bold) {
         if (bold) {
             view.setTypeface(null, Typeface.BOLD);
+        } else {
+            view.setTypeface(null, Typeface.NORMAL);
         }
     }
 
@@ -73,6 +76,11 @@ public class BindingUtils {
                 .load(avatar)
                 .bitmapTransform(new BlurTransformation(context))
                 .into(view);
+    }
+
+    @BindingAdapter({"percentage"})
+    public static void setCirclePercentage(CircleDisplay view, float percentage) {
+        view.showValue(percentage, 100f, true);
     }
 
     @BindingAdapter({"deadline"})

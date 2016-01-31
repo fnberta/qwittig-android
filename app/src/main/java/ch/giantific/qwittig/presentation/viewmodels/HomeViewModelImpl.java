@@ -22,7 +22,7 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
         super(savedState, userRepository);
 
         if (mCurrentUser != null) {
-            checkForInvitations();
+//            checkForInvitations();
         }
     }
 
@@ -45,12 +45,7 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
     }
 
     @Override
-    public void onJoinInvitedGroupSelected() {
-
-    }
-
-    @Override
-    public void onDiscardInvitationSelected() {
-
+    public boolean isDraftsEmpty() {
+        return false;
     }
 }

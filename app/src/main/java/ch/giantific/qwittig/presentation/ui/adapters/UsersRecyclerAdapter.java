@@ -19,7 +19,7 @@ import ch.giantific.qwittig.presentation.viewmodels.rows.UserRowViewModel;
 /**
  * Handles the display of users with their avatar images, nicknames and current balances.
  * <p/>
- * Subclass of {@link BaseRecyclerAdapter}.
+ * Subclass of {@link RecyclerView.Adapter}.
  */
 public class UsersRecyclerAdapter extends RecyclerView.Adapter<BindingRow> {
 

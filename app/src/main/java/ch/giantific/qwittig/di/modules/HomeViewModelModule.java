@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.di.scopes.PerFragment;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
@@ -16,6 +17,8 @@ import ch.giantific.qwittig.presentation.viewmodels.HomeDraftsViewModel;
 import ch.giantific.qwittig.presentation.viewmodels.HomeDraftsViewModelImpl;
 import ch.giantific.qwittig.presentation.viewmodels.HomePurchasesViewModel;
 import ch.giantific.qwittig.presentation.viewmodels.HomePurchasesViewModelImpl;
+import ch.giantific.qwittig.presentation.viewmodels.HomeViewModel;
+import ch.giantific.qwittig.presentation.viewmodels.HomeViewModelImpl;
 import dagger.Module;
 import dagger.Provides;
 
@@ -27,6 +30,12 @@ public class HomeViewModelModule extends BaseViewModelModule {
 
     public HomeViewModelModule(@Nullable Bundle savedState) {
         super(savedState);
+    }
+
+    @PerFragment
+    @Provides
+    HomeViewModel providesHomeViewModel(@NonNull UserRepository userRepository) {
+        return new HomeViewModelImpl(mSavedState, userRepository);
     }
 
     @PerFragment

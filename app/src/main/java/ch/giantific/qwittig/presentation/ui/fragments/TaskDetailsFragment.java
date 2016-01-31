@@ -90,6 +90,7 @@ public class TaskDetailsFragment extends BaseRecyclerViewFragment<TaskDetailsVie
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentTaskDetailsBinding.inflate(inflater, container, false);
+        mBinding.setViewModel(mViewModel);
         return mBinding.getRoot();
     }
 

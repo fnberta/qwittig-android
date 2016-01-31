@@ -15,9 +15,8 @@ import dagger.Component;
  * Created by fabio on 12.01.16.
  */
 @PerFragment
-@Component(modules = {TaskAddViewModelModule.class, TaskEditViewModelModule.class,
-        RepositoriesModule.class})
-public interface TaskAddEditComponent {
+@Component(modules = {TaskEditViewModelModule.class, RepositoriesModule.class})
+public interface TaskEditComponent {
 
     void inject(TaskAddEditFragment taskAddEditFragment);
 }

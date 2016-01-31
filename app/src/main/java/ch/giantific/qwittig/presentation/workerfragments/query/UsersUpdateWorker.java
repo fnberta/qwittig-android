@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 
 import javax.inject.Inject;
 
+import ch.giantific.qwittig.di.components.WorkerComponent;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.repositories.ApiRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
@@ -24,15 +25,17 @@ import rx.functions.Func1;
 public class UsersUpdateWorker extends BaseQueryWorker<User, UsersUpdateListener> {
 
     public static final String WORKER_TAG = "USER_UPDATE_WORKER";
-    private static final String LOG_TAG = UsersUpdateWorker.class.getSimpleName();
-    @Inject
-    UserRepository mUserRepo;
     @Inject
     ApiRepository mApiRepository;
 
     @Override
-    protected String getWorkerTag() {
-        return WORKER_TAG;
+    protected void injectWorkerDependencies(@NonNull WorkerComponent component) {
+        component.inject(this);
+    }
+
+    @Override
+    protected void onError() {
+        mActivity.onWorkerError(WORKER_TAG);
     }
 
     @Nullable
@@ -53,7 +56,7 @@ public class UsersUpdateWorker extends BaseQueryWorker<User, UsersUpdateListener
     }
 
     @Override
-    protected void setStream(@NonNull Observable<User> observable, @NonNull String workerTag) {
-        mActivity.setUsersUpdateStream(observable, workerTag);
+    protected void setStream(@NonNull Observable<User> observable) {
+        mActivity.setUsersUpdateStream(observable, WORKER_TAG);
     }
 }

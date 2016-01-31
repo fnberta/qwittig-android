@@ -11,19 +11,20 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.databinding.RowHeaderBinding;
+import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
 import ch.giantific.qwittig.databinding.RowTasksBinding;
 import ch.giantific.qwittig.domain.models.parse.Task;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.presentation.ui.adapters.rows.BindingRow;
 import ch.giantific.qwittig.presentation.viewmodels.TasksViewModel;
 import ch.giantific.qwittig.presentation.viewmodels.rows.HeaderRowViewModel;
+import ch.giantific.qwittig.presentation.viewmodels.rows.HeaderRowViewModelImpl;
 import ch.giantific.qwittig.presentation.viewmodels.rows.TaskRowViewModel;
 
 /**
  * Handles the display of recent tasks assigned to users in a group.
  * <p/>
- * Subclass of {@link BaseRecyclerAdapter}.
+ * Subclass of {@link RecyclerView.Adapter}.
  */
 public class TasksRecyclerAdapter extends RecyclerView.Adapter {
 
@@ -33,7 +34,7 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter {
     /**
      * Constructs a new {@link TasksRecyclerAdapter}.
      *
-     * @param viewModel   the main view's model
+     * @param viewModel the main view's model
      */
     public TasksRecyclerAdapter(@NonNull TasksViewModel viewModel) {
         super();
@@ -51,7 +52,7 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter {
                 return new TaskRow(binding, mViewModel);
             }
             case TasksViewModel.TYPE_HEADER: {
-                final RowHeaderBinding binding = RowHeaderBinding.inflate(inflater, parent, false);
+                final RowGenericHeaderBinding binding = RowGenericHeaderBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
             }
             default:
@@ -83,19 +84,14 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter {
                 break;
             }
             case TasksViewModel.TYPE_HEADER: {
-                final BindingRow<RowHeaderBinding> headerRow = (BindingRow<RowHeaderBinding>) viewHolder;
-                final RowHeaderBinding binding = headerRow.getBinding();
+                final BindingRow<RowGenericHeaderBinding> headerRow = (BindingRow<RowGenericHeaderBinding>) viewHolder;
+                final RowGenericHeaderBinding binding = headerRow.getBinding();
 
-                HeaderRowViewModel viewModel = binding.getViewModel();
                 final int header = position == 0
                         ? R.string.task_header_my
                         : R.string.task_header_group;
-                if (viewModel == null) {
-                    viewModel = new HeaderRowViewModel(header);
-                    binding.setViewModel(viewModel);
-                } else {
-                    viewModel.setHeader(header);
-                }
+                final HeaderRowViewModel viewModel = new HeaderRowViewModelImpl(header);
+                binding.setViewModel(viewModel);
                 binding.executePendingBindings();
 
                 break;

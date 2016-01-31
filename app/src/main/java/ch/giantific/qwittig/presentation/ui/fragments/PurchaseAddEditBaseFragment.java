@@ -42,6 +42,8 @@ import ch.berta.fabio.fabprogress.FabProgress;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentPurchaseAddEditBinding;
 import ch.giantific.qwittig.domain.models.MessageAction;
+import ch.giantific.qwittig.domain.models.PurchaseAddEditItem;
+import ch.giantific.qwittig.domain.models.PurchaseAddEditItem.Type;
 import ch.giantific.qwittig.domain.models.Receipt;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.presentation.ui.activities.CameraActivity;
@@ -89,6 +91,7 @@ public abstract class PurchaseAddEditBaseFragment<T extends PurchaseAddEditViewM
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBinding = FragmentPurchaseAddEditBinding.inflate(inflater, container, false);
+        mBinding.setViewModel(mViewModel);
         return mBinding.getRoot();
     }
 
@@ -97,7 +100,7 @@ public abstract class PurchaseAddEditBaseFragment<T extends PurchaseAddEditViewM
         super.onViewCreated(view, savedInstanceState);
 
         final ItemTouchHelper touchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
-                ItemTouchHelper.UP | ItemTouchHelper.DOWN,
+                0,
                 ItemTouchHelper.START | ItemTouchHelper.END) {
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
@@ -113,7 +116,7 @@ public abstract class PurchaseAddEditBaseFragment<T extends PurchaseAddEditViewM
             @Override
             public int getSwipeDirs(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
                 final int position = viewHolder.getAdapterPosition();
-                if (mViewModel.getItemViewType(position) != PurchaseAddEditViewModel.TYPE_ITEM) {
+                if (mViewModel.getItemViewType(position) != Type.ITEM) {
                     return 0;
                 }
 
@@ -305,7 +308,8 @@ public abstract class PurchaseAddEditBaseFragment<T extends PurchaseAddEditViewM
     public void showReceiptImage(@NonNull String receiptImagePath) {
         final FragmentManager fragmentManager = getFragmentManager();
         final PurchaseReceiptBaseFragment fragment =
-                PurchaseReceiptAddFragment.newInstance(receiptImagePath);
+                PurchaseReceiptAddEditFragment.newAddInstance(receiptImagePath);
+
         fragmentManager.beginTransaction()
                 .replace(R.id.container, fragment, PURCHASE_RECEIPT_FRAGMENT)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
@@ -317,9 +321,10 @@ public abstract class PurchaseAddEditBaseFragment<T extends PurchaseAddEditViewM
     public void showReceiptImage(@NonNull String receiptImagePath, @NonNull String objectId,
                                  boolean isDraft) {
         final FragmentManager fragmentManager = getFragmentManager();
-        final PurchaseReceiptBaseFragment fragment = TextUtils.isEmpty(receiptImagePath)
-                ? PurchaseReceiptEditFragment.newInstance(objectId, isDraft)
-                : PurchaseReceiptAddFragment.newInstance(receiptImagePath);
+        final PurchaseReceiptBaseFragment fragment = !TextUtils.isEmpty(receiptImagePath)
+                ? PurchaseReceiptAddEditFragment.newAddInstance(receiptImagePath)
+                : PurchaseReceiptAddEditFragment.newEditInstance(objectId, isDraft);
+
         fragmentManager.beginTransaction()
                 .replace(R.id.container, fragment, PURCHASE_RECEIPT_FRAGMENT)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
@@ -331,6 +336,7 @@ public abstract class PurchaseAddEditBaseFragment<T extends PurchaseAddEditViewM
     public void showNote(@NonNull String note) {
         final FragmentManager fragmentManager = getFragmentManager();
         final PurchaseNoteFragment noteFragment = PurchaseNoteFragment.newInstance(note);
+
         fragmentManager.beginTransaction()
                 .replace(R.id.container, noteFragment, PURCHASE_NOTE_FRAGMENT)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)

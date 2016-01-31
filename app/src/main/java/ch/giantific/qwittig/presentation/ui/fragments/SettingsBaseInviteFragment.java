@@ -14,13 +14,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import com.parse.ParseUser;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.presentation.ui.listeners.SwipeDismissTouchListener;
-import ch.giantific.qwittig.utils.WorkerUtils;
 import ch.giantific.qwittig.utils.Utils;
+import ch.giantific.qwittig.utils.WorkerUtils;
 
 /**
  * Provides an abstract base class for screens that deal with the invitation of users to a group.
@@ -34,6 +38,8 @@ public abstract class SettingsBaseInviteFragment extends BaseFragment {
     List<TextInputLayout> mUsersToInviteFields = new ArrayList<>();
     @NonNull
     ArrayList<String> mUsersToInviteEmails = new ArrayList<>();
+    User mCurrentUser;
+    Group mCurrentGroup;
     private int mInvitedUsersRowCount;
     private LinearLayout mLinearLayoutUsers;
     private Button mButtonAddUser;
@@ -64,6 +70,23 @@ public abstract class SettingsBaseInviteFragment extends BaseFragment {
 
         mLinearLayoutUsers = (LinearLayout) view.findViewById(R.id.ll_users);
         mButtonAddUser = (Button) view.findViewById(R.id.bt_user_add);
+    }
+
+    void updateCurrentUserAndGroup() {
+        mCurrentUser = (User) ParseUser.getCurrentUser();
+        if (mCurrentUser != null) {
+            mCurrentGroup = mCurrentUser.getCurrentGroup();
+        }
+    }
+
+    @Override
+    protected void setViewModelToActivity() {
+
+    }
+
+    @Override
+    protected View getSnackbarView() {
+        return null;
     }
 
     final void setupUsersToInviteRows() {

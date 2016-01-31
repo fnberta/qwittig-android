@@ -34,8 +34,9 @@ import ch.giantific.qwittig.utils.Utils;
  * Subclass of {@link BaseActivity}.
  */
 public class SettingsUserInviteActivity extends BaseActivity implements
-        SettingsUserInviteFragment.FragmentInteractionListener,
-        UsersInviteWorker.WorkerInteractionListener {
+        SettingsUserInviteFragment.FragmentInteractionListener
+//        UsersInviteWorker.WorkerInteractionListener
+{
 
     private static final String STATE_USER_INVITE_FRAGMENT = "STATE_USER_INVITE_FRAGMENT";
     private SettingsUserInviteFragment mSettingsUserInviteFragment;
@@ -136,15 +137,15 @@ public class SettingsUserInviteActivity extends BaseActivity implements
         mFabProgress.startProgress();
     }
 
-    @Override
-    public void onUsersInvited() {
-        mSettingsUserInviteFragment.onUsersInvited();
-    }
-
-    @Override
-    public void onInviteUsersFailed(@StringRes int errorMessage) {
-        mSettingsUserInviteFragment.onInviteUsersFailed(errorMessage);
-    }
+//    @Override
+//    public void onUsersInvited() {
+//        mSettingsUserInviteFragment.onUsersInvited();
+//    }
+//
+//    @Override
+//    public void onInviteUsersFailed(@StringRes int errorMessage) {
+//        mSettingsUserInviteFragment.onInviteUsersFailed(errorMessage);
+//    }
 
     @Override
     public void onBackPressed() {

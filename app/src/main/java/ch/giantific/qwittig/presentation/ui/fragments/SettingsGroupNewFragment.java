@@ -220,7 +220,7 @@ public class SettingsGroupNewFragment extends SettingsBaseInviteFragment {
     /**
      * Defines the interaction with the hosting {@link Activity}.
      */
-    public interface FragmentInteractionListener extends BaseFragmentInteractionListener {
+    public interface FragmentInteractionListener extends BaseFragment.ActivityListener {
         /**
          * Indicates to start the loading animation of the {@link FabProgress}.
          */

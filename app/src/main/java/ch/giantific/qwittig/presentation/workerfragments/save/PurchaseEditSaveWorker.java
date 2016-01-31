@@ -27,7 +27,6 @@ import rx.functions.Func1;
  */
 public class PurchaseEditSaveWorker extends PurchaseSaveWorker {
 
-    private static final String LOG_TAG = PurchaseEditSaveWorker.class.getSimpleName();
     @Inject
     ApiRepository mCloudClient;
     private ParseFile mReceiptParseFileOld;

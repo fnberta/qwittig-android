@@ -17,8 +17,8 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.utils.PercentFormatter;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.presentation.workerfragments.group.StatsCalcWorker;
 import ch.giantific.qwittig.presentation.ui.widgets.PieChart;
+import ch.giantific.qwittig.presentation.workerfragments.group.StatsCalcWorker.StatsType;
 
 /**
  * Displays the currency statistics in a {@link PieChart}. Shows the percentages of the currencies
@@ -28,7 +28,6 @@ import ch.giantific.qwittig.presentation.ui.widgets.PieChart;
  */
 public class StatsCurrenciesFragment extends StatsPieBaseFragment {
 
-    private static final String LOG_TAG = StatsCurrenciesFragment.class.getSimpleName();
     private static final String STATS_WORKER_CURRENCIES = "STATS_WORKER_CURRENCIES";
 
     public StatsCurrenciesFragment() {
@@ -58,7 +57,7 @@ public class StatsCurrenciesFragment extends StatsPieBaseFragment {
     void calcStats(@NonNull String year, int month) {
         super.calcStats(year, month);
 
-        calcStatsWithWorker(StatsCalcWorker.TYPE_CURRENCIES, year, month);
+        calcStatsWithWorker(StatsType.CURRENCIES, year, month);
     }
 
     @Override

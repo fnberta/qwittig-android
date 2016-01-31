@@ -7,6 +7,7 @@ package ch.giantific.qwittig.data.repositories;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -38,7 +39,6 @@ public class ParsePurchaseRepository extends ParseBaseRepository<Purchase> imple
 
     private static final String LOG_TAG = ParsePurchaseRepository.class.getSimpleName();
 
-    @Inject
     public ParsePurchaseRepository() {
         super();
     }
@@ -346,10 +346,39 @@ public class ParsePurchaseRepository extends ParseBaseRepository<Purchase> imple
     }
 
     @Override
+    public Single<byte[]> getPurchaseReceiptImageAsync(@NonNull final Purchase purchase) {
+        return Single.create(new Single.OnSubscribe<byte[]>() {
+            @Override
+            public void call(final SingleSubscriber<? super byte[]> singleSubscriber) {
+                final ParseFile file = purchase.getReceiptParseFile();
+                file.getDataInBackground(new GetDataCallback() {
+                    @Override
+                    public void done(byte[] data, ParseException e) {
+                        if (singleSubscriber.isUnsubscribed()) {
+                            return;
+                        }
+
+                        if (e != null) {
+                            singleSubscriber.onError(e);
+                        } else {
+                            singleSubscriber.onSuccess(data);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
     public void deleteItemsByIds(@NonNull List<String> itemIds) {
         for (String itemId : itemIds) {
             final ParseObject item = ParseObject.createWithoutData(Item.CLASS, itemId);
             item.deleteEventually();
         }
+    }
+
+    @Override
+    public void deletePurchase(@NonNull Purchase purchase) {
+        purchase.deleteEventually();
     }
 }

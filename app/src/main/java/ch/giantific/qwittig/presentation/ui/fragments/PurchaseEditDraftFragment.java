@@ -10,9 +10,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.di.components.DaggerPurchaseAddEditComponent;
-import ch.giantific.qwittig.di.components.PurchaseAddEditComponent;
+import ch.giantific.qwittig.di.components.DaggerPurchaseEditComponent;
 import ch.giantific.qwittig.di.modules.PurchaseEditViewModelModule;
 import ch.giantific.qwittig.presentation.viewmodels.PurchaseEditDraftViewModel;
 
@@ -50,7 +50,8 @@ public class PurchaseEditDraftFragment extends PurchaseAddEditBaseFragment<Purch
         setHasOptionsMenu(true);
 
         final String editPurchaseId = getArguments().getString(KEY_EDIT_PURCHASE_ID, "");
-        DaggerPurchaseAddEditComponent.builder()
+        DaggerPurchaseEditComponent.builder()
+                .applicationComponent(Qwittig.getAppComponent(getActivity()))
                 .purchaseEditViewModelModule(new PurchaseEditViewModelModule(savedInstanceState, editPurchaseId))
                 .build()
                 .inject(this);

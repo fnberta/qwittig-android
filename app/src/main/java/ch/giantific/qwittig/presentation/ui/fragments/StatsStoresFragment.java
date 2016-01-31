@@ -23,6 +23,7 @@ import ch.giantific.qwittig.domain.models.stats.Stats;
 import ch.giantific.qwittig.presentation.workerfragments.group.StatsCalcWorker;
 import ch.giantific.qwittig.presentation.ui.widgets.PieChart;
 import ch.giantific.qwittig.CurrencyFormatter;
+import ch.giantific.qwittig.presentation.workerfragments.group.StatsCalcWorker.StatsType;
 
 /**
  * Displays the stores statistics in a {@link PieChart}. Shows the percentages of the stores
@@ -32,7 +33,6 @@ import ch.giantific.qwittig.CurrencyFormatter;
  */
 public class StatsStoresFragment extends StatsPieBaseFragment {
 
-    private static final String LOG_TAG = StatsStoresFragment.class.getSimpleName();
     private static final String STATS_WORKER_STORES = "STATS_WORKER_STORES";
     private static final String STATE_SHOW_PERCENT = "STATE_SHOW_PERCENT";
     private static final String STATE_SHOW_AVERAGE = "STATE_SHOW_AVERAGE";
@@ -116,7 +116,7 @@ public class StatsStoresFragment extends StatsPieBaseFragment {
     void calcStats(@NonNull String year, int month) {
         super.calcStats(year, month);
 
-        calcStatsWithWorker(StatsCalcWorker.TYPE_STORES, year, month);
+        calcStatsWithWorker(StatsType.STORES, year, month);
     }
 
     @Override

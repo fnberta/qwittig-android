@@ -6,8 +6,8 @@
 
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     >
 
     <data>
@@ -50,7 +50,8 @@
             android:layout_toStartOf="@+id/tv_task_details_history_date"
             android:gravity="center_vertical"
             android:text="@{taskHistory.userNickname}"
-            tools:text="Vera"/>
+            tools:text="Vera"
+            />
 
         <TextView
             android:id="@+id/tv_task_details_history_date"

@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 
 import javax.inject.Inject;
 
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.di.components.DaggerWorkerComponent;
 import ch.giantific.qwittig.di.components.WorkerComponent;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
@@ -57,7 +58,9 @@ public abstract class BaseWorker<T, S extends BaseWorkerListener> extends Fragme
         setRetainInstance(true);
 
         // inject dependencies
-        final WorkerComponent component = DaggerWorkerComponent.create();
+        final WorkerComponent component = DaggerWorkerComponent.builder()
+                .applicationComponent(Qwittig.getAppComponent(getActivity()))
+                .build();
         injectWorkerDependencies(component);
 
         final Bundle args = getArguments();

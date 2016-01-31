@@ -4,7 +4,9 @@
 
 package ch.giantific.qwittig;
 
+import android.app.Activity;
 import android.app.Application;
+import android.support.annotation.NonNull;
 
 import com.facebook.FacebookSdk;
 import com.parse.Parse;
@@ -14,6 +16,10 @@ import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
 
+import ch.giantific.qwittig.di.components.ApplicationComponent;
+import ch.giantific.qwittig.di.components.DaggerApplicationComponent;
+import ch.giantific.qwittig.di.modules.ApplicationModule;
+import ch.giantific.qwittig.di.modules.RestServiceModule;
 import ch.giantific.qwittig.domain.models.parse.Compensation;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.Item;
@@ -28,6 +34,16 @@ import ch.giantific.qwittig.utils.parse.ParseConfigUtils;
  * Subclass of {@link android.app.Application}.
  */
 public class Qwittig extends Application {
+
+    private ApplicationComponent mAppComponent;
+
+    public static ApplicationComponent getAppComponent(@NonNull Activity activity) {
+        return ((Qwittig) activity.getApplication()).getAppComponent();
+    }
+
+    public ApplicationComponent getAppComponent() {
+        return mAppComponent;
+    }
 
     @Override
     public void onCreate() {
@@ -66,5 +82,10 @@ public class Qwittig extends Application {
 
         // refresh ParseConfig
         ParseConfigUtils.refreshConfig();
+
+        mAppComponent = DaggerApplicationComponent.builder()
+                .applicationModule(new ApplicationModule(this))
+                .restServiceModule(new RestServiceModule())
+                .build();
     }
 }

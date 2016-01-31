@@ -29,6 +29,7 @@ import ch.giantific.qwittig.presentation.ui.activities.HomeActivity;
 import ch.giantific.qwittig.presentation.ui.activities.PurchaseEditActivity;
 import ch.giantific.qwittig.presentation.ui.adapters.DraftsRecyclerAdapter;
 import ch.giantific.qwittig.presentation.viewmodels.HomeDraftsViewModel;
+import ch.giantific.qwittig.presentation.viewmodels.PurchaseAddEditViewModel;
 
 /**
  * Displays the currently open drafts of the current user in an {@link RecyclerView list.
@@ -63,6 +64,7 @@ public class HomeDraftsFragment extends BaseRecyclerViewFragment<HomeDraftsViewM
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentHomeDraftsBinding.inflate(inflater, container, false);
+        mBinding.setViewModel(mViewModel);
         return mBinding.getRoot();
     }
 
@@ -79,16 +81,16 @@ public class HomeDraftsFragment extends BaseRecyclerViewFragment<HomeDraftsViewM
 
         if (requestCode == HomeActivity.INTENT_REQUEST_PURCHASE_MODIFY) {
             switch (resultCode) {
-                case PurchaseEditFragment.RESULT_PURCHASE_SAVED:
+                case PurchaseAddEditViewModel.RESULT_PURCHASE_SAVED:
                     showMessage(R.string.toast_purchase_added);
                     break;
-                case PurchaseEditFragment.RESULT_PURCHASE_DISCARDED:
+                case PurchaseAddEditViewModel.RESULT_PURCHASE_DISCARDED:
                     showMessage(R.string.toast_changes_discarded);
                     break;
-                case PurchaseEditFragment.RESULT_PURCHASE_DRAFT:
+                case PurchaseAddEditViewModel.RESULT_PURCHASE_DRAFT:
                     showMessage(R.string.toast_changes_saved_as_draft);
                     break;
-                case PurchaseEditFragment.RESULT_PURCHASE_DRAFT_DELETED:
+                case PurchaseAddEditViewModel.RESULT_PURCHASE_DRAFT_DELETED:
                     showMessage(R.string.toast_draft_deleted);
                     break;
             }

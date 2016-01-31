@@ -22,11 +22,8 @@ public interface FinanceCompsUnpaidViewModel extends OnlineListViewModel<Compens
         CompensationsUnpaidRecyclerAdapter.AdapterInteractionListener,
         CompensationChangeAmountDialogFragment.DialogInteractionListener {
 
-    int TYPE_HEADER = 0;
     int TYPE_PENDING_POS = 1;
     int TYPE_PENDING_NEG = 2;
-    int TYPE_SUGGESTION = 3;
-    int TYPE_SUGGESTION_LOADING = 4;
 
     interface ViewListener extends OnlineListViewModel.ViewListener {
 

@@ -11,7 +11,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.viewmodels.rows.PurchaseAddStoreRowViewModel"
+            type="ch.giantific.qwittig.presentation.viewmodels.rows.PurchaseAddEditStoreRowViewModel"
             />
     </data>
 

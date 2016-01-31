@@ -3,13 +3,26 @@
   ~ Copyright (c) 2015 Fabio Berta
   -->
 
-<TextView
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/tv_purchase_details_note"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="@dimen/key_line_1"
-    android:layout_marginEnd="@dimen/key_line_1"
-    tools:text="Dies ist eine Notiz"
-    />
+    >
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.viewmodels.rows.PurchaseDetailsNoteRowViewModel"
+            />
+    </data>
+
+    <TextView
+        android:id="@+id/tv_purchase_details_note"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/key_line_1"
+        android:layout_marginStart="@dimen/key_line_1"
+        android:text="@{viewModel.purchaseNote}"
+        tools:text="Dies ist eine Notiz"
+        />
+</layout>

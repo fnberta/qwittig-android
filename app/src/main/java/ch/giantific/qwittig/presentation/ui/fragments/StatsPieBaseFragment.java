@@ -39,7 +39,6 @@ import ch.giantific.qwittig.presentation.ui.widgets.PieChart;
  */
 public abstract class StatsPieBaseFragment extends StatsBaseFragment {
 
-    private static final String LOG_TAG = StatsPieBaseFragment.class.getSimpleName();
     private static final String STATE_SORT_BY_USER = "STATE_SORT_BY_USER";
     PieChart mPieChart;
     StatsPieChartRecyclerAdapter mRecyclerAdapter;

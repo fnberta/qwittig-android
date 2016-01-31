@@ -11,6 +11,7 @@ import ch.giantific.qwittig.presentation.ui.fragments.HomeDraftsFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.HomePurchasesFragment;
 import ch.giantific.qwittig.presentation.viewmodels.HomeDraftsViewModel;
 import ch.giantific.qwittig.presentation.viewmodels.HomePurchasesViewModel;
+import ch.giantific.qwittig.presentation.viewmodels.HomeViewModel;
 import dagger.Component;
 
 /**
@@ -27,4 +28,6 @@ public interface HomeComponent {
     HomePurchasesViewModel getHomePurchasesViewModel();
 
     HomeDraftsViewModel getHomeDraftsViewModel();
+
+    HomeViewModel getHomeViewModel();
 }

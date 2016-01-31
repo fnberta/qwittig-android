@@ -21,20 +21,16 @@ import java.lang.annotation.RetentionPolicy;
 
 import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.di.components.WorkerComponent;
 import ch.giantific.qwittig.domain.models.parse.User;
+import rx.Observable;
 
 /**
  * Handles the unlinking of the user's account from this Facebook or Google profile.
  */
 public class UnlinkThirdPartyWorker extends BaseGoogleApiLoginWorker {
 
-    @IntDef({UNLINK_FACEBOOK, UNLINK_GOOGLE})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface UnlinkAction {}
-    public static final int UNLINK_FACEBOOK = 1;
-    public static final int UNLINK_GOOGLE = 2;
     private static final String BUNDLE_UNLINK_ACTION = "BUNDLE_UNLINK_ACTION";
-    private static final String LOG_TAG = UnlinkThirdPartyWorker.class.getSimpleName();
     @Nullable
     private WorkerInteractionListener mListener;
     private User mCurrentUser;
@@ -83,11 +79,11 @@ public class UnlinkThirdPartyWorker extends BaseGoogleApiLoginWorker {
             type = args.getInt(BUNDLE_UNLINK_ACTION, 0);
         }
         switch (type) {
-            case UNLINK_FACEBOOK: {
+            case UnlinkAction.UNLINK_FACEBOOK: {
                 unlinkFacebook();
                 break;
             }
-            case UNLINK_GOOGLE: {
+            case UnlinkAction.UNLINK_GOOGLE: {
                 setupGoogleApiClient();
                 break;
             }
@@ -153,6 +149,13 @@ public class UnlinkThirdPartyWorker extends BaseGoogleApiLoginWorker {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @IntDef({UnlinkAction.UNLINK_FACEBOOK, UnlinkAction.UNLINK_GOOGLE})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface UnlinkAction {
+        int UNLINK_FACEBOOK = 1;
+        int UNLINK_GOOGLE = 2;
     }
 
     /**

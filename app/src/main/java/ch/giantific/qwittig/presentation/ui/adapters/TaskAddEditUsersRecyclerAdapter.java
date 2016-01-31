@@ -12,7 +12,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
-import ch.giantific.qwittig.databinding.RowTaskUsersInvolvedBinding;
+import ch.giantific.qwittig.databinding.RowTaskAddEditUsersBinding;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.presentation.ui.adapters.rows.BindingRow;
 import ch.giantific.qwittig.presentation.viewmodels.TaskAddEditViewModel;
@@ -25,19 +25,19 @@ import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;
  * Handles the display of the users involved in a task including the reordering of the different
  * users.
  * <p/>
- * Subclass of {@link BaseRecyclerAdapter}.
+ * Subclass of {@link RecyclerView.Adapter}.
  */
-public class TaskUsersInvolvedRecyclerAdapter extends RecyclerView.Adapter<TaskUsersInvolvedRecyclerAdapter.TaskUserInvolvedRow> {
+public class TaskAddEditUsersRecyclerAdapter extends RecyclerView.Adapter<TaskAddEditUsersRecyclerAdapter.TaskUserInvolvedRow> {
 
-    private static final String LOG_TAG = TaskUsersInvolvedRecyclerAdapter.class.getSimpleName();
+    private static final String LOG_TAG = TaskAddEditUsersRecyclerAdapter.class.getSimpleName();
     private TaskAddEditViewModel mViewModel;
 
     /**
-     * Constructs a new {@link TaskUsersInvolvedRecyclerAdapter}.
+     * Constructs a new {@link TaskAddEditUsersRecyclerAdapter}.
      *
      * @param viewModel the view model for the view
      */
-    public TaskUsersInvolvedRecyclerAdapter(@NonNull TaskAddEditViewModel viewModel) {
+    public TaskAddEditUsersRecyclerAdapter(@NonNull TaskAddEditViewModel viewModel) {
         mViewModel = viewModel;
     }
 
@@ -45,13 +45,13 @@ public class TaskUsersInvolvedRecyclerAdapter extends RecyclerView.Adapter<TaskU
     @Override
     public TaskUserInvolvedRow onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        final RowTaskUsersInvolvedBinding binding = RowTaskUsersInvolvedBinding.inflate(inflater, parent, false);
+        final RowTaskAddEditUsersBinding binding = RowTaskAddEditUsersBinding.inflate(inflater, parent, false);
         return new TaskUserInvolvedRow(binding, mViewModel);
     }
 
     @Override
     public void onBindViewHolder(TaskUserInvolvedRow holder, int position) {
-        final RowTaskUsersInvolvedBinding binding = holder.getBinding();
+        final RowTaskAddEditUsersBinding binding = holder.getBinding();
         final TaskUserInvolvedRowViewModel viewModel = binding.getViewModel();
 
         final User user = mViewModel.getUserAvailableAtPosition(position);
@@ -95,7 +95,7 @@ public class TaskUsersInvolvedRecyclerAdapter extends RecyclerView.Adapter<TaskU
      * Provides a {@link RecyclerView} row that displays the user's avatar, the nickname and a
      * drag handler.
      */
-    public static class TaskUserInvolvedRow extends BindingRow<RowTaskUsersInvolvedBinding> {
+    public static class TaskUserInvolvedRow extends BindingRow<RowTaskAddEditUsersBinding> {
 
         /**
          * Constructs a new {@link TaskUserInvolvedRow} and sets the click and drag listeners.
@@ -103,7 +103,7 @@ public class TaskUsersInvolvedRecyclerAdapter extends RecyclerView.Adapter<TaskU
          * @param binding  the binding for the row
          * @param listener the callback for user clicks and drags
          */
-        public TaskUserInvolvedRow(@NonNull RowTaskUsersInvolvedBinding binding,
+        public TaskUserInvolvedRow(@NonNull RowTaskAddEditUsersBinding binding,
                                    @NonNull final AdapterInteractionListener listener) {
             super(binding);
 

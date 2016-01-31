@@ -28,9 +28,8 @@ import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.models.rates.CurrencyRates;
 import ch.giantific.qwittig.presentation.ui.fragments.PurchaseAddEditBaseFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.PurchaseAddFragment;
-import ch.giantific.qwittig.presentation.ui.fragments.PurchaseEditFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.PurchaseNoteFragment;
-import ch.giantific.qwittig.presentation.ui.fragments.PurchaseReceiptAddFragment;
+import ch.giantific.qwittig.presentation.ui.fragments.PurchaseReceiptAddEditFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.ManualExchangeRateDialogFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.PurchaseDiscardDialogFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.PurchaseNoteAddEditDialogFragment;
@@ -52,7 +51,7 @@ import rx.Single;
 public class PurchaseAddActivity extends BaseActivity<PurchaseAddEditViewModel> implements
         PurchaseAddEditBaseFragment.ActivityListener,
         PurchaseNoteFragment.FragmentInteractionListener,
-        PurchaseReceiptAddFragment.FragmentInteractionListener,
+        PurchaseReceiptAddEditFragment.ActivityListener,
         PurchaseSaveWorkerListener, RatesWorkerListener, DatePickerDialog.OnDateSetListener,
         PurchaseNoteAddEditDialogFragment.DialogInteractionListener,
         ManualExchangeRateDialogFragment.DialogInteractionListener,

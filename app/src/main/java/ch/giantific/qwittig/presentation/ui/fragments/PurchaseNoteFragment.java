@@ -5,6 +5,7 @@
 package ch.giantific.qwittig.presentation.ui.fragments;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -23,7 +24,7 @@ import ch.giantific.qwittig.R;
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public class PurchaseNoteFragment extends BaseFragment {
+public class PurchaseNoteFragment extends Fragment {
 
     private static final String BUNDLE_NOTE = "BUNDLE_NOTE";
     private FragmentInteractionListener mListener;

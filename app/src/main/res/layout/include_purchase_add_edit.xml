@@ -22,7 +22,7 @@
 
     <include
         android:id="@+id/ll_user"
-        layout="@layout/row_recycler_user"
+        layout="@layout/row_purchase_details_users"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"

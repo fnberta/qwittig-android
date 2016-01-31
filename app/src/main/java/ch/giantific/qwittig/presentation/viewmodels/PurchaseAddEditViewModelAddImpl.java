@@ -30,6 +30,8 @@ import java.util.Map;
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.MessageAction;
+import ch.giantific.qwittig.domain.models.PurchaseAddEditItem;
+import ch.giantific.qwittig.domain.models.PurchaseAddEditItem.Type;
 import ch.giantific.qwittig.domain.models.RowItem;
 import ch.giantific.qwittig.domain.models.RowItemUser;
 import ch.giantific.qwittig.domain.models.ocr.OcrItem;
@@ -52,7 +54,7 @@ import rx.functions.Func1;
 /**
  * Created by fabio on 24.01.16.
  */
-public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<RowItem, ViewListener>
+public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<PurchaseAddEditItem, ViewListener>
         implements PurchaseAddEditViewModel {
 
     // add permission to manifest when enabling!
@@ -75,12 +77,12 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<RowIt
     String mNote;
     Date mDate;
     String mStore;
-    BigDecimal mTotalPrice;
+    BigDecimal mTotalPrice = BigDecimal.ZERO;
     float mExchangeRate;
     private SharedPreferences mSharedPreferences;
     private List<User> mUsersAvailable = new ArrayList<>();
     private boolean mSaving;
-    private BigDecimal mMyShare;
+    private BigDecimal mMyShare = BigDecimal.ZERO;
     private boolean mFetchingExchangeRates;
     private ArrayList<String> mReceiptImagePaths;
 
@@ -218,7 +220,12 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<RowIt
         BigDecimal myShare = BigDecimal.ZERO;
         final int maximumFractionDigits = MoneyUtils.getMaximumFractionDigits(mCurrency);
 
-        for (RowItem rowItem : mItems) {
+        for (PurchaseAddEditItem addEditItem : mItems) {
+            if (addEditItem.getType() != Type.ITEM) {
+                continue;
+            }
+
+            final RowItem rowItem = addEditItem.getRowItem();
             final BigDecimal finalPrice = rowItem.parsePrice(mCurrency);
 
             // update total price
@@ -255,11 +262,16 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<RowIt
 
     @Override
     public void onCurrencySelected(@NonNull AdapterView<?> parent, View view, int position, long id) {
-        mCurrency = (String) parent.getItemAtPosition(position);
+        final String currency = (String) parent.getItemAtPosition(position);
+        if (currency.equals(mCurrency)) {
+            return;
+        }
 
         // update item prices, total price and my share
-        for (RowItem rowItem : mItems) {
-            rowItem.updateCurrency(mCurrency);
+        for (PurchaseAddEditItem addEditItem : mItems) {
+            if (addEditItem.getType() == Type.ITEM) {
+                addEditItem.getRowItem().updateCurrency(mCurrency);
+            }
         }
         notifyPropertyChanged(BR.totalPrice);
         notifyPropertyChanged(BR.myShare);
@@ -288,8 +300,9 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<RowIt
                     mFetchingExchangeRates = true;
                     mView.loadFetchExchangeRatesWorker(mCurrentGroup.getCurrency());
                 } else {
-                    notifyPropertyChanged(BR.exchangeRate);
-                    notifyPropertyChanged(BR.exchangeRateVisible);
+                    // TODO: check if row already exists
+                    mItems.add(PurchaseAddEditItem.createNewExchangeRateInstance());
+                    mView.notifyItemInserted(getLastPosition());
                 }
             }
         }
@@ -312,6 +325,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<RowIt
                         mFetchingExchangeRates = false;
                         mView.removeWorker(workerTag);
 
+                        // TODO: move to repository
                         final SharedPreferences.Editor editor = mSharedPreferences.edit();
                         for (Map.Entry<String, Float> exchangeRate : exchangeRates.entrySet()) {
                             final BigDecimal roundedExchangeRate = MoneyUtils.roundToFractionDigits(
@@ -346,14 +360,17 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<RowIt
     }
 
     @Override
-    public void attachView(@NonNull PurchaseAddEditViewModel.ViewListener view) {
-        super.attachView(view);
-
-        updateList();
-    }
-
-    @Override
     public void updateList() {
+        if (mItems.isEmpty()) {
+            mItems.add(PurchaseAddEditItem.createNewHeaderInstance(R.string.header_purchase));
+            mItems.add(PurchaseAddEditItem.createNewDateInstance());
+            mItems.add(PurchaseAddEditItem.createNewStoreInstance());
+            mItems.add(PurchaseAddEditItem.createNewHeaderInstance(R.string.header_items));
+
+            mItems.add(PurchaseAddEditItem.createNewAddRowInstance());
+            mItems.add(PurchaseAddEditItem.createNewTotalInstance());
+        }
+
         mSubscriptions.add(mUserRepo.getUsersLocalAsync(mCurrentGroup)
                 .toSortedList()
                 .toSingle()
@@ -376,10 +393,19 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<RowIt
     }
 
     void onUsersReady() {
-        // only fill with first row on first start
-        if (mItems.isEmpty()) {
-            mItems.add(new RowItem(getRowItemUser(mUsersAvailable), mCurrency));
-            mView.notifyItemInserted(ROWS_BEFORE_ITEMS);
+        // fill with one row on first start
+        for (int i = 0, size = mItems.size(); i < size; i++) {
+            final PurchaseAddEditItem addEditItem = mItems.get(i);
+            if (addEditItem.getType() == Type.ITEM) {
+                return;
+            }
+
+            if (addEditItem.getType() == Type.ADD_ROW) {
+                final RowItem rowItem = new RowItem(getRowItemUser(mUsersAvailable), mCurrency);
+                mItems.add(i, PurchaseAddEditItem.createNewRowItemInstance(rowItem));
+                mView.notifyDataSetChanged();
+                return;
+            }
         }
     }
 
@@ -395,61 +421,19 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<RowIt
     }
 
     @Override
-    public RowItem getItemAtPosition(int position) {
-        return super.getItemAtPosition(getAdjustedPosition(position));
-    }
-
-    @Override
     public int getItemViewType(int position) {
-        if (position == 0) {
-            return TYPE_HEADER;
-        }
-
-        if (position == 1) {
-            return TYPE_DATE;
-        }
-
-        if (position == 2) {
-            return TYPE_STORE;
-        }
-
-        if (position == 3) {
-            return TYPE_HEADER;
-        }
-
-        if (position == getLastPosition()) {
-            return TYPE_ADD_ROW;
-        }
-
-
-        final RowItem rowItem = getItemAtPosition(position);
-        if (rowItem == null) {
-            return TYPE_USERS;
-        }
-
-        return TYPE_ITEM;
-    }
-
-    @Override
-    public int getItemCount() {
-        // TODO: or +2 if exchange rate visible
-        return super.getItemCount() + ROWS_BEFORE_ITEMS + 1;
-    }
-
-    @Override
-    public int getAdjustedPosition(int position) {
-        return position - ROWS_BEFORE_ITEMS;
-    }
-
-    @Override
-    public int adjustPosition(int position) {
-        return position + ROWS_BEFORE_ITEMS;
+        return mItems.get(position).getType();
     }
 
     @Override
     public void onItemDismissed(int position) {
-        mItems.remove(getAdjustedPosition(position));
-        mView.notifyItemRemoved(position);
+        mItems.remove(position);
+        if (getItemViewType(position) != Type.USERS) {
+            mView.notifyItemRemoved(position);
+        } else {
+            mItems.remove(position);
+            mView.notifyItemRangeRemoved(position, 2);
+        }
         onRowPriceChanged();
     }
 
@@ -500,12 +484,13 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<RowIt
                 setStore(ocrPurchase.getStore());
 
                 final List<OcrItem> ocrItems = ocrPurchase.getItems();
-                for (int i = 0, size = ocrItems.size(); i < size; i++) {
-                    final OcrItem ocrItem = ocrItems.get(i);
+                for (OcrItem ocrItem : ocrItems) {
                     final String price = MoneyUtils.formatPrice(ocrItem.getPrice(), mCurrency);
-                    mItems.add(new RowItem(ocrItem.getName(), price,
-                            getRowItemUser(mUsersAvailable), mCurrency));
-                    mView.notifyItemInserted(adjustPosition(i));
+                    final RowItem rowItem = new RowItem(ocrItem.getName(), price,
+                            getRowItemUser(mUsersAvailable), mCurrency);
+                    final PurchaseAddEditItem addEditItem = PurchaseAddEditItem.createNewRowItemInstance(rowItem);
+                    mItems.add(addEditItem);
+                    mView.notifyItemInserted(mItems.indexOf(addEditItem));
                 }
 
                 //        setEditTextPriceImeOptions();
@@ -654,7 +639,12 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<RowIt
         }
 
         boolean allValid = true;
-        for (RowItem rowItem : mItems) {
+        for (PurchaseAddEditItem addEditItem : mItems) {
+            if (addEditItem.getType() != Type.ITEM) {
+                continue;
+            }
+
+            final RowItem rowItem = addEditItem.getRowItem();
             if (!rowItem.validateFields()) {
                 allValid = false;
             }
@@ -667,7 +657,12 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<RowIt
         final List<User> purchaseUsersInvolved = new ArrayList<>();
         final List<Item> purchaseItems = new ArrayList<>();
 
-        for (RowItem rowItem : mItems) {
+        for (PurchaseAddEditItem addEditItem : mItems) {
+            if (addEditItem.getType() != Type.ITEM) {
+                continue;
+            }
+
+            final RowItem rowItem = addEditItem.getRowItem();
             final String name = rowItem.getName();
             final BigDecimal price = rowItem.parsePrice(mCurrency);
             final List<User> usersInvolved = getUsersInvolved(rowItem.getUsers());
@@ -827,33 +822,49 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<RowIt
 
     @Override
     public void onToggleUsersClick(int position) {
+        final PurchaseAddEditItem addEditItem = mItems.get(position);
         final int insertPos = position + 1;
-        final int insertPosAdj = getAdjustedPosition(insertPos);
-        if (mItems.size() > insertPosAdj && mItems.get(insertPosAdj) == null) {
-            mItems.remove(insertPosAdj);
-            mView.notifyItemRemoved(insertPos);
+        if (mItems.size() < insertPos) {
+            expandRowItem(insertPos, addEditItem);
+        } else if (getItemViewType(insertPos) == Type.USERS) {
+            collapseRowItem(insertPos);
         } else {
-            mItems.add(insertPosAdj, null);
-            mView.notifyItemInserted(insertPos);
+            expandRowItem(insertPos, addEditItem);
+        }
+    }
 
-            int pos = ROWS_BEFORE_ITEMS;
-            for (Iterator<RowItem> iterator = mItems.iterator(); iterator.hasNext(); ) {
-                final RowItem item = iterator.next();
-                if (item == null && pos != insertPos) {
-                    iterator.remove();
-                    mView.notifyItemRemoved(pos);
-                }
+    private void collapseRowItem(int pos) {
+        mItems.remove(pos);
+        mView.notifyItemRemoved(pos);
+    }
 
-                pos++;
+    private void expandRowItem(int pos, PurchaseAddEditItem parent) {
+        final RowItem rowItem = parent.getRowItem();
+        mItems.add(pos, PurchaseAddEditItem.createNewUsersInstance(rowItem.getUsers()));
+        mView.notifyItemInserted(pos);
+
+        collapseAllOtherRowItems(pos);
+    }
+
+    private void collapseAllOtherRowItems(int insertPos) {
+        int pos = 0;
+        for (Iterator<PurchaseAddEditItem> iterator = mItems.iterator(); iterator.hasNext(); ) {
+            final int type = iterator.next().getType();
+            if (type == Type.USERS && pos != insertPos) {
+                iterator.remove();
+                mView.notifyItemRemoved(pos);
             }
+
+            pos++;
         }
     }
 
     @Override
     public void onAddRowClick(int position) {
-        mItems.add(new RowItem(getRowItemUser(mUsersAvailable), mCurrency));
+        final RowItem rowItem = new RowItem(getRowItemUser(mUsersAvailable), mCurrency);
+        mItems.add(position, PurchaseAddEditItem.createNewRowItemInstance(rowItem));
         mView.notifyItemInserted(position);
-        mView.scrollToPosition(getLastPosition());
+        mView.scrollToPosition(position + 1);
     }
 
     @Override

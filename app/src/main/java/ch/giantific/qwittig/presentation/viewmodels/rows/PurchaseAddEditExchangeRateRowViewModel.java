@@ -11,7 +11,7 @@ import android.view.View;
 /**
  * Created by fabio on 26.01.16.
  */
-public interface PurchaseAddExchangeRateRowViewModel extends Observable {
+public interface PurchaseAddEditExchangeRateRowViewModel extends Observable {
 
     @Bindable
     String getExchangeRate();

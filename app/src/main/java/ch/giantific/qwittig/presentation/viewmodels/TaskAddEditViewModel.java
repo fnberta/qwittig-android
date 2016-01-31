@@ -16,7 +16,7 @@ import java.util.Date;
 import ch.giantific.qwittig.domain.models.parse.Task;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.presentation.ui.adapters.ItemTouchHelperAdapter;
-import ch.giantific.qwittig.presentation.ui.adapters.TaskUsersInvolvedRecyclerAdapter;
+import ch.giantific.qwittig.presentation.ui.adapters.TaskAddEditUsersRecyclerAdapter;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.DiscardChangesDialogFragment;
 
 /**
@@ -26,7 +26,7 @@ public interface TaskAddEditViewModel extends
         ViewModel<TaskAddEditViewModel.ViewListener>,
         DiscardChangesDialogFragment.DialogInteractionListener,
         DatePickerDialog.OnDateSetListener,
-        TaskUsersInvolvedRecyclerAdapter.AdapterInteractionListener,
+        TaskAddEditUsersRecyclerAdapter.AdapterInteractionListener,
         ItemTouchHelperAdapter {
 
     @Bindable

@@ -24,13 +24,13 @@ import java.lang.annotation.RetentionPolicy;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentTaskAddBinding;
-import ch.giantific.qwittig.di.components.DaggerTaskAddEditComponent;
-import ch.giantific.qwittig.di.components.TaskAddEditComponent;
+import ch.giantific.qwittig.di.components.DaggerTaskAddComponent;
+import ch.giantific.qwittig.di.components.DaggerTaskEditComponent;
 import ch.giantific.qwittig.di.modules.TaskAddViewModelModule;
 import ch.giantific.qwittig.di.modules.TaskEditViewModelModule;
 import ch.giantific.qwittig.domain.models.parse.Task;
 import ch.giantific.qwittig.presentation.ui.adapters.StringResSpinnerAdapter;
-import ch.giantific.qwittig.presentation.ui.adapters.TaskUsersInvolvedRecyclerAdapter;
+import ch.giantific.qwittig.presentation.ui.adapters.TaskAddEditUsersRecyclerAdapter;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.DatePickerDialogFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.viewmodels.TaskAddEditViewModel;
@@ -51,7 +51,7 @@ public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, Task
     private static final String DATE_PICKER_DIALOG = "DATE_PICKER_DIALOG";
     private static final String DISCARD_TASK_CHANGES_DIALOG = "DISCARD_TASK_CHANGES_DIALOG";
     StringResSpinnerAdapter mTimeFrameAdapter;
-    TaskUsersInvolvedRecyclerAdapter mUsersRecyclerAdapter;
+    TaskAddEditUsersRecyclerAdapter mUsersRecyclerAdapter;
     private FragmentTaskAddBinding mBinding;
     private ItemTouchHelper mUsersItemTouchHelper;
 
@@ -88,24 +88,24 @@ public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, Task
         super.onCreate(savedInstanceState);
 
         final String editTaskId = getArguments().getString(KEY_EDIT_TASK_ID, "");
-        final TaskAddEditComponent component;
         if (TextUtils.isEmpty(editTaskId)) {
-            component = DaggerTaskAddEditComponent.builder()
+            DaggerTaskAddComponent.builder()
                     .taskAddViewModelModule(new TaskAddViewModelModule(savedInstanceState))
-                    .build();
+                    .build()
+                    .inject(this);
         } else {
-            component = DaggerTaskAddEditComponent.builder()
+            DaggerTaskEditComponent.builder()
                     .taskEditViewModelModule(new TaskEditViewModelModule(savedInstanceState, editTaskId))
-                    .build();
+                    .build()
+                    .inject(this);
         }
-
-        component.inject(this);
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentTaskAddBinding.inflate(inflater, container, false);
+        mBinding.setViewModel(mViewModel);
         return mBinding.getRoot();
     }
 
@@ -125,7 +125,7 @@ public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, Task
     private void setupUsersInvolvedRecyclerView() {
         mBinding.rvTaskUsersInvolved.setHasFixedSize(true);
         mBinding.rvTaskUsersInvolved.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mUsersRecyclerAdapter = new TaskUsersInvolvedRecyclerAdapter(mViewModel);
+        mUsersRecyclerAdapter = new TaskAddEditUsersRecyclerAdapter(mViewModel);
         mBinding.rvTaskUsersInvolved.setAdapter(mUsersRecyclerAdapter);
 
         mUsersItemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(

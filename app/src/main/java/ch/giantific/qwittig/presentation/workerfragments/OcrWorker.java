@@ -16,6 +16,7 @@ import java.io.File;
 
 import javax.inject.Inject;
 
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.data.rest.ReceiptOcr;
 import ch.giantific.qwittig.di.components.WorkerComponent;
 import ch.giantific.qwittig.domain.models.ocr.OcrPurchase;

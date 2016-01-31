@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.Task;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
@@ -29,7 +27,6 @@ import rx.functions.Func1;
  */
 public class ParseTaskRepository extends ParseBaseRepository<Task> implements TaskRepository {
 
-    @Inject
     public ParseTaskRepository() {
         super();
     }

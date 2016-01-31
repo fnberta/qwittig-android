@@ -14,8 +14,6 @@ import com.parse.ParseQuery;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import ch.giantific.qwittig.domain.models.parse.Compensation;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
@@ -36,7 +34,6 @@ public class ParseCompensationRepository extends ParseBaseRepository<Compensatio
     private static final String DATE_UPDATED = "updatedAt";
     private static final String LOG_TAG = ParseCompensationRepository.class.getSimpleName();
 
-    @Inject
     public ParseCompensationRepository() {
         super();
     }

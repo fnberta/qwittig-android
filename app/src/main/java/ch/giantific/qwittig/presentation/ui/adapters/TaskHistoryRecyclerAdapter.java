@@ -10,12 +10,13 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.databinding.RowHeaderBinding;
+import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
 import ch.giantific.qwittig.databinding.RowTaskDetailsHistoryBinding;
 import ch.giantific.qwittig.domain.models.TaskHistory;
 import ch.giantific.qwittig.presentation.ui.adapters.rows.BindingRow;
 import ch.giantific.qwittig.presentation.viewmodels.TaskDetailsViewModel;
 import ch.giantific.qwittig.presentation.viewmodels.rows.HeaderRowViewModel;
+import ch.giantific.qwittig.presentation.viewmodels.rows.HeaderRowViewModelImpl;
 
 
 /**
@@ -50,7 +51,7 @@ public class TaskHistoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerVie
                 return new BindingRow<>(binding);
             }
             case TaskDetailsViewModel.TYPE_HEADER: {
-                RowHeaderBinding binding = RowHeaderBinding.inflate(inflater, parent, false);
+                RowGenericHeaderBinding binding = RowGenericHeaderBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
             }
             default:
@@ -86,10 +87,10 @@ public class TaskHistoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerVie
                 break;
             }
             case TaskDetailsViewModel.TYPE_HEADER: {
-                final BindingRow<RowHeaderBinding> headerRow = (BindingRow<RowHeaderBinding>) viewHolder;
-                final RowHeaderBinding binding = headerRow.getBinding();
+                final BindingRow<RowGenericHeaderBinding> headerRow = (BindingRow<RowGenericHeaderBinding>) viewHolder;
+                final RowGenericHeaderBinding binding = headerRow.getBinding();
 
-                final HeaderRowViewModel viewModel = new HeaderRowViewModel(R.string.header_task_history);
+                final HeaderRowViewModel viewModel = new HeaderRowViewModelImpl(R.string.header_task_history);
                 binding.setViewModel(viewModel);
                 binding.executePendingBindings();
                 break;

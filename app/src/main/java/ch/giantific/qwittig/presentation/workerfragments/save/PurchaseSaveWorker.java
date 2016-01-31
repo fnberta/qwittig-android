@@ -28,7 +28,6 @@ import rx.Observable;
 public class PurchaseSaveWorker extends BaseWorker<Purchase, PurchaseSaveWorkerListener> {
 
     public static final String WORKER_TAG = "PURCHASE_SAVE_WORKER";
-    private static final String LOG_TAG = PurchaseSaveWorker.class.getSimpleName();
     @Inject
     PurchaseRepository mPurchaseRepo;
     Purchase mPurchase;
@@ -46,7 +45,7 @@ public class PurchaseSaveWorker extends BaseWorker<Purchase, PurchaseSaveWorkerL
      * Because the fragment  is retained across configuration changes, there is no risk that the
      * system will recreate it with the default empty constructor.
      *
-     * @param purchase    the {@link Purchase} object to save
+     * @param purchase     the {@link Purchase} object to save
      * @param receiptImage the receipt image to attach to the purchase
      */
     @SuppressLint("ValidFragment")

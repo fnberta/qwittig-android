@@ -36,12 +36,4 @@ public class FinanceCompsUnpaidViewModelImplTest {
                 new ParseUserRepository(),
                 new ParseCompensationRepository());
     }
-
-    @Test
-    public void testGetItemViewType() throws Exception {
-        mViewModel.updateList();
-
-        final int firstPos = mViewModel.getItemViewType(0);
-        assertTrue(firstPos == FinanceCompsUnpaidViewModel.TYPE_HEADER);
-    }
 }

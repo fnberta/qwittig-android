@@ -18,8 +18,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.parse.ParseUser;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,10 +27,10 @@ import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.utils.parse.ParseUtils;
+import ch.giantific.qwittig.presentation.workerfragments.group.UsersInviteWorker;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.WorkerUtils;
-import ch.giantific.qwittig.presentation.workerfragments.group.UsersInviteWorker;
+import rx.SingleSubscriber;
 
 /**
  * Displays the user invite screen, where the user can invite new users to the group and sees
@@ -40,11 +38,9 @@ import ch.giantific.qwittig.presentation.workerfragments.group.UsersInviteWorker
  * <p/>
  * Subclass of {@link SettingsBaseInviteFragment}.
  */
-public class SettingsUserInviteFragment extends SettingsBaseInviteFragment implements
-        UserRepository.GetUsersLocalListener {
+public class SettingsUserInviteFragment extends SettingsBaseInviteFragment {
 
     private static final String INVITE_WORKER = "INVITE_WORKER";
-    private static final String LOG_TAG = SettingsUserInviteFragment.class.getSimpleName();
     private FragmentInteractionListener mListener;
     private LinearLayout mLinearLayoutUsersInvited;
     private TextView mTextViewNoInvitations;
@@ -160,11 +156,6 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
      * the group to check if the invitees are not already in the group.
      */
     public void startInvitation() {
-        if (ParseUtils.isTestUser(mCurrentUser)) {
-            mListener.showAccountCreateDialog();
-            return;
-        }
-
         if (mIsInviting || !invitedUsersEmailsAreValid()) {
             return;
         }
@@ -179,8 +170,23 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
             return;
         }
 
-        UserRepository repo = new ParseUserRepository(getActivity());
-        repo.getUsersLocalAsync(mCurrentGroup);
+        UserRepository repo = new ParseUserRepository();
+        repo.getUsersLocalAsync(mCurrentGroup)
+                .toList()
+                .toSingle()
+                .subscribe(new SingleSubscriber<List<User>>() {
+                    @Override
+                    public void onSuccess(List<User> users) {
+                        if (allEmailsAreNotAlreadyInGroup(users)) {
+                            inviteNewUsers();
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable error) {
+
+                    }
+                });
     }
 
     private boolean allEmailsAreNotAlreadyInvited() {
@@ -200,19 +206,10 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
         return emailsAreNotAlreadyInvited;
     }
 
-    @Override
-    public void onUsersLocalLoaded(@NonNull List<ParseUser> users) {
-        if (allEmailsAreNotAlreadyInGroup(users)) {
-            inviteNewUsers();
-        }
-    }
-
-    private boolean allEmailsAreNotAlreadyInGroup(@NonNull List<ParseUser> users) {
+    private boolean allEmailsAreNotAlreadyInGroup(@NonNull List<User> users) {
         boolean allEmailsAreNotAlreadyInGroup = true;
 
-        for (ParseUser parseUser : users) {
-            User user = (User) parseUser;
-
+        for (User user : users) {
             for (int i = 0, mUsersToInviteEmailsSize = mUsersToInviteEmails.size(); i < mUsersToInviteEmailsSize; i++) {
                 String email = mUsersToInviteEmails.get(i);
 
@@ -301,9 +298,9 @@ public class SettingsUserInviteFragment extends SettingsBaseInviteFragment imple
     /**
      * Defines the interaction with the hosting {@link Activity}.
      * <p/>
-     * Extends {@link BaseFragmentInteractionListener}.
+     * Extends {@link ch.giantific.qwittig.presentation.ui.fragments.BaseFragment.ActivityListener}.
      */
-    public interface FragmentInteractionListener extends BaseFragmentInteractionListener {
+    public interface FragmentInteractionListener extends BaseFragment.ActivityListener {
 
         /**
          * Handles the start of the loading animation of the {@link FabProgress}.

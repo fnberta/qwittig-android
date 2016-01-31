@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.presentation.workerfragments.account;
 
+import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,16 +21,22 @@ import ch.giantific.qwittig.presentation.workerfragments.BaseWorker;
 /**
  * Handles the unlinking of the user's account from this Facebook or Google profile.
  */
-public abstract class BaseGoogleApiLoginWorker extends BaseWorker implements
+public abstract class BaseGoogleApiLoginWorker extends Fragment implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    private static final String LOG_TAG = BaseGoogleApiLoginWorker.class.getSimpleName();
     @Nullable
     GoogleApiClient mGoogleApiClient;
 
     public BaseGoogleApiLoginWorker() {
         // empty default constructor
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setRetainInstance(true);
     }
 
     final void setupGoogleApiClient() {

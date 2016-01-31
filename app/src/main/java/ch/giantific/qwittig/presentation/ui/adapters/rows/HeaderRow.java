@@ -18,7 +18,7 @@ import ch.giantific.qwittig.R;
  */
 public class HeaderRow extends RecyclerView.ViewHolder {
 
-    public static final int VIEW_RESOURCE = R.layout.row_header;
+    public static final int VIEW_RESOURCE = R.layout.row_generic_header;
     private TextView mTextViewHeader;
 
     /**

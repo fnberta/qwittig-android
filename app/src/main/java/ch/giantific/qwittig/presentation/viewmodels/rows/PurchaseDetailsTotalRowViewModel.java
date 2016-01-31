@@ -8,12 +8,13 @@ import android.databinding.Bindable;
 import android.databinding.Observable;
 
 /**
- * Created by fabio on 24.01.16.
+ * Created by fabio on 30.01.16.
  */
-public interface PurchaseAddStoreRowViewModel extends Observable {
+public interface PurchaseDetailsTotalRowViewModel extends Observable {
 
     @Bindable
-    String getStore();
+    String getPurchaseTotal();
 
-    void onStoreChanged(CharSequence s, int start, int before, int count);
+    @Bindable
+    String getPurchaseTotalForeign();
 }

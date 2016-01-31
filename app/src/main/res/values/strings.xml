@@ -110,7 +110,7 @@
     <string name="pref_category_me">Me</string>
     <string name="pref_category_current_group">Current group</string>
     <string name="title_activity_settings_stores">Stores</string>
-    <string name="dialog_group_balance_not_zero_message">Your balance needs to be zero in order to be able to leave this group. Do you want to start a new settlement?</string>
+    <string name="toast_balance_not_zero">Please clear outstanding debts before leaving this group.</string>
     <string name="dialog_positive_start_new">Start new</string>
     <string name="dialog_positive_leave">Leave</string>
     <string name="dialog_positive_reset">Reset</string>
@@ -347,5 +347,6 @@
     <string name="comp_unpaid_button_claim">Claim</string>
     <string name="toast_error_purchases_load">Failed to load purchases</string>
     <string name="toast_error_drafts_load">Failed to load drafts</string>
+    <string name="toast_error_receipt_load">Failed to load purchase receipt</string>
 
 </resources>

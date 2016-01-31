@@ -41,23 +41,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.presentation.workerfragments.account.LogoutWorker;
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.ui.activities.BaseActivity;
-import ch.giantific.qwittig.presentation.ui.activities.FinanceActivity;
 import ch.giantific.qwittig.presentation.ui.activities.SettingsActivity;
 import ch.giantific.qwittig.presentation.ui.activities.SettingsGroupNewActivity;
 import ch.giantific.qwittig.presentation.ui.activities.SettingsProfileActivity;
 import ch.giantific.qwittig.presentation.ui.activities.SettingsStoresActivity;
 import ch.giantific.qwittig.presentation.ui.activities.SettingsUserInviteActivity;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.AccountDeleteDialogFragment;
-import ch.giantific.qwittig.presentation.ui.fragments.dialogs.GroupLeaveBalanceNotZeroDialogFragment;
-import ch.giantific.qwittig.utils.WorkerUtils;
-import ch.giantific.qwittig.utils.parse.ParseUtils;
+import ch.giantific.qwittig.presentation.ui.fragments.dialogs.ConfirmationDialogFragment;
+import ch.giantific.qwittig.presentation.workerfragments.account.LogoutWorker;
 import ch.giantific.qwittig.utils.Utils;
+import ch.giantific.qwittig.utils.WorkerUtils;
+import rx.SingleSubscriber;
 
 /**
  * Displays the main settings of the app and listens for changes.
@@ -81,7 +80,6 @@ public class SettingsFragment extends PreferenceFragment implements
     private static final String PREF_GROUP_LEAVE = "PREF_GROUP_LEAVE";
     private static final String PREF_GROUP_ADD_USER = "PREF_GROUP_ADD_USER";
     private static final String GROUP_LEAVE_DIALOG = "GROUP_LEAVE_DIALOG";
-    private static final String GROUP_LEAVE_BALANCE_NOT_ZERO_DIALOG = "GROUP_LEAVE_BALANCE_NOT_ZERO_DIALOG";
     private static final String ACCOUNT_DELETE_DIALOG = "ACCOUNT_DELETE_DIALOG";
     private static final String LOGOUT_WORKER = "LOGOUT_WORKER";
     private static final int UPDATE_LIST_NAME = 1;
@@ -185,7 +183,27 @@ public class SettingsFragment extends PreferenceFragment implements
      * be deleted.
      */
     private void showGroupLeaveDialog() {
-        mUserRepo.getUsersLocalAsync(mCurrentGroup);
+        mUserRepo.getUsersLocalAsync(mCurrentGroup)
+                .toList()
+                .toSingle()
+                .subscribe(new SingleSubscriber<List<User>>() {
+                    @Override
+                    public void onSuccess(List<User> users) {
+                        String message = users.size() == 1 &&
+                                users.get(0).getObjectId().equals(mCurrentUser.getObjectId()) ?
+                                getString(R.string.dialog_group_leave_delete_message) :
+                                getString(R.string.dialog_group_leave_message);
+
+                        final ConfirmationDialogFragment dialog =
+                                ConfirmationDialogFragment.newInstance(message, R.string.dialog_positive_leave);
+                        dialog.show(getFragmentManager(), GROUP_LEAVE_DIALOG);
+                    }
+
+                    @Override
+                    public void onError(Throwable error) {
+                        // TODO: handle error
+                    }
+                });
     }
 
     /**
@@ -194,7 +212,7 @@ public class SettingsFragment extends PreferenceFragment implements
      */
     public void onLeaveGroupSelected() {
         if (!balanceIsZero(mCurrentGroup)) {
-            showBalanceNotZeroDialog();
+            Snackbar.make(getView(), R.string.toast_balance_not_zero, Snackbar.LENGTH_LONG).show();
             return;
         }
 
@@ -205,14 +223,6 @@ public class SettingsFragment extends PreferenceFragment implements
         BigFraction balance = mCurrentUser.getBalance(group);
 
         return balance.equals(BigFraction.ZERO);
-    }
-
-
-    private void showBalanceNotZeroDialog() {
-        GroupLeaveBalanceNotZeroDialogFragment groupLeaveBalanceNotZeroDialogFragment =
-                new GroupLeaveBalanceNotZeroDialogFragment();
-        groupLeaveBalanceNotZeroDialogFragment.show(getFragmentManager(),
-                GROUP_LEAVE_BALANCE_NOT_ZERO_DIALOG);
     }
 
     private void deleteCurrentUserFromCurrentGroup() {
@@ -246,16 +256,6 @@ public class SettingsFragment extends PreferenceFragment implements
                 setupCurrentGroupCategory();
                 break;
         }
-    }
-
-    /**
-     * Starts {@link FinanceActivity} to calculate a new settlement in reaction to the user wanting
-     * to leave the group with a non-zero balance.
-     */
-    public void onStartSettlementSelected() {
-        Intent intent = new Intent(getActivity(), FinanceActivity.class);
-        intent.putExtra(FinanceActivity.INTENT_AUTO_START_NEW, true);
-        startActivity(intent);
     }
 
     @Override
@@ -372,9 +372,6 @@ public class SettingsFragment extends PreferenceFragment implements
     }
 
     private void setupGroupChangeName() {
-        if (ParseUtils.isTestUser(mCurrentUser)) {
-            mEditTextPreferenceGroupName.setEnabled(false);
-        }
         mEditTextPreferenceGroupName.setText(mCurrentGroup.getName());
     }
 
@@ -408,7 +405,7 @@ public class SettingsFragment extends PreferenceFragment implements
                     String newGroupName = data.getStringExtra(
                             SettingsGroupNewActivity.RESULT_DATA_GROUP);
                     Snackbar.make(rootView, getString(R.string.toast_group_added,
-                                    newGroupName),
+                            newGroupName),
                             Snackbar.LENGTH_LONG).show();
                 }
                 break;

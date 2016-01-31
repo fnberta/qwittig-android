@@ -7,13 +7,17 @@ package ch.giantific.qwittig.presentation.ui.widgets;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.RectF;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
+
+import ch.giantific.qwittig.R;
+
+import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA_RGB;
 
 /**
  * Simple custom-view for displaying values (with and without animation) and
@@ -23,9 +27,8 @@ import android.view.animation.AccelerateDecelerateInterpolator;
  */
 public class CircleDisplay extends View {
 
-    private static final String LOG_TAG = CircleDisplay.class.getSimpleName();
     /**
-     * startangle of the view
+     * start angle of the view
      */
     private float mStartAngle = 270f;
     /**
@@ -43,7 +46,7 @@ public class CircleDisplay extends View {
     /**
      * represents the alpha value used for the remainder bar
      */
-    private int mDimAlpha = 80;
+    private int mDimAlpha = DISABLED_ALPHA_RGB;
     /**
      * rect object that represents the bounds of the view, needed for drawing
      * the circle
@@ -61,27 +64,30 @@ public class CircleDisplay extends View {
 
     public CircleDisplay(Context context) {
         super(context);
-        init();
+
+        init(context);
     }
 
     public CircleDisplay(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+
+        init(context);
     }
 
     public CircleDisplay(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+
+        init(context);
     }
 
-    private void init() {
+    private void init(Context context) {
         mBoxSetup = false;
 
         mArcPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mArcPaint.setStyle(Style.FILL);
-        mArcPaint.setColor(Color.rgb(192, 255, 140));
+        mArcPaint.setColor(ContextCompat.getColor(context, R.color.accent));
 
-        mDrawAnimator = ObjectAnimator.ofFloat(this, "phase", mPhase, 1.0f).setDuration(3000);
+        mDrawAnimator = ObjectAnimator.ofFloat(this, "phase", mPhase, 1.0f).setDuration(1000);
         mDrawAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
     }
 

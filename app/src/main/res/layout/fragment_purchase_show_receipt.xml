@@ -2,50 +2,73 @@
   ~ Copyright (c) 2015 Fabio Berta
   -->
 
-<FrameLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
-    tools:context=".presentation.ui.fragments.PurchaseReceiptDetailFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
 
-    <include layout="@layout/include_progress"/>
+    <data>
 
-    <ScrollView
+        <import type="android.view.View"/>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.viewmodels.PurchaseReceiptViewModel"
+            />
+    </data>
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="@dimen/small_space"
-        android:clipToPadding="false">
+        android:animateLayoutChanges="true"
+        tools:context=".presentation.ui.fragments.PurchaseReceiptDetailFragment"
+        >
 
-        <LinearLayout
+        <include
+            layout="@layout/include_progress"
+            app:viewModel="@{viewModel}"
+            />
+
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="@dimen/small_space"
+            android:visibility="@{viewModel.loading ? View.GONE : View.VISIBLE}"
+            >
 
-            <TextView
-                style="@style/SubHeader"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/subheader_height"
-                android:paddingStart="@dimen/key_line_1"
-                android:paddingEnd="@dimen/key_line_1"
-                android:gravity="center_vertical"
-                android:text="@string/header_receipt"
-                tools:text="Receipt"/>
-
-            <ImageView
-                android:id="@+id/iv_receipt"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/key_line_1"
-                android:layout_marginEnd="@dimen/key_line_1"
-                android:layout_gravity="center_horizontal"
-                android:contentDescription="@string/purchase_receipt"/>
-        </LinearLayout>
+                android:orientation="vertical"
+                >
 
-    </ScrollView>
+                <TextView
+                    style="@style/SubHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/subheader_height"
+                    android:gravity="center_vertical"
+                    android:paddingEnd="@dimen/key_line_1"
+                    android:paddingStart="@dimen/key_line_1"
+                    android:text="@string/header_receipt"
+                    tools:text="Receipt"
+                    />
+
+                <ImageView
+                    android:id="@+id/iv_receipt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginEnd="@dimen/key_line_1"
+                    android:layout_marginStart="@dimen/key_line_1"
+                    android:contentDescription="@string/purchase_receipt"
+                    />
+            </LinearLayout>
+
+        </ScrollView>
 
 
-</FrameLayout
-    >
+    </FrameLayout>
+</layout>
+
 

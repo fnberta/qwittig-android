@@ -12,7 +12,6 @@ import ch.giantific.qwittig.di.scopes.PerFragment;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.viewmodels.TaskAddEditViewModel;
-import ch.giantific.qwittig.presentation.viewmodels.TaskAddEditViewModelAddImpl;
 import ch.giantific.qwittig.presentation.viewmodels.TaskAddEditViewModelEditImpl;
 import dagger.Module;
 import dagger.Provides;
@@ -34,7 +33,7 @@ public class TaskEditViewModelModule extends BaseViewModelModule {
     @PerFragment
     @Provides
     TaskAddEditViewModel providesTaskAddEditViewModel(@NonNull UserRepository userRepository,
-                                                  @NonNull TaskRepository taskRepository) {
+                                                      @NonNull TaskRepository taskRepository) {
         return new TaskAddEditViewModelEditImpl(mSavedState, userRepository, taskRepository,
                 mEditTaskId);
     }

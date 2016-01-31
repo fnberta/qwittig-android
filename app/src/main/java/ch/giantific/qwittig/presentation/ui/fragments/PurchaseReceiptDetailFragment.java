@@ -7,18 +7,22 @@ package ch.giantific.qwittig.presentation.ui.fragments;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
+import ch.giantific.qwittig.di.components.DaggerPurchaseReceiptIdComponent;
+import ch.giantific.qwittig.di.modules.PurchaseReceiptIdViewModelModule;
+import ch.giantific.qwittig.presentation.viewmodels.PurchaseReceiptViewModel;
+
 
 /**
  * Shows the receipt image of a purchase when viewing its details.
  * <p/>
  * Subclass of {@link PurchaseReceiptBaseFragment}.
  */
-public class PurchaseReceiptDetailFragment extends PurchaseReceiptBaseFragment {
+public class PurchaseReceiptDetailFragment extends PurchaseReceiptBaseFragment<PurchaseReceiptViewModel, PurchaseReceiptBaseFragment.ActivityListener> {
 
-    static final String BUNDLE_PURCHASE_ID = "BUNDLE_PURCHASE_ID";
-    private String mPurchaseId;
+    private static final String KEY_PURCHASE_ID = "PURCHASE_ID";
 
     public PurchaseReceiptDetailFragment() {
+        // required empty constructor
     }
 
     /**
@@ -32,7 +36,7 @@ public class PurchaseReceiptDetailFragment extends PurchaseReceiptBaseFragment {
     public static PurchaseReceiptDetailFragment newInstance(@NonNull String purchaseId) {
         PurchaseReceiptDetailFragment fragment = new PurchaseReceiptDetailFragment();
         Bundle args = new Bundle();
-        args.putString(BUNDLE_PURCHASE_ID, purchaseId);
+        args.putString(KEY_PURCHASE_ID, purchaseId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -41,23 +45,10 @@ public class PurchaseReceiptDetailFragment extends PurchaseReceiptBaseFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Bundle args = getArguments();
-        if (args != null) {
-            mPurchaseId = args.getString(BUNDLE_PURCHASE_ID, "");
-        }
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        loadData();
-    }
-
-    /**
-     * Fetches the purchase from the object id and displays the receipt.
-     */
-    public void loadData() {
-        mPurchaseRepo.fetchPurchaseDataLocalAsync(mPurchaseId);
+        final String purchaseId = getArguments().getString(KEY_PURCHASE_ID, "");
+        DaggerPurchaseReceiptIdComponent.builder()
+                .purchaseReceiptIdViewModelModule(new PurchaseReceiptIdViewModelModule(savedInstanceState, purchaseId, false))
+                .build()
+                .inject(this);
     }
 }

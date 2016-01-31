@@ -9,7 +9,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import ch.giantific.qwittig.data.repositories.ParseApiRepository;
+import javax.inject.Inject;
+
+import ch.giantific.qwittig.di.components.WorkerComponent;
 import ch.giantific.qwittig.domain.repositories.ApiRepository;
 import ch.giantific.qwittig.presentation.workerfragments.BaseWorker;
 import rx.Observable;
@@ -22,10 +24,10 @@ import rx.Observable;
 public class TaskRemindWorker extends BaseWorker<String, TaskReminderListener> {
 
     public static final String WORKER_TAG = "TASK_REMIND_WORKER_";
-    private static final String BUNDLE_TASK_ID = "BUNDLE_TASK_ID";
-    private static final String LOG_TAG = TaskRemindWorker.class.getSimpleName();
+    private static final String KEY_TASK_ID = "TASK_ID";
+    @Inject
+    ApiRepository mApiRepo;
     private String mTaskId;
-    private ApiRepository mApiRepo;
 
     /**
      * Returns a new instance of {@link TaskRemindWorker} with an argument.
@@ -37,22 +39,27 @@ public class TaskRemindWorker extends BaseWorker<String, TaskReminderListener> {
     public static TaskRemindWorker newInstance(@NonNull String taskId) {
         TaskRemindWorker fragment = new TaskRemindWorker();
         Bundle args = new Bundle();
-        args.putString(BUNDLE_TASK_ID, taskId);
+        args.putString(KEY_TASK_ID, taskId);
         fragment.setArguments(args);
         return fragment;
     }
 
     @Override
-    protected String getWorkerTag() {
-        return WORKER_TAG + mTaskId;
+    protected void onError() {
+        // TODO: check tag
+        mActivity.onWorkerError(WORKER_TAG + mTaskId);
+    }
+
+    @Override
+    protected void injectWorkerDependencies(@NonNull WorkerComponent component) {
+        component.inject(this);
     }
 
     @Nullable
     @Override
     protected Observable<String> getObservable(@NonNull Bundle args) {
-        mTaskId = args.getString(BUNDLE_TASK_ID, "");
+        mTaskId = args.getString(KEY_TASK_ID, "");
         if (!TextUtils.isEmpty(mTaskId)) {
-            mApiRepo = new ParseApiRepository(); // TODO: inject
             return mApiRepo.pushTaskReminder(mTaskId).toObservable();
         }
 
@@ -60,7 +67,7 @@ public class TaskRemindWorker extends BaseWorker<String, TaskReminderListener> {
     }
 
     @Override
-    protected void setStream(@NonNull Observable<String> observable, @NonNull String workerTag) {
-        mActivity.setTaskReminderStream(observable.toSingle(), mTaskId, workerTag);
+    protected void setStream(@NonNull Observable<String> observable) {
+        mActivity.setTaskReminderStream(observable.toSingle(), mTaskId, WORKER_TAG + mTaskId);
     }
 }

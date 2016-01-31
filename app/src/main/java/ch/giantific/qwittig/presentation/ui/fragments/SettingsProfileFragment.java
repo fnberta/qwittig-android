@@ -31,6 +31,7 @@ import android.widget.EditText;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.parse.ParseUser;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -38,12 +39,14 @@ import java.util.Arrays;
 
 import ch.berta.fabio.fabprogress.FabProgress;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.workerfragments.account.UnlinkThirdPartyWorker;
+import ch.giantific.qwittig.presentation.workerfragments.account.UnlinkThirdPartyWorker.UnlinkAction;
 import ch.giantific.qwittig.utils.AvatarUtils;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.WorkerUtils;
-import ch.giantific.qwittig.utils.parse.ParseUtils;
 
 /**
  * Displays the profile details of the current user, allowing him/her to edit them.
@@ -83,6 +86,9 @@ public class SettingsProfileFragment extends BaseFragment {
     private boolean mUnlinkThirdPartyLogin;
     private boolean mIsSaving;
     private Snackbar mSnackbarSetPassword;
+    private User mCurrentUser;
+    private Group mCurrentGroup;
+
     public SettingsProfileFragment() {
     }
 
@@ -113,6 +119,13 @@ public class SettingsProfileFragment extends BaseFragment {
         }
     }
 
+    private void updateCurrentUserAndGroup() {
+        mCurrentUser = (User) ParseUser.getCurrentUser();
+        if (mCurrentUser != null) {
+            mCurrentGroup = mCurrentUser.getCurrentGroup();
+        }
+    }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -133,6 +146,16 @@ public class SettingsProfileFragment extends BaseFragment {
 
         setupPasswordViews(view);
         checkAvatar();
+    }
+
+    @Override
+    protected void setViewModelToActivity() {
+
+    }
+
+    @Override
+    protected View getSnackbarView() {
+        return null;
     }
 
     private void setupPasswordViews(View view) {
@@ -328,11 +351,6 @@ public class SettingsProfileFragment extends BaseFragment {
      * Saves the changes made by the user to his profile if all fields contain valid values.
      */
     public void saveChanges() {
-        if (ParseUtils.isTestUser(mCurrentUser)) {
-            mListener.showAccountCreateDialog();
-            return;
-        }
-
         readValues();
 
         boolean valuesChanged = false;
@@ -365,10 +383,10 @@ public class SettingsProfileFragment extends BaseFragment {
                 finishEdit(Activity.RESULT_OK);
             } else if (mIsGoogleUser) {
                 mListener.startProgressAnim();
-                unlinkThirdPartyWithWorker(UnlinkThirdPartyWorker.UNLINK_GOOGLE);
+                unlinkThirdPartyWithWorker(UnlinkAction.UNLINK_GOOGLE);
             } else if (mIsFacebookUser) {
                 mListener.startProgressAnim();
-                unlinkThirdPartyWithWorker(UnlinkThirdPartyWorker.UNLINK_FACEBOOK);
+                unlinkThirdPartyWithWorker(UnlinkAction.UNLINK_FACEBOOK);
             }
         }
     }
@@ -414,7 +432,7 @@ public class SettingsProfileFragment extends BaseFragment {
         }
     }
 
-    private void unlinkThirdPartyWithWorker(@UnlinkThirdPartyWorker.UnlinkAction int unlinkAction) {
+    private void unlinkThirdPartyWithWorker(@UnlinkAction int unlinkAction) {
         if (!Utils.isNetworkAvailable(getActivity())) {
             Snackbar.make(mTextInputLayoutNickname, getString(R.string.toast_no_connection),
                     Snackbar.LENGTH_LONG).show();
@@ -470,8 +488,7 @@ public class SettingsProfileFragment extends BaseFragment {
     private boolean changesWereMade() {
         readValues();
 
-        return !mEmail.equals(mCurrentEmail) && !ParseUtils.isTestUser(mCurrentUser) ||
-                !mNickname.equals(mCurrentNickname) || !TextUtils.isEmpty(mPassword) ||
+        return !mEmail.equals(mCurrentEmail) || !mNickname.equals(mCurrentNickname) || !TextUtils.isEmpty(mPassword) ||
                 mAvatar != null && !Arrays.equals(mAvatar, mCurrentUser.getAvatar());
 
     }
@@ -507,9 +524,9 @@ public class SettingsProfileFragment extends BaseFragment {
     /**
      * Defines the interaction with the hosting {@link Activity}.
      * <p/>
-     * Extends {@link BaseFragmentInteractionListener}.
+     * Extends {@link ActivityListener}.
      */
-    public interface FragmentInteractionListener extends BaseFragment.BaseFragmentInteractionListener {
+    public interface FragmentInteractionListener extends ActivityListener {
         /**
          * Sets the avatar images as the toolbar backdrop image.
          */

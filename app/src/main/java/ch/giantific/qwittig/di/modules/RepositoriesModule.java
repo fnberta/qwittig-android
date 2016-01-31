@@ -4,11 +4,18 @@
 
 package ch.giantific.qwittig.di.modules;
 
+import android.support.annotation.NonNull;
+
+import com.google.gson.Gson;
+
+import ch.giantific.qwittig.data.repositories.ParseApiRepository;
 import ch.giantific.qwittig.data.repositories.ParseCompensationRepository;
 import ch.giantific.qwittig.data.repositories.ParseGroupRepository;
 import ch.giantific.qwittig.data.repositories.ParsePurchaseRepository;
 import ch.giantific.qwittig.data.repositories.ParseTaskRepository;
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
+import ch.giantific.qwittig.di.scopes.PerFragment;
+import ch.giantific.qwittig.domain.repositories.ApiRepository;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
@@ -24,6 +31,16 @@ import dagger.Provides;
 public class RepositoriesModule {
 
     public RepositoriesModule() {
+    }
+
+    @Provides
+    Gson providesGson() {
+        return new Gson();
+    }
+
+    @Provides
+    ApiRepository providesApiRepository(@NonNull Gson gson) {
+        return new ParseApiRepository(gson);
     }
 
     @Provides

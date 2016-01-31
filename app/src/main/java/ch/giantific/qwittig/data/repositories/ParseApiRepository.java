@@ -19,8 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import ch.giantific.qwittig.domain.models.stats.Stats;
 import ch.giantific.qwittig.domain.repositories.ApiRepository;
 import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
@@ -55,10 +53,10 @@ public class ParseApiRepository implements ApiRepository {
     private static final String PARAM_ID_TOKEN = "idToken";
     private static final String LOGIN_WITH_GOOGLE = "loginWithGoogle";
 
-    @Inject
-    Gson mGson;
+    private Gson mGson;
 
-    public ParseApiRepository() {
+    public ParseApiRepository(@NonNull Gson gson) {
+        mGson = gson;
     }
 
     private <T> Single<T> callFunctionInBackground(@NonNull final String function,

@@ -59,6 +59,7 @@ public class FinanceCompensationsUnpaidFragment extends BaseRecyclerViewOnlineFr
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentFinanceCompensationsUnpaidBinding.inflate(inflater, container, false);
+        mBinding.setViewModel(mViewModel);
         return mBinding.getRoot();
     }
 

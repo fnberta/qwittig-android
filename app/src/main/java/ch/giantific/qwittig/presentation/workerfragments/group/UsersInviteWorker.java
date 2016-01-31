@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import ch.giantific.qwittig.di.components.WorkerComponent;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.repositories.ApiRepository;
 import ch.giantific.qwittig.presentation.workerfragments.BaseWorker;
@@ -27,9 +28,8 @@ import rx.Observable;
 public class UsersInviteWorker extends BaseWorker<String, UsersInviteListener> {
 
     public static final String WORKER_TAG = "INVITE_USERS_WORKER";
-    private static final String BUNDLE_USERS_TO_INVITE = "BUNDLE_USERS_TO_INVITE";
-    private static final String BUNDLE_GROUP_NAME = "BUNDLE_GROUP_NAME";
-    private static final String LOG_TAG = UsersInviteWorker.class.getSimpleName();
+    private static final String KEY_USERS_TO_INVITE = "USERS_TO_INVITE";
+    private static final String KEY_GROUP_NAME = "GROUP_NAME";
     @Inject
     ApiRepository mApiRepo;
 
@@ -50,22 +50,27 @@ public class UsersInviteWorker extends BaseWorker<String, UsersInviteListener> {
                                                 @NonNull String groupName) {
         UsersInviteWorker fragment = new UsersInviteWorker();
         Bundle args = new Bundle();
-        args.putStringArrayList(BUNDLE_USERS_TO_INVITE, usersToInvite);
-        args.putString(BUNDLE_GROUP_NAME, groupName);
+        args.putStringArrayList(KEY_USERS_TO_INVITE, usersToInvite);
+        args.putString(KEY_GROUP_NAME, groupName);
         fragment.setArguments(args);
         return fragment;
     }
 
     @Override
-    protected String getWorkerTag() {
-        return WORKER_TAG;
+    protected void injectWorkerDependencies(@NonNull WorkerComponent component) {
+        component.inject(this);
+    }
+
+    @Override
+    protected void onError() {
+        mActivity.onWorkerError(WORKER_TAG);
     }
 
     @Nullable
     @Override
     protected Observable<String> getObservable(@NonNull Bundle args) {
-        final List<String> usersToInvite = args.getStringArrayList(BUNDLE_USERS_TO_INVITE);
-        final String groupName = args.getString(BUNDLE_GROUP_NAME);
+        final List<String> usersToInvite = args.getStringArrayList(KEY_USERS_TO_INVITE);
+        final String groupName = args.getString(KEY_GROUP_NAME);
         if (usersToInvite != null && !usersToInvite.isEmpty() && !TextUtils.isEmpty(groupName)) {
             return mApiRepo.inviteUsers(usersToInvite, groupName).toObservable();
         }
@@ -74,7 +79,7 @@ public class UsersInviteWorker extends BaseWorker<String, UsersInviteListener> {
     }
 
     @Override
-    protected void setStream(@NonNull Observable<String> observable, @NonNull String workerTag) {
-        mActivity.setStatsCalcStream(observable.toSingle(), workerTag);
+    protected void setStream(@NonNull Observable<String> observable) {
+        mActivity.setStatsCalcStream(observable.toSingle(), WORKER_TAG);
     }
 }

@@ -13,9 +13,10 @@ import ch.giantific.qwittig.presentation.workerfragments.group.InvitedGroupWorke
 /**
  * Created by fabio on 22.01.16.
  */
-public interface HomeViewModel extends ViewModel<HomeViewModel.ViewListener>,
-        GroupJoinDialogFragment.DialogInteractionListener,
-        InvitedGroupWorker.WorkerInteractionListener {
+public interface HomeViewModel extends ViewModel<HomeViewModel.ViewListener>
+//        GroupJoinDialogFragment.DialogInteractionListener,
+//        InvitedGroupWorker.WorkerInteractionListener
+{
 
     @Bindable
     boolean isDraftsEmpty();

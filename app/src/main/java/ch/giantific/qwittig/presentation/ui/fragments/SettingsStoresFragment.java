@@ -23,15 +23,16 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 
 import com.parse.ParseConfig;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.utils.parse.ParseConfigUtils;
 import ch.giantific.qwittig.presentation.ui.adapters.StoresRecyclerAdapter;
-import ch.giantific.qwittig.utils.parse.ParseUtils;
 
 /**
  * Displays the settings screen where the user sees all stores added for his/her account and can
@@ -60,6 +61,7 @@ public class SettingsStoresFragment extends BaseFragment implements
     private ArrayList<String> mStoresSelected;
     private boolean mInActionMode;
     private boolean mDeleteSelectedStores;
+    private User mCurrentUser;
 
     public SettingsStoresFragment() {
     }
@@ -86,7 +88,7 @@ public class SettingsStoresFragment extends BaseFragment implements
             mStoresSelected = new ArrayList<>();
         }
 
-        updateCurrentUserAndGroup();
+        mCurrentUser = (User) ParseUser.getCurrentUser();
         setupStoreLists();
     }
 
@@ -151,6 +153,16 @@ public class SettingsStoresFragment extends BaseFragment implements
         }
     }
 
+    @Override
+    protected void setViewModelToActivity() {
+
+    }
+
+    @Override
+    protected View getSnackbarView() {
+        return null;
+    }
+
     private void startActionMode() {
         mActionMode = mListener.startActionMode();
         setActionModeTitle();
@@ -163,12 +175,6 @@ public class SettingsStoresFragment extends BaseFragment implements
     @Override
     public void onStoreRowStarClick(int position, CheckBox checkBox) {
         boolean isChecked = checkBox.isChecked();
-
-        if (ParseUtils.isTestUser(mCurrentUser)) {
-            mListener.showAccountCreateDialog();
-            checkBox.setChecked(!isChecked);
-            return;
-        }
 
         String store = mRecyclerAdapter.getItem(position);
         if (isChecked) {
@@ -216,11 +222,6 @@ public class SettingsStoresFragment extends BaseFragment implements
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_store_delete:
-                if (ParseUtils.isTestUser(mCurrentUser)) {
-                    mListener.showAccountCreateDialog();
-                    return true;
-                }
-
                 mDeleteSelectedStores = true;
                 mode.finish(); // Action picked, so close the CAB
                 return true;
@@ -250,11 +251,6 @@ public class SettingsStoresFragment extends BaseFragment implements
      * @param store the store to add
      */
     public void onNewStoreSet(@NonNull String store) {
-        if (ParseUtils.isTestUser(mCurrentUser)) {
-            mListener.showAccountCreateDialog();
-            return;
-        }
-
         ParseConfig config = ParseConfig.getCurrentConfig();
         List<String> defaultStores = config.getList(ParseConfigUtils.DEFAULT_STORES);
         boolean storeIsNew = true;
@@ -297,9 +293,9 @@ public class SettingsStoresFragment extends BaseFragment implements
     /**
      * Defines the interaction with the hosting {@link Activity}.
      * <p/>
-     * Extends {@link BaseFragmentInteractionListener}.
+     * Extends {@link ActivityListener}.
      */
-    public interface FragmentInteractionListener extends BaseFragmentInteractionListener {
+    public interface FragmentInteractionListener extends ActivityListener {
         /**
          * Handles the visibility change of the {@link FloatingActionButton}.
          */

@@ -60,6 +60,7 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment<TasksViewModel
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentTasksBinding.inflate(inflater, container, false);
+        mBinding.setViewModel(mViewModel);
         return mBinding.getRoot();
     }
 

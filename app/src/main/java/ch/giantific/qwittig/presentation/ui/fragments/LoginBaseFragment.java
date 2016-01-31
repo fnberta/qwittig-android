@@ -21,13 +21,12 @@ import com.parse.ParseUser;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.utils.parse.ParseInstallationUtils;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.utils.parse.ParseUtils;
+import ch.giantific.qwittig.presentation.workerfragments.account.LoginWorker;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.ViewUtils;
 import ch.giantific.qwittig.utils.WorkerUtils;
-import ch.giantific.qwittig.presentation.workerfragments.account.LoginWorker;
+import ch.giantific.qwittig.utils.parse.ParseInstallationUtils;
 
 /**
  * Provides an abstract base class for the login screen views.
@@ -37,7 +36,7 @@ import ch.giantific.qwittig.presentation.workerfragments.account.LoginWorker;
  * Implements {@link LoaderManager.LoaderCallbacks} to provide the user with email propositions
  * from this address book.
  */
-public abstract class LoginBaseFragment extends BaseFragment {
+public abstract class LoginBaseFragment extends Fragment {
 
     static final String LOGIN_WORKER = "LOGIN_WORKER";
     private static final String STATE_LOADING = "STATE_LOADING";
@@ -124,13 +123,9 @@ public abstract class LoginBaseFragment extends BaseFragment {
     }
 
     private void addUserToInstallation(@NonNull ParseUser parseUser) {
-        if (ParseUtils.isTestUser(parseUser)) {
-            return;
-        }
-
-        User user = (User) parseUser;
-        List<String> channels = user.getGroupIds();
-        ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+        final User user = (User) parseUser;
+        final List<String> channels = user.getGroupIds();
+        final ParseInstallation installation = ParseInstallation.getCurrentInstallation();
         installation.addAllUnique(ParseInstallationUtils.CHANNELS, channels);
         installation.put(ParseInstallationUtils.USER, parseUser);
         installation.saveEventually();

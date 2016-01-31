@@ -30,6 +30,7 @@ public abstract class UserAvatarRowBaseViewModel extends BaseObservable {
 
     @Bindable
     public String getUserName() {
+        // TODO: check if user is deleted and show me for current user
         return mUser.getNickname();
     }
 

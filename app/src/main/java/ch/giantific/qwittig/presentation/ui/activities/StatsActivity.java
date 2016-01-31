@@ -8,7 +8,6 @@ import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -21,16 +20,17 @@ import java.util.Collections;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.di.components.NavDrawerComponent;
 import ch.giantific.qwittig.domain.models.Month;
 import ch.giantific.qwittig.domain.models.stats.Stats;
-import ch.giantific.qwittig.presentation.workerfragments.group.StatsCalcListener;
-import ch.giantific.qwittig.services.ParseQueryService;
 import ch.giantific.qwittig.presentation.ui.adapters.StringResSpinnerAdapter;
 import ch.giantific.qwittig.presentation.ui.adapters.ThemedArrayAdapter;
 import ch.giantific.qwittig.presentation.ui.fragments.StatsBaseFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.StatsCurrenciesFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.StatsSpendingFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.StatsStoresFragment;
+import ch.giantific.qwittig.presentation.workerfragments.group.StatsCalcListener;
+import rx.Single;
 
 /**
  * Hosts the different stats fragments, {@link StatsSpendingFragment}, {@link StatsStoresFragment}
@@ -74,7 +74,7 @@ public class StatsActivity extends BaseNavDrawerActivity implements
         mSpinnerMonth = (Spinner) findViewById(R.id.sp_month);
         setupMonthSpinner();
 
-        if (mUserIsLoggedIn) {
+        if (isUserLoggedIn()) {
             if (savedInstanceState == null) {
                 addFirstFragment();
             } else {
@@ -84,7 +84,10 @@ public class StatsActivity extends BaseNavDrawerActivity implements
         }
     }
 
+    @Override
+    protected void injectNavDrawerDependencies(@NonNull NavDrawerComponent navComp) {
 
+    }
 
     private void setupTypeSpinner() {
         final int[] types = new int[]{
@@ -145,7 +148,7 @@ public class StatsActivity extends BaseNavDrawerActivity implements
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        if (mUserIsLoggedIn) {
+        if (isUserLoggedIn()) {
             getFragmentManager().putFragment(outState, STATE_STATS_FRAGMENT, mStatsFragment);
         }
     }
@@ -154,7 +157,7 @@ public class StatsActivity extends BaseNavDrawerActivity implements
     protected void onStart() {
         super.onStart();
 
-        if (mUserIsLoggedIn) {
+        if (isUserLoggedIn()) {
             setSpinnerListeners();
         }
     }
@@ -247,16 +250,16 @@ public class StatsActivity extends BaseNavDrawerActivity implements
         }
     }
 
-    @Override
-    void afterLoginSetup() {
-        super.afterLoginSetup();
-
-        addFirstFragment();
-        setSpinnerListeners();
-        if (userIsInGroup()) {
-            ParseQueryService.startQueryAll(this);
-        }
-    }
+//    @Override
+//    void afterLoginSetup() {
+//        super.afterLoginSetup();
+//
+//        addFirstFragment();
+//        setSpinnerListeners();
+//        if (userIsInGroup()) {
+//            ParseQueryService.startQueryAll(this);
+//        }
+//    }
 
     @NonNull
     @Override
@@ -271,23 +274,7 @@ public class StatsActivity extends BaseNavDrawerActivity implements
     }
 
     @Override
-    public void onStatsCalculated(int statsType, @NonNull Stats stats) {
-        if (mStatsFragment != null) {
-            mStatsFragment.onStatsCalculated(stats);
-        }
-    }
+    public void setStatsCalcStream(@NonNull Single<Stats> single, int statsType, @NonNull String workerTag) {
 
-    @Override
-    public void onStatsCalculationFailed(int statsType, @StringRes int errorMessage) {
-        if (mStatsFragment != null) {
-            mStatsFragment.onStatsCalculationFailed(errorMessage);
-        }
-    }
-
-    @Override
-    protected void onGroupChanged() {
-        if (mStatsFragment != null) {
-            mStatsFragment.updateFragment();
-        }
     }
 }

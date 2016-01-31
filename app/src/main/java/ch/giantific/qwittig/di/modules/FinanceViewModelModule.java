@@ -32,18 +32,17 @@ public class FinanceViewModelModule extends BaseViewModelModule {
         super(savedState);
     }
 
-    @PerFragment
-    @Provides
-    ComparatorParseUserIgnoreCase providesComparatorParseUserIgnoreCase() {
-        return new ComparatorParseUserIgnoreCase();
-    }
+//    @PerFragment
+//    @Provides
+//    ComparatorParseUserIgnoreCase providesComparatorParseUserIgnoreCase() {
+//        return new ComparatorParseUserIgnoreCase();
+//    }
 
     @PerFragment
     @Provides
     FinanceUsersViewModel providesFinanceUsersViewModel(@NonNull GroupRepository groupRepository,
-                                                        @NonNull UserRepository userRepository,
-                                                        @NonNull ComparatorParseUserIgnoreCase comparator) {
-        return new FinanceUsersViewModelImpl(mSavedState, groupRepository, userRepository, comparator);
+                                                        @NonNull UserRepository userRepository) {
+        return new FinanceUsersViewModelImpl(mSavedState, groupRepository, userRepository);
     }
 
     @PerFragment

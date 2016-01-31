@@ -35,7 +35,6 @@ public class ParseUserRepository extends ParseBaseRepository<ParseUser> implemen
 
     private static final String LOG_TAG = ParseUserRepository.class.getSimpleName();
 
-    @Inject
     public ParseUserRepository() {
         super();
     }
@@ -172,4 +171,28 @@ public class ParseUserRepository extends ParseBaseRepository<ParseUser> implemen
         return query.find();
     }
 
+    @Override
+    public Single<String> requestPasswordReset(@NonNull String email) {
+        return null;
+    }
+
+    @Override
+    public Single<User> loginEmail(@NonNull String username, @NonNull String password) {
+        return null;
+    }
+
+    @Override
+    public Single<User> signUpEmail(@NonNull String username, @NonNull String password) {
+        return null;
+    }
+
+    @Override
+    public Single<User> loginFacebook() {
+        return null;
+    }
+
+    @Override
+    public Single<User> loginGoogle() {
+        return null;
+    }
 }

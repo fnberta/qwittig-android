@@ -48,18 +48,6 @@ public class ParseUtils {
     }
 
     /**
-     * Returns whether the passed in user is a test user or a valid one.
-     *
-     * @param parseUser the user to test
-     * @return whether the passed in user is a test user
-     */
-    public static boolean isTestUser(@NonNull ParseUser parseUser) {
-        User user = (User) parseUser;
-        String username = user.getUsername();
-        return username.startsWith(User.USERNAME_PREFIX_TEST);
-    }
-
-    /**
      * Returns a default {@link ParseACL} with read/write access for the role of the passed group.
      *
      * @param group the group to get the role from

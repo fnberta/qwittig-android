@@ -74,6 +74,11 @@ public abstract class BaseRecyclerViewFragment<T extends ListViewModel, S extend
     }
 
     @Override
+    public void notifyItemRangeRemoved(int positionStart, int itemCount) {
+        mRecyclerAdapter.notifyItemRangeRemoved(positionStart, itemCount);
+    }
+
+    @Override
     public void notifyItemInserted(int lastPosition) {
         mRecyclerAdapter.notifyItemInserted(lastPosition);
     }

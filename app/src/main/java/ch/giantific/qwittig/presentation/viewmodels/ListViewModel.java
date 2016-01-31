@@ -10,12 +10,7 @@ import android.databinding.Bindable;
  * Created by fabio on 10.01.16.
  */
 public interface ListViewModel<T, S extends ListViewModel.ViewListener>
-        extends ViewModel<S> {
-
-    @Bindable
-    boolean isLoading();
-
-    void setLoading(boolean isLoading);
+        extends ViewModel<S>, LoadingViewModel {
 
     @Bindable
     boolean isEmpty();
@@ -52,6 +47,8 @@ public interface ListViewModel<T, S extends ListViewModel.ViewListener>
         void notifyItemRangeChanged(int positionStart, int itemCount);
 
         void notifyItemRemoved(int position);
+
+        void notifyItemRangeRemoved(int positionStart, int itemCount);
 
         void notifyItemInserted(int lastPosition);
 

@@ -14,7 +14,7 @@ import java.util.Date;
 /**
  * Created by fabio on 24.01.16.
  */
-public interface PurchaseAddDateRowViewModel extends Observable {
+public interface PurchaseAddEditDateRowViewModel extends Observable {
 
     @Bindable
     String getDate();

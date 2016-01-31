@@ -30,7 +30,6 @@ import ch.giantific.qwittig.presentation.ui.adapters.rows.HeaderRow;
 public class StoresRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         implements SelectionModeViewModel {
 
-    private static final String LOG_TAG = StoresRecyclerAdapter.class.getSimpleName();
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_STORE_ADDED = 1;
     private static final int TYPE_STORE_DEFAULT = 2;
@@ -196,24 +195,24 @@ public class StoresRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             if (isSelected(store)) {
                 mStoresSelected.remove(store);
                 int adjustedPosition = getAdjustedStoreAddedPosition(i);
-                if (deleteSelectedItems) {
-                    mStoresAdded.remove(i);
-                    if (mStoresFavorites.contains(store)) {
-                        mStoresFavorites.remove(store);
-                    }
-                    notifyItemRemoved(adjustedPosition);
-
-                    mListener.onStoresSet();
-                } else {
-                    notifyItemChanged(adjustedPosition);
-                }
+//                if (deleteSelectedItems) {
+//                    mStoresAdded.remove(i);
+//                    if (mStoresFavorites.contains(store)) {
+//                        mStoresFavorites.remove(store);
+//                    }
+//                    notifyItemRemoved(adjustedPosition);
+//
+//                    mListener.onStoresSet();
+//                } else {
+//                    notifyItemChanged(adjustedPosition);
+//                }
             }
         }
     }
 
     @Override
-    public boolean isSelected(@NonNull String store) {
-        return mStoresSelected.contains(store);
+    public boolean isSelected(@NonNull Object item) {
+        return mStoresSelected.contains(item);
     }
 
     /**

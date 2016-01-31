@@ -18,7 +18,7 @@ import ch.giantific.qwittig.R;
  */
 public class ProgressRow extends RecyclerView.ViewHolder {
 
-    public static final int VIEW_RESOURCE = R.layout.row_progress;
+    public static final int VIEW_RESOURCE = R.layout.row_generic_progress;
 
     /**
      * Constructs a new {@link ProgressRow}.

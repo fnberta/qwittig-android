@@ -25,7 +25,7 @@ public class RestServiceModule {
 
     @Provides
     @Singleton
-    ReceiptOcr provideReceiptOcrService() {
+    ReceiptOcr providesReceiptOcrService() {
         final Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL_OCR)
                 .addConverterFactory(GsonConverterFactory.create())

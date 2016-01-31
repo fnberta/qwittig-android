@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 
 import javax.inject.Inject;
 
+import ch.giantific.qwittig.di.components.WorkerComponent;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import rx.Observable;
@@ -20,7 +21,7 @@ import rx.Observable;
 public class PurchasesQueryMoreWorker extends BaseQueryWorker<Purchase, PurchasesQueryMoreListener> {
 
     public static final String WORKER_TAG = "PURCHASES_QUERY_MORE_WORKER";
-    private static final String BUNDLE_SKIP = "BUNDLE_SKIP";
+    private static final String KEY_SKIP = "SKIP";
     @Inject
     PurchaseRepository mPurchaseRepo;
 
@@ -35,21 +36,26 @@ public class PurchasesQueryMoreWorker extends BaseQueryWorker<Purchase, Purchase
     public static PurchasesQueryMoreWorker newInstance(int skip) {
         PurchasesQueryMoreWorker fragment = new PurchasesQueryMoreWorker();
         Bundle args = new Bundle();
-        args.putInt(BUNDLE_SKIP, skip);
+        args.putInt(KEY_SKIP, skip);
         fragment.setArguments(args);
         return fragment;
     }
 
     @Override
-    protected String getWorkerTag() {
-        return WORKER_TAG;
+    protected void injectWorkerDependencies(@NonNull WorkerComponent component) {
+        component.inject(this);
+    }
+
+    @Override
+    protected void onError() {
+        mActivity.onWorkerError(WORKER_TAG);
     }
 
     @Nullable
     @Override
     protected Observable<Purchase> getObservable(@NonNull Bundle args) {
         if (setCurrentGroups()) {
-            final int skip = args.getInt(BUNDLE_SKIP, 0);
+            final int skip = args.getInt(KEY_SKIP, 0);
             return mPurchaseRepo.getPurchasesOnlineAsync(mCurrentUser, mCurrentGroup, skip);
         }
 
@@ -57,7 +63,7 @@ public class PurchasesQueryMoreWorker extends BaseQueryWorker<Purchase, Purchase
     }
 
     @Override
-    protected void setStream(@NonNull Observable<Purchase> observable, @NonNull String workerTag) {
-        mActivity.setPurchasesQueryMoreStream(observable, workerTag);
+    protected void setStream(@NonNull Observable<Purchase> observable) {
+        mActivity.setPurchasesQueryMoreStream(observable, WORKER_TAG);
     }
 }

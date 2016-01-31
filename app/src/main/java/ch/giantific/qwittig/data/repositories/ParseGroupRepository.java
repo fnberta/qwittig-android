@@ -29,7 +29,6 @@ import rx.functions.Func1;
  */
 public class ParseGroupRepository extends ParseBaseRepository<Group> implements GroupRepository {
 
-    @Inject
     public ParseGroupRepository() {
         super();
     }
@@ -54,10 +53,10 @@ public class ParseGroupRepository extends ParseBaseRepository<Group> implements 
 
                 group.fetchFromLocalDatastoreInBackground(new GetCallback<Group>() {
                     @Override
-                    public void done(Group group, @Nullable ParseException e) {
+                    public void done(Group groupFetched, @Nullable ParseException e) {
                         if (e == null) {
                             if (!singleSubscriber.isUnsubscribed()) {
-                                singleSubscriber.onSuccess(group);
+                                singleSubscriber.onSuccess(groupFetched);
                             }
                         } else {
                             group.fetchIfNeededInBackground(new GetCallback<Group>() {

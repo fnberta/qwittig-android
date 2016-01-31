@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 
 import javax.inject.Inject;
 
+import ch.giantific.qwittig.di.components.WorkerComponent;
 import ch.giantific.qwittig.domain.models.parse.Task;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import rx.Observable;
@@ -27,8 +28,13 @@ public class TasksUpdateWorker extends BaseQueryWorker<Task, TasksUpdateListener
     TaskRepository mTaskRepo;
 
     @Override
-    protected String getWorkerTag() {
-        return WORKER_TAG;
+    protected void injectWorkerDependencies(@NonNull WorkerComponent component) {
+        component.inject(this);
+    }
+
+    @Override
+    protected void onError() {
+        mActivity.onWorkerError(WORKER_TAG);
     }
 
     @Nullable
@@ -42,7 +48,7 @@ public class TasksUpdateWorker extends BaseQueryWorker<Task, TasksUpdateListener
     }
 
     @Override
-    protected void setStream(@NonNull Observable<Task> observable, @NonNull String workerTag) {
-        mActivity.setTasksUpdateStream(observable, workerTag);
+    protected void setStream(@NonNull Observable<Task> observable) {
+        mActivity.setTasksUpdateStream(observable, WORKER_TAG);
     }
 }

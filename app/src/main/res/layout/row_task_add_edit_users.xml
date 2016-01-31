@@ -48,7 +48,8 @@
             android:layout_toStartOf="@+id/iv_reorder"
             android:gravity="center_vertical"
             android:text="@{viewModel.userName}"
-            tools:text="Vera"/>
+            tools:text="Vera"
+            />
 
         <ImageView
             android:id="@+id/iv_reorder"

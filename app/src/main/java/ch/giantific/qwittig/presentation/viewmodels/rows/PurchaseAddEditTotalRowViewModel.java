@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 /**
  * Created by fabio on 26.01.16.
  */
-public interface PurchaseAddTotalRowViewModel extends Observable {
+public interface PurchaseAddEditTotalRowViewModel extends Observable {
 
     @Bindable
     String getTotalPrice();

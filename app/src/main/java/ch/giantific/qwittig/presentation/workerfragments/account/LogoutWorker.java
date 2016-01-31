@@ -22,10 +22,12 @@ import com.parse.SaveCallback;
 
 import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.di.components.WorkerComponent;
 import ch.giantific.qwittig.presentation.workerfragments.BaseWorker;
 import ch.giantific.qwittig.domain.repositories.ApiRepository;
 import ch.giantific.qwittig.utils.parse.ParseInstallationUtils;
 import ch.giantific.qwittig.domain.models.parse.User;
+import rx.Observable;
 
 /**
  * Resets the device's {@link ParseInstallation} object and logs out the current user.
@@ -125,20 +127,20 @@ public class LogoutWorker extends BaseGoogleApiLoginWorker {
     }
 
     private void deleteUserInCloud() {
-        ApiRepository cloudCode = new ApiRepository(getActivity());
-        cloudCode.deleteAccount(new ApiRepository.CloudCodeListener() {
-            @Override
-            public void onCloudFunctionReturned(Object result) {
-                handleInstallation();
-            }
-
-            @Override
-            public void onCloudFunctionFailed(@StringRes int errorMessage) {
-                if (mListener != null) {
-                    mListener.onLogoutFailed(errorMessage);
-                }
-            }
-        });
+//        ApiRepository cloudCode = new ApiRepository(getActivity());
+//        cloudCode.deleteAccount(new ApiRepository.CloudCodeListener() {
+//            @Override
+//            public void onCloudFunctionReturned(Object result) {
+//                handleInstallation();
+//            }
+//
+//            @Override
+//            public void onCloudFunctionFailed(@StringRes int errorMessage) {
+//                if (mListener != null) {
+//                    mListener.onLogoutFailed(errorMessage);
+//                }
+//            }
+//        });
     }
 
     /**

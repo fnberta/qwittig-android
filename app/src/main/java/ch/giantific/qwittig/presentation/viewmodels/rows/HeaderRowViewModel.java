@@ -4,39 +4,16 @@
 
 package ch.giantific.qwittig.presentation.viewmodels.rows;
 
-import android.databinding.BaseObservable;
 import android.databinding.Bindable;
+import android.databinding.Observable;
 import android.support.annotation.StringRes;
 
-import ch.giantific.qwittig.BR;
-
 /**
- * Provides an implementation of the {@link HeaderRowViewModel} interface.
- * <p/>
- * Subclass of {@link BaseObservable}.
+ * Created by fabio on 30.01.16.
  */
-public class HeaderRowViewModel extends BaseObservable {
-
-    @StringRes
-    private int mHeader;
-
-    /**
-     * Constructs a new {@link HeaderRowViewModel}.
-     *
-     * @param header the header to display
-     */
-    public HeaderRowViewModel(@StringRes int header) {
-        mHeader = header;
-    }
+public interface HeaderRowViewModel extends Observable {
 
     @StringRes
     @Bindable
-    public int getHeader() {
-        return mHeader;
-    }
-
-    public void setHeader(@StringRes int header) {
-        mHeader = header;
-        notifyPropertyChanged(BR.header);
-    }
+    int getHeader();
 }

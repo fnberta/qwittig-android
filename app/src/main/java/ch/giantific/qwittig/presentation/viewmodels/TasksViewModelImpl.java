@@ -18,8 +18,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.MessageAction;
 import ch.giantific.qwittig.domain.models.parse.Group;
@@ -29,7 +27,6 @@ import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.utils.DateUtils;
-import ch.giantific.qwittig.utils.parse.ParseUtils;
 import rx.Observable;
 import rx.Single;
 import rx.SingleSubscriber;
@@ -47,7 +44,6 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<Task, TasksV
     private ArrayList<String> mLoadingTasks;
     private Date mDeadlineSelected;
 
-    @Inject
     public TasksViewModelImpl(@Nullable Bundle savedState,
                               @NonNull GroupRepository groupRepo,
                               @NonNull UserRepository userRepository,
@@ -73,13 +69,6 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<Task, TasksV
         super.saveState(outState);
 
         outState.putStringArrayList(STATE_LOADING_TASKS, mLoadingTasks);
-    }
-
-    @Override
-    public void attachView(@NonNull TasksViewModel.ViewListener view) {
-        super.attachView(view);
-
-        updateList();
     }
 
     @Override

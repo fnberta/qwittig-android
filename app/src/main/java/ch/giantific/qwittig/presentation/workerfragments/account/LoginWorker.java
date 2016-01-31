@@ -5,6 +5,7 @@
 package ch.giantific.qwittig.presentation.workerfragments.account;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -37,11 +38,13 @@ import java.util.List;
 
 import ch.giantific.qwittig.ParseErrorHandler;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.di.components.WorkerComponent;
 import ch.giantific.qwittig.presentation.workerfragments.BaseWorker;
 import ch.giantific.qwittig.domain.repositories.ApiRepository;
 import ch.giantific.qwittig.utils.AvatarUtils;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.EmailPromptDialogFragment;
+import rx.Observable;
 
 /**
  * Handles the different use-cases connected with the account of a user (log-in, create account,
@@ -54,7 +57,7 @@ import ch.giantific.qwittig.presentation.ui.fragments.dialogs.EmailPromptDialogF
  * <li>Reset the password of a user</li>
  * </ol>
  */
-public class LoginWorker extends BaseWorker {
+public class LoginWorker extends Fragment {
 
     private static final String BUNDLE_USERNAME = "BUNDLE_USERNAME";
     private static final String BUNDLE_PASSWORD = "BUNDLE_PASSWORD";
@@ -67,7 +70,6 @@ public class LoginWorker extends BaseWorker {
     private static final int TYPE_LOGIN_GOOGLE = 3;
     private static final int TYPE_SIGN_UP = 4;
     private static final int TYPE_RESET_PASSWORD = 5;
-    private static final String LOG_TAG = LoginWorker.class.getSimpleName();
     private static final String PROMPT_EMAIL_DIALOG = "PROMPT_EMAIL_DIALOG";
     @Nullable
     private WorkerInteractionListener mListener;
@@ -189,6 +191,8 @@ public class LoginWorker extends BaseWorker {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setRetainInstance(true);
 
         int type = 0;
         Bundle args = getArguments();
@@ -391,7 +395,7 @@ public class LoginWorker extends BaseWorker {
     }
 
     private void promptForEmail() {
-        EmailPromptDialogFragment dialog = EmailPromptDialogFragment.newInstance(
+        final EmailPromptDialogFragment dialog = EmailPromptDialogFragment.newInstance(
                 R.string.dialog_login_email_title,
                 R.string.dialog_login_email_message,
                 android.R.string.yes);
@@ -440,34 +444,34 @@ public class LoginWorker extends BaseWorker {
     private void loginWithGoogle(@NonNull String idToken,
                                  @NonNull final String displayName,
                                  @NonNull final Uri photoUrl) {
-        final ApiRepository cloudCode = new ApiRepository(getActivity());
-        cloudCode.loginWithGoogle(idToken, new ApiRepository.CloudCodeListener() {
-            @Override
-            public void onCloudFunctionReturned(Object result) {
-                JSONObject token;
-                try {
-                    token = new JSONObject((String) result);
-                } catch (JSONException e) {
-                    if (mListener != null) {
-                        mListener.onLoginFailed(R.string.toast_login_failed_google);
-                    }
-
-                    // TODO: user should also be deleted
-                    return;
-                }
-
-                final String sessionToken = token.optString("sessionToken");
-                final boolean isNew = token.optBoolean("isNew");
-                becomeUser(sessionToken, isNew, displayName, photoUrl);
-            }
-
-            @Override
-            public void onCloudFunctionFailed(@StringRes int errorMessage) {
-                if (mListener != null) {
-                    mListener.onLoginFailed(R.string.toast_login_failed_google);
-                }
-            }
-        });
+//        final ApiRepository cloudCode = new ApiRepository(getActivity());
+//        cloudCode.loginWithGoogle(idToken, new ApiRepository.CloudCodeListener() {
+//            @Override
+//            public void onCloudFunctionReturned(Object result) {
+//                JSONObject token;
+//                try {
+//                    token = new JSONObject((String) result);
+//                } catch (JSONException e) {
+//                    if (mListener != null) {
+//                        mListener.onLoginFailed(R.string.toast_login_failed_google);
+//                    }
+//
+//                    // TODO: user should also be deleted
+//                    return;
+//                }
+//
+//                final String sessionToken = token.optString("sessionToken");
+//                final boolean isNew = token.optBoolean("isNew");
+//                becomeUser(sessionToken, isNew, displayName, photoUrl);
+//            }
+//
+//            @Override
+//            public void onCloudFunctionFailed(@StringRes int errorMessage) {
+//                if (mListener != null) {
+//                    mListener.onLoginFailed(R.string.toast_login_failed_google);
+//                }
+//            }
+//        });
     }
 
     private void becomeUser(@NonNull String sessionToken, final boolean isNew,

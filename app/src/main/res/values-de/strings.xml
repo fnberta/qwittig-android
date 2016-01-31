@@ -113,7 +113,7 @@
     <string name="pref_category_me">Ich</string>
     <string name="pref_category_current_group">Aktuelle Gruppe</string>
     <string name="title_activity_settings_stores">Geschäfte</string>
-    <string name="dialog_group_balance_not_zero_message">Dein Kontostand muss auf null sein um diese Gruppe verlassen zu können. Möchtest du eine neue Abrechnung starten?</string>
+    <string name="toast_balance_not_zero">Bitte begleiche alle deine Schulden bevor du diese Gruppe verlässt.</string>
     <string name="dialog_positive_start_new">Starten</string>
     <string name="dialog_positive_leave">Verlassen</string>
     <string name="dialog_positive_reset">Zurücksetzen</string>
@@ -339,5 +339,6 @@
     <string name="comp_unpaid_button_claim">Einfordern</string>
     <string name="toast_error_purchases_load">Laden der Einkäufe fehlgeschlagen</string>
     <string name="toast_error_drafts_load">Laden der Entwürfe fehlgeschlagen</string>
+    <string name="toast_error_receipt_load">Laden der Quittung fehlgeschlagen</string>
 
 </resources>

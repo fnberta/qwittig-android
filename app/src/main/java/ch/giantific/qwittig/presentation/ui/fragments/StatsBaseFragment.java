@@ -17,12 +17,16 @@ import android.support.v4.widget.ContentLoadingProgressBar;
 import android.view.View;
 import android.widget.TextView;
 
+import com.parse.ParseUser;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.ParseGroupRepository;
 import ch.giantific.qwittig.domain.models.Month;
+import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.models.stats.Stats;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.utils.Utils;
@@ -40,7 +44,8 @@ public abstract class StatsBaseFragment extends BaseFragment {
     static final int PERIOD_MONTH = 1;
     private static final String STATE_STATS_DATA = "STATE_STATS_DATA";
     private static final String STATE_PERIOD_TYPE = "STATE_PERIOD_TYPE";
-    private static final String LOG_TAG = StatsBaseFragment.class.getSimpleName();
+    User mCurrentUser;
+    Group mCurrentGroup;
     int mPeriodType;
     boolean mIsLoading;
     @Nullable
@@ -79,6 +84,13 @@ public abstract class StatsBaseFragment extends BaseFragment {
         }
     }
 
+    private void updateCurrentUserAndGroup() {
+        mCurrentUser = (User) ParseUser.getCurrentUser();
+        if (mCurrentUser != null) {
+            mCurrentGroup = mCurrentUser.getCurrentGroup();
+        }
+    }
+
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -97,6 +109,16 @@ public abstract class StatsBaseFragment extends BaseFragment {
         mProgressBar = (ContentLoadingProgressBar) view.findViewById(R.id.pb_base);
     }
 
+    @Override
+    protected void setViewModelToActivity() {
+
+    }
+
+    @Override
+    protected View getSnackbarView() {
+        return null;
+    }
+
     /**
      * Starts the stats loading process by checking if data is available for the current group. If
      * yes, loads the stats data and if not, fetches the data for the group and then starts the
@@ -110,7 +132,7 @@ public abstract class StatsBaseFragment extends BaseFragment {
                 setStuffWithGroupData();
                 loadData();
             } else {
-                GroupRepository repo = new ParseGroupRepository(getActivity());
+                final GroupRepository repo = new ParseGroupRepository();
                 repo.fetchGroupDataAsync(mCurrentGroup);
             }
         } else {

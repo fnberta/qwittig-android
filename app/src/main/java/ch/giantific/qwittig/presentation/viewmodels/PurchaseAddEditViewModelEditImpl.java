@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import ch.giantific.qwittig.domain.models.PurchaseAddEditItem;
+import ch.giantific.qwittig.domain.models.PurchaseDetailsItem.Type;
 import ch.giantific.qwittig.domain.models.RowItem;
 import ch.giantific.qwittig.domain.models.parse.Item;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
@@ -133,6 +135,7 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
         // set note to value from original purchase
         String oldNote = mEditPurchase.getNote();
         mOldNote = oldNote != null ? oldNote : "";
+        // TODO: notify changed?
         mNote = mOldNote;
         // check if purchase has a note and update action bar menu accordingly
         mView.toggleNoteMenuOption(!TextUtils.isEmpty(mOldNote));
@@ -160,17 +163,16 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
     }
 
     private void setOldItemValues() {
-        for (int i = 0, size = mOldItems.size(); i < size; i++) {
-            final ParseObject object = mOldItems.get(i);
+        for (ParseObject object : mOldItems) {
             final Item item = (Item) object;
-
             final String price = MoneyUtils.formatMoneyNoSymbol(
                     item.getPriceForeign(mOldExchangeRate), mCurrency);
             final List<ParseUser> usersInvolved = item.getUsersInvolved();
             final RowItem rowItem = new RowItem(item.getName(), price,
                     getRowItemUser(usersInvolved), mCurrency);
-            mItems.add(rowItem);
-            mView.notifyItemInserted(adjustPosition(i));
+            final PurchaseAddEditItem addEditItem = PurchaseAddEditItem.createNewRowItemInstance(rowItem);
+            mItems.add(getLastPosition(), addEditItem);
+            mView.notifyItemInserted(mItems.indexOf(addEditItem));
         }
     }
 
@@ -247,15 +249,29 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
         if (mOldItems == null) {
             mOldItems = mEditPurchase.getItems();
         }
+
+        // TODO: maybe drop size comparison, requires loop anyway
         final int oldItemsSize = mOldItems.size();
-        if (oldItemsSize != mItems.size()) {
+        int newItemsSize = 0;
+        for (PurchaseAddEditItem addEditItem : mItems) {
+            if (addEditItem.getType() == Type.ITEM) {
+                newItemsSize++;
+            }
+        }
+        if (oldItemsSize != newItemsSize) {
             return true;
         }
 
         final int maxFractionDigits = MoneyUtils.getMaximumFractionDigits(mCurrency);
-        for (int i = 0; i < oldItemsSize; i++) {
-            final Item itemOld = (Item) mOldItems.get(i);
-            final RowItem rowItemNew = mItems.get(adjustPosition(i));
+        for (int i = 0, size = mItems.size(), skipCount = 0; i < size; i++) {
+            final PurchaseAddEditItem addEditItem = mItems.get(i);
+            if (addEditItem.getType() != Type.ITEM) {
+                skipCount++;
+                continue;
+            }
+
+            final Item itemOld = (Item) mOldItems.get(i - skipCount);
+            final RowItem rowItemNew = mItems.get(i).getRowItem();
             if (!itemOld.getName().equals(rowItemNew.getName())) {
                 return true;
             }

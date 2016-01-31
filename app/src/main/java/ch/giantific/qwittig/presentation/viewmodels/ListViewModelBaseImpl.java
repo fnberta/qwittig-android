@@ -57,6 +57,13 @@ public abstract class ListViewModelBaseImpl<T, S extends ListViewModel.ViewListe
     }
 
     @Override
+    public void attachView(@NonNull S view) {
+        super.attachView(view);
+
+        updateList();
+    }
+
+    @Override
     public void onNewGroupSet() {
         super.onNewGroupSet();
 

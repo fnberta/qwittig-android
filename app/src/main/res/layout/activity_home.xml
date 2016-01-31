@@ -78,6 +78,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_create_black_24dp"
+                    android:onClick="@{viewModel.onFabAddPurchaseManualClick}"
                     app:fabSize="mini"
                     />
 
@@ -86,6 +87,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_camera_alt_black_24dp"
+                    android:onClick="@{viewModel.onFabAddPurchaseAutoClick}"
                     app:fabSize="mini"
                     />
             </ch.berta.fabio.fabspeeddial.FabMenu>

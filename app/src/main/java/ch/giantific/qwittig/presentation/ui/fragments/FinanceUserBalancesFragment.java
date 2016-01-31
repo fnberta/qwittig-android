@@ -53,6 +53,7 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewOnlineFragment<
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBinding = FragmentFinanceUsersBinding.inflate(inflater, container, false);
+        mBinding.setViewModel(mViewModel);
         return mBinding.getRoot();
     }
 

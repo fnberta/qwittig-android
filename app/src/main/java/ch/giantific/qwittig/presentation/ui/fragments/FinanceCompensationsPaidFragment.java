@@ -19,7 +19,6 @@ import com.mugen.MugenCallbacks;
 
 import ch.giantific.qwittig.databinding.FragmentFinanceCompensationsPaidBinding;
 import ch.giantific.qwittig.di.components.DaggerFinanceComponent;
-import ch.giantific.qwittig.di.components.DaggerFinanceCompsPaidComponent;
 import ch.giantific.qwittig.di.modules.FinanceViewModelModule;
 import ch.giantific.qwittig.presentation.ui.adapters.CompensationsPaidRecyclerAdapter;
 import ch.giantific.qwittig.presentation.viewmodels.FinanceCompsPaidViewModel;
@@ -56,6 +55,7 @@ public class FinanceCompensationsPaidFragment extends BaseRecyclerViewOnlineFrag
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentFinanceCompensationsPaidBinding.inflate(inflater, container, false);
+        mBinding.setViewModel(mViewModel);
         return mBinding.getRoot();
     }
 
@@ -121,7 +121,6 @@ public class FinanceCompensationsPaidFragment extends BaseRecyclerViewOnlineFrag
                     .commit();
         }
     }
-
 
 
     public interface ActivityListener extends BaseRecyclerViewOnlineFragment.ActivityListener {
