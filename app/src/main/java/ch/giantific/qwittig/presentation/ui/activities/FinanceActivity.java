@@ -49,7 +49,7 @@ import rx.Single;
  * <p/>
  * Subclass of {@link BaseNavDrawerActivity}.
  */
-public class FinanceActivity extends BaseNavDrawerActivity<FinanceUsersViewModel> implements
+public class FinanceActivity extends BaseNavDrawerActivity<FinanceCompsUnpaidViewModel> implements
         FinanceUserBalancesFragment.ActivityListener,
         FinanceCompensationsUnpaidFragment.ActivityListener,
         FinanceCompensationsPaidFragment.ActivityListener,
@@ -59,12 +59,8 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceUsersViewModel
         CompensationReminderListener,
         UsersUpdateListener {
 
-    public static final int TAB_NONE = -1;
-    public static final int TAB_USER_BALANCES = 0;
-    public static final int TAB_COMPS_UNPAID = 1;
-    public static final int TAB_COMPS_PAID = 2;
     private ActivityFinanceBinding mBinding;
-    private FinanceCompsUnpaidViewModel mCompsUnpaidViewModel;
+    private FinanceUsersViewModel mUsersViewModel;
     private FinanceCompsPaidViewModel mCompsPaidViewModel;
 
     @Override
@@ -79,7 +75,7 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceUsersViewModel
                 if (paid) {
                     mCompsPaidViewModel.updateList();
                 } else {
-                    mCompsUnpaidViewModel.updateList();
+                    mViewModel.updateList();
                 }
                 break;
         }
@@ -98,8 +94,8 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceUsersViewModel
             actionBar.setTitle(null);
         }
 
-        if (isUserLoggedIn() && savedInstanceState == null) {
-            addViewPagerFragments();
+        if (isUserLoggedIn()) {
+            setupTabs();
         }
     }
 
@@ -108,33 +104,28 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceUsersViewModel
         navComp.inject(this);
     }
 
-    private void addViewPagerFragments() {
+    private void setupTabs() {
         @FragmentTabs
-        final int fragmentToSelect = getIntent().getIntExtra(
-                PushBroadcastReceiver.INTENT_EXTRA_FINANCE_FRAGMENT, TAB_NONE);
+        final int tabToSelect = getIntent().getIntExtra(
+                PushBroadcastReceiver.INTENT_EXTRA_FINANCE_FRAGMENT, FragmentTabs.NONE);
 
         final TabsAdapter tabsAdapter = new TabsAdapter(getFragmentManager());
-        tabsAdapter.addFragment(new FinanceUserBalancesFragment(), getString(R.string.tab_users));
+//        tabsAdapter.addFragment(new FinanceUserBalancesFragment(), getString(R.string.tab_users));
         tabsAdapter.addFragment(new FinanceCompensationsUnpaidFragment(), getString(R.string.tab_compensations_new));
         tabsAdapter.addFragment(new FinanceCompensationsPaidFragment(), getString(R.string.tab_compensations_history));
         mBinding.viewpager.setAdapter(tabsAdapter);
         mBinding.viewpager.setOffscreenPageLimit(2);
-        if (fragmentToSelect != TAB_NONE) {
-            mBinding.viewpager.setCurrentItem(fragmentToSelect);
+        if (tabToSelect != FragmentTabs.NONE) {
+            mBinding.viewpager.setCurrentItem(tabToSelect);
         }
 
         mBinding.tabs.setupWithViewPager(mBinding.viewpager);
     }
 
     @Override
-    public void setUsersViewModel(@NonNull FinanceUsersViewModel viewModel) {
+    public void setCompsUnpaidViewModel(@NonNull FinanceCompsUnpaidViewModel viewModel) {
         mViewModel = viewModel;
         mBinding.setViewModel(viewModel);
-    }
-
-    @Override
-    public void setCompsUnpaidViewModel(@NonNull FinanceCompsUnpaidViewModel viewModel) {
-        mCompsUnpaidViewModel = viewModel;
     }
 
     @Override
@@ -143,18 +134,23 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceUsersViewModel
     }
 
     @Override
+    public void setUsersViewModel(@NonNull FinanceUsersViewModel viewModel) {
+        mUsersViewModel = viewModel;
+    }
+
+    @Override
     void onLoginSuccessful() {
         super.onLoginSuccessful();
 
         // TODO: fix setLoading(true) because online query is still happening
-        addViewPagerFragments();
+        setupTabs();
     }
 
     @Override
     public void onNewGroupSet() {
         super.onNewGroupSet();
 
-        mCompsUnpaidViewModel.onNewGroupSet();
+        mUsersViewModel.onNewGroupSet();
         mCompsPaidViewModel.onNewGroupSet();
     }
 
@@ -184,14 +180,14 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceUsersViewModel
     }
 
     @Override
-    public void onChangedAmountSet(@NonNull BigFraction amount) {
-        mCompsUnpaidViewModel.onChangedAmountSet(amount);
+    public void onAmountConfirmed(@NonNull BigFraction amount) {
+        mViewModel.onAmountConfirmed(amount);
     }
 
     @Override
     public void setUsersUpdateStream(@NonNull Observable<User> observable,
                                      @NonNull String workerTag) {
-        mViewModel.setUsersUpdateStream(observable, workerTag);
+        mUsersViewModel.setUsersUpdateStream(observable, workerTag);
     }
 
     @Override
@@ -200,7 +196,7 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceUsersViewModel
         if (paid) {
             mCompsPaidViewModel.setCompensationsUpdateStream(observable, true, workerTag);
         } else {
-            mCompsUnpaidViewModel.setCompensationsUpdateStream(observable, false, workerTag);
+            mViewModel.setCompensationsUpdateStream(observable, false, workerTag);
         }
     }
 
@@ -211,14 +207,19 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceUsersViewModel
     }
 
     @Override
-    public void setCompensationReminderStream(@NonNull Single<String> single,
-                                              @NonNull String compensationId,
-                                              @NonNull String workerTag) {
-        mCompsUnpaidViewModel.setCompensationReminderStream(single, compensationId, workerTag);
+    public void setCompensationRemindStream(@NonNull Single<String> single,
+                                            @NonNull String compensationId,
+                                            @NonNull String workerTag) {
+        mViewModel.setCompensationRemindStream(single, compensationId, workerTag);
     }
 
-    @IntDef({TAB_NONE, TAB_USER_BALANCES, TAB_COMPS_UNPAID, TAB_COMPS_PAID})
+    @IntDef({FragmentTabs.NONE, FragmentTabs.USER_BALANCES, FragmentTabs.COMPS_UNPAID,
+            FragmentTabs.COMPS_PAID})
     @Retention(RetentionPolicy.SOURCE)
     public @interface FragmentTabs {
+        int NONE = -1;
+        int USER_BALANCES = 0;
+        int COMPS_UNPAID = 1;
+        int COMPS_PAID = 2;
     }
 }

@@ -21,9 +21,8 @@ public class PurchaseAddEditViewModelAddAutoImpl extends PurchaseAddEditViewMode
     public PurchaseAddEditViewModelAddAutoImpl(@Nullable Bundle savedState,
                                                @NonNull GroupRepository groupRepository,
                                                @NonNull UserRepository userRepository,
-                                               @NonNull SharedPreferences sharedPreferences,
                                                @NonNull PurchaseRepository purchaseRepo) {
-        super(savedState, groupRepository, userRepository, sharedPreferences, purchaseRepo);
+        super(savedState, groupRepository, userRepository, purchaseRepo);
 
         if (savedState == null) {
             mLoading = true;
@@ -34,16 +33,13 @@ public class PurchaseAddEditViewModelAddAutoImpl extends PurchaseAddEditViewMode
     public void setLoading(boolean loading) {
         super.setLoading(loading);
 
-        mView.reloadOptionsMenu();
+        if (!loading) {
+            mView.showOptionsMenu();
+        }
     }
 
     @Override
     void onUsersReady() {
         mView.captureImage(USE_CUSTOM_CAMERA);
-    }
-
-    @Override
-    public void onReceiptImageTaken() {
-        mView.loadOcrWorker(mReceiptImagePath);
     }
 }

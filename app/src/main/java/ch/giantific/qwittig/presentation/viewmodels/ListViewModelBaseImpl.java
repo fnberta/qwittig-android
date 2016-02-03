@@ -38,8 +38,9 @@ public abstract class ListViewModelBaseImpl<T, S extends ListViewModel.ViewListe
         mGroupRepo = groupRepo;
 
         if (savedState != null) {
-            setLoading(savedState.getBoolean(STATE_LOADING, false));
+            mLoading = (savedState.getBoolean(STATE_LOADING, false));
         } else {
+            mLoading = true;
             mItems = new ArrayList<>();
         }
     }

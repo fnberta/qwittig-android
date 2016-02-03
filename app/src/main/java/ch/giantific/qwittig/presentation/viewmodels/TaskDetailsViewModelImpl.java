@@ -75,6 +75,7 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskHistory,
     @StringRes
     @Bindable
     public int getTaskTimeFrame() {
+        // TODO: crashes because is 0 at start and 0 is not a valid string res
         return mTaskTimeFrame;
     }
 
@@ -114,28 +115,70 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskHistory,
     }
 
     @Override
-    public void attachView(@NonNull TaskDetailsViewModel.ViewListener view) {
-        super.attachView(view);
-
-        updateList();
-    }
-
-    @Override
     public void updateList() {
-        mSubscriptions.add(mTaskRepo.getTaskLocalAsync(mTaskId).toObservable()
-                .flatMap(new Func1<Task, Observable<User>>() {
+        mSubscriptions.add(mTaskRepo.getTaskLocalAsync(mTaskId)
+                .flatMapObservable(new Func1<Task, Observable<TaskHistory>>() {
                     @Override
-                    public Observable<User> call(Task task) {
+                    public Observable<TaskHistory> call(Task task) {
                         mTask = task;
 
                         updateToolbarHeader();
                         updateToolbarMenu();
 
-                        return mUserRepo.getUsersLocalAsync(mCurrentGroup);
+                        return getTaskHistory();
                     }
                 })
-                .subscribe(new UserSubscriber())
+                .subscribe(new Subscriber<TaskHistory>() {
+                    @Override
+                    public void onStart() {
+                        super.onStart();
+                        mItems.clear();
+                    }
+
+                    @Override
+                    public void onCompleted() {
+                        Collections.sort(mItems, Collections.reverseOrder());
+                        mView.notifyDataSetChanged();
+                        mView.startPostponedEnterTransition();
+                        setLoading(false);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        setLoading(false);
+                        mView.showMessage(R.string.toast_error_task_details_load);
+                    }
+
+                    @Override
+                    public void onNext(TaskHistory taskHistory) {
+                        mItems.add(taskHistory);
+                    }
+                })
         );
+    }
+
+    private Observable<TaskHistory> getTaskHistory() {
+        final Map<String, List<Date>> history = mTask.getHistory();
+        final Set<String> keys = history.keySet();
+        return mUserRepo.getUsersLocalAsync(mCurrentGroup)
+                .filter(new Func1<User, Boolean>() {
+                    @Override
+                    public Boolean call(User user) {
+                        return keys.contains(user.getObjectId());
+                    }
+                })
+                .flatMap(new Func1<User, Observable<TaskHistory>>() {
+                    @Override
+                    public Observable<TaskHistory> call(final User user) {
+                        return Observable.from(history.get(user.getObjectId()))
+                                .map(new Func1<Date, TaskHistory>() {
+                                    @Override
+                                    public TaskHistory call(Date date) {
+                                        return new TaskHistory(user, date);
+                                    }
+                                });
+                    }
+                });
     }
 
     private void updateToolbarHeader() {
@@ -245,50 +288,36 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskHistory,
         mTask.saveEventually();
 
         updateToolbarHeader();
-        mSubscriptions.add(mUserRepo.getUsersLocalAsync(mCurrentGroup).subscribe(new UserSubscriber()));
+        mSubscriptions.add(getTaskHistory()
+                .subscribe(new Subscriber<TaskHistory>() {
+                    @Override
+                    public void onStart() {
+                        super.onStart();
+                        mItems.clear();
+                    }
+
+                    @Override
+                    public void onCompleted() {
+                        Collections.sort(mItems, Collections.reverseOrder());
+                        mView.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        mView.showMessage(R.string.toast_error_task_details_load);
+                    }
+
+                    @Override
+                    public void onNext(TaskHistory taskHistory) {
+                        mItems.add(taskHistory);
+                    }
+                })
+        );
     }
 
     @SuppressLint("MissingSuperCall")
     @Override
     public void onNewGroupSet() {
         mView.finishScreen(RESULT_GROUP_CHANGED);
-    }
-
-    private class UserSubscriber extends Subscriber<User> {
-        private Set<String> mKeys;
-        private Map<String, List<Date>> mTaskHistory;
-
-        @Override
-        public void onStart() {
-            super.onStart();
-
-            mItems.clear();
-            mTaskHistory = mTask.getHistory();
-            mKeys = mTaskHistory.keySet();
-        }
-
-        @Override
-        public void onCompleted() {
-            Collections.sort(mItems, Collections.reverseOrder());
-            mView.notifyDataSetChanged();
-            mView.startPostponedEnterTransition();
-            setLoading(false);
-        }
-
-        @Override
-        public void onError(Throwable e) {
-            mView.showMessage(R.string.toast_error_task_details_load);
-        }
-
-        @Override
-        public void onNext(User user) {
-            final String userId = user.getObjectId();
-            if (mKeys.contains(userId)) {
-                List<Date> dates = mTaskHistory.get(userId);
-                for (Date date : dates) {
-                    mItems.add(new TaskHistory(user, date));
-                }
-            }
-        }
     }
 }

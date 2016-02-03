@@ -4,8 +4,6 @@
 
 package ch.giantific.qwittig.presentation.ui.fragments;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -24,7 +22,6 @@ import ch.giantific.qwittig.presentation.ui.adapters.CompensationsPaidRecyclerAd
 import ch.giantific.qwittig.presentation.viewmodels.FinanceCompsPaidViewModel;
 import ch.giantific.qwittig.presentation.workerfragments.query.CompensationsQueryMoreWorker;
 import ch.giantific.qwittig.presentation.workerfragments.query.CompensationsUpdateWorker;
-import ch.giantific.qwittig.utils.WorkerUtils;
 
 /**
  * Displays recent paid compensations in a {@link RecyclerView} list.
@@ -34,7 +31,6 @@ import ch.giantific.qwittig.utils.WorkerUtils;
 public class FinanceCompensationsPaidFragment extends BaseRecyclerViewOnlineFragment<FinanceCompsPaidViewModel, FinanceCompensationsPaidFragment.ActivityListener>
         implements FinanceCompsPaidViewModel.ViewListener {
 
-    private static final String LOG_TAG = FinanceCompensationsPaidFragment.class.getSimpleName();
     private FragmentFinanceCompensationsPaidBinding mBinding;
 
     public FinanceCompensationsPaidFragment() {
@@ -98,28 +94,12 @@ public class FinanceCompensationsPaidFragment extends BaseRecyclerViewOnlineFrag
 
     @Override
     public void loadUpdateCompensationsPaidWorker() {
-        final FragmentManager fragmentManager = getFragmentManager();
-        Fragment queryWorker = WorkerUtils.findWorker(fragmentManager, CompensationsUpdateWorker.WORKER_TAG);
-        if (queryWorker == null) {
-            queryWorker = CompensationsUpdateWorker.newInstance(true);
-
-            fragmentManager.beginTransaction()
-                    .add(queryWorker, CompensationsUpdateWorker.WORKER_TAG)
-                    .commit();
-        }
+        CompensationsUpdateWorker.attach(getFragmentManager(), true);
     }
 
     @Override
     public void loadQueryMoreCompensationsPaidWorker(int skip) {
-        final FragmentManager fragmentManager = getFragmentManager();
-        Fragment moreQueryWorker = WorkerUtils.findWorker(fragmentManager, CompensationsQueryMoreWorker.WORKER_TAG);
-        if (moreQueryWorker == null) {
-            moreQueryWorker = CompensationsQueryMoreWorker.newInstance(skip);
-
-            fragmentManager.beginTransaction()
-                    .add(moreQueryWorker, CompensationsQueryMoreWorker.WORKER_TAG)
-                    .commit();
-        }
+        CompensationsQueryMoreWorker.attach(getFragmentManager(), skip);
     }
 
 

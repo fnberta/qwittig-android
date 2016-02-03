@@ -342,11 +342,14 @@
     <string name="toast_error_users_load">Failed to load users</string>
     <string name="toast_error_comps_load">Failed to load compensations</string>
     <string name="toast_compensation_accepted">Payment accepted</string>
-    <string name="header_comps_pending">Pending</string>
-    <string name="header_comps_suggestions">Suggestions</string>
+    <string name="header_comps_credits">Credits</string>
+    <string name="header_comps_debts">Debts</string>
     <string name="comp_unpaid_button_claim">Claim</string>
     <string name="toast_error_purchases_load">Failed to load purchases</string>
     <string name="toast_error_drafts_load">Failed to load drafts</string>
     <string name="toast_error_receipt_load">Failed to load purchase receipt</string>
+    <string name="toast_store_empty">Please enter a store</string>
+    <string name="toast_error_exchange_rate">Failed to fetch exchange rate</string>
+    <string name="toast_error_comps_paid">Failed to confirm compensation</string>
 
 </resources>

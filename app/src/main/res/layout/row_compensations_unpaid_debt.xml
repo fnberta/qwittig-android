@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2016 Fabio Berta
+  ~ Copyright (c) 2015 Fabio Berta
   -->
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -25,7 +25,7 @@
         android:layout_marginEnd="@dimen/small_space"
         android:layout_marginStart="@dimen/small_space"
         android:layout_marginTop="@dimen/min_space"
-        card_view:cardBackgroundColor="@color/grey_300"
+        card_view:cardBackgroundColor="@color/red_light"
         card_view:cardCornerRadius="@dimen/card_corner_radius"
         card_view:cardElevation="@dimen/card_elevation"
         >
@@ -45,6 +45,11 @@
                 />
 
             <include
+                layout="@layout/include_card_top_progress"
+                app:viewModel="@{viewModel}"
+                />
+
+            <include
                 layout="@layout/include_compensation_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -53,17 +58,16 @@
                 />
 
             <Button
-                android:id="@+id/bt_comp_unpaid_claim"
+                android:id="@+id/bt_comp_unpaid_remind_paid"
                 style="?android:attr/borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/ll_header"
                 android:layout_toEndOf="@id/iv_avatar"
-                android:text="@string/comp_unpaid_button_claim"
+                android:text="@{@string/button_remind_paid(viewModel.compUsername)}"
                 android:textColor="?attr/colorAccent"
                 />
 
         </RelativeLayout>
     </android.support.v7.widget.CardView>
-
 </layout>

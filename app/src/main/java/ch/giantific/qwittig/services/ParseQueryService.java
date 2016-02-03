@@ -45,7 +45,6 @@ import ch.giantific.qwittig.domain.repositories.UserRepository;
 public class ParseQueryService extends IntentService {
 
     private static final String SERVICE_NAME = "ParseQueryService";
-    private static final String LOG_TAG = ParseQueryService.class.getSimpleName();
     private static final String ACTION_UNPIN_OBJECT = "ch.giantific.qwittig.services.action.UNPIN_OBJECT";
     private static final String ACTION_QUERY_OBJECT = "ch.giantific.qwittig.services.action.QUERY_OBJECT";
     private static final String ACTION_QUERY_USERS = "ch.giantific.qwittig.services.action.QUERY_USERS";

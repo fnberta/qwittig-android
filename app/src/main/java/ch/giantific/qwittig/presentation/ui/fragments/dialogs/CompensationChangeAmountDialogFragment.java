@@ -123,7 +123,7 @@ public class CompensationChangeAmountDialogFragment extends DialogFragment {
                     BigFraction amountNew = new BigFraction(amount.doubleValue());
                     if (amountNew.compareTo(BigFraction.ZERO) > 0) {
                         mTextInputLayoutAmount.setErrorEnabled(false);
-                        mListener.onChangedAmountSet(amountNew);
+                        mListener.onAmountConfirmed(amountNew);
                         dismiss();
                     } else {
                         mTextInputLayoutAmount.setError(getString(R.string.error_valid_amount));
@@ -142,6 +142,6 @@ public class CompensationChangeAmountDialogFragment extends DialogFragment {
          *
          * @param amount the new amount
          */
-        void onChangedAmountSet(@NonNull BigFraction amount);
+        void onAmountConfirmed(@NonNull BigFraction amount);
     }
 }

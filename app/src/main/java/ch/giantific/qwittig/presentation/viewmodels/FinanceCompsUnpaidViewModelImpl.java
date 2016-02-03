@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.presentation.viewmodels;
 
+import android.databinding.Bindable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,7 +16,10 @@ import org.apache.commons.math3.fraction.BigFraction;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.domain.models.CompensationUnpaidItem;
+import ch.giantific.qwittig.domain.models.CompensationUnpaidItem.Type;
 import ch.giantific.qwittig.domain.models.MessageAction;
 import ch.giantific.qwittig.domain.models.parse.Compensation;
 import ch.giantific.qwittig.domain.models.parse.Group;
@@ -23,6 +27,7 @@ import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Observable;
 import rx.Single;
 import rx.SingleSubscriber;
@@ -32,7 +37,7 @@ import rx.functions.Func1;
 /**
  * Created by fabio on 19.01.16.
  */
-public class FinanceCompsUnpaidViewModelImpl extends OnlineListViewModelBaseImpl<Compensation, FinanceCompsUnpaidViewModel.ViewListener>
+public class FinanceCompsUnpaidViewModelImpl extends OnlineListViewModelBaseImpl<CompensationUnpaidItem, FinanceCompsUnpaidViewModel.ViewListener>
         implements FinanceCompsUnpaidViewModel {
 
     private static final String STATE_COMPS_LOADING = "STATE_COMPS_LOADING";
@@ -50,6 +55,7 @@ public class FinanceCompsUnpaidViewModelImpl extends OnlineListViewModelBaseImpl
         mCompsRepo = compsRepo;
 
         if (savedState != null) {
+            mItems = new ArrayList<>();
             mLoadingComps = savedState.getStringArrayList(STATE_COMPS_LOADING);
             mCompChangeAmount = savedState.getString(STATE_COMP_CHANGE_AMOUNT);
         } else {
@@ -68,6 +74,14 @@ public class FinanceCompsUnpaidViewModelImpl extends OnlineListViewModelBaseImpl
     }
 
     @Override
+    @Bindable
+    public String getCurrentUserBalance() {
+        final BigFraction balance = mCurrentUser.getBalance(mCurrentGroup);
+        mView.setColorTheme(balance);
+        return MoneyUtils.formatMoney(balance, mCurrentGroup.getCurrency());
+    }
+
+    @Override
     public void updateList() {
         mSubscriptions.add(mGroupRepo.fetchGroupDataAsync(mCurrentGroup)
                 .toObservable()
@@ -78,27 +92,50 @@ public class FinanceCompsUnpaidViewModelImpl extends OnlineListViewModelBaseImpl
                     }
                 })
                 .subscribe(new Subscriber<Compensation>() {
+                    private String currentUserId = mCurrentUser.getObjectId();
+                    private List<Compensation> credits = new ArrayList<>();
+                    private List<Compensation> debts = new ArrayList<>();
+
                     @Override
                     public void onStart() {
                         super.onStart();
-
                         mItems.clear();
                     }
 
                     @Override
                     public void onCompleted() {
+                        if (!credits.isEmpty()) {
+                            mItems.add(CompensationUnpaidItem.createNewHeaderInstance(R.string.header_comps_credits));
+                            for (Compensation comp : credits) {
+                                mItems.add(CompensationUnpaidItem.createNewCreditInstance(comp));
+                            }
+                        }
+
+                        if (!debts.isEmpty()) {
+                            mItems.add(CompensationUnpaidItem.createNewHeaderInstance(R.string.header_comps_debts));
+                            for (Compensation comp : debts) {
+                                mItems.add(CompensationUnpaidItem.createNewDebtInstance(comp));
+                            }
+                        }
+
+                        notifyPropertyChanged(BR.currentUserBalance);
                         setLoading(false);
                         mView.notifyDataSetChanged();
                     }
 
                     @Override
                     public void onError(Throwable e) {
+                        setLoading(false);
                         mView.showMessage(R.string.toast_error_comps_load);
                     }
 
                     @Override
                     public void onNext(Compensation compensation) {
-                        mItems.add(compensation);
+                        if (compensation.getPayer().getObjectId().equals(currentUserId)) {
+                            debts.add(compensation);
+                        } else {
+                            credits.add(compensation);
+                        }
                         compensation.setIsLoading(mLoadingComps.contains(compensation.getObjectId()));
                     }
                 })
@@ -107,13 +144,7 @@ public class FinanceCompsUnpaidViewModelImpl extends OnlineListViewModelBaseImpl
 
     @Override
     public int getItemViewType(int position) {
-        final Compensation compensation = mItems.get(position);
-        final User beneficiary = compensation.getBeneficiary();
-        if (beneficiary.getObjectId().equals(mCurrentUser.getObjectId())) {
-            return TYPE_PENDING_POS;
-        }
-
-        return TYPE_PENDING_NEG;
+        return mItems.get(position).getType();
     }
 
     @Override
@@ -147,6 +178,8 @@ public class FinanceCompsUnpaidViewModelImpl extends OnlineListViewModelBaseImpl
                     @Override
                     public void onSuccess(List<Compensation> value) {
                         mView.removeWorker(workerTag);
+                        setRefreshing(false);
+
                         updateList();
                     }
 
@@ -154,6 +187,7 @@ public class FinanceCompsUnpaidViewModelImpl extends OnlineListViewModelBaseImpl
                     public void onError(Throwable error) {
                         mView.removeWorker(workerTag);
                         setRefreshing(false);
+
                         mView.showMessageWithAction(mCompsRepo.getErrorMessage(error),
                                 getRefreshAction());
                     }
@@ -163,22 +197,10 @@ public class FinanceCompsUnpaidViewModelImpl extends OnlineListViewModelBaseImpl
 
     @Override
     public void onConfirmButtonClick(int position) {
-        // TODO: show confirm amount dialog
-//        final Compensation comp = mItems.get(position);
-//        final BigFraction amount = comp.getAmountFraction();
-//        final String currency = mCurrentGroup.getCurrency();
-//        mView.showChangeCompensationAmountDialog(amount, currency);
-
-        final Compensation compensation = mItems.get(position);
-        // TODO: unpin and pin with new label
-        compensation.setPaid(true);
-        compensation.saveEventually();
-
-        mItems.remove(position);
-        mView.notifyItemRemoved(position);
-        mView.showMessage(R.string.toast_compensation_accepted);
-
-        // TODO: check in cloud whether amount was changed, if yes calculate new suggestions
+        final Compensation comp = mItems.get(position).getCompensation();
+        final BigFraction amount = comp.getAmountFraction();
+        final String currency = mCurrentGroup.getCurrency();
+        mView.showCompensationAmountConfirmDialog(amount, currency);
     }
 
     @Override
@@ -188,14 +210,14 @@ public class FinanceCompsUnpaidViewModelImpl extends OnlineListViewModelBaseImpl
             return;
         }
 
-        final Compensation compensation = mItems.get(position);
+        final Compensation compensation = mItems.get(position).getCompensation();
         final String compensationId = compensation.getObjectId();
         if (mLoadingComps.contains(compensationId)) {
             return;
         }
 
         setCompensationLoading(compensation, compensationId, position, true);
-        mView.loadCompensationRemindWorker(compensationId); // TODO: handle tags correctly, there could be multiple workers
+        mView.loadCompensationRemindWorker(compensationId);
     }
 
     private void setCompensationLoading(@NonNull Compensation compensation,
@@ -211,9 +233,9 @@ public class FinanceCompsUnpaidViewModelImpl extends OnlineListViewModelBaseImpl
     }
 
     @Override
-    public void setCompensationReminderStream(@NonNull Single<String> single,
-                                              @NonNull final String compensationId,
-                                              @NonNull final String workerTag) {
+    public void setCompensationRemindStream(@NonNull Single<String> single,
+                                            @NonNull final String compensationId,
+                                            @NonNull final String workerTag) {
         mSubscriptions.add(single.subscribe(new SingleSubscriber<String>() {
             @Override
             public void onSuccess(String value) {
@@ -235,11 +257,16 @@ public class FinanceCompsUnpaidViewModelImpl extends OnlineListViewModelBaseImpl
     }
 
     @Nullable
-    private Compensation stopCompensationLoading(@NonNull String objectId) {
+    private Compensation stopCompensationLoading(@NonNull String compId) {
         for (int i = 0, size = mItems.size(); i < size; i++) {
-            final Compensation compensation = mItems.get(i);
-            if (objectId.equals(compensation.getObjectId())) {
-                setCompensationLoading(compensation, objectId, i, false);
+            final CompensationUnpaidItem item = mItems.get(i);
+            if (item.getType() == Type.HEADER) {
+                continue;
+            }
+
+            final Compensation compensation = item.getCompensation();
+            if (compId.equals(compensation.getObjectId())) {
+                setCompensationLoading(compensation, compId, i, false);
                 return compensation;
             }
         }
@@ -248,17 +275,36 @@ public class FinanceCompsUnpaidViewModelImpl extends OnlineListViewModelBaseImpl
     }
 
     @Override
-    public void onChangedAmountSet(@NonNull BigFraction amount) {
-//        for (int i = 0, size = mItems.size(); i < size; i++) {
-//            final Compensation comp = mItems.get(i);
-//            if (comp.getObjectId().equals(mCompChangeAmount)) {
-//                comp.setAmountFraction(amount);
-//                comp.saveEventually();
-//
-//                mView.notifyItemChanged(i);
-//                return;
-//            }
-//        }
+    public void onAmountConfirmed(@NonNull BigFraction amount) {
+        for (int i = 0, size = mItems.size(); i < size; i++) {
+            final CompensationUnpaidItem item = mItems.get(i);
+            if (item.getType() != Type.CREDIT) {
+                continue;
+            }
+            final Compensation compensation = item.getCompensation();
+            if (!compensation.getObjectId().equals(mCompChangeAmount)) {
+                continue;
+            }
+
+            final int position = i;
+            compensation.setAmountFraction(amount);
+            mCompsRepo.saveCompensationPaid(compensation)
+                    .subscribe(new SingleSubscriber<Compensation>() {
+                        @Override
+                        public void onSuccess(Compensation compensation) {
+                            mItems.remove(position);
+                            mView.notifyItemRemoved(position);
+                            mView.showMessage(R.string.toast_compensation_accepted);
+                        }
+
+                        @Override
+                        public void onError(Throwable error) {
+                            mView.showMessage(R.string.toast_error_comps_paid);
+                        }
+                    });
+
+            return;
+        }
     }
 
     @Override

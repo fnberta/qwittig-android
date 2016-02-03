@@ -9,5 +9,7 @@ package ch.giantific.qwittig.presentation.ui.adapters;
  */
 public interface PurchaseAddEditItemUsersClickListener {
 
-    void onUserClick(int position);
+    void onTooFewUsersSelected();
+
+    void onRowItemUserClick(int position);
 }

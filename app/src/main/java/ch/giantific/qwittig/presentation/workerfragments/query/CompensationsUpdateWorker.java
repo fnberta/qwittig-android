@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.presentation.workerfragments.query;
 
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -22,20 +23,32 @@ import rx.Observable;
  */
 public class CompensationsUpdateWorker extends BaseQueryWorker<Compensation, CompensationsUpdateListener> {
 
-    public static final String WORKER_TAG = "TASK_QUERY_WORKER";
-    private static final String LOG_TAG = CompensationsUpdateWorker.class.getSimpleName();
+    private static final String WORKER_TAG = CompensationsUpdateWorker.class.getCanonicalName();
     private static final String KEY_QUERY_PAID = "QUERY_PAID";
     @Inject
     CompensationRepository mCompsRepo;
     private boolean mQueryPaid;
 
     /**
-     * Returns a new instance of {@link CompensationsUpdateWorker} with an argument whether to
+     * Attaches a new instance of {@link CompensationsUpdateWorker} with an argument whether to
      * query for paid or unpaid compensations.
      *
+     * @param fm        the fragment manager to use for the transaction
      * @param queryPaid whether to query paid compensations
      * @return a new instance of {@link CompensationsUpdateWorker}
      */
+    public static CompensationsUpdateWorker attach(@NonNull FragmentManager fm, boolean queryPaid) {
+        CompensationsUpdateWorker worker = (CompensationsUpdateWorker) fm.findFragmentByTag(WORKER_TAG);
+        if (worker == null) {
+            worker = CompensationsUpdateWorker.newInstance(queryPaid);
+            fm.beginTransaction()
+                    .add(worker, WORKER_TAG)
+                    .commit();
+        }
+
+        return worker;
+    }
+
     @NonNull
     public static CompensationsUpdateWorker newInstance(boolean queryPaid) {
         CompensationsUpdateWorker fragment = new CompensationsUpdateWorker();

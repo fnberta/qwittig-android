@@ -20,7 +20,7 @@ public interface CompensationReminderListener extends BaseWorkerListener {
      * @param single    the object id of the compensation to be paid
      * @param workerTag the tag of the worker fragment
      */
-    void setCompensationReminderStream(@NonNull Single<String> single,
-                                       @NonNull String compensationId,
-                                       @NonNull String workerTag);
+    void setCompensationRemindStream(@NonNull Single<String> single,
+                                     @NonNull String compensationId,
+                                     @NonNull String workerTag);
 }

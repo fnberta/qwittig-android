@@ -86,7 +86,6 @@ public class StatsActivity extends BaseNavDrawerActivity implements
 
     @Override
     protected void injectNavDrawerDependencies(@NonNull NavDrawerComponent navComp) {
-
     }
 
     private void setupTypeSpinner() {

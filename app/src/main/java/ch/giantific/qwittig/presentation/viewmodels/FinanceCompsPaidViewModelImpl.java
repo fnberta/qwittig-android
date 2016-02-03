@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
@@ -41,6 +42,7 @@ public class FinanceCompsPaidViewModelImpl extends OnlineListViewModelBaseImpl<C
 
         mCompsRepo = compsRepo;
         if (savedState != null) {
+            mItems = new ArrayList<>();
             mIsLoadingMore = savedState.getBoolean(STATE_IS_LOADING_MORE, false);
         }
     }
@@ -81,6 +83,7 @@ public class FinanceCompsPaidViewModelImpl extends OnlineListViewModelBaseImpl<C
 
                     @Override
                     public void onError(Throwable e) {
+                        setLoading(false);
                         mView.showMessage(R.string.toast_error_comps_load);
                     }
 
@@ -179,6 +182,8 @@ public class FinanceCompsPaidViewModelImpl extends OnlineListViewModelBaseImpl<C
                     @Override
                     public void onSuccess(List<Compensation> compensations) {
                         mView.removeWorker(workerTag);
+                        setRefreshing(false);
+
                         updateList();
                     }
 
@@ -186,6 +191,7 @@ public class FinanceCompsPaidViewModelImpl extends OnlineListViewModelBaseImpl<C
                     public void onError(Throwable error) {
                         mView.removeWorker(workerTag);
                         setRefreshing(false);
+
                         mView.showMessageWithAction(mCompsRepo.getErrorMessage(error),
                                 getRefreshAction());
                     }

@@ -14,7 +14,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -87,15 +86,16 @@ public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, Task
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final String editTaskId = getArguments().getString(KEY_EDIT_TASK_ID, "");
-        if (TextUtils.isEmpty(editTaskId)) {
-            DaggerTaskAddComponent.builder()
-                    .taskAddViewModelModule(new TaskAddViewModelModule(savedInstanceState))
+        final Bundle args = getArguments();
+        if (args != null) {
+            final String editTaskId = args.getString(KEY_EDIT_TASK_ID, "");
+            DaggerTaskEditComponent.builder()
+                    .taskEditViewModelModule(new TaskEditViewModelModule(savedInstanceState, editTaskId))
                     .build()
                     .inject(this);
         } else {
-            DaggerTaskEditComponent.builder()
-                    .taskEditViewModelModule(new TaskEditViewModelModule(savedInstanceState, editTaskId))
+            DaggerTaskAddComponent.builder()
+                    .taskAddViewModelModule(new TaskAddViewModelModule(savedInstanceState))
                     .build()
                     .inject(this);
         }

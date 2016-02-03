@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentHomeDraftsBinding;
 import ch.giantific.qwittig.di.components.DaggerHomeComponent;
@@ -55,6 +56,7 @@ public class HomeDraftsFragment extends BaseRecyclerViewFragment<HomeDraftsViewM
         super.onCreate(savedInstanceState);
 
         DaggerHomeComponent.builder()
+                .applicationComponent(Qwittig.getAppComponent(getActivity()))
                 .homeViewModelModule(new HomeViewModelModule(savedInstanceState))
                 .build()
                 .inject(this);
@@ -81,16 +83,16 @@ public class HomeDraftsFragment extends BaseRecyclerViewFragment<HomeDraftsViewM
 
         if (requestCode == HomeActivity.INTENT_REQUEST_PURCHASE_MODIFY) {
             switch (resultCode) {
-                case PurchaseAddEditViewModel.RESULT_PURCHASE_SAVED:
+                case PurchaseAddEditViewModel.PurchaseResult.PURCHASE_SAVED:
                     showMessage(R.string.toast_purchase_added);
                     break;
-                case PurchaseAddEditViewModel.RESULT_PURCHASE_DISCARDED:
+                case PurchaseAddEditViewModel.PurchaseResult.PURCHASE_DISCARDED:
                     showMessage(R.string.toast_changes_discarded);
                     break;
-                case PurchaseAddEditViewModel.RESULT_PURCHASE_DRAFT:
+                case PurchaseAddEditViewModel.PurchaseResult.PURCHASE_DRAFT:
                     showMessage(R.string.toast_changes_saved_as_draft);
                     break;
-                case PurchaseAddEditViewModel.RESULT_PURCHASE_DRAFT_DELETED:
+                case PurchaseAddEditViewModel.PurchaseResult.PURCHASE_DRAFT_DELETED:
                     showMessage(R.string.toast_draft_deleted);
                     break;
             }

@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.utils.MoneyUtils;
 
 /**
  * Provides a dialog that allows the user to manually edit the currency exchange rate of a purchase.
@@ -88,7 +89,7 @@ public class ManualExchangeRateDialogFragment extends DialogFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         String exchangeRate = mTextInputLayoutExchangeRate.getEditText().getText().toString().trim();
                         if (!TextUtils.isEmpty(exchangeRate)) {
-                            mListener.onExchangeRateSet(Float.parseFloat(exchangeRate));
+                            mListener.onExchangeRateManuallySet(MoneyUtils.parsePrice(exchangeRate).floatValue());
                         }
                     }
                 })
@@ -106,6 +107,6 @@ public class ManualExchangeRateDialogFragment extends DialogFragment {
          *
          * @param exchangeRate the newly set currency exchange rate
          */
-        void onExchangeRateSet(float exchangeRate);
+        void onExchangeRateManuallySet(float exchangeRate);
     }
 }

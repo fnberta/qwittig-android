@@ -96,7 +96,7 @@ public class PurchaseDetailsItem extends BaseObservable
                 break;
             case Type.TOTAL:
                 mPurchaseTotal = value;
-                mPurchaseTotalForeign = value;
+                mPurchaseTotalForeign = foreignValue;
                 break;
         }
     }

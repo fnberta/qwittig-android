@@ -21,7 +21,6 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
 import ch.giantific.qwittig.databinding.RowPurchaseAddAddRowBinding;
 import ch.giantific.qwittig.databinding.RowPurchaseAddDateBinding;
-import ch.giantific.qwittig.databinding.RowPurchaseAddExchangeRateBinding;
 import ch.giantific.qwittig.databinding.RowPurchaseAddItemBinding;
 import ch.giantific.qwittig.databinding.RowPurchaseAddItemUsersBinding;
 import ch.giantific.qwittig.databinding.RowPurchaseAddStoreBinding;
@@ -32,7 +31,6 @@ import ch.giantific.qwittig.domain.models.RowItem;
 import ch.giantific.qwittig.domain.models.RowItemUser;
 import ch.giantific.qwittig.presentation.ui.adapters.rows.BindingRow;
 import ch.giantific.qwittig.presentation.viewmodels.PurchaseAddEditViewModel;
-import ch.giantific.qwittig.utils.parse.ParseUtils;
 
 /**
  * Created by fabio on 24.01.16.
@@ -82,12 +80,7 @@ public class PurchaseAddEditRecyclerAdapter extends RecyclerView.Adapter {
             case Type.TOTAL: {
                 final RowPurchaseAddTotalBinding binding =
                         RowPurchaseAddTotalBinding.inflate(inflater, parent, false);
-                return new TotalRow(context, binding);
-            }
-            case Type.EXCHANGE_RATE: {
-                final RowPurchaseAddExchangeRateBinding binding =
-                        RowPurchaseAddExchangeRateBinding.inflate(inflater, parent, false);
-                return new BindingRow<>(binding);
+                return new TotalRow(context, binding, mViewModel);
             }
             default:
                 throw new RuntimeException("there is no type that matches the type " + viewType +
@@ -149,15 +142,6 @@ public class PurchaseAddEditRecyclerAdapter extends RecyclerView.Adapter {
             case Type.TOTAL: {
                 final TotalRow row = (TotalRow) holder;
                 final RowPurchaseAddTotalBinding binding = row.getBinding();
-                binding.setViewModel(mViewModel);
-
-                binding.executePendingBindings();
-                break;
-            }
-            case Type.EXCHANGE_RATE: {
-                final BindingRow<RowPurchaseAddExchangeRateBinding> row =
-                        (BindingRow<RowPurchaseAddExchangeRateBinding>) holder;
-                final RowPurchaseAddExchangeRateBinding binding = row.getBinding();
                 binding.setViewModel(mViewModel);
 
                 binding.executePendingBindings();
@@ -238,11 +222,12 @@ public class PurchaseAddEditRecyclerAdapter extends RecyclerView.Adapter {
 
     public static class TotalRow extends BindingRow<RowPurchaseAddTotalBinding> {
 
-        public TotalRow(@NonNull Context context, @NonNull RowPurchaseAddTotalBinding binding) {
+        public TotalRow(@NonNull Context context, @NonNull RowPurchaseAddTotalBinding binding,
+                        @NonNull PurchaseAddEditViewModel viewModel) {
             super(binding);
 
             final ArrayAdapter<String> adapter = new ArrayAdapter<>(context,
-                    R.layout.spinner_item_title, ParseUtils.getSupportedCurrencyCodes());
+                    R.layout.spinner_item_title, viewModel.getSupportedCurrencies());
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             binding.spCurrency.setAdapter(adapter);
         }

@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.presentation.workerfragments.query;
 
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -22,13 +23,24 @@ import rx.Observable;
  */
 public class PurchasesUpdateWorker extends BaseQueryWorker<Purchase, PurchasesUpdateListener> {
 
-    public static final String WORKER_TAG = "PURCHASE_UPDATE_WORKER";
-    private static final String LOG_TAG = PurchasesUpdateWorker.class.getSimpleName();
+    private static final String WORKER_TAG = PurchasesUpdateWorker.class.getCanonicalName();
     @Inject
     PurchaseRepository mPurchaseRepo;
 
     public PurchasesUpdateWorker() {
         // required empty constructor
+    }
+
+    public static PurchasesUpdateWorker attach(@NonNull FragmentManager fm) {
+        PurchasesUpdateWorker worker = (PurchasesUpdateWorker) fm.findFragmentByTag(WORKER_TAG);
+        if (worker == null) {
+            worker = new PurchasesUpdateWorker();
+            fm.beginTransaction()
+                    .add(worker, WORKER_TAG)
+                    .commit();
+        }
+
+        return worker;
     }
 
     @Override

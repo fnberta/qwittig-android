@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.presentation.workerfragments.group;
 
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
@@ -20,7 +21,6 @@ import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.models.stats.Stats;
 import ch.giantific.qwittig.domain.repositories.ApiRepository;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.workerfragments.BaseWorker;
 import rx.Observable;
 
@@ -34,7 +34,7 @@ import rx.Observable;
  */
 public class StatsCalcWorker extends BaseWorker<Stats, StatsCalcListener> {
 
-    public static final String WORKER_TAG = "STATS_CALC_WORKER";
+    private static final String WORKER_TAG = StatsCalcWorker.class.getCanonicalName();
     private static final String KEY_STATS_TYPE = "STATS_TYPE";
     private static final String KEY_YEAR = "YEAR";
     private static final String KEY_MONTH = "MONTH";
@@ -44,6 +44,29 @@ public class StatsCalcWorker extends BaseWorker<Stats, StatsCalcListener> {
 
     public StatsCalcWorker() {
         // empty default constructor
+    }
+
+    /**
+     * Attaches a new instance of {@link StatsCalcWorker}.
+     *
+     * @param fm        the fragment manger to use for the transaction
+     * @param statsType the type of statistic to calculate
+     * @param year      the year to calculate statistics for
+     * @param month     the month to calculate statistics for (1-12), if 0 statistics for whole year
+     *                  will be calculated
+     * @return a new instance of {@link StatsCalcWorker}
+     */
+    public static StatsCalcWorker attach(@NonNull FragmentManager fm, @StatsType int statsType,
+                                         @NonNull String year, int month) {
+        StatsCalcWorker worker = (StatsCalcWorker) fm.findFragmentByTag(WORKER_TAG);
+        if (worker == null) {
+            worker = StatsCalcWorker.newInstance(statsType, year, month);
+            fm.beginTransaction()
+                    .add(worker, WORKER_TAG)
+                    .commit();
+        }
+
+        return worker;
     }
 
     /**

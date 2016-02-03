@@ -7,6 +7,7 @@ package ch.giantific.qwittig.presentation.ui.fragments;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.di.components.DaggerPurchaseReceiptIdComponent;
 import ch.giantific.qwittig.di.modules.PurchaseReceiptIdViewModelModule;
 import ch.giantific.qwittig.presentation.viewmodels.PurchaseReceiptViewModel;
@@ -47,6 +48,7 @@ public class PurchaseReceiptDetailFragment extends PurchaseReceiptBaseFragment<P
 
         final String purchaseId = getArguments().getString(KEY_PURCHASE_ID, "");
         DaggerPurchaseReceiptIdComponent.builder()
+                .applicationComponent(Qwittig.getAppComponent(getActivity()))
                 .purchaseReceiptIdViewModelModule(new PurchaseReceiptIdViewModelModule(savedInstanceState, purchaseId, false))
                 .build()
                 .inject(this);

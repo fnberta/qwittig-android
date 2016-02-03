@@ -20,6 +20,7 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:layout_marginEnd="@dimen/normal_space"
         android:gravity="center"
         android:orientation="vertical"
         >
@@ -29,13 +30,10 @@
             android:layout_width="@dimen/avatar_size"
             android:layout_height="@dimen/avatar_size"
             android:layout_marginBottom="@dimen/min_space"
-            android:layout_marginEnd="@dimen/key_line_1"
-            android:layout_marginStart="@dimen/key_line_1"
             android:alpha="@{rowItemUser.alpha}"
             android:contentDescription="@string/user_avatar"
             app:avatar="@{rowItemUser.avatar}"
             app:fallback="@{@drawable/ic_account_circle_black_40dp}"
-            app:withRipple="@{false}"
             tools:src="@drawable/ic_account_circle_black_40dp"
             />
 

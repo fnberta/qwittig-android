@@ -26,12 +26,12 @@ import ch.giantific.qwittig.domain.models.parse.Group;
  * <p/>
  * Subclass of {@link ArrayAdapter}.
  */
-public class NavHeaderGroupsArrayAdapter extends ArrayAdapter<ParseObject> {
+public class NavHeaderGroupsArrayAdapter extends ArrayAdapter<Group> {
 
     private static final String LOG_TAG = NavHeaderGroupsArrayAdapter.class.getSimpleName();
     private static final int VIEW_RESOURCE = R.layout.spinner_item_nav;
     private static final int VIEW_RESOURCE_DROPDOWN = android.R.layout.simple_spinner_dropdown_item;
-    private List<ParseObject> mGroups;
+    private List<Group> mGroups;
 
     /**
      * Constructs a new {@link NavHeaderGroupsArrayAdapter}.
@@ -40,7 +40,7 @@ public class NavHeaderGroupsArrayAdapter extends ArrayAdapter<ParseObject> {
      * @param groups  the groups to display
      */
     public NavHeaderGroupsArrayAdapter(@NonNull Context context,
-                                       @NonNull List<ParseObject> groups) {
+                                       @NonNull List<Group> groups) {
         super(context, VIEW_RESOURCE, groups);
 
         mGroups = groups;
@@ -72,7 +72,7 @@ public class NavHeaderGroupsArrayAdapter extends ArrayAdapter<ParseObject> {
             groupRow = (GroupRow) convertView.getTag();
         }
 
-        Group group = (Group) mGroups.get(position);
+        final Group group = mGroups.get(position);
         groupRow.setGroup(group.getName());
 
         return convertView;

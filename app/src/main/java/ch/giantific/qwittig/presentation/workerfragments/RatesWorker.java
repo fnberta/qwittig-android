@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.presentation.workerfragments;
 
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,7 +14,7 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.data.rest.ExchangeRates;
 import ch.giantific.qwittig.di.components.WorkerComponent;
-import ch.giantific.qwittig.domain.models.rates.CurrencyRates;
+import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import rx.Observable;
 
 /**
@@ -21,29 +22,45 @@ import rx.Observable;
  * <p/>
  * Subclass of {@link BaseWorker}.
  */
-public class RatesWorker extends BaseWorker<CurrencyRates, RatesWorkerListener> {
+public class RatesWorker extends BaseWorker<Float, RatesWorkerListener> {
 
-    public static final String WORKER_TAG = "RATES_WORKER";
-    private static final String LOG_TAG = RatesWorker.class.getSimpleName();
-    private static final String BUNDLE_BASE_CURRENCY = "BUNDLE_BASE_CURRENCY";
+    private static final String WORKER_TAG = RatesWorker.class.getCanonicalName();
+    private static final String KEY_BASE_CURRENCY = "BASE_CURRENCY";
+    private static final String KEY_CURRENCY = "CURRENCY";
     @Inject
-    ExchangeRates mExchangeRates;
+    PurchaseRepository mPurchaseRepo;
 
     public RatesWorker() {
         // empty default constructor
     }
 
     /**
-     * Returns a new instance of {@link RatesWorker} with a base currency code as an argument.
+     * Attaches a new instance of {@link RatesWorker} with a base currency code as an argument.
      *
+     * @param fm           the fragment manager to use for the transaction
      * @param baseCurrency the currency to use as a base for the foreign currencies
      * @return a new instance of {@link RatesWorker}
      */
+    public static RatesWorker attach(@NonNull FragmentManager fm, @NonNull String baseCurrency,
+                                     @NonNull String currency) {
+        RatesWorker worker = (RatesWorker) fm.findFragmentByTag(WORKER_TAG);
+        if (worker == null) {
+            worker = RatesWorker.newInstance(baseCurrency, currency);
+            fm.beginTransaction()
+                    .add(worker, WORKER_TAG)
+                    .commit();
+        }
+
+        return worker;
+    }
+
     @NonNull
-    public static RatesWorker newInstance(@NonNull String baseCurrency) {
+    private static RatesWorker newInstance(@NonNull String baseCurrency,
+                                           @NonNull String currency) {
         RatesWorker fragment = new RatesWorker();
         Bundle args = new Bundle();
-        args.putString(BUNDLE_BASE_CURRENCY, baseCurrency);
+        args.putString(KEY_BASE_CURRENCY, baseCurrency);
+        args.putString(KEY_CURRENCY, currency);
         fragment.setArguments(args);
         return fragment;
     }
@@ -55,10 +72,11 @@ public class RatesWorker extends BaseWorker<CurrencyRates, RatesWorkerListener> 
 
     @Nullable
     @Override
-    protected Observable<CurrencyRates> getObservable(@NonNull Bundle args) {
-        final String baseCurrency = args.getString(BUNDLE_BASE_CURRENCY, "");
-        if (!TextUtils.isEmpty(baseCurrency)) {
-            return mExchangeRates.getRates(baseCurrency);
+    protected Observable<Float> getObservable(@NonNull Bundle args) {
+        final String baseCurrency = args.getString(KEY_BASE_CURRENCY, "");
+        final String currency = args.getString(KEY_CURRENCY, "");
+        if (!TextUtils.isEmpty(baseCurrency) && !TextUtils.isEmpty(currency)) {
+            return mPurchaseRepo.getExchangeRate(baseCurrency, currency).toObservable();
         }
 
         return null;
@@ -70,7 +88,7 @@ public class RatesWorker extends BaseWorker<CurrencyRates, RatesWorkerListener> 
     }
 
     @Override
-    protected void setStream(@NonNull Observable<CurrencyRates> observable) {
-        mActivity.setRatesFetchStream(observable, WORKER_TAG);
+    protected void setStream(@NonNull Observable<Float> observable) {
+        mActivity.setRateFetchStream(observable.toSingle(), WORKER_TAG);
     }
 }

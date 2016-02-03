@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentPurchaseDetailsBinding;
 import ch.giantific.qwittig.di.components.DaggerPurchaseDetailsComponent;
@@ -80,6 +81,7 @@ public class PurchaseDetailsFragment extends BaseRecyclerViewFragment<PurchaseDe
 
         final String purchaseId = getArguments().getString(INTENT_PURCHASE_ID, "");
         DaggerPurchaseDetailsComponent.builder()
+                .applicationComponent(Qwittig.getAppComponent(getActivity()))
                 .purchaseDetailsViewModelModule(new PurchaseDetailsViewModelModule(savedInstanceState, purchaseId))
                 .build()
                 .inject(this);
@@ -122,6 +124,7 @@ public class PurchaseDetailsFragment extends BaseRecyclerViewFragment<PurchaseDe
                 return true;
             case R.id.action_purchase_show_exchange_rate:
                 mViewModel.onShowExchangeRateClick();
+                return true;
             case R.id.action_purchase_show_receipt:
                 mViewModel.onShowReceiptImageClick();
                 return true;
@@ -137,10 +140,10 @@ public class PurchaseDetailsFragment extends BaseRecyclerViewFragment<PurchaseDe
 
         if (requestCode == BaseActivity.INTENT_REQUEST_PURCHASE_MODIFY) {
             switch (resultCode) {
-                case PurchaseAddEditViewModel.RESULT_PURCHASE_SAVED:
+                case PurchaseAddEditViewModel.PurchaseResult.PURCHASE_SAVED:
                     showMessage(R.string.toast_changes_saved);
                     break;
-                case PurchaseAddEditViewModel.RESULT_PURCHASE_DISCARDED:
+                case PurchaseAddEditViewModel.PurchaseResult.PURCHASE_DISCARDED:
                     showMessage(R.string.toast_changes_discarded);
                     break;
             }

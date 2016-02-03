@@ -21,12 +21,12 @@ import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
 import ch.giantific.qwittig.domain.models.PurchaseAddEditItem;
 import ch.giantific.qwittig.domain.models.RowItem;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.presentation.ui.adapters.PurchaseAddEditItemUsersClickListener;
 import ch.giantific.qwittig.presentation.ui.adapters.PurchaseAddEditRecyclerAdapter;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.ManualExchangeRateDialogFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.PurchaseNoteAddEditDialogFragment;
 import ch.giantific.qwittig.presentation.viewmodels.rows.PurchaseAddEditDateRowViewModel;
-import ch.giantific.qwittig.presentation.viewmodels.rows.PurchaseAddEditExchangeRateRowViewModel;
 import ch.giantific.qwittig.presentation.viewmodels.rows.PurchaseAddEditStoreRowViewModel;
 import ch.giantific.qwittig.presentation.viewmodels.rows.PurchaseAddEditTotalRowViewModel;
 import ch.giantific.qwittig.presentation.workerfragments.OcrWorkerListener;
@@ -40,19 +40,10 @@ import rx.Single;
 public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditItem, PurchaseAddEditViewModel.ViewListener>,
         PurchaseAddEditRecyclerAdapter.AdapterListener, RowItem.PriceChangedListener,
         PurchaseAddEditDateRowViewModel, PurchaseAddEditStoreRowViewModel, PurchaseAddEditTotalRowViewModel,
-        PurchaseAddEditExchangeRateRowViewModel, PurchaseNoteAddEditDialogFragment.DialogInteractionListener,
+        PurchaseAddEditItemUsersClickListener, PurchaseNoteAddEditDialogFragment.DialogInteractionListener,
         DiscardChangesDialogFragment.DialogInteractionListener, OcrWorkerListener,
         ManualExchangeRateDialogFragment.DialogInteractionListener, RatesWorkerListener, PurchaseSaveWorkerListener,
         ProgressFinalAnimationListener {
-
-    int RESULT_PURCHASE_SAVED = 2;
-    int RESULT_PURCHASE_SAVED_AUTO = 3;
-    int RESULT_PURCHASE_DRAFT = 4;
-    int RESULT_PURCHASE_ERROR = 5;
-    int RESULT_PURCHASE_DISCARDED = 6;
-    int RESULT_PURCHASE_DRAFT_DELETED = 7;
-
-    boolean isSaving();
 
     void onDateSet(@NonNull Date date);
 
@@ -63,10 +54,6 @@ public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditI
      */
     void onReceiptImagePathSet(@NonNull String receiptImagePath);
 
-    void onReceiptImageTaken();
-
-    void onReceiptImageFailed();
-
     /**
      * Sets the receipt image paths, only used when custom camera is enabled
      *
@@ -75,8 +62,6 @@ public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditI
     void onReceiptImagesTaken(@NonNull List<String> receiptImagePaths);
 
     void onItemDismissed(int position);
-
-    void onTooFewUsersSelected();
 
     /**
      * Launches the camera that allows the user to add a receipt image to the purchase.
@@ -113,18 +98,28 @@ public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditI
      */
     void onSavePurchaseAsDraftClick();
 
-    @IntDef({RESULT_PURCHASE_SAVED, RESULT_PURCHASE_SAVED_AUTO, RESULT_PURCHASE_DRAFT, RESULT_PURCHASE_ERROR,
-            RESULT_PURCHASE_DISCARDED, RESULT_PURCHASE_DRAFT_DELETED, Activity.RESULT_CANCELED})
+    List<String> getSupportedCurrencies();
+
+    @IntDef({PurchaseResult.PURCHASE_SAVED, PurchaseResult.PURCHASE_SAVED_AUTO,
+            PurchaseResult.PURCHASE_DRAFT, PurchaseResult.PURCHASE_ERROR,
+            PurchaseResult.PURCHASE_DISCARDED, PurchaseResult.PURCHASE_DRAFT_DELETED,
+            Activity.RESULT_CANCELED})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface PurchaseResults {
+    @interface PurchaseResult {
+        int PURCHASE_SAVED = 2;
+        int PURCHASE_SAVED_AUTO = 3;
+        int PURCHASE_DRAFT = 4;
+        int PURCHASE_ERROR = 5;
+        int PURCHASE_DISCARDED = 6;
+        int PURCHASE_DRAFT_DELETED = 7;
     }
 
     interface ViewListener extends ListViewModel.ViewListener {
         Single<byte[]> getReceiptImage(@NonNull String imagePath);
 
-        void loadFetchExchangeRatesWorker(@NonNull String baseCurrency);
+        void loadFetchExchangeRatesWorker(@NonNull String baseCurrency, @NonNull String currency);
 
-        void loadOcrWorker(@NonNull String receiptImagePath);
+        void loadOcrWorker();
 
         void loadSavePurchaseWorker(@NonNull Purchase purchase, @Nullable byte[] receiptImage);
 
@@ -144,10 +139,9 @@ public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditI
 
         void toggleNoteMenuOption(boolean show);
 
-        void showReceiptImage(@NonNull String receiptImagePath);
+        void showReceiptImage();
 
-        void showReceiptImage(@NonNull String receiptImagePath, @NonNull String objectId,
-                              boolean isDraft);
+        void showReceiptImage(@NonNull String objectId, boolean isDraft);
 
         void showNote(@NonNull String note);
 
@@ -162,7 +156,7 @@ public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditI
          */
         void captureImage(boolean useCustomCamera);
 
-        void reloadOptionsMenu();
+        void showOptionsMenu();
 
         void finishScreen(int purchaseResult);
 

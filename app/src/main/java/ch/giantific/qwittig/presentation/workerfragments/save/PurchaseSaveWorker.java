@@ -5,6 +5,7 @@
 package ch.giantific.qwittig.presentation.workerfragments.save;
 
 import android.annotation.SuppressLint;
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -27,7 +28,7 @@ import rx.Observable;
  */
 public class PurchaseSaveWorker extends BaseWorker<Purchase, PurchaseSaveWorkerListener> {
 
-    public static final String WORKER_TAG = "PURCHASE_SAVE_WORKER";
+    static final String WORKER_TAG = PurchaseSaveWorker.class.getCanonicalName();
     @Inject
     PurchaseRepository mPurchaseRepo;
     Purchase mPurchase;
@@ -49,9 +50,31 @@ public class PurchaseSaveWorker extends BaseWorker<Purchase, PurchaseSaveWorkerL
      * @param receiptImage the receipt image to attach to the purchase
      */
     @SuppressLint("ValidFragment")
-    public PurchaseSaveWorker(@NonNull Purchase purchase, @Nullable byte[] receiptImage) {
+    PurchaseSaveWorker(@NonNull Purchase purchase, @Nullable byte[] receiptImage) {
         mPurchase = purchase;
         mReceiptImage = receiptImage;
+    }
+
+    /**
+     * Attaches a new instance of a {@link PurchaseSaveWorker}.
+     *
+     * @param fm           the fragment manager to use for the transaction
+     * @param purchase     the {@link Purchase} object to save
+     * @param receiptImage the receipt image to attach to the purchase
+     * @return a new instance of a {@link PurchaseSaveWorker}
+     */
+    public static PurchaseSaveWorker attach(@NonNull FragmentManager fm,
+                                            @NonNull Purchase purchase,
+                                            @Nullable byte[] receiptImage) {
+        PurchaseSaveWorker worker = (PurchaseSaveWorker) fm.findFragmentByTag(WORKER_TAG);
+        if (worker == null) {
+            worker = new PurchaseSaveWorker(purchase, receiptImage);
+            fm.beginTransaction()
+                    .add(worker, WORKER_TAG)
+                    .commit();
+        }
+
+        return worker;
     }
 
     @Override

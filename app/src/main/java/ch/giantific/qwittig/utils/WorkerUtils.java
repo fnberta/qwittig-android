@@ -24,7 +24,7 @@ public class WorkerUtils {
      * @param tag             the tag to find the fragment
      */
     public static void removeWorker(@NonNull FragmentManager fragmentManager, @NonNull String tag) {
-        Fragment fragment = findWorker(fragmentManager, tag);
+        final Fragment fragment = findWorker(fragmentManager, tag);
 
         if (fragment != null) {
             fragmentManager.beginTransaction().remove(fragment).commitAllowingStateLoss();

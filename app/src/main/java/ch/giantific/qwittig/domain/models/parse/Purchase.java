@@ -47,15 +47,10 @@ public class Purchase extends ParseObject {
     public static final String NOTE = "note";
     public static final String DRAFT_ID = "draftId";
     public static final String PIN_LABEL = "purchasesPinLabel";
+    public static final String PIN_LABEL_DRAFT = "purchaseDraftsPinLabel";
 
     public Purchase() {
         // A default constructor is required.
-    }
-
-    public Purchase(@NonNull ParseUser currentUser, @NonNull Group group, @NonNull Date date,
-                    @NonNull String store, @NonNull List<Item> items, double totalPrice,
-                    @NonNull List<User> usersInvolved, @NonNull String currency) {
-        this(currentUser, group, date, store, items, totalPrice, usersInvolved, currency, 1);
     }
 
     public Purchase(@NonNull ParseUser currentUser, @NonNull Group group, @NonNull Date date,

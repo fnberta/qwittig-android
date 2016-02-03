@@ -7,7 +7,7 @@ package ch.giantific.qwittig.data.rest;
 import ch.giantific.qwittig.domain.models.rates.CurrencyRates;
 import retrofit.http.GET;
 import retrofit.http.Query;
-import rx.Observable;
+import rx.Single;
 
 /**
  * Defines the call to the server to fetch the currency rates.
@@ -19,5 +19,5 @@ public interface ExchangeRates {
      * @param baseCurrency the base currency to base the rates on
      */
     @GET("/latest")
-    Observable<CurrencyRates> getRates(@Query("base") String baseCurrency);
+    Single<CurrencyRates> getRates(@Query("base") String baseCurrency);
 }

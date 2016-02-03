@@ -4,7 +4,6 @@
 
 package ch.giantific.qwittig.di.modules;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,7 +14,6 @@ import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.viewmodels.PurchaseAddEditViewModel;
 import ch.giantific.qwittig.presentation.viewmodels.PurchaseAddEditViewModelAddAutoImpl;
-import ch.giantific.qwittig.presentation.viewmodels.PurchaseAddEditViewModelAddImpl;
 import dagger.Module;
 import dagger.Provides;
 
@@ -33,9 +31,8 @@ public class PurchaseAddAutoViewModelModule extends BaseViewModelModule {
     @Provides
     PurchaseAddEditViewModel providesPurchaseAddAutoViewModel(@NonNull GroupRepository groupRepository,
                                                               @NonNull UserRepository userRepository,
-                                                              @NonNull SharedPreferences sharedPreferences,
                                                               @NonNull PurchaseRepository purchaseRepository) {
         return new PurchaseAddEditViewModelAddAutoImpl(mSavedState, groupRepository,
-                userRepository, sharedPreferences, purchaseRepository);
+                userRepository, purchaseRepository);
     }
 }

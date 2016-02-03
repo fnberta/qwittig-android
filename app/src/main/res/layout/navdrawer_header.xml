@@ -50,9 +50,8 @@
                 android:layout_marginTop="@dimen/navdrawer_status_bar_plus_normal_space"
                 android:contentDescription="@string/user_avatar"
                 android:onClick="@{viewModel.onAvatarClick}"
-                app:avatar="@{viewModel.userAvatar}"
+                app:avatarRipple="@{viewModel.userAvatar}"
                 app:fallback="@{@drawable/ic_account_circle_black_80dp}"
-                app:withRipple="@{true}"
                 tools:src="@drawable/ic_account_circle_black_80dp"
                 />
 

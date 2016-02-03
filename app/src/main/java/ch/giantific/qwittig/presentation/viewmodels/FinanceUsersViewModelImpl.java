@@ -12,6 +12,7 @@ import android.view.View;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.BR;
@@ -36,6 +37,10 @@ public class FinanceUsersViewModelImpl extends OnlineListViewModelBaseImpl<User,
                                      @NonNull GroupRepository groupRepo,
                                      @NonNull UserRepository userRepository) {
         super(savedState, groupRepo, userRepository);
+
+        if (savedState != null) {
+            mItems = new ArrayList<>();
+        }
     }
 
     @Override
@@ -75,6 +80,7 @@ public class FinanceUsersViewModelImpl extends OnlineListViewModelBaseImpl<User,
 
                     @Override
                     public void onError(Throwable error) {
+                        setLoading(false);
                         mView.showMessage(R.string.toast_error_users_load);
                     }
                 })
@@ -111,6 +117,8 @@ public class FinanceUsersViewModelImpl extends OnlineListViewModelBaseImpl<User,
                     @Override
                     public void onSuccess(User value) {
                         mView.removeWorker(workerTag);
+                        setRefreshing(false);
+
                         notifyPropertyChanged(BR.currentUserBalance);
                         updateList();
                     }
@@ -136,6 +144,6 @@ public class FinanceUsersViewModelImpl extends OnlineListViewModelBaseImpl<User,
 
     @Override
     public int getItemViewType(int position) {
-        throw new UnsupportedOperationException("there is only one view type in users adapter!");
+        throw new UnsupportedOperationException("there is only one view type for this view");
     }
 }

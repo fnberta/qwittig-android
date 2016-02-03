@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.presentation.workerfragments.query;
 
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,20 +21,32 @@ import rx.Observable;
  */
 public class PurchasesQueryMoreWorker extends BaseQueryWorker<Purchase, PurchasesQueryMoreListener> {
 
-    public static final String WORKER_TAG = "PURCHASES_QUERY_MORE_WORKER";
+    private static final String WORKER_TAG = PurchasesQueryMoreWorker.class.getCanonicalName();
     private static final String KEY_SKIP = "SKIP";
     @Inject
     PurchaseRepository mPurchaseRepo;
 
     /**
-     * Return a new instance of {@link PurchasesQueryMoreWorker} with the number of items to skip
+     * Attaches a new instance of {@link PurchasesQueryMoreWorker} with the number of items to skip
      * as arguments.
      *
+     * @param fm   the fragment manger to use for the transaction
      * @param skip the number of items to skip
      * @return a new instance of {@link PurchasesQueryMoreWorker}
      */
-    @NonNull
-    public static PurchasesQueryMoreWorker newInstance(int skip) {
+    public static PurchasesQueryMoreWorker attach(@NonNull FragmentManager fm, int skip) {
+        PurchasesQueryMoreWorker worker = (PurchasesQueryMoreWorker) fm.findFragmentByTag(WORKER_TAG);
+        if (worker == null) {
+            worker = PurchasesQueryMoreWorker.newInstance(skip);
+            fm.beginTransaction()
+                    .add(worker, WORKER_TAG)
+                    .commit();
+        }
+
+        return worker;
+    }
+
+    private static PurchasesQueryMoreWorker newInstance(int skip) {
         PurchasesQueryMoreWorker fragment = new PurchasesQueryMoreWorker();
         Bundle args = new Bundle();
         args.putInt(KEY_SKIP, skip);

@@ -100,4 +100,6 @@ public interface CompensationRepository extends Repository {
      */
     @Nullable
     Boolean updateCompensation(@NonNull String compensationId, boolean isNew);
+
+    Single<Compensation> saveCompensationPaid(@NonNull Compensation compensation);
 }

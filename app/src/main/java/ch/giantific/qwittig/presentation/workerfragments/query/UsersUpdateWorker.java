@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.presentation.workerfragments.query;
 
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,7 +14,6 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.di.components.WorkerComponent;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.repositories.ApiRepository;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -24,9 +24,31 @@ import rx.functions.Func1;
  */
 public class UsersUpdateWorker extends BaseQueryWorker<User, UsersUpdateListener> {
 
-    public static final String WORKER_TAG = "USER_UPDATE_WORKER";
+    private static final String WORKER_TAG = UsersUpdateWorker.class.getCanonicalName();
     @Inject
     ApiRepository mApiRepository;
+
+    public UsersUpdateWorker() {
+        // required empty constructor
+    }
+
+    /**
+     * Attaches a new instance of a {@link UsersUpdateWorker}.
+     *
+     * @param fm the fragment manager to use for the transaction
+     * @return a new instance of a {@link UsersUpdateWorker}
+     */
+    public static UsersUpdateWorker attach(@NonNull FragmentManager fm) {
+        UsersUpdateWorker worker = (UsersUpdateWorker) fm.findFragmentByTag(WORKER_TAG);
+        if (worker == null) {
+            worker = new UsersUpdateWorker();
+            fm.beginTransaction()
+                    .add(worker, WORKER_TAG)
+                    .commit();
+        }
+
+        return worker;
+    }
 
     @Override
     protected void injectWorkerDependencies(@NonNull WorkerComponent component) {

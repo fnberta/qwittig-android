@@ -4,6 +4,8 @@
 
 package ch.giantific.qwittig.utils;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.databinding.BindingAdapter;
@@ -12,7 +14,6 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.View;
 import android.widget.ImageView;
@@ -53,9 +54,27 @@ public class BindingUtils {
         }
     }
 
-    @BindingAdapter({"avatar", "fallback", "withRipple"})
-    public static void loadAvatar(ImageView view, byte[] avatar, Drawable fallback,
-                                  final boolean withRipple) {
+    @BindingAdapter({"avatarSquare", "fallback"})
+    public static void loadAvatarSquare(ImageView view, byte[] avatar, Drawable fallback) {
+        final Context context = view.getContext();
+        Glide.with(context)
+                .load(avatar)
+                .error(fallback)
+                .into(view);
+    }
+
+    @BindingAdapter({"avatar", "fallback"})
+    public static void loadAvatar(ImageView view, byte[] avatar, Drawable fallback) {
+        glideLoadAvatar(view, avatar, fallback, false);
+    }
+
+    @BindingAdapter({"avatarRipple", "fallback"})
+    public static void loadAvatarRipple(ImageView view, byte[] avatar, Drawable fallback) {
+        glideLoadAvatar(view, avatar, fallback, true);
+    }
+
+    private static void glideLoadAvatar(final ImageView view, byte[] avatar, Drawable fallback,
+                                        final boolean withRipple) {
         final Context context = view.getContext();
         Glide.with(context)
                 .load(avatar)
@@ -80,7 +99,43 @@ public class BindingUtils {
 
     @BindingAdapter({"percentage"})
     public static void setCirclePercentage(CircleDisplay view, float percentage) {
-        view.showValue(percentage, 100f, true);
+        view.showValue(percentage, 100f, false);
+    }
+
+    @BindingAdapter("fadeVisible")
+    public static void setFadeVisible(final View view, boolean visible) {
+        if (view.getTag() == null) {
+            view.setTag(true);
+            view.setVisibility(visible ? View.VISIBLE : View.GONE);
+        } else {
+            view.animate().cancel();
+
+            final int duration = view.getContext().getResources().getInteger(android.R.integer.config_longAnimTime);
+            if (visible) {
+                view.setVisibility(View.VISIBLE);
+                view.setAlpha(0);
+                view.animate()
+                        .alpha(1)
+                        .setDuration(duration)
+                        .setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                view.setAlpha(1);
+                            }
+                        });
+            } else {
+                view.animate()
+                        .alpha(0)
+                        .setDuration(duration)
+                        .setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                view.setAlpha(1);
+                                view.setVisibility(View.GONE);
+                            }
+                        });
+            }
+        }
     }
 
     @BindingAdapter({"deadline"})

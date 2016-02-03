@@ -33,9 +33,8 @@ public class PurchaseAddViewModelModule extends BaseViewModelModule {
     @Provides
     PurchaseAddEditViewModel providesPurchaseAddViewModel(@NonNull GroupRepository groupRepository,
                                                           @NonNull UserRepository userRepository,
-                                                          @NonNull SharedPreferences sharedPreferences,
                                                           @NonNull PurchaseRepository purchaseRepository) {
         return new PurchaseAddEditViewModelAddImpl(mSavedState, groupRepository, userRepository,
-                sharedPreferences, purchaseRepository);
+                purchaseRepository);
     }
 }

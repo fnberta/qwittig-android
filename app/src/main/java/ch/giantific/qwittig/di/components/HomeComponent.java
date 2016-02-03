@@ -18,7 +18,8 @@ import dagger.Component;
  * Created by fabio on 12.01.16.
  */
 @PerFragment
-@Component(modules = {HomeViewModelModule.class, RepositoriesModule.class})
+@Component(dependencies = {ApplicationComponent.class},
+        modules = {HomeViewModelModule.class, RepositoriesModule.class})
 public interface HomeComponent {
 
     void inject(HomePurchasesFragment homePurchasesFragment);

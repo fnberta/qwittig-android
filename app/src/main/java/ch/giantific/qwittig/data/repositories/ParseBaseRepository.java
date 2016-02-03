@@ -7,9 +7,9 @@ package ch.giantific.qwittig.data.repositories;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
-import android.text.TextUtils;
 import android.util.Log;
 
+import com.parse.CountCallback;
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -143,41 +143,24 @@ public abstract class ParseBaseRepository<T extends ParseObject> implements Repo
     }
 
     @NonNull
-    final Single<T> unpin(@NonNull final T object, @Nullable final String tag) {
+    final Single<T> unpin(@NonNull final T object, @NonNull final String tag) {
         return Single.create(new Single.OnSubscribe<T>() {
             @Override
             public void call(final SingleSubscriber<? super T> singleSubscriber) {
-                if (TextUtils.isEmpty(tag)) {
-                    object.unpinInBackground(new DeleteCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            if (singleSubscriber.isUnsubscribed()) {
-                                return;
-                            }
-
-                            if (e != null) {
-                                singleSubscriber.onError(e);
-                            } else {
-                                singleSubscriber.onSuccess(object);
-                            }
+                object.unpinInBackground(tag, new DeleteCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (singleSubscriber.isUnsubscribed()) {
+                            return;
                         }
-                    });
-                } else {
-                    object.unpinInBackground(tag, new DeleteCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            if (singleSubscriber.isUnsubscribed()) {
-                                return;
-                            }
 
-                            if (e != null) {
-                                singleSubscriber.onError(e);
-                            } else {
-                                singleSubscriber.onSuccess(object);
-                            }
+                        if (e != null) {
+                            singleSubscriber.onError(e);
+                        } else {
+                            singleSubscriber.onSuccess(object);
                         }
-                    });
-                }
+                    }
+                });
             }
         });
     }
@@ -294,6 +277,29 @@ public abstract class ParseBaseRepository<T extends ParseObject> implements Repo
                             singleSubscriber.onError(e);
                         } else {
                             singleSubscriber.onSuccess(object);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    @NonNull
+    final Single<Integer> count(@NonNull final ParseQuery<T> query) {
+        return Single.create(new Single.OnSubscribe<Integer>() {
+            @Override
+            public void call(final SingleSubscriber<? super Integer> singleSubscriber) {
+                query.countInBackground(new CountCallback() {
+                    @Override
+                    public void done(int count, ParseException e) {
+                        if (singleSubscriber.isUnsubscribed()) {
+                            return;
+                        }
+
+                        if (e != null) {
+                            singleSubscriber.onError(e);
+                        } else {
+                            singleSubscriber.onSuccess(count);
                         }
                     }
                 });

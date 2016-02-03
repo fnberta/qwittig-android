@@ -4,10 +4,7 @@
 
 package ch.giantific.qwittig.presentation.viewmodels;
 
-import com.mugen.MugenCallbacks;
-
 import ch.giantific.qwittig.domain.models.parse.Compensation;
-import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.presentation.workerfragments.query.CompensationsQueryMoreListener;
 import ch.giantific.qwittig.presentation.workerfragments.query.CompensationsUpdateListener;
 

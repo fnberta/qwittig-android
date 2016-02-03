@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.BR;
@@ -47,6 +48,9 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<Purchase
 
         mPurchaseRepo = purchaseRepo;
         mPurchaseId = purchaseId;
+        if (savedState != null) {
+            mItems = new ArrayList<>();
+        }
     }
 
     @Override
@@ -113,17 +117,18 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<Purchase
         mItems.add(PurchaseDetailsItem.createUsersInvolvedInstance(mPurchase.getUsersInvolved()));
 
         mItems.add(PurchaseDetailsItem.createHeaderInstance(R.string.header_items));
+        final String groupCurrency = mCurrentGroup.getCurrency();
         for (ParseObject item : mPurchase.getItems()) {
-            mItems.add(PurchaseDetailsItem.createItemInstance((Item) item, mCurrentUser, mCurrentGroup.getCurrency()));
+            mItems.add(PurchaseDetailsItem.createItemInstance((Item) item, mCurrentUser, groupCurrency));
         }
-        final String currency = mCurrentGroup.getCurrency();
-        final String total = MoneyUtils.formatMoney(mPurchase.getTotalPrice(), currency);
-        final String totalForeign = MoneyUtils.formatMoney(mPurchase.getTotalPriceForeign(), currency);
+        final String total = MoneyUtils.formatMoney(mPurchase.getTotalPrice(), groupCurrency);
+        final String purchaseCurrency = mPurchase.getCurrency();
+        final String totalForeign = MoneyUtils.formatMoney(mPurchase.getTotalPriceForeign(), purchaseCurrency);
         mItems.add(PurchaseDetailsItem.createTotalInstance(total, totalForeign));
 
         final double share = mPurchase.calculateUserShare(mCurrentUser);
-        final String myShare = MoneyUtils.formatMoney(share, currency);
-        final String myShareForeign = MoneyUtils.formatMoney(share / mPurchase.getExchangeRate(), currency);
+        final String myShare = MoneyUtils.formatMoney(share, groupCurrency);
+        final String myShareForeign = MoneyUtils.formatMoney(share / mPurchase.getExchangeRate(), purchaseCurrency);
         mItems.add(PurchaseDetailsItem.createMyShareInstance(myShare, myShareForeign));
 
         final String note = mPurchase.getNote();

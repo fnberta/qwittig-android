@@ -10,10 +10,12 @@ import android.support.annotation.Nullable;
 import com.parse.ParseObject;
 
 import java.util.List;
+import java.util.Map;
 
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.models.rates.CurrencyRates;
 import rx.Observable;
 import rx.Single;
 
@@ -50,10 +52,10 @@ public interface PurchaseRepository extends Repository {
      * Removes a purchase from the local data store.
      *
      * @param purchase the purchase to remove
-     * @param groupId  the object id of the group the purchase belongs to
+     * @param tag      the pin tag the purchase uses
      * @return a {@link Single} representing the save action
      */
-    Single<Purchase> removePurchaseLocalAsync(@NonNull Purchase purchase, @Nullable String groupId);
+    Single<Purchase> removePurchaseLocalAsync(@NonNull Purchase purchase, @NonNull String tag);
 
     /**
      * Removes a purchase from the local data store.
@@ -131,4 +133,8 @@ public interface PurchaseRepository extends Repository {
     void deleteItemsByIds(@NonNull List<String> itemIds);
 
     void deletePurchase(@NonNull Purchase purchase);
+
+    boolean isPurchaseDraftsAvailable();
+
+    Single<Float> getExchangeRate(@NonNull String baseCurrency, @NonNull String currency);
 }

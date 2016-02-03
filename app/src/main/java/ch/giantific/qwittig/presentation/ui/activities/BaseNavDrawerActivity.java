@@ -23,8 +23,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 
-import com.parse.ParseObject;
-
 import java.util.List;
 
 import javax.inject.Inject;
@@ -34,6 +32,7 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.NavdrawerHeaderBinding;
 import ch.giantific.qwittig.di.components.DaggerNavDrawerComponent;
 import ch.giantific.qwittig.di.components.NavDrawerComponent;
+import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.presentation.ui.adapters.NavHeaderGroupsArrayAdapter;
 import ch.giantific.qwittig.presentation.ui.fragments.SettingsFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.SettingsProfileFragment;
@@ -295,11 +294,11 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
 
     @Override
     public void showMessage(@StringRes int resId) {
-        Snackbar.make(mHeaderBinding.ivHeaderBackground, resId, Snackbar.LENGTH_LONG).show();
+        Snackbar.make(mToolbar, resId, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
-    public void setupHeaderGroupSelection(@NonNull List<ParseObject> groups) {
+    public void setupHeaderGroupSelection(@NonNull List<Group> groups) {
         mHeaderGroupsAdapter = new NavHeaderGroupsArrayAdapter(this, groups);
         mHeaderBinding.spDrawerGroup.setAdapter(mHeaderGroupsAdapter);
     }

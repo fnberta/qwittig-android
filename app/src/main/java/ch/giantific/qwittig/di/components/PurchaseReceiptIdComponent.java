@@ -16,7 +16,8 @@ import dagger.Component;
  * Created by fabio on 12.01.16.
  */
 @PerFragment
-@Component(modules = {PurchaseReceiptIdViewModelModule.class, RepositoriesModule.class})
+@Component(dependencies = {ApplicationComponent.class},
+        modules = {PurchaseReceiptIdViewModelModule.class, RepositoriesModule.class})
 public interface PurchaseReceiptIdComponent {
 
     void inject(PurchaseReceiptAddEditFragment purchaseReceiptAddEditFragment);

@@ -30,5 +30,20 @@ public interface PurchaseAddEditTotalRowViewModel extends Observable {
     @Bindable
     String getCurrency();
 
+    void setCurrency(@NonNull String currency);
+
+    @Bindable
+    int getCurrencySelected();
+
     void onCurrencySelected(@NonNull AdapterView<?> parent, View view, int position, long id);
+
+    @Bindable
+    String getExchangeRate();
+
+    void setExchangeRate(float exchangeRate);
+
+    @Bindable
+    boolean isExchangeRateVisible();
+
+    void onExchangeRateClick(View view);
 }

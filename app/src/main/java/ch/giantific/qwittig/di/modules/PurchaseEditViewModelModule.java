@@ -4,7 +4,6 @@
 
 package ch.giantific.qwittig.di.modules;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -38,19 +37,17 @@ public class PurchaseEditViewModelModule extends BaseViewModelModule {
     @Provides
     PurchaseAddEditViewModel providesPurchaseEditViewModel(@NonNull GroupRepository groupRepository,
                                                            @NonNull UserRepository userRepository,
-                                                           @NonNull SharedPreferences sharedPreferences,
                                                            @NonNull PurchaseRepository purchaseRepository) {
         return new PurchaseAddEditViewModelEditImpl(mSavedState, groupRepository, userRepository,
-                sharedPreferences, purchaseRepository, mEditPurchaseId);
+                purchaseRepository, mEditPurchaseId);
     }
 
     @PerFragment
     @Provides
     PurchaseEditDraftViewModel providesPurchaseEditDraftViewModel(@NonNull GroupRepository groupRepository,
                                                                   @NonNull UserRepository userRepository,
-                                                                  @NonNull SharedPreferences sharedPreferences,
                                                                   @NonNull PurchaseRepository purchaseRepository) {
         return new PurchaseEditDraftViewModelImpl(mSavedState, groupRepository, userRepository,
-                sharedPreferences, purchaseRepository, mEditPurchaseId);
+                purchaseRepository, mEditPurchaseId);
     }
 }

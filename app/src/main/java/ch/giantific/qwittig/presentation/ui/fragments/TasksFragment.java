@@ -5,8 +5,6 @@
 package ch.giantific.qwittig.presentation.ui.fragments;
 
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -29,7 +27,6 @@ import ch.giantific.qwittig.presentation.viewmodels.TaskDetailsViewModel;
 import ch.giantific.qwittig.presentation.viewmodels.TasksViewModel;
 import ch.giantific.qwittig.presentation.workerfragments.query.TasksUpdateWorker;
 import ch.giantific.qwittig.presentation.workerfragments.reminder.TaskRemindWorker;
-import ch.giantific.qwittig.utils.WorkerUtils;
 
 /**
  * Displays a {@link RecyclerView} list of all the ongoing tasks in a group in card base interface.
@@ -40,7 +37,6 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment<TasksViewModel
         implements TasksViewModel.ViewListener {
 
     public static final String INTENT_TASK_ID = "ch.giantific.qwittig.INTENT_TASK_ID";
-    private static final String LOG_TAG = TasksFragment.class.getSimpleName();
     private FragmentTasksBinding mBinding;
 
     public TasksFragment() {
@@ -111,16 +107,7 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment<TasksViewModel
 
     @Override
     public void loadUpdateTasksWorker() {
-        FragmentManager fragmentManager = getFragmentManager();
-        Fragment tasksUpdateWorker = WorkerUtils.findWorker(fragmentManager,
-                TasksUpdateWorker.WORKER_TAG);
-
-        if (tasksUpdateWorker == null) {
-            tasksUpdateWorker = new TasksUpdateWorker();
-            fragmentManager.beginTransaction()
-                    .add(tasksUpdateWorker, TasksUpdateWorker.WORKER_TAG)
-                    .commit();
-        }
+        TasksUpdateWorker.attach(getFragmentManager());
     }
 
     @SuppressWarnings("unchecked")
@@ -146,16 +133,7 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment<TasksViewModel
 
     @Override
     public void loadRemindUserWorker(@NonNull String taskId) {
-        final FragmentManager fragmentManager = getFragmentManager();
-        final String workerTag = TaskRemindWorker.WORKER_TAG + taskId;
-        Fragment taskRemindWorker = WorkerUtils.findWorker(fragmentManager, workerTag);
-
-        if (taskRemindWorker == null) {
-            taskRemindWorker = TaskRemindWorker.newInstance(taskId);
-            fragmentManager.beginTransaction()
-                    .add(taskRemindWorker, workerTag)
-                    .commit();
-        }
+        TaskRemindWorker.attach(getFragmentManager(), taskId);
     }
 
     public interface ActivityListener extends BaseFragment.ActivityListener {

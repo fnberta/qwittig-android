@@ -9,14 +9,10 @@ import android.content.SharedPreferences;
 
 import javax.inject.Singleton;
 
-import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.data.rest.ExchangeRates;
-import ch.giantific.qwittig.data.rest.OcrClient;
 import ch.giantific.qwittig.data.rest.ReceiptOcr;
 import ch.giantific.qwittig.di.modules.ApplicationModule;
 import ch.giantific.qwittig.di.modules.RestServiceModule;
-import ch.giantific.qwittig.presentation.workerfragments.OcrWorker;
-import ch.giantific.qwittig.presentation.workerfragments.RatesWorker;
 import dagger.Component;
 
 /**

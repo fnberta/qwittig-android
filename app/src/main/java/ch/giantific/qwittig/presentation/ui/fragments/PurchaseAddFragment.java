@@ -6,6 +6,7 @@ package ch.giantific.qwittig.presentation.ui.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -66,7 +67,10 @@ public class PurchaseAddFragment extends PurchaseAddEditBaseFragment<PurchaseAdd
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
+        injectDependencies(savedInstanceState);
+    }
 
+    private void injectDependencies(@Nullable Bundle savedInstanceState) {
         final boolean auto = getArguments().getBoolean(KEY_AUTO_MODE, false);
         if (auto) {
             DaggerPurchaseAddAutoComponent.builder()
@@ -86,7 +90,7 @@ public class PurchaseAddFragment extends PurchaseAddEditBaseFragment<PurchaseAdd
     @Override
     public void onCreateOptionsMenu(Menu menu, @NonNull MenuInflater inflater) {
         if (mViewModel.isLoading()) {
-            menu.clear();
+            setMenuVisibility(false);
             return;
         }
 

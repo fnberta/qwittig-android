@@ -15,6 +15,8 @@ import com.parse.ParseObject;
 
 import java.util.List;
 
+import ch.giantific.qwittig.domain.models.parse.Group;
+
 /**
  * Created by fabio on 12.01.16.
  */
@@ -50,7 +52,7 @@ public interface NavDrawerViewModel extends Observable, ViewInteraction<NavDrawe
 
         void showMessage(@StringRes int resId);
 
-        void setupHeaderGroupSelection(@NonNull List<ParseObject> groups);
+        void setupHeaderGroupSelection(@NonNull List<Group> groups);
 
         void notifyHeaderGroupListChanged();
 

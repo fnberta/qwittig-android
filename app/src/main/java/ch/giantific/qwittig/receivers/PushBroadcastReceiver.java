@@ -754,10 +754,10 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 case TYPE_COMPENSATION_EXISTING_NOT_NOW:
                     // fall through
                 case TYPE_COMPENSATION_REMIND_USER_HAS_PAID:
-                    intent.putExtra(INTENT_EXTRA_FINANCE_FRAGMENT, FinanceActivity.TAB_COMPS_UNPAID);
+                    intent.putExtra(INTENT_EXTRA_FINANCE_FRAGMENT, FinanceActivity.FragmentTabs.COMPS_UNPAID);
                     break;
                 case TYPE_COMPENSATION_EXISTING_PAID:
-                    intent.putExtra(INTENT_EXTRA_FINANCE_FRAGMENT, FinanceActivity.TAB_COMPS_PAID);
+                    intent.putExtra(INTENT_EXTRA_FINANCE_FRAGMENT, FinanceActivity.FragmentTabs.COMPS_PAID);
                     break;
             }
         }

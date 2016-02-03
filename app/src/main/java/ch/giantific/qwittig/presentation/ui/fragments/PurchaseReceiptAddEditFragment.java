@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import java.io.File;
 import java.io.IOException;
 
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.di.components.DaggerPurchaseReceiptIdComponent;
 import ch.giantific.qwittig.di.components.DaggerPurchaseReceiptPathComponent;
@@ -89,11 +90,13 @@ public class PurchaseReceiptAddEditFragment extends PurchaseReceiptBaseFragment<
 
         if (!TextUtils.isEmpty(receiptImagePath)) {
             DaggerPurchaseReceiptPathComponent.builder()
+                    .applicationComponent(Qwittig.getAppComponent(getActivity()))
                     .purchaseReceiptPathViewModelModule(new PurchaseReceiptPathViewModelModule(savedInstanceState, receiptImagePath))
                     .build()
                     .inject(this);
         } else {
             DaggerPurchaseReceiptIdComponent.builder()
+                    .applicationComponent(Qwittig.getAppComponent(getActivity()))
                     .purchaseReceiptIdViewModelModule(new PurchaseReceiptIdViewModelModule(savedInstanceState, purchaseId, draft))
                     .build()
                     .inject(this);

@@ -7,19 +7,17 @@ package ch.giantific.qwittig.presentation.viewmodels;
 import android.databinding.Bindable;
 import android.view.View;
 
-import ch.giantific.qwittig.presentation.ui.fragments.dialogs.GroupJoinDialogFragment;
-import ch.giantific.qwittig.presentation.workerfragments.group.InvitedGroupWorker;
-
 /**
  * Created by fabio on 22.01.16.
  */
-public interface HomeViewModel extends ViewModel<HomeViewModel.ViewListener>
-//        GroupJoinDialogFragment.DialogInteractionListener,
-//        InvitedGroupWorker.WorkerInteractionListener
-{
+public interface HomeViewModel extends ViewModel<HomeViewModel.ViewListener> {
 
     @Bindable
-    boolean isDraftsEmpty();
+    boolean isDraftsAvailable();
+
+    void setDraftsAvailable(boolean available);
+
+    boolean updateDraftsAvailable();
 
     void onFabAddPurchaseManualClick(View view);
 

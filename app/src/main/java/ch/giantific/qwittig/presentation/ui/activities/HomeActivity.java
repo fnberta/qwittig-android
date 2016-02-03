@@ -4,12 +4,14 @@
 
 package ch.giantific.qwittig.presentation.ui.activities;
 
+import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.ActionBar;
 import android.view.ActionMode;
@@ -32,7 +34,7 @@ import ch.giantific.qwittig.presentation.ui.fragments.dialogs.GroupCreateDialogF
 import ch.giantific.qwittig.presentation.viewmodels.HomeDraftsViewModel;
 import ch.giantific.qwittig.presentation.viewmodels.HomePurchasesViewModel;
 import ch.giantific.qwittig.presentation.viewmodels.HomeViewModel;
-import ch.giantific.qwittig.presentation.viewmodels.PurchaseAddEditViewModel;
+import ch.giantific.qwittig.presentation.viewmodels.PurchaseAddEditViewModel.PurchaseResult;
 import ch.giantific.qwittig.presentation.workerfragments.query.PurchasesQueryMoreListener;
 import ch.giantific.qwittig.presentation.workerfragments.query.PurchasesUpdateListener;
 import ch.giantific.qwittig.utils.ViewUtils;
@@ -54,18 +56,17 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
         HomeDraftsFragment.ActivityListener,
         PurchasesUpdateListener,
         PurchasesQueryMoreListener,
-//        GroupJoinDialogFragment.DialogInteractionListener,
-        GroupCreateDialogFragment.DialogInteractionListener
-//        InvitedGroupWorker.WorkerInteractionListener
-{
+        GroupCreateDialogFragment.DialogInteractionListener {
 
-    private static final String LOG_TAG = HomeActivity.class.getSimpleName();
+    private static final String STATE_DRAFTS_FRAGMENT = "STATE_DRAFTS_FRAGMENT";
+    private static final String STATE_PURCHASES_FRAGMENT = "STATE_PURCHASES_FRAGMENT";
     private static final String INVITED_GROUP_WORKER = "INVITED_GROUP_WORKER";
     private static final String URI_INVITED_GROUP_ID = "group";
     private static final String GROUP_JOIN_DIALOG = "GROUP_JOIN_DIALOG";
     private ActivityHomeBinding mBinding;
     private HomePurchasesViewModel mPurchasesViewModel;
     private HomeDraftsViewModel mDraftsViewModel;
+    private HomePurchasesFragment mPurchasesFragment;
     private HomeDraftsFragment mDraftsFragment;
     private Group mInvitedGroup;
     private String mInviteInitiator;
@@ -103,38 +104,115 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
             }
         }, ViewUtils.FAB_CIRCULAR_REVEAL_DELAY * 4);
 
-        final HomeComponent comp = DaggerHomeComponent.builder()
-                .homeViewModelModule(new HomeViewModelModule(savedInstanceState))
-                .build();
-        mViewModel = comp.getHomeViewModel();
-        mBinding.setViewModel(mViewModel);
+        injectViewModel(savedInstanceState);
 
         if (isUserLoggedIn()) {
             if (savedInstanceState == null) {
-                addViewPagerFragments();
+                addFragments();
                 //            checkForInvitations();
             } else {
-                // TODO: get drafts fragment reference
+                final FragmentManager fragmentManager = getFragmentManager();
+                mPurchasesFragment = (HomePurchasesFragment)
+                        fragmentManager.getFragment(savedInstanceState, STATE_PURCHASES_FRAGMENT);
+                if (mViewModel.isDraftsAvailable()) {
+                    mDraftsFragment = (HomeDraftsFragment)
+                            fragmentManager.getFragment(savedInstanceState, STATE_DRAFTS_FRAGMENT);
+                    setupTabs();
+                }
             }
         }
     }
 
-    private void addViewPagerFragments() {
-        mDraftsFragment = new HomeDraftsFragment();
+    private void injectViewModel(Bundle savedInstanceState) {
+        final HomeComponent comp = DaggerHomeComponent.builder()
+                .applicationComponent(Qwittig.getAppComponent(this))
+                .homeViewModelModule(new HomeViewModelModule(savedInstanceState))
+                .build();
+        mViewModel = comp.getHomeViewModel();
+        mBinding.setViewModel(mViewModel);
+    }
 
+    private void addFragments() {
+        mPurchasesFragment = new HomePurchasesFragment();
+        if (mViewModel.isDraftsAvailable()) {
+            showViewPager();
+        } else {
+            showPurchasesFragment();
+        }
+    }
+
+    private void showViewPager() {
+        mDraftsFragment = new HomeDraftsFragment();
+        setupTabs();
+        toggleToolbarScrollFlags(true);
+    }
+
+    private void setupTabs() {
         final TabsAdapter tabsAdapter = new TabsAdapter(getFragmentManager());
-        tabsAdapter.addFragment(new HomePurchasesFragment(), getString(R.string.tab_purchases));
+        tabsAdapter.addFragment(mPurchasesFragment, getString(R.string.tab_purchases));
         tabsAdapter.addFragment(mDraftsFragment, getString(R.string.title_activity_purchase_drafts));
         mBinding.viewpager.setAdapter(tabsAdapter);
-
         mBinding.tabs.setupWithViewPager(mBinding.viewpager);
+    }
+
+    private void toggleToolbarScrollFlags(boolean scroll) {
+        final AppBarLayout.LayoutParams params =
+                (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
+        params.setScrollFlags(scroll
+                ? AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL |
+                AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS |
+                AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP
+                : 0);
+    }
+
+    private void showPurchasesFragment() {
+        getFragmentManager().beginTransaction()
+                .add(R.id.container, mPurchasesFragment)
+                .commit();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        final boolean draftsAvailable = mViewModel.isDraftsAvailable();
+        if (draftsAvailable != mViewModel.updateDraftsAvailable()) {
+            switchFragments();
+        }
+    }
+
+    private void switchFragments() {
+        final FragmentManager fragmentManager = getFragmentManager();
+        if (mViewModel.isDraftsAvailable()) {
+            fragmentManager
+                    .beginTransaction()
+                    .remove(mPurchasesFragment)
+                    .commit();
+            fragmentManager.executePendingTransactions();
+            showViewPager();
+        } else {
+            fragmentManager
+                    .beginTransaction()
+                    .remove(mPurchasesFragment)
+                    .remove(mDraftsFragment)
+                    .commit();
+            fragmentManager.executePendingTransactions();
+            showPurchasesFragment();
+            toggleToolbarScrollFlags(false);
+        }
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        // TODO: save drafts fragment reference
+        if (isUserLoggedIn()) {
+            final FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.putFragment(outState, STATE_PURCHASES_FRAGMENT, mPurchasesFragment);
+            if (mViewModel.isDraftsAvailable()) {
+                fragmentManager.putFragment(outState, STATE_DRAFTS_FRAGMENT, mDraftsFragment);
+            }
+        }
     }
 
     @Override
@@ -163,19 +241,19 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
         switch (requestCode) {
             case INTENT_REQUEST_PURCHASE_MODIFY:
                 switch (resultCode) {
-                    case PurchaseAddEditViewModel.RESULT_PURCHASE_SAVED:
+                    case PurchaseResult.PURCHASE_SAVED:
                         showMessage(R.string.toast_purchase_added);
                         break;
-                    case PurchaseAddEditViewModel.RESULT_PURCHASE_SAVED_AUTO:
+                    case PurchaseResult.PURCHASE_SAVED_AUTO:
                         showMessage(R.string.toast_purchase_added);
                         break;
-                    case PurchaseAddEditViewModel.RESULT_PURCHASE_DRAFT:
+                    case PurchaseResult.PURCHASE_DRAFT:
                         showMessage(R.string.toast_purchase_added_draft);
                         break;
-                    case PurchaseAddEditViewModel.RESULT_PURCHASE_DISCARDED:
+                    case PurchaseResult.PURCHASE_DISCARDED:
                         showMessage(R.string.toast_purchase_discarded);
                         break;
-                    case PurchaseAddEditViewModel.RESULT_PURCHASE_ERROR:
+                    case PurchaseResult.PURCHASE_ERROR:
                         showMessage(R.string.toast_create_image_file_failed);
                         break;
                 }
@@ -193,164 +271,12 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
         mDraftsViewModel = viewModel;
     }
 
-//    private void checkForInvitations() {
-//        Intent intent = getIntent();
-//        if (intent == null) {
-//            return;
-//        }
-//
-//        String intentAction = intent.getAction();
-//        if (Intent.ACTION_VIEW.equals(intentAction)) {
-//            Uri uri = intent.getData();
-//            if (uri != null) {
-//                String email = uri.getQueryParameter(URI_INVITED_EMAIL);
-//                mInvitedGroupId = uri.getQueryParameter(URI_INVITED_GROUP_ID);
-//
-//                if (!email.equals(mCurrentUser.getUsername())) {
-//                    Snackbar.make(mFabMenu, R.string.toast_emails_no_match, Snackbar.LENGTH_LONG).show();
-//                    return;
-//                }
-//            }
-//        } else if (intent.hasExtra(PushBroadcastReceiver.KEY_PUSH_DATA)) {
-//            try {
-//                JSONObject jsonExtras = PushBroadcastReceiver.getData(intent);
-//                String notificationType = jsonExtras.optString(PushBroadcastReceiver.NOTIFICATION_TYPE);
-//                if (PushBroadcastReceiver.TYPE_USER_INVITED.equals(notificationType)) {
-//                    mInvitedGroupId = jsonExtras.optString(PushBroadcastReceiver.PUSH_PARAM_GROUP_ID);
-//                    mInviteInitiator = jsonExtras.optString(PushBroadcastReceiver.PUSH_PARAM_USER);
-//                    mInvitationAction = intent.getIntExtra(
-//                            PushBroadcastReceiver.INTENT_ACTION_INVITATION, 0);
-//                }
-//            } catch (JSONException e) {
-//                return;
-//            }
-//        } else {
-//            return;
-//        }
-//
-//        if (!TextUtils.isEmpty(mInvitedGroupId)) {
-//            if (!Utils.isNetworkAvailable(this)) {
-//                Snackbar.make(mFabMenu, R.string.toast_no_connection, Snackbar.LENGTH_LONG).show();
-//                return;
-//            }
-//
-//            // add currentUser to the ACL and Role of the group he is invited to, otherwise we
-//            // won't be able to query the group
-//            getInvitedGroupWithWorker();
-//        }
-//    }
-//
-//    private void getInvitedGroupWithWorker() {
-//        final FragmentManager fragmentManager = getFragmentManager();
-//        Fragment fragment = WorkerUtils.findWorker(fragmentManager, INVITED_GROUP_WORKER);
-//        if (fragment == null) {
-//            fragment = InvitedGroupWorker.newInstance(mInvitedGroupId);
-//
-//            fragmentManager.beginTransaction()
-//                    .add(fragment, INVITED_GROUP_WORKER)
-//                    .commit();
-//        }
-//    }
-//
-//    @Override
-//    public void onInvitedGroupQueryFailed(@StringRes int errorMessage) {
-//        Snackbar.make(mFabMenu, errorMessage, Snackbar.LENGTH_LONG).show();
-//        WorkerUtils.removeWorker(getFragmentManager(), INVITED_GROUP_WORKER);
-//    }
-//
-//    @Override
-//    public void onEmailNotValid() {
-//        Snackbar.make(mFabMenu, getString(R.string.toast_group_invite_not_valid),
-//                Snackbar.LENGTH_LONG).show();
-//        WorkerUtils.removeWorker(getFragmentManager(), INVITED_GROUP_WORKER);
-//    }
-//
-//    @Override
-//    public void onInvitedGroupQueried(@NonNull ParseObject parseObject) {
-//        mInvitedGroup = (Group) parseObject;
-//
-//        switch (mInvitationAction) {
-//            case PushBroadcastReceiver.ACTION_INVITATION_ACCEPTED:
-//                onJoinInvitedGroupSelected();
-//                break;
-//            case PushBroadcastReceiver.ACTION_INVITATION_DISCARDED:
-//                onDiscardInvitationSelected();
-//                break;
-//            default:
-//                String groupName = mInvitedGroup.getName();
-//                showGroupJoinDialog(groupName);
-//        }
-//    }
-//
-//    private void showGroupJoinDialog(String groupName) {
-//        final GroupJoinDialogFragment dialog =
-//                GroupJoinDialogFragment.newInstance(groupName, mInviteInitiator);
-//        dialog.show(getFragmentManager(), GROUP_JOIN_DIALOG);
-//    }
-//
-//    @Override
-//    public void onJoinInvitedGroupSelected() {
-//        showProgressDialog(getString(R.string.progress_switch_groups));
-//
-//        final InvitedGroupWorker invitedGroupWorker = (InvitedGroupWorker)
-//                WorkerUtils.findWorker(getFragmentManager(), INVITED_GROUP_WORKER);
-//        invitedGroupWorker.joinInvitedGroup(mInvitedGroup);
-//    }
-//
-//    private void showProgressDialog(@NonNull String message) {
-//        mProgressDialog = ProgressDialog.show(this, null, message);
-//    }
-//
-//    @Override
-//    public void onUserJoinedGroup() {
-//        WorkerUtils.removeWorker(getFragmentManager(), INVITED_GROUP_WORKER);
-//        dismissProgressDialog();
-//        Snackbar.make(mFabMenu, getString(R.string.toast_group_added, mInvitedGroup.getName()),
-//                Snackbar.LENGTH_LONG).show();
-//
-//        // register for notifications for the new group
-//        ParsePush.subscribeInBackground(mInvitedGroup.getObjectId());
-//
-//        // remove user from invited list
-//        mInvitedGroup.removeUserInvited(mCurrentUser.getUsername());
-//        mInvitedGroup.saveEventually();
-//
-//        mCurrentGroup = mCurrentUser.getCurrentGroup();
-//        updateGroupSpinner();
-//        // TODO: set query in progress in fragment
-//        ParseQueryService.startQueryAll(this);
-//    }
-//
-//    private void dismissProgressDialog() {
-//        if (mProgressDialog != null) {
-//            mProgressDialog.dismiss();
-//        }
-//    }
-//
-//    @Override
-//    public void onUserJoinGroupFailed(@StringRes int errorMessage) {
-//        Snackbar.make(mFabMenu, errorMessage, Snackbar.LENGTH_LONG).show();
-//        WorkerUtils.removeWorker(getFragmentManager(), INVITED_GROUP_WORKER);
-//
-//        dismissProgressDialog();
-//    }
-//
-//    @Override
-//    public void onDiscardInvitationSelected() {
-//        WorkerUtils.removeWorker(getFragmentManager(), INVITED_GROUP_WORKER);
-//
-//        mInvitedGroup.removeUserInvited(mCurrentUser.getUsername());
-//        mInvitedGroup.saveEventually();
-//
-//        Snackbar.make(mFabMenu, R.string.toast_invitation_discarded, Snackbar.LENGTH_LONG).show();
-//    }
-
     @Override
     void onLoginSuccessful() {
         super.onLoginSuccessful();
 
         // TODO: fix setLoading(true) because online query is still happening
-        addViewPagerFragments();
+        addFragments();
     }
 
     @Override
@@ -358,7 +284,9 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
         super.onNewGroupSet();
 
         mPurchasesViewModel.onNewGroupSet();
-        mDraftsViewModel.onNewGroupSet();
+        if (mViewModel.isDraftsAvailable()) {
+            mDraftsViewModel.onNewGroupSet();
+        }
     }
 
     @Override

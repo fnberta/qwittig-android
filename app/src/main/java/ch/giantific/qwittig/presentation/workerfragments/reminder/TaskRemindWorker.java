@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.presentation.workerfragments.reminder;
 
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -23,11 +24,30 @@ import rx.Observable;
  */
 public class TaskRemindWorker extends BaseWorker<String, TaskReminderListener> {
 
-    public static final String WORKER_TAG = "TASK_REMIND_WORKER_";
+    private static final String WORKER_TAG = TaskRemindWorker.class.getCanonicalName();
     private static final String KEY_TASK_ID = "TASK_ID";
     @Inject
     ApiRepository mApiRepo;
     private String mTaskId;
+
+    /**
+     * Attaches a new instance of {@link TaskRemindWorker} with an argument.
+     *
+     * @param fm     the fragment manager to use for the transaction
+     * @param taskId the object id of the task that should be finished
+     * @return a new instance of {@link TaskRemindWorker}
+     */
+    public static TaskRemindWorker attach(@NonNull FragmentManager fm, @NonNull String taskId) {
+        TaskRemindWorker worker = (TaskRemindWorker) fm.findFragmentByTag(WORKER_TAG);
+        if (worker == null) {
+            worker = TaskRemindWorker.newInstance(taskId);
+            fm.beginTransaction()
+                    .add(worker, WORKER_TAG + taskId)
+                    .commit();
+        }
+
+        return worker;
+    }
 
     /**
      * Returns a new instance of {@link TaskRemindWorker} with an argument.
@@ -36,7 +56,7 @@ public class TaskRemindWorker extends BaseWorker<String, TaskReminderListener> {
      * @return a new instance of {@link TaskRemindWorker}
      */
     @NonNull
-    public static TaskRemindWorker newInstance(@NonNull String taskId) {
+    private static TaskRemindWorker newInstance(@NonNull String taskId) {
         TaskRemindWorker fragment = new TaskRemindWorker();
         Bundle args = new Bundle();
         args.putString(KEY_TASK_ID, taskId);

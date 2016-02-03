@@ -33,7 +33,6 @@
             android:contentDescription="@string/user_avatar"
             app:avatar="@{viewModel.userAvatar}"
             app:fallback="@{@drawable/ic_account_circle_black_40dp}"
-            app:withRipple="@{false}"
             tools:src="@drawable/ic_account_circle_black_40dp"
             />
 

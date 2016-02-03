@@ -5,6 +5,7 @@
 package ch.giantific.qwittig.presentation.workerfragments.save;
 
 import android.annotation.SuppressLint;
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -24,7 +25,7 @@ import rx.Observable;
  */
 public class CompensationSaveWorker extends BaseWorker<Compensation, CompensationSaveWorkerListener> {
 
-    public static final String WORKER_TAG = "COMPENSATION_SAVE_WORKER";
+    private static final String WORKER_TAG = CompensationSaveWorker.class.getCanonicalName();
     @Inject
     CompensationRepository mCompsRepo;
     private Compensation mCompensation;
@@ -44,8 +45,28 @@ public class CompensationSaveWorker extends BaseWorker<Compensation, Compensatio
      * @param compensation the {@link Compensation} to save
      */
     @SuppressLint("ValidFragment")
-    public CompensationSaveWorker(@NonNull Compensation compensation) {
+    private CompensationSaveWorker(@NonNull Compensation compensation) {
         mCompensation = compensation;
+    }
+
+    /**
+     * Attaches a new instance of a {@link CompensationSaveWorker}.
+     *
+     * @param fm           the fragment manager to use for the transaction.
+     * @param compensation the compensation to save
+     * @return a new instance of a {@link CompensationSaveWorker}
+     */
+    public static CompensationSaveWorker attach(@NonNull FragmentManager fm,
+                                                @NonNull Compensation compensation) {
+        CompensationSaveWorker worker = (CompensationSaveWorker) fm.findFragmentByTag(WORKER_TAG);
+        if (worker == null) {
+            worker = new CompensationSaveWorker(compensation);
+            fm.beginTransaction()
+                    .add(worker, WORKER_TAG)
+                    .commit();
+        }
+
+        return worker;
     }
 
     @Override

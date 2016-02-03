@@ -10,8 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import ch.giantific.qwittig.databinding.RowCompensationsUnpaidPendingNegBinding;
-import ch.giantific.qwittig.databinding.RowCompensationsUnpaidPendingPosBinding;
+import ch.giantific.qwittig.databinding.RowCompensationsUnpaidCreditBinding;
+import ch.giantific.qwittig.databinding.RowCompensationsUnpaidDebtBinding;
+import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
+import ch.giantific.qwittig.domain.models.CompensationUnpaidItem;
+import ch.giantific.qwittig.domain.models.CompensationUnpaidItem.Type;
 import ch.giantific.qwittig.domain.models.parse.Compensation;
 import ch.giantific.qwittig.presentation.ui.adapters.rows.BindingRow;
 import ch.giantific.qwittig.presentation.viewmodels.FinanceCompsUnpaidViewModel;
@@ -45,15 +48,20 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter {
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         switch (viewType) {
-            case FinanceCompsUnpaidViewModel.TYPE_PENDING_POS: {
-                final RowCompensationsUnpaidPendingPosBinding binding =
-                        RowCompensationsUnpaidPendingPosBinding.inflate(inflater, parent, false);
-                return new CompensationPendingPosRow(binding, mViewModel);
+            case Type.HEADER: {
+                final RowGenericHeaderBinding binding =
+                        RowGenericHeaderBinding.inflate(inflater, parent, false);
+                return new BindingRow<>(binding);
             }
-            case FinanceCompsUnpaidViewModel.TYPE_PENDING_NEG: {
-                final RowCompensationsUnpaidPendingNegBinding binding =
-                        RowCompensationsUnpaidPendingNegBinding.inflate(inflater, parent, false);
-                return new CompensationPendingNegRow(binding, mViewModel);
+            case Type.CREDIT: {
+                final RowCompensationsUnpaidCreditBinding binding =
+                        RowCompensationsUnpaidCreditBinding.inflate(inflater, parent, false);
+                return new CompensationCreditRow(binding, mViewModel);
+            }
+            case Type.DEBT: {
+                final RowCompensationsUnpaidDebtBinding binding =
+                        RowCompensationsUnpaidDebtBinding.inflate(inflater, parent, false);
+                return new BindingRow<>(binding);
             }
             default:
                 throw new RuntimeException("there is no type that matches the type " + viewType +
@@ -63,13 +71,22 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        final CompensationUnpaidItem compItem = mViewModel.getItemAtPosition(position);
         final int viewType = getItemViewType(position);
         switch (viewType) {
-            case FinanceCompsUnpaidViewModel.TYPE_PENDING_POS: {
-                final CompensationPendingPosRow row = (CompensationPendingPosRow) viewHolder;
-                final RowCompensationsUnpaidPendingPosBinding binding = row.getBinding();
-                final Compensation compensation = mViewModel.getItemAtPosition(position);
+            case Type.HEADER: {
+                final BindingRow<RowGenericHeaderBinding> row = (BindingRow<RowGenericHeaderBinding>) holder;
+                final RowGenericHeaderBinding binding = row.getBinding();
+                binding.setViewModel(compItem);
+
+                binding.executePendingBindings();
+                break;
+            }
+            case Type.CREDIT: {
+                final CompensationCreditRow row = (CompensationCreditRow) holder;
+                final RowCompensationsUnpaidCreditBinding binding = row.getBinding();
+                final Compensation compensation = mViewModel.getItemAtPosition(position).getCompensation();
 
                 CompUnpaidRowViewModel viewModel = binding.getViewModel();
                 if (viewModel == null) {
@@ -82,10 +99,11 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter {
                 binding.executePendingBindings();
                 break;
             }
-            case FinanceCompsUnpaidViewModel.TYPE_PENDING_NEG: {
-                final CompensationPendingNegRow row = (CompensationPendingNegRow) viewHolder;
-                final RowCompensationsUnpaidPendingNegBinding binding = row.getBinding();
-                final Compensation compensation = mViewModel.getItemAtPosition(position);
+            case Type.DEBT: {
+                final BindingRow<RowCompensationsUnpaidDebtBinding> row =
+                        (BindingRow<RowCompensationsUnpaidDebtBinding>) holder;
+                final RowCompensationsUnpaidDebtBinding binding = row.getBinding();
+                final Compensation compensation = mViewModel.getItemAtPosition(position).getCompensation();
 
                 CompUnpaidRowViewModel viewModel = binding.getViewModel();
                 if (viewModel == null) {
@@ -129,13 +147,6 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter {
          * @param position the adapter position of the compensation
          */
         void onRemindButtonClick(int position);
-
-//        /**
-//         * Handles the click on the change amount button of a compensation.
-//         *
-//         * @param position the adapter position of the compensation
-//         */
-//        void onChangeAmountButtonClick(int position);
     }
 
     /**
@@ -143,10 +154,10 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter {
      * <p/>
      * Subclass of {@link BindingRow}.
      */
-    private static class CompensationPendingPosRow extends BindingRow<RowCompensationsUnpaidPendingPosBinding> {
+    private static class CompensationCreditRow extends BindingRow<RowCompensationsUnpaidCreditBinding> {
 
-        public CompensationPendingPosRow(@NonNull RowCompensationsUnpaidPendingPosBinding binding,
-                                         @NonNull final AdapterInteractionListener listener) {
+        public CompensationCreditRow(@NonNull RowCompensationsUnpaidCreditBinding binding,
+                                     @NonNull final AdapterInteractionListener listener) {
             super(binding);
 
             binding.btCompUnpaidConfirm.setOnClickListener(new View.OnClickListener() {
@@ -161,27 +172,6 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter {
                     listener.onRemindButtonClick(getAdapterPosition());
                 }
             });
-        }
-    }
-
-    /**
-     * Provides a {@link RecyclerView} row that displays unpaid compensations, where the current
-     * user receives money.
-     * <p/>
-     * Subclass of {@link BindingRow}.
-     */
-    private static class CompensationPendingNegRow extends BindingRow<RowCompensationsUnpaidPendingNegBinding> {
-
-        public CompensationPendingNegRow(@NonNull RowCompensationsUnpaidPendingNegBinding binding,
-                                         @NonNull final AdapterInteractionListener listener) {
-            super(binding);
-
-//            binding.btCompUnpaidChangeAmount.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    listener.onChangeAmountButtonClick(getAdapterPosition());
-//                }
-//            });
         }
     }
 }

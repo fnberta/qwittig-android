@@ -80,6 +80,7 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener> extend
     }
 
     @Override
+    @CallSuper
     public void onWorkerError(@NonNull String workerTag) {
         mView.removeWorker(workerTag);
         mView.showMessage(R.string.toast_unknown_error);

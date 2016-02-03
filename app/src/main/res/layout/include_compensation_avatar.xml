@@ -21,9 +21,8 @@
         android:id="@id/iv_avatar"
         android:contentDescription="@string/user_avatar"
         android:scaleType="centerCrop"
-        app:avatar="@{viewModel.compUserAvatar}"
+        app:avatarSquare="@{viewModel.compUserAvatar}"
         app:fallback="@{@drawable/ic_account_circle_black_80dp}"
-        app:withRipple="@{false}"
         tools:src="@drawable/ic_account_circle_black_80dp"
         />
 

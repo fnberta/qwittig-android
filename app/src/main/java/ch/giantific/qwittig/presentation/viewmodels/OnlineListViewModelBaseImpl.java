@@ -65,4 +65,11 @@ public abstract class OnlineListViewModelBaseImpl<T, S extends OnlineListViewMod
     }
 
     protected abstract void refreshItems();
+
+    @Override
+    public void onWorkerError(@NonNull String workerTag) {
+        super.onWorkerError(workerTag);
+
+        setRefreshing(false);
+    }
 }

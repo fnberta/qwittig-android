@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.presentation.workerfragments.reminder;
 
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -27,11 +28,32 @@ import rx.Observable;
  */
 public class CompensationRemindWorker extends BaseWorker<String, CompensationReminderListener> {
 
-    public static final String WORKER_TAG = "COMPENSATION_REMIND_WORKER";
+    private static final String WORKER_TAG = CompensationRemindWorker.class.getCanonicalName();
     private static final String KEY_COMPENSATION_ID = "COMPENSATION_ID";
     @Inject
     ApiRepository mApiRepo;
     private String mCompensationId;
+
+    /**
+     * Attaches a new instance of {@link CompensationRemindWorker} with the compensation object id
+     * as arguments.
+     *
+     * @param fm             the fragment manager to use for the transaction
+     * @param compensationId the object id of the compensation
+     * @return a new instance of {@link CompensationRemindWorker}
+     */
+    public static CompensationRemindWorker attach(@NonNull FragmentManager fm,
+                                                  @NonNull String compensationId) {
+        CompensationRemindWorker worker = (CompensationRemindWorker) fm.findFragmentByTag(WORKER_TAG);
+        if (worker == null) {
+            worker = CompensationRemindWorker.newInstance(compensationId);
+            fm.beginTransaction()
+                    .add(worker, WORKER_TAG + compensationId)
+                    .commit();
+        }
+
+        return worker;
+    }
 
     /**
      * Returns a new instance of {@link CompensationRemindWorker} with the compensation object id
@@ -57,7 +79,7 @@ public class CompensationRemindWorker extends BaseWorker<String, CompensationRem
     @Override
     protected void onError() {
         // TODO: check tag
-        mActivity.onWorkerError(WORKER_TAG);
+        mActivity.onWorkerError(WORKER_TAG + mCompensationId);
     }
 
     @Nullable
@@ -76,6 +98,6 @@ public class CompensationRemindWorker extends BaseWorker<String, CompensationRem
 
     @Override
     protected void setStream(@NonNull Observable<String> observable) {
-        mActivity.setCompensationReminderStream(observable.toSingle(), mCompensationId, WORKER_TAG);
+        mActivity.setCompensationRemindStream(observable.toSingle(), mCompensationId, WORKER_TAG + mCompensationId);
     }
 }

@@ -53,7 +53,7 @@ import ch.giantific.qwittig.utils.WorkerUtils;
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public class SettingsProfileFragment extends BaseFragment {
+public class SettingsProfileFragment extends Fragment {
 
     public static final int RESULT_CHANGES_DISCARDED = 2;
     private static final String LOG_TAG = SettingsProfileFragment.class.getSimpleName();
@@ -146,16 +146,6 @@ public class SettingsProfileFragment extends BaseFragment {
 
         setupPasswordViews(view);
         checkAvatar();
-    }
-
-    @Override
-    protected void setViewModelToActivity() {
-
-    }
-
-    @Override
-    protected View getSnackbarView() {
-        return null;
     }
 
     private void setupPasswordViews(View view) {
@@ -524,9 +514,9 @@ public class SettingsProfileFragment extends BaseFragment {
     /**
      * Defines the interaction with the hosting {@link Activity}.
      * <p/>
-     * Extends {@link ActivityListener}.
+     * Extends {@link BaseFragment.ActivityListener}.
      */
-    public interface FragmentInteractionListener extends ActivityListener {
+    public interface FragmentInteractionListener extends BaseFragment.ActivityListener {
         /**
          * Sets the avatar images as the toolbar backdrop image.
          */

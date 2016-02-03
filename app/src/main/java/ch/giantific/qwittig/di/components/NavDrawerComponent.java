@@ -12,6 +12,7 @@ import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.presentation.ui.activities.FinanceActivity;
 import ch.giantific.qwittig.presentation.ui.activities.HomeActivity;
 import ch.giantific.qwittig.presentation.ui.activities.PurchaseDetailsActivity;
+import ch.giantific.qwittig.presentation.ui.activities.StatsActivity;
 import ch.giantific.qwittig.presentation.ui.activities.TaskDetailsActivity;
 import ch.giantific.qwittig.presentation.ui.activities.TasksActivity;
 import dagger.Component;

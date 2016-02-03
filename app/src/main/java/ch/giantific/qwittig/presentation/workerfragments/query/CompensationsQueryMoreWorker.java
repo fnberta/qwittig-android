@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.presentation.workerfragments.query;
 
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,20 +21,33 @@ import rx.Observable;
  */
 public class CompensationsQueryMoreWorker extends BaseQueryWorker<Compensation, CompensationsQueryMoreListener> {
 
-    public static final String WORKER_TAG = "COMPENSATIONS_QUERY_MORE_WORKER";
+    private static final String WORKER_TAG = CompensationsQueryMoreWorker.class.getCanonicalName();
     private static final String KEY_SKIP = "SKIP";
     @Inject
     CompensationRepository mCompsRepo;
 
     /**
-     * Return a new instance of {@link CompensationsQueryMoreWorker} with the number of items to skip
-     * as arguments.
+     * Attaches a new instance of {@link CompensationsQueryMoreWorker} with the number of items to
+     * skip as arguments.
      *
+     * @param fm   the fragment manager to use for the transaction
      * @param skip the number of items to skip
      * @return a new instance of {@link CompensationsQueryMoreWorker}
      */
+    public static CompensationsQueryMoreWorker attach(@NonNull FragmentManager fm, int skip) {
+        CompensationsQueryMoreWorker worker = (CompensationsQueryMoreWorker) fm.findFragmentByTag(WORKER_TAG);
+        if (worker == null) {
+            worker = CompensationsQueryMoreWorker.newInstance(skip);
+            fm.beginTransaction()
+                    .add(worker, WORKER_TAG)
+                    .commit();
+        }
+
+        return worker;
+    }
+
     @NonNull
-    public static CompensationsQueryMoreWorker newInstance(int skip) {
+    private static CompensationsQueryMoreWorker newInstance(int skip) {
         CompensationsQueryMoreWorker fragment = new CompensationsQueryMoreWorker();
         Bundle args = new Bundle();
         args.putInt(KEY_SKIP, skip);

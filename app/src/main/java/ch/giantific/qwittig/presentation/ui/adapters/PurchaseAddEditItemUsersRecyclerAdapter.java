@@ -54,7 +54,7 @@ public class PurchaseAddEditItemUsersRecyclerAdapter extends RecyclerView.Adapte
     }
 
     @Override
-    public void onUserClick(int position) {
+    public void onRowItemUserClick(int position) {
         final RowItemUser user = mUsers.get(position);
         if (user.isSelected()) {
             boolean anotherUserSelected = false;
@@ -76,6 +76,13 @@ public class PurchaseAddEditItemUsersRecyclerAdapter extends RecyclerView.Adapte
             notifyItemChanged(position);
         }
 
+        // notify main view model because total and my share values need to be updated
+        mViewModel.onRowItemUserClick(position);
+    }
+
+    @Override
+    public void onTooFewUsersSelected() {
+        // nothing to do here
     }
 
     public static class ItemUserRow extends BindingRow<RowPurchaseAddItemUsersUserBinding> {
@@ -87,7 +94,7 @@ public class PurchaseAddEditItemUsersRecyclerAdapter extends RecyclerView.Adapte
             binding.getRoot().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    listener.onUserClick(getAdapterPosition());
+                    listener.onRowItemUserClick(getAdapterPosition());
                 }
             });
         }

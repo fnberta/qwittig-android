@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import com.mugen.Mugen;
 import com.mugen.MugenCallbacks;
 
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentHomePurchasesBinding;
 import ch.giantific.qwittig.di.components.DaggerHomeComponent;
@@ -55,6 +56,7 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment<HomePu
         super.onCreate(savedInstanceState);
 
         DaggerHomeComponent.builder()
+                .applicationComponent(Qwittig.getAppComponent(getActivity()))
                 .homeViewModelModule(new HomeViewModelModule(savedInstanceState))
                 .build()
                 .inject(this);
@@ -125,28 +127,12 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment<HomePu
 
     @Override
     public void loadUpdatePurchasesWorker() {
-        final FragmentManager fragmentManager = getFragmentManager();
-        Fragment fragment = WorkerUtils.findWorker(fragmentManager, PurchasesUpdateWorker.WORKER_TAG);
-        if (fragment == null) {
-            fragment = new PurchasesUpdateWorker();
-
-            fragmentManager.beginTransaction()
-                    .add(fragment, PurchasesUpdateWorker.WORKER_TAG)
-                    .commit();
-        }
+        PurchasesUpdateWorker.attach(getFragmentManager());
     }
 
     @Override
     public void loadQueryMorePurchasesWorker(int skip) {
-        final FragmentManager fragmentManager = getFragmentManager();
-        Fragment fragment = WorkerUtils.findWorker(fragmentManager, PurchasesQueryMoreWorker.WORKER_TAG);
-        if (fragment == null) {
-            fragment = PurchasesQueryMoreWorker.newInstance(skip);
-
-            fragmentManager.beginTransaction()
-                    .add(fragment, PurchasesQueryMoreWorker.WORKER_TAG)
-                    .commit();
-        }
+        PurchasesQueryMoreWorker.attach(getFragmentManager(), skip);
     }
 
     @SuppressWarnings("unchecked")

@@ -41,6 +41,7 @@ public class HomeDraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, Hom
 
         mPurchaseRepo = purchaseRepo;
         if (savedState != null) {
+            mItems = new ArrayList<>();
             mDraftsSelected = savedState.getStringArrayList(STATE_DRAFTS_SELECTED);
             mSelectionModeEnabled = savedState.getBoolean(STATE_SELECTION_MODE, false);
         } else {

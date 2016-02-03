@@ -36,6 +36,7 @@
                 android:id="@+id/appbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:animateLayoutChanges="true"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 >
 
@@ -45,7 +46,6 @@
                     android:layout_height="?attr/actionBarSize"
                     android:background="?attr/colorPrimary"
                     app:contentInsetStart="@dimen/key_line_2"
-                    app:layout_scrollFlags="scroll|enterAlways|snap"
                     app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                     />
 
@@ -53,6 +53,7 @@
                     android:id="@+id/tabs"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:visibility="@{viewModel.draftsAvailable ? View.VISIBLE : View.GONE}"
                     />
 
             </android.support.design.widget.AppBarLayout>
@@ -61,7 +62,17 @@
                 android:id="@+id/viewpager"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:visibility="@{viewModel.draftsAvailable ? View.VISIBLE : View.GONE}"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                />
+
+            <FrameLayout
+                android:id="@+id/container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="?attr/actionBarSize"
+                android:visibility="@{viewModel.draftsAvailable ? View.GONE: View.VISIBLE}"
+                tools:ignore="MergeRootFrame"
                 />
 
             <ch.berta.fabio.fabspeeddial.FabMenu
@@ -77,8 +88,8 @@
                     android:id="@+id/fab_manual"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_create_black_24dp"
                     android:onClick="@{viewModel.onFabAddPurchaseManualClick}"
+                    android:src="@drawable/ic_create_black_24dp"
                     app:fabSize="mini"
                     />
 
@@ -86,8 +97,8 @@
                     android:id="@+id/fab_auto"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_camera_alt_black_24dp"
                     android:onClick="@{viewModel.onFabAddPurchaseAutoClick}"
+                    android:src="@drawable/ic_camera_alt_black_24dp"
                     app:fabSize="mini"
                     />
             </ch.berta.fabio.fabspeeddial.FabMenu>

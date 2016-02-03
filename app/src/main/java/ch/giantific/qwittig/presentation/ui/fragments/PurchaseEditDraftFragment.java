@@ -70,6 +70,7 @@ public class PurchaseEditDraftFragment extends PurchaseAddEditBaseFragment<Purch
                 return true;
             case R.id.action_purchase_edit_draft_delete:
                 mViewModel.onDeleteDraftClick();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

@@ -5,6 +5,7 @@
 package ch.giantific.qwittig.presentation.workerfragments.save;
 
 import android.annotation.SuppressLint;
+import android.app.FragmentManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -52,14 +53,39 @@ public class PurchaseEditSaveWorker extends PurchaseSaveWorker {
      * @param draft               whether we are saving a draft or an already saved purchase
      */
     @SuppressLint("ValidFragment")
-    public PurchaseEditSaveWorker(@NonNull Purchase purchase, @Nullable byte[] receiptImage,
-                                  @Nullable ParseFile receiptParseFileOld,
-                                  boolean deleteOldReceipt, boolean draft) {
+    private PurchaseEditSaveWorker(@NonNull Purchase purchase, @Nullable byte[] receiptImage,
+                                   @Nullable ParseFile receiptParseFileOld,
+                                   boolean deleteOldReceipt, boolean draft) {
         super(purchase, receiptImage);
 
         mDeleteOldReceipt = deleteOldReceipt;
         mReceiptParseFileOld = receiptParseFileOld;
         mDraft = draft;
+    }
+
+    /**
+     * Attaches a new instance of a {@link PurchaseEditSaveWorker}.
+     *
+     * @param fm           the fragment manager to use for the transaction
+     * @param purchase     the {@link Purchase} object to save
+     * @param receiptImage the receipt image to attach to the purchase
+     * @return a new instance of a {@link PurchaseEditSaveWorker}
+     */
+    public static PurchaseEditSaveWorker attach(@NonNull FragmentManager fm,
+                                                @NonNull Purchase purchase,
+                                                @Nullable byte[] receiptImage,
+                                                @Nullable ParseFile receiptParseFileOld,
+                                                boolean deleteOldReceipt, boolean draft) {
+        PurchaseEditSaveWorker worker = (PurchaseEditSaveWorker) fm.findFragmentByTag(WORKER_TAG);
+        if (worker == null) {
+            worker = new PurchaseEditSaveWorker(purchase, receiptImage, receiptParseFileOld,
+                    deleteOldReceipt, draft);
+            fm.beginTransaction()
+                    .add(worker, WORKER_TAG)
+                    .commit();
+        }
+
+        return worker;
     }
 
     @NonNull

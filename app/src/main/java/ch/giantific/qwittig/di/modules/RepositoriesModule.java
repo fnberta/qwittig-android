@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.di.modules;
 
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
@@ -14,7 +15,7 @@ import ch.giantific.qwittig.data.repositories.ParseGroupRepository;
 import ch.giantific.qwittig.data.repositories.ParsePurchaseRepository;
 import ch.giantific.qwittig.data.repositories.ParseTaskRepository;
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
-import ch.giantific.qwittig.di.scopes.PerFragment;
+import ch.giantific.qwittig.data.rest.ExchangeRates;
 import ch.giantific.qwittig.domain.repositories.ApiRepository;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
@@ -49,8 +50,9 @@ public class RepositoriesModule {
     }
 
     @Provides
-    PurchaseRepository providesPurchaseRepository() {
-        return new ParsePurchaseRepository();
+    PurchaseRepository providesPurchaseRepository(@NonNull SharedPreferences sharedPreferences,
+                                                  @NonNull ExchangeRates exchangeRates) {
+        return new ParsePurchaseRepository(sharedPreferences, exchangeRates);
     }
 
     @Provides

@@ -4,7 +4,6 @@
 
 package ch.giantific.qwittig.presentation.viewmodels;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -28,10 +27,9 @@ public class PurchaseEditDraftViewModelImpl extends PurchaseAddEditViewModelEdit
     public PurchaseEditDraftViewModelImpl(@Nullable Bundle savedState,
                                           @NonNull GroupRepository groupRepository,
                                           @NonNull UserRepository userRepository,
-                                          @NonNull SharedPreferences sharedPreferences,
                                           @NonNull PurchaseRepository purchaseRepo,
                                           @NonNull String editPurchaseId) {
-        super(savedState, groupRepository, userRepository, sharedPreferences, purchaseRepo, editPurchaseId);
+        super(savedState, groupRepository, userRepository, purchaseRepo, editPurchaseId);
     }
 
     @Override
@@ -67,11 +65,11 @@ public class PurchaseEditDraftViewModelImpl extends PurchaseAddEditViewModelEdit
 
     @Override
     public void onDeleteDraftClick() {
-        mSubscriptions.add(mPurchaseRepo.removePurchaseLocalAsync(mEditPurchase, null)
+        mSubscriptions.add(mPurchaseRepo.removePurchaseLocalAsync(mEditPurchase, Purchase.PIN_LABEL_DRAFT)
                 .subscribe(new SingleSubscriber<Purchase>() {
                     @Override
                     public void onSuccess(Purchase value) {
-                        mView.finishScreen(RESULT_PURCHASE_DRAFT_DELETED);
+                        mView.finishScreen(PurchaseResult.PURCHASE_DRAFT_DELETED);
                     }
 
                     @Override

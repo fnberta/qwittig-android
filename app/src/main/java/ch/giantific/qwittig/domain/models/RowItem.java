@@ -146,10 +146,12 @@ public class RowItem extends BaseObservable implements Parcelable {
         return MoneyUtils.parsePrice(mPrice).setScale(maxFractionDigits, BigDecimal.ROUND_HALF_UP);
     }
 
-    public List<String> getUserIds() {
+    public List<String> getSelectedUserIds() {
         final List<String> userIds = new ArrayList<>();
         for (RowItemUser user : mUsers) {
-            userIds.add(user.getObjectId());
+            if (user.isSelected()) {
+                userIds.add(user.getObjectId());
+            }
         }
         return userIds;
     }

@@ -5,8 +5,6 @@
 package ch.giantific.qwittig.presentation.ui.fragments;
 
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -23,7 +21,6 @@ import ch.giantific.qwittig.di.modules.FinanceViewModelModule;
 import ch.giantific.qwittig.presentation.ui.adapters.UsersRecyclerAdapter;
 import ch.giantific.qwittig.presentation.viewmodels.FinanceUsersViewModel;
 import ch.giantific.qwittig.presentation.workerfragments.query.UsersUpdateWorker;
-import ch.giantific.qwittig.utils.WorkerUtils;
 
 /**
  * Displays the users of a group and their current balances in a {@link RecyclerView} list. Does not
@@ -74,14 +71,7 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewOnlineFragment<
 
     @Override
     public void loadUpdateUsersWorker() {
-        final FragmentManager fragmentManager = getFragmentManager();
-        Fragment userQueryWorker = WorkerUtils.findWorker(fragmentManager, UsersUpdateWorker.WORKER_TAG);
-        if (userQueryWorker == null) {
-            userQueryWorker = new UsersUpdateWorker();
-            fragmentManager.beginTransaction()
-                    .add(userQueryWorker, UsersUpdateWorker.WORKER_TAG)
-                    .commit();
-        }
+        UsersUpdateWorker.attach(getFragmentManager());
     }
 
     @Override

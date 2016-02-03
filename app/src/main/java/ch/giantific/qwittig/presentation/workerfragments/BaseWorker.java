@@ -19,6 +19,7 @@ import ch.giantific.qwittig.domain.repositories.UserRepository;
 import rx.Observable;
 import rx.Subscription;
 import rx.subjects.PublishSubject;
+import rx.subjects.ReplaySubject;
 
 /**
  * Provides an abstract class for a so-called headless {@link Fragment}, which does not contain
@@ -31,7 +32,7 @@ public abstract class BaseWorker<T, S extends BaseWorkerListener> extends Fragme
     @Inject
     protected UserRepository mUserRepo;
     private Subscription mSubscription;
-    private PublishSubject<T> mSubject = PublishSubject.create();
+    private ReplaySubject<T> mSubject = ReplaySubject.create();
 
     public BaseWorker() {
         // empty default constructor
@@ -63,13 +64,7 @@ public abstract class BaseWorker<T, S extends BaseWorkerListener> extends Fragme
                 .build();
         injectWorkerDependencies(component);
 
-        final Bundle args = getArguments();
-        if (args == null) {
-            onError();
-            return;
-        }
-
-        final Observable<T> observable = getObservable(args);
+        final Observable<T> observable = getObservable(getArguments());
         if (observable != null) {
             mSubscription = observable.subscribe(mSubject);
         } else {

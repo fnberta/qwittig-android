@@ -8,7 +8,7 @@ import android.support.annotation.NonNull;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
-import ch.giantific.qwittig.domain.models.parse.Compensation;
+import ch.giantific.qwittig.domain.models.CompensationUnpaidItem;
 import ch.giantific.qwittig.presentation.ui.adapters.CompensationsUnpaidRecyclerAdapter;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.CompensationChangeAmountDialogFragment;
 import ch.giantific.qwittig.presentation.workerfragments.query.CompensationsUpdateListener;
@@ -17,13 +17,10 @@ import ch.giantific.qwittig.presentation.workerfragments.reminder.CompensationRe
 /**
  * Created by fabio on 18.01.16.
  */
-public interface FinanceCompsUnpaidViewModel extends OnlineListViewModel<Compensation, FinanceCompsUnpaidViewModel.ViewListener>,
-        CompensationsUpdateListener, CompensationReminderListener,
+public interface FinanceCompsUnpaidViewModel extends OnlineListViewModel<CompensationUnpaidItem, FinanceCompsUnpaidViewModel.ViewListener>,
+        FinanceHeaderViewModel, CompensationsUpdateListener, CompensationReminderListener,
         CompensationsUnpaidRecyclerAdapter.AdapterInteractionListener,
         CompensationChangeAmountDialogFragment.DialogInteractionListener {
-
-    int TYPE_PENDING_POS = 1;
-    int TYPE_PENDING_NEG = 2;
 
     interface ViewListener extends OnlineListViewModel.ViewListener {
 
@@ -31,6 +28,9 @@ public interface FinanceCompsUnpaidViewModel extends OnlineListViewModel<Compens
 
         void loadCompensationRemindWorker(@NonNull String compensationId);
 
-        void showChangeCompensationAmountDialog(@NonNull BigFraction amount, @NonNull String currency);
+        void showCompensationAmountConfirmDialog(@NonNull BigFraction amount,
+                                                 @NonNull String currency);
+
+        void setColorTheme(@NonNull BigFraction balance);
     }
 }

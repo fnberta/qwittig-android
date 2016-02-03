@@ -334,11 +334,14 @@
     <string name="toast_error_users_load">Laden der Nutzer fehlgeschlagen</string>
     <string name="toast_error_comps_load">Laden der Abrechnungen fehlgeschlagen</string>
     <string name="toast_compensation_accepted">Zahlung akzeptiert</string>
-    <string name="header_comps_pending">Pendent</string>
-    <string name="header_comps_suggestions">Vorschläge</string>
+    <string name="header_comps_credits">Guthaben</string>
+    <string name="header_comps_debts">Schulden</string>
     <string name="comp_unpaid_button_claim">Einfordern</string>
     <string name="toast_error_purchases_load">Laden der Einkäufe fehlgeschlagen</string>
     <string name="toast_error_drafts_load">Laden der Entwürfe fehlgeschlagen</string>
     <string name="toast_error_receipt_load">Laden der Quittung fehlgeschlagen</string>
+    <string name="toast_store_empty">Bitte gib ein Geschäft ein</string>
+    <string name="toast_error_exchange_rate">Laden des Wechselkurses fehlgeschlagen</string>
+    <string name="toast_error_comps_paid">Bestätigung der Zahlung fehlgeschlagen</string>
 
 </resources>

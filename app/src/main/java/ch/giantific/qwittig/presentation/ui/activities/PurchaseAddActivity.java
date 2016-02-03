@@ -25,7 +25,6 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivityPurchaseAddEditBinding;
 import ch.giantific.qwittig.domain.models.ocr.OcrPurchase;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
-import ch.giantific.qwittig.domain.models.rates.CurrencyRates;
 import ch.giantific.qwittig.presentation.ui.fragments.PurchaseAddEditBaseFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.PurchaseAddFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.PurchaseNoteFragment;
@@ -40,7 +39,6 @@ import ch.giantific.qwittig.presentation.workerfragments.RatesWorkerListener;
 import ch.giantific.qwittig.presentation.workerfragments.save.PurchaseSaveWorkerListener;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.Utils;
-import rx.Observable;
 import rx.Single;
 
 /**
@@ -75,6 +73,12 @@ public class PurchaseAddActivity extends BaseActivity<PurchaseAddEditViewModel> 
             @Override
             public void onProgressFinalAnimationComplete() {
                 mViewModel.onProgressFinalAnimationComplete();
+            }
+        });
+        mBinding.fabPurchaseSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mViewModel.onFabSavePurchaseClick(v);
             }
         });
 
@@ -226,14 +230,14 @@ public class PurchaseAddActivity extends BaseActivity<PurchaseAddEditViewModel> 
     }
 
     @Override
-    public void onExchangeRateSet(float exchangeRate) {
-        mViewModel.onExchangeRateSet(exchangeRate);
+    public void onExchangeRateManuallySet(float exchangeRate) {
+        mViewModel.onExchangeRateManuallySet(exchangeRate);
     }
 
     @Override
-    public void setRatesFetchStream(@NonNull Observable<CurrencyRates> observable,
+    public void setRateFetchStream(@NonNull Single<Float> single,
                                     @NonNull String workerTag) {
-        mViewModel.setRatesFetchStream(observable, workerTag);
+        mViewModel.setRateFetchStream(single, workerTag);
     }
 
     @Override

@@ -6,7 +6,6 @@ package ch.giantific.qwittig.presentation.viewmodels;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
-import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.AdapterView;
@@ -14,8 +13,6 @@ import android.widget.AdapterView;
 import com.parse.ParseObject;
 
 import java.util.List;
-
-import javax.inject.Inject;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
@@ -59,30 +56,20 @@ public class NavDrawerViewModelImpl extends BaseObservable implements NavDrawerV
     private void loadUserGroups() {
         mUserGroups = mCurrentUser.getGroups();
         mGroupRepo.fetchGroupsDataAsync(mUserGroups)
+                .toList()
                 .toSingle()
-                .subscribe(new SingleSubscriber<Group>() {
+                .subscribe(new SingleSubscriber<List<Group>>() {
                     @Override
-                    public void onSuccess(Group value) {
+                    public void onSuccess(List<Group> groups) {
                         mView.bindHeaderView();
-                        mView.setupHeaderGroupSelection(mUserGroups);
-                        updateGroupSelectionList();
+                        mView.setupHeaderGroupSelection(groups);
                     }
 
                     @Override
                     public void onError(Throwable error) {
-                        // TODO: handle error
+
                     }
                 });
-    }
-
-    private void updateGroupSelectionList() {
-        mUserGroups.clear();
-        List<ParseObject> groups = mCurrentUser.getGroups();
-        if (!groups.isEmpty()) {
-            mUserGroups.addAll(groups);
-        }
-
-        mView.notifyHeaderGroupListChanged();
     }
 
     @Override
@@ -126,7 +113,17 @@ public class NavDrawerViewModelImpl extends BaseObservable implements NavDrawerV
     @Override
     public void onGroupChanged() {
         updateGroupSelectionList();
-        notifyPropertyChanged(BR.selectedGroup);
+        notifySelectedGroupChanged();
+    }
+
+    private void updateGroupSelectionList() {
+        mUserGroups.clear();
+        List<ParseObject> groups = mCurrentUser.getGroups();
+        if (!groups.isEmpty()) {
+            mUserGroups.addAll(groups);
+        }
+
+        mView.notifyHeaderGroupListChanged();
     }
 
     @Override

@@ -10,8 +10,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.ViewUtils;
-import android.view.View;
 
 import ch.giantific.qwittig.BR;
 
@@ -35,10 +33,6 @@ public class RowItemUser extends BaseObservable implements Parcelable {
     private String mNickname;
     private byte[] mAvatar;
     private boolean mSelected;
-
-    public RowItemUser(@NonNull String objectId, @NonNull String nickname, @Nullable byte[] avatar) {
-        this(objectId, nickname, avatar, true);
-    }
 
     public RowItemUser(@NonNull String objectId, @NonNull String nickname, @Nullable byte[] avatar,
                        boolean selected) {

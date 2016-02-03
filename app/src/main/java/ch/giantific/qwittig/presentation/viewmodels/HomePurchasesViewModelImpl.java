@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
@@ -40,7 +41,9 @@ public class HomePurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purc
         super(savedState, groupRepo, userRepository);
 
         mPurchaseRepo = purchaseRepo;
+
         if (savedState != null) {
+            mItems = new ArrayList<>();
             mIsLoadingMore = savedState.getBoolean(STATE_IS_LOADING_MORE, false);
         }
     }
@@ -82,6 +85,7 @@ public class HomePurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purc
 
                     @Override
                     public void onError(Throwable e) {
+                        setLoading(false);
                         mView.showMessage(R.string.toast_error_purchases_load);
                     }
 
@@ -124,6 +128,7 @@ public class HomePurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purc
         return new MessageAction(R.string.action_retry) {
             @Override
             public void onClick(View v) {
+                setRefreshing(true);
                 refreshItems();
             }
         };
@@ -145,6 +150,8 @@ public class HomePurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purc
                     @Override
                     public void onSuccess(List<Purchase> purchases) {
                         mView.removeWorker(workerTag);
+                        setRefreshing(false);
+
                         updateList();
                     }
 
@@ -152,6 +159,7 @@ public class HomePurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purc
                     public void onError(Throwable error) {
                         mView.removeWorker(workerTag);
                         setRefreshing(false);
+
                         mView.showMessageWithAction(mPurchaseRepo.getErrorMessage(error),
                                 getRefreshAction());
                     }

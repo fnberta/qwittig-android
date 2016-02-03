@@ -5,6 +5,7 @@
 package ch.giantific.qwittig.presentation.ui.fragments;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -43,7 +44,7 @@ import ch.giantific.qwittig.presentation.ui.adapters.StoresRecyclerAdapter;
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public class SettingsStoresFragment extends BaseFragment implements
+public class SettingsStoresFragment extends Fragment implements
         StoresRecyclerAdapter.AdapterInteractionListener,
         ActionMode.Callback {
 
@@ -151,16 +152,6 @@ public class SettingsStoresFragment extends BaseFragment implements
                 });
             }
         }
-    }
-
-    @Override
-    protected void setViewModelToActivity() {
-
-    }
-
-    @Override
-    protected View getSnackbarView() {
-        return null;
     }
 
     private void startActionMode() {
@@ -293,9 +284,9 @@ public class SettingsStoresFragment extends BaseFragment implements
     /**
      * Defines the interaction with the hosting {@link Activity}.
      * <p/>
-     * Extends {@link ActivityListener}.
+     * Extends {@link BaseFragment.ActivityListener}.
      */
-    public interface FragmentInteractionListener extends ActivityListener {
+    public interface FragmentInteractionListener extends BaseFragment.ActivityListener {
         /**
          * Handles the visibility change of the {@link FloatingActionButton}.
          */

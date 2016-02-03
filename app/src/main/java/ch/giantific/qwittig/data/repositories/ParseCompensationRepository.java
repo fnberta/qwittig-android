@@ -292,4 +292,21 @@ public class ParseCompensationRepository extends ParseBaseRepository<Compensatio
         return (Compensation) query.get(compensationId);
     }
 
+    @Override
+    public Single<Compensation> saveCompensationPaid(@NonNull Compensation compensation) {
+        return unpin(compensation, Compensation.PIN_LABEL_UNPAID)
+                .flatMap(new Func1<Compensation, Single<Compensation>>() {
+                    @Override
+                    public Single<Compensation> call(Compensation compensation) {
+                        return pin(compensation, Compensation.PIN_LABEL_PAID);
+                    }
+                })
+                .doOnSuccess(new Action1<Compensation>() {
+                    @Override
+                    public void call(Compensation compensation) {
+                        compensation.setPaid(true);
+                        compensation.saveEventually();
+                    }
+                });
+    }
 }

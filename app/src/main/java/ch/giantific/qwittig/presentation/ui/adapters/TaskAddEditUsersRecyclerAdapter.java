@@ -12,7 +12,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
-import ch.giantific.qwittig.databinding.RowTaskAddEditUsersBinding;
+import ch.giantific.qwittig.databinding.RowTaskAddEditUserBinding;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.presentation.ui.adapters.rows.BindingRow;
 import ch.giantific.qwittig.presentation.viewmodels.TaskAddEditViewModel;
@@ -45,13 +45,13 @@ public class TaskAddEditUsersRecyclerAdapter extends RecyclerView.Adapter<TaskAd
     @Override
     public TaskUserInvolvedRow onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        final RowTaskAddEditUsersBinding binding = RowTaskAddEditUsersBinding.inflate(inflater, parent, false);
+        final RowTaskAddEditUserBinding binding = RowTaskAddEditUserBinding.inflate(inflater, parent, false);
         return new TaskUserInvolvedRow(binding, mViewModel);
     }
 
     @Override
     public void onBindViewHolder(TaskUserInvolvedRow holder, int position) {
-        final RowTaskAddEditUsersBinding binding = holder.getBinding();
+        final RowTaskAddEditUserBinding binding = holder.getBinding();
         final TaskUserInvolvedRowViewModel viewModel = binding.getViewModel();
 
         final User user = mViewModel.getUserAvailableAtPosition(position);
@@ -95,7 +95,7 @@ public class TaskAddEditUsersRecyclerAdapter extends RecyclerView.Adapter<TaskAd
      * Provides a {@link RecyclerView} row that displays the user's avatar, the nickname and a
      * drag handler.
      */
-    public static class TaskUserInvolvedRow extends BindingRow<RowTaskAddEditUsersBinding> {
+    public static class TaskUserInvolvedRow extends BindingRow<RowTaskAddEditUserBinding> {
 
         /**
          * Constructs a new {@link TaskUserInvolvedRow} and sets the click and drag listeners.
@@ -103,7 +103,7 @@ public class TaskAddEditUsersRecyclerAdapter extends RecyclerView.Adapter<TaskAd
          * @param binding  the binding for the row
          * @param listener the callback for user clicks and drags
          */
-        public TaskUserInvolvedRow(@NonNull RowTaskAddEditUsersBinding binding,
+        public TaskUserInvolvedRow(@NonNull RowTaskAddEditUserBinding binding,
                                    @NonNull final AdapterInteractionListener listener) {
             super(binding);
 

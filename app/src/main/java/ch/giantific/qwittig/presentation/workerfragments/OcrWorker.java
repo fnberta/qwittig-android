@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.presentation.workerfragments;
 
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,12 +17,13 @@ import java.io.File;
 
 import javax.inject.Inject;
 
-import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.data.rest.ReceiptOcr;
 import ch.giantific.qwittig.di.components.WorkerComponent;
 import ch.giantific.qwittig.domain.models.ocr.OcrPurchase;
 import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 /**
  * Sends the image of receipt to the server to analyse and ocr it using
@@ -31,8 +33,7 @@ import rx.functions.Func1;
  */
 public class OcrWorker extends BaseWorker<OcrPurchase, OcrWorkerListener> {
 
-    public static final String WORKER_TAG = "OCR_WORKER";
-    private static final String LOG_TAG = OcrWorker.class.getSimpleName();
+    private static final String WORKER_TAG = OcrWorker.class.getCanonicalName();
     private static final String BUNDLE_RECEIPT_PATH = "BUNDLE_RECEIPT_PATH";
     private static final int MAX_RETRIES = 0;
     @Inject
@@ -43,13 +44,26 @@ public class OcrWorker extends BaseWorker<OcrPurchase, OcrWorkerListener> {
     }
 
     /**
-     * Returns a new instance of {@link OcrWorker} with the path to a receipt image as an argument.
+     * Attaches a new instance of {@link OcrWorker} with the path to a receipt image as an argument.
      *
+     * @param fm          the fragment manager to use for the transaction
      * @param receiptPath the path to the image of the receipt to perform ocr on
      * @return a new instance of {@link OcrWorker}
      */
+    public static OcrWorker attach(@NonNull FragmentManager fm, @NonNull String receiptPath) {
+        OcrWorker worker = (OcrWorker) fm.findFragmentByTag(WORKER_TAG);
+        if (worker == null) {
+            worker = OcrWorker.newInstance(receiptPath);
+            fm.beginTransaction()
+                    .add(worker, WORKER_TAG)
+                    .commit();
+        }
+
+        return worker;
+    }
+
     @NonNull
-    public static OcrWorker newInstance(@NonNull String receiptPath) {
+    private static OcrWorker newInstance(@NonNull String receiptPath) {
         OcrWorker fragment = new OcrWorker();
         Bundle args = new Bundle();
         args.putString(BUNDLE_RECEIPT_PATH, receiptPath);
@@ -78,7 +92,9 @@ public class OcrWorker extends BaseWorker<OcrPurchase, OcrWorkerListener> {
                             final RequestBody receiptPart = RequestBody.create(
                                     MediaType.parse("image/jpeg"), new File(receiptPath));
 
-                            return mReceiptOcr.uploadReceipt(tokenPart, receiptPart);
+                            return mReceiptOcr.uploadReceipt(tokenPart, receiptPart)
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread());
                         }
                     });
         }

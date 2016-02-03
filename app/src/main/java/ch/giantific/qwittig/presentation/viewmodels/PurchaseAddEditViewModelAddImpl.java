@@ -4,7 +4,6 @@
 
 package ch.giantific.qwittig.presentation.viewmodels;
 
-import android.content.SharedPreferences;
 import android.databinding.Bindable;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
@@ -25,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.R;
@@ -39,14 +37,13 @@ import ch.giantific.qwittig.domain.models.ocr.OcrPurchase;
 import ch.giantific.qwittig.domain.models.parse.Item;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.domain.models.rates.CurrencyRates;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.viewmodels.PurchaseAddEditViewModel.ViewListener;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
-import rx.Observable;
+import ch.giantific.qwittig.utils.parse.ParseUtils;
 import rx.Single;
 import rx.SingleSubscriber;
 import rx.functions.Func1;
@@ -65,12 +62,11 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
     private static final String STATE_DATE = "STATE_DATE";
     private static final String STATE_STORE = "STATE_STORE";
     private static final String STATE_CURRENCY = "STATE_CURRENCY";
+    private static final String STATE_EXCHANGE_RATE = "STATE_EXCHANGE_RATE";
     private static final String STATE_NOTE = "STATE_NOTE";
     private static final String STATE_RECEIPT_IMAGE_PATH = "STATE_RECEIPT_IMAGE_PATH";
     private static final String STATE_RECEIPT_IMAGE_PATHS = "STATE_RECEIPT_IMAGE_PATHS";
     private static final String STATE_FETCHING_RATES = "STATE_FETCHING_RATES";
-    private static final String EXCHANGE_RATE_LAST_FETCHED_TIME = "EXCHANGE_RATE_LAST_FETCHED_TIME";
-    private static final long EXCHANGE_RATE_REFRESH_INTERVAL = 24 * 60 * 60 * 1000;
     PurchaseRepository mPurchaseRepo;
     String mCurrency;
     String mReceiptImagePath;
@@ -79,9 +75,9 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
     String mStore;
     BigDecimal mTotalPrice = BigDecimal.ZERO;
     float mExchangeRate;
-    private SharedPreferences mSharedPreferences;
+    boolean mSaving;
+    private List<String> mSupportedCurrencies = ParseUtils.getSupportedCurrencyCodes();
     private List<User> mUsersAvailable = new ArrayList<>();
-    private boolean mSaving;
     private BigDecimal mMyShare = BigDecimal.ZERO;
     private boolean mFetchingExchangeRates;
     private ArrayList<String> mReceiptImagePaths;
@@ -89,11 +85,9 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
     public PurchaseAddEditViewModelAddImpl(@Nullable Bundle savedState,
                                            @NonNull GroupRepository groupRepository,
                                            @NonNull UserRepository userRepository,
-                                           @NonNull SharedPreferences sharedPreferences,
                                            @NonNull PurchaseRepository purchaseRepo) {
         super(savedState, groupRepository, userRepository);
 
-        mSharedPreferences = sharedPreferences;
         mPurchaseRepo = purchaseRepo;
 
         if (savedState != null) {
@@ -101,7 +95,8 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
             mSaving = savedState.getBoolean(STATE_SAVING);
             mDate = DateUtils.parseLongToDate(savedState.getLong(STATE_DATE));
             mStore = savedState.getString(STATE_STORE);
-            mCurrency = savedState.getString(STATE_CURRENCY);
+            setCurrency(savedState.getString(STATE_CURRENCY, mCurrentGroup.getCurrency()));
+            mExchangeRate = savedState.getFloat(STATE_EXCHANGE_RATE);
             mNote = savedState.getString(STATE_NOTE);
             mReceiptImagePath = savedState.getString(STATE_RECEIPT_IMAGE_PATH);
             if (USE_CUSTOM_CAMERA) {
@@ -109,12 +104,24 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
             }
             mFetchingExchangeRates = savedState.getBoolean(STATE_FETCHING_RATES);
         } else {
+            initFixedRows();
+            mLoading = false;
             mDate = new Date();
             mCurrency = mCurrentGroup.getCurrency();
+            mExchangeRate = 1;
             if (USE_CUSTOM_CAMERA) {
                 mReceiptImagePaths = new ArrayList<>();
             }
         }
+    }
+
+    private void initFixedRows() {
+        mItems.add(PurchaseAddEditItem.createNewHeaderInstance(R.string.header_purchase));
+        mItems.add(PurchaseAddEditItem.createNewDateInstance());
+        mItems.add(PurchaseAddEditItem.createNewStoreInstance());
+        mItems.add(PurchaseAddEditItem.createNewHeaderInstance(R.string.header_items));
+        mItems.add(PurchaseAddEditItem.createNewAddRowInstance());
+        mItems.add(PurchaseAddEditItem.createNewTotalInstance());
     }
 
     @Override
@@ -126,17 +133,13 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
         outState.putLong(STATE_DATE, DateUtils.parseDateToLong(mDate));
         outState.putString(STATE_STORE, mStore);
         outState.putString(STATE_CURRENCY, mCurrency);
+        outState.putFloat(STATE_EXCHANGE_RATE, mExchangeRate);
         outState.putString(STATE_NOTE, mNote);
         outState.putString(STATE_RECEIPT_IMAGE_PATH, mReceiptImagePath);
         if (USE_CUSTOM_CAMERA) {
             outState.putStringArrayList(STATE_RECEIPT_IMAGE_PATHS, mReceiptImagePaths);
         }
         outState.putBoolean(STATE_FETCHING_RATES, mFetchingExchangeRates);
-    }
-
-    @Override
-    public boolean isSaving() {
-        return mSaving;
     }
 
     @Override
@@ -192,9 +195,27 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
     }
 
     @Override
+    public List<String> getSupportedCurrencies() {
+        return mSupportedCurrencies;
+    }
+
+    @Override
     @Bindable
     public String getCurrency() {
         return mCurrency;
+    }
+
+    @Override
+    public void setCurrency(@NonNull String currency) {
+        mCurrency = currency;
+        notifyPropertyChanged(BR.currencySelected);
+        notifyPropertyChanged(BR.currency);
+    }
+
+    @Override
+    @Bindable
+    public int getCurrencySelected() {
+        return mSupportedCurrencies.indexOf(mCurrency);
     }
 
     @Override
@@ -207,15 +228,21 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
     public void setExchangeRate(float exchangeRate) {
         mExchangeRate = exchangeRate;
         notifyPropertyChanged(BR.exchangeRate);
+        notifyPropertyChanged(BR.exchangeRateVisible);
     }
 
     @Override
+    @Bindable
     public boolean isExchangeRateVisible() {
-        return mExchangeRate == 1;
+        return mExchangeRate != 1;
     }
 
     @Override
     public void onRowPriceChanged() {
+        updateTotalAndMyShare();
+    }
+
+    private void updateTotalAndMyShare() {
         BigDecimal totalPrice = BigDecimal.ZERO;
         BigDecimal myShare = BigDecimal.ZERO;
         final int maximumFractionDigits = MoneyUtils.getMaximumFractionDigits(mCurrency);
@@ -233,11 +260,21 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
 
             // update my share
             final RowItemUser[] rowItemUsers = rowItem.getUsers();
-            final List<User> usersInvolved = getUsersInvolved(rowItemUsers);
-            if (usersInvolved.contains(mCurrentUser)) {
-                final BigDecimal usersCount = new BigDecimal(usersInvolved.size());
-                myShare = myShare.add(finalPrice.divide(usersCount, maximumFractionDigits,
-                        BigDecimal.ROUND_HALF_UP));
+            int selectedCount = 0;
+            boolean currentUserInvolved = false;
+            for (RowItemUser rowItemUser : rowItemUsers) {
+                if (!rowItemUser.isSelected()) {
+                    continue;
+                }
+
+                selectedCount++;
+                if (rowItemUser.getObjectId().equals(mCurrentUser.getObjectId())) {
+                    currentUserInvolved = true;
+                }
+            }
+            if (currentUserInvolved) {
+                myShare = myShare.add(finalPrice.divide(new BigDecimal(selectedCount),
+                        maximumFractionDigits, BigDecimal.ROUND_HALF_UP));
             }
         }
 
@@ -267,91 +304,54 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
             return;
         }
 
-        // update item prices, total price and my share
-        for (PurchaseAddEditItem addEditItem : mItems) {
+        mCurrency = currency;
+
+        // update item price formatting
+        for (int i = 0, size = mItems.size(); i < size; i++) {
+            final PurchaseAddEditItem addEditItem = mItems.get(i);
             if (addEditItem.getType() == Type.ITEM) {
                 addEditItem.getRowItem().updateCurrency(mCurrency);
             }
         }
+
+        // update total price and my share formatting
         notifyPropertyChanged(BR.totalPrice);
         notifyPropertyChanged(BR.myShare);
+        // update my share currency field
         notifyPropertyChanged(BR.currency);
 
-        // update exchangeRate
-        updateExchangeRate();
-    }
-
-    private void updateExchangeRate() {
-        if (mCurrency.equals(mCurrentGroup.getCurrency())) {
-            mExchangeRate = 1;
-            notifyPropertyChanged(BR.exchangeRateVisible);
-        } else {
-            mExchangeRate = mSharedPreferences.getFloat(mCurrency, 1);
-            if (mExchangeRate == 1) {
-                mView.loadFetchExchangeRatesWorker(mCurrentGroup.getCurrency());
-            } else {
-                long lastFetched = mSharedPreferences.getLong(EXCHANGE_RATE_LAST_FETCHED_TIME, 0);
-                long currentTime = System.currentTimeMillis();
-                if (currentTime - lastFetched > EXCHANGE_RATE_REFRESH_INTERVAL) {
-                    final SharedPreferences.Editor editor = mSharedPreferences.edit();
-                    editor.putLong(EXCHANGE_RATE_LAST_FETCHED_TIME, currentTime);
-                    editor.apply();
-
-                    mFetchingExchangeRates = true;
-                    mView.loadFetchExchangeRatesWorker(mCurrentGroup.getCurrency());
-                } else {
-                    // TODO: check if row already exists
-                    mItems.add(PurchaseAddEditItem.createNewExchangeRateInstance());
-                    mView.notifyItemInserted(getLastPosition());
-                }
-            }
-        }
+        // get new exchange rate
+        mView.loadFetchExchangeRatesWorker(mCurrentGroup.getCurrency(), mCurrency);
     }
 
     @Override
-    public void setRatesFetchStream(@NonNull Observable<CurrencyRates> observable,
-                                    @NonNull final String workerTag) {
-        mSubscriptions.add(observable
-                .map(new Func1<CurrencyRates, Map<String, Float>>() {
+    public void setRateFetchStream(@NonNull Single<Float> single,
+                                   @NonNull final String workerTag) {
+        mSubscriptions.add(single
+                .subscribe(new SingleSubscriber<Float>() {
                     @Override
-                    public Map<String, Float> call(CurrencyRates currencyRates) {
-                        return currencyRates.getRates();
-                    }
-                })
-                .toSingle()
-                .subscribe(new SingleSubscriber<Map<String, Float>>() {
-                    @Override
-                    public void onSuccess(Map<String, Float> exchangeRates) {
-                        mFetchingExchangeRates = false;
+                    public void onSuccess(Float exchangeRate) {
                         mView.removeWorker(workerTag);
+                        mFetchingExchangeRates = false;
 
-                        // TODO: move to repository
-                        final SharedPreferences.Editor editor = mSharedPreferences.edit();
-                        for (Map.Entry<String, Float> exchangeRate : exchangeRates.entrySet()) {
-                            final BigDecimal roundedExchangeRate = MoneyUtils.roundToFractionDigits(
-                                    MoneyUtils.EXCHANGE_RATE_FRACTION_DIGITS, 1 / exchangeRate.getValue());
-                            editor.putFloat(exchangeRate.getKey(), roundedExchangeRate.floatValue());
-                        }
-                        editor.apply();
-
-                        setExchangeRate(exchangeRates.get(mCurrency));
+                        setExchangeRate(exchangeRate);
                     }
 
                     @Override
                     public void onError(Throwable error) {
-                        mFetchingExchangeRates = false;
                         mView.removeWorker(workerTag);
-                        // TODO: handle error
+                        mFetchingExchangeRates = false;
+
+                        mView.showMessageWithAction(R.string.toast_error_exchange_rate,
+                                new MessageAction(R.string.action_retry) {
+                                    @Override
+                                    public void onClick(View v) {
+                                        mView.loadFetchExchangeRatesWorker(mCurrentGroup.getCurrency(), mCurrency);
+                                    }
+                                });
                     }
                 })
         );
-    }
-
-    @Override
-    public void onExchangeRateSet(float exchangeRate) {
-        final BigDecimal roundedExchangeRate = MoneyUtils.roundToFractionDigits(
-                MoneyUtils.EXCHANGE_RATE_FRACTION_DIGITS, exchangeRate);
-        setExchangeRate(roundedExchangeRate.floatValue());
     }
 
     @Override
@@ -360,17 +360,14 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
     }
 
     @Override
+    public void onExchangeRateManuallySet(float exchangeRate) {
+        final BigDecimal roundedExchangeRate = MoneyUtils.roundToFractionDigits(
+                MoneyUtils.EXCHANGE_RATE_FRACTION_DIGITS, exchangeRate);
+        setExchangeRate(roundedExchangeRate.floatValue());
+    }
+
+    @Override
     public void updateList() {
-        if (mItems.isEmpty()) {
-            mItems.add(PurchaseAddEditItem.createNewHeaderInstance(R.string.header_purchase));
-            mItems.add(PurchaseAddEditItem.createNewDateInstance());
-            mItems.add(PurchaseAddEditItem.createNewStoreInstance());
-            mItems.add(PurchaseAddEditItem.createNewHeaderInstance(R.string.header_items));
-
-            mItems.add(PurchaseAddEditItem.createNewAddRowInstance());
-            mItems.add(PurchaseAddEditItem.createNewTotalInstance());
-        }
-
         mSubscriptions.add(mUserRepo.getUsersLocalAsync(mCurrentGroup)
                 .toSortedList()
                 .toSingle()
@@ -410,11 +407,17 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
     }
 
     final RowItemUser[] getRowItemUser(@NonNull List<? extends ParseUser> users) {
-        final int size = users.size();
+        final int size = mUsersAvailable.size();
         final RowItemUser[] rowItemUser = new RowItemUser[size];
         for (int i = 0; i < size; i++) {
-            final User user = (User) users.get(i);
-            rowItemUser[i] = new RowItemUser(user.getObjectId(), user.getNickname(), user.getAvatar());
+            final User user = mUsersAvailable.get(i);
+            if (users.contains(user)) {
+                rowItemUser[i] = new RowItemUser(user.getObjectId(), user.getNickname(),
+                        user.getAvatar(), true);
+            } else {
+                rowItemUser[i] = new RowItemUser(user.getObjectId(), user.getNickname(),
+                        user.getAvatar(), false);
+            }
         }
 
         return rowItemUser;
@@ -443,6 +446,11 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
     }
 
     @Override
+    public void onRowItemUserClick(int position) {
+        updateTotalAndMyShare();
+    }
+
+    @Override
     public void onAddReceiptImageClick() {
         mView.captureImage(USE_CUSTOM_CAMERA);
     }
@@ -453,23 +461,12 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
     }
 
     @Override
-    public void onReceiptImageTaken() {
-        mView.showMessage(R.string.toast_receipt_added);
-    }
-
-    @Override
-    public void onReceiptImageFailed() {
-        mView.finishScreen(RESULT_PURCHASE_DISCARDED);
-    }
-
-    @Override
     public void onReceiptImagesTaken(@NonNull List<String> receiptImagePaths) {
         mReceiptImagePaths.clear();
         if (!receiptImagePaths.isEmpty()) {
             mReceiptImagePaths.addAll(receiptImagePaths);
         }
         mReceiptImagePath = mReceiptImagePaths.get(0);
-        onReceiptImageTaken();
     }
 
     @Override
@@ -540,6 +537,11 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
             return;
         }
 
+        if (TextUtils.isEmpty(mStore)) {
+            mView.showMessage(R.string.toast_store_empty);
+            return;
+        }
+
         if (!validateItems()) {
             return;
         }
@@ -591,21 +593,20 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
 
         final Purchase purchase = getPurchase();
         purchase.setRandomDraftId();
-        final String tag = Purchase.PIN_LABEL + mCurrentGroup.getObjectId();
         if (!TextUtils.isEmpty(mReceiptImagePath)) {
             mSubscriptions.add(mView.getReceiptImage(mReceiptImagePath)
                     .flatMap(new Func1<byte[], Single<Purchase>>() {
                         @Override
                         public Single<Purchase> call(byte[] bytes) {
                             purchase.setReceiptData(bytes);
-                            return mPurchaseRepo.savePurchaseAsDraftAsync(purchase, tag);
+                            return mPurchaseRepo.savePurchaseAsDraftAsync(purchase, Purchase.PIN_LABEL_DRAFT);
                         }
                     })
                     .subscribe(new SingleSubscriber<Purchase>() {
                         @Override
                         public void onSuccess(Purchase value) {
                             deleteTakenImages();
-                            mView.finishScreen(RESULT_PURCHASE_DRAFT);
+                            mView.finishScreen(PurchaseResult.PURCHASE_DRAFT);
                         }
 
                         @Override
@@ -615,12 +616,12 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
                     })
             );
         } else {
-            mSubscriptions.add(mPurchaseRepo.savePurchaseAsDraftAsync(purchase, tag)
+            mSubscriptions.add(mPurchaseRepo.savePurchaseAsDraftAsync(purchase, Purchase.PIN_LABEL_DRAFT)
                     .subscribe(new SingleSubscriber<Purchase>() {
                         @Override
                         public void onSuccess(Purchase value) {
                             deleteTakenImages();
-                            mView.finishScreen(RESULT_PURCHASE_DRAFT);
+                            mView.finishScreen(PurchaseResult.PURCHASE_DRAFT);
                         }
 
                         @Override
@@ -633,21 +634,23 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
     }
 
     private boolean validateItems() {
-        if (mItems.size() < 1) {
-            mView.showMessage(R.string.toast_min_one_item);
-            return false;
-        }
-
+        boolean hasItem = false;
         boolean allValid = true;
         for (PurchaseAddEditItem addEditItem : mItems) {
             if (addEditItem.getType() != Type.ITEM) {
                 continue;
             }
 
+            hasItem = true;
             final RowItem rowItem = addEditItem.getRowItem();
             if (!rowItem.validateFields()) {
                 allValid = false;
             }
+        }
+
+        if (!hasItem) {
+            mView.showMessage(R.string.toast_min_one_item);
+            return false;
         }
 
         return allValid;
@@ -682,8 +685,8 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
     @NonNull
     Purchase createPurchase(@NonNull List<User> purchaseUsersInvolved,
                             @NonNull List<Item> purchaseItems) {
-        final Purchase purchase = new Purchase(mCurrentUser, mCurrentGroup, mDate, mStore, purchaseItems,
-                mTotalPrice.doubleValue(), purchaseUsersInvolved, mCurrency);
+        final Purchase purchase = new Purchase(mCurrentUser, mCurrentGroup, mDate, mStore,
+                purchaseItems, mTotalPrice.doubleValue(), purchaseUsersInvolved, mCurrency, mExchangeRate);
         if (!TextUtils.isEmpty(mNote)) {
             purchase.setNote(mNote);
         }
@@ -693,12 +696,12 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
     @NonNull
     private List<User> getUsersInvolved(@NonNull RowItemUser[] rowItemUsers) {
         final List<User> usersInvolved = new ArrayList<>();
-        for (int i = 0, size = mUsersAvailable.size(); i < size; i++) {
-            final User user = mUsersAvailable.get(i);
-            if (rowItemUsers[i].getObjectId().equals(user.getObjectId())) {
-                usersInvolved.add(user);
+        for (int i = 0, length = rowItemUsers.length; i < length; i++) {
+            if (rowItemUsers[i].isSelected()) {
+                usersInvolved.add(mUsersAvailable.get(i));
             }
         }
+
         return usersInvolved;
     }
 
@@ -769,7 +772,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
 
     @Override
     public void onShowReceiptImageClick() {
-        mView.showReceiptImage(mReceiptImagePath);
+        mView.showReceiptImage();
     }
 
     @Override
@@ -789,7 +792,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
 
     @Override
     public void onEditNoteClick() {
-        // TODO: possible?
+        // TODO: possible, no!
         mView.showAddEditNoteDialog(mNote);
     }
 
@@ -800,7 +803,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
 
     @Override
     public void onUpOrBackClick() {
-        if (isSaving()) {
+        if (mSaving) {
             mView.showMessage(R.string.toast_saving_purchase);
         } else {
             askToDiscard();
@@ -817,7 +820,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
 
     @Override
     public void onDiscardChangesSelected() {
-        mView.finishScreen(RESULT_PURCHASE_DISCARDED);
+        mView.finishScreen(PurchaseResult.PURCHASE_DISCARDED);
     }
 
     @Override
@@ -869,6 +872,6 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
 
     @Override
     public void onProgressFinalAnimationComplete() {
-        mView.finishScreen(RESULT_PURCHASE_SAVED);
+        mView.finishScreen(PurchaseResult.PURCHASE_SAVED);
     }
 }

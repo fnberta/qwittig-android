@@ -29,6 +29,7 @@
         android:paddingEnd="@dimen/key_line_1"
         android:paddingStart="@dimen/key_line_1"
         android:text="@{viewModel.date}"
+        android:onClick="@{viewModel.onDateClick}"
         tools:text="27. November 2014"
         />
 

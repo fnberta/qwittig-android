@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.presentation.ui.fragments;
 
+import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -31,7 +32,7 @@ import ch.giantific.qwittig.utils.WorkerUtils;
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public abstract class SettingsBaseInviteFragment extends BaseFragment {
+public abstract class SettingsBaseInviteFragment extends Fragment {
 
     private static final String STATE_ROW_COUNT = "STATE_ROW_COUNT";
     @NonNull
@@ -77,16 +78,6 @@ public abstract class SettingsBaseInviteFragment extends BaseFragment {
         if (mCurrentUser != null) {
             mCurrentGroup = mCurrentUser.getCurrentGroup();
         }
-    }
-
-    @Override
-    protected void setViewModelToActivity() {
-
-    }
-
-    @Override
-    protected View getSnackbarView() {
-        return null;
     }
 
     final void setupUsersToInviteRows() {

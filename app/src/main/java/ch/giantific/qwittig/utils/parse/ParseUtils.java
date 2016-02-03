@@ -98,9 +98,9 @@ public class ParseUtils {
      * @return the currently supported currency codes
      */
     public static List<String> getSupportedCurrencyCodes() {
-        ParseConfig config = ParseConfig.getCurrentConfig();
+        final ParseConfig config = ParseConfig.getCurrentConfig();
 
-        return config.getList(ParseConfigUtils.SUPPORTED_CURRENCIES);
+        return config.getList(ParseConfigUtils.SUPPORTED_CURRENCIES, new ArrayList<String>());
     }
 
     /**

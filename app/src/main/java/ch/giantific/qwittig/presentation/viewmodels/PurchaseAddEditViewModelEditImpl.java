@@ -5,7 +5,6 @@
 package ch.giantific.qwittig.presentation.viewmodels;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,7 +19,7 @@ import java.util.Date;
 import java.util.List;
 
 import ch.giantific.qwittig.domain.models.PurchaseAddEditItem;
-import ch.giantific.qwittig.domain.models.PurchaseDetailsItem.Type;
+import ch.giantific.qwittig.domain.models.PurchaseAddEditItem.Type;
 import ch.giantific.qwittig.domain.models.RowItem;
 import ch.giantific.qwittig.domain.models.parse.Item;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
@@ -60,10 +59,9 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
     public PurchaseAddEditViewModelEditImpl(@Nullable Bundle savedState,
                                             @NonNull GroupRepository groupRepository,
                                             @NonNull UserRepository userRepository,
-                                            @NonNull SharedPreferences sharedPreferences,
                                             @NonNull PurchaseRepository purchaseRepo,
                                             @NonNull String editPurchaseId) {
-        super(savedState, groupRepository, userRepository, sharedPreferences, purchaseRepo);
+        super(savedState, groupRepository, userRepository, purchaseRepo);
 
         mEditPurchaseId = editPurchaseId;
 
@@ -135,10 +133,9 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
         // set note to value from original purchase
         String oldNote = mEditPurchase.getNote();
         mOldNote = oldNote != null ? oldNote : "";
-        // TODO: notify changed?
         mNote = mOldNote;
         // check if purchase has a note and update action bar menu accordingly
-        mView.toggleNoteMenuOption(!TextUtils.isEmpty(mOldNote));
+        mView.toggleNoteMenuOption(!TextUtils.isEmpty(mNote));
 
         // set store to value from original purchase
         mOldStore = mEditPurchase.getStore();
@@ -150,8 +147,7 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
 
         // set currency from original purchase
         mOldCurrency = mEditPurchase.getCurrency();
-        mCurrency = mOldCurrency;
-        // TODO: set spinner to correct position
+        setCurrency(mOldCurrency);
 
         // get original exchangeRate to convert prices
         mOldExchangeRate = mEditPurchase.getExchangeRate();
@@ -171,7 +167,8 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
             final RowItem rowItem = new RowItem(item.getName(), price,
                     getRowItemUser(usersInvolved), mCurrency);
             final PurchaseAddEditItem addEditItem = PurchaseAddEditItem.createNewRowItemInstance(rowItem);
-            mItems.add(getLastPosition(), addEditItem);
+            // TODO: don't hardcode add row position
+            mItems.add(getLastPosition() - 1, addEditItem);
             mView.notifyItemInserted(mItems.indexOf(addEditItem));
         }
     }
@@ -199,7 +196,7 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
 
     @Override
     public void onShowReceiptImageClick() {
-        mView.showReceiptImage(mReceiptImagePath, mEditPurchaseId, false);
+        mView.showReceiptImage(mEditPurchaseId, false);
     }
 
     @Override
@@ -283,7 +280,7 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
             }
 
             final List<String> usersInvolvedOld = itemOld.getUsersInvolvedIds();
-            final List<String> usersInvolvedNew = rowItemNew.getUserIds();
+            final List<String> usersInvolvedNew = rowItemNew.getSelectedUserIds();
             if (!usersInvolvedNew.containsAll(usersInvolvedOld) ||
                     !usersInvolvedOld.containsAll(usersInvolvedNew)) {
                 return true;

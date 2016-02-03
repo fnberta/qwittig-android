@@ -4,8 +4,6 @@
 
 package ch.giantific.qwittig.presentation.ui.fragments;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -24,7 +22,6 @@ import ch.giantific.qwittig.presentation.ui.fragments.dialogs.CompensationChange
 import ch.giantific.qwittig.presentation.viewmodels.FinanceCompsUnpaidViewModel;
 import ch.giantific.qwittig.presentation.workerfragments.query.CompensationsUpdateWorker;
 import ch.giantific.qwittig.presentation.workerfragments.reminder.CompensationRemindWorker;
-import ch.giantific.qwittig.utils.WorkerUtils;
 
 /**
  * Displays all currently open unpaid compensations in the group in card based {@link RecyclerView}
@@ -37,7 +34,6 @@ import ch.giantific.qwittig.utils.WorkerUtils;
 public class FinanceCompensationsUnpaidFragment extends BaseRecyclerViewOnlineFragment<FinanceCompsUnpaidViewModel, FinanceCompensationsUnpaidFragment.ActivityListener>
         implements FinanceCompsUnpaidViewModel.ViewListener {
 
-    private static final String LOG_TAG = FinanceCompensationsUnpaidFragment.class.getSimpleName();
     private static final String CHANGE_AMOUNT_DIALOG = "CHANGE_AMOUNT_DIALOG";
     private FragmentFinanceCompensationsUnpaidBinding mBinding;
 
@@ -80,39 +76,29 @@ public class FinanceCompensationsUnpaidFragment extends BaseRecyclerViewOnlineFr
 
     @Override
     public void loadUpdateCompensationsUnpaidWorker() {
-        final FragmentManager fragmentManager = getFragmentManager();
-        Fragment queryWorker = WorkerUtils.findWorker(fragmentManager, CompensationsUpdateWorker.WORKER_TAG);
-        if (queryWorker == null) {
-            queryWorker = CompensationsUpdateWorker.newInstance(false);
-
-            fragmentManager.beginTransaction()
-                    .add(queryWorker, CompensationsUpdateWorker.WORKER_TAG)
-                    .commit();
-        }
+        CompensationsUpdateWorker.attach(getFragmentManager(), false);
     }
 
     @Override
     public void loadCompensationRemindWorker(@NonNull String compensationId) {
-        final FragmentManager fragmentManager = getFragmentManager();
-        Fragment compensationRemindWorker = WorkerUtils.findWorker(fragmentManager,
-                CompensationRemindWorker.WORKER_TAG);
-        if (compensationRemindWorker == null) {
-            compensationRemindWorker = CompensationRemindWorker.newInstance(compensationId);
-
-            fragmentManager.beginTransaction()
-                    .add(compensationRemindWorker, CompensationRemindWorker.WORKER_TAG)
-                    .commit();
-        }
+        CompensationRemindWorker.attach(getFragmentManager(), compensationId);
     }
 
     @Override
-    public void showChangeCompensationAmountDialog(@NonNull BigFraction amount, @NonNull String currency) {
+    public void showCompensationAmountConfirmDialog(@NonNull BigFraction amount, @NonNull String currency) {
         final CompensationChangeAmountDialogFragment dialog =
                 CompensationChangeAmountDialogFragment.newInstance(amount, currency);
         dialog.show(getFragmentManager(), CHANGE_AMOUNT_DIALOG);
     }
 
+    @Override
+    public void setColorTheme(@NonNull BigFraction balance) {
+        mActivity.setColorTheme(balance);
+    }
+
     public interface ActivityListener extends BaseRecyclerViewOnlineFragment.ActivityListener {
         void setCompsUnpaidViewModel(@NonNull FinanceCompsUnpaidViewModel viewModel);
+
+        void setColorTheme(@NonNull BigFraction balance);
     }
 }

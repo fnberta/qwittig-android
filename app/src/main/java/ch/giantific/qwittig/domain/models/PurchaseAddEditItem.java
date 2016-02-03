@@ -58,10 +58,6 @@ public class PurchaseAddEditItem extends BaseObservable
         mRowItemUsers = users;
     }
 
-    public PurchaseAddEditItem() {
-        mType = Type.ADD_ROW;
-    }
-
     @SuppressWarnings("WrongConstant")
     protected PurchaseAddEditItem(Parcel in) {
         mType = in.readInt();
@@ -91,15 +87,11 @@ public class PurchaseAddEditItem extends BaseObservable
     }
 
     public static PurchaseAddEditItem createNewAddRowInstance() {
-        return new PurchaseAddEditItem();
+        return new PurchaseAddEditItem(Type.ADD_ROW);
     }
 
     public static PurchaseAddEditItem createNewTotalInstance() {
         return new PurchaseAddEditItem(Type.TOTAL);
-    }
-
-    public static PurchaseAddEditItem createNewExchangeRateInstance() {
-        return new PurchaseAddEditItem(Type.EXCHANGE_RATE);
     }
 
     public int getType() {
@@ -132,8 +124,7 @@ public class PurchaseAddEditItem extends BaseObservable
         dest.writeParcelableArray(mRowItemUsers, 0);
     }
 
-    @IntDef({Type.HEADER, Type.DATE, Type.STORE, Type.ITEM, Type.USERS, Type.ADD_ROW, Type.TOTAL,
-            Type.EXCHANGE_RATE})
+    @IntDef({Type.HEADER, Type.DATE, Type.STORE, Type.ITEM, Type.USERS, Type.ADD_ROW, Type.TOTAL})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Type {
         int HEADER = 0;
@@ -143,6 +134,5 @@ public class PurchaseAddEditItem extends BaseObservable
         int USERS = 4;
         int ADD_ROW = 5;
         int TOTAL = 6;
-        int EXCHANGE_RATE = 7;
     }
 }

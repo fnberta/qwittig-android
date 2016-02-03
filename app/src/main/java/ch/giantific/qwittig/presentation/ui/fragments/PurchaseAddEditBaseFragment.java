@@ -6,7 +6,6 @@ package ch.giantific.qwittig.presentation.ui.fragments;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
@@ -42,7 +41,6 @@ import ch.berta.fabio.fabprogress.FabProgress;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentPurchaseAddEditBinding;
 import ch.giantific.qwittig.domain.models.MessageAction;
-import ch.giantific.qwittig.domain.models.PurchaseAddEditItem;
 import ch.giantific.qwittig.domain.models.PurchaseAddEditItem.Type;
 import ch.giantific.qwittig.domain.models.Receipt;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
@@ -54,13 +52,13 @@ import ch.giantific.qwittig.presentation.ui.fragments.dialogs.ManualExchangeRate
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.PurchaseDiscardDialogFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.PurchaseNoteAddEditDialogFragment;
 import ch.giantific.qwittig.presentation.viewmodels.PurchaseAddEditViewModel;
+import ch.giantific.qwittig.presentation.viewmodels.PurchaseAddEditViewModel.PurchaseResult;
 import ch.giantific.qwittig.presentation.workerfragments.OcrWorker;
 import ch.giantific.qwittig.presentation.workerfragments.RatesWorker;
 import ch.giantific.qwittig.presentation.workerfragments.save.PurchaseEditSaveWorker;
 import ch.giantific.qwittig.presentation.workerfragments.save.PurchaseSaveWorker;
 import ch.giantific.qwittig.utils.CameraUtils;
 import ch.giantific.qwittig.utils.Utils;
-import ch.giantific.qwittig.utils.WorkerUtils;
 import rx.Single;
 import rx.SingleSubscriber;
 
@@ -86,6 +84,7 @@ public abstract class PurchaseAddEditBaseFragment<T extends PurchaseAddEditViewM
     private static final String DISCARD_CHANGES_DIALOG = "DISCARD_CHANGES_DIALOG";
     private static final String EDIT_NOTE_DIALOG = "EDIT_NOTE_DIALOG";
     private FragmentPurchaseAddEditBinding mBinding;
+    private String mReceiptImagePath;
 
     @Nullable
     @Override
@@ -146,20 +145,35 @@ public abstract class PurchaseAddEditBaseFragment<T extends PurchaseAddEditViewM
                 switch (resultCode) {
                     case Activity.RESULT_OK:
                         mActivity.toggleReceiptMenuOption(true);
-                        mViewModel.onReceiptImageTaken();
+                        onImageTaken();
                         break;
                     case Activity.RESULT_CANCELED:
-                        mViewModel.onReceiptImageFailed();
+                        finishScreen(PurchaseResult.PURCHASE_DISCARDED);
                         break;
                 }
                 break;
             case INTENT_REQUEST_IMAGE_CAPTURE_CUSTOM:
-                if (resultCode == Activity.RESULT_OK) {
-                    mActivity.toggleReceiptMenuOption(true);
-                    final List<String> paths = data.getStringArrayListExtra(CameraActivity.INTENT_EXTRA_PATHS);
-                    mViewModel.onReceiptImagesTaken(paths);
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        mActivity.toggleReceiptMenuOption(true);
+                        final List<String> paths = data.getStringArrayListExtra(CameraActivity.INTENT_EXTRA_PATHS);
+                        mViewModel.onReceiptImagesTaken(paths);
+                        mReceiptImagePath = paths.get(0);
+                        onImageTaken();
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        finishScreen(PurchaseResult.PURCHASE_DISCARDED);
+                        break;
                 }
                 break;
+        }
+    }
+
+    private void onImageTaken() {
+        if (mViewModel.isLoading()) {
+            loadOcrWorker();
+        } else {
+            showMessage(R.string.toast_receipt_added);
         }
     }
 
@@ -179,8 +193,8 @@ public abstract class PurchaseAddEditBaseFragment<T extends PurchaseAddEditViewM
     }
 
     @Override
-    public void reloadOptionsMenu() {
-        getActivity().invalidateOptionsMenu();
+    public void showOptionsMenu() {
+        setMenuVisibility(true);
     }
 
     @Override
@@ -215,58 +229,26 @@ public abstract class PurchaseAddEditBaseFragment<T extends PurchaseAddEditViewM
     }
 
     @Override
-    public void loadFetchExchangeRatesWorker(@NonNull String baseCurrency) {
-        final FragmentManager fragmentManager = getFragmentManager();
-        Fragment worker = WorkerUtils.findWorker(fragmentManager, RatesWorker.WORKER_TAG);
-        if (worker == null) {
-            worker = RatesWorker.newInstance(baseCurrency);
-
-            fragmentManager.beginTransaction()
-                    .add(worker, RatesWorker.WORKER_TAG)
-                    .commit();
-        }
+    public void loadFetchExchangeRatesWorker(@NonNull String baseCurrency, @NonNull String currency) {
+        RatesWorker.attach(getFragmentManager(), baseCurrency, currency);
     }
 
     @Override
-    public void loadOcrWorker(@NonNull String receiptImagePath) {
-        final FragmentManager fragmentManager = getFragmentManager();
-        Fragment worker = WorkerUtils.findWorker(fragmentManager, OcrWorker.WORKER_TAG);
-        if (worker == null) {
-            worker = OcrWorker.newInstance(receiptImagePath);
-
-            fragmentManager.beginTransaction()
-                    .add(worker, OcrWorker.WORKER_TAG)
-                    .commit();
-        }
+    public void loadOcrWorker() {
+        OcrWorker.attach(getFragmentManager(), mReceiptImagePath);
     }
 
     @Override
     public void loadSavePurchaseWorker(@NonNull Purchase purchase, @Nullable byte[] receiptImage) {
-        final FragmentManager fragmentManager = getFragmentManager();
-        Fragment worker = WorkerUtils.findWorker(fragmentManager, PurchaseSaveWorker.WORKER_TAG);
-        if (worker == null) {
-            worker = new PurchaseSaveWorker(purchase, receiptImage);
-
-            fragmentManager.beginTransaction()
-                    .add(worker, PurchaseSaveWorker.WORKER_TAG)
-                    .commit();
-        }
+        PurchaseSaveWorker.attach(getFragmentManager(), purchase, receiptImage);
     }
 
     @Override
     public void loadSavePurchaseWorker(@NonNull Purchase purchase, @Nullable byte[] receiptImage,
                                        @Nullable ParseFile receiptFileOld,
                                        boolean deleteOldReceipt, boolean draft) {
-        final FragmentManager fragmentManager = getFragmentManager();
-        Fragment worker = WorkerUtils.findWorker(fragmentManager, PurchaseSaveWorker.WORKER_TAG);
-        if (worker == null) {
-            worker = new PurchaseEditSaveWorker(purchase, receiptImage, receiptFileOld,
-                    deleteOldReceipt, draft);
-
-            fragmentManager.beginTransaction()
-                    .add(worker, PurchaseSaveWorker.WORKER_TAG)
-                    .commit();
-        }
+        PurchaseEditSaveWorker.attach(getFragmentManager(), purchase, receiptImage, receiptFileOld,
+                deleteOldReceipt, draft);
     }
 
     @Override
@@ -305,10 +287,10 @@ public abstract class PurchaseAddEditBaseFragment<T extends PurchaseAddEditViewM
     }
 
     @Override
-    public void showReceiptImage(@NonNull String receiptImagePath) {
+    public void showReceiptImage() {
         final FragmentManager fragmentManager = getFragmentManager();
         final PurchaseReceiptBaseFragment fragment =
-                PurchaseReceiptAddEditFragment.newAddInstance(receiptImagePath);
+                PurchaseReceiptAddEditFragment.newAddInstance(mReceiptImagePath);
 
         fragmentManager.beginTransaction()
                 .replace(R.id.container, fragment, PURCHASE_RECEIPT_FRAGMENT)
@@ -318,11 +300,11 @@ public abstract class PurchaseAddEditBaseFragment<T extends PurchaseAddEditViewM
     }
 
     @Override
-    public void showReceiptImage(@NonNull String receiptImagePath, @NonNull String objectId,
+    public void showReceiptImage(@NonNull String objectId,
                                  boolean isDraft) {
         final FragmentManager fragmentManager = getFragmentManager();
-        final PurchaseReceiptBaseFragment fragment = !TextUtils.isEmpty(receiptImagePath)
-                ? PurchaseReceiptAddEditFragment.newAddInstance(receiptImagePath)
+        final PurchaseReceiptBaseFragment fragment = !TextUtils.isEmpty(mReceiptImagePath)
+                ? PurchaseReceiptAddEditFragment.newAddInstance(mReceiptImagePath)
                 : PurchaseReceiptAddEditFragment.newEditInstance(objectId, isDraft);
 
         fragmentManager.beginTransaction()
@@ -420,11 +402,13 @@ public abstract class PurchaseAddEditBaseFragment<T extends PurchaseAddEditViewM
             try {
                 imageFile = CameraUtils.createImageFile(context);
             } catch (IOException e) {
-                finishScreen(PurchaseAddEditViewModel.RESULT_PURCHASE_ERROR);
+                finishScreen(PurchaseResult.PURCHASE_ERROR);
                 return;
             }
 
-            mViewModel.onReceiptImagePathSet(imageFile.getAbsolutePath());
+            final String path = imageFile.getAbsolutePath();
+            mReceiptImagePath = path;
+            mViewModel.onReceiptImagePathSet(path);
             final Intent cameraIntent = CameraUtils.getCameraIntent(context, imageFile);
             if (cameraIntent != null) {
                 startActivityForResult(cameraIntent, INTENT_REQUEST_IMAGE_CAPTURE);
