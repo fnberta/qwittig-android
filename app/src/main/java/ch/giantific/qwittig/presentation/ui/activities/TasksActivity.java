@@ -41,7 +41,6 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksViewModel> impleme
         TasksUpdateListener,
         TaskReminderListener {
 
-    private static final String LOG_TAG = TasksActivity.class.getSimpleName();
     private ActivityTasksBinding mBinding;
 
     @Override
@@ -49,7 +48,7 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksViewModel> impleme
         super.handleLocalBroadcast(intent, dataType);
 
         if (dataType == LocalBroadcast.DataType.TASKS_UPDATED) {
-            mViewModel.updateList();
+            mViewModel.loadData();
         }
     }
 

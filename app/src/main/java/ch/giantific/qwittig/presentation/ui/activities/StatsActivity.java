@@ -45,7 +45,6 @@ public class StatsActivity extends BaseNavDrawerActivity implements
         StatsBaseFragment.FragmentInteractionListener,
         StatsCalcListener {
 
-    private static final String LOG_TAG = StatsActivity.class.getSimpleName();
     private static final String STATE_STATS_FRAGMENT = "STATE_STATS_FRAGMENT";
     private static final int NUMBER_OF_MONTHS = 12;
     private Spinner mSpinnerStatsType;

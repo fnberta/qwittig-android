@@ -44,6 +44,7 @@ import ch.giantific.qwittig.presentation.ui.activities.PurchaseDetailsActivity;
 import ch.giantific.qwittig.presentation.ui.activities.TaskDetailsActivity;
 import ch.giantific.qwittig.presentation.ui.activities.TasksActivity;
 import ch.giantific.qwittig.utils.MoneyUtils;
+import timber.log.Timber;
 
 /**
  * Handles incoming push messages sent through the Parse.com framework which leverages the Google
@@ -101,7 +102,6 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     private static final int NEW_PURCHASE_NOTIFICATION_ID = 1;
     private static final String STORED_PURCHASE_NOTIFICATIONS = "STORED_PURCHASE_NOTIFICATIONS";
     private static final int MAX_LINES_INBOX_STYLE = 7;
-    private static final String LOG_TAG = PushBroadcastReceiver.class.getSimpleName();
     private SharedPreferences mSharedPreferences;
     private NotificationManager mNotificationManager;
     @Nullable
@@ -210,12 +210,12 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
 
     @Override
     protected void onPushReceive(@NonNull Context context, @NonNull Intent intent) {
-        Log.e(LOG_TAG, "onPushReceive");
+        Timber.e("onPushReceive");
 
         final User currentUser = (User) ParseUser.getCurrentUser();
         // return immediately if no user is logged in
         if (currentUser == null) {
-            Log.e(LOG_TAG, "currentUser is null");
+            Timber.e("currentUser is null");
             return;
         }
 
@@ -224,7 +224,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
             jsonExtras = getData(intent);
         } catch (JSONException e) {
             // return immediately if no data
-            Log.e(LOG_TAG, "jsonExtras is null");
+            Timber.e("jsonExtras is null");
             return;
         }
 

@@ -39,10 +39,11 @@ public class TaskAddEditViewModelEditImpl extends TaskAddEditViewModelAddImpl {
     private List<ParseUser> mOldTaskUsersInvolved;
 
     public TaskAddEditViewModelEditImpl(@Nullable Bundle savedState,
+                                        @NonNull TaskAddEditViewModel.ViewListener view,
                                         @NonNull UserRepository userRepository,
                                         @NonNull TaskRepository taskRepository,
                                         @NonNull String editTaskId) {
-        super(savedState, userRepository, taskRepository);
+        super(savedState, view, userRepository, taskRepository);
 
         mEditTaskId = editTaskId;
 

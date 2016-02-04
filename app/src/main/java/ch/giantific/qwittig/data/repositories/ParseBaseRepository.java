@@ -7,7 +7,6 @@ package ch.giantific.qwittig.data.repositories;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
-import android.util.Log;
 
 import com.parse.CountCallback;
 import com.parse.DeleteCallback;
@@ -26,6 +25,7 @@ import rx.Observable;
 import rx.Single;
 import rx.SingleSubscriber;
 import rx.Subscriber;
+import timber.log.Timber;
 
 /**
  * Provides a base class for repository implementations that use the Parse.com framework.
@@ -33,7 +33,6 @@ import rx.Subscriber;
 public abstract class ParseBaseRepository<T extends ParseObject> implements Repository {
 
     public static final int QUERY_ITEMS_PER_PAGE = 15;
-    private static final String LOG_TAG = ParseBaseRepository.class.getSimpleName();
 
     public ParseBaseRepository() {
     }
@@ -51,7 +50,7 @@ public abstract class ParseBaseRepository<T extends ParseObject> implements Repo
             case ParseException.CONNECTION_FAILED:
                 return R.string.toast_no_connection;
             default:
-                Log.e(LOG_TAG, "unknown error " + e);
+                Timber.e(e, "unknown error");
                 return R.string.toast_unknown_error;
         }
     }

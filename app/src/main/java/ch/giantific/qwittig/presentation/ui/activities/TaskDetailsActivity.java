@@ -44,7 +44,7 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity<TaskDetailsViewMo
         super.handleLocalBroadcast(intent, dataType);
 
         if (dataType == LocalBroadcast.DataType.TASKS_UPDATED) {
-            mViewModel.updateList();
+            mViewModel.loadData();
         }
     }
 

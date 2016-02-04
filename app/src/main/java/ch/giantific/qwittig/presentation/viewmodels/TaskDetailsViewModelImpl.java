@@ -49,11 +49,12 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskHistory,
     private boolean mCurrentUserResponsible;
 
     public TaskDetailsViewModelImpl(@Nullable Bundle savedState,
+                                    @NonNull TaskDetailsViewModel.ViewListener view,
                                     @NonNull UserRepository userRepository,
                                     @NonNull GroupRepository groupRepository,
                                     @NonNull TaskRepository taskRepository,
                                     @NonNull String taskId) {
-        super(savedState, groupRepository, userRepository);
+        super(savedState, view, groupRepository, userRepository);
 
         mTaskRepo = taskRepository;
         mTaskId = taskId;
@@ -115,7 +116,7 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskHistory,
     }
 
     @Override
-    public void updateList() {
+    public void loadData() {
         mSubscriptions.add(mTaskRepo.getTaskLocalAsync(mTaskId)
                 .flatMapObservable(new Func1<Task, Observable<TaskHistory>>() {
                     @Override

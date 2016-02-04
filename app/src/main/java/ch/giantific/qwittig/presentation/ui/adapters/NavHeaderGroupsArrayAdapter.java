@@ -28,7 +28,6 @@ import ch.giantific.qwittig.domain.models.parse.Group;
  */
 public class NavHeaderGroupsArrayAdapter extends ArrayAdapter<Group> {
 
-    private static final String LOG_TAG = NavHeaderGroupsArrayAdapter.class.getSimpleName();
     private static final int VIEW_RESOURCE = R.layout.spinner_item_nav;
     private static final int VIEW_RESOURCE_DROPDOWN = android.R.layout.simple_spinner_dropdown_item;
     private List<Group> mGroups;

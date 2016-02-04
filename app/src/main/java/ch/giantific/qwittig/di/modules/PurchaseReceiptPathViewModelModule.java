@@ -20,12 +20,14 @@ import dagger.Provides;
  * Created by fabio on 12.01.16.
  */
 @Module
-public class PurchaseReceiptPathViewModelModule extends BaseViewModelModule {
+public class PurchaseReceiptPathViewModelModule extends BaseViewModelModule<PurchaseReceiptViewModel.ViewListener> {
 
     private String mReceiptImagePath;
 
-    public PurchaseReceiptPathViewModelModule(@Nullable Bundle savedState, String receiptImagePath) {
-        super(savedState);
+    public PurchaseReceiptPathViewModelModule(@Nullable Bundle savedState,
+                                              @NonNull PurchaseReceiptViewModel.ViewListener view,
+                                              @NonNull String receiptImagePath) {
+        super(savedState, view);
 
         mReceiptImagePath = receiptImagePath;
     }
@@ -33,7 +35,8 @@ public class PurchaseReceiptPathViewModelModule extends BaseViewModelModule {
     @PerFragment
     @Provides
     PurchaseReceiptViewModel providesPurchaseReceiptViewModel(@NonNull UserRepository userRepository,
-                                                                  @NonNull PurchaseRepository purchaseRepository) {
-        return new PurchaseReceiptViewModelImpl(mSavedState, userRepository, purchaseRepository, mReceiptImagePath);
+                                                              @NonNull PurchaseRepository purchaseRepository) {
+        return new PurchaseReceiptViewModelImpl(mSavedState, mView, userRepository,
+                purchaseRepository, mReceiptImagePath);
     }
 }

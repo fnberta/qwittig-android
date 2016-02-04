@@ -52,7 +52,7 @@ public class PurchaseEditDraftFragment extends PurchaseAddEditBaseFragment<Purch
         final String editPurchaseId = getArguments().getString(KEY_EDIT_PURCHASE_ID, "");
         DaggerPurchaseEditComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(getActivity()))
-                .purchaseEditViewModelModule(new PurchaseEditViewModelModule(savedInstanceState, editPurchaseId))
+                .purchaseEditViewModelModule(new PurchaseEditViewModelModule(savedInstanceState, this, editPurchaseId))
                 .build()
                 .inject(this);
     }

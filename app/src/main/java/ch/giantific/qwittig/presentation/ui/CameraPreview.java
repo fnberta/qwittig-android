@@ -4,23 +4,25 @@
 
 package ch.giantific.qwittig.presentation.ui;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.hardware.Camera;
-import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.io.IOException;
+
+import timber.log.Timber;
 
 /**
  * Provides a custom camera preview that is locked to portrait orientation.
  * <p/>
  * Subclass of {@link SurfaceView}.
  */
+@SuppressLint("ViewConstructor")
 @SuppressWarnings("deprecation")
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
 
-    private static final String LOG_TAG = CameraPreview.class.getSimpleName();
     private Camera mCamera;
 
     /**
@@ -48,7 +50,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCamera.setDisplayOrientation(90);
             mCamera.startPreview();
         } catch (IOException e) {
-            Log.d(LOG_TAG, "Error setting camera preview: " + e.getMessage());
+            Timber.d(e, "Error setting camera preview: ");
             // TODO: tell user
         }
     }

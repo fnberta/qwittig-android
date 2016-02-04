@@ -4,9 +4,10 @@
 
 package ch.giantific.qwittig.presentation.viewmodels;
 
-import android.databinding.BaseObservable;
 import android.databinding.Bindable;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.AdapterView;
 
@@ -17,7 +18,6 @@ import java.util.List;
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import rx.SingleSubscriber;
@@ -25,24 +25,19 @@ import rx.SingleSubscriber;
 /**
  * Created by fabio on 12.01.16.
  */
-public class NavDrawerViewModelImpl extends BaseObservable implements NavDrawerViewModel {
+public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel.ViewListener>
+        implements NavDrawerViewModel {
 
-    private ViewListener mView;
-    private User mCurrentUser;
     private GroupRepository mGroupRepo;
-    private UserRepository mUserRepo;
     private List<ParseObject> mUserGroups;
 
-    public NavDrawerViewModelImpl(@NonNull GroupRepository groupRepository,
+    public NavDrawerViewModelImpl(@Nullable Bundle savedState,
+                                  @NonNull NavDrawerViewModel.ViewListener view,
+                                  @NonNull GroupRepository groupRepository,
                                   @NonNull UserRepository userRepository) {
-        mGroupRepo = groupRepository;
-        mUserRepo = userRepository;
-        mCurrentUser = userRepository.getCurrentUser();
-    }
+        super(savedState, view, userRepository);
 
-    @Override
-    public void attachView(@NonNull NavDrawerViewModel.ViewListener view) {
-        mView = view;
+        mGroupRepo = groupRepository;
     }
 
     @Override
@@ -54,7 +49,7 @@ public class NavDrawerViewModelImpl extends BaseObservable implements NavDrawerV
 
     private void loadUserGroups() {
         mUserGroups = mCurrentUser.getGroups();
-        mGroupRepo.fetchGroupsDataAsync(mUserGroups)
+        mSubscriptions.add(mGroupRepo.fetchGroupsDataAsync(mUserGroups)
                 .toList()
                 .toSingle()
                 .subscribe(new SingleSubscriber<List<Group>>() {
@@ -66,9 +61,10 @@ public class NavDrawerViewModelImpl extends BaseObservable implements NavDrawerV
 
                     @Override
                     public void onError(Throwable error) {
-
+                        // TODO: handle error
                     }
-                });
+                })
+        );
     }
 
     @Override
@@ -101,7 +97,7 @@ public class NavDrawerViewModelImpl extends BaseObservable implements NavDrawerV
 
     @Override
     public void onLoginSuccessful() {
-        mCurrentUser = mUserRepo.getCurrentUser();
+        updateCurrentUserAndGroup();
     }
 
     @Override
@@ -148,15 +144,5 @@ public class NavDrawerViewModelImpl extends BaseObservable implements NavDrawerV
     @Override
     public void onAvatarClick(View view) {
         mView.startProfileSettingsActivity();
-    }
-
-    @Override
-    public void unsubscribe() {
-        // clean up any long running tasks
-    }
-
-    @Override
-    public void detachView() {
-        mView = null;
     }
 }

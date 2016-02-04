@@ -28,7 +28,6 @@ import ch.giantific.qwittig.presentation.viewmodels.rows.TaskRowViewModel;
  */
 public class TasksRecyclerAdapter extends RecyclerView.Adapter {
 
-    private static final String LOG_TAG = TasksRecyclerAdapter.class.getSimpleName();
     private TasksViewModel mViewModel;
 
     /**

@@ -33,12 +33,15 @@ import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.NavdrawerHeaderBinding;
 import ch.giantific.qwittig.di.components.DaggerNavDrawerComponent;
 import ch.giantific.qwittig.di.components.NavDrawerComponent;
+import ch.giantific.qwittig.di.modules.NavDrawerViewModelModule;
+import ch.giantific.qwittig.domain.models.MessageAction;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.presentation.ui.adapters.NavHeaderGroupsArrayAdapter;
 import ch.giantific.qwittig.presentation.ui.fragments.SettingsFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.SettingsProfileFragment;
 import ch.giantific.qwittig.presentation.viewmodels.NavDrawerViewModel;
 import ch.giantific.qwittig.presentation.viewmodels.ViewModel;
+import ch.giantific.qwittig.utils.Utils;
 
 /**
  * Provides an abstract base class that sets up the navigation drawer and implements a couple of
@@ -81,9 +84,10 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final NavDrawerComponent navComp = DaggerNavDrawerComponent.create();
+        final NavDrawerComponent navComp = DaggerNavDrawerComponent.builder()
+                .navDrawerViewModelModule(new NavDrawerViewModelModule(savedInstanceState, this))
+                .build();
         injectNavDrawerDependencies(navComp);
-        mNavDrawerViewModel.attachView(this);
 
         mUserLoggedIn = isUserLoggedIn();
     }
@@ -213,6 +217,20 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        mNavDrawerViewModel.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        mNavDrawerViewModel.onStop();
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -255,13 +273,6 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
         ParseQueryService.startQueryAll(this);
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        mNavDrawerViewModel.unsubscribe();
-    }
-
     int getSelfNavDrawerItem() {
         return NAVDRAWER_ITEM_INVALID;
     }
@@ -295,6 +306,16 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
     }
 
     @Override
+    public void showMessage(@StringRes int resId, @NonNull String... args) {
+
+    }
+
+    @Override
+    public void showMessageWithAction(@StringRes int resId, @NonNull MessageAction action) {
+
+    }
+
+    @Override
     public void setupHeaderGroupSelection(@NonNull List<Group> groups) {
         mHeaderGroupsAdapter = new NavHeaderGroupsArrayAdapter(this, groups);
         mHeaderBinding.spDrawerGroup.setAdapter(mHeaderGroupsAdapter);
@@ -325,5 +346,20 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
     @Override
     public void onNewGroupSet() {
         mViewModel.onNewGroupSet();
+    }
+
+    @Override
+    public boolean isNetworkAvailable() {
+        return Utils.isNetworkAvailable(this);
+    }
+
+    @Override
+    public void showCreateGroupDialog(@StringRes int message) {
+        // will be removed
+    }
+
+    @Override
+    public void removeWorker(@NonNull String workerTag) {
+        // do nothing
     }
 }

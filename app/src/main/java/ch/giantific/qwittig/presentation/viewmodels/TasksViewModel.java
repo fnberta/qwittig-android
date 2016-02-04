@@ -18,7 +18,7 @@ import ch.giantific.qwittig.presentation.workerfragments.reminder.TaskReminderLi
  * Created by fabio on 09.01.16.
  */
 public interface TasksViewModel extends
-        OnlineListViewModel<Task, TasksViewModel.ViewListener>,
+        OnlineListViewModel<Task>,
         TasksRecyclerAdapter.AdapterInteractionListener,
         TasksUpdateListener,
         TaskReminderListener {

@@ -33,10 +33,11 @@ public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseRece
     private boolean mDraft;
 
     public PurchaseReceiptViewModelImpl(@Nullable Bundle savedState,
+                                        @NonNull PurchaseReceiptViewModel.ViewListener view,
                                         @NonNull UserRepository userRepository,
                                         @NonNull PurchaseRepository purchaseRepo,
                                         @NonNull String receiptImagePath) {
-        super(savedState, userRepository);
+        super(savedState, view, userRepository);
 
         mPurchaseRepo = purchaseRepo;
         mReceiptImagePath = receiptImagePath;
@@ -45,10 +46,11 @@ public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseRece
     }
 
     public PurchaseReceiptViewModelImpl(@Nullable Bundle savedState,
+                                        @NonNull PurchaseReceiptViewModel.ViewListener view,
                                         @NonNull UserRepository userRepository,
                                         @NonNull PurchaseRepository purchaseRepo,
                                         @NonNull String purchaseId, boolean draft) {
-        super(savedState, userRepository);
+        super(savedState, view, userRepository);
 
         mPurchaseRepo = purchaseRepo;
         mPurchaseId = purchaseId;
@@ -75,11 +77,16 @@ public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseRece
     }
 
     @Override
-    public void attachView(@NonNull PurchaseReceiptViewModel.ViewListener view) {
-        super.attachView(view);
+    public void onStart() {
+        super.onStart();
 
+        loadReceipt();
+    }
+
+    private void loadReceipt() {
         if (!TextUtils.isEmpty(mReceiptImagePath)) {
             mView.setReceiptImage(mReceiptImagePath);
+            setLoading(false);
         } else if (mDraft) {
             mSubscriptions.add(mPurchaseRepo.getPurchaseLocalAsync(mPurchaseId, true)
                     .subscribe(new SingleSubscriber<Purchase>() {

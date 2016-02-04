@@ -6,17 +6,40 @@ package ch.giantific.qwittig.presentation.viewmodels;
 
 import android.databinding.Bindable;
 
+import ch.giantific.qwittig.domain.models.parse.User;
+
 /**
  * Created by fabio on 10.01.16.
  */
-public interface ListViewModel<T, S extends ListViewModel.ViewListener>
-        extends ViewModel<S>, LoadingViewModel {
+public interface ListViewModel<T>
+        extends ViewModel, LoadingViewModel {
 
+    /**
+     * Returns whether the list is empty or not.
+     *
+     * @return whether the list is empty or not
+     */
     @Bindable
     boolean isEmpty();
 
-    void updateList();
+    /**
+     * Loads the data from the repository and propagates the ui.
+     */
+    void loadData();
 
+    /**
+     * Returns the current logged in user.
+     *
+     * @return the current logged in user
+     */
+    User getCurrentUser();
+
+    /**
+     * Returns the item at the position.
+     *
+     * @param position the position of the item
+     * @return the item
+     */
     T getItemAtPosition(int position);
 
     /**
@@ -36,6 +59,11 @@ public interface ListViewModel<T, S extends ListViewModel.ViewListener>
      */
     int getItemCount();
 
+    /**
+     * Returns the position of the last item in the list.
+     *
+     * @return the last position
+     */
     int getLastPosition();
 
     interface ViewListener extends ViewModel.ViewListener {

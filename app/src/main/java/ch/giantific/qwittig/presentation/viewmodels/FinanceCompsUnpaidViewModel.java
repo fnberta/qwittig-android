@@ -17,7 +17,7 @@ import ch.giantific.qwittig.presentation.workerfragments.reminder.CompensationRe
 /**
  * Created by fabio on 18.01.16.
  */
-public interface FinanceCompsUnpaidViewModel extends OnlineListViewModel<CompensationUnpaidItem, FinanceCompsUnpaidViewModel.ViewListener>,
+public interface FinanceCompsUnpaidViewModel extends OnlineListViewModel<CompensationUnpaidItem>,
         FinanceHeaderViewModel, CompensationsUpdateListener, CompensationReminderListener,
         CompensationsUnpaidRecyclerAdapter.AdapterInteractionListener,
         CompensationConfirmAmountDialogFragment.DialogInteractionListener {

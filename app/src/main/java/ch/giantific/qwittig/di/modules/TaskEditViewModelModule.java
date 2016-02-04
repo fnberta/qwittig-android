@@ -20,12 +20,14 @@ import dagger.Provides;
  * Created by fabio on 12.01.16.
  */
 @Module
-public class TaskEditViewModelModule extends BaseViewModelModule {
+public class TaskEditViewModelModule extends BaseViewModelModule<TaskAddEditViewModel.ViewListener> {
 
     private String mEditTaskId;
 
-    public TaskEditViewModelModule(@Nullable Bundle savedState, String editTaskId) {
-        super(savedState);
+    public TaskEditViewModelModule(@Nullable Bundle savedState,
+                                   @NonNull TaskAddEditViewModel.ViewListener view,
+                                   @NonNull String editTaskId) {
+        super(savedState, view);
 
         mEditTaskId = editTaskId;
     }
@@ -34,8 +36,8 @@ public class TaskEditViewModelModule extends BaseViewModelModule {
     @Provides
     TaskAddEditViewModel providesTaskAddEditViewModel(@NonNull UserRepository userRepository,
                                                       @NonNull TaskRepository taskRepository) {
-        return new TaskAddEditViewModelEditImpl(mSavedState, userRepository, taskRepository,
-                mEditTaskId);
+        return new TaskAddEditViewModelEditImpl(mSavedState, mView, userRepository,
+                taskRepository, mEditTaskId);
     }
 
 }

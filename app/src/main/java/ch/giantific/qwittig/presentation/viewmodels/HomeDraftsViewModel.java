@@ -13,7 +13,7 @@ import ch.giantific.qwittig.presentation.ui.adapters.DraftsRecyclerAdapter;
 /**
  * Created by fabio on 21.01.16.
  */
-public interface HomeDraftsViewModel extends ListViewModel<Purchase, HomeDraftsViewModel.ViewListener>,
+public interface HomeDraftsViewModel extends ListViewModel<Purchase>,
         SelectionModeViewModel<Purchase>, DraftsRecyclerAdapter.AdapterInteractionListener {
 
     void onReadyForSelectionMode();

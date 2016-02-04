@@ -12,8 +12,8 @@ import ch.giantific.qwittig.di.scopes.PerFragment;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.presentation.viewmodels.PurchaseAddEditViewModel;
-import ch.giantific.qwittig.presentation.viewmodels.PurchaseAddEditViewModelAddImpl;
+import ch.giantific.qwittig.presentation.viewmodels.HomePurchasesViewModel;
+import ch.giantific.qwittig.presentation.viewmodels.HomePurchasesViewModelImpl;
 import dagger.Module;
 import dagger.Provides;
 
@@ -21,19 +21,19 @@ import dagger.Provides;
  * Created by fabio on 12.01.16.
  */
 @Module
-public class PurchaseAddViewModelModule extends BaseViewModelModule<PurchaseAddEditViewModel.ViewListener> {
+public class HomePurchasesViewModelModule extends BaseViewModelModule<HomePurchasesViewModel.ViewListener> {
 
-    public PurchaseAddViewModelModule(@Nullable Bundle savedState,
-                                      @NonNull PurchaseAddEditViewModel.ViewListener view) {
+    public HomePurchasesViewModelModule(@Nullable Bundle savedState,
+                                        @NonNull HomePurchasesViewModel.ViewListener view) {
         super(savedState, view);
     }
 
     @PerFragment
     @Provides
-    PurchaseAddEditViewModel providesPurchaseAddViewModel(@NonNull GroupRepository groupRepository,
+    HomePurchasesViewModel providesHomePurchasesViewModel(@NonNull GroupRepository groupRepository,
                                                           @NonNull UserRepository userRepository,
                                                           @NonNull PurchaseRepository purchaseRepository) {
-        return new PurchaseAddEditViewModelAddImpl(mSavedState, mView, groupRepository,
-                userRepository, purchaseRepository);
+        return new HomePurchasesViewModelImpl(mSavedState, mView, groupRepository, userRepository,
+                purchaseRepository);
     }
 }

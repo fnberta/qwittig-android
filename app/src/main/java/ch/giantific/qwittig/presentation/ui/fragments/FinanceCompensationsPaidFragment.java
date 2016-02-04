@@ -16,8 +16,8 @@ import com.mugen.Mugen;
 import com.mugen.MugenCallbacks;
 
 import ch.giantific.qwittig.databinding.FragmentFinanceCompensationsPaidBinding;
-import ch.giantific.qwittig.di.components.DaggerFinanceComponent;
-import ch.giantific.qwittig.di.modules.FinanceViewModelModule;
+import ch.giantific.qwittig.di.components.DaggerFinanceCompsPaidComponent;
+import ch.giantific.qwittig.di.modules.FinanceCompsPaidViewModelModule;
 import ch.giantific.qwittig.presentation.ui.adapters.CompensationsPaidRecyclerAdapter;
 import ch.giantific.qwittig.presentation.viewmodels.FinanceCompsPaidViewModel;
 import ch.giantific.qwittig.presentation.workerfragments.query.CompensationsQueryMoreWorker;
@@ -41,8 +41,8 @@ public class FinanceCompensationsPaidFragment extends BaseRecyclerViewOnlineFrag
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        DaggerFinanceComponent.builder()
-                .financeViewModelModule(new FinanceViewModelModule(savedInstanceState))
+        DaggerFinanceCompsPaidComponent.builder()
+                .financeCompsPaidViewModelModule(new FinanceCompsPaidViewModelModule(savedInstanceState, this))
                 .build()
                 .inject(this);
     }

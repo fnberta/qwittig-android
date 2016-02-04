@@ -6,7 +6,9 @@ package ch.giantific.qwittig;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.multidex.MultiDex;
 
 import com.facebook.FacebookSdk;
 import com.parse.Parse;
@@ -28,6 +30,7 @@ import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.models.parse.Task;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.utils.parse.ParseConfigUtils;
+import timber.log.Timber;
 
 /**
  * Handles the initialisation of the Parse.com framework.
@@ -47,19 +50,26 @@ public class Qwittig extends Application {
     }
 
     @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+
+        if (BuildConfig.DEBUG) {
+            MultiDex.install(this);
+        }
+    }
+
+    @Override
     public void onCreate() {
         super.onCreate();
 
-        initialiseLeakCanary();
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
+            LeakCanary.install(this);
+        }
+
         buildAppComponent();
         initialiseFacebookSdk();
         initialiseParse();
-    }
-
-    private void initialiseLeakCanary() {
-        if (BuildConfig.DEBUG) {
-            LeakCanary.install(this);
-        }
     }
 
     private void buildAppComponent() {

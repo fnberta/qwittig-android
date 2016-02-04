@@ -45,10 +45,11 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<Task, TasksV
     private Date mDeadlineSelected;
 
     public TasksViewModelImpl(@Nullable Bundle savedState,
+                              @NonNull TasksViewModel.ViewListener view,
                               @NonNull GroupRepository groupRepo,
                               @NonNull UserRepository userRepository,
                               @NonNull TaskRepository taskRepo) {
-        super(savedState, groupRepo, userRepository);
+        super(savedState, view, groupRepo, userRepository);
 
         mTaskRepo = taskRepo;
         mDeadlineSelected = new Date(Long.MAX_VALUE);
@@ -73,7 +74,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<Task, TasksV
     }
 
     @Override
-    public void updateList() {
+    public void loadData() {
         mSubscriptions.add(mGroupRepo.fetchGroupDataAsync(mCurrentGroup)
                 .toObservable()
                 .flatMap(new Func1<Group, Observable<Task>>() {
@@ -155,7 +156,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<Task, TasksV
         int deadline = (int) parent.getItemAtPosition(position);
         if (deadline == R.string.deadline_all) {
             mDeadlineSelected = new Date(Long.MAX_VALUE);
-            updateList();
+            loadData();
             return;
         }
 
@@ -185,7 +186,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<Task, TasksV
 
         cal = DateUtils.resetToMidnight(cal);
         mDeadlineSelected = cal.getTime();
-        updateList();
+        loadData();
     }
 
     @Override
@@ -207,7 +208,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<Task, TasksV
                     @Override
                     public void onSuccess(Task value) {
                         mView.removeWorker(workerTag);
-                        updateList();
+                        loadData();
                     }
 
                     @Override
@@ -256,7 +257,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<Task, TasksV
         String currentUserId = mCurrentUser.getObjectId();
         if (userResponsible != null && userResponsible.getObjectId().equals(currentUserId) ||
                 userResponsibleNew != null && userResponsibleNew.getObjectId().equals(currentUserId)) {
-            updateList();
+            loadData();
         } else {
             mView.notifyItemChanged(position);
         }

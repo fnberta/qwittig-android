@@ -30,13 +30,15 @@ import rx.functions.Func1;
 /**
  * Created by fabio on 18.01.16.
  */
-public class FinanceUsersViewModelImpl extends OnlineListViewModelBaseImpl<User, FinanceUsersViewModel.ViewListener>
+public class FinanceUsersViewModelImpl
+        extends OnlineListViewModelBaseImpl<User, FinanceUsersViewModel.ViewListener>
         implements FinanceUsersViewModel {
 
     public FinanceUsersViewModelImpl(@Nullable Bundle savedState,
+                                     @NonNull FinanceUsersViewModel.ViewListener view,
                                      @NonNull GroupRepository groupRepo,
                                      @NonNull UserRepository userRepository) {
-        super(savedState, groupRepo, userRepository);
+        super(savedState, view, groupRepo, userRepository);
 
         if (savedState != null) {
             mItems = new ArrayList<>();
@@ -52,7 +54,7 @@ public class FinanceUsersViewModelImpl extends OnlineListViewModelBaseImpl<User,
     }
 
     @Override
-    public void updateList() {
+    public void loadData() {
         mSubscriptions.add(mGroupRepo.fetchGroupDataAsync(mCurrentGroup)
                 .toObservable()
                 .flatMap(new Func1<Group, Observable<User>>() {
@@ -120,7 +122,7 @@ public class FinanceUsersViewModelImpl extends OnlineListViewModelBaseImpl<User,
                         setRefreshing(false);
 
                         notifyPropertyChanged(BR.currentUserBalance);
-                        updateList();
+                        loadData();
                     }
 
                     @Override
@@ -139,7 +141,7 @@ public class FinanceUsersViewModelImpl extends OnlineListViewModelBaseImpl<User,
         super.onNewGroupSet();
 
         notifyPropertyChanged(BR.currentUserBalance);
-        updateList();
+        loadData();
     }
 
     @Override

@@ -24,7 +24,6 @@ import ch.giantific.qwittig.presentation.ui.widgets.PieChart;
  */
 public class StatsPieChartRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private static final String LOG_TAG = StatsPieChartRecyclerAdapter.class.getSimpleName();
     private static final int VIEW_RESOURCE = R.layout.row_stats_stores_user;
     private List<PieData> mPieData;
     private List<String> mNicknames;

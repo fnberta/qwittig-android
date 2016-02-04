@@ -25,11 +25,12 @@ import rx.SingleSubscriber;
 public class PurchaseEditDraftViewModelImpl extends PurchaseAddEditViewModelEditImpl implements PurchaseEditDraftViewModel {
 
     public PurchaseEditDraftViewModelImpl(@Nullable Bundle savedState,
+                                          @NonNull PurchaseAddEditViewModel.ViewListener view,
                                           @NonNull GroupRepository groupRepository,
                                           @NonNull UserRepository userRepository,
                                           @NonNull PurchaseRepository purchaseRepo,
                                           @NonNull String editPurchaseId) {
-        super(savedState, groupRepository, userRepository, purchaseRepo, editPurchaseId);
+        super(savedState, view, groupRepository, userRepository, purchaseRepo, editPurchaseId);
     }
 
     @Override

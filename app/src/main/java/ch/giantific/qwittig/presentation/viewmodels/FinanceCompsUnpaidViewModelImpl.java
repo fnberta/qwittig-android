@@ -37,7 +37,8 @@ import rx.functions.Func1;
 /**
  * Created by fabio on 19.01.16.
  */
-public class FinanceCompsUnpaidViewModelImpl extends OnlineListViewModelBaseImpl<CompensationUnpaidItem, FinanceCompsUnpaidViewModel.ViewListener>
+public class FinanceCompsUnpaidViewModelImpl
+        extends OnlineListViewModelBaseImpl<CompensationUnpaidItem, FinanceCompsUnpaidViewModel.ViewListener>
         implements FinanceCompsUnpaidViewModel {
 
     private static final String STATE_COMPS_LOADING = "STATE_COMPS_LOADING";
@@ -47,10 +48,11 @@ public class FinanceCompsUnpaidViewModelImpl extends OnlineListViewModelBaseImpl
     private String mCompConfirmingId;
 
     public FinanceCompsUnpaidViewModelImpl(@Nullable Bundle savedState,
+                                           @NonNull FinanceCompsUnpaidViewModel.ViewListener view,
                                            @NonNull GroupRepository groupRepo,
                                            @NonNull UserRepository userRepository,
                                            @NonNull CompensationRepository compsRepo) {
-        super(savedState, groupRepo, userRepository);
+        super(savedState, view, groupRepo, userRepository);
 
         mCompsRepo = compsRepo;
 
@@ -82,7 +84,7 @@ public class FinanceCompsUnpaidViewModelImpl extends OnlineListViewModelBaseImpl
     }
 
     @Override
-    public void updateList() {
+    public void loadData() {
         mSubscriptions.add(mGroupRepo.fetchGroupDataAsync(mCurrentGroup)
                 .flatMapObservable(new Func1<Group, Observable<Compensation>>() {
                     @Override
@@ -179,7 +181,7 @@ public class FinanceCompsUnpaidViewModelImpl extends OnlineListViewModelBaseImpl
                         mView.removeWorker(workerTag);
                         setRefreshing(false);
 
-                        updateList();
+                        loadData();
                     }
 
                     @Override
@@ -315,6 +317,6 @@ public class FinanceCompsUnpaidViewModelImpl extends OnlineListViewModelBaseImpl
     public void onNewGroupSet() {
         super.onNewGroupSet();
 
-        updateList();
+        loadData();
     }
 }

@@ -10,14 +10,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 
 import ch.giantific.qwittig.domain.models.MessageAction;
-import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.presentation.workerfragments.BaseWorkerListener;
 
 /**
  * Defines the basic methods every view model contains.
  */
-public interface ViewModel<T extends ViewModel.ViewListener>
-        extends Observable, BaseWorkerListener, ViewInteraction<T> {
+public interface ViewModel
+        extends Observable, BaseWorkerListener {
 
     /**
      * Saves the state of the view model in a bundle before recreation.
@@ -27,16 +26,20 @@ public interface ViewModel<T extends ViewModel.ViewListener>
     void saveState(@NonNull Bundle outState);
 
     /**
-     * Returns the current logged in user.
-     *
-     * @return the current logged in user
+     * Sets up RxJava composite subscriptions and loads the data for the view.
      */
-    User getCurrentUser();
+    void onStart();
 
     /**
      * Loads the appropriate data for the newly set group.
      */
     void onNewGroupSet();
+
+    /**
+     * Cleans up any long living tasks, e.g. RxJava subscriptions, in order to allow the view model
+     * and the view it references to be garbage collected.
+     */
+    void onStop();
 
     interface ViewListener {
         boolean isNetworkAvailable();

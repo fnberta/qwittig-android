@@ -9,20 +9,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
-import android.util.Log;
 
 import com.parse.LogOutCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
 import ch.giantific.qwittig.presentation.ui.activities.HomeActivity;
+import timber.log.Timber;
 
 /**
  * Provides a generic error handler for exceptions thrown by the Parse.com framework.
  */
 public class ParseErrorHandler {
-
-    private static final String LOG_TAG = ParseErrorHandler.class.getSimpleName();
 
     private ParseErrorHandler() {
         // class cannot be instantiated
@@ -49,7 +47,7 @@ public class ParseErrorHandler {
             case ParseException.CONNECTION_FAILED:
                 return R.string.toast_no_connection;
             default:
-                Log.e(LOG_TAG, "unknown error " + e);
+                Timber.e(e, "unknown error");
                 return R.string.toast_unknown_error;
         }
     }

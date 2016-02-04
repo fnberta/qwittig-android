@@ -49,7 +49,7 @@ public class PurchaseReceiptDetailFragment extends PurchaseReceiptBaseFragment<P
         final String purchaseId = getArguments().getString(KEY_PURCHASE_ID, "");
         DaggerPurchaseReceiptIdComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(getActivity()))
-                .purchaseReceiptIdViewModelModule(new PurchaseReceiptIdViewModelModule(savedInstanceState, purchaseId, false))
+                .purchaseReceiptIdViewModelModule(new PurchaseReceiptIdViewModelModule(savedInstanceState, this, purchaseId, false))
                 .build()
                 .inject(this);
     }

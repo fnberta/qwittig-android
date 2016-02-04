@@ -15,8 +15,8 @@ import android.view.ViewGroup;
 import org.apache.commons.math3.fraction.BigFraction;
 
 import ch.giantific.qwittig.databinding.FragmentFinanceCompensationsUnpaidBinding;
-import ch.giantific.qwittig.di.components.DaggerFinanceComponent;
-import ch.giantific.qwittig.di.modules.FinanceViewModelModule;
+import ch.giantific.qwittig.di.components.DaggerFinanceCompsUnpaidComponent;
+import ch.giantific.qwittig.di.modules.FinanceCompsUnpaidViewModelModule;
 import ch.giantific.qwittig.presentation.ui.adapters.CompensationsUnpaidRecyclerAdapter;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.CompensationConfirmAmountDialogFragment;
 import ch.giantific.qwittig.presentation.viewmodels.FinanceCompsUnpaidViewModel;
@@ -44,8 +44,8 @@ public class FinanceCompensationsUnpaidFragment extends BaseRecyclerViewOnlineFr
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        DaggerFinanceComponent.builder()
-                .financeViewModelModule(new FinanceViewModelModule(savedInstanceState))
+        DaggerFinanceCompsUnpaidComponent.builder()
+                .financeCompsUnpaidViewModelModule(new FinanceCompsUnpaidViewModelModule(savedInstanceState, this))
                 .build()
                 .inject(this);
     }

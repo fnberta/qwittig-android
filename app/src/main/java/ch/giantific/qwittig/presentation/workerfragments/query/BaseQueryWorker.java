@@ -25,7 +25,6 @@ import ch.giantific.qwittig.presentation.workerfragments.BaseWorkerListener;
 public abstract class BaseQueryWorker<T, S extends BaseWorkerListener>
         extends BaseWorker<T, S> {
 
-    private static final String LOG_TAG = BaseQueryWorker.class.getSimpleName();
     User mCurrentUser;
     Group mCurrentGroup;
     List<ParseObject> mCurrentUserGroups;

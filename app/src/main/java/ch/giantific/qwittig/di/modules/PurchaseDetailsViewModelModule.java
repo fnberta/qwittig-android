@@ -21,13 +21,14 @@ import dagger.Provides;
  * Created by fabio on 12.01.16.
  */
 @Module
-public class PurchaseDetailsViewModelModule extends BaseViewModelModule {
+public class PurchaseDetailsViewModelModule extends BaseViewModelModule<PurchaseDetailsViewModel.ViewListener> {
 
     private String mPurchaseId;
 
-    public PurchaseDetailsViewModelModule(@Nullable Bundle savedState, String purchaseId) {
-        super(savedState);
-
+    public PurchaseDetailsViewModelModule(@Nullable Bundle savedState,
+                                          @NonNull PurchaseDetailsViewModel.ViewListener view,
+                                          @NonNull String purchaseId) {
+        super(savedState, view);
         mPurchaseId = purchaseId;
     }
 
@@ -36,7 +37,7 @@ public class PurchaseDetailsViewModelModule extends BaseViewModelModule {
     PurchaseDetailsViewModel providesPurchaseDetailsViewModel(@NonNull UserRepository userRepository,
                                                               @NonNull GroupRepository groupRepository,
                                                               @NonNull PurchaseRepository purchaseRepository) {
-        return new PurchaseDetailsViewModelImpl(mSavedState, groupRepository, userRepository,
+        return new PurchaseDetailsViewModelImpl(mSavedState, mView, groupRepository, userRepository,
                 purchaseRepository, mPurchaseId);
     }
 }

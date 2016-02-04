@@ -57,11 +57,12 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
     private String mOldNote;
 
     public PurchaseAddEditViewModelEditImpl(@Nullable Bundle savedState,
+                                            @NonNull PurchaseAddEditViewModel.ViewListener view,
                                             @NonNull GroupRepository groupRepository,
                                             @NonNull UserRepository userRepository,
                                             @NonNull PurchaseRepository purchaseRepo,
                                             @NonNull String editPurchaseId) {
-        super(savedState, groupRepository, userRepository, purchaseRepo);
+        super(savedState, view, groupRepository, userRepository, purchaseRepo);
 
         mEditPurchaseId = editPurchaseId;
 
@@ -196,7 +197,7 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
 
     @Override
     public void onShowReceiptImageClick() {
-        mView.showReceiptImage(mEditPurchaseId, false);
+        mView.showReceiptImage(mEditPurchaseId, mReceiptImagePath, false);
     }
 
     @Override

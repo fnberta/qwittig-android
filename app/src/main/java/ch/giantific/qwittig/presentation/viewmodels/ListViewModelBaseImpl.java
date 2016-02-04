@@ -11,18 +11,18 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import ch.giantific.qwittig.BR;
+import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 
 /**
  * Created by fabio on 10.01.16.
  */
-public abstract class ListViewModelBaseImpl<T, S extends ListViewModel.ViewListener> extends
-        ViewModelBaseImpl<S> implements
-        ListViewModel<T, S> {
+public abstract class ListViewModelBaseImpl<T, S extends ListViewModel.ViewListener>
+        extends ViewModelBaseImpl<S>
+        implements ListViewModel<T> {
 
     private static final String STATE_LOADING = "STATE_LOADING";
 
@@ -31,9 +31,10 @@ public abstract class ListViewModelBaseImpl<T, S extends ListViewModel.ViewListe
     boolean mLoading;
 
     public ListViewModelBaseImpl(@Nullable Bundle savedState,
+                                 @NonNull S view,
                                  @NonNull GroupRepository groupRepo,
                                  @NonNull UserRepository userRepository) {
-        super(savedState, userRepository);
+        super(savedState, view, userRepository);
 
         mGroupRepo = groupRepo;
 
@@ -58,17 +59,16 @@ public abstract class ListViewModelBaseImpl<T, S extends ListViewModel.ViewListe
     }
 
     @Override
-    public void attachView(@NonNull S view) {
-        super.attachView(view);
+    public void onStart() {
+        super.onStart();
 
-        updateList();
+        loadData();
     }
 
     @Override
-    public void onNewGroupSet() {
-        super.onNewGroupSet();
-
-        updateList();
+    @Bindable
+    public boolean isEmpty() {
+        return mItems.isEmpty();
     }
 
     @Override
@@ -84,9 +84,8 @@ public abstract class ListViewModelBaseImpl<T, S extends ListViewModel.ViewListe
     }
 
     @Override
-    @Bindable
-    public boolean isEmpty() {
-        return mItems.isEmpty();
+    public User getCurrentUser() {
+        return mCurrentUser;
     }
 
     @Override
@@ -102,5 +101,12 @@ public abstract class ListViewModelBaseImpl<T, S extends ListViewModel.ViewListe
     @Override
     public int getLastPosition() {
         return getItemCount() - 1;
+    }
+
+    @Override
+    public void onNewGroupSet() {
+        super.onNewGroupSet();
+
+        loadData();
     }
 }

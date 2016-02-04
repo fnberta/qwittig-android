@@ -23,12 +23,14 @@ import dagger.Provides;
  * Created by fabio on 12.01.16.
  */
 @Module
-public class PurchaseEditViewModelModule extends BaseViewModelModule {
+public class PurchaseEditViewModelModule extends BaseViewModelModule<PurchaseAddEditViewModel.ViewListener> {
 
     private String mEditPurchaseId;
 
-    public PurchaseEditViewModelModule(@Nullable Bundle savedState, @NonNull String editPurchaseId) {
-        super(savedState);
+    public PurchaseEditViewModelModule(@Nullable Bundle savedState,
+                                       @NonNull PurchaseAddEditViewModel.ViewListener view,
+                                       @NonNull String editPurchaseId) {
+        super(savedState, view);
 
         mEditPurchaseId = editPurchaseId;
     }
@@ -38,8 +40,8 @@ public class PurchaseEditViewModelModule extends BaseViewModelModule {
     PurchaseAddEditViewModel providesPurchaseEditViewModel(@NonNull GroupRepository groupRepository,
                                                            @NonNull UserRepository userRepository,
                                                            @NonNull PurchaseRepository purchaseRepository) {
-        return new PurchaseAddEditViewModelEditImpl(mSavedState, groupRepository, userRepository,
-                purchaseRepository, mEditPurchaseId);
+        return new PurchaseAddEditViewModelEditImpl(mSavedState, mView, groupRepository,
+                userRepository, purchaseRepository, mEditPurchaseId);
     }
 
     @PerFragment
@@ -47,7 +49,7 @@ public class PurchaseEditViewModelModule extends BaseViewModelModule {
     PurchaseEditDraftViewModel providesPurchaseEditDraftViewModel(@NonNull GroupRepository groupRepository,
                                                                   @NonNull UserRepository userRepository,
                                                                   @NonNull PurchaseRepository purchaseRepository) {
-        return new PurchaseEditDraftViewModelImpl(mSavedState, groupRepository, userRepository,
-                purchaseRepository, mEditPurchaseId);
+        return new PurchaseEditDraftViewModelImpl(mSavedState, mView, groupRepository,
+                userRepository, purchaseRepository, mEditPurchaseId);
     }
 }

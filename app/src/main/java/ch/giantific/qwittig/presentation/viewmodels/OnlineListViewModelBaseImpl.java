@@ -20,15 +20,16 @@ import ch.giantific.qwittig.domain.repositories.UserRepository;
  */
 public abstract class OnlineListViewModelBaseImpl<T, S extends OnlineListViewModel.ViewListener>
         extends ListViewModelBaseImpl<T, S>
-        implements OnlineListViewModel<T, S> {
+        implements OnlineListViewModel<T> {
 
     private static final String STATE_REFRESHING = "STATE_REFRESHING";
     private boolean mRefreshing;
 
     public OnlineListViewModelBaseImpl(@Nullable Bundle savedState,
+                                       @NonNull S view,
                                        @NonNull GroupRepository groupRepo,
                                        @NonNull UserRepository userRepository) {
-        super(savedState, groupRepo, userRepository);
+        super(savedState, view, groupRepo, userRepository);
 
         if (savedState != null) {
             setRefreshing(savedState.getBoolean(STATE_REFRESHING, false));

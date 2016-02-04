@@ -33,8 +33,6 @@ import rx.functions.Func1;
  */
 public class ParseUserRepository extends ParseBaseRepository<ParseUser> implements UserRepository {
 
-    private static final String LOG_TAG = ParseUserRepository.class.getSimpleName();
-
     public ParseUserRepository() {
         super();
     }

@@ -23,8 +23,8 @@ import android.view.ViewGroup;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentHomeDraftsBinding;
-import ch.giantific.qwittig.di.components.DaggerHomeComponent;
-import ch.giantific.qwittig.di.modules.HomeViewModelModule;
+import ch.giantific.qwittig.di.components.DaggerHomeDraftsComponent;
+import ch.giantific.qwittig.di.modules.HomeDraftsViewModelModule;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.presentation.ui.activities.HomeActivity;
 import ch.giantific.qwittig.presentation.ui.activities.PurchaseEditActivity;
@@ -55,9 +55,9 @@ public class HomeDraftsFragment extends BaseRecyclerViewFragment<HomeDraftsViewM
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        DaggerHomeComponent.builder()
+        DaggerHomeDraftsComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(getActivity()))
-                .homeViewModelModule(new HomeViewModelModule(savedInstanceState))
+                .homeDraftsViewModelModule(new HomeDraftsViewModelModule(savedInstanceState, this))
                 .build()
                 .inject(this);
     }

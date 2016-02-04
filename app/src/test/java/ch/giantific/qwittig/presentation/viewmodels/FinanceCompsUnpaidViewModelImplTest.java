@@ -7,7 +7,6 @@ package ch.giantific.qwittig.presentation.viewmodels;
 import android.os.Bundle;
 
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -16,8 +15,6 @@ import ch.giantific.qwittig.data.repositories.ParseCompensationRepository;
 import ch.giantific.qwittig.data.repositories.ParseGroupRepository;
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 
-import static org.junit.Assert.assertTrue;
-
 
 /**
  * Created by fabio on 20.01.16.
@@ -25,13 +22,16 @@ import static org.junit.Assert.assertTrue;
 @RunWith(MockitoJUnitRunner.class)
 public class FinanceCompsUnpaidViewModelImplTest {
 
-    private FinanceCompsUnpaidViewModelImpl mViewModel;
     @Mock
-    private Bundle mBundle;
+    private Bundle mMockBundle;
+    @Mock
+    private FinanceCompsUnpaidViewModel.ViewListener mMockView;
+
+    private FinanceCompsUnpaidViewModelImpl mViewModel;
 
     @Before
     public void setUp() throws Exception {
-        mViewModel = new FinanceCompsUnpaidViewModelImpl(mBundle,
+        mViewModel = new FinanceCompsUnpaidViewModelImpl(mMockBundle, mMockView,
                 new ParseGroupRepository(),
                 new ParseUserRepository(),
                 new ParseCompensationRepository());

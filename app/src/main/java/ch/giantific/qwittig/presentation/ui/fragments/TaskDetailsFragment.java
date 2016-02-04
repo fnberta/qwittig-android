@@ -81,7 +81,7 @@ public class TaskDetailsFragment extends BaseRecyclerViewFragment<TaskDetailsVie
 
         final String taskId = getArguments().getString(KEY_TASK_ID, "");
         DaggerTaskDetailsComponent.builder()
-                .taskDetailsViewModelModule(new TaskDetailsViewModelModule(savedInstanceState, taskId))
+                .taskDetailsViewModelModule(new TaskDetailsViewModelModule(savedInstanceState, this, taskId))
                 .build()
                 .inject(this);
     }

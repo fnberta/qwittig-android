@@ -80,16 +80,16 @@ public abstract class BaseActivity<T extends ViewModel>
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mLocalBroadcastReceiver,
                 new IntentFilter(LocalBroadcastImpl.INTENT_FILTER_DATA_NEW));
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onStop() {
+        super.onStop();
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mLocalBroadcastReceiver);
     }

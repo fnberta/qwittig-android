@@ -21,10 +21,11 @@ import dagger.Provides;
  * Created by fabio on 12.01.16.
  */
 @Module
-public class PurchaseAddAutoViewModelModule extends BaseViewModelModule {
+public class PurchaseAddAutoViewModelModule extends BaseViewModelModule<PurchaseAddEditViewModel.ViewListener> {
 
-    public PurchaseAddAutoViewModelModule(@Nullable Bundle savedState) {
-        super(savedState);
+    public PurchaseAddAutoViewModelModule(@Nullable Bundle savedState,
+                                          @NonNull PurchaseAddEditViewModel.ViewListener view) {
+        super(savedState, view);
     }
 
     @PerFragment
@@ -32,7 +33,7 @@ public class PurchaseAddAutoViewModelModule extends BaseViewModelModule {
     PurchaseAddEditViewModel providesPurchaseAddAutoViewModel(@NonNull GroupRepository groupRepository,
                                                               @NonNull UserRepository userRepository,
                                                               @NonNull PurchaseRepository purchaseRepository) {
-        return new PurchaseAddEditViewModelAddAutoImpl(mSavedState, groupRepository,
+        return new PurchaseAddEditViewModelAddAutoImpl(mSavedState, mView, groupRepository,
                 userRepository, purchaseRepository);
     }
 }

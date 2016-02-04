@@ -50,7 +50,6 @@ public class SettingsStoresFragment extends Fragment implements
 
     private static final String STATE_DRAFTS_SELECTED = "STATE_DRAFTS_SELECTED";
     private static final String STATE_ACTION_MODE = "STATE_ACTION_MODE";
-    private static final String LOG_TAG = SettingsStoresFragment.class.getSimpleName();
     private ActionMode mActionMode;
     private FragmentInteractionListener mListener;
     private RecyclerView mRecyclerView;

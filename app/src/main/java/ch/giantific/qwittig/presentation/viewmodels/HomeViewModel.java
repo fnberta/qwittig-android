@@ -10,7 +10,7 @@ import android.view.View;
 /**
  * Created by fabio on 22.01.16.
  */
-public interface HomeViewModel extends ViewModel<HomeViewModel.ViewListener> {
+public interface HomeViewModel extends ViewModel {
 
     @Bindable
     boolean isDraftsAvailable();

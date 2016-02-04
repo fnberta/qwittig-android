@@ -90,12 +90,13 @@ public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, Task
         if (args != null) {
             final String editTaskId = args.getString(KEY_EDIT_TASK_ID, "");
             DaggerTaskEditComponent.builder()
-                    .taskEditViewModelModule(new TaskEditViewModelModule(savedInstanceState, editTaskId))
+                    .taskEditViewModelModule(new TaskEditViewModelModule(savedInstanceState, this,
+                            editTaskId))
                     .build()
                     .inject(this);
         } else {
             DaggerTaskAddComponent.builder()
-                    .taskAddViewModelModule(new TaskAddViewModelModule(savedInstanceState))
+                    .taskAddViewModelModule(new TaskAddViewModelModule(savedInstanceState, this))
                     .build()
                     .inject(this);
         }

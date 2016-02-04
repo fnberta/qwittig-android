@@ -51,9 +51,10 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
     private List<ParseUser> mTaskUsersAvailable = new ArrayList<>();
 
     public TaskAddEditViewModelAddImpl(@Nullable Bundle savedState,
+                                       @NonNull TaskAddEditViewModel.ViewListener view,
                                        @NonNull UserRepository userRepository,
                                        @NonNull TaskRepository taskRepository) {
-        super(savedState, userRepository);
+        super(savedState, view, userRepository);
 
         mTaskRepo = taskRepository;
         if (savedState != null) {
@@ -75,8 +76,8 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
     }
 
     @Override
-    public void attachView(@NonNull TaskAddEditViewModel.ViewListener view) {
-        super.attachView(view);
+    public void onStart() {
+        super.onStart();
 
         loadTaskUsers();
     }

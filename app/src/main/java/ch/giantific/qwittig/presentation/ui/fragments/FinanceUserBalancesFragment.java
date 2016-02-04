@@ -16,8 +16,8 @@ import android.view.ViewGroup;
 import org.apache.commons.math3.fraction.BigFraction;
 
 import ch.giantific.qwittig.databinding.FragmentFinanceUsersBinding;
-import ch.giantific.qwittig.di.components.DaggerFinanceComponent;
-import ch.giantific.qwittig.di.modules.FinanceViewModelModule;
+import ch.giantific.qwittig.di.components.DaggerFinanceUsersComponent;
+import ch.giantific.qwittig.di.modules.FinanceUsersViewModelModule;
 import ch.giantific.qwittig.presentation.ui.adapters.UsersRecyclerAdapter;
 import ch.giantific.qwittig.presentation.viewmodels.FinanceUsersViewModel;
 import ch.giantific.qwittig.presentation.workerfragments.query.UsersUpdateWorker;
@@ -41,8 +41,8 @@ public class FinanceUserBalancesFragment extends BaseRecyclerViewOnlineFragment<
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        DaggerFinanceComponent.builder()
-                .financeViewModelModule(new FinanceViewModelModule(savedInstanceState))
+        DaggerFinanceUsersComponent.builder()
+                .financeUsersViewModelModule(new FinanceUsersViewModelModule(savedInstanceState, this))
                 .build()
                 .inject(this);
     }

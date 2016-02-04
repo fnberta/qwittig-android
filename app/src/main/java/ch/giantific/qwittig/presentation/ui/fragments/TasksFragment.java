@@ -47,7 +47,7 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment<TasksViewModel
         super.onCreate(savedInstanceState);
 
         DaggerTasksListComponent.builder()
-                .tasksListViewModelModule(new TasksListViewModelModule(savedInstanceState))
+                .tasksListViewModelModule(new TasksListViewModelModule(savedInstanceState, this))
                 .build()
                 .inject(this);
     }

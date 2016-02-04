@@ -17,7 +17,7 @@ import ch.giantific.qwittig.presentation.workerfragments.query.PurchasesUpdateLi
 /**
  * Created by fabio on 21.01.16.
  */
-public interface HomePurchasesViewModel extends OnlineListViewModel<Purchase, HomePurchasesViewModel.ViewListener>,
+public interface HomePurchasesViewModel extends OnlineListViewModel<Purchase>,
         PurchasesRecyclerAdapter.AdapterInteractionListener,
         PurchasesUpdateListener, PurchasesQueryMoreListener, LoadMoreViewModel {
 

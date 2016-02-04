@@ -34,10 +34,11 @@ public class HomeDraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, Hom
     private boolean mDeleteSelectedItems;
 
     public HomeDraftsViewModelImpl(@Nullable Bundle savedState,
+                                   @NonNull HomeDraftsViewModel.ViewListener view,
                                    @NonNull GroupRepository groupRepo,
                                    @NonNull UserRepository userRepository,
                                    @NonNull PurchaseRepository purchaseRepo) {
-        super(savedState, groupRepo, userRepository);
+        super(savedState, view, groupRepo, userRepository);
 
         mPurchaseRepo = purchaseRepo;
         if (savedState != null) {
@@ -58,7 +59,7 @@ public class HomeDraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, Hom
     }
 
     @Override
-    public void updateList() {
+    public void loadData() {
         mSubscriptions.add(mGroupRepo.fetchGroupDataAsync(mCurrentGroup)
                 .toObservable()
                 .flatMap(new Func1<Group, Observable<Purchase>>() {
@@ -196,6 +197,6 @@ public class HomeDraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, Hom
     public void onNewGroupSet() {
         super.onNewGroupSet();
 
-        updateList();
+        loadData();
     }
 }

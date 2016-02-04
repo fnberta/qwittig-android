@@ -13,7 +13,7 @@ import ch.giantific.qwittig.domain.models.parse.User;
 /**
  * Created by fabio on 29.01.16.
  */
-public interface PurchaseDetailsViewModel extends ListViewModel<PurchaseDetailsItem, PurchaseDetailsViewModel.ViewListener> {
+public interface PurchaseDetailsViewModel extends ListViewModel<PurchaseDetailsItem> {
 
     int RESULT_PURCHASE_DELETED = 2;
     int RESULT_GROUP_CHANGED = 3;

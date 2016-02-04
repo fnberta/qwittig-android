@@ -5,8 +5,6 @@
 package ch.giantific.qwittig.presentation.ui.fragments;
 
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -23,8 +21,8 @@ import com.mugen.MugenCallbacks;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentHomePurchasesBinding;
-import ch.giantific.qwittig.di.components.DaggerHomeComponent;
-import ch.giantific.qwittig.di.modules.HomeViewModelModule;
+import ch.giantific.qwittig.di.components.DaggerHomePurchasesComponent;
+import ch.giantific.qwittig.di.modules.HomePurchasesViewModelModule;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.presentation.ui.activities.BaseActivity;
 import ch.giantific.qwittig.presentation.ui.activities.HomeActivity;
@@ -34,7 +32,6 @@ import ch.giantific.qwittig.presentation.viewmodels.HomePurchasesViewModel;
 import ch.giantific.qwittig.presentation.viewmodels.PurchaseDetailsViewModel;
 import ch.giantific.qwittig.presentation.workerfragments.query.PurchasesQueryMoreWorker;
 import ch.giantific.qwittig.presentation.workerfragments.query.PurchasesUpdateWorker;
-import ch.giantific.qwittig.utils.WorkerUtils;
 
 /**
  * Displays recent purchases in a {@link RecyclerView} list.
@@ -55,9 +52,9 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment<HomePu
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        DaggerHomeComponent.builder()
+        DaggerHomePurchasesComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(getActivity()))
-                .homeViewModelModule(new HomeViewModelModule(savedInstanceState))
+                .homePurchasesViewModelModule(new HomePurchasesViewModelModule(savedInstanceState, this))
                 .build()
                 .inject(this);
     }

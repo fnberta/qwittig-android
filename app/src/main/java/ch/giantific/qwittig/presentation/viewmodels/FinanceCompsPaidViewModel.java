@@ -11,7 +11,7 @@ import ch.giantific.qwittig.presentation.workerfragments.query.CompensationsUpda
 /**
  * Created by fabio on 18.01.16.
  */
-public interface FinanceCompsPaidViewModel extends OnlineListViewModel<Compensation, FinanceCompsPaidViewModel.ViewListener>,
+public interface FinanceCompsPaidViewModel extends OnlineListViewModel<Compensation>,
         CompensationsUpdateListener, CompensationsQueryMoreListener, LoadMoreViewModel {
 
 

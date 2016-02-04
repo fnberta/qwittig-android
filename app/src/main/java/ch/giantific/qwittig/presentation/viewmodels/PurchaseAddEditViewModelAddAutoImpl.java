@@ -4,7 +4,6 @@
 
 package ch.giantific.qwittig.presentation.viewmodels;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -19,10 +18,11 @@ import ch.giantific.qwittig.domain.repositories.UserRepository;
 public class PurchaseAddEditViewModelAddAutoImpl extends PurchaseAddEditViewModelAddImpl {
 
     public PurchaseAddEditViewModelAddAutoImpl(@Nullable Bundle savedState,
+                                               @NonNull PurchaseAddEditViewModel.ViewListener view,
                                                @NonNull GroupRepository groupRepository,
                                                @NonNull UserRepository userRepository,
                                                @NonNull PurchaseRepository purchaseRepo) {
-        super(savedState, groupRepository, userRepository, purchaseRepo);
+        super(savedState, view, groupRepository, userRepository, purchaseRepo);
 
         if (savedState == null) {
             mLoading = true;
@@ -41,5 +41,11 @@ public class PurchaseAddEditViewModelAddAutoImpl extends PurchaseAddEditViewMode
     @Override
     void onUsersReady() {
         mView.captureImage(USE_CUSTOM_CAMERA);
+    }
+
+    @Override
+    public void onReceiptImageTaken() {
+        mView.toggleReceiptMenuOption(true);
+        mView.loadOcrWorker(mReceiptImagePath);
     }
 }

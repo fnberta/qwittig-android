@@ -24,9 +24,11 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
     private PurchaseRepository mPurchaseRepo;
     private boolean mDraftsAvailable;
 
-    public HomeViewModelImpl(@Nullable Bundle savedState, @NonNull UserRepository userRepository,
+    public HomeViewModelImpl(@Nullable Bundle savedState,
+                             @NonNull HomeViewModel.ViewListener view,
+                             @NonNull UserRepository userRepository,
                              @NonNull PurchaseRepository purchaseRepo) {
-        super(savedState, userRepository);
+        super(savedState, view, userRepository);
 
         mPurchaseRepo = purchaseRepo;
         mDraftsAvailable = mPurchaseRepo.isPurchaseDraftsAvailable();

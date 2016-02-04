@@ -40,11 +40,12 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<Purchase
     private Purchase mPurchase;
 
     public PurchaseDetailsViewModelImpl(@Nullable Bundle savedState,
+                                        @NonNull PurchaseDetailsViewModel.ViewListener view,
                                         @NonNull GroupRepository groupRepo,
                                         @NonNull UserRepository userRepository,
                                         @NonNull PurchaseRepository purchaseRepo,
                                         @NonNull String purchaseId) {
-        super(savedState, groupRepo, userRepository);
+        super(savedState, view, groupRepo, userRepository);
 
         mPurchaseRepo = purchaseRepo;
         mPurchaseId = purchaseId;
@@ -79,7 +80,7 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<Purchase
     }
 
     @Override
-    public void updateList() {
+    public void loadData() {
         if (!isUserInGroup()) {
             mView.showMessage(R.string.toast_error_purchase_details_group_not);
             return;

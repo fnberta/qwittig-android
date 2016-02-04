@@ -32,7 +32,6 @@ public class ParseCompensationRepository extends ParseBaseRepository<Compensatio
 
     private static final String DATE_CREATED = "createdAt";
     private static final String DATE_UPDATED = "updatedAt";
-    private static final String LOG_TAG = ParseCompensationRepository.class.getSimpleName();
 
     public ParseCompensationRepository() {
         super();

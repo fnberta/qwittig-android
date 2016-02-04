@@ -37,7 +37,7 @@ import rx.Single;
 /**
  * Created by fabio on 24.01.16.
  */
-public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditItem, PurchaseAddEditViewModel.ViewListener>,
+public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditItem>,
         PurchaseAddEditRecyclerAdapter.AdapterListener, RowItem.PriceChangedListener,
         PurchaseAddEditDateRowViewModel, PurchaseAddEditStoreRowViewModel, PurchaseAddEditTotalRowViewModel,
         PurchaseAddEditItemUsersClickListener, PurchaseNoteDialogFragment.DialogInteractionListener,
@@ -53,6 +53,10 @@ public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditI
      * @param receiptImagePath the path to the receipt image
      */
     void onReceiptImagePathSet(@NonNull String receiptImagePath);
+
+    void onReceiptImageTaken();
+
+    void onReceiptImageFailed();
 
     /**
      * Sets the receipt image paths, only used when custom camera is enabled
@@ -119,7 +123,7 @@ public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditI
 
         void loadFetchExchangeRatesWorker(@NonNull String baseCurrency, @NonNull String currency);
 
-        void loadOcrWorker();
+        void loadOcrWorker(@NonNull String receiptImagePath);
 
         void loadSavePurchaseWorker(@NonNull Purchase purchase, @Nullable byte[] receiptImage);
 
@@ -139,9 +143,9 @@ public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditI
 
         void toggleNoteMenuOption(boolean show);
 
-        void showReceiptImage();
+        void showReceiptImage(@NonNull String receiptImagePath);
 
-        void showReceiptImage(@NonNull String objectId, boolean isDraft);
+        void showReceiptImage(@NonNull String objectId, @NonNull String receiptImagePath, boolean isDraft);
 
         void showNote(@NonNull String note);
 

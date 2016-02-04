@@ -91,13 +91,13 @@ public class PurchaseReceiptAddEditFragment extends PurchaseReceiptBaseFragment<
         if (!TextUtils.isEmpty(receiptImagePath)) {
             DaggerPurchaseReceiptPathComponent.builder()
                     .applicationComponent(Qwittig.getAppComponent(getActivity()))
-                    .purchaseReceiptPathViewModelModule(new PurchaseReceiptPathViewModelModule(savedInstanceState, receiptImagePath))
+                    .purchaseReceiptPathViewModelModule(new PurchaseReceiptPathViewModelModule(savedInstanceState, this, receiptImagePath))
                     .build()
                     .inject(this);
         } else {
             DaggerPurchaseReceiptIdComponent.builder()
                     .applicationComponent(Qwittig.getAppComponent(getActivity()))
-                    .purchaseReceiptIdViewModelModule(new PurchaseReceiptIdViewModelModule(savedInstanceState, purchaseId, draft))
+                    .purchaseReceiptIdViewModelModule(new PurchaseReceiptIdViewModelModule(savedInstanceState, this, purchaseId, draft))
                     .build()
                     .inject(this);
         }

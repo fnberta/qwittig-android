@@ -22,9 +22,8 @@ import ch.giantific.qwittig.presentation.ui.fragments.dialogs.DiscardChangesDial
 /**
  * Created by fabio on 09.01.16.
  */
-public interface TaskAddEditViewModel extends
-        ViewModel<TaskAddEditViewModel.ViewListener>,
-        DiscardChangesDialogFragment.DialogInteractionListener,
+public interface TaskAddEditViewModel
+        extends ViewModel, DiscardChangesDialogFragment.DialogInteractionListener,
         DatePickerDialog.OnDateSetListener,
         TaskAddEditUsersRecyclerAdapter.AdapterInteractionListener,
         ItemTouchHelperAdapter {

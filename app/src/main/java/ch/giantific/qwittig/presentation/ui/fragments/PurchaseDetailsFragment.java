@@ -82,7 +82,7 @@ public class PurchaseDetailsFragment extends BaseRecyclerViewFragment<PurchaseDe
         final String purchaseId = getArguments().getString(INTENT_PURCHASE_ID, "");
         DaggerPurchaseDetailsComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(getActivity()))
-                .purchaseDetailsViewModelModule(new PurchaseDetailsViewModelModule(savedInstanceState, purchaseId))
+                .purchaseDetailsViewModelModule(new PurchaseDetailsViewModelModule(savedInstanceState, this, purchaseId))
                 .build()
                 .inject(this);
     }

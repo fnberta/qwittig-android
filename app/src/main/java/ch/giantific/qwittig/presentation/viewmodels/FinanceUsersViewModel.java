@@ -15,7 +15,7 @@ import ch.giantific.qwittig.presentation.workerfragments.query.UsersUpdateListen
 /**
  * Created by fabio on 18.01.16.
  */
-public interface FinanceUsersViewModel extends OnlineListViewModel<User, FinanceUsersViewModel.ViewListener>,
+public interface FinanceUsersViewModel extends OnlineListViewModel<User>,
         UsersUpdateListener {
 
     @Bindable

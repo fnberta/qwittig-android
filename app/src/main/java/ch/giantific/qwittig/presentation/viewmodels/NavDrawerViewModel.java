@@ -20,9 +20,7 @@ import ch.giantific.qwittig.domain.models.parse.Group;
 /**
  * Created by fabio on 12.01.16.
  */
-public interface NavDrawerViewModel extends Observable, ViewInteraction<NavDrawerViewModel.ViewListener> {
-
-    void unsubscribe();
+public interface NavDrawerViewModel extends ViewModel {
 
     @Bindable
     String getUserNickname();
@@ -51,10 +49,8 @@ public interface NavDrawerViewModel extends Observable, ViewInteraction<NavDrawe
 
     void onAvatarClick(View view);
 
-    interface ViewListener {
+    interface ViewListener extends ViewModel.ViewListener {
         void bindHeaderView();
-
-        void showMessage(@StringRes int resId);
 
         void setupHeaderGroupSelection(@NonNull List<Group> groups);
 

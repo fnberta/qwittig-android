@@ -10,7 +10,6 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.TextView;
@@ -47,6 +46,7 @@ import ch.giantific.qwittig.utils.parse.ParseUtils;
 import rx.Single;
 import rx.SingleSubscriber;
 import rx.functions.Func1;
+import timber.log.Timber;
 
 /**
  * Created by fabio on 24.01.16.
@@ -56,7 +56,6 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
 
     // add permission to manifest when enabling!
     static final boolean USE_CUSTOM_CAMERA = false;
-    private static final String LOG_TAG = PurchaseAddEditViewModelAddImpl.class.getSimpleName();
     private static final String STATE_ROW_ITEMS = "STATE_ROW_ITEMS";
     private static final String STATE_SAVING = "STATE_SAVING";
     private static final String STATE_DATE = "STATE_DATE";
@@ -83,10 +82,11 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
     private ArrayList<String> mReceiptImagePaths;
 
     public PurchaseAddEditViewModelAddImpl(@Nullable Bundle savedState,
+                                           @NonNull PurchaseAddEditViewModel.ViewListener view,
                                            @NonNull GroupRepository groupRepository,
                                            @NonNull UserRepository userRepository,
                                            @NonNull PurchaseRepository purchaseRepo) {
-        super(savedState, groupRepository, userRepository);
+        super(savedState, view, groupRepository, userRepository);
 
         mPurchaseRepo = purchaseRepo;
 
@@ -367,7 +367,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
     }
 
     @Override
-    public void updateList() {
+    public void loadData() {
         mSubscriptions.add(mUserRepo.getUsersLocalAsync(mCurrentGroup)
                 .toSortedList()
                 .toSingle()
@@ -458,6 +458,17 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
     @Override
     public void onReceiptImagePathSet(@NonNull String receiptImagePath) {
         mReceiptImagePath = receiptImagePath;
+    }
+
+    @Override
+    public void onReceiptImageTaken() {
+        mView.toggleReceiptMenuOption(true);
+        mView.showMessage(R.string.toast_receipt_added);
+    }
+
+    @Override
+    public void onReceiptImageFailed() {
+        mView.finishScreen(PurchaseResult.PURCHASE_DISCARDED);
     }
 
     @Override
@@ -666,11 +677,11 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
             }
 
             final RowItem rowItem = addEditItem.getRowItem();
-            final String name = rowItem.getName();
+            final String rowItemName = rowItem.getName();
+            final String name = rowItemName != null ? rowItemName : "";
             final BigDecimal price = rowItem.parsePrice(mCurrency);
             final List<User> usersInvolved = getUsersInvolved(rowItem.getUsers());
             for (User user : usersInvolved) {
-                // TODO: check if need to use object ids here
                 if (!purchaseUsersInvolved.contains(user)) {
                     purchaseUsersInvolved.add(user);
                 }
@@ -756,7 +767,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
                 for (String path : mReceiptImagePaths) {
                     final boolean fileDeleted = new File(path).delete();
                     if (!fileDeleted && BuildConfig.DEBUG) {
-                        Log.e(LOG_TAG, "failed to delete file");
+                        Timber.e("failed to delete file");
                     }
                 }
                 mReceiptImagePaths.clear();
@@ -764,7 +775,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
         } else if (!TextUtils.isEmpty(mReceiptImagePath)) {
             boolean fileDeleted = new File(mReceiptImagePath).delete();
             if (!fileDeleted && BuildConfig.DEBUG) {
-                Log.e(LOG_TAG, "failed to delete file");
+                Timber.e("failed to delete file");
             }
             mReceiptImagePath = "";
         }
@@ -772,7 +783,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
 
     @Override
     public void onShowReceiptImageClick() {
-        mView.showReceiptImage();
+        mView.showReceiptImage(mReceiptImagePath);
     }
 
     @Override

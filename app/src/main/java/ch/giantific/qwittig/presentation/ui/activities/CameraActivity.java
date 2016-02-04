@@ -12,7 +12,6 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.OrientationEventListener;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -37,6 +36,7 @@ import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.ui.CameraPreview;
 import ch.giantific.qwittig.utils.CameraUtils;
+import timber.log.Timber;
 
 /**
  * Provides a custom camera interface that is locked to portrait orientation and allows the user
@@ -56,7 +56,6 @@ import ch.giantific.qwittig.utils.CameraUtils;
 public class CameraActivity extends AppCompatActivity implements View.OnClickListener {
 
     public static final String INTENT_EXTRA_PATHS = "INTENT_EXTRA_PATHS";
-    private static final String LOG_TAG = CameraActivity.class.getSimpleName();
     private static final int MAX_NUMBER_IMAGES = 3;
     private Camera mCamera;
     private CameraPreview mPreview;
@@ -167,7 +166,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
         Camera.getCameraInfo(0, info);
         orientation = (orientation + 45) / 90 * 90;
-        Log.e(LOG_TAG, "info.orientation " + info.orientation);
+        Timber.e("info.orientation %1$s", info.orientation);
         int rotation;
         if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
             rotation = (info.orientation - orientation + 360) % 360;
@@ -175,7 +174,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
             rotation = (info.orientation + orientation) % 360;
         }
 
-        Log.e(LOG_TAG, "rotation " + rotation);
+        Timber.e("rotation %1$s", rotation);
         params.setRotation(rotation);
         return params;
     }
@@ -219,7 +218,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                         if (success) {
                             mCamera.takePicture(null, null, mPicture);
                         } else {
-                            Log.e(LOG_TAG, "autoFocus failed");
+                            Timber.e("autoFocus failed");
                         }
                     }
                 });
@@ -228,7 +227,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                 File image = mImageFiles.get(mImageFiles.size() - 1);
                 boolean isDeleted = image.delete();
                 if (!isDeleted && BuildConfig.DEBUG) {
-                    Log.e(LOG_TAG, "failed to delete file");
+                    Timber.e("failed to delete file");
                 }
                 mImageFiles.remove(image);
                 showPreview();

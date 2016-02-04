@@ -73,14 +73,14 @@ public abstract class BaseFragment<T extends ViewModel, S extends BaseFragment.A
     public void onStart() {
         super.onStart();
 
-        mViewModel.attachView(this);
+        mViewModel.onStart();
     }
 
     @Override
     public void onStop() {
         super.onStop();
 
-        mViewModel.detachView();
+        mViewModel.onStop();
     }
 
     @Override

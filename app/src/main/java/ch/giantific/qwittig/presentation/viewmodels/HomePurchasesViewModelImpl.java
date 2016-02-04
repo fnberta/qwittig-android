@@ -35,10 +35,11 @@ public class HomePurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purc
     private boolean mIsLoadingMore;
 
     public HomePurchasesViewModelImpl(@Nullable Bundle savedState,
+                                      @NonNull HomePurchasesViewModel.ViewListener view,
                                       @NonNull GroupRepository groupRepo,
                                       @NonNull UserRepository userRepository,
                                       @NonNull PurchaseRepository purchaseRepo) {
-        super(savedState, groupRepo, userRepository);
+        super(savedState, view, groupRepo, userRepository);
 
         mPurchaseRepo = purchaseRepo;
 
@@ -56,7 +57,7 @@ public class HomePurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purc
     }
 
     @Override
-    public void updateList() {
+    public void loadData() {
         mSubscriptions.add(mGroupRepo.fetchGroupDataAsync(mCurrentGroup)
                 .toObservable()
                 .flatMap(new Func1<Group, Observable<Purchase>>() {
@@ -152,7 +153,7 @@ public class HomePurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purc
                         mView.removeWorker(workerTag);
                         setRefreshing(false);
 
-                        updateList();
+                        loadData();
                     }
 
                     @Override

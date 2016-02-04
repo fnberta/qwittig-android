@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
 /**
  * Created by fabio on 29.01.16.
  */
-public interface PurchaseReceiptViewModel extends ViewModel<PurchaseReceiptViewModel.ViewListener>,
+public interface PurchaseReceiptViewModel extends ViewModel,
         LoadingViewModel {
 
     void onReceiptImagePathSet(@NonNull String receiptImagePath);

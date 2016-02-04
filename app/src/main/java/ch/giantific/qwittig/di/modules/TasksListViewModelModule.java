@@ -8,10 +8,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import ch.giantific.qwittig.di.scopes.PerFragment;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.di.scopes.PerFragment;
 import ch.giantific.qwittig.presentation.viewmodels.TasksViewModel;
 import ch.giantific.qwittig.presentation.viewmodels.TasksViewModelImpl;
 import dagger.Module;
@@ -21,10 +21,11 @@ import dagger.Provides;
  * Created by fabio on 12.01.16.
  */
 @Module
-public class TasksListViewModelModule extends BaseViewModelModule {
+public class TasksListViewModelModule extends BaseViewModelModule<TasksViewModel.ViewListener> {
 
-    public TasksListViewModelModule(@Nullable Bundle savedState) {
-        super(savedState);
+    public TasksListViewModelModule(@Nullable Bundle savedState,
+                                    @NonNull TasksViewModel.ViewListener view) {
+        super(savedState, view);
     }
 
     @PerFragment
@@ -32,7 +33,8 @@ public class TasksListViewModelModule extends BaseViewModelModule {
     TasksViewModel providesTasksListViewModel(@NonNull GroupRepository groupRepository,
                                               @NonNull UserRepository userRepository,
                                               @NonNull TaskRepository taskRepository) {
-        return new TasksViewModelImpl(mSavedState, groupRepository, userRepository, taskRepository);
+        return new TasksViewModelImpl(mSavedState, mView, groupRepository, userRepository,
+                taskRepository);
     }
 
 }

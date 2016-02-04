@@ -47,7 +47,7 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
         super.handleLocalBroadcast(intent, dataType);
 
         if (dataType == LocalBroadcast.DataType.PURCHASES_UPDATED) {
-            mViewModel.updateList();
+            mViewModel.loadData();
         }
     }
 

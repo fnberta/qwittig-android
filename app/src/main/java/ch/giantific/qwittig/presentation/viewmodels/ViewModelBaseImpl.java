@@ -21,9 +21,9 @@ import rx.subscriptions.CompositeSubscription;
  * <p/>
  * Subclass of {@link BaseObservable} to make fields observable for data binding.
  */
-public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener> extends
-        BaseObservable implements
-        ViewModel<T> {
+public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
+        extends BaseObservable
+        implements ViewModel {
 
     User mCurrentUser;
     Group mCurrentGroup;
@@ -31,7 +31,9 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener> extend
     CompositeSubscription mSubscriptions;
     UserRepository mUserRepo;
 
-    public ViewModelBaseImpl(@Nullable Bundle savedState, @NonNull UserRepository userRepository) {
+    public ViewModelBaseImpl(@Nullable Bundle savedState, @NonNull T view,
+                             @NonNull UserRepository userRepository) {
+        mView = view;
         mUserRepo = userRepository;
         updateCurrentUserAndGroup();
     }
@@ -45,8 +47,17 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener> extend
     }
 
     @Override
-    public User getCurrentUser() {
-        return mCurrentUser;
+    @CallSuper
+    public void saveState(@NonNull Bundle outState) {
+        // Empty default implementation
+    }
+
+    @Override
+    @CallSuper
+    public void onStart() {
+        if (mSubscriptions == null || mSubscriptions.isUnsubscribed()) {
+            mSubscriptions = new CompositeSubscription();
+        }
     }
 
     @Override
@@ -56,24 +67,7 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener> extend
     }
 
     @Override
-    @CallSuper
-    public void saveState(@NonNull Bundle outState) {
-        // Empty default implementation
-    }
-
-    @Override
-    @CallSuper
-    public void attachView(@NonNull T view) {
-        mView = view;
-        if (mSubscriptions == null || mSubscriptions.isUnsubscribed()) {
-            mSubscriptions = new CompositeSubscription();
-        }
-    }
-
-    @Override
-    @CallSuper
-    public void detachView() {
-        mView = null;
+    public void onStop() {
         if (mSubscriptions.hasSubscriptions()) {
             mSubscriptions.unsubscribe();
         }

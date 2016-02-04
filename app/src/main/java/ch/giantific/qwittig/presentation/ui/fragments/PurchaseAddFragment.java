@@ -75,13 +75,13 @@ public class PurchaseAddFragment extends PurchaseAddEditBaseFragment<PurchaseAdd
         if (auto) {
             DaggerPurchaseAddAutoComponent.builder()
                     .applicationComponent(Qwittig.getAppComponent(getActivity()))
-                    .purchaseAddAutoViewModelModule(new PurchaseAddAutoViewModelModule(savedInstanceState))
+                    .purchaseAddAutoViewModelModule(new PurchaseAddAutoViewModelModule(savedInstanceState, this))
                     .build()
                     .inject(this);
         } else {
             DaggerPurchaseAddComponent.builder()
                     .applicationComponent(Qwittig.getAppComponent(getActivity()))
-                    .purchaseAddViewModelModule(new PurchaseAddViewModelModule(savedInstanceState))
+                    .purchaseAddViewModelModule(new PurchaseAddViewModelModule(savedInstanceState, this))
                     .build()
                     .inject(this);
         }

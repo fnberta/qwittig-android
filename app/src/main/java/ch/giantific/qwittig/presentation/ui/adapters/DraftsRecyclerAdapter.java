@@ -23,7 +23,6 @@ import ch.giantific.qwittig.presentation.viewmodels.rows.DraftsRowViewModel;
  */
 public class DraftsRecyclerAdapter extends RecyclerView.Adapter<DraftsRecyclerAdapter.DraftRow> {
 
-    private static final String LOG_TAG = DraftsRecyclerAdapter.class.getSimpleName();
     private HomeDraftsViewModel mViewModel;
 
     /**

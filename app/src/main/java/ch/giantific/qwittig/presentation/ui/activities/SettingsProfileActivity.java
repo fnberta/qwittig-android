@@ -45,7 +45,6 @@ public class SettingsProfileActivity extends BaseActivity implements
         UnlinkThirdPartyWorker.WorkerInteractionListener {
 
     private static final String STATE_PROFILE_FRAGMENT = "STATE_PROFILE_FRAGMENT";
-    private static final String LOG_TAG = SettingsProfileActivity.class.getSimpleName();
     private ImageView mImageViewAvatar;
     private SettingsProfileFragment mSettingsProfileFragment;
     private FabProgress mFabProgress;

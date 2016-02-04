@@ -42,7 +42,6 @@ public class SettingsGroupNewActivity extends BaseActivity implements
 
     public static final String RESULT_DATA_GROUP = "RESULT_DATA_GROUP";
     private static final String STATE_GROUP_NEW_FRAGMENT = "STATE_GROUP_NEW_FRAGMENT";
-    private static final String LOG_TAG = SettingsGroupNewActivity.class.getSimpleName();
     private SettingsGroupNewFragment mSettingsGroupNewFragment;
     private FabProgress mFabProgress;
     private String mNewGroupName;

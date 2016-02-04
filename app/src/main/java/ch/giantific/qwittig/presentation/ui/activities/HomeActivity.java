@@ -79,7 +79,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
         super.handleLocalBroadcast(intent, dataType);
 
         if (dataType == LocalBroadcast.DataType.PURCHASES_UPDATED) {
-            mPurchasesViewModel.updateList();
+            mPurchasesViewModel.loadData();
         }
     }
 
@@ -126,7 +126,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     private void injectViewModel(Bundle savedInstanceState) {
         final HomeComponent comp = DaggerHomeComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
-                .homeViewModelModule(new HomeViewModelModule(savedInstanceState))
+                .homeViewModelModule(new HomeViewModelModule(savedInstanceState, this))
                 .build();
         mViewModel = comp.getHomeViewModel();
         mBinding.setViewModel(mViewModel);
@@ -224,14 +224,14 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     protected void onStart() {
         super.onStart();
 
-        mViewModel.attachView(this);
+        mViewModel.onStart();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
 
-        mViewModel.detachView();
+        mViewModel.onStop();
     }
 
     @Override
@@ -300,11 +300,6 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     }
 
     @Override
-    public void showCreateGroupDialog(@StringRes int message) {
-
-    }
-
-    @Override
     public void onCreateGroupSelected() {
         final Intent intent = new Intent(this, SettingsGroupNewActivity.class);
         startActivity(intent);
@@ -341,26 +336,6 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     @Override
     int getSelfNavDrawerItem() {
         return R.id.nav_home;
-    }
-
-    @Override
-    public boolean isNetworkAvailable() {
-        return false;
-    }
-
-    @Override
-    public void showMessage(@StringRes int resId, @NonNull String... args) {
-
-    }
-
-    @Override
-    public void showMessageWithAction(@StringRes int resId, @NonNull MessageAction action) {
-
-    }
-
-    @Override
-    public void removeWorker(@NonNull String workerTag) {
-
     }
 }
 

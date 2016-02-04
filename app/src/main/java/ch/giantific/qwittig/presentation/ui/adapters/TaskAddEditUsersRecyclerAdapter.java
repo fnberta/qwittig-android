@@ -29,7 +29,6 @@ import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;
  */
 public class TaskAddEditUsersRecyclerAdapter extends RecyclerView.Adapter<TaskAddEditUsersRecyclerAdapter.TaskUserInvolvedRow> {
 
-    private static final String LOG_TAG = TaskAddEditUsersRecyclerAdapter.class.getSimpleName();
     private TaskAddEditViewModel mViewModel;
 
     /**

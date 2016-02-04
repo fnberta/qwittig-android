@@ -24,7 +24,6 @@ import ch.giantific.qwittig.presentation.viewmodels.rows.PurchaseRowViewModel;
  */
 public class PurchasesRecyclerAdapter extends RecyclerView.Adapter {
 
-    private static final String LOG_TAG = PurchasesRecyclerAdapter.class.getSimpleName();
     private HomePurchasesViewModel mViewModel;
 
     /**

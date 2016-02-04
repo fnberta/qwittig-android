@@ -27,7 +27,8 @@ import rx.functions.Func1;
 /**
  * Created by fabio on 18.01.16.
  */
-public class FinanceCompsPaidViewModelImpl extends OnlineListViewModelBaseImpl<Compensation, FinanceCompsPaidViewModel.ViewListener>
+public class FinanceCompsPaidViewModelImpl
+        extends OnlineListViewModelBaseImpl<Compensation, FinanceCompsPaidViewModel.ViewListener>
         implements FinanceCompsPaidViewModel {
 
     private static final String STATE_IS_LOADING_MORE = "STATE_IS_LOADING_MORE";
@@ -35,10 +36,11 @@ public class FinanceCompsPaidViewModelImpl extends OnlineListViewModelBaseImpl<C
     private boolean mIsLoadingMore;
 
     public FinanceCompsPaidViewModelImpl(@Nullable Bundle savedState,
+                                         @NonNull FinanceCompsPaidViewModel.ViewListener view,
                                          @NonNull GroupRepository groupRepo,
                                          @NonNull UserRepository userRepository,
                                          @NonNull CompensationRepository compsRepo) {
-        super(savedState, groupRepo, userRepository);
+        super(savedState, view, groupRepo, userRepository);
 
         mCompsRepo = compsRepo;
         if (savedState != null) {
@@ -55,7 +57,7 @@ public class FinanceCompsPaidViewModelImpl extends OnlineListViewModelBaseImpl<C
     }
 
     @Override
-    public void updateList() {
+    public void loadData() {
         mSubscriptions.add(mGroupRepo.fetchGroupDataAsync(mCurrentGroup)
                 .toObservable()
                 .flatMap(new Func1<Group, Observable<Compensation>>() {
@@ -153,11 +155,11 @@ public class FinanceCompsPaidViewModelImpl extends OnlineListViewModelBaseImpl<C
                         mView.removeWorker(workerTag);
                         mView.showMessageWithAction(mCompsRepo.getErrorMessage(error),
                                 new MessageAction(R.string.action_retry) {
-                            @Override
-                            public void onClick(View v) {
-                                onLoadMore();
-                            }
-                        });
+                                    @Override
+                                    public void onClick(View v) {
+                                        onLoadMore();
+                                    }
+                                });
                         mIsLoadingMore = false;
 
                         removeLoadMore();
@@ -184,7 +186,7 @@ public class FinanceCompsPaidViewModelImpl extends OnlineListViewModelBaseImpl<C
                         mView.removeWorker(workerTag);
                         setRefreshing(false);
 
-                        updateList();
+                        loadData();
                     }
 
                     @Override
@@ -217,6 +219,6 @@ public class FinanceCompsPaidViewModelImpl extends OnlineListViewModelBaseImpl<C
     public void onNewGroupSet() {
         super.onNewGroupSet();
 
-        updateList();
+        loadData();
     }
 }

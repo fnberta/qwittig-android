@@ -56,7 +56,6 @@ import ch.giantific.qwittig.utils.WorkerUtils;
 public class SettingsProfileFragment extends Fragment {
 
     public static final int RESULT_CHANGES_DISCARDED = 2;
-    private static final String LOG_TAG = SettingsProfileFragment.class.getSimpleName();
     private static final String DISCARD_CHANGES_DIALOG = "DISCARD_CHANGES_DIALOG";
     private static final int INTENT_REQUEST_IMAGE = 1;
     private static final String STATE_IS_SAVING = "STATE_IS_SAVING";

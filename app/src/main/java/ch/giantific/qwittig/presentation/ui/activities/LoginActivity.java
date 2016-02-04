@@ -49,7 +49,6 @@ public class LoginActivity extends BaseActivity implements
     public static final int FRAGMENT_SIGN_UP = 3;
     public static final int RC_SIGN_IN = 9001;
     private static final String FRAGMENT_LOGIN = "FRAGMENT_LOGIN";
-    private static final String LOG_TAG = LoginActivity.class.getSimpleName();
     private String mEmail;
     private GoogleApiClient mGoogleApiClient;
 
