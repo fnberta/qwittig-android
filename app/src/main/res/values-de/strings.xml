@@ -173,8 +173,8 @@
     <string name="error_valid_amount">Bitte gib einen gültigen Betrag an</string>
     <string name="dialog_positive_pay">Bezahlen</string>
     <string name="toast_payment_saved">Zahlung an %1$s hinzugefügt</string>
-    <string name="tab_compensations_history">Vergangene Zahlungen</string>
-    <string name="tab_compensations_new">Offene Zahlungen</string>
+    <string name="tab_compensations_archive">Archiv</string>
+    <string name="tab_compensations_new">Abrechnung</string>
     <string name="header_users_invited">Bereits eingeladen</string>
     <string name="hint_clear">Entfernen</string>
     <string name="no_invitations">Keine offenen Einladungen</string>
@@ -188,7 +188,7 @@
     <string name="push_user_left_title">%1$s ist weg</string>
     <string name="push_user_left_alert">%1$s hat %2$s verlassen</string>
     <string name="no_compensations_subhead_group_has">Alle Mitglieder der Gruppe müssen zuerst ihre Schulden begleichen haben bevor du einen neuen Ausgleich starten kannst.</string>
-    <string name="no_compensations_history">Keine vergangenen Ausgleiche</string>
+    <string name="no_compensations_history">Keine vergangenen Abrechnungen</string>
     <string name="progress_logout">Abmelden…</string>
     <string name="action_purchase_add_edit_receipt_delete">Quittung löschen</string>
     <string name="action_purchase_add_edit_receipt_add">Quittung hinzufügen</string>
@@ -229,7 +229,7 @@
     <string name="progress_purchase_auto">Hochladen und verarbeiten….</string>
     <string name="comp_unpaid_button_change_amount">Betrag ändern</string>
     <string name="dialog_positive_change">Ändern</string>
-    <string name="dialog_change_amount_message">Gib den gewünschten neuen Betrag ein.</string>
+    <string name="dialog_compensation_confirm_amount_message">%1$s schuldet dir %2$s, bitte bestätige die Zahlung. Falls nötig, kannst du den Betrag ändern.</string>
     <string name="push_compensation_amount_changed_title">Betrag geändert</string>
     <string name="push_compensation_amount_changed_alert">%1$s wird dir %2$s bezahlen</string>
     <string name="fab_label_auto">Magisch</string>
@@ -343,5 +343,8 @@
     <string name="toast_store_empty">Bitte gib ein Geschäft ein</string>
     <string name="toast_error_exchange_rate">Laden des Wechselkurses fehlgeschlagen</string>
     <string name="toast_error_comps_paid">Bestätigung der Zahlung fehlgeschlagen</string>
+    <string name="dialog_compensation_confirm_amount_title">Zahlung bestätigen</string>
+    <string name="dialog_positive_confirm">Bestätigen</string>
+    <string name="error_valid_amount_too_big">Der Betrag kann max. doppelt so gross wie der ursprüngliche sein</string>
 
 </resources>

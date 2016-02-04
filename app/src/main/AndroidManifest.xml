@@ -159,7 +159,7 @@
 
         <service android:name="com.parse.PushService" />
         <service
-            android:name=".services.ParseQueryService"
+            android:name=".data.services.ParseQueryService"
             android:exported="false" />
 
         <receiver

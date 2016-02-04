@@ -6,12 +6,8 @@ package ch.giantific.qwittig;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 
 /**
  * Provides easy to use methods for sending local broadcasts messages.
@@ -20,15 +16,9 @@ import java.lang.annotation.RetentionPolicy;
  */
 public class LocalBroadcastImpl implements LocalBroadcast {
 
-    public static final int DATA_TYPE_ALL = 1;
-    public static final int DATA_TYPE_PURCHASES_UPDATED = 2;
-    public static final int DATA_TYPE_USERS_UPDATED = 3;
-    public static final int DATA_TYPE_COMPENSATIONS_UPDATED = 4;
-    public static final int DATA_TYPE_GROUP_UPDATED = 5;
-    public static final int DATA_TYPE_TASKS_UPDATED = 6;
-    public static final String INTENT_FILTER_DATA_NEW = "ch.giantific.qwittig.intents.DATA_NEW";
-    public static final String INTENT_DATA_TYPE = "ch.giantific.qwittig.intents.DATA_TYPE";
-    public static final String INTENT_EXTRA_COMPENSATION_PAID = "ch.giantific.qwittig.intents.COMPENSATION_PAID";
+    public static final String INTENT_FILTER_DATA_NEW = BuildConfig.APPLICATION_ID + ".intents.DATA_NEW";
+    public static final String INTENT_DATA_TYPE = BuildConfig.APPLICATION_ID + ".intents.DATA_TYPE";
+    public static final String INTENT_EXTRA_COMPENSATION_PAID = BuildConfig.APPLICATION_ID + ".intents.COMPENSATION_PAID";
     private Context mContext;
 
     public LocalBroadcastImpl(@NonNull Context context) {
@@ -37,31 +27,31 @@ public class LocalBroadcastImpl implements LocalBroadcast {
 
     @Override
     public void sendPurchasesUpdated() {
-        Intent intent = getIntent(DATA_TYPE_PURCHASES_UPDATED);
+        Intent intent = getIntent(DataType.PURCHASES_UPDATED);
         send(intent);
     }
 
     @Override
     public void sendUsersUpdated() {
-        Intent intent = getIntent(DATA_TYPE_USERS_UPDATED);
+        Intent intent = getIntent(DataType.USERS_UPDATED);
         send(intent);
     }
 
     @Override
     public void sendGroupUpdated() {
-        Intent intent = getIntent(DATA_TYPE_GROUP_UPDATED);
+        Intent intent = getIntent(DataType.GROUP_UPDATED);
         send(intent);
     }
 
     @Override
     public void sendTasksUpdated() {
-        Intent intent = getIntent(DATA_TYPE_TASKS_UPDATED);
+        Intent intent = getIntent(DataType.TASKS_UPDATED);
         send(intent);
     }
 
     @Override
     public void sendCompensationsUpdated(boolean isPaid) {
-        Intent intent = getIntent(DATA_TYPE_COMPENSATIONS_UPDATED);
+        Intent intent = getIntent(DataType.COMPENSATIONS_UPDATED);
         intent.putExtra(INTENT_EXTRA_COMPENSATION_PAID, isPaid);
         send(intent);
     }
@@ -76,9 +66,4 @@ public class LocalBroadcastImpl implements LocalBroadcast {
         LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 
-    @IntDef({DATA_TYPE_ALL, DATA_TYPE_PURCHASES_UPDATED, DATA_TYPE_USERS_UPDATED, DATA_TYPE_COMPENSATIONS_UPDATED,
-            DATA_TYPE_GROUP_UPDATED, DATA_TYPE_TASKS_UPDATED})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface DataType {
-    }
 }

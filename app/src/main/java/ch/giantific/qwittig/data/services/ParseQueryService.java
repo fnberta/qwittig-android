@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.services;
+package ch.giantific.qwittig.data.services;
 
 import android.app.IntentService;
 import android.content.Context;
@@ -18,6 +18,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.List;
 
+import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.LocalBroadcast;
 import ch.giantific.qwittig.LocalBroadcastImpl;
 import ch.giantific.qwittig.data.repositories.ParseCompensationRepository;
@@ -45,15 +46,16 @@ import ch.giantific.qwittig.domain.repositories.UserRepository;
 public class ParseQueryService extends IntentService {
 
     private static final String SERVICE_NAME = "ParseQueryService";
-    private static final String ACTION_UNPIN_OBJECT = "ch.giantific.qwittig.services.action.UNPIN_OBJECT";
-    private static final String ACTION_QUERY_OBJECT = "ch.giantific.qwittig.services.action.QUERY_OBJECT";
-    private static final String ACTION_QUERY_USERS = "ch.giantific.qwittig.services.action.QUERY_USERS";
-    private static final String ACTION_QUERY_ALL = "ch.giantific.qwittig.services.action.QUERY_ALL";
-    private static final String ACTION_QUERY_TASK_DONE = "ch.giantific.qwittig.services.action.TASK_DONE";
-    private static final String EXTRA_OBJECT_CLASS = "ch.giantific.qwittig.services.extra.OBJECT_CLASS";
-    private static final String EXTRA_OBJECT_ID = "ch.giantific.qwittig.services.extra.OBJECT_ID";
-    private static final String EXTRA_OBJECT_IS_NEW = "ch.giantific.qwittig.services.extra.OBJECT_IS_NEW";
-    private static final String EXTRA_OBJECT_GROUP_ID = "ch.giantific.qwittig.services.extra.GROUP_ID";
+    private static final String ACTION_UNPIN_OBJECT = BuildConfig.APPLICATION_ID + ".data.services.action.UNPIN_OBJECT";
+    private static final String ACTION_QUERY_OBJECT = BuildConfig.APPLICATION_ID + ".data.services.action.QUERY_OBJECT";
+    private static final String ACTION_QUERY_USERS = BuildConfig.APPLICATION_ID + ".data.services.action.QUERY_USERS";
+    private static final String ACTION_QUERY_COMPS = BuildConfig.APPLICATION_ID + ".data.services.action.QUERY_COMPS";
+    private static final String ACTION_QUERY_ALL = BuildConfig.APPLICATION_ID + ".data.services.action.QUERY_ALL";
+    private static final String ACTION_QUERY_TASK_DONE = BuildConfig.APPLICATION_ID + ".data.services.action.TASK_DONE";
+    private static final String EXTRA_OBJECT_CLASS = BuildConfig.APPLICATION_ID + ".data.services.extra.OBJECT_CLASS";
+    private static final String EXTRA_OBJECT_ID = BuildConfig.APPLICATION_ID + ".data.services.extra.OBJECT_ID";
+    private static final String EXTRA_OBJECT_IS_NEW = BuildConfig.APPLICATION_ID + ".data.services.extra.OBJECT_IS_NEW";
+    private static final String EXTRA_OBJECT_GROUP_ID = BuildConfig.APPLICATION_ID + ".data.services.extra.GROUP_ID";
     private User mCurrentUser;
     private List<ParseObject> mCurrentUserGroups;
     private LocalBroadcast mLocalBroadcast;
@@ -68,7 +70,7 @@ public class ParseQueryService extends IntentService {
     /**
      * Starts this service to unpin a specific ParseObject.
      *
-     * @param context   the context to use to construct the intent
+     * @param context   the context to use to start the service
      * @param className the class of the object to unpin
      * @param objectId  the id of the object to unpin
      * @see IntentService
@@ -82,7 +84,7 @@ public class ParseQueryService extends IntentService {
     /**
      * Starts this service to unpin a specific ParseObject.
      *
-     * @param context   the context to use to construct the intent
+     * @param context   the context to use to start the service
      * @param className the class of the object to unpin
      * @param objectId  the id of the object to unpin
      * @param groupId   the group id used to construct the correct pin label
@@ -103,7 +105,7 @@ public class ParseQueryService extends IntentService {
     /**
      * Starts this service to query a specific ParseObject.
      *
-     * @param context   the context to use to construct the intent
+     * @param context   the context to use to start the service
      * @param className the class of the object to query
      * @param objectId  the id of the object to query
      * @param isNew     whether the object was already queried once
@@ -124,7 +126,7 @@ public class ParseQueryService extends IntentService {
     /**
      * Starts this service to query all users.
      *
-     * @param context the context to use to construct the intent
+     * @param context the context to use to start the service
      * @see IntentService
      */
     public static void startQueryUsers(@NonNull Context context) {
@@ -134,9 +136,21 @@ public class ParseQueryService extends IntentService {
     }
 
     /**
+     * Starts this service to query all compensations.
+     *
+     * @param context the context to use to start the service
+     * @see IntentService
+     */
+    public static void startQueryCompensations(@NonNull Context context) {
+        Intent intent = new Intent(context, ParseQueryService.class);
+        intent.setAction(ACTION_QUERY_COMPS);
+        context.startService(intent);
+    }
+
+    /**
      * Starts this service to query all users, purchases, compensations and tasks.
      *
-     * @param context the context to use to construct the intent
+     * @param context the context to use to start the service
      * @see IntentService
      */
     public static void startQueryAll(@NonNull Context context) {
@@ -148,7 +162,7 @@ public class ParseQueryService extends IntentService {
     /**
      * Starts this service to query a task and rotate the users involved.
      *
-     * @param context the context to use to construct the intent
+     * @param context the context to use to start the service
      * @param taskId  the object id of the task to query
      * @see IntentService
      */
@@ -187,6 +201,10 @@ public class ParseQueryService extends IntentService {
             }
             case ACTION_QUERY_USERS: {
                 queryUsers();
+                break;
+            }
+            case ACTION_QUERY_COMPS: {
+                queryCompensations();
                 break;
             }
             case ACTION_QUERY_ALL: {

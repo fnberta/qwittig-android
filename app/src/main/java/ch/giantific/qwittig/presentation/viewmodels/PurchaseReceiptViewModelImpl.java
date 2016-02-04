@@ -25,6 +25,7 @@ import rx.functions.Func1;
 public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseReceiptViewModel.ViewListener>
         implements PurchaseReceiptViewModel {
 
+    private static final String STATE_LOADING = "STATE_LOADING";
     private PurchaseRepository mPurchaseRepo;
     private boolean mLoading;
     private String mReceiptImagePath;
@@ -39,6 +40,8 @@ public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseRece
 
         mPurchaseRepo = purchaseRepo;
         mReceiptImagePath = receiptImagePath;
+
+        mLoading = savedState == null || (savedState.getBoolean(STATE_LOADING, false));
     }
 
     public PurchaseReceiptViewModelImpl(@Nullable Bundle savedState,
@@ -50,6 +53,13 @@ public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseRece
         mPurchaseRepo = purchaseRepo;
         mPurchaseId = purchaseId;
         mDraft = draft;
+    }
+
+    @Override
+    public void saveState(@NonNull Bundle outState) {
+        super.saveState(outState);
+
+        outState.putBoolean(STATE_LOADING, mLoading);
     }
 
     @Override

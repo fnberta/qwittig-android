@@ -29,9 +29,9 @@ import ch.giantific.qwittig.presentation.ui.fragments.PurchaseAddEditBaseFragmen
 import ch.giantific.qwittig.presentation.ui.fragments.PurchaseAddFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.PurchaseNoteFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.PurchaseReceiptAddEditFragment;
-import ch.giantific.qwittig.presentation.ui.fragments.dialogs.ManualExchangeRateDialogFragment;
+import ch.giantific.qwittig.presentation.ui.fragments.dialogs.PurchaseExchangeRateDialogFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.PurchaseDiscardDialogFragment;
-import ch.giantific.qwittig.presentation.ui.fragments.dialogs.PurchaseNoteAddEditDialogFragment;
+import ch.giantific.qwittig.presentation.ui.fragments.dialogs.PurchaseNoteDialogFragment;
 import ch.giantific.qwittig.presentation.ui.listeners.TransitionListenerAdapter;
 import ch.giantific.qwittig.presentation.viewmodels.PurchaseAddEditViewModel;
 import ch.giantific.qwittig.presentation.workerfragments.OcrWorkerListener;
@@ -51,8 +51,8 @@ public class PurchaseAddActivity extends BaseActivity<PurchaseAddEditViewModel> 
         PurchaseNoteFragment.FragmentInteractionListener,
         PurchaseReceiptAddEditFragment.ActivityListener,
         PurchaseSaveWorkerListener, RatesWorkerListener, DatePickerDialog.OnDateSetListener,
-        PurchaseNoteAddEditDialogFragment.DialogInteractionListener,
-        ManualExchangeRateDialogFragment.DialogInteractionListener,
+        PurchaseNoteDialogFragment.DialogInteractionListener,
+        PurchaseExchangeRateDialogFragment.DialogInteractionListener,
         PurchaseDiscardDialogFragment.DialogInteractionListener,
         OcrWorkerListener {
 

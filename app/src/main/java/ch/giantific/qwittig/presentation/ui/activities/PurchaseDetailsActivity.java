@@ -18,7 +18,7 @@ import android.view.View;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import ch.giantific.qwittig.LocalBroadcastImpl;
+import ch.giantific.qwittig.LocalBroadcast;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivityPurchaseDetailsBinding;
 import ch.giantific.qwittig.di.components.NavDrawerComponent;
@@ -46,7 +46,7 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
     void handleLocalBroadcast(Intent intent, int dataType) {
         super.handleLocalBroadcast(intent, dataType);
 
-        if (dataType == LocalBroadcastImpl.DATA_TYPE_PURCHASES_UPDATED) {
+        if (dataType == LocalBroadcast.DataType.PURCHASES_UPDATED) {
             mViewModel.updateList();
         }
     }

@@ -14,7 +14,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import ch.giantific.qwittig.LocalBroadcastImpl;
+import ch.giantific.qwittig.LocalBroadcast;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivityTasksBinding;
 import ch.giantific.qwittig.di.components.NavDrawerComponent;
@@ -48,7 +48,7 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksViewModel> impleme
     void handleLocalBroadcast(Intent intent, int dataType) {
         super.handleLocalBroadcast(intent, dataType);
 
-        if (dataType == LocalBroadcastImpl.DATA_TYPE_TASKS_UPDATED) {
+        if (dataType == LocalBroadcast.DataType.TASKS_UPDATED) {
             mViewModel.updateList();
         }
     }
@@ -69,7 +69,7 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksViewModel> impleme
         showFab();
         setupDeadlineSpinner();
 
-        if (isUserLoggedIn() && savedInstanceState == null) {
+        if (mUserLoggedIn && savedInstanceState == null) {
             addTasksFragment();
         }
     }

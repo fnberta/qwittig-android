@@ -24,8 +24,8 @@ import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.presentation.ui.adapters.PurchaseAddEditItemUsersClickListener;
 import ch.giantific.qwittig.presentation.ui.adapters.PurchaseAddEditRecyclerAdapter;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.DiscardChangesDialogFragment;
-import ch.giantific.qwittig.presentation.ui.fragments.dialogs.ManualExchangeRateDialogFragment;
-import ch.giantific.qwittig.presentation.ui.fragments.dialogs.PurchaseNoteAddEditDialogFragment;
+import ch.giantific.qwittig.presentation.ui.fragments.dialogs.PurchaseExchangeRateDialogFragment;
+import ch.giantific.qwittig.presentation.ui.fragments.dialogs.PurchaseNoteDialogFragment;
 import ch.giantific.qwittig.presentation.viewmodels.rows.PurchaseAddEditDateRowViewModel;
 import ch.giantific.qwittig.presentation.viewmodels.rows.PurchaseAddEditStoreRowViewModel;
 import ch.giantific.qwittig.presentation.viewmodels.rows.PurchaseAddEditTotalRowViewModel;
@@ -40,9 +40,9 @@ import rx.Single;
 public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditItem, PurchaseAddEditViewModel.ViewListener>,
         PurchaseAddEditRecyclerAdapter.AdapterListener, RowItem.PriceChangedListener,
         PurchaseAddEditDateRowViewModel, PurchaseAddEditStoreRowViewModel, PurchaseAddEditTotalRowViewModel,
-        PurchaseAddEditItemUsersClickListener, PurchaseNoteAddEditDialogFragment.DialogInteractionListener,
+        PurchaseAddEditItemUsersClickListener, PurchaseNoteDialogFragment.DialogInteractionListener,
         DiscardChangesDialogFragment.DialogInteractionListener, OcrWorkerListener,
-        ManualExchangeRateDialogFragment.DialogInteractionListener, RatesWorkerListener, PurchaseSaveWorkerListener,
+        PurchaseExchangeRateDialogFragment.DialogInteractionListener, RatesWorkerListener, PurchaseSaveWorkerListener,
         ProgressFinalAnimationListener {
 
     void onDateSet(@NonNull Date date);

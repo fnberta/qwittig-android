@@ -90,10 +90,10 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter {
 
                 CompUnpaidRowViewModel viewModel = binding.getViewModel();
                 if (viewModel == null) {
-                    viewModel = new CompUnpaidRowViewModel(compensation, mGroupCurrency);
+                    viewModel = new CompUnpaidRowViewModel(compensation, mGroupCurrency, true);
                     binding.setViewModel(viewModel);
                 } else {
-                    viewModel.updateCompInfo(compensation);
+                    viewModel.updateCompInfo(compensation, true);
                 }
 
                 binding.executePendingBindings();
@@ -107,10 +107,10 @@ public class CompensationsUnpaidRecyclerAdapter extends RecyclerView.Adapter {
 
                 CompUnpaidRowViewModel viewModel = binding.getViewModel();
                 if (viewModel == null) {
-                    viewModel = new CompUnpaidRowViewModel(compensation, mGroupCurrency);
+                    viewModel = new CompUnpaidRowViewModel(compensation, mGroupCurrency, false);
                     binding.setViewModel(viewModel);
                 } else {
-                    viewModel.updateCompInfo(compensation);
+                    viewModel.updateCompInfo(compensation, false);
                 }
 
                 binding.executePendingBindings();

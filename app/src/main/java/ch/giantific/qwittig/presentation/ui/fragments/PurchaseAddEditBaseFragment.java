@@ -48,9 +48,9 @@ import ch.giantific.qwittig.presentation.ui.activities.CameraActivity;
 import ch.giantific.qwittig.presentation.ui.adapters.PurchaseAddEditRecyclerAdapter;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.DatePickerDialogFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.DiscardChangesDialogFragment;
-import ch.giantific.qwittig.presentation.ui.fragments.dialogs.ManualExchangeRateDialogFragment;
+import ch.giantific.qwittig.presentation.ui.fragments.dialogs.PurchaseExchangeRateDialogFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.dialogs.PurchaseDiscardDialogFragment;
-import ch.giantific.qwittig.presentation.ui.fragments.dialogs.PurchaseNoteAddEditDialogFragment;
+import ch.giantific.qwittig.presentation.ui.fragments.dialogs.PurchaseNoteDialogFragment;
 import ch.giantific.qwittig.presentation.viewmodels.PurchaseAddEditViewModel;
 import ch.giantific.qwittig.presentation.viewmodels.PurchaseAddEditViewModel.PurchaseResult;
 import ch.giantific.qwittig.presentation.workerfragments.OcrWorker;
@@ -259,8 +259,8 @@ public abstract class PurchaseAddEditBaseFragment<T extends PurchaseAddEditViewM
 
     @Override
     public void showManualExchangeRateSelectorDialog(@NonNull String exchangeRate) {
-        final ManualExchangeRateDialogFragment dialog =
-                ManualExchangeRateDialogFragment.newInstance(exchangeRate);
+        final PurchaseExchangeRateDialogFragment dialog =
+                PurchaseExchangeRateDialogFragment.newInstance(exchangeRate);
         dialog.show(getFragmentManager(), MANUAL_EXCHANGE_RATE_DIALOG);
     }
 
@@ -328,8 +328,8 @@ public abstract class PurchaseAddEditBaseFragment<T extends PurchaseAddEditViewM
 
     @Override
     public void showAddEditNoteDialog(@NonNull String note) {
-        final PurchaseNoteAddEditDialogFragment dialog =
-                PurchaseNoteAddEditDialogFragment.newInstance(note);
+        final PurchaseNoteDialogFragment dialog =
+                PurchaseNoteDialogFragment.newInstance(note);
         dialog.show(getFragmentManager(), EDIT_NOTE_DIALOG);
     }
 

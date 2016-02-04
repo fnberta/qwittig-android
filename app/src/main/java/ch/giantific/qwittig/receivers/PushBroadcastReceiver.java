@@ -37,7 +37,7 @@ import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.models.parse.Task;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.services.ParseQueryService;
+import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.presentation.ui.activities.FinanceActivity;
 import ch.giantific.qwittig.presentation.ui.activities.HomeActivity;
 import ch.giantific.qwittig.presentation.ui.activities.PurchaseDetailsActivity;
@@ -83,14 +83,9 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     private static final String TYPE_PURCHASE_NEW = "purchaseNew";
     private static final String TYPE_PURCHASE_EDIT = "purchaseEdit";
     private static final String TYPE_PURCHASE_DELETE = "purchaseDelete";
-    private static final String TYPE_SETTLEMENT_NEW = "settlementNew";
-    private static final String TYPE_COMPENSATION_NEW_PAID = "compensationNewPaid";
-    private static final String TYPE_COMPENSATION_NEW_UNPAID = "compensationNewUnpaid";
     private static final String TYPE_COMPENSATION_EXISTING_PAID = "compensationExistingPaid";
-    private static final String TYPE_COMPENSATION_EXISTING_NOT_NOW = "compensationExistingNotNow";
     private static final String TYPE_COMPENSATION_REMIND_USER = "compensationRemindUser";
     private static final String TYPE_COMPENSATION_REMIND_USER_HAS_PAID = "compensationRemindUserHasPaid";
-    private static final String TYPE_COMPENSATION_AMOUNT_CHANGED = "compensationAmountChanged";
     private static final String TYPE_USER_JOINED = "userJoined";
     private static final String TYPE_USER_LEFT = "userLeft";
     private static final String TYPE_USER_DELETED = "userDeleted";
@@ -182,12 +177,6 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
 
                 String type = jsonExtras.optString(NOTIFICATION_TYPE);
                 switch (type) {
-                    case TYPE_COMPENSATION_REMIND_USER:
-                        Compensation compensation = getCompensation(jsonExtras);
-                        compensation.deleteEventually();
-
-                        cancelNotification(intent);
-                        break;
                     case TYPE_USER_INVITED:
                         intent.putExtra(INTENT_ACTION_INVITATION, ACTION_INVITATION_DISCARDED);
                         onPushOpen(context, intent);
@@ -303,62 +292,19 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 ParseQueryService.startUnpinObject(context, Purchase.CLASS, purchaseId, groupId);
                 break;
             }
-            case TYPE_SETTLEMENT_NEW: {
-                String initiatorId = jsonExtras.optString(PUSH_PARAM_INITIATOR_ID);
-                if (initiatorId.equals(currentUser.getObjectId())) {
-                    return;
-                }
-                break;
-            }
-            case TYPE_COMPENSATION_NEW_UNPAID: {
-                // query compensation for all users
-                queryCompensation(context, jsonExtras, true);
-                break;
-            }
-            case TYPE_COMPENSATION_NEW_PAID: {
-                // update balance for all users
-                ParseQueryService.startQueryUsers(context);
-
-                // query compensation
-                queryCompensation(context, jsonExtras, true);
-                break;
-            }
             case TYPE_COMPENSATION_EXISTING_PAID: {
                 // update balance for all users
                 ParseQueryService.startQueryUsers(context);
 
+                // update all compensations, TODO: only all if amount was changed
+                ParseQueryService.startQueryCompensations(context);
+
                 // update compensation for all users
-                queryCompensation(context, jsonExtras, false);
+//                queryCompensation(context, jsonExtras, false);
 
                 // only show notification for payer
                 String payerId = jsonExtras.optString(PUSH_PARAM_PAYER_ID);
                 if (!payerId.equals(currentUser.getObjectId())) {
-                    return;
-                }
-                break;
-            }
-            case TYPE_COMPENSATION_EXISTING_NOT_NOW: {
-                // update balance for all users
-                ParseQueryService.startQueryUsers(context);
-
-                // unpin compensation for all users
-                String compensationId = jsonExtras.optString(PUSH_PARAM_COMPENSATION_ID);
-                ParseQueryService.startUnpinObject(context, Compensation.CLASS, compensationId);
-
-                // only show notification for beneficiary
-                String beneficiaryId = jsonExtras.optString(PUSH_PARAM_BENEFICIARY_ID);
-                if (!beneficiaryId.equals(currentUser.getObjectId())) {
-                    return;
-                }
-                break;
-            }
-            case TYPE_COMPENSATION_AMOUNT_CHANGED: {
-                // update compensation for all users
-                queryCompensation(context, jsonExtras, false);
-
-                // only show notification for beneficiary
-                String beneficiaryId = jsonExtras.optString(PUSH_PARAM_BENEFICIARY_ID);
-                if (!beneficiaryId.equals(currentUser.getObjectId())) {
                     return;
                 }
                 break;
@@ -421,7 +367,8 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
         }
     }
 
-    private void queryCompensation(@NonNull Context context, @NonNull JSONObject jsonExtras, boolean isNew) {
+    private void queryCompensation(@NonNull Context context, @NonNull JSONObject jsonExtras,
+                                   boolean isNew) {
         String compensationId = jsonExtras.optString(PUSH_PARAM_COMPENSATION_ID);
         ParseQueryService.startQueryObject(context, Compensation.CLASS, compensationId, isNew);
     }
@@ -434,7 +381,6 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
 
     private boolean isSilentNotification(@NonNull String type) {
         return type.equals(TYPE_PURCHASE_EDIT) || type.equals(TYPE_PURCHASE_DELETE) ||
-                type.equals(TYPE_COMPENSATION_NEW_PAID) || type.equals(TYPE_COMPENSATION_NEW_UNPAID) ||
                 type.equals(TYPE_GROUP_NAME_CHANGED) || type.equals(TYPE_GROUP_USERS_INVITED_CHANGED) ||
                 type.equals(TYPE_TASK_EDIT);
     }
@@ -538,13 +484,6 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 }
                 break;
             }
-            case TYPE_SETTLEMENT_NEW:
-                title = context.getString(R.string.push_settlement_new_title, user);
-                alert = context.getString(R.string.push_settlement_new_alert);
-
-                // set title and alert
-                builder.setContentTitle(title).setContentText(alert);
-                break;
             case TYPE_COMPENSATION_REMIND_USER: {
                 String amount = getAmount(jsonExtras);
                 title = context.getString(R.string.push_compensation_remind_title);
@@ -589,23 +528,6 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 String amount = getAmount(jsonExtras);
                 title = context.getString(R.string.push_compensation_payment_done_title);
                 alert = context.getString(R.string.push_compensation_payment_done_alert, user, amount);
-
-                // set title and alert
-                builder.setContentTitle(title).setContentText(alert);
-                break;
-            }
-            case TYPE_COMPENSATION_EXISTING_NOT_NOW: {
-                title = context.getString(R.string.push_compensation_not_now_title);
-                alert = context.getString(R.string.push_compensation_not_now_alert, user);
-
-                // set title and alert
-                builder.setContentTitle(title).setContentText(alert);
-                break;
-            }
-            case TYPE_COMPENSATION_AMOUNT_CHANGED: {
-                String amount = getAmount(jsonExtras);
-                title = context.getString(R.string.push_compensation_amount_changed_title);
-                alert = context.getString(R.string.push_compensation_amount_changed_alert, user, amount);
 
                 // set title and alert
                 builder.setContentTitle(title).setContentText(alert);
@@ -745,13 +667,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
             }
 
             switch (type) {
-                case TYPE_COMPENSATION_AMOUNT_CHANGED:
-                    // fall through
-                case TYPE_SETTLEMENT_NEW:
-                    // fall through
                 case TYPE_COMPENSATION_REMIND_USER:
-                    // fall through
-                case TYPE_COMPENSATION_EXISTING_NOT_NOW:
                     // fall through
                 case TYPE_COMPENSATION_REMIND_USER_HAS_PAID:
                     intent.putExtra(INTENT_EXTRA_FINANCE_FRAGMENT, FinanceActivity.FragmentTabs.COMPS_UNPAID);
@@ -802,13 +718,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                     return HomeActivity.class;
                 }
             }
-            case TYPE_COMPENSATION_AMOUNT_CHANGED:
-                // fall through
-            case TYPE_SETTLEMENT_NEW:
-                // fall through
             case TYPE_COMPENSATION_REMIND_USER:
-                // fall through
-            case TYPE_COMPENSATION_EXISTING_NOT_NOW:
                 // fall through
             case TYPE_COMPENSATION_EXISTING_PAID:
                 // fall through

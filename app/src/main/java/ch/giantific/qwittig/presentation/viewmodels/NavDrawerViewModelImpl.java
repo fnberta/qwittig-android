@@ -43,14 +43,13 @@ public class NavDrawerViewModelImpl extends BaseObservable implements NavDrawerV
     @Override
     public void attachView(@NonNull NavDrawerViewModel.ViewListener view) {
         mView = view;
-        if (isUserLoggedIn()) {
-            loadUserGroups();
-        }
     }
 
     @Override
-    public void detachView() {
-        mView = null;
+    public void onNavDrawerReady() {
+        if (isUserLoggedIn()) {
+            loadUserGroups();
+        }
     }
 
     private void loadUserGroups() {
@@ -149,5 +148,15 @@ public class NavDrawerViewModelImpl extends BaseObservable implements NavDrawerV
     @Override
     public void onAvatarClick(View view) {
         mView.startProfileSettingsActivity();
+    }
+
+    @Override
+    public void unsubscribe() {
+        // clean up any long running tasks
+    }
+
+    @Override
+    public void detachView() {
+        mView = null;
     }
 }

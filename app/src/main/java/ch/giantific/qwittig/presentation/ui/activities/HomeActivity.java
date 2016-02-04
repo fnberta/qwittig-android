@@ -16,7 +16,7 @@ import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.ActionBar;
 import android.view.ActionMode;
 
-import ch.giantific.qwittig.LocalBroadcastImpl;
+import ch.giantific.qwittig.LocalBroadcast;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivityHomeBinding;
@@ -78,7 +78,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     void handleLocalBroadcast(Intent intent, int dataType) {
         super.handleLocalBroadcast(intent, dataType);
 
-        if (dataType == LocalBroadcastImpl.DATA_TYPE_PURCHASES_UPDATED) {
+        if (dataType == LocalBroadcast.DataType.PURCHASES_UPDATED) {
             mPurchasesViewModel.updateList();
         }
     }
@@ -106,7 +106,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
 
         injectViewModel(savedInstanceState);
 
-        if (isUserLoggedIn()) {
+        if (mUserLoggedIn) {
             if (savedInstanceState == null) {
                 addFragments();
                 //            checkForInvitations();
@@ -206,7 +206,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        if (isUserLoggedIn()) {
+        if (mUserLoggedIn) {
             final FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.putFragment(outState, STATE_PURCHASES_FRAGMENT, mPurchasesFragment);
             if (mViewModel.isDraftsAvailable()) {

@@ -178,8 +178,8 @@
     <string name="header_users_invited">Already invited</string>
     <string name="hint_clear">Remove</string>
     <string name="no_invitations">No open invitations</string>
-    <string name="tab_compensations_new">Unsettled payments</string>
-    <string name="tab_compensations_history">Past payments</string>
+    <string name="tab_compensations_new">Settlement</string>
+    <string name="tab_compensations_archive">Archive</string>
     <string name="hint_store_new">New store</string>
     <string name="header_purchase">Details</string>
     <string name="action_purchase_edit_save_changes_draft">Save changes in draft</string>
@@ -231,7 +231,7 @@
     <string name="progress_purchase_auto">Uploading and processing image…</string>
     <string name="comp_unpaid_button_change_amount">Change amount</string>
     <string name="dialog_positive_change">Change</string>
-    <string name="dialog_change_amount_message">Enter the desired new amount.</string>
+    <string name="dialog_compensation_confirm_amount_message">%1$s ows you %2$s, please confirm the payment. You can change the amount if needed.</string>
     <string name="push_compensation_amount_changed_title">Amount changed</string>
     <string name="push_compensation_amount_changed_alert">%1$s will pay you %2$s</string>
     <string name="fab_label_auto">Magically</string>
@@ -351,5 +351,8 @@
     <string name="toast_store_empty">Please enter a store</string>
     <string name="toast_error_exchange_rate">Failed to fetch exchange rate</string>
     <string name="toast_error_comps_paid">Failed to confirm compensation</string>
+    <string name="dialog_compensation_confirm_amount_title">Confirm payment</string>
+    <string name="dialog_positive_confirm">Confirm</string>
+    <string name="error_valid_amount_too_big">Amount can be max. double the original one</string>
 
 </resources>

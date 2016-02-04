@@ -74,7 +74,7 @@ public class StatsActivity extends BaseNavDrawerActivity implements
         mSpinnerMonth = (Spinner) findViewById(R.id.sp_month);
         setupMonthSpinner();
 
-        if (isUserLoggedIn()) {
+        if (mUserLoggedIn) {
             if (savedInstanceState == null) {
                 addFirstFragment();
             } else {
@@ -147,7 +147,7 @@ public class StatsActivity extends BaseNavDrawerActivity implements
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        if (isUserLoggedIn()) {
+        if (mUserLoggedIn) {
             getFragmentManager().putFragment(outState, STATE_STATS_FRAGMENT, mStatsFragment);
         }
     }
@@ -156,7 +156,7 @@ public class StatsActivity extends BaseNavDrawerActivity implements
     protected void onStart() {
         super.onStart();
 
-        if (isUserLoggedIn()) {
+        if (mUserLoggedIn) {
             setSpinnerListeners();
         }
     }

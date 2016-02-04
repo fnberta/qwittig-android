@@ -13,8 +13,10 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.di.components.WorkerComponent;
 import ch.giantific.qwittig.domain.models.parse.Compensation;
+import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import rx.Observable;
+import rx.functions.Func1;
 
 /**
  * Performs an online query to the Parse.com database to query either paid or unpaid compensations.
@@ -72,7 +74,13 @@ public class CompensationsUpdateWorker extends BaseQueryWorker<Compensation, Com
             if (mQueryPaid) {
                 return mCompsRepo.updateCompensationsPaidAsync(mCurrentUserGroups, mCurrentGroup.getObjectId());
             } else {
-                return mCompsRepo.updateCompensationsUnpaidAsync(mCurrentUserGroups);
+                return mUserRepo.updateUsersAsync(mCurrentUserGroups)
+                        .flatMap(new Func1<User, Observable<Compensation>>() {
+                            @Override
+                            public Observable<Compensation> call(User user) {
+                                return mCompsRepo.updateCompensationsUnpaidAsync(mCurrentUserGroups);
+                            }
+                        });
             }
         }
 

@@ -39,6 +39,7 @@ ext {
     supportLibVersion = '23.1.1'
     playServicesVersion = '8.4.0'
     retrofitVersion = '2.0.0-beta2'
+    leakCanaryVersion = '1.4-beta1'
 }
 
 dependencies {
@@ -72,4 +73,7 @@ dependencies {
     compile 'com.vinaysshenoy:mugen:1.0.2'
     compile 'com.github.fnberta:FabSpeedDial:0.2'
     compile 'com.github.fnberta:FabProgress:0.1'
+    debugCompile "com.squareup.leakcanary:leakcanary-android:${leakCanaryVersion}"
+    releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
+    testCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
 }

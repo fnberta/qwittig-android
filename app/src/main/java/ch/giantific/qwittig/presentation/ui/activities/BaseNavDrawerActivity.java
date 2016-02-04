@@ -27,8 +27,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import ch.giantific.qwittig.LocalBroadcastImpl;
+import ch.giantific.qwittig.LocalBroadcast;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.NavdrawerHeaderBinding;
 import ch.giantific.qwittig.di.components.DaggerNavDrawerComponent;
 import ch.giantific.qwittig.di.components.NavDrawerComponent;
@@ -38,7 +39,6 @@ import ch.giantific.qwittig.presentation.ui.fragments.SettingsFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.SettingsProfileFragment;
 import ch.giantific.qwittig.presentation.viewmodels.NavDrawerViewModel;
 import ch.giantific.qwittig.presentation.viewmodels.ViewModel;
-import ch.giantific.qwittig.services.ParseQueryService;
 
 /**
  * Provides an abstract base class that sets up the navigation drawer and implements a couple of
@@ -54,7 +54,7 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
 
     static final String URI_INVITED_EMAIL = "email";
     private static final int NAVDRAWER_ITEM_INVALID = -1;
-
+    protected boolean mUserLoggedIn;
     @Inject
     NavDrawerViewModel mNavDrawerViewModel;
     private NavdrawerHeaderBinding mHeaderBinding;
@@ -71,7 +71,7 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
         super.handleLocalBroadcast(intent, dataType);
 
         switch (dataType) {
-            case LocalBroadcastImpl.DATA_TYPE_GROUP_UPDATED:
+            case LocalBroadcast.DataType.GROUP_UPDATED:
                 mNavDrawerViewModel.onGroupChanged();
                 break;
         }
@@ -83,15 +83,43 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
 
         final NavDrawerComponent navComp = DaggerNavDrawerComponent.create();
         injectNavDrawerDependencies(navComp);
+        mNavDrawerViewModel.attachView(this);
+
+        mUserLoggedIn = isUserLoggedIn();
     }
 
     protected abstract void injectNavDrawerDependencies(@NonNull NavDrawerComponent navComp);
+
+    private boolean isUserLoggedIn() {
+        if (mNavDrawerViewModel.isUserLoggedIn()) {
+            return true;
+        }
+
+        startLoginActivity();
+        return false;
+    }
+
+    private void startLoginActivity() {
+        Intent intentLogin = new Intent(this, LoginActivity.class);
+        Uri uri = getIntent().getData();
+        if (uri != null) {
+            String invitedEmail = uri.getQueryParameter(URI_INVITED_EMAIL);
+            intentLogin.putExtra(LoginActivity.INTENT_URI_EMAIL, invitedEmail);
+        }
+
+//        Starting an activity with forResult and transitions during a lifecycle method results on
+//        onActivityResult not being called
+//        ActivityOptionsCompat activityOptionsCompat =
+//                ActivityOptionsCompat.makeSceneTransitionAnimation(this);
+        startActivityForResult(intentLogin, INTENT_REQUEST_LOGIN);
+    }
 
     @Override
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
 
         setupNavDrawer();
+        mNavDrawerViewModel.onNavDrawerReady();
     }
 
     private void setupNavDrawer() {
@@ -185,13 +213,6 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-
-        mNavDrawerViewModel.attachView(this);
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -238,31 +259,7 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
     protected void onStop() {
         super.onStop();
 
-        mNavDrawerViewModel.detachView();
-    }
-
-    final boolean isUserLoggedIn() {
-        if (mNavDrawerViewModel.isUserLoggedIn()) {
-            return true;
-        }
-
-        startLoginActivity();
-        return false;
-    }
-
-    private void startLoginActivity() {
-        Intent intentLogin = new Intent(this, LoginActivity.class);
-        Uri uri = getIntent().getData();
-        if (uri != null) {
-            String invitedEmail = uri.getQueryParameter(URI_INVITED_EMAIL);
-            intentLogin.putExtra(LoginActivity.INTENT_URI_EMAIL, invitedEmail);
-        }
-
-//        Starting an activity with forResult and transitions during a lifecycle method results on
-//        onActivityResult not being called
-//        ActivityOptionsCompat activityOptionsCompat =
-//                ActivityOptionsCompat.makeSceneTransitionAnimation(this);
-        startActivityForResult(intentLogin, INTENT_REQUEST_LOGIN);
+        mNavDrawerViewModel.unsubscribe();
     }
 
     int getSelfNavDrawerItem() {

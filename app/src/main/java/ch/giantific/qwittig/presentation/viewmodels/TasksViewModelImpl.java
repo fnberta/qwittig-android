@@ -53,6 +53,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<Task, TasksV
         mTaskRepo = taskRepo;
         mDeadlineSelected = new Date(Long.MAX_VALUE);
         if (savedState != null) {
+            mItems = new ArrayList<>();
             mLoadingTasks = savedState.getStringArrayList(STATE_LOADING_TASKS);
         } else {
             mLoadingTasks = new ArrayList<>();

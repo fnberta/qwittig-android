@@ -18,28 +18,39 @@ import ch.giantific.qwittig.utils.MoneyUtils;
 public class CompUnpaidRowViewModel extends BaseObservable implements CardTopProgressViewModel {
 
     private final String mCurrency;
+    private boolean mCredit;
     private String mCompUsername;
     private byte[] mCompUserAvatar;
     private String mCompAmount;
     private boolean mCompLoading;
 
     public CompUnpaidRowViewModel(@NonNull Compensation compensation,
-                                  @NonNull String currency) {
+                                  @NonNull String currency, boolean credit) {
         mCurrency = currency;
-        setCompInfo(compensation);
+        setCompInfo(compensation, credit);
     }
 
-    private void setCompInfo(@NonNull Compensation compensation) {
-        final User payer = compensation.getPayer();
-        mCompUsername = payer.getNickname();
-        mCompUserAvatar = payer.getAvatar();
+    private void setCompInfo(@NonNull Compensation compensation, boolean credit) {
+        mCredit = credit;
+        final User user = credit ? compensation.getPayer() : compensation.getBeneficiary();
+        mCompUsername = user.getNickname();
+        mCompUserAvatar = user.getAvatar();
         mCompAmount = MoneyUtils.formatMoney(compensation.getAmountFraction(), mCurrency);
         mCompLoading = compensation.isLoading();
     }
 
-    public void updateCompInfo(@NonNull Compensation compensation) {
-        setCompInfo(compensation);
+    public void updateCompInfo(@NonNull Compensation compensation, boolean credit) {
+        setCompInfo(compensation, credit);
         notifyChange();
+    }
+
+    @Bindable
+    public boolean isCredit() {
+        return mCredit;
+    }
+
+    public void setCredit(boolean credit) {
+        mCredit = credit;
     }
 
     @Bindable

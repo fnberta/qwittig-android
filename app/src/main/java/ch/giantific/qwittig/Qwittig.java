@@ -15,6 +15,7 @@ import com.parse.ParseCrashReporting;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
+import com.squareup.leakcanary.LeakCanary;
 
 import ch.giantific.qwittig.di.components.ApplicationComponent;
 import ch.giantific.qwittig.di.components.DaggerApplicationComponent;
@@ -49,9 +50,30 @@ public class Qwittig extends Application {
     public void onCreate() {
         super.onCreate();
 
-        // initialise Facebook SDK
-        FacebookSdk.sdkInitialize(getApplicationContext());
+        initialiseLeakCanary();
+        buildAppComponent();
+        initialiseFacebookSdk();
+        initialiseParse();
+    }
 
+    private void initialiseLeakCanary() {
+        if (BuildConfig.DEBUG) {
+            LeakCanary.install(this);
+        }
+    }
+
+    private void buildAppComponent() {
+        mAppComponent = DaggerApplicationComponent.builder()
+                .applicationModule(new ApplicationModule(this))
+                .restServiceModule(new RestServiceModule())
+                .build();
+    }
+
+    private void initialiseFacebookSdk() {
+        FacebookSdk.sdkInitialize(getApplicationContext());
+    }
+
+    private void initialiseParse() {
         // register ParseObject subclasses
         ParseObject.registerSubclass(Group.class);
         ParseObject.registerSubclass(User.class);
@@ -82,10 +104,5 @@ public class Qwittig extends Application {
 
         // refresh ParseConfig
         ParseConfigUtils.refreshConfig();
-
-        mAppComponent = DaggerApplicationComponent.builder()
-                .applicationModule(new ApplicationModule(this))
-                .restServiceModule(new RestServiceModule())
-                .build();
     }
 }

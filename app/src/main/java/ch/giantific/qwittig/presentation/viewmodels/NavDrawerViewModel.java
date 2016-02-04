@@ -22,6 +22,8 @@ import ch.giantific.qwittig.domain.models.parse.Group;
  */
 public interface NavDrawerViewModel extends Observable, ViewInteraction<NavDrawerViewModel.ViewListener> {
 
+    void unsubscribe();
+
     @Bindable
     String getUserNickname();
 
@@ -34,6 +36,8 @@ public interface NavDrawerViewModel extends Observable, ViewInteraction<NavDrawe
     void notifySelectedGroupChanged();
 
     boolean isUserLoggedIn();
+
+    void onNavDrawerReady();
 
     void onLoginSuccessful();
 

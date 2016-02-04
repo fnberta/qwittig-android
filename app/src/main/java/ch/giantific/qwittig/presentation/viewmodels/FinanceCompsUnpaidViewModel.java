@@ -10,7 +10,7 @@ import org.apache.commons.math3.fraction.BigFraction;
 
 import ch.giantific.qwittig.domain.models.CompensationUnpaidItem;
 import ch.giantific.qwittig.presentation.ui.adapters.CompensationsUnpaidRecyclerAdapter;
-import ch.giantific.qwittig.presentation.ui.fragments.dialogs.CompensationChangeAmountDialogFragment;
+import ch.giantific.qwittig.presentation.ui.fragments.dialogs.CompensationConfirmAmountDialogFragment;
 import ch.giantific.qwittig.presentation.workerfragments.query.CompensationsUpdateListener;
 import ch.giantific.qwittig.presentation.workerfragments.reminder.CompensationReminderListener;
 
@@ -20,7 +20,7 @@ import ch.giantific.qwittig.presentation.workerfragments.reminder.CompensationRe
 public interface FinanceCompsUnpaidViewModel extends OnlineListViewModel<CompensationUnpaidItem, FinanceCompsUnpaidViewModel.ViewListener>,
         FinanceHeaderViewModel, CompensationsUpdateListener, CompensationReminderListener,
         CompensationsUnpaidRecyclerAdapter.AdapterInteractionListener,
-        CompensationChangeAmountDialogFragment.DialogInteractionListener {
+        CompensationConfirmAmountDialogFragment.DialogInteractionListener {
 
     interface ViewListener extends OnlineListViewModel.ViewListener {
 
@@ -29,6 +29,7 @@ public interface FinanceCompsUnpaidViewModel extends OnlineListViewModel<Compens
         void loadCompensationRemindWorker(@NonNull String compensationId);
 
         void showCompensationAmountConfirmDialog(@NonNull BigFraction amount,
+                                                 @NonNull String debtorNickname,
                                                  @NonNull String currency);
 
         void setColorTheme(@NonNull BigFraction balance);

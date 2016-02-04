@@ -18,6 +18,7 @@ import org.apache.commons.math3.fraction.BigFraction;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+import ch.giantific.qwittig.LocalBroadcast.DataType;
 import ch.giantific.qwittig.LocalBroadcastImpl;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivityFinanceBinding;
@@ -28,7 +29,7 @@ import ch.giantific.qwittig.presentation.ui.adapters.TabsAdapter;
 import ch.giantific.qwittig.presentation.ui.fragments.FinanceCompensationsPaidFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.FinanceCompensationsUnpaidFragment;
 import ch.giantific.qwittig.presentation.ui.fragments.FinanceUserBalancesFragment;
-import ch.giantific.qwittig.presentation.ui.fragments.dialogs.CompensationChangeAmountDialogFragment;
+import ch.giantific.qwittig.presentation.ui.fragments.dialogs.CompensationConfirmAmountDialogFragment;
 import ch.giantific.qwittig.presentation.viewmodels.FinanceCompsPaidViewModel;
 import ch.giantific.qwittig.presentation.viewmodels.FinanceCompsUnpaidViewModel;
 import ch.giantific.qwittig.presentation.viewmodels.FinanceUsersViewModel;
@@ -53,7 +54,7 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceCompsUnpaidVie
         FinanceUserBalancesFragment.ActivityListener,
         FinanceCompensationsUnpaidFragment.ActivityListener,
         FinanceCompensationsPaidFragment.ActivityListener,
-        CompensationChangeAmountDialogFragment.DialogInteractionListener,
+        CompensationConfirmAmountDialogFragment.DialogInteractionListener,
         CompensationsUpdateListener,
         CompensationsQueryMoreListener,
         CompensationReminderListener,
@@ -67,10 +68,10 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceCompsUnpaidVie
     void handleLocalBroadcast(Intent intent, int dataType) {
         super.handleLocalBroadcast(intent, dataType);
         switch (dataType) {
-            case LocalBroadcastImpl.DATA_TYPE_USERS_UPDATED:
+            case DataType.USERS_UPDATED:
                 mViewModel.updateList();
                 break;
-            case LocalBroadcastImpl.DATA_TYPE_COMPENSATIONS_UPDATED:
+            case DataType.COMPENSATIONS_UPDATED:
                 final boolean paid = intent.getBooleanExtra(LocalBroadcastImpl.INTENT_EXTRA_COMPENSATION_PAID, false);
                 if (paid) {
                     mCompsPaidViewModel.updateList();
@@ -94,7 +95,7 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceCompsUnpaidVie
             actionBar.setTitle(null);
         }
 
-        if (isUserLoggedIn()) {
+        if (mUserLoggedIn) {
             setupTabs();
         }
     }
@@ -112,9 +113,9 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceCompsUnpaidVie
         final TabsAdapter tabsAdapter = new TabsAdapter(getFragmentManager());
 //        tabsAdapter.addFragment(new FinanceUserBalancesFragment(), getString(R.string.tab_users));
         tabsAdapter.addFragment(new FinanceCompensationsUnpaidFragment(), getString(R.string.tab_compensations_new));
-        tabsAdapter.addFragment(new FinanceCompensationsPaidFragment(), getString(R.string.tab_compensations_history));
+        tabsAdapter.addFragment(new FinanceCompensationsPaidFragment(), getString(R.string.tab_compensations_archive));
         mBinding.viewpager.setAdapter(tabsAdapter);
-        mBinding.viewpager.setOffscreenPageLimit(2);
+//        mBinding.viewpager.setOffscreenPageLimit(2);
         if (tabToSelect != FragmentTabs.NONE) {
             mBinding.viewpager.setCurrentItem(tabToSelect);
         }
@@ -173,7 +174,7 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceCompsUnpaidVie
             colorDark = ContextCompat.getColor(this, R.color.red_dark);
             style = R.style.AppTheme_DrawStatusBar_Red;
         }
-        setTheme(style);
+//        setTheme(style);
         mToolbar.setBackgroundColor(color);
         mBinding.tabs.setBackgroundColor(color);
         setStatusBarBackgroundColor(colorDark);

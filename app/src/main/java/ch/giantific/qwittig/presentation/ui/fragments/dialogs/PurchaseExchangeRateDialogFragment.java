@@ -25,7 +25,7 @@ import ch.giantific.qwittig.utils.MoneyUtils;
  * <p/>
  * Subclass of {@link DialogFragment}.
  */
-public class ManualExchangeRateDialogFragment extends DialogFragment {
+public class PurchaseExchangeRateDialogFragment extends DialogFragment {
 
     private static final String BUNDLE_EXCHANGE_RATE = "BUNDLE_EXCHANGE_RATE";
     private DialogInteractionListener mListener;
@@ -34,14 +34,14 @@ public class ManualExchangeRateDialogFragment extends DialogFragment {
     private String mAutoExchangeRate;
 
     /**
-     * Returns a new instance of {@link ManualExchangeRateDialogFragment}.
+     * Returns a new instance of {@link PurchaseExchangeRateDialogFragment}.
      *
      * @param exchangeRate the currently set currency exchange rate
-     * @return a new instance of {@link ManualExchangeRateDialogFragment}
+     * @return a new instance of {@link PurchaseExchangeRateDialogFragment}
      */
     @NonNull
-    public static ManualExchangeRateDialogFragment newInstance(@NonNull String exchangeRate) {
-        ManualExchangeRateDialogFragment fragment = new ManualExchangeRateDialogFragment();
+    public static PurchaseExchangeRateDialogFragment newInstance(@NonNull String exchangeRate) {
+        PurchaseExchangeRateDialogFragment fragment = new PurchaseExchangeRateDialogFragment();
 
         Bundle args = new Bundle();
         args.putString(BUNDLE_EXCHANGE_RATE, exchangeRate);

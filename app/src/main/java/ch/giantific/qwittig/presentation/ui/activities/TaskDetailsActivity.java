@@ -18,7 +18,7 @@ import android.view.View;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import ch.giantific.qwittig.LocalBroadcastImpl;
+import ch.giantific.qwittig.LocalBroadcast;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivityTaskDetailsBinding;
 import ch.giantific.qwittig.di.components.NavDrawerComponent;
@@ -43,7 +43,7 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity<TaskDetailsViewMo
     void handleLocalBroadcast(Intent intent, int dataType) {
         super.handleLocalBroadcast(intent, dataType);
 
-        if (dataType == LocalBroadcastImpl.DATA_TYPE_TASKS_UPDATED) {
+        if (dataType == LocalBroadcast.DataType.TASKS_UPDATED) {
             mViewModel.updateList();
         }
     }
@@ -69,7 +69,7 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity<TaskDetailsViewMo
         unCheckNavDrawerItems();
         supportPostponeEnterTransition();
 
-        if (isUserLoggedIn() && savedInstanceState == null) {
+        if (mUserLoggedIn && savedInstanceState == null) {
             addDetailsFragment();
         }
     }

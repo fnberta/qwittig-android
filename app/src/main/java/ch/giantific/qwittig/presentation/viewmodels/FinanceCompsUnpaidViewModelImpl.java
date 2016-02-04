@@ -44,7 +44,7 @@ public class FinanceCompsUnpaidViewModelImpl extends OnlineListViewModelBaseImpl
     private static final String STATE_COMP_CHANGE_AMOUNT = "STATE_COMP_CHANGE_AMOUNT";
     private CompensationRepository mCompsRepo;
     private ArrayList<String> mLoadingComps;
-    private String mCompChangeAmount;
+    private String mCompConfirmingId;
 
     public FinanceCompsUnpaidViewModelImpl(@Nullable Bundle savedState,
                                            @NonNull GroupRepository groupRepo,
@@ -57,7 +57,7 @@ public class FinanceCompsUnpaidViewModelImpl extends OnlineListViewModelBaseImpl
         if (savedState != null) {
             mItems = new ArrayList<>();
             mLoadingComps = savedState.getStringArrayList(STATE_COMPS_LOADING);
-            mCompChangeAmount = savedState.getString(STATE_COMP_CHANGE_AMOUNT);
+            mCompConfirmingId = savedState.getString(STATE_COMP_CHANGE_AMOUNT);
         } else {
             mLoadingComps = new ArrayList<>();
         }
@@ -68,8 +68,8 @@ public class FinanceCompsUnpaidViewModelImpl extends OnlineListViewModelBaseImpl
         super.saveState(outState);
 
         outState.putStringArrayList(STATE_COMPS_LOADING, mLoadingComps);
-        if (!TextUtils.isEmpty(mCompChangeAmount)) {
-            outState.putString(STATE_COMP_CHANGE_AMOUNT, mCompChangeAmount);
+        if (!TextUtils.isEmpty(mCompConfirmingId)) {
+            outState.putString(STATE_COMP_CHANGE_AMOUNT, mCompConfirmingId);
         }
     }
 
@@ -84,8 +84,7 @@ public class FinanceCompsUnpaidViewModelImpl extends OnlineListViewModelBaseImpl
     @Override
     public void updateList() {
         mSubscriptions.add(mGroupRepo.fetchGroupDataAsync(mCurrentGroup)
-                .toObservable()
-                .flatMap(new Func1<Group, Observable<Compensation>>() {
+                .flatMapObservable(new Func1<Group, Observable<Compensation>>() {
                     @Override
                     public Observable<Compensation> call(Group group) {
                         return mCompsRepo.getCompensationsLocalUnpaidAsync(mCurrentUser, group);
@@ -200,7 +199,45 @@ public class FinanceCompsUnpaidViewModelImpl extends OnlineListViewModelBaseImpl
         final Compensation comp = mItems.get(position).getCompensation();
         final BigFraction amount = comp.getAmountFraction();
         final String currency = mCurrentGroup.getCurrency();
-        mView.showCompensationAmountConfirmDialog(amount, currency);
+
+        mCompConfirmingId = comp.getObjectId();
+        mView.showCompensationAmountConfirmDialog(amount, comp.getPayer().getNickname(), currency);
+    }
+
+    @Override
+    public void onAmountConfirmed(@NonNull BigFraction amount) {
+        for (int i = 0, size = mItems.size(); i < size; i++) {
+            final CompensationUnpaidItem item = mItems.get(i);
+            if (item.getType() != Type.CREDIT) {
+                continue;
+            }
+            final Compensation compensation = item.getCompensation();
+            if (compensation.getObjectId().equals(mCompConfirmingId)) {
+                compensation.setAmountFraction(amount);
+                confirmCompensation(compensation, i);
+                return;
+            }
+        }
+    }
+
+    private void confirmCompensation(Compensation compensation, final int position) {
+        mCompsRepo.saveCompensationPaid(compensation)
+                .subscribe(new SingleSubscriber<Compensation>() {
+                    @Override
+                    public void onSuccess(Compensation compensation) {
+                        mItems.remove(position);
+                        mView.notifyItemRemoved(position);
+                        mView.showMessage(R.string.toast_compensation_accepted);
+
+                        // new compensations are calculated on the server
+                        setLoading(true);
+                    }
+
+                    @Override
+                    public void onError(Throwable error) {
+                        mView.showMessage(R.string.toast_error_comps_paid);
+                    }
+                });
     }
 
     @Override
@@ -272,39 +309,6 @@ public class FinanceCompsUnpaidViewModelImpl extends OnlineListViewModelBaseImpl
         }
 
         return null;
-    }
-
-    @Override
-    public void onAmountConfirmed(@NonNull BigFraction amount) {
-        for (int i = 0, size = mItems.size(); i < size; i++) {
-            final CompensationUnpaidItem item = mItems.get(i);
-            if (item.getType() != Type.CREDIT) {
-                continue;
-            }
-            final Compensation compensation = item.getCompensation();
-            if (!compensation.getObjectId().equals(mCompChangeAmount)) {
-                continue;
-            }
-
-            final int position = i;
-            compensation.setAmountFraction(amount);
-            mCompsRepo.saveCompensationPaid(compensation)
-                    .subscribe(new SingleSubscriber<Compensation>() {
-                        @Override
-                        public void onSuccess(Compensation compensation) {
-                            mItems.remove(position);
-                            mView.notifyItemRemoved(position);
-                            mView.showMessage(R.string.toast_compensation_accepted);
-                        }
-
-                        @Override
-                        public void onError(Throwable error) {
-                            mView.showMessage(R.string.toast_error_comps_paid);
-                        }
-                    });
-
-            return;
-        }
     }
 
     @Override

@@ -18,7 +18,7 @@ import ch.giantific.qwittig.databinding.FragmentFinanceCompensationsUnpaidBindin
 import ch.giantific.qwittig.di.components.DaggerFinanceComponent;
 import ch.giantific.qwittig.di.modules.FinanceViewModelModule;
 import ch.giantific.qwittig.presentation.ui.adapters.CompensationsUnpaidRecyclerAdapter;
-import ch.giantific.qwittig.presentation.ui.fragments.dialogs.CompensationChangeAmountDialogFragment;
+import ch.giantific.qwittig.presentation.ui.fragments.dialogs.CompensationConfirmAmountDialogFragment;
 import ch.giantific.qwittig.presentation.viewmodels.FinanceCompsUnpaidViewModel;
 import ch.giantific.qwittig.presentation.workerfragments.query.CompensationsUpdateWorker;
 import ch.giantific.qwittig.presentation.workerfragments.reminder.CompensationRemindWorker;
@@ -34,7 +34,6 @@ import ch.giantific.qwittig.presentation.workerfragments.reminder.CompensationRe
 public class FinanceCompensationsUnpaidFragment extends BaseRecyclerViewOnlineFragment<FinanceCompsUnpaidViewModel, FinanceCompensationsUnpaidFragment.ActivityListener>
         implements FinanceCompsUnpaidViewModel.ViewListener {
 
-    private static final String CHANGE_AMOUNT_DIALOG = "CHANGE_AMOUNT_DIALOG";
     private FragmentFinanceCompensationsUnpaidBinding mBinding;
 
     public FinanceCompensationsUnpaidFragment() {
@@ -85,10 +84,11 @@ public class FinanceCompensationsUnpaidFragment extends BaseRecyclerViewOnlineFr
     }
 
     @Override
-    public void showCompensationAmountConfirmDialog(@NonNull BigFraction amount, @NonNull String currency) {
-        final CompensationChangeAmountDialogFragment dialog =
-                CompensationChangeAmountDialogFragment.newInstance(amount, currency);
-        dialog.show(getFragmentManager(), CHANGE_AMOUNT_DIALOG);
+    public void showCompensationAmountConfirmDialog(@NonNull BigFraction amount,
+                                                    @NonNull String debtorNickname,
+                                                    @NonNull String currency) {
+        CompensationConfirmAmountDialogFragment.show(getFragmentManager(), amount, debtorNickname,
+                currency);
     }
 
     @Override
