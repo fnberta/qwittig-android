@@ -7,7 +7,6 @@ package ch.giantific.qwittig.data.repositories;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
@@ -23,6 +22,7 @@ import java.util.Map;
 
 import ch.giantific.qwittig.data.rest.ExchangeRates;
 import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.Identity;
 import ch.giantific.qwittig.domain.models.parse.Item;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.models.parse.User;
@@ -67,13 +67,13 @@ public class ParsePurchaseRepository extends ParseBaseRepository<Purchase> imple
     }
 
     @Override
-    public Observable<Purchase> getPurchasesLocalAsync(@NonNull User currentUser,
-                                                       @NonNull Group group, boolean getDrafts) {
+    public Observable<Purchase> getPurchasesLocalAsync(@NonNull Identity currentIdentity,
+                                                       boolean getDrafts) {
         final ParseQuery<Purchase> query = getPurchasesLocalQuery();
-        query.whereEqualTo(Purchase.GROUP, currentUser.getCurrentGroup());
+        query.whereEqualTo(Purchase.GROUP, currentIdentity.getGroup());
         if (getDrafts) {
             query.whereExists(Purchase.DRAFT_ID);
-            query.whereEqualTo(Purchase.BUYER, currentUser);
+            query.whereEqualTo(Purchase.BUYER, currentIdentity);
         } else {
             query.whereDoesNotExist(Purchase.DRAFT_ID);
         }
@@ -104,7 +104,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository<Purchase> imple
         query.ignoreACLs();
         query.include(Purchase.ITEMS);
         query.include(Purchase.BUYER);
-        query.include(Purchase.USERS_INVOLVED);
+        query.include(Purchase.IDENTITIES);
         query.orderByDescending(Purchase.DATE);
         return query;
     }
@@ -161,18 +161,22 @@ public class ParsePurchaseRepository extends ParseBaseRepository<Purchase> imple
     }
 
     @Override
-    public Observable<Purchase> updatePurchasesAsync(@NonNull final User currentUser,
-                                                     @NonNull List<ParseObject> groups,
-                                                     @NonNull final String currentGroupId) {
-        return Observable.from(groups)
-                .flatMap(new Func1<ParseObject, Observable<Purchase>>() {
+    public Observable<Purchase> updatePurchasesAsync(@NonNull final User currentUser) {
+        final Identity currentIdentity = currentUser.getCurrentIdentity();
+        final String currentIdentityGroupId = currentIdentity.getGroup().getObjectId();
+
+        final List<ParseObject> identities = currentUser.getIdentities();
+        return Observable.from(identities)
+                .cast(Identity.class)
+                .flatMap(new Func1<Identity, Observable<Purchase>>() {
                     @Override
-                    public Observable<Purchase> call(ParseObject parseObject) {
-                        final String groupId = parseObject.getObjectId();
+                    public Observable<Purchase> call(Identity identity) {
+                        final Group group = identity.getGroup();
+                        final String groupId = group.getObjectId();
                         final String pinLabel = Purchase.PIN_LABEL + groupId;
 
-                        ParseQuery<Purchase> query = getPurchasesOnlineQuery(currentUser);
-                        query.whereEqualTo(Purchase.GROUP, parseObject);
+                        ParseQuery<Purchase> query = getPurchasesOnlineQuery(currentIdentity);
+                        query.whereEqualTo(Purchase.GROUP, group);
                         return find(query)
                                 .flatMap(new Func1<List<Purchase>, Observable<List<Purchase>>>() {
                                     @Override
@@ -195,7 +199,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository<Purchase> imple
                                 .filter(new Func1<Purchase, Boolean>() {
                                     @Override
                                     public Boolean call(Purchase purchase) {
-                                        return groupId.equals(currentGroupId);
+                                        return groupId.equals(currentIdentityGroupId);
                                     }
                                 });
                     }
@@ -203,12 +207,12 @@ public class ParsePurchaseRepository extends ParseBaseRepository<Purchase> imple
     }
 
     @NonNull
-    private ParseQuery<Purchase> getPurchasesOnlineQuery(@NonNull User currentUser) {
+    private ParseQuery<Purchase> getPurchasesOnlineQuery(@NonNull Identity currentIdentity) {
         final ParseQuery<Purchase> buyerQuery = ParseQuery.getQuery(Purchase.CLASS);
-        buyerQuery.whereEqualTo(Purchase.BUYER, currentUser);
+        buyerQuery.whereEqualTo(Purchase.BUYER, currentIdentity);
 
         final ParseQuery<Purchase> involvedQuery = ParseQuery.getQuery(Purchase.CLASS);
-        involvedQuery.whereEqualTo(Purchase.USERS_INVOLVED, currentUser);
+        involvedQuery.whereEqualTo(Purchase.IDENTITIES, currentIdentity);
 
         final List<ParseQuery<Purchase>> queries = new ArrayList<>();
         queries.add(buyerQuery);
@@ -217,24 +221,25 @@ public class ParsePurchaseRepository extends ParseBaseRepository<Purchase> imple
         final ParseQuery<Purchase> query = ParseQuery.or(queries);
         query.include(Purchase.ITEMS);
         query.include(Purchase.BUYER);
-        query.include(Purchase.USERS_INVOLVED);
+        query.include(Purchase.IDENTITIES);
         query.setLimit(QUERY_ITEMS_PER_PAGE);
         query.orderByDescending(Purchase.DATE);
         return query;
     }
 
     @Override
-    public Observable<Purchase> getPurchasesOnlineAsync(@NonNull User currentUser,
-                                                        @NonNull final Group group, int skip) {
-        final ParseQuery<Purchase> query = getPurchasesOnlineQuery(currentUser);
+    public Observable<Purchase> getPurchasesOnlineAsync(@NonNull Identity currentIdentity,
+                                                        int skip) {
+        final Group currentGroup = currentIdentity.getGroup();
+        final ParseQuery<Purchase> query = getPurchasesOnlineQuery(currentIdentity);
         query.setSkip(skip);
-        query.whereEqualTo(Purchase.GROUP, group);
+        query.whereEqualTo(Purchase.GROUP, currentGroup);
 
         return find(query)
                 .flatMap(new Func1<List<Purchase>, Observable<List<Purchase>>>() {
                     @Override
                     public Observable<List<Purchase>> call(List<Purchase> purchases) {
-                        final String tag = Purchase.PIN_LABEL + group.getObjectId();
+                        final String tag = Purchase.PIN_LABEL + currentGroup.getObjectId();
                         return pinAll(purchases, tag);
                     }
                 })
@@ -247,14 +252,15 @@ public class ParsePurchaseRepository extends ParseBaseRepository<Purchase> imple
     }
 
     @Override
-    public boolean updatePurchases(@NonNull User currentUser, @NonNull List<ParseObject> groups) {
-        if (groups.isEmpty()) {
-            return false;
-        }
+    public boolean updatePurchases(@NonNull User currentUser) {
+        final Identity currentIdentity = currentUser.getCurrentIdentity();
+        final List<ParseObject> identities = currentUser.getIdentities();
+        for (ParseObject parseObject : identities) {
+            final Identity identity = (Identity) parseObject;
+            final Group group = identity.getGroup();
 
-        for (ParseObject group : groups) {
             try {
-                final List<Purchase> purchases = getPurchasesForGroupOnline(currentUser, group);
+                final List<Purchase> purchases = getPurchasesForGroupOnline(currentIdentity, group);
                 final String groupId = group.getObjectId();
                 final String label = Purchase.PIN_LABEL + groupId;
 
@@ -268,10 +274,10 @@ public class ParsePurchaseRepository extends ParseBaseRepository<Purchase> imple
         return true;
     }
 
-    private List<Purchase> getPurchasesForGroupOnline(@NonNull User currentUser,
-                                                      @NonNull ParseObject group)
+    private List<Purchase> getPurchasesForGroupOnline(@NonNull Identity currentIdentity,
+                                                      @NonNull Group group)
             throws ParseException {
-        final ParseQuery<Purchase> query = getPurchasesOnlineQuery(currentUser);
+        final ParseQuery<Purchase> query = getPurchasesOnlineQuery(currentIdentity);
         query.whereEqualTo(Purchase.GROUP, group);
         return query.find();
     }
@@ -286,7 +292,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository<Purchase> imple
             if (isNew) {
                 purchase.pin(pinLabel);
             } else {
-                // although we only update an existing purchase, we need to unpin and repin it
+                // although we only update an existing purchase, we need to unpin and re-pin it
                 // because the items have changed
                 purchase.unpin(pinLabel);
                 purchase.pin(pinLabel);
@@ -301,7 +307,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository<Purchase> imple
     private Purchase getPurchaseOnline(@NonNull String objectId) throws ParseException {
         final ParseQuery<ParseObject> query = ParseQuery.getQuery(Purchase.CLASS);
         query.include(Purchase.ITEMS);
-        query.include(Purchase.USERS_INVOLVED);
+        query.include(Purchase.IDENTITIES);
         query.include(Purchase.BUYER);
         return (Purchase) query.get(objectId);
     }

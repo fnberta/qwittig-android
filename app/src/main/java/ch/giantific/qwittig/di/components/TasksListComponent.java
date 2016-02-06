@@ -7,8 +7,8 @@ package ch.giantific.qwittig.di.components;
 import ch.giantific.qwittig.di.modules.RepositoriesModule;
 import ch.giantific.qwittig.di.modules.TasksListViewModelModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.presentation.ui.fragments.TasksFragment;
-import ch.giantific.qwittig.presentation.viewmodels.TasksViewModel;
+import ch.giantific.qwittig.presentation.tasks.list.TasksFragment;
+import ch.giantific.qwittig.presentation.tasks.list.TasksViewModel;
 import dagger.Component;
 
 /**

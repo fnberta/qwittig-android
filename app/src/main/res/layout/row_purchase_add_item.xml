@@ -14,7 +14,7 @@
 
         <variable
             name="rowItem"
-            type="ch.giantific.qwittig.domain.models.RowItem"
+            type="ch.giantific.qwittig.presentation.home.purchases.addedit.RowItem"
             />
     </data>
 

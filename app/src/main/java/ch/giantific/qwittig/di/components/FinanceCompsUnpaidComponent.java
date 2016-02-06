@@ -7,7 +7,7 @@ package ch.giantific.qwittig.di.components;
 import ch.giantific.qwittig.di.modules.FinanceCompsUnpaidViewModelModule;
 import ch.giantific.qwittig.di.modules.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.presentation.ui.fragments.FinanceCompensationsUnpaidFragment;
+import ch.giantific.qwittig.presentation.finance.FinanceCompensationsUnpaidFragment;
 import dagger.Component;
 
 /**

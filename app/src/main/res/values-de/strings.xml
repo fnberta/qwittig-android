@@ -313,7 +313,7 @@
     <string name="toast_note_deleted">Notiz gelöscht</string>
     <string name="toast_note_added">Notiz hinzugefügt</string>
     <string name="toast_note_edited">Notiz geändert</string>
-    <string name="login_button_email">Anmelden</string>
+    <string name="login_button_email">Oder mit deiner Email</string>
     <string name="login_disclaimer">Durch die Nutzung von Qwittig bist Du mit den Nutzungsbedingungen und der Datenschutzerklärung einverstanden.</string>
     <string name="dialog_login_email_title">Email benötigt</string>
     <string name="dialog_login_email_message">Bitte gib eine gültige Email Adresse an. Andere Nutzer werden dich über diese Adresse in Gruppen einladen können.</string>

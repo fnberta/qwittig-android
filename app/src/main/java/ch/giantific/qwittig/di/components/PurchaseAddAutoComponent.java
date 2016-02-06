@@ -5,10 +5,9 @@
 package ch.giantific.qwittig.di.components;
 
 import ch.giantific.qwittig.di.modules.PurchaseAddAutoViewModelModule;
-import ch.giantific.qwittig.di.modules.PurchaseAddViewModelModule;
 import ch.giantific.qwittig.di.modules.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.presentation.ui.fragments.PurchaseAddFragment;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddFragment;
 import dagger.Component;
 
 /**

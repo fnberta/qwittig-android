@@ -5,10 +5,9 @@
 package ch.giantific.qwittig.di.components;
 
 import ch.giantific.qwittig.di.modules.RepositoriesModule;
-import ch.giantific.qwittig.di.modules.TaskAddViewModelModule;
 import ch.giantific.qwittig.di.modules.TaskEditViewModelModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.presentation.ui.fragments.TaskAddEditFragment;
+import ch.giantific.qwittig.presentation.tasks.addedit.TaskAddEditFragment;
 import dagger.Component;
 
 /**

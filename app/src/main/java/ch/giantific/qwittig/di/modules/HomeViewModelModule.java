@@ -11,8 +11,8 @@ import android.support.annotation.Nullable;
 import ch.giantific.qwittig.di.scopes.PerFragment;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.presentation.viewmodels.HomeViewModel;
-import ch.giantific.qwittig.presentation.viewmodels.HomeViewModelImpl;
+import ch.giantific.qwittig.presentation.home.HomeViewModel;
+import ch.giantific.qwittig.presentation.home.HomeViewModelImpl;
 import dagger.Module;
 import dagger.Provides;
 

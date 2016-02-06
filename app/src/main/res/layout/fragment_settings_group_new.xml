@@ -7,38 +7,42 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/small_space"
     android:clipToPadding="false"
-    tools:context=".presentation.ui.fragments.SettingsGroupNewFragment">
+    android:paddingBottom="@dimen/small_space"
+    tools:context=".presentation.settings.SettingsGroupNewFragment"
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        >
 
         <TextView
             style="@style/TextAppearance.AppCompat.Subhead"
-            android:text="@string/desc_group_add_new"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/key_line_2"
+            android:layout_marginBottom="@dimen/small_space"
             android:layout_marginEnd="@dimen/key_line_1"
+            android:layout_marginStart="@dimen/key_line_2"
             android:layout_marginTop="@dimen/small_space"
-            android:layout_marginBottom="@dimen/small_space"/>
+            android:text="@string/desc_group_add_new"
+            />
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/small_space"
             android:layout_marginTop="@dimen/small_space"
-            android:layout_marginBottom="@dimen/small_space">
+            android:orientation="horizontal"
+            >
 
             <ImageView
                 android:layout_width="@dimen/icon_size"
                 android:layout_height="@dimen/icon_size"
                 android:layout_gravity="center_vertical"
-                android:layout_marginStart="@dimen/key_line_1"
                 android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+                android:layout_marginStart="@dimen/key_line_1"
                 android:contentDescription="@string/dialog_users_involved_title"
                 android:src="@drawable/ic_group_black_24dp"
                 />
@@ -48,30 +52,33 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/key_line_1"
-                android:transitionGroup="true">
+                android:transitionGroup="true"
+                >
 
                 <EditText
                     android:id="@+id/et_settings_group_add_new_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:hint="@string/hint_group_name"
                     android:inputType="text|textCapSentences"
-                    android:hint="@string/hint_group_name"/>
+                    />
             </android.support.design.widget.TextInputLayout>
 
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/small_space">
+            android:layout_marginTop="@dimen/small_space"
+            android:orientation="horizontal"
+            >
 
             <ImageView
                 android:layout_width="@dimen/icon_size"
                 android:layout_height="@dimen/icon_size"
                 android:layout_gravity="center_vertical"
-                android:layout_marginStart="@dimen/key_line_1"
                 android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+                android:layout_marginStart="@dimen/key_line_1"
                 android:contentDescription="@string/hint_group_currency"
                 android:src="@drawable/ic_attach_money_black_24dp"
                 />
@@ -80,7 +87,8 @@
                 android:id="@+id/sp_settings_group_add_new_currency"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/key_line_1"/>
+                android:layout_marginEnd="@dimen/key_line_1"
+                />
         </LinearLayout>
 
         <TextView
@@ -88,24 +96,27 @@
             style="@style/SubHeader"
             android:layout_width="match_parent"
             android:layout_height="@dimen/subheader_height"
-            android:paddingStart="@dimen/key_line_1"
-            android:paddingEnd="@dimen/key_line_1"
             android:gravity="center_vertical"
-            android:text="@string/header_invite_users"/>
+            android:paddingEnd="@dimen/key_line_1"
+            android:paddingStart="@dimen/key_line_1"
+            android:text="@string/header_invite_users"
+            />
 
         <LinearLayout
             android:id="@+id/ll_users"
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            />
 
         <Button
             android:id="@+id/bt_user_add"
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/key_line_2"
             android:layout_marginEnd="@dimen/key_line_1"
-            android:text="@string/button_add_user"/>
+            android:layout_marginStart="@dimen/key_line_2"
+            android:text="@string/button_add_user"
+            />
     </LinearLayout>
 </ScrollView>

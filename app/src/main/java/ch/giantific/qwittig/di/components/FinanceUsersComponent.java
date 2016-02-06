@@ -7,7 +7,7 @@ package ch.giantific.qwittig.di.components;
 import ch.giantific.qwittig.di.modules.FinanceUsersViewModelModule;
 import ch.giantific.qwittig.di.modules.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.presentation.ui.fragments.FinanceUserBalancesFragment;
+import ch.giantific.qwittig.presentation.finance.IdentitiesFragment;
 import dagger.Component;
 
 /**
@@ -17,5 +17,5 @@ import dagger.Component;
 @Component(modules = {FinanceUsersViewModelModule.class, RepositoriesModule.class})
 public interface FinanceUsersComponent {
 
-    void inject(FinanceUserBalancesFragment financeUserBalancesFragment);
+    void inject(IdentitiesFragment identitiesFragment);
 }

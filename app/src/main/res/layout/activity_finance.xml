@@ -12,7 +12,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.viewmodels.FinanceHeaderViewModel"
+            type="ch.giantific.qwittig.presentation.finance.BalanceHeaderViewModel"
             />
     </data>
 
@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
-        tools:context=".presentation.ui.activities.FinanceActivity"
+        tools:context=".presentation.finance.FinanceActivity"
         >
 
         <android.support.design.widget.CoordinatorLayout
@@ -56,7 +56,7 @@
                         android:ellipsize="middle"
                         android:lines="1"
                         android:textColor="@android:color/white"
-                        android:text="@{viewModel.currentUserBalance}"
+                        android:text="@{viewModel.currentIdentityBalance}"
                         tools:text="-123.40"
                         />
 

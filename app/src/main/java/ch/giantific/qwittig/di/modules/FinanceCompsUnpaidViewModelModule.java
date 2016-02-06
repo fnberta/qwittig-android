@@ -12,8 +12,8 @@ import ch.giantific.qwittig.di.scopes.PerFragment;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.presentation.viewmodels.FinanceCompsUnpaidViewModel;
-import ch.giantific.qwittig.presentation.viewmodels.FinanceCompsUnpaidViewModelImpl;
+import ch.giantific.qwittig.presentation.finance.FinanceCompsUnpaidViewModel;
+import ch.giantific.qwittig.presentation.finance.FinanceCompsUnpaidViewModelImpl;
 import dagger.Module;
 import dagger.Provides;
 

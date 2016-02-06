@@ -11,8 +11,8 @@ import android.support.annotation.Nullable;
 import ch.giantific.qwittig.di.scopes.PerFragment;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.presentation.viewmodels.PurchaseReceiptViewModel;
-import ch.giantific.qwittig.presentation.viewmodels.PurchaseReceiptViewModelImpl;
+import ch.giantific.qwittig.presentation.home.purchases.PurchaseReceiptViewModel;
+import ch.giantific.qwittig.presentation.home.purchases.PurchaseReceiptViewModelImpl;
 import dagger.Module;
 import dagger.Provides;
 

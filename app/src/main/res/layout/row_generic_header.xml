@@ -12,7 +12,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.viewmodels.rows.HeaderRowViewModel"
+            type="ch.giantific.qwittig.presentation.common.viewmodels.HeaderRowViewModel"
             />
     </data>
 

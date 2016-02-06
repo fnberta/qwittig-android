@@ -14,7 +14,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.viewmodels.OnlineListViewModel"
+            type="ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModel"
             />
     </data>
 

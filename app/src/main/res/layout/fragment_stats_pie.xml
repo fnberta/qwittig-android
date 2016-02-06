@@ -7,18 +7,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".presentation.ui.fragments.StatsStoresFragment"
     android:animateLayoutChanges="true"
+    tools:context=".presentation.stats.StatsStoresFragment"
     >
 
-    <ch.giantific.qwittig.presentation.ui.widgets.PieChart
+    <ch.giantific.qwittig.presentation.common.widgets.PieChart
         android:id="@+id/pc_stores"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginStart="@dimen/key_line_1"
-        android:layout_marginEnd="@dimen/key_line_1"
-        android:layout_marginTop="@dimen/small_space"
         android:layout_marginBottom="@dimen/small_space"
+        android:layout_marginEnd="@dimen/key_line_1"
+        android:layout_marginStart="@dimen/key_line_1"
+        android:layout_marginTop="@dimen/small_space"
         android:visibility="gone"
         />
 
@@ -26,8 +26,8 @@
         android:id="@+id/rv_stats_stores"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="@dimen/small_space"
         android:clipToPadding="false"
+        android:paddingTop="@dimen/small_space"
         android:scrollbars="vertical"
         android:visibility="gone"/>
 

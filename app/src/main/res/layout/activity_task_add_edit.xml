@@ -12,7 +12,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.viewmodels.TaskAddEditViewModel"
+            type="ch.giantific.qwittig.presentation.tasks.addedit.TaskAddEditViewModel"
             />
     </data>
 
@@ -21,6 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:transitionGroup="true"
+        tools:targetApi="lollipop"
         >
 
         <FrameLayout

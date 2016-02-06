@@ -4,9 +4,9 @@
 
 package ch.giantific.qwittig.utils;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 
 /**
  * Provides useful static utility methods for the handling of retained headless worker fragments.
@@ -24,21 +24,13 @@ public class WorkerUtils {
      * @param tag             the tag to find the fragment
      */
     public static void removeWorker(@NonNull FragmentManager fragmentManager, @NonNull String tag) {
-        final Fragment fragment = findWorker(fragmentManager, tag);
+        final Fragment worker = fragmentManager.findFragmentByTag(tag);
 
-        if (fragment != null) {
-            fragmentManager.beginTransaction().remove(fragment).commitAllowingStateLoss();
+        if (worker != null) {
+            fragmentManager
+                    .beginTransaction()
+                    .remove(worker)
+                    .commitAllowingStateLoss();
         }
-    }
-
-    /**
-     * Returns the worker fragment associated with the specified tag.
-     *
-     * @param fragmentManager the fragment manager to use to find the fragment
-     * @param tag             the tag to find the fragment
-     * @return the worker fragment associated with the tag
-     */
-    public static Fragment findWorker(@NonNull FragmentManager fragmentManager, @NonNull String tag) {
-        return fragmentManager.findFragmentByTag(tag);
     }
 }

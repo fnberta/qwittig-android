@@ -16,6 +16,7 @@ import java.util.List;
 
 import ch.giantific.qwittig.domain.models.parse.Compensation;
 import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.Identity;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import rx.Observable;
@@ -43,43 +44,45 @@ public class ParseCompensationRepository extends ParseBaseRepository<Compensatio
     }
 
     @Override
-    public Observable<Compensation> getCompensationsLocalUnpaidAsync(@NonNull User currentUser,
+    public Observable<Compensation> getCompensationsLocalUnpaidAsync(@NonNull Identity currentIdentity,
                                                                      @NonNull final Group group) {
-        ParseQuery<Compensation> query = getCompensationsLocalQuery(currentUser, group);
-        query.whereEqualTo(Compensation.IS_PAID, false);
+        ParseQuery<Compensation> query = getCompensationsLocalQuery(currentIdentity, group);
+        query.whereEqualTo(Compensation.PAID, false);
         query.orderByAscending(DATE_CREATED);
 
-        return find(query).flatMap(new Func1<List<Compensation>, Observable<Compensation>>() {
-            @Override
-            public Observable<Compensation> call(List<Compensation> compensations) {
-                return Observable.from(compensations);
-            }
-        });
+        return find(query)
+                .flatMap(new Func1<List<Compensation>, Observable<Compensation>>() {
+                    @Override
+                    public Observable<Compensation> call(List<Compensation> compensations) {
+                        return Observable.from(compensations);
+                    }
+                });
     }
 
     @Override
-    public Observable<Compensation> getCompensationsLocalPaidAsync(@NonNull final User currentUser,
+    public Observable<Compensation> getCompensationsLocalPaidAsync(@NonNull final Identity currentIdentity,
                                                                    @NonNull final Group group) {
-        ParseQuery<Compensation> query = getCompensationsLocalQuery(currentUser, group);
-        query.whereEqualTo(Compensation.IS_PAID, true);
+        ParseQuery<Compensation> query = getCompensationsLocalQuery(currentIdentity, group);
+        query.whereEqualTo(Compensation.PAID, true);
         query.orderByDescending(DATE_UPDATED);
 
-        return find(query).flatMap(new Func1<List<Compensation>, Observable<Compensation>>() {
-            @Override
-            public Observable<Compensation> call(List<Compensation> compensations) {
-                return Observable.from(compensations);
-            }
-        });
+        return find(query)
+                .flatMap(new Func1<List<Compensation>, Observable<Compensation>>() {
+                    @Override
+                    public Observable<Compensation> call(List<Compensation> compensations) {
+                        return Observable.from(compensations);
+                    }
+                });
     }
 
     @NonNull
-    private ParseQuery<Compensation> getCompensationsLocalQuery(@NonNull User currentUser,
+    private ParseQuery<Compensation> getCompensationsLocalQuery(@NonNull Identity currentIdentity,
                                                                 @NonNull final Group group) {
         ParseQuery<Compensation> payerQuery = ParseQuery.getQuery(Compensation.CLASS);
-        payerQuery.whereEqualTo(Compensation.PAYER, currentUser);
+        payerQuery.whereEqualTo(Compensation.DEBTOR, currentIdentity);
 
         ParseQuery<Compensation> beneficiaryQuery = ParseQuery.getQuery(Compensation.CLASS);
-        beneficiaryQuery.whereEqualTo(Compensation.BENEFICIARY, currentUser);
+        beneficiaryQuery.whereEqualTo(Compensation.CREDITOR, currentIdentity);
 
         List<ParseQuery<Compensation>> queries = new ArrayList<>();
         queries.add(payerQuery);
@@ -94,12 +97,13 @@ public class ParseCompensationRepository extends ParseBaseRepository<Compensatio
 
     @Override
     public Single<Compensation> saveCompensationAsync(@NonNull final Compensation compensation) {
-        return save(compensation).doOnError(new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-                compensation.setPaid(false);
-            }
-        });
+        return save(compensation)
+                .doOnError(new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        compensation.setPaid(false);
+                    }
+                });
     }
 
     @Override
@@ -115,10 +119,17 @@ public class ParseCompensationRepository extends ParseBaseRepository<Compensatio
     }
 
     @Override
-    public Observable<Compensation> updateCompensationsUnpaidAsync(@NonNull final List<ParseObject> groups) {
+    public Observable<Compensation> updateCompensationsUnpaidAsync(@NonNull Identity currentIdentity,
+                                                                   @NonNull List<? extends ParseObject> identities) {
+        final List<ParseObject> groups = new ArrayList<>();
+        for (ParseObject parseObject : identities) {
+            final Identity identity = (Identity) parseObject;
+            groups.add(identity.getGroup());
+        }
+
         ParseQuery<Compensation> query = getCompensationsOnlineQuery();
         query.whereContainedIn(Compensation.GROUP, groups);
-        query.whereEqualTo(Compensation.IS_PAID, false);
+        query.whereEqualTo(Compensation.PAID, false);
         return find(query)
                 .flatMap(new Func1<List<Compensation>, Observable<List<Compensation>>>() {
                     @Override
@@ -141,18 +152,21 @@ public class ParseCompensationRepository extends ParseBaseRepository<Compensatio
     }
 
     @Override
-    public Observable<Compensation> updateCompensationsPaidAsync(@NonNull List<ParseObject> groups,
-                                                                 @NonNull final String currentGroupId) {
-        return Observable.from(groups)
-                .flatMap(new Func1<ParseObject, Observable<Compensation>>() {
+    public Observable<Compensation> updateCompensationsPaidAsync(@NonNull Identity currentIdentity,
+                                                                 @NonNull List<ParseObject> identities) {
+        final String currentIdentityGroupId = currentIdentity.getGroup().getObjectId();
+        return Observable.from(identities)
+                .cast(Identity.class)
+                .flatMap(new Func1<Identity, Observable<Compensation>>() {
                     @Override
-                    public Observable<Compensation> call(final ParseObject parseObject) {
-                        final String groupId = parseObject.getObjectId();
+                    public Observable<Compensation> call(final Identity identity) {
+                        final Group group = identity.getGroup();
+                        final String groupId = group.getObjectId();
                         final String pinLabel = Compensation.PIN_LABEL_PAID + groupId;
 
-                        ParseQuery<Compensation> query = getCompensationsOnlineQuery();
-                        query.whereEqualTo(Compensation.GROUP, parseObject);
-                        query.whereEqualTo(Compensation.IS_PAID, true);
+                        final ParseQuery<Compensation> query = getCompensationsOnlineQuery();
+                        query.whereEqualTo(Compensation.GROUP, group);
+                        query.whereEqualTo(Compensation.PAID, true);
                         query.setLimit(QUERY_ITEMS_PER_PAGE);
                         return find(query)
                                 .flatMap(new Func1<List<Compensation>, Observable<List<Compensation>>>() {
@@ -176,7 +190,7 @@ public class ParseCompensationRepository extends ParseBaseRepository<Compensatio
                                 .filter(new Func1<Compensation, Boolean>() {
                                     @Override
                                     public Boolean call(Compensation compensation) {
-                                        return groupId.equals(currentGroupId);
+                                        return groupId.equals(currentIdentityGroupId);
                                     }
                                 });
                     }
@@ -184,18 +198,19 @@ public class ParseCompensationRepository extends ParseBaseRepository<Compensatio
     }
 
     @Override
-    public Observable<Compensation> getCompensationsPaidOnlineAsync(@NonNull final Group group,
+    public Observable<Compensation> getCompensationsPaidOnlineAsync(@NonNull final Identity currentIdentity,
                                                                     final int skip) {
+        final Group currentGroup = currentIdentity.getGroup();
         final ParseQuery<Compensation> query = getCompensationsOnlineQuery();
         query.setSkip(skip);
-        query.whereEqualTo(Compensation.GROUP, group);
-        query.whereEqualTo(Compensation.IS_PAID, true);
+        query.whereEqualTo(Compensation.GROUP, currentGroup);
+        query.whereEqualTo(Compensation.PAID, true);
 
         return find(query)
                 .flatMap(new Func1<List<Compensation>, Observable<List<Compensation>>>() {
                     @Override
                     public Observable<List<Compensation>> call(List<Compensation> compensations) {
-                        final String tag = Compensation.PIN_LABEL_PAID + group.getObjectId();
+                        final String tag = Compensation.PIN_LABEL_PAID + currentGroup.getObjectId();
                         return pinAll(compensations, tag);
                     }
                 })
@@ -208,14 +223,12 @@ public class ParseCompensationRepository extends ParseBaseRepository<Compensatio
     }
 
     @Override
-    public boolean updateCompensations(@NonNull List<ParseObject> groups) {
-        if (groups.isEmpty()) {
-            return false;
-        }
+    public boolean updateCompensations(@NonNull User currentUser) {
+        final List<ParseObject> identities = currentUser.getIdentities();
 
         try {
-            updateCompensationsUnpaid(groups);
-            updateCompensationsPaid(groups);
+            updateCompensationsUnpaid(identities);
+            updateCompensationsPaid(identities);
         } catch (ParseException e) {
             return false;
         }
@@ -223,24 +236,33 @@ public class ParseCompensationRepository extends ParseBaseRepository<Compensatio
         return true;
     }
 
-    private void updateCompensationsUnpaid(@NonNull List<ParseObject> groups) throws ParseException {
-        ParseQuery<Compensation> query = getCompensationsOnlineQuery();
-        query.whereContainedIn(Compensation.GROUP, groups);
-        query.whereEqualTo(Compensation.IS_PAID, false);
+    private void updateCompensationsUnpaid(@NonNull List<ParseObject> identities) throws ParseException {
+        final List<ParseObject> groups = new ArrayList<>();
+        for (ParseObject parseObject : identities) {
+            final Identity identity = (Identity) parseObject;
+            groups.add(identity.getGroup());
+        }
 
-        List<Compensation> compensationsUnpaid = query.find();
+        final ParseQuery<Compensation> query = getCompensationsOnlineQuery();
+        query.whereContainedIn(Compensation.GROUP, groups);
+        query.whereEqualTo(Compensation.PAID, false);
+
+        final List<Compensation> compensationsUnpaid = query.find();
         ParseObject.unpinAll(Compensation.PIN_LABEL_UNPAID);
         ParseObject.pinAll(Compensation.PIN_LABEL_UNPAID, compensationsUnpaid);
     }
 
-    private void updateCompensationsPaid(@NonNull final List<ParseObject> groups) throws ParseException {
-        for (ParseObject group : groups) {
-            ParseQuery<Compensation> query = getCompensationsOnlineQuery();
+    private void updateCompensationsPaid(@NonNull final List<ParseObject> identities) throws ParseException {
+        for (ParseObject parseObject : identities) {
+            final Identity identity = (Identity) parseObject;
+            final Group group = identity.getGroup();
+
+            final ParseQuery<Compensation> query = getCompensationsOnlineQuery();
             query.whereEqualTo(Compensation.GROUP, group);
-            query.whereEqualTo(Compensation.IS_PAID, true);
+            query.whereEqualTo(Compensation.PAID, true);
             query.setLimit(ParseBaseRepository.QUERY_ITEMS_PER_PAGE);
 
-            List<Compensation> compensationsPaid = query.find();
+            final List<Compensation> compensationsPaid = query.find();
             final String groupId = group.getObjectId();
             final String pinLabel = Compensation.PIN_LABEL_PAID + groupId;
             ParseObject.unpinAll(pinLabel);

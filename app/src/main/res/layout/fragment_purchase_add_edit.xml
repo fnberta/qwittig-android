@@ -13,7 +13,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.viewmodels.PurchaseAddEditViewModel"
+            type="ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddEditViewModel"
             />
     </data>
 
@@ -52,7 +52,7 @@
             android:clipToPadding="false"
             android:paddingBottom="@dimen/small_space"
             android:visibility="@{viewModel.loading ? View.GONE : View.VISIBLE}"
-            tools:context=".presentation.ui.fragments.PurchaseAddFragment"
+            tools:context=".presentation.home.purchases.addedit.PurchaseAddFragment"
             />
     </FrameLayout>
 

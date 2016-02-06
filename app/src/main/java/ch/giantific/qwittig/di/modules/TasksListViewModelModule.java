@@ -12,8 +12,8 @@ import ch.giantific.qwittig.di.scopes.PerFragment;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.presentation.viewmodels.TasksViewModel;
-import ch.giantific.qwittig.presentation.viewmodels.TasksViewModelImpl;
+import ch.giantific.qwittig.presentation.tasks.list.TasksViewModel;
+import ch.giantific.qwittig.presentation.tasks.list.TasksViewModelImpl;
 import dagger.Module;
 import dagger.Provides;
 

@@ -6,13 +6,11 @@ package ch.giantific.qwittig.domain.repositories;
 
 import android.support.annotation.NonNull;
 
-import com.parse.ParseObject;
-
 import java.util.Date;
-import java.util.List;
 
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.Task;
+import ch.giantific.qwittig.domain.models.parse.User;
 import rx.Observable;
 import rx.Single;
 
@@ -64,17 +62,17 @@ public interface TaskRepository extends Repository {
      * Updates all tasks in the local data store by deleting all tasks from the local data
      * store, querying and saving new ones.
      *
-     * @param groups the groups for which to update the tasks
+     * @param currentUser the groups for which to update the tasks
      */
-    Observable<Task> updateTasksAsync(@NonNull List<ParseObject> groups);
+    Observable<Task> updateTasksAsync(@NonNull User currentUser);
 
     /**
      * Deletes all tasks from the local data store and saves new ones.
      *
-     * @param groups the groups for which to update the tasks
+     * @param currentUser the groups for which to update the tasks
      * @return whether the update was successful or not
      */
-    boolean updateTasks(@NonNull List<ParseObject> groups);
+    boolean updateTasks(@NonNull User currentUser);
 
     /**
      * Updates a task if is already available in the local data store (by simply querying it) or

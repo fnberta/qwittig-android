@@ -5,15 +5,15 @@
 
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     >
 
     <data>
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.viewmodels.rows.CompUnpaidRowViewModel"
+            type="ch.giantific.qwittig.presentation.finance.CompUnpaidRowViewModel"
             />
     </data>
 

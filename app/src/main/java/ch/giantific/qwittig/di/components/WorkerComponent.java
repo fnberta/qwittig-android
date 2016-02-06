@@ -6,25 +6,23 @@ package ch.giantific.qwittig.di.components;
 
 import ch.giantific.qwittig.di.modules.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.presentation.workerfragments.OcrWorker;
-import ch.giantific.qwittig.presentation.workerfragments.RatesWorker;
-import ch.giantific.qwittig.presentation.workerfragments.account.LoginWorker;
-import ch.giantific.qwittig.presentation.workerfragments.account.LogoutWorker;
-import ch.giantific.qwittig.presentation.workerfragments.account.UnlinkThirdPartyWorker;
-import ch.giantific.qwittig.presentation.workerfragments.group.CreateGroupWorker;
-import ch.giantific.qwittig.presentation.workerfragments.group.InvitedGroupWorker;
-import ch.giantific.qwittig.presentation.workerfragments.group.StatsCalcWorker;
-import ch.giantific.qwittig.presentation.workerfragments.group.UsersInviteWorker;
-import ch.giantific.qwittig.presentation.workerfragments.query.CompensationsQueryMoreWorker;
-import ch.giantific.qwittig.presentation.workerfragments.query.CompensationsUpdateWorker;
-import ch.giantific.qwittig.presentation.workerfragments.query.PurchasesQueryMoreWorker;
-import ch.giantific.qwittig.presentation.workerfragments.query.PurchasesUpdateWorker;
-import ch.giantific.qwittig.presentation.workerfragments.query.TasksUpdateWorker;
-import ch.giantific.qwittig.presentation.workerfragments.query.UsersUpdateWorker;
-import ch.giantific.qwittig.presentation.workerfragments.reminder.CompensationRemindWorker;
-import ch.giantific.qwittig.presentation.workerfragments.reminder.TaskRemindWorker;
-import ch.giantific.qwittig.presentation.workerfragments.save.CompensationSaveWorker;
-import ch.giantific.qwittig.presentation.workerfragments.save.PurchaseSaveWorker;
+import ch.giantific.qwittig.presentation.finance.IdentitiesUpdateWorker;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.OcrWorker;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.RatesWorker;
+import ch.giantific.qwittig.presentation.login.LoginWorker;
+import ch.giantific.qwittig.presentation.settings.CreateGroupWorker;
+import ch.giantific.qwittig.presentation.home.InvitedGroupWorker;
+import ch.giantific.qwittig.presentation.stats.StatsCalcWorker;
+import ch.giantific.qwittig.presentation.settings.UsersInviteWorker;
+import ch.giantific.qwittig.presentation.finance.CompensationsQueryMoreWorker;
+import ch.giantific.qwittig.presentation.finance.CompensationsUpdateWorker;
+import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesQueryMoreWorker;
+import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesUpdateWorker;
+import ch.giantific.qwittig.presentation.tasks.list.TasksUpdateWorker;
+import ch.giantific.qwittig.presentation.finance.CompensationRemindWorker;
+import ch.giantific.qwittig.presentation.tasks.list.TaskRemindWorker;
+import ch.giantific.qwittig.presentation.finance.CompensationSaveWorker;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseSaveWorker;
 import dagger.Component;
 
 /**
@@ -65,5 +63,7 @@ public interface WorkerComponent {
 
     void inject(TasksUpdateWorker tasksUpdateWorker);
 
-    void inject(UsersUpdateWorker usersUpdateWorker);
+    void inject(IdentitiesUpdateWorker identitiesUpdateWorker);
+
+    void inject(LoginWorker loginWorker);
 }

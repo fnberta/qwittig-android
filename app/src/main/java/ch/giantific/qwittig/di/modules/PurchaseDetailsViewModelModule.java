@@ -12,8 +12,8 @@ import ch.giantific.qwittig.di.scopes.PerFragment;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.presentation.viewmodels.PurchaseDetailsViewModel;
-import ch.giantific.qwittig.presentation.viewmodels.PurchaseDetailsViewModelImpl;
+import ch.giantific.qwittig.presentation.home.purchases.details.PurchaseDetailsViewModel;
+import ch.giantific.qwittig.presentation.home.purchases.details.PurchaseDetailsViewModelImpl;
 import dagger.Module;
 import dagger.Provides;
 

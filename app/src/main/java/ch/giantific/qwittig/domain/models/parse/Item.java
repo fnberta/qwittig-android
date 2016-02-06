@@ -9,14 +9,11 @@ import android.support.annotation.NonNull;
 import com.parse.ParseACL;
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
-import com.parse.ParseUser;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.giantific.qwittig.domain.models.RowItem;
-import ch.giantific.qwittig.domain.models.RowItemUser;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.parse.ParseUtils;
 
@@ -31,21 +28,21 @@ public class Item extends ParseObject {
     public static final String CLASS = "Item";
     public static final String NAME = "name";
     public static final String PRICE = "price";
-    public static final String USERS_INVOLVED = "usersInvolved";
+    public static final String IDENTITIES = "identities";
 
     public Item() {
         // A default constructor is required.
     }
 
     public Item(@NonNull String name, @NonNull BigDecimal price,
-                @NonNull List<User> usersInvolved, @NonNull ParseObject currentGroup) {
+                @NonNull List<Identity> identities, @NonNull Group currentGroup) {
         setName(name);
         setPrice(price);
-        setUsersInvolved(usersInvolved);
+        setIdentities(identities);
         setAccessRights(currentGroup);
     }
 
-    private void setAccessRights(@NonNull ParseObject group) {
+    private void setAccessRights(@NonNull Group group) {
         final ParseACL acl = ParseUtils.getDefaultAcl(group);
         setACL(acl);
     }
@@ -66,14 +63,6 @@ public class Item extends ParseObject {
         put(PRICE, finalPrice);
     }
 
-    public List<ParseUser> getUsersInvolved() {
-        return getList(USERS_INVOLVED);
-    }
-
-    public void setUsersInvolved(@NonNull List<User> usersInvolved) {
-        put(USERS_INVOLVED, usersInvolved);
-    }
-
     /**
      * Returns the price converted to foreign currency using the provided exchange rate.
      *
@@ -81,7 +70,7 @@ public class Item extends ParseObject {
      * @return the price in foreign currency
      */
     public double getPriceForeign(float exchangeRate) {
-        double price = getPrice();
+        final double price = getPrice();
         if (exchangeRate == 1) {
             return price;
         }
@@ -97,9 +86,17 @@ public class Item extends ParseObject {
      * @param toGroupCurrency whether to convert to the group's currency or to a foreign one
      */
     public void convertPrice(float exchangeRate, boolean toGroupCurrency) {
-        double price = getPrice();
-        double priceConverted = toGroupCurrency ? price * exchangeRate : price / exchangeRate;
+        final double price = getPrice();
+        final double priceConverted = toGroupCurrency ? price * exchangeRate : price / exchangeRate;
         setPrice(MoneyUtils.roundToFractionDigits(4, priceConverted));
+    }
+
+    public List<Identity> getIdentities() {
+        return getList(IDENTITIES);
+    }
+
+    public void setIdentities(@NonNull List<Identity> identities) {
+        put(IDENTITIES, identities);
     }
 
     /**
@@ -108,12 +105,12 @@ public class Item extends ParseObject {
      * @return the object ids of the involved users
      */
     @NonNull
-    public List<String> getUsersInvolvedIds() {
-        final List<String> listIds = new ArrayList<>();
-        final List<ParseUser> list = getUsersInvolved();
-        for (ParseUser user : list) {
-            listIds.add(user.getObjectId());
+    public List<String> getIdentitiesIds() {
+        final List<String> ids = new ArrayList<>();
+        final List<Identity> identities = getIdentities();
+        for (Identity identity : identities) {
+            ids.add(identity.getObjectId());
         }
-        return listIds;
+        return ids;
     }
 }

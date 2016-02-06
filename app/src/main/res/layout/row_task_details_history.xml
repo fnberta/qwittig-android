@@ -16,7 +16,7 @@
 
         <variable
             name="taskHistory"
-            type="ch.giantific.qwittig.domain.models.TaskHistory"
+            type="ch.giantific.qwittig.presentation.tasks.details.TaskHistory"
             />
     </data>
 

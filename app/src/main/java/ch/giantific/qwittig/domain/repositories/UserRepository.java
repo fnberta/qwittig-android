@@ -4,16 +4,12 @@
 
 package ch.giantific.qwittig.domain.repositories;
 
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 
-import com.parse.ParseObject;
-
-import java.util.List;
-
-import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
-import rx.Observable;
 import rx.Single;
 
 /**
@@ -21,45 +17,73 @@ import rx.Single;
  */
 public interface UserRepository extends Repository {
 
+    /**
+     * Returns the currently logged in user, null if no one is logged in.
+     *
+     * @return the currently logged in user
+     */
     @Nullable
     User getCurrentUser();
 
-    Single<String> requestPasswordReset(@NonNull String email);
-
-    Single<User> loginEmail(@NonNull String username, @NonNull String password);
-
-    Single<User> signUpEmail(@NonNull String username, @NonNull String password);
-
-    Single<User> loginFacebook();
-
-    Single<User> loginGoogle();
-
-    Single<User> logOut(@NonNull User user);
-
-    Observable<User> saveUserAsync(@NonNull User user);
-
+    /**
+     * Returns the session token for current user session.
+     *
+     * @return the session token
+     */
     Single<String> getUserSessionToken();
 
     /**
-     * Queries the local data store for users.
+     * Logs the user in using his email address and password.
      *
-     * @param group the group for which to get users for
+     * @param username the email address for the login
+     * @param password the pass word for the login
+     * @return the logged in user
      */
-    Observable<User> getUsersLocalAsync(@NonNull Group group);
+    Single<User> loginEmail(@NonNull String username, @NonNull String password);
 
     /**
-     * Updates all users in the local data store by deleting all users from the local data
-     * store, querying and saving new ones.
+     * Sends the user an email with a link to reset his password
      *
-     * @param groups the groups for which to update the users
+     * @param email the email address to send the link to
+     * @return the email address the reset link was sent to
      */
-    Observable<User> updateUsersAsync(@NonNull List<ParseObject> groups);
+    Single<String> requestPasswordReset(@NonNull String email);
 
     /**
-     * Deletes all users from the local data store and saves new ones.
+     * Signs up and logs in a new user using his email address as username and a password.
      *
-     * @param groups the groups for which to update the purchases
-     * @return whether the update was successful or not
+     * @param username the user's email to use as username
+     * @param password the user's password
+     * @return the now signed up and logged in user
      */
-    boolean updateUsers(@NonNull List<ParseObject> groups);
+    Single<User> signUpEmail(@NonNull String username, @NonNull String password);
+
+    /**
+     * Logs in a user using his facebook account
+     *
+     * @param fragment the fragment that is initiating the login
+     * @return the logged in user
+     */
+    Single<User> loginFacebook(@NonNull Fragment fragment);
+
+    /**
+     * Logs in the user using his google account.
+     *
+     * @param idToken     the google id token
+     * @param displayName the google profile display name
+     * @param photoUrl    the url to the google profile image
+     * @return the logged in user
+     */
+    Single<User> loginGoogle(@NonNull final Fragment fragment,
+                             @NonNull String idToken,
+                             @NonNull final String displayName,
+                             @NonNull final Uri photoUrl);
+
+    /**
+     * Logs out the user.
+     *
+     * @param user the user to log out
+     * @return the logged out user
+     */
+    Single<User> logOut(@NonNull User user);
 }

@@ -14,7 +14,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.viewmodels.rows.PurchaseDetailsItemRowViewModel"
+            type="ch.giantific.qwittig.presentation.home.purchases.details.PurchaseDetailsItemRowViewModel"
             />
     </data>
 
@@ -25,7 +25,7 @@
         android:alpha="@{viewModel.itemAlpha}"
         >
 
-        <ch.giantific.qwittig.presentation.ui.widgets.CircleDisplay
+        <ch.giantific.qwittig.presentation.common.widgets.CircleDisplay
             android:id="@+id/list_item_percentage"
             android:layout_width="@dimen/icon_size"
             android:layout_height="@dimen/icon_size"

@@ -14,7 +14,7 @@ import com.parse.LogOutCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
-import ch.giantific.qwittig.presentation.ui.activities.HomeActivity;
+import ch.giantific.qwittig.presentation.home.purchases.list.HomeActivity;
 import timber.log.Timber;
 
 /**

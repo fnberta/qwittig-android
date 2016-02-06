@@ -11,7 +11,6 @@ import android.support.annotation.StringDef;
 import com.parse.ParseACL;
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
-import com.parse.ParseUser;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -40,23 +39,18 @@ public class Task extends ParseObject {
     public static final String GROUP = "group";
     public static final String TIME_FRAME = "timeFrame";
     public static final String DEADLINE = "deadline";
-    public static final String USERS_INVOLVED = "usersInvolved";
+    public static final String IDENTITIES = "identities";
     public static final String HISTORY = "history";
     public static final String PIN_LABEL = "tasksPinLabel";
-    public static final String TIME_FRAME_ONE_TIME = "oneTime";
-    public static final String TIME_FRAME_DAILY = "daily";
-    public static final String TIME_FRAME_WEEKLY = "weekly";
-    public static final String TIME_FRAME_MONTHLY = "monthly";
-    public static final String TIME_FRAME_YEARLY = "yearly";
-    public static final String TIME_FRAME_AS_NEEDED = "asNeeded";
-    private boolean mIsLoading;
+    private boolean mLoading;
+
     public Task() {
         // A default constructor is required.
     }
 
-    public Task(@NonNull ParseUser initiator, @NonNull String title, @NonNull ParseObject group,
+    public Task(@NonNull Identity initiator, @NonNull String title, @NonNull Group group,
                 @NonNull @TimeFrame String timeFrame, @Nullable Date deadline,
-                @NonNull List<ParseUser> usersInvolved) {
+                @NonNull List<Identity> identities) {
         setInitiator(initiator);
         setTitle(title);
         setGroup(group);
@@ -64,7 +58,7 @@ public class Task extends ParseObject {
         if (deadline != null) {
             setDeadline(deadline);
         }
-        setUsersInvolved(usersInvolved);
+        setIdentities(identities);
         setAccessRights(group);
     }
 
@@ -73,11 +67,11 @@ public class Task extends ParseObject {
         setACL(acl);
     }
 
-    public User getInitiator() {
-        return (User) getParseUser(INITIATOR);
+    public Identity getInitiator() {
+        return (Identity) getParseObject(INITIATOR);
     }
 
-    public void setInitiator(@NonNull ParseUser initiator) {
+    public void setInitiator(@NonNull Identity initiator) {
         put(INITIATOR, initiator);
     }
 
@@ -116,17 +110,17 @@ public class Task extends ParseObject {
     }
 
     @NonNull
-    public List<ParseUser> getUsersInvolved() {
-        List<ParseUser> usersInvolved = getList(USERS_INVOLVED);
-        if (usersInvolved == null) {
+    public List<Identity> getIdentities() {
+        List<Identity> identities = getList(IDENTITIES);
+        if (identities == null) {
             return Collections.emptyList();
         }
 
-        return usersInvolved;
+        return identities;
     }
 
-    public void setUsersInvolved(@NonNull List<ParseUser> usersInvolved) {
-        put(USERS_INVOLVED, usersInvolved);
+    public void setIdentities(@NonNull List<Identity> identities) {
+        put(IDENTITIES, identities);
     }
 
     @NonNull
@@ -144,11 +138,11 @@ public class Task extends ParseObject {
     }
 
     public boolean isLoading() {
-        return mIsLoading;
+        return mLoading;
     }
 
     public void setLoading(boolean isLoading) {
-        mIsLoading = isLoading;
+        mLoading = isLoading;
     }
 
     /**
@@ -175,7 +169,7 @@ public class Task extends ParseObject {
      */
     public void updateDeadline() {
         String timeFrame = getTimeFrame();
-        if (timeFrame.equals(Task.TIME_FRAME_AS_NEEDED)) {
+        if (timeFrame.equals(TimeFrame.AS_NEEDED)) {
             // as needed tasks have no deadline
             return;
         }
@@ -183,16 +177,16 @@ public class Task extends ParseObject {
         Calendar deadline = DateUtils.getCalendarInstanceUTC();
         deadline.setTime(new Date());
         switch (timeFrame) {
-            case Task.TIME_FRAME_DAILY:
+            case TimeFrame.DAILY:
                 deadline.add(Calendar.DAY_OF_YEAR, 1);
                 break;
-            case Task.TIME_FRAME_WEEKLY:
+            case TimeFrame.WEEKLY:
                 deadline.add(Calendar.WEEK_OF_YEAR, 1);
                 break;
-            case Task.TIME_FRAME_MONTHLY:
+            case TimeFrame.MONTHLY:
                 deadline.add(Calendar.MONTH, 1);
                 break;
-            case Task.TIME_FRAME_YEARLY:
+            case TimeFrame.YEARLY:
                 deadline.add(Calendar.YEAR, 1);
                 break;
         }
@@ -206,8 +200,8 @@ public class Task extends ParseObject {
      *
      * @return the user currently responsible for finishing the task
      */
-    public User getUserResponsible() {
-        return (User) getUsersInvolved().get(0);
+    public Identity getUserResponsible() {
+        return getIdentities().get(0);
     }
 
     /**
@@ -216,19 +210,19 @@ public class Task extends ParseObject {
      * A history event simply contains the object id of the user who completed the task and the
      * date on which he/she did.
      *
-     * @param currentUser the current user who just completed the task
+     * @param currentIdentity the current user who just completed the task
      * @return the new user responsible
      */
     @Nullable
-    public User addHistoryEvent(@Nullable ParseUser currentUser) {
-        if (currentUser == null) {
+    public Identity addHistoryEvent(@Nullable Identity currentIdentity) {
+        if (currentIdentity == null) {
             return null;
         }
 
-        List<ParseUser> usersInvolved = getUsersInvolved();
-        Collections.rotate(usersInvolved, -1);
+        List<Identity> identities = getIdentities();
+        Collections.rotate(identities, -1);
 
-        final String currentUserId = currentUser.getObjectId();
+        final String currentUserId = currentIdentity.getObjectId();
         Map<String, List<Date>> historyNew = new HashMap<>();
 
         Map<String, List<Date>> historyOld = getHistory();
@@ -244,12 +238,18 @@ public class Task extends ParseObject {
         historyNew.put(currentUserId, entries);
         put(HISTORY, historyNew);
 
-        return (User) usersInvolved.get(0);
+        return identities.get(0);
     }
 
-    @StringDef({TIME_FRAME_ONE_TIME, TIME_FRAME_DAILY, TIME_FRAME_WEEKLY, TIME_FRAME_MONTHLY,
-            TIME_FRAME_YEARLY, TIME_FRAME_AS_NEEDED})
+    @StringDef({TimeFrame.ONE_TIME, TimeFrame.DAILY, TimeFrame.WEEKLY, TimeFrame.MONTHLY,
+            TimeFrame.YEARLY, TimeFrame.AS_NEEDED})
     @Retention(RetentionPolicy.SOURCE)
     public @interface TimeFrame {
+        String ONE_TIME = "oneTime";
+        String DAILY = "daily";
+        String WEEKLY = "weekly";
+        String MONTHLY = "monthly";
+        String YEARLY = "yearly";
+        String AS_NEEDED = "asNeeded";
     }
 }

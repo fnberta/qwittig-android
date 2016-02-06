@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import com.parse.ParseACL;
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
-import com.parse.ParseUser;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
@@ -30,24 +29,24 @@ public class Compensation extends ParseObject {
 
     public static final String CLASS = "Compensation";
     public static final String GROUP = "group";
-    public static final String PAYER = "payer";
-    public static final String BENEFICIARY = "beneficiary";
+    public static final String DEBTOR = "debtor";
+    public static final String CREDITOR = "creditor";
     public static final String AMOUNT = "amount";
-    public static final String IS_PAID = "isPaid";
+    public static final String PAID = "isPaid";
     public static final String PIN_LABEL_PAID = "compensationPinLabelPaid";
     public static final String PIN_LABEL_UNPAID = "compensationPinLabelUnpaid";
-    private boolean mIsLoading;
+    private boolean mLoading;
 
     public Compensation() {
         // A default constructor is required.
     }
 
-    public Compensation(@NonNull ParseObject group, @NonNull ParseUser payer,
-                        @NonNull ParseUser beneficiary, @NonNull BigFraction amount,
+    public Compensation(@NonNull Group group, @NonNull Identity debtor,
+                        @NonNull Identity creditor, @NonNull BigFraction amount,
                         boolean isPaid) {
         setGroup(group);
-        setPayer(payer);
-        setBeneficiary(beneficiary);
+        setDebtor(debtor);
+        setCreditor(creditor);
         setAmountFraction(amount);
         setPaid(isPaid);
         setAccessRights(group);
@@ -61,20 +60,20 @@ public class Compensation extends ParseObject {
         put(GROUP, group);
     }
 
-    public User getPayer() {
-        return (User) getParseUser(PAYER);
+    public Identity getDebtor() {
+        return (Identity) getParseObject(DEBTOR);
     }
 
-    public void setPayer(@NonNull ParseUser payer) {
-        put(PAYER, payer);
+    public void setDebtor(@NonNull Identity debtor) {
+        put(DEBTOR, debtor);
     }
 
-    public User getBeneficiary() {
-        return (User) getParseUser(BENEFICIARY);
+    public Identity getCreditor() {
+        return (Identity) getParseObject(CREDITOR);
     }
 
-    public void setBeneficiary(@NonNull ParseUser beneficiary) {
-        put(BENEFICIARY, beneficiary);
+    public void setCreditor(@NonNull Identity creditor) {
+        put(CREDITOR, creditor);
     }
 
     public List<Number> getAmount() {
@@ -86,22 +85,22 @@ public class Compensation extends ParseObject {
     }
 
     public boolean isPaid() {
-        return getBoolean(IS_PAID);
+        return getBoolean(PAID);
     }
 
     public void setPaid(boolean isPaid) {
-        put(IS_PAID, isPaid);
+        put(PAID, isPaid);
     }
 
     public boolean isLoading() {
-        return mIsLoading;
+        return mLoading;
     }
 
-    public void setIsLoading(boolean isLoading) {
-        mIsLoading = isLoading;
+    public void setLoading(boolean loading) {
+        mLoading = loading;
     }
 
-    private void setAccessRights(@NonNull ParseObject group) {
+    private void setAccessRights(@NonNull Group group) {
         ParseACL acl = ParseUtils.getDefaultAcl(group);
         setACL(acl);
     }

@@ -42,9 +42,9 @@ public class Stats implements Parcelable {
     }
 
     protected Stats(@NonNull Parcel in) {
-        this.mNumberOfUnits = in.readInt();
-        this.mMembers = in.createTypedArrayList(Member.CREATOR);
-        this.mGroup = in.readParcelable(Group.class.getClassLoader());
+        mNumberOfUnits = in.readInt();
+        mMembers = in.createTypedArrayList(Member.CREATOR);
+        mGroup = in.readParcelable(Group.class.getClassLoader());
     }
 
     public int getNumberOfUnits() {
@@ -78,9 +78,9 @@ public class Stats implements Parcelable {
 
     @Override
     public void writeToParcel(@NonNull Parcel dest, int flags) {
-        dest.writeInt(this.mNumberOfUnits);
+        dest.writeInt(mNumberOfUnits);
         dest.writeTypedList(mMembers);
-        dest.writeParcelable(this.mGroup, 0);
+        dest.writeParcelable(mGroup, 0);
     }
 
     /**
@@ -110,8 +110,8 @@ public class Stats implements Parcelable {
         }
 
         protected Group(@NonNull Parcel in) {
-            this.mGroupId = in.readString();
-            this.mUnits = in.createTypedArrayList(Unit.CREATOR);
+            mGroupId = in.readString();
+            mUnits = in.createTypedArrayList(Unit.CREATOR);
         }
 
         public String getGroupId() {
@@ -142,7 +142,7 @@ public class Stats implements Parcelable {
 
         @Override
         public void writeToParcel(@NonNull Parcel dest, int flags) {
-            dest.writeString(this.mGroupId);
+            dest.writeString(mGroupId);
             dest.writeTypedList(mUnits);
         }
     }
@@ -174,8 +174,8 @@ public class Stats implements Parcelable {
         }
 
         protected Member(@NonNull Parcel in) {
-            this.mMemberId = in.readString();
-            this.mUnits = in.createTypedArrayList(Unit.CREATOR);
+            mMemberId = in.readString();
+            mUnits = in.createTypedArrayList(Unit.CREATOR);
         }
 
         public String getMemberId() {
@@ -206,7 +206,7 @@ public class Stats implements Parcelable {
 
         @Override
         public void writeToParcel(@NonNull Parcel dest, int flags) {
-            dest.writeString(this.mMemberId);
+            dest.writeString(mMemberId);
             dest.writeTypedList(mUnits);
         }
     }
@@ -240,9 +240,9 @@ public class Stats implements Parcelable {
         }
 
         protected Unit(@NonNull Parcel in) {
-            this.mIdentifier = in.readString();
-            this.mTotal = in.readFloat();
-            this.mAverage = in.readFloat();
+            mIdentifier = in.readString();
+            mTotal = in.readFloat();
+            mAverage = in.readFloat();
         }
 
         public String getIdentifier() {
@@ -281,9 +281,9 @@ public class Stats implements Parcelable {
 
         @Override
         public void writeToParcel(@NonNull Parcel dest, int flags) {
-            dest.writeString(this.mIdentifier);
-            dest.writeFloat(this.mTotal);
-            dest.writeFloat(this.mAverage);
+            dest.writeString(mIdentifier);
+            dest.writeFloat(mTotal);
+            dest.writeFloat(mAverage);
         }
     }
 }

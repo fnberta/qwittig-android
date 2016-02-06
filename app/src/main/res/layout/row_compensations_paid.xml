@@ -14,7 +14,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.viewmodels.rows.CompPaidRowViewModel"
+            type="ch.giantific.qwittig.presentation.finance.CompPaidRowViewModel"
             />
     </data>
 
@@ -54,7 +54,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top"
-                android:text="@{viewModel.compUserValid ? viewModel.compUsername : @string/user_deleted}"
+                android:text="@{viewModel.compUsername}"
                 tools:text="Vera"/>
 
             <TextView

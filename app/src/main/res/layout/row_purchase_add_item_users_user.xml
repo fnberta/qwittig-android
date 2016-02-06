@@ -13,7 +13,7 @@
 
         <variable
             name="rowItemUser"
-            type="ch.giantific.qwittig.domain.models.RowItemUser"
+            type="ch.giantific.qwittig.presentation.home.purchases.addedit.RowItemUser"
             />
     </data>
 

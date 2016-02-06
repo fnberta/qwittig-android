@@ -284,6 +284,29 @@ public abstract class ParseBaseRepository<T extends ParseObject> implements Repo
     }
 
     @NonNull
+    final Single<T> fetchIfNeeded(@NonNull final T object) {
+        return Single.create(new Single.OnSubscribe<T>() {
+            @Override
+            public void call(final SingleSubscriber<? super T> singleSubscriber) {
+                object.fetchIfNeededInBackground(new GetCallback<T>() {
+                    @Override
+                    public void done(T object, ParseException e) {
+                        if (singleSubscriber.isUnsubscribed()) {
+                            return;
+                        }
+
+                        if (e != null) {
+                            singleSubscriber.onError(e);
+                        } else {
+                            singleSubscriber.onSuccess(object);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    @NonNull
     final Single<Integer> count(@NonNull final ParseQuery<T> query) {
         return Single.create(new Single.OnSubscribe<Integer>() {
             @Override

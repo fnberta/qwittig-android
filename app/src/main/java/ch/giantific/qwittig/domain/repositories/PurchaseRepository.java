@@ -7,15 +7,11 @@ package ch.giantific.qwittig.domain.repositories;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.parse.ParseObject;
-
 import java.util.List;
-import java.util.Map;
 
-import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.Identity;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.domain.models.rates.CurrencyRates;
 import rx.Observable;
 import rx.Single;
 
@@ -27,12 +23,10 @@ public interface PurchaseRepository extends Repository {
     /**
      * Queries the local data store for purchases.
      *
-     * @param currentUser the current user
-     * @param group       the group for which to get purchases for
-     * @param getDrafts   whether to query for drafts or purchases
+     * @param currentIdentity the current identity of the user
+     * @param getDrafts       whether to query for drafts or purchases
      */
-    Observable<Purchase> getPurchasesLocalAsync(@NonNull User currentUser, @NonNull Group group,
-                                                boolean getDrafts);
+    Observable<Purchase> getPurchasesLocalAsync(@NonNull Identity currentIdentity, boolean getDrafts);
 
     /**
      * Queries the local data store for a single purchase.
@@ -70,32 +64,26 @@ public interface PurchaseRepository extends Repository {
      * Updates all purchases in the local data store by deleting all purchases from the local data
      * store, querying and saving new ones.
      *
-     * @param currentUser    the current user
-     * @param groups         the groups for which to update the purchases
-     * @param currentGroupId the object id of the user's current group
+     * @param currentUser the current user
      */
-    Observable<Purchase> updatePurchasesAsync(@NonNull User currentUser,
-                                              @NonNull List<ParseObject> groups,
-                                              @NonNull String currentGroupId);
+    Observable<Purchase> updatePurchasesAsync(@NonNull User currentUser);
 
     /**
      * Queries purchases from the online data store and saves them in the local data store.
      *
-     * @param currentUser the current user
-     * @param group       the group for which to get purchases for
-     * @param skip        the number of purchases to skip for the query
+     * @param currentIdentity the current identity of the user
+     * @param skip            the number of purchases to skip for the query
      */
-    Observable<Purchase> getPurchasesOnlineAsync(@NonNull User currentUser, @NonNull Group group,
+    Observable<Purchase> getPurchasesOnlineAsync(@NonNull Identity currentIdentity,
                                                  int skip);
 
     /**
      * Deletes all purchases from the local data store and saves new ones.
      *
      * @param currentUser the current user
-     * @param groups      the groups for which to update the purchases
      * @return whether the update was successful or not
      */
-    boolean updatePurchases(@NonNull User currentUser, @NonNull List<ParseObject> groups);
+    boolean updatePurchases(@NonNull User currentUser);
 
     /**
      * Updates a purchase if is already available in the local data store (by simply querying it) or
@@ -113,7 +101,7 @@ public interface PurchaseRepository extends Repository {
      * @param purchase     the purchase to save
      * @param tag          the tag to save the purchase in the offline storage
      * @param receiptImage the receipt image to attach to the purchase
-     * @param isDraft
+     * @param isDraft      whether to save the purchase as a draft
      * @return a {@link Single} emitting the save stream
      */
     Single<Purchase> savePurchaseAsync(@NonNull Purchase purchase, @NonNull String tag,

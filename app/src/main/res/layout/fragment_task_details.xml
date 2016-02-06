@@ -4,8 +4,8 @@
 
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     >
 
     <data>
@@ -14,14 +14,14 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.viewmodels.TaskDetailsViewModel"
+            type="ch.giantific.qwittig.presentation.tasks.details.TaskDetailsViewModel"
             />
     </data>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".presentation.ui.fragments.TaskDetailsFragment"
+        tools:context=".presentation.tasks.details.TaskDetailsFragment"
         >
 
         <android.support.v7.widget.RecyclerView

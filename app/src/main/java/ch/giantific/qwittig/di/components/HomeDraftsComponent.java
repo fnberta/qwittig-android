@@ -5,12 +5,9 @@
 package ch.giantific.qwittig.di.components;
 
 import ch.giantific.qwittig.di.modules.HomeDraftsViewModelModule;
-import ch.giantific.qwittig.di.modules.HomeViewModelModule;
 import ch.giantific.qwittig.di.modules.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.presentation.ui.activities.HomeActivity;
-import ch.giantific.qwittig.presentation.ui.fragments.HomeDraftsFragment;
-import ch.giantific.qwittig.presentation.viewmodels.HomeViewModel;
+import ch.giantific.qwittig.presentation.home.purchases.list.HomeDraftsFragment;
 import dagger.Component;
 
 /**

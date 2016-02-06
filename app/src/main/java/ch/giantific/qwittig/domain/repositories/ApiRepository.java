@@ -51,16 +51,6 @@ public interface ApiRepository {
                                             @NonNull String currencyCode);
 
     /**
-     * Calculates a new settlement and pushes the result to all users in the group.
-     *
-     * @param groupToBalanceId       the object id of the group to settle
-     * @param doSingleUserSettlement whether only the current user's balance should be settled or
-     *                               that of all users
-     */
-    Single<String> startNewSettlement(@NonNull String groupToBalanceId,
-                                      boolean doSingleUserSettlement);
-
-    /**
      * Adds the current user to the group role, giving him/her access to all the objects of the
      * group.
      *

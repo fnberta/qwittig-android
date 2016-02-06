@@ -14,6 +14,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import ch.giantific.qwittig.data.repositories.ParseCompensationRepository;
 import ch.giantific.qwittig.data.repositories.ParseGroupRepository;
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
+import ch.giantific.qwittig.presentation.finance.FinanceCompsUnpaidViewModel;
+import ch.giantific.qwittig.presentation.finance.FinanceCompsUnpaidViewModelImpl;
 
 
 /**
@@ -33,7 +35,7 @@ public class FinanceCompsUnpaidViewModelImplTest {
     public void setUp() throws Exception {
         mViewModel = new FinanceCompsUnpaidViewModelImpl(mMockBundle, mMockView,
                 new ParseGroupRepository(),
-                new ParseUserRepository(),
+                new ParseUserRepository(apiRepo),
                 new ParseCompensationRepository());
     }
 }

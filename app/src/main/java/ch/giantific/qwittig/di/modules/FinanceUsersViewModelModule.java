@@ -11,8 +11,8 @@ import android.support.annotation.Nullable;
 import ch.giantific.qwittig.di.scopes.PerFragment;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.presentation.viewmodels.FinanceUsersViewModel;
-import ch.giantific.qwittig.presentation.viewmodels.FinanceUsersViewModelImpl;
+import ch.giantific.qwittig.presentation.finance.IdentitiesViewModel;
+import ch.giantific.qwittig.presentation.finance.IdentitiesViewModelImpl;
 import dagger.Module;
 import dagger.Provides;
 
@@ -20,17 +20,17 @@ import dagger.Provides;
  * Created by fabio on 12.01.16.
  */
 @Module
-public class FinanceUsersViewModelModule extends BaseViewModelModule<FinanceUsersViewModel.ViewListener> {
+public class FinanceUsersViewModelModule extends BaseViewModelModule<IdentitiesViewModel.ViewListener> {
 
     public FinanceUsersViewModelModule(@Nullable Bundle savedState,
-                                       @NonNull FinanceUsersViewModel.ViewListener view) {
+                                       @NonNull IdentitiesViewModel.ViewListener view) {
         super(savedState, view);
     }
 
     @PerFragment
     @Provides
-    FinanceUsersViewModel providesFinanceUsersViewModel(@NonNull GroupRepository groupRepository,
-                                                        @NonNull UserRepository userRepository) {
-        return new FinanceUsersViewModelImpl(mSavedState, mView, groupRepository, userRepository);
+    IdentitiesViewModel providesFinanceUsersViewModel(@NonNull GroupRepository groupRepository,
+                                                      @NonNull UserRepository userRepository) {
+        return new IdentitiesViewModelImpl(mSavedState, mView, userRepository, groupRepository);
     }
 }

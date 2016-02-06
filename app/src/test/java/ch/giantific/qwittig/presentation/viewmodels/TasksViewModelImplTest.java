@@ -24,6 +24,8 @@ import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.tasks.list.TasksViewModel;
+import ch.giantific.qwittig.presentation.tasks.list.TasksViewModelImpl;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.never;
@@ -147,7 +149,7 @@ public class TasksViewModelImplTest {
 
     @Test
     public void onDoneClick_shouldRemoveTaskIfOneTime() throws Exception {
-        when(mMockTask.getTimeFrame()).thenReturn(Task.TIME_FRAME_ONE_TIME);
+        when(mMockTask.getTimeFrame()).thenReturn(Task.TimeFrame.ONE_TIME);
 
         mViewModel.onDoneButtonClicked(0);
         verify(mMockTask).deleteEventually();
@@ -157,7 +159,7 @@ public class TasksViewModelImplTest {
 
     @Test
     public void onDoneClick_shouldUpdateDeadlineAndAddHistoryEventIfNotOneTime() throws Exception {
-        when(mMockTask.getTimeFrame()).thenReturn(Task.TIME_FRAME_MONTHLY);
+        when(mMockTask.getTimeFrame()).thenReturn(Task.TimeFrame.MONTHLY);
 //        when(mCurrentUser.getObjectId()).thenReturn("someId");
 
         mViewModel.onDoneButtonClicked(0);
@@ -168,7 +170,7 @@ public class TasksViewModelImplTest {
 
     @Test
     public void onDoneClick_shouldReloadWholeDataSetIfOldOrNewUserResponsibleIsCurrentUser() throws Exception {
-        when(mMockTask.getTimeFrame()).thenReturn(Task.TIME_FRAME_MONTHLY);
+        when(mMockTask.getTimeFrame()).thenReturn(Task.TimeFrame.MONTHLY);
 //        when(mMockTask.getUserResponsible()).thenReturn(mCurrentUser);
 //        when(mMockTask.addHistoryEvent(mCurrentUser)).thenReturn(mCurrentUser);
 //        when(mCurrentUser.getObjectId()).thenReturn("someId");
@@ -181,7 +183,7 @@ public class TasksViewModelImplTest {
     public void onDoneClick_shouldReloadOnlyItemIfNeitherOldOrNewUserResponsibleIsCurrentUser() throws Exception {
         final User user = Mockito.mock(User.class);
         when(user.getObjectId()).thenReturn("someOtherId");
-        when(mMockTask.getTimeFrame()).thenReturn(Task.TIME_FRAME_MONTHLY);
+        when(mMockTask.getTimeFrame()).thenReturn(Task.TimeFrame.MONTHLY);
         when(mMockTask.getUserResponsible()).thenReturn(user);
 //        when(mMockTask.addHistoryEvent(mCurrentUser)).thenReturn(user);
 //        when(mCurrentUser.getObjectId()).thenReturn("someId");

@@ -328,14 +328,14 @@ public class ParseQueryService extends IntentService {
 
     private void queryPurchases() {
         PurchaseRepository repo = new ParsePurchaseRepository();
-        if (repo.updatePurchases(mCurrentUser, mCurrentUserGroups)) {
+        if (repo.updatePurchases(mCurrentUser)) {
             mLocalBroadcast.sendPurchasesUpdated();
         }
     }
 
     private void queryUsers() {
-        UserRepository repo = new ParseUserRepository();
-        if (repo.updateUsers(mCurrentUserGroups)) {
+        UserRepository repo = new ParseUserRepository(apiRepo);
+        if (repo.updateIdentities(mCurrentUserGroups)) {
             mLocalBroadcast.sendUsersUpdated();
         }
     }

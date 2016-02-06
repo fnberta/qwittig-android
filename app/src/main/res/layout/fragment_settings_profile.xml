@@ -7,29 +7,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipToPadding="false"
     android:paddingTop="@dimen/small_space"
-    android:clipToPadding="false">
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        tools:context=".presentation.ui.fragments.SettingsProfileFragment">
+        tools:context=".presentation.settings.SettingsProfileFragment"
+        >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_marginBottom="@dimen/small_space"
             android:layout_marginTop="@dimen/small_space"
-            android:layout_marginBottom="@dimen/small_space">
+            android:orientation="horizontal"
+            >
 
             <ImageView
                 android:id="@+id/iv_nickname"
                 android:layout_width="@dimen/icon_size"
                 android:layout_height="@dimen/icon_size"
                 android:layout_gravity="center_vertical"
-                android:layout_marginStart="@dimen/key_line_1"
                 android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+                android:layout_marginStart="@dimen/key_line_1"
                 android:contentDescription="@string/hint_nickname"
                 android:src="@drawable/ic_account_box_black_24dp"
                 />
@@ -39,14 +42,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/key_line_1"
-                android:transitionGroup="true">
+                android:transitionGroup="true"
+                >
 
                 <EditText
                     android:id="@+id/et_nickname"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:hint="@string/hint_nickname"
                     android:inputType="textPersonName"
-                    android:hint="@string/hint_nickname"/>
+                    />
 
             </android.support.design.widget.TextInputLayout>
 
@@ -55,16 +60,17 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/small_space"
             android:orientation="horizontal"
-            android:layout_marginTop="@dimen/small_space">
+            >
 
             <ImageView
                 android:id="@+id/iv_email"
                 android:layout_width="@dimen/icon_size"
                 android:layout_height="@dimen/icon_size"
                 android:layout_gravity="center_vertical"
-                android:layout_marginStart="@dimen/key_line_1"
                 android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+                android:layout_marginStart="@dimen/key_line_1"
                 android:contentDescription="@string/hint_email"
                 android:src="@drawable/ic_email_black_24dp"
                 />
@@ -74,14 +80,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/key_line_1"
-                android:transitionGroup="true">
+                android:transitionGroup="true"
+                >
 
                 <EditText
                     android:id="@+id/et_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:hint="@string/hint_email"
                     android:inputType="textEmailAddress"
-                    android:hint="@string/hint_email"/>
+                    />
 
             </android.support.design.widget.TextInputLayout>
 
@@ -91,16 +99,17 @@
             android:id="@+id/ll_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/small_space"
             android:orientation="horizontal"
-            android:layout_marginTop="@dimen/small_space">
+            >
 
             <ImageView
                 android:id="@+id/iv_password"
                 android:layout_width="@dimen/icon_size"
                 android:layout_height="@dimen/icon_size"
                 android:layout_gravity="center_vertical"
-                android:layout_marginStart="@dimen/key_line_1"
                 android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+                android:layout_marginStart="@dimen/key_line_1"
                 android:contentDescription="@string/hint_email"
                 android:src="@drawable/ic_security_black_24dp"
                 />
@@ -110,14 +119,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/key_line_1"
-                android:transitionGroup="true">
+                android:transitionGroup="true"
+                >
 
                 <EditText
                     android:id="@+id/et_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:hint="@string/hint_password_new"
                     android:inputType="textPassword"
-                    android:hint="@string/hint_password_new"/>
+                    />
 
             </android.support.design.widget.TextInputLayout>
 
@@ -127,17 +138,19 @@
             android:id="@+id/til_password_repeat"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/small_space"
-            android:layout_marginStart="@dimen/key_line_2"
             android:layout_marginEnd="@dimen/key_line_1"
-            android:transitionGroup="true">
+            android:layout_marginStart="@dimen/key_line_2"
+            android:layout_marginTop="@dimen/small_space"
+            android:transitionGroup="true"
+            >
 
             <EditText
                 android:id="@+id/et_password_repeat"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:hint="@string/hint_password_repeat"
                 android:inputType="textPassword"
-                android:hint="@string/hint_password_repeat"/>
+                />
 
         </android.support.design.widget.TextInputLayout>
 

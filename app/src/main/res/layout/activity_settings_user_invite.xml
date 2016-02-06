@@ -10,7 +10,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipChildren="false"
-    tools:context=".presentation.ui.activities.SettingsUserInviteActivity">
+    tools:context=".presentation.settings.SettingsUserInviteActivity">
 
     <include layout="@layout/include_appbar_x2"/>
 

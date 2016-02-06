@@ -7,20 +7,17 @@ package ch.giantific.qwittig.data.repositories;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.Identity;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import rx.Observable;
 import rx.Single;
-import rx.SingleSubscriber;
 import rx.functions.Func1;
 
 /**
@@ -40,50 +37,26 @@ public class ParseGroupRepository extends ParseBaseRepository<Group> implements 
 
     @Override
     public Single<Group> fetchGroupDataAsync(@NonNull final Group group) {
-        return Single.create(new Single.OnSubscribe<Group>() {
-            @Override
-            public void call(final SingleSubscriber<? super Group> singleSubscriber) {
-                if (group.isDataAvailable()) {
-                    if (!singleSubscriber.isUnsubscribed()) {
-                        singleSubscriber.onSuccess(group);
-                    }
+        if (group.isDataAvailable()) {
+            return Single.just(group);
+        }
 
-                    return;
-                }
-
-                group.fetchFromLocalDatastoreInBackground(new GetCallback<Group>() {
-                    @Override
-                    public void done(Group groupFetched, @Nullable ParseException e) {
-                        if (e == null) {
-                            if (!singleSubscriber.isUnsubscribed()) {
-                                singleSubscriber.onSuccess(groupFetched);
-                            }
-                        } else {
-                            group.fetchIfNeededInBackground(new GetCallback<Group>() {
-                                @Override
-                                public void done(Group group, @Nullable ParseException e) {
-                                    if (singleSubscriber.isUnsubscribed()) {
-                                        return;
-                                    }
-
-                                    if (e != null) {
-                                        singleSubscriber.onError(e);
-                                    } else {
-                                        singleSubscriber.onSuccess(group);
-                                    }
-                                }
-                            });
-                        }
-                    }
-                });
-            }
-        });
+        return fetchLocal(group)
+                .toObservable()
+                .onErrorResumeNext(fetchIfNeeded(group).toObservable())
+                .toSingle();
     }
 
     @Override
-    public Observable<Group> fetchGroupsDataAsync(@NonNull List<ParseObject> groups) {
-        return Observable.from(groups)
-                .cast(Group.class)
+    public Observable<Group> fetchGroupsDataAsync(@NonNull List<ParseObject> identities) {
+        return Observable.from(identities)
+                .cast(Identity.class)
+                .map(new Func1<Identity, Group>() {
+                    @Override
+                    public Group call(Identity identity) {
+                        return identity.getGroup();
+                    }
+                })
                 .flatMap(new Func1<Group, Observable<Group>>() {
                     @Override
                     public Observable<Group> call(Group parseObject) {

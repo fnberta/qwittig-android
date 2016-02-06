@@ -11,8 +11,8 @@ import android.support.annotation.Nullable;
 import ch.giantific.qwittig.di.scopes.PerFragment;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.presentation.viewmodels.TaskAddEditViewModel;
-import ch.giantific.qwittig.presentation.viewmodels.TaskAddEditViewModelAddImpl;
+import ch.giantific.qwittig.presentation.tasks.addedit.TaskAddEditViewModel;
+import ch.giantific.qwittig.presentation.tasks.addedit.TaskAddEditViewModelAddImpl;
 import dagger.Module;
 import dagger.Provides;
 

@@ -3,29 +3,44 @@
   ~ Copyright (c) 2015 Fabio Berta
   -->
 
-<LinearLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/ll_login_progress"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:visibility="gone"
     >
 
-    <ProgressBar
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/small_space"
-        android:indeterminate="true"
-        />
+    <data>
 
-    <TextView
-        android:id="@+id/tv_progress_message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/progress_login"
-        />
+        <import type="android.view.View"/>
 
-</LinearLayout>
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.common.viewmodels.LoadingViewModel"
+            />
+    </data>
+
+    <LinearLayout
+        android:id="@+id/ll_login_progress"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="@{viewModel.loading ? View.VISIBLE : View.GONE}"
+        >
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/small_space"
+            android:indeterminate="true"
+            />
+
+        <TextView
+            android:id="@+id/tv_progress_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/progress_login"
+            />
+
+    </LinearLayout>
+
+</layout>

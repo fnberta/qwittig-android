@@ -12,8 +12,8 @@ import ch.giantific.qwittig.di.scopes.PerFragment;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.presentation.viewmodels.PurchaseAddEditViewModel;
-import ch.giantific.qwittig.presentation.viewmodels.PurchaseAddEditViewModelAddAutoImpl;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddEditViewModel;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddEditViewModelAddAutoImpl;
 import dagger.Module;
 import dagger.Provides;
 

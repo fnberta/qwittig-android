@@ -11,7 +11,6 @@ import com.parse.ParseACL;
 import com.parse.ParseClassName;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
-import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,7 +37,7 @@ public class Purchase extends ParseObject {
     public static final String STORE = "store";
     public static final String ITEMS = "items";
     public static final String TOTAL_PRICE = "totalPrice";
-    public static final String USERS_INVOLVED = "usersInvolved";
+    public static final String IDENTITIES = "identities";
     public static final String CURRENCY = "currency";
     public static final String EXCHANGE_RATE = "exchangeRate";
     public static final String READ_BY = "readBy";
@@ -53,20 +52,20 @@ public class Purchase extends ParseObject {
         // A default constructor is required.
     }
 
-    public Purchase(@NonNull ParseUser currentUser, @NonNull Group group, @NonNull Date date,
+    public Purchase(@NonNull Identity currentIdentity, @NonNull Group group, @NonNull Date date,
                     @NonNull String store, @NonNull List<Item> items, double totalPrice,
-                    @NonNull List<User> usersInvolved, @NonNull String currency,
+                    @NonNull List<Identity> identities, @NonNull String currency,
                     float exchangeRate) {
-        setBuyer(currentUser);
+        setBuyer(currentIdentity);
         setGroup(group);
         setDate(date);
         setStore(store);
         setItems(items);
         setTotalPrice(totalPrice);
-        setUsersInvolved(usersInvolved);
+        setIdentities(identities);
         setCurrency(currency);
         setExchangeRate(exchangeRate);
-        addUserToReadBy(currentUser);
+        addUserToReadBy(currentIdentity);
         setAccessRights(group);
     }
 
@@ -79,15 +78,15 @@ public class Purchase extends ParseObject {
         return (Group) getParseObject(GROUP);
     }
 
-    public void setGroup(@NonNull ParseObject group) {
+    public void setGroup(@NonNull Group group) {
         put(GROUP, group);
     }
 
-    public User getBuyer() {
-        return (User) getParseUser(BUYER);
+    public Identity getBuyer() {
+        return (Identity) getParseObject(BUYER);
     }
 
-    public void setBuyer(@NonNull ParseUser buyer) {
+    public void setBuyer(@NonNull Identity buyer) {
         put(BUYER, buyer);
     }
 
@@ -115,12 +114,12 @@ public class Purchase extends ParseObject {
         put(ITEMS, items);
     }
 
-    public List<ParseUser> getUsersInvolved() {
-        return getList(USERS_INVOLVED);
+    public List<Identity> getIdentities() {
+        return getList(IDENTITIES);
     }
 
-    public void setUsersInvolved(@NonNull List<User> usersInvolved) {
-        put(USERS_INVOLVED, usersInvolved);
+    public void setIdentities(@NonNull List<Identity> identities) {
+        put(IDENTITIES, identities);
     }
 
     public double getTotalPrice() {
@@ -180,8 +179,8 @@ public class Purchase extends ParseObject {
     }
 
     @NonNull
-    public List<ParseUser> getReadBy() {
-        List<ParseUser> readBy = getList(READ_BY);
+    public List<Identity> getReadBy() {
+        List<Identity> readBy = getList(READ_BY);
         if (readBy == null) {
             return Collections.emptyList();
         }
@@ -189,8 +188,8 @@ public class Purchase extends ParseObject {
         return readBy;
     }
 
-    public void setReadBy(List<ParseUser> users) {
-        put(READ_BY, users);
+    public void setReadBy(List<Identity> identities) {
+        put(READ_BY, identities);
     }
 
     public void addItems(List<ParseObject> items) {
@@ -210,14 +209,14 @@ public class Purchase extends ParseObject {
     }
 
     /**
-     * Returns whether the user has already read the purchase or not.
+     * Returns whether the identity has already read the purchase or not.
      *
-     * @param user the user to check the read status for
-     * @return whether the user has read the purchase or not
+     * @param identity the identity to check the read status for
+     * @return whether the identity has read the purchase or not
      */
-    public boolean userHasReadPurchase(@NonNull ParseUser user) {
+    public boolean userHasReadPurchase(@NonNull Identity identity) {
         List<String> readByIds = getReadByIds();
-        return readByIds.contains(user.getObjectId());
+        return readByIds.contains(identity.getObjectId());
     }
 
     /**
@@ -228,30 +227,26 @@ public class Purchase extends ParseObject {
     @NonNull
     public List<String> getReadByIds() {
         List<String> readByIds = new ArrayList<>();
-        List<ParseUser> readBy = getReadBy();
+        List<Identity> readBy = getReadBy();
         if (!readBy.isEmpty()) {
-            for (ParseUser user : readBy) {
-                readByIds.add(user.getObjectId());
+            for (Identity identity : readBy) {
+                readByIds.add(identity.getObjectId());
             }
         }
 
         return readByIds;
     }
 
-    public void addUserToReadBy(@NonNull ParseUser user) {
-        addReadBy(user);
-    }
-
-    public void addReadBy(@NonNull ParseUser user) {
-        addUnique(READ_BY, user);
+    public void addUserToReadBy(@NonNull Identity identity) {
+        addUnique(READ_BY, identity);
     }
 
     /**
-     * Resets the read by field to only the user.
+     * Resets the read by field to only the identity.
      */
-    public void resetReadBy(@NonNull ParseUser user) {
-        List<ParseUser> readBy = new ArrayList<>();
-        readBy.add(user);
+    public void resetReadBy(@NonNull Identity identity) {
+        List<Identity> readBy = new ArrayList<>();
+        readBy.add(identity);
         put(READ_BY, readBy);
     }
 
@@ -330,20 +325,20 @@ public class Purchase extends ParseObject {
     }
 
     /**
-     * Returns a user's share from the purchase.
+     * Returns a identity's share from the purchase.
      *
-     * @param user the user to calculate the share for
-     * @return the share of the user
+     * @param identity the identity to calculate the share for
+     * @return the share of the identity
      */
-    public double calculateUserShare(@NonNull ParseUser user) {
+    public double calculateUserShare(@NonNull Identity identity) {
         double userShare = 0;
         double exchangeRate = getExchangeRate();
         List<ParseObject> items = getItems();
         for (ParseObject parseObject : items) {
             Item item = (Item) parseObject;
-            List<ParseUser> usersInvolved = item.getUsersInvolved();
-            if (usersInvolved.contains(user)) {
-                userShare += (item.getPrice() * exchangeRate / usersInvolved.size());
+            List<Identity> identities = item.getIdentities();
+            if (identities.contains(identity)) {
+                userShare += (item.getPrice() * exchangeRate / identities.size());
             }
         }
 

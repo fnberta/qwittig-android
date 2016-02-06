@@ -15,7 +15,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.parse.ParseObject;
 import com.parse.ParsePushBroadcastReceiver;
@@ -26,23 +25,22 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.domain.models.parse.Compensation;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.models.parse.Task;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.data.services.ParseQueryService;
-import ch.giantific.qwittig.presentation.ui.activities.FinanceActivity;
-import ch.giantific.qwittig.presentation.ui.activities.HomeActivity;
-import ch.giantific.qwittig.presentation.ui.activities.PurchaseDetailsActivity;
-import ch.giantific.qwittig.presentation.ui.activities.TaskDetailsActivity;
-import ch.giantific.qwittig.presentation.ui.activities.TasksActivity;
+import ch.giantific.qwittig.presentation.finance.FinanceActivity;
+import ch.giantific.qwittig.presentation.home.purchases.details.PurchaseDetailsActivity;
+import ch.giantific.qwittig.presentation.home.purchases.list.HomeActivity;
+import ch.giantific.qwittig.presentation.tasks.details.TaskDetailsActivity;
+import ch.giantific.qwittig.presentation.tasks.list.TasksActivity;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import timber.log.Timber;
 
@@ -61,12 +59,12 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     public static final String PUSH_PARAM_PURCHASE_ID = "purchaseId";
     public static final String PUSH_PARAM_COMPENSATION_ID = "compensationId";
     public static final String PUSH_PARAM_GROUP_ID = "groupId";
-    public static final String PUSH_PARAM_PAYER_ID = "payerId";
-    public static final String PUSH_PARAM_BENEFICIARY_ID = "beneficiaryId";
+    public static final String PUSH_PARAM_DEBTOR_ID = "debtrId";
+    public static final String PUSH_PARAM_CREDITOR_ID = "creditorId";
     public static final String PUSH_PARAM_BUYER_ID = "buyerId";
     public static final String PUSH_PARAM_INITIATOR_ID = "initiatorId";
     public static final String PUSH_PARAM_TASK_ID = "taskId";
-    public static final String PUSH_PARAM_USERS_INVOLVED_IDS = "usersInvolvedIds";
+    public static final String PUSH_PARAM_IDENTITIES_IDS = "identitiesIds";
     public static final String PUSH_PARAM_USER = "user";
     public static final String PUSH_PARAM_AMOUNT = "amount";
     public static final String PUSH_PARAM_STORE = "store";
@@ -258,7 +256,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 String totalAmountFormatted = getAmount(jsonExtras);
                 mPurchaseNotifications = mSharedPreferences.getStringSet(
                         STORED_PURCHASE_NOTIFICATIONS + notificationTag, new LinkedHashSet<String>());
-                mPurchaseNotifications.add(String.format(Locale.getDefault(), "%s: %s",store,
+                mPurchaseNotifications.add(String.format(Locale.getDefault(), "%s: %s", store,
                         totalAmountFormatted));
 
                 // save set in sharedPreferences
@@ -303,7 +301,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
 //                queryCompensation(context, jsonExtras, false);
 
                 // only show notification for payer
-                String payerId = jsonExtras.optString(PUSH_PARAM_PAYER_ID);
+                String payerId = jsonExtras.optString(PUSH_PARAM_DEBTOR_ID);
                 if (!payerId.equals(currentUser.getObjectId())) {
                     return;
                 }
@@ -396,7 +394,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     }
 
     private boolean userIsInUsersInvolved(@NonNull User user, @NonNull JSONObject jsonExtras) {
-        JSONArray usersInvolvedIds = jsonExtras.optJSONArray(PUSH_PARAM_USERS_INVOLVED_IDS);
+        JSONArray usersInvolvedIds = jsonExtras.optJSONArray(PUSH_PARAM_IDENTITIES_IDS);
         return usersInvolvedIds.toString().contains(user.getObjectId());
     }
 
@@ -645,7 +643,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
 
     @Override
     protected void onPushOpen(Context context, @NonNull Intent intent) {
-        String type = getNotificationType(intent);
+        final String type = getNotificationType(intent);
         if (!isSilentNotification(type) && !type.equals(TYPE_USER_INVITED)) {
             String groupId;
             try {
@@ -655,16 +653,16 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 return;
             }
 
-            final User currentUser = (User) ParseUser.getCurrentUser();
-            if (currentUser != null) {
-                final Group oldGroup = currentUser.getCurrentGroup();
-                if (!oldGroup.getObjectId().equals(groupId) &&
-                        isInPurchaseGroup(currentUser, groupId)) {
-                    ParseObject group = ParseObject.createWithoutData(Group.CLASS, groupId);
-                    currentUser.setCurrentGroup(group);
-                    currentUser.saveEventually();
-                }
-            }
+//            final User currentUser = (User) ParseUser.getCurrentUser();
+//            if (currentUser != null) {
+//                final Group oldGroup = currentUser.getCurrentIdentity().getGroup();
+//                if (!oldGroup.getObjectId().equals(groupId) &&
+//                        isInPurchaseGroup(currentUser, groupId)) {
+//                    ParseObject group = ParseObject.createWithoutData(Group.CLASS, groupId);
+//                    currentUser.setCurrentGroup(group);
+//                    currentUser.saveEventually();
+//                }
+//            }
 
             switch (type) {
                 case TYPE_COMPENSATION_REMIND_USER:
@@ -687,8 +685,9 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     }
 
     private boolean isInPurchaseGroup(@NonNull User currentUser, String purchaseGroupId) {
-        List<String> groupIds = currentUser.getGroupIds();
-        return groupIds.contains(purchaseGroupId);
+//        List<String> groupIds = currentUser.getGroupIds();
+//        return groupIds.contains(purchaseGroupId);
+        return true;
     }
 
     @Override

@@ -4,8 +4,8 @@
 
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     >
 
     <data>
@@ -14,14 +14,15 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.viewmodels.PurchaseReceiptViewModel"
+            type="ch.giantific.qwittig.presentation.home.purchases.PurchaseReceiptViewModel"
             />
     </data>
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
-        tools:context=".presentation.ui.fragments.PurchaseReceiptDetailFragment"
+        tools:context=".presentation.home.purchases.details.PurchaseReceiptDetailFragment"
         >
 
         <include

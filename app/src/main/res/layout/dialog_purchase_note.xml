@@ -5,9 +5,9 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     >
 
@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:hint="@string/header_note"
             android:inputType="textMultiLine|textCapSentences"
-            tools:text="Die ist eine Test, die hoffentlich über eine Zeile hinausgeht. Falls nicht, füge ich gleich nochmals eine Zeile an."
+            tools:text="Die ist ein Text, die hoffentlich über eine Zeile hinausgeht. Falls nicht, füge ich gleich nochmals eine Zeile an."
             />
 
     </android.support.design.widget.TextInputLayout>

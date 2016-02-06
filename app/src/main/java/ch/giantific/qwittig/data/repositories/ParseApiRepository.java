@@ -36,7 +36,6 @@ public class ParseApiRepository implements ApiRepository {
     private static final String INVITE_USER = "inviteUsers";
     private static final String PUSH_TASK_REMIND = "pushTaskRemind";
     private static final String PUSH_COMPENSATION_REMIND = "pushCompensationRemind";
-    private static final String SETTLEMENT_NEW = "settlementNew";
     private static final String GROUP_ROLE_ADD_USER = "groupRoleAddUser";
     private static final String GROUP_ROLE_REMOVE_USER = "groupRoleRemoveUser";
     private static final String DELETE_PARSE_FILE = "deleteParseFile";
@@ -45,7 +44,6 @@ public class ParseApiRepository implements ApiRepository {
     private static final String STATS_STORES = "statsStores";
     private static final String STATS_CURRENCIES = "statsCurrencies";
 
-    private static final String PARAM_SETTLEMENT_SINGLE_USER = "singleUser";
     private static final String PARAM_EMAIL = "emails";
     private static final String PARAM_FILE_NAME = "fileName";
     private static final String PARAM_YEAR = "year";
@@ -120,16 +118,6 @@ public class ParseApiRepository implements ApiRepository {
         params.put(PushBroadcastReceiver.PUSH_PARAM_CURRENCY_CODE, currencyCode);
 
         return params;
-    }
-
-    @Override
-    public Single<String> startNewSettlement(@NonNull String groupToBalanceId,
-                                             boolean doSingleUserSettlement) {
-        Map<String, Object> params = new HashMap<>();
-        params.put(PushBroadcastReceiver.PUSH_PARAM_GROUP_ID, groupToBalanceId);
-        params.put(PARAM_SETTLEMENT_SINGLE_USER, doSingleUserSettlement);
-
-        return callFunctionInBackground(SETTLEMENT_NEW, params);
     }
 
     @Override

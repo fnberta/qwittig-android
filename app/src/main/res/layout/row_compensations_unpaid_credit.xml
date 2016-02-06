@@ -14,7 +14,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.viewmodels.rows.CompUnpaidRowViewModel"
+            type="ch.giantific.qwittig.presentation.finance.CompUnpaidRowViewModel"
             />
     </data>
 

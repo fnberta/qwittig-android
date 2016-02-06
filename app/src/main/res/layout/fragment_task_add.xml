@@ -13,7 +13,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.viewmodels.TaskAddEditViewModel"
+            type="ch.giantific.qwittig.presentation.tasks.addedit.TaskAddEditViewModel"
             />
     </data>
 
@@ -22,7 +22,7 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:paddingBottom="@dimen/small_space"
-        tools:context=".presentation.ui.fragments.TaskAddEditFragment"
+        tools:context=".presentation.tasks.addedit.TaskAddEditFragment"
         >
 
         <LinearLayout

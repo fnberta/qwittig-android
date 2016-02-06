@@ -7,8 +7,7 @@ package ch.giantific.qwittig.di.components;
 import ch.giantific.qwittig.di.modules.PurchaseReceiptPathViewModelModule;
 import ch.giantific.qwittig.di.modules.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.presentation.ui.fragments.PurchaseReceiptAddEditFragment;
-import ch.giantific.qwittig.presentation.ui.fragments.PurchaseReceiptDetailFragment;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseReceiptAddEditFragment;
 import dagger.Component;
 
 /**

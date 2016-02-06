@@ -7,8 +7,8 @@ package ch.giantific.qwittig.di.components;
 import ch.giantific.qwittig.di.modules.PurchaseEditViewModelModule;
 import ch.giantific.qwittig.di.modules.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.presentation.ui.fragments.PurchaseEditDraftFragment;
-import ch.giantific.qwittig.presentation.ui.fragments.PurchaseEditFragment;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseEditDraftFragment;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseEditFragment;
 import dagger.Component;
 
 /**

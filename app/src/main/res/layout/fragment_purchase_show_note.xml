@@ -9,7 +9,8 @@
     android:layout_height="match_parent"
     android:clipToPadding="false"
     android:paddingBottom="@dimen/small_space"
-    tools:context=".presentation.ui.fragments.PurchaseReceiptDetailFragment">
+    tools:context=".presentation.home.purchases.details.PurchaseReceiptDetailFragment"
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -26,7 +27,8 @@
             android:paddingEnd="@dimen/key_line_1"
             android:paddingStart="@dimen/key_line_1"
             android:text="@string/header_note"
-            tools:text="Note"/>
+            tools:text="Note"
+            />
 
         <TextView
             android:id="@+id/tv_purchase_note"

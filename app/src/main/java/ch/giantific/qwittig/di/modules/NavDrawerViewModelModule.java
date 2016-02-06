@@ -9,10 +9,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.di.scopes.PerActivity;
-import ch.giantific.qwittig.domain.repositories.GroupRepository;
+import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.presentation.viewmodels.NavDrawerViewModel;
-import ch.giantific.qwittig.presentation.viewmodels.NavDrawerViewModelImpl;
+import ch.giantific.qwittig.presentation.navdrawer.NavDrawerViewModel;
+import ch.giantific.qwittig.presentation.navdrawer.NavDrawerViewModelImpl;
 import dagger.Module;
 import dagger.Provides;
 
@@ -29,9 +29,9 @@ public class NavDrawerViewModelModule extends BaseViewModelModule<NavDrawerViewM
 
     @PerActivity
     @Provides
-    NavDrawerViewModel providesNavDrawerViewModel(@NonNull GroupRepository groupRepository,
-                                                  @NonNull UserRepository userRepository) {
-        return new NavDrawerViewModelImpl(mSavedState, mView, groupRepository, userRepository);
+    NavDrawerViewModel providesNavDrawerViewModel(@NonNull UserRepository userRepository,
+                                                  @NonNull IdentityRepository identityRepository) {
+        return new NavDrawerViewModelImpl(mSavedState, mView, userRepository, identityRepository);
     }
 
 }

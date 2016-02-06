@@ -8,7 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import ch.giantific.qwittig.presentation.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 
 /**
  * Created by fabio on 16.01.16.

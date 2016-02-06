@@ -7,7 +7,7 @@ package ch.giantific.qwittig.di.components;
 import ch.giantific.qwittig.di.modules.HomePurchasesViewModelModule;
 import ch.giantific.qwittig.di.modules.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.presentation.ui.fragments.HomePurchasesFragment;
+import ch.giantific.qwittig.presentation.home.purchases.list.HomePurchasesFragment;
 import dagger.Component;
 
 /**

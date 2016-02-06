@@ -13,6 +13,7 @@ import java.util.List;
 
 import ch.giantific.qwittig.domain.models.parse.Compensation;
 import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.Identity;
 import ch.giantific.qwittig.domain.models.parse.User;
 import rx.Observable;
 import rx.Single;
@@ -25,19 +26,19 @@ public interface CompensationRepository extends Repository {
     /**
      * Queries the local data store for unpaid compensations.
      *
-     * @param currentUser the current user
-     * @param group       the group for which to get compensations for
+     * @param currentIdentity the current user
+     * @param group           the group for which to get compensations for
      */
-    Observable<Compensation> getCompensationsLocalUnpaidAsync(@NonNull User currentUser, @NonNull Group group);
+    Observable<Compensation> getCompensationsLocalUnpaidAsync(@NonNull Identity currentIdentity, @NonNull Group group);
 
     /**
      * Queries the local data store for paid compensations where the current user is either the
      * buyer or the beneficiary.
      *
-     * @param currentUser the current user
-     * @param group       the group for which to get compensations for
+     * @param currentIdentity the current user
+     * @param group           the group for which to get compensations for
      */
-    Observable<Compensation> getCompensationsLocalPaidAsync(@NonNull User currentUser, @NonNull Group group);
+    Observable<Compensation> getCompensationsLocalPaidAsync(@NonNull Identity currentIdentity, @NonNull Group group);
 
     /**
      * Saves a {@link Compensation} object to the online and offline storage
@@ -59,35 +60,37 @@ public interface CompensationRepository extends Repository {
      * Updates all unpaid compensations in the local data store by deleting all compensations from the
      * local data store, querying and saving new ones.
      *
-     * @param groups the group for which to update the compensations
+     * @param currentIdentity the current identity
+     * @param identities      all identities from the current user
      */
-    Observable<Compensation> updateCompensationsUnpaidAsync(@NonNull List<ParseObject> groups);
+    Observable<Compensation> updateCompensationsUnpaidAsync(@NonNull Identity currentIdentity,
+                                                            @NonNull List<? extends ParseObject> identities);
 
     /**
      * Updates all paid compensations in the local data store by deleting all compensations from the
      * local data store, querying and saving new ones.
      *
-     * @param groups         the group for which to update the compensations
-     * @param currentGroupId the object id of the user's current group
+     * @param currentIdentity the current identity
+     * @param identities      all identities from the current user
      */
-    Observable<Compensation> updateCompensationsPaidAsync(@NonNull List<ParseObject> groups,
-                                                          @NonNull String currentGroupId);
+    Observable<Compensation> updateCompensationsPaidAsync(@NonNull Identity currentIdentity,
+                                                          @NonNull List<ParseObject> identities);
 
     /**
      * Queries paid compensations from the online data store and saves them in the local data store.
      *
-     * @param group the group for which to get compensations for
-     * @param skip  the number of compensations to skip for the query
+     * @param currentIdentity the group for which to get compensations for
+     * @param skip            the number of compensations to skip for the query
      */
-    Observable<Compensation> getCompensationsPaidOnlineAsync(@NonNull Group group, int skip);
+    Observable<Compensation> getCompensationsPaidOnlineAsync(@NonNull Identity currentIdentity, int skip);
 
     /**
      * Deletes all compensations from the local data store and saves new ones.
      *
-     * @param groups the groups for which to update the compensations
+     * @param currentUser the groups for which to update the compensations
      * @return whether the update was successful or not
      */
-    boolean updateCompensations(@NonNull List<ParseObject> groups);
+    boolean updateCompensations(@NonNull User currentUser);
 
     /**
      * Updates a compensation if is already available in the local data store (by simply querying

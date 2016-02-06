@@ -22,14 +22,13 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
-import com.parse.ParseUser;
 
 import java.util.List;
 
 import ch.giantific.qwittig.BlurTransformation;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.presentation.ui.widgets.CircleDisplay;
+import ch.giantific.qwittig.domain.models.parse.Identity;
+import ch.giantific.qwittig.presentation.common.widgets.CircleDisplay;
 
 /**
  * Contains generic binding adapters.
@@ -161,23 +160,21 @@ public class BindingUtils {
         view.setTextColor(ContextCompat.getColor(context, color));
     }
 
-    @BindingAdapter({"usersInvolved", "currentUser"})
-    public static void setTaskUsersInvolved(TextView view, List<ParseUser> usersInvolved,
-                                            User currentUser) {
+    @BindingAdapter({"identities"})
+    public static void setTaskIdentities(TextView view, List<Identity> identities) {
         final Context context = view.getContext();
-        final User userResponsible = (User) usersInvolved.get(0);
+        final Identity identityResponsible = identities.get(0);
         String usersInvolvedString = "";
-        if (usersInvolved.size() > 1) {
-            StringBuilder stringBuilder = new StringBuilder();
+        if (identities.size() > 1) {
+            final StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append(context.getString(R.string.task_users_involved_next)).append(" ");
-            for (ParseUser parseUser : usersInvolved) {
-                User user = (User) parseUser;
-                if (!user.getObjectId().equals(userResponsible.getObjectId())) {
-                    stringBuilder.append(user.getNicknameOrMe(context, currentUser)).append(" - ");
+            for (Identity identity : identities) {
+                if (!identity.getObjectId().equals(identityResponsible.getObjectId())) {
+                    stringBuilder.append(identity.getNickname()).append(" - ");
                 }
             }
             // delete last -
-            int length = stringBuilder.length();
+            final int length = stringBuilder.length();
             stringBuilder.delete(length - 3, length - 1);
             usersInvolvedString = stringBuilder.toString();
         }

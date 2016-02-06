@@ -4,6 +4,7 @@
 
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipToPadding="false"
@@ -19,7 +20,9 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:transitionGroup="true"
-        tools:context=".presentation.ui.activities.LoginActivity">
+        tools:context=".presentation.login.LoginActivity"
+        tools:targetApi="lollipop"
+        >
 
         <TextView
             android:id="@+id/tv_app_title"
@@ -27,15 +30,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="@dimen/small_space"
             android:layout_marginBottom="@dimen/normal_space"
-            android:text="@string/app_name"/>
+            android:layout_marginTop="@dimen/small_space"
+            android:text="@string/app_name"
+            />
 
         <FrameLayout
             android:id="@+id/container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:ignore="MergeRootFrame"/>
+            tools:ignore="MergeRootFrame"
+            />
 
     </LinearLayout>
 </ScrollView>

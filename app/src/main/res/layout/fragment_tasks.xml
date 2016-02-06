@@ -13,7 +13,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.viewmodels.TasksViewModel"
+            type="ch.giantific.qwittig.presentation.tasks.list.TasksViewModel"
             />
     </data>
 
@@ -22,7 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
-        tools:context=".presentation.ui.fragments.TasksFragment"
+        tools:context=".presentation.tasks.list.TasksFragment"
         >
 
         <include

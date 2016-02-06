@@ -13,7 +13,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.viewmodels.rows.PurchaseDetailsUsersUserRowViewModel"
+            type="ch.giantific.qwittig.presentation.home.purchases.details.PurchaseDetailsUsersUserRowViewModel"
             />
     </data>
 
@@ -31,7 +31,7 @@
             android:layout_height="@dimen/avatar_size"
             android:layout_marginBottom="@dimen/min_space"
             android:contentDescription="@string/user_avatar"
-            app:avatar="@{viewModel.userAvatar}"
+            app:avatar="@{viewModel.identityAvatar}"
             app:fallback="@{@drawable/ic_account_circle_black_40dp}"
             tools:src="@drawable/ic_account_circle_black_40dp"
             />
@@ -44,8 +44,8 @@
             android:ellipsize="marquee"
             android:gravity="center_horizontal"
             android:lines="1"
-            android:text="@{viewModel.userName}"
-            app:bold="@{viewModel.userNameBold}"
+            android:text="@{viewModel.identityName}"
+            app:bold="@{viewModel.nicknameBold}"
             tools:text="Vera"
             />
 
