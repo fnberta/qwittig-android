@@ -19,6 +19,9 @@ import rx.Single;
  * Provides the methods to get, update and remove groups from the local and online data store.
  */
 public interface GroupRepository extends Repository {
+
+    Single<String> addNewGroup(@NonNull String groupName, @NonNull String groupCurrency);
+
     /**
      * Fetches the data of a {@link Group} object from the local data store. If there is no data
      * available in the local data store it will try to fetch the data online.

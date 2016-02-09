@@ -19,6 +19,4 @@ import dagger.Component;
 public interface TaskDetailsComponent {
 
     void inject(TaskDetailsFragment taskDetailsFragment);
-
-    TaskDetailsViewModel getTaskDetailsViewModel();
 }

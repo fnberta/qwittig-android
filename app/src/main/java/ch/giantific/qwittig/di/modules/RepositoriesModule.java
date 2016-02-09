@@ -58,7 +58,7 @@ public class RepositoriesModule {
     }
 
     @Provides
-    IdentityRepository providesIdentityRepositors() {
+    IdentityRepository providesIdentityRepository() {
         return new ParseIdentityRepository();
     }
 

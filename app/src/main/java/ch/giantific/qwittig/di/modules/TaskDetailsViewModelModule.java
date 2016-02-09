@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.domain.repositories.GroupRepository;
+import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.tasks.details.TaskDetailsViewModel;
@@ -35,10 +35,10 @@ public class TaskDetailsViewModelModule extends BaseViewModelModule<TaskDetailsV
 
     @PerFragment
     @Provides
-    TaskDetailsViewModel providesTaskDetailsViewModel(@NonNull GroupRepository groupRepository,
-                                                      @NonNull UserRepository userRepository,
+    TaskDetailsViewModel providesTaskDetailsViewModel(@NonNull UserRepository userRepository,
+                                                      @NonNull IdentityRepository identityRepository,
                                                       @NonNull TaskRepository taskRepository) {
-        return new TaskDetailsViewModelImpl(mSavedState, mView, userRepository, groupRepository,
+        return new TaskDetailsViewModelImpl(mSavedState, mView, userRepository, identityRepository,
                 taskRepository, mTaskId);
     }
 

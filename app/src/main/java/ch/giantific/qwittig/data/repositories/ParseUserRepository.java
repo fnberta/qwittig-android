@@ -29,6 +29,7 @@ import com.parse.ParseObject;
 import com.parse.ParseSession;
 import com.parse.ParseUser;
 import com.parse.RequestPasswordResetCallback;
+import com.parse.SaveCallback;
 import com.parse.SignUpCallback;
 
 import org.json.JSONObject;
@@ -44,6 +45,7 @@ import ch.giantific.qwittig.domain.repositories.ApiRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.utils.AvatarUtils;
 import ch.giantific.qwittig.utils.parse.ParseInstallationUtils;
+import rx.Observable;
 import rx.Single;
 import rx.SingleSubscriber;
 import rx.functions.Action1;
@@ -72,6 +74,11 @@ public class ParseUserRepository extends ParseBaseRepository<ParseUser> implemen
     @Override
     public User getCurrentUser() {
         return (User) ParseUser.getCurrentUser();
+    }
+
+    @Override
+    public Single<User> udpateCurrentUser() {
+        return ;
     }
 
     @Override
@@ -406,8 +413,6 @@ public class ParseUserRepository extends ParseBaseRepository<ParseUser> implemen
     }
 
     private Single<User> addFirstIdentity(@NonNull User user) {
-        // TODO: check for existing ones on server
-
         final Group defaultGroup = new Group("Qwittig rocks", "CHF");
         final Identity defaultIdentity = new Identity(defaultGroup);
         user.addIdentity(defaultIdentity);
@@ -417,8 +422,8 @@ public class ParseUserRepository extends ParseBaseRepository<ParseUser> implemen
     }
 
     private void addUserToInstallation(@NonNull User user) {
-        List<ParseObject> identities = user.getIdentities();
-        List<String> channels = new ArrayList<>();
+        final List<ParseObject> identities = user.getIdentities();
+        final List<String> channels = new ArrayList<>();
         for (ParseObject parseObject : identities) {
             final Identity identity = (Identity) parseObject;
             channels.add(identity.getGroup().getObjectId());
@@ -451,5 +456,59 @@ public class ParseUserRepository extends ParseBaseRepository<ParseUser> implemen
                 });
             }
         });
+    }
+
+    @Override
+    public Observable<User> addNewIdentity(@NonNull String groupName,
+                                           @NonNull String groupCurrency) {
+        final User currentUser = getCurrentUser();
+        if (currentUser == null) {
+            return Observable.empty();
+        }
+        final Identity currentIdentity = currentUser.getCurrentIdentity();
+
+        final Group group = new Group(groupName, groupCurrency);
+        return Single
+                .create(new Single.OnSubscribe<Group>() {
+                    @Override
+                    public void call(final SingleSubscriber<? super Group> singleSubscriber) {
+                        group.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (singleSubscriber.isUnsubscribed()) {
+                                    return;
+                                }
+
+                                if (e != null) {
+                                    singleSubscriber.onError(e);
+                                } else {
+                                    singleSubscriber.onSuccess(group);
+                                }
+                            }
+                        });
+                    }
+                })
+                .flatMapObservable(new Func1<Group, Observable<? super ParseUser>>() {
+                    @Override
+                    public Observable<? super ParseUser> call(Group group) {
+                        final Identity newIdentity = new Identity(group, currentIdentity.getNickname());
+                        final byte[] avatar = currentIdentity.getAvatar();
+                        if (avatar != null) {
+                            newIdentity.setAvatar(avatar);
+                        }
+                        currentUser.addIdentity(newIdentity);
+                        currentUser.setCurrentIdentity(newIdentity);
+                        return save(currentUser)
+                                .toObservable()
+                                .doOnError(new Action1<Throwable>() {
+                                    @Override
+                                    public void call(Throwable throwable) {
+                                        currentUser.removeIdentity(newIdentity);
+                                        currentUser.setCurrentIdentity(currentIdentity);
+                                    }
+                                });
+                    }
+                })
+                .cast(User.class);
     }
 }

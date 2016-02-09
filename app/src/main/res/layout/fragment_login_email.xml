@@ -111,6 +111,7 @@
                     android:layout_weight="0.5"
                     android:text="@string/login_button_log_in"
                     android:theme="@style/Widget.AppCompat.Button.AccentColor"
+                    android:onClick="@{viewModel.onLoginClick}"
                     tools:ignore="ButtonStyle"
                     />
 
@@ -121,6 +122,7 @@
                     android:layout_weight="0.5"
                     android:text="@string/login_button_sign_up"
                     android:theme="@style/Widget.AppCompat.Button.AccentColor"
+                    android:onClick="@{viewModel.onSignUpClick}"
                     tools:ignore="ButtonStyle"
                     />
 
@@ -133,6 +135,7 @@
                 android:layout_height="@dimen/touch_target_min"
                 android:layout_gravity="center_horizontal"
                 android:gravity="center_vertical"
+                android:onClick="@{viewModel.onResetPasswordClick}"
                 android:text="@string/login_text_forgot_credentials"
                 />
 

@@ -86,6 +86,22 @@ public class LoginActivity extends BaseActivity<LoginAccountsViewModel> implemen
         }
     }
 
+    private void handleGoogleSignInResult(@NonNull GoogleSignInResult result) {
+        if (result.isSuccess()) {
+            final GoogleSignInAccount acct = result.getSignInAccount();
+            if (acct != null) {
+                final String idToken = acct.getIdToken();
+                final String displayName = acct.getDisplayName();
+                final Uri photoUrl = acct.getPhotoUrl();
+                mViewModel.onGoogleSignedIn(idToken, displayName, photoUrl);
+            } else {
+                mViewModel.onGoogleLoginFailed();
+            }
+        } else {
+            mViewModel.onGoogleLoginFailed();
+        }
+    }
+
     @Override
     public void setAccountsViewModel(@NonNull LoginAccountsViewModel viewModel) {
         mViewModel = viewModel;
@@ -119,22 +135,6 @@ public class LoginActivity extends BaseActivity<LoginAccountsViewModel> implemen
     public void loginWithGoogle() {
         final Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-
-    private void handleGoogleSignInResult(@NonNull GoogleSignInResult result) {
-        if (result.isSuccess()) {
-            final GoogleSignInAccount acct = result.getSignInAccount();
-            if (acct != null) {
-                final String idToken = acct.getIdToken();
-                final String displayName = acct.getDisplayName();
-                final Uri photoUrl = acct.getPhotoUrl();
-                mViewModel.onGoogleSignedIn(idToken, displayName, photoUrl);
-            } else {
-                mViewModel.onGoogleLoginFailed();
-            }
-        } else {
-            mViewModel.onGoogleLoginFailed();
-        }
     }
 
     @Override

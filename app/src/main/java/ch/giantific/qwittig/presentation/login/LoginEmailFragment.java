@@ -68,6 +68,7 @@ public class LoginEmailFragment extends BaseFragment<LoginEmailViewModel, LoginE
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentLoginEmailBinding.inflate(inflater, container, false);
+        mBinding.setViewModel(mViewModel);
         return mBinding.getRoot();
     }
 

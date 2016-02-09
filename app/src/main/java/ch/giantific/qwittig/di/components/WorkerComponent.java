@@ -10,10 +10,10 @@ import ch.giantific.qwittig.presentation.finance.IdentitiesUpdateWorker;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.OcrWorker;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.RatesWorker;
 import ch.giantific.qwittig.presentation.login.LoginWorker;
-import ch.giantific.qwittig.presentation.settings.CreateGroupWorker;
+import ch.giantific.qwittig.presentation.settings.addgroup.AddGroupWorker;
 import ch.giantific.qwittig.presentation.home.InvitedGroupWorker;
 import ch.giantific.qwittig.presentation.stats.StatsCalcWorker;
-import ch.giantific.qwittig.presentation.settings.UsersInviteWorker;
+import ch.giantific.qwittig.presentation.settings.addusers.AddUserWorker;
 import ch.giantific.qwittig.presentation.finance.CompensationsQueryMoreWorker;
 import ch.giantific.qwittig.presentation.finance.CompensationsUpdateWorker;
 import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesQueryMoreWorker;
@@ -45,13 +45,13 @@ public interface WorkerComponent {
 
     void inject(OcrWorker ocrWorker);
 
-    void inject(UsersInviteWorker usersInviteWorker);
+    void inject(AddUserWorker addUserWorker);
 
     void inject(StatsCalcWorker statsCalcWorker);
 
     void inject(InvitedGroupWorker invitedGroupWorker);
 
-    void inject(CreateGroupWorker createGroupWorker);
+    void inject(AddGroupWorker addGroupWorker);
 
     void inject(TaskRemindWorker taskRemindWorker);
 

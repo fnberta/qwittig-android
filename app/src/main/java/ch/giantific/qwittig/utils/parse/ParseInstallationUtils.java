@@ -16,6 +16,7 @@ public class ParseInstallationUtils {
 
     public static final String USER = "user";
     public static final String CHANNELS = "channels";
+
     private ParseInstallationUtils() {
         // class cannot be instantiated
     }

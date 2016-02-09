@@ -53,6 +53,7 @@ public class LoginAccountsFragment extends BaseFragment<LoginAccountsViewModel, 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentLoginAccountsBinding.inflate(inflater, container, false);
+        mBinding.setViewModel(mViewModel);
         return mBinding.getRoot();
     }
 
@@ -85,8 +86,7 @@ public class LoginAccountsFragment extends BaseFragment<LoginAccountsViewModel, 
 
     @Override
     public void showEmailFragment() {
-        final LoginAccountsFragment fragment = new LoginAccountsFragment();
-
+        final LoginEmailFragment fragment = new LoginEmailFragment();
         if (Utils.isRunningLollipopAndHigher()) {
             setExitTransition(new Slide(Gravity.BOTTOM));
             fragment.setEnterTransition(new Slide(Gravity.BOTTOM));

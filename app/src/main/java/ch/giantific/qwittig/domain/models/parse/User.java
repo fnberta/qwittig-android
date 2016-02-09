@@ -26,7 +26,7 @@ public class User extends ParseUser {
     public static final String NAME = "username";
     public static final String PASSWORD = "password";
     public static final String IDENTITIES = "identities";
-    public static final String CURRENT_IDENTITY = "currentIdentities";
+    public static final String CURRENT_IDENTITY = "currentIdentity";
     public static final String GOOGLE_ID = "googleId";
 
     public User() {

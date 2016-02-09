@@ -16,6 +16,7 @@ import com.parse.ParseUser;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.BuildConfig;
@@ -23,19 +24,20 @@ import ch.giantific.qwittig.LocalBroadcast;
 import ch.giantific.qwittig.LocalBroadcastImpl;
 import ch.giantific.qwittig.data.repositories.ParseCompensationRepository;
 import ch.giantific.qwittig.data.repositories.ParseGroupRepository;
+import ch.giantific.qwittig.data.repositories.ParseIdentityRepository;
 import ch.giantific.qwittig.data.repositories.ParsePurchaseRepository;
 import ch.giantific.qwittig.data.repositories.ParseTaskRepository;
-import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.domain.models.parse.Compensation;
 import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.Identity;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.models.parse.Task;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
+import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
 
 /**
  * Handles the various background tasks to query, pin or unpin objects.
@@ -57,7 +59,8 @@ public class ParseQueryService extends IntentService {
     private static final String EXTRA_OBJECT_IS_NEW = BuildConfig.APPLICATION_ID + ".data.services.extra.OBJECT_IS_NEW";
     private static final String EXTRA_OBJECT_GROUP_ID = BuildConfig.APPLICATION_ID + ".data.services.extra.GROUP_ID";
     private User mCurrentUser;
-    private List<ParseObject> mCurrentUserGroups;
+    private Identity mCurrentIdentity;
+    private List<ParseObject> mCurrentUserGroups = new ArrayList<>();
     private LocalBroadcast mLocalBroadcast;
 
     /**
@@ -180,7 +183,12 @@ public class ParseQueryService extends IntentService {
         }
 
         mCurrentUser = (User) ParseUser.getCurrentUser();
-        mCurrentUserGroups = mCurrentUser.getGroups();
+        mCurrentIdentity = mCurrentUser.getCurrentIdentity();
+        final List<ParseObject> identities = mCurrentUser.getIdentities();
+        for (ParseObject parseObject : identities) {
+            final Identity identity = (Identity) parseObject;
+            mCurrentUserGroups.add(identity.getGroup());
+        }
         mLocalBroadcast = new LocalBroadcastImpl(this);
 
         final String action = intent.getAction();
@@ -301,7 +309,7 @@ public class ParseQueryService extends IntentService {
         TaskRepository repo = new ParseTaskRepository();
         Task task = repo.fetchTaskDataLocal(taskId);
         if (task != null) {
-            task.addHistoryEvent(mCurrentUser);
+            task.addHistoryEvent(mCurrentIdentity);
             task.saveEventually();
             mLocalBroadcast.sendTasksUpdated();
         }
@@ -334,7 +342,7 @@ public class ParseQueryService extends IntentService {
     }
 
     private void queryUsers() {
-        UserRepository repo = new ParseUserRepository(apiRepo);
+        IdentityRepository repo = new ParseIdentityRepository();
         if (repo.updateIdentities(mCurrentUserGroups)) {
             mLocalBroadcast.sendUsersUpdated();
         }
@@ -342,7 +350,7 @@ public class ParseQueryService extends IntentService {
 
     private void queryCompensations() {
         CompensationRepository repo = new ParseCompensationRepository();
-        if (repo.updateCompensations(mCurrentUserGroups)) {
+        if (repo.updateCompensations(mCurrentUser)) {
             mLocalBroadcast.sendCompensationsUpdated(false);
             mLocalBroadcast.sendCompensationsUpdated(true);
         }
@@ -350,7 +358,7 @@ public class ParseQueryService extends IntentService {
 
     private void queryTasks() {
         TaskRepository repo = new ParseTaskRepository();
-        if (repo.updateTasks(mCurrentUserGroups)) {
+        if (repo.updateTasks(mCurrentUser)) {
             mLocalBroadcast.sendTasksUpdated();
         }
     }

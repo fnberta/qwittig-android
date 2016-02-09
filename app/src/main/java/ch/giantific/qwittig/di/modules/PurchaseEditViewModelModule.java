@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.domain.repositories.GroupRepository;
+import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddEditViewModel;
@@ -37,19 +37,19 @@ public class PurchaseEditViewModelModule extends BaseViewModelModule<PurchaseAdd
 
     @PerFragment
     @Provides
-    PurchaseAddEditViewModel providesPurchaseEditViewModel(@NonNull GroupRepository groupRepository,
+    PurchaseAddEditViewModel providesPurchaseEditViewModel(@NonNull IdentityRepository identityRepository,
                                                            @NonNull UserRepository userRepository,
                                                            @NonNull PurchaseRepository purchaseRepository) {
-        return new PurchaseAddEditViewModelEditImpl(mSavedState, mView, groupRepository,
+        return new PurchaseAddEditViewModelEditImpl(mSavedState, mView, identityRepository,
                 userRepository, purchaseRepository, mEditPurchaseId);
     }
 
     @PerFragment
     @Provides
-    PurchaseEditDraftViewModel providesPurchaseEditDraftViewModel(@NonNull GroupRepository groupRepository,
+    PurchaseEditDraftViewModel providesPurchaseEditDraftViewModel(@NonNull IdentityRepository identityRepository,
                                                                   @NonNull UserRepository userRepository,
                                                                   @NonNull PurchaseRepository purchaseRepository) {
-        return new PurchaseEditDraftViewModelImpl(mSavedState, mView, groupRepository,
+        return new PurchaseEditDraftViewModelImpl(mSavedState, mView, identityRepository,
                 userRepository, purchaseRepository, mEditPurchaseId);
     }
 }

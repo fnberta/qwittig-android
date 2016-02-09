@@ -5,21 +5,14 @@
 package ch.giantific.qwittig.utils.parse;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.parse.ParseACL;
 import com.parse.ParseConfig;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseUser;
 
 import java.util.ArrayList;
-import java.util.Currency;
 import java.util.List;
-import java.util.Locale;
 
 import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.utils.MoneyUtils;
 
 /**
@@ -32,29 +25,13 @@ public class ParseUtils {
     }
 
     /**
-     * Returns the currency code for the current group or the systems default if the current group
-     * is null.
-     *
-     * @param group the group to get the currency for
-     * @return the currency code for the current group
-     */
-    public static String getGroupCurrencyWithFallback(@Nullable Group group) {
-        if (group != null) {
-            return group.getCurrency();
-        }
-
-        Currency fallback = Currency.getInstance(Locale.getDefault());
-        return fallback.getCurrencyCode();
-    }
-
-    /**
      * Returns a default {@link ParseACL} with read/write access for the role of the passed group.
      *
      * @param group the group to get the role from
      * @return a default {@link ParseACL}
      */
     @NonNull
-    public static ParseACL getDefaultAcl(@NonNull ParseObject group) {
+    public static ParseACL getDefaultAcl(@NonNull Group group) {
         String roleName = getGroupRoleName(group);
         ParseACL acl = new ParseACL();
         acl.setRoleReadAccess(roleName, true);
@@ -63,7 +40,7 @@ public class ParseUtils {
     }
 
     @NonNull
-    private static String getGroupRoleName(@NonNull ParseObject group) {
+    private static String getGroupRoleName(@NonNull Group group) {
         return Group.ROLE_PREFIX + group.getObjectId();
     }
 
@@ -101,25 +78,5 @@ public class ParseUtils {
         final ParseConfig config = ParseConfig.getCurrentConfig();
 
         return config.getList(ParseConfigUtils.SUPPORTED_CURRENCIES, new ArrayList<String>());
-    }
-
-    /**
-     * Returns a no connection {@link ParseException} with an empty error message.
-     *
-     * @return a no connection {@link ParseException}
-     */
-    @NonNull
-    public static ParseException getNoConnectionException() {
-        return getNoConnectionException("");
-    }
-
-    /**
-     * Returns a no connection {@link ParseException} with an error message.
-     *
-     * @return a no connection {@link ParseException}
-     */
-    @NonNull
-    public static ParseException getNoConnectionException(String message) {
-        return new ParseException(ParseException.CONNECTION_FAILED, message);
     }
 }

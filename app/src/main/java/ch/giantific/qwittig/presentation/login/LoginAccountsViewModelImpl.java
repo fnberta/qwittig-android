@@ -34,7 +34,7 @@ public class LoginAccountsViewModelImpl extends ViewModelBaseImpl<LoginAccountsV
                                       @NonNull UserRepository userRepository) {
         super(savedState, view, userRepository);
 
-        mLoading = savedState == null || (savedState.getBoolean(STATE_LOADING, false));
+        mLoading = savedState != null && savedState.getBoolean(STATE_LOADING);
     }
 
     @Override

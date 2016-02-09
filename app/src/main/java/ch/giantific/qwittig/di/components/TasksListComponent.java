@@ -19,6 +19,4 @@ import dagger.Component;
 public interface TasksListComponent {
 
     void inject(TasksFragment tasksFragment);
-
-    TasksViewModel getTasksListViewModel();
 }

@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.di.scopes.PerFragment;
+import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.tasks.addedit.TaskAddEditViewModel;
@@ -35,8 +36,9 @@ public class TaskEditViewModelModule extends BaseViewModelModule<TaskAddEditView
     @PerFragment
     @Provides
     TaskAddEditViewModel providesTaskAddEditViewModel(@NonNull UserRepository userRepository,
+                                                      @NonNull IdentityRepository identityRepository,
                                                       @NonNull TaskRepository taskRepository) {
-        return new TaskAddEditViewModelEditImpl(mSavedState, mView, userRepository,
+        return new TaskAddEditViewModelEditImpl(mSavedState, mView, userRepository, identityRepository,
                 taskRepository, mEditTaskId);
     }
 

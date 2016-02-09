@@ -1,0 +1,60 @@
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <variable
+            name="nicknameItem"
+            type="ch.giantific.qwittig.presentation.settings.addusers.listitems.NicknameItem"
+            />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/til_add_users_nickname"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/key_line_1"
+            android:layout_marginEnd="@dimen/key_line_1"
+            android:layout_weight="1"
+            android:error="@{!nicknameItem.validate ? null : nicknameItem.nicknameComplete ? null : @string/error_item_name}"
+            android:transitionGroup="true"
+            tools:targetApi="lollipop"
+            >
+
+            <EditText
+                android:id="@+id/et_add_users_nickname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_nickname"
+                android:inputType="textPersonName"
+                android:onTextChanged="@{nicknameItem.onNicknameChanged}"
+                />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <ImageView
+            android:id="@+id/iv_add_users_add"
+            android:layout_width="@dimen/touch_target_min"
+            android:layout_height="@dimen/touch_target_min"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="@string/hint_users"
+            android:onClick="@{nicknameItem.onAddUserClick}"
+            android:padding="@dimen/icon_size"
+            android:src="@drawable/ic_person_add_black_24dp"
+            />
+
+    </LinearLayout>
+
+</layout>

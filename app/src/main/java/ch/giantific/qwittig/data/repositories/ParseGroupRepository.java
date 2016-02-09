@@ -11,7 +11,9 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.Identity;
@@ -26,6 +28,11 @@ import rx.functions.Func1;
  */
 public class ParseGroupRepository extends ParseBaseRepository<Group> implements GroupRepository {
 
+    private static final String ADD_NEW_GROUP = "addGroup";
+    private static final String PARAM_GROUP_NAME = "groupName";
+    private static final String PARAM_GROUP_CURRENCY = "groupCurrency";
+
+
     public ParseGroupRepository() {
         super();
     }
@@ -33,6 +40,14 @@ public class ParseGroupRepository extends ParseBaseRepository<Group> implements 
     @Override
     protected String getClassName() {
         return Group.CLASS;
+    }
+
+    @Override
+    public Single<String> addNewGroup(@NonNull String groupName, @NonNull String groupCurrency) {
+        final Map<String, Object> params = new HashMap<>();
+        params.put(PARAM_GROUP_NAME, groupName);
+        params.put(PARAM_GROUP_CURRENCY, groupCurrency);
+        return callFunctionInBackground(ADD_NEW_GROUP, params);
     }
 
     @Override

@@ -1,0 +1,26 @@
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.settings.addusers.SettingsAddUsersViewModel"
+            />
+    </data>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_add_users"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/small_space"
+        />
+
+</layout>

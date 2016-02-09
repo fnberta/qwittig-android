@@ -9,7 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import ch.giantific.qwittig.databinding.RowUsersBinding;
+import ch.giantific.qwittig.databinding.RowIdentitiesBinding;
 import ch.giantific.qwittig.domain.models.parse.Identity;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
 
@@ -38,14 +38,14 @@ public class IdentitiesRecyclerAdapter extends RecyclerView.Adapter<BindingRow> 
     @Override
     public BindingRow onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        final RowUsersBinding binding = RowUsersBinding.inflate(inflater, parent, false);
+        final RowIdentitiesBinding binding = RowIdentitiesBinding.inflate(inflater, parent, false);
         return new BindingRow<>(binding);
     }
 
     @Override
     public void onBindViewHolder(BindingRow holder, int position) {
         final Identity identity = mViewModel.getItemAtPosition(position);
-        final RowUsersBinding binding = (RowUsersBinding) holder.getBinding();
+        final RowIdentitiesBinding binding = (RowIdentitiesBinding) holder.getBinding();
         IdentityRowViewModel viewModel = binding.getViewModel();
 
         if (viewModel == null) {

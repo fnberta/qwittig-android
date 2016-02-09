@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
-import ch.giantific.qwittig.databinding.FragmentFinanceUsersBinding;
+import ch.giantific.qwittig.databinding.FragmentFinanceIdentitiesBinding;
 import ch.giantific.qwittig.di.components.DaggerFinanceUsersComponent;
 import ch.giantific.qwittig.di.modules.FinanceUsersViewModelModule;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewOnlineFragment;
@@ -30,7 +30,7 @@ import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewOnline
 public class IdentitiesFragment extends BaseRecyclerViewOnlineFragment<IdentitiesViewModel, IdentitiesFragment.ActivityListener>
         implements IdentitiesViewModel.ViewListener {
 
-    private FragmentFinanceUsersBinding mBinding;
+    private FragmentFinanceIdentitiesBinding mBinding;
 
     public IdentitiesFragment() {
     }
@@ -47,7 +47,7 @@ public class IdentitiesFragment extends BaseRecyclerViewOnlineFragment<Identitie
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mBinding = FragmentFinanceUsersBinding.inflate(inflater, container, false);
+        mBinding = FragmentFinanceIdentitiesBinding.inflate(inflater, container, false);
         mBinding.setViewModel(mViewModel);
         return mBinding.getRoot();
     }

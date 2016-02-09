@@ -10,7 +10,7 @@ import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.di.scopes.PerFragment;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
-import ch.giantific.qwittig.domain.repositories.GroupRepository;
+import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.finance.FinanceCompsUnpaidViewModel;
 import ch.giantific.qwittig.presentation.finance.FinanceCompsUnpaidViewModelImpl;
@@ -30,10 +30,10 @@ public class FinanceCompsUnpaidViewModelModule extends BaseViewModelModule<Finan
 
     @PerFragment
     @Provides
-    FinanceCompsUnpaidViewModel providesFinanceCompsUnpaidViewModel(@NonNull GroupRepository groupRepository,
+    FinanceCompsUnpaidViewModel providesFinanceCompsUnpaidViewModel(@NonNull IdentityRepository identityRepository,
                                                                     @NonNull UserRepository userRepository,
                                                                     @NonNull CompensationRepository compsRepository) {
-        return new FinanceCompsUnpaidViewModelImpl(mSavedState, mView, groupRepository,
+        return new FinanceCompsUnpaidViewModelImpl(mSavedState, mView, identityRepository,
                 userRepository, compsRepository);
     }
 }

@@ -33,8 +33,6 @@ public interface NavDrawerViewModel extends ViewModel {
 
     boolean isUserLoggedIn();
 
-    void onNavDrawerReady();
-
     void onLoginSuccessful();
 
     void onLogout();

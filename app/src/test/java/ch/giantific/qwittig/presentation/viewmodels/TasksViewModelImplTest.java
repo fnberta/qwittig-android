@@ -19,15 +19,16 @@ import java.util.Date;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.Identity;
 import ch.giantific.qwittig.domain.models.parse.Task;
-import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.domain.repositories.GroupRepository;
+import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.tasks.list.TasksViewModel;
 import ch.giantific.qwittig.presentation.tasks.list.TasksViewModelImpl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -47,7 +48,7 @@ public class TasksViewModelImplTest {
     @Mock
     private TaskRepository mMockTaskRepo;
     @Mock
-    private GroupRepository mMockGroupRepo;
+    private IdentityRepository mMockIdentityRepo;
     @Mock
     private UserRepository mMockUserRepo;
 
@@ -56,37 +57,29 @@ public class TasksViewModelImplTest {
 
     @Before
     public void setUp() throws Exception {
-        mViewModel = new TasksViewModelImpl(mMockBundle, mMockView, mMockGroupRepo, mMockUserRepo, mMockTaskRepo);
+        mViewModel = new TasksViewModelImpl(mMockBundle, mMockView, mMockIdentityRepo, mMockUserRepo, mMockTaskRepo);
         mTasks = new ArrayList<>();
         mTasks.add(mMockTask);
         mViewModel.setItems(mTasks);
     }
 
-    @Test
-    public void onRefresh_shouldShowErrorIfNoConnection() throws Exception {
-        when(mMockView.isNetworkAvailable()).thenReturn(false);
-
-        mViewModel.refreshItems();
-        assertFalse(mViewModel.isRefreshing());
-        verify(mMockView).showMessage(R.string.toast_no_connection);
-    }
-
-    @Test
-    public void onRefresh_shouldRefreshIfConnection() throws Exception {
-        when(mMockView.isNetworkAvailable()).thenReturn(true);
-
-        mViewModel.refreshItems();
-        assertTrue(mViewModel.isRefreshing());
-        verify(mMockView).loadUpdateTasksWorker();
-    }
-
-    @Test
-    public void onFabClick_shouldShowDialogIfUserIsNotInGroup() throws Exception {
-//        when(mCurrentUser.getCurrentGroup()).thenReturn(null);
-
-        mViewModel.onAddTaskFabClick(Mockito.mock(View.class));
-        verify(mMockView).showCreateGroupDialog(R.string.dialog_group_create_tasks);
-    }
+//    @Test
+//    public void onRefresh_shouldShowErrorIfNoConnection() throws Exception {
+//        when(mMockView.isNetworkAvailable()).thenReturn(false);
+//
+//        mViewModel.refreshItems();
+//        assertFalse(mViewModel.isRefreshing());
+//        verify(mMockView).showMessage(R.string.toast_no_connection);
+//    }
+//
+//    @Test
+//    public void onRefresh_shouldRefreshIfConnection() throws Exception {
+//        when(mMockView.isNetworkAvailable()).thenReturn(true);
+//
+//        mViewModel.refreshItems();
+//        assertTrue(mViewModel.isRefreshing());
+//        verify(mMockView).loadUpdateTasksWorker();
+//    }
 
     @Test
     public void onFabClick_shouldStartAddActivityIfUserIsInGroup() throws Exception {
@@ -181,10 +174,10 @@ public class TasksViewModelImplTest {
 
     @Test
     public void onDoneClick_shouldReloadOnlyItemIfNeitherOldOrNewUserResponsibleIsCurrentUser() throws Exception {
-        final User user = Mockito.mock(User.class);
-        when(user.getObjectId()).thenReturn("someOtherId");
+        final Identity identity = Mockito.mock(Identity.class);
+        when(identity.getObjectId()).thenReturn("someOtherId");
         when(mMockTask.getTimeFrame()).thenReturn(Task.TimeFrame.MONTHLY);
-        when(mMockTask.getUserResponsible()).thenReturn(user);
+        when(mMockTask.getUserResponsible()).thenReturn(identity);
 //        when(mMockTask.addHistoryEvent(mCurrentUser)).thenReturn(user);
 //        when(mCurrentUser.getObjectId()).thenReturn("someId");
 

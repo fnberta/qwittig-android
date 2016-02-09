@@ -123,7 +123,6 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
         super.setContentView(layoutResID);
 
         setupNavDrawer();
-        mNavDrawerViewModel.onNavDrawerReady();
     }
 
     private void setupNavDrawer() {

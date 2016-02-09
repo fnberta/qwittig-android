@@ -20,6 +20,12 @@ import rx.Single;
  */
 public interface IdentityRepository extends Repository {
 
+    String INVITATION_LINK = "https://qwittig.ch/invitation/";
+
+    Single<String> addIdentity(@NonNull String nickname,
+                               @NonNull String groupId,
+                               @NonNull String groupName);
+
     /**
      * Fetches the data of a {@link Identity} object from the local data store. If there is no data
      * available in the local data store it will try to fetch the data online.

@@ -15,6 +15,7 @@ import android.support.v4.app.FragmentManager;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.fragments.ConfirmationDialogFragment;
+import ch.giantific.qwittig.presentation.settings.addgroup.SettingsAddGroupActivity;
 
 /**
  * Hosts {@link SettingsFragment} containing the main settings options.
@@ -34,7 +35,7 @@ public class SettingsActivity extends BaseActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        // set default Result to OK, if logOut is triggered it will be set to LOGOUT in order to
+        // set default Result to OK, if logout is triggered it will be set to LOGOUT in order to
         // finish HomeActivity as well
         setResult(RESULT_OK);
 
@@ -76,7 +77,7 @@ public class SettingsActivity extends BaseActivity implements
             case INTENT_REQUEST_SETTINGS_GROUP_NEW:
                 if (resultCode == Activity.RESULT_OK) {
                     final String newGroupName = data.getStringExtra(
-                            SettingsGroupNewActivity.RESULT_DATA_GROUP);
+                            SettingsAddGroupActivity.RESULT_DATA_GROUP);
                     Snackbar.make(mToolbar, getString(R.string.toast_group_added, newGroupName),
                             Snackbar.LENGTH_LONG).show();
                 }

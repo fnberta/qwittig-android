@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.domain.repositories.GroupRepository;
+import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.finance.IdentitiesViewModel;
 import ch.giantific.qwittig.presentation.finance.IdentitiesViewModelImpl;
@@ -29,8 +29,8 @@ public class FinanceUsersViewModelModule extends BaseViewModelModule<IdentitiesV
 
     @PerFragment
     @Provides
-    IdentitiesViewModel providesFinanceUsersViewModel(@NonNull GroupRepository groupRepository,
+    IdentitiesViewModel providesFinanceUsersViewModel(@NonNull IdentityRepository identityRepository,
                                                       @NonNull UserRepository userRepository) {
-        return new IdentitiesViewModelImpl(mSavedState, mView, userRepository, groupRepository);
+        return new IdentitiesViewModelImpl(mSavedState, mView, identityRepository, userRepository);
     }
 }

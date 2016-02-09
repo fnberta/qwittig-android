@@ -9,7 +9,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
+import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
+import rx.Observable;
 import rx.Single;
 
 /**
@@ -24,6 +26,8 @@ public interface UserRepository extends Repository {
      */
     @Nullable
     User getCurrentUser();
+
+    Single<User> udpateCurrentUser();
 
     /**
      * Returns the session token for current user session.
@@ -74,10 +78,8 @@ public interface UserRepository extends Repository {
      * @param photoUrl    the url to the google profile image
      * @return the logged in user
      */
-    Single<User> loginGoogle(@NonNull final Fragment fragment,
-                             @NonNull String idToken,
-                             @NonNull final String displayName,
-                             @NonNull final Uri photoUrl);
+    Single<User> loginGoogle(@NonNull final Fragment fragment, @NonNull String idToken,
+                             @NonNull final String displayName, @NonNull final Uri photoUrl);
 
     /**
      * Logs out the user.
@@ -86,4 +88,6 @@ public interface UserRepository extends Repository {
      * @return the logged out user
      */
     Single<User> logOut(@NonNull User user);
+
+    Observable<User> addNewIdentity(@NonNull String groupName, @NonNull String groupCurrency);
 }

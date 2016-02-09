@@ -7,6 +7,7 @@ package ch.giantific.qwittig.domain.models.parse;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import com.parse.ParseACL;
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
 
@@ -14,6 +15,8 @@ import org.apache.commons.math3.fraction.BigFraction;
 
 import java.math.BigInteger;
 import java.util.List;
+
+import ch.giantific.qwittig.utils.parse.ParseUtils;
 
 /**
  * Represents a user identity. Every user has one identity for every group he is in, containing
@@ -27,6 +30,7 @@ public class Identity extends ParseObject implements Comparable<Identity> {
     public static final String CLASS = "Identity";
     public static final String GROUP = "group";
     public static final String ACTIVE = "isActive";
+    public static final String PENDING = "pending";
     public static final String NICKNAME = "nickname";
     public static final String AVATAR = "avatar";
     public static final String BALANCE = "balance";
@@ -36,8 +40,26 @@ public class Identity extends ParseObject implements Comparable<Identity> {
         // A default constructor is required.
     }
 
+    public Identity(@NonNull Group group, @NonNull String nickname, @NonNull byte[] avatar) {
+        this(group, nickname);
+        setAvatar(avatar);
+    }
+
+    public Identity(@NonNull Group group, @NonNull String nickname) {
+        this(group);
+        setPending(true);
+        setNickname(nickname);
+    }
+
     public Identity(@NonNull Group group) {
         setGroup(group);
+        setActive(true);
+        setAccessRights(group);
+    }
+
+    private void setAccessRights(@NonNull Group group) {
+        ParseACL acl = ParseUtils.getDefaultAcl(group);
+        setACL(acl);
     }
 
     public Group getGroup() {
@@ -54,6 +76,14 @@ public class Identity extends ParseObject implements Comparable<Identity> {
 
     public void setActive(boolean active) {
         put(ACTIVE, active);
+    }
+
+    public boolean isPending() {
+        return getBoolean(PENDING);
+    }
+
+    public void setPending(boolean pending) {
+        put(PENDING, pending);
     }
 
     public String getNickname() {

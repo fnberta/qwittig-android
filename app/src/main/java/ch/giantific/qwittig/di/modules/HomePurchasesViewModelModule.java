@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.domain.repositories.GroupRepository;
+import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.home.purchases.list.HomePurchasesViewModel;
@@ -30,10 +30,10 @@ public class HomePurchasesViewModelModule extends BaseViewModelModule<HomePurcha
 
     @PerFragment
     @Provides
-    HomePurchasesViewModel providesHomePurchasesViewModel(@NonNull GroupRepository groupRepository,
+    HomePurchasesViewModel providesHomePurchasesViewModel(@NonNull IdentityRepository identityRepository,
                                                           @NonNull UserRepository userRepository,
                                                           @NonNull PurchaseRepository purchaseRepository) {
-        return new HomePurchasesViewModelImpl(mSavedState, mView, groupRepository, userRepository,
+        return new HomePurchasesViewModelImpl(mSavedState, mView, identityRepository, userRepository,
                 purchaseRepository);
     }
 }

@@ -11,13 +11,16 @@ import android.support.annotation.StringRes;
 import com.parse.CountCallback;
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
+import com.parse.FunctionCallback;
 import com.parse.GetCallback;
+import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.SaveCallback;
 
 import java.util.List;
+import java.util.Map;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.repositories.Repository;
@@ -70,6 +73,29 @@ public abstract class ParseBaseRepository<T extends ParseObject> implements Repo
     }
 
     protected abstract String getClassName();
+
+    final <T> Single<T> callFunctionInBackground(@NonNull final String function,
+                                                   @NonNull final Map<String, ?> params) {
+        return Single.create(new Single.OnSubscribe<T>() {
+            @Override
+            public void call(final SingleSubscriber<? super T> singleSubscriber) {
+                ParseCloud.callFunctionInBackground(function, params, new FunctionCallback<T>() {
+                    @Override
+                    public void done(T object, ParseException e) {
+                        if (singleSubscriber.isUnsubscribed()) {
+                            return;
+                        }
+
+                        if (e != null) {
+                            singleSubscriber.onError(e);
+                        } else {
+                            singleSubscriber.onSuccess(object);
+                        }
+                    }
+                });
+            }
+        });
+    }
 
     @NonNull
     final Single<T> save(@NonNull final T object) {
@@ -279,6 +305,16 @@ public abstract class ParseBaseRepository<T extends ParseObject> implements Repo
                         }
                     }
                 });
+            }
+        });
+    }
+
+    @NonNull
+    final Single<T> fetch(@NonNull final T object) {
+        return Single.create(new Single.OnSubscribe<T>() {
+            @Override
+            public void call(SingleSubscriber<? super T> singleSubscriber) {
+
             }
         });
     }

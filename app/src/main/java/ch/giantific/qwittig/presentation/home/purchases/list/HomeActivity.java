@@ -31,7 +31,7 @@ import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddActiv
 import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddEditViewModel.PurchaseResult;
 import ch.giantific.qwittig.presentation.home.purchases.details.PurchaseDetailsViewModel.PurchaseDetailsResult;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
-import ch.giantific.qwittig.presentation.settings.SettingsGroupNewActivity;
+import ch.giantific.qwittig.presentation.settings.addgroup.SettingsAddGroupActivity;
 import ch.giantific.qwittig.utils.ViewUtils;
 import rx.Observable;
 
@@ -302,12 +302,6 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     @Override
     public ActionMode startActionMode() {
         return mToolbar.startActionMode(mDraftsFragment);
-    }
-
-    @Override
-    public void onCreateGroupSelected() {
-        final Intent intent = new Intent(this, SettingsGroupNewActivity.class);
-        startActivity(intent);
     }
 
     @SuppressWarnings("unchecked")

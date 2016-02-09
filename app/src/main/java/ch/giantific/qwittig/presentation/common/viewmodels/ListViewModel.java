@@ -79,7 +79,7 @@ public interface ListViewModel<T>
 
         void notifyItemRangeRemoved(int positionStart, int itemCount);
 
-        void notifyItemInserted(int lastPosition);
+        void notifyItemInserted(int position);
 
         void notifyItemRangeInserted(int positionStart, int itemCount);
 

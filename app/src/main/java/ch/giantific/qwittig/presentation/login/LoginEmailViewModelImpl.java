@@ -26,6 +26,7 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
         implements LoginEmailViewModel {
 
     private static final String STATE_LOADING = "STATE_LOADING";
+    private static final String STATE_SIGN_UP = "STATE_SIGN_UP";
     private boolean mLoading;
     private boolean mSignUp;
     private String mEmail;
@@ -38,7 +39,15 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
                                    @NonNull UserRepository userRepository) {
         super(savedState, view, userRepository);
 
-        mLoading = savedState == null || (savedState.getBoolean(STATE_LOADING, false));
+
+
+        if (savedState != null) {
+            mLoading = savedState.getBoolean(STATE_LOADING);
+            mSignUp = savedState.getBoolean(STATE_SIGN_UP);
+        } else {
+            mLoading = false;
+            mSignUp = false;
+        }
     }
 
     @Override
@@ -46,6 +55,7 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
         super.saveState(outState);
 
         outState.putBoolean(STATE_LOADING, mLoading);
+        outState.putBoolean(STATE_SIGN_UP, mSignUp);
     }
 
     @Override
@@ -152,13 +162,20 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
     @Override
     public void onLoginClick(View view) {
         if (validate()) {
+            setLoading(true);
             mView.loadEmailLoginWorker(mEmail, mPassword);
         }
     }
 
     @Override
     public void onSignUpClick(View view) {
+        if (!mSignUp) {
+            setSignUp(true);
+            return;
+        }
+
         if (validate()) {
+            setLoading(true);
             mView.loadEmailSignUpWorker(mEmail, mPassword);
         }
     }

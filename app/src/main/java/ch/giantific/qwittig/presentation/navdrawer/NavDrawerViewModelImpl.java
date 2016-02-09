@@ -42,7 +42,9 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
     }
 
     @Override
-    public void onNavDrawerReady() {
+    public void onStart() {
+        super.onStart();
+
         if (isUserLoggedIn()) {
             loadIdentities();
         }

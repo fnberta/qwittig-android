@@ -16,7 +16,6 @@ import org.json.JSONObject;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import ch.giantific.qwittig.domain.models.stats.Stats;
@@ -86,10 +85,10 @@ public class ParseApiRepository implements ApiRepository {
     }
 
     @Override
-    public Single<String> inviteUsers(@NonNull List<String> emails,
+    public Single<String> addIdentity(@NonNull String nickname,
                                       @NonNull String groupName) {
         final Map<String, Object> params = new HashMap<>();
-        params.put(PARAM_EMAIL, emails);
+        params.put(PARAM_EMAIL, nickname);
         params.put(PushBroadcastReceiver.PUSH_PARAM_GROUP_NAME, groupName);
 
         return callFunctionInBackground(INVITE_USER, params);

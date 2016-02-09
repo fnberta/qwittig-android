@@ -39,6 +39,20 @@ public class ParseIdentityRepository extends ParseBaseRepository<Identity> imple
     }
 
     @Override
+    public Single<String> addIdentity(@NonNull String nickname, @NonNull String groupId,
+                                      @NonNull final String groupName) {
+        final Group group = (Group) ParseObject.createWithoutData(Group.CLASS, groupId);
+        final Identity identity = new Identity(group, nickname);
+        return save(identity)
+                .map(new Func1<Identity, String>() {
+                    @Override
+                    public String call(Identity identity) {
+                        return INVITATION_LINK + "?id=" + identity.getObjectId() + "&group=" + groupName;
+                    }
+                });
+    }
+
+    @Override
     public Observable<Identity> fetchIdentityDataAsync(@NonNull final Identity identity) {
         if (identity.isDataAvailable() && identity.getGroup().isDataAvailable()) {
             return Observable.just(identity);

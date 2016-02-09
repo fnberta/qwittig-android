@@ -10,8 +10,6 @@ import com.parse.ParseFile;
 
 import org.json.JSONObject;
 
-import java.util.List;
-
 import ch.giantific.qwittig.domain.models.stats.Stats;
 import rx.Single;
 
@@ -25,13 +23,13 @@ public interface ApiRepository {
     Single<String> calcUserBalances();
 
     /**
-     * Invites new users to join a group by sending them an email and a push notification if the
-     * there is already an account for the email address.
+     * Creates a new identity and generates an invitation link for it. Allows the user to interact
+     * with the identity even if no one has yet accepted the invitation.
      *
-     * @param emails    the emails to which to send the invitations too
-     * @param groupName the name of the group the users are invited to
+     * @param nickname  the nickname to use in the new identity
+     * @param groupName the name of the group the new identity is created for, user for the link
      */
-    Single<String> inviteUsers(@NonNull List<String> emails,
+    Single<String> addIdentity(@NonNull String nickname,
                                @NonNull String groupName);
 
     /**

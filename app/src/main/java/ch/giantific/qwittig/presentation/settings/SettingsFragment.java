@@ -5,9 +5,7 @@
 package ch.giantific.qwittig.presentation.settings;
 
 
-import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -26,21 +24,15 @@ import android.support.v7.preference.PreferenceCategory;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.preference.PreferenceScreen;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.google.gson.Gson;
 import com.parse.ParseObject;
-import com.parse.ParsePush;
 import com.parse.ParseUser;
 
 import org.apache.commons.math3.fraction.BigFraction;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.ParseApiRepository;
@@ -48,11 +40,10 @@ import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.presentation.common.BaseActivity;
-import ch.giantific.qwittig.presentation.common.fragments.ConfirmationDialogFragment;
+import ch.giantific.qwittig.presentation.settings.addgroup.SettingsAddGroupActivity;
+import ch.giantific.qwittig.presentation.settings.addusers.SettingsAddUsersActivity;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.WorkerUtils;
-import rx.SingleSubscriber;
 
 /**
  * Displays the main settings of the app and listens for changes.
@@ -145,7 +136,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         prefGroupNew.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                final Intent intent = new Intent(activity, SettingsGroupNewActivity.class);
+                final Intent intent = new Intent(activity, SettingsAddGroupActivity.class);
                 final ActivityOptionsCompat activityOptionsCompat =
                         ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity());
                 activity.startActivityForResult(intent, SettingsActivity.INTENT_REQUEST_SETTINGS_GROUP_NEW,
@@ -157,7 +148,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         prefGroupAddUser.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                Intent intent = new Intent(activity, SettingsUserInviteActivity.class);
+                Intent intent = new Intent(activity, SettingsAddUsersActivity.class);
                 ActivityOptionsCompat activityOptionsCompat =
                         ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity());
                 activity.startActivity(intent, activityOptionsCompat.toBundle());

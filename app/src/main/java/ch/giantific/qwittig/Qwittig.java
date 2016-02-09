@@ -25,6 +25,7 @@ import ch.giantific.qwittig.di.modules.ApplicationModule;
 import ch.giantific.qwittig.di.modules.RestServiceModule;
 import ch.giantific.qwittig.domain.models.parse.Compensation;
 import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.Identity;
 import ch.giantific.qwittig.domain.models.parse.Item;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.models.parse.Task;
@@ -86,6 +87,7 @@ public class Qwittig extends Application {
     private void initialiseParse() {
         // register ParseObject subclasses
         ParseObject.registerSubclass(Group.class);
+        ParseObject.registerSubclass(Identity.class);
         ParseObject.registerSubclass(User.class);
         ParseObject.registerSubclass(Purchase.class);
         ParseObject.registerSubclass(Item.class);
