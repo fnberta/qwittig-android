@@ -13,11 +13,19 @@ import android.support.v4.app.FragmentManager;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.List;
+
+import javax.inject.Inject;
 
 import ch.giantific.qwittig.di.components.WorkerComponent;
+import ch.giantific.qwittig.domain.models.parse.Identity;
 import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.repositories.GroupRepository;
+import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;
+import rx.Single;
+import rx.functions.Func1;
 
 /**
  * Handles the different use-cases connected with the account of a user (log-in, create account,
@@ -38,6 +46,10 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
     private static final String KEY_PASSWORD = "PASSWORD";
     private static final String KEY_GOOGLE_ID_TOKEN = "ID_TOKEN";
     private static final String KEY_GOOGLE_PHOTO_URL = "GOOGLE_PHOTO_URL";
+    @Inject
+    IdentityRepository mIdentityRepo;
+    @Inject
+    GroupRepository mGroupRepo;
     @Type
     private int mType;
 
@@ -214,7 +226,32 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
             case Type.SIGN_UP_EMAIL: {
                 final String username = args.getString(KEY_USERNAME, "");
                 final String password = args.getString(KEY_PASSWORD, "");
-                return mUserRepo.signUpEmail(username, password).toObservable();
+                return mUserRepo.signUpEmail(username, password)
+                        .flatMap(new Func1<User, Single<User>>() {
+                            @Override
+                            public Single<User> call(final User user) {
+                                return mGroupRepo.addNewGroup("Qwittig Rocks", "CHF")
+                                        .flatMap(new Func1<String, Single<User>>() {
+                                            @Override
+                                            public Single<User> call(String result) {
+                                                return mUserRepo.updateUser(user);
+                                            }
+                                        });
+                            }
+                        })
+                        .flatMapObservable(new Func1<User, Observable<User>>() {
+                            @Override
+                            public Observable<User> call(final User user) {
+                                return mIdentityRepo.updateIdentitiesAsync(user)
+                                        .toList()
+                                        .map(new Func1<List<Identity>, User>() {
+                                            @Override
+                                            public User call(List<Identity> identities) {
+                                                return user;
+                                            }
+                                        });
+                            }
+                        });
             }
             case Type.LOGIN_FACEBOOK: {
                 return mUserRepo.loginFacebook(this).toObservable();

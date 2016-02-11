@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.di.scopes.PerFragment;
+import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.settings.addgroup.SettingsAddGroupViewModel;
 import ch.giantific.qwittig.presentation.settings.addgroup.SettingsAddGroupViewModelImpl;
@@ -28,7 +29,8 @@ public class SettingsAddGroupViewModelModule extends BaseViewModelModule<Setting
 
     @PerFragment
     @Provides
-    SettingsAddGroupViewModel providesSettingsAddGroupViewModel(@NonNull UserRepository userRepository) {
-        return new SettingsAddGroupViewModelImpl(mSavedState, mView, userRepository);
+    SettingsAddGroupViewModel providesSettingsAddGroupViewModel(@NonNull UserRepository userRepository,
+                                                                @NonNull IdentityRepository identityRepository) {
+        return new SettingsAddGroupViewModelImpl(mSavedState, mView, userRepository, identityRepository);
     }
 }

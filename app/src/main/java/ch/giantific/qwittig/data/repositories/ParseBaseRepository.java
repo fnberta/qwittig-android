@@ -15,6 +15,7 @@ import com.parse.FunctionCallback;
 import com.parse.GetCallback;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.SaveCallback;
@@ -33,7 +34,7 @@ import timber.log.Timber;
 /**
  * Provides a base class for repository implementations that use the Parse.com framework.
  */
-public abstract class ParseBaseRepository<T extends ParseObject> implements Repository {
+public abstract class ParseBaseRepository implements Repository {
 
     public static final int QUERY_ITEMS_PER_PAGE = 15;
 
@@ -75,7 +76,7 @@ public abstract class ParseBaseRepository<T extends ParseObject> implements Repo
     protected abstract String getClassName();
 
     final <T> Single<T> callFunctionInBackground(@NonNull final String function,
-                                                   @NonNull final Map<String, ?> params) {
+                                                 @NonNull final Map<String, ?> params) {
         return Single.create(new Single.OnSubscribe<T>() {
             @Override
             public void call(final SingleSubscriber<? super T> singleSubscriber) {
@@ -98,7 +99,7 @@ public abstract class ParseBaseRepository<T extends ParseObject> implements Repo
     }
 
     @NonNull
-    final Single<T> save(@NonNull final T object) {
+    final <T extends ParseFile> Single<T> saveFile(@NonNull final T object) {
         return Single.create(new Single.OnSubscribe<T>() {
             @Override
             public void call(final SingleSubscriber<? super T> singleSubscriber) {
@@ -121,7 +122,30 @@ public abstract class ParseBaseRepository<T extends ParseObject> implements Repo
     }
 
     @NonNull
-    final Observable<List<T>> find(@NonNull final ParseQuery<T> query) {
+    final <T extends ParseObject> Single<T> save(@NonNull final T object) {
+        return Single.create(new Single.OnSubscribe<T>() {
+            @Override
+            public void call(final SingleSubscriber<? super T> singleSubscriber) {
+                object.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(@Nullable ParseException e) {
+                        if (singleSubscriber.isUnsubscribed()) {
+                            return;
+                        }
+
+                        if (e != null) {
+                            singleSubscriber.onError(e);
+                        } else {
+                            singleSubscriber.onSuccess(object);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    @NonNull
+    final <T extends ParseObject> Observable<List<T>> find(@NonNull final ParseQuery<T> query) {
         return Observable.create(new Observable.OnSubscribe<List<T>>() {
             @Override
             public void call(final Subscriber<? super List<T>> subscriber) {
@@ -145,7 +169,7 @@ public abstract class ParseBaseRepository<T extends ParseObject> implements Repo
     }
 
     @NonNull
-    final Single<T> first(@NonNull final ParseQuery<T> query) {
+    final <T extends ParseObject> Single<T> first(@NonNull final ParseQuery<T> query) {
         return Single.create(new Single.OnSubscribe<T>() {
             @Override
             public void call(final SingleSubscriber<? super T> singleSubscriber) {
@@ -168,7 +192,7 @@ public abstract class ParseBaseRepository<T extends ParseObject> implements Repo
     }
 
     @NonNull
-    final Single<T> unpin(@NonNull final T object, @NonNull final String tag) {
+    final <T extends ParseObject> Single<T> unpin(@NonNull final T object, @NonNull final String tag) {
         return Single.create(new Single.OnSubscribe<T>() {
             @Override
             public void call(final SingleSubscriber<? super T> singleSubscriber) {
@@ -191,8 +215,8 @@ public abstract class ParseBaseRepository<T extends ParseObject> implements Repo
     }
 
     @NonNull
-    final Observable<List<T>> unpinAll(@NonNull final List<T> objects,
-                                       @NonNull final String tag) {
+    final <T extends ParseObject> Observable<List<T>> unpinAll(@NonNull final List<T> objects,
+                                                               @NonNull final String tag) {
         return Observable.create(new Observable.OnSubscribe<List<T>>() {
             @Override
             public void call(final Subscriber<? super List<T>> subscriber) {
@@ -216,8 +240,8 @@ public abstract class ParseBaseRepository<T extends ParseObject> implements Repo
     }
 
     @NonNull
-    final Observable<List<T>> pinAll(@NonNull final List<T> objects,
-                                     @NonNull final String tag) {
+    final <T extends ParseObject> Observable<List<T>> pinAll(@NonNull final List<T> objects,
+                                                             @NonNull final String tag) {
         return Observable.create(new Observable.OnSubscribe<List<T>>() {
             @Override
             public void call(final Subscriber<? super List<T>> subscriber) {
@@ -241,7 +265,7 @@ public abstract class ParseBaseRepository<T extends ParseObject> implements Repo
     }
 
     @NonNull
-    final Single<T> pin(@NonNull final T object, @NonNull final String tag) {
+    final <T extends ParseObject> Single<T> pin(@NonNull final T object, @NonNull final String tag) {
         return Single.create(new Single.OnSubscribe<T>() {
             @Override
             public void call(final SingleSubscriber<? super T> singleSubscriber) {
@@ -264,7 +288,7 @@ public abstract class ParseBaseRepository<T extends ParseObject> implements Repo
     }
 
     @NonNull
-    final Single<T> get(@NonNull final ParseQuery<T> query, @NonNull final String objectId) {
+    final <T extends ParseObject> Single<T> get(@NonNull final ParseQuery<T> query, @NonNull final String objectId) {
         return Single.create(new Single.OnSubscribe<T>() {
             @Override
             public void call(final SingleSubscriber<? super T> singleSubscriber) {
@@ -287,7 +311,7 @@ public abstract class ParseBaseRepository<T extends ParseObject> implements Repo
     }
 
     @NonNull
-    final Single<T> fetchLocal(@NonNull final T object) {
+    final <T extends ParseObject> Single<T> fetchLocal(@NonNull final T object) {
         return Single.create(new Single.OnSubscribe<T>() {
             @Override
             public void call(final SingleSubscriber<? super T> singleSubscriber) {
@@ -310,17 +334,30 @@ public abstract class ParseBaseRepository<T extends ParseObject> implements Repo
     }
 
     @NonNull
-    final Single<T> fetch(@NonNull final T object) {
+    final <T extends ParseObject> Single<T> fetch(@NonNull final T object) {
         return Single.create(new Single.OnSubscribe<T>() {
             @Override
-            public void call(SingleSubscriber<? super T> singleSubscriber) {
+            public void call(final SingleSubscriber<? super T> singleSubscriber) {
+                object.fetchInBackground(new GetCallback<T>() {
+                    @Override
+                    public void done(T object, ParseException e) {
+                        if (singleSubscriber.isUnsubscribed()) {
+                            return;
+                        }
 
+                        if (e != null) {
+                            singleSubscriber.onError(e);
+                        } else {
+                            singleSubscriber.onSuccess(object);
+                        }
+                    }
+                });
             }
         });
     }
 
     @NonNull
-    final Single<T> fetchIfNeeded(@NonNull final T object) {
+    final <T extends ParseObject> Single<T> fetchIfNeeded(@NonNull final T object) {
         return Single.create(new Single.OnSubscribe<T>() {
             @Override
             public void call(final SingleSubscriber<? super T> singleSubscriber) {
@@ -343,7 +380,7 @@ public abstract class ParseBaseRepository<T extends ParseObject> implements Repo
     }
 
     @NonNull
-    final Single<Integer> count(@NonNull final ParseQuery<T> query) {
+    final <T extends ParseObject> Single<Integer> count(@NonNull final ParseQuery<T> query) {
         return Single.create(new Single.OnSubscribe<Integer>() {
             @Override
             public void call(final SingleSubscriber<? super Integer> singleSubscriber) {
@@ -358,6 +395,29 @@ public abstract class ParseBaseRepository<T extends ParseObject> implements Repo
                             singleSubscriber.onError(e);
                         } else {
                             singleSubscriber.onSuccess(count);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    @NonNull
+    final <T extends ParseObject> Single<T> delete(@NonNull final T object) {
+        return Single.create(new Single.OnSubscribe<T>() {
+            @Override
+            public void call(final SingleSubscriber<? super T> singleSubscriber) {
+                object.deleteInBackground(new DeleteCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (singleSubscriber.isUnsubscribed()) {
+                            return;
+                        }
+
+                        if (e != null) {
+                            singleSubscriber.onError(e);
+                        } else {
+                            singleSubscriber.onSuccess(object);
                         }
                     }
                 });

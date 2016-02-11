@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.data.repositories;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -24,30 +25,33 @@ import com.parse.LogInCallback;
 import com.parse.LogOutCallback;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseFile;
 import com.parse.ParseInstallation;
-import com.parse.ParseObject;
 import com.parse.ParseSession;
 import com.parse.ParseUser;
 import com.parse.RequestPasswordResetCallback;
 import com.parse.SaveCallback;
 import com.parse.SignUpCallback;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.GoogleApiClientSignOut;
+import ch.giantific.qwittig.GoogleApiClientUnlink;
 import ch.giantific.qwittig.domain.models.parse.Identity;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.domain.repositories.ApiRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.utils.AvatarUtils;
 import ch.giantific.qwittig.utils.parse.ParseInstallationUtils;
 import rx.Observable;
 import rx.Single;
 import rx.SingleSubscriber;
+import rx.exceptions.Exceptions;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
@@ -55,14 +59,13 @@ import rx.functions.Func1;
  * Provides an implementation of {@link UserRepository} that uses the Parse.com framework as
  * the local and online data store.
  */
-public class ParseUserRepository extends ParseBaseRepository<ParseUser> implements UserRepository {
+public class ParseUserRepository extends ParseBaseRepository implements UserRepository {
 
-    private ApiRepository mApiRepo;
+    private static final String VERIFY_GOOGLE_LOGIN = "loginWithGoogle";
+    private static final String PARAM_ID_TOKEN = "idToken";
 
-    public ParseUserRepository(@NonNull ApiRepository apiRepo) {
+    public ParseUserRepository() {
         super();
-
-        mApiRepo = apiRepo;
     }
 
     @Override
@@ -77,8 +80,8 @@ public class ParseUserRepository extends ParseBaseRepository<ParseUser> implemen
     }
 
     @Override
-    public Single<User> udpateCurrentUser() {
-        return ;
+    public Single<User> updateUser(@NonNull User user) {
+        return fetch(user);
     }
 
     @Override
@@ -129,7 +132,7 @@ public class ParseUserRepository extends ParseBaseRepository<ParseUser> implemen
                 .doOnSuccess(new Action1<User>() {
                     @Override
                     public void call(User user) {
-                        addUserToInstallation(user);
+//                        addUserToInstallation(user);
                     }
                 });
     }
@@ -178,12 +181,6 @@ public class ParseUserRepository extends ParseBaseRepository<ParseUser> implemen
                                 }
                             }
                         });
-                    }
-                })
-                .flatMap(new Func1<User, Single<? extends User>>() {
-                    @Override
-                    public Single<? extends User> call(User user) {
-                        return addFirstIdentity(user);
                     }
                 })
                 .flatMap(new Func1<User, Single<? extends User>>() {
@@ -239,10 +236,10 @@ public class ParseUserRepository extends ParseBaseRepository<ParseUser> implemen
 
                                             final String id = facebookData.optString("id");
                                             return getFacebookUserProfileImage(fragment, id)
-                                                    .map(new Func1<byte[], User>() {
+                                                    .map(new Func1<ParseFile, User>() {
                                                         @Override
-                                                        public User call(byte[] bytes) {
-//                                                            user.setAvatar(bytes);
+                                                        public User call(ParseFile avatar) {
+//                                                            user.setAvatar(avatar);
                                                             return user;
                                                         }
                                                     });
@@ -255,7 +252,7 @@ public class ParseUserRepository extends ParseBaseRepository<ParseUser> implemen
                 .doOnSuccess(new Action1<User>() {
                     @Override
                     public void call(User user) {
-                        addUserToInstallation(user);
+//                        addUserToInstallation(user);
                     }
                 });
     }
@@ -287,36 +284,44 @@ public class ParseUserRepository extends ParseBaseRepository<ParseUser> implemen
         });
     }
 
-    private Single<byte[]> getFacebookUserProfileImage(@NonNull final Fragment fragment,
-                                                       @NonNull String facebookId) {
+    private Single<ParseFile> getFacebookUserProfileImage(@NonNull final Fragment fragment,
+                                                          @NonNull String facebookId) {
         final String pictureUrl = "http://graph.facebook.com/" + facebookId + "/picture?type=large";
-        return Single.create(new Single.OnSubscribe<byte[]>() {
-            @Override
-            public void call(final SingleSubscriber<? super byte[]> singleSubscriber) {
-                Glide.with(fragment)
-                        .load(pictureUrl)
-                        .asBitmap()
-                        .toBytes(Bitmap.CompressFormat.JPEG, AvatarUtils.JPEG_COMPRESSION_RATE)
-                        .centerCrop()
-                        .into(new SimpleTarget<byte[]>(AvatarUtils.WIDTH, AvatarUtils.HEIGHT) {
-                            @Override
-                            public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
-                                if (!singleSubscriber.isUnsubscribed()) {
-                                    singleSubscriber.onSuccess(resource);
-                                }
-                            }
+        return Single
+                .create(new Single.OnSubscribe<byte[]>() {
+                    @Override
+                    public void call(final SingleSubscriber<? super byte[]> singleSubscriber) {
+                        Glide.with(fragment)
+                                .load(pictureUrl)
+                                .asBitmap()
+                                .toBytes(Bitmap.CompressFormat.JPEG, AvatarUtils.JPEG_COMPRESSION_RATE)
+                                .centerCrop()
+                                .into(new SimpleTarget<byte[]>(AvatarUtils.WIDTH, AvatarUtils.HEIGHT) {
+                                    @Override
+                                    public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
+                                        if (!singleSubscriber.isUnsubscribed()) {
+                                            singleSubscriber.onSuccess(resource);
+                                        }
+                                    }
 
-                            @Override
-                            public void onLoadFailed(Exception e, Drawable errorDrawable) {
-                                super.onLoadFailed(e, errorDrawable);
+                                    @Override
+                                    public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                                        super.onLoadFailed(e, errorDrawable);
 
-                                if (!singleSubscriber.isUnsubscribed()) {
-                                    singleSubscriber.onError(e);
-                                }
-                            }
-                        });
-            }
-        });
+                                        if (!singleSubscriber.isUnsubscribed()) {
+                                            singleSubscriber.onError(e);
+                                        }
+                                    }
+                                });
+                    }
+                })
+                .flatMap(new Func1<byte[], Single<? extends ParseFile>>() {
+                    @Override
+                    public Single<? extends ParseFile> call(byte[] bytes) {
+                        final ParseFile avatar = new ParseFile(bytes);
+                        return saveFile(avatar);
+                    }
+                });
     }
 
     @Override
@@ -324,7 +329,7 @@ public class ParseUserRepository extends ParseBaseRepository<ParseUser> implemen
                                     @NonNull String idToken,
                                     @NonNull final String displayName,
                                     @NonNull final Uri photoUrl) {
-        return mApiRepo.loginWithGoogle(idToken)
+        return verifyGoogleLogin(idToken)
                 .flatMap(new Func1<JSONObject, Single<? extends User>>() {
                     @Override
                     public Single<? extends User> call(JSONObject token) {
@@ -340,10 +345,10 @@ public class ParseUserRepository extends ParseBaseRepository<ParseUser> implemen
                                     public Single<? extends User> call(final User user) {
 //                                        user.setNickname(displayName);
                                         return getGoogleProfileImage(fragment, photoUrl)
-                                                .map(new Func1<byte[], User>() {
+                                                .map(new Func1<ParseFile, User>() {
                                                     @Override
-                                                    public User call(byte[] bytes) {
-//                                                    user.setAvatar(bytes);
+                                                    public User call(ParseFile avatar) {
+//                                                    user.setAvatar(avatar);
                                                         return user;
                                                     }
                                                 });
@@ -354,7 +359,25 @@ public class ParseUserRepository extends ParseBaseRepository<ParseUser> implemen
                 .doOnSuccess(new Action1<User>() {
                     @Override
                     public void call(User user) {
-                        addUserToInstallation(user);
+//                        addUserToInstallation(user);
+                    }
+                });
+    }
+
+    @Override
+    public Single<JSONObject> verifyGoogleLogin(@NonNull String idToken) {
+        Map<String, Object> params = new HashMap<>();
+        params.put(PARAM_ID_TOKEN, idToken);
+
+        return this.<String>callFunctionInBackground(VERIFY_GOOGLE_LOGIN, params)
+                .map(new Func1<String, JSONObject>() {
+                    @Override
+                    public JSONObject call(String s) {
+                        try {
+                            return new JSONObject(s);
+                        } catch (JSONException e) {
+                            throw Exceptions.propagate(e);
+                        }
                     }
                 });
     }
@@ -381,58 +404,76 @@ public class ParseUserRepository extends ParseBaseRepository<ParseUser> implemen
         });
     }
 
-    private Single<byte[]> getGoogleProfileImage(@NonNull final Fragment fragment,
-                                                 @NonNull final Uri photoUrl) {
-        return Single.create(new Single.OnSubscribe<byte[]>() {
-            @Override
-            public void call(final SingleSubscriber<? super byte[]> singleSubscriber) {
-                Glide.with(fragment)
-                        .load(photoUrl)
-                        .asBitmap()
-                        .toBytes(Bitmap.CompressFormat.JPEG, AvatarUtils.JPEG_COMPRESSION_RATE)
-                        .centerCrop()
-                        .into(new SimpleTarget<byte[]>(AvatarUtils.WIDTH, AvatarUtils.HEIGHT) {
-                            @Override
-                            public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
-                                if (!singleSubscriber.isUnsubscribed()) {
-                                    singleSubscriber.onSuccess(resource);
-                                }
-                            }
+    private Single<ParseFile> getGoogleProfileImage(@NonNull final Fragment fragment,
+                                                    @NonNull final Uri photoUrl) {
+        return Single
+                .create(new Single.OnSubscribe<byte[]>() {
+                    @Override
+                    public void call(final SingleSubscriber<? super byte[]> singleSubscriber) {
+                        Glide.with(fragment)
+                                .load(photoUrl)
+                                .asBitmap()
+                                .toBytes(Bitmap.CompressFormat.JPEG, AvatarUtils.JPEG_COMPRESSION_RATE)
+                                .centerCrop()
+                                .into(new SimpleTarget<byte[]>(AvatarUtils.WIDTH, AvatarUtils.HEIGHT) {
+                                    @Override
+                                    public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
+                                        if (!singleSubscriber.isUnsubscribed()) {
+                                            singleSubscriber.onSuccess(resource);
+                                        }
+                                    }
 
-                            @Override
-                            public void onLoadFailed(Exception e, Drawable errorDrawable) {
-                                super.onLoadFailed(e, errorDrawable);
+                                    @Override
+                                    public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                                        super.onLoadFailed(e, errorDrawable);
 
-                                if (!singleSubscriber.isUnsubscribed()) {
-                                    singleSubscriber.onError(e);
-                                }
-                            }
-                        });
-            }
-        });
+                                        if (!singleSubscriber.isUnsubscribed()) {
+                                            singleSubscriber.onError(e);
+                                        }
+                                    }
+                                });
+                    }
+                })
+                .flatMap(new Func1<byte[], Single<? extends ParseFile>>() {
+                    @Override
+                    public Single<? extends ParseFile> call(byte[] bytes) {
+                        final ParseFile avatar = new ParseFile(bytes);
+                        return saveFile(avatar);
+                    }
+                });
     }
 
-    private Single<User> addFirstIdentity(@NonNull User user) {
-        final Group defaultGroup = new Group("Qwittig rocks", "CHF");
-        final Identity defaultIdentity = new Identity(defaultGroup);
-        user.addIdentity(defaultIdentity);
-        user.setCurrentIdentity(defaultIdentity);
+    private void addUserToInstallation(@NonNull final User user,
+                                       @NonNull final List<Identity> identities) {
+        Observable.from(identities)
+                .map(new Func1<Identity, String>() {
+                    @Override
+                    public String call(Identity identity) {
+                        return identity.getGroup().getObjectId();
+                    }
+                })
+                .toList()
+                .map(new Func1<List<String>, ParseInstallation>() {
+                    @Override
+                    public ParseInstallation call(List<String> channels) {
+                        final ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+                        installation.addAllUnique(ParseInstallationUtils.CHANNELS, channels);
+                        installation.put(ParseInstallationUtils.USER, user);
+                        return installation;
+                    }
+                })
+                .toSingle()
+                .subscribe(new SingleSubscriber<ParseInstallation>() {
+                    @Override
+                    public void onSuccess(ParseInstallation installation) {
+                        installation.saveEventually();
+                    }
 
-        return save(user).toObservable().cast(User.class).toSingle();
-    }
+                    @Override
+                    public void onError(Throwable error) {
 
-    private void addUserToInstallation(@NonNull User user) {
-        final List<ParseObject> identities = user.getIdentities();
-        final List<String> channels = new ArrayList<>();
-        for (ParseObject parseObject : identities) {
-            final Identity identity = (Identity) parseObject;
-            channels.add(identity.getGroup().getObjectId());
-        }
-
-        final ParseInstallation installation = ParseInstallation.getCurrentInstallation();
-        installation.addAllUnique(ParseInstallationUtils.CHANNELS, channels);
-        installation.put(ParseInstallationUtils.USER, user);
-        installation.saveEventually();
+                    }
+                });
     }
 
     @Override
@@ -459,56 +500,53 @@ public class ParseUserRepository extends ParseBaseRepository<ParseUser> implemen
     }
 
     @Override
-    public Observable<User> addNewIdentity(@NonNull String groupName,
-                                           @NonNull String groupCurrency) {
-        final User currentUser = getCurrentUser();
-        if (currentUser == null) {
-            return Observable.empty();
-        }
-        final Identity currentIdentity = currentUser.getCurrentIdentity();
-
-        final Group group = new Group(groupName, groupCurrency);
-        return Single
-                .create(new Single.OnSubscribe<Group>() {
+    public Single<User> unlinkFacebook(@NonNull final User user) {
+        return Single.create(new Single.OnSubscribe<User>() {
+            @Override
+            public void call(final SingleSubscriber<? super User> singleSubscriber) {
+                ParseFacebookUtils.unlinkInBackground(user, new SaveCallback() {
                     @Override
-                    public void call(final SingleSubscriber<? super Group> singleSubscriber) {
-                        group.saveInBackground(new SaveCallback() {
-                            @Override
-                            public void done(ParseException e) {
-                                if (singleSubscriber.isUnsubscribed()) {
-                                    return;
-                                }
-
-                                if (e != null) {
-                                    singleSubscriber.onError(e);
-                                } else {
-                                    singleSubscriber.onSuccess(group);
-                                }
-                            }
-                        });
-                    }
-                })
-                .flatMapObservable(new Func1<Group, Observable<? super ParseUser>>() {
-                    @Override
-                    public Observable<? super ParseUser> call(Group group) {
-                        final Identity newIdentity = new Identity(group, currentIdentity.getNickname());
-                        final byte[] avatar = currentIdentity.getAvatar();
-                        if (avatar != null) {
-                            newIdentity.setAvatar(avatar);
+                    public void done(ParseException e) {
+                        if (singleSubscriber.isUnsubscribed()) {
+                            return;
                         }
-                        currentUser.addIdentity(newIdentity);
-                        currentUser.setCurrentIdentity(newIdentity);
-                        return save(currentUser)
-                                .toObservable()
-                                .doOnError(new Action1<Throwable>() {
-                                    @Override
-                                    public void call(Throwable throwable) {
-                                        currentUser.removeIdentity(newIdentity);
-                                        currentUser.setCurrentIdentity(currentIdentity);
-                                    }
-                                });
+
+                        if (e != null) {
+                            singleSubscriber.onError(e);
+                        } else {
+                            singleSubscriber.onSuccess(user);
+                        }
                     }
-                })
-                .cast(User.class);
+                });
+            }
+        });
+    }
+
+    @Override
+    public Single<Void> signOutGoogle(@NonNull Context context) {
+        return GoogleApiClientSignOut.create(context);
+    }
+
+    @Override
+    public Single<User> unlinkGoogle(@NonNull Context context, @NonNull final User user) {
+        return GoogleApiClientUnlink.create(context)
+                .flatMap(new Func1<Void, Single<? extends User>>() {
+                    @Override
+                    public Single<? extends User> call(Void aVoid) {
+                        user.removeGoogleId();
+                        return save(user);
+                    }
+                });
+    }
+
+    @Override
+    public Single<User> deleteUser(@NonNull User user) {
+        return delete(user);
+    }
+
+    @Override
+    public Single<ParseInstallation> clearInstallation() {
+        final ParseInstallation installation = ParseInstallationUtils.getResetInstallation();
+        return save(installation);
     }
 }

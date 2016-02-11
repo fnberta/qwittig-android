@@ -16,9 +16,7 @@ import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
-import rx.Single;
 import rx.SingleSubscriber;
-import rx.functions.Func1;
 
 /**
  * Created by fabio on 29.01.16.
@@ -93,7 +91,8 @@ public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseRece
                     .subscribe(new SingleSubscriber<Purchase>() {
                         @Override
                         public void onSuccess(Purchase purchase) {
-                            onReceiptImageLoaded(purchase.getReceiptData());
+                            setLoading(false);
+                            mView.setReceiptImage(purchase.getReceiptData());
                         }
 
                         @Override
@@ -103,16 +102,11 @@ public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseRece
                     }));
         } else {
             mSubscriptions.add(mPurchaseRepo.fetchPurchaseDataLocalAsync(mPurchaseId)
-                    .flatMap(new Func1<Purchase, Single<byte[]>>() {
+                    .subscribe(new SingleSubscriber<Purchase>() {
                         @Override
-                        public Single<byte[]> call(Purchase purchase) {
-                            return mPurchaseRepo.getPurchaseReceiptImageAsync(purchase);
-                        }
-                    })
-                    .subscribe(new SingleSubscriber<byte[]>() {
-                        @Override
-                        public void onSuccess(byte[] receiptImage) {
-                            onReceiptImageLoaded(receiptImage);
+                        public void onSuccess(Purchase purchase) {
+                            setLoading(false);
+                            mView.setReceiptImage(purchase.getReceiptUrl());
                         }
 
                         @Override
@@ -122,11 +116,6 @@ public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseRece
                     })
             );
         }
-    }
-
-    private void onReceiptImageLoaded(byte[] receiptImage) {
-        setLoading(false);
-        mView.setReceiptImage(receiptImage);
     }
 
     private void onReceiptLoadFailed() {

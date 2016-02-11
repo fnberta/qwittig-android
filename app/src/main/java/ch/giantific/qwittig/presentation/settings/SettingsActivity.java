@@ -7,28 +7,28 @@ package ch.giantific.qwittig.presentation.settings;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentManager;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.fragments.ConfirmationDialogFragment;
 import ch.giantific.qwittig.presentation.settings.addgroup.SettingsAddGroupActivity;
+import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileViewModel.Result;
+import rx.Single;
 
 /**
  * Hosts {@link SettingsFragment} containing the main settings options.
  * <p/>
  * Subclass of {@link BaseActivity}.
  */
-public class SettingsActivity extends BaseActivity implements
+public class SettingsActivity extends BaseActivity<SettingsViewModel> implements
+        SettingsFragment.ActivityListener,
         ConfirmationDialogFragment.DialogInteractionListener,
-        AccountDeleteDialogFragment.DialogInteractionListener,
-        LogoutWorker.WorkerInteractionListener {
-
-    private static final String STATE_SETTINGS_FRAGMENT = "STATE_SETTINGS_FRAGMENT";
-    private SettingsFragment mSettingsFragment;
+        DeleteAccountDialogFragment.DialogInteractionListener,
+        LogoutWorkerListener {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,23 +39,11 @@ public class SettingsActivity extends BaseActivity implements
         // finish HomeActivity as well
         setResult(RESULT_OK);
 
-        final FragmentManager fragmentManager = getSupportFragmentManager();
         if (savedInstanceState == null) {
-            mSettingsFragment = new SettingsFragment();
-            fragmentManager.beginTransaction()
-                    .add(R.id.container, mSettingsFragment)
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.container, new SettingsFragment())
                     .commit();
-        } else {
-            mSettingsFragment = (SettingsFragment) fragmentManager
-                    .getFragment(savedInstanceState, STATE_SETTINGS_FRAGMENT);
         }
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        getSupportFragmentManager().putFragment(outState, STATE_SETTINGS_FRAGMENT, mSettingsFragment);
     }
 
     @Override
@@ -69,7 +57,7 @@ public class SettingsActivity extends BaseActivity implements
                         Snackbar.make(mToolbar, getString(R.string.toast_profile_update),
                                 Snackbar.LENGTH_LONG).show();
                         break;
-                    case SettingsProfileFragment.RESULT_CHANGES_DISCARDED:
+                    case Result.CHANGES_DISCARDED:
                         Snackbar.make(mToolbar, getString(R.string.toast_changes_discarded), Snackbar.LENGTH_LONG).show();
                         break;
                 }
@@ -86,22 +74,22 @@ public class SettingsActivity extends BaseActivity implements
     }
 
     @Override
+    public void setSettingsViewModel(@NonNull SettingsViewModel viewModel) {
+        mViewModel = viewModel;
+    }
+
+    @Override
     public void onActionConfirmed() {
-        mSettingsFragment.onLeaveGroupSelected();
+        mViewModel.onActionConfirmed();
     }
 
     @Override
-    public void onLoggedOut() {
-        mSettingsFragment.onLoggedOut();
-    }
-
-    @Override
-    public void onLogoutFailed(@StringRes int errorMessage) {
-        mSettingsFragment.onLogoutFailed(errorMessage);
+    public void setLogoutStream(@NonNull Single<User> single, @NonNull String workerTag) {
+        mViewModel.setLogoutStream(single, workerTag);
     }
 
     @Override
     public void onDeleteAccountSelected() {
-        mSettingsFragment.onDeleteAccountSelected();
+        mViewModel.onDeleteAccountSelected();
     }
 }

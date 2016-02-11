@@ -4,10 +4,10 @@
 
 package ch.giantific.qwittig.presentation.finance;
 
-import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
 
 import java.util.List;
 
@@ -16,7 +16,6 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.di.components.WorkerComponent;
 import ch.giantific.qwittig.domain.models.parse.Compensation;
 import ch.giantific.qwittig.domain.models.parse.Identity;
-import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.presentation.common.workers.BaseQueryWorker;
@@ -28,14 +27,12 @@ import rx.functions.Func1;
  * <p/>
  * Subclass of {@link BaseQueryWorker}.
  */
-public class CompensationsUpdateWorker extends BaseQueryWorker<Compensation, CompensationsUpdateListener> {
+public class CompensationsUpdateWorker extends BaseQueryWorker<Compensation, CompensationsUpdateWorkerListener> {
 
     private static final String WORKER_TAG = CompensationsUpdateWorker.class.getCanonicalName();
     private static final String KEY_QUERY_PAID = "QUERY_PAID";
     @Inject
     CompensationRepository mCompsRepo;
-    @Inject
-    IdentityRepository mIdentityRepo;
     private boolean mQueryPaid;
 
     /**
@@ -79,9 +76,16 @@ public class CompensationsUpdateWorker extends BaseQueryWorker<Compensation, Com
 
         if (setCurrentGroups()) {
             if (mQueryPaid) {
-                return mCompsRepo.updateCompensationsPaidAsync(mCurrentIdentity, mCurrentUserIdentities);
+                return mIdentityRepo.getUserIdentitiesLocalAsync(mCurrentUser)
+                        .toList()
+                        .flatMap(new Func1<List<Identity>, Observable<Compensation>>() {
+                            @Override
+                            public Observable<Compensation> call(List<Identity> identities) {
+                                return mCompsRepo.updateCompensationsPaidAsync(mCurrentIdentity, identities);
+                            }
+                        });
             } else {
-                return mIdentityRepo.updateIdentitiesAsync(mCurrentUserIdentities)
+                return mIdentityRepo.updateIdentitiesAsync(mCurrentUser)
                         .toList()
                         .flatMap(new Func1<List<Identity>, Observable<Compensation>>() {
                             @Override

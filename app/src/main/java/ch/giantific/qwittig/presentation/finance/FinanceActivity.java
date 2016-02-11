@@ -45,9 +45,9 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceCompsUnpaidVie
         FinanceCompensationsUnpaidFragment.ActivityListener,
         FinanceCompensationsPaidFragment.ActivityListener,
         CompensationConfirmAmountDialogFragment.DialogInteractionListener,
-        CompensationsUpdateListener,
+        CompensationsUpdateWorkerListener,
         CompensationsQueryMoreListener,
-        CompensationReminderListener,
+        CompensationReminderWorkerListener,
         IdentitiesUpdateWorkerListener {
 
     private ActivityFinanceBinding mBinding;

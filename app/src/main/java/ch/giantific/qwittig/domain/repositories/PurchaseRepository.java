@@ -7,11 +7,12 @@ package ch.giantific.qwittig.domain.repositories;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.parse.ParseFile;
+
 import java.util.List;
 
 import ch.giantific.qwittig.domain.models.parse.Identity;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
-import ch.giantific.qwittig.domain.models.parse.User;
 import rx.Observable;
 import rx.Single;
 
@@ -64,9 +65,10 @@ public interface PurchaseRepository extends Repository {
      * Updates all purchases in the local data store by deleting all purchases from the local data
      * store, querying and saving new ones.
      *
-     * @param currentUser the current user
+     * @param currentIdentity the user's current identity
+     * @param identities      the identities of the current user
      */
-    Observable<Purchase> updatePurchasesAsync(@NonNull User currentUser);
+    Observable<Purchase> updatePurchasesAsync(@NonNull Identity currentIdentity, @NonNull List<Identity> identities);
 
     /**
      * Queries purchases from the online data store and saves them in the local data store.
@@ -80,10 +82,12 @@ public interface PurchaseRepository extends Repository {
     /**
      * Deletes all purchases from the local data store and saves new ones.
      *
-     * @param currentUser the current user
+     * @param currentIdentity the user's current identity
+     * @param identities      the identities of the current user
      * @return whether the update was successful or not
      */
-    boolean updatePurchases(@NonNull User currentUser);
+    boolean updatePurchases(@NonNull final Identity currentIdentity,
+                            @NonNull final List<Identity> identities);
 
     /**
      * Updates a purchase if is already available in the local data store (by simply querying it) or
@@ -116,7 +120,13 @@ public interface PurchaseRepository extends Repository {
      */
     Single<Purchase> savePurchaseAsDraftAsync(@NonNull Purchase purchase, @NonNull String tag);
 
-    Single<byte[]> getPurchaseReceiptImageAsync(@NonNull Purchase purchase);
+    /**
+     * Deletes the the specified {@link ParseFile}, probably a receipt image that is no longer
+     * needed.
+     *
+     * @param fileName the file name of the {@link ParseFile} to delete
+     */
+    Single<String> deleteReceipt(@NonNull String fileName);
 
     void deleteItemsByIds(@NonNull List<String> itemIds);
 

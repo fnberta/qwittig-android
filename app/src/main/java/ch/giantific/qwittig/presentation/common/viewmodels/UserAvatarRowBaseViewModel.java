@@ -17,7 +17,7 @@ import ch.giantific.qwittig.domain.models.parse.Identity;
 public abstract class UserAvatarRowBaseViewModel extends BaseObservable {
 
     private String mIdentityName;
-    private byte[] mIdentityAvatar;
+    private String mIdentityAvatar;
 
     public UserAvatarRowBaseViewModel(@NonNull Identity identity) {
         setIdentity(identity);
@@ -27,7 +27,7 @@ public abstract class UserAvatarRowBaseViewModel extends BaseObservable {
     protected void setIdentity(@NonNull Identity identity) {
         // TODO: show me for current user
         mIdentityName = identity.getNickname();
-        mIdentityAvatar = identity.getAvatar();
+        mIdentityAvatar = identity.getAvatarUrl();
     }
 
     @CallSuper
@@ -41,7 +41,7 @@ public abstract class UserAvatarRowBaseViewModel extends BaseObservable {
     }
 
     @Bindable
-    public byte[] getIdentityAvatar() {
+    public String getIdentityAvatar() {
         return mIdentityAvatar;
     }
 }

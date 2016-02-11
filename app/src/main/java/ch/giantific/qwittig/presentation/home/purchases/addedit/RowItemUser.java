@@ -31,10 +31,10 @@ public class RowItemUser extends BaseObservable implements Parcelable {
     };
     private String mObjectId;
     private String mNickname;
-    private byte[] mAvatar;
+    private String mAvatar;
     private boolean mSelected;
 
-    public RowItemUser(@NonNull String objectId, @NonNull String nickname, @Nullable byte[] avatar,
+    public RowItemUser(@NonNull String objectId, @NonNull String nickname, @Nullable String avatar,
                        boolean selected) {
         mObjectId = objectId;
         mNickname = nickname;
@@ -45,7 +45,7 @@ public class RowItemUser extends BaseObservable implements Parcelable {
     protected RowItemUser(Parcel in) {
         mObjectId = in.readString();
         mNickname = in.readString();
-        mAvatar = in.createByteArray();
+        mAvatar = in.readString();
         mSelected = in.readByte() != 0;
     }
 
@@ -67,11 +67,11 @@ public class RowItemUser extends BaseObservable implements Parcelable {
     }
 
     @Bindable
-    public byte[] getAvatar() {
+    public String getAvatar() {
         return mAvatar;
     }
 
-    public void setAvatar(@Nullable byte[] avatar) {
+    public void setAvatar(@Nullable String avatar) {
         mAvatar = avatar;
     }
 
@@ -102,7 +102,7 @@ public class RowItemUser extends BaseObservable implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(mObjectId);
         dest.writeString(mNickname);
-        dest.writeByteArray(mAvatar);
+        dest.writeString(mAvatar);
         dest.writeByte(mSelected ? (byte) 1 : (byte) 0);
     }
 }

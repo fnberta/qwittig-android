@@ -12,7 +12,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModel;
  * Created by fabio on 18.01.16.
  */
 public interface FinanceCompsPaidViewModel extends OnlineListViewModel<Compensation>,
-        CompensationsUpdateListener, CompensationsQueryMoreListener, LoadMoreViewModel {
+        CompensationsUpdateWorkerListener, CompensationsQueryMoreListener, LoadMoreViewModel {
 
 
     int TYPE_ITEM = 0;

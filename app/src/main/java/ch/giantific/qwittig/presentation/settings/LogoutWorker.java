@@ -4,237 +4,155 @@
 
 package ch.giantific.qwittig.presentation.settings;
 
-import android.app.Activity;
+import android.app.Application;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
+import android.support.v4.app.FragmentManager;
 
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
-import com.parse.LogOutCallback;
-import com.parse.ParseException;
 import com.parse.ParseInstallation;
-import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
-import ch.giantific.qwittig.ParseErrorHandler;
-import ch.giantific.qwittig.R;
+import javax.inject.Inject;
+
+import ch.giantific.qwittig.di.components.WorkerComponent;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.presentation.common.workers.BaseGoogleApiLoginWorker;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
-import ch.giantific.qwittig.utils.parse.ParseInstallationUtils;
+import rx.Observable;
+import rx.Single;
+import rx.functions.Func1;
 
 /**
  * Resets the device's {@link ParseInstallation} object and logs out the current user.
  * <p/>
  * Subclass of {@link BaseWorker}.
  */
-public class LogoutWorker extends BaseGoogleApiLoginWorker {
+public class LogoutWorker extends BaseWorker<User, LogoutWorkerListener> {
 
-    private static final String BUNDLE_DELETE_USER = "BUNDLE_DELETE_USER";
-
-    @Nullable
-    private WorkerInteractionListener mListener;
-    private boolean mDeleteUser;
+    private static final String WORKER_TAG = LogoutWorker.class.getCanonicalName();
+    private static final String KEY_DELETE_USER = "DELETE_USER";
+    @Inject
+    Application mAppContext;
 
     public LogoutWorker() {
         // empty default constructor
     }
 
-    public static LogoutWorker newInstance(boolean deleteUser) {
-        LogoutWorker fragment = new LogoutWorker();
-        Bundle args = new Bundle();
-        args.putBoolean(BUNDLE_DELETE_USER, deleteUser);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onAttach(@NonNull Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (WorkerInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement DialogInteractionListener");
-        }
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        final Bundle args = getArguments();
-        if (args != null) {
-            mDeleteUser = args.getBoolean(BUNDLE_DELETE_USER, false);
-        }
-
-        final User currentUser = (User) ParseUser.getCurrentUser();
-        final boolean isGoogleUser = currentUser.isGoogleUser();
-        if (isGoogleUser) {
-            setupGoogleApiClient();
-        } else if (mDeleteUser) {
-            deleteUserInCloud();
-        } else {
-            handleInstallation();
-        }
-    }
-
-    @Override
-    protected void onGoogleClientConnected() {
-        if (mDeleteUser) {
-            unlinkGoogle();
-        } else {
-            signOutGoogle();
-        }
-    }
-
-    @Override
-    protected void onGoogleClientConnectionFailed() {
-        if (mListener != null) {
-            mListener.onLogoutFailed(R.string.toast_no_connection);
-        }
-    }
-
-    @Override
-    protected void onGoogleUnlinkSuccessful() {
-        deleteUserInCloud();
-    }
-
-    @Override
-    protected void onGoogleUnlinkFailed() {
-        if (mListener != null) {
-            mListener.onLogoutFailed(R.string.toast_unknown_error);
-        }
-    }
-
-    private void signOutGoogle() {
-        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
-            @Override
-            public void onResult(Status status) {
-                if (status.isSuccess()) {
-                    handleInstallation();
-                } else if (mListener != null) {
-                    mListener.onLogoutFailed(status.getStatusCode());
-                }
-            }
-        });
-    }
-
-    private void deleteUserInCloud() {
-//        ApiRepository cloudCode = new ApiRepository(getActivity());
-//        cloudCode.deleteAccount(new ApiRepository.CloudCodeListener() {
-//            @Override
-//            public void onCloudFunctionReturned(Object result) {
-//                handleInstallation();
-//            }
-//
-//            @Override
-//            public void onCloudFunctionFailed(@StringRes int errorMessage) {
-//                if (mListener != null) {
-//                    mListener.onLogoutFailed(errorMessage);
-//                }
-//            }
-//        });
-    }
-
     /**
-     * Un-subscribes the device from all notification channels and removes the current user from the
-     * installation object, so that the device does not keep receiving push notifications.
+     * Attaches a new instance of {@link LogoutWorker} that either logs the user out or deletes his
+     * account.
+     *
+     * @param deleteUser whether to delete the account
+     * @return a new instance of {@link LogoutWorker}
      */
-    private void handleInstallation() {
-        ParseInstallation installation = ParseInstallationUtils.getResetInstallation();
-        installation.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(@Nullable ParseException e) {
-                if (e != null) {
-                    if (mListener != null) {
-                        mListener.onLogoutFailed(ParseErrorHandler.handleParseError(getActivity(), e));
+    public static LogoutWorker attach(@NonNull FragmentManager fm, boolean deleteUser) {
+        LogoutWorker worker = (LogoutWorker) fm.findFragmentByTag(WORKER_TAG);
+        if (worker == null) {
+            worker = new LogoutWorker();
+            final Bundle args = new Bundle();
+            args.putBoolean(KEY_DELETE_USER, deleteUser);
+            worker.setArguments(args);
+
+            fm.beginTransaction()
+                    .add(worker, WORKER_TAG)
+                    .commit();
+        }
+
+        return worker;
+    }
+
+    @Override
+    protected void injectWorkerDependencies(@NonNull WorkerComponent component) {
+        component.inject(this);
+    }
+
+    @Nullable
+    @Override
+    protected Observable<User> getObservable(@NonNull Bundle args) {
+        final boolean delete = args.getBoolean(KEY_DELETE_USER, false);
+        final User user = mUserRepo.getCurrentUser();
+        if (user == null) {
+            return null;
+        }
+
+        if (user.isGoogleUser()) {
+            if (delete) {
+                return mUserRepo.unlinkGoogle(mAppContext, user)
+                        .flatMap(new Func1<User, Single<ParseInstallation>>() {
+                            @Override
+                            public Single<ParseInstallation> call(User user) {
+                                return mUserRepo.clearInstallation();
+                            }
+                        })
+                        .flatMap(new Func1<ParseInstallation, Single<User>>() {
+                            @Override
+                            public Single<User> call(ParseInstallation parseInstallation) {
+                                return mUserRepo.deleteUser(user);
+                            }
+                        })
+                        .toObservable();
+            }
+
+            return mUserRepo.signOutGoogle(mAppContext)
+                    .flatMap(new Func1<Void, Single<ParseInstallation>>() {
+                        @Override
+                        public Single<ParseInstallation> call(Void aVoid) {
+                            return mUserRepo.clearInstallation();
+                        }
+                    })
+                    .flatMap(new Func1<ParseInstallation, Single<User>>() {
+                        @Override
+                        public Single<User> call(ParseInstallation parseInstallation) {
+                            return mUserRepo.logOut(user);
+                        }
+                    })
+                    .toObservable();
+        }
+
+        if (delete) {
+            if (user.isFacebookUser()) {
+                return mUserRepo.unlinkFacebook(user)
+                        .flatMap(new Func1<User, Single<ParseInstallation>>() {
+                            @Override
+                            public Single<ParseInstallation> call(User user) {
+                                return mUserRepo.clearInstallation();
+                            }
+                        })
+                        .flatMap(new Func1<ParseInstallation, Single<User>>() {
+                            @Override
+                            public Single<User> call(ParseInstallation parseInstallation) {
+                                return mUserRepo.deleteUser(user);
+                            }
+                        })
+                        .toObservable();
+            }
+
+            return mUserRepo.clearInstallation()
+                    .flatMap(new Func1<ParseInstallation, Single<User>>() {
+                        @Override
+                        public Single<User> call(ParseInstallation parseInstallation) {
+                            return mUserRepo.deleteUser(user);
+                        }
+                    })
+                    .toObservable();
+        }
+
+        return mUserRepo.clearInstallation()
+                .flatMap(new Func1<ParseInstallation, Single<User>>() {
+                    @Override
+                    public Single<User> call(ParseInstallation parseInstallation) {
+                        return mUserRepo.logOut(user);
                     }
-                    return;
-                }
-
-                if (mDeleteUser) {
-                    deleteUser();
-                } else {
-                    logOut();
-                }
-            }
-        });
-    }
-
-    private void deleteUser() {
-//        final User currentUser = (User) ParseUser.getCurrentUser();
-//        final String username = currentUser.getUsername();
-//        currentUser.deleteUserFields();
-//        if (currentUser.isFacebookUser()) {
-//            ParseFacebookUtils.unlinkInBackground(currentUser, new SaveCallback() {
-//                @Override
-//                public void done(ParseException e) {
-//                    onDeleteUserSaved(currentUser, username, e);
-//                }
-//            });
-//        } else {
-//            currentUser.saveInBackground(new SaveCallback() {
-//                @Override
-//                public void done(@Nullable ParseException e) {
-//                    onDeleteUserSaved(currentUser, username, e);
-//                }
-//            });
-//        }
-    }
-
-//    private void onDeleteUserSaved(User currentUser, String username, ParseException e) {
-//        if (e != null) {
-//            currentUser.undeleteUserFields(username);
-//            if (mListener != null) {
-//                mListener.onLogoutFailed(ParseErrorHandler.handleParseError(getActivity(), e));
-//            }
-//
-//            return;
-//        }
-//
-//        logOut();
-//    }
-
-    private void logOut() {
-        ParseUser.logOutInBackground(new LogOutCallback() {
-            @Override
-            public void done(ParseException e) {
-                // ignore possible exception, currentUser will always be null now
-                onLogoutSucceeded();
-            }
-        });
-    }
-
-    private void onLogoutSucceeded() {
-        if (mListener != null) {
-            mListener.onLoggedOut();
-        }
+                })
+                .toObservable();
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
+    protected void onError() {
+        mActivity.onWorkerError(WORKER_TAG);
     }
 
-    /**
-     * Defines the actions to take after the user was logged out or the logout failed
-     */
-    public interface WorkerInteractionListener {
-        /**
-         * Handles the failed logout of a user.
-         *
-         * @param errorMessage the error message from the exception thrown during the process
-         */
-        void onLogoutFailed(@StringRes int errorMessage);
-
-        /**
-         * Handles a successful logout of the user.
-         */
-        void onLoggedOut();
+    @Override
+    protected void setStream(@NonNull Observable<User> observable) {
+        mActivity.setLogoutStream(observable.toSingle(), WORKER_TAG);
     }
 }

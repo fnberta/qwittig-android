@@ -32,7 +32,7 @@ public class Compensation extends ParseObject {
     public static final String DEBTOR = "debtor";
     public static final String CREDITOR = "creditor";
     public static final String AMOUNT = "amount";
-    public static final String PAID = "isPaid";
+    public static final String PAID = "paid";
     public static final String PIN_LABEL_PAID = "compensationPinLabelPaid";
     public static final String PIN_LABEL_UNPAID = "compensationPinLabelUnpaid";
     private boolean mLoading;

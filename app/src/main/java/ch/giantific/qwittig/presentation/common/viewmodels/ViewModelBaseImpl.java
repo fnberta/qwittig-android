@@ -11,7 +11,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.Identity;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
@@ -36,11 +35,11 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
                              @NonNull UserRepository userRepository) {
         mView = view;
         mUserRepo = userRepository;
-        updateCurrentUserIdentityGroup();
+        updateCurrentUserAndIdentity();
     }
 
     @CallSuper
-    protected void updateCurrentUserIdentityGroup() {
+    protected void updateCurrentUserAndIdentity() {
         mCurrentUser = mUserRepo.getCurrentUser();
         if (mCurrentUser != null) {
             mCurrentIdentity = mCurrentUser.getCurrentIdentity();
@@ -64,7 +63,7 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
     @Override
     @CallSuper
     public void onIdentitySelected() {
-        updateCurrentUserIdentityGroup();
+        updateCurrentUserAndIdentity();
     }
 
     @Override

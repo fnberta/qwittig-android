@@ -110,7 +110,7 @@ public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditI
     }
 
     interface ViewListener extends ListViewModel.ViewListener {
-        Single<byte[]> getReceiptImage(@NonNull String imagePath);
+        Single<byte[]> encodeReceiptImage(@NonNull String imagePath);
 
         void loadFetchExchangeRatesWorker(@NonNull String baseCurrency, @NonNull String currency);
 

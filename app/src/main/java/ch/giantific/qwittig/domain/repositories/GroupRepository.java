@@ -12,6 +12,7 @@ import com.parse.ParseObject;
 import java.util.List;
 
 import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.Identity;
 import rx.Observable;
 import rx.Single;
 
@@ -28,15 +29,15 @@ public interface GroupRepository extends Repository {
      *
      * @param group the group to fetch the data for
      */
-    Single<Group> fetchGroupDataAsync(@NonNull Group group);
+    Observable<Group> fetchGroupDataAsync(@NonNull Group group);
 
     /**
      * Fetches the data of multiple {@link Group} objects from the local data store. If there is no
      * data  available in the local data store it will try to fetch the data online.
      *
-     * @param groups the groups to fetch the data for
+     * @param identities the identities to fetch the group data for
      */
-    Observable<Group> fetchGroupsDataAsync(@NonNull List<ParseObject> groups);
+    Observable<Group> fetchGroupsDataAsync(@NonNull List<Identity> identities);
 
     /**
      * Queries a group from the online data store.
@@ -54,4 +55,6 @@ public interface GroupRepository extends Repository {
      */
     @Nullable
     Group getGroupOnline(@NonNull String groupId);
+
+    void unsubscribeGroup(@NonNull Group group);
 }

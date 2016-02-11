@@ -163,7 +163,7 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<Purchase
         }
         boolean hasForeignCurrency = !mCurrentIdentity.getGroup().getCurrency().equals(mPurchase.getCurrency());
 
-        mView.toggleMenuOptions(userIsBuyer, mPurchase.getReceiptParseFile() != null, hasForeignCurrency);
+        mView.toggleMenuOptions(userIsBuyer, mPurchase.getReceipt() != null, hasForeignCurrency);
     }
 
     private void updateReadBy() {

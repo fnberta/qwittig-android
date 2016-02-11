@@ -14,7 +14,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModel;
  * Created by fabio on 18.01.16.
  */
 public interface FinanceCompsUnpaidViewModel extends OnlineListViewModel<CompensationUnpaidItem>,
-        BalanceHeaderViewModel, CompensationsUpdateListener, CompensationReminderListener,
+        BalanceHeaderViewModel, CompensationsUpdateWorkerListener, CompensationReminderWorkerListener,
         CompensationsUnpaidRecyclerAdapter.AdapterInteractionListener,
         CompensationConfirmAmountDialogFragment.DialogInteractionListener {
 

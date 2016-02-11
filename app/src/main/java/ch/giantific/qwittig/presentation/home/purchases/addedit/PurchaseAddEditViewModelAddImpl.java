@@ -414,10 +414,10 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
             final Identity identity = mIdentities.get(i);
             if (identities.contains(identity)) {
                 rowItemUser[i] = new RowItemUser(identity.getObjectId(), identity.getNickname(),
-                        identity.getAvatar(), true);
+                        identity.getAvatarUrl(), true);
             } else {
                 rowItemUser[i] = new RowItemUser(identity.getObjectId(), identity.getNickname(),
-                        identity.getAvatar(), false);
+                        identity.getAvatarUrl(), false);
             }
         }
 
@@ -562,7 +562,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
         mView.startSaveAnim();
         final Purchase purchase = getPurchase();
         if (!TextUtils.isEmpty(mReceiptImagePath)) {
-            mSubscriptions.add(mView.getReceiptImage(mReceiptImagePath)
+            mSubscriptions.add(mView.encodeReceiptImage(mReceiptImagePath)
                     .subscribe(new SingleSubscriber<byte[]>() {
                         @Override
                         public void onSuccess(byte[] receiptImage) {
@@ -606,7 +606,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
         final Purchase purchase = getPurchase();
         purchase.setRandomDraftId();
         if (!TextUtils.isEmpty(mReceiptImagePath)) {
-            mSubscriptions.add(mView.getReceiptImage(mReceiptImagePath)
+            mSubscriptions.add(mView.encodeReceiptImage(mReceiptImagePath)
                     .flatMap(new Func1<byte[], Single<Purchase>>() {
                         @Override
                         public Single<Purchase> call(byte[] bytes) {
@@ -736,7 +736,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
                 mView.removeWorker(workerTag);
                 onPurchaseSaveError(error);
                 // TODO: maybe give user action to save as draft
-//                    ParseFile receipt = mPurchase.getReceiptParseFile();
+//                    ParseFile receipt = mPurchase.getReceipt();
 //                    if (receipt != null) {
 //                        receipt.getDataInBackground(new GetDataCallback() {
 //                            @Override

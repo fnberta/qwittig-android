@@ -15,7 +15,7 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.di.components.WorkerComponent;
 import ch.giantific.qwittig.domain.models.parse.Identity;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.domain.repositories.ApiRepository;
+import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;
 
@@ -25,12 +25,12 @@ import rx.Observable;
  * <p/>
  * Subclass of {@link BaseWorker}.
  */
-public class CompensationRemindWorker extends BaseWorker<String, CompensationReminderListener> {
+public class CompensationRemindWorker extends BaseWorker<String, CompensationReminderWorkerListener> {
 
     private static final String WORKER_TAG = CompensationRemindWorker.class.getCanonicalName();
     private static final String KEY_COMPENSATION_ID = "COMPENSATION_ID";
     @Inject
-    ApiRepository mApiRepo;
+    CompensationRepository mCompensRepo;
     private String mCompensationId;
 
     /**
@@ -89,7 +89,7 @@ public class CompensationRemindWorker extends BaseWorker<String, CompensationRem
         if (!TextUtils.isEmpty(mCompensationId) && currentUser != null) {
             final Identity currentIdentity = currentUser.getCurrentIdentity();
             final String currencyCode = currentIdentity.getGroup().getCurrency();
-            return mApiRepo.pushCompensationReminder(mCompensationId, currencyCode).toObservable();
+            return mCompensRepo.pushCompensationReminder(mCompensationId, currencyCode).toObservable();
         }
 
         return null;

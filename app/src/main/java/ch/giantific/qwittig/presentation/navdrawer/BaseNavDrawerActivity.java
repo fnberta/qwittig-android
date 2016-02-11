@@ -34,7 +34,6 @@ import ch.giantific.qwittig.di.components.DaggerNavDrawerComponent;
 import ch.giantific.qwittig.di.components.NavDrawerComponent;
 import ch.giantific.qwittig.di.modules.NavDrawerViewModelModule;
 import ch.giantific.qwittig.domain.models.MessageAction;
-import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.Identity;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
@@ -43,9 +42,9 @@ import ch.giantific.qwittig.presentation.helpfeedback.HelpFeedbackActivity;
 import ch.giantific.qwittig.presentation.home.purchases.list.HomeActivity;
 import ch.giantific.qwittig.presentation.login.LoginActivity;
 import ch.giantific.qwittig.presentation.settings.SettingsActivity;
-import ch.giantific.qwittig.presentation.settings.SettingsFragment;
-import ch.giantific.qwittig.presentation.settings.SettingsProfileActivity;
-import ch.giantific.qwittig.presentation.settings.SettingsProfileFragment;
+import ch.giantific.qwittig.presentation.settings.SettingsViewModel;
+import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileActivity;
+import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileViewModel;
 import ch.giantific.qwittig.presentation.stats.StatsActivity;
 import ch.giantific.qwittig.presentation.tasks.list.TasksActivity;
 import ch.giantific.qwittig.utils.Utils;
@@ -110,7 +109,7 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
     }
 
     private void startLoginActivity() {
-        Intent intentLogin = new Intent(this, LoginActivity.class);
+        final Intent intentLogin = new Intent(this, LoginActivity.class);
 //        Starting an activity with forResult and transitions during a lifecycle method results on
 //        onActivityResult not being called
 //        ActivityOptionsCompat activityOptionsCompat =
@@ -161,6 +160,10 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
         };
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+    }
+
+    protected int getSelfNavDrawerItem() {
+        return NAVDRAWER_ITEM_INVALID;
     }
 
     private void goToNavDrawerItem(int itemId) {
@@ -244,10 +247,10 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
                 break;
             case INTENT_REQUEST_SETTINGS:
                 switch (resultCode) {
-                    case SettingsFragment.RESULT_LOGOUT:
+                    case SettingsViewModel.Result.RESULT_LOGOUT:
                         mNavDrawerViewModel.onLogout();
                         break;
-                    case SettingsFragment.RESULT_GROUP_CHANGED:
+                    case SettingsViewModel.Result.RESULT_GROUP_CHANGED:
                         mNavDrawerViewModel.onIdentityChanged();
                         break;
                 }
@@ -257,7 +260,7 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
                     case RESULT_OK:
                         mNavDrawerViewModel.onProfileUpdated();
                         break;
-                    case SettingsProfileFragment.RESULT_CHANGES_DISCARDED:
+                    case SettingsProfileViewModel.Result.CHANGES_DISCARDED:
                         showMessage(R.string.toast_changes_discarded);
                         break;
                 }
@@ -268,10 +271,6 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
     @CallSuper
     protected void onLoginSuccessful() {
         ParseQueryService.startQueryAll(this);
-    }
-
-    protected int getSelfNavDrawerItem() {
-        return NAVDRAWER_ITEM_INVALID;
     }
 
     protected final void setStatusBarBackgroundColor(int color) {

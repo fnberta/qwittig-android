@@ -13,7 +13,7 @@ import rx.Observable;
 /**
  * Defines the actions to take after tasks are updated.
  */
-public interface CompensationsUpdateListener extends BaseWorkerListener {
+public interface CompensationsUpdateWorkerListener extends BaseWorkerListener {
     /**
      * Sets the {@link Observable} that emits the compensations update stream
      *  @param observable the observable emitting the updates

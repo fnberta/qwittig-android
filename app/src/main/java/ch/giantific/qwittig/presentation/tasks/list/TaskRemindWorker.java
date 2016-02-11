@@ -13,7 +13,7 @@ import android.text.TextUtils;
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.di.components.WorkerComponent;
-import ch.giantific.qwittig.domain.repositories.ApiRepository;
+import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;
 
@@ -27,7 +27,7 @@ public class TaskRemindWorker extends BaseWorker<String, TaskReminderListener> {
     private static final String WORKER_TAG = TaskRemindWorker.class.getCanonicalName();
     private static final String KEY_TASK_ID = "TASK_ID";
     @Inject
-    ApiRepository mApiRepo;
+    TaskRepository mTaskRepo;
     private String mTaskId;
 
     /**
@@ -80,7 +80,7 @@ public class TaskRemindWorker extends BaseWorker<String, TaskReminderListener> {
     protected Observable<String> getObservable(@NonNull Bundle args) {
         mTaskId = args.getString(KEY_TASK_ID, "");
         if (!TextUtils.isEmpty(mTaskId)) {
-            return mApiRepo.pushTaskReminder(mTaskId).toObservable();
+            return mTaskRepo.pushTaskReminder(mTaskId).toObservable();
         }
 
         return null;

@@ -153,7 +153,7 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
     }
 
     boolean hasOldReceiptFile() {
-        return mEditPurchase.getReceiptParseFile() != null;
+        return mEditPurchase.getReceipt() != null;
     }
 
     private void setOldItemValues() {
@@ -206,7 +206,7 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
 
     @Override
     void loadSavePurchaseWorker(@NonNull Purchase purchase, @Nullable byte[] receiptImage) {
-        mView.loadSavePurchaseWorker(purchase, receiptImage, purchase.getReceiptParseFile(),
+        mView.loadSavePurchaseWorker(purchase, receiptImage, purchase.getReceipt(),
                 mDeleteOldReceipt, false);
     }
 

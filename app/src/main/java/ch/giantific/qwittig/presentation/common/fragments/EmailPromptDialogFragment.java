@@ -123,7 +123,7 @@ public class EmailPromptDialogFragment extends BaseDialogFragment<EmailPromptDia
                 @Override
                 public void onClick(View v) {
                     mEmail = mEditTextEmail.getText().toString();
-                    if (Utils.emailIsValid(mEmail)) {
+                    if (Utils.isEmailValid(mEmail)) {
                         mTextInputLayoutEmail.setErrorEnabled(false);
                         mActivity.onValidEmailEntered(mEmail);
                         dismiss();

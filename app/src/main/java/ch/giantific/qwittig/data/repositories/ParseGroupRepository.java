@@ -8,7 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.parse.ParseException;
-import com.parse.ParseObject;
+import com.parse.ParsePush;
 import com.parse.ParseQuery;
 
 import java.util.HashMap;
@@ -26,12 +26,11 @@ import rx.functions.Func1;
  * Provides an implementation of {@link GroupRepository} that uses the Parse.com framework as
  * the local and online data store.
  */
-public class ParseGroupRepository extends ParseBaseRepository<Group> implements GroupRepository {
+public class ParseGroupRepository extends ParseBaseRepository implements GroupRepository {
 
     private static final String ADD_NEW_GROUP = "addGroup";
     private static final String PARAM_GROUP_NAME = "groupName";
     private static final String PARAM_GROUP_CURRENCY = "groupCurrency";
-
 
     public ParseGroupRepository() {
         super();
@@ -51,21 +50,19 @@ public class ParseGroupRepository extends ParseBaseRepository<Group> implements 
     }
 
     @Override
-    public Single<Group> fetchGroupDataAsync(@NonNull final Group group) {
+    public Observable<Group> fetchGroupDataAsync(@NonNull final Group group) {
         if (group.isDataAvailable()) {
-            return Single.just(group);
+            return Observable.just(group);
         }
 
         return fetchLocal(group)
                 .toObservable()
-                .onErrorResumeNext(fetchIfNeeded(group).toObservable())
-                .toSingle();
+                .onErrorResumeNext(fetchIfNeeded(group).toObservable());
     }
 
     @Override
-    public Observable<Group> fetchGroupsDataAsync(@NonNull List<ParseObject> identities) {
+    public Observable<Group> fetchGroupsDataAsync(@NonNull List<Identity> identities) {
         return Observable.from(identities)
-                .cast(Identity.class)
                 .map(new Func1<Identity, Group>() {
                     @Override
                     public Group call(Identity identity) {
@@ -75,26 +72,32 @@ public class ParseGroupRepository extends ParseBaseRepository<Group> implements 
                 .flatMap(new Func1<Group, Observable<Group>>() {
                     @Override
                     public Observable<Group> call(Group parseObject) {
-                        return fetchGroupDataAsync(parseObject).toObservable();
+                        return fetchGroupDataAsync(parseObject);
                     }
                 });
     }
 
     @Override
     public Single<Group> getGroupOnlineAsync(@NonNull final String groupId) {
-        ParseQuery<Group> query = ParseQuery.getQuery(Group.CLASS);
+        final ParseQuery<Group> query = ParseQuery.getQuery(Group.CLASS);
         return get(query, groupId);
     }
 
     @Override
     @Nullable
     public Group getGroupOnline(@NonNull String groupId) {
-        ParseQuery<Group> query = ParseQuery.getQuery(Group.CLASS);
+        final ParseQuery<Group> query = ParseQuery.getQuery(Group.CLASS);
         try {
             return query.get(groupId);
         } catch (ParseException e) {
             return null;
         }
     }
+
+    @Override
+    public void unsubscribeGroup(@NonNull Group group) {
+        ParsePush.unsubscribeInBackground(group.getObjectId());
+    }
+
 
 }

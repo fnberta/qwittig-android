@@ -7,13 +7,9 @@ package ch.giantific.qwittig.domain.models.parse;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import com.parse.ParseACL;
 import com.parse.ParseFacebookUtils;
-import com.parse.ParseObject;
 import com.parse.ParseUser;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 
 /**
@@ -25,7 +21,6 @@ public class User extends ParseUser {
     public static final String CLASS = "_User";
     public static final String NAME = "username";
     public static final String PASSWORD = "password";
-    public static final String IDENTITIES = "identities";
     public static final String CURRENT_IDENTITY = "currentIdentity";
     public static final String GOOGLE_ID = "googleId";
 
@@ -38,20 +33,6 @@ public class User extends ParseUser {
         setPassword(password);
     }
 
-    @NonNull
-    public List<ParseObject> getIdentities() {
-        List<ParseObject> identities = getList(IDENTITIES);
-        if (identities != null) {
-            return identities;
-        } else {
-            return Collections.emptyList();
-        }
-    }
-
-    public void setIdentities(@NonNull List<ParseObject> identities) {
-        put(IDENTITIES, identities);
-    }
-
     public Identity getCurrentIdentity() {
         return (Identity) getParseObject(CURRENT_IDENTITY);
     }
@@ -62,36 +43,6 @@ public class User extends ParseUser {
 
     public void removeCurrentIdentity() {
         remove(CURRENT_IDENTITY);
-    }
-
-    /**
-     * Returns the object ids of the user's identities.
-     *
-     * @return the object ids of the user's identities
-     */
-    @NonNull
-    public List<String> getIdentityIds() {
-        List<String> identityIds = new ArrayList<>();
-        List<ParseObject> identities = getIdentities();
-        for (ParseObject parseObject : identities) {
-            identityIds.add(parseObject.getObjectId());
-        }
-
-        return identityIds;
-    }
-
-    public void addIdentity(@NonNull Identity identity) {
-        addUnique(IDENTITIES, identity);
-    }
-
-    public void removeIdentity(@NonNull Identity identity) {
-        List<ParseObject> identities = new ArrayList<>();
-        identities.add(identity);
-        removeAll(IDENTITIES, identities);
-    }
-
-    public void removeIdentities() {
-        remove(IDENTITIES);
     }
 
     public String getGoogleId() {

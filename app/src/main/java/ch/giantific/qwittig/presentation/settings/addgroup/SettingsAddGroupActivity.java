@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.domain.models.parse.Identity;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.settings.addusers.AddUserWorkerListener;
@@ -53,7 +54,7 @@ public class SettingsAddGroupActivity extends BaseActivity<SettingsAddGroupViewM
     }
 
     @Override
-    public void setCreateGroupStream(@NonNull Single<User> single, @NonNull String workerTag) {
+    public void setCreateGroupStream(@NonNull Single<Identity> single, @NonNull String workerTag) {
         mViewModel.setCreateGroupStream(single, workerTag);
     }
 

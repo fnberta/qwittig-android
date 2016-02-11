@@ -10,8 +10,10 @@ import ch.giantific.qwittig.presentation.finance.IdentitiesUpdateWorker;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.OcrWorker;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.RatesWorker;
 import ch.giantific.qwittig.presentation.login.LoginWorker;
+import ch.giantific.qwittig.presentation.settings.LogoutWorker;
 import ch.giantific.qwittig.presentation.settings.addgroup.AddGroupWorker;
 import ch.giantific.qwittig.presentation.home.InvitedGroupWorker;
+import ch.giantific.qwittig.presentation.settings.profile.UnlinkThirdPartyWorker;
 import ch.giantific.qwittig.presentation.stats.StatsCalcWorker;
 import ch.giantific.qwittig.presentation.settings.addusers.AddUserWorker;
 import ch.giantific.qwittig.presentation.finance.CompensationsQueryMoreWorker;
@@ -66,4 +68,8 @@ public interface WorkerComponent {
     void inject(IdentitiesUpdateWorker identitiesUpdateWorker);
 
     void inject(LoginWorker loginWorker);
+
+    void inject(LogoutWorker logoutWorker);
+
+    void inject(UnlinkThirdPartyWorker unlinkThirdPartyWorker);
 }

@@ -54,7 +54,7 @@ public class PurchaseEditDraftViewModelImpl extends PurchaseAddEditViewModelEdit
 
     @Override
     void loadSavePurchaseWorker(@NonNull Purchase purchase, @Nullable byte[] receiptImage) {
-        mView.loadSavePurchaseWorker(purchase, receiptImage, purchase.getReceiptParseFile(),
+        mView.loadSavePurchaseWorker(purchase, receiptImage, purchase.getReceipt(),
                 mDeleteOldReceipt, true);
     }
 

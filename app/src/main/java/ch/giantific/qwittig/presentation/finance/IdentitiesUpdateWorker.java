@@ -13,7 +13,6 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.di.components.WorkerComponent;
 import ch.giantific.qwittig.domain.models.parse.Identity;
-import ch.giantific.qwittig.domain.repositories.ApiRepository;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.presentation.common.workers.BaseQueryWorker;
 import rx.Observable;
@@ -27,10 +26,6 @@ import rx.functions.Func1;
 public class IdentitiesUpdateWorker extends BaseQueryWorker<Identity, IdentitiesUpdateWorkerListener> {
 
     private static final String WORKER_TAG = IdentitiesUpdateWorker.class.getCanonicalName();
-    @Inject
-    ApiRepository mApiRepo;
-    @Inject
-    IdentityRepository mIdentityRepo;
 
     public IdentitiesUpdateWorker() {
         // required empty constructor
@@ -68,11 +63,11 @@ public class IdentitiesUpdateWorker extends BaseQueryWorker<Identity, Identities
     @Override
     protected Observable<Identity> getObservable(@NonNull Bundle args) {
         if (setCurrentGroups()) {
-            return mApiRepo.calcUserBalances()
+            return mIdentityRepo.calcUserBalances()
                     .flatMapObservable(new Func1<String, Observable<Identity>>() {
                         @Override
                         public Observable<Identity> call(String s) {
-                            return mIdentityRepo.updateIdentitiesAsync(mCurrentUserIdentities);
+                            return mIdentityRepo.updateIdentitiesAsync(mCurrentUser);
                         }
                     });
         }

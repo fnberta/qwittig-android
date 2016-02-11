@@ -20,7 +20,7 @@ import ch.giantific.qwittig.di.components.WorkerComponent;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.models.stats.Stats;
-import ch.giantific.qwittig.domain.repositories.ApiRepository;
+import ch.giantific.qwittig.domain.repositories.StatsRepository;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;
 
@@ -39,7 +39,7 @@ public class StatsCalcWorker extends BaseWorker<Stats, StatsCalcListener> {
     private static final String KEY_YEAR = "YEAR";
     private static final String KEY_MONTH = "MONTH";
     @Inject
-    ApiRepository mApiRepo;
+    StatsRepository mStatsRepo;
     private int mStatsType;
 
     public StatsCalcWorker() {
@@ -115,11 +115,11 @@ public class StatsCalcWorker extends BaseWorker<Stats, StatsCalcListener> {
         final String groupId = currentGroup.getObjectId();
         switch (mStatsType) {
             case StatsType.SPENDING:
-                return mApiRepo.calcStatsSpending(groupId, year, month).toObservable();
+                return mStatsRepo.calcStatsSpending(groupId, year, month).toObservable();
             case StatsType.STORES:
-                return mApiRepo.calcStatsStores(groupId, year, month).toObservable();
+                return mStatsRepo.calcStatsStores(groupId, year, month).toObservable();
             case StatsType.CURRENCIES:
-                return mApiRepo.calcStatsCurrencies(groupId, year, month).toObservable();
+                return mStatsRepo.calcStatsCurrencies(groupId, year, month).toObservable();
         }
 
         return null;

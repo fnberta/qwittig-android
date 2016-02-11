@@ -88,7 +88,7 @@ public class FinanceCompsUnpaidViewModelImpl
                 .flatMap(new Func1<Identity, Observable<Compensation>>() {
                     @Override
                     public Observable<Compensation> call(Identity identity) {
-                        return mCompsRepo.getCompensationsLocalUnpaidAsync(identity, identity.getGroup());
+                        return mCompsRepo.getCompensationsLocalUnpaidAsync(identity);
                     }
                 })
                 .subscribe(new Subscriber<Compensation>() {

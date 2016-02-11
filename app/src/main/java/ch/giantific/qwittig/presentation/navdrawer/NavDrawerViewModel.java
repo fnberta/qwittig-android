@@ -24,7 +24,7 @@ public interface NavDrawerViewModel extends ViewModel {
     String getIdentityNickname();
 
     @Bindable
-    byte[] getIdentityAvatar();
+    String getIdentityAvatar();
 
     @Bindable
     int getSelectedIdentity();

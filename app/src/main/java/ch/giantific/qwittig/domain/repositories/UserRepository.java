@@ -4,14 +4,17 @@
 
 package ch.giantific.qwittig.domain.repositories;
 
+import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
-import ch.giantific.qwittig.domain.models.parse.Group;
+import com.parse.ParseInstallation;
+
+import org.json.JSONObject;
+
 import ch.giantific.qwittig.domain.models.parse.User;
-import rx.Observable;
 import rx.Single;
 
 /**
@@ -27,7 +30,7 @@ public interface UserRepository extends Repository {
     @Nullable
     User getCurrentUser();
 
-    Single<User> udpateCurrentUser();
+    Single<User> updateUser(@NonNull User user);
 
     /**
      * Returns the session token for current user session.
@@ -82,6 +85,14 @@ public interface UserRepository extends Repository {
                              @NonNull final String displayName, @NonNull final Uri photoUrl);
 
     /**
+     * Verifies the idToken obtained from Google and if successful logs in the user attached to the
+     * email address in the token. If no such user exists yet, creates a new one.
+     *
+     * @param idToken the token obtained from the Google login
+     */
+    Single<JSONObject> verifyGoogleLogin(@NonNull String idToken);
+
+    /**
      * Logs out the user.
      *
      * @param user the user to log out
@@ -89,5 +100,19 @@ public interface UserRepository extends Repository {
      */
     Single<User> logOut(@NonNull User user);
 
-    Observable<User> addNewIdentity(@NonNull String groupName, @NonNull String groupCurrency);
+    Single<User> unlinkFacebook(@NonNull User user);
+
+    Single<Void> signOutGoogle(@NonNull Context context);
+
+    Single<User> unlinkGoogle(@NonNull Context context, @NonNull User user);
+
+    /**
+     * Deletes a users account by deleting it. His identities will be kept because they are
+     * referenced in other objects (e.g. purchases and items.
+     *
+     * @param user the user to delete
+     */
+    Single<User> deleteUser(@NonNull User user);
+
+    Single<ParseInstallation> clearInstallation();
 }

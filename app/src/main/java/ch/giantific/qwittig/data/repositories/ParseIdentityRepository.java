@@ -5,29 +5,31 @@
 package ch.giantific.qwittig.data.repositories;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.Identity;
+import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import rx.Observable;
 import rx.Single;
-import rx.Subscriber;
 import rx.functions.Func1;
 
 /**
  * Provides an implementation of {@link UserRepository} that uses the Parse.com framework as
  * the local and online data store.
  */
-public class ParseIdentityRepository extends ParseBaseRepository<Identity> implements IdentityRepository {
+public class ParseIdentityRepository extends ParseBaseRepository implements IdentityRepository {
+
+    private static final String CALCULATE_BALANCE = "calculateBalance";
 
     public ParseIdentityRepository() {
         super();
@@ -36,6 +38,11 @@ public class ParseIdentityRepository extends ParseBaseRepository<Identity> imple
     @Override
     protected String getClassName() {
         return Identity.CLASS;
+    }
+
+    @Override
+    public Single<String> calcUserBalances() {
+        return callFunctionInBackground(CALCULATE_BALANCE, Collections.<String, Object>emptyMap());
     }
 
     @Override
@@ -53,6 +60,39 @@ public class ParseIdentityRepository extends ParseBaseRepository<Identity> imple
     }
 
     @Override
+    public Observable<Identity> getUserIdentitiesLocalAsync(@NonNull User user) {
+        final ParseQuery<Identity> query = getUserIdentitiesLocalQuery(user);
+        return find(query)
+                .flatMap(new Func1<List<Identity>, Observable<Identity>>() {
+                    @Override
+                    public Observable<Identity> call(List<Identity> identities) {
+                        return Observable.from(identities);
+                    }
+                });
+    }
+
+    @NonNull
+    private ParseQuery<Identity> getUserIdentitiesLocalQuery(@NonNull User user) {
+        final ParseQuery<Identity> query = ParseQuery.getQuery(Identity.CLASS);
+        query.fromLocalDatastore();
+        query.ignoreACLs();
+        query.whereEqualTo(Identity.USER, user);
+        query.whereEqualTo(Identity.ACTIVE, true);
+        query.include(Identity.GROUP);
+        return query;
+    }
+
+    @Override
+    public List<Identity> getUserIdentitiesLocal(@NonNull User user) {
+        try {
+            final ParseQuery<Identity> query = getUserIdentitiesLocalQuery(user);
+            return query.find();
+        } catch (ParseException e) {
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
     public Observable<Identity> fetchIdentityDataAsync(@NonNull final Identity identity) {
         if (identity.isDataAvailable() && identity.getGroup().isDataAvailable()) {
             return Observable.just(identity);
@@ -64,7 +104,10 @@ public class ParseIdentityRepository extends ParseBaseRepository<Identity> imple
                 .flatMap(new Func1<Identity, Observable<? extends Group>>() {
                     @Override
                     public Observable<? extends Group> call(Identity identity) {
-                        return fetchGroupLocal(identity.getGroup());
+                        final Group group = identity.getGroup();
+                        return fetchLocal(group)
+                                .toObservable()
+                                .onErrorResumeNext(fetchIfNeeded(group).toObservable());
                     }
                 })
                 .map(new Func1<Group, Identity>() {
@@ -75,71 +118,13 @@ public class ParseIdentityRepository extends ParseBaseRepository<Identity> imple
                 });
     }
 
-    private Observable<Group> fetchGroupLocal(@NonNull final Group group) {
-        return Observable
-                .create(new Observable.OnSubscribe<Group>() {
-                    @Override
-                    public void call(final Subscriber<? super Group> subscriber) {
-                        group.fetchFromLocalDatastoreInBackground(new GetCallback<Group>() {
-                            @Override
-                            public void done(Group groupFetched, @Nullable ParseException e) {
-                                if (subscriber.isUnsubscribed()) {
-                                    return;
-                                }
-
-                                if (e != null) {
-                                    subscriber.onError(e);
-                                } else {
-                                    subscriber.onNext(groupFetched);
-                                    subscriber.onCompleted();
-                                }
-                            }
-                        });
-                    }
-                })
-                .onErrorResumeNext(Observable
-                        .create(new Observable.OnSubscribe<Group>() {
-                            @Override
-                            public void call(final Subscriber<? super Group> subscriber) {
-                                group.fetchIfNeededInBackground(new GetCallback<Group>() {
-                                    @Override
-                                    public void done(Group groupFetched, @Nullable ParseException e) {
-                                        if (subscriber.isUnsubscribed()) {
-                                            return;
-                                        }
-
-                                        if (e != null) {
-                                            subscriber.onError(e);
-                                        } else {
-                                            subscriber.onNext(groupFetched);
-                                            subscriber.onCompleted();
-                                        }
-                                    }
-                                });
-                            }
-                        }));
-    }
-
-    @Override
-    public Observable<Identity> fetchIdentitiesDataAsync(@NonNull List<ParseObject> identities) {
-        return Observable.from(identities)
-                .cast(Identity.class)
-                .flatMap(new Func1<Identity, Observable<Identity>>() {
-                    @Override
-                    public Observable<Identity> call(Identity identity) {
-                        return fetchIdentityDataAsync(identity);
-                    }
-                });
-    }
-
     @Override
     public Observable<Identity> getIdentitiesLocalAsync(@NonNull Group group) {
         final ParseQuery<Identity> query = ParseQuery.getQuery(Identity.CLASS);
         query.fromLocalDatastore();
+        query.ignoreACLs();
         query.whereEqualTo(Identity.GROUP, group);
         query.whereEqualTo(Identity.ACTIVE, true);
-        query.ignoreACLs();
-
         return find(query)
                 .flatMap(new Func1<List<Identity>, Observable<Identity>>() {
                     @Override
@@ -150,10 +135,33 @@ public class ParseIdentityRepository extends ParseBaseRepository<Identity> imple
     }
 
     @Override
-    public Observable<Identity> updateIdentitiesAsync(@NonNull List<ParseObject> groups) {
-        final ParseQuery<Identity> query = getIdentitiesOnlineQuery(groups);
-
-        return find(query)
+    public Observable<Identity> updateIdentitiesAsync(@NonNull User user) {
+        return Observable.just(user)
+                .flatMap(new Func1<User, Observable<Identity>>() {
+                    @Override
+                    public Observable<Identity> call(User user) {
+                        return getUserIdentitiesAsync(user);
+                    }
+                })
+                .map(new Func1<Identity, Group>() {
+                    @Override
+                    public Group call(Identity identity) {
+                        return identity.getGroup();
+                    }
+                })
+                .toList()
+                .map(new Func1<List<Group>, ParseQuery<Identity>>() {
+                    @Override
+                    public ParseQuery<Identity> call(List<Group> groups) {
+                        return getIdentitiesOnlineQuery(groups);
+                    }
+                })
+                .flatMap(new Func1<ParseQuery<Identity>, Observable<List<Identity>>>() {
+                    @Override
+                    public Observable<List<Identity>> call(ParseQuery<Identity> identityParseQuery) {
+                        return find(identityParseQuery);
+                    }
+                })
                 .flatMap(new Func1<List<Identity>, Observable<List<Identity>>>() {
                     @Override
                     public Observable<List<Identity>> call(List<Identity> identities) {
@@ -174,18 +182,41 @@ public class ParseIdentityRepository extends ParseBaseRepository<Identity> imple
                 });
     }
 
+    private Observable<Identity> getUserIdentitiesAsync(@NonNull User user) {
+        final ParseQuery<Identity> query = ParseQuery.getQuery(Identity.CLASS);
+        query.whereEqualTo(Identity.USER, user);
+        query.whereEqualTo(Identity.ACTIVE, true);
+        query.include(Identity.GROUP);
+        return find(query)
+                .flatMap(new Func1<List<Identity>, Observable<Identity>>() {
+                    @Override
+                    public Observable<Identity> call(List<Identity> identities) {
+                        return Observable.from(identities);
+                    }
+                });
+    }
+
     @NonNull
-    private ParseQuery<Identity> getIdentitiesOnlineQuery(@NonNull List<ParseObject> groups) {
+    private ParseQuery<Identity> getIdentitiesOnlineQuery(@NonNull List<Group> groups) {
         final ParseQuery<Identity> query = ParseQuery.getQuery(Identity.CLASS);
         query.whereContainedIn(Identity.GROUP, groups);
         query.whereEqualTo(Identity.ACTIVE, true);
+        query.include(Identity.GROUP);
         return query;
     }
 
     @Override
-    public boolean updateIdentities(@NonNull List<ParseObject> groups) {
+    public boolean updateIdentities(@NonNull User user) {
         try {
-            final List<Identity> onlineUsers = getIdentitiesOnline(groups);
+            final List<Identity> identities = getUserIdentities(user);
+            final List<Group> groups = new ArrayList<>();
+            for (Identity identity : identities) {
+                groups.add(identity.getGroup());
+            }
+
+            final ParseQuery<Identity> query = getIdentitiesOnlineQuery(groups);
+            final List<Identity> onlineUsers = query.find();
+
             ParseObject.unpinAll(Identity.PIN_LABEL);
             ParseObject.pinAll(Identity.PIN_LABEL, onlineUsers);
         } catch (ParseException e) {
@@ -195,8 +226,16 @@ public class ParseIdentityRepository extends ParseBaseRepository<Identity> imple
         return true;
     }
 
-    private List<Identity> getIdentitiesOnline(@NonNull List<ParseObject> groups) throws ParseException {
-        final ParseQuery<Identity> query = getIdentitiesOnlineQuery(groups);
+    private List<Identity> getUserIdentities(@NonNull User user) throws ParseException {
+        final ParseQuery<Identity> query = ParseQuery.getQuery(Identity.CLASS);
+        query.whereEqualTo(Identity.USER, user);
+        query.whereEqualTo(Identity.ACTIVE, true);
+        query.include(Identity.GROUP);
         return query.find();
+    }
+
+    @Override
+    public Single<Identity> saveIdentityLocalAsync(@NonNull Identity identity) {
+        return pin(identity, Identity.PIN_LABEL);
     }
 }

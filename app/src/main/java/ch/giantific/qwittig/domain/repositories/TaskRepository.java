@@ -7,10 +7,10 @@ package ch.giantific.qwittig.domain.repositories;
 import android.support.annotation.NonNull;
 
 import java.util.Date;
+import java.util.List;
 
-import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.parse.Identity;
 import ch.giantific.qwittig.domain.models.parse.Task;
-import ch.giantific.qwittig.domain.models.parse.User;
 import rx.Observable;
 import rx.Single;
 
@@ -30,11 +30,10 @@ public interface TaskRepository extends Repository {
 
     /**
      * Queries the local data store for tasks.
-     *
-     * @param group    the for which to get the tasks for
+     *  @param identity    the for which to get the tasks for
      * @param deadline the deadline until which to get queries
      */
-    Observable<Task> getTasksLocalAsync(@NonNull Group group, @NonNull Date deadline);
+    Observable<Task> getTasksLocalAsync(@NonNull Identity identity, @NonNull Date deadline);
 
     /**
      * Queries the local data store for a single task.
@@ -62,17 +61,17 @@ public interface TaskRepository extends Repository {
      * Updates all tasks in the local data store by deleting all tasks from the local data
      * store, querying and saving new ones.
      *
-     * @param currentUser the groups for which to update the tasks
+     * @param identities the groups for which to update the tasks
      */
-    Observable<Task> updateTasksAsync(@NonNull User currentUser);
+    Observable<Task> updateTasksAsync(@NonNull List<Identity> identities);
 
     /**
      * Deletes all tasks from the local data store and saves new ones.
      *
-     * @param currentUser the groups for which to update the tasks
+     * @param identities the groups for which to update the tasks
      * @return whether the update was successful or not
      */
-    boolean updateTasks(@NonNull User currentUser);
+    boolean updateTasks(@NonNull List<Identity> identities);
 
     /**
      * Updates a task if is already available in the local data store (by simply querying it) or
@@ -91,4 +90,11 @@ public interface TaskRepository extends Repository {
      * @return a fetched {@link Task} object
      */
     Task fetchTaskDataLocal(@NonNull String taskId);
+
+    /**
+     * Sends a push notification to remind a user to finish a task.
+     *
+     * @param taskId the object id of the task that should be finished
+     */
+    Single<String> pushTaskReminder(@NonNull String taskId);
 }

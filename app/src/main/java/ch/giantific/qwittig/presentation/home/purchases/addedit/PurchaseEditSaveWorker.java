@@ -11,10 +11,7 @@ import android.support.v4.app.FragmentManager;
 
 import com.parse.ParseFile;
 
-import javax.inject.Inject;
-
 import ch.giantific.qwittig.domain.models.parse.Purchase;
-import ch.giantific.qwittig.domain.repositories.ApiRepository;
 import rx.Observable;
 import rx.Single;
 import rx.functions.Action1;
@@ -28,8 +25,6 @@ import rx.functions.Func1;
  */
 public class PurchaseEditSaveWorker extends PurchaseSaveWorker {
 
-    @Inject
-    ApiRepository mCloudClient;
     private ParseFile mReceiptParseFileOld;
     private boolean mDraft;
     private boolean mDeleteOldReceipt;
@@ -129,7 +124,7 @@ public class PurchaseEditSaveWorker extends PurchaseSaveWorker {
 
     private Single<String> deleteOldReceiptFile() {
         final String fileName = mReceiptParseFileOld.getName();
-        return mCloudClient.deleteParseFile(fileName).doOnSuccess(new Action1<String>() {
+        return mPurchaseRepo.deleteReceipt(fileName).doOnSuccess(new Action1<String>() {
             @Override
             public void call(String s) {
                 mPurchase.removeReceiptParseFile();

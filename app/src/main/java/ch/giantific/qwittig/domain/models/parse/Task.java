@@ -62,7 +62,7 @@ public class Task extends ParseObject {
         setAccessRights(group);
     }
 
-    private void setAccessRights(@NonNull ParseObject group) {
+    private void setAccessRights(@NonNull Group group) {
         ParseACL acl = ParseUtils.getDefaultAcl(group);
         setACL(acl);
     }

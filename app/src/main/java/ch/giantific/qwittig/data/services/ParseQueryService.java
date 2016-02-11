@@ -11,13 +11,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
 
-import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.ArrayList;
-import java.util.List;
 
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.LocalBroadcast;
@@ -60,8 +57,8 @@ public class ParseQueryService extends IntentService {
     private static final String EXTRA_OBJECT_GROUP_ID = BuildConfig.APPLICATION_ID + ".data.services.extra.GROUP_ID";
     private User mCurrentUser;
     private Identity mCurrentIdentity;
-    private List<ParseObject> mCurrentUserGroups = new ArrayList<>();
     private LocalBroadcast mLocalBroadcast;
+    private IdentityRepository mIdentityRepo;
 
     /**
      * Constructs a new {@link ParseQueryService}.
@@ -184,12 +181,8 @@ public class ParseQueryService extends IntentService {
 
         mCurrentUser = (User) ParseUser.getCurrentUser();
         mCurrentIdentity = mCurrentUser.getCurrentIdentity();
-        final List<ParseObject> identities = mCurrentUser.getIdentities();
-        for (ParseObject parseObject : identities) {
-            final Identity identity = (Identity) parseObject;
-            mCurrentUserGroups.add(identity.getGroup());
-        }
         mLocalBroadcast = new LocalBroadcastImpl(this);
+        mIdentityRepo = new ParseIdentityRepository();
 
         final String action = intent.getAction();
         switch (action) {
@@ -336,21 +329,21 @@ public class ParseQueryService extends IntentService {
 
     private void queryPurchases() {
         PurchaseRepository repo = new ParsePurchaseRepository();
-        if (repo.updatePurchases(mCurrentUser)) {
+        if (repo.updatePurchases(mCurrentIdentity, mIdentityRepo.getUserIdentitiesLocal(mCurrentUser))) {
             mLocalBroadcast.sendPurchasesUpdated();
         }
     }
 
     private void queryUsers() {
         IdentityRepository repo = new ParseIdentityRepository();
-        if (repo.updateIdentities(mCurrentUserGroups)) {
+        if (repo.updateIdentities(mCurrentUser)) {
             mLocalBroadcast.sendUsersUpdated();
         }
     }
 
     private void queryCompensations() {
         CompensationRepository repo = new ParseCompensationRepository();
-        if (repo.updateCompensations(mCurrentUser)) {
+        if (repo.updateCompensations(mIdentityRepo.getUserIdentitiesLocal(mCurrentUser))) {
             mLocalBroadcast.sendCompensationsUpdated(false);
             mLocalBroadcast.sendCompensationsUpdated(true);
         }
@@ -358,7 +351,7 @@ public class ParseQueryService extends IntentService {
 
     private void queryTasks() {
         TaskRepository repo = new ParseTaskRepository();
-        if (repo.updateTasks(mCurrentUser)) {
+        if (repo.updateTasks(mIdentityRepo.getUserIdentitiesLocal(mCurrentUser))) {
             mLocalBroadcast.sendTasksUpdated();
         }
     }

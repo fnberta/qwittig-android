@@ -9,19 +9,19 @@ import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 
-import ch.giantific.qwittig.data.repositories.ParseApiRepository;
 import ch.giantific.qwittig.data.repositories.ParseCompensationRepository;
 import ch.giantific.qwittig.data.repositories.ParseGroupRepository;
 import ch.giantific.qwittig.data.repositories.ParseIdentityRepository;
 import ch.giantific.qwittig.data.repositories.ParsePurchaseRepository;
+import ch.giantific.qwittig.data.repositories.ParseStatsRepository;
 import ch.giantific.qwittig.data.repositories.ParseTaskRepository;
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.data.rest.ExchangeRates;
-import ch.giantific.qwittig.domain.repositories.ApiRepository;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
+import ch.giantific.qwittig.domain.repositories.StatsRepository;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import dagger.Module;
@@ -42,11 +42,6 @@ public class RepositoriesModule {
     }
 
     @Provides
-    ApiRepository providesApiRepository(@NonNull Gson gson) {
-        return new ParseApiRepository(gson);
-    }
-
-    @Provides
     GroupRepository providesGroupRepository() {
         return new ParseGroupRepository();
     }
@@ -63,8 +58,8 @@ public class RepositoriesModule {
     }
 
     @Provides
-    UserRepository providesUserRepository(@NonNull ApiRepository apiRepository) {
-        return new ParseUserRepository(apiRepository);
+    UserRepository providesUserRepository() {
+        return new ParseUserRepository();
     }
 
     @Provides
@@ -75,5 +70,10 @@ public class RepositoriesModule {
     @Provides
     TaskRepository providesTaskRepository() {
         return new ParseTaskRepository();
+    }
+
+    @Provides
+    StatsRepository providesStatsRepository(@NonNull Gson gson) {
+        return new ParseStatsRepository(gson);
     }
 }

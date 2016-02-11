@@ -12,7 +12,7 @@ import rx.Single;
 /**
  * Defines the actions to take after a user was reminded or after the process failed.
  */
-public interface CompensationReminderListener extends BaseWorkerListener {
+public interface CompensationReminderWorkerListener extends BaseWorkerListener {
 
     /**
      * Handles the successful reminder of a user to pay a compensation.

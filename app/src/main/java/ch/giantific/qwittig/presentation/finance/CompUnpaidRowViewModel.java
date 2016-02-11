@@ -20,7 +20,7 @@ public class CompUnpaidRowViewModel extends BaseObservable implements CardTopPro
     private final String mCurrency;
     private boolean mCredit;
     private String mCompUsername;
-    private byte[] mCompUserAvatar;
+    private String mCompUserAvatar;
     private String mCompAmount;
     private boolean mCompLoading;
 
@@ -34,7 +34,7 @@ public class CompUnpaidRowViewModel extends BaseObservable implements CardTopPro
         mCredit = credit;
         final Identity identity = credit ? compensation.getDebtor() : compensation.getCreditor();
         mCompUsername = identity.getNickname();
-        mCompUserAvatar = identity.getAvatar();
+        mCompUserAvatar = identity.getAvatarUrl();
         mCompAmount = MoneyUtils.formatMoney(compensation.getAmountFraction(), mCurrency);
         mCompLoading = compensation.isLoading();
     }
@@ -55,7 +55,7 @@ public class CompUnpaidRowViewModel extends BaseObservable implements CardTopPro
     }
 
     @Bindable
-    public byte[] getCompUserAvatar() {
+    public String getCompUserAvatar() {
         return mCompUserAvatar;
     }
 

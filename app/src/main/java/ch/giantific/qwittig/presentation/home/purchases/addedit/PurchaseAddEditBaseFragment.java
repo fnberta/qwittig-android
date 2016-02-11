@@ -171,7 +171,7 @@ public abstract class PurchaseAddEditBaseFragment<T extends PurchaseAddEditViewM
     }
 
     @Override
-    public Single<byte[]> getReceiptImage(@NonNull final String imagePath) {
+    public Single<byte[]> encodeReceiptImage(@NonNull final String imagePath) {
         final PurchaseAddEditBaseFragment fragment = this;
         return Single.create(new Single.OnSubscribe<byte[]>() {
             @Override

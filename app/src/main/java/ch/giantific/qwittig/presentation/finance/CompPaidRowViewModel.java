@@ -23,7 +23,7 @@ public class CompPaidRowViewModel extends BaseObservable {
     private final Identity mCurrentIdentity;
     private final String mCurrency;
     private String mCompUsername;
-    private byte[] mCompUserAvatar;
+    private String mCompUserAvatar;
     private String mCompAmount;
     private boolean mCompAmountPos;
     private String mCompDate;
@@ -43,12 +43,12 @@ public class CompPaidRowViewModel extends BaseObservable {
         if (creditor.getObjectId().equals(mCurrentIdentity.getObjectId())) {
             final Identity debtor = compensation.getDebtor();
             mCompUsername = debtor.getNickname();
-            mCompUserAvatar = debtor.getAvatar();
+            mCompUserAvatar = debtor.getAvatarUrl();
             mCompAmount = MoneyUtils.formatMoney(amount, mCurrency);
             mCompAmountPos = true;
         } else {
             mCompUsername = creditor.getNickname();
-            mCompUserAvatar = creditor.getAvatar();
+            mCompUserAvatar = creditor.getAvatarUrl();
             mCompAmountPos = false;
             mCompAmount = MoneyUtils.formatMoney(amount.negate(), mCurrency);
         }
@@ -65,7 +65,7 @@ public class CompPaidRowViewModel extends BaseObservable {
     }
 
     @Bindable
-    public byte[] getCompUserAvatar() {
+    public String getCompUserAvatar() {
         return mCompUserAvatar;
     }
 

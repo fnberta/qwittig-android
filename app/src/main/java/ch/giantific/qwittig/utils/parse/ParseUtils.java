@@ -32,8 +32,8 @@ public class ParseUtils {
      */
     @NonNull
     public static ParseACL getDefaultAcl(@NonNull Group group) {
-        String roleName = getGroupRoleName(group);
-        ParseACL acl = new ParseACL();
+        final String roleName = getGroupRoleName(group);
+        final ParseACL acl = new ParseACL();
         acl.setRoleReadAccess(roleName, true);
         acl.setRoleWriteAccess(roleName, true);
         return acl;

@@ -54,29 +54,29 @@ public class BindingUtils {
     }
 
     @BindingAdapter({"avatarSquare", "fallback"})
-    public static void loadAvatarSquare(ImageView view, byte[] avatar, Drawable fallback) {
+    public static void loadAvatarSquare(ImageView view, String avatarUrl, Drawable fallback) {
         final Context context = view.getContext();
         Glide.with(context)
-                .load(avatar)
+                .load(avatarUrl)
                 .error(fallback)
                 .into(view);
     }
 
     @BindingAdapter({"avatar", "fallback"})
-    public static void loadAvatar(ImageView view, byte[] avatar, Drawable fallback) {
-        glideLoadAvatar(view, avatar, fallback, false);
+    public static void loadAvatar(ImageView view, String avatarUrl, Drawable fallback) {
+        glideLoadAvatar(view, avatarUrl, fallback, false);
     }
 
     @BindingAdapter({"avatarRipple", "fallback"})
-    public static void loadAvatarRipple(ImageView view, byte[] avatar, Drawable fallback) {
-        glideLoadAvatar(view, avatar, fallback, true);
+    public static void loadAvatarRipple(ImageView view, String avatarUrl, Drawable fallback) {
+        glideLoadAvatar(view, avatarUrl, fallback, true);
     }
 
-    private static void glideLoadAvatar(final ImageView view, byte[] avatar, Drawable fallback,
+    private static void glideLoadAvatar(final ImageView view, String avatarUrl, Drawable fallback,
                                         final boolean withRipple) {
         final Context context = view.getContext();
         Glide.with(context)
-                .load(avatar)
+                .load(avatarUrl)
                 .asBitmap()
                 .error(fallback)
                 .into(new BitmapImageViewTarget(view) {
@@ -88,10 +88,10 @@ public class BindingUtils {
     }
 
     @BindingAdapter({"backdrop"})
-    public static void loadAvatarBackdrop(ImageView view, byte[] avatar) {
+    public static void loadAvatarBackdrop(ImageView view, String avatarUrl) {
         final Context context = view.getContext();
         Glide.with(context)
-                .load(avatar)
+                .load(avatarUrl)
                 .bitmapTransform(new BlurTransformation(context))
                 .into(view);
     }

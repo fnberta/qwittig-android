@@ -4,13 +4,11 @@
 
 package ch.giantific.qwittig.presentation.common.workers;
 
-import com.parse.ParseObject;
+import javax.inject.Inject;
 
-import java.util.List;
-
-import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.Identity;
 import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 
 /**
  * Provides an abstract base class for worker fragments whose task it is to query data from the
@@ -21,10 +19,10 @@ import ch.giantific.qwittig.domain.models.parse.User;
 public abstract class BaseQueryWorker<T, S extends BaseWorkerListener>
         extends BaseWorker<T, S> {
 
+    @Inject
+    protected IdentityRepository mIdentityRepo;
     protected User mCurrentUser;
     protected Identity mCurrentIdentity;
-    protected Group mCurrentGroup;
-    protected List<ParseObject> mCurrentUserIdentities;
 
     /**
      * Returns if the current user's current group and groups are not null or empty.
@@ -33,13 +31,10 @@ public abstract class BaseQueryWorker<T, S extends BaseWorkerListener>
      */
     protected final boolean setCurrentGroups() {
         mCurrentUser = mUserRepo.getCurrentUser();
-
         if (mCurrentUser != null) {
             mCurrentIdentity = mCurrentUser.getCurrentIdentity();
-            mCurrentGroup = mCurrentIdentity.getGroup();
-            mCurrentUserIdentities = mCurrentUser.getIdentities();
         }
 
-        return mCurrentUser != null && mCurrentGroup != null && !mCurrentUserIdentities.isEmpty();
+        return mCurrentUser != null && mCurrentIdentity != null;
     }
 }

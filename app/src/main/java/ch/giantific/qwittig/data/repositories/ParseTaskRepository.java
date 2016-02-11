@@ -12,13 +12,15 @@ import com.parse.ParseQuery;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.Identity;
 import ch.giantific.qwittig.domain.models.parse.Task;
-import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
+import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 import rx.Observable;
 import rx.Single;
 import rx.functions.Func1;
@@ -27,7 +29,9 @@ import rx.functions.Func1;
  * Provides an implementation of {@link TaskRepository} that uses the Parse.com framework as
  * the local and online data store.
  */
-public class ParseTaskRepository extends ParseBaseRepository<Task> implements TaskRepository {
+public class ParseTaskRepository extends ParseBaseRepository implements TaskRepository {
+
+    private static final String PUSH_TASK_REMIND = "pushTaskRemind";
 
     public ParseTaskRepository() {
         super();
@@ -44,7 +48,8 @@ public class ParseTaskRepository extends ParseBaseRepository<Task> implements Ta
     }
 
     @Override
-    public Observable<Task> getTasksLocalAsync(@NonNull Group group, @NonNull Date deadline) {
+    public Observable<Task> getTasksLocalAsync(@NonNull Identity identity,
+                                               @NonNull Date deadline) {
         ParseQuery<Task> deadlineQuery = ParseQuery.getQuery(Task.CLASS);
         deadlineQuery.whereLessThan(Task.DEADLINE, deadline);
 
@@ -58,7 +63,7 @@ public class ParseTaskRepository extends ParseBaseRepository<Task> implements Ta
         ParseQuery<Task> query = ParseQuery.or(queries);
         query.fromLocalDatastore();
         query.ignoreACLs();
-        query.whereEqualTo(Task.GROUP, group);
+        query.whereEqualTo(Task.GROUP, identity.getGroup());
         query.include(Task.IDENTITIES);
         query.orderByAscending(Task.DEADLINE);
 
@@ -99,16 +104,27 @@ public class ParseTaskRepository extends ParseBaseRepository<Task> implements Ta
     }
 
     @Override
-    public Observable<Task> updateTasksAsync(@NonNull User currentUser) {
-        final List<ParseObject> identities = currentUser.getIdentities();
-        final List<ParseObject> groups = new ArrayList<>();
-        for (ParseObject parseObject : identities) {
-            final Identity identity = (Identity) parseObject;
-            groups.add(identity.getGroup());
-        }
-
-        final ParseQuery<Task> query = getTasksOnlineQuery(groups);
-        return find(query)
+    public Observable<Task> updateTasksAsync(@NonNull List<Identity> identities) {
+        return Observable.from(identities)
+                .map(new Func1<Identity, Group>() {
+                    @Override
+                    public Group call(Identity identity) {
+                        return identity.getGroup();
+                    }
+                })
+                .toList()
+                .map(new Func1<List<Group>, ParseQuery<Task>>() {
+                    @Override
+                    public ParseQuery<Task> call(List<Group> groups) {
+                        return getTasksOnlineQuery(groups);
+                    }
+                })
+                .flatMap(new Func1<ParseQuery<Task>, Observable<List<Task>>>() {
+                    @Override
+                    public Observable<List<Task>> call(ParseQuery<Task> taskParseQuery) {
+                        return find(taskParseQuery);
+                    }
+                })
                 .concatMap(new Func1<List<Task>, Observable<List<Task>>>() {
                     @Override
                     public Observable<List<Task>> call(List<Task> tasks) {
@@ -123,14 +139,14 @@ public class ParseTaskRepository extends ParseBaseRepository<Task> implements Ta
                 })
                 .concatMap(new Func1<List<Task>, Observable<Task>>() {
                     @Override
-                    public Observable<Task> call(List<Task> parseUsers) {
-                        return Observable.from(parseUsers);
+                    public Observable<Task> call(List<Task> tasks) {
+                        return Observable.from(tasks);
                     }
                 });
     }
 
     @NonNull
-    private ParseQuery<Task> getTasksOnlineQuery(@NonNull List<ParseObject> groups) {
+    private ParseQuery<Task> getTasksOnlineQuery(@NonNull List<Group> groups) {
         ParseQuery<Task> query = ParseQuery.getQuery(Task.CLASS);
         query.whereContainedIn(Task.GROUP, groups);
         query.include(Task.IDENTITIES);
@@ -138,11 +154,9 @@ public class ParseTaskRepository extends ParseBaseRepository<Task> implements Ta
     }
 
     @Override
-    public boolean updateTasks(@NonNull User currentUser) {
-        final List<ParseObject> identities = currentUser.getIdentities();
-        final List<ParseObject> groups = new ArrayList<>();
-        for (ParseObject parseObject : identities) {
-            final Identity identity = (Identity) parseObject;
+    public boolean updateTasks(@NonNull List<Identity> identities) {
+        final List<Group> groups = new ArrayList<>();
+        for (Identity identity : identities) {
             groups.add(identity.getGroup());
         }
 
@@ -190,4 +204,11 @@ public class ParseTaskRepository extends ParseBaseRepository<Task> implements Ta
         return task;
     }
 
+
+    @Override
+    public Single<String> pushTaskReminder(@NonNull String taskId) {
+        final Map<String, Object> params = new HashMap<>();
+        params.put(PushBroadcastReceiver.PUSH_PARAM_TASK_ID, taskId);
+        return callFunctionInBackground(PUSH_TASK_REMIND, params);
+    }
 }

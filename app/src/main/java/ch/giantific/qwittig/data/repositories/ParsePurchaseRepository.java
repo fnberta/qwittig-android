@@ -8,15 +8,14 @@ import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.SaveCallback;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,13 +24,11 @@ import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.Identity;
 import ch.giantific.qwittig.domain.models.parse.Item;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
-import ch.giantific.qwittig.domain.models.parse.User;
 import ch.giantific.qwittig.domain.models.rates.CurrencyRates;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Observable;
 import rx.Single;
-import rx.SingleSubscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -41,9 +38,11 @@ import rx.schedulers.Schedulers;
  * Provides an implementation of {@link PurchaseRepository} that uses the Parse.com framework as
  * the local and online data store.
  */
-public class ParsePurchaseRepository extends ParseBaseRepository<Purchase> implements
+public class ParsePurchaseRepository extends ParseBaseRepository implements
         PurchaseRepository {
 
+    private static final String DELETE_PARSE_FILE = "deleteParseFile";
+    private static final String PARAM_FILE_NAME = "fileName";
     private static final String DRAFTS_AVAILABLE = "DRAFTS_AVAILABLE";
     private static final String EXCHANGE_RATE_LAST_FETCHED_TIME = "EXCHANGE_RATE_LAST_FETCHED_TIME";
     private static final long EXCHANGE_RATE_REFRESH_INTERVAL = 24 * 60 * 60 * 1000;
@@ -161,13 +160,10 @@ public class ParsePurchaseRepository extends ParseBaseRepository<Purchase> imple
     }
 
     @Override
-    public Observable<Purchase> updatePurchasesAsync(@NonNull final User currentUser) {
-        final Identity currentIdentity = currentUser.getCurrentIdentity();
+    public Observable<Purchase> updatePurchasesAsync(@NonNull Identity currentIdentity,
+                                                     @NonNull final List<Identity> identities) {
         final String currentIdentityGroupId = currentIdentity.getGroup().getObjectId();
-
-        final List<ParseObject> identities = currentUser.getIdentities();
         return Observable.from(identities)
-                .cast(Identity.class)
                 .flatMap(new Func1<Identity, Observable<Purchase>>() {
                     @Override
                     public Observable<Purchase> call(Identity identity) {
@@ -175,8 +171,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository<Purchase> imple
                         final String groupId = group.getObjectId();
                         final String pinLabel = Purchase.PIN_LABEL + groupId;
 
-                        ParseQuery<Purchase> query = getPurchasesOnlineQuery(currentIdentity);
-                        query.whereEqualTo(Purchase.GROUP, group);
+                        ParseQuery<Purchase> query = getPurchasesOnlineQuery(identity);
                         return find(query)
                                 .flatMap(new Func1<List<Purchase>, Observable<List<Purchase>>>() {
                                     @Override
@@ -207,12 +202,12 @@ public class ParsePurchaseRepository extends ParseBaseRepository<Purchase> imple
     }
 
     @NonNull
-    private ParseQuery<Purchase> getPurchasesOnlineQuery(@NonNull Identity currentIdentity) {
+    private ParseQuery<Purchase> getPurchasesOnlineQuery(@NonNull Identity identity) {
         final ParseQuery<Purchase> buyerQuery = ParseQuery.getQuery(Purchase.CLASS);
-        buyerQuery.whereEqualTo(Purchase.BUYER, currentIdentity);
+        buyerQuery.whereEqualTo(Purchase.BUYER, identity);
 
         final ParseQuery<Purchase> involvedQuery = ParseQuery.getQuery(Purchase.CLASS);
-        involvedQuery.whereEqualTo(Purchase.IDENTITIES, currentIdentity);
+        involvedQuery.whereEqualTo(Purchase.IDENTITIES, identity);
 
         final List<ParseQuery<Purchase>> queries = new ArrayList<>();
         queries.add(buyerQuery);
@@ -231,16 +226,15 @@ public class ParsePurchaseRepository extends ParseBaseRepository<Purchase> imple
     public Observable<Purchase> getPurchasesOnlineAsync(@NonNull Identity currentIdentity,
                                                         int skip) {
         final Group currentGroup = currentIdentity.getGroup();
+        final String pinLabel = Purchase.PIN_LABEL + currentGroup.getObjectId();
         final ParseQuery<Purchase> query = getPurchasesOnlineQuery(currentIdentity);
         query.setSkip(skip);
-        query.whereEqualTo(Purchase.GROUP, currentGroup);
 
         return find(query)
                 .flatMap(new Func1<List<Purchase>, Observable<List<Purchase>>>() {
                     @Override
                     public Observable<List<Purchase>> call(List<Purchase> purchases) {
-                        final String tag = Purchase.PIN_LABEL + currentGroup.getObjectId();
-                        return pinAll(purchases, tag);
+                        return pinAll(purchases, pinLabel);
                     }
                 })
                 .flatMap(new Func1<List<Purchase>, Observable<Purchase>>() {
@@ -252,34 +246,23 @@ public class ParsePurchaseRepository extends ParseBaseRepository<Purchase> imple
     }
 
     @Override
-    public boolean updatePurchases(@NonNull User currentUser) {
-        final Identity currentIdentity = currentUser.getCurrentIdentity();
-        final List<ParseObject> identities = currentUser.getIdentities();
-        for (ParseObject parseObject : identities) {
-            final Identity identity = (Identity) parseObject;
-            final Group group = identity.getGroup();
-
+    public boolean updatePurchases(@NonNull final Identity currentIdentity,
+                                   @NonNull final List<Identity> identities) {
+        for (Identity identity : identities) {
             try {
-                final List<Purchase> purchases = getPurchasesForGroupOnline(currentIdentity, group);
-                final String groupId = group.getObjectId();
-                final String label = Purchase.PIN_LABEL + groupId;
+                final ParseQuery<Purchase> query = getPurchasesOnlineQuery(identity);
+                final List<Purchase> purchases = query.find();
+                final Group group = identity.getGroup();
+                final String pinLabel = Purchase.PIN_LABEL + group.getObjectId();
 
-                ParseObject.unpinAll(label);
-                ParseObject.pinAll(label, purchases);
+                ParseObject.unpinAll(pinLabel);
+                ParseObject.pinAll(pinLabel, purchases);
             } catch (ParseException e) {
                 return false;
             }
         }
 
         return true;
-    }
-
-    private List<Purchase> getPurchasesForGroupOnline(@NonNull Identity currentIdentity,
-                                                      @NonNull Group group)
-            throws ParseException {
-        final ParseQuery<Purchase> query = getPurchasesOnlineQuery(currentIdentity);
-        query.whereEqualTo(Purchase.GROUP, group);
-        return query.find();
     }
 
     @Override
@@ -320,13 +303,15 @@ public class ParsePurchaseRepository extends ParseBaseRepository<Purchase> imple
             return saveAndPinPurchase(purchase, tag, isDraft);
         }
 
-        return saveReceiptFile(receiptImage).flatMap(new Func1<ParseFile, Single<? extends Purchase>>() {
-            @Override
-            public Single<? extends Purchase> call(ParseFile parseFile) {
-                purchase.setReceiptParseFile(parseFile);
-                return saveAndPinPurchase(purchase, tag, isDraft);
-            }
-        });
+        final ParseFile receipt = new ParseFile(receiptImage);
+        return saveFile(receipt)
+                .flatMap(new Func1<ParseFile, Single<? extends Purchase>>() {
+                    @Override
+                    public Single<? extends Purchase> call(ParseFile parseFile) {
+                        purchase.setReceipt(parseFile);
+                        return saveAndPinPurchase(purchase, tag, isDraft);
+                    }
+                });
     }
 
     private Single<Purchase> saveAndPinPurchase(@NonNull final Purchase purchase,
@@ -355,25 +340,6 @@ public class ParsePurchaseRepository extends ParseBaseRepository<Purchase> imple
                         convertPrices(purchase, false);
                     }
                 });
-    }
-
-    private Single<ParseFile> saveReceiptFile(@NonNull byte[] receiptImage) {
-        final ParseFile parseFile = new ParseFile(receiptImage);
-        return Single.create(new Single.OnSubscribe<ParseFile>() {
-            @Override
-            public void call(final SingleSubscriber<? super ParseFile> singleSubscriber) {
-                parseFile.saveInBackground(new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        if (e != null) {
-                            singleSubscriber.onError(e);
-                        } else {
-                            singleSubscriber.onSuccess(parseFile);
-                        }
-                    }
-                });
-            }
-        });
     }
 
     private void convertPrices(@NonNull Purchase purchase, boolean toGroupCurrency) {
@@ -406,27 +372,11 @@ public class ParsePurchaseRepository extends ParseBaseRepository<Purchase> imple
     }
 
     @Override
-    public Single<byte[]> getPurchaseReceiptImageAsync(@NonNull final Purchase purchase) {
-        return Single.create(new Single.OnSubscribe<byte[]>() {
-            @Override
-            public void call(final SingleSubscriber<? super byte[]> singleSubscriber) {
-                final ParseFile file = purchase.getReceiptParseFile();
-                file.getDataInBackground(new GetDataCallback() {
-                    @Override
-                    public void done(byte[] data, ParseException e) {
-                        if (singleSubscriber.isUnsubscribed()) {
-                            return;
-                        }
+    public Single<String> deleteReceipt(@NonNull String fileName) {
+        Map<String, Object> params = new HashMap<>();
+        params.put(PARAM_FILE_NAME, fileName);
 
-                        if (e != null) {
-                            singleSubscriber.onError(e);
-                        } else {
-                            singleSubscriber.onSuccess(data);
-                        }
-                    }
-                });
-            }
-        });
+        return callFunctionInBackground(DELETE_PARSE_FILE, params);
     }
 
     @Override

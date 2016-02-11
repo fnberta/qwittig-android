@@ -20,12 +20,12 @@ import ch.giantific.qwittig.presentation.common.fragments.BaseDialogFragment;
  * <p/>
  * Subclass of {@link DialogFragment}.
  */
-public class AccountDeleteDialogFragment extends BaseDialogFragment<AccountDeleteDialogFragment.DialogInteractionListener> {
+public class DeleteAccountDialogFragment extends BaseDialogFragment<DeleteAccountDialogFragment.DialogInteractionListener> {
 
-    private static final String DIALOG_TAG = AccountDeleteDialogFragment.class.getCanonicalName();
+    private static final String DIALOG_TAG = DeleteAccountDialogFragment.class.getCanonicalName();
 
     public static void display(@NonNull FragmentManager fm) {
-        final AccountDeleteDialogFragment dialog = new AccountDeleteDialogFragment();
+        final DeleteAccountDialogFragment dialog = new DeleteAccountDialogFragment();
         dialog.show(fm, DIALOG_TAG);
     }
 

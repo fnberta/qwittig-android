@@ -9,13 +9,17 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.di.components.WorkerComponent;
+import ch.giantific.qwittig.domain.models.parse.Identity;
 import ch.giantific.qwittig.domain.models.parse.Purchase;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.presentation.common.workers.BaseQueryWorker;
 import rx.Observable;
+import rx.functions.Func1;
 
 /**
  * Performs an online query to the Parse.com database to query purchases.
@@ -58,7 +62,14 @@ public class PurchasesUpdateWorker extends BaseQueryWorker<Purchase, PurchasesUp
     @Override
     protected Observable<Purchase> getObservable(@NonNull Bundle args) {
         if (setCurrentGroups()) {
-            return mPurchaseRepo.updatePurchasesAsync(mCurrentUser);
+            mIdentityRepo.getUserIdentitiesLocalAsync(mCurrentUser)
+                    .toList()
+                    .flatMap(new Func1<List<Identity>, Observable<Purchase>>() {
+                        @Override
+                        public Observable<Purchase> call(List<Identity> identities) {
+                            return mPurchaseRepo.updatePurchasesAsync(mCurrentIdentity, identities);
+                        }
+                    });
         }
 
         return null;

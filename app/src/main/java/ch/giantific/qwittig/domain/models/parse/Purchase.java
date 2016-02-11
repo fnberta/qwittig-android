@@ -69,7 +69,7 @@ public class Purchase extends ParseObject {
         setAccessRights(group);
     }
 
-    private void setAccessRights(ParseObject group) {
+    private void setAccessRights(@NonNull Group group) {
         ParseACL acl = ParseUtils.getDefaultAcl(group);
         setACL(acl);
     }
@@ -146,11 +146,16 @@ public class Purchase extends ParseObject {
         put(EXCHANGE_RATE, exchangeRate);
     }
 
-    public ParseFile getReceiptParseFile() {
+    public String getReceiptUrl() {
+        final ParseFile receipt = getReceipt();
+        return receipt != null ? receipt.getUrl() : "";
+    }
+
+    public ParseFile getReceipt() {
         return getParseFile(RECEIPT);
     }
 
-    public void setReceiptParseFile(@NonNull ParseFile file) {
+    public void setReceipt(@NonNull ParseFile file) {
         put(RECEIPT, file);
     }
 

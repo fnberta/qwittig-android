@@ -9,13 +9,17 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.di.components.WorkerComponent;
+import ch.giantific.qwittig.domain.models.parse.Identity;
 import ch.giantific.qwittig.domain.models.parse.Task;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.presentation.common.workers.BaseQueryWorker;
 import rx.Observable;
+import rx.functions.Func1;
 
 /**
  * Performs an online query to the Parse.com database to query tasks.
@@ -64,7 +68,14 @@ public class TasksUpdateWorker extends BaseQueryWorker<Task, TasksUpdateWorkerLi
     @Override
     protected Observable<Task> getObservable(@NonNull Bundle args) {
         if (setCurrentGroups()) {
-            return mTaskRepo.updateTasksAsync(mCurrentUser);
+            return mIdentityRepo.getUserIdentitiesLocalAsync(mCurrentUser)
+                    .toList()
+                    .flatMap(new Func1<List<Identity>, Observable<Task>>() {
+                        @Override
+                        public Observable<Task> call(List<Identity> identities) {
+                            return mTaskRepo.updateTasksAsync(identities);
+                        }
+                    });
         }
 
         return null;

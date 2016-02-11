@@ -43,8 +43,8 @@ public class TaskHistory extends BaseObservable
     }
 
     @Bindable
-    public byte[] getUserAvatar() {
-        return mUser.getAvatar();
+    public String getUserAvatar() {
+        return mUser.getAvatarUrl();
     }
 
     @Bindable

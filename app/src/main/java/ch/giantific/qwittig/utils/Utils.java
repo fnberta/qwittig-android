@@ -39,7 +39,7 @@ public class Utils {
      * @param email the email address to test
      * @return whether the email address is valid or not
      */
-    public static boolean emailIsValid(@NonNull String email) {
+    public static boolean isEmailValid(@NonNull String email) {
         String pattern = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}";
         return !TextUtils.isEmpty(email) && email.matches(pattern);
     }
@@ -50,7 +50,7 @@ public class Utils {
      * @param password the password to test
      * @return whether the password is valid or not
      */
-    public static boolean passwordIsValid(@NonNull String password) {
+    public static boolean isPasswordValid(@NonNull String password) {
         // TODO: add real validation
         return !TextUtils.isEmpty(password);
     }

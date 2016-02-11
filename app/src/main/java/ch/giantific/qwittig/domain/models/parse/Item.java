@@ -35,11 +35,11 @@ public class Item extends ParseObject {
     }
 
     public Item(@NonNull String name, @NonNull BigDecimal price,
-                @NonNull List<Identity> identities, @NonNull Group currentGroup) {
+                @NonNull List<Identity> identities, @NonNull Group group) {
         setName(name);
         setPrice(price);
         setIdentities(identities);
-        setAccessRights(currentGroup);
+        setAccessRights(group);
     }
 
     private void setAccessRights(@NonNull Group group) {

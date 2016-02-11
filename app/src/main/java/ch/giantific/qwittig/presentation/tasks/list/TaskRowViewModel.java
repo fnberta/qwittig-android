@@ -82,8 +82,8 @@ public class TaskRowViewModel extends BaseObservable implements CardTopProgressV
     }
 
     @Bindable
-    public byte[] getTaskUserResponsibleAvatar() {
-        return mTaskIdentityResponsible.getAvatar();
+    public String getTaskUserResponsibleAvatar() {
+        return mTaskIdentityResponsible.getAvatarUrl();
     }
 
     /**

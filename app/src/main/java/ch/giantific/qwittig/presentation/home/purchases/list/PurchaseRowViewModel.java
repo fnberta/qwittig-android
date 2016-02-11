@@ -20,7 +20,7 @@ public class PurchaseRowViewModel extends BaseObservable {
 
     private Identity mCurrentIdentity;
     private String mPurchaseBuyerAndDate;
-    private byte[] mPurchaseBuyerAvatar;
+    private String mPurchaseBuyerAvatar;
     private String mPurchaseStore;
     private String mPurchaseTotalPrice;
     private String mPurchaseMyShare;
@@ -38,7 +38,7 @@ public class PurchaseRowViewModel extends BaseObservable {
         // TODO: show me if buyer == currentUser
         mPurchaseBuyerAndDate = String.format("%s, %s", buyer.getNickname(),
                 DateUtils.formatDateShort(purchase.getDate()));
-        mPurchaseBuyerAvatar = buyer.getAvatar();
+        mPurchaseBuyerAvatar = buyer.getAvatarUrl();
         mPurchaseStore = purchase.getStore();
         mPurchaseTotalPrice = MoneyUtils.formatMoneyNoSymbol(purchase.getTotalPrice(), mCurrency);
         mPurchaseMyShare = MoneyUtils.formatMoneyNoSymbol(purchase.calculateUserShare(mCurrentIdentity), mCurrency);
@@ -57,7 +57,7 @@ public class PurchaseRowViewModel extends BaseObservable {
     }
 
     @Bindable
-    public byte[] getPurchaseBuyerAvatar() {
+    public String getPurchaseBuyerAvatar() {
         return mPurchaseBuyerAvatar;
     }
 

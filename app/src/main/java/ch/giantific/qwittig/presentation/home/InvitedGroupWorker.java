@@ -17,7 +17,6 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.di.components.WorkerComponent;
 import ch.giantific.qwittig.domain.models.parse.Group;
 import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.domain.repositories.ApiRepository;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;
@@ -33,8 +32,6 @@ import rx.functions.Func1;
 public class InvitedGroupWorker extends BaseWorker<Group, InvitedGroupWorkerListener> {
 
     private static final String KEY_GROUP_ID = "GROUP_ID";
-    @Inject
-    ApiRepository mCloudCode;
     @Inject
     GroupRepository mGroupRepo;
     private String mGroupId;
@@ -68,18 +65,18 @@ public class InvitedGroupWorker extends BaseWorker<Group, InvitedGroupWorkerList
     @Nullable
     @Override
     protected Observable<Group> getObservable(@NonNull Bundle args) {
-        mGroupId = args.getString(KEY_GROUP_ID, "");
-        mCurrentUser = mUserRepo.getCurrentUser();
-        if (!TextUtils.isEmpty(mGroupId) && mCurrentUser != null) {
-            return mCloudCode.addUserToGroupRole(mGroupId)
-                    .flatMap(new Func1<String, Single<Group>>() {
-                        @Override
-                        public Single<Group> call(String s) {
-                            return mGroupRepo.getGroupOnlineAsync(mGroupId);
-                        }
-                    })
-                    .toObservable();
-        }
+//        mGroupId = args.getString(KEY_GROUP_ID, "");
+//        mCurrentUser = mUserRepo.getCurrentUser();
+//        if (!TextUtils.isEmpty(mGroupId) && mCurrentUser != null) {
+//            return mCloudCode.addUserToGroupRole(mGroupId)
+//                    .flatMap(new Func1<String, Single<Group>>() {
+//                        @Override
+//                        public Single<Group> call(String s) {
+//                            return mGroupRepo.getGroupOnlineAsync(mGroupId);
+//                        }
+//                    })
+//                    .toObservable();
+//        }
 
         return null;
     }

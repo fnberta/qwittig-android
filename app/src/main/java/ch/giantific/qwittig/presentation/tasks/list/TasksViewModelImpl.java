@@ -77,7 +77,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<Task, TasksV
                 .flatMap(new Func1<Identity, Observable<Task>>() {
                     @Override
                     public Observable<Task> call(Identity identity) {
-                        return mTaskRepo.getTasksLocalAsync(identity.getGroup(), mDeadlineSelected);
+                        return mTaskRepo.getTasksLocalAsync(identity, mDeadlineSelected);
                     }
                 })
                 .filter(new Func1<Task, Boolean>() {

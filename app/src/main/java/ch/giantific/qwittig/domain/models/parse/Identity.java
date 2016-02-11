@@ -9,6 +9,7 @@ import android.text.TextUtils;
 
 import com.parse.ParseACL;
 import com.parse.ParseClassName;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 
 import org.apache.commons.math3.fraction.BigFraction;
@@ -29,7 +30,8 @@ public class Identity extends ParseObject implements Comparable<Identity> {
 
     public static final String CLASS = "Identity";
     public static final String GROUP = "group";
-    public static final String ACTIVE = "isActive";
+    public static final String USER = "user";
+    public static final String ACTIVE = "active";
     public static final String PENDING = "pending";
     public static final String NICKNAME = "nickname";
     public static final String AVATAR = "avatar";
@@ -40,25 +42,31 @@ public class Identity extends ParseObject implements Comparable<Identity> {
         // A default constructor is required.
     }
 
-    public Identity(@NonNull Group group, @NonNull String nickname, @NonNull byte[] avatar) {
-        this(group, nickname);
+    public Identity(@NonNull Group group, @NonNull User user, @NonNull String nickname,
+                    @NonNull ParseFile avatar) {
+        this(group, user, nickname);
         setAvatar(avatar);
     }
 
-    public Identity(@NonNull Group group, @NonNull String nickname) {
-        this(group);
-        setPending(true);
-        setNickname(nickname);
+    public Identity(@NonNull Group group, @NonNull User user, @NonNull String nickname) {
+        this(group, nickname, false);
+        setUser(user);
     }
 
-    public Identity(@NonNull Group group) {
+    public Identity(@NonNull Group group, @NonNull String nickname) {
+        this(group, nickname, true);
+    }
+
+    public Identity(@NonNull Group group, @NonNull String nickname, boolean pending) {
         setGroup(group);
         setActive(true);
+        setPending(pending);
+        setNickname(nickname);
         setAccessRights(group);
     }
 
     private void setAccessRights(@NonNull Group group) {
-        ParseACL acl = ParseUtils.getDefaultAcl(group);
+        final ParseACL acl = ParseUtils.getDefaultAcl(group);
         setACL(acl);
     }
 
@@ -68,6 +76,14 @@ public class Identity extends ParseObject implements Comparable<Identity> {
 
     public void setGroup(@NonNull Group group) {
         put(GROUP, group);
+    }
+
+    public User getUser() {
+        return (User) getParseUser(USER);
+    }
+
+    public void setUser(@NonNull User user) {
+        put(USER, user);
     }
 
     public boolean isActive() {
@@ -94,30 +110,39 @@ public class Identity extends ParseObject implements Comparable<Identity> {
         put(NICKNAME, nickname);
     }
 
-    public byte[] getAvatar() {
-        return getBytes(AVATAR);
+    public String getAvatarUrl() {
+        final ParseFile avatar = getAvatar();
+        return avatar != null ? avatar.getUrl() : "";
     }
 
-    public void setAvatar(@NonNull byte[] avatar) {
+    public ParseFile getAvatar() {
+        return getParseFile(AVATAR);
+    }
+
+    public void setAvatar(@NonNull ParseFile avatar) {
         put(AVATAR, avatar);
+    }
+
+    public void removeAvatar() {
+        remove(AVATAR);
     }
 
     @NonNull
     public BigFraction getBalance() {
-        List<Number> numbers = getList(BALANCE);
+        final List<Number> numbers = getList(BALANCE);
         if (numbers == null) {
             return BigFraction.ZERO;
         }
 
-        long numerator = numbers.get(0).longValue();
-        long denominator = numbers.get(1).longValue();
+        final long numerator = numbers.get(0).longValue();
+        final long denominator = numbers.get(1).longValue();
 
         return new BigFraction(numerator, denominator);
     }
 
     public void setBalance(@NonNull BigFraction balance) {
-        BigInteger num = balance.getNumerator();
-        BigInteger den = balance.getDenominator();
+        final BigInteger num = balance.getNumerator();
+        final BigInteger den = balance.getDenominator();
 
         final long[] numbers = new long[]{num.longValue(), den.longValue()};
         put(BALANCE, numbers);
