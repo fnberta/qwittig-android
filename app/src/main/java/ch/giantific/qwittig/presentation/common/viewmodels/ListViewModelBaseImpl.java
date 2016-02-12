@@ -13,7 +13,7 @@ import android.support.annotation.VisibleForTesting;
 import java.util.ArrayList;
 
 import ch.giantific.qwittig.BR;
-import ch.giantific.qwittig.domain.models.parse.Identity;
+import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 

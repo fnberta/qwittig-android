@@ -8,8 +8,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import ch.giantific.qwittig.domain.models.parse.Task;
-import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.models.Task;
+import ch.giantific.qwittig.domain.models.User;
 
 /**
  * Represents a user available for selection in a {@link Task}. Includes the id of the

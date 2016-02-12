@@ -20,10 +20,11 @@ import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.di.components.NavDrawerComponent;
-import ch.giantific.qwittig.domain.models.stats.Stats;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.presentation.common.adapters.StringResSpinnerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.ThemedArrayAdapter;
+import ch.giantific.qwittig.presentation.stats.models.Month;
+import ch.giantific.qwittig.presentation.stats.models.Stats;
 import rx.Single;
 
 /**

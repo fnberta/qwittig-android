@@ -15,8 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.Identity;
+import ch.giantific.qwittig.domain.models.Group;
+import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import rx.Observable;
 import rx.Single;
@@ -58,23 +58,6 @@ public class ParseGroupRepository extends ParseBaseRepository implements GroupRe
         return fetchLocal(group)
                 .toObservable()
                 .onErrorResumeNext(fetchIfNeeded(group).toObservable());
-    }
-
-    @Override
-    public Observable<Group> fetchGroupsDataAsync(@NonNull List<Identity> identities) {
-        return Observable.from(identities)
-                .map(new Func1<Identity, Group>() {
-                    @Override
-                    public Group call(Identity identity) {
-                        return identity.getGroup();
-                    }
-                })
-                .flatMap(new Func1<Group, Observable<Group>>() {
-                    @Override
-                    public Observable<Group> call(Group parseObject) {
-                        return fetchGroupDataAsync(parseObject);
-                    }
-                });
     }
 
     @Override

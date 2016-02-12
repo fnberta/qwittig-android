@@ -17,7 +17,7 @@ import android.view.ViewGroup;
 import ch.giantific.qwittig.databinding.FragmentTasksBinding;
 import ch.giantific.qwittig.di.components.DaggerTasksListComponent;
 import ch.giantific.qwittig.di.modules.TasksListViewModelModule;
-import ch.giantific.qwittig.domain.models.parse.Task;
+import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewOnlineFragment;

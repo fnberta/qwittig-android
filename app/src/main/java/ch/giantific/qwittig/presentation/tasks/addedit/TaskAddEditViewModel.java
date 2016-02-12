@@ -17,8 +17,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Date;
 
-import ch.giantific.qwittig.domain.models.parse.Identity;
-import ch.giantific.qwittig.domain.models.parse.Task;
+import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.presentation.common.ItemTouchHelperAdapter;
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;

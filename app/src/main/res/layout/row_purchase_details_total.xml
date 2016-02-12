@@ -13,8 +13,8 @@
         <import type="android.view.View"/>
 
         <variable
-            name="viewModel"
-            type="ch.giantific.qwittig.presentation.home.purchases.details.PurchaseDetailsTotalRowViewModel"
+            name="item"
+            type="ch.giantific.qwittig.presentation.home.purchases.details.items.TotalItem"
             />
     </data>
 
@@ -55,7 +55,7 @@
             android:layout_below="@id/divider"
             android:layout_marginEnd="@dimen/key_line_1"
             android:layout_marginTop="@dimen/normal_space"
-            android:text="@{viewModel.purchaseTotal}"
+            android:text="@{item.purchaseTotal}"
             tools:text="124.50 CHF"
             />
 
@@ -68,8 +68,8 @@
             android:layout_below="@id/tv_total_value"
             android:layout_marginEnd="@dimen/key_line_1"
             android:layout_marginTop="2dp"
-            android:text="@{viewModel.purchaseTotalForeign}"
-            android:visibility="@{viewModel.purchaseTotalForeign.equals(viewModel.purchaseTotal) ? View.GONE : View.VISIBLE}"
+            android:text="@{item.purchaseTotalForeign}"
+            android:visibility="@{item.purchaseTotalForeign.equals(item.purchaseTotal) ? View.GONE : View.VISIBLE}"
             tools:text="1.34 GBP"
             tools:visibility="visible"
             />

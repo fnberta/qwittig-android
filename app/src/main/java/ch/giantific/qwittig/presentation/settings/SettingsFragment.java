@@ -32,7 +32,7 @@ import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.di.components.DaggerSettingsComponent;
 import ch.giantific.qwittig.di.modules.SettingsViewModelModule;
-import ch.giantific.qwittig.domain.models.MessageAction;
+import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.presentation.common.fragments.ConfirmationDialogFragment;
 import ch.giantific.qwittig.presentation.settings.addgroup.SettingsAddGroupActivity;
 import ch.giantific.qwittig.presentation.settings.addusers.SettingsAddUsersActivity;
@@ -97,13 +97,8 @@ public class SettingsFragment extends PreferenceFragmentCompat
                 .settingsViewModelModule(new SettingsViewModelModule(savedInstanceState, this))
                 .build()
                 .inject(this);
-    }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        mViewModel.saveState(outState);
+        mViewModel.onPreferencesLoaded();
     }
 
     @SuppressWarnings("unchecked")
@@ -147,7 +142,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
                 final Intent intent = new Intent(activity, SettingsAddGroupActivity.class);
                 final ActivityOptionsCompat activityOptionsCompat =
                         ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity());
-                activity.startActivityForResult(intent, SettingsActivity.INTENT_REQUEST_SETTINGS_GROUP_NEW,
+                activity.startActivityForResult(intent, SettingsActivity.INTENT_REQUEST_SETTINGS_ADD_GROUP,
                         activityOptionsCompat.toBundle());
                 return true;
             }
@@ -163,6 +158,13 @@ public class SettingsFragment extends PreferenceFragmentCompat
                 return true;
             }
         });
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        mViewModel.saveState(outState);
     }
 
     @Override

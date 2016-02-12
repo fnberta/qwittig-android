@@ -21,12 +21,15 @@ import java.util.Set;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.Identity;
-import ch.giantific.qwittig.domain.models.parse.Task;
+import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
+import ch.giantific.qwittig.presentation.tasks.details.items.DetailsItem;
+import ch.giantific.qwittig.presentation.tasks.details.items.HeaderItem;
+import ch.giantific.qwittig.presentation.tasks.details.items.TaskHistoryItem;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Func1;
@@ -34,7 +37,7 @@ import rx.functions.Func1;
 /**
  * Created by fabio on 16.01.16.
  */
-public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskHistory, TaskDetailsViewModel.ViewListener>
+public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<DetailsItem, TaskDetailsViewModel.ViewListener>
         implements TaskDetailsViewModel {
 
     private Task mTask;
@@ -109,16 +112,11 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskHistory,
     }
 
     @Override
-    public TaskHistory getTaskHistoryForPosition(int position) {
-        return mItems.get(position - 1);
-    }
-
-    @Override
     public void loadData() {
         mSubscriptions.add(mTaskRepo.getTaskLocalAsync(mTaskId)
-                .flatMapObservable(new Func1<Task, Observable<TaskHistory>>() {
+                .flatMapObservable(new Func1<Task, Observable<TaskHistoryItem>>() {
                     @Override
-                    public Observable<TaskHistory> call(Task task) {
+                    public Observable<TaskHistoryItem> call(Task task) {
                         mTask = task;
 
                         updateToolbarHeader();
@@ -127,11 +125,12 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskHistory,
                         return getTaskHistory();
                     }
                 })
-                .subscribe(new Subscriber<TaskHistory>() {
+                .subscribe(new Subscriber<TaskHistoryItem>() {
                     @Override
                     public void onStart() {
                         super.onStart();
                         mItems.clear();
+                        mItems.add(new HeaderItem(R.string.header_task_history));
                     }
 
                     @Override
@@ -149,14 +148,14 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskHistory,
                     }
 
                     @Override
-                    public void onNext(TaskHistory taskHistory) {
-                        mItems.add(taskHistory);
+                    public void onNext(TaskHistoryItem taskHistoryItem) {
+                        mItems.add(taskHistoryItem);
                     }
                 })
         );
     }
 
-    private Observable<TaskHistory> getTaskHistory() {
+    private Observable<TaskHistoryItem> getTaskHistory() {
         final Map<String, List<Date>> history = mTask.getHistory();
         final Set<String> keys = history.keySet();
         return mIdentityRepo.getIdentitiesLocalAsync(mCurrentIdentity.getGroup())
@@ -166,14 +165,14 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskHistory,
                         return keys.contains(identity.getObjectId());
                     }
                 })
-                .flatMap(new Func1<Identity, Observable<TaskHistory>>() {
+                .flatMap(new Func1<Identity, Observable<TaskHistoryItem>>() {
                     @Override
-                    public Observable<TaskHistory> call(final Identity identity) {
+                    public Observable<TaskHistoryItem> call(final Identity identity) {
                         return Observable.from(history.get(identity.getObjectId()))
-                                .map(new Func1<Date, TaskHistory>() {
+                                .map(new Func1<Date, TaskHistoryItem>() {
                                     @Override
-                                    public TaskHistory call(Date date) {
-                                        return new TaskHistory(identity, date);
+                                    public TaskHistoryItem call(Date date) {
+                                        return new TaskHistoryItem(identity, date);
                                     }
                                 });
                     }
@@ -248,11 +247,7 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskHistory,
 
     @Override
     public int getItemViewType(int position) {
-        if (position == 0) {
-            return TYPE_HEADER;
-        }
-
-        return TYPE_ITEM;
+        return mItems.get(position).getType();
     }
 
     @Override
@@ -287,7 +282,7 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskHistory,
 
         updateToolbarHeader();
         mSubscriptions.add(getTaskHistory()
-                .subscribe(new Subscriber<TaskHistory>() {
+                .subscribe(new Subscriber<TaskHistoryItem>() {
                     @Override
                     public void onStart() {
                         super.onStart();
@@ -306,8 +301,8 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskHistory,
                     }
 
                     @Override
-                    public void onNext(TaskHistory taskHistory) {
-                        mItems.add(taskHistory);
+                    public void onNext(TaskHistoryItem taskHistoryItem) {
+                        mItems.add(taskHistoryItem);
                     }
                 })
         );

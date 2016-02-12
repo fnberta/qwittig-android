@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.repositories.Repository;
+import ch.giantific.qwittig.domain.repositories.BaseRepository;
 import rx.Observable;
 import rx.Single;
 import rx.SingleSubscriber;
@@ -34,7 +34,7 @@ import timber.log.Timber;
 /**
  * Provides a base class for repository implementations that use the Parse.com framework.
  */
-public abstract class ParseBaseRepository implements Repository {
+public abstract class ParseBaseRepository implements BaseRepository {
 
     public static final int QUERY_ITEMS_PER_PAGE = 15;
 
@@ -58,6 +58,26 @@ public abstract class ParseBaseRepository implements Repository {
                 return R.string.toast_unknown_error;
         }
     }
+
+//    /**
+//     * Forces the user to the login screen because his/her session token is no longer valid and a
+//     * new login is required.
+//     * TODO: can we un-subscribe from notification channels before logging out?
+//     *
+//     * @param context the context used to construct the intent, may be an application context as
+//     *                we start the activity as a new task
+//     */
+//    private static void forceNewLogin(final Context context) {
+//        ParseUser.logOutInBackground(new LogOutCallback() {
+//            @Override
+//            public void done(ParseException e) {
+//                // ignore possible exception, currentUser will always be null now
+//                Intent intent = new Intent(context, HomeActivity.class);
+//                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+//                context.startActivity(intent);
+//            }
+//        });
+//    }
 
     @Override
     public boolean isAlreadySavedLocal(@NonNull String objectId) {

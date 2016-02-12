@@ -11,8 +11,8 @@
     <data>
 
         <variable
-            name="viewModel"
-            type="ch.giantific.qwittig.presentation.home.purchases.details.PurchaseDetailsNoteRowViewModel"
+            name="item"
+            type="ch.giantific.qwittig.presentation.home.purchases.details.items.NoteItem"
             />
     </data>
 
@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/key_line_1"
         android:layout_marginStart="@dimen/key_line_1"
-        android:text="@{viewModel.purchaseNote}"
+        android:text="@{item.purchaseNote}"
         tools:text="Dies ist eine Notiz"
         />
 </layout>

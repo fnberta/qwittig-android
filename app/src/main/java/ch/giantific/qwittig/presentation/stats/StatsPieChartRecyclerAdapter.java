@@ -15,7 +15,7 @@ import com.github.mikephil.charting.data.PieData;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.presentation.common.widgets.PieChart;
+import ch.giantific.qwittig.presentation.stats.widgets.PieChart;
 
 /**
  * Handles the display of separate stats pie charts for each user of a group.

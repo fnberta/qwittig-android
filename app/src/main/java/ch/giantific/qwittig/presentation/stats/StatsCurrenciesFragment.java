@@ -17,8 +17,8 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.utils.PercentFormatter;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.presentation.common.widgets.PieChart;
 import ch.giantific.qwittig.presentation.stats.StatsCalcWorker.StatsType;
+import ch.giantific.qwittig.presentation.stats.widgets.PieChart;
 
 /**
  * Displays the currency statistics in a {@link PieChart}. Shows the percentages of the currencies

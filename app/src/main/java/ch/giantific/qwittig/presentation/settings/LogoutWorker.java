@@ -15,7 +15,7 @@ import com.parse.ParseInstallation;
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.di.components.WorkerComponent;
-import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;
 import rx.Single;

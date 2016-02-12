@@ -8,21 +8,18 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.AdapterView;
 
-import ch.giantific.qwittig.domain.models.parse.Task;
+import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModel;
 import ch.giantific.qwittig.presentation.tasks.addedit.TaskAddActivity;
+import ch.giantific.qwittig.presentation.tasks.list.items.ListItem;
 
 /**
  * Created by fabio on 09.01.16.
  */
-public interface TasksViewModel extends
-        OnlineListViewModel<Task>,
+public interface TasksViewModel extends OnlineListViewModel<ListItem>,
         TasksRecyclerAdapter.AdapterInteractionListener,
         TasksUpdateWorkerListener,
-        TaskReminderListener {
-
-    int TYPE_ITEM = 0;
-    int TYPE_HEADER = 1;
+        TaskRemindWorkerListener {
 
     void onAddTaskFabClick(View view);
 

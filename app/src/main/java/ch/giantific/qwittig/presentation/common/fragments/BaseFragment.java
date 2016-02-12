@@ -14,7 +14,7 @@ import android.view.View;
 
 import javax.inject.Inject;
 
-import ch.giantific.qwittig.domain.models.MessageAction;
+import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.WorkerUtils;

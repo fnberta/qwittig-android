@@ -22,6 +22,8 @@ public interface SettingsViewModel extends ViewModel,
         LogoutWorkerListener,
         DeleteAccountDialogFragment.DialogInteractionListener {
 
+    void onPreferencesLoaded();
+
     void onGroupSelected(@NonNull String identityId);
 
     void onGroupNameChanged(@NonNull String newName);

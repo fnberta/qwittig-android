@@ -11,8 +11,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 
 import ch.giantific.qwittig.BR;
-import ch.giantific.qwittig.domain.models.parse.Identity;
-import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 

@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.MessageAction;
-import ch.giantific.qwittig.domain.models.parse.Identity;
-import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.utils.MessageAction;
+import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;

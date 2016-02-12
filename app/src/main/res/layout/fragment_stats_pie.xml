@@ -11,7 +11,7 @@
     tools:context=".presentation.stats.StatsStoresFragment"
     >
 
-    <ch.giantific.qwittig.presentation.common.widgets.PieChart
+    <ch.giantific.qwittig.presentation.stats.widgets.PieChart
         android:id="@+id/pc_stores"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

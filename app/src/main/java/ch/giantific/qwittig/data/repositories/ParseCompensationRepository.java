@@ -16,9 +16,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ch.giantific.qwittig.domain.models.parse.Compensation;
-import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.Identity;
+import ch.giantific.qwittig.domain.models.Compensation;
+import ch.giantific.qwittig.domain.models.Group;
+import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 import rx.Observable;
@@ -111,10 +111,29 @@ public class ParseCompensationRepository extends ParseBaseRepository implements
 
     @Override
     public Observable<Compensation> updateCompensationsUnpaidAsync(@NonNull Identity currentIdentity,
-                                                                   @NonNull final List<Identity> identities) {
-        final ParseQuery<Compensation> query = getCompensationsOnlineQuery(identities);
-        query.whereEqualTo(Compensation.PAID, false);
-        return find(query)
+                                                                   @NonNull List<Identity> identities) {
+        return Observable.from(identities)
+                .filter(new Func1<Identity, Boolean>() {
+                    @Override
+                    public Boolean call(Identity identity) {
+                        return identity.isActive();
+                    }
+                })
+                .toList()
+                .map(new Func1<List<Identity>, ParseQuery<Compensation>>() {
+                    @Override
+                    public ParseQuery<Compensation> call(List<Identity> identities) {
+                        final ParseQuery<Compensation> query = getCompensationsOnlineQuery(identities);
+                        query.whereEqualTo(Compensation.PAID, false);
+                        return query;
+                    }
+                })
+                .flatMap(new Func1<ParseQuery<Compensation>, Observable<List<Compensation>>>() {
+                    @Override
+                    public Observable<List<Compensation>> call(ParseQuery<Compensation> query) {
+                        return find(query);
+                    }
+                })
                 .flatMap(new Func1<List<Compensation>, Observable<List<Compensation>>>() {
                     @Override
                     public Observable<List<Compensation>> call(List<Compensation> compensations) {

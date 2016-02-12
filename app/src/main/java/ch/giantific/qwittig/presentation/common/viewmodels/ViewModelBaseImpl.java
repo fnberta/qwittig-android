@@ -11,8 +11,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.Identity;
-import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import rx.subscriptions.CompositeSubscription;
 

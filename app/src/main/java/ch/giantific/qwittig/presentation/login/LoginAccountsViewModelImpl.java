@@ -14,7 +14,7 @@ import android.view.View;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.Single;
@@ -69,6 +69,8 @@ public class LoginAccountsViewModelImpl extends ViewModelBaseImpl<LoginAccountsV
             @Override
             public void onError(Throwable error) {
                 mView.removeWorker(workerTag);
+                setLoading(false);
+
                 mView.showMessage(mUserRepo.getErrorMessage(error));
             }
         }));
@@ -87,11 +89,13 @@ public class LoginAccountsViewModelImpl extends ViewModelBaseImpl<LoginAccountsV
 
     @Override
     public void onLoginFacebookClick(View view) {
+        setLoading(true);
         mView.loadFacebookLoginWorker();
     }
 
     @Override
     public void onLoginGoogleClick(View view) {
+        setLoading(true);
         mView.loginWithGoogle();
     }
 

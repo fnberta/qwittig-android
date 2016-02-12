@@ -6,8 +6,10 @@ package ch.giantific.qwittig.presentation.settings.addgroup;
 
 import android.support.annotation.NonNull;
 
-import ch.giantific.qwittig.domain.models.parse.Identity;
+import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorkerListener;
+import rx.Observable;
 import rx.Single;
 
 /**
@@ -16,5 +18,5 @@ import rx.Single;
  */
 public interface AddGroupWorkerListener extends BaseWorkerListener {
 
-    void setCreateGroupStream(@NonNull Single<Identity> single, @NonNull String workerTag);
+    void setCreateGroupStream(@NonNull Single<User> single, @NonNull String workerTag);
 }

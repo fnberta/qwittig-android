@@ -12,8 +12,8 @@ import ch.giantific.qwittig.di.scopes.PerFragment;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.presentation.finance.FinanceCompsUnpaidViewModel;
-import ch.giantific.qwittig.presentation.finance.FinanceCompsUnpaidViewModelImpl;
+import ch.giantific.qwittig.presentation.finance.CompsUnpaidViewModel;
+import ch.giantific.qwittig.presentation.finance.CompsUnpaidViewModelImpl;
 import dagger.Module;
 import dagger.Provides;
 
@@ -21,19 +21,19 @@ import dagger.Provides;
  * Created by fabio on 12.01.16.
  */
 @Module
-public class FinanceCompsUnpaidViewModelModule extends BaseViewModelModule<FinanceCompsUnpaidViewModel.ViewListener> {
+public class FinanceCompsUnpaidViewModelModule extends BaseViewModelModule<CompsUnpaidViewModel.ViewListener> {
 
     public FinanceCompsUnpaidViewModelModule(@Nullable Bundle savedState,
-                                             @NonNull FinanceCompsUnpaidViewModel.ViewListener view) {
+                                             @NonNull CompsUnpaidViewModel.ViewListener view) {
         super(savedState, view);
     }
 
     @PerFragment
     @Provides
-    FinanceCompsUnpaidViewModel providesFinanceCompsUnpaidViewModel(@NonNull IdentityRepository identityRepository,
-                                                                    @NonNull UserRepository userRepository,
-                                                                    @NonNull CompensationRepository compsRepository) {
-        return new FinanceCompsUnpaidViewModelImpl(mSavedState, mView, identityRepository,
+    CompsUnpaidViewModel providesFinanceCompsUnpaidViewModel(@NonNull IdentityRepository identityRepository,
+                                                             @NonNull UserRepository userRepository,
+                                                             @NonNull CompensationRepository compsRepository) {
+        return new CompsUnpaidViewModelImpl(mSavedState, mView, identityRepository,
                 userRepository, compsRepository);
     }
 }

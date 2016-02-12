@@ -39,8 +39,8 @@
     <string name="action_purchase_edit">Edit purchase</string>
     <string name="hint_store">Store</string>
     <string name="hint_users">User</string>
-    <string name="title_activity_settings_user_invite">Invite users</string>
-    <string name="desc_user_invite">Emails will be sent to the addresses entered below with an invitation to join your group</string>
+    <string name="title_activity_settings_user_invite">Add users</string>
+    <string name="desc_user_invite">To add a new user, simply enter his nickname and click on add. Qwittig generates an invitation link that you\'ll send him.</string>
     <string name="error_group_name">Please enter a group name</string>
     <string name="error_email">Please enter a valid email address</string>
     <string name="error_item_name">Please enter an article name</string>
@@ -56,8 +56,8 @@
     <string name="hint_nickname">Nickname</string>
     <string name="hint_password_repeat">Repeat password</string>
     <string name="error_nickname">Please enter a nickname</string>
-    <string name="error_login_password">Please enter a password</string>
-    <string name="error_login_signup_password_nomatch">Passwords do not match</string>
+    <string name="error_password">Please enter a password</string>
+    <string name="error_password_match">Passwords do not match</string>
     <string name="purchase_total">Total:</string>
     <string name="toast_reset_password_link">You have received an email with a link to reset your password</string>
     <string name="dialog_login_reset_password_title">Reset password</string>
@@ -175,7 +175,7 @@
     <string name="error_valid_amount">Please enter a valid amount</string>
     <string name="dialog_positive_pay">Pay</string>
     <string name="toast_payment_saved">Payment to %1$s added</string>
-    <string name="header_users_invited">Already invited</string>
+    <string name="header_users_added">Users added</string>
     <string name="hint_clear">Remove</string>
     <string name="no_invitations">No open invitations</string>
     <string name="tab_compensations_new">Settlement</string>
@@ -250,7 +250,7 @@
     <string name="toast_failed_load_new_group_data">Failed to load data for new group</string>
     <string name="progress_new_group_data">Loading data for new group…</string>
     <string name="pref_group_add_new">Create new group</string>
-    <string name="pref_group_add_user">Invite users</string>
+    <string name="pref_group_add_user">Add users</string>
     <string name="pref_group_current">Current group</string>
     <string name="pref_group_name">Change group name</string>
     <string name="title_activity_tasks">Tasks</string>
@@ -354,7 +354,10 @@
     <string name="dialog_compensation_confirm_amount_title">Confirm payment</string>
     <string name="dialog_positive_confirm">Confirm</string>
     <string name="error_valid_amount_too_big">Amount can be max. double the original one</string>
-    <string name="desc_group_add_new_create">Press the button to create the group and continue with the addtion of users.</string>
+    <string name="desc_group_add_new_create">Press the button to create the group and continue with the addition of users.</string>
     <string name="action_share">Share</string>
+    <string name="toast_error_profile">Failed to save profile</string>
+    <string name="progress_add_group">Creating group…</string>
+    <string name="progress_add_user">Adding user…</string>
 
 </resources>

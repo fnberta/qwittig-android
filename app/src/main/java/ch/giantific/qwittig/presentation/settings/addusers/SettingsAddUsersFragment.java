@@ -90,7 +90,7 @@ public class SettingsAddUsersFragment extends BaseRecyclerViewFragment<SettingsA
     @Override
     public void toggleProgressDialog(boolean show) {
         if (show) {
-            mProgressDialog = ProgressDialog.show(getActivity(), null, "adding user...", true, false);
+            mProgressDialog = ProgressDialog.show(getActivity(), null, getString(R.string.progress_add_user), true, false);
         } else {
             mProgressDialog.hide();
         }
@@ -102,7 +102,11 @@ public class SettingsAddUsersFragment extends BaseRecyclerViewFragment<SettingsA
      * Extends {@link BaseFragment.ActivityListener}.
      */
     public interface ActivityListener extends BaseFragment.ActivityListener {
+        /**
+         * Sets the view model to the activty.
+         *
+         * @param viewModel the view model to set
+         */
         void setAddUserViewModel(@NonNull SettingsAddUsersViewModel viewModel);
     }
-
 }

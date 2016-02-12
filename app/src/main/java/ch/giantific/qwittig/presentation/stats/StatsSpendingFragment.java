@@ -23,12 +23,11 @@ import com.parse.ParseObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.giantific.qwittig.CurrencyFormatter;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.Identity;
-import ch.giantific.qwittig.domain.models.stats.Stats;
-import ch.giantific.qwittig.presentation.common.widgets.BarChart;
+import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.stats.StatsCalcWorker.StatsType;
+import ch.giantific.qwittig.presentation.stats.models.Stats;
+import ch.giantific.qwittig.presentation.stats.widgets.BarChart;
 import ch.giantific.qwittig.utils.DateUtils;
 
 /**

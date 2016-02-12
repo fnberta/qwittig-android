@@ -9,12 +9,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
 import ch.giantific.qwittig.databinding.RowTaskDetailsHistoryBinding;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.common.viewmodels.HeaderRowViewModel;
-import ch.giantific.qwittig.presentation.common.viewmodels.HeaderRowViewModelImpl;
+import ch.giantific.qwittig.presentation.tasks.details.items.DetailsItem;
+import ch.giantific.qwittig.presentation.tasks.details.items.DetailsItem.Type;
+import ch.giantific.qwittig.presentation.tasks.details.items.HeaderItem;
+import ch.giantific.qwittig.presentation.tasks.details.items.TaskHistoryItem;
 
 
 /**
@@ -40,16 +41,17 @@ public class TaskHistoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerVie
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, @Type int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         switch (viewType) {
-            case TaskDetailsViewModel.TYPE_ITEM: {
+            case Type.HISTORY: {
                 RowTaskDetailsHistoryBinding binding =
                         RowTaskDetailsHistoryBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
             }
-            case TaskDetailsViewModel.TYPE_HEADER: {
-                RowGenericHeaderBinding binding = RowGenericHeaderBinding.inflate(inflater, parent, false);
+            case Type.HEADER: {
+                RowGenericHeaderBinding binding =
+                        RowGenericHeaderBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
             }
             default:
@@ -72,24 +74,23 @@ public class TaskHistoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerVie
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        int viewType = getItemViewType(position);
+        final DetailsItem detailsItem = mViewModel.getItemAtPosition(position);
+        final int viewType = getItemViewType(position);
         switch (viewType) {
-            case TaskDetailsViewModel.TYPE_ITEM: {
+            case Type.HISTORY: {
                 final BindingRow<RowTaskDetailsHistoryBinding> historyRow =
                         (BindingRow<RowTaskDetailsHistoryBinding>) viewHolder;
                 final RowTaskDetailsHistoryBinding binding = historyRow.getBinding();
 
-                final TaskHistory taskHistory = mViewModel.getTaskHistoryForPosition(position);
-                binding.setTaskHistory(taskHistory);
+                binding.setItem((TaskHistoryItem) detailsItem);
                 binding.executePendingBindings();
                 break;
             }
-            case TaskDetailsViewModel.TYPE_HEADER: {
+            case Type.HEADER: {
                 final BindingRow<RowGenericHeaderBinding> headerRow = (BindingRow<RowGenericHeaderBinding>) viewHolder;
                 final RowGenericHeaderBinding binding = headerRow.getBinding();
 
-                final HeaderRowViewModel viewModel = new HeaderRowViewModelImpl(R.string.header_task_history);
-                binding.setViewModel(viewModel);
+                binding.setViewModel((HeaderItem) detailsItem);
                 binding.executePendingBindings();
                 break;
             }

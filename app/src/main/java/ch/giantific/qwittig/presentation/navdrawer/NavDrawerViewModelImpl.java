@@ -15,11 +15,10 @@ import java.util.List;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.Identity;
+import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
-import rx.Observable;
 import rx.SingleSubscriber;
 import rx.functions.Func1;
 
@@ -30,7 +29,7 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
         implements NavDrawerViewModel {
 
     private IdentityRepository mIdentityRepo;
-    private List<Identity> mUserIdentities;
+    private List<Identity> mIdentities;
 
     public NavDrawerViewModelImpl(@Nullable Bundle savedState,
                                   @NonNull NavDrawerViewModel.ViewListener view,
@@ -51,11 +50,11 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
     }
 
     private void loadIdentities() {
-        mSubscriptions.add(mIdentityRepo.fetchIdentityDataAsync(mCurrentIdentity)
-                .flatMap(new Func1<Identity, Observable<Identity>>() {
+        mSubscriptions.add(mIdentityRepo.fetchUserIdentitiesDataAsync(mCurrentUser.getIdentities())
+                .filter(new Func1<Identity, Boolean>() {
                     @Override
-                    public Observable<Identity> call(Identity identity) {
-                       return mIdentityRepo.getUserIdentitiesLocalAsync(mCurrentUser);
+                    public Boolean call(Identity identity) {
+                        return identity.isActive();
                     }
                 })
                 .toList()
@@ -63,7 +62,7 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
                 .subscribe(new SingleSubscriber<List<Identity>>() {
                     @Override
                     public void onSuccess(List<Identity> identities) {
-                        mUserIdentities = identities;
+                        mIdentities = identities;
                         mView.bindHeaderView();
                         mView.setupHeaderIdentitySelection(identities);
                     }
@@ -91,7 +90,7 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
     @Override
     @Bindable
     public int getSelectedIdentity() {
-        return mUserIdentities.indexOf(mCurrentIdentity);
+        return mIdentities.indexOf(mCurrentIdentity);
     }
 
     @Override
@@ -111,23 +110,31 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
 
     @Override
     public void onLogout() {
+        updateCurrentUserAndIdentity();
         mView.startHomeActivityAndFinish();
     }
 
     @Override
     public void onIdentityChanged() {
-        mSubscriptions.add(mIdentityRepo.getUserIdentitiesLocalAsync(mCurrentUser)
+        mSubscriptions.add(mIdentityRepo.fetchUserIdentitiesDataAsync(mCurrentUser.getIdentities())
+                .filter(new Func1<Identity, Boolean>() {
+                    @Override
+                    public Boolean call(Identity identity) {
+                        return identity.isActive();
+                    }
+                })
                 .toList()
                 .toSingle()
                 .subscribe(new SingleSubscriber<List<Identity>>() {
                     @Override
                     public void onSuccess(List<Identity> identities) {
-                        mUserIdentities.clear();
+                        mIdentities.clear();
                         if (!identities.isEmpty()) {
-                            mUserIdentities.addAll(identities);
+                            mIdentities.addAll(identities);
                         }
-
                         mView.notifyHeaderIdentitiesChanged();
+
+                        mCurrentIdentity = mCurrentUser.getCurrentIdentity();
                         notifySelectedGroupChanged();
                     }
 
@@ -142,8 +149,8 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
 
     @Override
     public void onProfileUpdated() {
-        notifyPropertyChanged(BR.userNickname);
-        notifyPropertyChanged(BR.userAvatar);
+        notifyPropertyChanged(BR.identityNickname);
+        notifyPropertyChanged(BR.identityAvatar);
         mView.showMessage(R.string.toast_profile_update);
     }
 
@@ -154,6 +161,7 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
             return;
         }
 
+        mCurrentIdentity = identity;
         mCurrentUser.setCurrentIdentity(identity);
         mCurrentUser.saveEventually();
         mView.onIdentitySelected();

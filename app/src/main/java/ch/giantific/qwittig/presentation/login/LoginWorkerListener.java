@@ -6,7 +6,7 @@ package ch.giantific.qwittig.presentation.login;
 
 import android.support.annotation.NonNull;
 
-import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorkerListener;
 import rx.Single;
 

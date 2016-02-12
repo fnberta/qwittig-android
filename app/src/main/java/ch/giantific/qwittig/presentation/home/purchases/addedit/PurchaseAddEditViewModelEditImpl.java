@@ -17,13 +17,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import ch.giantific.qwittig.domain.models.parse.Identity;
-import ch.giantific.qwittig.domain.models.parse.Item;
-import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.Item;
+import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddEditItem.Type;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.AddEditItem;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.AddEditItem.Type;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.ItemItem;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Single;
@@ -45,7 +47,7 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
     Purchase mEditPurchase;
     boolean mDeleteOldReceipt;
     private boolean mOldValuesSet;
-    private List<ParseObject> mOldItems;
+    private List<Item> mOldItems;
     private ArrayList<String> mOldItemIds;
     private String mOldStore;
     private Date mOldDate;
@@ -121,7 +123,7 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
     private void setOldPurchaseValues() {
         // get old items and save in class wide list
         mOldItems = mEditPurchase.getItems();
-        for (ParseObject itemOld : mOldItems) {
+        for (Item itemOld : mOldItems) {
             mOldItemIds.add(itemOld.getObjectId());
         }
 
@@ -157,17 +159,15 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
     }
 
     private void setOldItemValues() {
-        for (ParseObject object : mOldItems) {
-            final Item item = (Item) object;
+        for (Item item : mOldItems) {
             final String price = MoneyUtils.formatMoneyNoSymbol(
                     item.getPriceForeign(mOldExchangeRate), mCurrency);
             final List<Identity> identities = item.getIdentities();
-            final RowItem rowItem = new RowItem(item.getName(), price,
-                    getRowItemUser(identities), mCurrency);
-            final PurchaseAddEditItem addEditItem = PurchaseAddEditItem.createNewRowItemInstance(rowItem);
+            final ItemItem itemItem = new ItemItem(item.getName(), price,
+                    getItemUsersItemUsers(identities), mCurrency);
             // TODO: don't hardcode add row position
-            mItems.add(getLastPosition() - 1, addEditItem);
-            mView.notifyItemInserted(mItems.indexOf(addEditItem));
+            mItems.add(getLastPosition() - 1, itemItem);
+            mView.notifyItemInserted(mItems.indexOf(itemItem));
         }
     }
 
@@ -248,7 +248,7 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
         // TODO: maybe drop size comparison, requires loop anyway
         final int oldItemsSize = mOldItems.size();
         int newItemsSize = 0;
-        for (PurchaseAddEditItem addEditItem : mItems) {
+        for (AddEditItem addEditItem : mItems) {
             if (addEditItem.getType() == Type.ITEM) {
                 newItemsSize++;
             }
@@ -259,26 +259,26 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
 
         final int maxFractionDigits = MoneyUtils.getMaximumFractionDigits(mCurrency);
         for (int i = 0, size = mItems.size(), skipCount = 0; i < size; i++) {
-            final PurchaseAddEditItem addEditItem = mItems.get(i);
+            final AddEditItem addEditItem = mItems.get(i);
             if (addEditItem.getType() != Type.ITEM) {
                 skipCount++;
                 continue;
             }
 
-            final Item itemOld = (Item) mOldItems.get(i - skipCount);
-            final RowItem rowItemNew = mItems.get(i).getRowItem();
-            if (!itemOld.getName().equals(rowItemNew.getName())) {
+            final Item itemOld = mOldItems.get(i - skipCount);
+            final ItemItem itemItem = (ItemItem) addEditItem;
+            if (!itemOld.getName().equals(itemItem.getName())) {
                 return true;
             }
 
             final BigDecimal oldPrice = new BigDecimal(itemOld.getPriceForeign(mOldExchangeRate))
                     .setScale(maxFractionDigits, BigDecimal.ROUND_HALF_UP);
-            if (oldPrice.compareTo(rowItemNew.parsePrice(mCurrency)) > 0) {
+            if (oldPrice.compareTo(itemItem.parsePrice(mCurrency)) > 0) {
                 return true;
             }
 
             final List<String> usersInvolvedOld = itemOld.getIdentitiesIds();
-            final List<String> usersInvolvedNew = rowItemNew.getSelectedUserIds();
+            final List<String> usersInvolvedNew = itemItem.getSelectedUserIds();
             if (!usersInvolvedNew.containsAll(usersInvolvedOld) ||
                     !usersInvolvedOld.containsAll(usersInvolvedNew)) {
                 return true;

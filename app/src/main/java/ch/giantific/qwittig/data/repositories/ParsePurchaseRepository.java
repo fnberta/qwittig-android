@@ -20,11 +20,11 @@ import java.util.List;
 import java.util.Map;
 
 import ch.giantific.qwittig.data.rest.ExchangeRates;
-import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.Identity;
-import ch.giantific.qwittig.domain.models.parse.Item;
-import ch.giantific.qwittig.domain.models.parse.Purchase;
-import ch.giantific.qwittig.domain.models.rates.CurrencyRates;
+import ch.giantific.qwittig.domain.models.Group;
+import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.Item;
+import ch.giantific.qwittig.domain.models.Purchase;
+import ch.giantific.qwittig.data.rest.CurrencyRates;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Observable;
@@ -160,10 +160,16 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public Observable<Purchase> updatePurchasesAsync(@NonNull Identity currentIdentity,
-                                                     @NonNull final List<Identity> identities) {
+    public Observable<Purchase> updatePurchasesAsync(@NonNull final List<Identity> identities,
+                                                     @NonNull Identity currentIdentity) {
         final String currentIdentityGroupId = currentIdentity.getGroup().getObjectId();
         return Observable.from(identities)
+                .filter(new Func1<Identity, Boolean>() {
+                    @Override
+                    public Boolean call(Identity identity) {
+                        return identity.isActive();
+                    }
+                })
                 .flatMap(new Func1<Identity, Observable<Purchase>>() {
                     @Override
                     public Observable<Purchase> call(Identity identity) {
@@ -171,7 +177,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
                         final String groupId = group.getObjectId();
                         final String pinLabel = Purchase.PIN_LABEL + groupId;
 
-                        ParseQuery<Purchase> query = getPurchasesOnlineQuery(identity);
+                        final ParseQuery<Purchase> query = getPurchasesOnlineQuery(identity);
                         return find(query)
                                 .flatMap(new Func1<List<Purchase>, Observable<List<Purchase>>>() {
                                     @Override
@@ -246,9 +252,13 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public boolean updatePurchases(@NonNull final Identity currentIdentity,
-                                   @NonNull final List<Identity> identities) {
+    public boolean updatePurchases(@NonNull final List<Identity> identities,
+                                   @NonNull final Identity currentIdentity) {
         for (Identity identity : identities) {
+            if (!identity.isActive()) {
+                continue;
+            }
+
             try {
                 final ParseQuery<Purchase> query = getPurchasesOnlineQuery(identity);
                 final List<Purchase> purchases = query.find();
@@ -298,12 +308,13 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     @Override
     public Single<Purchase> savePurchaseAsync(@NonNull final Purchase purchase,
                                               @NonNull final String tag,
-                                              @Nullable byte[] receiptImage, final boolean isDraft) {
+                                              @Nullable byte[] receiptImage,
+                                              final boolean isDraft) {
         if (receiptImage == null) {
             return saveAndPinPurchase(purchase, tag, isDraft);
         }
 
-        final ParseFile receipt = new ParseFile(receiptImage);
+        final ParseFile receipt = new ParseFile(PurchaseRepository.FILE_NAME, receiptImage);
         return saveFile(receipt)
                 .flatMap(new Func1<ParseFile, Single<? extends Purchase>>() {
                     @Override
@@ -348,9 +359,8 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
             return;
         }
 
-        List<ParseObject> items = purchase.getItems();
-        for (ParseObject parseObject : items) {
-            final Item item = (Item) parseObject;
+        List<Item> items = purchase.getItems();
+        for (Item item : items) {
             item.convertPrice(exchangeRate, toGroupCurrency);
         }
 

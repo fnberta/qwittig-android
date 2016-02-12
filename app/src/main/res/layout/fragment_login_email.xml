@@ -63,7 +63,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/small_space"
-                android:error="@{!viewModel.validate ? null : viewModel.passwordComplete ? null : @string/error_login_password}"
+                android:error="@{!viewModel.validate ? null : viewModel.passwordComplete ? null : @string/error_password}"
                 android:transitionGroup="true"
                 >
 

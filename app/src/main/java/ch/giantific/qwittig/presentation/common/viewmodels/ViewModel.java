@@ -9,7 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 
-import ch.giantific.qwittig.domain.models.MessageAction;
+import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorkerListener;
 
 /**

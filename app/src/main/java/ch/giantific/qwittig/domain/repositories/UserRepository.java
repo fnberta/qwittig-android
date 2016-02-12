@@ -14,13 +14,13 @@ import com.parse.ParseInstallation;
 
 import org.json.JSONObject;
 
-import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.models.User;
 import rx.Single;
 
 /**
  * Provides the methods to get, update and remove users from the local and online data store.
  */
-public interface UserRepository extends Repository {
+public interface UserRepository extends BaseRepository {
 
     /**
      * Returns the currently logged in user, null if no one is logged in.

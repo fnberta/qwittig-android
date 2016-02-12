@@ -23,15 +23,14 @@ import ch.giantific.qwittig.di.components.DaggerHomeComponent;
 import ch.giantific.qwittig.di.components.HomeComponent;
 import ch.giantific.qwittig.di.components.NavDrawerComponent;
 import ch.giantific.qwittig.di.modules.HomeViewModelModule;
-import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.domain.models.Group;
+import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.adapters.TabsAdapter;
 import ch.giantific.qwittig.presentation.home.HomeViewModel;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddActivity;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddEditViewModel.PurchaseResult;
 import ch.giantific.qwittig.presentation.home.purchases.details.PurchaseDetailsViewModel.PurchaseDetailsResult;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
-import ch.giantific.qwittig.presentation.settings.addgroup.SettingsAddGroupActivity;
 import ch.giantific.qwittig.utils.ViewUtils;
 import rx.Observable;
 

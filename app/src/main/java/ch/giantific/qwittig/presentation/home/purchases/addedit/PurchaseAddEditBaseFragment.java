@@ -39,15 +39,15 @@ import java.util.List;
 import ch.berta.fabio.fabprogress.FabProgress;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentPurchaseAddEditBinding;
-import ch.giantific.qwittig.domain.models.MessageAction;
-import ch.giantific.qwittig.domain.models.Receipt;
-import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.utils.MessageAction;
+import ch.giantific.qwittig.domain.models.Purchase;
+import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
 import ch.giantific.qwittig.presentation.common.fragments.DatePickerDialogFragment;
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.home.purchases.PurchaseReceiptBaseFragment;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddEditItem.Type;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddEditViewModel.PurchaseResult;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.AddEditItem.Type;
 import ch.giantific.qwittig.utils.CameraUtils;
 import ch.giantific.qwittig.utils.Utils;
 import rx.Single;
@@ -178,9 +178,9 @@ public abstract class PurchaseAddEditBaseFragment<T extends PurchaseAddEditViewM
             public void call(final SingleSubscriber<? super byte[]> singleSubscriber) {
                 Glide.with(fragment).load(imagePath)
                         .asBitmap()
-                        .toBytes(Bitmap.CompressFormat.JPEG, Receipt.JPEG_COMPRESSION_RATE)
+                        .toBytes(Bitmap.CompressFormat.JPEG, PurchaseRepository.JPEG_COMPRESSION_RATE)
                         .centerCrop()
-                        .into(new SimpleTarget<byte[]>(Receipt.WIDTH, Receipt.HEIGHT) {
+                        .into(new SimpleTarget<byte[]>(PurchaseRepository.WIDTH, PurchaseRepository.HEIGHT) {
                             @Override
                             public void onResourceReady(@NonNull byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
                                 if (!singleSubscriber.isUnsubscribed()) {

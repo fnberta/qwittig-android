@@ -22,7 +22,7 @@ import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.databinding.FragmentHomePurchasesBinding;
 import ch.giantific.qwittig.di.components.DaggerHomePurchasesComponent;
 import ch.giantific.qwittig.di.modules.HomePurchasesViewModelModule;
-import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewOnlineFragment;
 import ch.giantific.qwittig.presentation.home.purchases.details.PurchaseDetailsActivity;

@@ -6,7 +6,6 @@ package ch.giantific.qwittig.presentation.settings.profile;
 
 import android.app.Activity;
 import android.databinding.Bindable;
-import android.net.Uri;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
@@ -23,7 +22,13 @@ import rx.Single;
  * Created by fabio on 10.02.16.
  */
 public interface SettingsProfileViewModel extends ViewModel, UnlinkThirdPartyWorkerListener,
+        AvatarLoadListener,
         DiscardChangesDialogFragment.DialogInteractionListener {
+
+    @Bindable
+    boolean isValidate();
+
+    void setValidate(boolean validate);
 
     @Bindable
     String getAvatar();
@@ -61,7 +66,7 @@ public interface SettingsProfileViewModel extends ViewModel, UnlinkThirdPartyWor
 
     void onPickAvatarMenuClick();
 
-    void onNewAvatarTaken(@NonNull Uri avatar);
+    void onNewAvatarTaken(@NonNull String avatar);
 
     void onDeleteAvatarMenuClick();
 
@@ -88,6 +93,9 @@ public interface SettingsProfileViewModel extends ViewModel, UnlinkThirdPartyWor
     }
 
     interface ViewListener extends ViewModel.ViewListener {
+
+        void startPostponedEnterTransition();
+
         void loadUnlinkThirdPartyWorker(@UnlinkAction int unlinkAction);
 
         void showDiscardChangesDialog();
@@ -98,7 +106,7 @@ public interface SettingsProfileViewModel extends ViewModel, UnlinkThirdPartyWor
 
         void dismissSetPasswordMessage();
 
-        Single<byte[]> encodeAvatar(@NonNull Uri avatarUri);
+        Single<byte[]> encodeAvatar(@NonNull String avatar);
 
         void reloadOptionsMenu();
 

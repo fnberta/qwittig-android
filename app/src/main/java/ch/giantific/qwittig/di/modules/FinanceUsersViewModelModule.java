@@ -11,8 +11,8 @@ import android.support.annotation.Nullable;
 import ch.giantific.qwittig.di.scopes.PerFragment;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.presentation.finance.IdentitiesViewModel;
-import ch.giantific.qwittig.presentation.finance.IdentitiesViewModelImpl;
+import ch.giantific.qwittig.presentation.finance.identities.IdentitiesViewModel;
+import ch.giantific.qwittig.presentation.finance.identities.IdentitiesViewModelImpl;
 import dagger.Module;
 import dagger.Provides;
 

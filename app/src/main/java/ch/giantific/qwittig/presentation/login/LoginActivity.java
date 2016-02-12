@@ -18,7 +18,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.parse.ParseFacebookUtils;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.fragments.EmailPromptDialogFragment;
 import rx.Single;

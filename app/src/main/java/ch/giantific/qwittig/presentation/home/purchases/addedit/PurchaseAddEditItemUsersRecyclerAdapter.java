@@ -14,6 +14,7 @@ import java.util.List;
 
 import ch.giantific.qwittig.databinding.RowPurchaseAddItemUsersUserBinding;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.ItemUsersItemUser;
 
 /**
  * Created by fabio on 24.01.16.
@@ -22,10 +23,10 @@ public class PurchaseAddEditItemUsersRecyclerAdapter extends RecyclerView.Adapte
         implements PurchaseAddEditItemUsersClickListener {
 
     private PurchaseAddEditViewModel mViewModel;
-    private List<RowItemUser> mUsers;
+    private List<ItemUsersItemUser> mUsers;
 
     public PurchaseAddEditItemUsersRecyclerAdapter(@NonNull PurchaseAddEditViewModel viewModel,
-                                                   @NonNull List<RowItemUser> users) {
+                                                   @NonNull List<ItemUsersItemUser> users) {
         mViewModel = viewModel;
         mUsers = users;
     }
@@ -41,8 +42,8 @@ public class PurchaseAddEditItemUsersRecyclerAdapter extends RecyclerView.Adapte
     @Override
     public void onBindViewHolder(ItemUserRow holder, int position) {
         final RowPurchaseAddItemUsersUserBinding binding = holder.getBinding();
-        final RowItemUser rowItemUser = mUsers.get(position);
-        binding.setRowItemUser(rowItemUser);
+        final ItemUsersItemUser itemUsersItemUser = mUsers.get(position);
+        binding.setItemUsersItemUser(itemUsersItemUser);
         binding.executePendingBindings();
     }
 
@@ -52,12 +53,12 @@ public class PurchaseAddEditItemUsersRecyclerAdapter extends RecyclerView.Adapte
     }
 
     @Override
-    public void onRowItemUserClick(int position) {
-        final RowItemUser user = mUsers.get(position);
+    public void onItemRowUserClick(int position) {
+        final ItemUsersItemUser user = mUsers.get(position);
         if (user.isSelected()) {
             boolean anotherUserSelected = false;
-            for (RowItemUser rowItemUser : mUsers) {
-                if (rowItemUser != user && rowItemUser.isSelected()) {
+            for (ItemUsersItemUser itemUsersItemUser : mUsers) {
+                if (itemUsersItemUser != user && itemUsersItemUser.isSelected()) {
                     anotherUserSelected = true;
                     break;
                 }
@@ -75,7 +76,7 @@ public class PurchaseAddEditItemUsersRecyclerAdapter extends RecyclerView.Adapte
         }
 
         // notify main view model because total and my share values need to be updated
-        mViewModel.onRowItemUserClick(position);
+        mViewModel.onItemRowUserClick(position);
     }
 
     @Override
@@ -92,7 +93,7 @@ public class PurchaseAddEditItemUsersRecyclerAdapter extends RecyclerView.Adapte
             binding.getRoot().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    listener.onRowItemUserClick(getAdapterPosition());
+                    listener.onItemRowUserClick(getAdapterPosition());
                 }
             });
         }

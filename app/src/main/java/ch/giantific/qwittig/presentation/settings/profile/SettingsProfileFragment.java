@@ -117,7 +117,7 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileViewMod
             case INTENT_REQUEST_IMAGE:
                 if (resultCode == Activity.RESULT_OK) {
                     final Uri imageUri = data.getData();
-                    mViewModel.onNewAvatarTaken(imageUri);
+                    mViewModel.onNewAvatarTaken(imageUri.toString());
                 }
         }
     }
@@ -130,6 +130,11 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileViewMod
     @Override
     protected View getSnackbarView() {
         return mBinding.etNickname;
+    }
+
+    @Override
+    public void startPostponedEnterTransition() {
+        ActivityCompat.startPostponedEnterTransition(getActivity());
     }
 
     @Override
@@ -161,13 +166,13 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileViewMod
     }
 
     @Override
-    public Single<byte[]> encodeAvatar(@NonNull final Uri avatarUri) {
+    public Single<byte[]> encodeAvatar(@NonNull final String avatar) {
         final SettingsProfileFragment frag = this;
         return Single.create(new Single.OnSubscribe<byte[]>() {
             @Override
             public void call(final SingleSubscriber<? super byte[]> singleSubscriber) {
                 Glide.with(frag)
-                        .load(avatarUri)
+                        .load(avatar)
                         .asBitmap()
                         .toBytes(Bitmap.CompressFormat.JPEG, AvatarUtils.JPEG_COMPRESSION_RATE)
                         .centerCrop()

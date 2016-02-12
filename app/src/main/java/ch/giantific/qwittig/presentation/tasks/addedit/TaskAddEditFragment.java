@@ -23,7 +23,7 @@ import ch.giantific.qwittig.di.components.DaggerTaskAddComponent;
 import ch.giantific.qwittig.di.components.DaggerTaskEditComponent;
 import ch.giantific.qwittig.di.modules.TaskAddViewModelModule;
 import ch.giantific.qwittig.di.modules.TaskEditViewModelModule;
-import ch.giantific.qwittig.domain.models.parse.Task;
+import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.presentation.common.adapters.StringResSpinnerAdapter;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.fragments.DatePickerDialogFragment;

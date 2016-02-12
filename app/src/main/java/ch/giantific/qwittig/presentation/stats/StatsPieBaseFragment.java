@@ -27,9 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.Identity;
-import ch.giantific.qwittig.domain.models.stats.Stats;
-import ch.giantific.qwittig.presentation.common.widgets.PieChart;
+import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.presentation.stats.models.Stats;
+import ch.giantific.qwittig.presentation.stats.widgets.PieChart;
 
 /**
  * Provides an abstract base class for the display of stats data in a {@link PieChart}.

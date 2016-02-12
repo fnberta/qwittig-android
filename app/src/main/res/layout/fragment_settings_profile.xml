@@ -9,6 +9,8 @@
 
     <data>
 
+        <import type="android.view.View"/>
+
         <variable
             name="viewModel"
             type="ch.giantific.qwittig.presentation.settings.profile.SettingsProfileViewModel"
@@ -54,6 +56,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/key_line_1"
                     android:transitionGroup="true"
+                    android:error="@{!viewModel.validate ? null : viewModel.nicknameComplete ? null : @string/error_nickname}"
                     >
 
                     <EditText
@@ -75,6 +78,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/small_space"
                 android:orientation="horizontal"
+                android:visibility="@{viewModel.emailAndPasswordVisible ? View.VISIBLE : View.GONE}"
                 >
 
                 <ImageView
@@ -93,6 +97,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/key_line_1"
                     android:transitionGroup="true"
+                    android:error="@{!viewModel.validate ? null : viewModel.emailValid ? null : @string/error_email}"
                     >
 
                     <EditText
@@ -110,15 +115,14 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/ll_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/small_space"
                 android:orientation="horizontal"
+                android:visibility="@{viewModel.emailAndPasswordVisible ? View.VISIBLE : View.GONE}"
                 >
 
                 <ImageView
-                    android:id="@+id/iv_password"
                     android:layout_width="@dimen/icon_size"
                     android:layout_height="@dimen/icon_size"
                     android:layout_gravity="center_vertical"
@@ -134,6 +138,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/key_line_1"
                     android:transitionGroup="true"
+                    android:error="@{!viewModel.validate ? null : viewModel.passwordValid ? null : @string/error_password}"
                     >
 
                     <EditText
@@ -157,6 +162,8 @@
                 android:layout_marginStart="@dimen/key_line_2"
                 android:layout_marginTop="@dimen/small_space"
                 android:transitionGroup="true"
+                android:visibility="@{viewModel.emailAndPasswordVisible ? View.VISIBLE : View.GONE}"
+                android:error="@{!viewModel.validate ? null : viewModel.passwordEqual ? null : @string/error_password_match}"
                 >
 
                 <EditText

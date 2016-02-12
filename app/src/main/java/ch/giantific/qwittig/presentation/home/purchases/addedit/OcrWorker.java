@@ -19,7 +19,7 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.data.rest.ReceiptOcr;
 import ch.giantific.qwittig.di.components.WorkerComponent;
-import ch.giantific.qwittig.domain.models.ocr.OcrPurchase;
+import ch.giantific.qwittig.data.rest.OcrPurchase;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;

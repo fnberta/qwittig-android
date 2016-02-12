@@ -15,17 +15,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.List;
 
-import ch.giantific.qwittig.domain.models.parse.Identity;
+import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
+import ch.giantific.qwittig.presentation.tasks.details.items.DetailsItem;
+import ch.giantific.qwittig.presentation.tasks.details.items.TaskHistoryItem;
 
 /**
  * Created by fabio on 09.01.16.
  */
 public interface TaskDetailsViewModel extends
-        ListViewModel<TaskHistory> {
-
-    int TYPE_ITEM = 0;
-    int TYPE_HEADER = 1;
+        ListViewModel<DetailsItem> {
 
     @Bindable
     String getTaskTitle();
@@ -47,8 +46,6 @@ public interface TaskDetailsViewModel extends
     boolean isCurrentUserResponsible();
 
     void setCurrentUserResponsible(boolean currentUserResponsible);
-
-    TaskHistory getTaskHistoryForPosition(int position);
 
     void deleteTask();
 

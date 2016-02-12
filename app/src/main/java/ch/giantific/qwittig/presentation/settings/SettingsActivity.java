@@ -12,10 +12,10 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.fragments.ConfirmationDialogFragment;
-import ch.giantific.qwittig.presentation.settings.addgroup.SettingsAddGroupActivity;
+import ch.giantific.qwittig.presentation.settings.addgroup.SettingsAddGroupFragment;
 import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileViewModel.Result;
 import rx.Single;
 
@@ -62,10 +62,10 @@ public class SettingsActivity extends BaseActivity<SettingsViewModel> implements
                         break;
                 }
                 break;
-            case INTENT_REQUEST_SETTINGS_GROUP_NEW:
+            case INTENT_REQUEST_SETTINGS_ADD_GROUP:
                 if (resultCode == Activity.RESULT_OK) {
                     final String newGroupName = data.getStringExtra(
-                            SettingsAddGroupActivity.RESULT_DATA_GROUP);
+                            SettingsAddGroupFragment.RESULT_DATA_GROUP);
                     Snackbar.make(mToolbar, getString(R.string.toast_group_added, newGroupName),
                             Snackbar.LENGTH_LONG).show();
                 }

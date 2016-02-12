@@ -4,7 +4,6 @@
 
 package ch.giantific.qwittig;
 
-import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -23,13 +22,13 @@ import ch.giantific.qwittig.di.components.ApplicationComponent;
 import ch.giantific.qwittig.di.components.DaggerApplicationComponent;
 import ch.giantific.qwittig.di.modules.ApplicationModule;
 import ch.giantific.qwittig.di.modules.RestServiceModule;
-import ch.giantific.qwittig.domain.models.parse.Compensation;
-import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.Identity;
-import ch.giantific.qwittig.domain.models.parse.Item;
-import ch.giantific.qwittig.domain.models.parse.Purchase;
-import ch.giantific.qwittig.domain.models.parse.Task;
-import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.models.Compensation;
+import ch.giantific.qwittig.domain.models.Group;
+import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.Item;
+import ch.giantific.qwittig.domain.models.Purchase;
+import ch.giantific.qwittig.domain.models.Task;
+import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.utils.parse.ParseConfigUtils;
 import timber.log.Timber;
 
@@ -42,8 +41,8 @@ public class Qwittig extends Application {
 
     private ApplicationComponent mAppComponent;
 
-    public static ApplicationComponent getAppComponent(@NonNull Activity activity) {
-        return ((Qwittig) activity.getApplication()).getAppComponent();
+    public static ApplicationComponent getAppComponent(@NonNull Context context) {
+        return ((Qwittig) context.getApplicationContext()).getAppComponent();
     }
 
     public ApplicationComponent getAppComponent() {

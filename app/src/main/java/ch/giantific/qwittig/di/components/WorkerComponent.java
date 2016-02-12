@@ -6,7 +6,10 @@ package ch.giantific.qwittig.di.components;
 
 import ch.giantific.qwittig.di.modules.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.presentation.finance.IdentitiesUpdateWorker;
+import ch.giantific.qwittig.presentation.finance.CompRemindWorker;
+import ch.giantific.qwittig.presentation.finance.CompSaveWorker;
+import ch.giantific.qwittig.presentation.finance.CompsQueryMoreWorker;
+import ch.giantific.qwittig.presentation.finance.identities.IdentitiesUpdateWorker;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.OcrWorker;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.RatesWorker;
 import ch.giantific.qwittig.presentation.login.LoginWorker;
@@ -16,14 +19,11 @@ import ch.giantific.qwittig.presentation.home.InvitedGroupWorker;
 import ch.giantific.qwittig.presentation.settings.profile.UnlinkThirdPartyWorker;
 import ch.giantific.qwittig.presentation.stats.StatsCalcWorker;
 import ch.giantific.qwittig.presentation.settings.addusers.AddUserWorker;
-import ch.giantific.qwittig.presentation.finance.CompensationsQueryMoreWorker;
-import ch.giantific.qwittig.presentation.finance.CompensationsUpdateWorker;
+import ch.giantific.qwittig.presentation.finance.CompsUpdateWorker;
 import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesQueryMoreWorker;
 import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesUpdateWorker;
 import ch.giantific.qwittig.presentation.tasks.list.TasksUpdateWorker;
-import ch.giantific.qwittig.presentation.finance.CompensationRemindWorker;
 import ch.giantific.qwittig.presentation.tasks.list.TaskRemindWorker;
-import ch.giantific.qwittig.presentation.finance.CompensationSaveWorker;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseSaveWorker;
 import dagger.Component;
 
@@ -35,11 +35,11 @@ import dagger.Component;
         modules = {RepositoriesModule.class})
 public interface WorkerComponent {
 
-    void inject(CompensationsUpdateWorker compensationsUpdateWorker);
+    void inject(CompsUpdateWorker compsUpdateWorker);
 
     void inject(PurchaseSaveWorker purchaseSaveWorker);
 
-    void inject(CompensationSaveWorker compensationSaveWorker);
+    void inject(CompSaveWorker compSaveWorker);
 
     void inject(PurchasesUpdateWorker purchasesUpdateWorker);
 
@@ -57,9 +57,9 @@ public interface WorkerComponent {
 
     void inject(TaskRemindWorker taskRemindWorker);
 
-    void inject(CompensationRemindWorker compensationRemindWorker);
+    void inject(CompRemindWorker compRemindWorker);
 
-    void inject(CompensationsQueryMoreWorker compensationsQueryMoreWorker);
+    void inject(CompsQueryMoreWorker compsQueryMoreWorker);
 
     void inject(PurchasesQueryMoreWorker purchasesQueryMoreWorker);
 

@@ -10,8 +10,8 @@ import android.support.annotation.NonNull;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
-import ch.giantific.qwittig.domain.models.parse.Compensation;
-import ch.giantific.qwittig.domain.models.parse.Identity;
+import ch.giantific.qwittig.domain.models.Compensation;
+import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 

@@ -13,7 +13,7 @@ import android.text.TextUtils;
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.di.components.WorkerComponent;
-import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;

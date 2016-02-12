@@ -9,7 +9,7 @@ import android.databinding.Bindable;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 
-import ch.giantific.qwittig.domain.models.parse.Identity;
+import ch.giantific.qwittig.domain.models.Identity;
 
 /**
  * Created by fabio on 18.01.16.

@@ -6,8 +6,7 @@ package ch.giantific.qwittig.presentation.common.viewmodels;
 
 import android.databinding.Bindable;
 
-import ch.giantific.qwittig.domain.models.parse.Identity;
-import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.models.Identity;
 
 /**
  * Created by fabio on 10.01.16.

@@ -6,13 +6,13 @@ package ch.giantific.qwittig.domain.repositories;
 
 import android.support.annotation.NonNull;
 
-import ch.giantific.qwittig.domain.models.stats.Stats;
+import ch.giantific.qwittig.presentation.stats.models.Stats;
 import rx.Single;
 
 /**
  * Provides the methods to calculate stats.
  */
-public interface StatsRepository extends Repository {
+public interface StatsRepository extends BaseRepository {
 
     /**
      * Calculates the stats that show how much each users of the group spent in a month/year.

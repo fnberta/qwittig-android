@@ -8,20 +8,17 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
-import android.text.TextUtils;
 
 import com.parse.ParseObject;
 
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.di.components.WorkerComponent;
-import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.models.Group;
+import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;
-import rx.Single;
-import rx.functions.Func1;
 
 /**
  * Handles the process of a user being invited to a group and he/she accepting the invitation and

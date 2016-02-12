@@ -16,15 +16,13 @@ import java.util.List;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.Currency;
-import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.Identity;
+import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.Single;
 import rx.SingleSubscriber;
-import rx.functions.Func1;
 
 /**
  * Created by fabio on 07.02.16.
@@ -32,6 +30,7 @@ import rx.functions.Func1;
 public class SettingsAddGroupViewModelImpl extends ViewModelBaseImpl<SettingsAddGroupViewModel.ViewListener>
         implements SettingsAddGroupViewModel {
 
+    private static final String STATE_VALIDATE = "STATE_VALIDATE";
     private String mName;
     private String mCurrency;
     private boolean mValidate;
@@ -44,6 +43,17 @@ public class SettingsAddGroupViewModelImpl extends ViewModelBaseImpl<SettingsAdd
         super(savedState, view, userRepository);
 
         mIdentityRepo = identityRepository;
+
+        if (savedState != null) {
+            mValidate = savedState.getBoolean(STATE_VALIDATE);
+        }
+    }
+
+    @Override
+    public void saveState(@NonNull Bundle outState) {
+        super.saveState(outState);
+
+        outState.putBoolean(STATE_VALIDATE, mValidate);
     }
 
     @Override
@@ -84,59 +94,41 @@ public class SettingsAddGroupViewModelImpl extends ViewModelBaseImpl<SettingsAdd
             return;
         }
 
-        mSubscriptions.add(mIdentityRepo.getUserIdentitiesLocalAsync(mCurrentUser)
-                .map(new Func1<Identity, Group>() {
-                    @Override
-                    public Group call(Identity identity) {
-                        return identity.getGroup();
-                    }
-                })
-                .toList()
-                .toSingle()
-                .subscribe(new SingleSubscriber<List<Group>>() {
-                    @Override
-                    public void onSuccess(List<Group> groups) {
-                        boolean groupNew = true;
-                        for (Group group : groups) {
-                            if (mName.equalsIgnoreCase(group.getName())) {
-                                groupNew = false;
-                            }
-                        }
+        final List<Identity> identities = mCurrentUser.getIdentities();
+        boolean newGroup = true;
+        for (Identity identity : identities) {
+            if (mName.equalsIgnoreCase(identity.getGroup().getName())) {
+                newGroup = false;
+            }
+        }
+        if (newGroup) {
+            mView.toggleProgressDialog(true);
+            mView.loadAddGroupWorker(mName, mCurrency);
+        } else {
+            mView.showMessage(R.string.toast_group_already_in_list);
+        }
+    }
 
-                        if (groupNew) {
-                            mView.toggleProgressDialog(true);
-                            mView.loadAddGroupWorker(mName, mCurrency);
-                        } else {
-                            mView.showMessage(R.string.toast_group_already_in_list);
-                        }
+    @Override
+    public void setCreateGroupStream(@NonNull Single<User> single, @NonNull final String workerTag) {
+        mSubscriptions.add(single
+                .subscribe(new SingleSubscriber<User>() {
+                    @Override
+                    public void onSuccess(User user) {
+                        mView.removeWorker(workerTag);
+                        mView.toggleProgressDialog(false);
+
+                        mView.showAddUsersFragment();
                     }
 
                     @Override
                     public void onError(Throwable error) {
+                        mView.removeWorker(workerTag);
+                        mView.toggleProgressDialog(false);
+
                         // TODO: handle error
                     }
                 })
         );
-    }
-
-    @Override
-    public void setCreateGroupStream(@NonNull Single<Identity> single, @NonNull final String workerTag) {
-        mSubscriptions.add(single.subscribe(new SingleSubscriber<Identity>() {
-            @Override
-            public void onSuccess(Identity value) {
-                mView.removeWorker(workerTag);
-                mView.toggleProgressDialog(false);
-
-                mView.showAddUsersFragment();
-            }
-
-            @Override
-            public void onError(Throwable error) {
-                mView.removeWorker(workerTag);
-                mView.toggleProgressDialog(false);
-
-                // TODO: handle error
-            }
-        }));
     }
 }

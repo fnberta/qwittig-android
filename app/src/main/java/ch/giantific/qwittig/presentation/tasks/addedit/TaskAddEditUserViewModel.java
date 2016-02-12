@@ -7,7 +7,7 @@ package ch.giantific.qwittig.presentation.tasks.addedit;
 import android.databinding.Bindable;
 import android.support.annotation.NonNull;
 
-import ch.giantific.qwittig.domain.models.parse.Identity;
+import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.viewmodels.UserAvatarRowBaseViewModel;
 
 /**

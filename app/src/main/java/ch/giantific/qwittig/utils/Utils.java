@@ -139,21 +139,6 @@ public class Utils {
     }
 
     /**
-     * Returns the value of a view's tag if it is an int.
-     *
-     * @param v the view to read tag from
-     * @return the view's tag value or 0 if it is not an int
-     */
-    public static int getViewPositionFromTag(@NonNull View v) {
-        int value = 0;
-
-        if (v.getTag() instanceof Integer) {
-            value = (Integer) v.getTag();
-        }
-        return value;
-    }
-
-    /**
      * Returns whether the running Android version is lollipop and higher or an older version.
      *
      * @return whether the running Android version is lollipop and higher or an older version

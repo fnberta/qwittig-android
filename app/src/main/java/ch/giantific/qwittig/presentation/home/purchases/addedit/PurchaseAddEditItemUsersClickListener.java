@@ -11,5 +11,5 @@ public interface PurchaseAddEditItemUsersClickListener {
 
     void onTooFewUsersSelected();
 
-    void onRowItemUserClick(int position);
+    void onItemRowUserClick(int position);
 }

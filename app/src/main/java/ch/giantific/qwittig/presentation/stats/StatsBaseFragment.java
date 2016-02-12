@@ -24,11 +24,12 @@ import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.repositories.ParseGroupRepository;
-import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.domain.models.stats.Stats;
+import ch.giantific.qwittig.domain.models.Group;
+import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
+import ch.giantific.qwittig.presentation.stats.models.Month;
+import ch.giantific.qwittig.presentation.stats.models.Stats;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.WorkerUtils;
 

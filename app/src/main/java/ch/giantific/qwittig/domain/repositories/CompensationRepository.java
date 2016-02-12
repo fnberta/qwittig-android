@@ -7,13 +7,10 @@ package ch.giantific.qwittig.domain.repositories;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.parse.ParseObject;
-
 import java.util.List;
 
-import ch.giantific.qwittig.domain.models.parse.Compensation;
-import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.Identity;
+import ch.giantific.qwittig.domain.models.Compensation;
+import ch.giantific.qwittig.domain.models.Identity;
 import rx.Observable;
 import rx.Single;
 
@@ -21,7 +18,7 @@ import rx.Single;
  * Provides the methods to get, update and remove compensations from the local and online data
  * store.
  */
-public interface CompensationRepository extends Repository {
+public interface CompensationRepository extends BaseRepository {
     /**
      * Queries the local data store for unpaid compensations.
      *  @param currentIdentity the current user

@@ -6,7 +6,7 @@ package ch.giantific.qwittig.presentation.home.purchases.addedit;
 
 import android.support.annotation.NonNull;
 
-import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorkerListener;
 import rx.Single;
 

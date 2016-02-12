@@ -7,7 +7,7 @@ package ch.giantific.qwittig.di.components;
 import ch.giantific.qwittig.di.modules.FinanceUsersViewModelModule;
 import ch.giantific.qwittig.di.modules.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.presentation.finance.IdentitiesFragment;
+import ch.giantific.qwittig.presentation.finance.identities.IdentitiesFragment;
 import dagger.Component;
 
 /**

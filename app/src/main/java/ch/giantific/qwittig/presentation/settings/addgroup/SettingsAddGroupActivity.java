@@ -8,10 +8,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.ActionBar;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.Identity;
-import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.settings.addusers.AddUserWorkerListener;
 import ch.giantific.qwittig.presentation.settings.addusers.SettingsAddUsersFragment;
@@ -32,9 +32,7 @@ public class SettingsAddGroupActivity extends BaseActivity<SettingsAddGroupViewM
         SettingsAddUsersFragment.ActivityListener,
         AddUserWorkerListener {
 
-    public static final String RESULT_DATA_GROUP = "RESULT_DATA_GROUP";
     private SettingsAddUsersViewModel mAddUsersViewModel;
-    private String mNewGroupName;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,12 +47,20 @@ public class SettingsAddGroupActivity extends BaseActivity<SettingsAddGroupViewM
     }
 
     @Override
+    public void setUpIconDone() {
+        final ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_done_white_24dp);
+        }
+    }
+
+    @Override
     public void setGroupNewViewModel(@NonNull SettingsAddGroupViewModel viewModel) {
         mViewModel = viewModel;
     }
 
     @Override
-    public void setCreateGroupStream(@NonNull Single<Identity> single, @NonNull String workerTag) {
+    public void setCreateGroupStream(@NonNull Single<User> single, @NonNull String workerTag) {
         mViewModel.setCreateGroupStream(single, workerTag);
     }
 
@@ -67,12 +73,4 @@ public class SettingsAddGroupActivity extends BaseActivity<SettingsAddGroupViewM
     public void setAddUserStream(@NonNull Single<String> single, @NonNull String workerTag) {
         mAddUsersViewModel.setAddUserStream(single, workerTag);
     }
-
-    //    private void finishGroupCreation(@NonNull String newGroupName) {
-//        mNewGroupName = newGroupName;
-//        final Intent intentNewGroupName = new Intent();
-//        intentNewGroupName.putExtra(RESULT_DATA_GROUP, mNewGroupName);
-//        setResult(RESULT_OK, intentNewGroupName);
-//        ActivityCompat.finishAfterTransition(activity);
-//    }
 }

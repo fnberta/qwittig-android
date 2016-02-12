@@ -22,7 +22,7 @@ import rx.Observable;
  * <p/>
  * Subclass of {@link BaseWorker}.
  */
-public class TaskRemindWorker extends BaseWorker<String, TaskReminderListener> {
+public class TaskRemindWorker extends BaseWorker<String, TaskRemindWorkerListener> {
 
     private static final String WORKER_TAG = TaskRemindWorker.class.getCanonicalName();
     private static final String KEY_TASK_ID = "TASK_ID";

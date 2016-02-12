@@ -9,15 +9,15 @@ import android.support.annotation.NonNull;
 import java.util.Date;
 import java.util.List;
 
-import ch.giantific.qwittig.domain.models.parse.Identity;
-import ch.giantific.qwittig.domain.models.parse.Task;
+import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.Task;
 import rx.Observable;
 import rx.Single;
 
 /**
  * Provides the methods to get, update and remove tasks from the local and online data store.
  */
-public interface TaskRepository extends Repository {
+public interface TaskRepository extends BaseRepository {
 
     /**
      * Saves the task to the local data store.

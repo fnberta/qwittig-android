@@ -21,6 +21,8 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:paddingBottom="@dimen/small_space"
+        android:transitionGroup="true"
+        tools:targetApi="lollipop"
         >
 
         <LinearLayout
@@ -35,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/small_space"
                 android:layout_marginEnd="@dimen/key_line_1"
-                android:layout_marginStart="@dimen/key_line_1"
+                android:layout_marginStart="@dimen/key_line_2"
                 android:layout_marginTop="@dimen/small_space"
                 android:text="@string/desc_group_add_new"
                 />
@@ -123,6 +125,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/key_line_1"
                 android:layout_marginStart="@dimen/key_line_1"
+                android:gravity="center_horizontal"
                 android:text="@string/desc_group_add_new_create"
                 />
 

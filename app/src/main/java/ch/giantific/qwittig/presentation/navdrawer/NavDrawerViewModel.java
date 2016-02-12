@@ -11,8 +11,7 @@ import android.widget.AdapterView;
 
 import java.util.List;
 
-import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.Identity;
+import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 
 /**

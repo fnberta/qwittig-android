@@ -15,7 +15,7 @@ import android.view.View;
 import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivitySettingsProfileBinding;
-import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
 import rx.Single;
@@ -43,7 +43,7 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileViewMod
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_settings_profile);
 
-//        supportPostponeEnterTransition();
+        supportPostponeEnterTransition();
 
         final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {

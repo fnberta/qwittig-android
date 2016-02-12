@@ -11,8 +11,8 @@
     <data>
 
         <variable
-            name="viewModel"
-            type="ch.giantific.qwittig.presentation.finance.CompUnpaidRowViewModel"
+            name="item"
+            type="ch.giantific.qwittig.presentation.finance.items.UnpaidCompItem"
             />
     </data>
 
@@ -30,7 +30,7 @@
             android:layout_marginEnd="@dimen/normal_space"
             android:layout_marginStart="@dimen/normal_space"
             android:layout_marginTop="@dimen/normal_space"
-            android:text="@{viewModel.compUsername}"
+            android:text="@{item.compUsername}"
             tools:text="veriberi"
             />
 
@@ -42,7 +42,7 @@
             android:layout_marginBottom="@dimen/normal_space"
             android:layout_marginEnd="@dimen/normal_space"
             android:layout_marginStart="@dimen/normal_space"
-            android:text="@{viewModel.credit ? @string/balance_owe_you(viewModel.compAmount) : @string/balance_gets_from_you(viewModel.compAmount)}"
+            android:text="@{item.credit ? @string/balance_owe_you(item.compAmount) : @string/balance_gets_from_you(item.compAmount)}"
             tools:text="schuldet dir 33.45"
             />
 

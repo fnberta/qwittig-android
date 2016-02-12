@@ -25,19 +25,25 @@ import java.util.List;
 
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.MessageAction;
-import ch.giantific.qwittig.domain.models.ocr.OcrItem;
-import ch.giantific.qwittig.domain.models.ocr.OcrPurchase;
-import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.Identity;
-import ch.giantific.qwittig.domain.models.parse.Item;
-import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.utils.MessageAction;
+import ch.giantific.qwittig.data.rest.OcrItem;
+import ch.giantific.qwittig.data.rest.OcrPurchase;
+import ch.giantific.qwittig.domain.models.Group;
+import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.Item;
+import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddEditItem.Type;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddEditViewModel.ViewListener;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.AddEditItem;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.AddEditItem.Type;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.GenericItem;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.HeaderItem;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.ItemItem;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.ItemUsersItem;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.ItemUsersItemUser;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.parse.ParseUtils;
@@ -49,7 +55,7 @@ import timber.log.Timber;
 /**
  * Created by fabio on 24.01.16.
  */
-public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<PurchaseAddEditItem, ViewListener>
+public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEditItem, ViewListener>
         implements PurchaseAddEditViewModel {
 
     // add permission to manifest when enabling!
@@ -116,12 +122,12 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
     }
 
     private void initFixedRows() {
-        mItems.add(PurchaseAddEditItem.createNewHeaderInstance(R.string.header_purchase));
-        mItems.add(PurchaseAddEditItem.createNewDateInstance());
-        mItems.add(PurchaseAddEditItem.createNewStoreInstance());
-        mItems.add(PurchaseAddEditItem.createNewHeaderInstance(R.string.header_items));
-        mItems.add(PurchaseAddEditItem.createNewAddRowInstance());
-        mItems.add(PurchaseAddEditItem.createNewTotalInstance());
+        mItems.add(new HeaderItem(R.string.header_purchase));
+        mItems.add(GenericItem.createNewDateInstance());
+        mItems.add(GenericItem.createNewStoreInstance());
+        mItems.add(new HeaderItem(R.string.header_items));
+        mItems.add(GenericItem.createNewAddRowInstance());
+        mItems.add(GenericItem.createNewTotalInstance());
     }
 
     @Override
@@ -247,28 +253,28 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
         BigDecimal myShare = BigDecimal.ZERO;
         final int maximumFractionDigits = MoneyUtils.getMaximumFractionDigits(mCurrency);
 
-        for (PurchaseAddEditItem addEditItem : mItems) {
+        for (AddEditItem addEditItem : mItems) {
             if (addEditItem.getType() != Type.ITEM) {
                 continue;
             }
 
-            final RowItem rowItem = addEditItem.getRowItem();
-            final BigDecimal finalPrice = rowItem.parsePrice(mCurrency);
+            final ItemItem itemItem = (ItemItem) addEditItem;
+            final BigDecimal finalPrice = itemItem.parsePrice(mCurrency);
 
             // update total price
             totalPrice = totalPrice.add(finalPrice);
 
             // update my share
-            final RowItemUser[] rowItemUsers = rowItem.getUsers();
+            final ItemUsersItemUser[] itemUsersRows = itemItem.getUsers();
             int selectedCount = 0;
             boolean currentIdentityInvolved = false;
-            for (RowItemUser rowItemUser : rowItemUsers) {
-                if (!rowItemUser.isSelected()) {
+            for (ItemUsersItemUser itemUsersItemUser : itemUsersRows) {
+                if (!itemUsersItemUser.isSelected()) {
                     continue;
                 }
 
                 selectedCount++;
-                if (rowItemUser.getObjectId().equals(mCurrentIdentity.getObjectId())) {
+                if (itemUsersItemUser.getObjectId().equals(mCurrentIdentity.getObjectId())) {
                     currentIdentityInvolved = true;
                 }
             }
@@ -308,9 +314,10 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
 
         // update item price formatting
         for (int i = 0, size = mItems.size(); i < size; i++) {
-            final PurchaseAddEditItem addEditItem = mItems.get(i);
+            final AddEditItem addEditItem = mItems.get(i);
             if (addEditItem.getType() == Type.ITEM) {
-                addEditItem.getRowItem().updateCurrency(mCurrency);
+                final ItemItem itemItem = (ItemItem) addEditItem;
+                itemItem.updateCurrency(mCurrency);
             }
         }
 
@@ -393,35 +400,35 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
     void onIdentitiesReady() {
         // fill with one row on first start
         for (int i = 0, size = mItems.size(); i < size; i++) {
-            final PurchaseAddEditItem addEditItem = mItems.get(i);
+            final AddEditItem addEditItem = mItems.get(i);
             if (addEditItem.getType() == Type.ITEM) {
                 return;
             }
 
             if (addEditItem.getType() == Type.ADD_ROW) {
-                final RowItem rowItem = new RowItem(getRowItemUser(mIdentities), mCurrency);
-                mItems.add(i, PurchaseAddEditItem.createNewRowItemInstance(rowItem));
+                final ItemItem itemItem = new ItemItem(getItemUsersItemUsers(mIdentities), mCurrency);
+                mItems.add(i, itemItem);
                 mView.notifyDataSetChanged();
                 return;
             }
         }
     }
 
-    final RowItemUser[] getRowItemUser(@NonNull List<Identity> identities) {
+    final ItemUsersItemUser[] getItemUsersItemUsers(@NonNull List<Identity> identities) {
         final int size = mIdentities.size();
-        final RowItemUser[] rowItemUser = new RowItemUser[size];
+        final ItemUsersItemUser[] itemUsersRow = new ItemUsersItemUser[size];
         for (int i = 0; i < size; i++) {
             final Identity identity = mIdentities.get(i);
             if (identities.contains(identity)) {
-                rowItemUser[i] = new RowItemUser(identity.getObjectId(), identity.getNickname(),
+                itemUsersRow[i] = new ItemUsersItemUser(identity.getObjectId(), identity.getNickname(),
                         identity.getAvatarUrl(), true);
             } else {
-                rowItemUser[i] = new RowItemUser(identity.getObjectId(), identity.getNickname(),
+                itemUsersRow[i] = new ItemUsersItemUser(identity.getObjectId(), identity.getNickname(),
                         identity.getAvatarUrl(), false);
             }
         }
 
-        return rowItemUser;
+        return itemUsersRow;
     }
 
     @Override
@@ -447,7 +454,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
     }
 
     @Override
-    public void onRowItemUserClick(int position) {
+    public void onItemRowUserClick(int position) {
         updateTotalAndMyShare();
     }
 
@@ -495,11 +502,10 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
                 final List<OcrItem> ocrItems = ocrPurchase.getItems();
                 for (OcrItem ocrItem : ocrItems) {
                     final String price = MoneyUtils.formatPrice(ocrItem.getPrice(), mCurrency);
-                    final RowItem rowItem = new RowItem(ocrItem.getName(), price,
-                            getRowItemUser(mIdentities), mCurrency);
-                    final PurchaseAddEditItem addEditItem = PurchaseAddEditItem.createNewRowItemInstance(rowItem);
-                    mItems.add(addEditItem);
-                    mView.notifyItemInserted(mItems.indexOf(addEditItem));
+                    final ItemItem itemItem = new ItemItem(ocrItem.getName(), price,
+                            getItemUsersItemUsers(mIdentities), mCurrency);
+                    mItems.add(itemItem);
+                    mView.notifyItemInserted(mItems.indexOf(itemItem));
                 }
 
                 //        setEditTextPriceImeOptions();
@@ -652,14 +658,14 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
     private boolean validateItems() {
         boolean hasItem = false;
         boolean allValid = true;
-        for (PurchaseAddEditItem addEditItem : mItems) {
+        for (AddEditItem addEditItem : mItems) {
             if (addEditItem.getType() != Type.ITEM) {
                 continue;
             }
 
             hasItem = true;
-            final RowItem rowItem = addEditItem.getRowItem();
-            if (!rowItem.validateFields()) {
+            final ItemItem itemRow = (ItemItem) addEditItem;
+            if (!itemRow.validateFields()) {
                 allValid = false;
             }
         }
@@ -676,16 +682,16 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
         final List<Identity> purchaseIdentities = new ArrayList<>();
         final List<Item> purchaseItems = new ArrayList<>();
 
-        for (PurchaseAddEditItem addEditItem : mItems) {
+        for (AddEditItem addEditItem : mItems) {
             if (addEditItem.getType() != Type.ITEM) {
                 continue;
             }
 
-            final RowItem rowItem = addEditItem.getRowItem();
-            final String rowItemName = rowItem.getName();
+            final ItemItem itemRow = (ItemItem) addEditItem;
+            final String rowItemName = itemRow.getName();
             final String name = rowItemName != null ? rowItemName : "";
-            final BigDecimal price = rowItem.parsePrice(mCurrency);
-            final List<Identity> identities = getIdentities(rowItem.getUsers());
+            final BigDecimal price = itemRow.parsePrice(mCurrency);
+            final List<Identity> identities = getIdentities(itemRow.getUsers());
             for (Identity identity : identities) {
                 if (!purchaseIdentities.contains(identity)) {
                     purchaseIdentities.add(identity);
@@ -710,10 +716,10 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
     }
 
     @NonNull
-    private List<Identity> getIdentities(@NonNull RowItemUser[] rowItemUsers) {
+    private List<Identity> getIdentities(@NonNull ItemUsersItemUser[] itemUsersRows) {
         final List<Identity> identities = new ArrayList<>();
-        for (int i = 0, length = rowItemUsers.length; i < length; i++) {
-            if (rowItemUsers[i].isSelected()) {
+        for (int i = 0, length = itemUsersRows.length; i < length; i++) {
+            if (itemUsersRows[i].isSelected()) {
                 identities.add(mIdentities.get(i));
             }
         }
@@ -841,33 +847,33 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
 
     @Override
     public void onToggleUsersClick(int position) {
-        final PurchaseAddEditItem addEditItem = mItems.get(position);
+        final AddEditItem addEditItem = mItems.get(position);
         final int insertPos = position + 1;
         if (mItems.size() < insertPos) {
-            expandRowItem(insertPos, addEditItem);
+            expandItemRow(insertPos, addEditItem);
         } else if (getItemViewType(insertPos) == Type.USERS) {
-            collapseRowItem(insertPos);
+            collapseItemRow(insertPos);
         } else {
-            expandRowItem(insertPos, addEditItem);
+            expandItemRow(insertPos, addEditItem);
         }
     }
 
-    private void collapseRowItem(int pos) {
+    private void collapseItemRow(int pos) {
         mItems.remove(pos);
         mView.notifyItemRemoved(pos);
     }
 
-    private void expandRowItem(int pos, PurchaseAddEditItem parent) {
-        final RowItem rowItem = parent.getRowItem();
-        mItems.add(pos, PurchaseAddEditItem.createNewUsersInstance(rowItem.getUsers()));
+    private void expandItemRow(int pos, AddEditItem parent) {
+        final ItemItem itemItem = (ItemItem) parent;
+        mItems.add(pos, new ItemUsersItem(itemItem.getUsers()));
         mView.notifyItemInserted(pos);
 
-        collapseAllOtherRowItems(pos);
+        collapseOtherItemRows(pos);
     }
 
-    private void collapseAllOtherRowItems(int insertPos) {
+    private void collapseOtherItemRows(int insertPos) {
         int pos = 0;
-        for (Iterator<PurchaseAddEditItem> iterator = mItems.iterator(); iterator.hasNext(); ) {
+        for (Iterator<AddEditItem> iterator = mItems.iterator(); iterator.hasNext(); ) {
             final int type = iterator.next().getType();
             if (type == Type.USERS && pos != insertPos) {
                 iterator.remove();
@@ -880,8 +886,8 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<Purch
 
     @Override
     public void onAddRowClick(int position) {
-        final RowItem rowItem = new RowItem(getRowItemUser(mIdentities), mCurrency);
-        mItems.add(position, PurchaseAddEditItem.createNewRowItemInstance(rowItem));
+        final ItemItem itemItem = new ItemItem(getItemUsersItemUsers(mIdentities), mCurrency);
+        mItems.add(position, itemItem);
         mView.notifyItemInserted(position);
         mView.scrollToPosition(position + 1);
     }

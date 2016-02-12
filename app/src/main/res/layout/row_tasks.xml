@@ -16,8 +16,8 @@
         <import type="android.view.View"/>
 
         <variable
-            name="viewModel"
-            type="ch.giantific.qwittig.presentation.tasks.list.TaskRowViewModel"
+            name="item"
+            type="ch.giantific.qwittig.presentation.tasks.list.items.TaskItem"
             />
     </data>
 
@@ -45,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
-                app:viewModel="@{viewModel}"
+                app:viewModel="@{item}"
                 />
 
             <ImageView
@@ -58,7 +58,7 @@
                 android:layout_marginStart="@dimen/key_line_1"
                 android:layout_marginTop="@dimen/normal_space"
                 android:contentDescription="@string/user_avatar"
-                app:avatar="@{viewModel.taskUserResponsibleAvatar}"
+                app:avatar="@{item.taskUserResponsibleAvatar}"
                 app:fallback="@{@drawable/ic_account_circle_black_40dp}"
                 tools:src="@drawable/ic_account_circle_black_40dp"
                 />
@@ -71,7 +71,7 @@
                 android:layout_marginTop="@dimen/normal_space"
                 android:layout_toEndOf="@id/iv_avatar"
                 android:layout_toStartOf="@+id/tv_task_deadline"
-                android:text="@{viewModel.currentUserResponsible ? @string/nickname_me : viewModel.taskUserResponsibleNickname}"
+                android:text="@{item.currentUserResponsible ? @string/nickname_me : item.taskUserResponsibleNickname}"
                 tools:text="Vera"
                 />
 
@@ -82,7 +82,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tv_task_user_responsible"
                 android:layout_toEndOf="@id/iv_avatar"
-                android:text="@{viewModel.taskTitle}"
+                android:text="@{item.taskTitle}"
                 tools:text="Küche putzen"
                 />
 
@@ -94,7 +94,7 @@
                 android:layout_below="@id/tv_task_title"
                 android:layout_marginTop="@dimen/small_space"
                 android:layout_toEndOf="@id/iv_avatar"
-                android:text="@{viewModel.taskTimeFrame}"
+                android:text="@{item.taskTimeFrame}"
                 tools:text="Wöchentlich"
                 />
 
@@ -117,7 +117,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginEnd="@dimen/normal_space"
                 android:layout_marginTop="@dimen/normal_space"
-                app:deadline="@{viewModel.daysToTaskDeadline}"
+                app:deadline="@{item.daysToTaskDeadline}"
                 tools:text="In 2 Tagen"
                 tools:textColor="@color/green"
                 />
@@ -137,9 +137,9 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@id/divider"
-                android:text="@{viewModel.taskDoneText}"
+                android:text="@{item.taskDoneText}"
                 android:textColor="?attr/colorAccent"
-                android:visibility="@{viewModel.currentUserResponsible ? View.VISIBLE : View.GONE}"
+                android:visibility="@{item.currentUserResponsible ? View.VISIBLE : View.GONE}"
                 tools:text="Done for this week"
                 />
 
@@ -150,9 +150,9 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@id/divider"
-                android:text="@{@string/task_remind_user(viewModel.taskUserResponsibleNickname)}"
+                android:text="@{@string/task_remind_user(item.taskUserResponsibleNickname)}"
                 android:textColor="?attr/colorAccent"
-                android:visibility="@{viewModel.currentUserResponsible ? View.GONE : View.VISIBLE}"
+                android:visibility="@{item.currentUserResponsible ? View.GONE : View.VISIBLE}"
                 tools:text="Remind sturzi"
                 />
 

@@ -9,13 +9,16 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
 import ch.giantific.qwittig.databinding.RowSettingsAddUsersIntroBinding;
 import ch.giantific.qwittig.databinding.RowSettingsAddUsersNicknameBinding;
 import ch.giantific.qwittig.databinding.RowSettingsAddUsersUserBinding;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.settings.addusers.listitems.ListItem;
-import ch.giantific.qwittig.presentation.settings.addusers.listitems.NicknameItem;
-import ch.giantific.qwittig.presentation.settings.addusers.listitems.UserItem;
+import ch.giantific.qwittig.presentation.settings.addusers.items.AddUsersItem;
+import ch.giantific.qwittig.presentation.settings.addusers.items.HeaderItem;
+import ch.giantific.qwittig.presentation.settings.addusers.items.AddUsersItem.Type;
+import ch.giantific.qwittig.presentation.settings.addusers.items.NicknameItem;
+import ch.giantific.qwittig.presentation.settings.addusers.items.UserItem;
 
 /**
  * Created by fabio on 08.02.16.
@@ -29,20 +32,25 @@ public class AddUsersRecyclerAdapter extends RecyclerView.Adapter {
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, @ListItem.Type int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, @Type int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         switch (viewType) {
-            case ListItem.Type.INTRO: {
+            case Type.HEADER: {
+                final RowGenericHeaderBinding binding =
+                        RowGenericHeaderBinding.inflate(inflater, parent, false);
+                return new BindingRow<>(binding);
+            }
+            case Type.INTRO: {
                 final RowSettingsAddUsersIntroBinding binding =
                         RowSettingsAddUsersIntroBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
             }
-            case ListItem.Type.NICKNAME: {
+            case Type.NICKNAME: {
                 final RowSettingsAddUsersNicknameBinding binding =
                         RowSettingsAddUsersNicknameBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
             }
-            case ListItem.Type.USER: {
+            case Type.USER: {
                 final RowSettingsAddUsersUserBinding binding =
                         RowSettingsAddUsersUserBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
@@ -57,13 +65,23 @@ public class AddUsersRecyclerAdapter extends RecyclerView.Adapter {
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        final ListItem item = mViewModel.getItemAtPosition(position);
-        @ListItem.Type final int type = getItemViewType(position);
+        final AddUsersItem item = mViewModel.getItemAtPosition(position);
+        @Type final int type = getItemViewType(position);
         switch (type) {
-            case ListItem.Type.INTRO:
+            case Type.HEADER: {
+                final BindingRow<RowGenericHeaderBinding> row =
+                        (BindingRow<RowGenericHeaderBinding>) holder;
+                final RowGenericHeaderBinding binding = row.getBinding();
+                final HeaderItem headerItem = (HeaderItem) item;
+
+                binding.setViewModel(headerItem);
+                binding.executePendingBindings();
+                break;
+            }
+            case Type.INTRO:
                 // do nothing
                 break;
-            case ListItem.Type.NICKNAME: {
+            case Type.NICKNAME: {
                 final BindingRow<RowSettingsAddUsersNicknameBinding> row =
                         (BindingRow<RowSettingsAddUsersNicknameBinding>) holder;
                 final RowSettingsAddUsersNicknameBinding binding = row.getBinding();
@@ -74,7 +92,7 @@ public class AddUsersRecyclerAdapter extends RecyclerView.Adapter {
                 binding.executePendingBindings();
                 break;
             }
-            case ListItem.Type.USER: {
+            case Type.USER: {
                 final BindingRow<RowSettingsAddUsersUserBinding> row =
                         (BindingRow<RowSettingsAddUsersUserBinding>) holder;
                 final RowSettingsAddUsersUserBinding binding = row.getBinding();

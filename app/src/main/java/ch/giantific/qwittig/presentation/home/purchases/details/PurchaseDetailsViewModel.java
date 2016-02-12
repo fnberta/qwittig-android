@@ -11,13 +11,14 @@ import android.support.annotation.NonNull;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import ch.giantific.qwittig.domain.models.parse.Identity;
+import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
+import ch.giantific.qwittig.presentation.home.purchases.details.items.DetailsItem;
 
 /**
  * Created by fabio on 29.01.16.
  */
-public interface PurchaseDetailsViewModel extends ListViewModel<PurchaseDetailsItem> {
+public interface PurchaseDetailsViewModel extends ListViewModel<DetailsItem> {
 
     @Bindable
     String getPurchaseStore();

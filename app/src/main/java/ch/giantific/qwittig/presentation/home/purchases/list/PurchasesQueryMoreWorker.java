@@ -12,7 +12,7 @@ import android.support.v4.app.FragmentManager;
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.di.components.WorkerComponent;
-import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.presentation.common.workers.BaseQueryWorker;
 import rx.Observable;
@@ -68,7 +68,7 @@ public class PurchasesQueryMoreWorker extends BaseQueryWorker<Purchase, Purchase
     @Nullable
     @Override
     protected Observable<Purchase> getObservable(@NonNull Bundle args) {
-        if (setCurrentGroups()) {
+        if (setUserInfo()) {
             final int skip = args.getInt(KEY_SKIP, 0);
             return mPurchaseRepo.getPurchasesOnlineAsync(mCurrentIdentity, skip);
         }

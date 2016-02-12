@@ -11,8 +11,8 @@ import android.support.annotation.Nullable;
 import java.util.ArrayList;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.Identity;
-import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
@@ -191,12 +191,5 @@ public class HomeDraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, Hom
     @Override
     public boolean isSelected(@NonNull Purchase draft) {
         return mDraftsSelected.contains(draft.getDraftId());
-    }
-
-    @Override
-    public void onIdentitySelected() {
-        super.onIdentitySelected();
-
-        loadData();
     }
 }

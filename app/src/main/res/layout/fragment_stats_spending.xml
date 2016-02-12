@@ -11,7 +11,7 @@
     tools:context=".presentation.stats.StatsSpendingFragment"
     >
 
-    <ch.giantific.qwittig.presentation.common.widgets.BarChart
+    <ch.giantific.qwittig.presentation.stats.widgets.BarChart
         android:id="@+id/bc_spending"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

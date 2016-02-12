@@ -13,7 +13,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.finance.CardTopProgressViewModel"
+            type="ch.giantific.qwittig.presentation.common.viewmodels.CardTopProgressViewModel"
             />
     </data>
 

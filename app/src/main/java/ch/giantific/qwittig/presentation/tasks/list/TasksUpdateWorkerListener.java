@@ -6,7 +6,7 @@ package ch.giantific.qwittig.presentation.tasks.list;
 
 import android.support.annotation.NonNull;
 
-import ch.giantific.qwittig.domain.models.parse.Task;
+import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorkerListener;
 import rx.Observable;
 

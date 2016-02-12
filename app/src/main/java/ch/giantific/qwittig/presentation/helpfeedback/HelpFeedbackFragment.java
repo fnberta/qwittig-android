@@ -18,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.HelpItem;
 
 /**
  * Displays help and feedback items in a {@link RecyclerView} list.
@@ -26,16 +25,16 @@ import ch.giantific.qwittig.domain.models.HelpItem;
 public class HelpFeedbackFragment extends Fragment implements
         HelpFeedbackRecyclerAdapter.AdapterInteractionListener {
 
-    private static final HelpItem[] HELP_ITEMS = new HelpItem[]{
-            new HelpItem(R.string.header_help),
-            new HelpItem(R.string.help_faq, R.drawable.ic_help_black_24dp),
-            new HelpItem(R.string.help_contact_support, R.drawable.ic_email_black_24dp),
-            new HelpItem(R.string.help_facebook, R.drawable.ic_facebook_box_black_24dp),
-            new HelpItem(R.string.help_twitter, R.drawable.ic_twitter_box_black_24dp),
-            new HelpItem(R.string.header_feedback),
-            new HelpItem(R.string.help_feedback, R.drawable.ic_bug_report_black_24dp),
-            new HelpItem(R.string.help_rate, R.drawable.ic_star_rate_black_24dp),
-            new HelpItem(R.string.help_recommend, R.drawable.ic_favorite_black_24dp)
+    private static final HelpFeedbackItem[] HELP_ITEMS = new HelpFeedbackItem[]{
+            new HelpFeedbackItem(R.string.header_help),
+            new HelpFeedbackItem(R.string.help_faq, R.drawable.ic_help_black_24dp),
+            new HelpFeedbackItem(R.string.help_contact_support, R.drawable.ic_email_black_24dp),
+            new HelpFeedbackItem(R.string.help_facebook, R.drawable.ic_facebook_box_black_24dp),
+            new HelpFeedbackItem(R.string.help_twitter, R.drawable.ic_twitter_box_black_24dp),
+            new HelpFeedbackItem(R.string.header_feedback),
+            new HelpFeedbackItem(R.string.help_feedback, R.drawable.ic_bug_report_black_24dp),
+            new HelpFeedbackItem(R.string.help_rate, R.drawable.ic_star_rate_black_24dp),
+            new HelpFeedbackItem(R.string.help_recommend, R.drawable.ic_favorite_black_24dp)
     };
     private static final int HELP_TIPS = 1;
     private static final int HELP_CONTACT_SUPPORT = 2;

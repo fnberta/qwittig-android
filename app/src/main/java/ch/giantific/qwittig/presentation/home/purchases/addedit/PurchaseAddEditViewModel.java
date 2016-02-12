@@ -18,16 +18,18 @@ import java.util.Date;
 import java.util.List;
 
 import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
-import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
-import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
+import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.AddEditItem;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.ItemItem;
 import rx.Single;
 
 /**
  * Created by fabio on 24.01.16.
  */
-public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditItem>,
-        PurchaseAddEditRecyclerAdapter.AdapterListener, RowItem.PriceChangedListener,
+public interface PurchaseAddEditViewModel extends ListViewModel<AddEditItem>,
+        PurchaseAddEditRecyclerAdapter.AdapterListener, ItemItem.PriceChangedListener,
         PurchaseAddEditDateRowViewModel, PurchaseAddEditStoreRowViewModel, PurchaseAddEditTotalRowViewModel,
         PurchaseAddEditItemUsersClickListener, PurchaseNoteDialogFragment.DialogInteractionListener,
         DiscardChangesDialogFragment.DialogInteractionListener, OcrWorkerListener,

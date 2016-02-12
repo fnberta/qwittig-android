@@ -10,14 +10,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
 import ch.giantific.qwittig.databinding.RowTasksBinding;
-import ch.giantific.qwittig.domain.models.parse.Identity;
-import ch.giantific.qwittig.domain.models.parse.Task;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.common.viewmodels.HeaderRowViewModel;
-import ch.giantific.qwittig.presentation.common.viewmodels.HeaderRowViewModelImpl;
+import ch.giantific.qwittig.presentation.tasks.list.items.HeaderItem;
+import ch.giantific.qwittig.presentation.tasks.list.items.TaskItem;
+import ch.giantific.qwittig.presentation.tasks.list.items.ListItem;
+import ch.giantific.qwittig.presentation.tasks.list.items.ListItem.Type;
 
 /**
  * Handles the display of recent tasks assigned to users in a group.
@@ -41,14 +40,14 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter {
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, @Type int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         switch (viewType) {
-            case TasksViewModel.TYPE_ITEM: {
+            case Type.TASK: {
                 final RowTasksBinding binding = RowTasksBinding.inflate(inflater, parent, false);
                 return new TaskRow(binding, mViewModel);
             }
-            case TasksViewModel.TYPE_HEADER: {
+            case Type.HEADER: {
                 final RowGenericHeaderBinding binding = RowGenericHeaderBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
             }
@@ -60,35 +59,24 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, @Type int position) {
+        final ListItem taskListItem = mViewModel.getItemAtPosition(position);
         final int viewType = getItemViewType(position);
         switch (viewType) {
-            case TasksViewModel.TYPE_ITEM: {
+            case Type.TASK: {
                 final TaskRow taskRow = (TaskRow) viewHolder;
-                final Task task = mViewModel.getItemAtPosition(position);
                 final RowTasksBinding binding = taskRow.getBinding();
 
-                TaskRowViewModel viewModel = binding.getViewModel();
-                final Identity currentIdentity = mViewModel.getCurrentIdentity();
-                if (viewModel == null) {
-                    viewModel = new TaskRowViewModel(task, currentIdentity);
-                    binding.setViewModel(viewModel);
-                } else {
-                    viewModel.updateTaskInfo(task);
-                }
+                binding.setItem((TaskItem) taskListItem);
                 binding.executePendingBindings();
 
                 break;
             }
-            case TasksViewModel.TYPE_HEADER: {
+            case Type.HEADER: {
                 final BindingRow<RowGenericHeaderBinding> headerRow = (BindingRow<RowGenericHeaderBinding>) viewHolder;
                 final RowGenericHeaderBinding binding = headerRow.getBinding();
 
-                final int header = position == 0
-                        ? R.string.task_header_my
-                        : R.string.task_header_group;
-                final HeaderRowViewModel viewModel = new HeaderRowViewModelImpl(header);
-                binding.setViewModel(viewModel);
+                binding.setViewModel((HeaderItem) taskListItem);
                 binding.executePendingBindings();
 
                 break;

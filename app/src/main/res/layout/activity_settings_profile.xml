@@ -59,6 +59,7 @@
                         android:scaleType="centerCrop"
                         app:avatarSquare="@{viewModel.avatar}"
                         app:fallback="@{@drawable/ic_account_box_black_144dp}"
+                        app:listener="@{viewModel}"
                         />
 
                     <View

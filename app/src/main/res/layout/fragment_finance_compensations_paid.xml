@@ -15,14 +15,14 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.finance.FinanceCompsPaidViewModel"
+            type="ch.giantific.qwittig.presentation.finance.CompsPaidViewModel"
             />
     </data>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".presentation.finance.FinanceCompensationsPaidFragment"
+        tools:context=".presentation.finance.CompsPaidFragment"
         >
 
         <include

@@ -10,20 +10,25 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.parse.ParseObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.Identity;
-import ch.giantific.qwittig.domain.models.parse.Item;
-import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.Item;
+import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
+import ch.giantific.qwittig.presentation.home.purchases.details.items.DetailsItem;
+import ch.giantific.qwittig.presentation.home.purchases.details.items.HeaderItem;
+import ch.giantific.qwittig.presentation.home.purchases.details.items.IdentitiesItem;
+import ch.giantific.qwittig.presentation.home.purchases.details.items.ItemItem;
+import ch.giantific.qwittig.presentation.home.purchases.details.items.MyShareItem;
+import ch.giantific.qwittig.presentation.home.purchases.details.items.NoteItem;
+import ch.giantific.qwittig.presentation.home.purchases.details.items.TotalItem;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.SingleSubscriber;
@@ -31,7 +36,7 @@ import rx.SingleSubscriber;
 /**
  * Created by fabio on 29.01.16.
  */
-public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<PurchaseDetailsItem, PurchaseDetailsViewModel.ViewListener>
+public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<DetailsItem, PurchaseDetailsViewModel.ViewListener>
         implements PurchaseDetailsViewModel {
 
     private PurchaseRepository mPurchaseRepo;
@@ -113,28 +118,28 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<Purchase
     private void updateItemList() {
         mItems.clear();
 
-        mItems.add(PurchaseDetailsItem.createHeaderInstance(R.string.header_users));
-        mItems.add(PurchaseDetailsItem.createUsersInvolvedInstance(mPurchase.getIdentities()));
+        mItems.add(new HeaderItem(R.string.header_users));
+        mItems.add(new IdentitiesItem(mPurchase.getIdentities()));
 
-        mItems.add(PurchaseDetailsItem.createHeaderInstance(R.string.header_items));
+        mItems.add(new HeaderItem(R.string.header_items));
         final String groupCurrency = mCurrentIdentity.getGroup().getCurrency();
-        for (ParseObject item : mPurchase.getItems()) {
-            mItems.add(PurchaseDetailsItem.createItemInstance((Item) item, mCurrentIdentity, groupCurrency));
+        for (Item item : mPurchase.getItems()) {
+            mItems.add(new ItemItem(item, mCurrentIdentity, groupCurrency));
         }
         final String total = MoneyUtils.formatMoney(mPurchase.getTotalPrice(), groupCurrency);
         final String purchaseCurrency = mPurchase.getCurrency();
         final String totalForeign = MoneyUtils.formatMoney(mPurchase.getTotalPriceForeign(), purchaseCurrency);
-        mItems.add(PurchaseDetailsItem.createTotalInstance(total, totalForeign));
+        mItems.add(new TotalItem(total, totalForeign));
 
         final double share = mPurchase.calculateUserShare(mCurrentIdentity);
         final String myShare = MoneyUtils.formatMoney(share, groupCurrency);
         final String myShareForeign = MoneyUtils.formatMoney(share / mPurchase.getExchangeRate(), purchaseCurrency);
-        mItems.add(PurchaseDetailsItem.createMyShareInstance(myShare, myShareForeign));
+        mItems.add(new MyShareItem(myShare, myShareForeign));
 
         final String note = mPurchase.getNote();
         if (note != null) {
-            mItems.add(PurchaseDetailsItem.createHeaderInstance(R.string.header_note));
-            mItems.add(PurchaseDetailsItem.createNoteInstance(note));
+            mItems.add(new HeaderItem(R.string.header_note));
+            mItems.add(new NoteItem(note));
         }
 
         mView.notifyDataSetChanged();
@@ -198,7 +203,7 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<Purchase
 
     @Override
     public int getItemViewType(int position) {
-        final PurchaseDetailsItem detailsItem = mItems.get(position);
+        final DetailsItem detailsItem = mItems.get(position);
         return detailsItem.getType();
     }
 

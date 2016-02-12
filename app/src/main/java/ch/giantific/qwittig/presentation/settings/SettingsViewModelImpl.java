@@ -17,16 +17,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.Identity;
-import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.models.Group;
+import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.Single;
 import rx.SingleSubscriber;
-import rx.Subscriber;
 
 /**
  * Created by fabio on 10.02.16.
@@ -49,9 +48,7 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-
+    public void onPreferencesLoaded() {
         setupCurrentGroupCategory();
         loadIdentitySelection();
     }
@@ -64,33 +61,22 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
     }
 
     private void loadIdentitySelection() {
+        final List<Identity> identities = mCurrentUser.getIdentities();
+        final List<String> identityEntries = new ArrayList<>();
+        final List<String> identityValues = new ArrayList<>();
+        for (Identity identity : identities) {
+            if (identity.isActive()) {
+                identityEntries.add(identity.getGroup().getName());
+                identityValues.add(identity.getObjectId());
+            }
+        }
+
+        final int size = identityEntries.size();
+        final CharSequence[] entries = identityEntries.toArray(new CharSequence[size]);
+        final CharSequence[] values = identityValues.toArray(new CharSequence[size]);
         final String selectedValue = mCurrentIdentity.getObjectId();
 
-        mSubscriptions.add(mIdentityRepo.getUserIdentitiesLocalAsync(mCurrentUser)
-                .subscribe(new Subscriber<Identity>() {
-                    private List<String> identityEntries = new ArrayList<>();
-                    private List<String> identityValues = new ArrayList<>();
-
-                    @Override
-                    public void onCompleted() {
-                        final int size = identityEntries.size();
-                        final CharSequence[] entries = identityEntries.toArray(new CharSequence[size]);
-                        final CharSequence[] values = identityValues.toArray(new CharSequence[size]);
-                        mView.setupGroupSelection(entries, values, selectedValue);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        // TODO: handle error
-                    }
-
-                    @Override
-                    public void onNext(Identity identity) {
-                        identityEntries.add(identity.getGroup().getName());
-                        identityValues.add(identity.getObjectId());
-                    }
-                })
-        );
+        mView.setupGroupSelection(entries, values, selectedValue);
     }
 
 
@@ -182,41 +168,18 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
     public void onActionConfirmed() {
         mGroupRepo.unsubscribeGroup(mCurrentIdentity.getGroup());
         mCurrentIdentity.setActive(false);
-        mCurrentIdentity.saveEventually();
 
-        mSubscriptions.add(mIdentityRepo.getUserIdentitiesLocalAsync(mCurrentUser)
-                .toList()
-                .toSingle()
-                .subscribe(new SingleSubscriber<List<Identity>>() {
-                    @Override
-                    public void onSuccess(List<Identity> identities) {
-                        // reset to first identity in the list;
-                        final Identity firstIdentity = identities.get(0);
-                        mCurrentUser.setCurrentIdentity(firstIdentity);
-                        final String selectedValue = firstIdentity.getObjectId();
-                        mCurrentUser.saveEventually();
+        final List<Identity> identities = mCurrentUser.getIdentities();
+        for (Identity identity : identities) {
+            if (identity.isActive()) {
+                mCurrentIdentity = identity;
+                mCurrentUser.setCurrentIdentity(identity);
+                mCurrentUser.saveEventually();
+                break;
+            }
+        }
 
-                        // reset identities list
-                        final int size = identities.size();
-                        final List<String> identityEntries = new ArrayList<>(size);
-                        final List<String> identityValues = new ArrayList<>(size);
-
-                        for (Identity identity : identities) {
-                            identityEntries.add(identity.getGroup().getName());
-                            identityValues.add(identity.getObjectId());
-                        }
-
-                        final CharSequence[] entries = identityEntries.toArray(new CharSequence[size]);
-                        final CharSequence[] values = identityValues.toArray(new CharSequence[size]);
-                        mView.setupGroupSelection(entries, values, selectedValue);
-                    }
-
-                    @Override
-                    public void onError(Throwable error) {
-                        // TODO: handle error
-                    }
-                })
-        );
+        loadIdentitySelection();
 
         // NavDrawer group setting needs to be updated
         mView.setResult(Result.RESULT_GROUP_CHANGED);

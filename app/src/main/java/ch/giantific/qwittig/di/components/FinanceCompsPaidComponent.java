@@ -7,7 +7,7 @@ package ch.giantific.qwittig.di.components;
 import ch.giantific.qwittig.di.modules.FinanceCompsPaidViewModelModule;
 import ch.giantific.qwittig.di.modules.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.presentation.finance.FinanceCompensationsPaidFragment;
+import ch.giantific.qwittig.presentation.finance.CompsPaidFragment;
 import dagger.Component;
 
 /**
@@ -17,5 +17,5 @@ import dagger.Component;
 @Component(modules = {FinanceCompsPaidViewModelModule.class, RepositoriesModule.class})
 public interface FinanceCompsPaidComponent {
 
-    void inject(FinanceCompensationsPaidFragment financeCompensationsPaidFragment);
+    void inject(CompsPaidFragment compsPaidFragment);
 }

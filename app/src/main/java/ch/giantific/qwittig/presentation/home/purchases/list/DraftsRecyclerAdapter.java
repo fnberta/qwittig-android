@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.RowDraftsBinding;
-import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
 
 /**

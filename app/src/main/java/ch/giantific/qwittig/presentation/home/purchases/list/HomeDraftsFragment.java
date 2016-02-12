@@ -25,11 +25,10 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentHomeDraftsBinding;
 import ch.giantific.qwittig.di.components.DaggerHomeDraftsComponent;
 import ch.giantific.qwittig.di.modules.HomeDraftsViewModelModule;
-import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseEditActivity;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddEditViewModel;
 
 /**
  * Displays the currently open drafts of the current user in an {@link RecyclerView list.

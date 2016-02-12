@@ -15,17 +15,18 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.Identity;
-import ch.giantific.qwittig.domain.models.parse.Task;
+import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.Task;
+import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.tasks.list.TasksViewModel;
 import ch.giantific.qwittig.presentation.tasks.list.TasksViewModelImpl;
+import ch.giantific.qwittig.presentation.tasks.list.items.ListItem;
+import ch.giantific.qwittig.presentation.tasks.list.items.TaskItem;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -53,13 +54,14 @@ public class TasksViewModelImplTest {
     private UserRepository mMockUserRepo;
 
     private TasksViewModelImpl mViewModel;
-    private ArrayList<Task> mTasks;
+    private ArrayList<ListItem> mTasks;
 
     @Before
     public void setUp() throws Exception {
+        final User currentUser = mMockUserRepo.getCurrentUser();
         mViewModel = new TasksViewModelImpl(mMockBundle, mMockView, mMockIdentityRepo, mMockUserRepo, mMockTaskRepo);
         mTasks = new ArrayList<>();
-        mTasks.add(mMockTask);
+        mTasks.add(new TaskItem(mMockTask, currentUser.getCurrentIdentity()));
         mViewModel.setItems(mTasks);
     }
 

@@ -5,21 +5,20 @@
 package ch.giantific.qwittig.domain.repositories;
 
 import android.support.annotation.NonNull;
-
-import com.parse.ParseFile;
+import android.support.annotation.Nullable;
 
 import java.util.List;
 
-import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.Identity;
-import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.models.Group;
+import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.User;
 import rx.Observable;
 import rx.Single;
 
 /**
  * Provides the methods to get, update and remove users from the local and online data store.
  */
-public interface IdentityRepository extends Repository {
+public interface IdentityRepository extends BaseRepository {
 
     String INVITATION_LINK = "https://qwittig.ch/invitation/";
 
@@ -40,15 +39,7 @@ public interface IdentityRepository extends Repository {
                                @NonNull String groupId,
                                @NonNull String groupName);
 
-    /**
-     * Fetches all identities of a user form the local datastore.
-     *
-     * @param user the user to fetch the identities for
-     * @return all identities of a user
-     */
-    Observable<Identity> getUserIdentitiesLocalAsync(@NonNull User user);
-
-    List<Identity> getUserIdentitiesLocal(@NonNull User user);
+    String getInvitationUrl(Identity identity, @NonNull String groupName);
 
     /**
      * Fetches the data of a {@link Identity} object from the local data store. If there is no data
@@ -57,6 +48,8 @@ public interface IdentityRepository extends Repository {
      * @param identity the identity to fetch the data for
      */
     Observable<Identity> fetchIdentityDataAsync(@NonNull Identity identity);
+
+    Observable<Identity> fetchUserIdentitiesDataAsync(@NonNull List<Identity> identities);
 
     /**
      * Queries the local data store for identities.
@@ -69,17 +62,19 @@ public interface IdentityRepository extends Repository {
      * Updates all users in the local data store by deleting all identities from the local data
      * store, querying and saving new ones.
      *
-     * @param user the groups for which to update the identities
+     * @param identities the groups for which to update the identities
      */
-    Observable<Identity> updateIdentitiesAsync(@NonNull User user);
+    Observable<Identity> updateIdentitiesAsync(@NonNull List<Identity> identities);
 
     /**
      * Deletes all identities from the local data store and saves new ones.
      *
-     * @param user the groups for which to update the identities
+     * @param identities the groups for which to update the identities
      * @return whether the update was successful or not
      */
-    boolean updateIdentities(@NonNull User user);
+    boolean updateIdentities(@NonNull List<Identity> identities);
 
-    Single<Identity> saveIdentityLocalAsync(@NonNull Identity identity);
+    Observable<Identity> saveIdentitiesWithAvatar(@NonNull List<Identity> identities,
+                                                  @NonNull String nickname,
+                                                  @NonNull byte[] avatarBytes);
 }

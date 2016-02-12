@@ -13,8 +13,8 @@
         <import type="android.view.View"/>
 
         <variable
-            name="rowItem"
-            type="ch.giantific.qwittig.presentation.home.purchases.addedit.RowItem"
+            name="itemRow"
+            type="ch.giantific.qwittig.presentation.home.purchases.addedit.items.ItemItem"
             />
     </data>
 
@@ -28,11 +28,12 @@
 
         <ImageView
             android:id="@+id/iv_purchase_add_toggle_users"
-            android:layout_width="@dimen/icon_size"
-            android:layout_height="@dimen/icon_size"
+            android:layout_width="@dimen/touch_target_min"
+            android:layout_height="@dimen/touch_target_min"
             android:layout_gravity="center_vertical"
-            android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
-            android:layout_marginStart="@dimen/key_line_1"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="@dimen/min_space"
+            android:padding="@dimen/icon_padding"
             android:src="@drawable/ic_group_black_24dp"
             />
 
@@ -48,7 +49,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="7"
-                android:error="@{!rowItem.validate ? null : rowItem.nameComplete ? null : @string/error_item_name}"
+                android:error="@{!itemRow.validate ? null : itemRow.nameComplete ? null : @string/error_item_name}"
                 >
 
                 <EditText
@@ -58,8 +59,8 @@
                     android:hint="@string/hint_item_name"
                     android:imeOptions="actionNext"
                     android:inputType="text|textCapSentences"
-                    android:onTextChanged="@{rowItem.onNameChanged}"
-                    android:text="@{rowItem.name}"
+                    android:onTextChanged="@{itemRow.onNameChanged}"
+                    android:text="@{itemRow.name}"
                     />
 
             </android.support.design.widget.TextInputLayout>
@@ -69,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/normal_space"
                 android:layout_weight="3"
-                android:error="@{!rowItem.validate ? null : rowItem.priceComplete ? null : @string/error_item_price}"
+                android:error="@{!itemRow.validate ? null : itemRow.priceComplete ? null : @string/error_item_price}"
                 >
 
                 <EditText
@@ -80,9 +81,9 @@
                     android:hint="@string/hint_item_price"
                     android:inputType="numberDecimal"
                     android:maxLength="9"
-                    android:onTextChanged="@{rowItem.onPriceChanged}"
-                    android:onFocusChange="@{rowItem.onPriceFocusChange}"
-                    android:text="@{rowItem.price}"
+                    android:onTextChanged="@{itemRow.onPriceChanged}"
+                    android:onFocusChange="@{itemRow.onPriceFocusChange}"
+                    android:text="@{itemRow.price}"
                     />
 
             </android.support.design.widget.TextInputLayout>

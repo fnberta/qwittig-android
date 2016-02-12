@@ -25,10 +25,11 @@ import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
 import java.util.List;
 
-import ch.giantific.qwittig.BlurTransformation;
+import ch.giantific.qwittig.presentation.navdrawer.BlurTransformation;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.parse.Identity;
-import ch.giantific.qwittig.presentation.common.widgets.CircleDisplay;
+import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.presentation.home.purchases.details.widgets.CircleDisplay;
+import ch.giantific.qwittig.presentation.settings.profile.AvatarLoadListener;
 
 /**
  * Contains generic binding adapters.
@@ -60,6 +61,31 @@ public class BindingUtils {
                 .load(avatarUrl)
                 .error(fallback)
                 .into(view);
+    }
+
+    @BindingAdapter({"avatarSquare", "fallback", "listener"})
+    public static void loadAvatarSquareListener(ImageView view, String avatarUrl,
+                                                Drawable fallback, final AvatarLoadListener listener) {
+        final Context context = view.getContext();
+        Glide.with(context)
+                .load(avatarUrl)
+                .asBitmap()
+                .error(fallback)
+                .into(new BitmapImageViewTarget(view) {
+                    @Override
+                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                        super.onResourceReady(resource, glideAnimation);
+
+                        listener.onAvatarLoaded();
+                    }
+
+                    @Override
+                    public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                        super.onLoadFailed(e, errorDrawable);
+
+                        listener.onAvatarLoaded();
+                    }
+                });
     }
 
     @BindingAdapter({"avatar", "fallback"})

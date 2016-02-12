@@ -11,24 +11,23 @@
 
         <variable
             name="nicknameItem"
-            type="ch.giantific.qwittig.presentation.settings.addusers.listitems.NicknameItem"
+            type="ch.giantific.qwittig.presentation.settings.addusers.items.NicknameItem"
             />
     </data>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         >
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/til_add_users_nickname"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
             android:layout_marginStart="@dimen/key_line_1"
-            android:layout_marginEnd="@dimen/key_line_1"
-            android:layout_weight="1"
-            android:error="@{!nicknameItem.validate ? null : nicknameItem.nicknameComplete ? null : @string/error_item_name}"
+            android:layout_toStartOf="@+id/iv_add_users_add"
+            android:error="@{!nicknameItem.validate ? null : nicknameItem.nicknameComplete ? null : @string/error_nickname}"
             android:transitionGroup="true"
             tools:targetApi="lollipop"
             >
@@ -48,13 +47,14 @@
             android:id="@+id/iv_add_users_add"
             android:layout_width="@dimen/touch_target_min"
             android:layout_height="@dimen/touch_target_min"
+            android:layout_alignParentEnd="true"
             android:layout_gravity="center_vertical"
             android:contentDescription="@string/hint_users"
             android:onClick="@{nicknameItem.onAddUserClick}"
-            android:padding="@dimen/icon_size"
+            android:padding="@dimen/icon_padding"
             android:src="@drawable/ic_person_add_black_24dp"
             />
 
-    </LinearLayout>
+    </RelativeLayout>
 
 </layout>

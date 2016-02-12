@@ -30,7 +30,7 @@
     <string name="pref_group_current">Aktive Gruppe</string>
     <string name="pref_group_add_new">Neue Gruppe erstellen</string>
     <string name="pref_group_name">Gruppennamen ändern</string>
-    <string name="pref_group_add_user">Nutzer einladen</string>
+    <string name="pref_group_add_user">Füge Nutzer hinzu</string>
     <string name="action_purchase_delete">Einkauf löschen</string>
     <string name="title_activity_settings_group_new">Neue Gruppe erstellen</string>
     <string name="toast_purchase_deleted">Einkauf gelöscht</string>
@@ -43,8 +43,8 @@
     <string name="action_purchase_edit">Einkauf bearbeiten</string>
     <string name="hint_store">Geschäft</string>
     <string name="hint_users">Nutzer</string>
-    <string name="desc_user_invite">Die Besitzer der eingebenen Email-Adressen erhalten eine Einladung, deiner Gruppe beizutreten.</string>
-    <string name="title_activity_settings_user_invite">Nutzer einladen</string>
+    <string name="desc_user_invite">Um einen neuen Nutzer hinzuzufügen, gib einfach seinen Spitznamen ein und klicke auf hinzufügen. Qiwttig generiert dir einen Einladungslink, den du deinem Kumpel zusendest.</string>
+    <string name="title_activity_settings_user_invite">Nutzer hinzufügen</string>
     <string name="error_group_name">Bitte gib einen Gruppennamen an</string>
     <string name="error_email">Bitte gib eine gültige Email Adresse ein</string>
     <string name="error_item_name">Bitte gib einen Artikelnamen an</string>
@@ -59,8 +59,8 @@
     <string name="hint_nickname">Spitzname</string>
     <string name="hint_password_repeat">Passwort wiederholen</string>
     <string name="error_nickname">Bitte gib einen Spitznamen an</string>
-    <string name="error_login_password">Bitte gib ein Passwort ein</string>
-    <string name="error_login_signup_password_nomatch">Passwörter stimmen nicht überein</string>
+    <string name="error_password">Bitte gib ein Passwort ein</string>
+    <string name="error_password_match">Passwörter stimmen nicht überein</string>
     <string name="purchase_total">Total:</string>
     <string name="toast_reset_password_link">Du hast ein Email erhalten mit einem Link, um dein Passwort zurückzusetzen</string>
     <string name="dialog_login_reset_password_title">Passwort zurücksetzen</string>
@@ -175,7 +175,7 @@
     <string name="toast_payment_saved">Zahlung an %1$s hinzugefügt</string>
     <string name="tab_compensations_archive">Archiv</string>
     <string name="tab_compensations_new">Abrechnung</string>
-    <string name="header_users_invited">Bereits eingeladen</string>
+    <string name="header_users_added">Hinzugefügte Nutzer</string>
     <string name="hint_clear">Entfernen</string>
     <string name="no_invitations">Keine offenen Einladungen</string>
     <string name="hint_store_new">Neues Geschäft</string>
@@ -348,5 +348,8 @@
     <string name="error_valid_amount_too_big">Der Betrag kann max. doppelt so gross wie der ursprüngliche sein</string>
     <string name="desc_group_add_new_create">Klicke auf den Button um die neue Gruppe zu erstellen und mit dem Hinzufügen von Nutzern weiterzufahren.</string>
     <string name="action_share">Teilen</string>
+    <string name="toast_error_profile">Speichern des Profils fehlgeschlagen</string>
+    <string name="progress_add_group">Füge Gruppe hinzu…</string>
+    <string name="progress_add_user">Füge Nutzer hinzu…</string>
 
 </resources>

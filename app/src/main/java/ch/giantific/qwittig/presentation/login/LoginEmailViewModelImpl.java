@@ -13,7 +13,7 @@ import android.text.TextUtils;
 import android.view.View;
 
 import ch.giantific.qwittig.BR;
-import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.Single;
@@ -126,6 +126,8 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
                     @Override
                     public void onError(Throwable error) {
                         mView.removeWorker(workerTag);
+                        setLoading(false);
+
                         mView.showMessage(mUserRepo.getErrorMessage(error));
                     }
                 })

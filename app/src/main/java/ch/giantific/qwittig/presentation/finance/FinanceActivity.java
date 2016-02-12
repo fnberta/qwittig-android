@@ -23,9 +23,12 @@ import ch.giantific.qwittig.LocalBroadcastImpl;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivityFinanceBinding;
 import ch.giantific.qwittig.di.components.NavDrawerComponent;
-import ch.giantific.qwittig.domain.models.parse.Compensation;
-import ch.giantific.qwittig.domain.models.parse.Identity;
+import ch.giantific.qwittig.domain.models.Compensation;
+import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.adapters.TabsAdapter;
+import ch.giantific.qwittig.presentation.finance.identities.IdentitiesFragment;
+import ch.giantific.qwittig.presentation.finance.identities.IdentitiesUpdateWorkerListener;
+import ch.giantific.qwittig.presentation.finance.identities.IdentitiesViewModel;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.utils.Utils;
@@ -40,19 +43,19 @@ import rx.Single;
  * <p/>
  * Subclass of {@link BaseNavDrawerActivity}.
  */
-public class FinanceActivity extends BaseNavDrawerActivity<FinanceCompsUnpaidViewModel> implements
+public class FinanceActivity extends BaseNavDrawerActivity<CompsUnpaidViewModel> implements
         IdentitiesFragment.ActivityListener,
-        FinanceCompensationsUnpaidFragment.ActivityListener,
-        FinanceCompensationsPaidFragment.ActivityListener,
-        CompensationConfirmAmountDialogFragment.DialogInteractionListener,
-        CompensationsUpdateWorkerListener,
-        CompensationsQueryMoreListener,
-        CompensationReminderWorkerListener,
+        CompsUnpaidFragment.ActivityListener,
+        CompsPaidFragment.ActivityListener,
+        CompConfirmAmountDialogFragment.DialogInteractionListener,
+        CompsUpdateWorkerListener,
+        CompsQueryMoreWorkerListener,
+        CompRemindWorkerListener,
         IdentitiesUpdateWorkerListener {
 
     private ActivityFinanceBinding mBinding;
-    private IdentitiesViewModel mUsersViewModel;
-    private FinanceCompsPaidViewModel mCompsPaidViewModel;
+    private IdentitiesViewModel mIdentitiesViewModel;
+    private CompsPaidViewModel mCompsPaidViewModel;
 
     @Override
     protected void handleLocalBroadcast(Intent intent, int dataType) {
@@ -102,8 +105,8 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceCompsUnpaidVie
 
         final TabsAdapter tabsAdapter = new TabsAdapter(getSupportFragmentManager());
 //        tabsAdapter.addFragment(new IdentitiesFragment(), getString(R.string.tab_users));
-        tabsAdapter.addFragment(new FinanceCompensationsUnpaidFragment(), getString(R.string.tab_compensations_new));
-        tabsAdapter.addFragment(new FinanceCompensationsPaidFragment(), getString(R.string.tab_compensations_archive));
+        tabsAdapter.addFragment(new CompsUnpaidFragment(), getString(R.string.tab_compensations_new));
+        tabsAdapter.addFragment(new CompsPaidFragment(), getString(R.string.tab_compensations_archive));
         mBinding.viewpager.setAdapter(tabsAdapter);
 //        mBinding.viewpager.setOffscreenPageLimit(2);
         if (tabToSelect != FragmentTabs.NONE) {
@@ -114,19 +117,19 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceCompsUnpaidVie
     }
 
     @Override
-    public void setCompsUnpaidViewModel(@NonNull FinanceCompsUnpaidViewModel viewModel) {
+    public void setCompsUnpaidViewModel(@NonNull CompsUnpaidViewModel viewModel) {
         mViewModel = viewModel;
         mBinding.setViewModel(viewModel);
     }
 
     @Override
-    public void setCompsPaidViewModel(@NonNull FinanceCompsPaidViewModel viewModel) {
+    public void setCompsPaidViewModel(@NonNull CompsPaidViewModel viewModel) {
         mCompsPaidViewModel = viewModel;
     }
 
     @Override
-    public void setUsersViewModel(@NonNull IdentitiesViewModel viewModel) {
-        mUsersViewModel = viewModel;
+    public void setIdentitiesViewModel(@NonNull IdentitiesViewModel viewModel) {
+        mIdentitiesViewModel = viewModel;
     }
 
     @Override
@@ -141,7 +144,9 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceCompsUnpaidVie
     public void onIdentitySelected() {
         super.onIdentitySelected();
 
-        mUsersViewModel.onIdentitySelected();
+        if (mIdentitiesViewModel != null) {
+            mIdentitiesViewModel.onIdentitySelected();
+        }
         mCompsPaidViewModel.onIdentitySelected();
     }
 
@@ -178,7 +183,7 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceCompsUnpaidVie
     @Override
     public void setUsersUpdateStream(@NonNull Observable<Identity> observable,
                                      @NonNull String workerTag) {
-        mUsersViewModel.setUsersUpdateStream(observable, workerTag);
+        mIdentitiesViewModel.setUsersUpdateStream(observable, workerTag);
     }
 
     @Override

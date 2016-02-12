@@ -35,7 +35,7 @@ public abstract class BaseActivity<T extends ViewModel>
     public static final int INTENT_REQUEST_PURCHASE_MODIFY = 3;
     public static final int INTENT_REQUEST_PURCHASE_DETAILS = 4;
     public static final int INTENT_REQUEST_SETTINGS_PROFILE = 5;
-    public static final int INTENT_REQUEST_SETTINGS_GROUP_NEW = 6;
+    public static final int INTENT_REQUEST_SETTINGS_ADD_GROUP = 6;
     public static final int INTENT_REQUEST_TASK_NEW = 7;
     public static final int INTENT_REQUEST_TASK_MODIFY = 8;
     public static final int INTENT_REQUEST_TASK_DETAILS = 9;

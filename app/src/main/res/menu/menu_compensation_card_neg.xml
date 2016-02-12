@@ -5,7 +5,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
-      tools:context=".presentation.finance.CompensationsUnpaidRecyclerAdapter">
+      tools:context=".presentation.finance.CompsUnpaidRecyclerAdapter">
     <item
         android:id="@+id/action_compensation_not_now"
         android:title="@string/action_compensation_not_now"

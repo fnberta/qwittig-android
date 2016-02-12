@@ -18,7 +18,7 @@ import ch.giantific.qwittig.LocalBroadcast;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivityTasksBinding;
 import ch.giantific.qwittig.di.components.NavDrawerComponent;
-import ch.giantific.qwittig.domain.models.parse.Task;
+import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.presentation.common.adapters.StringResSpinnerAdapter;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.presentation.tasks.addedit.TaskAddEditViewModel.TaskResult;
@@ -38,7 +38,7 @@ import rx.Single;
 public class TasksActivity extends BaseNavDrawerActivity<TasksViewModel> implements
         TasksFragment.ActivityListener,
         TasksUpdateWorkerListener,
-        TaskReminderListener {
+        TaskRemindWorkerListener {
 
     private ActivityTasksBinding mBinding;
 

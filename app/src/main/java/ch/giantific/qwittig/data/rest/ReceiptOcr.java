@@ -6,7 +6,6 @@ package ch.giantific.qwittig.data.rest;
 
 import com.squareup.okhttp.RequestBody;
 
-import ch.giantific.qwittig.domain.models.ocr.OcrPurchase;
 import retrofit.http.Multipart;
 import retrofit.http.POST;
 import retrofit.http.Part;

@@ -6,8 +6,8 @@ package ch.giantific.qwittig.presentation.stats;
 
 import android.support.annotation.NonNull;
 
-import ch.giantific.qwittig.domain.models.stats.Stats;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorkerListener;
+import ch.giantific.qwittig.presentation.stats.models.Stats;
 import rx.Single;
 
 /**

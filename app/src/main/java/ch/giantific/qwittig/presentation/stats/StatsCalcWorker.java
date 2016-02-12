@@ -17,11 +17,11 @@ import java.lang.annotation.RetentionPolicy;
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.di.components.WorkerComponent;
-import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.User;
-import ch.giantific.qwittig.domain.models.stats.Stats;
+import ch.giantific.qwittig.domain.models.Group;
+import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.StatsRepository;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
+import ch.giantific.qwittig.presentation.stats.models.Stats;
 import rx.Observable;
 
 

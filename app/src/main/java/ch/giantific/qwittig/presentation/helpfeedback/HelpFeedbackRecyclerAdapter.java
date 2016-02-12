@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.HelpItem;
 import ch.giantific.qwittig.presentation.common.adapters.rows.HeaderRow;
 
 /**
@@ -30,7 +29,7 @@ public class HelpFeedbackRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
     private static final int VIEW_RESOURCE = R.layout.row_help_feedback;
     private AdapterInteractionListener mListener;
     private Context mContext;
-    private HelpItem[] mItems;
+    private HelpFeedbackItem[] mItems;
 
     /**
      * Constructs a new {@link HelpFeedbackRecyclerAdapter}.
@@ -39,7 +38,7 @@ public class HelpFeedbackRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
      * @param items    the help and feedback items to display
      * @param listener the callback for user clicks on an item
      */
-    public HelpFeedbackRecyclerAdapter(@NonNull Context context, @NonNull HelpItem[] items,
+    public HelpFeedbackRecyclerAdapter(@NonNull Context context, @NonNull HelpFeedbackItem[] items,
                                        @NonNull AdapterInteractionListener listener) {
 
         mContext = context;
@@ -69,7 +68,7 @@ public class HelpFeedbackRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        HelpItem item = mItems[position];
+        HelpFeedbackItem item = mItems[position];
 
         int viewType = getItemViewType(position);
         switch (viewType) {

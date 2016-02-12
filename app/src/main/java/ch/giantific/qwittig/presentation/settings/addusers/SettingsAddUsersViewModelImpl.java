@@ -8,37 +8,86 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.domain.models.Group;
+import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
-import ch.giantific.qwittig.presentation.settings.addusers.listitems.IntroItem;
-import ch.giantific.qwittig.presentation.settings.addusers.listitems.ListItem;
-import ch.giantific.qwittig.presentation.settings.addusers.listitems.NicknameItem;
-import ch.giantific.qwittig.presentation.settings.addusers.listitems.UserItem;
+import ch.giantific.qwittig.presentation.settings.addusers.items.HeaderItem;
+import ch.giantific.qwittig.presentation.settings.addusers.items.IntroItem;
+import ch.giantific.qwittig.presentation.settings.addusers.items.AddUsersItem;
+import ch.giantific.qwittig.presentation.settings.addusers.items.NicknameItem;
+import ch.giantific.qwittig.presentation.settings.addusers.items.UserItem;
 import rx.Single;
 import rx.SingleSubscriber;
+import rx.Subscriber;
+import rx.functions.Func1;
 
 /**
  * Created by fabio on 08.02.16.
  */
-public class SettingsAddUsersViewModelImpl extends ListViewModelBaseImpl<ListItem, SettingsAddUsersViewModel.ViewListener>
+public class SettingsAddUsersViewModelImpl extends ListViewModelBaseImpl<AddUsersItem, SettingsAddUsersViewModel.ViewListener>
         implements SettingsAddUsersViewModel {
+
+    private static final String STATE_ITEMS = "STATE_ITEMS";
 
     public SettingsAddUsersViewModelImpl(@Nullable Bundle savedState,
                                          @NonNull SettingsAddUsersViewModel.ViewListener view,
                                          @NonNull IdentityRepository identityRepo,
                                          @NonNull UserRepository userRepository) {
         super(savedState, view, identityRepo, userRepository);
+
+        if (savedState != null) {
+            mItems = savedState.getParcelableArrayList(STATE_ITEMS);
+        }
+    }
+
+    @Override
+    public void saveState(@NonNull Bundle outState) {
+        super.saveState(outState);
+
+        outState.putParcelableArrayList(STATE_ITEMS, mItems);
     }
 
     @Override
     public void loadData() {
-        if (mItems.isEmpty()) {
-            mItems.add(new IntroItem());
-            mItems.add(new NicknameItem());
-            mView.notifyDataSetChanged();
+        if (!mItems.isEmpty()) {
+            return;
         }
+
+        mItems.add(new IntroItem());
+        mItems.add(new NicknameItem());
+        mItems.add(new HeaderItem(R.string.header_users_added));
+
+        final Group group = mCurrentIdentity.getGroup();
+        mSubscriptions.add(mIdentityRepo.getIdentitiesLocalAsync(group)
+                .filter(new Func1<Identity, Boolean>() {
+                    @Override
+                    public Boolean call(Identity identity) {
+                        return identity.isPending();
+                    }
+                })
+                .subscribe(new Subscriber<Identity>() {
+                    final String groupName = group.getName();
+
+                    @Override
+                    public void onCompleted() {
+                        mView.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        // TODO: handle error
+                    }
+
+                    @Override
+                    public void onNext(Identity identity) {
+                        mItems.add(new UserItem(identity.getNickname(),
+                                mIdentityRepo.getInvitationUrl(identity, groupName)));
+                    }
+                })
+        );
     }
 
     @Override
@@ -47,6 +96,7 @@ public class SettingsAddUsersViewModelImpl extends ListViewModelBaseImpl<ListIte
             final Group group = mCurrentIdentity.getGroup();
             mView.toggleProgressDialog(true);
             mView.loadAddUserWorker(nicknameItem.getNickname(), group.getObjectId(), group.getName());
+            nicknameItem.setValidate(false);
         }
     }
 
@@ -58,10 +108,10 @@ public class SettingsAddUsersViewModelImpl extends ListViewModelBaseImpl<ListIte
                         mView.removeWorker(workerTag);
                         mView.toggleProgressDialog(false);
 
+                        // TODO: hardcode position?
                         final NicknameItem nicknameItem = ((NicknameItem) mItems.get(1));
-                        final int lastPosition = getLastPosition();
-                        mItems.add(lastPosition, new UserItem(nicknameItem.getNickname(), invitationUrl));
-                        mView.notifyItemInserted(lastPosition);
+                        mItems.add(new UserItem(nicknameItem.getNickname(), invitationUrl));
+                        mView.notifyItemInserted(getLastPosition());
                     }
 
                     @Override

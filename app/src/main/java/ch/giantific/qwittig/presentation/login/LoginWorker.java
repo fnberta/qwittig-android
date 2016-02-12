@@ -13,13 +13,12 @@ import android.support.v4.app.FragmentManager;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.List;
 
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.di.components.WorkerComponent;
-import ch.giantific.qwittig.domain.models.parse.Identity;
-import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
@@ -217,7 +216,13 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
             case Type.LOGIN_EMAIL: {
                 final String username = args.getString(KEY_USERNAME, "");
                 final String password = args.getString(KEY_PASSWORD, "");
-                return mUserRepo.loginEmail(username, password).toObservable();
+                return mUserRepo.loginEmail(username, password)
+                        .flatMapObservable(new Func1<User, Observable<User>>() {
+                            @Override
+                            public Observable<User> call(final User user) {
+                                return fetchIdentityData(user);
+                            }
+                        });
             }
 //            case Type.RESET_PASSWORD: {
 //                final String username = args.getString(KEY_USERNAME, "");
@@ -238,18 +243,10 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
                                             }
                                         });
                             }
-                        })
-                        .flatMapObservable(new Func1<User, Observable<User>>() {
+                        }).flatMapObservable(new Func1<User, Observable<User>>() {
                             @Override
                             public Observable<User> call(final User user) {
-                                return mIdentityRepo.updateIdentitiesAsync(user)
-                                        .toList()
-                                        .map(new Func1<List<Identity>, User>() {
-                                            @Override
-                                            public User call(List<Identity> identities) {
-                                                return user;
-                                            }
-                                        });
+                                return fetchIdentityData(user);
                             }
                         });
             }
@@ -265,6 +262,17 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
         }
 
         return null;
+    }
+
+    @NonNull
+    private Observable<User> fetchIdentityData(final User user) {
+        return mIdentityRepo.fetchIdentityDataAsync(user.getCurrentIdentity())
+                .map(new Func1<Identity, User>() {
+                    @Override
+                    public User call(Identity identity) {
+                        return user;
+                    }
+                });
     }
 
     @Override

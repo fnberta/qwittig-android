@@ -4,7 +4,6 @@
 
 package ch.giantific.qwittig.data.rest;
 
-import ch.giantific.qwittig.domain.models.rates.CurrencyRates;
 import retrofit.http.GET;
 import retrofit.http.Query;
 import rx.Single;

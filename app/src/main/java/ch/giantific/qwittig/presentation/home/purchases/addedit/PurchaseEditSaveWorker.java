@@ -11,7 +11,7 @@ import android.support.v4.app.FragmentManager;
 
 import com.parse.ParseFile;
 
-import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.domain.models.Purchase;
 import rx.Observable;
 import rx.Single;
 import rx.functions.Action1;

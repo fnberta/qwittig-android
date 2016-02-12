@@ -13,7 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.RowTaskAddEditUserBinding;
-import ch.giantific.qwittig.domain.models.parse.Identity;
+import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
 
 import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;

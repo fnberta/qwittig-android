@@ -6,7 +6,7 @@ package ch.giantific.qwittig.presentation.home.purchases.list;
 
 import android.support.annotation.NonNull;
 
-import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.viewmodels.LoadMoreViewModel;
 import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModel;
 

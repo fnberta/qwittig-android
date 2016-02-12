@@ -21,7 +21,6 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentSettingsAddGroupBinding;
 import ch.giantific.qwittig.di.components.DaggerSettingsAddGroupComponent;
 import ch.giantific.qwittig.di.modules.SettingsAddGroupViewModelModule;
-import ch.giantific.qwittig.domain.models.Currency;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.settings.addusers.SettingsAddUsersFragment;
 import ch.giantific.qwittig.utils.Utils;
@@ -35,6 +34,7 @@ import ch.giantific.qwittig.utils.parse.ParseUtils;
 public class SettingsAddGroupFragment extends BaseFragment<SettingsAddGroupViewModel, SettingsAddGroupFragment.ActivityListener>
         implements SettingsAddGroupViewModel.ViewListener {
 
+    public static final String RESULT_DATA_GROUP = "RESULT_DATA_GROUP";
     private static final String ADD_USERS_FRAGMENT = "ADD_USERS_FRAGMENT";
     private FragmentSettingsAddGroupBinding mBinding;
     private ProgressDialog mProgressDialog;
@@ -89,7 +89,7 @@ public class SettingsAddGroupFragment extends BaseFragment<SettingsAddGroupViewM
     @Override
     public void toggleProgressDialog(boolean show) {
         if (show) {
-            mProgressDialog = ProgressDialog.show(getActivity(), null, "creating group...", true, false);
+            mProgressDialog = ProgressDialog.show(getActivity(), null, getString(R.string.progress_add_group), true, false);
         } else {
             mProgressDialog.hide();
         }
@@ -105,15 +105,35 @@ public class SettingsAddGroupFragment extends BaseFragment<SettingsAddGroupViewM
 
         getFragmentManager().beginTransaction()
                 .replace(R.id.container, fragment, ADD_USERS_FRAGMENT)
-                .addToBackStack(null)
                 .commit();
+
+        mActivity.setUpIconDone();
     }
+
+//    @Override
+//    public void finishScreen(@NonNull String groupName) {
+//        final FragmentActivity activity = getActivity();
+//        final Intent intentNewGroupName = new Intent();
+//        intentNewGroupName.putExtra(RESULT_DATA_GROUP, groupName);
+//        activity.setResult(Activity.RESULT_OK, intentNewGroupName);
+//        ActivityCompat.finishAfterTransition(activity);
+//    }
 
     /**
      * Defines the interaction with the hosting {@link Activity}.
      */
     public interface ActivityListener extends BaseFragment.ActivityListener {
 
+        /**
+         * Sets the view model to the activity.
+         *
+         * @param viewModel the view model to set
+         */
         void setGroupNewViewModel(@NonNull SettingsAddGroupViewModel viewModel);
+
+        /**
+         * Changes the up icon in the action bar to a done icon.
+         */
+        void setUpIconDone();
     }
 }

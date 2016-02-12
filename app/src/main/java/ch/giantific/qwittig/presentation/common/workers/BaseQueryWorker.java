@@ -4,10 +4,12 @@
 
 package ch.giantific.qwittig.presentation.common.workers;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
-import ch.giantific.qwittig.domain.models.parse.Identity;
-import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 
 /**
@@ -23,18 +25,20 @@ public abstract class BaseQueryWorker<T, S extends BaseWorkerListener>
     protected IdentityRepository mIdentityRepo;
     protected User mCurrentUser;
     protected Identity mCurrentIdentity;
+    protected List<Identity> mIdentities;
 
     /**
-     * Returns if the current user's current group and groups are not null or empty.
+     * Returns if the current user's current identity and identities are not null or empty.
      *
-     * @return whether the current user's current group and groups are not null or empty
+     * @return whether the current user's current identities and identities are not null or empty
      */
-    protected final boolean setCurrentGroups() {
+    protected final boolean setUserInfo() {
         mCurrentUser = mUserRepo.getCurrentUser();
         if (mCurrentUser != null) {
             mCurrentIdentity = mCurrentUser.getCurrentIdentity();
+            mIdentities = mCurrentUser.getIdentities();
         }
 
-        return mCurrentUser != null && mCurrentIdentity != null;
+        return mCurrentUser != null && mCurrentIdentity != null && !mIdentities.isEmpty();
     }
 }

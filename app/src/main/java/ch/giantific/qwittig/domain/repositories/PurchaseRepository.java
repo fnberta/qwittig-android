@@ -11,15 +11,20 @@ import com.parse.ParseFile;
 
 import java.util.List;
 
-import ch.giantific.qwittig.domain.models.parse.Identity;
-import ch.giantific.qwittig.domain.models.parse.Purchase;
+import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.Purchase;
 import rx.Observable;
 import rx.Single;
 
 /**
  * Provides the methods to get, update and remove purchases from the local and online data store.
  */
-public interface PurchaseRepository extends Repository {
+public interface PurchaseRepository extends BaseRepository {
+
+    String FILE_NAME = "receipt.jpg";
+    int JPEG_COMPRESSION_RATE = 80; // TODO: figure out real value
+    int HEIGHT = 720; // TODO: figure out real height and width
+    int WIDTH = 720;
 
     /**
      * Queries the local data store for purchases.
@@ -65,10 +70,10 @@ public interface PurchaseRepository extends Repository {
      * Updates all purchases in the local data store by deleting all purchases from the local data
      * store, querying and saving new ones.
      *
-     * @param currentIdentity the user's current identity
      * @param identities      the identities of the current user
+     * @param currentIdentity the user's current identity
      */
-    Observable<Purchase> updatePurchasesAsync(@NonNull Identity currentIdentity, @NonNull List<Identity> identities);
+    Observable<Purchase> updatePurchasesAsync(@NonNull List<Identity> identities, @NonNull Identity currentIdentity);
 
     /**
      * Queries purchases from the online data store and saves them in the local data store.
@@ -82,12 +87,11 @@ public interface PurchaseRepository extends Repository {
     /**
      * Deletes all purchases from the local data store and saves new ones.
      *
-     * @param currentIdentity the user's current identity
      * @param identities      the identities of the current user
+     * @param currentIdentity the user's current identity
      * @return whether the update was successful or not
      */
-    boolean updatePurchases(@NonNull final Identity currentIdentity,
-                            @NonNull final List<Identity> identities);
+    boolean updatePurchases(@NonNull final List<Identity> identities, @NonNull final Identity currentIdentity);
 
     /**
      * Updates a purchase if is already available in the local data store (by simply querying it) or

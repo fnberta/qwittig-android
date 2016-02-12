@@ -12,8 +12,8 @@ import ch.giantific.qwittig.di.scopes.PerFragment;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.presentation.finance.FinanceCompsPaidViewModel;
-import ch.giantific.qwittig.presentation.finance.FinanceCompsPaidViewModelImpl;
+import ch.giantific.qwittig.presentation.finance.CompsPaidViewModel;
+import ch.giantific.qwittig.presentation.finance.CompsPaidViewModelImpl;
 import dagger.Module;
 import dagger.Provides;
 
@@ -21,19 +21,19 @@ import dagger.Provides;
  * Created by fabio on 12.01.16.
  */
 @Module
-public class FinanceCompsPaidViewModelModule extends BaseViewModelModule<FinanceCompsPaidViewModel.ViewListener> {
+public class FinanceCompsPaidViewModelModule extends BaseViewModelModule<CompsPaidViewModel.ViewListener> {
 
     public FinanceCompsPaidViewModelModule(@Nullable Bundle savedState,
-                                           @NonNull FinanceCompsPaidViewModel.ViewListener view) {
+                                           @NonNull CompsPaidViewModel.ViewListener view) {
         super(savedState, view);
     }
 
     @PerFragment
     @Provides
-    FinanceCompsPaidViewModel providesFinanceCompsPaidViewModel(@NonNull IdentityRepository identityRepository,
-                                                                @NonNull UserRepository userRepository,
-                                                                @NonNull CompensationRepository compsRepository) {
-        return new FinanceCompsPaidViewModelImpl(mSavedState, mView, identityRepository,
+    CompsPaidViewModel providesFinanceCompsPaidViewModel(@NonNull IdentityRepository identityRepository,
+                                                         @NonNull UserRepository userRepository,
+                                                         @NonNull CompensationRepository compsRepository) {
+        return new CompsPaidViewModelImpl(mSavedState, mView, identityRepository,
                 userRepository, compsRepository);
     }
 }

@@ -12,7 +12,8 @@ import com.parse.ParseConfig;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.Group;
+import ch.giantific.qwittig.presentation.settings.addgroup.Currency;
 import ch.giantific.qwittig.utils.MoneyUtils;
 
 /**
@@ -46,22 +47,22 @@ public class ParseUtils {
 
     /**
      * Returns the currently supported currencies as
-     * {@link ch.giantific.qwittig.domain.models.Currency} objects with a name and currency code.
+     * {@link Currency} objects with a name and currency code.
      * Reads the information from {@link ParseConfig}.
      *
      * @return the currently supported currencies
      */
     @NonNull
-    public static List<ch.giantific.qwittig.domain.models.Currency> getSupportedCurrencies() {
+    public static List<Currency> getSupportedCurrencies() {
         ParseConfig config = ParseConfig.getCurrentConfig();
         List<String> currencyCodes = config.getList(ParseConfigUtils.SUPPORTED_CURRENCIES);
         List<String> currencyNames = MoneyUtils.getCurrencyDisplayNames(currencyCodes);
 
         int currencyNamesLength = currencyNames.size();
-        List<ch.giantific.qwittig.domain.models.Currency> currencies =
+        List<Currency> currencies =
                 new ArrayList<>(currencyNamesLength);
         for (int i = 0; i < currencyNamesLength; i++) {
-            currencies.add(new ch.giantific.qwittig.domain.models.Currency(currencyNames.get(i),
+            currencies.add(new Currency(currencyNames.get(i),
                     currencyCodes.get(i)));
         }
 
