@@ -61,7 +61,7 @@ public class SettingsAddUsersViewModelImpl extends ListViewModelBaseImpl<AddUser
         mItems.add(new HeaderItem(R.string.header_users_added));
 
         final Group group = mCurrentIdentity.getGroup();
-        mSubscriptions.add(mIdentityRepo.getIdentitiesLocalAsync(group)
+        mSubscriptions.add(mIdentityRepo.getIdentitiesLocalAsync(group, true)
                 .filter(new Func1<Identity, Boolean>() {
                     @Override
                     public Boolean call(Identity identity) {

@@ -158,7 +158,7 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<DetailsItem,
     private Observable<TaskHistoryItem> getTaskHistory() {
         final Map<String, List<Date>> history = mTask.getHistory();
         final Set<String> keys = history.keySet();
-        return mIdentityRepo.getIdentitiesLocalAsync(mCurrentIdentity.getGroup())
+        return mIdentityRepo.getIdentitiesLocalAsync(mCurrentIdentity.getGroup(), true)
                 .filter(new Func1<Identity, Boolean>() {
                     @Override
                     public Boolean call(Identity identity) {

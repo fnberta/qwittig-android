@@ -84,7 +84,7 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
     }
 
     void loadTaskUsers() {
-        mSubscriptions.add(mIdentityRepo.getIdentitiesLocalAsync(mCurrentIdentity.getGroup())
+        mSubscriptions.add(mIdentityRepo.getIdentitiesLocalAsync(mCurrentIdentity.getGroup(), true)
                 .toList()
                 .toSingle()
                 .subscribe(new SingleSubscriber<List<Identity>>() {

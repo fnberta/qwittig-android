@@ -359,5 +359,7 @@
     <string name="toast_error_profile">Failed to save profile</string>
     <string name="progress_add_group">Creating group…</string>
     <string name="progress_add_user">Adding user…</string>
+    <string name="progress_joining_group">Joining group…</string>
+    <string name="toast_group_joined">Joined and switched to the new group</string>
 
 </resources>

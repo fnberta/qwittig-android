@@ -136,7 +136,9 @@ public interface PurchaseRepository extends BaseRepository {
 
     void deletePurchase(@NonNull Purchase purchase);
 
-    boolean isPurchaseDraftsAvailable();
+    boolean isDraftsAvailable();
+
+    void toggleDraftsAvailable(boolean available);
 
     Single<Float> getExchangeRate(@NonNull String baseCurrency, @NonNull String currency);
 }

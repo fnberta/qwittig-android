@@ -62,7 +62,9 @@ import rx.functions.Func1;
 public class ParseUserRepository extends ParseBaseRepository implements UserRepository {
 
     private static final String VERIFY_GOOGLE_LOGIN = "loginWithGoogle";
+    private static final String HANDLE_INVITATION = "checkIdentity";
     private static final String PARAM_ID_TOKEN = "idToken";
+    private static final String PARAM_IDENTITY_ID = "identityId";
 
     public ParseUserRepository() {
         super();
@@ -474,6 +476,13 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
 
                     }
                 });
+    }
+
+    @Override
+    public Single<String> handleInvitation(@NonNull String identityId) {
+        final Map<String, Object> params = new HashMap<>();
+        params.put(PARAM_IDENTITY_ID, identityId);
+        return callFunctionInBackground(HANDLE_INVITATION, params);
     }
 
     @Override

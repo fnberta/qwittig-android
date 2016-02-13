@@ -376,7 +376,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
 
     @Override
     public void loadData() {
-        mSubscriptions.add(mIdentityRepo.getIdentitiesLocalAsync(mCurrentGroup)
+        mSubscriptions.add(mIdentityRepo.getIdentitiesLocalAsync(mCurrentGroup, true)
                 .toSortedList()
                 .toSingle()
                 .subscribe(new SingleSubscriber<List<Identity>>() {

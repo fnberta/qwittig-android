@@ -92,6 +92,8 @@ public interface UserRepository extends BaseRepository {
      */
     Single<JSONObject> verifyGoogleLogin(@NonNull String idToken);
 
+    Single<String> handleInvitation(@NonNull String identityId);
+
     /**
      * Logs out the user.
      *

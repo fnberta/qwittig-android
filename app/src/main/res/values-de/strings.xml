@@ -351,5 +351,7 @@
     <string name="toast_error_profile">Speichern des Profils fehlgeschlagen</string>
     <string name="progress_add_group">Füge Gruppe hinzu…</string>
     <string name="progress_add_user">Füge Nutzer hinzu…</string>
+    <string name="progress_joining_group">Trete Gruppe bei…</string>
+    <string name="toast_group_joined">Neue Gruppe hinzugefügt und zu ihr gewechselt</string>
 
 </resources>

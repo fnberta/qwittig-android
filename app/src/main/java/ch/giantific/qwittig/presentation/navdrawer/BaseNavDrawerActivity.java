@@ -247,10 +247,13 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
                 break;
             case INTENT_REQUEST_SETTINGS:
                 switch (resultCode) {
-                    case SettingsViewModel.Result.RESULT_LOGOUT:
+                    case SettingsViewModel.Result.LOGOUT:
                         mNavDrawerViewModel.onLogout();
                         break;
-                    case SettingsViewModel.Result.RESULT_GROUP_CHANGED:
+                    case SettingsViewModel.Result.GROUP_SELECTED:
+                        mNavDrawerViewModel.notifySelectedGroupChanged();
+                        break;
+                    case SettingsViewModel.Result.GROUP_CHANGED:
                         mNavDrawerViewModel.onIdentityChanged();
                         break;
                 }
@@ -336,7 +339,7 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
 
     @Override
     public void startHomeActivityAndFinish() {
-        Intent intent = new Intent(this, HomeActivity.class);
+        final Intent intent = new Intent(this, HomeActivity.class);
         startActivity(intent);
         finish();
     }

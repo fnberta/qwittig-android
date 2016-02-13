@@ -55,8 +55,9 @@ public interface IdentityRepository extends BaseRepository {
      * Queries the local data store for identities.
      *
      * @param group the group for which to get identities for
+     * @param includePending
      */
-    Observable<Identity> getIdentitiesLocalAsync(@NonNull Group group);
+    Observable<Identity> getIdentitiesLocalAsync(@NonNull Group group, boolean includePending);
 
     /**
      * Updates all users in the local data store by deleting all identities from the local data

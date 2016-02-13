@@ -93,8 +93,8 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
 
         setupCurrentGroupCategory();
 
-        // NavDrawer group setting needs to be updated
-        mView.setResult(Result.RESULT_GROUP_CHANGED);
+        // new group selected, tell calling activity to reload data
+        mView.setResult(Result.GROUP_SELECTED);
     }
 
     @Override
@@ -116,7 +116,7 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
             return;
         }
 
-        mSubscriptions.add(mIdentityRepo.getIdentitiesLocalAsync(mCurrentIdentity.getGroup())
+        mSubscriptions.add(mIdentityRepo.getIdentitiesLocalAsync(mCurrentIdentity.getGroup(), false)
                 .toList()
                 .toSingle()
                 .subscribe(new SingleSubscriber<List<Identity>>() {
@@ -182,7 +182,7 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
         loadIdentitySelection();
 
         // NavDrawer group setting needs to be updated
-        mView.setResult(Result.RESULT_GROUP_CHANGED);
+        mView.setResult(Result.GROUP_CHANGED);
     }
 
     @Override
@@ -193,7 +193,7 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
                 mView.removeWorker(workerTag);
                 mView.hideProgressDialog();
 
-                mView.setResult(Result.RESULT_LOGOUT);
+                mView.setResult(Result.LOGOUT);
                 mView.finishScreen();
             }
 

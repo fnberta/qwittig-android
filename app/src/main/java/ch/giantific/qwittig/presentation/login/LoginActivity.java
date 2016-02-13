@@ -121,7 +121,7 @@ public class LoginActivity extends BaseActivity<LoginAccountsViewModel> implemen
             case LoginWorker.Type.RESET_PASSWORD:
                 // fall through
             case LoginWorker.Type.SIGN_UP_EMAIL:
-                mViewModel.setUserLoginStream(single, workerTag, type);
+                mEmailViewModel.setUserLoginStream(single, workerTag, type);
                 break;
             case LoginWorker.Type.LOGIN_FACEBOOK:
                 // fall through

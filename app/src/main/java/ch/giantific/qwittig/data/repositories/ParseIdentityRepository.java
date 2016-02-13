@@ -111,12 +111,15 @@ public class ParseIdentityRepository extends ParseBaseRepository implements Iden
     }
 
     @Override
-    public Observable<Identity> getIdentitiesLocalAsync(@NonNull Group group) {
+    public Observable<Identity> getIdentitiesLocalAsync(@NonNull Group group, boolean includePending) {
         final ParseQuery<Identity> query = ParseQuery.getQuery(Identity.CLASS);
         query.fromLocalDatastore();
         query.ignoreACLs();
         query.whereEqualTo(Identity.GROUP, group);
         query.whereEqualTo(Identity.ACTIVE, true);
+        if (!includePending) {
+            query.whereEqualTo(Identity.PENDING, true);
+        }
         return find(query)
                 .flatMap(new Func1<List<Identity>, Observable<Identity>>() {
                     @Override

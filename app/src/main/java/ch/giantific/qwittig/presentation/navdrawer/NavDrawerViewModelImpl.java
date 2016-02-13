@@ -95,7 +95,9 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
 
     @Override
     public void notifySelectedGroupChanged() {
+        mCurrentIdentity = mCurrentUser.getCurrentIdentity();
         notifyPropertyChanged(BR.selectedIdentity);
+        mView.onIdentitySelected();
     }
 
     @Override
@@ -132,9 +134,8 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
                         if (!identities.isEmpty()) {
                             mIdentities.addAll(identities);
                         }
-                        mView.notifyHeaderIdentitiesChanged();
 
-                        mCurrentIdentity = mCurrentUser.getCurrentIdentity();
+                        mView.notifyHeaderIdentitiesChanged();
                         notifySelectedGroupChanged();
                     }
 
@@ -164,6 +165,7 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
         mCurrentIdentity = identity;
         mCurrentUser.setCurrentIdentity(identity);
         mCurrentUser.saveEventually();
+
         mView.onIdentitySelected();
     }
 

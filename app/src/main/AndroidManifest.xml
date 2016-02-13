@@ -50,19 +50,19 @@
                 <data
                     android:host="qwittig.ch"
                     android:pathPrefix="/invitation"
-                    android:scheme="http" />
+                    android:scheme="https" />
                 <data
                     android:host="www.qwittig.ch"
                     android:pathPrefix="/invitation"
-                    android:scheme="http" />
+                    android:scheme="https" />
                 <data
                     android:host="qwittig.com"
                     android:pathPrefix="/invitation"
-                    android:scheme="http" />
+                    android:scheme="https" />
                 <data
                     android:host="www.qwittig.com"
                     android:pathPrefix="/invitation"
-                    android:scheme="http" />
+                    android:scheme="https" />
                 <data android:scheme="qwittig" />
             </intent-filter>
         </activity>

@@ -19,12 +19,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ch.giantific.qwittig.data.rest.CurrencyRates;
 import ch.giantific.qwittig.data.rest.ExchangeRates;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Item;
 import ch.giantific.qwittig.domain.models.Purchase;
-import ch.giantific.qwittig.data.rest.CurrencyRates;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Observable;
@@ -46,7 +46,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     private static final String DRAFTS_AVAILABLE = "DRAFTS_AVAILABLE";
     private static final String EXCHANGE_RATE_LAST_FETCHED_TIME = "EXCHANGE_RATE_LAST_FETCHED_TIME";
     private static final long EXCHANGE_RATE_REFRESH_INTERVAL = 24 * 60 * 60 * 1000;
-    private SharedPreferences mSharedPreferences;
+    private SharedPreferences mSharedPrefs;
     private ExchangeRates mExchangeRates;
 
     public ParsePurchaseRepository() {
@@ -56,7 +56,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
                                    @NonNull ExchangeRates exchangeRates) {
         super();
 
-        mSharedPreferences = sharedPreferences;
+        mSharedPrefs = sharedPreferences;
         mExchangeRates = exchangeRates;
     }
 
@@ -126,15 +126,8 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
                 })
                 .map(new Func1<Integer, Purchase>() {
                     @Override
-                    public Purchase call(Integer integer) {
-                        final SharedPreferences.Editor editor = mSharedPreferences.edit();
-                        if (integer > 0) {
-                            editor.putBoolean(DRAFTS_AVAILABLE, true);
-                        } else {
-                            editor.putBoolean(DRAFTS_AVAILABLE, false);
-                        }
-                        editor.apply();
-
+                    public Purchase call(Integer count) {
+                        toggleDraftsAvailable(count > 0);
                         return purchase;
                     }
                 });
@@ -374,9 +367,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
                 .doOnSuccess(new Action1<Purchase>() {
                     @Override
                     public void call(Purchase purchase) {
-                        final SharedPreferences.Editor editor = mSharedPreferences.edit();
-                        editor.putBoolean(DRAFTS_AVAILABLE, true);
-                        editor.apply();
+                        toggleDraftsAvailable(true);
                     }
                 });
     }
@@ -403,8 +394,15 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public boolean isPurchaseDraftsAvailable() {
-        return mSharedPreferences.getBoolean(DRAFTS_AVAILABLE, false);
+    public boolean isDraftsAvailable() {
+        return mSharedPrefs.getBoolean(DRAFTS_AVAILABLE, false);
+    }
+
+    @Override
+    public void toggleDraftsAvailable(boolean available) {
+        mSharedPrefs.edit()
+                .putBoolean(DRAFTS_AVAILABLE, available)
+                .apply();
     }
 
     @Override
@@ -413,11 +411,11 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
             return Single.just(1f);
         }
 
-        final float rate = mSharedPreferences.getFloat(currency, 1);
+        final float rate = mSharedPrefs.getFloat(currency, 1);
         if (rate == 1) {
             return loadExchangeRates(baseCurrency, currency);
         } else {
-            long lastFetched = mSharedPreferences.getLong(EXCHANGE_RATE_LAST_FETCHED_TIME, 0);
+            long lastFetched = mSharedPrefs.getLong(EXCHANGE_RATE_LAST_FETCHED_TIME, 0);
             long currentTime = System.currentTimeMillis();
             if (currentTime - lastFetched > EXCHANGE_RATE_REFRESH_INTERVAL) {
                 return loadExchangeRates(baseCurrency, currency);
@@ -441,7 +439,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
                 .doOnSuccess(new Action1<Map<String, Float>>() {
                     @Override
                     public void call(Map<String, Float> exchangeRates) {
-                        final SharedPreferences.Editor editor = mSharedPreferences.edit();
+                        final SharedPreferences.Editor editor = mSharedPrefs.edit();
                         for (Map.Entry<String, Float> exchangeRate : exchangeRates.entrySet()) {
                             final BigDecimal roundedExchangeRate = MoneyUtils.roundToFractionDigits(
                                     MoneyUtils.EXCHANGE_RATE_FRACTION_DIGITS, 1 / exchangeRate.getValue());

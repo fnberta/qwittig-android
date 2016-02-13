@@ -59,7 +59,7 @@ public class IdentitiesViewModelImpl
                 .flatMap(new Func1<Identity, Observable<Identity>>() {
                     @Override
                     public Observable<Identity> call(Identity identity) {
-                        return mIdentityRepo.getIdentitiesLocalAsync(identity.getGroup());
+                        return mIdentityRepo.getIdentitiesLocalAsync(identity.getGroup(), true);
                     }
                 })
                 .filter(new Func1<Identity, Boolean>() {

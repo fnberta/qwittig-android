@@ -65,7 +65,8 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
      * @param password the password of the user
      * @return a new instance of {@link LoginWorker} that will log in the user
      */
-    public static LoginWorker attachEmailLoginInstance(@NonNull FragmentManager fm, @NonNull String username,
+    public static LoginWorker attachEmailLoginInstance(@NonNull FragmentManager fm,
+                                                       @NonNull String username,
                                                        @NonNull String password) {
         LoginWorker worker = (LoginWorker) fm.findFragmentByTag(WORKER_TAG);
         if (worker == null) {

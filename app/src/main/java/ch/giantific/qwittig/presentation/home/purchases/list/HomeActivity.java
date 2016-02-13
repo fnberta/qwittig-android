@@ -7,8 +7,11 @@ package ch.giantific.qwittig.presentation.home.purchases.list;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentManager;
@@ -18,21 +21,26 @@ import android.view.ActionMode;
 import ch.giantific.qwittig.LocalBroadcast;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.ActivityHomeBinding;
 import ch.giantific.qwittig.di.components.DaggerHomeComponent;
 import ch.giantific.qwittig.di.components.HomeComponent;
 import ch.giantific.qwittig.di.components.NavDrawerComponent;
 import ch.giantific.qwittig.di.modules.HomeViewModelModule;
-import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Purchase;
+import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.adapters.TabsAdapter;
 import ch.giantific.qwittig.presentation.home.HomeViewModel;
+import ch.giantific.qwittig.presentation.home.JoinGroupDialogFragment;
+import ch.giantific.qwittig.presentation.home.JoinGroupWorker;
+import ch.giantific.qwittig.presentation.home.JoinGroupWorkerListener;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddActivity;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddEditViewModel.PurchaseResult;
 import ch.giantific.qwittig.presentation.home.purchases.details.PurchaseDetailsViewModel.PurchaseDetailsResult;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.utils.ViewUtils;
 import rx.Observable;
+import rx.Single;
 
 /**
  * Provides the launcher activity for {@link Qwittig}, hosts a viewpager with
@@ -49,23 +57,20 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
         HomePurchasesFragment.ActivityListener,
         HomeDraftsFragment.ActivityListener,
         PurchasesUpdateListener,
-        PurchasesQueryMoreListener {
+        PurchasesQueryMoreListener,
+        JoinGroupDialogFragment.DialogInteractionListener,
+        JoinGroupWorkerListener {
 
     private static final String STATE_DRAFTS_FRAGMENT = "STATE_DRAFTS_FRAGMENT";
     private static final String STATE_PURCHASES_FRAGMENT = "STATE_PURCHASES_FRAGMENT";
-    private static final String INVITED_GROUP_WORKER = "INVITED_GROUP_WORKER";
-    private static final String URI_INVITED_GROUP_ID = "group";
-    private static final String GROUP_JOIN_DIALOG = "GROUP_JOIN_DIALOG";
+    private static final String URI_INVITED_IDENTITY_ID = "id";
+    private static final String URI_INVITED_GROUP_NAME = "group";
     private ActivityHomeBinding mBinding;
     private HomePurchasesViewModel mPurchasesViewModel;
     private HomeDraftsViewModel mDraftsViewModel;
     private HomePurchasesFragment mPurchasesFragment;
     private HomeDraftsFragment mDraftsFragment;
-    private Group mInvitedGroup;
-    private String mInviteInitiator;
-    private String mInvitedGroupId;
     private ProgressDialog mProgressDialog;
-    private int mInvitationAction;
 
     @Override
     protected void handleLocalBroadcast(Intent intent, int dataType) {
@@ -102,7 +107,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
         if (mUserLoggedIn) {
             if (savedInstanceState == null) {
                 addFragments();
-                //            checkForInvitations();
+                checkForInvitations();
             } else {
                 final FragmentManager fragmentManager = getSupportFragmentManager();
                 mPurchasesFragment = (HomePurchasesFragment)
@@ -116,7 +121,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
         }
     }
 
-    private void injectViewModel(Bundle savedInstanceState) {
+    private void injectViewModel(@Nullable Bundle savedInstanceState) {
         final HomeComponent comp = DaggerHomeComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .homeViewModelModule(new HomeViewModelModule(savedInstanceState, this))
@@ -162,6 +167,22 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.container, mPurchasesFragment)
                 .commit();
+    }
+
+    private void checkForInvitations() {
+        final Intent intent = getIntent();
+        if (intent == null) {
+            return;
+        }
+
+        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+            final Uri uri = intent.getData();
+            if (uri != null) {
+                final String identityId = uri.getQueryParameter(URI_INVITED_IDENTITY_ID);
+                final String groupName = uri.getQueryParameter(URI_INVITED_GROUP_NAME);
+                mViewModel.handleInvitation(identityId, groupName);
+            }
+        }
     }
 
     @Override
@@ -271,6 +292,49 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     }
 
     @Override
+    public void showGroupJoinDialog(@NonNull String groupName) {
+        JoinGroupDialogFragment.display(getSupportFragmentManager(), groupName);
+    }
+
+    @Override
+    public void onJoinInvitedGroupSelected() {
+        mViewModel.onJoinInvitedGroupSelected();
+    }
+
+    @Override
+    public void onDiscardInvitationSelected() {
+        mViewModel.onDiscardInvitationSelected();
+    }
+
+    @Override
+    public void loadJoinGroupWorker(@NonNull String identityId) {
+        JoinGroupWorker.attach(getSupportFragmentManager(), identityId);
+    }
+
+    @Override
+    public void setJoinGroupStream(@NonNull Single<User> single, @NonNull String workerTag) {
+        mViewModel.setJoinGroupStream(single, workerTag);
+    }
+
+    @Override
+    public void showProgressDialog(@StringRes int message) {
+        mProgressDialog = ProgressDialog.show(this, null, getString(message), true);
+    }
+
+    @Override
+    public void hideProgressDialog() {
+        if (mProgressDialog != null) {
+            mProgressDialog.hide();
+        }
+    }
+
+    @Override
+    public void onGroupJoined() {
+        ParseQueryService.startQueryAll(this);
+        mNavDrawerViewModel.onIdentityChanged();
+    }
+
+    @Override
     public void setPurchasesViewModel(@NonNull HomePurchasesViewModel viewModel) {
         mPurchasesViewModel = viewModel;
     }
@@ -284,6 +348,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     protected void onLoginSuccessful() {
         super.onLoginSuccessful();
 
+        checkForInvitations();
         // TODO: fix setLoading(true) because online query is still happening
         addFragments();
     }
