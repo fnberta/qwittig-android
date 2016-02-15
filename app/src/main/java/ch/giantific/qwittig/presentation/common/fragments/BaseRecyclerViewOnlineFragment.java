@@ -34,11 +34,16 @@ public abstract class BaseRecyclerViewOnlineFragment<T extends OnlineListViewMod
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-//        mSwipeRefreshLayout.post(new Runnable() {
-//            @Override
-//            public void run() {
-//                mSwipeRefreshLayout.setRefreshing(isLoading);
-//            }
-//        });
+        // work around bug that state of swipe refresh layout can only be changed after is is drawn.
+        // TODO: remove once fixed
+        final SwipeRefreshLayout srl = getSrl();
+        srl.post(new Runnable() {
+            @Override
+            public void run() {
+                srl.setRefreshing(mViewModel.isRefreshing());
+            }
+        });
     }
+
+    protected abstract SwipeRefreshLayout getSrl();
 }

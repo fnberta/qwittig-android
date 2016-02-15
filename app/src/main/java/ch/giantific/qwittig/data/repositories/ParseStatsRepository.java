@@ -13,7 +13,7 @@ import java.util.Map;
 
 import ch.giantific.qwittig.presentation.stats.models.Stats;
 import ch.giantific.qwittig.domain.repositories.StatsRepository;
-import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
+import ch.giantific.qwittig.data.receivers.PushBroadcastReceiver;
 import rx.Single;
 import rx.functions.Func1;
 

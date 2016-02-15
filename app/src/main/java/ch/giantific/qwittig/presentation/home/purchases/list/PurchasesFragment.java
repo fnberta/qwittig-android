@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,13 +33,13 @@ import ch.giantific.qwittig.presentation.home.purchases.details.PurchaseDetailsA
  * <p/>
  * Subclass of {@link BaseRecyclerViewOnlineFragment}.
  */
-public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment<HomePurchasesViewModel, HomePurchasesFragment.ActivityListener>
-        implements HomePurchasesViewModel.ViewListener {
+public class PurchasesFragment extends BaseRecyclerViewOnlineFragment<PurchasesViewModel, PurchasesFragment.ActivityListener>
+        implements PurchasesViewModel.ViewListener {
 
     public static final String INTENT_PURCHASE_ID = "INTENT_PURCHASE_ID";
     private FragmentHomePurchasesBinding mBinding;
 
-    public HomePurchasesFragment() {
+    public PurchasesFragment() {
         // required empty constructor
     }
 
@@ -84,13 +85,6 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment<HomePu
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-
-    }
-
-    @Override
     protected RecyclerView getRecyclerView() {
         return mBinding.srlRv.rvBase;
     }
@@ -98,6 +92,11 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment<HomePu
     @Override
     protected RecyclerView.Adapter getRecyclerAdapter() {
         return new PurchasesRecyclerAdapter(mViewModel);
+    }
+
+    @Override
+    protected SwipeRefreshLayout getSrl() {
+        return mBinding.srlRv.srlBase;
     }
 
     @Override
@@ -129,6 +128,6 @@ public class HomePurchasesFragment extends BaseRecyclerViewOnlineFragment<HomePu
     }
 
     public interface ActivityListener extends BaseRecyclerViewOnlineFragment.ActivityListener {
-        void setPurchasesViewModel(@NonNull HomePurchasesViewModel viewModel);
+        void setPurchasesViewModel(@NonNull PurchasesViewModel viewModel);
     }
 }

@@ -25,7 +25,7 @@ import ch.giantific.qwittig.di.components.NavDrawerComponent;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.presentation.tasks.addedit.TaskAddEditViewModel;
 import ch.giantific.qwittig.presentation.tasks.list.TasksFragment;
-import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
+import ch.giantific.qwittig.data.receivers.PushBroadcastReceiver;
 
 /**
  * Hosts {@link TaskDetailsFragment} that shows the details of a task.

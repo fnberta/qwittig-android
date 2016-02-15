@@ -7,7 +7,7 @@ package ch.giantific.qwittig.di.components;
 import ch.giantific.qwittig.di.modules.HomePurchasesViewModelModule;
 import ch.giantific.qwittig.di.modules.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.presentation.home.purchases.list.HomePurchasesFragment;
+import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesFragment;
 import dagger.Component;
 
 /**
@@ -18,5 +18,5 @@ import dagger.Component;
         modules = {HomePurchasesViewModelModule.class, RepositoriesModule.class})
 public interface HomePurchasesComponent {
 
-    void inject(HomePurchasesFragment homePurchasesFragment);
+    void inject(PurchasesFragment purchasesFragment);
 }

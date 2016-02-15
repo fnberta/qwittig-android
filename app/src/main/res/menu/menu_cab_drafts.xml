@@ -5,7 +5,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
-      tools:context=".presentation.home.purchases.list.HomeDraftsFragment">
+      tools:context=".presentation.home.purchases.list.DraftsFragment">
     <item
         android:id="@+id/action_draft_delete"
         android:title="@string/action_drafts_delete_selected"

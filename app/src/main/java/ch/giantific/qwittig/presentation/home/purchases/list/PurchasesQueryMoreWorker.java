@@ -20,7 +20,7 @@ import rx.Observable;
 /**
  * Created by fabio on 13.01.16.
  */
-public class PurchasesQueryMoreWorker extends BaseQueryWorker<Purchase, PurchasesQueryMoreListener> {
+public class PurchasesQueryMoreWorker extends BaseQueryWorker<Purchase, PurchasesQueryMoreWorkerListener> {
 
     private static final String WORKER_TAG = PurchasesQueryMoreWorker.class.getCanonicalName();
     private static final String KEY_SKIP = "SKIP";

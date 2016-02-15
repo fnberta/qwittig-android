@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
+import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 
 /**
  * Provides a an abstract base class for screens with a {@link RecyclerView} and shows a progress
@@ -22,7 +23,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
  * @see RecyclerView
  * @see ProgressBar
  */
-public abstract class BaseRecyclerViewFragment<T extends ListViewModel, S extends BaseFragment.ActivityListener>
+public abstract class BaseRecyclerViewFragment<T extends ViewModel, S extends BaseFragment.ActivityListener>
         extends BaseFragment<T, S>
         implements ListViewModel.ViewListener {
 

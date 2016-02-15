@@ -28,18 +28,18 @@ import rx.functions.Func1;
 /**
  * Created by fabio on 21.01.16.
  */
-public class HomePurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purchase, HomePurchasesViewModel.ViewListener>
-        implements HomePurchasesViewModel {
+public class PurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purchase, PurchasesViewModel.ViewListener>
+        implements PurchasesViewModel {
 
     private static final String STATE_IS_LOADING_MORE = "STATE_IS_LOADING_MORE";
     private PurchaseRepository mPurchaseRepo;
     private boolean mIsLoadingMore;
 
-    public HomePurchasesViewModelImpl(@Nullable Bundle savedState,
-                                      @NonNull HomePurchasesViewModel.ViewListener view,
-                                      @NonNull IdentityRepository identityRepository,
-                                      @NonNull UserRepository userRepository,
-                                      @NonNull PurchaseRepository purchaseRepo) {
+    public PurchasesViewModelImpl(@Nullable Bundle savedState,
+                                  @NonNull PurchasesViewModel.ViewListener view,
+                                  @NonNull IdentityRepository identityRepository,
+                                  @NonNull UserRepository userRepository,
+                                  @NonNull PurchaseRepository purchaseRepo) {
         super(savedState, view, identityRepository, userRepository);
 
         mPurchaseRepo = purchaseRepo;

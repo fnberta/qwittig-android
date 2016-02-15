@@ -29,14 +29,15 @@ public class ParseUtils {
      * Returns a default {@link ParseACL} with read/write access for the role of the passed group.
      *
      * @param group the group to get the role from
+     * @param roleWriteAccess whether to give the group role write access
      * @return a default {@link ParseACL}
      */
     @NonNull
-    public static ParseACL getDefaultAcl(@NonNull Group group) {
+    public static ParseACL getDefaultAcl(@NonNull Group group, boolean roleWriteAccess) {
         final String roleName = getGroupRoleName(group);
         final ParseACL acl = new ParseACL();
         acl.setRoleReadAccess(roleName, true);
-        acl.setRoleWriteAccess(roleName, true);
+        acl.setRoleWriteAccess(roleName, roleWriteAccess);
         return acl;
     }
 

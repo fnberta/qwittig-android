@@ -28,6 +28,7 @@ import ch.giantific.qwittig.di.modules.HomeDraftsViewModelModule;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
+import ch.giantific.qwittig.presentation.home.HomeActivity;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseEditActivity;
 
 /**
@@ -38,14 +39,14 @@ import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseEditActi
  * <p/>
  * Subclass of {@link BaseRecyclerViewFragment}.
  */
-public class HomeDraftsFragment extends BaseRecyclerViewFragment<HomeDraftsViewModel, HomeDraftsFragment.ActivityListener>
-        implements ActionMode.Callback, HomeDraftsViewModel.ViewListener {
+public class DraftsFragment extends BaseRecyclerViewFragment<DraftsViewModel, DraftsFragment.ActivityListener>
+        implements ActionMode.Callback, DraftsViewModel.ViewListener {
 
     public static final String INTENT_PURCHASE_EDIT_DRAFT = "INTENT_PURCHASE_EDIT_DRAFT";
     private ActionMode mActionMode;
     private FragmentHomeDraftsBinding mBinding;
 
-    public HomeDraftsFragment() {
+    public DraftsFragment() {
         // required empty constructor
     }
 
@@ -123,7 +124,7 @@ public class HomeDraftsFragment extends BaseRecyclerViewFragment<HomeDraftsViewM
     public void startPurchaseEditActivity(@NonNull Purchase draft) {
         final Activity activity = getActivity();
         final Intent intent = new Intent(activity, PurchaseEditActivity.class);
-        intent.putExtra(HomePurchasesFragment.INTENT_PURCHASE_ID, draft.getDraftId());
+        intent.putExtra(PurchasesFragment.INTENT_PURCHASE_ID, draft.getDraftId());
         intent.putExtra(INTENT_PURCHASE_EDIT_DRAFT, true);
         final ActivityOptionsCompat activityOptionsCompat =
                 ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
@@ -158,7 +159,7 @@ public class HomeDraftsFragment extends BaseRecyclerViewFragment<HomeDraftsViewM
     }
 
     public interface ActivityListener extends BaseFragment.ActivityListener {
-        void setDraftsViewModel(@NonNull HomeDraftsViewModel viewModel);
+        void setDraftsViewModel(@NonNull DraftsViewModel viewModel);
 
         ActionMode startActionMode();
     }

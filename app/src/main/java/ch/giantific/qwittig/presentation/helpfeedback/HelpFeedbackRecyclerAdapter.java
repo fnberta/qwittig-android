@@ -4,18 +4,19 @@
 
 package ch.giantific.qwittig.presentation.helpfeedback;
 
-import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.presentation.common.adapters.rows.HeaderRow;
+import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
+import ch.giantific.qwittig.databinding.RowHelpFeedbackBinding;
+import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
+import ch.giantific.qwittig.presentation.helpfeedback.items.ActionItem;
+import ch.giantific.qwittig.presentation.helpfeedback.items.HeaderItem;
+import ch.giantific.qwittig.presentation.helpfeedback.items.HelpFeedbackItem;
+import ch.giantific.qwittig.presentation.helpfeedback.items.HelpFeedbackItem.Type;
 
 /**
  * Handles the display of help and feedback items.
@@ -24,41 +25,32 @@ import ch.giantific.qwittig.presentation.common.adapters.rows.HeaderRow;
  */
 public class HelpFeedbackRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private static final int TYPE_ITEM = 0;
-    private static final int TYPE_HEADER = 1;
-    private static final int VIEW_RESOURCE = R.layout.row_help_feedback;
-    private AdapterInteractionListener mListener;
-    private Context mContext;
-    private HelpFeedbackItem[] mItems;
+    private HelpFeedbackViewModel mViewModel;
 
     /**
      * Constructs a new {@link HelpFeedbackRecyclerAdapter}.
      *
-     * @param context  the context to use in the adapter
-     * @param items    the help and feedback items to display
-     * @param listener the callback for user clicks on an item
+     * @param viewModel the view model of the main view
      */
-    public HelpFeedbackRecyclerAdapter(@NonNull Context context, @NonNull HelpFeedbackItem[] items,
-                                       @NonNull AdapterInteractionListener listener) {
+    public HelpFeedbackRecyclerAdapter(@NonNull HelpFeedbackViewModel viewModel) {
 
-        mContext = context;
-        mListener = listener;
-        mItems = items;
+        mViewModel = viewModel;
     }
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         switch (viewType) {
-            case TYPE_ITEM: {
-                View v = LayoutInflater.from(parent.getContext())
-                        .inflate(VIEW_RESOURCE, parent, false);
-                return new ItemRow(v, mListener);
+            case Type.HELP_FEEDBACK: {
+                final RowHelpFeedbackBinding binding =
+                        RowHelpFeedbackBinding.inflate(inflater, parent, false);
+                return new ItemRow(binding, mViewModel);
             }
-            case TYPE_HEADER: {
-                View v = LayoutInflater.from(parent.getContext())
-                        .inflate(HeaderRow.VIEW_RESOURCE, parent, false);
-                return new HeaderRow(v);
+            case Type.HEADER: {
+                final RowGenericHeaderBinding binding =
+                        RowGenericHeaderBinding.inflate(inflater, parent, false);
+                return new BindingRow<>(binding);
             }
             default:
                 throw new RuntimeException("there is no type that matches the type " + viewType +
@@ -66,22 +58,28 @@ public class HelpFeedbackRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        HelpFeedbackItem item = mItems[position];
+        final HelpFeedbackItem item = mViewModel.getItemAtPosition(position);
 
         int viewType = getItemViewType(position);
         switch (viewType) {
-            case TYPE_ITEM: {
-                ItemRow itemRow = (ItemRow) viewHolder;
+            case Type.HELP_FEEDBACK: {
+                final ItemRow itemRow = (ItemRow) viewHolder;
+                final RowHelpFeedbackBinding binding = itemRow.getBinding();
 
-                itemRow.setTitleWithDrawable(mContext.getString(item.getTitle()),
-                        ContextCompat.getDrawable(mContext, item.getIcon()));
+                binding.setItem((ActionItem) item);
+                binding.executePendingBindings();
                 break;
             }
-            case TYPE_HEADER: {
-                HeaderRow headerRow = (HeaderRow) viewHolder;
-                headerRow.setHeader(mContext.getString(item.getTitle()));
+            case Type.HEADER: {
+                final BindingRow<RowGenericHeaderBinding> headerRow =
+                        (BindingRow<RowGenericHeaderBinding>) viewHolder;
+                final RowGenericHeaderBinding binding = headerRow.getBinding();
+
+                binding.setViewModel((HeaderItem) item);
+                binding.executePendingBindings();
                 break;
             }
         }
@@ -89,16 +87,12 @@ public class HelpFeedbackRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
 
     @Override
     public int getItemViewType(int position) {
-        if (mItems[position].getIcon() == 0) {
-            return TYPE_HEADER;
-        }
-
-        return TYPE_ITEM;
+        return mViewModel.getItemAtPosition(position).getType();
     }
 
     @Override
     public int getItemCount() {
-        return mItems.length;
+        return mViewModel.getItemCount();
     }
 
     /**
@@ -118,38 +112,24 @@ public class HelpFeedbackRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
      * <p/>
      * Subclass of {@link RecyclerView.ViewHolder}.
      */
-    private static class ItemRow extends RecyclerView.ViewHolder {
-
-        private TextView mTextViewTitle;
+    private static class ItemRow extends BindingRow<RowHelpFeedbackBinding> {
 
         /**
          * Constructs a new {@link ItemRow} and sets the click listener.
          *
-         * @param view     the inflated view
+         * @param binding  the binding for the view
          * @param listener the callback for user clicks on the item
          */
-        public ItemRow(@NonNull View view, @NonNull final AdapterInteractionListener listener) {
-            super(view);
+        public ItemRow(@NonNull RowHelpFeedbackBinding binding,
+                       @NonNull final AdapterInteractionListener listener) {
+            super(binding);
 
-            view.setOnClickListener(new View.OnClickListener() {
+            binding.getRoot().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     listener.onHelpFeedbackItemClicked(getAdapterPosition());
                 }
             });
-
-            mTextViewTitle = (TextView) view.findViewById(R.id.tv_help_title);
-        }
-
-        /**
-         * Sets the title of an item and its corresponding icon as a compound drawable
-         *
-         * @param title    the title to set
-         * @param drawable the drawable to set as a compound drawable
-         */
-        public void setTitleWithDrawable(String title, Drawable drawable) {
-            mTextViewTitle.setText(title);
-            mTextViewTitle.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
         }
     }
 }

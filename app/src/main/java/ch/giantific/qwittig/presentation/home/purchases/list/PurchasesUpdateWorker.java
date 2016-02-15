@@ -22,7 +22,7 @@ import rx.Observable;
  * <p/>
  * Subclass of {@link BaseQueryWorker}.
  */
-public class PurchasesUpdateWorker extends BaseQueryWorker<Purchase, PurchasesUpdateListener> {
+public class PurchasesUpdateWorker extends BaseQueryWorker<Purchase, PurchasesUpdateWorkerListener> {
 
     private static final String WORKER_TAG = PurchasesUpdateWorker.class.getCanonicalName();
     @Inject

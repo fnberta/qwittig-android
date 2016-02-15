@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.home.purchases.list;
+package ch.giantific.qwittig.presentation.home;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -30,13 +30,15 @@ import ch.giantific.qwittig.di.modules.HomeViewModelModule;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.adapters.TabsAdapter;
-import ch.giantific.qwittig.presentation.home.HomeViewModel;
-import ch.giantific.qwittig.presentation.home.JoinGroupDialogFragment;
-import ch.giantific.qwittig.presentation.home.JoinGroupWorker;
-import ch.giantific.qwittig.presentation.home.JoinGroupWorkerListener;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddActivity;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddEditViewModel.PurchaseResult;
 import ch.giantific.qwittig.presentation.home.purchases.details.PurchaseDetailsViewModel.PurchaseDetailsResult;
+import ch.giantific.qwittig.presentation.home.purchases.list.DraftsFragment;
+import ch.giantific.qwittig.presentation.home.purchases.list.DraftsViewModel;
+import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesFragment;
+import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesQueryMoreWorkerListener;
+import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesViewModel;
+import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesUpdateWorkerListener;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.utils.ViewUtils;
 import rx.Observable;
@@ -44,7 +46,7 @@ import rx.Single;
 
 /**
  * Provides the launcher activity for {@link Qwittig}, hosts a viewpager with
- * {@link HomePurchasesFragment} and {@link HomeDraftsFragment} that display lists of recent
+ * {@link PurchasesFragment} and {@link DraftsFragment} that display lists of recent
  * purchases and open drafts. Only loads the fragments if the  user is logged in.
  * <p/>
  * Handles the case when a user is invited to a group and he/she wants to join it or declines the
@@ -54,10 +56,10 @@ import rx.Single;
  */
 public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implements
         HomeViewModel.ViewListener,
-        HomePurchasesFragment.ActivityListener,
-        HomeDraftsFragment.ActivityListener,
-        PurchasesUpdateListener,
-        PurchasesQueryMoreListener,
+        PurchasesFragment.ActivityListener,
+        DraftsFragment.ActivityListener,
+        PurchasesUpdateWorkerListener,
+        PurchasesQueryMoreWorkerListener,
         JoinGroupDialogFragment.DialogInteractionListener,
         JoinGroupWorkerListener {
 
@@ -66,10 +68,10 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     private static final String URI_INVITED_IDENTITY_ID = "id";
     private static final String URI_INVITED_GROUP_NAME = "group";
     private ActivityHomeBinding mBinding;
-    private HomePurchasesViewModel mPurchasesViewModel;
-    private HomeDraftsViewModel mDraftsViewModel;
-    private HomePurchasesFragment mPurchasesFragment;
-    private HomeDraftsFragment mDraftsFragment;
+    private PurchasesViewModel mPurchasesViewModel;
+    private DraftsViewModel mDraftsViewModel;
+    private PurchasesFragment mPurchasesFragment;
+    private DraftsFragment mDraftsFragment;
     private ProgressDialog mProgressDialog;
 
     @Override
@@ -110,10 +112,10 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
                 checkForInvitations();
             } else {
                 final FragmentManager fragmentManager = getSupportFragmentManager();
-                mPurchasesFragment = (HomePurchasesFragment)
+                mPurchasesFragment = (PurchasesFragment)
                         fragmentManager.getFragment(savedInstanceState, STATE_PURCHASES_FRAGMENT);
                 if (mViewModel.isDraftsAvailable()) {
-                    mDraftsFragment = (HomeDraftsFragment)
+                    mDraftsFragment = (DraftsFragment)
                             fragmentManager.getFragment(savedInstanceState, STATE_DRAFTS_FRAGMENT);
                     setupTabs();
                 }
@@ -131,7 +133,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     }
 
     private void addFragments() {
-        mPurchasesFragment = new HomePurchasesFragment();
+        mPurchasesFragment = new PurchasesFragment();
         if (mViewModel.isDraftsAvailable()) {
             showViewPager();
         } else {
@@ -140,7 +142,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     }
 
     private void showViewPager() {
-        mDraftsFragment = new HomeDraftsFragment();
+        mDraftsFragment = new DraftsFragment();
         setupTabs();
         toggleToolbarScrollFlags(true);
     }
@@ -335,12 +337,12 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     }
 
     @Override
-    public void setPurchasesViewModel(@NonNull HomePurchasesViewModel viewModel) {
+    public void setPurchasesViewModel(@NonNull PurchasesViewModel viewModel) {
         mPurchasesViewModel = viewModel;
     }
 
     @Override
-    public void setDraftsViewModel(@NonNull HomeDraftsViewModel viewModel) {
+    public void setDraftsViewModel(@NonNull DraftsViewModel viewModel) {
         mDraftsViewModel = viewModel;
     }
 

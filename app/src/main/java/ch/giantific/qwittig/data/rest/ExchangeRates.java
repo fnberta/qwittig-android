@@ -4,8 +4,8 @@
 
 package ch.giantific.qwittig.data.rest;
 
-import retrofit.http.GET;
-import retrofit.http.Query;
+import retrofit2.http.GET;
+import retrofit2.http.Query;
 import rx.Single;
 
 /**

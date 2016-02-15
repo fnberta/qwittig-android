@@ -13,13 +13,12 @@ import rx.Observable;
 /**
  * Defines the actions to take after purchases are updated.
  */
-public interface PurchasesQueryMoreListener extends BaseWorkerListener {
+public interface PurchasesUpdateWorkerListener extends BaseWorkerListener {
     /**
-     * Sets the {@link Observable} that emits the query more purchases stream.
+     * Sets the {@link Observable} that emits the purchases update stream
      *
      * @param observable the observable emitting the updates
      * @param workerTag  the tag of the worker fragment
      */
-    void setPurchasesQueryMoreStream(@NonNull Observable<Purchase> observable,
-                                     @NonNull String workerTag);
+    void setPurchasesUpdateStream(@NonNull Observable<Purchase> observable, @NonNull String workerTag);
 }

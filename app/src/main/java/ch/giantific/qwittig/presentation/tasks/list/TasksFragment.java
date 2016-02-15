@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -62,13 +63,6 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment<TasksViewModel
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-
-    }
-
-    @Override
     protected RecyclerView getRecyclerView() {
         return mBinding.srlRv.rvBase;
     }
@@ -79,8 +73,8 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment<TasksViewModel
     }
 
     @Override
-    protected View getSnackbarView() {
-        return mBinding.flMain;
+    protected SwipeRefreshLayout getSrl() {
+        return mBinding.srlRv.srlBase;
     }
 
     @Override

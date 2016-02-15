@@ -39,7 +39,7 @@ import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.finance.FinanceActivity;
 import ch.giantific.qwittig.presentation.helpfeedback.HelpFeedbackActivity;
-import ch.giantific.qwittig.presentation.home.purchases.list.HomeActivity;
+import ch.giantific.qwittig.presentation.home.HomeActivity;
 import ch.giantific.qwittig.presentation.login.LoginActivity;
 import ch.giantific.qwittig.presentation.settings.SettingsActivity;
 import ch.giantific.qwittig.presentation.settings.SettingsViewModel;

@@ -21,14 +21,14 @@ import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
  */
 public class DraftsRecyclerAdapter extends RecyclerView.Adapter<DraftsRecyclerAdapter.DraftRow> {
 
-    private HomeDraftsViewModel mViewModel;
+    private DraftsViewModel mViewModel;
 
     /**
      * Constructs a new {@link DraftsRecyclerAdapter}.
      *
      * @param viewModel the view's model
      */
-    public DraftsRecyclerAdapter(@NonNull HomeDraftsViewModel viewModel) {
+    public DraftsRecyclerAdapter(@NonNull DraftsViewModel viewModel) {
         super();
 
         mViewModel = viewModel;

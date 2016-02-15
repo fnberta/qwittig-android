@@ -15,13 +15,13 @@ import java.lang.annotation.RetentionPolicy;
 
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
-import ch.giantific.qwittig.presentation.settings.profile.UnlinkThirdPartyWorker.UnlinkAction;
+import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileWorker.ProfileAction;
 import rx.Single;
 
 /**
  * Created by fabio on 10.02.16.
  */
-public interface SettingsProfileViewModel extends ViewModel, UnlinkThirdPartyWorkerListener,
+public interface SettingsProfileViewModel extends ViewModel, SettingsProfileWorkerListener,
         AvatarLoadListener,
         DiscardChangesDialogFragment.DialogInteractionListener {
 
@@ -96,7 +96,9 @@ public interface SettingsProfileViewModel extends ViewModel, UnlinkThirdPartyWor
 
         void startPostponedEnterTransition();
 
-        void loadUnlinkThirdPartyWorker(@UnlinkAction int unlinkAction);
+        void loadSaveAvatarWorker(@NonNull String nickname, @NonNull byte[] avatar);
+
+        void loadUnlinkThirdPartyWorker(@ProfileAction int unlinkAction);
 
         void showDiscardChangesDialog();
 

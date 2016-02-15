@@ -20,12 +20,10 @@ import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
-import ch.giantific.qwittig.presentation.settings.profile.UnlinkThirdPartyWorker.UnlinkAction;
+import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileWorker.ProfileAction;
 import ch.giantific.qwittig.utils.Utils;
-import rx.Observable;
 import rx.Single;
 import rx.SingleSubscriber;
-import rx.functions.Func1;
 
 /**
  * Created by fabio on 10.02.16.
@@ -47,22 +45,6 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     private boolean mUnlinkThirdParty;
     private boolean mFacebookUser;
     private boolean mGoogleUser;
-    private final SingleSubscriber<List<Identity>> saveIdentities = new SingleSubscriber<List<Identity>>() {
-        @Override
-        public void onSuccess(List<Identity> identities) {
-            if (!mUnlinkThirdParty) {
-                mView.finishScreen(Activity.RESULT_OK);
-            } else {
-                handleThirdParty();
-            }
-        }
-
-        @Override
-        public void onError(Throwable error) {
-            mView.showMessage(R.string.toast_error_profile);
-            // TODO: handle error
-        }
-    };
     private String mAvatar;
     private String mEmail;
     private String mNickname;
@@ -319,16 +301,19 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
         final boolean emptyAvatar = TextUtils.isEmpty(mAvatar);
         final boolean newAvatar = !emptyAvatar && !mAvatar.equals(mCurrentIdentity.getAvatarUrl());
         if (newAvatar) {
+            setSaving(true);
             mSubscriptions.add(mView.encodeAvatar(mAvatar)
-                    .flatMapObservable(new Func1<byte[], Observable<Identity>>() {
+                    .subscribe(new SingleSubscriber<byte[]>() {
                         @Override
-                        public Observable<Identity> call(byte[] bytes) {
-                            return mIdentityRepo.saveIdentitiesWithAvatar(identities, mNickname, bytes);
+                        public void onSuccess(byte[] value) {
+                            mView.loadSaveAvatarWorker(mNickname, value);
+                        }
+
+                        @Override
+                        public void onError(Throwable error) {
+                            // TODO: handle error
                         }
                     })
-                    .toList()
-                    .toSingle()
-                    .subscribe(saveIdentities)
             );
         } else {
             for (Identity identity : identities) {
@@ -349,32 +334,62 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     private void handleThirdParty() {
         if (mGoogleUser) {
             setSaving(true);
-            mView.loadUnlinkThirdPartyWorker(UnlinkAction.UNLINK_GOOGLE);
+            mView.loadUnlinkThirdPartyWorker(ProfileAction.UNLINK_GOOGLE);
         } else if (mFacebookUser) {
             setSaving(true);
-            mView.loadUnlinkThirdPartyWorker(UnlinkAction.UNLINK_FACEBOOK);
+            mView.loadUnlinkThirdPartyWorker(ProfileAction.UNLINK_FACEBOOK);
         }
     }
 
     @Override
-    public void setUnlinkStream(@NonNull Single<User> single, @NonNull final String workerTag) {
-        mSubscriptions.add(single.subscribe(new SingleSubscriber<User>() {
-                    @Override
-                    public void onSuccess(User value) {
-                        mView.removeWorker(workerTag);
+    public void setProfileActionStream(@NonNull Single<User> single, @NonNull final String workerTag,
+                                       @ProfileAction int action) {
+        switch (action) {
+            case ProfileAction.SAVE_AVATAR:
+                mSubscriptions.add(single.subscribe(new SingleSubscriber<User>() {
+                            @Override
+                            public void onSuccess(User user) {
+                                mView.removeWorker(workerTag);
 
-                        mSaving = false;
-                        mView.showSaveFinishedAnim();
-                    }
+                                if (!mUnlinkThirdParty) {
+                                    mSaving = false;
+                                    mView.showSaveFinishedAnim();
+                                } else {
+                                    handleThirdParty();
+                                }
+                            }
 
-                    @Override
-                    public void onError(Throwable error) {
-                        mView.removeWorker(workerTag);
+                            @Override
+                            public void onError(Throwable error) {
+                                mView.removeWorker(workerTag);
+                                mView.showMessage(R.string.toast_error_profile);
+                                // TODO: handle error
+                            }
+                        })
+                );
+                break;
+            case ProfileAction.UNLINK_FACEBOOK:
+                // fall through
+            case ProfileAction.UNLINK_GOOGLE:
+                mSubscriptions.add(single.subscribe(new SingleSubscriber<User>() {
+                            @Override
+                            public void onSuccess(User value) {
+                                mView.removeWorker(workerTag);
 
-                        setSaving(false);
-                        mView.showMessage(mUserRepo.getErrorMessage(error));
-                    }
-                })
-        );
+                                mSaving = false;
+                                mView.showSaveFinishedAnim();
+                            }
+
+                            @Override
+                            public void onError(Throwable error) {
+                                mView.removeWorker(workerTag);
+
+                                setSaving(false);
+                                mView.showMessage(mUserRepo.getErrorMessage(error));
+                            }
+                        })
+                );
+                break;
+        }
     }
 }

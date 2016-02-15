@@ -24,8 +24,8 @@ import rx.functions.Func1;
 /**
  * Created by fabio on 22.01.16.
  */
-public class HomeDraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, HomeDraftsViewModel.ViewListener>
-        implements HomeDraftsViewModel {
+public class DraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, DraftsViewModel.ViewListener>
+        implements DraftsViewModel {
 
     private static final String STATE_DRAFTS_SELECTED = "STATE_DRAFTS_SELECTED";
     private static final String STATE_SELECTION_MODE = "STATE_SELECTION_MODE";
@@ -34,11 +34,11 @@ public class HomeDraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, Hom
     private boolean mSelectionModeEnabled;
     private boolean mDeleteSelectedItems;
 
-    public HomeDraftsViewModelImpl(@Nullable Bundle savedState,
-                                   @NonNull HomeDraftsViewModel.ViewListener view,
-                                   @NonNull IdentityRepository identityRepository,
-                                   @NonNull UserRepository userRepository,
-                                   @NonNull PurchaseRepository purchaseRepo) {
+    public DraftsViewModelImpl(@Nullable Bundle savedState,
+                               @NonNull DraftsViewModel.ViewListener view,
+                               @NonNull IdentityRepository identityRepository,
+                               @NonNull UserRepository userRepository,
+                               @NonNull PurchaseRepository purchaseRepo) {
         super(savedState, view, identityRepository, userRepository);
 
         mPurchaseRepo = purchaseRepo;
@@ -178,7 +178,7 @@ public class HomeDraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, Hom
                 mDraftsSelected.remove(draft.getDraftId());
 
                 if (mDeleteSelectedItems) {
-                    draft.unpinInBackground();
+                    draft.unpinInBackground(Purchase.PIN_LABEL_DRAFT);
                     mItems.remove(i);
                     mView.notifyItemRemoved(i);
                 } else {

@@ -138,8 +138,13 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileViewMod
     }
 
     @Override
-    public void loadUnlinkThirdPartyWorker(@UnlinkThirdPartyWorker.UnlinkAction int unlinkAction) {
-        UnlinkThirdPartyWorker.attach(getFragmentManager(), unlinkAction);
+    public void loadSaveAvatarWorker(@NonNull String nickname, @NonNull byte[] avatar) {
+        SettingsProfileWorker.attachSaveAvatar(getFragmentManager(), nickname, avatar);
+    }
+
+    @Override
+    public void loadUnlinkThirdPartyWorker(@SettingsProfileWorker.ProfileAction int unlinkAction) {
+        SettingsProfileWorker.attachUnlink(getFragmentManager(), unlinkAction);
     }
 
     @Override

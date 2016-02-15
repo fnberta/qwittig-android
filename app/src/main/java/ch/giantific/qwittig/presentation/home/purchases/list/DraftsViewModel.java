@@ -14,7 +14,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.SelectionModeViewMode
 /**
  * Created by fabio on 21.01.16.
  */
-public interface HomeDraftsViewModel extends ListViewModel<Purchase>,
+public interface DraftsViewModel extends ListViewModel<Purchase>,
         SelectionModeViewModel<Purchase>, DraftsRecyclerAdapter.AdapterInteractionListener {
 
     void onReadyForSelectionMode();

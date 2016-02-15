@@ -8,7 +8,7 @@ import ch.giantific.qwittig.di.modules.NavDrawerViewModelModule;
 import ch.giantific.qwittig.di.modules.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.presentation.finance.FinanceActivity;
-import ch.giantific.qwittig.presentation.home.purchases.list.HomeActivity;
+import ch.giantific.qwittig.presentation.home.HomeActivity;
 import ch.giantific.qwittig.presentation.home.purchases.details.PurchaseDetailsActivity;
 import ch.giantific.qwittig.presentation.tasks.details.TaskDetailsActivity;
 import ch.giantific.qwittig.presentation.tasks.list.TasksActivity;

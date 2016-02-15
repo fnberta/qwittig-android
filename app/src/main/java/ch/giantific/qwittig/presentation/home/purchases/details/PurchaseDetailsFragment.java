@@ -30,7 +30,7 @@ import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseEditActivity;
 
-import static ch.giantific.qwittig.presentation.home.purchases.list.HomePurchasesFragment.INTENT_PURCHASE_ID;
+import static ch.giantific.qwittig.presentation.home.purchases.list.PurchasesFragment.INTENT_PURCHASE_ID;
 
 
 /**

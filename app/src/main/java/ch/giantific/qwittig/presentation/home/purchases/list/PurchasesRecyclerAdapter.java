@@ -22,14 +22,14 @@ import ch.giantific.qwittig.presentation.common.adapters.rows.ProgressRow;
  */
 public class PurchasesRecyclerAdapter extends RecyclerView.Adapter {
 
-    private HomePurchasesViewModel mViewModel;
+    private PurchasesViewModel mViewModel;
 
     /**
      * Constructs a new {@link PurchasesRecyclerAdapter}.
      *
      * @param viewModel the view's model
      */
-    public PurchasesRecyclerAdapter(@NonNull HomePurchasesViewModel viewModel) {
+    public PurchasesRecyclerAdapter(@NonNull PurchasesViewModel viewModel) {
         super();
 
         mViewModel = viewModel;
@@ -40,11 +40,11 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter {
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         switch (viewType) {
-            case HomePurchasesViewModel.TYPE_ITEM: {
+            case PurchasesViewModel.TYPE_ITEM: {
                 final RowPurchasesBinding binding = RowPurchasesBinding.inflate(inflater, parent, false);
                 return new PurchaseRow(binding, mViewModel);
             }
-            case HomePurchasesViewModel.TYPE_PROGRESS: {
+            case PurchasesViewModel.TYPE_PROGRESS: {
                 View view = inflater
                         .inflate(ProgressRow.VIEW_RESOURCE, parent, false);
                 return new ProgressRow(view);
@@ -59,7 +59,7 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         int viewType = getItemViewType(position);
         switch (viewType) {
-            case HomePurchasesViewModel.TYPE_ITEM: {
+            case PurchasesViewModel.TYPE_ITEM: {
                 final PurchaseRow purchaseRow = (PurchaseRow) viewHolder;
                 final RowPurchasesBinding binding = purchaseRow.getBinding();
                 final Purchase purchase = mViewModel.getItemAtPosition(position);
@@ -75,7 +75,7 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter {
                 binding.executePendingBindings();
                 break;
             }
-            case HomePurchasesViewModel.TYPE_PROGRESS:
+            case PurchasesViewModel.TYPE_PROGRESS:
                 // do nothing
                 break;
         }

@@ -101,7 +101,7 @@ public class Compensation extends ParseObject {
     }
 
     private void setAccessRights(@NonNull Group group) {
-        ParseACL acl = ParseUtils.getDefaultAcl(group);
+        ParseACL acl = ParseUtils.getDefaultAcl(group, true);
         setACL(acl);
     }
 

@@ -11,8 +11,8 @@ import android.support.v7.app.ActionBar;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
-import ch.giantific.qwittig.presentation.home.purchases.list.HomeDraftsFragment;
-import ch.giantific.qwittig.presentation.home.purchases.list.HomePurchasesFragment;
+import ch.giantific.qwittig.presentation.home.purchases.list.DraftsFragment;
+import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesFragment;
 
 /**
  * Hosts {@link PurchaseAddFragment} or {@link PurchaseEditDraftFragment} that handle the
@@ -38,8 +38,8 @@ public class PurchaseEditActivity extends PurchaseAddActivity implements
     @NonNull
     @Override
     PurchaseAddEditBaseFragment getPurchaseAddEditFragment() {
-        final String editPurchaseId = getIntent().getStringExtra(HomePurchasesFragment.INTENT_PURCHASE_ID);
-        final boolean draft = getIntent().getBooleanExtra(HomeDraftsFragment.INTENT_PURCHASE_EDIT_DRAFT, false);
+        final String editPurchaseId = getIntent().getStringExtra(PurchasesFragment.INTENT_PURCHASE_ID);
+        final boolean draft = getIntent().getBooleanExtra(DraftsFragment.INTENT_PURCHASE_EDIT_DRAFT, false);
         return draft
                 ? PurchaseEditDraftFragment.newInstance(editPurchaseId)
                 : PurchaseEditFragment.newInstance(editPurchaseId);

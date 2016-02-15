@@ -23,9 +23,9 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivityPurchaseDetailsBinding;
 import ch.giantific.qwittig.di.components.NavDrawerComponent;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddEditViewModel;
-import ch.giantific.qwittig.presentation.home.purchases.list.HomePurchasesFragment;
+import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesFragment;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
-import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
+import ch.giantific.qwittig.data.receivers.PushBroadcastReceiver;
 
 /**
  * Hosts {@link PurchaseDetailsFragment} that displays the details of a purchase and
@@ -88,7 +88,7 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
 
     private String getPurchaseId() {
         final Intent intent = getIntent();
-        String purchaseId = intent.getStringExtra(HomePurchasesFragment.INTENT_PURCHASE_ID); // started from HomeActivity
+        String purchaseId = intent.getStringExtra(PurchasesFragment.INTENT_PURCHASE_ID); // started from HomeActivity
 
         if (TextUtils.isEmpty(purchaseId)) { // started via push notification
             try {

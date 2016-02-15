@@ -13,9 +13,9 @@ import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModel;
 /**
  * Created by fabio on 21.01.16.
  */
-public interface HomePurchasesViewModel extends OnlineListViewModel<Purchase>,
+public interface PurchasesViewModel extends OnlineListViewModel<Purchase>,
         PurchasesRecyclerAdapter.AdapterInteractionListener,
-        PurchasesUpdateListener, PurchasesQueryMoreListener, LoadMoreViewModel {
+        PurchasesUpdateWorkerListener, PurchasesQueryMoreWorkerListener, LoadMoreViewModel {
 
     int TYPE_ITEM = 0;
     int TYPE_PROGRESS = 1;

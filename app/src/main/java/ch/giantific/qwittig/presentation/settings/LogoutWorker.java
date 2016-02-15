@@ -108,25 +108,14 @@ public class LogoutWorker extends BaseWorker<User, LogoutWorkerListener> {
                     .toObservable();
         }
 
-        if (delete) {
-            if (user.isFacebookUser()) {
-                return mUserRepo.unlinkFacebook(user)
-                        .flatMap(new Func1<User, Single<ParseInstallation>>() {
-                            @Override
-                            public Single<ParseInstallation> call(User user) {
-                                return mUserRepo.clearInstallation();
-                            }
-                        })
-                        .flatMap(new Func1<ParseInstallation, Single<User>>() {
-                            @Override
-                            public Single<User> call(ParseInstallation parseInstallation) {
-                                return mUserRepo.deleteUser(user);
-                            }
-                        })
-                        .toObservable();
-            }
-
-            return mUserRepo.clearInstallation()
+        if (user.isFacebookUser() && delete) {
+            return mUserRepo.unlinkFacebook(user)
+                    .flatMap(new Func1<User, Single<ParseInstallation>>() {
+                        @Override
+                        public Single<ParseInstallation> call(User user) {
+                            return mUserRepo.clearInstallation();
+                        }
+                    })
                     .flatMap(new Func1<ParseInstallation, Single<User>>() {
                         @Override
                         public Single<User> call(ParseInstallation parseInstallation) {
@@ -140,7 +129,9 @@ public class LogoutWorker extends BaseWorker<User, LogoutWorkerListener> {
                 .flatMap(new Func1<ParseInstallation, Single<User>>() {
                     @Override
                     public Single<User> call(ParseInstallation parseInstallation) {
-                        return mUserRepo.logOut(user);
+                        return delete
+                                ? mUserRepo.deleteUser(user)
+                                : mUserRepo.logOut(user);
                     }
                 })
                 .toObservable();

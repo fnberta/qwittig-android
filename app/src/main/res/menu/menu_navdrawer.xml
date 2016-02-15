@@ -24,11 +24,13 @@
             android:id="@+id/nav_tasks"
             android:icon="@drawable/ic_nav_assignment"
             android:title="@string/title_activity_tasks"
+            android:visible="false"
             />
         <item
             android:id="@+id/nav_stats"
             android:icon="@drawable/ic_nav_assessment"
             android:title="@string/title_activity_stats"
+            android:visible="false"
             />
     </group>
 
@@ -41,12 +43,6 @@
         android:id="@+id/nav_help_feedback"
         android:icon="@drawable/ic_nav_help"
         android:title="@string/title_activity_help_feedback"
-        />
-    <item
-        android:id="@+id/nav_go_premium"
-        android:icon="@drawable/ic_nav_star"
-        android:title="@string/go_premium"
-        android:visible="false"
         />
 
 </menu>

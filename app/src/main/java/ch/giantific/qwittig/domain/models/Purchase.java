@@ -70,7 +70,7 @@ public class Purchase extends ParseObject {
     }
 
     private void setAccessRights(@NonNull Group group) {
-        final ParseACL acl = ParseUtils.getDefaultAcl(group);
+        final ParseACL acl = ParseUtils.getDefaultAcl(group, true);
         setACL(acl);
     }
 

@@ -20,7 +20,7 @@ import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
-import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
+import ch.giantific.qwittig.data.receivers.PushBroadcastReceiver;
 import rx.Observable;
 import rx.Single;
 import rx.functions.Action1;

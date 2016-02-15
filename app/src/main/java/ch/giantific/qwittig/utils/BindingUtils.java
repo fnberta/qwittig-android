@@ -25,10 +25,10 @@ import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
 import java.util.List;
 
-import ch.giantific.qwittig.presentation.navdrawer.BlurTransformation;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.home.purchases.details.widgets.CircleDisplay;
+import ch.giantific.qwittig.presentation.navdrawer.BlurTransformation;
 import ch.giantific.qwittig.presentation.settings.profile.AvatarLoadListener;
 
 /**
@@ -161,6 +161,13 @@ public class BindingUtils {
                         });
             }
         }
+    }
+
+    @BindingAdapter({"drawableStartBounds"})
+    public static void setDrawableStartWithIntrinsicBounds(TextView view, int drawableRes) {
+        final Drawable[] drawables = view.getCompoundDrawablesRelative();
+        final Drawable drawable = ContextCompat.getDrawable(view.getContext(), drawableRes);
+        view.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, drawables[1], drawables[2], drawables[3]);
     }
 
     @BindingAdapter({"deadline"})

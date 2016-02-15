@@ -10,8 +10,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.RequestBody;
 
 import java.io.File;
 
@@ -21,6 +19,8 @@ import ch.giantific.qwittig.data.rest.ReceiptOcr;
 import ch.giantific.qwittig.di.components.WorkerComponent;
 import ch.giantific.qwittig.data.rest.OcrPurchase;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
@@ -35,7 +35,7 @@ import rx.schedulers.Schedulers;
 public class OcrWorker extends BaseWorker<OcrPurchase, OcrWorkerListener> {
 
     private static final String WORKER_TAG = OcrWorker.class.getCanonicalName();
-    private static final String BUNDLE_RECEIPT_PATH = "BUNDLE_RECEIPT_PATH";
+    private static final String KEY_RECEIPT_PATH = "RECEIPT_PATH";
     private static final int MAX_RETRIES = 0;
     @Inject
     ReceiptOcr mReceiptOcr;
@@ -55,6 +55,7 @@ public class OcrWorker extends BaseWorker<OcrPurchase, OcrWorkerListener> {
         OcrWorker worker = (OcrWorker) fm.findFragmentByTag(WORKER_TAG);
         if (worker == null) {
             worker = OcrWorker.newInstance(receiptPath);
+
             fm.beginTransaction()
                     .add(worker, WORKER_TAG)
                     .commit();
@@ -67,7 +68,7 @@ public class OcrWorker extends BaseWorker<OcrPurchase, OcrWorkerListener> {
     private static OcrWorker newInstance(@NonNull String receiptPath) {
         OcrWorker fragment = new OcrWorker();
         Bundle args = new Bundle();
-        args.putString(BUNDLE_RECEIPT_PATH, receiptPath);
+        args.putString(KEY_RECEIPT_PATH, receiptPath);
         fragment.setArguments(args);
         return fragment;
     }
@@ -82,7 +83,7 @@ public class OcrWorker extends BaseWorker<OcrPurchase, OcrWorkerListener> {
     protected Observable<OcrPurchase> getObservable(@NonNull Bundle args) {
         // TODO: implement retries
 
-        final String receiptPath = args.getString(BUNDLE_RECEIPT_PATH, "");
+        final String receiptPath = args.getString(KEY_RECEIPT_PATH, "");
         if (!TextUtils.isEmpty(receiptPath)) {
             return mUserRepo.getUserSessionToken()
                     .flatMapObservable(new Func1<String, Observable<OcrPurchase>>() {

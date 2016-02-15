@@ -7,6 +7,7 @@ package ch.giantific.qwittig.presentation.finance.identities;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -60,6 +61,11 @@ public class IdentitiesFragment extends BaseRecyclerViewOnlineFragment<Identitie
     @Override
     protected RecyclerView.Adapter getRecyclerAdapter() {
         return new IdentitiesRecyclerAdapter(mViewModel);
+    }
+
+    @Override
+    protected SwipeRefreshLayout getSrl() {
+        return mBinding.srlRv.srlBase;
     }
 
     @Override

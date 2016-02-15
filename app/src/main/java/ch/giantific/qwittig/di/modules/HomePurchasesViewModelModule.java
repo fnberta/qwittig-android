@@ -12,8 +12,8 @@ import ch.giantific.qwittig.di.scopes.PerFragment;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.presentation.home.purchases.list.HomePurchasesViewModel;
-import ch.giantific.qwittig.presentation.home.purchases.list.HomePurchasesViewModelImpl;
+import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesViewModel;
+import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesViewModelImpl;
 import dagger.Module;
 import dagger.Provides;
 
@@ -21,19 +21,19 @@ import dagger.Provides;
  * Created by fabio on 12.01.16.
  */
 @Module
-public class HomePurchasesViewModelModule extends BaseViewModelModule<HomePurchasesViewModel.ViewListener> {
+public class HomePurchasesViewModelModule extends BaseViewModelModule<PurchasesViewModel.ViewListener> {
 
     public HomePurchasesViewModelModule(@Nullable Bundle savedState,
-                                        @NonNull HomePurchasesViewModel.ViewListener view) {
+                                        @NonNull PurchasesViewModel.ViewListener view) {
         super(savedState, view);
     }
 
     @PerFragment
     @Provides
-    HomePurchasesViewModel providesHomePurchasesViewModel(@NonNull IdentityRepository identityRepository,
-                                                          @NonNull UserRepository userRepository,
-                                                          @NonNull PurchaseRepository purchaseRepository) {
-        return new HomePurchasesViewModelImpl(mSavedState, mView, identityRepository, userRepository,
+    PurchasesViewModel providesHomePurchasesViewModel(@NonNull IdentityRepository identityRepository,
+                                                      @NonNull UserRepository userRepository,
+                                                      @NonNull PurchaseRepository purchaseRepository) {
+        return new PurchasesViewModelImpl(mSavedState, mView, identityRepository, userRepository,
                 purchaseRepository);
     }
 }

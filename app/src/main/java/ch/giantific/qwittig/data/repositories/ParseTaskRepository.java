@@ -20,7 +20,7 @@ import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
-import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
+import ch.giantific.qwittig.data.receivers.PushBroadcastReceiver;
 import rx.Observable;
 import rx.Single;
 import rx.functions.Func1;

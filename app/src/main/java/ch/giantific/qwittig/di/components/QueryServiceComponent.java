@@ -4,10 +4,10 @@
 
 package ch.giantific.qwittig.di.components;
 
+import ch.giantific.qwittig.data.services.ParseQueryService;
+import ch.giantific.qwittig.di.modules.LocalBroadcastModule;
 import ch.giantific.qwittig.di.modules.RepositoriesModule;
-import ch.giantific.qwittig.di.modules.SystemServiceModule;
 import ch.giantific.qwittig.di.scopes.PerBroadcastReceive;
-import ch.giantific.qwittig.data.receivers.PushBroadcastReceiver;
 import dagger.Component;
 
 /**
@@ -15,8 +15,7 @@ import dagger.Component;
  */
 @PerBroadcastReceive
 @Component(dependencies = {ApplicationComponent.class},
-        modules = {SystemServiceModule.class, RepositoriesModule.class})
-public interface PushReceiverComponent {
-
-    void inject(PushBroadcastReceiver pushBroadcastReceiver);
+        modules = {RepositoriesModule.class, LocalBroadcastModule.class})
+public interface QueryServiceComponent {
+    void inject(ParseQueryService parseQueryService);
 }

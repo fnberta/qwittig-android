@@ -30,7 +30,7 @@ import ch.giantific.qwittig.presentation.finance.identities.IdentitiesFragment;
 import ch.giantific.qwittig.presentation.finance.identities.IdentitiesUpdateWorkerListener;
 import ch.giantific.qwittig.presentation.finance.identities.IdentitiesViewModel;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
-import ch.giantific.qwittig.receivers.PushBroadcastReceiver;
+import ch.giantific.qwittig.data.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.utils.Utils;
 import rx.Observable;
 import rx.Single;

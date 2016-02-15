@@ -12,15 +12,13 @@ import com.parse.ParsePush;
 import com.parse.ParseQuery;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import ch.giantific.qwittig.data.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.domain.models.Group;
-import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import rx.Observable;
 import rx.Single;
-import rx.functions.Func1;
 
 /**
  * Provides an implementation of {@link GroupRepository} that uses the Parse.com framework as
@@ -29,8 +27,6 @@ import rx.functions.Func1;
 public class ParseGroupRepository extends ParseBaseRepository implements GroupRepository {
 
     private static final String ADD_NEW_GROUP = "addGroup";
-    private static final String PARAM_GROUP_NAME = "groupName";
-    private static final String PARAM_GROUP_CURRENCY = "groupCurrency";
 
     public ParseGroupRepository() {
         super();
@@ -44,8 +40,8 @@ public class ParseGroupRepository extends ParseBaseRepository implements GroupRe
     @Override
     public Single<String> addNewGroup(@NonNull String groupName, @NonNull String groupCurrency) {
         final Map<String, Object> params = new HashMap<>();
-        params.put(PARAM_GROUP_NAME, groupName);
-        params.put(PARAM_GROUP_CURRENCY, groupCurrency);
+        params.put(PushBroadcastReceiver.PUSH_PARAM_GROUP_NAME, groupName);
+        params.put(PushBroadcastReceiver.PUSH_PARAM_CURRENCY_CODE, groupCurrency);
         return callFunctionInBackground(ADD_NEW_GROUP, params);
     }
 

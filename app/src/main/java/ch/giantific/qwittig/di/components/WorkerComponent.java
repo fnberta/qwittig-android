@@ -16,7 +16,7 @@ import ch.giantific.qwittig.presentation.login.LoginWorker;
 import ch.giantific.qwittig.presentation.settings.LogoutWorker;
 import ch.giantific.qwittig.presentation.settings.addgroup.AddGroupWorker;
 import ch.giantific.qwittig.presentation.home.JoinGroupWorker;
-import ch.giantific.qwittig.presentation.settings.profile.UnlinkThirdPartyWorker;
+import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileWorker;
 import ch.giantific.qwittig.presentation.stats.StatsCalcWorker;
 import ch.giantific.qwittig.presentation.settings.addusers.AddUserWorker;
 import ch.giantific.qwittig.presentation.finance.CompsUpdateWorker;
@@ -71,5 +71,5 @@ public interface WorkerComponent {
 
     void inject(LogoutWorker logoutWorker);
 
-    void inject(UnlinkThirdPartyWorker unlinkThirdPartyWorker);
+    void inject(SettingsProfileWorker settingsProfileWorker);
 }
