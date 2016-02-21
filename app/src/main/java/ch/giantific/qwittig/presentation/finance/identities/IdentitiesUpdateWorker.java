@@ -67,6 +67,6 @@ public class IdentitiesUpdateWorker extends BaseQueryWorker<Identity, Identities
 
     @Override
     protected void setStream(@NonNull Observable<Identity> observable) {
-        mActivity.setUsersUpdateStream(observable, WORKER_TAG);
+        mActivity.setIdentitiesUpdateStream(observable, WORKER_TAG);
     }
 }

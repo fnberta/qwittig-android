@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Item;
 import ch.giantific.qwittig.domain.models.Purchase;
@@ -41,12 +42,12 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
     private static final String STATE_OLD_CURRENCY = "STATE_OLD_CURRENCY";
     private static final String STATE_OLD_EXCHANGE_RATE = "STATE_OLD_EXCHANGE_RATE";
     private static final String STATE_OLD_NOTE = "STATE_OLD_NOTE";
-    String mEditPurchaseId;
+    final String mEditPurchaseId;
     Purchase mEditPurchase;
     boolean mDeleteOldReceipt;
     private boolean mOldValuesSet;
     private List<Item> mOldItems;
-    private ArrayList<String> mOldItemIds;
+    private final ArrayList<String> mOldItemIds;
     private String mOldStore;
     private Date mOldDate;
     private String mOldCurrency;
@@ -112,7 +113,7 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
 
                     @Override
                     public void onError(Throwable error) {
-                        // TODO: handle error
+                        mView.showMessage(R.string.toast_error_purchase_edit_load);
                     }
                 })
         );
@@ -165,7 +166,6 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
             final List<Identity> identities = item.getIdentities();
             final String price = mMoneyFormatter.format(item.getPriceForeign(mOldExchangeRate));
             final ItemItem itemItem = new ItemItem(item.getName(), price, getItemUsersItemUsers(identities));
-            // TODO: don't hardcode add row position
             mItems.add(getLastPosition() - 1, itemItem);
             mView.notifyItemInserted(mItems.indexOf(itemItem));
         }
@@ -247,18 +247,6 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
         // after recreation mOldItems is null, hence check for it and if true fetch it again
         if (mOldItems == null) {
             mOldItems = mEditPurchase.getItems();
-        }
-
-        // TODO: maybe drop size comparison, requires loop anyway
-        final int oldItemsSize = mOldItems.size();
-        int newItemsSize = 0;
-        for (AddEditItem addEditItem : mItems) {
-            if (addEditItem.getType() == Type.ITEM) {
-                newItemsSize++;
-            }
-        }
-        if (oldItemsSize != newItemsSize) {
-            return true;
         }
 
         for (int i = 0, size = mItems.size(), skipCount = 0; i < size; i++) {

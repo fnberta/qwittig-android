@@ -41,12 +41,12 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
     private static final String STATE_DEADLINE_SELECTED = "STATE_DEADLINE_SELECTED";
     private static final String STATE_USERS_INVOLVED = "STATE_USERS_INVOLVED";
     Date mTaskDeadline;
-    ArrayList<TaskUser> mTaskIdentities;
-    TaskRepository mTaskRepo;
-    String mTaskTitle;
-    private IdentityRepository mIdentityRepo;
+    final ArrayList<TaskUser> mTaskIdentities;
+    final TaskRepository mTaskRepo;
+    private String mTaskTitle;
+    private final IdentityRepository mIdentityRepo;
     private int mTaskTimeFrame;
-    private List<Identity> mIdentitiesAvailable = new ArrayList<>();
+    private final List<Identity> mIdentitiesAvailable = new ArrayList<>();
 
     public TaskAddEditViewModelAddImpl(@Nullable Bundle savedState,
                                        @NonNull TaskAddEditViewModel.ViewListener view,

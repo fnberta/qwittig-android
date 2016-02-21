@@ -25,7 +25,7 @@ import ch.giantific.qwittig.presentation.settings.addusers.items.UserItem;
  */
 public class SettingsUsersRecyclerAdapter extends RecyclerView.Adapter {
 
-    private SettingsUsersViewModel mViewModel;
+    private final SettingsUsersViewModel mViewModel;
 
     public SettingsUsersRecyclerAdapter(@NonNull SettingsUsersViewModel viewModel) {
         mViewModel = viewModel;

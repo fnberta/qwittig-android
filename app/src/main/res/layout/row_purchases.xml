@@ -20,7 +20,6 @@
     </data>
 
     <RelativeLayout
-        android:id="@+id/rl_purchase"
         android:layout_width="match_parent"
         android:layout_height="@dimen/list_avatar_with_two_line_text"
         app:purchaseBackground="@{viewModel.purchaseRead}"
@@ -53,7 +52,6 @@
             >
 
             <TextView
-                android:id="@+id/tv_store"
                 style="@style/TextAppearance.AppCompat.Subhead.List"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -63,7 +61,6 @@
                 />
 
             <TextView
-                android:id="@+id/tv_user_date"
                 style="@style/TextAppearance.AppCompat.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -86,7 +83,6 @@
             >
 
             <TextView
-                android:id="@+id/tv_total"
                 style="@style/TextAppearance.AppCompat.Subhead.List"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -95,7 +91,6 @@
                 tools:text="56.20"/>
 
             <TextView
-                android:id="@+id/tv_my_share"
                 style="@style/TextAppearance.AppCompat.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

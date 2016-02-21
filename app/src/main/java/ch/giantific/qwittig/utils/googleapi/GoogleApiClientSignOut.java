@@ -20,7 +20,7 @@ import rx.SingleSubscriber;
  */
 public class GoogleApiClientSignOut extends BaseGoogleApiClientSingle<Void> {
 
-    public GoogleApiClientSignOut(@NonNull Context context) {
+    private GoogleApiClientSignOut(@NonNull Context context) {
         super(context);
     }
 

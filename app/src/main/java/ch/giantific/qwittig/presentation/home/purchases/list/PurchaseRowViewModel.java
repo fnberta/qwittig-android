@@ -20,8 +20,8 @@ import ch.giantific.qwittig.utils.MoneyUtils;
  */
 public class PurchaseRowViewModel extends BaseObservable {
 
-    private Identity mCurrentIdentity;
-    private NumberFormat mMoneyFormatter;
+    private final Identity mCurrentIdentity;
+    private final NumberFormat mMoneyFormatter;
     private String mPurchaseBuyerAndDate;
     private String mPurchaseBuyerAvatar;
     private String mPurchaseStore;

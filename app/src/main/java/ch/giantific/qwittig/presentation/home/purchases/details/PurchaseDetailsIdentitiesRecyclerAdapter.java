@@ -21,8 +21,8 @@ import ch.giantific.qwittig.presentation.home.purchases.details.items.Identities
  */
 public class PurchaseDetailsIdentitiesRecyclerAdapter extends RecyclerView.Adapter<BindingRow<RowPurchaseDetailsIdentitiesIdentityBinding>> {
 
-    private PurchaseDetailsViewModel mViewModel;
-    private List<Identity> mIdentities;
+    private final PurchaseDetailsViewModel mViewModel;
+    private final List<Identity> mIdentities;
 
     public PurchaseDetailsIdentitiesRecyclerAdapter(@NonNull PurchaseDetailsViewModel viewModel,
                                                     @NonNull List<Identity> identities) {

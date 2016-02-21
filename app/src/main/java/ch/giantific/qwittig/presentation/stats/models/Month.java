@@ -14,8 +14,8 @@ import ch.giantific.qwittig.utils.DateUtils;
  */
 public class Month {
 
-    private String mNameShort;
-    private int mNumber;
+    private final String mNameShort;
+    private final int mNumber;
 
     public int getNumber() {
         return mNumber;

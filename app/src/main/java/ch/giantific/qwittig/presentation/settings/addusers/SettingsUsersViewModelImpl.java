@@ -16,10 +16,10 @@ import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
-import ch.giantific.qwittig.presentation.settings.addusers.items.SettingsUsersItem;
 import ch.giantific.qwittig.presentation.settings.addusers.items.HeaderItem;
 import ch.giantific.qwittig.presentation.settings.addusers.items.IntroItem;
 import ch.giantific.qwittig.presentation.settings.addusers.items.NicknameItem;
+import ch.giantific.qwittig.presentation.settings.addusers.items.SettingsUsersItem;
 import ch.giantific.qwittig.presentation.settings.addusers.items.UserItem;
 import rx.Single;
 import rx.SingleSubscriber;
@@ -32,6 +32,7 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
         implements SettingsUsersViewModel {
 
     private static final String STATE_ITEMS = "STATE_ITEMS";
+    private static final int POS_NICKNAME = 1;
 
     public SettingsUsersViewModelImpl(@Nullable Bundle savedState,
                                       @NonNull SettingsUsersViewModel.ViewListener view,
@@ -91,20 +92,17 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
 
                     @Override
                     public void onError(Throwable error) {
-                        // TODO: handle error
+                        mView.showMessage(R.string.toast_error_users_load);
                     }
                 })
         );
     }
 
     @Override
-    public void onAddUserClick(@NonNull NicknameItem nicknameItem) {
-        if (nicknameItem.validate()) {
-            final Group group = mCurrentIdentity.getGroup();
-            mView.toggleProgressDialog(true);
-            mView.loadAddUserWorker(nicknameItem.getNickname(), group.getObjectId(), group.getName());
-            nicknameItem.setValidate(false);
-        }
+    public void onValidUserEntered(@NonNull String nickname) {
+        final Group group = mCurrentIdentity.getGroup();
+        mView.toggleProgressDialog(true);
+        mView.loadAddUserWorker(nickname, group.getObjectId(), group.getName());
     }
 
     @Override
@@ -115,8 +113,10 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
                         mView.removeWorker(workerTag);
                         mView.toggleProgressDialog(false);
 
-                        // TODO: hardcode position?
-                        final NicknameItem nicknameItem = ((NicknameItem) mItems.get(1));
+                        // TODO: hardcode item position?
+                        final NicknameItem nicknameItem = ((NicknameItem) mItems.get(POS_NICKNAME));
+                        nicknameItem.setValidate(false);
+                        nicknameItem.setNickname("");
                         mItems.add(new UserItem(nicknameItem.getNickname(), invitationUrl));
                         mView.notifyItemInserted(getLastPosition());
                     }
@@ -126,7 +126,7 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
                         mView.removeWorker(workerTag);
                         mView.toggleProgressDialog(false);
 
-                        // TODO: handle error
+                        mView.showMessage(R.string.toast_error_settings_users_add);
                     }
                 })
         );

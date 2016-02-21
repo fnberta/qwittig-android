@@ -10,8 +10,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 
-import com.parse.ParseInstallation;
-
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.di.components.WorkerComponent;

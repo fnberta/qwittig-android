@@ -22,7 +22,7 @@ import ch.giantific.qwittig.presentation.common.adapters.rows.ProgressRow;
  */
 public class PurchasesRecyclerAdapter extends RecyclerView.Adapter {
 
-    private PurchasesViewModel mViewModel;
+    private final PurchasesViewModel mViewModel;
 
     /**
      * Constructs a new {@link PurchasesRecyclerAdapter}.

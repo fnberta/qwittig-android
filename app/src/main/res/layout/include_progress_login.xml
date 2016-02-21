@@ -18,7 +18,6 @@
     </data>
 
     <LinearLayout
-        android:id="@+id/ll_login_progress"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"

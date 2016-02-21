@@ -9,7 +9,9 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.NavigationView;
 import android.support.v4.view.ViewCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -110,19 +112,6 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksViewModel> impleme
                 .commit();
     }
 
-    @Override
-    public void setViewModel(@NonNull TasksViewModel viewModel) {
-        mViewModel = viewModel;
-        mBinding.setViewModel(viewModel);
-    }
-
-    @Override
-    protected void onLoginSuccessful() {
-        super.onLoginSuccessful();
-
-        // TODO: fix setLoading(true) because online query is still happening
-        addTasksFragment();
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -155,6 +144,12 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksViewModel> impleme
     }
 
     @Override
+    public void setViewModel(@NonNull TasksViewModel viewModel) {
+        mViewModel = viewModel;
+        mBinding.setViewModel(viewModel);
+    }
+
+    @Override
     public void setTasksUpdateStream(@NonNull Observable<Task> observable,
                                      @NonNull String workerTag) {
         mViewModel.setTasksUpdateStream(observable, workerTag);
@@ -164,5 +159,13 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksViewModel> impleme
     public void setTaskReminderStream(@NonNull Single<String> single, @NonNull String taskId,
                                       @NonNull String workerTag) {
         mViewModel.setTaskReminderStream(single, taskId, workerTag);
+    }
+
+    @Override
+    protected void onLoginSuccessful() {
+        super.onLoginSuccessful();
+
+        // TODO: fix setLoading(true) because online query is still happening
+        addTasksFragment();
     }
 }

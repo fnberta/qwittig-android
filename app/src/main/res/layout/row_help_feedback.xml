@@ -18,7 +18,6 @@
     </data>
 
     <TextView
-        android:id="@+id/tv_help_title"
         style="@style/TextAppearance.AppCompat.Subhead.List"
         android:layout_width="match_parent"
         android:layout_height="@dimen/list_icon_with_text"

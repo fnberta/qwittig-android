@@ -25,7 +25,7 @@ import dagger.Provides;
 @Module
 public class PurchaseEditViewModelModule extends BaseViewModelModule<PurchaseAddEditViewModel.ViewListener> {
 
-    private String mEditPurchaseId;
+    private final String mEditPurchaseId;
 
     public PurchaseEditViewModelModule(@Nullable Bundle savedState,
                                        @NonNull PurchaseAddEditViewModel.ViewListener view,

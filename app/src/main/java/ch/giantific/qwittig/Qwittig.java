@@ -12,7 +12,6 @@ import android.support.multidex.MultiDex;
 import com.facebook.FacebookSdk;
 import com.parse.Parse;
 import com.parse.ParseACL;
-import com.parse.ParseCrashReporting;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
@@ -45,7 +44,7 @@ public class Qwittig extends Application {
         return ((Qwittig) context.getApplicationContext()).getAppComponent();
     }
 
-    public ApplicationComponent getAppComponent() {
+    private ApplicationComponent getAppComponent() {
         return mAppComponent;
     }
 
@@ -64,7 +63,7 @@ public class Qwittig extends Application {
 
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
-            LeakCanary.install(this);
+//            LeakCanary.install(this);
         }
 
         buildAppComponent();
@@ -95,9 +94,6 @@ public class Qwittig extends Application {
 
         // enable local data store
         Parse.enableLocalDatastore(this);
-
-        // Enable Crash Reporting
-        ParseCrashReporting.enable(this);
 
         // initialise Parse
         Parse.initialize(this, "yLuL6xJB2dUD2hjfh4W2EcZizcPsJZKDgDzbrPji",

@@ -28,6 +28,8 @@ public interface NavDrawerViewModel extends ViewModel {
     @Bindable
     int getSelectedIdentity();
 
+    List<Identity> getIdentities();
+
     void notifySelectedGroupChanged();
 
     boolean isUserLoggedIn();
@@ -45,9 +47,6 @@ public interface NavDrawerViewModel extends ViewModel {
     void onAvatarClick(View view);
 
     interface ViewListener extends ViewModel.ViewListener {
-        void bindHeaderView();
-
-        void setupHeaderIdentitySelection(@NonNull List<Identity> identities);
 
         void notifyHeaderIdentitiesChanged();
 
@@ -56,5 +55,7 @@ public interface NavDrawerViewModel extends ViewModel {
         void startHomeActivityAndFinish();
 
         void onIdentitySelected();
+
+        void startLoginActivity();
     }
 }

@@ -27,7 +27,7 @@ public class IntroItem implements SettingsUsersItem {
     public IntroItem() {
     }
 
-    protected IntroItem(Parcel in) {
+    private IntroItem(Parcel in) {
     }
 
     @Override

@@ -6,9 +6,7 @@ package ch.giantific.qwittig.di.components;
 
 import ch.giantific.qwittig.di.modules.RepositoriesModule;
 import ch.giantific.qwittig.di.modules.SettingsProfileViewModelModule;
-import ch.giantific.qwittig.di.modules.SettingsViewModelModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.presentation.settings.SettingsFragment;
 import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileFragment;
 import dagger.Component;
 

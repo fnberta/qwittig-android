@@ -37,7 +37,6 @@
             >
 
             <Button
-                android:id="@+id/bt_login_accounts_facebook"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/com_facebook_button_background"
@@ -72,7 +71,6 @@
                 />
 
             <Button
-                android:id="@+id/bt_login_accounts_email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="@{viewModel.onUseEmailClick}"

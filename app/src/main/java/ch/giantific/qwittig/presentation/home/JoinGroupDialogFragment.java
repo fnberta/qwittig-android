@@ -31,7 +31,7 @@ public class JoinGroupDialogFragment extends BaseDialogFragment<JoinGroupDialogF
      *
      * @param fm        the fragment manager to use for the transaction
      * @param groupName the name of the group the user was invited to
-     * @return a new intsance of {@link JoinGroupDialogFragment}
+     * @return a new instance of {@link JoinGroupDialogFragment}
      */
     @NonNull
     public static JoinGroupDialogFragment display(@NonNull FragmentManager fm,

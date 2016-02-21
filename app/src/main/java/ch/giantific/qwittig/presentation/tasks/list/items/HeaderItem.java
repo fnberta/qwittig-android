@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.presentation.tasks.list.items;
 
+import android.annotation.SuppressLint;
 import android.support.annotation.StringRes;
 
 import ch.giantific.qwittig.presentation.common.viewmodels.HeaderRowViewModelBaseImpl;
@@ -11,6 +12,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.HeaderRowViewModelBas
 /**
  * Created by fabio on 11.02.16.
  */
+@SuppressLint("ParcelCreator")
 public class HeaderItem extends HeaderRowViewModelBaseImpl implements ListItem {
 
     public HeaderItem(@StringRes int header) {

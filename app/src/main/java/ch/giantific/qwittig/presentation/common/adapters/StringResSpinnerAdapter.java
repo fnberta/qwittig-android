@@ -27,9 +27,9 @@ public class StringResSpinnerAdapter extends BaseAdapter implements ThemedSpinne
 
     @NonNull
     private final ThemedSpinnerAdapter.Helper mDropDownHelper;
-    private Context mContext;
-    private int mViewResource;
-    private int[] mStringRes;
+    private final Context mContext;
+    private final int mViewResource;
+    private final int[] mStringRes;
 
     /**
      * Constructs a new {@link StringResSpinnerAdapter}.
@@ -130,7 +130,7 @@ public class StringResSpinnerAdapter extends BaseAdapter implements ThemedSpinne
      * its id.
      */
     private static class TypeRow {
-        private TextView mTextViewTitle;
+        private final TextView mTextViewTitle;
 
         /**
          * Constructs a new {@link TypeRow}.

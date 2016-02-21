@@ -27,7 +27,7 @@ public abstract class ListViewModelBaseImpl<T, S extends ListViewModel.ViewListe
     private static final String STATE_LOADING = "STATE_LOADING";
 
     protected ArrayList<T> mItems;
-    protected IdentityRepository mIdentityRepo;
+    protected final IdentityRepository mIdentityRepo;
     protected boolean mLoading;
 
     public ListViewModelBaseImpl(@Nullable Bundle savedState,

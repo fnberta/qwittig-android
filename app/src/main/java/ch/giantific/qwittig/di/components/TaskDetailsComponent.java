@@ -8,7 +8,6 @@ import ch.giantific.qwittig.di.modules.RepositoriesModule;
 import ch.giantific.qwittig.di.modules.TaskDetailsViewModelModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
 import ch.giantific.qwittig.presentation.tasks.details.TaskDetailsFragment;
-import ch.giantific.qwittig.presentation.tasks.details.TaskDetailsViewModel;
 import dagger.Component;
 
 /**

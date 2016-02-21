@@ -31,7 +31,7 @@ public class TaskAddEditViewModelEditImpl extends TaskAddEditViewModelAddImpl {
     private static final String STATE_OLD_DEADLINE = "STATE_OLD_DEADLINE";
     private boolean mOldValuesSet;
     private Task mEditTask;
-    private String mEditTaskId;
+    private final String mEditTaskId;
     private String mOldTaskTitle;
     private String mOldTaskTimeFrame;
     private Date mOldTaskDeadline;

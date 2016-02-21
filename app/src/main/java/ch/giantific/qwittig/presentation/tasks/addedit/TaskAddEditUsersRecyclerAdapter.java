@@ -27,7 +27,7 @@ import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;
  */
 public class TaskAddEditUsersRecyclerAdapter extends RecyclerView.Adapter<TaskAddEditUsersRecyclerAdapter.TaskUserInvolvedRow> {
 
-    private TaskAddEditViewModel mViewModel;
+    private final TaskAddEditViewModel mViewModel;
 
     /**
      * Constructs a new {@link TaskAddEditUsersRecyclerAdapter}.

@@ -13,12 +13,12 @@ import android.support.annotation.NonNull;
  */
 public class MyShareItem extends BaseObservable implements DetailsItem {
 
-    private String mPurchaseMyShare;
-    private String mPurchaseMyShareForeign;
+    private final String mPurchaseMyShare;
+    private final String mPurchaseMyShareForeign;
 
-    public MyShareItem(@NonNull String myShare, @NonNull String myShareForegin) {
+    public MyShareItem(@NonNull String myShare, @NonNull String myShareForeign) {
         mPurchaseMyShare = myShare;
-        mPurchaseMyShareForeign = myShareForegin;
+        mPurchaseMyShareForeign = myShareForeign;
     }
 
     @Bindable

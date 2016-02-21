@@ -165,8 +165,8 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
      */
     private static class UsersRow extends BindingRow<RowPurchaseDetailsIdentitiesBinding> {
 
-        private RecyclerView.Adapter mRecyclerAdapter;
-        private List<Identity> mIdentities = new ArrayList<>();
+        private final RecyclerView.Adapter mRecyclerAdapter;
+        private final List<Identity> mIdentities = new ArrayList<>();
 
         /**
          * Constructs a new {@link UsersRow} by initialising a new

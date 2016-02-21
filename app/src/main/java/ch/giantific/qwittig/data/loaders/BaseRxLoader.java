@@ -9,17 +9,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
 
-import javax.inject.Inject;
-
-import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.models.Purchase;
-import ch.giantific.qwittig.domain.models.User;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
-import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
 import rx.Observable;
 import rx.Subscription;
-import rx.functions.Func1;
 import rx.subjects.ReplaySubject;
 
 /**

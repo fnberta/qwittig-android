@@ -10,7 +10,6 @@ import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
-import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.navdrawer.NavDrawerViewModel;
 import ch.giantific.qwittig.presentation.navdrawer.NavDrawerViewModelImpl;

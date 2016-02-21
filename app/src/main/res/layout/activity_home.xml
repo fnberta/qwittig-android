@@ -85,7 +85,6 @@
                 >
 
                 <android.support.design.widget.FloatingActionButton
-                    android:id="@+id/fab_manual"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:onClick="@{viewModel.onFabAddPurchaseManualClick}"
@@ -94,7 +93,6 @@
                     />
 
                 <android.support.design.widget.FloatingActionButton
-                    android:id="@+id/fab_auto"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:onClick="@{viewModel.onFabAddPurchaseAutoClick}"
@@ -105,7 +103,7 @@
 
         </android.support.design.widget.CoordinatorLayout>
 
-        <include layout="@layout/include_navdrawer"/>
+        <include layout="@layout/include_nav_drawer"/>
 
     </android.support.v4.widget.DrawerLayout>
 </layout>

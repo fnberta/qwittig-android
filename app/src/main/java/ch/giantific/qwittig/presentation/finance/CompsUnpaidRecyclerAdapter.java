@@ -28,7 +28,7 @@ import ch.giantific.qwittig.presentation.finance.items.UnpaidItem.Type;
  */
 public class CompsUnpaidRecyclerAdapter extends RecyclerView.Adapter {
 
-    private CompsUnpaidViewModel mViewModel;
+    private final CompsUnpaidViewModel mViewModel;
 
     /**
      * Constructs a new {@link CompsUnpaidRecyclerAdapter}.

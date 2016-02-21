@@ -72,7 +72,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
     private static final String STATE_RECEIPT_IMAGE_PATH = "STATE_RECEIPT_IMAGE_PATH";
     private static final String STATE_RECEIPT_IMAGE_PATHS = "STATE_RECEIPT_IMAGE_PATHS";
     private static final String STATE_FETCHING_RATES = "STATE_FETCHING_RATES";
-    PurchaseRepository mPurchaseRepo;
+    final PurchaseRepository mPurchaseRepo;
     String mCurrency;
     String mReceiptImagePath;
     String mNote;
@@ -80,15 +80,15 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
     String mStore;
     double mTotalPrice = 0;
     double mExchangeRate;
-    boolean mSaving;
     NumberFormat mMoneyFormatter;
-    private NumberFormat mExchangeRateFormatter;
-    private List<String> mSupportedCurrencies = ParseUtils.getSupportedCurrencyCodes();
+    private boolean mSaving;
+    private final NumberFormat mExchangeRateFormatter;
+    private final List<String> mSupportedCurrencies = ParseUtils.getSupportedCurrencyCodes();
     private List<Identity> mIdentities = new ArrayList<>();
     private double mMyShare = 0;
     private boolean mFetchingExchangeRates;
     private ArrayList<String> mReceiptImagePaths;
-    private Group mCurrentGroup;
+    private final Group mCurrentGroup;
 
     public PurchaseAddEditViewModelAddImpl(@Nullable Bundle savedState,
                                            @NonNull PurchaseAddEditViewModel.ViewListener view,
@@ -323,15 +323,8 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
         mCurrency = currency;
         mMoneyFormatter = MoneyUtils.getMoneyFormatter(currency, false, true);
 
-        // update item price formatting
-        // TODO: only needed when we support currencies with other than 2 decimal values
-//        for (int i = 0, size = mItems.size(); i < size; i++) {
-//            final AddEditItem addEditItem = mItems.get(i);
-//            if (addEditItem.getType() == Type.ITEM) {
-//                final ItemItem itemItem = (ItemItem) addEditItem;
-//                itemItem.updatePriceFormat(mMoneyFormatter);
-//            }
-//        }
+        // TODO: only needed once we support currencies with other than 2 decimal values
+//        updateItemsPriceFormatting();
 
         // update total price and my share formatting
         notifyPropertyChanged(BR.totalPrice);
@@ -341,6 +334,16 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
 
         // get new exchange rate
         mView.loadFetchExchangeRatesWorker(mCurrentGroup.getCurrency(), mCurrency);
+    }
+
+    private void updateItemsPriceFormatting() {
+        for (int i = 0, size = mItems.size(); i < size; i++) {
+            final AddEditItem addEditItem = mItems.get(i);
+            if (addEditItem.getType() == Type.ITEM) {
+                final ItemItem itemItem = (ItemItem) addEditItem;
+                itemItem.updatePriceFormat(mMoneyFormatter);
+            }
+        }
     }
 
     @Override
@@ -401,7 +404,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
 
                     @Override
                     public void onError(Throwable error) {
-                        // TODO: handle error
+                        mView.showMessage(R.string.toast_error_purchase_add_edit_load);
                     }
                 })
         );
@@ -595,7 +598,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
                         public void onError(Throwable error) {
                             mSaving = false;
                             mView.stopSaveAnim();
-                            // TODO: handle error
+                            onPurchaseSaveError();
                         }
                     })
             );
@@ -639,13 +642,12 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
                     .subscribe(new SingleSubscriber<Purchase>() {
                         @Override
                         public void onSuccess(Purchase value) {
-                            deleteTakenImages();
-                            mView.finishScreen(getDraftFinishedResult());
+                            onDraftSaved();
                         }
 
                         @Override
                         public void onError(Throwable error) {
-                            // TODO: handle error
+                            mView.showMessage(R.string.toast_error_purchase_save_draft);
                         }
                     })
             );
@@ -654,17 +656,21 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
                     .subscribe(new SingleSubscriber<Purchase>() {
                         @Override
                         public void onSuccess(Purchase value) {
-                            deleteTakenImages();
-                            mView.finishScreen(PurchaseResult.PURCHASE_DRAFT);
+                            onDraftSaved();
                         }
 
                         @Override
                         public void onError(Throwable error) {
-                            // TODO: handle error
+                            mView.showMessage(R.string.toast_error_purchase_save_draft);
                         }
                     })
             );
         }
+    }
+
+    private void onDraftSaved() {
+        deleteTakenImages();
+        mView.finishScreen(getDraftFinishedResult());
     }
 
     int getDraftFinishedResult() {
@@ -773,7 +779,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
             @Override
             public void onError(Throwable error) {
                 mView.removeWorker(workerTag);
-                onPurchaseSaveError(error);
+                onPurchaseSaveError();
                 // TODO: maybe give user action to save as draft
 //                    ParseFile receipt = mPurchase.getReceipt();
 //                    if (receipt != null) {
@@ -799,10 +805,10 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
     }
 
     @CallSuper
-    void onPurchaseSaveError(Throwable error) {
+    void onPurchaseSaveError() {
         mSaving = false;
         mView.stopSaveAnim();
-        mView.showMessage(mPurchaseRepo.getErrorMessage(error));
+        mView.showMessage(R.string.toast_error_purchase_save);
     }
 
     private void deleteTakenImages() {
@@ -847,7 +853,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
 
     @Override
     public void onEditNoteClick() {
-        // TODO: doesn't work because note fragment is shown
+        // TODO: doesn't work because note fragment is shown, move to note fragment view model
         mView.showAddEditNoteDialog(mNote);
     }
 

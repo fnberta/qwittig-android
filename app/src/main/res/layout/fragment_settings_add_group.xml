@@ -61,7 +61,6 @@
                     />
 
                 <android.support.design.widget.TextInputLayout
-                    android:id="@+id/til_settings_group_add_new_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/key_line_1"

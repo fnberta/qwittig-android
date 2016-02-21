@@ -30,7 +30,7 @@ public class CompRemindWorker extends BaseWorker<String, CompRemindWorkerListene
     private static final String WORKER_TAG = CompRemindWorker.class.getCanonicalName();
     private static final String KEY_COMPENSATION_ID = "COMPENSATION_ID";
     @Inject
-    CompensationRepository mCompensRepo;
+    CompensationRepository mCompsRepo;
     private String mCompensationId;
 
     /**
@@ -54,15 +54,8 @@ public class CompRemindWorker extends BaseWorker<String, CompRemindWorkerListene
         return worker;
     }
 
-    /**
-     * Returns a new instance of {@link CompRemindWorker} with the compensation object id
-     * as arguments.
-     *
-     * @param compensationId the object id of the compensation
-     * @return a new instance of {@link CompRemindWorker}
-     */
     @NonNull
-    public static CompRemindWorker newInstance(@NonNull String compensationId) {
+    private static CompRemindWorker newInstance(@NonNull String compensationId) {
         CompRemindWorker fragment = new CompRemindWorker();
         Bundle args = new Bundle();
         args.putString(KEY_COMPENSATION_ID, compensationId);
@@ -77,7 +70,6 @@ public class CompRemindWorker extends BaseWorker<String, CompRemindWorkerListene
 
     @Override
     protected void onError() {
-        // TODO: check tag
         mActivity.onWorkerError(WORKER_TAG + mCompensationId);
     }
 
@@ -89,7 +81,7 @@ public class CompRemindWorker extends BaseWorker<String, CompRemindWorkerListene
         if (!TextUtils.isEmpty(mCompensationId) && currentUser != null) {
             final Identity currentIdentity = currentUser.getCurrentIdentity();
             final String currencyCode = currentIdentity.getGroup().getCurrency();
-            return mCompensRepo.pushCompensationReminder(mCompensationId, currencyCode).toObservable();
+            return mCompsRepo.pushCompensationReminder(mCompensationId, currencyCode).toObservable();
         }
 
         return null;

@@ -20,5 +20,5 @@ public interface IdentitiesUpdateWorkerListener extends BaseWorkerListener {
      * @param observable the observable emitting the updates
      * @param workerTag  the tag of the worker fragment
      */
-    void setUsersUpdateStream(@NonNull Observable<Identity> observable, @NonNull String workerTag);
+    void setIdentitiesUpdateStream(@NonNull Observable<Identity> observable, @NonNull String workerTag);
 }

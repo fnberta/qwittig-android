@@ -30,8 +30,8 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, DraftsV
 
     private static final String STATE_DRAFTS_SELECTED = "STATE_DRAFTS_SELECTED";
     private static final String STATE_SELECTION_MODE = "STATE_SELECTION_MODE";
-    private PurchaseRepository mPurchaseRepo;
-    private ArrayList<String> mDraftsSelected;
+    private final PurchaseRepository mPurchaseRepo;
+    private final ArrayList<String> mDraftsSelected;
     private boolean mSelectionModeEnabled;
     private boolean mDeleteSelectedItems;
 

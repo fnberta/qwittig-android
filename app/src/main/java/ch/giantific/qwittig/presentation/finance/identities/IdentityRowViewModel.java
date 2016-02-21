@@ -23,7 +23,7 @@ public class IdentityRowViewModel extends UserAvatarRowBaseViewModel {
 
     private String mIdentityBalance;
     private boolean mBalancePositive;
-    private NumberFormat mMoneyFormatter;
+    private final NumberFormat mMoneyFormatter;
 
     public IdentityRowViewModel(@NonNull Identity identity) {
         super(identity);

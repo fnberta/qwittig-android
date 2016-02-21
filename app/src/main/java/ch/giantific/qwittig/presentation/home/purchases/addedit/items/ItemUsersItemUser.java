@@ -44,7 +44,7 @@ public class ItemUsersItemUser extends BaseObservable implements Parcelable {
         mSelected = selected;
     }
 
-    protected ItemUsersItemUser(Parcel in) {
+    private ItemUsersItemUser(Parcel in) {
         mObjectId = in.readString();
         mNickname = in.readString();
         mAvatar = in.readString();

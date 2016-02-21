@@ -27,8 +27,8 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
 
     protected User mCurrentUser;
     protected Identity mCurrentIdentity;
-    protected T mView;
-    protected UserRepository mUserRepo;
+    protected final T mView;
+    protected final UserRepository mUserRepo;
     private CompositeSubscription mSubscriptions = new CompositeSubscription();
 
     public ViewModelBaseImpl(@Nullable Bundle savedState, @NonNull T view,
@@ -83,6 +83,6 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
     @CallSuper
     public void onWorkerError(@NonNull String workerTag) {
         mView.removeWorker(workerTag);
-        mView.showMessage(R.string.toast_unknown_error);
+        mView.showMessage(R.string.toast_error_unknown);
     }
 }

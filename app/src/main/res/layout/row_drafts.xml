@@ -43,7 +43,6 @@
             tools:text="FEB\n24"/>
 
         <TextView
-            android:id="@+id/tv_store"
             style="@style/TextAppearance.AppCompat.Subhead.List"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"

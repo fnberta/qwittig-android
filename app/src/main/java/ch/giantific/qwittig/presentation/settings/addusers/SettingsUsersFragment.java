@@ -62,7 +62,7 @@ public class SettingsUsersFragment extends BaseRecyclerViewFragment<SettingsUser
 
     @Override
     protected RecyclerView getRecyclerView() {
-        return mBinding.rvAddUsers;
+        return mBinding.rvSettingsUsers;
     }
 
     @Override
@@ -103,7 +103,7 @@ public class SettingsUsersFragment extends BaseRecyclerViewFragment<SettingsUser
      */
     public interface ActivityListener extends BaseFragment.ActivityListener {
         /**
-         * Sets the view model to the activty.
+         * Sets the view model to the activity.
          *
          * @param viewModel the view model to set
          */

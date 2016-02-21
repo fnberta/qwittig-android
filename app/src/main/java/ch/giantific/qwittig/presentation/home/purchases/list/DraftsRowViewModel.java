@@ -19,7 +19,7 @@ import ch.giantific.qwittig.utils.MoneyUtils;
  */
 public class DraftsRowViewModel extends BaseObservable {
 
-    private NumberFormat mMoneyFormatter;
+    private final NumberFormat mMoneyFormatter;
     private String mDraftDate;
     private String mDraftStore;
     private String mDraftTotalPrice;

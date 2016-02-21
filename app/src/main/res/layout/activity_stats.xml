@@ -80,6 +80,6 @@
 
     </LinearLayout>
 
-    <include layout="@layout/include_navdrawer"/>
+    <include layout="@layout/include_nav_drawer"/>
 
 </android.support.v4.widget.DrawerLayout>

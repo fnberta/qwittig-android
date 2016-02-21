@@ -22,19 +22,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.LocalBroadcast;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.services.ParseQueryService;
-import ch.giantific.qwittig.databinding.NavdrawerHeaderBinding;
+import ch.giantific.qwittig.databinding.NavDrawerHeaderBinding;
 import ch.giantific.qwittig.di.components.DaggerNavDrawerComponent;
 import ch.giantific.qwittig.di.components.NavDrawerComponent;
 import ch.giantific.qwittig.di.modules.NavDrawerViewModelModule;
-import ch.giantific.qwittig.utils.MessageAction;
-import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.finance.FinanceActivity;
@@ -47,6 +43,7 @@ import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileActivit
 import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileViewModel;
 import ch.giantific.qwittig.presentation.stats.StatsActivity;
 import ch.giantific.qwittig.presentation.tasks.list.TasksActivity;
+import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
@@ -61,15 +58,13 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
         extends BaseActivity<T>
         implements NavDrawerViewModel.ViewListener {
 
-    private static final int NAVDRAWER_ITEM_INVALID = -1;
+    private static final int NAV_DRAWER_ITEM_INVALID = -1;
     protected boolean mUserLoggedIn;
     @Inject
     protected NavDrawerViewModel mNavDrawerViewModel;
-    private NavdrawerHeaderBinding mHeaderBinding;
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
     private Menu mNavigationViewMenu;
-    private View mNavigationViewHeader;
     private ArrayAdapter mHeaderIdentitiesAdapter;
     private int mSelectedNavDrawerItem;
 
@@ -94,28 +89,10 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
                 .build();
         injectNavDrawerDependencies(navComp);
 
-        mUserLoggedIn = isUserLoggedIn();
+        mUserLoggedIn = mNavDrawerViewModel.isUserLoggedIn();
     }
 
     protected abstract void injectNavDrawerDependencies(@NonNull NavDrawerComponent navComp);
-
-    private boolean isUserLoggedIn() {
-        if (mNavDrawerViewModel.isUserLoggedIn()) {
-            return true;
-        }
-
-        startLoginActivity();
-        return false;
-    }
-
-    private void startLoginActivity() {
-        final Intent intentLogin = new Intent(this, LoginActivity.class);
-//        Starting an activity with forResult and transitions during a lifecycle method results on
-//        onActivityResult not being called
-//        ActivityOptionsCompat activityOptionsCompat =
-//                ActivityOptionsCompat.makeSceneTransitionAnimation(this);
-        startActivityForResult(intentLogin, INTENT_REQUEST_LOGIN);
-    }
 
     @Override
     public void setContentView(int layoutResID) {
@@ -126,7 +103,7 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
 
     private void setupNavDrawer() {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        final NavigationView navigationView = (NavigationView) findViewById(R.id.navdrawer_view);
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
@@ -136,7 +113,13 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
             }
         });
         mNavigationViewMenu = navigationView.getMenu();
-        mNavigationViewHeader = navigationView.getHeaderView(0);
+
+        final View navigationViewHeader = navigationView.getHeaderView(0);
+        final NavDrawerHeaderBinding headerBinding = NavDrawerHeaderBinding.bind(navigationViewHeader);
+        headerBinding.setViewModel(mNavDrawerViewModel);
+
+        mHeaderIdentitiesAdapter = new NavHeaderIdentitiesArrayAdapter(this, mNavDrawerViewModel);
+        headerBinding.spDrawerGroup.setAdapter(mHeaderIdentitiesAdapter);
 
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar,
                 R.string.drawer_open, R.string.drawer_close) {
@@ -163,7 +146,7 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
     }
 
     protected int getSelfNavDrawerItem() {
-        return NAVDRAWER_ITEM_INVALID;
+        return NAV_DRAWER_ITEM_INVALID;
     }
 
     private void goToNavDrawerItem(int itemId) {
@@ -294,9 +277,13 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
     }
 
     @Override
-    public void bindHeaderView() {
-        mHeaderBinding = NavdrawerHeaderBinding.bind(mNavigationViewHeader);
-        mHeaderBinding.setViewModel(mNavDrawerViewModel);
+    public void startLoginActivity() {
+        final Intent intentLogin = new Intent(this, LoginActivity.class);
+//        Starting an activity with forResult and transitions during a lifecycle method results on
+//        onActivityResult not being called
+//        ActivityOptionsCompat activityOptionsCompat =
+//                ActivityOptionsCompat.makeSceneTransitionAnimation(this);
+        startActivityForResult(intentLogin, INTENT_REQUEST_LOGIN);
     }
 
     @Override
@@ -314,12 +301,6 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
         Snackbar.make(mToolbar, resId, Snackbar.LENGTH_LONG)
                 .setAction(action.getActionText(), action)
                 .show();
-    }
-
-    @Override
-    public void setupHeaderIdentitySelection(@NonNull List<Identity> identities) {
-        mHeaderIdentitiesAdapter = new NavHeaderIdentitiesArrayAdapter(this, identities);
-        mHeaderBinding.spDrawerGroup.setAdapter(mHeaderIdentitiesAdapter);
     }
 
     @Override

@@ -25,8 +25,8 @@ import ch.giantific.qwittig.presentation.stats.widgets.PieChart;
 public class StatsPieChartRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int VIEW_RESOURCE = R.layout.row_stats_stores_user;
-    private List<PieData> mPieData;
-    private List<String> mNicknames;
+    private final List<PieData> mPieData;
+    private final List<String> mNicknames;
     private boolean mShowPercent;
 
     /**
@@ -82,7 +82,7 @@ public class StatsPieChartRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
      */
     private static class PieRow extends RecyclerView.ViewHolder {
 
-        private PieChart mPieChart;
+        private final PieChart mPieChart;
 
         /**
          * Constructs a new {@link PieRow} and sets default animation time for the pie chart.

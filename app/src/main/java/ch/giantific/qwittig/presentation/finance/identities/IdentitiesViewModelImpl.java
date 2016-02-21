@@ -116,8 +116,8 @@ public class IdentitiesViewModelImpl
     }
 
     @Override
-    public void setUsersUpdateStream(@NonNull Observable<Identity> observable,
-                                     @NonNull final String workerTag) {
+    public void setIdentitiesUpdateStream(@NonNull Observable<Identity> observable,
+                                          @NonNull final String workerTag) {
         getSubscriptions().add(observable.toSingle()
                 .subscribe(new SingleSubscriber<Identity>() {
                     @Override

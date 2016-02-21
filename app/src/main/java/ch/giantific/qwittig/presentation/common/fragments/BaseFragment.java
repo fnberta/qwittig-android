@@ -35,6 +35,7 @@ public abstract class BaseFragment<T extends ViewModel, S extends BaseFragment.A
     protected T mViewModel;
 
     public BaseFragment() {
+        // required empty constructor
     }
 
     @SuppressWarnings("unchecked")
@@ -66,7 +67,6 @@ public abstract class BaseFragment<T extends ViewModel, S extends BaseFragment.A
 
     protected abstract void setViewModelToActivity();
 
-    @SuppressWarnings("unchecked")
     @Override
     public void onStart() {
         super.onStart();

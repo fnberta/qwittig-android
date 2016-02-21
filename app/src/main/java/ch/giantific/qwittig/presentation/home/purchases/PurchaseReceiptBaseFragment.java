@@ -24,7 +24,7 @@ public abstract class PurchaseReceiptBaseFragment<T extends PurchaseReceiptViewM
         extends BaseFragment<T, S>
         implements PurchaseReceiptViewModel.ViewListener {
 
-    protected FragmentPurchaseShowReceiptBinding mBinding;
+    private FragmentPurchaseShowReceiptBinding mBinding;
 
     public PurchaseReceiptBaseFragment() {
         // required empty constructor

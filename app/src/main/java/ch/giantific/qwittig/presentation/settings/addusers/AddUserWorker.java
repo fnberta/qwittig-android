@@ -42,7 +42,7 @@ public class AddUserWorker extends BaseWorker<String, AddUserWorkerListener> {
      *
      * @param fm        the fragment manager to use for the transaction.
      * @param nickname  the nickname to add an identity for
-     * @param groupName the name of the group, used to display in the invite linnk
+     * @param groupName the name of the group, used to display in the invite link
      * @return a new instance of {@link AddUserWorker}
      */
     public static AddUserWorker attach(@NonNull FragmentManager fm,

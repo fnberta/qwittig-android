@@ -44,13 +44,13 @@ public abstract class StatsBaseFragment extends BaseFragment {
     static final int PERIOD_MONTH = 1;
     private static final String STATE_STATS_DATA = "STATE_STATS_DATA";
     private static final String STATE_PERIOD_TYPE = "STATE_PERIOD_TYPE";
-    User mCurrentUser;
     Group mCurrentGroup;
     int mPeriodType;
     boolean mIsLoading;
     @Nullable
     Stats mStatsData;
     boolean mDataIsLoaded;
+    private User mCurrentUser;
     private FragmentInteractionListener mListener;
     private TextView mTextViewEmptyView;
     private ContentLoadingProgressBar mProgressBar;

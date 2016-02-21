@@ -10,7 +10,9 @@ import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 
 import org.apache.commons.math3.fraction.BigFraction;
@@ -83,7 +85,7 @@ public class FinanceActivity extends BaseNavDrawerActivity<CompsUnpaidViewModel>
         // check item in NavDrawer
         checkNavDrawerItem(R.id.nav_finance);
 
-        ActionBar actionBar = getSupportActionBar();
+        final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setTitle(null);
         }
@@ -104,11 +106,9 @@ public class FinanceActivity extends BaseNavDrawerActivity<CompsUnpaidViewModel>
                 PushBroadcastReceiver.INTENT_EXTRA_FINANCE_FRAGMENT, FragmentTabs.NONE);
 
         final TabsAdapter tabsAdapter = new TabsAdapter(getSupportFragmentManager());
-//        tabsAdapter.addFragment(new IdentitiesFragment(), getString(R.string.tab_users));
         tabsAdapter.addFragment(new CompsUnpaidFragment(), getString(R.string.tab_compensations_new));
         tabsAdapter.addFragment(new CompsPaidFragment(), getString(R.string.tab_compensations_archive));
         mBinding.viewpager.setAdapter(tabsAdapter);
-//        mBinding.viewpager.setOffscreenPageLimit(2);
         if (tabToSelect != FragmentTabs.NONE) {
             mBinding.viewpager.setCurrentItem(tabToSelect);
         }
@@ -181,9 +181,9 @@ public class FinanceActivity extends BaseNavDrawerActivity<CompsUnpaidViewModel>
     }
 
     @Override
-    public void setUsersUpdateStream(@NonNull Observable<Identity> observable,
-                                     @NonNull String workerTag) {
-        mIdentitiesViewModel.setUsersUpdateStream(observable, workerTag);
+    public void setIdentitiesUpdateStream(@NonNull Observable<Identity> observable,
+                                          @NonNull String workerTag) {
+        mIdentitiesViewModel.setIdentitiesUpdateStream(observable, workerTag);
     }
 
     @Override

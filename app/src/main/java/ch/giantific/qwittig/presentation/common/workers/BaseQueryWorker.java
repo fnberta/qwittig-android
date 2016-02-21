@@ -23,7 +23,6 @@ public abstract class BaseQueryWorker<T, S extends BaseWorkerListener>
 
     @Inject
     protected IdentityRepository mIdentityRepo;
-    protected User mCurrentUser;
     protected Identity mCurrentIdentity;
     protected List<Identity> mIdentities;
 
@@ -33,12 +32,12 @@ public abstract class BaseQueryWorker<T, S extends BaseWorkerListener>
      * @return whether the current user's current identities and identities are not null or empty
      */
     protected final boolean setUserInfo() {
-        mCurrentUser = mUserRepo.getCurrentUser();
-        if (mCurrentUser != null) {
-            mCurrentIdentity = mCurrentUser.getCurrentIdentity();
-            mIdentities = mCurrentUser.getIdentities();
+        final User currentUser = mUserRepo.getCurrentUser();
+        if (currentUser != null) {
+            mCurrentIdentity = currentUser.getCurrentIdentity();
+            mIdentities = currentUser.getIdentities();
         }
 
-        return mCurrentUser != null && mCurrentIdentity != null && !mIdentities.isEmpty();
+        return currentUser != null && mCurrentIdentity != null && !mIdentities.isEmpty();
     }
 }

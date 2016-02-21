@@ -60,10 +60,8 @@ import timber.log.Timber;
  */
 public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
 
-    public static final String NOTIFICATION_TYPE = "type";
     public static final String PUSH_PARAM_TITLE = "title";
     public static final String PUSH_PARAM_ALERT = "alert";
-
     public static final String PUSH_PARAM_PURCHASE_ID = "purchaseId";
     public static final String PUSH_PARAM_COMPENSATION_ID = "compensationId";
     public static final String PUSH_PARAM_GROUP_ID = "groupId";
@@ -79,9 +77,8 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     public static final String PUSH_PARAM_GROUP_NAME = "groupName";
     public static final String PUSH_PARAM_CURRENCY_CODE = "currencyCode";
     public static final String PUSH_PARAM_TASK_TITLE = "taskTitle";
-
     public static final String INTENT_EXTRA_FINANCE_FRAGMENT = "INTENT_EXTRA_FINANCE_FRAGMENT";
-
+    private static final String NOTIFICATION_TYPE = "type";
     private static final String TYPE_PURCHASE_NEW = "purchaseNew";
     private static final String TYPE_PURCHASE_EDIT = "purchaseEdit";
     private static final String TYPE_PURCHASE_DELETE = "purchaseDelete";

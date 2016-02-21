@@ -28,7 +28,6 @@ import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;
 import rx.Single;
 import rx.functions.Func1;
-import timber.log.Timber;
 
 /**
  * Handles the different use-cases connected with the account of a user (log-in, create account,

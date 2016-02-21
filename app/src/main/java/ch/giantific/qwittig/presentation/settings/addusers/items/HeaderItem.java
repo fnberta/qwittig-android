@@ -30,7 +30,7 @@ public class HeaderItem extends HeaderRowViewModelBaseImpl implements SettingsUs
         super(header);
     }
 
-    protected HeaderItem(Parcel in) {
+    private HeaderItem(Parcel in) {
         super(in);
     }
 

@@ -8,9 +8,6 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import javax.inject.Singleton;
-
-import ch.giantific.qwittig.di.scopes.PerBroadcastReceive;
 import dagger.Module;
 import dagger.Provides;
 
@@ -20,7 +17,7 @@ import dagger.Provides;
 @Module
 public class SystemServiceModule {
 
-    private Context mContext;
+    private final Context mContext;
 
     public SystemServiceModule(@NonNull Context context) {
         mContext = context;

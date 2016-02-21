@@ -26,14 +26,14 @@ public class GenericItem extends BaseObservable
         }
     };
     @Type
-    private int mType;
+    private final int mType;
 
     private GenericItem(@Type int type) {
         mType = type;
     }
 
     @SuppressWarnings("WrongConstant")
-    protected GenericItem(Parcel in) {
+    private GenericItem(Parcel in) {
         mType = in.readInt();
     }
 

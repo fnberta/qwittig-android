@@ -79,11 +79,12 @@ public class NicknameItem extends BaseObservable implements SettingsUsersItem {
     }
 
     public void onAddUserClick(View view) {
-        // TODO: clear edittext
-        mAddListener.onAddUserClick(this);
+        if (validate()) {
+            mAddListener.onValidUserEntered(mNickname);
+        }
     }
 
-    public boolean validate() {
+    private boolean validate() {
         setValidate(true);
         return isNicknameComplete();
     }
@@ -105,6 +106,6 @@ public class NicknameItem extends BaseObservable implements SettingsUsersItem {
     }
 
     public interface AddListener {
-        void onAddUserClick(@NonNull NicknameItem nicknameItem);
+        void onValidUserEntered(@NonNull String nickname);
     }
 }

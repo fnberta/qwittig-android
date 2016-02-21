@@ -23,12 +23,12 @@ import ch.giantific.qwittig.utils.MoneyUtils;
 public class CompPaidRowViewModel extends BaseObservable {
 
     private final Identity mCurrentIdentity;
-    private NumberFormat mMoneyFormatter;
+    private final NumberFormat mMoneyFormatter;
+    private final String mCompDate;
     private String mCompUsername;
     private String mCompUserAvatar;
     private String mCompAmount;
     private boolean mCompAmountPos;
-    private String mCompDate;
 
     public CompPaidRowViewModel(@NonNull Compensation compensation,
                                 @NonNull Identity currentIdentity) {

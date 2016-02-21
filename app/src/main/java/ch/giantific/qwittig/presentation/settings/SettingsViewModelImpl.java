@@ -33,8 +33,8 @@ import rx.SingleSubscriber;
 public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.ViewListener>
         implements SettingsViewModel {
 
-    private GroupRepository mGroupRepo;
-    private IdentityRepository mIdentityRepo;
+    private final GroupRepository mGroupRepo;
+    private final IdentityRepository mIdentityRepo;
 
     public SettingsViewModelImpl(@Nullable Bundle savedState,
                                  @NonNull SettingsViewModel.ViewListener view,
@@ -134,7 +134,7 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
 
                     @Override
                     public void onError(Throwable error) {
-                        // TODO: handle error
+                        mView.showMessage(R.string.toast_error_unknown);
                     }
                 })
         );

@@ -36,14 +36,23 @@ import timber.log.Timber;
  */
 public abstract class ParseBaseRepository implements BaseRepository {
 
-    public static final int QUERY_ITEMS_PER_PAGE = 15;
+    static final int QUERY_ITEMS_PER_PAGE = 15;
 
-    public ParseBaseRepository() {
+    ParseBaseRepository() {
     }
 
     @StringRes
-    public int getErrorMessage(@NonNull Throwable e) {
-        final int code = ((ParseException) e).getCode();
+    public int getErrorMessage(@NonNull Throwable error) {
+        Timber.e(error, "error");
+
+        final ParseException exception;
+        try {
+            exception = ((ParseException) error);
+        } catch (ClassCastException e) {
+            return R.string.toast_error_unknown;
+        }
+
+        final int code = exception.getCode();
         switch (code) {
             case ParseException.INVALID_SESSION_TOKEN:
                 return R.string.toast_invalid_session;
@@ -54,8 +63,7 @@ public abstract class ParseBaseRepository implements BaseRepository {
             case ParseException.CONNECTION_FAILED:
                 return R.string.toast_no_connection;
             default:
-                Timber.e(e, "unknown error");
-                return R.string.toast_unknown_error;
+                return R.string.toast_error_unknown;
         }
     }
 

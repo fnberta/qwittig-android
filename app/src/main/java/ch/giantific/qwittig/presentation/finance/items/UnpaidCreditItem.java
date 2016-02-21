@@ -16,8 +16,8 @@ import ch.giantific.qwittig.domain.models.Identity;
  */
 public class UnpaidCreditItem extends UnpaidCompItem {
 
-    public UnpaidCreditItem(@NonNull Compensation compensation, @NonNull NumberFormat moneyformatter) {
-        super(compensation, moneyformatter);
+    public UnpaidCreditItem(@NonNull Compensation compensation, @NonNull NumberFormat moneyFormatter) {
+        super(compensation, moneyFormatter);
 
         mCredit = true;
         final Identity identity = compensation.getDebtor();

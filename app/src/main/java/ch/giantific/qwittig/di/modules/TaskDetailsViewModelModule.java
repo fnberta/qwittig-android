@@ -23,7 +23,7 @@ import dagger.Provides;
 @Module
 public class TaskDetailsViewModelModule extends BaseViewModelModule<TaskDetailsViewModel.ViewListener> {
 
-    String mTaskId;
+    private final String mTaskId;
 
     public TaskDetailsViewModelModule(@Nullable Bundle savedState,
                                       @NonNull TaskDetailsViewModel.ViewListener view,

@@ -39,7 +39,7 @@ import ch.giantific.qwittig.presentation.home.purchases.addedit.items.ItemUsersI
  */
 public class PurchaseAddEditRecyclerAdapter extends RecyclerView.Adapter {
 
-    private PurchaseAddEditViewModel mViewModel;
+    private final PurchaseAddEditViewModel mViewModel;
 
     public PurchaseAddEditRecyclerAdapter(@NonNull PurchaseAddEditViewModel viewModel) {
         mViewModel = viewModel;
@@ -189,8 +189,8 @@ public class PurchaseAddEditRecyclerAdapter extends RecyclerView.Adapter {
 
     public static class ItemUsersRow extends BindingRow<RowPurchaseAddItemUsersBinding> {
 
-        private PurchaseAddEditItemUsersRecyclerAdapter mRecyclerAdapter;
-        private List<ItemUsersItemUser> mUsers = new ArrayList<>();
+        private final PurchaseAddEditItemUsersRecyclerAdapter mRecyclerAdapter;
+        private final List<ItemUsersItemUser> mUsers = new ArrayList<>();
 
         public ItemUsersRow(@NonNull Context context,
                             @NonNull RowPurchaseAddItemUsersBinding binding,

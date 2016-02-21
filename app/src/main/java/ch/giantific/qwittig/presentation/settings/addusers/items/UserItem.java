@@ -43,7 +43,7 @@ public class UserItem extends BaseObservable implements SettingsUsersItem, Compa
         mShareLink = shareLink;
     }
 
-    protected UserItem(Parcel in) {
+    private UserItem(Parcel in) {
         mNickname = in.readString();
         mShareLink = in.readString();
     }

@@ -4,13 +4,11 @@
   -->
 
 <resources>
-
     <string name="app_name">Qwittig</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_purchase_details">Purchase details</string>
     <string name="title_activity_add_purchase">New purchase</string>
     <string name="tab_purchases">Purchases</string>
-    <string name="tab_users">Balances</string>
     <string name="header_items">Items</string>
     <string name="hint_item_name">Item name</string>
     <string name="hint_item_price">Price</string>
@@ -51,7 +49,6 @@
     <string name="toast_changes_saved">Changes saved</string>
     <string name="action_purchase_show_receipt">Show receipt</string>
     <string name="toast_changes_discarded">Changes discarded</string>
-    <string name="login_button_tryout">Test without account</string>
     <string name="login_text_forgot_credentials">Forgot your password?</string>
     <string name="hint_nickname">Nickname</string>
     <string name="hint_password_repeat">Repeat password</string>
@@ -59,7 +56,6 @@
     <string name="error_password">Please enter a password</string>
     <string name="error_password_match">Passwords do not match</string>
     <string name="purchase_total">Total:</string>
-    <string name="toast_reset_password_link">You have received an email with a link to reset your password</string>
     <string name="dialog_login_reset_password_title">Reset password</string>
     <string name="dialog_login_reset_password_message">Please enter your email address to reset your password.</string>
     <string name="toast_email_address_taken">Email address already taken, please enter another one</string>
@@ -72,7 +68,6 @@
     <string name="action_purchase_add_edit_receipt_edit">Replace receipt</string>
     <string name="toast_receipt_added">Added receipt</string>
     <string name="toast_receipt_changed">Changed receipt</string>
-    <string name="error_nickname_length">Nickname is too long</string>
     <string name="title_activity_finance">Finance</string>
     <string name="hint_password_new">New password</string>
     <string name="balance_owe_you">owes you %1$s</string>
@@ -84,48 +79,27 @@
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
     <string name="title_activity_home">Purchases</string>
-    <string name="toast_compensation_finish_old">All members of the group must haved settled their debts first</string>
-    <string name="no_compensations">No compensation payments</string>
-    <string name="action_compensation_add_manual">Add single payment</string>
-    <string name="header_recipient_amount">Recipient and amount</string>
+    <string name="no_compensations">No compensations</string>
     <string name="hint_amount">Amount</string>
-    <string name="action_compensation_not_now">Not now</string>
     <string name="push_compensation_remind_title">Pay your debts</string>
     <string name="push_compensation_remind_alert">You owe %1$s %2$s</string>
     <string name="push_compensation_remind_paid_title">%1$s has paid</string>
     <string name="push_compensation_remind_paid_alert">Confirm receipt of %1$s</string>
-    <string name="push_compensation_not_now_title">Not now</string>
-    <string name="push_compensation_not_now_alert">%1$s will not pay you now</string>
     <string name="toast_compensation_reminded_user">Reminded %1$s to pay the debts</string>
-    <string name="toast_compensation_reminded_user_paid">Reminded %1$s about your payment</string>
-    <string name="toast_unknown_error">Unknown error has occurred</string>
+    <string name="toast_error_unknown">Unknown error has occurred</string>
     <string name="push_compensation_payment_done_title">Payment done</string>
     <string name="push_compensation_payment_done_alert">%1$s accepted your payment of %2$s</string>
-    <string name="push_settlement_new_title">%1$s started a new settlement</string>
-    <string name="push_settlement_new_alert">Check if you get or owe money</string>
     <string name="toast_min_one_user">Please select at least one user.</string>
     <string name="toast_min_one_item">Add at least one item</string>
-    <string name="dialog_store_selector">Choose a store from the list or %1$s to add a new one.</string>
-    <string name="pref_stores">Store list</string>
     <string name="pref_category_me">Me</string>
     <string name="pref_category_current_group">Current group</string>
-    <string name="title_activity_settings_stores">Stores</string>
-    <string name="toast_balance_not_zero">Please clear outstanding debts before leaving this group.</string>
-    <string name="dialog_positive_start_new">Start new</string>
+    <string name="toast_balance_not_zero">Please clear all outstanding debts and credits before leaving this group</string>
     <string name="dialog_positive_leave">Leave</string>
     <string name="dialog_positive_reset">Reset</string>
-    <string name="push_user_invite_title">Join group %1$s</string>
-    <string name="push_user_invite_alert">%1$s invited you</string>
-    <string name="toast_user_invited">Users were invited to join your group</string>
     <string name="dialog_group_join_title">Join %1$s?</string>
-    <string name="dialog_group_join_message">%1$s invited you to join %2$s. By accepting the invitation your current group will change to the new one.</string>
     <string name="dialog_positive_join">Join</string>
     <string name="dialog_negative_discard">Discard </string>
-    <string name="dialog_neutral_decide_later">Later</string>
-    <string name="toast_already_in_group">%1$s is already in your group</string>
-    <string name="toast_already_invited">%1$s was already invited to your group</string>
     <string name="cab_title_selected">%1$d selected</string>
-    <string name="action_stores_delete_selected">Delete selected stores</string>
     <string name="action_account_delete">Delete account</string>
     <string name="dialog_positive_delete">Delete</string>
     <string name="title_activity_help_feedback">Help and Feedback</string>
@@ -139,18 +113,11 @@
     <string name="email_support_subject" translatable="false">Qwittig Support</string>
     <string name="email_support_message">Please describe your problem. We will get back to you as soon as possible.</string>
     <string name="email_feedback_subject" translatable="false">Qwittig Feedback</string>
-    <string name="email_recommend_subject">Download Qwittig today!</string>
-    <string name="email_recommend_message">Download Qwittig for iOS and Android. More information at www.qwittig.ch</string>
     <string name="toast_purchase_added_draft">Purchase saved as a draft</string>
     <string name="title_activity_purchase_drafts">Drafts</string>
     <string name="action_purchase_save_draft">Save as draft</string>
     <string name="action_drafts_delete_selected">Delete selected Drafts</string>
     <string name="dialog_account_delete_message">Do you really want to delete your account? You cannot undo this!</string>
-    <string name="user_deleted" translatable="false">n/a</string>
-    <string name="add_store">Add store</string>
-    <string name="dialog_positive_add">Add</string>
-    <string name="dialog_group_create_purchases">You have to be in a group to add items. Would you like to a create a new group?</string>
-    <string name="dialog_positive_create">Create</string>
     <string name="nickname_me">Me</string>
     <string name="progress_account_delete">Deleting account…</string>
     <string name="push_user_deleted_alert">Outstanding debts or credits have automatically been cleared</string>
@@ -160,27 +127,14 @@
     <string name="dialog_purchase_discard_message">Do you want to discard or save the purchase as a draft?</string>
     <string name="dialog_positive_save_draft">Save draft</string>
     <string name="purchase_my_share">My share:</string>
-    <string name="progress_switch_groups">Switching group…</string>
     <string name="pref_group_name_hint">New group name</string>
     <string name="toast_create_image_file_failed">Failed to open camera. Maybe your disk space is full?</string>
-    <string name="no_drafts">No open items</string>
-    <string name="no_compensations_subhead">To start a new settlement, click on the button!</string>
-    <string name="dialog_account_create">Please create an account to make any changes.</string>
-    <string name="header_stores_own">Manually added</string>
-    <string name="header_stores_default">Default</string>
-    <string name="toast_store_already_in_list">Store is already in your list</string>
     <string name="toast_group_already_in_list">Group already exists</string>
     <string name="dialog_group_leave_delete_message">You are the last member of this group. Leaving it will delete the group and all its items!</string>
-    <string name="dialog_compensation_single_title">Single payment</string>
     <string name="error_valid_amount">Please enter a valid amount</string>
-    <string name="dialog_positive_pay">Pay</string>
-    <string name="toast_payment_saved">Payment to %1$s added</string>
     <string name="header_settings_users">Users</string>
-    <string name="hint_clear">Remove</string>
-    <string name="no_invitations">No open invitations</string>
     <string name="tab_compensations_new">Settlement</string>
     <string name="tab_compensations_archive">Archive</string>
-    <string name="hint_store_new">New store</string>
     <string name="header_purchase">Details</string>
     <string name="action_purchase_edit_save_changes_draft">Save changes in draft</string>
     <string name="toast_changes_saved_as_draft">Changes saved in draft</string>
@@ -189,8 +143,7 @@
     <string name="push_user_joined_alert">%1$s has joined</string>
     <string name="push_user_left_title">%1$s left</string>
     <string name="push_user_left_alert">%1$s has left %2$s</string>
-    <string name="no_compensations_subhead_group_has">All members of the group must have settled their debts first before you can start a new settlement.</string>
-    <string name="no_compensations_history">No previous compensations</string>
+    <string name="no_compensations_history">No previous payments</string>
     <string name="progress_logout">Logging out…</string>
     <string name="action_purchase_add_edit_receipt_delete">Delete receipt</string>
     <string name="action_purchase_add_edit_receipt_add">Add receipt</string>
@@ -201,27 +154,12 @@
     <string name="push_purchase_new_multiple_title">%1$d new items</string>
     <string name="push_purchase_new_multiple_more">more</string>
     <string name="action_retry">Retry</string>
-    <string name="toast_emails_no_match">Invited email does not match logged in email</string>
-    <string name="dialog_group_join_message_no_initiator">Your were invited to join %1$s. By accepting the invitiation your current group will change to the new one.</string>
-    <string name="toast_group_invite_not_valid">Your invitation is no longer valid</string>
-    <string name="toast_invitation_discarded">Invitation discarded</string>
-    <string name="header_invite_users">Invite users</string>
-    <string name="button_add_user">Add user</string>
+    <string name="dialog_group_join_message_no_initiator">Your were invited to join %1$s. By accepting the invitation your current group will change to the new one.</string>
     <string name="toast_draft_deleted">Draft deleted</string>
     <string name="action_draft_delete">Delete draft</string>
-    <string name="go_premium">Go premium</string>
-    <string name="toast_not_supported">Not supported on your device</string>
-    <string name="dialog_go_premium">You need to go premium to be able to automatically scan receipts.</string>
-    <string name="toast_free_purchases_left">%1$d free auto items left.</string>
-    <string name="toast_new_settlement">Calculated new Settlement</string>
-    <string name="toast_not_now_done">Payment to %1$s deleted</string>
-    <string name="dialog_store_other">Other…</string>
-    <string name="error_store">Please enter a valid name</string>
     <string name="title_activity_stats">Stats</string>
     <string name="tab_stats_spending">Spending</string>
     <string name="tab_stats_stores">Stores</string>
-    <string name="period_year">Year</string>
-    <string name="period_month">Month</string>
     <string name="action_sort_by_user">Sort by user</string>
     <string name="no_stats_data">"No data for this period"</string>
     <string name="tab_stats_currencies">Currencies</string>
@@ -229,11 +167,7 @@
     <string name="action_show_group">Show group numbers</string>
     <string name="action_show_percent">Show percent Values</string>
     <string name="progress_purchase_auto">Uploading and processing image…</string>
-    <string name="comp_unpaid_button_change_amount">Change amount</string>
-    <string name="dialog_positive_change">Change</string>
     <string name="dialog_compensation_confirm_amount_message">%1$s ows you %2$s, please confirm the payment. You can change the amount if needed.</string>
-    <string name="push_compensation_amount_changed_title">Amount changed</string>
-    <string name="push_compensation_amount_changed_alert">%1$s will pay you %2$s</string>
     <string name="fab_label_auto">Magically</string>
     <string name="fab_label_manual">Manually</string>
     <string name="toast_exchange_no_data">No exchange rate data, please try again later</string>
@@ -247,8 +181,6 @@
     <string name="snackbar_action_open_settings">System settings</string>
     <string name="action_settings_profile_avatar_delete">Delete profile image</string>
     <string name="stats_month_all">All</string>
-    <string name="toast_failed_load_new_group_data">Failed to load data for new group</string>
-    <string name="progress_new_group_data">Loading data for new group…</string>
     <string name="pref_group_add_new">Create new group</string>
     <string name="pref_group_users">Users</string>
     <string name="pref_group_current">Current group</string>
@@ -302,16 +234,12 @@
     <string name="time_frame_one_time">One time</string>
     <string name="toast_task_max_one_user_one_time">Please select exactly one user for a one-time task</string>
     <string name="yesterday">Yesterday</string>
-    <string name="toast_error_purchase_details_group_not">Failed to load purchase since you are not a member of its group</string>
-    <string name="dialog_group_create_finance">You have to be in a group to add payments. Would you like to a create a new group?</string>
-    <string name="dialog_group_create_tasks">You have to be in a group to add tasks. Would you like to a create a new group?</string>
     <string name="title_activity_camera">CameraActivity</string>
     <string name="camera_redo">Redo capture</string>
     <string name="camera_done">Done</string>
     <string name="camera_add">Add photo</string>
     <string name="toast_no_camera">Your device has no camera</string>
     <string name="hint_image_taken">Taken image</string>
-    <string name="toast_only_user_in_group">You are the only one in the group</string>
     <string name="header_note">Note</string>
     <string name="action_purchase_show_note">Show note</string>
     <string name="action_purchase_add_edit_note_add">Add note</string>
@@ -323,20 +251,15 @@
     <string name="login_button_email">Or use your email</string>
     <string name="login_disclaimer">By using Qwittig, you agree to the terms of use and the data privacy statement.</string>
     <string name="facebook_app_id" translatable="false">1525413547783898</string>
-    <string name="dialog_login_email_title">Email required</string>
-    <string name="dialog_login_email_message">Please enter a valid email address. Other users will be able to invite you to groups with this address.</string>
     <string name="action_settings_profile_unlink_facebook">Unlink from Facebook</string>
     <string name="action_settings_profile_unlink_google">Unlink from Google</string>
     <string name="toast_profile_update">Profile updated</string>
-    <string name="toast_unlink_failed">Unlink failed</string>
+    <string name="toast_error_unlink_failed">Unlink failed</string>
     <string name="toast_unlink_password_required">Set a password to unlink your account</string>
     <string name="toast_saving_profile">Saving profile…</string>
     <string name="toast_saving_purchase">Still saving Purchase…</string>
-    <string name="toast_inviting_user">Still inviting user…</string>
-    <string name="toast_creating_group">Still creating group…</string>
     <string name="toast_invalid_session">Your session is no longer valid</string>
     <string name="toast_login_failed_google">Login with Google failed</string>
-    <string name="toast_login_failed_facebook">Login with Facebook failed</string>
     <string name="toast_error_tasks_load">Failed to load tasks</string>
     <string name="toast_error_task_save">Failed to save task</string>
     <string name="toast_error_users_load">Failed to load users</string>
@@ -344,7 +267,6 @@
     <string name="toast_compensation_accepted">Payment accepted</string>
     <string name="header_comps_credits">Credits</string>
     <string name="header_comps_debts">Debts</string>
-    <string name="comp_unpaid_button_claim">Claim</string>
     <string name="toast_error_purchases_load">Failed to load purchases</string>
     <string name="toast_error_drafts_load">Failed to load drafts</string>
     <string name="toast_error_receipt_load">Failed to load purchase receipt</string>
@@ -362,5 +284,13 @@
     <string name="progress_joining_group">Joining group…</string>
     <string name="toast_group_joined">Joined and switched to the new group</string>
     <string name="toast_error_draft_delete">Failed to delete draft</string>
+    <string name="toast_error_purchase_add_edit_load">Failed to the group\'s users</string>
+    <string name="toast_error_purchase_save_draft">Failed to save purchase as draft</string>
+    <string name="toast_error_purchase_save">Failed to save purchase</string>
+    <string name="toast_error_purchase_edit_load">Failed to load purchase</string>
+    <string name="toast_error_drawer_load_groups">Failed to load group selection</string>
+    <string name="toast_error_drawer_update_groups">Failed to update group selection</string>
+    <string name="toast_error_settings_group_add">Failed to create group</string>
+    <string name="toast_error_settings_users_add">Failed to add user</string>
 
 </resources>

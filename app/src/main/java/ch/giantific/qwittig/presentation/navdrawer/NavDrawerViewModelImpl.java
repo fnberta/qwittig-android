@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.AdapterView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.BR;
@@ -20,6 +21,7 @@ import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.SingleSubscriber;
+import rx.Subscriber;
 import rx.functions.Func1;
 
 /**
@@ -28,8 +30,8 @@ import rx.functions.Func1;
 public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel.ViewListener>
         implements NavDrawerViewModel {
 
-    private IdentityRepository mIdentityRepo;
-    private List<Identity> mIdentities;
+    private final IdentityRepository mIdentityRepo;
+    private List<Identity> mIdentities = new ArrayList<>();
 
     public NavDrawerViewModelImpl(@Nullable Bundle savedState,
                                   @NonNull NavDrawerViewModel.ViewListener view,
@@ -44,7 +46,7 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
     public void onStart() {
         super.onStart();
 
-        if (isUserLoggedIn()) {
+        if (mCurrentUser != null) {
             loadIdentities();
         }
     }
@@ -57,19 +59,28 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
                         return identity.isActive();
                     }
                 })
-                .toList()
-                .toSingle()
-                .subscribe(new SingleSubscriber<List<Identity>>() {
+                .subscribe(new Subscriber<Identity>() {
                     @Override
-                    public void onSuccess(List<Identity> identities) {
-                        mIdentities = identities;
-                        mView.bindHeaderView();
-                        mView.setupHeaderIdentitySelection(identities);
+                    public void onStart() {
+                        super.onStart();
+
+                        mIdentities.clear();
                     }
 
                     @Override
-                    public void onError(Throwable error) {
-                        // TODO: handle error
+                    public void onCompleted() {
+                        notifyPropertyChanged(BR.identityNickname);
+                        mView.notifyHeaderIdentitiesChanged();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        mView.showMessage(R.string.toast_error_drawer_load_groups);
+                    }
+
+                    @Override
+                    public void onNext(Identity identity) {
+                        mIdentities.add(identity);
                     }
                 })
         );
@@ -78,19 +89,24 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
     @Override
     @Bindable
     public String getIdentityNickname() {
-        return mCurrentIdentity.getNickname();
+        return mCurrentIdentity.isDataAvailable() ? mCurrentIdentity.getNickname() : "";
     }
 
     @Override
     @Bindable
     public String getIdentityAvatar() {
-        return mCurrentIdentity.getAvatarUrl();
+        return mCurrentIdentity.isDataAvailable() ? mCurrentIdentity.getAvatarUrl() : "";
     }
 
     @Override
     @Bindable
     public int getSelectedIdentity() {
         return mIdentities.indexOf(mCurrentIdentity);
+    }
+
+    @Override
+    public List<Identity> getIdentities() {
+        return mIdentities;
     }
 
     @Override
@@ -102,7 +118,12 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
 
     @Override
     public boolean isUserLoggedIn() {
-        return mCurrentUser != null;
+        if (mCurrentUser == null) {
+            mView.startLoginActivity();
+            return false;
+        }
+
+        return true;
     }
 
     @Override
@@ -125,26 +146,30 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
                         return identity.isActive();
                     }
                 })
-                .toList()
-                .toSingle()
-                .subscribe(new SingleSubscriber<List<Identity>>() {
+                .subscribe(new Subscriber<Identity>() {
                     @Override
-                    public void onSuccess(List<Identity> identities) {
-                        mIdentities.clear();
-                        if (!identities.isEmpty()) {
-                            mIdentities.addAll(identities);
-                        }
+                    public void onStart() {
+                        super.onStart();
 
+                        mIdentities.clear();
+                    }
+
+                    @Override
+                    public void onCompleted() {
                         mView.notifyHeaderIdentitiesChanged();
                         notifySelectedGroupChanged();
                     }
 
                     @Override
-                    public void onError(Throwable error) {
-                        // TODO: handle error
+                    public void onError(Throwable e) {
+                        mView.showMessage(R.string.toast_error_drawer_update_groups);
+                    }
+
+                    @Override
+                    public void onNext(Identity identity) {
+                        mIdentities.add(identity);
                     }
                 })
-
         );
     }
 

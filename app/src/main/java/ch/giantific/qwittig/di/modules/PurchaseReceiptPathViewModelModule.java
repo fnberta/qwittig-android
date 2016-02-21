@@ -22,7 +22,7 @@ import dagger.Provides;
 @Module
 public class PurchaseReceiptPathViewModelModule extends BaseViewModelModule<PurchaseReceiptViewModel.ViewListener> {
 
-    private String mReceiptImagePath;
+    private final String mReceiptImagePath;
 
     public PurchaseReceiptPathViewModelModule(@Nullable Bundle savedState,
                                               @NonNull PurchaseReceiptViewModel.ViewListener view,

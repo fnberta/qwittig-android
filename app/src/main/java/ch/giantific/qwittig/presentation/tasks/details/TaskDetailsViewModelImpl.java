@@ -41,8 +41,8 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<DetailsItem,
         implements TaskDetailsViewModel {
 
     private Task mTask;
-    private String mTaskId;
-    private TaskRepository mTaskRepo;
+    private final String mTaskId;
+    private final TaskRepository mTaskRepo;
     private String mTaskTitle;
     @StringRes
     private int mTaskTimeFrame;

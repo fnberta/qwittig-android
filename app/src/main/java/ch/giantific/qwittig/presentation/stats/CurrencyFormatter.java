@@ -19,7 +19,7 @@ import ch.giantific.qwittig.utils.MoneyUtils;
  */
 public class CurrencyFormatter implements ValueFormatter {
 
-    private NumberFormat mMoneyFormatter;
+    private final NumberFormat mMoneyFormatter;
 
     /**
      * Constructs new {@link CurrencyFormatter} with the currency code specified.

@@ -13,7 +13,7 @@ import android.support.annotation.NonNull;
  */
 public class NoteItem extends BaseObservable implements DetailsItem {
 
-    private String mPurchaseNote;
+    private final String mPurchaseNote;
 
     public NoteItem(@NonNull String note) {
         mPurchaseNote = note;

@@ -62,9 +62,9 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     private FloatingActionButton mFabCapture;
     private View mViewBottom;
     @NonNull
-    private List<File> mImageFiles = new ArrayList<>();
+    private final List<File> mImageFiles = new ArrayList<>();
     @NonNull
-    private Camera.PictureCallback mPicture = new Camera.PictureCallback() {
+    private final Camera.PictureCallback mPicture = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(@NonNull byte[] data, Camera camera) {
             File imageFile;

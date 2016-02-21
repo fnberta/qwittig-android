@@ -26,7 +26,7 @@ import ch.giantific.qwittig.presentation.tasks.details.items.TaskHistoryItem;
  */
 public class TaskHistoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private TaskDetailsViewModel mViewModel;
+    private final TaskDetailsViewModel mViewModel;
 
     /**
      * Constructs a new {@link TaskHistoryRecyclerAdapter}.

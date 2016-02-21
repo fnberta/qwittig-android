@@ -25,7 +25,7 @@ import rx.SingleSubscriber;
 public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListener>
         implements HomeViewModel {
 
-    private PurchaseRepository mPurchaseRepo;
+    private final PurchaseRepository mPurchaseRepo;
     private boolean mDraftsAvailable;
     private String mInvitationIdentityId;
 
@@ -103,8 +103,8 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
                 mView.removeWorker(workerTag);
                 mView.hideProgressDialog();
 
-                mView.showMessage(R.string.toast_unknown_error);
-                // TODO: show proper error message
+                mView.showMessage(R.string.toast_error_unknown);
+                // TODO: show proper error message, define error codes in cloud code
             }
         }));
     }

@@ -39,12 +39,12 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     private static final String STATE_NICKNAME = "STATE_NICKNAME";
     private static final String STATE_PASSWORD = "STATE_PASSWORD";
     private static final String STATE_PASSWORD_REPEAT = "STATE_PASSWORD_REPEAT";
-    private IdentityRepository mIdentityRepo;
+    private final IdentityRepository mIdentityRepo;
     private boolean mValidate;
     private boolean mSaving;
     private boolean mUnlinkThirdParty;
-    private boolean mFacebookUser;
-    private boolean mGoogleUser;
+    private final boolean mFacebookUser;
+    private final boolean mGoogleUser;
     private String mAvatar;
     private String mEmail;
     private String mNickname;
@@ -183,7 +183,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
         return mGoogleUser && !mUnlinkThirdParty;
     }
 
-    public void setSaving(boolean saving) {
+    private void setSaving(boolean saving) {
         mSaving = saving;
         if (saving) {
             mView.startSaveAnim();
@@ -311,7 +311,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
 
                         @Override
                         public void onError(Throwable error) {
-                            // TODO: handle error
+                            mView.showMessage(R.string.toast_error_profile);
                         }
                     })
             );
@@ -363,8 +363,9 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
                             @Override
                             public void onError(Throwable error) {
                                 mView.removeWorker(workerTag);
+                                setSaving(false);
+
                                 mView.showMessage(R.string.toast_error_profile);
-                                // TODO: handle error
                             }
                         })
                 );
@@ -384,9 +385,9 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
                             @Override
                             public void onError(Throwable error) {
                                 mView.removeWorker(workerTag);
-
                                 setSaving(false);
-                                mView.showMessage(mUserRepo.getErrorMessage(error));
+
+                                mView.showMessage(R.string.toast_error_unlink_failed);
                             }
                         })
                 );

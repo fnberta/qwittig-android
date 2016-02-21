@@ -21,30 +21,31 @@
         >
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/til_add_users_nickname"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_marginStart="@dimen/key_line_1"
-            android:layout_toStartOf="@+id/iv_add_users_add"
+            android:layout_toStartOf="@+id/iv_settings_users_add"
             android:error="@{!nicknameItem.validate ? null : nicknameItem.nicknameComplete ? null : @string/error_nickname}"
             android:transitionGroup="true"
             tools:targetApi="lollipop"
             >
 
             <EditText
-                android:id="@+id/et_add_users_nickname"
+                android:id="@+id/et_settings_users_add_nickname"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/hint_nickname"
                 android:inputType="textPersonName"
                 android:onTextChanged="@{nicknameItem.onNicknameChanged}"
+                android:text="@{nicknameItem.nickname}"
+                tools:text="Vera"
                 />
 
         </android.support.design.widget.TextInputLayout>
 
         <ImageView
-            android:id="@+id/iv_add_users_add"
+            android:id="@+id/iv_settings_users_add"
             android:layout_width="@dimen/touch_target_min"
             android:layout_height="@dimen/touch_target_min"
             android:layout_alignParentEnd="true"

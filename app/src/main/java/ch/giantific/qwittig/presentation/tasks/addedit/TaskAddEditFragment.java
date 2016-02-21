@@ -42,8 +42,8 @@ public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, Task
     private static final String KEY_EDIT_TASK_ID = "EDIT_TASK_ID";
     private static final String DATE_PICKER_DIALOG = "DATE_PICKER_DIALOG";
     private static final String DISCARD_TASK_CHANGES_DIALOG = "DISCARD_TASK_CHANGES_DIALOG";
-    StringResSpinnerAdapter mTimeFrameAdapter;
-    TaskAddEditUsersRecyclerAdapter mUsersRecyclerAdapter;
+    private StringResSpinnerAdapter mTimeFrameAdapter;
+    private TaskAddEditUsersRecyclerAdapter mUsersRecyclerAdapter;
     private FragmentTaskAddBinding mBinding;
     private ItemTouchHelper mUsersItemTouchHelper;
 
@@ -52,7 +52,7 @@ public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, Task
     }
 
     /**
-     * Returns a new instance of a {@link TaskAddEditFragment} in add mode withouth any params.
+     * Returns a new instance of a {@link TaskAddEditFragment} in add mode without any params.
      *
      * @return a new instance of a {@link TaskAddEditFragment} in add mode
      */

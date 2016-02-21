@@ -24,7 +24,7 @@ import rx.subscriptions.Subscriptions;
  */
 public abstract class BaseGoogleApiClientSingle<T> implements Single.OnSubscribe<T> {
 
-    private Context mContext;
+    private final Context mContext;
 
     public BaseGoogleApiClientSingle(@NonNull Context context) {
         mContext = context;
@@ -74,7 +74,7 @@ public abstract class BaseGoogleApiClientSingle<T> implements Single.OnSubscribe
     private class ApiClientCallbacks implements GoogleApiClient.ConnectionCallbacks,
             GoogleApiClient.OnConnectionFailedListener {
 
-        private SingleSubscriber<? super T> mSubscriber;
+        private final SingleSubscriber<? super T> mSubscriber;
         private GoogleApiClient mGoogleApiClient;
 
         public ApiClientCallbacks(@NonNull SingleSubscriber<? super T> subscriber) {

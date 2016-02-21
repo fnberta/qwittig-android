@@ -19,7 +19,7 @@ public class LocalBroadcastImpl implements LocalBroadcast {
     public static final String INTENT_FILTER_DATA_NEW = BuildConfig.APPLICATION_ID + ".intents.DATA_NEW";
     public static final String INTENT_DATA_TYPE = BuildConfig.APPLICATION_ID + ".intents.DATA_TYPE";
     public static final String INTENT_EXTRA_COMPENSATION_PAID = BuildConfig.APPLICATION_ID + ".intents.COMPENSATION_PAID";
-    private Context mContext;
+    private final Context mContext;
 
     public LocalBroadcastImpl(@NonNull Context context) {
         mContext = context;

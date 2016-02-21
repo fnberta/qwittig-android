@@ -106,7 +106,7 @@ public class DraftsFragment extends BaseRecyclerViewFragment<DraftsViewModel, Dr
 
     @Override
     protected RecyclerView getRecyclerView() {
-        return mBinding.rvBase;
+        return mBinding.rvDrafts;
     }
 
     @Override

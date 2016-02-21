@@ -60,9 +60,9 @@ public class PurchaseEditDraftViewModelImpl extends PurchaseAddEditViewModelEdit
     }
 
     @Override
-    void onPurchaseSaveError(Throwable error) {
+    void onPurchaseSaveError() {
         mEditPurchase.setDraftId(mEditPurchaseId);
-        super.onPurchaseSaveError(error);
+        super.onPurchaseSaveError();
     }
 
     @Override

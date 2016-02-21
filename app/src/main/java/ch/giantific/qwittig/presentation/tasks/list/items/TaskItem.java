@@ -26,7 +26,7 @@ public class TaskItem extends BaseObservable implements ListItem, CardTopProgres
 
     private Task mTask;
     private Identity mTaskIdentityResponsible;
-    private Identity mCurrentIdentity;
+    private final Identity mCurrentIdentity;
 
     // TODO: fix users involved (nothing displayed right now)
 

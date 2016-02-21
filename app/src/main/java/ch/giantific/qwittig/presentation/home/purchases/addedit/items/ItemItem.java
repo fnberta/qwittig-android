@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.BR;
-import timber.log.Timber;
 
 /**
  * Created by fabio on 24.01.16.

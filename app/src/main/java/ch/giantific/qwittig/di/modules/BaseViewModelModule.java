@@ -15,8 +15,8 @@ import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
  */
 public abstract class BaseViewModelModule<T extends ViewModel.ViewListener> {
 
-    Bundle mSavedState;
-    T mView;
+    final Bundle mSavedState;
+    final T mView;
 
     public BaseViewModelModule(@Nullable Bundle savedState, @NonNull T view) {
         mSavedState = savedState;

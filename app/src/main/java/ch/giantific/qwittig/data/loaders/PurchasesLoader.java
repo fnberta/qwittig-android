@@ -24,9 +24,9 @@ import rx.functions.Func1;
  */
 public class PurchasesLoader extends BaseRxLoader<Purchase> {
 
-    private UserRepository mUserRepo;
-    private IdentityRepository mIdentityRepo;
-    private PurchaseRepository mPurchaseRepo;
+    private final UserRepository mUserRepo;
+    private final IdentityRepository mIdentityRepo;
+    private final PurchaseRepository mPurchaseRepo;
 
     @Inject
     public PurchasesLoader(@NonNull Application context, @NonNull UserRepository userRepository,

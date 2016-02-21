@@ -90,7 +90,7 @@ public class EmailPromptDialogFragment extends BaseDialogFragment<EmailPromptDia
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.dialog_prompt_email, null);
 
-        mTextInputLayoutEmail = (TextInputLayout) view.findViewById(R.id.til_email);
+        mTextInputLayoutEmail = (TextInputLayout) view.findViewById(R.id.til_dialog_email);
         mEditTextEmail = mTextInputLayoutEmail.getEditText();
         if (!TextUtils.isEmpty(mEmail)) {
             mEditTextEmail.setText(mEmail);

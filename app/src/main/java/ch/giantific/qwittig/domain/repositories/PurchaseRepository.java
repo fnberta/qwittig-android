@@ -119,7 +119,7 @@ public interface PurchaseRepository extends BaseRepository {
      * Saves a {@link Purchase} object as a draft, meaning only to the local offline datastore.
      *
      * @param purchase the purchase to save
-     * @param tag      the tag save the purche in the offline storage
+     * @param tag      the tag save the purchase in the offline storage
      * @return a {@link Single} emitting the save stream
      */
     Single<Purchase> savePurchaseAsDraftAsync(@NonNull Purchase purchase, @NonNull String tag);

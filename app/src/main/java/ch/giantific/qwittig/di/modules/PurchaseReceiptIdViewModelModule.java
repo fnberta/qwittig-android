@@ -22,8 +22,8 @@ import dagger.Provides;
 @Module
 public class PurchaseReceiptIdViewModelModule extends BaseViewModelModule<PurchaseReceiptViewModel.ViewListener> {
 
-    private String mPurchaseId;
-    private boolean mDraft;
+    private final String mPurchaseId;
+    private final boolean mDraft;
 
     public PurchaseReceiptIdViewModelModule(@Nullable Bundle savedState,
                                             @NonNull PurchaseReceiptViewModel.ViewListener view,

@@ -51,7 +51,6 @@
                     />
 
                 <android.support.design.widget.TextInputLayout
-                    android:id="@+id/til_nickname"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/key_line_1"
@@ -60,7 +59,7 @@
                     >
 
                     <EditText
-                        android:id="@+id/et_nickname"
+                        android:id="@+id/et_settings_profile_nickname"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/hint_nickname"
@@ -92,7 +91,6 @@
                     />
 
                 <android.support.design.widget.TextInputLayout
-                    android:id="@+id/til_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/key_line_1"
@@ -101,7 +99,7 @@
                     >
 
                     <EditText
-                        android:id="@+id/et_email"
+                        android:id="@+id/et_settings_profile_email"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/hint_email"
@@ -133,7 +131,6 @@
                     />
 
                 <android.support.design.widget.TextInputLayout
-                    android:id="@+id/til_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/key_line_1"
@@ -142,7 +139,7 @@
                     >
 
                     <EditText
-                        android:id="@+id/et_password"
+                        android:id="@+id/et_settings_profile_password"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/hint_password_new"
@@ -155,7 +152,6 @@
             </LinearLayout>
 
             <android.support.design.widget.TextInputLayout
-                android:id="@+id/til_password_repeat"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/key_line_1"
@@ -167,7 +163,7 @@
                 >
 
                 <EditText
-                    android:id="@+id/et_password_repeat"
+                    android:id="@+id/et_settings_profile_password_repeat"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_password_repeat"

@@ -32,7 +32,7 @@ public class PurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purchase
         implements PurchasesViewModel {
 
     private static final String STATE_IS_LOADING_MORE = "STATE_IS_LOADING_MORE";
-    private PurchaseRepository mPurchaseRepo;
+    private final PurchaseRepository mPurchaseRepo;
     private boolean mIsLoadingMore;
 
     public PurchasesViewModelImpl(@Nullable Bundle savedState,

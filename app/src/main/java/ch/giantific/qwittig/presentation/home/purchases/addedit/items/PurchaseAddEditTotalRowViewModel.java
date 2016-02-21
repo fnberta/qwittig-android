@@ -10,8 +10,6 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.AdapterView;
 
-import java.math.BigDecimal;
-
 /**
  * Created by fabio on 26.01.16.
  */

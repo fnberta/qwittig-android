@@ -33,7 +33,7 @@ public class CompsPaidViewModelImpl
         implements CompsPaidViewModel {
 
     private static final String STATE_IS_LOADING_MORE = "STATE_IS_LOADING_MORE";
-    private CompensationRepository mCompsRepo;
+    private final CompensationRepository mCompsRepo;
     private boolean mIsLoadingMore;
 
     public CompsPaidViewModelImpl(@Nullable Bundle savedState,

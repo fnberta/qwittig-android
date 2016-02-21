@@ -44,9 +44,9 @@ public abstract class StatsPieBaseFragment extends StatsBaseFragment {
     boolean mSortByUser;
     private RecyclerView mRecyclerView;
     @NonNull
-    private List<PieData> mUserPieData = new ArrayList<>();
+    private final List<PieData> mUserPieData = new ArrayList<>();
     @NonNull
-    private List<String> mUserNicknames = new ArrayList<>();
+    private final List<String> mUserNicknames = new ArrayList<>();
 
     public StatsPieBaseFragment() {
         // Required empty public constructor

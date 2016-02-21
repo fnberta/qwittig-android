@@ -22,8 +22,8 @@ import ch.giantific.qwittig.presentation.home.purchases.addedit.items.ItemUsersI
 public class PurchaseAddEditItemUsersRecyclerAdapter extends RecyclerView.Adapter<PurchaseAddEditItemUsersRecyclerAdapter.ItemUserRow>
         implements PurchaseAddEditItemUsersClickListener {
 
-    private PurchaseAddEditViewModel mViewModel;
-    private List<ItemUsersItemUser> mUsers;
+    private final PurchaseAddEditViewModel mViewModel;
+    private final List<ItemUsersItemUser> mUsers;
 
     public PurchaseAddEditItemUsersRecyclerAdapter(@NonNull PurchaseAddEditViewModel viewModel,
                                                    @NonNull List<ItemUsersItemUser> users) {

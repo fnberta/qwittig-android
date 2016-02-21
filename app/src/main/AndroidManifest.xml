@@ -116,11 +116,6 @@
             android:parentActivityName=".presentation.home.HomeActivity"
             android:theme="@style/AppTheme.DrawStatusBar" />
         <activity
-            android:name=".presentation.settings.SettingsStoresActivity"
-            android:label="@string/title_activity_settings_stores"
-            android:parentActivityName=".presentation.settings.SettingsActivity"
-            android:theme="@style/AppTheme.Explode" />
-        <activity
             android:name=".presentation.helpfeedback.HelpFeedbackActivity"
             android:label="@string/title_activity_help_feedback"
             android:parentActivityName=".presentation.home.HomeActivity" />

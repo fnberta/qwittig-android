@@ -12,7 +12,6 @@ import java.text.NumberFormat;
 
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.presentation.common.viewmodels.CardTopProgressViewModel;
-import ch.giantific.qwittig.utils.MoneyUtils;
 
 /**
  * Created by fabio on 11.02.16.
@@ -20,12 +19,12 @@ import ch.giantific.qwittig.utils.MoneyUtils;
 public abstract class UnpaidCompItem extends BaseObservable
         implements UnpaidItem, CardTopProgressViewModel {
 
-    final Compensation mCompensation;
+    private final Compensation mCompensation;
+    private final String mCompAmount;
+    private final boolean mCompLoading;
     boolean mCredit;
     String mCompUsername;
     String mCompUserAvatar;
-    final String mCompAmount;
-    final boolean mCompLoading;
 
     public UnpaidCompItem(@NonNull Compensation compensation, @NonNull NumberFormat moneyFormatter) {
         mCompensation = compensation;

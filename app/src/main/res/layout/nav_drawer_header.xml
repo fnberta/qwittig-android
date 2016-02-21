@@ -23,7 +23,6 @@
         >
 
         <ImageView
-            android:id="@+id/iv_header_background"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:contentDescription="@string/user_avatar"
@@ -41,7 +40,6 @@
             >
 
             <ImageView
-                android:id="@+id/iv_drawer_avatar"
                 android:layout_width="@dimen/navdrawer_profile_avatar_size"
                 android:layout_height="@dimen/navdrawer_profile_avatar_size"
                 android:layout_marginBottom="@dimen/small_space"
@@ -56,7 +54,6 @@
                 />
 
             <TextView
-                android:id="@+id/tv_drawer_nickname"
                 style="@style/TextAppearance.AppCompat.Body2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

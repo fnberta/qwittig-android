@@ -48,8 +48,8 @@ public class CompsUnpaidViewModelImpl
 
     private static final String STATE_COMPS_LOADING = "STATE_COMPS_LOADING";
     private static final String STATE_COMP_CHANGE_AMOUNT = "STATE_COMP_CHANGE_AMOUNT";
-    private CompensationRepository mCompsRepo;
-    private ArrayList<String> mLoadingComps;
+    private final CompensationRepository mCompsRepo;
+    private final ArrayList<String> mLoadingComps;
     private String mCompConfirmingId;
     private NumberFormat mMoneyFormatter;
 
@@ -101,9 +101,9 @@ public class CompsUnpaidViewModelImpl
                     }
                 })
                 .subscribe(new Subscriber<Compensation>() {
-                    private String currentIdentityId = mCurrentIdentity.getObjectId();
-                    private List<Compensation> credits = new ArrayList<>();
-                    private List<Compensation> debts = new ArrayList<>();
+                    private final String currentIdentityId = mCurrentIdentity.getObjectId();
+                    private final List<Compensation> credits = new ArrayList<>();
+                    private final List<Compensation> debts = new ArrayList<>();
 
                     @Override
                     public void onStart() {
@@ -113,8 +113,6 @@ public class CompsUnpaidViewModelImpl
 
                     @Override
                     public void onCompleted() {
-                        final String currency = mCurrentIdentity.getGroup().getCurrency();
-
                         if (!credits.isEmpty()) {
                             mItems.add(new HeaderItem(R.string.header_comps_credits));
                             for (Compensation comp : credits) {

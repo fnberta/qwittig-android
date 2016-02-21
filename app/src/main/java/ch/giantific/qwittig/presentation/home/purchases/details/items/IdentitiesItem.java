@@ -15,7 +15,7 @@ import ch.giantific.qwittig.domain.models.Identity;
  */
 public class IdentitiesItem implements DetailsItem {
 
-    private List<Identity> mIdentities;
+    private final List<Identity> mIdentities;
 
     public IdentitiesItem(@NonNull List<Identity> identities) {
         mIdentities = identities;

@@ -34,7 +34,7 @@ public class SettingsAddGroupViewModelImpl extends ViewModelBaseImpl<SettingsAdd
     private String mName;
     private String mCurrency;
     private boolean mValidate;
-    private IdentityRepository mIdentityRepo;
+    private final IdentityRepository mIdentityRepo;
 
     public SettingsAddGroupViewModelImpl(@Nullable Bundle savedState,
                                          @NonNull SettingsAddGroupViewModel.ViewListener view,
@@ -126,7 +126,7 @@ public class SettingsAddGroupViewModelImpl extends ViewModelBaseImpl<SettingsAdd
                         mView.removeWorker(workerTag);
                         mView.toggleProgressDialog(false);
 
-                        // TODO: handle error
+                        mView.showMessage(R.string.toast_error_settings_group_add);
                     }
                 })
         );

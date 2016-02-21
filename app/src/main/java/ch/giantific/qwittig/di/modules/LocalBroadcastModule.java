@@ -18,7 +18,7 @@ import dagger.Provides;
 @Module
 public class LocalBroadcastModule {
 
-    private Context mContext;
+    private final Context mContext;
 
     public LocalBroadcastModule(@NonNull Context context) {
         mContext = context;

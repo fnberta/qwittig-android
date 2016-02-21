@@ -11,8 +11,8 @@ import android.support.annotation.NonNull;
  */
 public class Currency {
 
-    private String mName;
-    private String mCode;
+    private final String mName;
+    private final String mCode;
 
     public String getCode() {
         return mCode;

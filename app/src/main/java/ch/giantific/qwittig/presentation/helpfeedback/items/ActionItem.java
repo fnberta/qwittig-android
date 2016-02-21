@@ -36,7 +36,7 @@ public class ActionItem extends BaseObservable implements HelpFeedbackItem {
         mIcon = icon;
     }
 
-    protected ActionItem(Parcel in) {
+    private ActionItem(Parcel in) {
         mTitle = in.readInt();
         mIcon = in.readInt();
     }

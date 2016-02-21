@@ -39,7 +39,7 @@ public class TaskUser implements Parcelable {
         mIsInvolved = isInvolved;
     }
 
-    protected TaskUser(@NonNull Parcel in) {
+    private TaskUser(@NonNull Parcel in) {
         mIdentityId = in.readString();
         mIsInvolved = in.readByte() != 0;
         mPosition = in.readInt();

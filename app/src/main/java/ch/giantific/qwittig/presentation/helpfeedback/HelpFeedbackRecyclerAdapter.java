@@ -25,7 +25,7 @@ import ch.giantific.qwittig.presentation.helpfeedback.items.HelpFeedbackItem.Typ
  */
 public class HelpFeedbackRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private HelpFeedbackViewModel mViewModel;
+    private final HelpFeedbackViewModel mViewModel;
 
     /**
      * Constructs a new {@link HelpFeedbackRecyclerAdapter}.

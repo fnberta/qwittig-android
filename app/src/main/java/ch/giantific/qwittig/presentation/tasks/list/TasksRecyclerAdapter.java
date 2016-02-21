@@ -25,7 +25,7 @@ import ch.giantific.qwittig.presentation.tasks.list.items.ListItem.Type;
  */
 public class TasksRecyclerAdapter extends RecyclerView.Adapter {
 
-    private TasksViewModel mViewModel;
+    private final TasksViewModel mViewModel;
 
     /**
      * Constructs a new {@link TasksRecyclerAdapter}.
@@ -101,21 +101,21 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter {
         /**
          * Handles the click on the task row itself.
          *
-         * @param position the adapter postition of the task
+         * @param position the adapter position of the task
          */
         void onTaskRowClicked(int position);
 
         /**
          * Handles the click on the mark task as done button.
          *
-         * @param position the adapter postition of the task
+         * @param position the adapter position of the task
          */
         void onDoneButtonClicked(int position);
 
         /**
          * Handles the click on the remind user to finish a task button.
          *
-         * @param position the adapter postition of the task
+         * @param position the adapter position of the task
          */
         void onRemindButtonClicked(int position);
     }

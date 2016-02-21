@@ -48,15 +48,14 @@
                     >
 
                     <TextView
-                        android:id="@+id/tv_balance"
                         style="@style/HomeToolbarTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
                         android:ellipsize="middle"
                         android:lines="1"
-                        android:textColor="@android:color/white"
                         android:text="@{viewModel.currentIdentityBalance}"
+                        android:textColor="@android:color/white"
                         tools:text="-123.40"
                         />
 
@@ -78,7 +77,7 @@
 
         </android.support.design.widget.CoordinatorLayout>
 
-        <include layout="@layout/include_navdrawer"/>
+        <include layout="@layout/include_nav_drawer"/>
 
     </android.support.v4.widget.DrawerLayout>
 </layout>

@@ -20,7 +20,7 @@ import rx.SingleSubscriber;
  */
 public class GoogleApiClientUnlink extends BaseGoogleApiClientSingle<Void> {
 
-    public GoogleApiClientUnlink(@NonNull Context context) {
+    private GoogleApiClientUnlink(@NonNull Context context) {
         super(context);
     }
 

@@ -55,7 +55,7 @@ public class CompsUpdateWorker extends BaseQueryWorker<Compensation, CompsUpdate
     }
 
     @NonNull
-    public static CompsUpdateWorker newInstance(boolean queryPaid) {
+    private static CompsUpdateWorker newInstance(boolean queryPaid) {
         CompsUpdateWorker fragment = new CompsUpdateWorker();
         Bundle args = new Bundle();
         args.putBoolean(KEY_QUERY_PAID, queryPaid);

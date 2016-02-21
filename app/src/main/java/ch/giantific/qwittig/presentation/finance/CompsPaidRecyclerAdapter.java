@@ -23,7 +23,7 @@ import ch.giantific.qwittig.presentation.common.adapters.rows.ProgressRow;
  */
 public class CompsPaidRecyclerAdapter extends RecyclerView.Adapter {
 
-    private CompsPaidViewModel mViewModel;
+    private final CompsPaidViewModel mViewModel;
 
     /**
      * Constructs a new {@link CompsPaidRecyclerAdapter}.

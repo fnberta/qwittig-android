@@ -7,10 +7,7 @@ package ch.giantific.qwittig.domain.repositories;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import java.util.List;
-
 import ch.giantific.qwittig.domain.models.Group;
-import ch.giantific.qwittig.domain.models.Identity;
 import rx.Observable;
 import rx.Single;
 

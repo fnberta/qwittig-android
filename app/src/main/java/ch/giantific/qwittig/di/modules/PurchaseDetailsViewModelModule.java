@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
@@ -24,7 +23,7 @@ import dagger.Provides;
 @Module
 public class PurchaseDetailsViewModelModule extends BaseViewModelModule<PurchaseDetailsViewModel.ViewListener> {
 
-    private String mPurchaseId;
+    private final String mPurchaseId;
 
     public PurchaseDetailsViewModelModule(@Nullable Bundle savedState,
                                           @NonNull PurchaseDetailsViewModel.ViewListener view,

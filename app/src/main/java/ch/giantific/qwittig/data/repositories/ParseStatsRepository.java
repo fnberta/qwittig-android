@@ -29,7 +29,7 @@ public class ParseStatsRepository extends ParseBaseRepository implements StatsRe
     private static final String PARAM_YEAR = "year";
     private static final String PARAM_MONTH = "month";
 
-    private Gson mGson;
+    private final Gson mGson;
 
     public ParseStatsRepository(@NonNull Gson gson) {
         mGson = gson;

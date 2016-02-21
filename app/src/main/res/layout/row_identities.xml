@@ -36,7 +36,6 @@
             />
 
         <TextView
-            android:id="@+id/user_name"
             style="@style/TextAppearance.AppCompat.Subhead.List"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -47,7 +46,6 @@
             />
 
         <TextView
-            android:id="@+id/user_balance"
             style="@style/TextAppearance.AppCompat.Subhead.List"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"

@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.viewmodels.LoadMoreViewModel;
 import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModel;
-import rx.Observable;
 
 /**
  * Created by fabio on 21.01.16.

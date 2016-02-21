@@ -31,7 +31,7 @@ public abstract class BaseWorker<T, S extends BaseWorkerListener> extends Fragme
     @Inject
     protected UserRepository mUserRepo;
     private Subscription mSubscription;
-    private ReplaySubject<T> mSubject = ReplaySubject.create();
+    private final ReplaySubject<T> mSubject = ReplaySubject.create();
 
     public BaseWorker() {
         // empty default constructor

@@ -42,7 +42,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<ListItem, Ta
         implements TasksViewModel {
 
     private static final String STATE_LOADING_TASKS = "STATE_LOADING_TASKS";
-    private TaskRepository mTaskRepo;
+    private final TaskRepository mTaskRepo;
     private ArrayList<String> mLoadingTasks;
     private Date mDeadlineSelected;
 

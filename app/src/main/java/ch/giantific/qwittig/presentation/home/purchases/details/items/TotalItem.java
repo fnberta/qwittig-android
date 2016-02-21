@@ -13,8 +13,8 @@ import android.support.annotation.NonNull;
  */
 public class TotalItem extends BaseObservable implements DetailsItem {
 
-    private String mPurchaseTotal;
-    private String mPurchaseTotalForeign;
+    private final String mPurchaseTotal;
+    private final String mPurchaseTotalForeign;
 
     public TotalItem(@NonNull String total, @NonNull String totalForeign) {
         mPurchaseTotal = total;

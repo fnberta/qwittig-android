@@ -21,7 +21,7 @@ import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
  */
 public class IdentitiesRecyclerAdapter extends RecyclerView.Adapter<BindingRow> {
 
-    private IdentitiesViewModel mViewModel;
+    private final IdentitiesViewModel mViewModel;
 
     /**
      * Constructs a new {@link IdentitiesRecyclerAdapter}.

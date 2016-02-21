@@ -40,10 +40,10 @@ import rx.SingleSubscriber;
 public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<DetailsItem, PurchaseDetailsViewModel.ViewListener>
         implements PurchaseDetailsViewModel {
 
-    private PurchaseRepository mPurchaseRepo;
-    private String mPurchaseId;
+    private final PurchaseRepository mPurchaseRepo;
+    private final String mPurchaseId;
     private Purchase mPurchase;
-    private NumberFormat mMoneyFormatter;
+    private final NumberFormat mMoneyFormatter;
 
     public PurchaseDetailsViewModelImpl(@Nullable Bundle savedState,
                                         @NonNull PurchaseDetailsViewModel.ViewListener view,

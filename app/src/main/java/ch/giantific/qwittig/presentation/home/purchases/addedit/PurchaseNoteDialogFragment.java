@@ -68,7 +68,7 @@ public class PurchaseNoteDialogFragment extends BaseDialogFragment<PurchaseNoteD
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.dialog_purchase_note, null);
-        TextInputLayout tilNote = (TextInputLayout) view.findViewById(R.id.til_note);
+        TextInputLayout tilNote = (TextInputLayout) view.findViewById(R.id.til_dialog_purchase_note);
         mEditTextNote = tilNote.getEditText();
         if (mEditTextNote != null && !TextUtils.isEmpty(mNote)) {
             mEditTextNote.setText(mNote);

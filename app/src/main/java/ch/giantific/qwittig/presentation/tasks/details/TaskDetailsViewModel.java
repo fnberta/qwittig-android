@@ -18,7 +18,6 @@ import java.util.List;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
 import ch.giantific.qwittig.presentation.tasks.details.items.DetailsItem;
-import ch.giantific.qwittig.presentation.tasks.details.items.TaskHistoryItem;
 
 /**
  * Created by fabio on 09.01.16.
@@ -77,7 +76,7 @@ public interface TaskDetailsViewModel extends
         /**
          * Starts the screen that allows the user to edit a task
          *
-         * @param taskId the object id of the task toedit
+         * @param taskId the object id of the task to edit
          */
         void startEditTaskActivity(@NonNull String taskId);
 

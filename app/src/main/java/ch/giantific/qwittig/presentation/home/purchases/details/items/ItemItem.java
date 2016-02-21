@@ -21,11 +21,11 @@ import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;
  */
 public class ItemItem extends BaseObservable implements DetailsItem {
 
-    private Item mItem;
-    private String mItemName;
-    private String mItemPrice;
-    private float mItemAlpha;
-    private float mItemUserPercentage;
+    private final Item mItem;
+    private final String mItemName;
+    private final String mItemPrice;
+    private final float mItemAlpha;
+    private final float mItemUserPercentage;
 
     public ItemItem(@NonNull Item item, @NonNull Identity currentIdentity,
                     @NonNull NumberFormat formatter) {

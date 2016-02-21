@@ -129,7 +129,7 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileViewMod
 
     @Override
     protected View getSnackbarView() {
-        return mBinding.etNickname;
+        return mBinding.etSettingsProfileNickname;
     }
 
     @Override

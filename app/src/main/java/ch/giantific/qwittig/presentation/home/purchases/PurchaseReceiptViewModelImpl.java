@@ -25,7 +25,7 @@ public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseRece
         implements PurchaseReceiptViewModel {
 
     private static final String STATE_LOADING = "STATE_LOADING";
-    private PurchaseRepository mPurchaseRepo;
+    private final PurchaseRepository mPurchaseRepo;
     private boolean mLoading;
     private String mReceiptImagePath;
     private String mPurchaseId;
