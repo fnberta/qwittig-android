@@ -15,7 +15,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddEditTotalRowViewModel"
+            type="ch.giantific.qwittig.presentation.home.purchases.addedit.items.PurchaseAddEditTotalRowViewModel"
             />
     </data>
 

@@ -41,12 +41,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ch.giantific.qwittig.utils.googleapi.GoogleApiClientSignOut;
-import ch.giantific.qwittig.utils.googleapi.GoogleApiClientUnlink;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.utils.AvatarUtils;
+import ch.giantific.qwittig.utils.googleapi.GoogleApiClientSignOut;
+import ch.giantific.qwittig.utils.googleapi.GoogleApiClientUnlink;
 import ch.giantific.qwittig.utils.parse.ParseInstallationUtils;
 import rx.Observable;
 import rx.Single;
@@ -445,39 +445,6 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                 });
     }
 
-    private void addUserToInstallation(@NonNull final User user,
-                                       @NonNull final List<Identity> identities) {
-        Observable.from(identities)
-                .map(new Func1<Identity, String>() {
-                    @Override
-                    public String call(Identity identity) {
-                        return identity.getGroup().getObjectId();
-                    }
-                })
-                .toList()
-                .map(new Func1<List<String>, ParseInstallation>() {
-                    @Override
-                    public ParseInstallation call(List<String> channels) {
-                        final ParseInstallation installation = ParseInstallation.getCurrentInstallation();
-                        installation.addAllUnique(ParseInstallationUtils.CHANNELS, channels);
-                        installation.put(ParseInstallationUtils.USER, user);
-                        return installation;
-                    }
-                })
-                .toSingle()
-                .subscribe(new SingleSubscriber<ParseInstallation>() {
-                    @Override
-                    public void onSuccess(ParseInstallation installation) {
-                        installation.saveEventually();
-                    }
-
-                    @Override
-                    public void onError(Throwable error) {
-
-                    }
-                });
-    }
-
     @Override
     public Single<String> handleInvitation(@NonNull String identityId) {
         final Map<String, Object> params = new HashMap<>();
@@ -551,6 +518,27 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
     @Override
     public Single<User> deleteUser(@NonNull User user) {
         return delete(user);
+    }
+
+    @Override
+    public Observable<ParseInstallation> setupInstallation(@NonNull final User user) {
+        return Observable.from(user.getIdentities())
+                .map(new Func1<Identity, String>() {
+                    @Override
+                    public String call(Identity identity) {
+                        return identity.getGroup().getObjectId();
+                    }
+                })
+                .toList()
+                .flatMap(new Func1<List<String>, Observable<ParseInstallation>>() {
+                    @Override
+                    public Observable<ParseInstallation> call(List<String> channels) {
+                        final ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+                        installation.addAllUnique(ParseInstallationUtils.CHANNELS, channels);
+                        installation.put(ParseInstallationUtils.USER, user);
+                        return save(installation).toObservable();
+                    }
+                });
     }
 
     @Override

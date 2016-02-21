@@ -74,18 +74,24 @@ public class CompsUpdateWorker extends BaseQueryWorker<Compensation, CompsUpdate
         mQueryPaid = args.getBoolean(KEY_QUERY_PAID);
 
         if (setUserInfo()) {
-            if (mQueryPaid) {
-                return mCompsRepo.updateCompensationsPaidAsync(mCurrentIdentity, mIdentities);
-            } else {
-                return mIdentityRepo.updateIdentitiesAsync(mIdentities)
-                        .toList()
-                        .flatMap(new Func1<List<Identity>, Observable<Compensation>>() {
-                            @Override
-                            public Observable<Compensation> call(List<Identity> identities) {
-                                return mCompsRepo.updateCompensationsUnpaidAsync(mCurrentIdentity, mIdentities);
+            return mIdentityRepo.updateIdentitiesAsync(mIdentities)
+                    .toList()
+                    .flatMap(new Func1<List<Identity>, Observable<Compensation>>() {
+                        @Override
+                        public Observable<Compensation> call(List<Identity> identities) {
+                            if (mQueryPaid) {
+                                return mCompsRepo.updateCompensationsPaidAsync(mCurrentIdentity, mIdentities);
+                            } else {
+                                return mCompsRepo.calculateCompensations(mCurrentIdentity.getGroup())
+                                        .flatMapObservable(new Func1<String, Observable<? extends Compensation>>() {
+                                            @Override
+                                            public Observable<? extends Compensation> call(String s) {
+                                                return mCompsRepo.updateCompensationsUnpaidAsync(mIdentities);
+                                            }
+                                        });
                             }
-                        });
-            }
+                        }
+                    });
         }
 
         return null;

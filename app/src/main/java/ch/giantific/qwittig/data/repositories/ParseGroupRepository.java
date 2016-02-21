@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import com.parse.ParseException;
 import com.parse.ParsePush;
 import com.parse.ParseQuery;
+import com.parse.SaveCallback;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +20,7 @@ import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import rx.Observable;
 import rx.Single;
+import rx.SingleSubscriber;
 
 /**
  * Provides an implementation of {@link GroupRepository} that uses the Parse.com framework as
@@ -74,9 +76,30 @@ public class ParseGroupRepository extends ParseBaseRepository implements GroupRe
     }
 
     @Override
+    public Single<Group> subscribeGroup(@NonNull final Group group) {
+        return Single.create(new Single.OnSubscribe<Group>() {
+            @Override
+            public void call(final SingleSubscriber<? super Group> singleSubscriber) {
+                ParsePush.subscribeInBackground(group.getObjectId(), new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (singleSubscriber.isUnsubscribed()) {
+                            return;
+                        }
+
+                        if (e != null) {
+                            singleSubscriber.onError(e);
+                        } else {
+                            singleSubscriber.onSuccess(group);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
     public void unsubscribeGroup(@NonNull Group group) {
         ParsePush.unsubscribeInBackground(group.getObjectId());
     }
-
-
 }

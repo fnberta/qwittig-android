@@ -9,6 +9,8 @@ import android.support.annotation.NonNull;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
+import java.text.NumberFormat;
+
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.viewmodels.UserAvatarRowBaseViewModel;
 import ch.giantific.qwittig.utils.MoneyUtils;
@@ -21,9 +23,13 @@ public class IdentityRowViewModel extends UserAvatarRowBaseViewModel {
 
     private String mIdentityBalance;
     private boolean mBalancePositive;
+    private NumberFormat mMoneyFormatter;
 
     public IdentityRowViewModel(@NonNull Identity identity) {
         super(identity);
+
+        final String currency = identity.getGroup().getCurrency();
+        mMoneyFormatter = MoneyUtils.getMoneyFormatter(currency, false, true);
     }
 
     @Override
@@ -31,7 +37,7 @@ public class IdentityRowViewModel extends UserAvatarRowBaseViewModel {
         super.setIdentity(identity);
 
         final BigFraction balance = identity.getBalance();
-        mIdentityBalance = MoneyUtils.formatMoneyNoSymbol(balance, identity.getGroup().getCurrency());
+        mIdentityBalance = mMoneyFormatter.format(balance);
         mBalancePositive = Utils.isPositive(balance);
     }
 

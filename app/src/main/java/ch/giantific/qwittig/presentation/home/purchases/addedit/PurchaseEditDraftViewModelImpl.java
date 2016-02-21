@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 
 import java.util.List;
 
+import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Item;
 import ch.giantific.qwittig.domain.models.Purchase;
@@ -46,8 +47,8 @@ public class PurchaseEditDraftViewModelImpl extends PurchaseAddEditViewModelEdit
     @NonNull
     @Override
     Purchase createPurchase(@NonNull List<Identity> purchaseIdentities,
-                            @NonNull List<Item> purchaseItems) {
-        final Purchase purchase = super.createPurchase(purchaseIdentities, purchaseItems);
+                            @NonNull List<Item> purchaseItems, int fractionDigits) {
+        final Purchase purchase = super.createPurchase(purchaseIdentities, purchaseItems, fractionDigits);
         purchase.removeDraftId();
         return purchase;
     }
@@ -71,7 +72,7 @@ public class PurchaseEditDraftViewModelImpl extends PurchaseAddEditViewModelEdit
 
     @Override
     public void onDeleteDraftClick() {
-        mSubscriptions.add(mPurchaseRepo.removePurchaseLocalAsync(mEditPurchase, Purchase.PIN_LABEL_DRAFT)
+        getSubscriptions().add(mPurchaseRepo.removePurchaseLocalAsync(mEditPurchase, Purchase.PIN_LABEL_DRAFT)
                 .subscribe(new SingleSubscriber<Purchase>() {
                     @Override
                     public void onSuccess(Purchase value) {
@@ -80,8 +81,9 @@ public class PurchaseEditDraftViewModelImpl extends PurchaseAddEditViewModelEdit
 
                     @Override
                     public void onError(Throwable error) {
-                        // TODO: handle error
+                        mView.showMessage(R.string.toast_error_draft_delete);
                     }
-                }));
+                })
+        );
     }
 }

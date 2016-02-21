@@ -11,12 +11,13 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
 
-import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.BR;
-import ch.giantific.qwittig.utils.MoneyUtils;
+import timber.log.Timber;
 
 /**
  * Created by fabio on 24.01.16.
@@ -35,44 +36,40 @@ public class ItemItem extends BaseObservable implements AddEditItem {
         }
     };
     private PriceChangedListener mPriceChangedListener;
-    private String mCurrency;
+    private NumberFormat mMoneyFormatter;
     private boolean mValidate;
     private String mName;
     private String mPrice;
     private ItemUsersItemUser[] mUsers;
 
-    public ItemItem(@NonNull ItemUsersItemUser[] users, @NonNull String currency) {
+    public ItemItem(@NonNull ItemUsersItemUser[] users) {
         mUsers = users;
-        mCurrency = currency;
     }
 
-    public ItemItem(@NonNull String name, @NonNull String price, @NonNull ItemUsersItemUser[] users,
-                    @NonNull String currency) {
+    public ItemItem(@NonNull String name, @NonNull String price, @NonNull ItemUsersItemUser[] users) {
         mName = name;
         mPrice = price;
         mUsers = users;
-        mCurrency = currency;
     }
 
-    protected ItemItem(Parcel in) {
+    private ItemItem(Parcel in) {
         mValidate = in.readByte() != 0;
         mName = in.readString();
         mPrice = in.readString();
-        mUsers = (ItemUsersItemUser[]) in.readParcelableArray(ItemUsersItemUser.class.getClassLoader());
+        mUsers = in.createTypedArray(ItemUsersItemUser.CREATOR);
     }
 
     public void setPriceChangedListener(@NonNull PriceChangedListener priceChangedListener) {
         mPriceChangedListener = priceChangedListener;
     }
 
-    @Override
-    public int getType() {
-        return Type.ITEM;
+    public void setMoneyFormatter(@NonNull NumberFormat moneyFormatter) {
+        mMoneyFormatter = moneyFormatter;
     }
 
-    public void updateCurrency(@NonNull String currency) {
-        mCurrency = currency;
-        setPrice(MoneyUtils.formatPrice(mPrice, mCurrency));
+    public void updatePriceFormat(@NonNull NumberFormat moneyFormatter) {
+        setMoneyFormatter(moneyFormatter);
+        setPrice(mMoneyFormatter.format(parsePrice()));
     }
 
     @Bindable
@@ -93,6 +90,23 @@ public class ItemItem extends BaseObservable implements AddEditItem {
     public void setPrice(@NonNull String price) {
         mPrice = price;
         notifyPropertyChanged(BR.price);
+    }
+
+    /**
+     * Returns the price parsed as a double. Accounts for localized string formatting.
+     *
+     * @return the price parsed as a double.
+     */
+    public double parsePrice() {
+        try {
+            return Double.parseDouble(mPrice);
+        } catch (NumberFormatException e) {
+            try {
+                return mMoneyFormatter.parse(mPrice).doubleValue();
+            } catch (ParseException e1) {
+                return 0;
+            }
+        }
     }
 
     public ItemUsersItemUser[] getUsers() {
@@ -137,7 +151,7 @@ public class ItemItem extends BaseObservable implements AddEditItem {
 
     public void onPriceFocusChange(View v, boolean hasFocus) {
         if (!hasFocus) {
-            setPrice(MoneyUtils.formatPrice(mPrice, mCurrency));
+            setPrice(mMoneyFormatter.format(parsePrice()));
         }
     }
 
@@ -147,12 +161,7 @@ public class ItemItem extends BaseObservable implements AddEditItem {
         return isNameComplete() && isPriceComplete();
     }
 
-    public BigDecimal parsePrice(@NonNull String currency) {
-        int maxFractionDigits = MoneyUtils.getMaximumFractionDigits(currency);
-        return MoneyUtils.parsePrice(mPrice).setScale(maxFractionDigits, BigDecimal.ROUND_HALF_UP);
-    }
-
-    public List<String> getSelectedUserIds() {
+    public List<String> getSelectedIdentitiesIds() {
         final List<String> userIds = new ArrayList<>();
         for (ItemUsersItemUser user : mUsers) {
             if (user.isSelected()) {
@@ -160,6 +169,11 @@ public class ItemItem extends BaseObservable implements AddEditItem {
             }
         }
         return userIds;
+    }
+
+    @Override
+    public int getType() {
+        return Type.ITEM;
     }
 
     @Override
@@ -172,7 +186,7 @@ public class ItemItem extends BaseObservable implements AddEditItem {
         dest.writeByte(mValidate ? (byte) 1 : (byte) 0);
         dest.writeString(mName);
         dest.writeString(mPrice);
-        dest.writeParcelableArray(mUsers, 0);
+        dest.writeTypedArray(mUsers, 0);
     }
 
     public interface PriceChangedListener {

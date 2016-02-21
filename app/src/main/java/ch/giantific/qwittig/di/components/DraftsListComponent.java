@@ -4,10 +4,10 @@
 
 package ch.giantific.qwittig.di.components;
 
-import ch.giantific.qwittig.di.modules.HomePurchasesViewModelModule;
+import ch.giantific.qwittig.di.modules.HomeDraftsViewModelModule;
 import ch.giantific.qwittig.di.modules.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesFragment;
+import ch.giantific.qwittig.presentation.home.purchases.list.DraftsFragment;
 import dagger.Component;
 
 /**
@@ -15,8 +15,8 @@ import dagger.Component;
  */
 @PerFragment
 @Component(dependencies = {ApplicationComponent.class},
-        modules = {HomePurchasesViewModelModule.class, RepositoriesModule.class})
-public interface HomePurchasesComponent {
+        modules = {HomeDraftsViewModelModule.class, RepositoriesModule.class})
+public interface DraftsListComponent {
 
-    void inject(PurchasesFragment purchasesFragment);
+    void inject(DraftsFragment draftsFragment);
 }

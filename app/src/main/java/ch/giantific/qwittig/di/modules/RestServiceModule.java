@@ -10,9 +10,9 @@ import ch.giantific.qwittig.data.rest.ExchangeRates;
 import ch.giantific.qwittig.data.rest.ReceiptOcr;
 import dagger.Module;
 import dagger.Provides;
-import retrofit.GsonConverterFactory;
-import retrofit.Retrofit;
-import retrofit.RxJavaCallAdapterFactory;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by fabio on 13.01.16.

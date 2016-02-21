@@ -220,7 +220,7 @@ public class PurchaseAddActivity extends BaseActivity<PurchaseAddEditViewModel> 
     }
 
     @Override
-    public void onExchangeRateManuallySet(float exchangeRate) {
+    public void onExchangeRateManuallySet(double exchangeRate) {
         mViewModel.onExchangeRateManuallySet(exchangeRate);
     }
 

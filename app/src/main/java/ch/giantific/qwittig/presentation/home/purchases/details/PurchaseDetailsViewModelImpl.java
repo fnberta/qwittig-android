@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +43,7 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<DetailsI
     private PurchaseRepository mPurchaseRepo;
     private String mPurchaseId;
     private Purchase mPurchase;
+    private NumberFormat mMoneyFormatter;
 
     public PurchaseDetailsViewModelImpl(@Nullable Bundle savedState,
                                         @NonNull PurchaseDetailsViewModel.ViewListener view,
@@ -53,6 +55,9 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<DetailsI
 
         mPurchaseRepo = purchaseRepo;
         mPurchaseId = purchaseId;
+        final String groupCurrency = mCurrentIdentity.getGroup().getCurrency();
+        mMoneyFormatter = MoneyUtils.getMoneyFormatter(groupCurrency, true, true);
+
         if (savedState != null) {
             mItems = new ArrayList<>();
         }
@@ -61,21 +66,13 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<DetailsI
     @Override
     @Bindable
     public String getPurchaseStore() {
-        if (mPurchase != null) {
-            return mPurchase.getStore();
-        } else {
-            return "";
-        }
+        return mPurchase != null ? mPurchase.getStore() : "";
     }
 
     @Override
     @Bindable
     public String getPurchaseDate() {
-        if (mPurchase != null) {
-            return DateUtils.formatDateLong(mPurchase.getDate());
-        } else {
-            return "";
-        }
+        return mPurchase != null ? DateUtils.formatDateLong(mPurchase.getDate()) : "";
     }
 
     @Override
@@ -85,12 +82,7 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<DetailsI
 
     @Override
     public void loadData() {
-//        if (!isUserInGroup()) {
-//            mView.showMessage(R.string.toast_error_purchase_details_group_not);
-//            return;
-//        }
-
-        mSubscriptions.add(mPurchaseRepo.getPurchaseLocalAsync(mPurchaseId, false)
+        getSubscriptions().add(mPurchaseRepo.getPurchaseLocalAsync(mPurchaseId, false)
                 .subscribe(new SingleSubscriber<Purchase>() {
                     @Override
                     public void onSuccess(Purchase purchase) {
@@ -122,18 +114,18 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<DetailsI
         mItems.add(new IdentitiesItem(mPurchase.getIdentities()));
 
         mItems.add(new HeaderItem(R.string.header_items));
-        final String groupCurrency = mCurrentIdentity.getGroup().getCurrency();
         for (Item item : mPurchase.getItems()) {
-            mItems.add(new ItemItem(item, mCurrentIdentity, groupCurrency));
+            mItems.add(new ItemItem(item, mCurrentIdentity, mMoneyFormatter));
         }
-        final String total = MoneyUtils.formatMoney(mPurchase.getTotalPrice(), groupCurrency);
-        final String purchaseCurrency = mPurchase.getCurrency();
-        final String totalForeign = MoneyUtils.formatMoney(mPurchase.getTotalPriceForeign(), purchaseCurrency);
+
+        final NumberFormat foreignFormatter = MoneyUtils.getMoneyFormatter(mPurchase.getCurrency(), true, true);
+        final String total = mMoneyFormatter.format(mPurchase.getTotalPrice());
+        final String totalForeign = foreignFormatter.format(mPurchase.getTotalPriceForeign());
         mItems.add(new TotalItem(total, totalForeign));
 
         final double share = mPurchase.calculateUserShare(mCurrentIdentity);
-        final String myShare = MoneyUtils.formatMoney(share, groupCurrency);
-        final String myShareForeign = MoneyUtils.formatMoney(share / mPurchase.getExchangeRate(), purchaseCurrency);
+        final String myShare = mMoneyFormatter.format(share);
+        final String myShareForeign = foreignFormatter.format(share / mPurchase.getExchangeRate());
         mItems.add(new MyShareItem(myShare, myShareForeign));
 
         final String note = mPurchase.getNote();
@@ -172,7 +164,7 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<DetailsI
     }
 
     private void updateReadBy() {
-        if (!mPurchase.userHasReadPurchase(mCurrentIdentity)) {
+        if (!mPurchase.isRead(mCurrentIdentity)) {
             mPurchase.addUserToReadBy(mCurrentIdentity);
             mPurchase.saveEventually();
         }
@@ -197,8 +189,8 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<DetailsI
     @Override
     public void onShowExchangeRateClick() {
         final double exchangeRate = mPurchase.getExchangeRate();
-        mView.showMessage(R.string.toast_exchange_rate_value,
-                MoneyUtils.formatMoneyNoSymbol(exchangeRate, MoneyUtils.EXCHANGE_RATE_FRACTION_DIGITS));
+        final NumberFormat formatter = MoneyUtils.getExchangeRateFormatter();
+        mView.showMessage(R.string.toast_exchange_rate_value, formatter.format(exchangeRate));
     }
 
     @Override

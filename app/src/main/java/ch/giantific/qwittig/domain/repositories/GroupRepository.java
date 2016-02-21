@@ -46,5 +46,7 @@ public interface GroupRepository extends BaseRepository {
     @Nullable
     Group getGroupOnline(@NonNull String groupId);
 
+    Single<Group> subscribeGroup(@NonNull Group group);
+
     void unsubscribeGroup(@NonNull Group group);
 }

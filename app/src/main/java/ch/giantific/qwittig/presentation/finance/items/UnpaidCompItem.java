@@ -8,6 +8,8 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.support.annotation.NonNull;
 
+import java.text.NumberFormat;
+
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.presentation.common.viewmodels.CardTopProgressViewModel;
 import ch.giantific.qwittig.utils.MoneyUtils;
@@ -19,17 +21,15 @@ public abstract class UnpaidCompItem extends BaseObservable
         implements UnpaidItem, CardTopProgressViewModel {
 
     final Compensation mCompensation;
-    final String mCurrency;
     boolean mCredit;
     String mCompUsername;
     String mCompUserAvatar;
     final String mCompAmount;
     final boolean mCompLoading;
 
-    public UnpaidCompItem(@NonNull Compensation compensation, @NonNull String currency) {
+    public UnpaidCompItem(@NonNull Compensation compensation, @NonNull NumberFormat moneyFormatter) {
         mCompensation = compensation;
-        mCurrency = currency;
-        mCompAmount = MoneyUtils.formatMoney(compensation.getAmountFraction(), mCurrency);
+        mCompAmount = moneyFormatter.format(compensation.getAmountFraction());
         mCompLoading = compensation.isLoading();
     }
 

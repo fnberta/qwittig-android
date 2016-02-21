@@ -69,7 +69,7 @@ public class Item extends ParseObject {
      * @param exchangeRate the exchange rate to convert the price
      * @return the price in foreign currency
      */
-    public double getPriceForeign(float exchangeRate) {
+    public double getPriceForeign(double exchangeRate) {
         final double price = getPrice();
         if (exchangeRate == 1) {
             return price;
@@ -85,10 +85,10 @@ public class Item extends ParseObject {
      * @param exchangeRate    the exchange rate to be used to convert the price
      * @param toGroupCurrency whether to convert to the group's currency or to a foreign one
      */
-    public void convertPrice(float exchangeRate, boolean toGroupCurrency) {
+    public void convertPrice(double exchangeRate, boolean toGroupCurrency) {
         final double price = getPrice();
         final double priceConverted = toGroupCurrency ? price * exchangeRate : price / exchangeRate;
-        setPrice(MoneyUtils.roundToFractionDigits(4, priceConverted));
+        setPrice(MoneyUtils.roundConvertedPrice(priceConverted));
     }
 
     public List<Identity> getIdentities() {

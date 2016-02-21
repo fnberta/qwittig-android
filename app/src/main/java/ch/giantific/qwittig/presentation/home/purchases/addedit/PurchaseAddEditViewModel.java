@@ -14,6 +14,7 @@ import com.parse.ParseFile;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.text.NumberFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -23,6 +24,9 @@ import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFr
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.items.AddEditItem;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.items.ItemItem;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.PurchaseAddEditDateRowViewModel;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.PurchaseAddEditStoreRowViewModel;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.PurchaseAddEditTotalRowViewModel;
 import rx.Single;
 
 /**
@@ -94,6 +98,8 @@ public interface PurchaseAddEditViewModel extends ListViewModel<AddEditItem>,
     void onSavePurchaseAsDraftClick();
 
     List<String> getSupportedCurrencies();
+
+    NumberFormat getMoneyFormatter();
 
     @IntDef({PurchaseResult.PURCHASE_SAVED, PurchaseResult.PURCHASE_SAVED_AUTO,
             PurchaseResult.PURCHASE_DRAFT, PurchaseResult.PURCHASE_DRAFT_CHANGES,

@@ -33,7 +33,7 @@ public class LocalBroadcastImpl implements LocalBroadcast {
 
     @Override
     public void sendUsersUpdated() {
-        Intent intent = getIntent(DataType.USERS_UPDATED);
+        Intent intent = getIntent(DataType.IDENTITIES_UPDATED);
         send(intent);
     }
 

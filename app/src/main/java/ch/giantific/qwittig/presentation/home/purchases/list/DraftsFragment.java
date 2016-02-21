@@ -23,7 +23,7 @@ import android.view.ViewGroup;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentHomeDraftsBinding;
-import ch.giantific.qwittig.di.components.DaggerHomeDraftsComponent;
+import ch.giantific.qwittig.di.components.DaggerDraftsListComponent;
 import ch.giantific.qwittig.di.modules.HomeDraftsViewModelModule;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
@@ -54,7 +54,7 @@ public class DraftsFragment extends BaseRecyclerViewFragment<DraftsViewModel, Dr
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        DaggerHomeDraftsComponent.builder()
+        DaggerDraftsListComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(getActivity()))
                 .homeDraftsViewModelModule(new HomeDraftsViewModelModule(savedInstanceState, this))
                 .build()
@@ -148,6 +148,11 @@ public class DraftsFragment extends BaseRecyclerViewFragment<DraftsViewModel, Dr
     }
 
     @Override
+    public void updateDraftsDisplay() {
+        mActivity.checkDrafts();
+    }
+
+    @Override
     public void scrollToPosition(final int position) {
         // override to let RecyclerView layout its items first
         mRecyclerView.post(new Runnable() {
@@ -162,5 +167,7 @@ public class DraftsFragment extends BaseRecyclerViewFragment<DraftsViewModel, Dr
         void setDraftsViewModel(@NonNull DraftsViewModel viewModel);
 
         ActionMode startActionMode();
+
+        void checkDrafts();
     }
 }

@@ -10,8 +10,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import com.parse.ParseObject;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -52,7 +50,7 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
     private String mOldStore;
     private Date mOldDate;
     private String mOldCurrency;
-    private float mOldExchangeRate;
+    private double mOldExchangeRate;
     private String mOldNote;
 
     public PurchaseAddEditViewModelEditImpl(@Nullable Bundle savedState,
@@ -71,7 +69,7 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
             mOldStore = savedState.getString(STATE_OLD_STORE, "");
             mOldDate = DateUtils.parseLongToDate(savedState.getLong(STATE_OLD_DATE));
             mOldCurrency = savedState.getString(STATE_OLD_CURRENCY, "");
-            mOldExchangeRate = savedState.getFloat(STATE_OLD_EXCHANGE_RATE);
+            mOldExchangeRate = savedState.getDouble(STATE_OLD_EXCHANGE_RATE);
             mOldNote = savedState.getString(STATE_OLD_NOTE, "");
         } else {
             mOldValuesSet = false;
@@ -88,13 +86,17 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
         outState.putString(STATE_OLD_STORE, mOldStore);
         outState.putLong(STATE_OLD_DATE, DateUtils.parseDateToLong(mOldDate));
         outState.putString(STATE_OLD_CURRENCY, mOldCurrency);
-        outState.putFloat(STATE_OLD_EXCHANGE_RATE, mOldExchangeRate);
+        outState.putDouble(STATE_OLD_EXCHANGE_RATE, mOldExchangeRate);
         outState.putString(STATE_OLD_NOTE, mOldNote);
     }
 
     @Override
     void onIdentitiesReady() {
-        mSubscriptions.add(fetchEditPurchase()
+        if (mOldValuesSet) {
+            super.onIdentitiesReady();
+        }
+
+        getSubscriptions().add(fetchEditPurchase()
                 .subscribe(new SingleSubscriber<Purchase>() {
                     @Override
                     public void onSuccess(Purchase purchase) {
@@ -160,26 +162,28 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
 
     private void setOldItemValues() {
         for (Item item : mOldItems) {
-            final String price = MoneyUtils.formatMoneyNoSymbol(
-                    item.getPriceForeign(mOldExchangeRate), mCurrency);
             final List<Identity> identities = item.getIdentities();
-            final ItemItem itemItem = new ItemItem(item.getName(), price,
-                    getItemUsersItemUsers(identities), mCurrency);
+            final String price = mMoneyFormatter.format(item.getPriceForeign(mOldExchangeRate));
+            final ItemItem itemItem = new ItemItem(item.getName(), price, getItemUsersItemUsers(identities));
             // TODO: don't hardcode add row position
             mItems.add(getLastPosition() - 1, itemItem);
             mView.notifyItemInserted(mItems.indexOf(itemItem));
         }
+
+        super.onIdentitiesReady();
     }
 
     @NonNull
     @Override
     Purchase createPurchase(@NonNull List<Identity> purchaseIdentities,
-                            @NonNull List<Item> purchaseItems) {
+                            @NonNull List<Item> purchaseItems, int fractionDigits) {
         mEditPurchase.replaceItems(purchaseItems);
         mEditPurchase.setIdentities(purchaseIdentities);
         mEditPurchase.setDate(mDate);
         mEditPurchase.setStore(mStore);
-        mEditPurchase.setTotalPrice(mTotalPrice);
+        final BigDecimal totalPriceRounded =
+                new BigDecimal(mTotalPrice).setScale(fractionDigits, BigDecimal.ROUND_UP);
+        mEditPurchase.setTotalPrice(totalPriceRounded);
         mEditPurchase.setCurrency(mCurrency);
         mEditPurchase.setExchangeRate(mExchangeRate);
         if (TextUtils.isEmpty(mNote)) {
@@ -257,7 +261,6 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
             return true;
         }
 
-        final int maxFractionDigits = MoneyUtils.getMaximumFractionDigits(mCurrency);
         for (int i = 0, size = mItems.size(), skipCount = 0; i < size; i++) {
             final AddEditItem addEditItem = mItems.get(i);
             if (addEditItem.getType() != Type.ITEM) {
@@ -271,16 +274,16 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
                 return true;
             }
 
-            final BigDecimal oldPrice = new BigDecimal(itemOld.getPriceForeign(mOldExchangeRate))
-                    .setScale(maxFractionDigits, BigDecimal.ROUND_HALF_UP);
-            if (oldPrice.compareTo(itemItem.parsePrice(mCurrency)) > 0) {
+            final double oldPrice = itemOld.getPriceForeign(mOldExchangeRate);
+            final double newPrice = itemItem.parsePrice();
+            if (Math.abs(oldPrice - newPrice) >= MoneyUtils.MIN_DIFF) {
                 return true;
             }
 
-            final List<String> usersInvolvedOld = itemOld.getIdentitiesIds();
-            final List<String> usersInvolvedNew = itemItem.getSelectedUserIds();
-            if (!usersInvolvedNew.containsAll(usersInvolvedOld) ||
-                    !usersInvolvedOld.containsAll(usersInvolvedNew)) {
+            final List<String> identitiesOld = itemOld.getIdentitiesIds();
+            final List<String> identitiesNew = itemItem.getSelectedIdentitiesIds();
+            if (!identitiesNew.containsAll(identitiesOld) ||
+                    !identitiesOld.containsAll(identitiesNew)) {
                 return true;
             }
         }

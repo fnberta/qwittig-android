@@ -21,6 +21,7 @@ import java.lang.annotation.RetentionPolicy;
 import ch.giantific.qwittig.LocalBroadcast.DataType;
 import ch.giantific.qwittig.LocalBroadcastImpl;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.databinding.ActivityFinanceBinding;
 import ch.giantific.qwittig.di.components.NavDrawerComponent;
 import ch.giantific.qwittig.domain.models.Compensation;
@@ -30,7 +31,6 @@ import ch.giantific.qwittig.presentation.finance.identities.IdentitiesFragment;
 import ch.giantific.qwittig.presentation.finance.identities.IdentitiesUpdateWorkerListener;
 import ch.giantific.qwittig.presentation.finance.identities.IdentitiesViewModel;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
-import ch.giantific.qwittig.data.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.utils.Utils;
 import rx.Observable;
 import rx.Single;
@@ -61,8 +61,8 @@ public class FinanceActivity extends BaseNavDrawerActivity<CompsUnpaidViewModel>
     protected void handleLocalBroadcast(Intent intent, int dataType) {
         super.handleLocalBroadcast(intent, dataType);
         switch (dataType) {
-            case DataType.USERS_UPDATED:
-                mViewModel.loadData();
+            case DataType.IDENTITIES_UPDATED:
+                mIdentitiesViewModel.loadData();
                 break;
             case DataType.COMPENSATIONS_UPDATED:
                 final boolean paid = intent.getBooleanExtra(LocalBroadcastImpl.INTENT_EXTRA_COMPENSATION_PAID, false);
@@ -176,7 +176,7 @@ public class FinanceActivity extends BaseNavDrawerActivity<CompsUnpaidViewModel>
     }
 
     @Override
-    public void onAmountConfirmed(@NonNull BigFraction amount) {
+    public void onAmountConfirmed(double amount) {
         mViewModel.onAmountConfirmed(amount);
     }
 
@@ -209,13 +209,11 @@ public class FinanceActivity extends BaseNavDrawerActivity<CompsUnpaidViewModel>
         mViewModel.setCompensationRemindStream(single, compensationId, workerTag);
     }
 
-    @IntDef({FragmentTabs.NONE, FragmentTabs.USER_BALANCES, FragmentTabs.COMPS_UNPAID,
-            FragmentTabs.COMPS_PAID})
+    @IntDef({FragmentTabs.NONE, FragmentTabs.COMPS_UNPAID, FragmentTabs.COMPS_PAID})
     @Retention(RetentionPolicy.SOURCE)
     public @interface FragmentTabs {
         int NONE = -1;
-        int USER_BALANCES = 0;
-        int COMPS_UNPAID = 1;
-        int COMPS_PAID = 2;
+        int COMPS_UNPAID = 0;
+        int COMPS_PAID = 1;
     }
 }

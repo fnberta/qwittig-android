@@ -77,7 +77,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<ListItem, Ta
 
     @Override
     public void loadData() {
-        mSubscriptions.add(mIdentityRepo.fetchIdentityDataAsync(mCurrentIdentity)
+        getSubscriptions().add(mIdentityRepo.fetchIdentityDataAsync(mCurrentIdentity)
                 .flatMap(new Func1<Identity, Observable<Task>>() {
                     @Override
                     public Observable<Task> call(Identity identity) {
@@ -196,7 +196,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<ListItem, Ta
 
     @Override
     public void setTasksUpdateStream(@NonNull Observable<Task> observable, @NonNull final String workerTag) {
-        mSubscriptions.add(observable.toSingle()
+        getSubscriptions().add(observable.toSingle()
                 .subscribe(new SingleSubscriber<Task>() {
                     @Override
                     public void onSuccess(Task value) {
@@ -289,7 +289,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<ListItem, Ta
     public void setTaskReminderStream(@NonNull Single<String> single,
                                       @NonNull final String taskId,
                                       @NonNull final String workerTag) {
-        mSubscriptions.add(single.subscribe(new SingleSubscriber<String>() {
+        getSubscriptions().add(single.subscribe(new SingleSubscriber<String>() {
                     @Override
                     public void onSuccess(String value) {
                         mView.removeWorker(workerTag);

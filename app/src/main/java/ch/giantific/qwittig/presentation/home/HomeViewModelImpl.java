@@ -88,7 +88,7 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
 
     @Override
     public void setJoinGroupStream(@NonNull Single<User> single, @NonNull final String workerTag) {
-        mSubscriptions.add(single.subscribe(new SingleSubscriber<User>() {
+        getSubscriptions().add(single.subscribe(new SingleSubscriber<User>() {
             @Override
             public void onSuccess(User value) {
                 mView.removeWorker(workerTag);

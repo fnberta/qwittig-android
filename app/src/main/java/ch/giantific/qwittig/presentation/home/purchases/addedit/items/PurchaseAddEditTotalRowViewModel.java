@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.home.purchases.addedit;
+package ch.giantific.qwittig.presentation.home.purchases.addedit.items;
 
 import android.databinding.Bindable;
 import android.databinding.Observable;
@@ -20,12 +20,12 @@ public interface PurchaseAddEditTotalRowViewModel extends Observable {
     @Bindable
     String getTotalPrice();
 
-    void setTotalPrice(@NonNull BigDecimal totalPrice);
+    void setTotalPrice(double totalPrice);
 
     @Bindable
     String getMyShare();
 
-    void setMyShare(@NonNull BigDecimal myShare);
+    void setMyShare(double myShare);
 
     @Bindable
     String getCurrency();
@@ -40,7 +40,7 @@ public interface PurchaseAddEditTotalRowViewModel extends Observable {
     @Bindable
     String getExchangeRate();
 
-    void setExchangeRate(float exchangeRate);
+    void setExchangeRate(double exchangeRate);
 
     @Bindable
     boolean isExchangeRateVisible();

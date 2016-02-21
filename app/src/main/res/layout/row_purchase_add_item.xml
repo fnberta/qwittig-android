@@ -81,8 +81,9 @@
                     android:hint="@string/hint_item_price"
                     android:inputType="numberDecimal"
                     android:maxLength="9"
-                    android:onTextChanged="@{itemRow.onPriceChanged}"
                     android:onFocusChange="@{itemRow.onPriceFocusChange}"
+                    android:onTextChanged="@{itemRow.onPriceChanged}"
+                    android:selectAllOnFocus="true"
                     android:text="@{itemRow.price}"
                     />
 

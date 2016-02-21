@@ -191,6 +191,11 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     protected void onResume() {
         super.onResume();
 
+        checkDrafts();
+    }
+
+    @Override
+    public void checkDrafts() {
         final boolean draftsAvailable = mViewModel.isDraftsAvailable();
         if (draftsAvailable != mViewModel.updateDraftsAvailable()) {
             switchFragments();

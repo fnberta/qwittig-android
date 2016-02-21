@@ -113,7 +113,7 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<DetailsItem,
 
     @Override
     public void loadData() {
-        mSubscriptions.add(mTaskRepo.getTaskLocalAsync(mTaskId)
+        getSubscriptions().add(mTaskRepo.getTaskLocalAsync(mTaskId)
                 .flatMapObservable(new Func1<Task, Observable<TaskHistoryItem>>() {
                     @Override
                     public Observable<TaskHistoryItem> call(Task task) {
@@ -281,7 +281,7 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<DetailsItem,
         mTask.saveEventually();
 
         updateToolbarHeader();
-        mSubscriptions.add(getTaskHistory()
+        getSubscriptions().add(getTaskHistory()
                 .subscribe(new Subscriber<TaskHistoryItem>() {
                     @Override
                     public void onStart() {

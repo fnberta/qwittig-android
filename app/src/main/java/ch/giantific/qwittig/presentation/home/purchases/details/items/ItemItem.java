@@ -8,11 +8,11 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.support.annotation.NonNull;
 
+import java.text.NumberFormat;
 import java.util.List;
 
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Item;
-import ch.giantific.qwittig.utils.MoneyUtils;
 
 import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;
 
@@ -28,10 +28,10 @@ public class ItemItem extends BaseObservable implements DetailsItem {
     private float mItemUserPercentage;
 
     public ItemItem(@NonNull Item item, @NonNull Identity currentIdentity,
-                     @NonNull String currency) {
+                    @NonNull NumberFormat formatter) {
         mItem = item;
         mItemName = item.getName();
-        mItemPrice = MoneyUtils.formatMoney(item.getPrice(), currency);
+        mItemPrice = formatter.format(item.getPrice());
 
         final List<Identity> identities = item.getIdentities();
         if (identities.contains(currentIdentity)) {

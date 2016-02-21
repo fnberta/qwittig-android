@@ -13,13 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModelBaseImpl;
+import ch.giantific.qwittig.utils.MessageAction;
 import rx.Observable;
 import rx.SingleSubscriber;
 import rx.Subscriber;
@@ -59,42 +59,43 @@ public class PurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purchase
 
     @Override
     public void loadData() {
-        mSubscriptions.add(mIdentityRepo.fetchIdentityDataAsync(mCurrentIdentity)
-                .flatMap(new Func1<Identity, Observable<Purchase>>() {
-                    @Override
-                    public Observable<Purchase> call(Identity identity) {
-                        return mPurchaseRepo.getPurchasesLocalAsync(identity, false);
-                    }
-                })
-                .subscribe(new Subscriber<Purchase>() {
-                    @Override
-                    public void onStart() {
-                        super.onStart();
-                        mItems.clear();
-                    }
+        getSubscriptions().add(
+                mIdentityRepo.fetchIdentityDataAsync(mCurrentIdentity)
+                        .flatMap(new Func1<Identity, Observable<Purchase>>() {
+                            @Override
+                            public Observable<Purchase> call(Identity identity) {
+                                return mPurchaseRepo.getPurchasesLocalAsync(identity, false);
+                            }
+                        })
+                        .subscribe(new Subscriber<Purchase>() {
+                            @Override
+                            public void onStart() {
+                                super.onStart();
+                                mItems.clear();
+                            }
 
-                    @Override
-                    public void onCompleted() {
-                        setLoading(false);
-                        mView.notifyDataSetChanged();
+                            @Override
+                            public void onCompleted() {
+                                setLoading(false);
+                                mView.notifyDataSetChanged();
 
-                        if (mIsLoadingMore) {
-                            addLoadMore();
-                            mView.scrollToPosition(getLastPosition());
-                        }
-                    }
+                                if (mIsLoadingMore) {
+                                    addLoadMore();
+                                    mView.scrollToPosition(getLastPosition());
+                                }
+                            }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        setLoading(false);
-                        mView.showMessage(R.string.toast_error_purchases_load);
-                    }
+                            @Override
+                            public void onError(Throwable e) {
+                                setLoading(false);
+                                mView.showMessage(R.string.toast_error_purchases_load);
+                            }
 
-                    @Override
-                    public void onNext(Purchase purchase) {
-                        mItems.add(purchase);
-                    }
-                })
+                            @Override
+                            public void onNext(Purchase purchase) {
+                                mItems.add(purchase);
+                            }
+                        })
         );
     }
 
@@ -144,7 +145,7 @@ public class PurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purchase
     @Override
     public void setPurchasesUpdateStream(@NonNull Observable<Purchase> observable,
                                          @NonNull final String workerTag) {
-        mSubscriptions.add(observable
+        getSubscriptions().add(observable
                 .toList()
                 .toSingle()
                 .subscribe(new SingleSubscriber<List<Purchase>>() {
@@ -171,7 +172,7 @@ public class PurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purchase
     @Override
     public void setPurchasesQueryMoreStream(@NonNull Observable<Purchase> observable,
                                             @NonNull final String workerTag) {
-        mSubscriptions.add(observable
+        getSubscriptions().add(observable
                 .toList()
                 .toSingle()
                 .subscribe(new SingleSubscriber<List<Purchase>>() {

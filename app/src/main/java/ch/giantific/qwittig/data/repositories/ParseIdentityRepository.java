@@ -100,7 +100,7 @@ public class ParseIdentityRepository extends ParseBaseRepository implements Iden
     }
 
     @Override
-    public Observable<Identity> fetchUserIdentitiesDataAsync(@NonNull List<Identity> identities) {
+    public Observable<Identity> fetchIdentitiesDataAsync(@NonNull List<Identity> identities) {
         return Observable.from(identities)
                 .flatMap(new Func1<Identity, Observable<Identity>>() {
                     @Override

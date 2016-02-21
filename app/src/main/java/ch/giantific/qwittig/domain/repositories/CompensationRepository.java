@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import java.util.List;
 
 import ch.giantific.qwittig.domain.models.Compensation;
+import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import rx.Observable;
 import rx.Single;
@@ -19,18 +20,27 @@ import rx.Single;
  * store.
  */
 public interface CompensationRepository extends BaseRepository {
+
+    /**
+     * Calculates the compensations for the group.
+     *
+     * @param group the group to calculate for
+     * @return the response from the server
+     */
+    Single<String> calculateCompensations(@NonNull Group group);
+
     /**
      * Queries the local data store for unpaid compensations.
-     *  @param currentIdentity the current user
      *
+     * @param currentIdentity the current user
      */
     Observable<Compensation> getCompensationsLocalUnpaidAsync(@NonNull Identity currentIdentity);
 
     /**
      * Queries the local data store for paid compensations where the current user is either the
      * buyer or the beneficiary.
-     *  @param currentIdentity the current user
      *
+     * @param currentIdentity the current user
      */
     Observable<Compensation> getCompensationsLocalPaidAsync(@NonNull Identity currentIdentity);
 
@@ -54,16 +64,15 @@ public interface CompensationRepository extends BaseRepository {
      * Updates all unpaid compensations in the local data store by deleting all compensations from the
      * local data store, querying and saving new ones.
      *
-     * @param currentIdentity the current identity
      * @param identities      all identities from the current user
      */
-    Observable<Compensation> updateCompensationsUnpaidAsync(@NonNull Identity currentIdentity,
-                                                            @NonNull List<Identity> identities);
+    Observable<Compensation> updateCompensationsUnpaidAsync(@NonNull List<Identity> identities);
 
     /**
      * Updates all paid compensations in the local data store by deleting all compensations from the
      * local data store, querying and saving new ones.
-     *  @param currentIdentity the current identity
+     *
+     * @param currentIdentity the current identity
      * @param identities      all identities from the current user
      */
     Observable<Compensation> updateCompensationsPaidAsync(@NonNull Identity currentIdentity,

@@ -110,7 +110,6 @@ public class DateUtils {
      */
     public static String formatDateLong(@NonNull Date date) {
         final DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.LONG, Locale.getDefault());
-
         return dateFormatter.format(date);
     }
 
@@ -123,10 +122,10 @@ public class DateUtils {
      */
     @NonNull
     public static String formatMonthDayLineSeparated(@NonNull Date date) {
-        Calendar calendar = Calendar.getInstance();
+        final Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
-        String month = calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.US); // TODO: use Locale.getDefault() (but make sure only 3 letters)
-        String day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
+        final String month = calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.US); // TODO: use Locale.getDefault() (but make sure only 3 letters)
+        final String day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
 
         return month + System.getProperty("line.separator") + day;
     }

@@ -15,6 +15,7 @@ import com.parse.ParseInstallation;
 import org.json.JSONObject;
 
 import ch.giantific.qwittig.domain.models.User;
+import rx.Observable;
 import rx.Single;
 
 /**
@@ -30,6 +31,12 @@ public interface UserRepository extends BaseRepository {
     @Nullable
     User getCurrentUser();
 
+    /**
+     * Updates the locally cached version of the user with fresh data from the online store.
+     *
+     * @param user the user to update
+     * @return the updated user
+     */
     Single<User> updateUser(@NonNull User user);
 
     /**
@@ -92,6 +99,12 @@ public interface UserRepository extends BaseRepository {
      */
     Single<JSONObject> verifyGoogleLogin(@NonNull String idToken);
 
+    /**
+     * Handles an invitation link by calling a function in the cloud.
+     *
+     * @param identityId the object id of the identity the user is invited to
+     * @return the response from the server, to be neglected
+     */
     Single<String> handleInvitation(@NonNull String identityId);
 
     /**
@@ -102,10 +115,28 @@ public interface UserRepository extends BaseRepository {
      */
     Single<User> logOut(@NonNull User user);
 
+    /**
+     * Unlinks the user's account from his facebook profile.
+     *
+     * @param user the user to unlink
+     * @return the unlinked user
+     */
     Single<User> unlinkFacebook(@NonNull User user);
 
+    /**
+     * Signs out the currently logged in user from his google profile.
+     *
+     * @param context the context to user for the operation
+     * @return the unlinked user
+     */
     Single<Void> signOutGoogle(@NonNull Context context);
 
+    /**
+     * Unlinks the user's account from his google profile.
+     *
+     * @param user the user to unlink
+     * @return the unlinked user
+     */
     Single<User> unlinkGoogle(@NonNull Context context, @NonNull User user);
 
     /**
@@ -116,5 +147,19 @@ public interface UserRepository extends BaseRepository {
      */
     Single<User> deleteUser(@NonNull User user);
 
+    /**
+     * Sets up the installation object after login by subscribing to all group channels and setting
+     * the user field.
+     *
+     * @param user the user that just logged in
+     * @return the setup installation object
+     */
+    Observable<ParseInstallation> setupInstallation(@NonNull User user);
+
+    /**
+     * Clears the installation object by resetting channels and the user field
+     *
+     * @return the reset installation object
+     */
     Single<ParseInstallation> clearInstallation();
 }

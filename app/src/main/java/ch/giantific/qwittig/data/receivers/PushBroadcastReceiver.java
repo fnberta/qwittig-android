@@ -22,6 +22,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -179,12 +180,12 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     }
 
     private void cancelNotification(@NonNull Intent intent) {
-        int notificationId = intent.getIntExtra(NOTIFICATION_ID, 0);
+        final int notificationId = intent.getIntExtra(NOTIFICATION_ID, 0);
         mNotificationManager.cancel(notificationId);
     }
 
     private void closeShade(@NonNull Context context) {
-        Intent closeShade = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+        final Intent closeShade = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
         context.sendBroadcast(closeShade);
     }
 
@@ -198,9 +199,8 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
             Timber.e("currentUser is null");
             return;
         }
-        final List<Identity> userIdentities = currentUser.getIdentities();
 
-        JSONObject jsonExtras;
+        final JSONObject jsonExtras;
         try {
             jsonExtras = getData(intent);
         } catch (JSONException e) {
@@ -231,10 +231,8 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
 
                 // don't show notification for buyer
                 final String buyerId = jsonExtras.optString(PUSH_PARAM_BUYER_ID);
-                for (Identity identity : userIdentities) {
-                    if (buyerId.equals(identity.getObjectId())) {
-                        return;
-                    }
+                if (currentUser.hasIdentity(buyerId)) {
+                    return;
                 }
 
                 // store text in LinkedHashSet for combined notifications
@@ -282,7 +280,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 // update balance for all users
                 ParseQueryService.startQueryIdentities(context);
 
-                // update all compensations, TODO: only all if amount was changed
+                // update all compensations, TODO: only query all if amount was changed
                 ParseQueryService.startQueryCompensations(context);
 
                 // update compensation for all users
@@ -290,7 +288,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
 
                 // only show notification for payer
                 final String payerId = jsonExtras.optString(PUSH_PARAM_DEBTOR_ID);
-                if (!payerId.equals(currentUser.getObjectId())) {
+                if (!currentUser.hasIdentity(payerId)) {
                     return;
                 }
                 break;
@@ -301,7 +299,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
 
                 // don't show notification for initiator of task
                 final String initiatorId = jsonExtras.optString(PUSH_PARAM_INITIATOR_ID);
-                if (initiatorId.equals(currentUser.getObjectId())) {
+                if (currentUser.hasIdentity(initiatorId)) {
                     return;
                 }
                 break;
@@ -319,7 +317,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 // don't show notification for initiator of task,
                 // TODO: actually we don't want to show for the user that deleted the task / finished a one-time task
                 final String initiatorId = jsonExtras.optString(PUSH_PARAM_INITIATOR_ID);
-                if (initiatorId.equals(currentUser.getObjectId())) {
+                if (currentUser.hasIdentity(initiatorId)) {
                     return;
                 }
 
@@ -352,6 +350,13 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
         }
     }
 
+    private String getAmount(JSONObject jsonExtras) {
+        final String currency = jsonExtras.optString(PUSH_PARAM_CURRENCY_CODE);
+        final NumberFormat formatter = MoneyUtils.getMoneyFormatter(currency, true, true);
+        final double amount = jsonExtras.optDouble(PUSH_PARAM_AMOUNT);
+        return formatter.format(amount);
+    }
+
     private String getNotificationType(@NonNull Intent intent) {
         JSONObject jsonExtras;
         try {
@@ -376,12 +381,6 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                                    boolean isNew) {
         final String compensationId = jsonExtras.optString(PUSH_PARAM_COMPENSATION_ID);
         ParseQueryService.startQueryObject(context, Compensation.CLASS, compensationId, isNew);
-    }
-
-    private String getAmount(@NonNull JSONObject jsonExtras) {
-        final String currencyCode = jsonExtras.optString(PUSH_PARAM_CURRENCY_CODE);
-        double amount = jsonExtras.optDouble(PUSH_PARAM_AMOUNT);
-        return MoneyUtils.formatMoney(amount, currencyCode);
     }
 
     private boolean isSilentNotification(@NonNull String type) {
@@ -653,7 +652,6 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                     clearStoredPurchaseNotifications(groupId);
 
                     final User currentUser = mUserRepo.getCurrentUser();
-                    ;
                     if (currentUser != null && currentUser.isInGroup(groupId)) {
                         return PurchaseDetailsActivity.class;
                     }
@@ -677,7 +675,6 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 }
 
                 final User currentUser = mUserRepo.getCurrentUser();
-                ;
                 if (currentUser != null && currentUser.isInGroup(groupId)) {
                     return TaskDetailsActivity.class;
                 }

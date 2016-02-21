@@ -28,8 +28,8 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
     protected User mCurrentUser;
     protected Identity mCurrentIdentity;
     protected T mView;
-    protected CompositeSubscription mSubscriptions;
     protected UserRepository mUserRepo;
+    private CompositeSubscription mSubscriptions = new CompositeSubscription();
 
     public ViewModelBaseImpl(@Nullable Bundle savedState, @NonNull T view,
                              @NonNull UserRepository userRepository) {
@@ -52,12 +52,18 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
         // Empty default implementation
     }
 
-    @Override
-    @CallSuper
-    public void onStart() {
+    protected CompositeSubscription getSubscriptions() {
         if (mSubscriptions == null || mSubscriptions.isUnsubscribed()) {
             mSubscriptions = new CompositeSubscription();
         }
+
+        return mSubscriptions;
+    }
+
+    @Override
+    @CallSuper
+    public void onStart() {
+        // empty default implementation
     }
 
     @Override

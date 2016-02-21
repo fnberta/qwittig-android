@@ -61,7 +61,7 @@ public class SettingsAddUsersViewModelImpl extends ListViewModelBaseImpl<AddUser
         mItems.add(new HeaderItem(R.string.header_users_added));
 
         final Group group = mCurrentIdentity.getGroup();
-        mSubscriptions.add(mIdentityRepo.getIdentitiesLocalAsync(group, true)
+        getSubscriptions().add(mIdentityRepo.getIdentitiesLocalAsync(group, true)
                 .filter(new Func1<Identity, Boolean>() {
                     @Override
                     public Boolean call(Identity identity) {
@@ -102,7 +102,7 @@ public class SettingsAddUsersViewModelImpl extends ListViewModelBaseImpl<AddUser
 
     @Override
     public void setAddUserStream(@NonNull Single<String> single, @NonNull final String workerTag) {
-        mSubscriptions.add(single.subscribe(new SingleSubscriber<String>() {
+        getSubscriptions().add(single.subscribe(new SingleSubscriber<String>() {
                     @Override
                     public void onSuccess(String invitationUrl) {
                         mView.removeWorker(workerTag);

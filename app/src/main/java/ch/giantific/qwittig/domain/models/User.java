@@ -101,6 +101,17 @@ public class User extends ParseUser {
         return false;
     }
 
+    public boolean hasIdentity(@NonNull String identityId) {
+        final List<Identity> userIdentities = getIdentities();
+        for (Identity identity : userIdentities) {
+            if (identity.getObjectId().equals(identityId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public boolean isInGroup(@NonNull String groupId) {
         final List<String> groupIds = new ArrayList<>();
         final List<Identity> identities = getIdentities();

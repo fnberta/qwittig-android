@@ -77,12 +77,13 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
             query.whereDoesNotExist(Purchase.DRAFT_ID);
         }
 
-        return find(query).flatMap(new Func1<List<Purchase>, Observable<Purchase>>() {
-            @Override
-            public Observable<Purchase> call(List<Purchase> purchases) {
-                return Observable.from(purchases);
-            }
-        });
+        return find(query)
+                .flatMap(new Func1<List<Purchase>, Observable<Purchase>>() {
+                    @Override
+                    public Observable<Purchase> call(List<Purchase> purchases) {
+                        return Observable.from(purchases);
+                    }
+                });
     }
 
     @Override
@@ -347,7 +348,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     }
 
     private void convertPrices(@NonNull Purchase purchase, boolean toGroupCurrency) {
-        final float exchangeRate = purchase.getExchangeRate();
+        final double exchangeRate = purchase.getExchangeRate();
         if (exchangeRate == 1) {
             return;
         }
@@ -441,8 +442,8 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
                     public void call(Map<String, Float> exchangeRates) {
                         final SharedPreferences.Editor editor = mSharedPrefs.edit();
                         for (Map.Entry<String, Float> exchangeRate : exchangeRates.entrySet()) {
-                            final BigDecimal roundedExchangeRate = MoneyUtils.roundToFractionDigits(
-                                    MoneyUtils.EXCHANGE_RATE_FRACTION_DIGITS, 1 / exchangeRate.getValue());
+                            final BigDecimal roundedExchangeRate =
+                                    MoneyUtils.roundExchangeRate(1 / exchangeRate.getValue());
                             editor.putFloat(exchangeRate.getKey(), roundedExchangeRate.floatValue());
                         }
                         final long currentTime = System.currentTimeMillis();

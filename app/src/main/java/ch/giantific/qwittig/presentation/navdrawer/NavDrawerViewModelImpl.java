@@ -50,7 +50,7 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
     }
 
     private void loadIdentities() {
-        mSubscriptions.add(mIdentityRepo.fetchUserIdentitiesDataAsync(mCurrentUser.getIdentities())
+        getSubscriptions().add(mIdentityRepo.fetchIdentitiesDataAsync(mCurrentUser.getIdentities())
                 .filter(new Func1<Identity, Boolean>() {
                     @Override
                     public Boolean call(Identity identity) {
@@ -118,7 +118,7 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
 
     @Override
     public void onIdentityChanged() {
-        mSubscriptions.add(mIdentityRepo.fetchUserIdentitiesDataAsync(mCurrentUser.getIdentities())
+        getSubscriptions().add(mIdentityRepo.fetchIdentitiesDataAsync(mCurrentUser.getIdentities())
                 .filter(new Func1<Identity, Boolean>() {
                     @Override
                     public Boolean call(Identity identity) {

@@ -41,7 +41,11 @@ public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseRece
         mPurchaseRepo = purchaseRepo;
         mReceiptImagePath = receiptImagePath;
 
-        mLoading = savedState == null || (savedState.getBoolean(STATE_LOADING, false));
+        if (savedState != null) {
+            mLoading = savedState.getBoolean(STATE_LOADING, false);
+        } else {
+            mLoading = true;
+        }
     }
 
     public PurchaseReceiptViewModelImpl(@Nullable Bundle savedState,
@@ -87,7 +91,7 @@ public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseRece
             mView.setReceiptImage(mReceiptImagePath);
             setLoading(false);
         } else if (mDraft) {
-            mSubscriptions.add(mPurchaseRepo.getPurchaseLocalAsync(mPurchaseId, true)
+            getSubscriptions().add(mPurchaseRepo.getPurchaseLocalAsync(mPurchaseId, true)
                     .subscribe(new SingleSubscriber<Purchase>() {
                         @Override
                         public void onSuccess(Purchase purchase) {
@@ -101,7 +105,7 @@ public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseRece
                         }
                     }));
         } else {
-            mSubscriptions.add(mPurchaseRepo.fetchPurchaseDataLocalAsync(mPurchaseId)
+            getSubscriptions().add(mPurchaseRepo.fetchPurchaseDataLocalAsync(mPurchaseId)
                     .subscribe(new SingleSubscriber<Purchase>() {
                         @Override
                         public void onSuccess(Purchase purchase) {

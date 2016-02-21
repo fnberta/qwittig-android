@@ -111,7 +111,7 @@ public class SettingsAddGroupViewModelImpl extends ViewModelBaseImpl<SettingsAdd
 
     @Override
     public void setCreateGroupStream(@NonNull Single<User> single, @NonNull final String workerTag) {
-        mSubscriptions.add(single
+        getSubscriptions().add(single
                 .subscribe(new SingleSubscriber<User>() {
                     @Override
                     public void onSuccess(User user) {

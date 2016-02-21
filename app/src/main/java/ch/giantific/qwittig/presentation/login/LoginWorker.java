@@ -11,8 +11,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 
+import com.parse.ParseInstallation;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -25,6 +28,7 @@ import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;
 import rx.Single;
 import rx.functions.Func1;
+import timber.log.Timber;
 
 /**
  * Handles the different use-cases connected with the account of a user (log-in, create account,
@@ -221,7 +225,20 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
                         .flatMapObservable(new Func1<User, Observable<User>>() {
                             @Override
                             public Observable<User> call(final User user) {
-                                return fetchIdentityData(user);
+                                return mIdentityRepo.fetchIdentitiesDataAsync(user.getIdentities())
+                                        .toList()
+                                        .flatMap(new Func1<List<Identity>, Observable<ParseInstallation>>() {
+                                            @Override
+                                            public Observable<ParseInstallation> call(List<Identity> identities) {
+                                                return mUserRepo.setupInstallation(user);
+                                            }
+                                        })
+                                        .map(new Func1<ParseInstallation, User>() {
+                                            @Override
+                                            public User call(ParseInstallation installation) {
+                                                return user;
+                                            }
+                                        });
                             }
                         });
             }
@@ -247,7 +264,19 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
                         }).flatMapObservable(new Func1<User, Observable<User>>() {
                             @Override
                             public Observable<User> call(final User user) {
-                                return fetchIdentityData(user);
+                                return mIdentityRepo.fetchIdentityDataAsync(user.getCurrentIdentity())
+                                        .flatMap(new Func1<Identity, Observable<ParseInstallation>>() {
+                                            @Override
+                                            public Observable<ParseInstallation> call(Identity identity) {
+                                                return mUserRepo.setupInstallation(user);
+                                            }
+                                        })
+                                        .map(new Func1<ParseInstallation, User>() {
+                                            @Override
+                                            public User call(ParseInstallation installation) {
+                                                return user;
+                                            }
+                                        });
                             }
                         });
             }
@@ -263,17 +292,6 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
         }
 
         return null;
-    }
-
-    @NonNull
-    private Observable<User> fetchIdentityData(final User user) {
-        return mIdentityRepo.fetchIdentityDataAsync(user.getCurrentIdentity())
-                .map(new Func1<Identity, User>() {
-                    @Override
-                    public User call(Identity identity) {
-                        return user;
-                    }
-                });
     }
 
     @Override

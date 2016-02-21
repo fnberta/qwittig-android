@@ -111,11 +111,9 @@ public class Compensation extends ParseObject {
      * @return the amount of the compensation
      */
     public BigFraction getAmountFraction() {
-        List<Number> amountList = getAmount();
-
+        final List<Number> amountList = getAmount();
         long numerator = amountList.get(0).longValue();
         long denominator = amountList.get(1).longValue();
-
         return new BigFraction(numerator, denominator);
     }
 

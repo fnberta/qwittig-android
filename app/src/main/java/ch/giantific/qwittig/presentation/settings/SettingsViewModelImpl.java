@@ -104,8 +104,11 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
             group.setName(newName);
             group.saveEventually();
 
-            loadIdentitySelection();
             setupCurrentGroupCategory();
+            loadIdentitySelection();
+
+            // NavDrawer group setting needs to be updated
+            mView.setResult(Result.GROUP_CHANGED);
         }
     }
 
@@ -116,7 +119,7 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
             return;
         }
 
-        mSubscriptions.add(mIdentityRepo.getIdentitiesLocalAsync(mCurrentIdentity.getGroup(), false)
+        getSubscriptions().add(mIdentityRepo.getIdentitiesLocalAsync(mCurrentIdentity.getGroup(), false)
                 .toList()
                 .toSingle()
                 .subscribe(new SingleSubscriber<List<Identity>>() {
@@ -187,7 +190,7 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
 
     @Override
     public void setLogoutStream(@NonNull Single<User> single, @NonNull final String workerTag) {
-        mSubscriptions.add(single.subscribe(new SingleSubscriber<User>() {
+        getSubscriptions().add(single.subscribe(new SingleSubscriber<User>() {
             @Override
             public void onSuccess(User value) {
                 mView.removeWorker(workerTag);

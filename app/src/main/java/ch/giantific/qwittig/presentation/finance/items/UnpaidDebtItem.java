@@ -6,6 +6,8 @@ package ch.giantific.qwittig.presentation.finance.items;
 
 import android.support.annotation.NonNull;
 
+import java.text.NumberFormat;
+
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Identity;
 
@@ -14,8 +16,8 @@ import ch.giantific.qwittig.domain.models.Identity;
  */
 public class UnpaidDebtItem extends UnpaidCompItem {
 
-    public UnpaidDebtItem(@NonNull Compensation compensation, @NonNull String currency) {
-        super(compensation, currency);
+    public UnpaidDebtItem(@NonNull Compensation compensation, @NonNull NumberFormat moneyFormatter) {
+        super(compensation, moneyFormatter);
 
         mCredit = false;
         final Identity identity = compensation.getCreditor();

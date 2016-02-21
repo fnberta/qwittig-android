@@ -12,6 +12,7 @@ import com.parse.ParseClassName;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -53,9 +54,9 @@ public class Purchase extends ParseObject {
     }
 
     public Purchase(@NonNull Identity currentIdentity, @NonNull Group group, @NonNull Date date,
-                    @NonNull String store, @NonNull List<Item> items, double totalPrice,
+                    @NonNull String store, @NonNull List<Item> items, @NonNull BigDecimal totalPrice,
                     @NonNull List<Identity> identities, @NonNull String currency,
-                    float exchangeRate) {
+                    double exchangeRate) {
         setBuyer(currentIdentity);
         setGroup(group);
         setDate(date);
@@ -138,11 +139,11 @@ public class Purchase extends ParseObject {
         put(CURRENCY, currency);
     }
 
-    public float getExchangeRate() {
-        return (float) getDouble(EXCHANGE_RATE);
+    public double getExchangeRate() {
+        return getDouble(EXCHANGE_RATE);
     }
 
-    public void setExchangeRate(float exchangeRate) {
+    public void setExchangeRate(double exchangeRate) {
         put(EXCHANGE_RATE, exchangeRate);
     }
 
@@ -185,7 +186,7 @@ public class Purchase extends ParseObject {
 
     @NonNull
     public List<Identity> getReadBy() {
-        List<Identity> readBy = getList(READ_BY);
+        final List<Identity> readBy = getList(READ_BY);
         if (readBy == null) {
             return Collections.emptyList();
         }
@@ -207,27 +208,16 @@ public class Purchase extends ParseObject {
      * @param identity the identity to check the read status for
      * @return whether the identity has read the purchase or not
      */
-    public boolean userHasReadPurchase(@NonNull Identity identity) {
-        List<String> readByIds = getReadByIds();
-        return readByIds.contains(identity.getObjectId());
-    }
-
-    /**
-     * Returns the object ids of the users that have already read the purchase.
-     *
-     * @return the object ids of the users that read the purchase
-     */
-    @NonNull
-    public List<String> getReadByIds() {
-        List<String> readByIds = new ArrayList<>();
-        List<Identity> readBy = getReadBy();
-        if (!readBy.isEmpty()) {
-            for (Identity identity : readBy) {
-                readByIds.add(identity.getObjectId());
+    public boolean isRead(@NonNull Identity identity) {
+        final List<Identity> readBy = getReadBy();
+        final String identityId = identity.getObjectId();
+        for (Identity readByIdentity : readBy) {
+            if (readByIdentity.getObjectId().equals(identityId)) {
+                return true;
             }
         }
 
-        return readByIds;
+        return false;
     }
 
     public void addUserToReadBy(@NonNull Identity identity) {
@@ -238,7 +228,7 @@ public class Purchase extends ParseObject {
      * Resets the read by field to only the identity.
      */
     public void resetReadBy(@NonNull Identity identity) {
-        List<Identity> readBy = new ArrayList<>();
+        final List<Identity> readBy = new ArrayList<>();
         readBy.add(identity);
         put(READ_BY, readBy);
     }
@@ -296,10 +286,10 @@ public class Purchase extends ParseObject {
      * @param toGroupCurrency whether to convert to the group's currency or to a foreign one
      */
     public void convertTotalPrice(boolean toGroupCurrency) {
-        double totalPrice = getTotalPrice();
-        double exchangeRate = getExchangeRate();
-        double totalPriceConverted = toGroupCurrency ? totalPrice * exchangeRate : totalPrice / exchangeRate;
-        setTotalPrice(MoneyUtils.roundToFractionDigits(4, totalPriceConverted));
+        final double totalPrice = getTotalPrice();
+        final double exchangeRate = getExchangeRate();
+        final double totalPriceConverted = toGroupCurrency ? totalPrice * exchangeRate : totalPrice / exchangeRate;
+        setTotalPrice(MoneyUtils.roundConvertedPrice(totalPriceConverted));
     }
 
     /**
@@ -308,8 +298,8 @@ public class Purchase extends ParseObject {
      * @return the total price in foreign currency
      */
     public double getTotalPriceForeign() {
-        double totalPrice = getTotalPrice();
-        double exchangeRate = getExchangeRate();
+        final double totalPrice = getTotalPrice();
+        final double exchangeRate = getExchangeRate();
         if (exchangeRate == 1) {
             return totalPrice;
         }
@@ -325,7 +315,7 @@ public class Purchase extends ParseObject {
      */
     public double calculateUserShare(@NonNull Identity identity) {
         double userShare = 0;
-        double exchangeRate = getExchangeRate();
+        final double exchangeRate = getExchangeRate();
         List<Item> items = getItems();
         for (Item item : items) {
             List<Identity> identities = item.getIdentities();

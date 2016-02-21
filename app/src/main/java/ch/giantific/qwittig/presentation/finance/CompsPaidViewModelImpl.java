@@ -59,7 +59,7 @@ public class CompsPaidViewModelImpl
 
     @Override
     public void loadData() {
-        mSubscriptions.add(mIdentityRepo.fetchIdentityDataAsync(mCurrentIdentity)
+        getSubscriptions().add(mIdentityRepo.fetchIdentityDataAsync(mCurrentIdentity)
                 .flatMap(new Func1<Identity, Observable<Compensation>>() {
                     @Override
                     public Observable<Compensation> call(Identity identity) {
@@ -136,7 +136,7 @@ public class CompsPaidViewModelImpl
     @Override
     public void setCompensationsQueryMoreStream(@NonNull Observable<Compensation> observable,
                                                 @NonNull final String workerTag) {
-        mSubscriptions.add(observable
+        getSubscriptions().add(observable
                 .toList()
                 .toSingle()
                 .subscribe(new SingleSubscriber<List<Compensation>>() {
@@ -177,7 +177,7 @@ public class CompsPaidViewModelImpl
     @Override
     public void setCompensationsUpdateStream(@NonNull Observable<Compensation> observable,
                                              boolean paid, @NonNull final String workerTag) {
-        mSubscriptions.add(observable
+        getSubscriptions().add(observable
                 .toList()
                 .toSingle()
                 .subscribe(new SingleSubscriber<List<Compensation>>() {

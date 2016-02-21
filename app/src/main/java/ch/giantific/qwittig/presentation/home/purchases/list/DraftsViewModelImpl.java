@@ -18,6 +18,7 @@ import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
 import rx.Observable;
+import rx.SingleSubscriber;
 import rx.Subscriber;
 import rx.functions.Func1;
 
@@ -61,7 +62,7 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, DraftsV
 
     @Override
     public void loadData() {
-        mSubscriptions.add(mIdentityRepo.fetchIdentityDataAsync(mCurrentIdentity)
+        getSubscriptions().add(mIdentityRepo.fetchIdentityDataAsync(mCurrentIdentity)
                 .flatMap(new Func1<Identity, Observable<Purchase>>() {
                     @Override
                     public Observable<Purchase> call(Identity identity) {
@@ -178,14 +179,30 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, DraftsV
                 mDraftsSelected.remove(draft.getDraftId());
 
                 if (mDeleteSelectedItems) {
-                    draft.unpinInBackground(Purchase.PIN_LABEL_DRAFT);
-                    mItems.remove(i);
-                    mView.notifyItemRemoved(i);
+                    deleteDraft(draft, i);
                 } else {
                     mView.notifyItemChanged(i);
                 }
             }
         }
+    }
+
+    private void deleteDraft(@NonNull Purchase draft, final int pos) {
+        getSubscriptions().add(mPurchaseRepo.removePurchaseLocalAsync(draft, Purchase.PIN_LABEL_DRAFT)
+                .subscribe(new SingleSubscriber<Purchase>() {
+                    @Override
+                    public void onSuccess(Purchase value) {
+                        mItems.remove(pos);
+                        mView.notifyItemRemoved(pos);
+                        mView.updateDraftsDisplay();
+                    }
+
+                    @Override
+                    public void onError(Throwable error) {
+                        mView.showMessage(R.string.toast_error_draft_delete);
+                    }
+                })
+        );
     }
 
     @Override

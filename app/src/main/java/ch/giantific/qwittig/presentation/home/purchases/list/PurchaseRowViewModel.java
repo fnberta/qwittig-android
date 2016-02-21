@@ -8,6 +8,8 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.support.annotation.NonNull;
 
+import java.text.NumberFormat;
+
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.utils.DateUtils;
@@ -19,17 +21,18 @@ import ch.giantific.qwittig.utils.MoneyUtils;
 public class PurchaseRowViewModel extends BaseObservable {
 
     private Identity mCurrentIdentity;
+    private NumberFormat mMoneyFormatter;
     private String mPurchaseBuyerAndDate;
     private String mPurchaseBuyerAvatar;
     private String mPurchaseStore;
     private String mPurchaseTotalPrice;
     private String mPurchaseMyShare;
     private boolean mPurchaseRead;
-    private String mCurrency;
 
     public PurchaseRowViewModel(@NonNull Purchase purchase, @NonNull Identity currentIdentity) {
         mCurrentIdentity = currentIdentity;
-        mCurrency = currentIdentity.getGroup().getCurrency();
+        final String currency = currentIdentity.getGroup().getCurrency();
+        mMoneyFormatter = MoneyUtils.getMoneyFormatter(currency, false, true);
         setPurchaseInfo(purchase);
     }
 
@@ -40,10 +43,10 @@ public class PurchaseRowViewModel extends BaseObservable {
                 DateUtils.formatDateShort(purchase.getDate()));
         mPurchaseBuyerAvatar = buyer.getAvatarUrl();
         mPurchaseStore = purchase.getStore();
-        mPurchaseTotalPrice = MoneyUtils.formatMoneyNoSymbol(purchase.getTotalPrice(), mCurrency);
-        mPurchaseMyShare = MoneyUtils.formatMoneyNoSymbol(purchase.calculateUserShare(mCurrentIdentity), mCurrency);
+        mPurchaseTotalPrice = mMoneyFormatter.format(purchase.getTotalPrice());
+        mPurchaseMyShare = mMoneyFormatter.format(purchase.calculateUserShare(mCurrentIdentity));
         // TODO: implement ripple for <21 (just show white color)
-        mPurchaseRead = purchase.userHasReadPurchase(mCurrentIdentity);
+        mPurchaseRead = purchase.isRead(mCurrentIdentity);
     }
 
     public void updatePurchaseInfo(@NonNull Purchase purchase) {

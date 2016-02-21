@@ -10,6 +10,8 @@ import android.support.annotation.NonNull;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
+import java.text.NumberFormat;
+
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.utils.DateUtils;
@@ -21,7 +23,7 @@ import ch.giantific.qwittig.utils.MoneyUtils;
 public class CompPaidRowViewModel extends BaseObservable {
 
     private final Identity mCurrentIdentity;
-    private final String mCurrency;
+    private NumberFormat mMoneyFormatter;
     private String mCompUsername;
     private String mCompUserAvatar;
     private String mCompAmount;
@@ -31,7 +33,8 @@ public class CompPaidRowViewModel extends BaseObservable {
     public CompPaidRowViewModel(@NonNull Compensation compensation,
                                 @NonNull Identity currentIdentity) {
 
-        mCurrency = currentIdentity.getGroup().getCurrency();
+        final String currency = currentIdentity.getGroup().getCurrency();
+        mMoneyFormatter = MoneyUtils.getMoneyFormatter(currency, true, true);
         mCurrentIdentity = currentIdentity;
         setCompInfo(compensation);
         mCompDate = DateUtils.formatDateShort(compensation.getCreatedAt());
@@ -44,13 +47,13 @@ public class CompPaidRowViewModel extends BaseObservable {
             final Identity debtor = compensation.getDebtor();
             mCompUsername = debtor.getNickname();
             mCompUserAvatar = debtor.getAvatarUrl();
-            mCompAmount = MoneyUtils.formatMoney(amount, mCurrency);
+            mCompAmount = mMoneyFormatter.format(amount);
             mCompAmountPos = true;
         } else {
             mCompUsername = creditor.getNickname();
             mCompUserAvatar = creditor.getAvatarUrl();
             mCompAmountPos = false;
-            mCompAmount = MoneyUtils.formatMoney(amount.negate(), mCurrency);
+            mCompAmount = mMoneyFormatter.format(amount.negate());
         }
     }
 

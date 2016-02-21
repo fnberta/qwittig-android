@@ -16,11 +16,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ch.giantific.qwittig.data.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
-import ch.giantific.qwittig.data.receivers.PushBroadcastReceiver;
 import rx.Observable;
 import rx.Single;
 import rx.functions.Action1;
@@ -33,6 +33,7 @@ import rx.functions.Func1;
 public class ParseCompensationRepository extends ParseBaseRepository implements
         CompensationRepository {
 
+    private static final String CALCULATE_COMPENSATIONS = "calculateCompensations";
     private static final String PUSH_COMPENSATION_REMIND = "pushCompensationRemind";
     private static final String DATE_CREATED = "createdAt";
     private static final String DATE_UPDATED = "updatedAt";
@@ -44,6 +45,13 @@ public class ParseCompensationRepository extends ParseBaseRepository implements
     @Override
     protected String getClassName() {
         return Compensation.CLASS;
+    }
+
+    @Override
+    public Single<String> calculateCompensations(@NonNull Group group) {
+        final Map<String, Object> params = new HashMap<>();
+        params.put(PushBroadcastReceiver.PUSH_PARAM_GROUP_ID, group.getObjectId());
+        return callFunctionInBackground(CALCULATE_COMPENSATIONS, params);
     }
 
     @Override
@@ -110,8 +118,7 @@ public class ParseCompensationRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public Observable<Compensation> updateCompensationsUnpaidAsync(@NonNull Identity currentIdentity,
-                                                                   @NonNull List<Identity> identities) {
+    public Observable<Compensation> updateCompensationsUnpaidAsync(@NonNull List<Identity> identities) {
         return Observable.from(identities)
                 .filter(new Func1<Identity, Boolean>() {
                     @Override

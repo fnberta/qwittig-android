@@ -15,7 +15,7 @@ import dagger.Component;
  */
 @PerFragment
 @Component(modules = {FinanceUsersViewModelModule.class, RepositoriesModule.class})
-public interface FinanceUsersComponent {
+public interface FinanceIdentitiesComponent {
 
     void inject(IdentitiesFragment identitiesFragment);
 }

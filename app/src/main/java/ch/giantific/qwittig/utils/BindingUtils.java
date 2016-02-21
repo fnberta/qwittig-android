@@ -170,6 +170,23 @@ public class BindingUtils {
         view.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, drawables[1], drawables[2], drawables[3]);
     }
 
+    @BindingAdapter({"purchaseBackground"})
+    public static void setPurchaseBackground(View view, boolean read) {
+        final Context context = view.getContext();
+        if (read) {
+            final int[] attrs = new int[]{R.attr.selectableItemBackground};
+            final TypedArray typedArray = context.obtainStyledAttributes(attrs);
+            final int backgroundResource = typedArray.getResourceId(0, 0);
+            typedArray.recycle();
+
+            view.setBackgroundResource(backgroundResource);
+        } else if (Utils.isRunningLollipopAndHigher()) {
+            view.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_white));
+        } else {
+            view.setBackgroundColor(ContextCompat.getColor(context, android.R.color.white));
+        }
+    }
+
     @BindingAdapter({"deadline"})
     public static void setTaskDeadline(TextView view, int daysToDeadline) {
         final Context context = view.getContext();
@@ -213,22 +230,5 @@ public class BindingUtils {
         }
 
         view.setText(usersInvolvedString);
-    }
-
-    @BindingAdapter({"purchaseBackground"})
-    public static void setPurchaseBackground(View view, boolean read) {
-        final Context context = view.getContext();
-        if (read) {
-            int[] attrs = new int[]{R.attr.selectableItemBackground};
-            TypedArray typedArray = context.obtainStyledAttributes(attrs);
-            int backgroundResource = typedArray.getResourceId(0, 0);
-            typedArray.recycle();
-
-            view.setBackgroundResource(backgroundResource);
-        } else if (Utils.isRunningLollipopAndHigher()) {
-            view.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_white));
-        } else {
-            view.setBackgroundColor(ContextCompat.getColor(context, android.R.color.white));
-        }
     }
 }

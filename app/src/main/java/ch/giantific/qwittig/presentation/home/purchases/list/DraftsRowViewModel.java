@@ -8,6 +8,8 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.support.annotation.NonNull;
 
+import java.text.NumberFormat;
+
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
@@ -17,7 +19,7 @@ import ch.giantific.qwittig.utils.MoneyUtils;
  */
 public class DraftsRowViewModel extends BaseObservable {
 
-    private String mGroupCurrency;
+    private NumberFormat mMoneyFormatter;
     private String mDraftDate;
     private String mDraftStore;
     private String mDraftTotalPrice;
@@ -25,7 +27,7 @@ public class DraftsRowViewModel extends BaseObservable {
 
     public DraftsRowViewModel(@NonNull Purchase draft, boolean draftSelected,
                               @NonNull String groupCurrency) {
-        mGroupCurrency = groupCurrency;
+        mMoneyFormatter = MoneyUtils.getMoneyFormatter(groupCurrency, false, true);
         setDraftInfo(draft, draftSelected);
     }
 
@@ -38,7 +40,7 @@ public class DraftsRowViewModel extends BaseObservable {
         mDraftDate = DateUtils.formatMonthDayLineSeparated(draft.getDate());
         mDraftStore = draft.getStore();
         double totalPrice = draft.getTotalPrice();
-        mDraftTotalPrice = MoneyUtils.formatMoneyNoSymbol(totalPrice, mGroupCurrency);
+        mDraftTotalPrice = mMoneyFormatter.format(totalPrice);
         mDraftSelected = draftSelected;
     }
 

@@ -302,7 +302,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
         final boolean newAvatar = !emptyAvatar && !mAvatar.equals(mCurrentIdentity.getAvatarUrl());
         if (newAvatar) {
             setSaving(true);
-            mSubscriptions.add(mView.encodeAvatar(mAvatar)
+            getSubscriptions().add(mView.encodeAvatar(mAvatar)
                     .subscribe(new SingleSubscriber<byte[]>() {
                         @Override
                         public void onSuccess(byte[] value) {
@@ -346,7 +346,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
                                        @ProfileAction int action) {
         switch (action) {
             case ProfileAction.SAVE_AVATAR:
-                mSubscriptions.add(single.subscribe(new SingleSubscriber<User>() {
+                getSubscriptions().add(single.subscribe(new SingleSubscriber<User>() {
                             @Override
                             public void onSuccess(User user) {
                                 mView.removeWorker(workerTag);
@@ -371,7 +371,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
             case ProfileAction.UNLINK_FACEBOOK:
                 // fall through
             case ProfileAction.UNLINK_GOOGLE:
-                mSubscriptions.add(single.subscribe(new SingleSubscriber<User>() {
+                getSubscriptions().add(single.subscribe(new SingleSubscriber<User>() {
                             @Override
                             public void onSuccess(User value) {
                                 mView.removeWorker(workerTag);

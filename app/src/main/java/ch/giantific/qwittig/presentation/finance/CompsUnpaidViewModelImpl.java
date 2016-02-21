@@ -13,6 +13,7 @@ import android.view.View;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +51,7 @@ public class CompsUnpaidViewModelImpl
     private CompensationRepository mCompsRepo;
     private ArrayList<String> mLoadingComps;
     private String mCompConfirmingId;
+    private NumberFormat mMoneyFormatter;
 
     public CompsUnpaidViewModelImpl(@Nullable Bundle savedState,
                                     @NonNull CompsUnpaidViewModel.ViewListener view,
@@ -84,15 +86,17 @@ public class CompsUnpaidViewModelImpl
     public String getCurrentIdentityBalance() {
         final BigFraction balance = mCurrentIdentity.getBalance();
         mView.setColorTheme(balance);
-        return MoneyUtils.formatMoney(balance, mCurrentIdentity.getGroup().getCurrency());
+        return mMoneyFormatter.format(balance);
     }
 
     @Override
     public void loadData() {
-        mSubscriptions.add(mIdentityRepo.fetchIdentityDataAsync(mCurrentIdentity)
+        getSubscriptions().add(mIdentityRepo.fetchIdentityDataAsync(mCurrentIdentity)
                 .flatMap(new Func1<Identity, Observable<Compensation>>() {
                     @Override
                     public Observable<Compensation> call(Identity identity) {
+                        final String currency = mCurrentIdentity.getGroup().getCurrency();
+                        mMoneyFormatter = MoneyUtils.getMoneyFormatter(currency, true, true);
                         return mCompsRepo.getCompensationsLocalUnpaidAsync(identity);
                     }
                 })
@@ -114,14 +118,14 @@ public class CompsUnpaidViewModelImpl
                         if (!credits.isEmpty()) {
                             mItems.add(new HeaderItem(R.string.header_comps_credits));
                             for (Compensation comp : credits) {
-                                mItems.add(new UnpaidCreditItem(comp, currency));
+                                mItems.add(new UnpaidCreditItem(comp, mMoneyFormatter));
                             }
                         }
 
                         if (!debts.isEmpty()) {
                             mItems.add(new HeaderItem(R.string.header_comps_debts));
                             for (Compensation comp : debts) {
-                                mItems.add(new UnpaidDebtItem(comp, currency));
+                                mItems.add(new UnpaidDebtItem(comp, mMoneyFormatter));
                             }
                         }
 
@@ -178,7 +182,7 @@ public class CompsUnpaidViewModelImpl
     @Override
     public void setCompensationsUpdateStream(@NonNull Observable<Compensation> observable,
                                              boolean paid, @NonNull final String workerTag) {
-        mSubscriptions.add(observable
+        getSubscriptions().add(observable
                 .toList()
                 .toSingle()
                 .subscribe(new SingleSubscriber<List<Compensation>>() {
@@ -214,7 +218,7 @@ public class CompsUnpaidViewModelImpl
     }
 
     @Override
-    public void onAmountConfirmed(@NonNull BigFraction amount) {
+    public void onAmountConfirmed(double amount) {
         for (int i = 0, size = mItems.size(); i < size; i++) {
             final UnpaidItem item = mItems.get(i);
             if (item.getType() != Type.CREDIT) {
@@ -223,7 +227,11 @@ public class CompsUnpaidViewModelImpl
 
             final Compensation compensation = ((UnpaidCompItem) item).getCompensation();
             if (compensation.getObjectId().equals(mCompConfirmingId)) {
-                compensation.setAmountFraction(amount);
+                final BigFraction originalAmount = compensation.getAmountFraction();
+                final double diff = originalAmount.doubleValue() - amount;
+                if (Math.abs(diff) >= MoneyUtils.MIN_DIFF) {
+                    compensation.setAmountFraction(new BigFraction(amount));
+                }
                 confirmCompensation(compensation, i);
                 return;
             }
@@ -284,7 +292,7 @@ public class CompsUnpaidViewModelImpl
     public void setCompensationRemindStream(@NonNull Single<String> single,
                                             @NonNull final String compensationId,
                                             @NonNull final String workerTag) {
-        mSubscriptions.add(single.subscribe(new SingleSubscriber<String>() {
+        getSubscriptions().add(single.subscribe(new SingleSubscriber<String>() {
             @Override
             public void onSuccess(String value) {
                 final Compensation compensation = stopCompensationLoading(compensationId);

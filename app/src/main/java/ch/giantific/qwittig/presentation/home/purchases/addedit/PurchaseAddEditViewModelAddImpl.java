@@ -18,6 +18,8 @@ import com.android.databinding.library.baseAdapters.BR;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -25,7 +27,6 @@ import java.util.List;
 
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.data.rest.OcrItem;
 import ch.giantific.qwittig.data.rest.OcrPurchase;
 import ch.giantific.qwittig.domain.models.Group;
@@ -45,6 +46,7 @@ import ch.giantific.qwittig.presentation.home.purchases.addedit.items.ItemItem;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.items.ItemUsersItem;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.items.ItemUsersItemUser;
 import ch.giantific.qwittig.utils.DateUtils;
+import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.parse.ParseUtils;
 import rx.Single;
@@ -76,12 +78,14 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
     String mNote;
     Date mDate;
     String mStore;
-    BigDecimal mTotalPrice = BigDecimal.ZERO;
-    float mExchangeRate;
+    double mTotalPrice = 0;
+    double mExchangeRate;
     boolean mSaving;
+    NumberFormat mMoneyFormatter;
+    private NumberFormat mExchangeRateFormatter;
     private List<String> mSupportedCurrencies = ParseUtils.getSupportedCurrencyCodes();
     private List<Identity> mIdentities = new ArrayList<>();
-    private BigDecimal mMyShare = BigDecimal.ZERO;
+    private double mMyShare = 0;
     private boolean mFetchingExchangeRates;
     private ArrayList<String> mReceiptImagePaths;
     private Group mCurrentGroup;
@@ -102,7 +106,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
             mDate = DateUtils.parseLongToDate(savedState.getLong(STATE_DATE));
             mStore = savedState.getString(STATE_STORE);
             setCurrency(savedState.getString(STATE_CURRENCY, mCurrentGroup.getCurrency()));
-            mExchangeRate = savedState.getFloat(STATE_EXCHANGE_RATE);
+            mExchangeRate = savedState.getDouble(STATE_EXCHANGE_RATE);
             mNote = savedState.getString(STATE_NOTE);
             mReceiptImagePath = savedState.getString(STATE_RECEIPT_IMAGE_PATH);
             if (USE_CUSTOM_CAMERA) {
@@ -119,6 +123,9 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
                 mReceiptImagePaths = new ArrayList<>();
             }
         }
+
+        mMoneyFormatter = MoneyUtils.getMoneyFormatter(mCurrency, false, true);
+        mExchangeRateFormatter = MoneyUtils.getExchangeRateFormatter();
     }
 
     private void initFixedRows() {
@@ -139,7 +146,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
         outState.putLong(STATE_DATE, DateUtils.parseDateToLong(mDate));
         outState.putString(STATE_STORE, mStore);
         outState.putString(STATE_CURRENCY, mCurrency);
-        outState.putFloat(STATE_EXCHANGE_RATE, mExchangeRate);
+        outState.putDouble(STATE_EXCHANGE_RATE, mExchangeRate);
         outState.putString(STATE_NOTE, mNote);
         outState.putString(STATE_RECEIPT_IMAGE_PATH, mReceiptImagePath);
         if (USE_CUSTOM_CAMERA) {
@@ -179,11 +186,11 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
     @Override
     @Bindable
     public String getTotalPrice() {
-        return MoneyUtils.formatMoneyNoSymbol(mTotalPrice, mCurrency);
+        return mMoneyFormatter.format(mTotalPrice);
     }
 
     @Override
-    public void setTotalPrice(@NonNull BigDecimal totalPrice) {
+    public void setTotalPrice(double totalPrice) {
         mTotalPrice = totalPrice;
         notifyPropertyChanged(BR.totalPrice);
     }
@@ -191,13 +198,18 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
     @Override
     @Bindable
     public String getMyShare() {
-        return MoneyUtils.formatMoneyNoSymbol(mMyShare, mCurrency);
+        return mMoneyFormatter.format(mMyShare);
     }
 
     @Override
-    public void setMyShare(@NonNull BigDecimal myShare) {
+    public void setMyShare(double myShare) {
         mMyShare = myShare;
         notifyPropertyChanged(BR.myShare);
+    }
+
+    @Override
+    public NumberFormat getMoneyFormatter() {
+        return mMoneyFormatter;
     }
 
     @Override
@@ -227,11 +239,11 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
     @Override
     @Bindable
     public String getExchangeRate() {
-        return MoneyUtils.formatMoneyNoSymbol(mExchangeRate, MoneyUtils.EXCHANGE_RATE_FRACTION_DIGITS);
+        return mExchangeRateFormatter.format(mExchangeRate);
     }
 
     @Override
-    public void setExchangeRate(float exchangeRate) {
+    public void setExchangeRate(double exchangeRate) {
         mExchangeRate = exchangeRate;
         notifyPropertyChanged(BR.exchangeRate);
         notifyPropertyChanged(BR.exchangeRateVisible);
@@ -249,20 +261,19 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
     }
 
     private void updateTotalAndMyShare() {
-        BigDecimal totalPrice = BigDecimal.ZERO;
-        BigDecimal myShare = BigDecimal.ZERO;
-        final int maximumFractionDigits = MoneyUtils.getMaximumFractionDigits(mCurrency);
-
+        double totalPrice = 0;
+        double myShare = 0;
+        final String currentIdentityId = mCurrentIdentity.getObjectId();
         for (AddEditItem addEditItem : mItems) {
             if (addEditItem.getType() != Type.ITEM) {
                 continue;
             }
 
             final ItemItem itemItem = (ItemItem) addEditItem;
-            final BigDecimal finalPrice = itemItem.parsePrice(mCurrency);
+            final double itemPrice = itemItem.parsePrice();
 
             // update total price
-            totalPrice = totalPrice.add(finalPrice);
+            totalPrice += itemPrice;
 
             // update my share
             final ItemUsersItemUser[] itemUsersRows = itemItem.getUsers();
@@ -274,13 +285,12 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
                 }
 
                 selectedCount++;
-                if (itemUsersItemUser.getObjectId().equals(mCurrentIdentity.getObjectId())) {
+                if (itemUsersItemUser.getObjectId().equals(currentIdentityId)) {
                     currentIdentityInvolved = true;
                 }
             }
             if (currentIdentityInvolved) {
-                myShare = myShare.add(finalPrice.divide(new BigDecimal(selectedCount),
-                        maximumFractionDigits, BigDecimal.ROUND_HALF_UP));
+                myShare += (itemPrice / selectedCount);
             }
         }
 
@@ -311,15 +321,17 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
         }
 
         mCurrency = currency;
+        mMoneyFormatter = MoneyUtils.getMoneyFormatter(currency, false, true);
 
         // update item price formatting
-        for (int i = 0, size = mItems.size(); i < size; i++) {
-            final AddEditItem addEditItem = mItems.get(i);
-            if (addEditItem.getType() == Type.ITEM) {
-                final ItemItem itemItem = (ItemItem) addEditItem;
-                itemItem.updateCurrency(mCurrency);
-            }
-        }
+        // TODO: only needed when we support currencies with other than 2 decimal values
+//        for (int i = 0, size = mItems.size(); i < size; i++) {
+//            final AddEditItem addEditItem = mItems.get(i);
+//            if (addEditItem.getType() == Type.ITEM) {
+//                final ItemItem itemItem = (ItemItem) addEditItem;
+//                itemItem.updatePriceFormat(mMoneyFormatter);
+//            }
+//        }
 
         // update total price and my share formatting
         notifyPropertyChanged(BR.totalPrice);
@@ -334,7 +346,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
     @Override
     public void setRateFetchStream(@NonNull Single<Float> single,
                                    @NonNull final String workerTag) {
-        mSubscriptions.add(single
+        getSubscriptions().add(single
                 .subscribe(new SingleSubscriber<Float>() {
                     @Override
                     public void onSuccess(Float exchangeRate) {
@@ -353,8 +365,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
                                 new MessageAction(R.string.action_retry) {
                                     @Override
                                     public void onClick(View v) {
-                                        mView.loadFetchExchangeRatesWorker(
-                                                mCurrentGroup.getCurrency(), mCurrency);
+                                        mView.loadFetchExchangeRatesWorker(mCurrentGroup.getCurrency(), mCurrency);
                                     }
                                 });
                     }
@@ -368,15 +379,14 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
     }
 
     @Override
-    public void onExchangeRateManuallySet(float exchangeRate) {
-        final BigDecimal roundedExchangeRate = MoneyUtils.roundToFractionDigits(
-                MoneyUtils.EXCHANGE_RATE_FRACTION_DIGITS, exchangeRate);
-        setExchangeRate(roundedExchangeRate.floatValue());
+    public void onExchangeRateManuallySet(double exchangeRate) {
+        final BigDecimal roundedExchangeRate = MoneyUtils.roundExchangeRate(exchangeRate);
+        setExchangeRate(roundedExchangeRate.doubleValue());
     }
 
     @Override
     public void loadData() {
-        mSubscriptions.add(mIdentityRepo.getIdentitiesLocalAsync(mCurrentGroup, true)
+        getSubscriptions().add(mIdentityRepo.getIdentitiesLocalAsync(mCurrentGroup, true)
                 .toSortedList()
                 .toSingle()
                 .subscribe(new SingleSubscriber<List<Identity>>() {
@@ -398,15 +408,24 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
     }
 
     void onIdentitiesReady() {
-        // fill with one row on first start
+        boolean hasItems = false;
         for (int i = 0, size = mItems.size(); i < size; i++) {
             final AddEditItem addEditItem = mItems.get(i);
+
             if (addEditItem.getType() == Type.ITEM) {
-                return;
+                hasItems = true;
+
+                final ItemItem itemItem = (ItemItem) addEditItem;
+                itemItem.setMoneyFormatter(mMoneyFormatter);
+                itemItem.setPriceChangedListener(this);
+                continue;
             }
 
-            if (addEditItem.getType() == Type.ADD_ROW) {
-                final ItemItem itemItem = new ItemItem(getItemUsersItemUsers(mIdentities), mCurrency);
+            // fill with one row on first start
+            if (addEditItem.getType() == Type.ADD_ROW && !hasItems) {
+                final ItemItem itemItem = new ItemItem(getItemUsersItemUsers(mIdentities));
+                itemItem.setMoneyFormatter(mMoneyFormatter);
+                itemItem.setPriceChangedListener(this);
                 mItems.add(i, itemItem);
                 mView.notifyDataSetChanged();
                 return;
@@ -491,7 +510,9 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
     @Override
     public void setOcrStream(@NonNull final Single<OcrPurchase> single,
                              @NonNull final String workerTag) {
-        mSubscriptions.add(single.subscribe(new SingleSubscriber<OcrPurchase>() {
+        final ItemItem.PriceChangedListener priceListener = this;
+
+        getSubscriptions().add(single.subscribe(new SingleSubscriber<OcrPurchase>() {
             @Override
             public void onSuccess(OcrPurchase ocrPurchase) {
                 mView.removeWorker(workerTag);
@@ -501,19 +522,14 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
 
                 final List<OcrItem> ocrItems = ocrPurchase.getItems();
                 for (OcrItem ocrItem : ocrItems) {
-                    final String price = MoneyUtils.formatPrice(ocrItem.getPrice(), mCurrency);
+                    final String price = mMoneyFormatter.format(ocrItem.getPrice());
                     final ItemItem itemItem = new ItemItem(ocrItem.getName(), price,
-                            getItemUsersItemUsers(mIdentities), mCurrency);
+                            getItemUsersItemUsers(mIdentities));
+                    itemItem.setMoneyFormatter(mMoneyFormatter);
+                    itemItem.setPriceChangedListener(priceListener);
                     mItems.add(itemItem);
                     mView.notifyItemInserted(mItems.indexOf(itemItem));
                 }
-
-                //        setEditTextPriceImeOptions();
-//
-//        if (!itemRowsNew.isEmpty()) {
-//            ItemRow firstItemRow = itemRowsNew.get(0);
-//            firstItemRow.requestFocusForName();
-//        }
 
                 setLoading(false);
             }
@@ -568,7 +584,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
         mView.startSaveAnim();
         final Purchase purchase = getPurchase();
         if (!TextUtils.isEmpty(mReceiptImagePath)) {
-            mSubscriptions.add(mView.encodeReceiptImage(mReceiptImagePath)
+            getSubscriptions().add(mView.encodeReceiptImage(mReceiptImagePath)
                     .subscribe(new SingleSubscriber<byte[]>() {
                         @Override
                         public void onSuccess(byte[] receiptImage) {
@@ -612,7 +628,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
         final Purchase purchase = getPurchase();
         purchase.setRandomDraftId();
         if (!TextUtils.isEmpty(mReceiptImagePath)) {
-            mSubscriptions.add(mView.encodeReceiptImage(mReceiptImagePath)
+            getSubscriptions().add(mView.encodeReceiptImage(mReceiptImagePath)
                     .flatMap(new Func1<byte[], Single<Purchase>>() {
                         @Override
                         public Single<Purchase> call(byte[] bytes) {
@@ -634,7 +650,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
                     })
             );
         } else {
-            mSubscriptions.add(mPurchaseRepo.savePurchaseAsDraftAsync(purchase, Purchase.PIN_LABEL_DRAFT)
+            getSubscriptions().add(mPurchaseRepo.savePurchaseAsDraftAsync(purchase, Purchase.PIN_LABEL_DRAFT)
                     .subscribe(new SingleSubscriber<Purchase>() {
                         @Override
                         public void onSuccess(Purchase value) {
@@ -681,6 +697,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
     private Purchase getPurchase() {
         final List<Identity> purchaseIdentities = new ArrayList<>();
         final List<Item> purchaseItems = new ArrayList<>();
+        final int fractionDigits = MoneyUtils.getFractionDigits(mCurrency);
 
         for (AddEditItem addEditItem : mItems) {
             if (addEditItem.getType() != Type.ITEM) {
@@ -690,25 +707,41 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
             final ItemItem itemRow = (ItemItem) addEditItem;
             final String rowItemName = itemRow.getName();
             final String name = rowItemName != null ? rowItemName : "";
-            final BigDecimal price = itemRow.parsePrice(mCurrency);
+            final String price = itemRow.getPrice();
+            final BigDecimal priceRounded = roundPrice(price, fractionDigits);
             final List<Identity> identities = getIdentities(itemRow.getUsers());
             for (Identity identity : identities) {
                 if (!purchaseIdentities.contains(identity)) {
                     purchaseIdentities.add(identity);
                 }
             }
-            final Item item = new Item(name, price, identities, mCurrentGroup);
+            final Item item = new Item(name, priceRounded, identities, mCurrentGroup);
             purchaseItems.add(item);
         }
 
-        return createPurchase(purchaseIdentities, purchaseItems);
+        return createPurchase(purchaseIdentities, purchaseItems, fractionDigits);
+    }
+
+    private BigDecimal roundPrice(@NonNull String price, int fractionDigits) {
+        try {
+            return new BigDecimal(price).setScale(fractionDigits, BigDecimal.ROUND_UP);
+        } catch (NumberFormatException e) {
+            try {
+                final double parsed = mMoneyFormatter.parse(price).doubleValue();
+                return new BigDecimal(parsed).setScale(fractionDigits, BigDecimal.ROUND_UP);
+            } catch (ParseException e1) {
+                return BigDecimal.ZERO;
+            }
+        }
     }
 
     @NonNull
     Purchase createPurchase(@NonNull List<Identity> purchaseIdentities,
-                            @NonNull List<Item> purchaseItems) {
+                            @NonNull List<Item> purchaseItems, int fractionDigits) {
+        final BigDecimal totalPriceRounded =
+                new BigDecimal(mTotalPrice).setScale(fractionDigits, BigDecimal.ROUND_UP);
         final Purchase purchase = new Purchase(mCurrentIdentity, mCurrentGroup, mDate, mStore,
-                purchaseItems, mTotalPrice.doubleValue(), purchaseIdentities, mCurrency, mExchangeRate);
+                purchaseItems, totalPriceRounded, purchaseIdentities, mCurrency, mExchangeRate);
         if (!TextUtils.isEmpty(mNote)) {
             purchase.setNote(mNote);
         }
@@ -730,7 +763,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
     @Override
     public void setPurchaseSaveStream(@NonNull Single<Purchase> single,
                                       @NonNull final String workerTag) {
-        mSubscriptions.add(single.subscribe(new SingleSubscriber<Purchase>() {
+        getSubscriptions().add(single.subscribe(new SingleSubscriber<Purchase>() {
             @Override
             public void onSuccess(Purchase value) {
                 mView.removeWorker(workerTag);
@@ -814,7 +847,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
 
     @Override
     public void onEditNoteClick() {
-        // TODO: possible, no!
+        // TODO: doesn't work because note fragment is shown
         mView.showAddEditNoteDialog(mNote);
     }
 
@@ -886,7 +919,9 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
 
     @Override
     public void onAddRowClick(int position) {
-        final ItemItem itemItem = new ItemItem(getItemUsersItemUsers(mIdentities), mCurrency);
+        final ItemItem itemItem = new ItemItem(getItemUsersItemUsers(mIdentities));
+        itemItem.setMoneyFormatter(mMoneyFormatter);
+        itemItem.setPriceChangedListener(this);
         mItems.add(position, itemItem);
         mView.notifyItemInserted(position);
         mView.scrollToPosition(position + 1);

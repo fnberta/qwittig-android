@@ -12,16 +12,17 @@ import android.view.View;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModelBaseImpl;
+import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Observable;
 import rx.SingleSubscriber;
@@ -33,6 +34,8 @@ import rx.functions.Func1;
 public class IdentitiesViewModelImpl
         extends OnlineListViewModelBaseImpl<Identity, IdentitiesViewModel.ViewListener>
         implements IdentitiesViewModel {
+
+    private NumberFormat mMoneyFormatter;
 
     public IdentitiesViewModelImpl(@Nullable Bundle savedState,
                                    @NonNull IdentitiesViewModel.ViewListener view,
@@ -50,15 +53,17 @@ public class IdentitiesViewModelImpl
     public String getCurrentUserBalance() {
         final BigFraction balance = mCurrentIdentity.getBalance();
         mView.setColorTheme(balance);
-        return MoneyUtils.formatMoney(balance, mCurrentIdentity.getGroup().getCurrency());
+        return mMoneyFormatter.format(balance);
     }
 
     @Override
     public void loadData() {
-        mSubscriptions.add(mIdentityRepo.fetchIdentityDataAsync(mCurrentIdentity)
+        getSubscriptions().add(mIdentityRepo.fetchIdentityDataAsync(mCurrentIdentity)
                 .flatMap(new Func1<Identity, Observable<Identity>>() {
                     @Override
                     public Observable<Identity> call(Identity identity) {
+                        final String currency = mCurrentIdentity.getGroup().getCurrency();
+                        mMoneyFormatter = MoneyUtils.getMoneyFormatter(currency, true, true);
                         return mIdentityRepo.getIdentitiesLocalAsync(identity.getGroup(), true);
                     }
                 })
@@ -113,7 +118,7 @@ public class IdentitiesViewModelImpl
     @Override
     public void setUsersUpdateStream(@NonNull Observable<Identity> observable,
                                      @NonNull final String workerTag) {
-        mSubscriptions.add(observable.toSingle()
+        getSubscriptions().add(observable.toSingle()
                 .subscribe(new SingleSubscriber<Identity>() {
                     @Override
                     public void onSuccess(Identity identity) {

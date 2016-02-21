@@ -49,7 +49,7 @@ public interface IdentityRepository extends BaseRepository {
      */
     Observable<Identity> fetchIdentityDataAsync(@NonNull Identity identity);
 
-    Observable<Identity> fetchUserIdentitiesDataAsync(@NonNull List<Identity> identities);
+    Observable<Identity> fetchIdentitiesDataAsync(@NonNull List<Identity> identities);
 
     /**
      * Queries the local data store for identities.

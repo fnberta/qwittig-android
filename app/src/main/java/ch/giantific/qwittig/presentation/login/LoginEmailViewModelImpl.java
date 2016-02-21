@@ -115,7 +115,7 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
     @Override
     public void setUserLoginStream(@NonNull Single<User> single, @NonNull final String workerTag,
                                    @LoginWorker.Type int type) {
-        mSubscriptions.add(single
+        getSubscriptions().add(single
                 .subscribe(new SingleSubscriber<User>() {
                     @Override
                     public void onSuccess(User value) {

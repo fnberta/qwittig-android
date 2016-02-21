@@ -7,10 +7,6 @@ package ch.giantific.qwittig.presentation.home.purchases.addedit.items;
 import android.databinding.BaseObservable;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.IntDef;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 
 /**
  * Created by fabio on 30.01.16.
@@ -48,7 +44,6 @@ public class GenericItem extends BaseObservable
     public static GenericItem createNewStoreInstance() {
         return new GenericItem(Type.STORE);
     }
-
 
     public static GenericItem createNewAddRowInstance() {
         return new GenericItem(Type.ADD_ROW);

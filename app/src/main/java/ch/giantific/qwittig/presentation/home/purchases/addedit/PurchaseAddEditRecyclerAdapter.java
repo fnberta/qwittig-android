@@ -128,7 +128,8 @@ public class PurchaseAddEditRecyclerAdapter extends RecyclerView.Adapter {
                 final RowPurchaseAddItemBinding binding = row.getBinding();
 
                 final ItemItem itemRow = (ItemItem) addEditItem;
-                itemRow.setPriceChangedListener(mViewModel);
+//                itemRow.setPriceChangedListener(mViewModel);
+//                itemRow.setMoneyFormatter(mViewModel.getMoneyFormatter());
                 binding.setItemRow(itemRow);
                 binding.executePendingBindings();
                 break;
@@ -147,8 +148,8 @@ public class PurchaseAddEditRecyclerAdapter extends RecyclerView.Adapter {
             case Type.TOTAL: {
                 final TotalRow row = (TotalRow) holder;
                 final RowPurchaseAddTotalBinding binding = row.getBinding();
-                binding.setViewModel(mViewModel);
 
+                binding.setViewModel(mViewModel);
                 binding.executePendingBindings();
                 break;
             }
