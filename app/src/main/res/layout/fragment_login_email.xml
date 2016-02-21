@@ -32,6 +32,7 @@
             android:layout_height="match_parent"
             android:layout_marginEnd="@dimen/key_line_1"
             android:layout_marginStart="@dimen/key_line_1"
+            android:animateLayoutChanges="true"
             android:orientation="vertical"
             android:visibility="@{viewModel.loading ? View.GONE : View.VISIBLE}"
             >
@@ -109,9 +110,9 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.5"
+                    android:onClick="@{viewModel.onLoginClick}"
                     android:text="@string/login_button_log_in"
                     android:theme="@style/Widget.AppCompat.Button.AccentColor"
-                    android:onClick="@{viewModel.onLoginClick}"
                     tools:ignore="ButtonStyle"
                     />
 
@@ -120,9 +121,9 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.5"
+                    android:onClick="@{viewModel.onSignUpClick}"
                     android:text="@string/login_button_sign_up"
                     android:theme="@style/Widget.AppCompat.Button.AccentColor"
-                    android:onClick="@{viewModel.onSignUpClick}"
                     tools:ignore="ButtonStyle"
                     />
 

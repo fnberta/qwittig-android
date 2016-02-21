@@ -9,7 +9,7 @@ import android.os.Parcel;
 /**
  * Created by fabio on 07.02.16.
  */
-public class IntroItem implements AddUsersItem {
+public class IntroItem implements SettingsUsersItem {
 
 
     public static final Creator<IntroItem> CREATOR = new Creator<IntroItem>() {

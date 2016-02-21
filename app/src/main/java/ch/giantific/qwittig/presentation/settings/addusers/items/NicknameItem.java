@@ -11,15 +11,13 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import ch.giantific.qwittig.BR;
 
 /**
  * Created by fabio on 07.02.16.
  */
-public class NicknameItem extends BaseObservable implements AddUsersItem {
+public class NicknameItem extends BaseObservable implements SettingsUsersItem {
 
     public static final Parcelable.Creator<NicknameItem> CREATOR = new Parcelable.Creator<NicknameItem>() {
         @Override

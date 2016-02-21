@@ -29,8 +29,8 @@ public class ItemUsersItem implements AddEditItem {
         mUsers = users;
     }
 
-    protected ItemUsersItem(Parcel in) {
-        mUsers = (ItemUsersItemUser[]) in.readParcelableArray(ItemUsersItemUser.class.getClassLoader());
+    private ItemUsersItem(Parcel in) {
+        mUsers = in.createTypedArray(ItemUsersItemUser.CREATOR);
     }
 
     public ItemUsersItemUser[] getUsers() {
@@ -53,6 +53,6 @@ public class ItemUsersItem implements AddEditItem {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeParcelableArray(mUsers, 0);
+        dest.writeTypedArray(mUsers, 0);
     }
 }

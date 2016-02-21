@@ -13,7 +13,7 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * Created by fabio on 07.02.16.
  */
-public interface AddUsersItem extends Parcelable {
+public interface SettingsUsersItem extends Parcelable {
 
     @Type
     int getType();

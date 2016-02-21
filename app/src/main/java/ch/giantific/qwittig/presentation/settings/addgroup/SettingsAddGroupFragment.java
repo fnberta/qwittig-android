@@ -22,7 +22,7 @@ import ch.giantific.qwittig.databinding.FragmentSettingsAddGroupBinding;
 import ch.giantific.qwittig.di.components.DaggerSettingsAddGroupComponent;
 import ch.giantific.qwittig.di.modules.SettingsAddGroupViewModelModule;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
-import ch.giantific.qwittig.presentation.settings.addusers.SettingsAddUsersFragment;
+import ch.giantific.qwittig.presentation.settings.addusers.SettingsUsersFragment;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.parse.ParseUtils;
 
@@ -97,7 +97,7 @@ public class SettingsAddGroupFragment extends BaseFragment<SettingsAddGroupViewM
 
     @Override
     public void showAddUsersFragment() {
-        final SettingsAddUsersFragment fragment = new SettingsAddUsersFragment();
+        final SettingsUsersFragment fragment = new SettingsUsersFragment();
         if (Utils.isRunningLollipopAndHigher()) {
             setExitTransition(new Slide(Gravity.START));
             fragment.setEnterTransition(new Slide(Gravity.END));

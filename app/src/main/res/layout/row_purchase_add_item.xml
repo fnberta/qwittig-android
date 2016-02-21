@@ -33,6 +33,8 @@
             android:layout_gravity="center_vertical"
             android:layout_marginEnd="20dp"
             android:layout_marginStart="@dimen/min_space"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/header_settings_users"
             android:padding="@dimen/icon_padding"
             android:src="@drawable/ic_group_black_24dp"
             />

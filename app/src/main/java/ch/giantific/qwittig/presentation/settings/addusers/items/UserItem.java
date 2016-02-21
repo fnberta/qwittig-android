@@ -9,6 +9,7 @@ import android.databinding.Bindable;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.view.View;
 
 import ch.giantific.qwittig.BR;
@@ -16,7 +17,7 @@ import ch.giantific.qwittig.BR;
 /**
  * Created by fabio on 07.02.16.
  */
-public class UserItem extends BaseObservable implements AddUsersItem {
+public class UserItem extends BaseObservable implements SettingsUsersItem, Comparable<UserItem> {
 
     public static final Parcelable.Creator<UserItem> CREATOR = new Parcelable.Creator<UserItem>() {
         @Override
@@ -32,6 +33,10 @@ public class UserItem extends BaseObservable implements AddUsersItem {
     private ShareListener mShareListener;
     private String mNickname;
     private String mShareLink;
+
+    public UserItem(@NonNull String nickname) {
+        mNickname = nickname;
+    }
 
     public UserItem(@NonNull String nickname, @NonNull String shareLink) {
         mNickname = nickname;
@@ -57,12 +62,9 @@ public class UserItem extends BaseObservable implements AddUsersItem {
         notifyPropertyChanged(BR.nickname);
     }
 
-    public String getShareLink() {
-        return mShareLink;
-    }
-
-    public void setShareLink(@NonNull String shareLink) {
-        mShareLink = shareLink;
+    @Bindable
+    public boolean isPending() {
+        return !TextUtils.isEmpty(mShareLink);
     }
 
     public void onShareClick(View view) {
@@ -83,6 +85,11 @@ public class UserItem extends BaseObservable implements AddUsersItem {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(mNickname);
         dest.writeString(mShareLink);
+    }
+
+    @Override
+    public int compareTo(@NonNull UserItem another) {
+        return mNickname.compareToIgnoreCase(another.getNickname());
     }
 
     public interface ShareListener {

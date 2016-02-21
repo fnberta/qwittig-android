@@ -14,8 +14,8 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.settings.addusers.AddUserWorkerListener;
-import ch.giantific.qwittig.presentation.settings.addusers.SettingsAddUsersFragment;
-import ch.giantific.qwittig.presentation.settings.addusers.SettingsAddUsersViewModel;
+import ch.giantific.qwittig.presentation.settings.addusers.SettingsUsersFragment;
+import ch.giantific.qwittig.presentation.settings.addusers.SettingsUsersViewModel;
 import rx.Single;
 
 /**
@@ -29,10 +29,10 @@ import rx.Single;
 public class SettingsAddGroupActivity extends BaseActivity<SettingsAddGroupViewModel> implements
         SettingsAddGroupFragment.ActivityListener,
         AddGroupWorkerListener,
-        SettingsAddUsersFragment.ActivityListener,
+        SettingsUsersFragment.ActivityListener,
         AddUserWorkerListener {
 
-    private SettingsAddUsersViewModel mAddUsersViewModel;
+    private SettingsUsersViewModel mAddUsersViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,7 +65,7 @@ public class SettingsAddGroupActivity extends BaseActivity<SettingsAddGroupViewM
     }
 
     @Override
-    public void setAddUserViewModel(@NonNull SettingsAddUsersViewModel viewModel) {
+    public void setAddUserViewModel(@NonNull SettingsUsersViewModel viewModel) {
         mAddUsersViewModel = viewModel;
     }
 

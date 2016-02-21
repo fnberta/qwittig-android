@@ -12,7 +12,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.HeaderRowViewModelBas
 /**
  * Created by fabio on 07.02.16.
  */
-public class HeaderItem extends HeaderRowViewModelBaseImpl implements AddUsersItem {
+public class HeaderItem extends HeaderRowViewModelBaseImpl implements SettingsUsersItem {
 
     public static final Creator<HeaderItem> CREATOR = new Creator<HeaderItem>() {
         @Override

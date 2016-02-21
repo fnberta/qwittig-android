@@ -16,9 +16,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.databinding.FragmentSettingsAddUsersBinding;
-import ch.giantific.qwittig.di.components.DaggerSettingsAddUsersComponent;
-import ch.giantific.qwittig.di.modules.SettingsAddUsersViewModelModule;
+import ch.giantific.qwittig.databinding.FragmentSettingsUsersBinding;
+import ch.giantific.qwittig.di.components.DaggerSettingsUsersComponent;
+import ch.giantific.qwittig.di.modules.SettingsUsersViewModelModule;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
 
@@ -28,14 +28,14 @@ import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragme
  * <p/>
  * Subclass of {@link BaseRecyclerViewFragment}.
  */
-public class SettingsAddUsersFragment extends BaseRecyclerViewFragment<SettingsAddUsersViewModel, SettingsAddUsersFragment.ActivityListener>
-        implements SettingsAddUsersViewModel.ViewListener {
+public class SettingsUsersFragment extends BaseRecyclerViewFragment<SettingsUsersViewModel, SettingsUsersFragment.ActivityListener>
+        implements SettingsUsersViewModel.ViewListener {
 
     private ProgressDialog mProgressDialog;
     private Intent mShareLink;
-    private FragmentSettingsAddUsersBinding mBinding;
+    private FragmentSettingsUsersBinding mBinding;
 
-    public SettingsAddUsersFragment() {
+    public SettingsUsersFragment() {
         // Required empty public constructor
     }
 
@@ -43,8 +43,8 @@ public class SettingsAddUsersFragment extends BaseRecyclerViewFragment<SettingsA
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        DaggerSettingsAddUsersComponent.builder()
-                .settingsAddUsersViewModelModule(new SettingsAddUsersViewModelModule(savedInstanceState, this))
+        DaggerSettingsUsersComponent.builder()
+                .settingsUsersViewModelModule(new SettingsUsersViewModelModule(savedInstanceState, this))
                 .build()
                 .inject(this);
 
@@ -55,7 +55,7 @@ public class SettingsAddUsersFragment extends BaseRecyclerViewFragment<SettingsA
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentSettingsAddUsersBinding.inflate(inflater, container, false);
+        mBinding = FragmentSettingsUsersBinding.inflate(inflater, container, false);
         mBinding.setViewModel(mViewModel);
         return mBinding.getRoot();
     }
@@ -67,7 +67,7 @@ public class SettingsAddUsersFragment extends BaseRecyclerViewFragment<SettingsA
 
     @Override
     protected RecyclerView.Adapter getRecyclerAdapter() {
-        return new AddUsersRecyclerAdapter(mViewModel);
+        return new SettingsUsersRecyclerAdapter(mViewModel);
     }
 
     @Override
@@ -107,6 +107,6 @@ public class SettingsAddUsersFragment extends BaseRecyclerViewFragment<SettingsA
          *
          * @param viewModel the view model to set
          */
-        void setAddUserViewModel(@NonNull SettingsAddUsersViewModel viewModel);
+        void setAddUserViewModel(@NonNull SettingsUsersViewModel viewModel);
     }
 }

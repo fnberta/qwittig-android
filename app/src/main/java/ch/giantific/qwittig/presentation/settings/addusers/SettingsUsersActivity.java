@@ -14,18 +14,18 @@ import ch.giantific.qwittig.presentation.common.BaseActivity;
 import rx.Single;
 
 /**
- * Hosts {@link SettingsAddUsersFragment} that allows the user to add users to his/her current
+ * Hosts {@link SettingsUsersFragment} that allows the user to add users to his/her current
  * group.
  * <p/>
  * Subclass of {@link BaseActivity}.
  */
-public class SettingsAddUsersActivity extends BaseActivity<SettingsAddUsersViewModel>
-        implements SettingsAddUsersFragment.ActivityListener, AddUserWorkerListener {
+public class SettingsUsersActivity extends BaseActivity<SettingsUsersViewModel>
+        implements SettingsUsersFragment.ActivityListener, AddUserWorkerListener {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings_add_users);
+        setContentView(R.layout.activity_settings_users);
 
         final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -34,13 +34,13 @@ public class SettingsAddUsersActivity extends BaseActivity<SettingsAddUsersViewM
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new SettingsAddUsersFragment())
+                    .add(R.id.container, new SettingsUsersFragment())
                     .commit();
         }
     }
 
     @Override
-    public void setAddUserViewModel(@NonNull SettingsAddUsersViewModel viewModel) {
+    public void setAddUserViewModel(@NonNull SettingsUsersViewModel viewModel) {
         mViewModel = viewModel;
     }
 

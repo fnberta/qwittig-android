@@ -8,6 +8,8 @@
 
     <data>
 
+        <import type="android.view.View"/>
+
         <variable
             name="userItem"
             type="ch.giantific.qwittig.presentation.settings.addusers.items.UserItem"
@@ -48,10 +50,12 @@
             android:layout_width="@dimen/touch_target_min"
             android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/action_share"
             android:onClick="@{userItem.onShareClick}"
             android:padding="@dimen/icon_padding"
             android:src="@drawable/ic_share_black_24dp"
+            android:visibility="@{userItem.pending ? View.VISIBLE : View.GONE}"
             />
 
     </RelativeLayout>

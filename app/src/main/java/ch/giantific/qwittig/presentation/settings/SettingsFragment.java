@@ -35,7 +35,7 @@ import ch.giantific.qwittig.di.modules.SettingsViewModelModule;
 import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.presentation.common.fragments.ConfirmationDialogFragment;
 import ch.giantific.qwittig.presentation.settings.addgroup.SettingsAddGroupActivity;
-import ch.giantific.qwittig.presentation.settings.addusers.SettingsAddUsersActivity;
+import ch.giantific.qwittig.presentation.settings.addusers.SettingsUsersActivity;
 import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileActivity;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.WorkerUtils;
@@ -58,7 +58,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
     private static final String PREF_CATEGORY_CURRENT_GROUP = "PREF_CATEGORY_CURRENT_GROUP";
     private static final String PREF_GROUP_NAME = "PREF_GROUP_NAME";
     private static final String PREF_GROUP_LEAVE = "PREF_GROUP_LEAVE";
-    private static final String PREF_GROUP_ADD_USER = "PREF_GROUP_ADD_USER";
+    private static final String PREF_GROUP_USERS = "PREF_GROUP_USERS";
     @Inject
     SettingsViewModel mViewModel;
     @Inject
@@ -147,11 +147,11 @@ public class SettingsFragment extends PreferenceFragmentCompat
                 return true;
             }
         });
-        final Preference prefGroupAddUser = findPreference(PREF_GROUP_ADD_USER);
+        final Preference prefGroupAddUser = findPreference(PREF_GROUP_USERS);
         prefGroupAddUser.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                final Intent intent = new Intent(activity, SettingsAddUsersActivity.class);
+                final Intent intent = new Intent(activity, SettingsUsersActivity.class);
                 final ActivityOptionsCompat activityOptionsCompat =
                         ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity());
                 activity.startActivity(intent, activityOptionsCompat.toBundle());

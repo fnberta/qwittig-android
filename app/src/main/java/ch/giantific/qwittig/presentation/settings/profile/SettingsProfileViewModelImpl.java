@@ -322,6 +322,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
                     identity.removeAvatar();
                 }
                 identity.saveEventually();
+                mView.finishScreen(Activity.RESULT_OK);
             }
         }
     }

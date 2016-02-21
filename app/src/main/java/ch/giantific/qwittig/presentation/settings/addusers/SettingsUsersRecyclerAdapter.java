@@ -10,24 +10,24 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
-import ch.giantific.qwittig.databinding.RowSettingsAddUsersIntroBinding;
-import ch.giantific.qwittig.databinding.RowSettingsAddUsersNicknameBinding;
-import ch.giantific.qwittig.databinding.RowSettingsAddUsersUserBinding;
+import ch.giantific.qwittig.databinding.RowSettingsUsersIntroBinding;
+import ch.giantific.qwittig.databinding.RowSettingsUsersNicknameBinding;
+import ch.giantific.qwittig.databinding.RowSettingsUsersUserBinding;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.settings.addusers.items.AddUsersItem;
+import ch.giantific.qwittig.presentation.settings.addusers.items.SettingsUsersItem;
 import ch.giantific.qwittig.presentation.settings.addusers.items.HeaderItem;
-import ch.giantific.qwittig.presentation.settings.addusers.items.AddUsersItem.Type;
+import ch.giantific.qwittig.presentation.settings.addusers.items.SettingsUsersItem.Type;
 import ch.giantific.qwittig.presentation.settings.addusers.items.NicknameItem;
 import ch.giantific.qwittig.presentation.settings.addusers.items.UserItem;
 
 /**
  * Created by fabio on 08.02.16.
  */
-public class AddUsersRecyclerAdapter extends RecyclerView.Adapter {
+public class SettingsUsersRecyclerAdapter extends RecyclerView.Adapter {
 
-    private SettingsAddUsersViewModel mViewModel;
+    private SettingsUsersViewModel mViewModel;
 
-    public AddUsersRecyclerAdapter(@NonNull SettingsAddUsersViewModel viewModel) {
+    public SettingsUsersRecyclerAdapter(@NonNull SettingsUsersViewModel viewModel) {
         mViewModel = viewModel;
     }
 
@@ -41,18 +41,18 @@ public class AddUsersRecyclerAdapter extends RecyclerView.Adapter {
                 return new BindingRow<>(binding);
             }
             case Type.INTRO: {
-                final RowSettingsAddUsersIntroBinding binding =
-                        RowSettingsAddUsersIntroBinding.inflate(inflater, parent, false);
+                final RowSettingsUsersIntroBinding binding =
+                        RowSettingsUsersIntroBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
             }
             case Type.NICKNAME: {
-                final RowSettingsAddUsersNicknameBinding binding =
-                        RowSettingsAddUsersNicknameBinding.inflate(inflater, parent, false);
+                final RowSettingsUsersNicknameBinding binding =
+                        RowSettingsUsersNicknameBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
             }
             case Type.USER: {
-                final RowSettingsAddUsersUserBinding binding =
-                        RowSettingsAddUsersUserBinding.inflate(inflater, parent, false);
+                final RowSettingsUsersUserBinding binding =
+                        RowSettingsUsersUserBinding.inflate(inflater, parent, false);
                 return new BindingRow<>(binding);
             }
 
@@ -65,7 +65,7 @@ public class AddUsersRecyclerAdapter extends RecyclerView.Adapter {
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        final AddUsersItem item = mViewModel.getItemAtPosition(position);
+        final SettingsUsersItem item = mViewModel.getItemAtPosition(position);
         @Type final int type = getItemViewType(position);
         switch (type) {
             case Type.HEADER: {
@@ -82,9 +82,9 @@ public class AddUsersRecyclerAdapter extends RecyclerView.Adapter {
                 // do nothing
                 break;
             case Type.NICKNAME: {
-                final BindingRow<RowSettingsAddUsersNicknameBinding> row =
-                        (BindingRow<RowSettingsAddUsersNicknameBinding>) holder;
-                final RowSettingsAddUsersNicknameBinding binding = row.getBinding();
+                final BindingRow<RowSettingsUsersNicknameBinding> row =
+                        (BindingRow<RowSettingsUsersNicknameBinding>) holder;
+                final RowSettingsUsersNicknameBinding binding = row.getBinding();
                 final NicknameItem nicknameItem = (NicknameItem) item;
 
                 nicknameItem.setAddListener(mViewModel);
@@ -93,9 +93,9 @@ public class AddUsersRecyclerAdapter extends RecyclerView.Adapter {
                 break;
             }
             case Type.USER: {
-                final BindingRow<RowSettingsAddUsersUserBinding> row =
-                        (BindingRow<RowSettingsAddUsersUserBinding>) holder;
-                final RowSettingsAddUsersUserBinding binding = row.getBinding();
+                final BindingRow<RowSettingsUsersUserBinding> row =
+                        (BindingRow<RowSettingsUsersUserBinding>) holder;
+                final RowSettingsUsersUserBinding binding = row.getBinding();
                 final UserItem userItem = (UserItem) item;
 
                 userItem.setShareListener(mViewModel);
