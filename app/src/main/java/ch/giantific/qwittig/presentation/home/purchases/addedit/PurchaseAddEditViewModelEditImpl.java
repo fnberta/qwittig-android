@@ -68,7 +68,7 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
             mOldValuesSet = savedState.getBoolean(STATE_ITEMS_SET);
             mOldItemIds = savedState.getStringArrayList(STATE_OLD_ITEM_IDS);
             mOldStore = savedState.getString(STATE_OLD_STORE, "");
-            mOldDate = DateUtils.parseLongToDate(savedState.getLong(STATE_OLD_DATE));
+            mOldDate = new Date(savedState.getLong(STATE_OLD_DATE));
             mOldCurrency = savedState.getString(STATE_OLD_CURRENCY, "");
             mOldExchangeRate = savedState.getDouble(STATE_OLD_EXCHANGE_RATE);
             mOldNote = savedState.getString(STATE_OLD_NOTE, "");
@@ -85,7 +85,7 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
         outState.putBoolean(STATE_ITEMS_SET, mOldValuesSet);
         outState.putStringArrayList(STATE_OLD_ITEM_IDS, mOldItemIds);
         outState.putString(STATE_OLD_STORE, mOldStore);
-        outState.putLong(STATE_OLD_DATE, DateUtils.parseDateToLong(mOldDate));
+        outState.putLong(STATE_OLD_DATE, mOldDate.getTime());
         outState.putString(STATE_OLD_CURRENCY, mOldCurrency);
         outState.putDouble(STATE_OLD_EXCHANGE_RATE, mOldExchangeRate);
         outState.putString(STATE_OLD_NOTE, mOldNote);

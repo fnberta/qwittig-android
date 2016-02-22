@@ -17,7 +17,6 @@ import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.utils.DateUtils;
 import rx.SingleSubscriber;
 
 /**
@@ -29,9 +28,9 @@ public class TaskAddEditViewModelEditImpl extends TaskAddEditViewModelAddImpl {
     private static final String STATE_OLD_TITLE = "STATE_OLD_TITLE";
     private static final String STATE_OLD_TIME_FRAME = "STATE_OLD_TIME_FRAME";
     private static final String STATE_OLD_DEADLINE = "STATE_OLD_DEADLINE";
+    private final String mEditTaskId;
     private boolean mOldValuesSet;
     private Task mEditTask;
-    private final String mEditTaskId;
     private String mOldTaskTitle;
     private String mOldTaskTimeFrame;
     private Date mOldTaskDeadline;
@@ -51,7 +50,7 @@ public class TaskAddEditViewModelEditImpl extends TaskAddEditViewModelAddImpl {
             mOldValuesSet = savedState.getBoolean(STATE_ITEMS_SET, false);
             mOldTaskTitle = savedState.getString(STATE_OLD_TITLE, "");
             mOldTaskTimeFrame = savedState.getString(STATE_OLD_TIME_FRAME, "");
-            mOldTaskDeadline = DateUtils.parseLongToDate(savedState.getLong(STATE_OLD_DEADLINE));
+            mOldTaskDeadline = new Date(savedState.getLong(STATE_OLD_DEADLINE));
         }
     }
 
@@ -62,7 +61,7 @@ public class TaskAddEditViewModelEditImpl extends TaskAddEditViewModelAddImpl {
         outState.putBoolean(STATE_ITEMS_SET, mOldValuesSet);
         outState.putString(STATE_OLD_TITLE, mOldTaskTitle);
         outState.putString(STATE_OLD_TIME_FRAME, mOldTaskTimeFrame);
-        outState.putLong(STATE_OLD_DEADLINE, DateUtils.parseDateToLong(mOldTaskDeadline));
+        outState.putLong(STATE_OLD_DEADLINE, mOldTaskDeadline.getTime());
     }
 
     @Override

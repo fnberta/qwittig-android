@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
+import java.text.DateFormat;
 import java.text.NumberFormat;
 
 import ch.giantific.qwittig.domain.models.Compensation;
@@ -24,7 +25,8 @@ public class CompPaidRowViewModel extends BaseObservable {
 
     private final Identity mCurrentIdentity;
     private final NumberFormat mMoneyFormatter;
-    private final String mCompDate;
+    private final DateFormat mDateFormatter;
+    private String mCompDate;
     private String mCompUsername;
     private String mCompUserAvatar;
     private String mCompAmount;
@@ -35,12 +37,13 @@ public class CompPaidRowViewModel extends BaseObservable {
 
         final String currency = currentIdentity.getGroup().getCurrency();
         mMoneyFormatter = MoneyUtils.getMoneyFormatter(currency, true, true);
+        mDateFormatter = DateUtils.getDateFormatter(true);
         mCurrentIdentity = currentIdentity;
         setCompInfo(compensation);
-        mCompDate = DateUtils.formatDateShort(compensation.getCreatedAt());
     }
 
     private void setCompInfo(@NonNull Compensation compensation) {
+        mCompDate = mDateFormatter.format(compensation.getCreatedAt());
         final Identity creditor = compensation.getCreditor();
         final BigFraction amount = compensation.getAmountFraction();
         if (creditor.getObjectId().equals(mCurrentIdentity.getObjectId())) {

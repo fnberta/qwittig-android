@@ -26,8 +26,8 @@ import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 /**
  * Created by fabio on 09.01.16.
  */
-public interface TaskAddEditViewModel
-        extends ViewModel, DiscardChangesDialogFragment.DialogInteractionListener,
+public interface TaskAddEditViewModel extends ViewModel,
+        DiscardChangesDialogFragment.DialogInteractionListener,
         DatePickerDialog.OnDateSetListener,
         TaskAddEditUsersRecyclerAdapter.AdapterInteractionListener,
         ItemTouchHelperAdapter {
@@ -38,7 +38,7 @@ public interface TaskAddEditViewModel
     void setTaskTitle(@NonNull String taskTitle);
 
     @Bindable
-    Date getTaskDeadline();
+    String getTaskDeadline();
 
     void setTaskDeadline(@NonNull Date deadline);
 

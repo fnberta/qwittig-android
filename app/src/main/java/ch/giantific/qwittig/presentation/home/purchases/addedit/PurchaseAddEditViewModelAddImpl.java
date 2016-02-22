@@ -18,6 +18,7 @@ import com.android.databinding.library.baseAdapters.BR;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -73,6 +74,9 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
     private static final String STATE_RECEIPT_IMAGE_PATHS = "STATE_RECEIPT_IMAGE_PATHS";
     private static final String STATE_FETCHING_RATES = "STATE_FETCHING_RATES";
     final PurchaseRepository mPurchaseRepo;
+    private final NumberFormat mExchangeRateFormatter;
+    private final List<String> mSupportedCurrencies = ParseUtils.getSupportedCurrencyCodes();
+    private final Group mCurrentGroup;
     String mCurrency;
     String mReceiptImagePath;
     String mNote;
@@ -81,14 +85,12 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
     double mTotalPrice = 0;
     double mExchangeRate;
     NumberFormat mMoneyFormatter;
+    private DateFormat mDateFormatter;
     private boolean mSaving;
-    private final NumberFormat mExchangeRateFormatter;
-    private final List<String> mSupportedCurrencies = ParseUtils.getSupportedCurrencyCodes();
     private List<Identity> mIdentities = new ArrayList<>();
     private double mMyShare = 0;
     private boolean mFetchingExchangeRates;
     private ArrayList<String> mReceiptImagePaths;
-    private final Group mCurrentGroup;
 
     public PurchaseAddEditViewModelAddImpl(@Nullable Bundle savedState,
                                            @NonNull PurchaseAddEditViewModel.ViewListener view,
@@ -103,7 +105,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
         if (savedState != null) {
             mItems = savedState.getParcelableArrayList(STATE_ROW_ITEMS);
             mSaving = savedState.getBoolean(STATE_SAVING);
-            mDate = DateUtils.parseLongToDate(savedState.getLong(STATE_DATE));
+            mDate = new Date(savedState.getLong(STATE_DATE));
             mStore = savedState.getString(STATE_STORE);
             setCurrency(savedState.getString(STATE_CURRENCY, mCurrentGroup.getCurrency()));
             mExchangeRate = savedState.getDouble(STATE_EXCHANGE_RATE);
@@ -124,6 +126,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
             }
         }
 
+        mDateFormatter = DateUtils.getDateFormatter(false);
         mMoneyFormatter = MoneyUtils.getMoneyFormatter(mCurrency, false, true);
         mExchangeRateFormatter = MoneyUtils.getExchangeRateFormatter();
     }
@@ -143,7 +146,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
 
         outState.putParcelableArrayList(STATE_ROW_ITEMS, mItems);
         outState.putBoolean(STATE_SAVING, mSaving);
-        outState.putLong(STATE_DATE, DateUtils.parseDateToLong(mDate));
+        outState.putLong(STATE_DATE, mDate.getTime());
         outState.putString(STATE_STORE, mStore);
         outState.putString(STATE_CURRENCY, mCurrency);
         outState.putDouble(STATE_EXCHANGE_RATE, mExchangeRate);
@@ -158,7 +161,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
     @Override
     @Bindable
     public String getDate() {
-        return DateUtils.formatDateLong(mDate);
+        return mDateFormatter.format(mDate);
     }
 
     @Override

@@ -47,7 +47,7 @@ public class DateUtils {
      * @return the parsed {@link Date}
      */
     @NonNull
-    public static Date parseStringToDate(@Nullable String date) {
+    private static Date parseStringToDate(@Nullable String date) {
         final SimpleDateFormat dateParser = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
         Date parsedDate;
@@ -60,57 +60,14 @@ public class DateUtils {
     }
 
     /**
-     * Returns the date as milliseconds since January 1st, 1970 at UTC.
+     * Returns a date formatter that formats date to the specified format.
      *
-     * @param date the date to convert
-     * @return the date converted to Unix Epoch
+     * @param shortFormat whether to format in short format
+     * @return a properly configured {@link DateFormat} instance
      */
-    public static long parseDateToLong(@NonNull Date date) {
-        return date.getTime();
-    }
-
-    /**
-     * Returns a {@link Date} parsed from milliseconds since January 1st, 1970 at UTC.
-     *
-     * @param date the milliseconds to parse
-     * @return the parsed {@link Date}
-     */
-    @NonNull
-    public static Date parseLongToDate(long date) {
-        return new Date(date);
-    }
-
-    /**
-     * Returns a string with the short version of the date.
-     *
-     * @param date the date to format
-     * @return a string with the short version of the date
-     */
-    public static String formatDateShort(@NonNull Date date) {
-        final DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault());
-
-        return dateFormatter.format(date);
-    }
-
-    /**
-     * Returns a string with the long version of the date.
-     *
-     * @param date the date to format
-     * @return a string with the long version of the date
-     */
-    public static String formatDateLong(long date) {
-        return formatDateLong(new Date(date));
-    }
-
-    /**
-     * Returns a string with the long version of the date.
-     *
-     * @param date the date to format
-     * @return a string with the long version of the date
-     */
-    public static String formatDateLong(@NonNull Date date) {
-        final DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.LONG, Locale.getDefault());
-        return dateFormatter.format(date);
+    public static DateFormat getDateFormatter(boolean shortFormat) {
+        return DateFormat.getDateInstance(shortFormat ? DateFormat.SHORT : DateFormat.LONG,
+                Locale.getDefault());
     }
 
     /**

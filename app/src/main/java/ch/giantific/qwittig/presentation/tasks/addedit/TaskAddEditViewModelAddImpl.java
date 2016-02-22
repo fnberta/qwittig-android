@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.DatePicker;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -40,13 +41,14 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
 
     private static final String STATE_DEADLINE_SELECTED = "STATE_DEADLINE_SELECTED";
     private static final String STATE_USERS_INVOLVED = "STATE_USERS_INVOLVED";
-    Date mTaskDeadline;
     final ArrayList<TaskUser> mTaskIdentities;
     final TaskRepository mTaskRepo;
-    private String mTaskTitle;
     private final IdentityRepository mIdentityRepo;
-    private int mTaskTimeFrame;
     private final List<Identity> mIdentitiesAvailable = new ArrayList<>();
+    private final DateFormat mDateFormatter;
+    Date mTaskDeadline;
+    private String mTaskTitle;
+    private int mTaskTimeFrame;
 
     public TaskAddEditViewModelAddImpl(@Nullable Bundle savedState,
                                        @NonNull TaskAddEditViewModel.ViewListener view,
@@ -59,20 +61,22 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
         mTaskRepo = taskRepository;
 
         if (savedState != null) {
-            mTaskDeadline = DateUtils.parseLongToDate(savedState.getLong(STATE_DEADLINE_SELECTED));
+            mTaskDeadline = new Date(savedState.getLong(STATE_DEADLINE_SELECTED));
             ArrayList<TaskUser> usersInvolved = savedState.getParcelableArrayList(STATE_USERS_INVOLVED);
             mTaskIdentities = usersInvolved != null ? usersInvolved : new ArrayList<TaskUser>();
         } else {
             mTaskDeadline = new Date();
             mTaskIdentities = new ArrayList<>();
         }
+
+        mDateFormatter = DateUtils.getDateFormatter(false);
     }
 
     @Override
     public void saveState(@NonNull Bundle outState) {
         super.saveState(outState);
 
-        outState.putLong(STATE_DEADLINE_SELECTED, DateUtils.parseDateToLong(mTaskDeadline));
+        outState.putLong(STATE_DEADLINE_SELECTED, mTaskDeadline.getTime());
         outState.putParcelableArrayList(STATE_USERS_INVOLVED, mTaskIdentities);
     }
 
@@ -150,8 +154,8 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
 
     @Override
     @Bindable
-    public Date getTaskDeadline() {
-        return mTaskDeadline;
+    public String getTaskDeadline() {
+        return mDateFormatter.format(mTaskDeadline);
     }
 
     @Override

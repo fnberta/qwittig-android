@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,8 +43,9 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<DetailsI
 
     private final PurchaseRepository mPurchaseRepo;
     private final String mPurchaseId;
-    private Purchase mPurchase;
     private final NumberFormat mMoneyFormatter;
+    private final DateFormat mDateFormatter;
+    private Purchase mPurchase;
 
     public PurchaseDetailsViewModelImpl(@Nullable Bundle savedState,
                                         @NonNull PurchaseDetailsViewModel.ViewListener view,
@@ -57,6 +59,7 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<DetailsI
         mPurchaseId = purchaseId;
         final String groupCurrency = mCurrentIdentity.getGroup().getCurrency();
         mMoneyFormatter = MoneyUtils.getMoneyFormatter(groupCurrency, true, true);
+        mDateFormatter = DateUtils.getDateFormatter(false);
 
         if (savedState != null) {
             mItems = new ArrayList<>();
@@ -72,7 +75,7 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<DetailsI
     @Override
     @Bindable
     public String getPurchaseDate() {
-        return mPurchase != null ? DateUtils.formatDateLong(mPurchase.getDate()) : "";
+        return mPurchase != null ? mDateFormatter.format(mPurchase.getDate()) : "";
     }
 
     @Override

@@ -12,6 +12,8 @@
 
     <data>
 
+        <import type="android.view.View"/>
+
         <variable
             name="item"
             type="ch.giantific.qwittig.presentation.finance.items.UnpaidCreditItem"
@@ -76,6 +78,7 @@
                 android:layout_below="@id/ll_header"
                 android:layout_toEndOf="@id/bt_comp_unpaid_confirm"
                 android:text="@{@string/button_remind(item.compUsername)}"
+                android:visibility="@{item.userPending ? View.GONE : View.VISIBLE}"
                 tools:text="Remind Lexli to pay"
                 />
 

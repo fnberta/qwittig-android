@@ -12,8 +12,6 @@
 
     <data>
 
-        <import type="ch.giantific.qwittig.utils.DateUtils"/>
-
         <variable
             name="item"
             type="ch.giantific.qwittig.presentation.tasks.details.items.TaskHistoryItem"
@@ -59,7 +57,7 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/key_line_1"
-            android:text="@{DateUtils.formatDateLong(item.date)}"
+            android:text="@{item.date}"
             tools:text="27.02.2015"
             />
 

@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.presentation.finance.items;
 
+import android.databinding.Bindable;
 import android.support.annotation.NonNull;
 
 import java.text.NumberFormat;
@@ -16,6 +17,8 @@ import ch.giantific.qwittig.domain.models.Identity;
  */
 public class UnpaidCreditItem extends UnpaidCompItem {
 
+    private final boolean mUserPending;
+
     public UnpaidCreditItem(@NonNull Compensation compensation, @NonNull NumberFormat moneyFormatter) {
         super(compensation, moneyFormatter);
 
@@ -23,6 +26,12 @@ public class UnpaidCreditItem extends UnpaidCompItem {
         final Identity identity = compensation.getDebtor();
         mCompUsername = identity.getNickname();
         mCompUserAvatar = identity.getAvatarUrl();
+        mUserPending = identity.isPending();
+    }
+
+    @Bindable
+    public boolean isUserPending() {
+        return mUserPending;
     }
 
     @Override

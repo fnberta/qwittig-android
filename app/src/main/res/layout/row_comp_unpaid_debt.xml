@@ -11,6 +11,8 @@
 
     <data>
 
+        <import type="android.view.View"/>
+
         <variable
             name="item"
             type="ch.giantific.qwittig.presentation.finance.items.UnpaidDebtItem"
@@ -64,6 +66,7 @@
                 android:layout_toEndOf="@id/iv_avatar"
                 android:text="@{@string/button_remind_paid(item.compUsername)}"
                 android:textColor="?attr/colorAccent"
+                android:visibility="@{item.userPending ? View.GONE : View.VISIBLE}"
                 />
 
         </RelativeLayout>

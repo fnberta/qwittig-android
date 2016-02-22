@@ -8,6 +8,7 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.support.annotation.NonNull;
 
+import java.text.DateFormat;
 import java.text.NumberFormat;
 
 import ch.giantific.qwittig.domain.models.Identity;
@@ -22,6 +23,7 @@ public class PurchaseRowViewModel extends BaseObservable {
 
     private final Identity mCurrentIdentity;
     private final NumberFormat mMoneyFormatter;
+    private final DateFormat mDateFormatter;
     private String mPurchaseBuyerAndDate;
     private String mPurchaseBuyerAvatar;
     private String mPurchaseStore;
@@ -33,6 +35,7 @@ public class PurchaseRowViewModel extends BaseObservable {
         mCurrentIdentity = currentIdentity;
         final String currency = currentIdentity.getGroup().getCurrency();
         mMoneyFormatter = MoneyUtils.getMoneyFormatter(currency, false, true);
+        mDateFormatter = DateUtils.getDateFormatter(true);
         setPurchaseInfo(purchase);
     }
 
@@ -40,7 +43,7 @@ public class PurchaseRowViewModel extends BaseObservable {
         final Identity buyer = purchase.getBuyer();
         // TODO: show me if buyer == currentUser
         mPurchaseBuyerAndDate = String.format("%s, %s", buyer.getNickname(),
-                DateUtils.formatDateShort(purchase.getDate()));
+                mDateFormatter.format(purchase.getDate()));
         mPurchaseBuyerAvatar = buyer.getAvatarUrl();
         mPurchaseStore = purchase.getStore();
         mPurchaseTotalPrice = mMoneyFormatter.format(purchase.getTotalPrice());

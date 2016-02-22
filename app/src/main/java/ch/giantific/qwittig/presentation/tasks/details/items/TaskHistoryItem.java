@@ -13,6 +13,7 @@ import java.util.Date;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.domain.models.User;
+import ch.giantific.qwittig.utils.DateUtils;
 
 /**
  * Represents a history entry of a {@link Task} including a {@link User} and the {@link Date}
@@ -22,11 +23,11 @@ public class TaskHistoryItem extends BaseObservable
         implements DetailsItem, Comparable<TaskHistoryItem> {
 
     private Identity mUser;
-    private Date mDate;
+    private String mDate;
 
     public TaskHistoryItem(@NonNull Identity identity, @NonNull Date date) {
         mUser = identity;
-        mDate = date;
+        mDate = DateUtils.getDateFormatter(false).format(date);
     }
 
     public Identity getUser() {
@@ -48,12 +49,8 @@ public class TaskHistoryItem extends BaseObservable
     }
 
     @Bindable
-    public Date getDate() {
+    public String getDate() {
         return mDate;
-    }
-
-    public void setDate(@NonNull Date date) {
-        mDate = date;
     }
 
     @Override
