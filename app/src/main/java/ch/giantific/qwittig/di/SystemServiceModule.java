@@ -12,7 +12,7 @@ import dagger.Module;
 import dagger.Provides;
 
 /**
- * Created by fabio on 12.01.16.
+ * Defines the instantiation of Android system services.
  */
 @Module
 public class SystemServiceModule {

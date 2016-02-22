@@ -13,7 +13,7 @@ import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModel;
 
 /**
- * Created by fabio on 18.01.16.
+ * Defines an observable view model for the identities list screen.
  */
 public interface IdentitiesViewModel extends OnlineListViewModel<Identity>,
         IdentitiesUpdateWorkerListener {
@@ -21,6 +21,9 @@ public interface IdentitiesViewModel extends OnlineListViewModel<Identity>,
     @Bindable
     String getCurrentUserBalance();
 
+    /**
+     * Defines the interaction with the attached view.
+     */
     interface ViewListener extends OnlineListViewModel.ViewListener {
 
         void loadUpdateUsersWorker();

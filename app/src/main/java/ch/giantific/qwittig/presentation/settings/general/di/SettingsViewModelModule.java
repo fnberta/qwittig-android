@@ -8,18 +8,19 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.settings.general.SettingsViewModel;
 import ch.giantific.qwittig.presentation.settings.general.SettingsViewModelImpl;
 import dagger.Module;
 import dagger.Provides;
 
 /**
- * Created by fabio on 12.01.16.
+ * Defines which view model implementation to use for the main settings screen and how to
+ * instantiate it.
  */
 @Module
 public class SettingsViewModelModule extends BaseViewModelModule<SettingsViewModel.ViewListener> {

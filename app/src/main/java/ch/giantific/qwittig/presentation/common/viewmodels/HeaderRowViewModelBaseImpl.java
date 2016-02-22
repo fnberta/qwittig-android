@@ -13,7 +13,7 @@ import android.support.annotation.StringRes;
 import ch.giantific.qwittig.BR;
 
 /**
- * Created by fabio on 11.02.16.
+ * Defines an abstract base implementation of the {@link HeaderRowViewModel}.
  */
 public abstract class HeaderRowViewModelBaseImpl extends BaseObservable
         implements HeaderRowViewModel, Parcelable {

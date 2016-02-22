@@ -8,7 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 
 /**
- * Created by fabio on 10.01.16.
+ * Defines a base repository for actual repository to extend from.
  */
 public interface BaseRepository {
 

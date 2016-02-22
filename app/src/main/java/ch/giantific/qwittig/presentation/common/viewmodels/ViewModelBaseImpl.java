@@ -25,10 +25,10 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
         extends BaseObservable
         implements ViewModel {
 
-    protected User mCurrentUser;
-    protected Identity mCurrentIdentity;
     protected final T mView;
     protected final UserRepository mUserRepo;
+    protected User mCurrentUser;
+    protected Identity mCurrentIdentity;
     private CompositeSubscription mSubscriptions = new CompositeSubscription();
 
     public ViewModelBaseImpl(@Nullable Bundle savedState, @NonNull T view,
@@ -62,7 +62,7 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
 
     @Override
     @CallSuper
-    public void onStart() {
+    public void onScreenVisible() {
         // empty default implementation
     }
 
@@ -73,7 +73,7 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
     }
 
     @Override
-    public void onStop() {
+    public void onScreenGone() {
         if (mSubscriptions.hasSubscriptions()) {
             mSubscriptions.unsubscribe();
         }

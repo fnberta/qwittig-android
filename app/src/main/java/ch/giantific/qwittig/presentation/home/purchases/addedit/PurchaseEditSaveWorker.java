@@ -75,6 +75,7 @@ public class PurchaseEditSaveWorker extends PurchaseSaveWorker {
         if (worker == null) {
             worker = new PurchaseEditSaveWorker(purchase, receiptImage, receiptParseFileOld,
                     deleteOldReceipt, draft);
+
             fm.beginTransaction()
                     .add(worker, WORKER_TAG)
                     .commit();

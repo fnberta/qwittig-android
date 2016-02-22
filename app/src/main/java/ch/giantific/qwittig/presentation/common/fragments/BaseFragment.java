@@ -71,14 +71,14 @@ public abstract class BaseFragment<T extends ViewModel, S extends BaseFragment.A
     public void onStart() {
         super.onStart();
 
-        mViewModel.onStart();
+        mViewModel.onScreenVisible();
     }
 
     @Override
     public void onStop() {
         super.onStop();
 
-        mViewModel.onStop();
+        mViewModel.onScreenGone();
     }
 
     @Override

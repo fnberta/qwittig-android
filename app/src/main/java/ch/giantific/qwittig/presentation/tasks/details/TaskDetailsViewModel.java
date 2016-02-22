@@ -59,6 +59,9 @@ public interface TaskDetailsViewModel extends
         int GROUP_CHANGED = 3;
     }
 
+    /**
+     * Defines the interaction with the attached view.
+     */
     interface ViewListener extends ListViewModel.ViewListener {
 
         /**

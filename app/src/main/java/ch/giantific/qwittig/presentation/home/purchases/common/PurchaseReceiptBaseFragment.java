@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.presentation.home.purchases.common;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
@@ -62,6 +63,9 @@ public abstract class PurchaseReceiptBaseFragment<T extends PurchaseReceiptViewM
                 .into(mBinding.ivReceipt);
     }
 
+    /**
+     * Defines the interaction with the hosting {@link Activity}.
+     */
     public interface ActivityListener extends BaseFragment.ActivityListener {
     }
 }

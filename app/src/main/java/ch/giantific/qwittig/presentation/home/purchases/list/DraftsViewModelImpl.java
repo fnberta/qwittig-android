@@ -23,7 +23,7 @@ import rx.Subscriber;
 import rx.functions.Func1;
 
 /**
- * Created by fabio on 22.01.16.
+ * Provides an implementation of the {@link DraftsViewModel}.
  */
 public class DraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, DraftsViewModel.ViewListener>
         implements DraftsViewModel {

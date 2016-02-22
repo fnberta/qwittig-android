@@ -18,7 +18,7 @@ import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.parse.ParseUtils;
 
 /**
- * Represents an item of a purchase with a name, a price and the users involved.
+ * Represents an item of a purchase with a name, a price and the identities involved in the item.
  * <p/>
  * Subclass of {@link ParseObject}.
  */

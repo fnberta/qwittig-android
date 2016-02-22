@@ -14,7 +14,8 @@ import rx.Subscription;
 import rx.subjects.ReplaySubject;
 
 /**
- * Created by fabio on 15.02.16.
+ * Provides an abstract base class for a loader that returns a RxJava {@link Observable} as a
+ * result.
  */
 public abstract class BaseRxLoader<T> extends Loader<Observable<T>> {
 

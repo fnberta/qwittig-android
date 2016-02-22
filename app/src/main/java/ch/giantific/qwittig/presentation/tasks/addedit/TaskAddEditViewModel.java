@@ -19,7 +19,6 @@ import java.util.Date;
 
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Task;
-import ch.giantific.qwittig.presentation.common.ItemTouchHelperAdapter;
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 
@@ -29,8 +28,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 public interface TaskAddEditViewModel extends ViewModel,
         DiscardChangesDialogFragment.DialogInteractionListener,
         DatePickerDialog.OnDateSetListener,
-        TaskAddEditUsersRecyclerAdapter.AdapterInteractionListener,
-        ItemTouchHelperAdapter {
+        TaskAddEditUsersRecyclerAdapter.AdapterInteractionListener {
 
     @Bindable
     String getTaskTitle();
@@ -62,6 +60,23 @@ public interface TaskAddEditViewModel extends ViewModel,
 
     int getItemCount();
 
+    /**
+     * Called when an item has been dragged far enough to trigger a move. This is called every time
+     * an item is shifted, and not at the end of a "drop" event.
+     *
+     * @param fromPosition the start position of the moved item
+     * @param toPosition   the end position of the moved item
+     */
+    void onItemMove(int fromPosition, int toPosition);
+
+
+    /**
+     * Called when an item has been dismissed by a swipe.
+     *
+     * @param position the position of the item dismissed
+     */
+    void onItemDismiss(int position);
+
     void onDeadlineClicked(View view);
 
     /**
@@ -80,6 +95,9 @@ public interface TaskAddEditViewModel extends ViewModel,
         int TASK_DISCARDED = 3;
     }
 
+    /**
+     * Defines the interaction with the attached view.
+     */
     interface ViewListener extends ViewModel.ViewListener {
         void showDiscardChangesDialog();
 

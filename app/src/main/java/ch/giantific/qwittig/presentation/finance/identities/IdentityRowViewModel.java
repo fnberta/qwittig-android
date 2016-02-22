@@ -12,18 +12,18 @@ import org.apache.commons.math3.fraction.BigFraction;
 import java.text.NumberFormat;
 
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.presentation.common.viewmodels.UserAvatarRowBaseViewModel;
+import ch.giantific.qwittig.presentation.common.viewmodels.IdentityAvatarRowBaseViewModel;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
- * Created by fabio on 18.01.16.
+ * Provides a view model for an identity row, showing the avatar, name and balance.
  */
-public class IdentityRowViewModel extends UserAvatarRowBaseViewModel {
+public class IdentityRowViewModel extends IdentityAvatarRowBaseViewModel {
 
+    private final NumberFormat mMoneyFormatter;
     private String mIdentityBalance;
     private boolean mBalancePositive;
-    private final NumberFormat mMoneyFormatter;
 
     public IdentityRowViewModel(@NonNull Identity identity) {
         super(identity);

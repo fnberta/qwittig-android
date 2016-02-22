@@ -10,8 +10,7 @@ import com.parse.ParseClassName;
 import com.parse.ParseObject;
 
 /**
- * Represents a group, consisting of a name, a currency code and the emails of users invited
- * currently invited to the group.
+ * Represents a group, consisting of a name and a currency code.
  * <p/>
  * Subclass of {@link ParseObject}.
  */

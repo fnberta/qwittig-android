@@ -8,16 +8,16 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.helpfeedback.HelpFeedbackViewModel;
 import ch.giantific.qwittig.presentation.helpfeedback.HelpFeedbackViewModelImpl;
 import dagger.Module;
 import dagger.Provides;
 
 /**
- * Created by fabio on 12.01.16.
+ * Defines the implementation to use for the help and feedback view model and how to instantiate it.
  */
 @Module
 public class HelpFeedbackViewModelModule extends BaseViewModelModule<HelpFeedbackViewModel.ViewListener> {

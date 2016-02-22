@@ -19,6 +19,7 @@ public interface ReceiptOcr {
      *
      * @param sessionToken the token of the current to authenticate with the server
      * @param receipt      the receipt image to perform OCR on
+     * @return the result as an {@link Observable}
      */
     @Multipart
     @POST("/api/receipt")

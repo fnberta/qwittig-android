@@ -289,7 +289,6 @@
     <string name="toast_error_purchase_save">Failed to save purchase</string>
     <string name="toast_error_purchase_edit_load">Failed to load purchase</string>
     <string name="toast_error_drawer_load_groups">Failed to load group selection</string>
-    <string name="toast_error_drawer_update_groups">Failed to update group selection</string>
     <string name="toast_error_settings_group_add">Failed to create group</string>
     <string name="toast_error_settings_users_add">Failed to add user</string>
 

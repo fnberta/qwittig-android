@@ -63,7 +63,7 @@ public class TasksUpdateWorker extends BaseQueryWorker<Task, TasksUpdateWorkerLi
     @Nullable
     @Override
     protected Observable<Task> getObservable(@NonNull Bundle args) {
-        if (setUserInfo()) {
+        if (checkIdentities()) {
             return mTaskRepo.updateTasksAsync(mIdentities);
         }
 

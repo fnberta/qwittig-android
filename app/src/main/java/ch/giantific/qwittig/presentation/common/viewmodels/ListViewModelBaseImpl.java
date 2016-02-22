@@ -18,16 +18,15 @@ import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 
 /**
- * Created by fabio on 10.01.16.
+ * Provides an abstract base implementation of the {@link ListViewModel}.
  */
 public abstract class ListViewModelBaseImpl<T, S extends ListViewModel.ViewListener>
         extends ViewModelBaseImpl<S>
         implements ListViewModel<T> {
 
     private static final String STATE_LOADING = "STATE_LOADING";
-
-    protected ArrayList<T> mItems;
     protected final IdentityRepository mIdentityRepo;
+    protected ArrayList<T> mItems;
     protected boolean mLoading;
 
     public ListViewModelBaseImpl(@Nullable Bundle savedState,
@@ -59,8 +58,8 @@ public abstract class ListViewModelBaseImpl<T, S extends ListViewModel.ViewListe
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onScreenVisible() {
+        super.onScreenVisible();
 
         loadData();
     }

@@ -8,7 +8,6 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 
 import java.util.Calendar;
@@ -16,7 +15,7 @@ import java.util.Calendar;
 /**
  * Provides an Android standard date picker dialog.
  * <p/>
- * Subclass of {@link DialogFragment}.
+ * Subclass of {@link BaseDialogFragment}.
  */
 public class DatePickerDialogFragment extends BaseDialogFragment<DatePickerDialog.OnDateSetListener> {
 

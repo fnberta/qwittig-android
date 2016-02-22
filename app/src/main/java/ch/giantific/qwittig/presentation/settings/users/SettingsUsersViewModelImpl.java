@@ -16,19 +16,19 @@ import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
-import ch.giantific.qwittig.presentation.settings.users.items.HeaderItem;
-import ch.giantific.qwittig.presentation.settings.users.items.IntroItem;
-import ch.giantific.qwittig.presentation.settings.users.items.NicknameItem;
-import ch.giantific.qwittig.presentation.settings.users.items.SettingsUsersItem;
-import ch.giantific.qwittig.presentation.settings.users.items.UserItem;
+import ch.giantific.qwittig.presentation.settings.users.items.SettingsUsersUserItem;
+import ch.giantific.qwittig.presentation.settings.users.items.SettingsUsersHeaderItem;
+import ch.giantific.qwittig.presentation.settings.users.items.SettingsUsersIntroItem;
+import ch.giantific.qwittig.presentation.settings.users.items.SettingsUsersNicknameItem;
+import ch.giantific.qwittig.presentation.settings.users.items.SettingsUsersBaseItem;
 import rx.Single;
 import rx.SingleSubscriber;
 import rx.functions.Func1;
 
 /**
- * Created by fabio on 08.02.16.
+ * Provides an implementation of the {@link SettingsUsersViewModel}.
  */
-public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUsersItem, SettingsUsersViewModel.ViewListener>
+public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUsersBaseItem, SettingsUsersViewModel.ViewListener>
         implements SettingsUsersViewModel {
 
     private static final String STATE_ITEMS = "STATE_ITEMS";
@@ -59,9 +59,9 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
             return;
         }
 
-        mItems.add(new IntroItem());
-        mItems.add(new NicknameItem());
-        mItems.add(new HeaderItem(R.string.header_settings_users));
+        mItems.add(new SettingsUsersIntroItem());
+        mItems.add(new SettingsUsersNicknameItem());
+        mItems.add(new SettingsUsersHeaderItem(R.string.header_settings_users));
 
         final Group group = mCurrentIdentity.getGroup();
         final String groupName = group.getName();
@@ -73,19 +73,19 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
                         return !identity.getObjectId().equals(currentId);
                     }
                 })
-                .map(new Func1<Identity, UserItem>() {
+                .map(new Func1<Identity, SettingsUsersUserItem>() {
                     @Override
-                    public UserItem call(Identity identity) {
+                    public SettingsUsersUserItem call(Identity identity) {
                         return identity.isPending()
-                                ? new UserItem(identity.getNickname(), mIdentityRepo.getInvitationUrl(identity, groupName))
-                                : new UserItem(identity.getNickname());
+                                ? new SettingsUsersUserItem(identity.getNickname(), mIdentityRepo.getInvitationUrl(identity, groupName))
+                                : new SettingsUsersUserItem(identity.getNickname());
                     }
                 })
                 .toSortedList()
                 .toSingle()
-                .subscribe(new SingleSubscriber<List<UserItem>>() {
+                .subscribe(new SingleSubscriber<List<SettingsUsersUserItem>>() {
                     @Override
-                    public void onSuccess(List<UserItem> items) {
+                    public void onSuccess(List<SettingsUsersUserItem> items) {
                         mItems.addAll(items);
                         mView.notifyDataSetChanged();
                     }
@@ -114,10 +114,10 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
                         mView.toggleProgressDialog(false);
 
                         // TODO: hardcode item position?
-                        final NicknameItem nicknameItem = ((NicknameItem) mItems.get(POS_NICKNAME));
+                        final SettingsUsersNicknameItem nicknameItem = ((SettingsUsersNicknameItem) mItems.get(POS_NICKNAME));
                         nicknameItem.setValidate(false);
                         nicknameItem.setNickname("");
-                        mItems.add(new UserItem(nicknameItem.getNickname(), invitationUrl));
+                        mItems.add(new SettingsUsersUserItem(nicknameItem.getNickname(), invitationUrl));
                         mView.notifyItemInserted(getLastPosition());
                     }
 

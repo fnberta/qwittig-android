@@ -16,5 +16,11 @@ import rx.Single;
  */
 public interface AddGroupWorkerListener extends BaseWorkerListener {
 
+    /**
+     * Sets the create new group stream.
+     *
+     * @param single    the {@link Single} emitting the result
+     * @param workerTag the tag of the headless worker fragment
+     */
     void setCreateGroupStream(@NonNull Single<User> single, @NonNull String workerTag);
 }

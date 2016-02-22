@@ -7,16 +7,19 @@ package ch.giantific.qwittig.presentation.settings.users;
 import android.support.annotation.NonNull;
 
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
-import ch.giantific.qwittig.presentation.settings.users.items.SettingsUsersItem;
-import ch.giantific.qwittig.presentation.settings.users.items.NicknameItem;
-import ch.giantific.qwittig.presentation.settings.users.items.UserItem;
+import ch.giantific.qwittig.presentation.settings.users.items.SettingsUsersUserItem;
+import ch.giantific.qwittig.presentation.settings.users.items.SettingsUsersNicknameItem;
+import ch.giantific.qwittig.presentation.settings.users.items.SettingsUsersBaseItem;
 
 /**
- * Created by fabio on 07.02.16.
+ * Defines an observable view model for the manage users settings screen.
  */
-public interface SettingsUsersViewModel extends ListViewModel<SettingsUsersItem>, AddUserWorkerListener,
-        NicknameItem.AddListener, UserItem.ShareListener {
+public interface SettingsUsersViewModel extends ListViewModel<SettingsUsersBaseItem>, AddUserWorkerListener,
+        SettingsUsersNicknameItem.AddListener, SettingsUsersUserItem.ShareListener {
 
+    /**
+     * Defines the interaction with the attached view.
+     */
     interface ViewListener extends ListViewModel.ViewListener {
 
         void loadAddUserWorker(@NonNull String nickname, @NonNull String groupId,

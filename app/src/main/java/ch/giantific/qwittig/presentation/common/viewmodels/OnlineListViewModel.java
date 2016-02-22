@@ -8,7 +8,8 @@ import android.databinding.Bindable;
 import android.support.v4.widget.SwipeRefreshLayout;
 
 /**
- * Created by fabio on 10.01.16.
+ * Defines an observable view model for a screen filled with a scrollable list that can be
+ * refreshed with online content.
  */
 public interface OnlineListViewModel<T>
         extends ListViewModel<T> {
@@ -20,6 +21,9 @@ public interface OnlineListViewModel<T>
 
     SwipeRefreshLayout.OnRefreshListener getOnRefreshListener();
 
+    /**
+     * Defines the interaction with the attached view.
+     */
     interface ViewListener extends ListViewModel.ViewListener {
 
     }

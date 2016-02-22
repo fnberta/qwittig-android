@@ -31,7 +31,7 @@ public abstract class BaseQueryWorker<T, S extends BaseWorkerListener>
      *
      * @return whether the current user's current identities and identities are not null or empty
      */
-    protected final boolean setUserInfo() {
+    protected final boolean checkIdentities() {
         final User currentUser = mUserRepo.getCurrentUser();
         if (currentUser != null) {
             mCurrentIdentity = currentUser.getCurrentIdentity();

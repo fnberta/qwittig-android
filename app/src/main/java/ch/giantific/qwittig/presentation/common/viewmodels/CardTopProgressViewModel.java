@@ -8,7 +8,7 @@ import android.databinding.Bindable;
 import android.databinding.Observable;
 
 /**
- * Created by fabio on 20.01.16.
+ * Defines an observable view model for a progress bar on top of a card view.
  */
 public interface CardTopProgressViewModel extends Observable {
 

@@ -14,14 +14,17 @@ import ch.giantific.qwittig.databinding.RowSettingsUsersIntroBinding;
 import ch.giantific.qwittig.databinding.RowSettingsUsersNicknameBinding;
 import ch.giantific.qwittig.databinding.RowSettingsUsersUserBinding;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.settings.users.items.SettingsUsersItem;
-import ch.giantific.qwittig.presentation.settings.users.items.HeaderItem;
-import ch.giantific.qwittig.presentation.settings.users.items.SettingsUsersItem.Type;
-import ch.giantific.qwittig.presentation.settings.users.items.NicknameItem;
-import ch.giantific.qwittig.presentation.settings.users.items.UserItem;
+import ch.giantific.qwittig.presentation.settings.users.items.SettingsUsersHeaderItem;
+import ch.giantific.qwittig.presentation.settings.users.items.SettingsUsersNicknameItem;
+import ch.giantific.qwittig.presentation.settings.users.items.SettingsUsersBaseItem;
+import ch.giantific.qwittig.presentation.settings.users.items.SettingsUsersBaseItem.Type;
+import ch.giantific.qwittig.presentation.settings.users.items.SettingsUsersUserItem;
 
 /**
- * Created by fabio on 08.02.16.
+ * Provides a {@link RecyclerView} adapter that manages the list of items on the manage users
+ * settings screen.
+ * <p/>
+ * Subclass of {@link RecyclerView.Adapter}.
  */
 public class SettingsUsersRecyclerAdapter extends RecyclerView.Adapter {
 
@@ -65,14 +68,14 @@ public class SettingsUsersRecyclerAdapter extends RecyclerView.Adapter {
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        final SettingsUsersItem item = mViewModel.getItemAtPosition(position);
+        final SettingsUsersBaseItem item = mViewModel.getItemAtPosition(position);
         @Type final int type = getItemViewType(position);
         switch (type) {
             case Type.HEADER: {
                 final BindingRow<RowGenericHeaderBinding> row =
                         (BindingRow<RowGenericHeaderBinding>) holder;
                 final RowGenericHeaderBinding binding = row.getBinding();
-                final HeaderItem headerItem = (HeaderItem) item;
+                final SettingsUsersHeaderItem headerItem = (SettingsUsersHeaderItem) item;
 
                 binding.setViewModel(headerItem);
                 binding.executePendingBindings();
@@ -85,7 +88,7 @@ public class SettingsUsersRecyclerAdapter extends RecyclerView.Adapter {
                 final BindingRow<RowSettingsUsersNicknameBinding> row =
                         (BindingRow<RowSettingsUsersNicknameBinding>) holder;
                 final RowSettingsUsersNicknameBinding binding = row.getBinding();
-                final NicknameItem nicknameItem = (NicknameItem) item;
+                final SettingsUsersNicknameItem nicknameItem = (SettingsUsersNicknameItem) item;
 
                 nicknameItem.setAddListener(mViewModel);
                 binding.setNicknameItem(nicknameItem);
@@ -96,7 +99,7 @@ public class SettingsUsersRecyclerAdapter extends RecyclerView.Adapter {
                 final BindingRow<RowSettingsUsersUserBinding> row =
                         (BindingRow<RowSettingsUsersUserBinding>) holder;
                 final RowSettingsUsersUserBinding binding = row.getBinding();
-                final UserItem userItem = (UserItem) item;
+                final SettingsUsersUserItem userItem = (SettingsUsersUserItem) item;
 
                 userItem.setShareListener(mViewModel);
                 binding.setUserItem(userItem);

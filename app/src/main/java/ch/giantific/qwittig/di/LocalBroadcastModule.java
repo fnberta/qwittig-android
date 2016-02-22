@@ -4,28 +4,22 @@
 
 package ch.giantific.qwittig.di;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
 
-import ch.giantific.qwittig.LocalBroadcast;
-import ch.giantific.qwittig.LocalBroadcastImpl;
+import ch.giantific.qwittig.data.bus.LocalBroadcast;
+import ch.giantific.qwittig.data.bus.LocalBroadcastImpl;
 import dagger.Module;
 import dagger.Provides;
 
 /**
- * Created by fabio on 12.01.16.
+ * Defines which implementation to use for the {@link LocalBroadcast} interface and how to
+ * instantiate it.
  */
 @Module
 public class LocalBroadcastModule {
 
-    private final Context mContext;
-
-    public LocalBroadcastModule(@NonNull Context context) {
-        mContext = context;
-    }
-
     @Provides
-    LocalBroadcast providesLocalBroadcast() {
-        return new LocalBroadcastImpl(mContext);
+    LocalBroadcast providesLocalBroadcast(LocalBroadcastManager broadcastManager) {
+        return new LocalBroadcastImpl(broadcastManager);
     }
 }

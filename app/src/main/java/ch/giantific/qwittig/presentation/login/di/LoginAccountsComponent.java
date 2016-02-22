@@ -10,7 +10,7 @@ import ch.giantific.qwittig.presentation.login.LoginAccountsFragment;
 import dagger.Component;
 
 /**
- * Created by fabio on 05.02.16.
+ * Provides the dependencies for the login accounts screen.
  */
 @PerFragment
 @Component(modules = {LoginAccountsViewModelModule.class, RepositoriesModule.class})

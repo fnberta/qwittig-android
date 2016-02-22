@@ -12,9 +12,9 @@ import android.text.TextUtils;
 
 import javax.inject.Inject;
 
-import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
+import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;
 
@@ -51,7 +51,12 @@ public class AddUserWorker extends BaseWorker<String, AddUserWorkerListener> {
                                        @NonNull String groupName) {
         AddUserWorker worker = (AddUserWorker) fm.findFragmentByTag(WORKER_TAG);
         if (worker == null) {
-            worker = newInstance(nickname, groupId, groupName);
+            worker = new AddUserWorker();
+            final Bundle args = new Bundle();
+            args.putString(KEY_NICKNAME, nickname);
+            args.putString(KEY_GROUP_ID, groupId);
+            args.putString(KEY_GROUP_NAME, groupName);
+            worker.setArguments(args);
 
             fm.beginTransaction()
                     .add(worker, WORKER_TAG)
@@ -59,19 +64,6 @@ public class AddUserWorker extends BaseWorker<String, AddUserWorkerListener> {
         }
 
         return worker;
-    }
-
-    @NonNull
-    private static AddUserWorker newInstance(@NonNull String nickname,
-                                             @NonNull String groupId,
-                                             @NonNull String groupName) {
-        AddUserWorker fragment = new AddUserWorker();
-        Bundle args = new Bundle();
-        args.putString(KEY_NICKNAME, nickname);
-        args.putString(KEY_GROUP_ID, groupId);
-        args.putString(KEY_GROUP_NAME, groupName);
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override

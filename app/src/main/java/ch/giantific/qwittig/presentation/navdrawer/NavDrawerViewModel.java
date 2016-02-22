@@ -15,7 +15,7 @@ import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 
 /**
- * Created by fabio on 12.01.16.
+ * Defines an observable view model for the navigation drawer.
  */
 public interface NavDrawerViewModel extends ViewModel {
 
@@ -53,6 +53,9 @@ public interface NavDrawerViewModel extends ViewModel {
 
     void onAvatarClick(View view);
 
+    /**
+     * Defines the interaction with the attached view.
+     */
     interface ViewListener extends ViewModel.ViewListener {
 
         void notifyHeaderIdentitiesChanged();

@@ -8,11 +8,10 @@ import ch.giantific.qwittig.di.ApplicationComponent;
 import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
 import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesFragment;
-import ch.giantific.qwittig.data.loaders.PurchasesLoader;
 import dagger.Component;
 
 /**
- * Created by fabio on 12.01.16.
+ * Provides the dependencies for the list of purchases screen.
  */
 @PerFragment
 @Component(dependencies = {ApplicationComponent.class},
@@ -20,6 +19,4 @@ import dagger.Component;
 public interface PurchasesListComponent {
 
     void inject(PurchasesFragment purchasesFragment);
-
-    PurchasesLoader getPurchasesLoader();
 }

@@ -31,6 +31,7 @@ public interface PurchaseRepository extends BaseRepository {
      *
      * @param currentIdentity the current identity of the user
      * @param getDrafts       whether to query for drafts or purchases
+     * @return a {@link Observable} emitting the results
      */
     Observable<Purchase> getPurchasesLocalAsync(@NonNull Identity currentIdentity, boolean getDrafts);
 
@@ -38,6 +39,7 @@ public interface PurchaseRepository extends BaseRepository {
      * Queries the local data store for a single purchase.
      *
      * @param purchaseId the object id of the purchase to query
+     * @return a {@link Single} emitting the result
      */
     Single<Purchase> getPurchaseLocalAsync(@NonNull String purchaseId, boolean isDraft);
 
@@ -45,6 +47,7 @@ public interface PurchaseRepository extends BaseRepository {
      * Fetches the data of a purchase from the local data store.
      *
      * @param purchaseId the object id of the purchase to fetch
+     * @return a {@link Single} emitting the result
      */
     Single<Purchase> fetchPurchaseDataLocalAsync(@NonNull String purchaseId);
 
@@ -53,7 +56,7 @@ public interface PurchaseRepository extends BaseRepository {
      *
      * @param purchase the purchase to remove
      * @param tag      the pin tag the purchase uses
-     * @return a {@link Single} representing the save action
+     * @return a {@link Single} emitting the result
      */
     Single<Purchase> removePurchaseLocalAsync(@NonNull Purchase purchase, @NonNull String tag);
 
@@ -72,17 +75,19 @@ public interface PurchaseRepository extends BaseRepository {
      *
      * @param identities      the identities of the current user
      * @param currentIdentity the user's current identity
+     * @return a {@link Observable} emitting the results
      */
-    Observable<Purchase> updatePurchasesAsync(@NonNull List<Identity> identities, @NonNull Identity currentIdentity);
+    Observable<Purchase> updatePurchasesAsync(@NonNull List<Identity> identities,
+                                              @NonNull Identity currentIdentity);
 
     /**
      * Queries purchases from the online data store and saves them in the local data store.
      *
      * @param currentIdentity the current identity of the user
      * @param skip            the number of purchases to skip for the query
+     * @return a {@link Observable} emitting the results
      */
-    Observable<Purchase> getPurchasesOnlineAsync(@NonNull Identity currentIdentity,
-                                                 int skip);
+    Observable<Purchase> getPurchasesOnlineAsync(@NonNull Identity currentIdentity, int skip);
 
     /**
      * Deletes all purchases from the local data store and saves new ones.
@@ -110,7 +115,7 @@ public interface PurchaseRepository extends BaseRepository {
      * @param tag          the tag to save the purchase in the offline storage
      * @param receiptImage the receipt image to attach to the purchase
      * @param isDraft      whether to save the purchase as a draft
-     * @return a {@link Single} emitting the save stream
+     * @return a {@link Single} emitting the result
      */
     Single<Purchase> savePurchaseAsync(@NonNull Purchase purchase, @NonNull String tag,
                                        @Nullable byte[] receiptImage, boolean isDraft);
@@ -120,7 +125,7 @@ public interface PurchaseRepository extends BaseRepository {
      *
      * @param purchase the purchase to save
      * @param tag      the tag save the purchase in the offline storage
-     * @return a {@link Single} emitting the save stream
+     * @return a {@link Single} emitting the result
      */
     Single<Purchase> savePurchaseAsDraftAsync(@NonNull Purchase purchase, @NonNull String tag);
 
@@ -129,16 +134,44 @@ public interface PurchaseRepository extends BaseRepository {
      * needed.
      *
      * @param fileName the file name of the {@link ParseFile} to delete
+     * @return a {@link Single} emitting the result
      */
     Single<String> deleteReceipt(@NonNull String fileName);
 
+    /**
+     * Deletes the items with the specified object ids.
+     *
+     * @param itemIds the ids of the items to delete
+     */
     void deleteItemsByIds(@NonNull List<String> itemIds);
 
+    /**
+     * Deletes the purchase.
+     *
+     * @param purchase the purchase to delete
+     */
     void deletePurchase(@NonNull Purchase purchase);
 
+    /**
+     * Returns whether drafts are available for the current identity of the user.
+     *
+     * @return whether drafts are available
+     */
     boolean isDraftsAvailable();
 
+    /**
+     * Toggle the save setting whether drafts are available or not.
+     *
+     * @param available whether drafts are available or not
+     */
     void toggleDraftsAvailable(boolean available);
 
+    /**
+     * Returns the exchange rate for the given currency.
+     *
+     * @param baseCurrency the base currency of which to calculate the rate
+     * @param currency     the currency to get the rate for
+     * @return a {@link Single} emitting the result
+     */
     Single<Float> getExchangeRate(@NonNull String baseCurrency, @NonNull String currency);
 }

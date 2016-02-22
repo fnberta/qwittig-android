@@ -14,10 +14,13 @@ import java.util.List;
 import ch.giantific.qwittig.databinding.RowPurchaseDetailsIdentitiesIdentityBinding;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.home.purchases.details.items.IdentitiesItemIdentity;
+import ch.giantific.qwittig.presentation.home.purchases.details.items.PurchaseDetailsIdentitiesItemIdentity;
 
 /**
- * Created by fabio on 30.01.16.
+ * Provides a {@link RecyclerView} adapter that manages the list of identities involved in a
+ * purchase.
+ * <p/>
+ * Subclass of {@link RecyclerView.Adapter}.
  */
 public class PurchaseDetailsIdentitiesRecyclerAdapter extends RecyclerView.Adapter<BindingRow<RowPurchaseDetailsIdentitiesIdentityBinding>> {
 
@@ -42,11 +45,11 @@ public class PurchaseDetailsIdentitiesRecyclerAdapter extends RecyclerView.Adapt
     public void onBindViewHolder(BindingRow<RowPurchaseDetailsIdentitiesIdentityBinding> holder, int position) {
         final Identity identity = mIdentities.get(position);
         final RowPurchaseDetailsIdentitiesIdentityBinding binding = holder.getBinding();
-        IdentitiesItemIdentity item = binding.getItem();
+        PurchaseDetailsIdentitiesItemIdentity item = binding.getItem();
 
         final boolean boldName = mViewModel.getPurchaseBuyer().getObjectId().equals(identity.getObjectId());
         if (item == null) {
-            item = new IdentitiesItemIdentity(identity, boldName);
+            item = new PurchaseDetailsIdentitiesItemIdentity(identity, boldName);
             binding.setItem(item);
         } else {
             item.updateIdentity(identity, boldName);

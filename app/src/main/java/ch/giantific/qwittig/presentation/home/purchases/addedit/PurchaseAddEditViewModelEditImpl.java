@@ -22,16 +22,17 @@ import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.items.AddEditItem;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.items.AddEditItem.Type;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.items.ItemItem;
-import ch.giantific.qwittig.utils.DateUtils;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.PurchaseAddEditBaseItem;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.PurchaseAddEditBaseItem.Type;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.PurchaseAddEditItem;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Single;
 import rx.SingleSubscriber;
 
 /**
- * Created by fabio on 28.01.16.
+ * Provides an implementation of the {@link PurchaseAddEditViewModel} for the edit purchase screen.
+ * <p/>
+ * Subclass of {@link PurchaseAddEditViewModelAddImpl}.
  */
 public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAddImpl {
 
@@ -43,11 +44,11 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
     private static final String STATE_OLD_EXCHANGE_RATE = "STATE_OLD_EXCHANGE_RATE";
     private static final String STATE_OLD_NOTE = "STATE_OLD_NOTE";
     final String mEditPurchaseId;
+    private final ArrayList<String> mOldItemIds;
     Purchase mEditPurchase;
     boolean mDeleteOldReceipt;
     private boolean mOldValuesSet;
     private List<Item> mOldItems;
-    private final ArrayList<String> mOldItemIds;
     private String mOldStore;
     private Date mOldDate;
     private String mOldCurrency;
@@ -165,9 +166,9 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
         for (Item item : mOldItems) {
             final List<Identity> identities = item.getIdentities();
             final String price = mMoneyFormatter.format(item.getPriceForeign(mOldExchangeRate));
-            final ItemItem itemItem = new ItemItem(item.getName(), price, getItemUsersItemUsers(identities));
-            mItems.add(getLastPosition() - 1, itemItem);
-            mView.notifyItemInserted(mItems.indexOf(itemItem));
+            final PurchaseAddEditItem purchaseAddEditItem = new PurchaseAddEditItem(item.getName(), price, getItemUsersItemUsers(identities));
+            mItems.add(getLastPosition() - 1, purchaseAddEditItem);
+            mView.notifyItemInserted(mItems.indexOf(purchaseAddEditItem));
         }
 
         super.onIdentitiesReady();
@@ -250,7 +251,7 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
         }
 
         for (int i = 0, size = mItems.size(), skipCount = 0; i < size; i++) {
-            final AddEditItem addEditItem = mItems.get(i);
+            final PurchaseAddEditBaseItem addEditItem = mItems.get(i);
             if (addEditItem.getType() != Type.ITEM) {
                 skipCount++;
                 continue;
@@ -262,19 +263,19 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
             } catch (IndexOutOfBoundsException e) {
                 return true;
             }
-            final ItemItem itemItem = (ItemItem) addEditItem;
-            if (!itemOld.getName().equals(itemItem.getName())) {
+            final PurchaseAddEditItem purchaseAddEditItem = (PurchaseAddEditItem) addEditItem;
+            if (!itemOld.getName().equals(purchaseAddEditItem.getName())) {
                 return true;
             }
 
             final double oldPrice = itemOld.getPriceForeign(mOldExchangeRate);
-            final double newPrice = itemItem.parsePrice();
+            final double newPrice = purchaseAddEditItem.parsePrice();
             if (Math.abs(oldPrice - newPrice) >= MoneyUtils.MIN_DIFF) {
                 return true;
             }
 
             final List<String> identitiesOld = itemOld.getIdentitiesIds();
-            final List<String> identitiesNew = itemItem.getSelectedIdentitiesIds();
+            final List<String> identitiesNew = purchaseAddEditItem.getSelectedIdentitiesIds();
             if (!identitiesNew.containsAll(identitiesOld) ||
                     !identitiesOld.containsAll(identitiesNew)) {
                 return true;

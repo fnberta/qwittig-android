@@ -86,7 +86,7 @@ public class DraftsRecyclerAdapter extends RecyclerView.Adapter<DraftsRecyclerAd
     /**
      * Provides a {@link RecyclerView} row that displays a draft.
      * <p/>
-     * Subclass of {@link RecyclerView.ViewHolder}.
+     * Subclass of {@link BindingRow}.
      */
     public static class DraftRow extends BindingRow<RowDraftsBinding> {
 

@@ -5,7 +5,6 @@
 package ch.giantific.qwittig.presentation.settings.general;
 
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,12 +17,17 @@ import ch.giantific.qwittig.presentation.common.fragments.BaseDialogFragment;
 /**
  * Provides a dialog that asks the user if he really wants to delete his/her account.
  * <p/>
- * Subclass of {@link DialogFragment}.
+ * Subclass of {@link BaseDialogFragment}.
  */
 public class DeleteAccountDialogFragment extends BaseDialogFragment<DeleteAccountDialogFragment.DialogInteractionListener> {
 
     private static final String DIALOG_TAG = DeleteAccountDialogFragment.class.getCanonicalName();
 
+    /**
+     * Displays a new {@link DeleteAccountDialogFragment} instance.
+     *
+     * @param fm the fragment manager to use for the transaction
+     */
     public static void display(@NonNull FragmentManager fm) {
         final DeleteAccountDialogFragment dialog = new DeleteAccountDialogFragment();
         dialog.show(fm, DIALOG_TAG);

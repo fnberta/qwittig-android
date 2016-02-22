@@ -16,5 +16,12 @@ import rx.Single;
  */
 public interface LoginWorkerListener extends BaseWorkerListener {
 
+    /**
+     * Sets the user login stream.
+     *
+     * @param single    the {@link Single} emitting the result
+     * @param workerTag the tag of the worker fragment
+     * @param type      the action type taken
+     */
     void setUserLoginStream(@NonNull Single<User> single, @NonNull String workerTag, @LoginWorker.Type int type);
 }

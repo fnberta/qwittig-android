@@ -5,7 +5,7 @@
 package ch.giantific.qwittig.presentation.common.viewmodels;
 
 /**
- * Defines the callbacks for load more methods.
+ * Defines an observable view model for a screen with an infinite scrolling list.
  */
 public interface LoadMoreViewModel {
 

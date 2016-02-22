@@ -15,7 +15,7 @@ import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
- * Created by fabio on 13.01.16.
+ * Defines how the application wide rest services are instantiated.
  */
 @Module
 public class RestServiceModule {

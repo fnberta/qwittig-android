@@ -15,8 +15,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import ch.giantific.qwittig.LocalBroadcastImpl;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.LocalBroadcastImpl;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorkerListener;
@@ -39,9 +39,6 @@ public abstract class BaseActivity<T extends ViewModel>
     public static final int INTENT_REQUEST_TASK_NEW = 7;
     public static final int INTENT_REQUEST_TASK_MODIFY = 8;
     public static final int INTENT_REQUEST_TASK_DETAILS = 9;
-    protected Toolbar mToolbar;
-    protected T mViewModel;
-
     @NonNull
     private final BroadcastReceiver mLocalBroadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -50,6 +47,8 @@ public abstract class BaseActivity<T extends ViewModel>
             handleLocalBroadcast(intent, dataType);
         }
     };
+    protected Toolbar mToolbar;
+    protected T mViewModel;
 
     @CallSuper
     protected void handleLocalBroadcast(Intent intent, int dataType) {

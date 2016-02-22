@@ -17,8 +17,8 @@ import android.view.ViewGroup;
 import org.apache.commons.math3.fraction.BigFraction;
 
 import ch.giantific.qwittig.databinding.FragmentFinanceIdentitiesBinding;
-import ch.giantific.qwittig.presentation.finance.di.DaggerFinanceIdentitiesComponent;
-import ch.giantific.qwittig.presentation.finance.di.FinanceUsersViewModelModule;
+import ch.giantific.qwittig.presentation.finance.identities.di.DaggerFinanceIdentitiesComponent;
+import ch.giantific.qwittig.presentation.finance.identities.di.FinanceIdentitiesViewModelModule;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewOnlineFragment;
 
 /**
@@ -41,7 +41,7 @@ public class IdentitiesFragment extends BaseRecyclerViewOnlineFragment<Identitie
         super.onCreate(savedInstanceState);
 
         DaggerFinanceIdentitiesComponent.builder()
-                .financeUsersViewModelModule(new FinanceUsersViewModelModule(savedInstanceState, this))
+                .financeIdentitiesViewModelModule(new FinanceIdentitiesViewModelModule(savedInstanceState, this))
                 .build()
                 .inject(this);
     }

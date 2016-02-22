@@ -24,19 +24,19 @@ import android.widget.ArrayAdapter;
 
 import javax.inject.Inject;
 
-import ch.giantific.qwittig.LocalBroadcast;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.NavDrawerHeaderBinding;
-import ch.giantific.qwittig.presentation.navdrawer.di.DaggerNavDrawerComponent;
-import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
-import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerViewModelModule;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.finance.FinanceActivity;
 import ch.giantific.qwittig.presentation.helpfeedback.HelpFeedbackActivity;
 import ch.giantific.qwittig.presentation.home.HomeActivity;
 import ch.giantific.qwittig.presentation.login.LoginActivity;
+import ch.giantific.qwittig.presentation.navdrawer.di.DaggerNavDrawerComponent;
+import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
+import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerViewModelModule;
 import ch.giantific.qwittig.presentation.settings.general.SettingsActivity;
 import ch.giantific.qwittig.presentation.settings.general.SettingsViewModel;
 import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileActivity;
@@ -49,8 +49,6 @@ import ch.giantific.qwittig.utils.Utils;
 /**
  * Provides an abstract base class that sets up the navigation drawer and implements a couple of
  * default empty methods.
- * <p/>
- * Also initialises the in-app billing framework.
  * <p/>
  * Subclass of {@link BaseActivity}.
  */
@@ -205,14 +203,14 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
     protected void onStart() {
         super.onStart();
 
-        mNavDrawerViewModel.onStart();
+        mNavDrawerViewModel.onScreenVisible();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
 
-        mNavDrawerViewModel.onStop();
+        mNavDrawerViewModel.onScreenGone();
     }
 
     @Override

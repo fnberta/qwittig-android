@@ -12,7 +12,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
 import ch.giantific.qwittig.presentation.common.viewmodels.SelectionModeViewModel;
 
 /**
- * Created by fabio on 21.01.16.
+ * Defines an observable view model for the list of drafts screen.
  */
 public interface DraftsViewModel extends ListViewModel<Purchase>,
         SelectionModeViewModel<Purchase>, DraftsRecyclerAdapter.AdapterInteractionListener {
@@ -23,6 +23,9 @@ public interface DraftsViewModel extends ListViewModel<Purchase>,
 
     void onSelectionModeEnded();
 
+    /**
+     * Defines the interaction with the attached view.
+     */
     interface ViewListener extends ListViewModel.ViewListener {
         void startPurchaseEditActivity(@NonNull Purchase draft);
 

@@ -19,7 +19,6 @@ import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.utils.AvatarUtils;
 import rx.Observable;
 import rx.Single;
 import rx.functions.Action1;
@@ -212,7 +211,7 @@ public class ParseIdentityRepository extends ParseBaseRepository implements Iden
     public Observable<Identity> saveIdentitiesWithAvatar(@NonNull final List<Identity> identities,
                                                          @NonNull final String nickname,
                                                          @NonNull byte[] avatarBytes) {
-        final ParseFile avatar = new ParseFile(AvatarUtils.FILE_NAME, avatarBytes);
+        final ParseFile avatar = new ParseFile(IdentityRepository.FILE_NAME, avatarBytes);
         return saveFile(avatar)
                 .flatMapObservable(new Func1<ParseFile, Observable<? extends Identity>>() {
                     @Override

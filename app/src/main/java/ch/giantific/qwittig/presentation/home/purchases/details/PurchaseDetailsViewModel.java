@@ -13,12 +13,12 @@ import java.lang.annotation.RetentionPolicy;
 
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
-import ch.giantific.qwittig.presentation.home.purchases.details.items.DetailsItem;
+import ch.giantific.qwittig.presentation.home.purchases.details.items.PurchaseDetailsBaseItem;
 
 /**
- * Created by fabio on 29.01.16.
+ * Defines an observable view model for the purchase details screen.
  */
-public interface PurchaseDetailsViewModel extends ListViewModel<DetailsItem> {
+public interface PurchaseDetailsViewModel extends ListViewModel<PurchaseDetailsBaseItem> {
 
     @Bindable
     String getPurchaseStore();
@@ -43,11 +43,11 @@ public interface PurchaseDetailsViewModel extends ListViewModel<DetailsItem> {
         int GROUP_CHANGED = 3;
     }
 
+    /**
+     * Defines the interaction with the attached view.
+     */
     interface ViewListener extends ListViewModel.ViewListener {
 
-        /**
-         * Starts the postponed enter transition.
-         */
         void startPostponedEnterTransition();
 
         void startPurchaseEditScreen(@NonNull String purchaseId);

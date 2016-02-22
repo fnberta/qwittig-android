@@ -5,9 +5,12 @@
 package ch.giantific.qwittig.presentation.settings.profile;
 
 /**
- * Created by fabio on 12.02.16.
+ * Defines the action to take when an avatar has finished loading.
  */
 public interface AvatarLoadListener {
 
+    /**
+     * Called when avatar finished loading.
+     */
     void onAvatarLoaded();
 }

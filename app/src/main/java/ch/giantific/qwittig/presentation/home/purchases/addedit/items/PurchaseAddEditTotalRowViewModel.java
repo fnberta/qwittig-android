@@ -11,7 +11,7 @@ import android.view.View;
 import android.widget.AdapterView;
 
 /**
- * Created by fabio on 26.01.16.
+ * Defines the view model for a total row in the add or edit purchase screen.
  */
 public interface PurchaseAddEditTotalRowViewModel extends Observable {
 

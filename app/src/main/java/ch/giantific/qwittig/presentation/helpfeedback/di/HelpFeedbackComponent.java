@@ -10,7 +10,7 @@ import ch.giantific.qwittig.presentation.helpfeedback.HelpFeedbackFragment;
 import dagger.Component;
 
 /**
- * Created by fabio on 05.02.16.
+ * Provides the dependencies for the help and feedback screen.
  */
 @PerFragment
 @Component(modules = {HelpFeedbackViewModelModule.class, RepositoriesModule.class})

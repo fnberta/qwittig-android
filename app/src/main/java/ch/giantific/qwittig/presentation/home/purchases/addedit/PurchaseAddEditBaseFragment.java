@@ -39,16 +39,16 @@ import java.util.List;
 import ch.berta.fabio.fabprogress.FabProgress;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentPurchaseAddEditBinding;
-import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
 import ch.giantific.qwittig.presentation.common.fragments.DatePickerDialogFragment;
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
-import ch.giantific.qwittig.presentation.home.purchases.common.PurchaseReceiptBaseFragment;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddEditViewModel.PurchaseResult;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.items.AddEditItem.Type;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.PurchaseAddEditBaseItem.Type;
+import ch.giantific.qwittig.presentation.home.purchases.common.PurchaseReceiptBaseFragment;
 import ch.giantific.qwittig.utils.CameraUtils;
+import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.utils.Utils;
 import rx.Single;
 import rx.SingleSubscriber;
@@ -94,7 +94,7 @@ public abstract class PurchaseAddEditBaseFragment<T extends PurchaseAddEditViewM
 
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                mViewModel.onItemDismissed(viewHolder.getAdapterPosition());
+                mViewModel.onItemDismiss(viewHolder.getAdapterPosition());
             }
 
             @Override
@@ -402,6 +402,9 @@ public abstract class PurchaseAddEditBaseFragment<T extends PurchaseAddEditViewM
         ActivityCompat.finishAfterTransition(activity);
     }
 
+    /**
+     * Defines the interaction with the hosting activity.
+     */
     public interface ActivityListener extends BaseRecyclerViewFragment.ActivityListener {
         /**
          * Sets the view model to the activity.

@@ -16,8 +16,8 @@ public interface AddUserWorkerListener extends BaseWorkerListener {
     /**
      * Sets the {@link Single} that emits the user invitation.
      *
-     * @param single the single emitting the user invitation
-     * @param workerTag  the tag of the worker fragment
+     * @param single    the single emitting the user invitation
+     * @param workerTag the tag of the worker fragment
      */
     void setAddUserStream(@NonNull Single<String> single, @NonNull String workerTag);
 }

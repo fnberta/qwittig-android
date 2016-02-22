@@ -10,7 +10,7 @@ import ch.giantific.qwittig.presentation.settings.users.SettingsUsersFragment;
 import dagger.Component;
 
 /**
- * Created by fabio on 12.01.16.
+ * Provides the dependencies for the manage users settings screen.
  */
 @PerFragment
 @Component(modules = {SettingsUsersViewModelModule.class, RepositoriesModule.class})

@@ -11,7 +11,7 @@ import ch.giantific.qwittig.presentation.home.purchases.list.DraftsFragment;
 import dagger.Component;
 
 /**
- * Created by fabio on 12.01.16.
+ * Provides the dependencies for the list of drafts screen.
  */
 @PerFragment
 @Component(dependencies = {ApplicationComponent.class},

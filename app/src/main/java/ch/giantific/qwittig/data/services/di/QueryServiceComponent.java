@@ -12,7 +12,9 @@ import ch.giantific.qwittig.di.scopes.PerBroadcastReceive;
 import dagger.Component;
 
 /**
- * Created by fabio on 12.01.16.
+ * Provides the dependencies for the parse query service.
+ *
+ * @see {@link ParseQueryService}
  */
 @PerBroadcastReceive
 @Component(dependencies = {ApplicationComponent.class},

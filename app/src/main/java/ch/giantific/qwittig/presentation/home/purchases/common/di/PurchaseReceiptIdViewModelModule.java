@@ -8,17 +8,18 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.home.purchases.common.PurchaseReceiptViewModel;
 import ch.giantific.qwittig.presentation.home.purchases.common.PurchaseReceiptViewModelImpl;
 import dagger.Module;
 import dagger.Provides;
 
 /**
- * Created by fabio on 12.01.16.
+ * Defines which implementation of the view model for the purchase receipt screen to use and how to
+ * instantiate it.
  */
 @Module
 public class PurchaseReceiptIdViewModelModule extends BaseViewModelModule<PurchaseReceiptViewModel.ViewListener> {

@@ -15,7 +15,7 @@ import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 
 /**
- * Created by fabio on 22.01.16.
+ * Provides a view model for a draft in the list of drafts screen.
  */
 public class DraftsRowViewModel extends BaseObservable {
 

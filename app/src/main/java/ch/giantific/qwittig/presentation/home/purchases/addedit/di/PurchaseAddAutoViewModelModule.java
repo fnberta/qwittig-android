@@ -8,18 +8,18 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddEditViewModel;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddEditViewModelAddAutoImpl;
 import dagger.Module;
 import dagger.Provides;
 
 /**
- * Created by fabio on 12.01.16.
+ * Defines which implementation to use for the purchase add auto screen and how to instantiate it.
  */
 @Module
 public class PurchaseAddAutoViewModelModule extends BaseViewModelModule<PurchaseAddEditViewModel.ViewListener> {

@@ -8,7 +8,8 @@ import android.databinding.Bindable;
 import android.databinding.Observable;
 
 /**
- * Created by fabio on 10.01.16.
+ * Defines an observable view model for a screen that either shows the content or a spinning
+ * progress bar.
  */
 public interface LoadingViewModel extends Observable {
 

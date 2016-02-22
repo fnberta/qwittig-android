@@ -39,13 +39,13 @@ import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddEditViewModel.ViewListener;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.items.AddEditItem;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.items.AddEditItem.Type;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.items.GenericItem;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.items.HeaderItem;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.items.ItemItem;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.items.ItemUsersItem;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.items.ItemUsersItemUser;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.PurchaseAddEditBaseItem;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.PurchaseAddEditBaseItem.Type;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.PurchaseAddEditGenericItem;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.PurchaseAddEditHeaderItem;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.PurchaseAddEditItem;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.PurchaseAddEditItemUsers;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.PurchaseAddEditItemUsersUser;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.utils.MoneyUtils;
@@ -56,9 +56,9 @@ import rx.functions.Func1;
 import timber.log.Timber;
 
 /**
- * Created by fabio on 24.01.16.
+ * Provides an implementation of the {@link PurchaseAddEditViewModel} for the add purchase screen.
  */
-public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEditItem, ViewListener>
+public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<PurchaseAddEditBaseItem, ViewListener>
         implements PurchaseAddEditViewModel {
 
     // add permission to manifest when enabling!
@@ -77,6 +77,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
     private final NumberFormat mExchangeRateFormatter;
     private final List<String> mSupportedCurrencies = ParseUtils.getSupportedCurrencyCodes();
     private final Group mCurrentGroup;
+    private final DateFormat mDateFormatter;
     String mCurrency;
     String mReceiptImagePath;
     String mNote;
@@ -85,7 +86,6 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
     double mTotalPrice = 0;
     double mExchangeRate;
     NumberFormat mMoneyFormatter;
-    private DateFormat mDateFormatter;
     private boolean mSaving;
     private List<Identity> mIdentities = new ArrayList<>();
     private double mMyShare = 0;
@@ -132,12 +132,12 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
     }
 
     private void initFixedRows() {
-        mItems.add(new HeaderItem(R.string.header_purchase));
-        mItems.add(GenericItem.createNewDateInstance());
-        mItems.add(GenericItem.createNewStoreInstance());
-        mItems.add(new HeaderItem(R.string.header_items));
-        mItems.add(GenericItem.createNewAddRowInstance());
-        mItems.add(GenericItem.createNewTotalInstance());
+        mItems.add(new PurchaseAddEditHeaderItem(R.string.header_purchase));
+        mItems.add(PurchaseAddEditGenericItem.createNewDateInstance());
+        mItems.add(PurchaseAddEditGenericItem.createNewStoreInstance());
+        mItems.add(new PurchaseAddEditHeaderItem(R.string.header_items));
+        mItems.add(PurchaseAddEditGenericItem.createNewAddRowInstance());
+        mItems.add(PurchaseAddEditGenericItem.createNewTotalInstance());
     }
 
     @Override
@@ -267,28 +267,28 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
         double totalPrice = 0;
         double myShare = 0;
         final String currentIdentityId = mCurrentIdentity.getObjectId();
-        for (AddEditItem addEditItem : mItems) {
+        for (PurchaseAddEditBaseItem addEditItem : mItems) {
             if (addEditItem.getType() != Type.ITEM) {
                 continue;
             }
 
-            final ItemItem itemItem = (ItemItem) addEditItem;
-            final double itemPrice = itemItem.parsePrice();
+            final PurchaseAddEditItem purchaseAddEditItem = (PurchaseAddEditItem) addEditItem;
+            final double itemPrice = purchaseAddEditItem.parsePrice();
 
             // update total price
             totalPrice += itemPrice;
 
             // update my share
-            final ItemUsersItemUser[] itemUsersRows = itemItem.getUsers();
+            final PurchaseAddEditItemUsersUser[] itemUsersRows = purchaseAddEditItem.getUsers();
             int selectedCount = 0;
             boolean currentIdentityInvolved = false;
-            for (ItemUsersItemUser itemUsersItemUser : itemUsersRows) {
-                if (!itemUsersItemUser.isSelected()) {
+            for (PurchaseAddEditItemUsersUser purchaseAddEditItemUsersUser : itemUsersRows) {
+                if (!purchaseAddEditItemUsersUser.isSelected()) {
                     continue;
                 }
 
                 selectedCount++;
-                if (itemUsersItemUser.getObjectId().equals(currentIdentityId)) {
+                if (purchaseAddEditItemUsersUser.getObjectId().equals(currentIdentityId)) {
                     currentIdentityInvolved = true;
                 }
             }
@@ -341,10 +341,10 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
 
     private void updateItemsPriceFormatting() {
         for (int i = 0, size = mItems.size(); i < size; i++) {
-            final AddEditItem addEditItem = mItems.get(i);
+            final PurchaseAddEditBaseItem addEditItem = mItems.get(i);
             if (addEditItem.getType() == Type.ITEM) {
-                final ItemItem itemItem = (ItemItem) addEditItem;
-                itemItem.updatePriceFormat(mMoneyFormatter);
+                final PurchaseAddEditItem purchaseAddEditItem = (PurchaseAddEditItem) addEditItem;
+                purchaseAddEditItem.updatePriceFormat(mMoneyFormatter);
             }
         }
     }
@@ -416,39 +416,39 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
     void onIdentitiesReady() {
         boolean hasItems = false;
         for (int i = 0, size = mItems.size(); i < size; i++) {
-            final AddEditItem addEditItem = mItems.get(i);
+            final PurchaseAddEditBaseItem addEditItem = mItems.get(i);
 
             if (addEditItem.getType() == Type.ITEM) {
                 hasItems = true;
 
-                final ItemItem itemItem = (ItemItem) addEditItem;
-                itemItem.setMoneyFormatter(mMoneyFormatter);
-                itemItem.setPriceChangedListener(this);
+                final PurchaseAddEditItem purchaseAddEditItem = (PurchaseAddEditItem) addEditItem;
+                purchaseAddEditItem.setMoneyFormatter(mMoneyFormatter);
+                purchaseAddEditItem.setPriceChangedListener(this);
                 continue;
             }
 
             // fill with one row on first start
             if (addEditItem.getType() == Type.ADD_ROW && !hasItems) {
-                final ItemItem itemItem = new ItemItem(getItemUsersItemUsers(mIdentities));
-                itemItem.setMoneyFormatter(mMoneyFormatter);
-                itemItem.setPriceChangedListener(this);
-                mItems.add(i, itemItem);
+                final PurchaseAddEditItem purchaseAddEditItem = new PurchaseAddEditItem(getItemUsersItemUsers(mIdentities));
+                purchaseAddEditItem.setMoneyFormatter(mMoneyFormatter);
+                purchaseAddEditItem.setPriceChangedListener(this);
+                mItems.add(i, purchaseAddEditItem);
                 mView.notifyDataSetChanged();
                 return;
             }
         }
     }
 
-    final ItemUsersItemUser[] getItemUsersItemUsers(@NonNull List<Identity> identities) {
+    final PurchaseAddEditItemUsersUser[] getItemUsersItemUsers(@NonNull List<Identity> identities) {
         final int size = mIdentities.size();
-        final ItemUsersItemUser[] itemUsersRow = new ItemUsersItemUser[size];
+        final PurchaseAddEditItemUsersUser[] itemUsersRow = new PurchaseAddEditItemUsersUser[size];
         for (int i = 0; i < size; i++) {
             final Identity identity = mIdentities.get(i);
             if (identities.contains(identity)) {
-                itemUsersRow[i] = new ItemUsersItemUser(identity.getObjectId(), identity.getNickname(),
+                itemUsersRow[i] = new PurchaseAddEditItemUsersUser(identity.getObjectId(), identity.getNickname(),
                         identity.getAvatarUrl(), true);
             } else {
-                itemUsersRow[i] = new ItemUsersItemUser(identity.getObjectId(), identity.getNickname(),
+                itemUsersRow[i] = new PurchaseAddEditItemUsersUser(identity.getObjectId(), identity.getNickname(),
                         identity.getAvatarUrl(), false);
             }
         }
@@ -462,7 +462,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
     }
 
     @Override
-    public void onItemDismissed(int position) {
+    public void onItemDismiss(int position) {
         mItems.remove(position);
         if (getItemViewType(position) != Type.USERS) {
             mView.notifyItemRemoved(position);
@@ -516,7 +516,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
     @Override
     public void setOcrStream(@NonNull final Single<OcrPurchase> single,
                              @NonNull final String workerTag) {
-        final ItemItem.PriceChangedListener priceListener = this;
+        final PurchaseAddEditItem.PriceChangedListener priceListener = this;
 
         getSubscriptions().add(single.subscribe(new SingleSubscriber<OcrPurchase>() {
             @Override
@@ -529,12 +529,12 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
                 final List<OcrItem> ocrItems = ocrPurchase.getItems();
                 for (OcrItem ocrItem : ocrItems) {
                     final String price = mMoneyFormatter.format(ocrItem.getPrice());
-                    final ItemItem itemItem = new ItemItem(ocrItem.getName(), price,
+                    final PurchaseAddEditItem purchaseAddEditItem = new PurchaseAddEditItem(ocrItem.getName(), price,
                             getItemUsersItemUsers(mIdentities));
-                    itemItem.setMoneyFormatter(mMoneyFormatter);
-                    itemItem.setPriceChangedListener(priceListener);
-                    mItems.add(itemItem);
-                    mView.notifyItemInserted(mItems.indexOf(itemItem));
+                    purchaseAddEditItem.setMoneyFormatter(mMoneyFormatter);
+                    purchaseAddEditItem.setPriceChangedListener(priceListener);
+                    mItems.add(purchaseAddEditItem);
+                    mView.notifyItemInserted(mItems.indexOf(purchaseAddEditItem));
                 }
 
                 setLoading(false);
@@ -683,13 +683,13 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
     private boolean validateItems() {
         boolean hasItem = false;
         boolean allValid = true;
-        for (AddEditItem addEditItem : mItems) {
+        for (PurchaseAddEditBaseItem addEditItem : mItems) {
             if (addEditItem.getType() != Type.ITEM) {
                 continue;
             }
 
             hasItem = true;
-            final ItemItem itemRow = (ItemItem) addEditItem;
+            final PurchaseAddEditItem itemRow = (PurchaseAddEditItem) addEditItem;
             if (!itemRow.validateFields()) {
                 allValid = false;
             }
@@ -708,12 +708,12 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
         final List<Item> purchaseItems = new ArrayList<>();
         final int fractionDigits = MoneyUtils.getFractionDigits(mCurrency);
 
-        for (AddEditItem addEditItem : mItems) {
+        for (PurchaseAddEditBaseItem addEditItem : mItems) {
             if (addEditItem.getType() != Type.ITEM) {
                 continue;
             }
 
-            final ItemItem itemRow = (ItemItem) addEditItem;
+            final PurchaseAddEditItem itemRow = (PurchaseAddEditItem) addEditItem;
             final String rowItemName = itemRow.getName();
             final String name = rowItemName != null ? rowItemName : "";
             final String price = itemRow.getPrice();
@@ -758,7 +758,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
     }
 
     @NonNull
-    private List<Identity> getIdentities(@NonNull ItemUsersItemUser[] itemUsersRows) {
+    private List<Identity> getIdentities(@NonNull PurchaseAddEditItemUsersUser[] itemUsersRows) {
         final List<Identity> identities = new ArrayList<>();
         for (int i = 0, length = itemUsersRows.length; i < length; i++) {
             if (itemUsersRows[i].isSelected()) {
@@ -889,7 +889,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
 
     @Override
     public void onToggleUsersClick(int position) {
-        final AddEditItem addEditItem = mItems.get(position);
+        final PurchaseAddEditBaseItem addEditItem = mItems.get(position);
         final int insertPos = position + 1;
         if (mItems.size() < insertPos) {
             expandItemRow(insertPos, addEditItem);
@@ -905,9 +905,9 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
         mView.notifyItemRemoved(pos);
     }
 
-    private void expandItemRow(int pos, AddEditItem parent) {
-        final ItemItem itemItem = (ItemItem) parent;
-        mItems.add(pos, new ItemUsersItem(itemItem.getUsers()));
+    private void expandItemRow(int pos, PurchaseAddEditBaseItem parent) {
+        final PurchaseAddEditItem purchaseAddEditItem = (PurchaseAddEditItem) parent;
+        mItems.add(pos, new PurchaseAddEditItemUsers(purchaseAddEditItem.getUsers()));
         mView.notifyItemInserted(pos);
 
         collapseOtherItemRows(pos);
@@ -915,7 +915,7 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
 
     private void collapseOtherItemRows(int insertPos) {
         int pos = 0;
-        for (Iterator<AddEditItem> iterator = mItems.iterator(); iterator.hasNext(); ) {
+        for (Iterator<PurchaseAddEditBaseItem> iterator = mItems.iterator(); iterator.hasNext(); ) {
             final int type = iterator.next().getType();
             if (type == Type.USERS && pos != insertPos) {
                 iterator.remove();
@@ -928,10 +928,10 @@ public class PurchaseAddEditViewModelAddImpl extends ListViewModelBaseImpl<AddEd
 
     @Override
     public void onAddRowClick(int position) {
-        final ItemItem itemItem = new ItemItem(getItemUsersItemUsers(mIdentities));
-        itemItem.setMoneyFormatter(mMoneyFormatter);
-        itemItem.setPriceChangedListener(this);
-        mItems.add(position, itemItem);
+        final PurchaseAddEditItem purchaseAddEditItem = new PurchaseAddEditItem(getItemUsersItemUsers(mIdentities));
+        purchaseAddEditItem.setMoneyFormatter(mMoneyFormatter);
+        purchaseAddEditItem.setPriceChangedListener(this);
+        mItems.add(position, purchaseAddEditItem);
         mView.notifyItemInserted(position);
         mView.scrollToPosition(position + 1);
     }

@@ -18,7 +18,7 @@ import android.view.View;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import ch.giantific.qwittig.LocalBroadcast;
+import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivityPurchaseDetailsBinding;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;

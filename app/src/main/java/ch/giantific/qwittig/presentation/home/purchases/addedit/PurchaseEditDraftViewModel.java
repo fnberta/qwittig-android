@@ -5,7 +5,7 @@
 package ch.giantific.qwittig.presentation.home.purchases.addedit;
 
 /**
- * Created by fabio on 29.01.16.
+ * Defines an observable view model for the edit draft screen.
  */
 public interface PurchaseEditDraftViewModel extends PurchaseAddEditViewModel {
 

@@ -14,11 +14,11 @@ import com.parse.ParseFile;
 
 import javax.inject.Inject;
 
-import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
+import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;
 
@@ -70,6 +70,7 @@ public class PurchaseSaveWorker extends BaseWorker<Purchase, PurchaseSaveWorkerL
         PurchaseSaveWorker worker = (PurchaseSaveWorker) fm.findFragmentByTag(WORKER_TAG);
         if (worker == null) {
             worker = new PurchaseSaveWorker(purchase, receiptImage);
+
             fm.beginTransaction()
                     .add(worker, WORKER_TAG)
                     .commit();

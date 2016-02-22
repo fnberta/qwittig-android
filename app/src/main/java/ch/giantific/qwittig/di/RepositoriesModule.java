@@ -28,7 +28,7 @@ import dagger.Module;
 import dagger.Provides;
 
 /**
- * Created by fabio on 12.01.16.
+ * Defines which implementations to use for the repository interfaces and how to instantiate them.
  */
 @Module
 public class RepositoriesModule {

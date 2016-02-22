@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
 import com.google.android.gms.common.ConnectionResult;
 
 /**
- * Created by fabio on 10.02.16.
+ * Defines an exception thrown when the connection to Google's servers failed.
  */
 public class GoogleApiConnectionException extends RuntimeException {
 

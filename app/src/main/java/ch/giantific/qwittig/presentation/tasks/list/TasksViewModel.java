@@ -25,6 +25,9 @@ public interface TasksViewModel extends OnlineListViewModel<ListItem>,
 
     void onDeadlineSelected(@NonNull AdapterView<?> parent, View view, int position, long id);
 
+    /**
+     * Defines the interaction with the attached view.
+     */
     interface ViewListener extends OnlineListViewModel.ViewListener {
         void loadUpdateTasksWorker();
 

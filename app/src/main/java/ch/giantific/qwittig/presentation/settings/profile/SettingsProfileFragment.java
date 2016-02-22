@@ -30,11 +30,11 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import ch.berta.fabio.fabprogress.FabProgress;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentSettingsProfileBinding;
+import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.presentation.settings.profile.di.DaggerSettingsProfileComponent;
 import ch.giantific.qwittig.presentation.settings.profile.di.SettingsProfileViewModelModule;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
-import ch.giantific.qwittig.utils.AvatarUtils;
 import rx.Single;
 import rx.SingleSubscriber;
 
@@ -179,9 +179,9 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileViewMod
                 Glide.with(frag)
                         .load(avatar)
                         .asBitmap()
-                        .toBytes(Bitmap.CompressFormat.JPEG, AvatarUtils.JPEG_COMPRESSION_RATE)
+                        .toBytes(Bitmap.CompressFormat.JPEG, IdentityRepository.JPEG_COMPRESSION_RATE)
                         .centerCrop()
-                        .into(new SimpleTarget<byte[]>(AvatarUtils.WIDTH, AvatarUtils.HEIGHT) {
+                        .into(new SimpleTarget<byte[]>(IdentityRepository.WIDTH, IdentityRepository.HEIGHT) {
                             @Override
                             public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
                                 if (!singleSubscriber.isUnsubscribed()) {

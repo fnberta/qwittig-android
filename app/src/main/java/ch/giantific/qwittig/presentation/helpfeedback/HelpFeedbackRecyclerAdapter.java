@@ -13,10 +13,10 @@ import android.view.ViewGroup;
 import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
 import ch.giantific.qwittig.databinding.RowHelpFeedbackBinding;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.helpfeedback.items.ActionItem;
-import ch.giantific.qwittig.presentation.helpfeedback.items.HeaderItem;
 import ch.giantific.qwittig.presentation.helpfeedback.items.HelpFeedbackItem;
-import ch.giantific.qwittig.presentation.helpfeedback.items.HelpFeedbackItem.Type;
+import ch.giantific.qwittig.presentation.helpfeedback.items.HelpFeedbackHeaderItem;
+import ch.giantific.qwittig.presentation.helpfeedback.items.HelpFeedbackBaseItem;
+import ch.giantific.qwittig.presentation.helpfeedback.items.HelpFeedbackBaseItem.Type;
 
 /**
  * Handles the display of help and feedback items.
@@ -61,7 +61,7 @@ public class HelpFeedbackRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        final HelpFeedbackItem item = mViewModel.getItemAtPosition(position);
+        final HelpFeedbackBaseItem item = mViewModel.getItemAtPosition(position);
 
         int viewType = getItemViewType(position);
         switch (viewType) {
@@ -69,7 +69,7 @@ public class HelpFeedbackRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
                 final ItemRow itemRow = (ItemRow) viewHolder;
                 final RowHelpFeedbackBinding binding = itemRow.getBinding();
 
-                binding.setItem((ActionItem) item);
+                binding.setItem((HelpFeedbackItem) item);
                 binding.executePendingBindings();
                 break;
             }
@@ -78,7 +78,7 @@ public class HelpFeedbackRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
                         (BindingRow<RowGenericHeaderBinding>) viewHolder;
                 final RowGenericHeaderBinding binding = headerRow.getBinding();
 
-                binding.setViewModel((HeaderItem) item);
+                binding.setViewModel((HelpFeedbackHeaderItem) item);
                 binding.executePendingBindings();
                 break;
             }

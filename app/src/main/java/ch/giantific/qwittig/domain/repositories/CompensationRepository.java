@@ -33,6 +33,7 @@ public interface CompensationRepository extends BaseRepository {
      * Queries the local data store for unpaid compensations.
      *
      * @param currentIdentity the current user
+     * @return a {@link Observable} emitting the results
      */
     Observable<Compensation> getCompensationsLocalUnpaidAsync(@NonNull Identity currentIdentity);
 
@@ -41,6 +42,7 @@ public interface CompensationRepository extends BaseRepository {
      * buyer or the beneficiary.
      *
      * @param currentIdentity the current user
+     * @return a {@link Observable} emitting the results
      */
     Observable<Compensation> getCompensationsLocalPaidAsync(@NonNull Identity currentIdentity);
 
@@ -48,7 +50,7 @@ public interface CompensationRepository extends BaseRepository {
      * Saves a {@link Compensation} object to the online and offline storage
      *
      * @param compensation the compensation to save
-     * @return a {@link Single} emitting the save stream
+     * @return a {@link Single} emitting the result
      */
     Single<Compensation> saveCompensationAsync(@NonNull Compensation compensation);
 
@@ -64,7 +66,8 @@ public interface CompensationRepository extends BaseRepository {
      * Updates all unpaid compensations in the local data store by deleting all compensations from the
      * local data store, querying and saving new ones.
      *
-     * @param identities      all identities from the current user
+     * @param identities all identities from the current user
+     * @return a {@link Observable} emitting the results
      */
     Observable<Compensation> updateCompensationsUnpaidAsync(@NonNull List<Identity> identities);
 
@@ -74,6 +77,7 @@ public interface CompensationRepository extends BaseRepository {
      *
      * @param currentIdentity the current identity
      * @param identities      all identities from the current user
+     * @return a {@link Observable} emitting the results
      */
     Observable<Compensation> updateCompensationsPaidAsync(@NonNull Identity currentIdentity,
                                                           @NonNull List<Identity> identities);
@@ -83,6 +87,7 @@ public interface CompensationRepository extends BaseRepository {
      *
      * @param currentIdentity the group for which to get compensations for
      * @param skip            the number of compensations to skip for the query
+     * @return a {@link Observable} emitting the results
      */
     Observable<Compensation> getCompensationsPaidOnlineAsync(@NonNull Identity currentIdentity, int skip);
 
@@ -106,6 +111,12 @@ public interface CompensationRepository extends BaseRepository {
     @Nullable
     Boolean updateCompensation(@NonNull String compensationId, boolean isNew);
 
+    /**
+     * Marks the compensation as paid and saves it to the offline and online data stores.
+     *
+     * @param compensation the compensation to save
+     * @return a {@link Single} emitting the result
+     */
     Single<Compensation> saveCompensationPaid(@NonNull Compensation compensation);
 
     /**
@@ -113,6 +124,7 @@ public interface CompensationRepository extends BaseRepository {
      *
      * @param compensationId the object id of the compensation that needs to be paid
      * @param currencyCode   the currency code to format the price in the push notification
+     * @return a {@link Single} emitting the result
      */
     Single<String> pushCompensationReminder(@NonNull String compensationId,
                                             @NonNull String currencyCode);

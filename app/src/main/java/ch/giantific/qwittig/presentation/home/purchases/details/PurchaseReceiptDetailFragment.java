@@ -8,10 +8,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import ch.giantific.qwittig.Qwittig;
-import ch.giantific.qwittig.presentation.home.purchases.common.di.DaggerPurchaseReceiptIdComponent;
-import ch.giantific.qwittig.presentation.home.purchases.common.di.PurchaseReceiptIdViewModelModule;
 import ch.giantific.qwittig.presentation.home.purchases.common.PurchaseReceiptBaseFragment;
 import ch.giantific.qwittig.presentation.home.purchases.common.PurchaseReceiptViewModel;
+import ch.giantific.qwittig.presentation.home.purchases.common.di.DaggerPurchaseReceiptIdComponent;
+import ch.giantific.qwittig.presentation.home.purchases.common.di.PurchaseReceiptIdViewModelModule;
 
 
 /**

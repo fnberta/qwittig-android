@@ -12,7 +12,7 @@ import android.view.View;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 
 /**
- * Created by fabio on 22.01.16.
+ * Defines an observable view model for the home screen.
  */
 public interface HomeViewModel extends ViewModel,
         JoinGroupDialogFragment.DialogInteractionListener,
@@ -31,6 +31,9 @@ public interface HomeViewModel extends ViewModel,
 
     void onFabAddPurchaseAutoClick(View view);
 
+    /**
+     * Defines the interaction with the attached view.
+     */
     interface ViewListener extends ViewModel.ViewListener {
         void startPurchaseAddActivity(boolean autoMode);
 

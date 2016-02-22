@@ -8,7 +8,7 @@ import android.databinding.Bindable;
 import android.databinding.Observable;
 
 /**
- * Created by fabio on 24.01.16.
+ * Defines the view model for a store row in the add or edit purchase screen.
  */
 public interface PurchaseAddEditStoreRowViewModel extends Observable {
 

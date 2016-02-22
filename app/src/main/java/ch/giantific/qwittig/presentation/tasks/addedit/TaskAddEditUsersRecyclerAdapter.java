@@ -49,12 +49,12 @@ public class TaskAddEditUsersRecyclerAdapter extends RecyclerView.Adapter<TaskAd
     @Override
     public void onBindViewHolder(TaskUserInvolvedRow holder, int position) {
         final RowTaskAddEditUserBinding binding = holder.getBinding();
-        final TaskAddEditUserViewModel viewModel = binding.getViewModel();
+        final TaskAddEditIdentityViewModel viewModel = binding.getViewModel();
 
         final Identity identity = mViewModel.getIdentityAtPosition(position);
         final float userAlpha = mViewModel.isUserAtPositionInvolved(position) ? 1f : DISABLED_ALPHA;
         if (viewModel == null) {
-            binding.setViewModel(new TaskAddEditUserViewModel(identity, userAlpha, false));
+            binding.setViewModel(new TaskAddEditIdentityViewModel(identity, userAlpha, false));
         } else {
             viewModel.updateIdentity(identity, userAlpha, false);
         }

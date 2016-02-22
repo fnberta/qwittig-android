@@ -11,7 +11,7 @@ import android.support.annotation.Nullable;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 
 /**
- * Created by fabio on 16.01.16.
+ * Provides an abstract base class for modules defining the instantiation of view models.
  */
 public abstract class BaseViewModelModule<T extends ViewModel.ViewListener> {
 

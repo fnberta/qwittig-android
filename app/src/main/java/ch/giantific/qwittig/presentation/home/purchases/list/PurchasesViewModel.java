@@ -11,7 +11,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.LoadMoreViewModel;
 import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModel;
 
 /**
- * Created by fabio on 21.01.16.
+ * Defines an observable view model for list of purchases screen.
  */
 public interface PurchasesViewModel extends OnlineListViewModel<Purchase>,
         PurchasesRecyclerAdapter.AdapterInteractionListener,
@@ -20,6 +20,9 @@ public interface PurchasesViewModel extends OnlineListViewModel<Purchase>,
     int TYPE_ITEM = 0;
     int TYPE_PROGRESS = 1;
 
+    /**
+     * Defines the interaction with the attached view.
+     */
     interface ViewListener extends OnlineListViewModel.ViewListener {
 
         void loadUpdatePurchasesWorker();

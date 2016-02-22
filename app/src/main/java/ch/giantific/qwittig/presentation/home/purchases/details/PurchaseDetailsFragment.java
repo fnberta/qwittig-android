@@ -23,12 +23,12 @@ import android.view.ViewGroup;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentPurchaseDetailsBinding;
-import ch.giantific.qwittig.presentation.home.purchases.details.di.DaggerPurchaseDetailsComponent;
-import ch.giantific.qwittig.presentation.home.purchases.details.di.PurchaseDetailsViewModelModule;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseEditActivity;
+import ch.giantific.qwittig.presentation.home.purchases.details.di.DaggerPurchaseDetailsComponent;
+import ch.giantific.qwittig.presentation.home.purchases.details.di.PurchaseDetailsViewModelModule;
 
 import static ch.giantific.qwittig.presentation.home.purchases.list.PurchasesFragment.INTENT_PURCHASE_ID;
 

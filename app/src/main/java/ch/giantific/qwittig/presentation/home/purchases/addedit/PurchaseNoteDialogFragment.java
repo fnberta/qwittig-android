@@ -5,7 +5,6 @@
 package ch.giantific.qwittig.presentation.home.purchases.addedit;
 
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -28,7 +27,7 @@ import ch.giantific.qwittig.presentation.common.fragments.BaseDialogFragment;
  * Therefore overrides the default positive button onClickListener because the default behaviour is
  * to always call dismiss().
  * <p/>
- * Subclass of {@link DialogFragment}.
+ * Subclass of {@link BaseDialogFragment}.
  */
 public class PurchaseNoteDialogFragment extends BaseDialogFragment<PurchaseNoteDialogFragment.DialogInteractionListener> {
 

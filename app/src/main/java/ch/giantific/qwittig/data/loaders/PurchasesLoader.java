@@ -20,7 +20,9 @@ import rx.Observable;
 import rx.functions.Func1;
 
 /**
- * Created by fabio on 15.02.16.
+ * Gets the purchases from the local data store and sends them as the result.
+ * <p/>
+ * Subclass of {@link BaseRxLoader}.
  */
 public class PurchasesLoader extends BaseRxLoader<Purchase> {
 

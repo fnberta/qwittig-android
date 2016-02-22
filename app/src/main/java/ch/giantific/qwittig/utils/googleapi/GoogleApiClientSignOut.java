@@ -16,7 +16,7 @@ import rx.Single;
 import rx.SingleSubscriber;
 
 /**
- * Created by fabio on 10.02.16.
+ * Provides a reactive GoogleApiClient for signing out users from their google account for the app.
  */
 public class GoogleApiClientSignOut extends BaseGoogleApiClientSingle<Void> {
 

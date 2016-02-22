@@ -10,7 +10,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.LoadingViewModel;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 
 /**
- * Created by fabio on 29.01.16.
+ * Defines an observable view model for the purchase receipt screen.
  */
 public interface PurchaseReceiptViewModel extends ViewModel,
         LoadingViewModel {
@@ -19,6 +19,9 @@ public interface PurchaseReceiptViewModel extends ViewModel,
 
     void onReceiptImageCaptured();
 
+    /**
+     * Defines the interaction with the attached view.
+     */
     interface ViewListener extends ViewModel.ViewListener {
 
         void setReceiptImage(@NonNull String receiptImagePath);

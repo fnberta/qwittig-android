@@ -14,9 +14,10 @@ import rx.Single;
  */
 public interface RatesWorkerListener extends BaseWorkerListener {
     /**
-     * Sets the exchange rate fetch observable.
+     * Sets the exchange rate fetch result stream.
      *
-     * @param single the observable that fetches the currency exchange rates
+     * @param single    the {@link Single} that emits the results
+     * @param workerTag the tag of the worker fragment
      */
     void setRateFetchStream(@NonNull Single<Float> single,
                             @NonNull String workerTag);

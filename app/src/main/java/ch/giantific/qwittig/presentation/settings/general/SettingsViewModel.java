@@ -15,7 +15,7 @@ import ch.giantific.qwittig.presentation.common.fragments.ConfirmationDialogFrag
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 
 /**
- * Created by fabio on 10.02.16.
+ * Defines an observable view model for the main settings screen.
  */
 public interface SettingsViewModel extends ViewModel,
         ConfirmationDialogFragment.DialogInteractionListener,
@@ -42,6 +42,9 @@ public interface SettingsViewModel extends ViewModel,
         int GROUP_CHANGED = 4;
     }
 
+    /**
+     * Defines the interaction with the attached view.
+     */
     interface ViewListener extends ViewModel.ViewListener {
 
         void setupGroupSelection(@NonNull CharSequence[] entries, @NonNull CharSequence[] values,

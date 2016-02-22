@@ -20,7 +20,7 @@ import rx.Single;
 import rx.SingleSubscriber;
 
 /**
- * Created by fabio on 22.01.16.
+ * Provides an implementation of the {@link HomeViewModel}.
  */
 public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListener>
         implements HomeViewModel {

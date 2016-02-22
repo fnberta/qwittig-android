@@ -20,7 +20,7 @@ import rx.Single;
 import rx.SingleSubscriber;
 
 /**
- * Created by fabio on 05.02.16.
+ * Provides an implementation of the {@link LoginEmailViewModel}.
  */
 public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewModel.ViewListener>
         implements LoginEmailViewModel {
@@ -38,7 +38,6 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
                                    @NonNull LoginEmailViewModel.ViewListener view,
                                    @NonNull UserRepository userRepository) {
         super(savedState, view, userRepository);
-
 
 
         if (savedState != null) {

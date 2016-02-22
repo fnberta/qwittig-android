@@ -12,7 +12,7 @@ import ch.giantific.qwittig.presentation.home.purchases.details.PurchaseReceiptD
 import dagger.Component;
 
 /**
- * Created by fabio on 12.01.16.
+ * Provides the dependencies for the purchase receipt screen.
  */
 @PerFragment
 @Component(dependencies = {ApplicationComponent.class},

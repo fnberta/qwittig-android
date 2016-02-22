@@ -24,11 +24,6 @@ import ch.giantific.qwittig.R;
  */
 public class AvatarUtils {
 
-    public static final String FILE_NAME = "avatar.jpg";
-    public static final int JPEG_COMPRESSION_RATE = 60;
-    public static final int HEIGHT = 720;
-    public static final int WIDTH = 720;
-
     private AvatarUtils() {
         // class cannot be instantiated
     }

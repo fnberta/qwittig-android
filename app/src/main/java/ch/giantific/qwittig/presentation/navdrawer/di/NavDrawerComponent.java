@@ -14,7 +14,7 @@ import ch.giantific.qwittig.presentation.tasks.list.TasksActivity;
 import dagger.Component;
 
 /**
- * Created by fabio on 12.01.16.
+ * Provides the dependencies for the navigation drawer.
  */
 @PerActivity
 @Component(modules = {NavDrawerViewModelModule.class, RepositoriesModule.class})

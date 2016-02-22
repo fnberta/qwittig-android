@@ -15,7 +15,7 @@ import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 
 /**
- * Created by fabio on 10.01.16.
+ * Provides an abstract base implementation of the {@link OnlineListViewModel}.
  */
 public abstract class OnlineListViewModelBaseImpl<T, S extends OnlineListViewModel.ViewListener>
         extends ListViewModelBaseImpl<T, S>

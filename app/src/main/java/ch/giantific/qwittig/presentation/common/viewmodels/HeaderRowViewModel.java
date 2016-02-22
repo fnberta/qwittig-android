@@ -9,7 +9,7 @@ import android.databinding.Observable;
 import android.support.annotation.StringRes;
 
 /**
- * Created by fabio on 30.01.16.
+ * Defines an observable view model for a header row in a list.
  */
 public interface HeaderRowViewModel extends Observable {
 

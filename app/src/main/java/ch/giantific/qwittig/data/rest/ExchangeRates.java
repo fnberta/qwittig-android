@@ -13,9 +13,10 @@ import rx.Single;
  */
 public interface ExchangeRates {
     /**
-     * Makes a GET call to the server to fetch the currency rates
+     * Makes a GET call to the server to fetch the currency rates.
      *
      * @param baseCurrency the base currency to base the rates on
+     * @return the result as an {@link Single}
      */
     @GET("/latest")
     Single<CurrencyRates> getRates(@Query("base") String baseCurrency);

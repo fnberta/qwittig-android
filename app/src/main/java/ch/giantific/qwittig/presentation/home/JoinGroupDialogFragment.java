@@ -5,7 +5,6 @@
 package ch.giantific.qwittig.presentation.home;
 
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,7 +17,7 @@ import ch.giantific.qwittig.presentation.common.fragments.BaseDialogFragment;
 /**
  * Provides a dialog that asks the user if he wants to join a specific group he was invited to.
  * <p/>
- * Subclass of {@link DialogFragment}.
+ * Subclass of {@link BaseDialogFragment}.
  */
 public class JoinGroupDialogFragment extends BaseDialogFragment<JoinGroupDialogFragment.DialogInteractionListener> {
 

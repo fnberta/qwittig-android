@@ -43,8 +43,8 @@ import java.util.Map;
 
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
+import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.utils.AvatarUtils;
 import ch.giantific.qwittig.utils.googleapi.GoogleApiClientSignOut;
 import ch.giantific.qwittig.utils.googleapi.GoogleApiClientUnlink;
 import ch.giantific.qwittig.utils.parse.ParseInstallationUtils;
@@ -296,9 +296,9 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                         Glide.with(fragment)
                                 .load(pictureUrl)
                                 .asBitmap()
-                                .toBytes(Bitmap.CompressFormat.JPEG, AvatarUtils.JPEG_COMPRESSION_RATE)
+                                .toBytes(Bitmap.CompressFormat.JPEG, IdentityRepository.JPEG_COMPRESSION_RATE)
                                 .centerCrop()
-                                .into(new SimpleTarget<byte[]>(AvatarUtils.WIDTH, AvatarUtils.HEIGHT) {
+                                .into(new SimpleTarget<byte[]>(IdentityRepository.WIDTH, IdentityRepository.HEIGHT) {
                                     @Override
                                     public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
                                         if (!singleSubscriber.isUnsubscribed()) {
@@ -320,7 +320,7 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                 .flatMap(new Func1<byte[], Single<? extends ParseFile>>() {
                     @Override
                     public Single<? extends ParseFile> call(byte[] bytes) {
-                        final ParseFile avatar = new ParseFile(AvatarUtils.FILE_NAME, bytes);
+                        final ParseFile avatar = new ParseFile(IdentityRepository.FILE_NAME, bytes);
                         return saveFile(avatar);
                     }
                 });
@@ -415,9 +415,9 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                         Glide.with(fragment)
                                 .load(photoUrl)
                                 .asBitmap()
-                                .toBytes(Bitmap.CompressFormat.JPEG, AvatarUtils.JPEG_COMPRESSION_RATE)
+                                .toBytes(Bitmap.CompressFormat.JPEG, IdentityRepository.JPEG_COMPRESSION_RATE)
                                 .centerCrop()
-                                .into(new SimpleTarget<byte[]>(AvatarUtils.WIDTH, AvatarUtils.HEIGHT) {
+                                .into(new SimpleTarget<byte[]>(IdentityRepository.WIDTH, IdentityRepository.HEIGHT) {
                                     @Override
                                     public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
                                         if (!singleSubscriber.isUnsubscribed()) {
@@ -439,7 +439,7 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                 .flatMap(new Func1<byte[], Single<? extends ParseFile>>() {
                     @Override
                     public Single<? extends ParseFile> call(byte[] bytes) {
-                        final ParseFile avatar = new ParseFile(AvatarUtils.FILE_NAME, bytes);
+                        final ParseFile avatar = new ParseFile(IdentityRepository.FILE_NAME, bytes);
                         return saveFile(avatar);
                     }
                 });

@@ -24,13 +24,13 @@ import rx.Subscriber;
 import rx.functions.Func1;
 
 /**
- * Created by fabio on 12.01.16.
+ * Provides an implementation of the {@link NavDrawerViewModel}.
  */
 public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel.ViewListener>
         implements NavDrawerViewModel {
 
     private final IdentityRepository mIdentityRepo;
-    private List<Identity> mIdentities = new ArrayList<>();
+    private final List<Identity> mIdentities = new ArrayList<>();
 
     public NavDrawerViewModelImpl(@Nullable Bundle savedState,
                                   @NonNull NavDrawerViewModel.ViewListener view,
@@ -42,8 +42,8 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onScreenVisible() {
+        super.onScreenVisible();
 
         if (mCurrentUser != null) {
             loadIdentities();

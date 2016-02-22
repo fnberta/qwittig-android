@@ -19,7 +19,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.SingleSubscriber;
 
 /**
- * Created by fabio on 29.01.16.
+ * Provides an implementation of the {@link PurchaseReceiptViewModel}.
  */
 public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseReceiptViewModel.ViewListener>
         implements PurchaseReceiptViewModel {
@@ -80,8 +80,8 @@ public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseRece
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onScreenVisible() {
+        super.onScreenVisible();
 
         loadReceipt();
     }

@@ -11,14 +11,17 @@ import android.support.v4.app.FragmentManager;
 
 import javax.inject.Inject;
 
-import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
+import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.presentation.common.workers.BaseQueryWorker;
 import rx.Observable;
 
 /**
- * Created by fabio on 13.01.16.
+ * Provides a headless fragment that performs an online query for purchases in order to provide
+ * infinite scrolling in the list of purchases screen.
+ * <p/>
+ * Subclass of {@link BaseQueryWorker}.
  */
 public class PurchasesQueryMoreWorker extends BaseQueryWorker<Purchase, PurchasesQueryMoreWorkerListener> {
 
@@ -38,21 +41,17 @@ public class PurchasesQueryMoreWorker extends BaseQueryWorker<Purchase, Purchase
     public static PurchasesQueryMoreWorker attach(@NonNull FragmentManager fm, int skip) {
         PurchasesQueryMoreWorker worker = (PurchasesQueryMoreWorker) fm.findFragmentByTag(WORKER_TAG);
         if (worker == null) {
-            worker = PurchasesQueryMoreWorker.newInstance(skip);
+            worker = new PurchasesQueryMoreWorker();
+            final Bundle args = new Bundle();
+            args.putInt(KEY_SKIP, skip);
+            worker.setArguments(args);
+
             fm.beginTransaction()
                     .add(worker, WORKER_TAG)
                     .commit();
         }
 
         return worker;
-    }
-
-    private static PurchasesQueryMoreWorker newInstance(int skip) {
-        PurchasesQueryMoreWorker fragment = new PurchasesQueryMoreWorker();
-        Bundle args = new Bundle();
-        args.putInt(KEY_SKIP, skip);
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override
@@ -68,7 +67,7 @@ public class PurchasesQueryMoreWorker extends BaseQueryWorker<Purchase, Purchase
     @Nullable
     @Override
     protected Observable<Purchase> getObservable(@NonNull Bundle args) {
-        if (setUserInfo()) {
+        if (checkIdentities()) {
             final int skip = args.getInt(KEY_SKIP, 0);
             return mPurchaseRepo.getPurchasesOnlineAsync(mCurrentIdentity, skip);
         }

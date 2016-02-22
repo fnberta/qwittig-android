@@ -26,7 +26,7 @@ import rx.Subscriber;
 import rx.functions.Func1;
 
 /**
- * Created by fabio on 21.01.16.
+ * Provides an implementation of the {@link PurchasesViewModel}.
  */
 public class PurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purchase, PurchasesViewModel.ViewListener>
         implements PurchasesViewModel {

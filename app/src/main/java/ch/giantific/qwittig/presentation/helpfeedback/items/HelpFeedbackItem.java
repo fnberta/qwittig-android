@@ -4,24 +4,74 @@
 
 package ch.giantific.qwittig.presentation.helpfeedback.items;
 
-import android.os.Parcelable;
-import android.support.annotation.IntDef;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
+import android.os.Parcel;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.StringRes;
 
 /**
  * Represents a help item with a title and an icon, both referencing android resources.
  */
-public interface HelpFeedbackItem extends Parcelable {
+public class HelpFeedbackItem extends BaseObservable implements HelpFeedbackBaseItem {
 
-    @Type
-    int getType();
+    public static final Creator<HelpFeedbackItem> CREATOR = new Creator<HelpFeedbackItem>() {
+        @Override
+        public HelpFeedbackItem createFromParcel(Parcel source) {
+            return new HelpFeedbackItem(source);
+        }
 
-    @IntDef({Type.HELP_FEEDBACK, Type.HEADER})
-    @Retention(RetentionPolicy.SOURCE)
-    @interface Type {
-        int HEADER = 0;
-        int HELP_FEEDBACK = 1;
+        @Override
+        public HelpFeedbackItem[] newArray(int size) {
+            return new HelpFeedbackItem[size];
+        }
+    };
+    @StringRes
+    private int mTitle;
+    @DrawableRes
+    private int mIcon;
+
+    public HelpFeedbackItem(@StringRes int title, @DrawableRes int icon) {
+        mTitle = title;
+        mIcon = icon;
+    }
+
+    private HelpFeedbackItem(Parcel in) {
+        mTitle = in.readInt();
+        mIcon = in.readInt();
+    }
+
+    @Bindable
+    public int getTitle() {
+        return mTitle;
+    }
+
+    public void setTitle(@StringRes int title) {
+        mTitle = title;
+    }
+
+    @Bindable
+    public int getIcon() {
+        return mIcon;
+    }
+
+    public void setIcon(@DrawableRes int icon) {
+        mIcon = icon;
+    }
+
+    @Override
+    public int getType() {
+        return Type.HELP_FEEDBACK;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(mTitle);
+        dest.writeInt(mIcon);
     }
 }

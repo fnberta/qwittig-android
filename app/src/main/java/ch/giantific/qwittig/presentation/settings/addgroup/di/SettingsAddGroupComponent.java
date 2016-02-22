@@ -10,7 +10,7 @@ import ch.giantific.qwittig.presentation.settings.addgroup.SettingsAddGroupFragm
 import dagger.Component;
 
 /**
- * Created by fabio on 12.01.16.
+ * Provides the dependencies for the add new group settings screen.
  */
 @PerFragment
 @Component(modules = {SettingsAddGroupViewModelModule.class, RepositoriesModule.class})

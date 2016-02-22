@@ -4,20 +4,19 @@
 
 package ch.giantific.qwittig.presentation.home.purchases.addedit;
 
-import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
-
 
 import java.io.File;
 
 import javax.inject.Inject;
 
+import ch.giantific.qwittig.data.rest.OcrPurchase;
 import ch.giantific.qwittig.data.rest.ReceiptOcr;
 import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
-import ch.giantific.qwittig.data.rest.OcrPurchase;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -54,7 +53,10 @@ public class OcrWorker extends BaseWorker<OcrPurchase, OcrWorkerListener> {
     public static OcrWorker attach(@NonNull FragmentManager fm, @NonNull String receiptPath) {
         OcrWorker worker = (OcrWorker) fm.findFragmentByTag(WORKER_TAG);
         if (worker == null) {
-            worker = OcrWorker.newInstance(receiptPath);
+            worker = new OcrWorker();
+            final Bundle args = new Bundle();
+            args.putString(KEY_RECEIPT_PATH, receiptPath);
+            worker.setArguments(args);
 
             fm.beginTransaction()
                     .add(worker, WORKER_TAG)
@@ -62,15 +64,6 @@ public class OcrWorker extends BaseWorker<OcrPurchase, OcrWorkerListener> {
         }
 
         return worker;
-    }
-
-    @NonNull
-    private static OcrWorker newInstance(@NonNull String receiptPath) {
-        OcrWorker fragment = new OcrWorker();
-        Bundle args = new Bundle();
-        args.putString(KEY_RECEIPT_PATH, receiptPath);
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override

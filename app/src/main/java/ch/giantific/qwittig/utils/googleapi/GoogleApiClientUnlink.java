@@ -16,7 +16,7 @@ import rx.Single;
 import rx.SingleSubscriber;
 
 /**
- * Created by fabio on 10.02.16.
+ * Provides a reactive GoogleApiClient for un-linking a user's Google account from the app.
  */
 public class GoogleApiClientUnlink extends BaseGoogleApiClientSingle<Void> {
 

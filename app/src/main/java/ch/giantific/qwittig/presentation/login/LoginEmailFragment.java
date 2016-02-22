@@ -5,6 +5,7 @@
 package ch.giantific.qwittig.presentation.login;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -28,10 +29,10 @@ import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentLoginEmailBinding;
-import ch.giantific.qwittig.presentation.login.di.DaggerLoginEmailComponent;
-import ch.giantific.qwittig.presentation.login.di.LoginEmailViewModelModule;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.fragments.EmailPromptDialogFragment;
+import ch.giantific.qwittig.presentation.login.di.DaggerLoginEmailComponent;
+import ch.giantific.qwittig.presentation.login.di.LoginEmailViewModelModule;
 import ch.giantific.qwittig.utils.ViewUtils;
 
 /**
@@ -223,6 +224,9 @@ public class LoginEmailFragment extends BaseFragment<LoginEmailViewModel, LoginE
         ActivityCompat.finishAfterTransition(activity);
     }
 
+    /**
+     * Defines the interaction with the hosting {@link Activity}.
+     */
     public interface ActivityListener extends BaseFragment.ActivityListener {
         void setEmailViewModel(@NonNull LoginEmailViewModel viewModel);
     }

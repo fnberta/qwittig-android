@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
 import com.google.android.gms.common.api.Status;
 
 /**
- * Created by fabio on 10.02.16.
+ * Defines an exception thrown when the authentication with Google's servers failed.
  */
 public class GoogleAuthStatusException extends RuntimeException {
 

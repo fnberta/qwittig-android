@@ -13,7 +13,7 @@
 
         <variable
             name="item"
-            type="ch.giantific.qwittig.presentation.helpfeedback.items.ActionItem"
+            type="ch.giantific.qwittig.presentation.helpfeedback.items.HelpFeedbackItem"
             />
     </data>
 

@@ -13,7 +13,7 @@
 
         <variable
             name="item"
-            type="ch.giantific.qwittig.presentation.finance.items.UnpaidCompItem"
+            type="ch.giantific.qwittig.presentation.finance.unpaid.items.CompsUnpaidItem"
             />
     </data>
 

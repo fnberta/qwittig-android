@@ -16,7 +16,7 @@
 
         <variable
             name="item"
-            type="ch.giantific.qwittig.presentation.finance.items.UnpaidCreditItem"
+            type="ch.giantific.qwittig.presentation.finance.unpaid.items.CompsUnpaidCreditItem"
             />
     </data>
 

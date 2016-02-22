@@ -19,7 +19,7 @@ import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileWorker.
 import rx.Single;
 
 /**
- * Created by fabio on 10.02.16.
+ * Defines a observable view model for profile settings screen.
  */
 public interface SettingsProfileViewModel extends ViewModel, SettingsProfileWorkerListener,
         AvatarLoadListener,
@@ -92,6 +92,9 @@ public interface SettingsProfileViewModel extends ViewModel, SettingsProfileWork
         int CHANGES_DISCARDED = 2;
     }
 
+    /**
+     * Defines the interaction with the attached view.
+     */
     interface ViewListener extends ViewModel.ViewListener {
 
         void startPostponedEnterTransition();

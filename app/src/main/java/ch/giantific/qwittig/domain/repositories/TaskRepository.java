@@ -24,14 +24,16 @@ public interface TaskRepository extends BaseRepository {
      *
      * @param task the task to save
      * @param tag  the tag for the local data store
-     * @return a {@link Single} representing the save operation
+     * @return a {@link Single} emitting the result
      */
     Single<Task> saveTaskLocalAsync(@NonNull Task task, @NonNull String tag);
 
     /**
      * Queries the local data store for tasks.
-     *  @param identity    the for which to get the tasks for
+     *
+     * @param identity the for which to get the tasks for
      * @param deadline the deadline until which to get queries
+     * @return an {@link Observable} emitting the results
      */
     Observable<Task> getTasksLocalAsync(@NonNull Identity identity, @NonNull Date deadline);
 
@@ -39,6 +41,7 @@ public interface TaskRepository extends BaseRepository {
      * Queries the local data store for a single task.
      *
      * @param taskId the object id of the task to query
+     * @return a {@link Single} emitting the result
      */
     Single<Task> getTaskLocalAsync(@NonNull String taskId);
 
@@ -46,6 +49,7 @@ public interface TaskRepository extends BaseRepository {
      * Fetches the data of a task from the local data store.
      *
      * @param taskId the object id of the task to fetch
+     * @return a {@link Single} emitting the result
      */
     Single<Task> fetchTaskDataLocalAsync(@NonNull String taskId);
 
@@ -62,6 +66,7 @@ public interface TaskRepository extends BaseRepository {
      * store, querying and saving new ones.
      *
      * @param identities the groups for which to update the tasks
+     * @return an {@link Observable} emitting the results
      */
     Observable<Task> updateTasksAsync(@NonNull List<Identity> identities);
 
@@ -95,6 +100,7 @@ public interface TaskRepository extends BaseRepository {
      * Sends a push notification to remind a user to finish a task.
      *
      * @param taskId the object id of the task that should be finished
+     * @return a {@link Single} emitting the result
      */
     Single<String> pushTaskReminder(@NonNull String taskId);
 }

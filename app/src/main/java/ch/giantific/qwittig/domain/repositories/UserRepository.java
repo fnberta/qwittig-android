@@ -35,14 +35,14 @@ public interface UserRepository extends BaseRepository {
      * Updates the locally cached version of the user with fresh data from the online store.
      *
      * @param user the user to update
-     * @return the updated user
+     * @return a {@link Single} emitting the result
      */
     Single<User> updateUser(@NonNull User user);
 
     /**
      * Returns the session token for current user session.
      *
-     * @return the session token
+     * @return a {@link Single} emitting the result
      */
     Single<String> getUserSessionToken();
 
@@ -51,7 +51,7 @@ public interface UserRepository extends BaseRepository {
      *
      * @param username the email address for the login
      * @param password the pass word for the login
-     * @return the logged in user
+     * @return a {@link Single} emitting the result
      */
     Single<User> loginEmail(@NonNull String username, @NonNull String password);
 
@@ -59,7 +59,7 @@ public interface UserRepository extends BaseRepository {
      * Sends the user an email with a link to reset his password
      *
      * @param email the email address to send the link to
-     * @return the email address the reset link was sent to
+     * @return a {@link Single} emitting the result
      */
     Single<String> requestPasswordReset(@NonNull String email);
 
@@ -68,7 +68,7 @@ public interface UserRepository extends BaseRepository {
      *
      * @param username the user's email to use as username
      * @param password the user's password
-     * @return the now signed up and logged in user
+     * @return a {@link Single} emitting the result
      */
     Single<User> signUpEmail(@NonNull String username, @NonNull String password);
 
@@ -76,7 +76,7 @@ public interface UserRepository extends BaseRepository {
      * Logs in a user using his facebook account
      *
      * @param fragment the fragment that is initiating the login
-     * @return the logged in user
+     * @return a {@link Single} emitting the result
      */
     Single<User> loginFacebook(@NonNull Fragment fragment);
 
@@ -86,7 +86,7 @@ public interface UserRepository extends BaseRepository {
      * @param idToken     the google id token
      * @param displayName the google profile display name
      * @param photoUrl    the url to the google profile image
-     * @return the logged in user
+     * @return a {@link Single} emitting the result
      */
     Single<User> loginGoogle(@NonNull final Fragment fragment, @NonNull String idToken,
                              @NonNull final String displayName, @NonNull final Uri photoUrl);
@@ -96,6 +96,7 @@ public interface UserRepository extends BaseRepository {
      * email address in the token. If no such user exists yet, creates a new one.
      *
      * @param idToken the token obtained from the Google login
+     * @return a {@link Single} emitting the result
      */
     Single<JSONObject> verifyGoogleLogin(@NonNull String idToken);
 
@@ -103,7 +104,7 @@ public interface UserRepository extends BaseRepository {
      * Handles an invitation link by calling a function in the cloud.
      *
      * @param identityId the object id of the identity the user is invited to
-     * @return the response from the server, to be neglected
+     * @return a {@link Single} emitting the result
      */
     Single<String> handleInvitation(@NonNull String identityId);
 
@@ -111,15 +112,15 @@ public interface UserRepository extends BaseRepository {
      * Logs out the user.
      *
      * @param user the user to log out
-     * @return the logged out user
+     * @return a {@link Single} emitting the result
      */
     Single<User> logOut(@NonNull User user);
 
     /**
-     * Unlinks the user's account from his facebook profile.
+     * Un-links the user's account from his facebook profile.
      *
      * @param user the user to unlink
-     * @return the unlinked user
+     * @return a {@link Single} emitting the result
      */
     Single<User> unlinkFacebook(@NonNull User user);
 
@@ -127,7 +128,7 @@ public interface UserRepository extends BaseRepository {
      * Signs out the currently logged in user from his google profile.
      *
      * @param context the context to user for the operation
-     * @return the unlinked user
+     * @return a {@link Single} emitting the result
      */
     Single<Void> signOutGoogle(@NonNull Context context);
 
@@ -135,7 +136,7 @@ public interface UserRepository extends BaseRepository {
      * Unlinks the user's account from his google profile.
      *
      * @param user the user to unlink
-     * @return the unlinked user
+     * @return a {@link Single} emitting the result
      */
     Single<User> unlinkGoogle(@NonNull Context context, @NonNull User user);
 
@@ -143,7 +144,7 @@ public interface UserRepository extends BaseRepository {
      * Deletes a users account by deleting it. His identities will be kept because they are
      * referenced in other objects (e.g. purchases and items.
      *
-     * @param user the user to delete
+     * @return a {@link Single} emitting the result
      */
     Single<User> deleteUser(@NonNull User user);
 
@@ -152,14 +153,14 @@ public interface UserRepository extends BaseRepository {
      * the user field.
      *
      * @param user the user that just logged in
-     * @return the setup installation object
+     * @return an {@link Observable} emitting the results
      */
     Observable<ParseInstallation> setupInstallation(@NonNull User user);
 
     /**
      * Clears the installation object by resetting channels and the user field
      *
-     * @return the reset installation object
+     * @return a {@link Single} emitting the result
      */
     Single<ParseInstallation> clearInstallation();
 }

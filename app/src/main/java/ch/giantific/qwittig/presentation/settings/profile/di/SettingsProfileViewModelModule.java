@@ -8,17 +8,17 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileViewModel;
 import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileViewModelImpl;
 import dagger.Module;
 import dagger.Provides;
 
 /**
- * Created by fabio on 12.01.16.
+ * Defines which view model implementation to use for the profile settings screen and how to
+ * instantiate it.
  */
 @Module
 public class SettingsProfileViewModelModule extends BaseViewModelModule<SettingsProfileViewModel.ViewListener> {
@@ -30,8 +30,7 @@ public class SettingsProfileViewModelModule extends BaseViewModelModule<Settings
 
     @PerFragment
     @Provides
-    SettingsProfileViewModel providesSettingsProfileViewModel(@NonNull UserRepository userRepository,
-                                                              @NonNull IdentityRepository identityRepository) {
-        return new SettingsProfileViewModelImpl(mSavedState, mView, userRepository, identityRepository);
+    SettingsProfileViewModel providesSettingsProfileViewModel(@NonNull UserRepository userRepository) {
+        return new SettingsProfileViewModelImpl(mSavedState, mView, userRepository);
     }
 }

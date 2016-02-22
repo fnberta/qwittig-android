@@ -20,7 +20,7 @@ import rx.functions.Action0;
 import rx.subscriptions.Subscriptions;
 
 /**
- * Created by fabio on 10.02.16.
+ * Provides an abstract base class for a reactive GoogleApiClient emitting an {@link Single}.
  */
 public abstract class BaseGoogleApiClientSingle<T> implements Single.OnSubscribe<T> {
 
@@ -40,13 +40,13 @@ public abstract class BaseGoogleApiClientSingle<T> implements Single.OnSubscribe
         }
 
         singleSubscriber.add(Subscriptions.create(new Action0() {
-            @Override
-            public void call() {
-                if (apiClient.isConnected() || apiClient.isConnecting()) {
-                    apiClient.disconnect();
-                }
-            }
-        })
+                    @Override
+                    public void call() {
+                        if (apiClient.isConnected() || apiClient.isConnecting()) {
+                            apiClient.disconnect();
+                        }
+                    }
+                })
         );
     }
 

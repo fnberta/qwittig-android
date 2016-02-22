@@ -22,8 +22,8 @@ import ch.giantific.qwittig.utils.DateUtils;
 public class TaskHistoryItem extends BaseObservable
         implements DetailsItem, Comparable<TaskHistoryItem> {
 
+    private final String mDate;
     private Identity mUser;
-    private String mDate;
 
     public TaskHistoryItem(@NonNull Identity identity, @NonNull Date date) {
         mUser = identity;

@@ -10,7 +10,7 @@ import ch.giantific.qwittig.presentation.login.LoginEmailFragment;
 import dagger.Component;
 
 /**
- * Created by fabio on 05.02.16.
+ * Provides the dependencies for the login/sign-up with email screen.
  */
 @PerFragment
 @Component(modules = {LoginEmailViewModelModule.class, RepositoriesModule.class})

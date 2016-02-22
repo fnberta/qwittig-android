@@ -19,7 +19,7 @@ import dagger.Module;
 import dagger.Provides;
 
 /**
- * Created by fabio on 12.01.16.
+ * Defines which implementation to use for the purchase add screen and how to instantiate it.
  */
 @Module
 public class PurchaseAddViewModelModule extends BaseViewModelModule<PurchaseAddEditViewModel.ViewListener> {

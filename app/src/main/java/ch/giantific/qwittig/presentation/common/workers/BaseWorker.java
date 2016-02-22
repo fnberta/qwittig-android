@@ -13,9 +13,9 @@ import android.support.v4.app.Fragment;
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.Qwittig;
+import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.di.DaggerWorkerComponent;
 import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
 import rx.Observable;
 import rx.Subscription;
 import rx.subjects.ReplaySubject;
@@ -27,11 +27,11 @@ import rx.subjects.ReplaySubject;
  */
 public abstract class BaseWorker<T, S extends BaseWorkerListener> extends Fragment {
 
+    private final ReplaySubject<T> mSubject = ReplaySubject.create();
     protected S mActivity;
     @Inject
     protected UserRepository mUserRepo;
     private Subscription mSubscription;
-    private final ReplaySubject<T> mSubject = ReplaySubject.create();
 
     public BaseWorker() {
         // empty default constructor

@@ -8,7 +8,7 @@ import android.databinding.Bindable;
 import android.databinding.Observable;
 
 /**
- * Created by fabio on 03.02.16.
+ * Defines a view model for header that show a user's current identity balance.
  */
 public interface BalanceHeaderViewModel extends Observable {
 

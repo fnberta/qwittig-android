@@ -24,21 +24,21 @@ import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
-import ch.giantific.qwittig.presentation.home.purchases.details.items.DetailsItem;
-import ch.giantific.qwittig.presentation.home.purchases.details.items.HeaderItem;
-import ch.giantific.qwittig.presentation.home.purchases.details.items.IdentitiesItem;
-import ch.giantific.qwittig.presentation.home.purchases.details.items.ItemItem;
-import ch.giantific.qwittig.presentation.home.purchases.details.items.MyShareItem;
-import ch.giantific.qwittig.presentation.home.purchases.details.items.NoteItem;
-import ch.giantific.qwittig.presentation.home.purchases.details.items.TotalItem;
+import ch.giantific.qwittig.presentation.home.purchases.details.items.PurchaseDetailsBaseItem;
+import ch.giantific.qwittig.presentation.home.purchases.details.items.PurchaseDetailsHeaderItem;
+import ch.giantific.qwittig.presentation.home.purchases.details.items.PurchaseDetailsIdentitiesItem;
+import ch.giantific.qwittig.presentation.home.purchases.details.items.PurchaseDetailsItem;
+import ch.giantific.qwittig.presentation.home.purchases.details.items.PurchaseDetailsMyShareItem;
+import ch.giantific.qwittig.presentation.home.purchases.details.items.PurchaseDetailsNoteItem;
+import ch.giantific.qwittig.presentation.home.purchases.details.items.PurchaseDetailsTotalItem;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.SingleSubscriber;
 
 /**
- * Created by fabio on 29.01.16.
+ * Provides an implementation of the {@link PurchaseDetailsViewModel}.
  */
-public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<DetailsItem, PurchaseDetailsViewModel.ViewListener>
+public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<PurchaseDetailsBaseItem, PurchaseDetailsViewModel.ViewListener>
         implements PurchaseDetailsViewModel {
 
     private final PurchaseRepository mPurchaseRepo;
@@ -113,28 +113,28 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<DetailsI
     private void updateItemList() {
         mItems.clear();
 
-        mItems.add(new HeaderItem(R.string.header_users));
-        mItems.add(new IdentitiesItem(mPurchase.getIdentities()));
+        mItems.add(new PurchaseDetailsHeaderItem(R.string.header_users));
+        mItems.add(new PurchaseDetailsIdentitiesItem(mPurchase.getIdentities()));
 
-        mItems.add(new HeaderItem(R.string.header_items));
+        mItems.add(new PurchaseDetailsHeaderItem(R.string.header_items));
         for (Item item : mPurchase.getItems()) {
-            mItems.add(new ItemItem(item, mCurrentIdentity, mMoneyFormatter));
+            mItems.add(new PurchaseDetailsItem(item, mCurrentIdentity, mMoneyFormatter));
         }
 
         final NumberFormat foreignFormatter = MoneyUtils.getMoneyFormatter(mPurchase.getCurrency(), true, true);
         final String total = mMoneyFormatter.format(mPurchase.getTotalPrice());
         final String totalForeign = foreignFormatter.format(mPurchase.getTotalPriceForeign());
-        mItems.add(new TotalItem(total, totalForeign));
+        mItems.add(new PurchaseDetailsTotalItem(total, totalForeign));
 
         final double share = mPurchase.calculateUserShare(mCurrentIdentity);
         final String myShare = mMoneyFormatter.format(share);
         final String myShareForeign = foreignFormatter.format(share / mPurchase.getExchangeRate());
-        mItems.add(new MyShareItem(myShare, myShareForeign));
+        mItems.add(new PurchaseDetailsMyShareItem(myShare, myShareForeign));
 
         final String note = mPurchase.getNote();
         if (note != null) {
-            mItems.add(new HeaderItem(R.string.header_note));
-            mItems.add(new NoteItem(note));
+            mItems.add(new PurchaseDetailsHeaderItem(R.string.header_note));
+            mItems.add(new PurchaseDetailsNoteItem(note));
         }
 
         mView.notifyDataSetChanged();
@@ -198,7 +198,7 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<DetailsI
 
     @Override
     public int getItemViewType(int position) {
-        final DetailsItem detailsItem = mItems.get(position);
+        final PurchaseDetailsBaseItem detailsItem = mItems.get(position);
         return detailsItem.getType();
     }
 

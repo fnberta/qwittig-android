@@ -104,7 +104,7 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
         if (worker == null) {
             worker = new LoginWorker();
 
-            Bundle args = new Bundle();
+            final Bundle args = new Bundle();
             args.putInt(KEY_TYPE, Type.RESET_PASSWORD);
             args.putString(KEY_USERNAME, username);
             worker.setArguments(args);
@@ -136,7 +136,7 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
         if (worker == null) {
             worker = new LoginWorker();
 
-            Bundle args = new Bundle();
+            final Bundle args = new Bundle();
             args.putInt(KEY_TYPE, Type.SIGN_UP_EMAIL);
             args.putString(KEY_USERNAME, username);
             args.putString(KEY_PASSWORD, password);
@@ -163,7 +163,7 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
         if (worker == null) {
             worker = new LoginWorker();
 
-            Bundle args = new Bundle();
+            final Bundle args = new Bundle();
             args.putInt(KEY_TYPE, Type.LOGIN_FACEBOOK);
             worker.setArguments(args);
 
@@ -191,7 +191,7 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
         if (worker == null) {
             worker = new LoginWorker();
 
-            Bundle args = new Bundle();
+            final Bundle args = new Bundle();
             args.putInt(KEY_TYPE, Type.LOGIN_GOOGLE);
             args.putString(KEY_GOOGLE_ID_TOKEN, idToken);
             args.putString(KEY_USERNAME, displayName);

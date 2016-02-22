@@ -5,7 +5,7 @@
 package ch.giantific.qwittig.presentation.home.purchases.addedit;
 
 /**
- * Created by fabio on 27.01.16.
+ * Defines the actions to take when users are clicked.
  */
 public interface PurchaseAddEditItemUsersClickListener {
 

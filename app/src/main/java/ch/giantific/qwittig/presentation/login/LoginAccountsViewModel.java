@@ -12,7 +12,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.LoadingViewModel;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 
 /**
- * Created by fabio on 05.02.16.
+ * Defines an observable view model for the login accounts screen.
  */
 public interface LoginAccountsViewModel extends ViewModel, LoadingViewModel, LoginWorkerListener {
 
@@ -27,6 +27,9 @@ public interface LoginAccountsViewModel extends ViewModel, LoadingViewModel, Log
 
     void onUseEmailClick(View view);
 
+    /**
+     * Defines the interaction with the attached view.
+     */
     interface ViewListener extends ViewModel.ViewListener {
 
         void loadFacebookLoginWorker();

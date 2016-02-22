@@ -15,7 +15,7 @@
 
         <variable
             name="item"
-            type="ch.giantific.qwittig.presentation.finance.items.UnpaidDebtItem"
+            type="ch.giantific.qwittig.presentation.finance.unpaid.items.CompsUnpaidDebtItem"
             />
     </data>
 

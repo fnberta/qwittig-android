@@ -17,7 +17,6 @@ import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileWorker.ProfileAction;
@@ -26,7 +25,7 @@ import rx.Single;
 import rx.SingleSubscriber;
 
 /**
- * Created by fabio on 10.02.16.
+ * Provides an implementation of the {@link SettingsProfileViewModel}.
  */
 public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProfileViewModel.ViewListener>
         implements SettingsProfileViewModel {
@@ -39,12 +38,11 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     private static final String STATE_NICKNAME = "STATE_NICKNAME";
     private static final String STATE_PASSWORD = "STATE_PASSWORD";
     private static final String STATE_PASSWORD_REPEAT = "STATE_PASSWORD_REPEAT";
-    private final IdentityRepository mIdentityRepo;
+    private final boolean mFacebookUser;
+    private final boolean mGoogleUser;
     private boolean mValidate;
     private boolean mSaving;
     private boolean mUnlinkThirdParty;
-    private final boolean mFacebookUser;
-    private final boolean mGoogleUser;
     private String mAvatar;
     private String mEmail;
     private String mNickname;
@@ -53,11 +51,9 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
 
     public SettingsProfileViewModelImpl(@Nullable Bundle savedState,
                                         @NonNull SettingsProfileViewModel.ViewListener view,
-                                        @NonNull UserRepository userRepository,
-                                        @NonNull IdentityRepository identityRepository) {
+                                        @NonNull UserRepository userRepository) {
         super(savedState, view, userRepository);
 
-        mIdentityRepo = identityRepository;
         mFacebookUser = mCurrentUser.isFacebookUser();
         mGoogleUser = mCurrentUser.isGoogleUser();
 

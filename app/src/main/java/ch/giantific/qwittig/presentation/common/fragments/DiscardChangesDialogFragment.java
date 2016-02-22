@@ -5,7 +5,6 @@
 package ch.giantific.qwittig.presentation.common.fragments;
 
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -17,7 +16,7 @@ import ch.giantific.qwittig.R;
 /**
  * Provides a dialog that asks the user if he really wants to discard the changes made on a screen.
  * <p/>
- * Subclass of {@link DialogFragment}.
+ * Subclass of {@link BaseDialogFragment}.
  */
 public class DiscardChangesDialogFragment extends BaseDialogFragment<DiscardChangesDialogFragment.DialogInteractionListener> {
 

@@ -13,8 +13,8 @@ import android.text.TextUtils;
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.data.rest.ExchangeRates;
-import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
+import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;
 
@@ -46,24 +46,18 @@ public class RatesWorker extends BaseWorker<Float, RatesWorkerListener> {
                                      @NonNull String currency) {
         RatesWorker worker = (RatesWorker) fm.findFragmentByTag(WORKER_TAG);
         if (worker == null) {
-            worker = RatesWorker.newInstance(baseCurrency, currency);
+            worker = new RatesWorker();
+            final Bundle args = new Bundle();
+            args.putString(KEY_BASE_CURRENCY, baseCurrency);
+            args.putString(KEY_CURRENCY, currency);
+            worker.setArguments(args);
+
             fm.beginTransaction()
                     .add(worker, WORKER_TAG)
                     .commit();
         }
 
         return worker;
-    }
-
-    @NonNull
-    private static RatesWorker newInstance(@NonNull String baseCurrency,
-                                           @NonNull String currency) {
-        RatesWorker fragment = new RatesWorker();
-        Bundle args = new Bundle();
-        args.putString(KEY_BASE_CURRENCY, baseCurrency);
-        args.putString(KEY_CURRENCY, currency);
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override

@@ -16,6 +16,13 @@ import rx.Single;
  */
 public interface GroupRepository extends BaseRepository {
 
+    /**
+     * Adds a new group and corresponding identity for the user.
+     *
+     * @param groupName     the name of the new group
+     * @param groupCurrency the currency of the new group
+     * @return a {@link Single} emitting the result
+     */
     Single<String> addNewGroup(@NonNull String groupName, @NonNull String groupCurrency);
 
     /**
@@ -23,6 +30,7 @@ public interface GroupRepository extends BaseRepository {
      * available in the local data store it will try to fetch the data online.
      *
      * @param group the group to fetch the data for
+     * @return a {@link Observable} emitting the results
      */
     Observable<Group> fetchGroupDataAsync(@NonNull Group group);
 
@@ -30,6 +38,7 @@ public interface GroupRepository extends BaseRepository {
      * Queries a group from the online data store.
      *
      * @param groupId the object id of the group to get
+     * @return a {@link Single} emitting the result
      */
     Single<Group> getGroupOnlineAsync(@NonNull String groupId);
 
@@ -43,7 +52,18 @@ public interface GroupRepository extends BaseRepository {
     @Nullable
     Group getGroupOnline(@NonNull String groupId);
 
+    /**
+     * Subscribes the user to push messages for the group
+     *
+     * @param group the group to subscribe
+     * @return a {@link Single} emitting the result
+     */
     Single<Group> subscribeGroup(@NonNull Group group);
 
-    void unsubscribeGroup(@NonNull Group group);
+    /**
+     * Un-subscribes the user for push message from the group
+     *
+     * @param group the group to un-subscribe from
+     */
+    void unSubscribeGroup(@NonNull Group group);
 }

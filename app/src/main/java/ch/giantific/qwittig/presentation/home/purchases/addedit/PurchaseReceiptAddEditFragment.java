@@ -19,12 +19,12 @@ import java.io.IOException;
 
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.presentation.home.purchases.common.PurchaseReceiptBaseFragment;
+import ch.giantific.qwittig.presentation.home.purchases.common.PurchaseReceiptViewModel;
 import ch.giantific.qwittig.presentation.home.purchases.common.di.DaggerPurchaseReceiptIdComponent;
 import ch.giantific.qwittig.presentation.home.purchases.common.di.DaggerPurchaseReceiptPathComponent;
 import ch.giantific.qwittig.presentation.home.purchases.common.di.PurchaseReceiptIdViewModelModule;
 import ch.giantific.qwittig.presentation.home.purchases.common.di.PurchaseReceiptPathViewModelModule;
-import ch.giantific.qwittig.presentation.home.purchases.common.PurchaseReceiptBaseFragment;
-import ch.giantific.qwittig.presentation.home.purchases.common.PurchaseReceiptViewModel;
 import ch.giantific.qwittig.utils.CameraUtils;
 
 /**
@@ -51,8 +51,8 @@ public class PurchaseReceiptAddEditFragment extends PurchaseReceiptBaseFragment<
      */
     @NonNull
     public static PurchaseReceiptAddEditFragment newAddInstance(@NonNull String imagePath) {
-        PurchaseReceiptAddEditFragment purchaseReceiptAddFragment = new PurchaseReceiptAddEditFragment();
-        Bundle args = new Bundle();
+        final PurchaseReceiptAddEditFragment purchaseReceiptAddFragment = new PurchaseReceiptAddEditFragment();
+        final Bundle args = new Bundle();
         args.putString(KEY_RECEIPT_IMAGE_PATH, imagePath);
         purchaseReceiptAddFragment.setArguments(args);
         return purchaseReceiptAddFragment;
@@ -68,13 +68,11 @@ public class PurchaseReceiptAddEditFragment extends PurchaseReceiptBaseFragment<
     @NonNull
     public static PurchaseReceiptAddEditFragment newEditInstance(@NonNull String purchaseId,
                                                                  boolean isDraft) {
-        PurchaseReceiptAddEditFragment fragment = new PurchaseReceiptAddEditFragment();
-
-        Bundle args = new Bundle();
+        final PurchaseReceiptAddEditFragment fragment = new PurchaseReceiptAddEditFragment();
+        final Bundle args = new Bundle();
         args.putString(KEY_PURCHASE_ID, purchaseId);
         args.putBoolean(KEY_DRAFT, isDraft);
         fragment.setArguments(args);
-
         return fragment;
     }
 
@@ -137,7 +135,7 @@ public class PurchaseReceiptAddEditFragment extends PurchaseReceiptBaseFragment<
         }
 
         final Context context = getActivity();
-        File imageFile;
+        final File imageFile;
         try {
             imageFile = CameraUtils.createImageFile(context);
         } catch (IOException e) {

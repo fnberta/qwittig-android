@@ -13,7 +13,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.LoadingViewModel;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 
 /**
- * Created by fabio on 05.02.16.
+ * Defines an observable view model for the login/sign-up with email screen.
  */
 public interface LoginEmailViewModel extends ViewModel, LoadingViewModel,
         LoginWorkerListener, EmailPromptDialogFragment.DialogInteractionListener {
@@ -49,6 +49,9 @@ public interface LoginEmailViewModel extends ViewModel, LoadingViewModel,
 
     void onResetPasswordClick(View view);
 
+    /**
+     * Defines the interaction with the attached view.
+     */
     interface ViewListener extends ViewModel.ViewListener {
 
         void loadEmailLoginWorker(@NonNull final String email, @NonNull String password);

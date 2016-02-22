@@ -5,7 +5,7 @@
 package ch.giantific.qwittig.utils.googleapi;
 
 /**
- * Created by fabio on 10.02.16.
+ * Defines an exception thrown when the connection to Google's servers was suspended.
  */
 public class GoogleApiConnectionSuspendedException extends RuntimeException {
 

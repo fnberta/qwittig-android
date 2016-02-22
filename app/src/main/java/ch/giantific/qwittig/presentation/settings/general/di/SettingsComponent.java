@@ -11,7 +11,7 @@ import ch.giantific.qwittig.presentation.settings.general.SettingsFragment;
 import dagger.Component;
 
 /**
- * Created by fabio on 12.01.16.
+ * Provides the dependencies for the main settings screen.
  */
 @PerFragment
 @Component(dependencies = {ApplicationComponent.class},

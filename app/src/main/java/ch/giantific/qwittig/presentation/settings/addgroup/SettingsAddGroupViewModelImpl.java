@@ -18,14 +18,13 @@ import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.Single;
 import rx.SingleSubscriber;
 
 /**
- * Created by fabio on 07.02.16.
+ * Provides an implementation of the {@link SettingsAddGroupViewModel}.
  */
 public class SettingsAddGroupViewModelImpl extends ViewModelBaseImpl<SettingsAddGroupViewModel.ViewListener>
         implements SettingsAddGroupViewModel {
@@ -34,15 +33,11 @@ public class SettingsAddGroupViewModelImpl extends ViewModelBaseImpl<SettingsAdd
     private String mName;
     private String mCurrency;
     private boolean mValidate;
-    private final IdentityRepository mIdentityRepo;
 
     public SettingsAddGroupViewModelImpl(@Nullable Bundle savedState,
                                          @NonNull SettingsAddGroupViewModel.ViewListener view,
-                                         @NonNull UserRepository userRepository,
-                                         @NonNull IdentityRepository identityRepository) {
+                                         @NonNull UserRepository userRepository) {
         super(savedState, view, userRepository);
-
-        mIdentityRepo = identityRepository;
 
         if (savedState != null) {
             mValidate = savedState.getBoolean(STATE_VALIDATE);

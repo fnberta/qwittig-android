@@ -20,6 +20,7 @@ public interface StatsRepository extends BaseRepository {
      * @param groupId the object id of the group to calculate stats for
      * @param year    the year for which to calculate stats for
      * @param month   the month for which to calculate stats for, 0 means the whole year
+     * @return a {@link Single} emitting the result
      */
     Single<Stats> calcStatsSpending(@NonNull String groupId, @NonNull String year, int month);
 
@@ -29,6 +30,7 @@ public interface StatsRepository extends BaseRepository {
      * @param groupId the object id of the group to calculate stats for
      * @param year    the year for which to calculate stats for
      * @param month   the month for which to calculate stats for, 0 means the whole year
+     * @return a {@link Single} emitting the result
      */
     Single<Stats> calcStatsStores(@NonNull String groupId, @NonNull String year, int month);
 
@@ -38,6 +40,7 @@ public interface StatsRepository extends BaseRepository {
      * @param groupId the object id of the group to calculate stats for
      * @param year    the year for which to calculate stats for
      * @param month   the month for which to calculate stats for, 0 means the whole year
+     * @return a {@link Single} emitting the result
      */
     Single<Stats> calcStatsCurrencies(@NonNull String groupId, @NonNull String year, int month);
 }

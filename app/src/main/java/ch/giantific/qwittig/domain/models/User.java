@@ -52,26 +52,12 @@ public class User extends ParseUser {
         put(IDENTITIES, identities);
     }
 
-    public void addIdentity(@NonNull Identity identity) {
-        addUnique(IDENTITIES, identity);
-    }
-
-    public void removeIdentity(@NonNull Identity identity) {
-        final List<Identity> identities = new ArrayList<>();
-        identities.add(identity);
-        removeAll(IDENTITIES, identities);
-    }
-
     public Identity getCurrentIdentity() {
         return (Identity) getParseObject(CURRENT_IDENTITY);
     }
 
     public void setCurrentIdentity(@NonNull Identity currentIdentity) {
         put(CURRENT_IDENTITY, currentIdentity);
-    }
-
-    public void removeCurrentIdentity() {
-        remove(CURRENT_IDENTITY);
     }
 
     public String getGoogleId() {
@@ -90,6 +76,12 @@ public class User extends ParseUser {
         return ParseFacebookUtils.isLinked(this);
     }
 
+    /**
+     * Returns whether one of the identity ids provided belongs to the user.
+     *
+     * @param identityIds the ids of the identities to check
+     * @return whether one of the identity ids provided belongs to the user
+     */
     public boolean hasIdentity(@NonNull List<String> identityIds) {
         final List<Identity> userIdentities = getIdentities();
         for (Identity identity : userIdentities) {
@@ -101,6 +93,12 @@ public class User extends ParseUser {
         return false;
     }
 
+    /**
+     * Return whether the identity id provided belongs to the user
+     *
+     * @param identityId the id of the identity to check
+     * @return whether the identity id provided belongs to the user
+     */
     public boolean hasIdentity(@NonNull String identityId) {
         final List<Identity> userIdentities = getIdentities();
         for (Identity identity : userIdentities) {
@@ -112,6 +110,12 @@ public class User extends ParseUser {
         return false;
     }
 
+    /**
+     * Returns whether the user is part of the group
+     *
+     * @param groupId the id of the group to check
+     * @return whether the user is part of the group
+     */
     public boolean isInGroup(@NonNull String groupId) {
         final List<String> groupIds = new ArrayList<>();
         final List<Identity> identities = getIdentities();
@@ -122,6 +126,12 @@ public class User extends ParseUser {
         return groupIds.contains(groupId);
     }
 
+    /**
+     * Returns the identity for the group or null if the user is not part of the group.
+     *
+     * @param groupId the id of the group to return the identity for
+     * @return the identity for the group or null if the user is not part of the group
+     */
     @Nullable
     public Identity getIdentityForGroup(@NonNull String groupId) {
         final List<Identity> identities = getIdentities();

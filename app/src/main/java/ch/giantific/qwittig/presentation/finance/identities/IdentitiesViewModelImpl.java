@@ -29,7 +29,7 @@ import rx.SingleSubscriber;
 import rx.functions.Func1;
 
 /**
- * Created by fabio on 18.01.16.
+ * Provides an implementation of the {@link IdentitiesViewModel}.
  */
 public class IdentitiesViewModelImpl
         extends OnlineListViewModelBaseImpl<Identity, IdentitiesViewModel.ViewListener>

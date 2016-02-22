@@ -13,7 +13,10 @@ import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 
 /**
- * Created by fabio on 28.01.16.
+ * Provides an implementation of the {@link PurchaseAddEditViewModel} for the screen where the
+ * purchase items get automatically filled in via an image of the receipt.
+ * <p/>
+ * Subclass of {@link PurchaseAddEditViewModelAddImpl}.
  */
 public class PurchaseAddEditViewModelAddAutoImpl extends PurchaseAddEditViewModelAddImpl {
 

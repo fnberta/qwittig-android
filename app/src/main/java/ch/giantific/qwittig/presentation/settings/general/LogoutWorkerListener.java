@@ -16,6 +16,9 @@ import rx.Single;
 public interface LogoutWorkerListener extends BaseWorkerListener {
     /**
      * Sets the logout stream.
+     *
+     * @param single    the {@link Single} emitting the result
+     * @param workerTag the tag of the headless worker fragment
      */
     void setLogoutStream(@NonNull Single<User> single, @NonNull String workerTag);
 }

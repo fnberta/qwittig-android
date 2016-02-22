@@ -30,7 +30,7 @@ import ch.giantific.qwittig.utils.Utils;
  * Therefore overrides the default positive button onClickListener because the default behaviour is
  * to always call dismiss().
  * <p/>
- * Subclass of {@link DialogFragment}.
+ * Subclass of {@link BaseDialogFragment}.
  */
 public class EmailPromptDialogFragment extends BaseDialogFragment<EmailPromptDialogFragment.DialogInteractionListener> {
 

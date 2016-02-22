@@ -10,7 +10,7 @@ import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileFragmen
 import dagger.Component;
 
 /**
- * Created by fabio on 12.01.16.
+ * Provides the dependencies for the profile settings screen.
  */
 @PerFragment
 @Component(modules = {SettingsProfileViewModelModule.class, RepositoriesModule.class})

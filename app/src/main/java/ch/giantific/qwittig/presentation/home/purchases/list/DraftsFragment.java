@@ -23,13 +23,13 @@ import android.view.ViewGroup;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentHomeDraftsBinding;
-import ch.giantific.qwittig.presentation.home.purchases.list.di.DaggerDraftsListComponent;
-import ch.giantific.qwittig.presentation.home.purchases.list.di.DraftsListViewModelModule;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
 import ch.giantific.qwittig.presentation.home.HomeActivity;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseEditActivity;
+import ch.giantific.qwittig.presentation.home.purchases.list.di.DaggerDraftsListComponent;
+import ch.giantific.qwittig.presentation.home.purchases.list.di.DraftsListViewModelModule;
 
 /**
  * Displays the currently open drafts of the current user in an {@link RecyclerView list.
@@ -163,6 +163,9 @@ public class DraftsFragment extends BaseRecyclerViewFragment<DraftsViewModel, Dr
         });
     }
 
+    /**
+     * Defines the interaction with the hosting {@link Activity}.
+     */
     public interface ActivityListener extends BaseFragment.ActivityListener {
         void setDraftsViewModel(@NonNull DraftsViewModel viewModel);
 

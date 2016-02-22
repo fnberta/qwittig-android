@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 
 /**
- * Created by fabio on 03.02.16.
+ * Provides an abstract base class for dialog fragments.
  */
 public abstract class BaseDialogFragment<T> extends DialogFragment {
 

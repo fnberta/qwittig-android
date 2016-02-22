@@ -14,7 +14,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import ch.giantific.qwittig.LocalBroadcast;
+import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivityTasksBinding;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;

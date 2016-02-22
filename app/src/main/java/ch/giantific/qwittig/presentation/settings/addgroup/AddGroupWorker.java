@@ -12,12 +12,12 @@ import android.text.TextUtils;
 
 import javax.inject.Inject;
 
-import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
+import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;
 import rx.Single;
@@ -55,24 +55,18 @@ public class AddGroupWorker extends BaseWorker<User, AddGroupWorkerListener> {
                                         @NonNull String groupCurrency) {
         AddGroupWorker worker = (AddGroupWorker) fm.findFragmentByTag(WORKER_TAG);
         if (worker == null) {
-            worker = newInstance(groupName, groupCurrency);
+            worker = new AddGroupWorker();
+            final Bundle args = new Bundle();
+            args.putString(KEY_GROUP_NAME, groupName);
+            args.putString(KEY_GROUP_CURRENCY, groupCurrency);
+            worker.setArguments(args);
+
             fm.beginTransaction()
                     .add(worker, WORKER_TAG)
                     .commit();
         }
 
         return worker;
-    }
-
-    @NonNull
-    private static AddGroupWorker newInstance(@NonNull String groupName,
-                                              @NonNull String groupCurrency) {
-        AddGroupWorker fragment = new AddGroupWorker();
-        Bundle args = new Bundle();
-        args.putString(KEY_GROUP_NAME, groupName);
-        args.putString(KEY_GROUP_CURRENCY, groupCurrency);
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override

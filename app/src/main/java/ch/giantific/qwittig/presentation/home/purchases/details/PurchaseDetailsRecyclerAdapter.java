@@ -22,14 +22,14 @@ import ch.giantific.qwittig.databinding.RowPurchaseDetailsNoteBinding;
 import ch.giantific.qwittig.databinding.RowPurchaseDetailsTotalBinding;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.home.purchases.details.items.DetailsItem;
-import ch.giantific.qwittig.presentation.home.purchases.details.items.DetailsItem.Type;
-import ch.giantific.qwittig.presentation.home.purchases.details.items.HeaderItem;
-import ch.giantific.qwittig.presentation.home.purchases.details.items.IdentitiesItem;
-import ch.giantific.qwittig.presentation.home.purchases.details.items.ItemItem;
-import ch.giantific.qwittig.presentation.home.purchases.details.items.MyShareItem;
-import ch.giantific.qwittig.presentation.home.purchases.details.items.NoteItem;
-import ch.giantific.qwittig.presentation.home.purchases.details.items.TotalItem;
+import ch.giantific.qwittig.presentation.home.purchases.details.items.PurchaseDetailsBaseItem;
+import ch.giantific.qwittig.presentation.home.purchases.details.items.PurchaseDetailsBaseItem.Type;
+import ch.giantific.qwittig.presentation.home.purchases.details.items.PurchaseDetailsHeaderItem;
+import ch.giantific.qwittig.presentation.home.purchases.details.items.PurchaseDetailsIdentitiesItem;
+import ch.giantific.qwittig.presentation.home.purchases.details.items.PurchaseDetailsItem;
+import ch.giantific.qwittig.presentation.home.purchases.details.items.PurchaseDetailsMyShareItem;
+import ch.giantific.qwittig.presentation.home.purchases.details.items.PurchaseDetailsNoteItem;
+import ch.giantific.qwittig.presentation.home.purchases.details.items.PurchaseDetailsTotalItem;
 
 /**
  * Handles the display of the detail view of a purchase including the different headers,
@@ -90,7 +90,7 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        final DetailsItem detailsItem = mViewModel.getItemAtPosition(position);
+        final PurchaseDetailsBaseItem detailsItem = mViewModel.getItemAtPosition(position);
 
         @Type final int viewType = getItemViewType(position);
         switch (viewType) {
@@ -98,7 +98,7 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
                 final BindingRow<RowGenericHeaderBinding> row = (BindingRow<RowGenericHeaderBinding>) holder;
                 final RowGenericHeaderBinding binding = row.getBinding();
 
-                binding.setViewModel((HeaderItem) detailsItem);
+                binding.setViewModel((PurchaseDetailsHeaderItem) detailsItem);
                 binding.executePendingBindings();
                 break;
             }
@@ -107,7 +107,7 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
                         (BindingRow<RowPurchaseDetailsItemBinding>) holder;
                 final RowPurchaseDetailsItemBinding binding = row.getBinding();
 
-                binding.setItem((ItemItem) detailsItem);
+                binding.setItem((PurchaseDetailsItem) detailsItem);
                 binding.executePendingBindings();
                 break;
             }
@@ -116,7 +116,7 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
                         (BindingRow<RowPurchaseDetailsMyShareBinding>) holder;
                 final RowPurchaseDetailsMyShareBinding binding = row.getBinding();
 
-                binding.setItem((MyShareItem) detailsItem);
+                binding.setItem((PurchaseDetailsMyShareItem) detailsItem);
                 binding.executePendingBindings();
                 break;
             }
@@ -125,7 +125,7 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
                         (BindingRow<RowPurchaseDetailsNoteBinding>) holder;
                 final RowPurchaseDetailsNoteBinding binding = row.getBinding();
 
-                binding.setItem((NoteItem) detailsItem);
+                binding.setItem((PurchaseDetailsNoteItem) detailsItem);
                 binding.executePendingBindings();
                 break;
             }
@@ -134,13 +134,13 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
                         (BindingRow<RowPurchaseDetailsTotalBinding>) holder;
                 final RowPurchaseDetailsTotalBinding binding = row.getBinding();
 
-                binding.setItem((TotalItem) detailsItem);
+                binding.setItem((PurchaseDetailsTotalItem) detailsItem);
                 binding.executePendingBindings();
                 break;
             }
             case Type.IDENTITIES: {
                 final UsersRow row = (UsersRow) holder;
-                final IdentitiesItem identitiesItem = (IdentitiesItem) detailsItem;
+                final PurchaseDetailsIdentitiesItem identitiesItem = (PurchaseDetailsIdentitiesItem) detailsItem;
                 row.setIdentities(identitiesItem.getIdentities());
                 break;
             }

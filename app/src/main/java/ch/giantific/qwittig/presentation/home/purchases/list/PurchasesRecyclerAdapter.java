@@ -106,7 +106,7 @@ public class PurchasesRecyclerAdapter extends RecyclerView.Adapter {
     /**
      * Provides a {@link RecyclerView} row that displays a purchase.
      * <p/>
-     * Subclass of {@link RecyclerView.ViewHolder}.
+     * Subclass of {@link BindingRow}.
      */
     private static class PurchaseRow extends BindingRow<RowPurchasesBinding> {
 

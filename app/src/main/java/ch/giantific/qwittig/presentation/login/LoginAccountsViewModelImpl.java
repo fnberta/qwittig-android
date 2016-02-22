@@ -21,7 +21,7 @@ import rx.Single;
 import rx.SingleSubscriber;
 
 /**
- * Created by fabio on 05.02.16.
+ * Provides an implementation of the {@link LoginAccountsViewModel}.
  */
 public class LoginAccountsViewModelImpl extends ViewModelBaseImpl<LoginAccountsViewModel.ViewListener>
         implements LoginAccountsViewModel {

@@ -156,10 +156,10 @@ public class Utils {
      * @return whether there is an active network connection or not
      */
     public static boolean isNetworkAvailable(@NonNull Context context) {
-        ConnectivityManager cm =
+        final ConnectivityManager cm =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        final NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
@@ -215,5 +215,4 @@ public class Utils {
         }
         return true;
     }
-
 }

@@ -5,7 +5,6 @@
 package ch.giantific.qwittig.presentation.common.fragments;
 
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,7 +15,7 @@ import android.support.v7.app.AlertDialog;
 /**
  * Provides a dialog that asks the user to confirm an action.
  * <p/>
- * Subclass of {@link DialogFragment}.
+ * Subclass of {@link BaseDialogFragment}.
  */
 public class ConfirmationDialogFragment extends BaseDialogFragment<ConfirmationDialogFragment.DialogInteractionListener> {
 

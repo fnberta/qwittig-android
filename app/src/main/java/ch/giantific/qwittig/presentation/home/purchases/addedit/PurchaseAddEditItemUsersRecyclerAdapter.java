@@ -14,19 +14,21 @@ import java.util.List;
 
 import ch.giantific.qwittig.databinding.RowPurchaseAddItemUsersUserBinding;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.items.ItemUsersItemUser;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.items.PurchaseAddEditItemUsersUser;
 
 /**
- * Created by fabio on 24.01.16.
+ * Provides an adapter for a {@link RecyclerView} showing a list of users.
+ * <p/>
+ * Subclass of {@link RecyclerView.Adapter}.
  */
 public class PurchaseAddEditItemUsersRecyclerAdapter extends RecyclerView.Adapter<PurchaseAddEditItemUsersRecyclerAdapter.ItemUserRow>
         implements PurchaseAddEditItemUsersClickListener {
 
     private final PurchaseAddEditViewModel mViewModel;
-    private final List<ItemUsersItemUser> mUsers;
+    private final List<PurchaseAddEditItemUsersUser> mUsers;
 
     public PurchaseAddEditItemUsersRecyclerAdapter(@NonNull PurchaseAddEditViewModel viewModel,
-                                                   @NonNull List<ItemUsersItemUser> users) {
+                                                   @NonNull List<PurchaseAddEditItemUsersUser> users) {
         mViewModel = viewModel;
         mUsers = users;
     }
@@ -42,8 +44,8 @@ public class PurchaseAddEditItemUsersRecyclerAdapter extends RecyclerView.Adapte
     @Override
     public void onBindViewHolder(ItemUserRow holder, int position) {
         final RowPurchaseAddItemUsersUserBinding binding = holder.getBinding();
-        final ItemUsersItemUser itemUsersItemUser = mUsers.get(position);
-        binding.setItemUsersItemUser(itemUsersItemUser);
+        final PurchaseAddEditItemUsersUser purchaseAddEditItemUsersUser = mUsers.get(position);
+        binding.setItem(purchaseAddEditItemUsersUser);
         binding.executePendingBindings();
     }
 
@@ -54,11 +56,11 @@ public class PurchaseAddEditItemUsersRecyclerAdapter extends RecyclerView.Adapte
 
     @Override
     public void onItemRowUserClick(int position) {
-        final ItemUsersItemUser user = mUsers.get(position);
+        final PurchaseAddEditItemUsersUser user = mUsers.get(position);
         if (user.isSelected()) {
             boolean anotherUserSelected = false;
-            for (ItemUsersItemUser itemUsersItemUser : mUsers) {
-                if (itemUsersItemUser != user && itemUsersItemUser.isSelected()) {
+            for (PurchaseAddEditItemUsersUser purchaseAddEditItemUsersUser : mUsers) {
+                if (purchaseAddEditItemUsersUser != user && purchaseAddEditItemUsersUser.isSelected()) {
                     anotherUserSelected = true;
                     break;
                 }
@@ -84,6 +86,11 @@ public class PurchaseAddEditItemUsersRecyclerAdapter extends RecyclerView.Adapte
         // nothing to do here
     }
 
+    /**
+     * Provides a {@link RecyclerView} row showing a user.
+     * <p/>
+     * Subclass of {@link BindingRow}.
+     */
     public static class ItemUserRow extends BindingRow<RowPurchaseAddItemUsersUserBinding> {
 
         public ItemUserRow(@NonNull RowPurchaseAddItemUsersUserBinding binding,

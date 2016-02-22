@@ -21,7 +21,9 @@ import rx.Single;
 import rx.SingleSubscriber;
 
 /**
- * Created by fabio on 29.01.16.
+ * Provides an implementation of the {@link PurchaseEditDraftViewModel}.
+ * <p/>
+ * Subclass of {@link PurchaseAddEditViewModelEditImpl}.
  */
 public class PurchaseEditDraftViewModelImpl extends PurchaseAddEditViewModelEditImpl implements PurchaseEditDraftViewModel {
 

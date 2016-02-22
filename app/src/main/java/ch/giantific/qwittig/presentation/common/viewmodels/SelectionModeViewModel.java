@@ -5,10 +5,9 @@
 package ch.giantific.qwittig.presentation.common.viewmodels;
 
 import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 
 /**
- * Defines the needed methods for a {@link RecyclerView} adapter with state selection support.
+ * Defines the needed methods for a view model with a list that supports state selection.
  */
 public interface SelectionModeViewModel<T> {
 
@@ -21,7 +20,6 @@ public interface SelectionModeViewModel<T> {
 
     /**
      * Clears the selected items and if needed deletes them also from the local data store.
-     *
      */
     void clearSelection();
 

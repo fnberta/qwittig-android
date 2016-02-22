@@ -58,7 +58,7 @@ public class IdentitiesUpdateWorker extends BaseQueryWorker<Identity, Identities
     @Nullable
     @Override
     protected Observable<Identity> getObservable(@NonNull Bundle args) {
-        if (setUserInfo()) {
+        if (checkIdentities()) {
             return mIdentityRepo.updateIdentitiesAsync(mIdentities);
         }
 

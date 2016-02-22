@@ -9,11 +9,11 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 
-import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorkerListener;
+import ch.giantific.qwittig.utils.MessageAction;
 
 /**
- * Defines the basic methods every view model contains.
+ * Defines an observable view model for a screen.
  */
 public interface ViewModel
         extends Observable, BaseWorkerListener {
@@ -28,7 +28,7 @@ public interface ViewModel
     /**
      * Sets up RxJava composite subscriptions and loads the data for the view.
      */
-    void onStart();
+    void onScreenVisible();
 
     /**
      * Loads the appropriate data for the newly set group.
@@ -39,8 +39,11 @@ public interface ViewModel
      * Cleans up any long living tasks, e.g. RxJava subscriptions, in order to allow the view model
      * and the view it references to be garbage collected.
      */
-    void onStop();
+    void onScreenGone();
 
+    /**
+     * Defines the interaction with the attached view.
+     */
     interface ViewListener {
         boolean isNetworkAvailable();
 

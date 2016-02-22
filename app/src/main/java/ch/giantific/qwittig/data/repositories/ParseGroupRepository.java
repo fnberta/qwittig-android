@@ -99,7 +99,7 @@ public class ParseGroupRepository extends ParseBaseRepository implements GroupRe
     }
 
     @Override
-    public void unsubscribeGroup(@NonNull Group group) {
+    public void unSubscribeGroup(@NonNull Group group) {
         ParsePush.unsubscribeInBackground(group.getObjectId());
     }
 }

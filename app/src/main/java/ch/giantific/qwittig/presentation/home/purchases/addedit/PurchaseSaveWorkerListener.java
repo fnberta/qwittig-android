@@ -15,8 +15,12 @@ import rx.Single;
  * or after the save process failed.
  */
 public interface PurchaseSaveWorkerListener extends BaseWorkerListener {
+
     /**
-     * Sets the purchase save rx.single.
+     * Sets the save purchase stream.
+     *
+     * @param single    the {@link Single} that emits the save result
+     * @param workerTag the tag of the worker fragment
      */
     void setPurchaseSaveStream(@NonNull Single<Purchase> single, @NonNull String workerTag);
 }

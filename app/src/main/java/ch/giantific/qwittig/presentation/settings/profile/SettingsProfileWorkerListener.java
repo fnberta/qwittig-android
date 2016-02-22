@@ -17,7 +17,11 @@ import rx.Single;
  */
 public interface SettingsProfileWorkerListener extends BaseWorkerListener {
     /**
-     * Sets the unlink stream.
+     * Sets the profile action stream.
+     *
+     * @param single    the {@link Single} emitting the result
+     * @param workerTag the tag of the headless worker fragment
+     * @param action    the action type
      */
     void setProfileActionStream(@NonNull Single<User> single, @NonNull String workerTag,
                                 @ProfileAction int action);

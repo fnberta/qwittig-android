@@ -4,15 +4,17 @@
 
 package ch.giantific.qwittig.data.receivers.di;
 
+import ch.giantific.qwittig.data.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.di.ApplicationComponent;
 import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.SystemServiceModule;
 import ch.giantific.qwittig.di.scopes.PerBroadcastReceive;
-import ch.giantific.qwittig.data.receivers.PushBroadcastReceiver;
 import dagger.Component;
 
 /**
- * Created by fabio on 12.01.16.
+ * Provides the dependencies for the push broadcast receiver.
+ *
+ * @see {@link PushBroadcastReceiver}
  */
 @PerBroadcastReceive
 @Component(dependencies = {ApplicationComponent.class},

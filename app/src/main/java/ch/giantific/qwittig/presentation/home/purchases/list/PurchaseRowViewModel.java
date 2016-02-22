@@ -17,7 +17,7 @@ import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MoneyUtils;
 
 /**
- * Created by fabio on 21.01.16.
+ * Provides a view model for a purchase in the list of purchases screen.
  */
 public class PurchaseRowViewModel extends BaseObservable {
 

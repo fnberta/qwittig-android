@@ -8,17 +8,18 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.navdrawer.NavDrawerViewModel;
 import ch.giantific.qwittig.presentation.navdrawer.NavDrawerViewModelImpl;
 import dagger.Module;
 import dagger.Provides;
 
 /**
- * Created by fabio on 12.01.16.
+ * Defines which view model implementation to use for the navigation drawer and how to instantiate
+ * it.
  */
 @Module
 public class NavDrawerViewModelModule extends BaseViewModelModule<NavDrawerViewModel.ViewListener> {

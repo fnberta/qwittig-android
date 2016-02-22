@@ -18,10 +18,9 @@ import java.util.List;
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.BuildConfig;
-import ch.giantific.qwittig.LocalBroadcast;
+import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.data.services.di.DaggerQueryServiceComponent;
-import ch.giantific.qwittig.di.LocalBroadcastModule;
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
@@ -239,7 +238,6 @@ public class ParseQueryService extends IntentService {
     private void injectDependencies() {
         DaggerQueryServiceComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
-                .localBroadcastModule(new LocalBroadcastModule(this))
                 .build()
                 .inject(this);
     }

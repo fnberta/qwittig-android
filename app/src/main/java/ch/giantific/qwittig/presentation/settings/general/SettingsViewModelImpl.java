@@ -28,7 +28,7 @@ import rx.Single;
 import rx.SingleSubscriber;
 
 /**
- * Created by fabio on 10.02.16.
+ * Provides an implementation of the {@link SettingsViewModel}.
  */
 public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.ViewListener>
         implements SettingsViewModel {
@@ -169,7 +169,7 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
 
     @Override
     public void onActionConfirmed() {
-        mGroupRepo.unsubscribeGroup(mCurrentIdentity.getGroup());
+        mGroupRepo.unSubscribeGroup(mCurrentIdentity.getGroup());
         mCurrentIdentity.setActive(false);
 
         final List<Identity> identities = mCurrentUser.getIdentities();

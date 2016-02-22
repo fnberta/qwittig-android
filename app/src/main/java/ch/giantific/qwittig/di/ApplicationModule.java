@@ -8,6 +8,7 @@ import android.app.Application;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
 
 import javax.inject.Singleton;
 
@@ -15,7 +16,7 @@ import dagger.Module;
 import dagger.Provides;
 
 /**
- * Created by fabio on 12.01.16.
+ * Defines how the application wide dependencies are instantiated.
  */
 @Module
 public class ApplicationModule {
@@ -36,5 +37,11 @@ public class ApplicationModule {
     @Singleton
     SharedPreferences providesSharedPreferences(Application application) {
         return PreferenceManager.getDefaultSharedPreferences(application);
+    }
+
+    @Provides
+    @Singleton
+    LocalBroadcastManager providesLocalBroadcastManager(Application application) {
+        return LocalBroadcastManager.getInstance(application);
     }
 }

@@ -12,7 +12,7 @@ import android.widget.AdapterView;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 
 /**
- * Created by fabio on 06.02.16.
+ * Defines an observable view model for the add new group settings screen.
  */
 public interface SettingsAddGroupViewModel extends ViewModel, AddGroupWorkerListener {
 
@@ -30,6 +30,9 @@ public interface SettingsAddGroupViewModel extends ViewModel, AddGroupWorkerList
 
     void onFabCreateClick(View view);
 
+    /**
+     * Defines the interaction with the attached view.
+     */
     interface ViewListener extends ViewModel.ViewListener {
 
         void loadAddGroupWorker(@NonNull String name, @NonNull String currency);

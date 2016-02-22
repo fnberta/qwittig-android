@@ -18,7 +18,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.view.ActionMode;
 
-import ch.giantific.qwittig.LocalBroadcast;
+import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.services.ParseQueryService;
@@ -245,14 +245,14 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     protected void onStart() {
         super.onStart();
 
-        mViewModel.onStart();
+        mViewModel.onScreenVisible();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
 
-        mViewModel.onStop();
+        mViewModel.onScreenGone();
     }
 
     @Override

@@ -57,7 +57,7 @@ public class PurchasesUpdateWorker extends BaseQueryWorker<Purchase, PurchasesUp
     @Nullable
     @Override
     protected Observable<Purchase> getObservable(@NonNull Bundle args) {
-        if (setUserInfo()) {
+        if (checkIdentities()) {
             return mPurchaseRepo.updatePurchasesAsync(mIdentities, mCurrentIdentity);
         }
 

@@ -11,7 +11,7 @@ import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddFragm
 import dagger.Component;
 
 /**
- * Created by fabio on 12.01.16.
+ * Provides the dependencies for the purchase add auto screen.
  */
 @PerFragment
 @Component(dependencies = {ApplicationComponent.class},
