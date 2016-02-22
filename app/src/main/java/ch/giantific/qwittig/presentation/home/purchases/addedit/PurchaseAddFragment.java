@@ -13,11 +13,11 @@ import android.view.MenuItem;
 
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.di.components.DaggerPurchaseAddAutoComponent;
-import ch.giantific.qwittig.di.components.DaggerPurchaseAddComponent;
-import ch.giantific.qwittig.di.modules.PurchaseAddAutoViewModelModule;
-import ch.giantific.qwittig.di.modules.PurchaseAddViewModelModule;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.di.DaggerPurchaseAddAutoComponent;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.di.DaggerPurchaseAddComponent;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.di.PurchaseAddAutoViewModelModule;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.di.PurchaseAddViewModelModule;
 
 /**
  * Displays the interface where the user can add a new purchase by setting store, date, users

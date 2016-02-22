@@ -19,8 +19,8 @@ import android.view.ViewGroup;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentLoginAccountsBinding;
-import ch.giantific.qwittig.di.components.DaggerLoginAccountsComponent;
-import ch.giantific.qwittig.di.modules.LoginAccountsViewModelModule;
+import ch.giantific.qwittig.presentation.login.di.DaggerLoginAccountsComponent;
+import ch.giantific.qwittig.presentation.login.di.LoginAccountsViewModelModule;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.utils.Utils;
 

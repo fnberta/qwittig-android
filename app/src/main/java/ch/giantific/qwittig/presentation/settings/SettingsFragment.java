@@ -30,12 +30,12 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.di.components.DaggerSettingsComponent;
-import ch.giantific.qwittig.di.modules.SettingsViewModelModule;
+import ch.giantific.qwittig.presentation.settings.di.DaggerSettingsComponent;
+import ch.giantific.qwittig.presentation.settings.di.SettingsViewModelModule;
 import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.presentation.common.fragments.ConfirmationDialogFragment;
 import ch.giantific.qwittig.presentation.settings.addgroup.SettingsAddGroupActivity;
-import ch.giantific.qwittig.presentation.settings.addusers.SettingsUsersActivity;
+import ch.giantific.qwittig.presentation.settings.users.SettingsUsersActivity;
 import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileActivity;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.WorkerUtils;

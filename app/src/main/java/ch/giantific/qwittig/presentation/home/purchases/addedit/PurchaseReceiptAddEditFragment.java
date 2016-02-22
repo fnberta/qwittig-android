@@ -19,12 +19,12 @@ import java.io.IOException;
 
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.di.components.DaggerPurchaseReceiptIdComponent;
-import ch.giantific.qwittig.di.components.DaggerPurchaseReceiptPathComponent;
-import ch.giantific.qwittig.di.modules.PurchaseReceiptIdViewModelModule;
-import ch.giantific.qwittig.di.modules.PurchaseReceiptPathViewModelModule;
-import ch.giantific.qwittig.presentation.home.purchases.PurchaseReceiptBaseFragment;
-import ch.giantific.qwittig.presentation.home.purchases.PurchaseReceiptViewModel;
+import ch.giantific.qwittig.presentation.home.purchases.common.di.DaggerPurchaseReceiptIdComponent;
+import ch.giantific.qwittig.presentation.home.purchases.common.di.DaggerPurchaseReceiptPathComponent;
+import ch.giantific.qwittig.presentation.home.purchases.common.di.PurchaseReceiptIdViewModelModule;
+import ch.giantific.qwittig.presentation.home.purchases.common.di.PurchaseReceiptPathViewModelModule;
+import ch.giantific.qwittig.presentation.home.purchases.common.PurchaseReceiptBaseFragment;
+import ch.giantific.qwittig.presentation.home.purchases.common.PurchaseReceiptViewModel;
 import ch.giantific.qwittig.utils.CameraUtils;
 
 /**

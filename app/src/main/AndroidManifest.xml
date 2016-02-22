@@ -99,7 +99,7 @@
             android:theme="@style/AppTheme.Explode"
             android:windowSoftInputMode="stateUnchanged" />
         <activity
-            android:name=".presentation.settings.addusers.SettingsUsersActivity"
+            android:name=".presentation.settings.users.SettingsUsersActivity"
             android:label="@string/title_activity_settings_users"
             android:parentActivityName=".presentation.settings.SettingsActivity"
             android:theme="@style/AppTheme.Explode"

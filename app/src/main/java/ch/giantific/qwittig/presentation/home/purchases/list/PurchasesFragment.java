@@ -21,8 +21,8 @@ import com.mugen.MugenCallbacks;
 
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.databinding.FragmentHomePurchasesBinding;
-import ch.giantific.qwittig.di.components.DaggerPurchasesListComponent;
-import ch.giantific.qwittig.di.modules.HomePurchasesViewModelModule;
+import ch.giantific.qwittig.presentation.home.purchases.list.di.DaggerPurchasesListComponent;
+import ch.giantific.qwittig.presentation.home.purchases.list.di.PurchasesListViewModelModule;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewOnlineFragment;
@@ -49,7 +49,7 @@ public class PurchasesFragment extends BaseRecyclerViewOnlineFragment<PurchasesV
 
         DaggerPurchasesListComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(getActivity()))
-                .homePurchasesViewModelModule(new HomePurchasesViewModelModule(savedInstanceState, this))
+                .purchasesListViewModelModule(new PurchasesListViewModelModule(savedInstanceState, this))
                 .build()
                 .inject(this);
     }

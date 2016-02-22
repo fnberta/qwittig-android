@@ -85,7 +85,7 @@ public class CircleDisplay extends View {
 
         mArcPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mArcPaint.setStyle(Style.FILL);
-        mArcPaint.setColor(ContextCompat.getColor(context, R.color.accent));
+        mArcPaint.setColor(ContextCompat.getColor(context, R.color.amber_A700));
 
         mDrawAnimator = ObjectAnimator.ofFloat(this, "phase", mPhase, 1.0f).setDuration(1000);
         mDrawAnimator.setInterpolator(new AccelerateDecelerateInterpolator());

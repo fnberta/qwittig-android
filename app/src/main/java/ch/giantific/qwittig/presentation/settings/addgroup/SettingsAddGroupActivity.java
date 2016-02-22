@@ -13,9 +13,9 @@ import android.support.v7.app.ActionBar;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
-import ch.giantific.qwittig.presentation.settings.addusers.AddUserWorkerListener;
-import ch.giantific.qwittig.presentation.settings.addusers.SettingsUsersFragment;
-import ch.giantific.qwittig.presentation.settings.addusers.SettingsUsersViewModel;
+import ch.giantific.qwittig.presentation.settings.users.AddUserWorkerListener;
+import ch.giantific.qwittig.presentation.settings.users.SettingsUsersFragment;
+import ch.giantific.qwittig.presentation.settings.users.SettingsUsersViewModel;
 import rx.Single;
 
 /**

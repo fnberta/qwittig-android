@@ -7,8 +7,6 @@ package ch.giantific.qwittig.presentation.stats;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.NavigationView;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -21,7 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.di.components.NavDrawerComponent;
+import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.presentation.common.adapters.StringResSpinnerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.ThemedArrayAdapter;

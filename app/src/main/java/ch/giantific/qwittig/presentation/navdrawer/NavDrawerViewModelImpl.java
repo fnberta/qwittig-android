@@ -20,7 +20,6 @@ import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
-import rx.SingleSubscriber;
 import rx.Subscriber;
 import rx.functions.Func1;
 
@@ -71,6 +70,7 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
                     public void onCompleted() {
                         notifyPropertyChanged(BR.identityNickname);
                         mView.notifyHeaderIdentitiesChanged();
+                        notifyPropertyChanged(BR.selectedIdentity);
                     }
 
                     @Override
@@ -110,13 +110,6 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
     }
 
     @Override
-    public void notifySelectedGroupChanged() {
-        mCurrentIdentity = mCurrentUser.getCurrentIdentity();
-        notifyPropertyChanged(BR.selectedIdentity);
-        mView.onIdentitySelected();
-    }
-
-    @Override
     public boolean isUserLoggedIn() {
         if (mCurrentUser == null) {
             mView.startLoginActivity();
@@ -138,46 +131,33 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
     }
 
     @Override
-    public void onIdentityChanged() {
-        getSubscriptions().add(mIdentityRepo.fetchIdentitiesDataAsync(mCurrentUser.getIdentities())
-                .filter(new Func1<Identity, Boolean>() {
-                    @Override
-                    public Boolean call(Identity identity) {
-                        return identity.isActive();
-                    }
-                })
-                .subscribe(new Subscriber<Identity>() {
-                    @Override
-                    public void onStart() {
-                        super.onStart();
-
-                        mIdentities.clear();
-                    }
-
-                    @Override
-                    public void onCompleted() {
-                        mView.notifyHeaderIdentitiesChanged();
-                        notifySelectedGroupChanged();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        mView.showMessage(R.string.toast_error_drawer_update_groups);
-                    }
-
-                    @Override
-                    public void onNext(Identity identity) {
-                        mIdentities.add(identity);
-                    }
-                })
-        );
-    }
-
-    @Override
     public void onProfileUpdated() {
         notifyPropertyChanged(BR.identityNickname);
         notifyPropertyChanged(BR.identityAvatar);
         mView.showMessage(R.string.toast_profile_update);
+    }
+
+    @Override
+    public void onIdentityChanged() {
+        mIdentities.clear();
+        final List<Identity> identities = mCurrentUser.getIdentities();
+        if (!identities.isEmpty()) {
+            for (Identity identity : identities) {
+                if (identity.isActive()) {
+                    mIdentities.add(identity);
+                }
+            }
+        }
+        mView.notifyHeaderIdentitiesChanged();
+        onSettingsIdentitySelected();
+    }
+
+    @Override
+    public void onSettingsIdentitySelected() {
+        mCurrentIdentity = mCurrentUser.getCurrentIdentity();
+        notifyPropertyChanged(BR.selectedIdentity);
+
+        mView.onIdentitySelected();
     }
 
     @Override

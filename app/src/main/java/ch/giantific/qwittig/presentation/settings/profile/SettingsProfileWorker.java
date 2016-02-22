@@ -16,7 +16,7 @@ import java.lang.annotation.RetentionPolicy;
 
 import javax.inject.Inject;
 
-import ch.giantific.qwittig.di.components.WorkerComponent;
+import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;

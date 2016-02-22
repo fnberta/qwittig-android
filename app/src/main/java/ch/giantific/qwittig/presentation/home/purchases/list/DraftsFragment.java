@@ -23,8 +23,8 @@ import android.view.ViewGroup;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentHomeDraftsBinding;
-import ch.giantific.qwittig.di.components.DaggerDraftsListComponent;
-import ch.giantific.qwittig.di.modules.HomeDraftsViewModelModule;
+import ch.giantific.qwittig.presentation.home.purchases.list.di.DaggerDraftsListComponent;
+import ch.giantific.qwittig.presentation.home.purchases.list.di.DraftsListViewModelModule;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
@@ -56,7 +56,7 @@ public class DraftsFragment extends BaseRecyclerViewFragment<DraftsViewModel, Dr
 
         DaggerDraftsListComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(getActivity()))
-                .homeDraftsViewModelModule(new HomeDraftsViewModelModule(savedInstanceState, this))
+                .draftsListViewModelModule(new DraftsListViewModelModule(savedInstanceState, this))
                 .build()
                 .inject(this);
     }

@@ -45,7 +45,7 @@
             android:layout_marginTop="@dimen/fab_margin_toolbar_x2"
             android:src="@drawable/ic_save_black_24dp"
             android:visibility="gone"
-            app:fp_arcColor="@color/green"
+            app:fp_arcColor="@color/green_500"
             app:fp_finalIcon="@drawable/ic_done_black_24dp"
             tools:visibility="visible"
             />

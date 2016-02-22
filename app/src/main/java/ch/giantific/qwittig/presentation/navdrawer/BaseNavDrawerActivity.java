@@ -28,9 +28,9 @@ import ch.giantific.qwittig.LocalBroadcast;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.NavDrawerHeaderBinding;
-import ch.giantific.qwittig.di.components.DaggerNavDrawerComponent;
-import ch.giantific.qwittig.di.components.NavDrawerComponent;
-import ch.giantific.qwittig.di.modules.NavDrawerViewModelModule;
+import ch.giantific.qwittig.presentation.navdrawer.di.DaggerNavDrawerComponent;
+import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
+import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerViewModelModule;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.finance.FinanceActivity;
@@ -234,7 +234,7 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
                         mNavDrawerViewModel.onLogout();
                         break;
                     case SettingsViewModel.Result.GROUP_SELECTED:
-                        mNavDrawerViewModel.notifySelectedGroupChanged();
+                        mNavDrawerViewModel.onSettingsIdentitySelected();
                         break;
                     case SettingsViewModel.Result.GROUP_CHANGED:
                         mNavDrawerViewModel.onIdentityChanged();

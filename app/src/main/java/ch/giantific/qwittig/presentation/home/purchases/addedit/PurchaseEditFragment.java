@@ -8,8 +8,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import ch.giantific.qwittig.Qwittig;
-import ch.giantific.qwittig.di.components.DaggerPurchaseEditComponent;
-import ch.giantific.qwittig.di.modules.PurchaseEditViewModelModule;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.di.DaggerPurchaseEditComponent;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.di.PurchaseEditViewModelModule;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
 
 /**

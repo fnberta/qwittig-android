@@ -13,8 +13,8 @@ import android.support.v4.app.Fragment;
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.Qwittig;
-import ch.giantific.qwittig.di.components.DaggerWorkerComponent;
-import ch.giantific.qwittig.di.components.WorkerComponent;
+import ch.giantific.qwittig.presentation.common.di.DaggerWorkerComponent;
+import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import rx.Observable;
 import rx.Subscription;

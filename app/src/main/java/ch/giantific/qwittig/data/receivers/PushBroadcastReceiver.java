@@ -34,9 +34,9 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.receivers.di.DaggerPushReceiverComponent;
 import ch.giantific.qwittig.data.services.ParseQueryService;
-import ch.giantific.qwittig.di.components.DaggerPushReceiverComponent;
-import ch.giantific.qwittig.di.modules.SystemServiceModule;
+import ch.giantific.qwittig.di.SystemServiceModule;
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;

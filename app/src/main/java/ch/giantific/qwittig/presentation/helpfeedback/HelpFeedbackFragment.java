@@ -17,9 +17,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.FragmentHelpFeedbackBinding;
-import ch.giantific.qwittig.di.components.DaggerHelpFeedbackComponent;
-import ch.giantific.qwittig.di.modules.HelpFeedbackViewModelModule;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
+import ch.giantific.qwittig.presentation.helpfeedback.di.DaggerHelpFeedbackComponent;
+import ch.giantific.qwittig.presentation.helpfeedback.di.HelpFeedbackViewModelModule;
 
 /**
  * Displays help and feedback items in a {@link RecyclerView} list.

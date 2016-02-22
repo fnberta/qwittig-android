@@ -11,7 +11,7 @@
 
         <variable
             name="nicknameItem"
-            type="ch.giantific.qwittig.presentation.settings.addusers.items.NicknameItem"
+            type="ch.giantific.qwittig.presentation.settings.users.items.NicknameItem"
             />
     </data>
 

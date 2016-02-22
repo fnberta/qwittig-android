@@ -17,8 +17,8 @@ import com.mugen.Mugen;
 import com.mugen.MugenCallbacks;
 
 import ch.giantific.qwittig.databinding.FragmentFinanceCompensationsPaidBinding;
-import ch.giantific.qwittig.di.components.DaggerFinanceCompsPaidComponent;
-import ch.giantific.qwittig.di.modules.FinanceCompsPaidViewModelModule;
+import ch.giantific.qwittig.presentation.finance.di.DaggerFinanceCompsPaidComponent;
+import ch.giantific.qwittig.presentation.finance.di.FinanceCompsPaidViewModelModule;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewOnlineFragment;
 
 /**

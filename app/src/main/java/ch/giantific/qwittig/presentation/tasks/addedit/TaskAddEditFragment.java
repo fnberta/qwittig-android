@@ -19,10 +19,10 @@ import android.view.ViewGroup;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentTaskAddBinding;
-import ch.giantific.qwittig.di.components.DaggerTaskAddComponent;
-import ch.giantific.qwittig.di.components.DaggerTaskEditComponent;
-import ch.giantific.qwittig.di.modules.TaskAddViewModelModule;
-import ch.giantific.qwittig.di.modules.TaskEditViewModelModule;
+import ch.giantific.qwittig.presentation.tasks.addedit.di.DaggerTaskAddComponent;
+import ch.giantific.qwittig.presentation.tasks.addedit.di.DaggerTaskEditComponent;
+import ch.giantific.qwittig.presentation.tasks.addedit.di.TaskAddViewModelModule;
+import ch.giantific.qwittig.presentation.tasks.addedit.di.TaskEditViewModelModule;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.presentation.common.adapters.StringResSpinnerAdapter;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;

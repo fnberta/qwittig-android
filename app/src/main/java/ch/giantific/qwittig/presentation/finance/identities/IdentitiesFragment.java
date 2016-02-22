@@ -17,8 +17,8 @@ import android.view.ViewGroup;
 import org.apache.commons.math3.fraction.BigFraction;
 
 import ch.giantific.qwittig.databinding.FragmentFinanceIdentitiesBinding;
-import ch.giantific.qwittig.di.components.DaggerFinanceIdentitiesComponent;
-import ch.giantific.qwittig.di.modules.FinanceUsersViewModelModule;
+import ch.giantific.qwittig.presentation.finance.di.DaggerFinanceIdentitiesComponent;
+import ch.giantific.qwittig.presentation.finance.di.FinanceUsersViewModelModule;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewOnlineFragment;
 
 /**

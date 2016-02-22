@@ -78,9 +78,9 @@
             android:layout_marginStart="@dimen/normal_space"
             android:gravity="center"
             android:text="@{viewModel.compAmount}"
-            android:textColor="@{viewModel.compAmountPos ? @color/green : @color/red}"
+            android:textColor="@{viewModel.compAmountPos ? @color/green_500 : @color/red_500}"
             tools:text="-50"
-            tools:textColor="@color/green"/>
+            tools:textColor="@color/green_500"/>
 
     </RelativeLayout>
 

@@ -12,7 +12,7 @@
 
         <variable
             name="userItem"
-            type="ch.giantific.qwittig.presentation.settings.addusers.items.UserItem"
+            type="ch.giantific.qwittig.presentation.settings.users.items.UserItem"
             />
     </data>
 

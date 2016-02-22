@@ -19,10 +19,10 @@ import android.widget.ArrayAdapter;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentSettingsAddGroupBinding;
-import ch.giantific.qwittig.di.components.DaggerSettingsAddGroupComponent;
-import ch.giantific.qwittig.di.modules.SettingsAddGroupViewModelModule;
+import ch.giantific.qwittig.presentation.settings.addgroup.di.DaggerSettingsAddGroupComponent;
+import ch.giantific.qwittig.presentation.settings.addgroup.di.SettingsAddGroupViewModelModule;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
-import ch.giantific.qwittig.presentation.settings.addusers.SettingsUsersFragment;
+import ch.giantific.qwittig.presentation.settings.users.SettingsUsersFragment;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.parse.ParseUtils;
 

@@ -28,8 +28,8 @@ import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentLoginEmailBinding;
-import ch.giantific.qwittig.di.components.DaggerLoginEmailComponent;
-import ch.giantific.qwittig.di.modules.LoginEmailViewModelModule;
+import ch.giantific.qwittig.presentation.login.di.DaggerLoginEmailComponent;
+import ch.giantific.qwittig.presentation.login.di.LoginEmailViewModelModule;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.fragments.EmailPromptDialogFragment;
 import ch.giantific.qwittig.utils.ViewUtils;

@@ -12,8 +12,8 @@ import android.view.MenuItem;
 
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.di.components.DaggerPurchaseEditComponent;
-import ch.giantific.qwittig.di.modules.PurchaseEditViewModelModule;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.di.DaggerPurchaseEditComponent;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.di.PurchaseEditViewModelModule;
 
 /**
  * Displays the interface where the user can edit a purchase draft. The user can either save the

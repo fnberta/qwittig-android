@@ -23,10 +23,10 @@ import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.ActivityHomeBinding;
-import ch.giantific.qwittig.di.components.DaggerHomeComponent;
-import ch.giantific.qwittig.di.components.HomeComponent;
-import ch.giantific.qwittig.di.components.NavDrawerComponent;
-import ch.giantific.qwittig.di.modules.HomeViewModelModule;
+import ch.giantific.qwittig.presentation.home.di.DaggerHomeComponent;
+import ch.giantific.qwittig.presentation.home.di.HomeComponent;
+import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
+import ch.giantific.qwittig.presentation.home.di.HomeViewModelModule;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.adapters.TabsAdapter;
@@ -291,7 +291,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
                         showMessage(R.string.toast_purchase_deleted);
                         break;
                     case PurchaseDetailsResult.GROUP_CHANGED:
-                        mNavDrawerViewModel.notifySelectedGroupChanged();
+                        mNavDrawerViewModel.onSettingsIdentitySelected();
                         break;
                 }
                 break;

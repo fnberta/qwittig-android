@@ -15,12 +15,11 @@ import com.parse.ParseACL;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
-import com.squareup.leakcanary.LeakCanary;
 
-import ch.giantific.qwittig.di.components.ApplicationComponent;
-import ch.giantific.qwittig.di.components.DaggerApplicationComponent;
-import ch.giantific.qwittig.di.modules.ApplicationModule;
-import ch.giantific.qwittig.di.modules.RestServiceModule;
+import ch.giantific.qwittig.di.ApplicationComponent;
+import ch.giantific.qwittig.di.ApplicationModule;
+import ch.giantific.qwittig.di.DaggerApplicationComponent;
+import ch.giantific.qwittig.di.RestServiceModule;
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
