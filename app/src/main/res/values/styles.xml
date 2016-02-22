@@ -5,9 +5,9 @@
 <resources>
 
     <style name="BaseThemeDark" parent="Theme.AppCompat.NoActionBar">
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorAccent">@color/accent</item>
+        <item name="colorPrimary">@color/indigo_500</item>
+        <item name="colorPrimaryDark">@color/indigo_700</item>
+        <item name="colorAccent">@color/amber_A700</item>
 
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
         <item name="windowActionModeOverlay">true</item>
@@ -16,15 +16,15 @@
     <style name="AppThemeDark" parent="BaseThemeDark"/>
 
     <style name="AppThemeDark.Login" parent="AppThemeDark">
-        <item name="android:windowBackground">@color/primary</item>
+        <item name="android:windowBackground">?attr/colorPrimary</item>
     </style>
 
     <style name="AppThemeDark.DrawStatusBar" parent="AppThemeDark"/>
 
     <style name="BaseTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorAccent">@color/accent</item>
+        <item name="colorPrimary">@color/indigo_500</item>
+        <item name="colorPrimaryDark">@color/indigo_700</item>
+        <item name="colorAccent">@color/amber_A700</item>
         <item name="colorButtonNormal">@android:color/white</item>
 
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
@@ -44,13 +44,13 @@
     <style name="AppTheme.DrawStatusBar.Explode" parent="AppTheme.DrawStatusBar"/>
 
     <style name="AppTheme.DrawStatusBar.Green" parent="AppTheme.DrawStatusBar">
-        <item name="colorPrimary">@color/green</item>
-        <item name="colorPrimaryDark">@color/green_dark</item>
+        <item name="colorPrimary">@color/green_500</item>
+        <item name="colorPrimaryDark">@color/green_700</item>
     </style>
 
     <style name="AppTheme.DrawStatusBar.Red" parent="AppTheme.DrawStatusBar">
-        <item name="colorPrimary">@color/red</item>
-        <item name="colorPrimaryDark">@color/red_dark</item>
+        <item name="colorPrimary">@color/red_500</item>
+        <item name="colorPrimaryDark">@color/red_700</item>
     </style>
 
     <style name="TextAppearance.AppCompat.Subhead.List" parent="TextAppearance.AppCompat.Subhead">

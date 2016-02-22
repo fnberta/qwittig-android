@@ -194,16 +194,16 @@ public class BindingUtils {
         final int color;
         if (daysToDeadline == 0) {
             deadlineString = context.getString(R.string.deadline_today);
-            color = R.color.green;
+            color = R.color.green_500;
         } else if (daysToDeadline == -1) {
             deadlineString = context.getString(R.string.yesterday);
-            color = R.color.red;
+            color = R.color.red_500;
         } else if (daysToDeadline < 0) {
             deadlineString = context.getString(R.string.deadline_text_neg, daysToDeadline * -1);
-            color = R.color.red;
+            color = R.color.red_500;
         } else {
             deadlineString = context.getString(R.string.deadline_text_pos, daysToDeadline);
-            color = R.color.green;
+            color = R.color.green_500;
         }
 
         view.setText(deadlineString);

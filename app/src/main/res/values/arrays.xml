@@ -26,9 +26,9 @@
 
     <integer-array
         name="srl_color_scheme">
-        <item>@color/primary</item>
-        <item>@color/accent</item>
-        <item>@color/green</item>
-        <item>@color/red</item>
+        <item>@color/indigo_500</item>
+        <item>@color/amber_A700</item>
+        <item>@color/green_500</item>
+        <item>@color/red_500</item>
     </integer-array>
 </resources>

@@ -33,7 +33,7 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/normal_space"
             android:layout_marginStart="@dimen/key_line_1"
-            android:background="@color/grey_light"
+            android:background="@color/grey_300"
             android:gravity="center"
             android:lines="2"
             android:paddingEnd="@dimen/min_space"

@@ -7,48 +7,20 @@
     <color name="red_50">#FFEBEE</color>
     <color name="red_500">#F44336</color>
     <color name="red_700">#D32F2F</color>
-
     <color name="deep_purple_500">#673AB7</color>
-
     <color name="light_blue_700">#0288D1</color>
-
     <color name="green_50">#E8F5E9</color>
     <color name="green_500">#4CAF50</color>
     <color name="green_700">#388E3C</color>
-
     <color name="deep_orange_500">#FF5722</color>
-
     <color name="blue_grey_500">#607D8B</color>
-
     <color name="indigo_500">#3F51B5</color>
     <color name="indigo_700">#303F9F</color>
-
     <color name="cyan_700">#0097A7</color>
-
     <color name="amber_A700">#FFAB00</color>
-
     <color name="brown_500">#795548</color>
-
     <color name="purple_500">#9C27B0</color>
-
     <color name="blue_500">#2196F3</color>
-
     <color name="teal_700">#00796B</color>
-
     <color name="grey_300">#E0E0E0</color>
-
-
-    <color name="primary">@color/indigo_500</color>
-    <color name="primary_dark">@color/indigo_700</color>
-    <color name="accent">@color/amber_A700</color>
-
-    <color name="red">@color/red_500</color>
-    <color name="red_dark">@color/red_700</color>
-    <color name="red_light">@color/red_50</color>
-
-    <color name="green">@color/green_500</color>
-    <color name="green_dark">@color/green_700</color>
-    <color name="green_light">@color/green_50</color>
-
-    <color name="grey_light">@color/grey_300</color>
 </resources>
