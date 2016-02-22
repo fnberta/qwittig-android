@@ -2,12 +2,12 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.settings.di;
+package ch.giantific.qwittig.presentation.settings.general.di;
 
 import ch.giantific.qwittig.di.ApplicationComponent;
 import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.presentation.settings.SettingsFragment;
+import ch.giantific.qwittig.presentation.settings.general.SettingsFragment;
 import dagger.Component;
 
 /**

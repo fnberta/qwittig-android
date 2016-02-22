@@ -89,6 +89,8 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
         outState.putString(STATE_AVATAR, mAvatar);
         outState.putString(STATE_EMAIL, mEmail);
         outState.putString(STATE_NICKNAME, mNickname);
+        outState.putString(STATE_PASSWORD, mPassword);
+        outState.putString(STATE_PASSWORD_REPEAT, mPasswordRepeat);
     }
 
     @Override

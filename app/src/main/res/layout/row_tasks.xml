@@ -98,13 +98,14 @@
                 />
 
             <TextView
-                android:id="@+id/tv_task_users_involved"
+                android:id="@+id/tv_task_identities"
                 style="@style/TextAppearance.AppCompat.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tv_task_time_frame"
                 android:layout_marginBottom="@dimen/normal_space"
                 android:layout_toEndOf="@id/iv_avatar"
+                app:identities="@{item.taskIdentities}"
                 tools:text="vera - lexli - sturzi"
                 />
 
@@ -118,14 +119,14 @@
                 android:layout_marginTop="@dimen/normal_space"
                 app:deadline="@{item.daysToTaskDeadline}"
                 tools:text="In 2 Tagen"
-                tools:textColor="@color/green"
+                tools:textColor="@color/green_500"
                 />
 
             <View
                 android:id="@+id/divider"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_below="@id/tv_task_users_involved"
+                android:layout_below="@id/tv_task_identities"
                 android:background="?android:attr/listDivider"
                 />
 

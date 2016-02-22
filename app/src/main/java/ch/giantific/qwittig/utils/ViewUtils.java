@@ -79,8 +79,8 @@ public class ViewUtils {
      *
      * @param activity the activity to get the focused view
      */
-    public static void hideSoftKeyboard(Activity activity) {
-        InputMethodManager inputMethodManager = (InputMethodManager)
+    public static void hideSoftKeyboard(@NonNull Activity activity) {
+        final InputMethodManager inputMethodManager = (InputMethodManager)
                 activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         // Find the currently focused view, so we can grab the correct window token from it.
         View view = activity.getCurrentFocus();

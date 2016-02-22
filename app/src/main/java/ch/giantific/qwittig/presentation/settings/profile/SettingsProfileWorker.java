@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentManager;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -118,9 +119,10 @@ public class SettingsProfileWorker extends BaseWorker<User, SettingsProfileWorke
                     final String nickname = args.getString(KEY_NICKNAME, "");
                     final byte[] avatar = args.getByteArray(KEY_AVATAR);
                     return mIdentityRepo.saveIdentitiesWithAvatar(user.getIdentities(), nickname, avatar)
-                            .map(new Func1<Identity, User>() {
+                            .toList()
+                            .map(new Func1<List<Identity>, User>() {
                                 @Override
-                                public User call(Identity identity) {
+                                public User call(List<Identity> identities) {
                                     return user;
                                 }
                             });

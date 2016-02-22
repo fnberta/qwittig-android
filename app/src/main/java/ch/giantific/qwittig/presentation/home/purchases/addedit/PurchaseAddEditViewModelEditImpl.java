@@ -256,7 +256,12 @@ public class PurchaseAddEditViewModelEditImpl extends PurchaseAddEditViewModelAd
                 continue;
             }
 
-            final Item itemOld = mOldItems.get(i - skipCount);
+            final Item itemOld;
+            try {
+                itemOld = mOldItems.get(i - skipCount);
+            } catch (IndexOutOfBoundsException e) {
+                return true;
+            }
             final ItemItem itemItem = (ItemItem) addEditItem;
             if (!itemOld.getName().equals(itemItem.getName())) {
                 return true;

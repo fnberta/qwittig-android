@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.settings.di;
+package ch.giantific.qwittig.presentation.settings.general.di;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,8 +13,8 @@ import ch.giantific.qwittig.di.scopes.PerFragment;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.presentation.settings.SettingsViewModel;
-import ch.giantific.qwittig.presentation.settings.SettingsViewModelImpl;
+import ch.giantific.qwittig.presentation.settings.general.SettingsViewModel;
+import ch.giantific.qwittig.presentation.settings.general.SettingsViewModelImpl;
 import dagger.Module;
 import dagger.Provides;
 

@@ -11,6 +11,7 @@ import android.support.annotation.StringRes;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
@@ -24,11 +25,10 @@ import ch.giantific.qwittig.utils.DateUtils;
  */
 public class TaskItem extends BaseObservable implements ListItem, CardTopProgressViewModel {
 
+    private final Identity mCurrentIdentity;
     private Task mTask;
     private Identity mTaskIdentityResponsible;
-    private final Identity mCurrentIdentity;
-
-    // TODO: fix users involved (nothing displayed right now)
+    private List<Identity> mTaskIdentities;
 
     public TaskItem(@NonNull Task task, @NonNull Identity currentIdentity) {
         mCurrentIdentity = currentIdentity;
@@ -38,6 +38,7 @@ public class TaskItem extends BaseObservable implements ListItem, CardTopProgres
     private void setTaskInfo(@NonNull Task task) {
         mTask = task;
         mTaskIdentityResponsible = task.getUserResponsible();
+        mTaskIdentities = mTask.getIdentities();
     }
 
     /**
@@ -89,6 +90,11 @@ public class TaskItem extends BaseObservable implements ListItem, CardTopProgres
     @Bindable
     public String getTaskUserResponsibleAvatar() {
         return mTaskIdentityResponsible.getAvatarUrl();
+    }
+
+    @Bindable
+    public List<Identity> getTaskIdentities() {
+        return mTaskIdentities;
     }
 
     /**

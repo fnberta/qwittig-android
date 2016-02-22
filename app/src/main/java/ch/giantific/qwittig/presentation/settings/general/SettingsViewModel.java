@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.settings;
+package ch.giantific.qwittig.presentation.settings.general;
 
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;

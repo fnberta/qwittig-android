@@ -14,7 +14,7 @@ import ch.giantific.qwittig.presentation.finance.identities.IdentitiesUpdateWork
 import ch.giantific.qwittig.presentation.home.purchases.addedit.OcrWorker;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.RatesWorker;
 import ch.giantific.qwittig.presentation.login.LoginWorker;
-import ch.giantific.qwittig.presentation.settings.LogoutWorker;
+import ch.giantific.qwittig.presentation.settings.general.LogoutWorker;
 import ch.giantific.qwittig.presentation.settings.addgroup.AddGroupWorker;
 import ch.giantific.qwittig.presentation.home.JoinGroupWorker;
 import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileWorker;

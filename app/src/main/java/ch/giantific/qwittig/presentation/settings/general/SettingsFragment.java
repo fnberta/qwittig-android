@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.settings;
+package ch.giantific.qwittig.presentation.settings.general;
 
 
 import android.app.ProgressDialog;
@@ -30,8 +30,8 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.presentation.settings.di.DaggerSettingsComponent;
-import ch.giantific.qwittig.presentation.settings.di.SettingsViewModelModule;
+import ch.giantific.qwittig.presentation.settings.general.di.DaggerSettingsComponent;
+import ch.giantific.qwittig.presentation.settings.general.di.SettingsViewModelModule;
 import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.presentation.common.fragments.ConfirmationDialogFragment;
 import ch.giantific.qwittig.presentation.settings.addgroup.SettingsAddGroupActivity;
