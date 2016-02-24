@@ -81,8 +81,8 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
     }
 
     @Override
-    public void onScreenVisible() {
-        super.onScreenVisible();
+    public void onViewVisible() {
+        super.onViewVisible();
 
         loadTaskUsers();
     }

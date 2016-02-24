@@ -130,8 +130,7 @@ public class SettingsProfileWorker extends BaseWorker<User, SettingsProfileWorke
                     return mUserRepo.unlinkFacebook(user).toObservable();
                 }
                 case ProfileAction.UNLINK_GOOGLE: {
-                    return mUserRepo.unlinkGoogle(mAppContext, user)
-                            .toObservable();
+                    return mUserRepo.unlinkGoogle(mAppContext, user).toObservable();
                 }
             }
         }

@@ -25,6 +25,7 @@ import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
 import java.util.List;
 
+import ch.berta.fabio.fabprogress.FabProgress;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.home.purchases.details.widgets.CircleDisplay;
@@ -186,6 +187,18 @@ public class BindingUtils {
             view.setBackgroundColor(ContextCompat.getColor(context, android.R.color.white));
         }
     }
+
+    @BindingAdapter({"progress", "animStop"})
+    public static void setFabProgressAnim(FabProgress view, boolean start, boolean animStop) {
+        if (start) {
+            view.startProgress();
+        } else if (animStop) {
+            view.startProgressFinalAnimation();
+        } else {
+            view.stopProgress();
+        }
+    }
+
 
     @BindingAdapter({"deadline"})
     public static void setTaskDeadline(TextView view, int daysToDeadline) {

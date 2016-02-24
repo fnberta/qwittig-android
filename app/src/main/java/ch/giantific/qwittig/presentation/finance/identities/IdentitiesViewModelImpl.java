@@ -25,6 +25,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModelBa
 import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Observable;
+import rx.Single;
 import rx.SingleSubscriber;
 import rx.functions.Func1;
 
@@ -59,7 +60,7 @@ public class IdentitiesViewModelImpl
     @Override
     public void loadData() {
         getSubscriptions().add(mIdentityRepo.fetchIdentityDataAsync(mCurrentIdentity)
-                .flatMap(new Func1<Identity, Observable<Identity>>() {
+                .flatMapObservable(new Func1<Identity, Observable<Identity>>() {
                     @Override
                     public Observable<Identity> call(Identity identity) {
                         final String currency = mCurrentIdentity.getGroup().getCurrency();

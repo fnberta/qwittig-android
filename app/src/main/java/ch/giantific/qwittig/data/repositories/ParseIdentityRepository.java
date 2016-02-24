@@ -5,7 +5,9 @@
 package ch.giantific.qwittig.data.repositories;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -21,6 +23,7 @@ import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import rx.Observable;
 import rx.Single;
+import rx.SingleSubscriber;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
@@ -66,6 +69,11 @@ public class ParseIdentityRepository extends ParseBaseRepository implements Iden
                 });
     }
 
+    @Override
+    public Single<Identity> saveIdentityLocalAsync(@NonNull Identity identity) {
+        return pin(identity, Identity.PIN_LABEL);
+    }
+
     @NonNull
     @Override
     public String getInvitationUrl(Identity identity, @NonNull String groupName) {
@@ -73,21 +81,19 @@ public class ParseIdentityRepository extends ParseBaseRepository implements Iden
     }
 
     @Override
-    public Observable<Identity> fetchIdentityDataAsync(@NonNull final Identity identity) {
+    public Single<Identity> fetchIdentityDataAsync(@NonNull final Identity identity) {
         if (identity.isDataAvailable() && identity.getGroup().isDataAvailable()) {
-            return Observable.just(identity);
+            return Single.just(identity);
         }
 
         return fetchLocal(identity)
-                .toObservable()
-                .onErrorResumeNext(fetchIfNeeded(identity).toObservable())
-                .flatMap(new Func1<Identity, Observable<? extends Group>>() {
+                .onErrorResumeNext(fetchIfNeeded(identity))
+                .flatMap(new Func1<Identity, Single<? extends Group>>() {
                     @Override
-                    public Observable<? extends Group> call(Identity identity) {
+                    public Single<? extends Group> call(Identity identity) {
                         final Group group = identity.getGroup();
                         return fetchLocal(group)
-                                .toObservable()
-                                .onErrorResumeNext(fetchIfNeeded(group).toObservable());
+                                .onErrorResumeNext(fetchIfNeeded(group));
                     }
                 })
                 .map(new Func1<Group, Identity>() {
@@ -104,7 +110,7 @@ public class ParseIdentityRepository extends ParseBaseRepository implements Iden
                 .flatMap(new Func1<Identity, Observable<Identity>>() {
                     @Override
                     public Observable<Identity> call(Identity identity) {
-                        return fetchIdentityDataAsync(identity);
+                        return fetchIdentityDataAsync(identity).toObservable();
                     }
                 });
     }
@@ -117,7 +123,7 @@ public class ParseIdentityRepository extends ParseBaseRepository implements Iden
         query.whereEqualTo(Identity.GROUP, group);
         query.whereEqualTo(Identity.ACTIVE, true);
         if (!includePending) {
-            query.whereEqualTo(Identity.PENDING, true);
+            query.whereEqualTo(Identity.PENDING, false);
         }
         return find(query)
                 .flatMap(new Func1<List<Identity>, Observable<Identity>>() {
@@ -131,12 +137,6 @@ public class ParseIdentityRepository extends ParseBaseRepository implements Iden
     @Override
     public Observable<Identity> updateIdentitiesAsync(@NonNull List<Identity> identities) {
         return Observable.from(identities)
-                .filter(new Func1<Identity, Boolean>() {
-                    @Override
-                    public Boolean call(Identity identity) {
-                        return identity.isActive();
-                    }
-                })
                 .map(new Func1<Identity, Group>() {
                     @Override
                     public Group call(Identity identity) {
@@ -190,9 +190,7 @@ public class ParseIdentityRepository extends ParseBaseRepository implements Iden
         try {
             final List<Group> groups = new ArrayList<>();
             for (Identity identity : identities) {
-                if (identity.isActive()) {
-                    groups.add(identity.getGroup());
-                }
+                groups.add(identity.getGroup());
             }
 
             final ParseQuery<Identity> query = getIdentitiesOnlineQuery(groups);
@@ -217,12 +215,6 @@ public class ParseIdentityRepository extends ParseBaseRepository implements Iden
                     @Override
                     public Observable<? extends Identity> call(ParseFile parseFile) {
                         return Observable.from(identities)
-                                .filter(new Func1<Identity, Boolean>() {
-                                    @Override
-                                    public Boolean call(Identity identity) {
-                                        return identity.isActive();
-                                    }
-                                })
                                 .doOnNext(new Action1<Identity>() {
                                     @Override
                                     public void call(Identity identity) {

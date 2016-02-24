@@ -113,12 +113,12 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
                         mView.removeWorker(workerTag);
                         mView.toggleProgressDialog(false);
 
-                        // TODO: hardcode item position?
-                        final SettingsUsersNicknameItem nicknameItem = ((SettingsUsersNicknameItem) mItems.get(POS_NICKNAME));
-                        nicknameItem.setValidate(false);
-                        nicknameItem.setNickname("");
+                        final SettingsUsersNicknameItem nicknameItem =
+                                ((SettingsUsersNicknameItem) mItems.get(POS_NICKNAME));
                         mItems.add(new SettingsUsersUserItem(nicknameItem.getNickname(), invitationUrl));
                         mView.notifyItemInserted(getLastPosition());
+                        nicknameItem.setValidate(false);
+                        nicknameItem.setNickname("");
                     }
 
                     @Override

@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 
 import java.text.NumberFormat;
 
+import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.presentation.common.viewmodels.CardTopProgressViewModel;
 
@@ -22,7 +23,6 @@ public abstract class CompsUnpaidItem extends BaseObservable
 
     private final Compensation mCompensation;
     private final String mCompAmount;
-    private final boolean mCompLoading;
     boolean mCredit;
     String mCompUsername;
     String mCompUserAvatar;
@@ -30,7 +30,6 @@ public abstract class CompsUnpaidItem extends BaseObservable
     public CompsUnpaidItem(@NonNull Compensation compensation, @NonNull NumberFormat moneyFormatter) {
         mCompensation = compensation;
         mCompAmount = moneyFormatter.format(compensation.getAmountFraction());
-        mCompLoading = compensation.isLoading();
     }
 
     public Compensation getCompensation() {
@@ -60,6 +59,6 @@ public abstract class CompsUnpaidItem extends BaseObservable
     @Override
     @Bindable
     public boolean isItemLoading() {
-        return mCompLoading;
+        return mCompensation.isLoading();
     }
 }

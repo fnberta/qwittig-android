@@ -18,20 +18,19 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.view.ActionMode;
 
-import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.ActivityHomeBinding;
-import ch.giantific.qwittig.presentation.home.di.DaggerHomeComponent;
-import ch.giantific.qwittig.presentation.home.di.HomeComponent;
-import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
-import ch.giantific.qwittig.presentation.home.di.HomeViewModelModule;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.adapters.TabsAdapter;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddActivity;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddEditViewModel.PurchaseResult;
+import ch.giantific.qwittig.presentation.home.di.DaggerHomeComponent;
+import ch.giantific.qwittig.presentation.home.di.HomeComponent;
+import ch.giantific.qwittig.presentation.home.di.HomeViewModelModule;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.AddEditPurchaseViewModel;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.AddPurchaseActivity;
 import ch.giantific.qwittig.presentation.home.purchases.details.PurchaseDetailsViewModel.PurchaseDetailsResult;
 import ch.giantific.qwittig.presentation.home.purchases.list.DraftsFragment;
 import ch.giantific.qwittig.presentation.home.purchases.list.DraftsViewModel;
@@ -40,6 +39,7 @@ import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesQueryMoreW
 import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesUpdateWorkerListener;
 import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesViewModel;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
+import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
 import ch.giantific.qwittig.utils.ViewUtils;
 import rx.Observable;
 import rx.Single;
@@ -245,14 +245,14 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     protected void onStart() {
         super.onStart();
 
-        mViewModel.onScreenVisible();
+        mViewModel.onViewVisible();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
 
-        mViewModel.onScreenGone();
+        mViewModel.onViewGone();
     }
 
     @Override
@@ -262,25 +262,25 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
         switch (requestCode) {
             case INTENT_REQUEST_PURCHASE_MODIFY:
                 switch (resultCode) {
-                    case PurchaseResult.PURCHASE_SAVED:
+                    case AddEditPurchaseViewModel.PurchaseResult.PURCHASE_SAVED:
                         showMessage(R.string.toast_purchase_added);
                         break;
-                    case PurchaseResult.PURCHASE_SAVED_AUTO:
+                    case AddEditPurchaseViewModel.PurchaseResult.PURCHASE_SAVED_AUTO:
                         showMessage(R.string.toast_purchase_added);
                         break;
-                    case PurchaseResult.PURCHASE_DRAFT:
+                    case AddEditPurchaseViewModel.PurchaseResult.PURCHASE_DRAFT:
                         showMessage(R.string.toast_purchase_added_draft);
                         break;
-                    case PurchaseResult.PURCHASE_DRAFT_CHANGES:
+                    case AddEditPurchaseViewModel.PurchaseResult.PURCHASE_DRAFT_CHANGES:
                         showMessage(R.string.toast_changes_saved_as_draft);
                         break;
-                    case PurchaseResult.PURCHASE_DRAFT_DELETED:
+                    case AddEditPurchaseViewModel.PurchaseResult.PURCHASE_DRAFT_DELETED:
                         showMessage(R.string.toast_draft_deleted);
                         break;
-                    case PurchaseResult.PURCHASE_DISCARDED:
+                    case AddEditPurchaseViewModel.PurchaseResult.PURCHASE_DISCARDED:
                         showMessage(R.string.toast_purchase_discarded);
                         break;
-                    case PurchaseResult.PURCHASE_ERROR:
+                    case AddEditPurchaseViewModel.PurchaseResult.PURCHASE_ERROR:
                         showMessage(R.string.toast_create_image_file_failed);
                         break;
                 }
@@ -291,7 +291,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
                         showMessage(R.string.toast_purchase_deleted);
                         break;
                     case PurchaseDetailsResult.GROUP_CHANGED:
-                        mNavDrawerViewModel.onSettingsIdentitySelected();
+                        mNavDrawerViewModel.onIdentityChanged();
                         break;
                 }
                 break;
@@ -338,7 +338,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     @Override
     public void onGroupJoined() {
         ParseQueryService.startQueryAll(this);
-        mNavDrawerViewModel.onIdentityChanged();
+        mNavDrawerViewModel.onIdentitiesChanged();
     }
 
     @Override
@@ -378,12 +378,12 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     @SuppressWarnings("unchecked")
     @Override
     public void startPurchaseAddActivity(boolean autoMode) {
-        final Intent intent = new Intent(this, PurchaseAddActivity.class);
+        final Intent intent = new Intent(this, AddPurchaseActivity.class);
         if (autoMode) {
-            intent.putExtra(PurchaseAddActivity.INTENT_PURCHASE_NEW_AUTO, true);
+            intent.putExtra(AddPurchaseActivity.INTENT_PURCHASE_NEW_AUTO, true);
             startActivityForResult(intent, HomeActivity.INTENT_REQUEST_PURCHASE_MODIFY);
         } else {
-            intent.putExtra(PurchaseAddActivity.INTENT_PURCHASE_NEW_AUTO, false);
+            intent.putExtra(AddPurchaseActivity.INTENT_PURCHASE_NEW_AUTO, false);
             final ActivityOptionsCompat activityOptionsCompat =
                     ActivityOptionsCompat.makeSceneTransitionAnimation(this);
             startActivityForResult(intent, HomeActivity.INTENT_REQUEST_PURCHASE_MODIFY,

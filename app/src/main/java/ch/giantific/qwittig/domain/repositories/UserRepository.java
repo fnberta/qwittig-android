@@ -14,6 +14,7 @@ import com.parse.ParseInstallation;
 
 import org.json.JSONObject;
 
+import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
 import rx.Observable;
 import rx.Single;
@@ -81,15 +82,23 @@ public interface UserRepository extends BaseRepository {
     Single<User> loginFacebook(@NonNull Fragment fragment);
 
     /**
+     * Sets the information from facebook (emaio, nickname and avatar) for the user and its identity.
+     *
+     * @param user     the user to set the information for
+     * @param identity the identity to set the information for
+     * @param fragment the fragment to use as context  @return a {@link Single} emitting the result
+     */
+    Single<User> setFacebookData(@NonNull User user, @NonNull Identity identity,
+                                 @NonNull final Fragment fragment);
+
+    /**
      * Logs in the user using his google account.
      *
-     * @param idToken     the google id token
-     * @param displayName the google profile display name
-     * @param photoUrl    the url to the google profile image
+     * @param idToken the google id token
      * @return a {@link Single} emitting the result
      */
-    Single<User> loginGoogle(@NonNull final Fragment fragment, @NonNull String idToken,
-                             @NonNull final String displayName, @NonNull final Uri photoUrl);
+    Single<User> loginGoogle(@NonNull String idToken,
+                             @NonNull final Fragment fragment);
 
     /**
      * Verifies the idToken obtained from Google and if successful logs in the user attached to the
@@ -99,6 +108,19 @@ public interface UserRepository extends BaseRepository {
      * @return a {@link Single} emitting the result
      */
     Single<JSONObject> verifyGoogleLogin(@NonNull String idToken);
+
+    /**
+     * Sets the information from google (email, nickname and avatar) for the user and its identity.
+     *
+     * @param user        the user to set the information for
+     * @param identity    the identity to set the information for
+     * @param displayName the nickname from google
+     * @param photoUrl    the url to the avatar
+     * @param fragment    the fragment to use as context    @return a {@link Single} emitting the result
+     */
+    Single<User> setGoogleData(@NonNull User user, @NonNull Identity identity,
+                               @NonNull String displayName, @NonNull Uri photoUrl,
+                               @NonNull final Fragment fragment);
 
     /**
      * Handles an invitation link by calling a function in the cloud.
@@ -155,7 +177,7 @@ public interface UserRepository extends BaseRepository {
      * @param user the user that just logged in
      * @return an {@link Observable} emitting the results
      */
-    Observable<ParseInstallation> setupInstallation(@NonNull User user);
+    Single<User> setupInstallation(@NonNull User user);
 
     /**
      * Clears the installation object by resetting channels and the user field

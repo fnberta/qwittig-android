@@ -284,6 +284,7 @@
     <string name="toast_error_purchase_edit_load">Laden des Einkaufs fehlgeschlagen</string>
     <string name="toast_error_drawer_load_groups">Laden der Gruppenauswahl fehlgeschlagen</string>
     <string name="toast_error_settings_group_add">Erstellung der Gruppe fehlgeschlagen</string>
-    <string name="toast_error_settings_users_add">Hinzufügen des Nutzers fehlgeschalgen</string>
+    <string name="toast_error_settings_users_add">Hinzufügen des Nutzers fehlgeschlagen</string>
+    <string name="toast_password_reset">Du erhälst eine Email mit einem Link um dein Passwort zurückzusetzen</string>
 
 </resources>

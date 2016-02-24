@@ -14,7 +14,7 @@
 
         <variable
             name="itemRow"
-            type="ch.giantific.qwittig.presentation.home.purchases.addedit.items.PurchaseAddEditItem"
+            type="ch.giantific.qwittig.presentation.home.purchases.addedit.items.AddEditPurchaseItem"
             />
     </data>
 

@@ -51,19 +51,6 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileViewMod
             actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white_24dp);
         }
 
-        mBinding.fabSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mViewModel.onFabSaveChangesClick();
-            }
-        });
-        mBinding.fabSave.setProgressFinalAnimationListener(new ProgressFinalAnimationListener() {
-            @Override
-            public void onProgressFinalAnimationComplete() {
-                mViewModel.onSaveAnimFinished();
-            }
-        });
-
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, new SettingsProfileFragment())
@@ -76,7 +63,7 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileViewMod
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home:
-                mViewModel.onUpOrBackClick();
+                mViewModel.onExitClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -84,24 +71,14 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileViewMod
     }
 
     @Override
+    public void onBackPressed() {
+        mViewModel.onExitClick();
+    }
+
+    @Override
     public void setProfileViewModel(@NonNull SettingsProfileViewModel viewModel) {
         mViewModel = viewModel;
         mBinding.setViewModel(mViewModel);
-    }
-
-    @Override
-    public void startProgressAnim() {
-        mBinding.fabSave.startProgress();
-    }
-
-    @Override
-    public void startFinalProgressAnim() {
-        mBinding.fabSave.startProgressFinalAnimation();
-    }
-
-    @Override
-    public void stopProgressAnim() {
-        mBinding.fabSave.stopProgress();
     }
 
     @Override
@@ -113,10 +90,5 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileViewMod
     @Override
     public void onDiscardChangesSelected() {
         mViewModel.onDiscardChangesSelected();
-    }
-
-    @Override
-    public void onBackPressed() {
-        mViewModel.onUpOrBackClick();
     }
 }

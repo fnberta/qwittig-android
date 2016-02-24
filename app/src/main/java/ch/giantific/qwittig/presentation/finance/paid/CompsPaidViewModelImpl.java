@@ -60,7 +60,7 @@ public class CompsPaidViewModelImpl
     @Override
     public void loadData() {
         getSubscriptions().add(mIdentityRepo.fetchIdentityDataAsync(mCurrentIdentity)
-                .flatMap(new Func1<Identity, Observable<Compensation>>() {
+                .flatMapObservable(new Func1<Identity, Observable<Compensation>>() {
                     @Override
                     public Observable<Compensation> call(Identity identity) {
                         return mCompsRepo.getCompensationsLocalPaidAsync(identity);

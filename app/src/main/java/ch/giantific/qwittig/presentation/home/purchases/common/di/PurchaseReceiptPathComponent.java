@@ -7,7 +7,7 @@ package ch.giantific.qwittig.presentation.home.purchases.common.di;
 import ch.giantific.qwittig.di.ApplicationComponent;
 import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseReceiptAddEditFragment;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.AddEditPurchaseReceiptFragment;
 import dagger.Component;
 
 /**
@@ -18,5 +18,5 @@ import dagger.Component;
         modules = {PurchaseReceiptPathViewModelModule.class, RepositoriesModule.class})
 public interface PurchaseReceiptPathComponent {
 
-    void inject(PurchaseReceiptAddEditFragment purchaseReceiptAddEditFragment);
+    void inject(AddEditPurchaseReceiptFragment addEditPurchaseReceiptFragment);
 }

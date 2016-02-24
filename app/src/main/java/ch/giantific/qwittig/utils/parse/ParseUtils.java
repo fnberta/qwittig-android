@@ -55,12 +55,12 @@ public class ParseUtils {
      */
     @NonNull
     public static List<Currency> getSupportedCurrencies() {
-        ParseConfig config = ParseConfig.getCurrentConfig();
-        List<String> currencyCodes = config.getList(ParseConfigUtils.SUPPORTED_CURRENCIES);
-        List<String> currencyNames = MoneyUtils.getCurrencyDisplayNames(currencyCodes);
+        final ParseConfig config = ParseConfig.getCurrentConfig();
+        final List<String> currencyCodes = config.getList(ParseConfigUtils.SUPPORTED_CURRENCIES);
+        final List<String> currencyNames = MoneyUtils.getCurrencyDisplayNames(currencyCodes);
 
-        int currencyNamesLength = currencyNames.size();
-        List<Currency> currencies =
+        final int currencyNamesLength = currencyNames.size();
+        final List<Currency> currencies =
                 new ArrayList<>(currencyNamesLength);
         for (int i = 0; i < currencyNamesLength; i++) {
             currencies.add(new Currency(currencyNames.get(i),
@@ -78,7 +78,6 @@ public class ParseUtils {
      */
     public static List<String> getSupportedCurrencyCodes() {
         final ParseConfig config = ParseConfig.getCurrentConfig();
-
         return config.getList(ParseConfigUtils.SUPPORTED_CURRENCIES, new ArrayList<String>());
     }
 }

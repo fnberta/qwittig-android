@@ -47,6 +47,8 @@ public interface IdentityRepository extends BaseRepository {
                                @NonNull String groupId,
                                @NonNull String groupName);
 
+    Single<Identity> saveIdentityLocalAsync(@NonNull Identity identity);
+
     /**
      * Returns the invitation url for the invited identity
      *
@@ -63,7 +65,7 @@ public interface IdentityRepository extends BaseRepository {
      * @param identity the identity to fetch the data for
      * @return a {@link Observable} emitting the results
      */
-    Observable<Identity> fetchIdentityDataAsync(@NonNull Identity identity);
+    Single<Identity> fetchIdentityDataAsync(@NonNull Identity identity);
 
     /**
      * Fetches the data of multiple {@link Identity} objects from the local data store.If there is

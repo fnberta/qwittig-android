@@ -27,7 +27,7 @@ import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
 import ch.giantific.qwittig.presentation.home.HomeActivity;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseEditActivity;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.EditPurchaseActivity;
 import ch.giantific.qwittig.presentation.home.purchases.list.di.DaggerDraftsListComponent;
 import ch.giantific.qwittig.presentation.home.purchases.list.di.DraftsListViewModelModule;
 
@@ -123,7 +123,7 @@ public class DraftsFragment extends BaseRecyclerViewFragment<DraftsViewModel, Dr
     @Override
     public void startPurchaseEditActivity(@NonNull Purchase draft) {
         final Activity activity = getActivity();
-        final Intent intent = new Intent(activity, PurchaseEditActivity.class);
+        final Intent intent = new Intent(activity, EditPurchaseActivity.class);
         intent.putExtra(PurchasesFragment.INTENT_PURCHASE_ID, draft.getDraftId());
         intent.putExtra(INTENT_PURCHASE_EDIT_DRAFT, true);
         final ActivityOptionsCompat activityOptionsCompat =

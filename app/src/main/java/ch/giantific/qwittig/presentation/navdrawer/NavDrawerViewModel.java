@@ -41,13 +41,13 @@ public interface NavDrawerViewModel extends ViewModel {
     /**
      * Updates the group quick switch with the most recent values.
      */
-    void onIdentityChanged();
+    void onIdentitiesChanged();
 
     /**
      * Sets the group quick switch to the appropriate new selection. Called when the user changes
      * his group in the settings screen.
      */
-    void onSettingsIdentitySelected();
+    void onIdentityChanged();
 
     void onIdentitySelected(@NonNull AdapterView<?> parent, View view, int position, long id);
 

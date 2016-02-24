@@ -58,8 +58,8 @@ public abstract class ListViewModelBaseImpl<T, S extends ListViewModel.ViewListe
     }
 
     @Override
-    public void onScreenVisible() {
-        super.onScreenVisible();
+    public void onViewVisible() {
+        super.onViewVisible();
 
         loadData();
     }

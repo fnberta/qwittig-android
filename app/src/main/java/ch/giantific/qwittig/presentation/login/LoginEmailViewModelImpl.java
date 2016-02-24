@@ -13,6 +13,7 @@ import android.text.TextUtils;
 import android.view.View;
 
 import ch.giantific.qwittig.BR;
+import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
@@ -113,13 +114,18 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
 
     @Override
     public void setUserLoginStream(@NonNull Single<User> single, @NonNull final String workerTag,
-                                   @LoginWorker.Type int type) {
+                                   @LoginWorker.Type final int type) {
         getSubscriptions().add(single
                 .subscribe(new SingleSubscriber<User>() {
                     @Override
                     public void onSuccess(User value) {
                         mView.removeWorker(workerTag);
-                        mView.finishScreen(Activity.RESULT_OK);
+
+                        if (type == LoginWorker.Type.RESET_PASSWORD) {
+                            mView.showMessage(R.string.toast_password_reset);
+                        } else {
+                            mView.finishScreen(Activity.RESULT_OK);
+                        }
                     }
 
                     @Override

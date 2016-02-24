@@ -29,7 +29,7 @@ import rx.functions.Func1;
  * <p/>
  * Subclass of {@link BaseWorker}.
  */
-public class AddGroupWorker extends BaseWorker<User, AddGroupWorkerListener> {
+public class AddGroupWorker extends BaseWorker<Identity, AddGroupWorkerListener> {
 
     private static final String WORKER_TAG = AddGroupWorker.class.getCanonicalName();
     private static final String KEY_GROUP_NAME = "GROUP_NAME";
@@ -76,7 +76,7 @@ public class AddGroupWorker extends BaseWorker<User, AddGroupWorkerListener> {
 
     @Nullable
     @Override
-    protected Observable<User> getObservable(@NonNull Bundle args) {
+    protected Observable<Identity> getObservable(@NonNull Bundle args) {
         final String groupName = args.getString(KEY_GROUP_NAME);
         final String groupCurrency = args.getString(KEY_GROUP_CURRENCY);
         final User user = mUserRepo.getCurrentUser();
@@ -88,18 +88,20 @@ public class AddGroupWorker extends BaseWorker<User, AddGroupWorkerListener> {
                             return mUserRepo.updateUser(user);
                         }
                     })
-                    .flatMapObservable(new Func1<User, Observable<Identity>>() {
+                    .flatMap(new Func1<User, Single<Identity>>() {
                         @Override
-                        public Observable<Identity> call(User user) {
-                            return mIdentityRepo.fetchIdentityDataAsync(user.getCurrentIdentity());
+                        public Single<Identity> call(User user) {
+                            final Identity newIdentity = user.getCurrentIdentity();
+                            return mIdentityRepo.fetchIdentityDataAsync(newIdentity);
                         }
                     })
-                    .map(new Func1<Identity, User>() {
+                    .flatMap(new Func1<Identity, Single<Identity>>() {
                         @Override
-                        public User call(Identity identity) {
-                            return user;
+                        public Single<Identity> call(Identity identity) {
+                            return mIdentityRepo.saveIdentityLocalAsync(identity);
                         }
-                    });
+                    })
+                    .toObservable();
         }
 
         return null;
@@ -111,7 +113,7 @@ public class AddGroupWorker extends BaseWorker<User, AddGroupWorkerListener> {
     }
 
     @Override
-    protected void setStream(@NonNull Observable<User> observable) {
+    protected void setStream(@NonNull Observable<Identity> observable) {
         mActivity.setCreateGroupStream(observable.toSingle(), WORKER_TAG);
     }
 }

@@ -92,7 +92,7 @@ public class CompsUnpaidViewModelImpl
     @Override
     public void loadData() {
         getSubscriptions().add(mIdentityRepo.fetchIdentityDataAsync(mCurrentIdentity)
-                .flatMap(new Func1<Identity, Observable<Compensation>>() {
+                .flatMapObservable(new Func1<Identity, Observable<Compensation>>() {
                     @Override
                     public Observable<Compensation> call(Identity identity) {
                         final String currency = mCurrentIdentity.getGroup().getCurrency();
@@ -318,7 +318,8 @@ public class CompsUnpaidViewModelImpl
                 continue;
             }
 
-            final Compensation compensation = ((CompsUnpaidItem) item).getCompensation();
+            final CompsUnpaidItem unpaidItem = (CompsUnpaidItem) item;
+            final Compensation compensation = unpaidItem.getCompensation();
             if (compId.equals(compensation.getObjectId())) {
                 setCompensationLoading(compensation, compId, i, false);
                 return compensation;

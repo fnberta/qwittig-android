@@ -7,9 +7,11 @@ package ch.giantific.qwittig.presentation.settings.addgroup;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
 import android.transition.Slide;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -96,6 +98,14 @@ public class SettingsAddGroupFragment extends BaseFragment<SettingsAddGroupViewM
     }
 
     @Override
+    public void setResult(@NonNull String name) {
+        final FragmentActivity activity = getActivity();
+        final Intent intentNewGroupName = new Intent();
+        intentNewGroupName.putExtra(RESULT_DATA_GROUP, name);
+        activity.setResult(Activity.RESULT_OK, intentNewGroupName);
+    }
+
+    @Override
     public void showAddUsersFragment() {
         final SettingsUsersFragment fragment = new SettingsUsersFragment();
         if (Utils.isRunningLollipopAndHigher()) {
@@ -109,15 +119,6 @@ public class SettingsAddGroupFragment extends BaseFragment<SettingsAddGroupViewM
 
         mActivity.setUpIconDone();
     }
-
-//    @Override
-//    public void finishScreen(@NonNull String groupName) {
-//        final FragmentActivity activity = getActivity();
-//        final Intent intentNewGroupName = new Intent();
-//        intentNewGroupName.putExtra(RESULT_DATA_GROUP, groupName);
-//        activity.setResult(Activity.RESULT_OK, intentNewGroupName);
-//        ActivityCompat.finishAfterTransition(activity);
-//    }
 
     /**
      * Defines the interaction with the hosting {@link Activity}.

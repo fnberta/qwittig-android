@@ -13,8 +13,8 @@ import ch.giantific.qwittig.presentation.finance.paid.CompsQueryMoreWorker;
 import ch.giantific.qwittig.presentation.finance.unpaid.CompsUpdateWorker;
 import ch.giantific.qwittig.presentation.finance.identities.IdentitiesUpdateWorker;
 import ch.giantific.qwittig.presentation.home.JoinGroupWorker;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.AddPurchaseSaveWorker;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.OcrWorker;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseSaveWorker;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.RatesWorker;
 import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesQueryMoreWorker;
 import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesUpdateWorker;
@@ -38,7 +38,7 @@ public interface WorkerComponent {
 
     void inject(CompsUpdateWorker compsUpdateWorker);
 
-    void inject(PurchaseSaveWorker purchaseSaveWorker);
+    void inject(AddPurchaseSaveWorker addPurchaseSaveWorker);
 
     void inject(CompSaveWorker compSaveWorker);
 

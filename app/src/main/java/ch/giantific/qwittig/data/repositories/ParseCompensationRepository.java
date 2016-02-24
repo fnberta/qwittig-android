@@ -120,12 +120,6 @@ public class ParseCompensationRepository extends ParseBaseRepository implements
     @Override
     public Observable<Compensation> updateCompensationsUnpaidAsync(@NonNull List<Identity> identities) {
         return Observable.from(identities)
-                .filter(new Func1<Identity, Boolean>() {
-                    @Override
-                    public Boolean call(Identity identity) {
-                        return identity.isActive();
-                    }
-                })
                 .toList()
                 .map(new Func1<List<Identity>, ParseQuery<Compensation>>() {
                     @Override

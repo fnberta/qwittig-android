@@ -10,16 +10,22 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.LocalBroadcastImpl;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorkerListener;
+import ch.giantific.qwittig.utils.MessageAction;
+import ch.giantific.qwittig.utils.Utils;
+import ch.giantific.qwittig.utils.WorkerUtils;
 
 /**
  * Provides an abstract base class that sets up the {@link Toolbar} and commonly used methods.
@@ -28,7 +34,7 @@ import ch.giantific.qwittig.presentation.common.workers.BaseWorkerListener;
  */
 public abstract class BaseActivity<T extends ViewModel>
         extends AppCompatActivity
-        implements BaseFragment.ActivityListener, BaseWorkerListener {
+        implements BaseFragment.ActivityListener, BaseWorkerListener, ViewModel.ViewListener {
 
     public static final int INTENT_REQUEST_LOGIN = 1;
     public static final int INTENT_REQUEST_SETTINGS = 2;
@@ -92,5 +98,32 @@ public abstract class BaseActivity<T extends ViewModel>
     @Override
     public void onWorkerError(@NonNull String workerTag) {
         mViewModel.onWorkerError(workerTag);
+    }
+
+    @Override
+    public boolean isNetworkAvailable() {
+        return Utils.isNetworkAvailable(this);
+    }
+
+    @Override
+    public void showMessage(@StringRes int resId) {
+        Snackbar.make(mToolbar, resId, Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void showMessage(@StringRes int resId, @NonNull String... args) {
+        Snackbar.make(mToolbar, getString(resId, args), Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void showMessageWithAction(@StringRes int resId, @NonNull MessageAction action) {
+        Snackbar.make(mToolbar, resId, Snackbar.LENGTH_LONG)
+                .setAction(action.getActionText(), action)
+                .show();
+    }
+
+    @Override
+    public void removeWorker(@NonNull String workerTag) {
+        WorkerUtils.removeWorker(getSupportFragmentManager(), workerTag);
     }
 }

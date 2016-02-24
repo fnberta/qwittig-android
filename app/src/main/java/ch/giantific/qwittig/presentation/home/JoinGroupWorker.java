@@ -12,12 +12,12 @@ import android.text.TextUtils;
 
 import javax.inject.Inject;
 
-import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
+import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;
 import rx.Single;
@@ -85,17 +85,22 @@ public class JoinGroupWorker extends BaseWorker<User, JoinGroupWorkerListener> {
                             return mUserRepo.updateUser(currentUser);
                         }
                     })
-                    .flatMapObservable(new Func1<User, Observable<Identity>>() {
+                    .flatMap(new Func1<User, Single<Identity>>() {
                         @Override
-                        public Observable<Identity> call(User user) {
+                        public Single<Identity> call(User user) {
                             return mIdentityRepo.fetchIdentityDataAsync(user.getCurrentIdentity());
                         }
                     })
-                    .flatMap(new Func1<Identity, Observable<Group>>() {
+                    .flatMap(new Func1<Identity, Single<Identity>>() {
                         @Override
-                        public Observable<Group> call(Identity identity) {
-                            return mGroupRepo.subscribeGroup(identity.getGroup())
-                                    .toObservable();
+                        public Single<Identity> call(Identity identity) {
+                            return mIdentityRepo.saveIdentityLocalAsync(identity);
+                        }
+                    })
+                    .flatMap(new Func1<Identity, Single<Group>>() {
+                        @Override
+                        public Single<Group> call(Identity identity) {
+                            return mGroupRepo.subscribeGroup(identity.getGroup());
                         }
                     })
                     .map(new Func1<Group, User>() {
@@ -103,7 +108,8 @@ public class JoinGroupWorker extends BaseWorker<User, JoinGroupWorkerListener> {
                         public User call(Group group) {
                             return currentUser;
                         }
-                    });
+                    })
+                    .toObservable();
         }
 
         return null;

@@ -9,10 +9,12 @@ import android.databinding.Bindable;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
+import android.view.View;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileWorker.ProfileAction;
@@ -24,6 +26,16 @@ import rx.Single;
 public interface SettingsProfileViewModel extends ViewModel, SettingsProfileWorkerListener,
         AvatarLoadListener,
         DiscardChangesDialogFragment.DialogInteractionListener {
+
+    @Bindable
+    boolean isSaving();
+
+    @Bindable
+    boolean isAnimStop();
+
+    void startSaving();
+
+    void stopSaving(boolean anim);
 
     @Bindable
     boolean isValidate();
@@ -72,9 +84,7 @@ public interface SettingsProfileViewModel extends ViewModel, SettingsProfileWork
 
     void onUnlinkThirdPartyLoginMenuClick();
 
-    void onUpOrBackClick();
-
-    void onSaveAnimFinished();
+    void onExitClick();
 
     void onEmailChanged(CharSequence s, int start, int before, int count);
 
@@ -84,7 +94,9 @@ public interface SettingsProfileViewModel extends ViewModel, SettingsProfileWork
 
     void onPasswordRepeatChanged(CharSequence s, int start, int before, int count);
 
-    void onFabSaveChangesClick();
+    void onFabSaveProfileClick(View view);
+
+    ProgressFinalAnimationListener getProgressFinalAnimationListener();
 
     @IntDef({Activity.RESULT_OK, Activity.RESULT_CANCELED, Result.CHANGES_DISCARDED})
     @Retention(RetentionPolicy.SOURCE)
@@ -114,12 +126,6 @@ public interface SettingsProfileViewModel extends ViewModel, SettingsProfileWork
         Single<byte[]> encodeAvatar(@NonNull String avatar);
 
         void reloadOptionsMenu();
-
-        void startSaveAnim();
-
-        void stopSaveAnim();
-
-        void showSaveFinishedAnim();
 
         void finishScreen(@Result int result);
     }

@@ -6,7 +6,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".presentation.home.purchases.addedit.PurchaseNoteFragment"
+    tools:context=".presentation.home.purchases.addedit.AddEditPurchaseNoteFragment"
     >
     <item
         android:id="@+id/action_purchase_edit_note_edit"

@@ -6,7 +6,7 @@ package ch.giantific.qwittig.presentation.settings.addgroup;
 
 import android.support.annotation.NonNull;
 
-import ch.giantific.qwittig.domain.models.User;
+import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorkerListener;
 import rx.Single;
 
@@ -22,5 +22,5 @@ public interface AddGroupWorkerListener extends BaseWorkerListener {
      * @param single    the {@link Single} emitting the result
      * @param workerTag the tag of the headless worker fragment
      */
-    void setCreateGroupStream(@NonNull Single<User> single, @NonNull String workerTag);
+    void setCreateGroupStream(@NonNull Single<Identity> single, @NonNull String workerTag);
 }

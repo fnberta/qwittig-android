@@ -52,13 +52,6 @@ public abstract class BaseFragment<T extends ViewModel, S extends BaseFragment.A
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        mViewModel.saveState(outState);
-    }
-
-    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
@@ -71,14 +64,21 @@ public abstract class BaseFragment<T extends ViewModel, S extends BaseFragment.A
     public void onStart() {
         super.onStart();
 
-        mViewModel.onScreenVisible();
+        mViewModel.onViewVisible();
     }
 
     @Override
     public void onStop() {
         super.onStop();
 
-        mViewModel.onScreenGone();
+        mViewModel.onViewGone();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        mViewModel.saveState(outState);
     }
 
     @Override

@@ -14,9 +14,9 @@ import android.support.design.widget.Snackbar;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
-import ch.giantific.qwittig.presentation.common.fragments.ConfirmationDialogFragment;
+import ch.giantific.qwittig.presentation.common.fragments.LeaveGroupDialogFragment;
 import ch.giantific.qwittig.presentation.settings.addgroup.SettingsAddGroupFragment;
-import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileViewModel.Result;
+import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileViewModel;
 import rx.Single;
 
 /**
@@ -26,7 +26,7 @@ import rx.Single;
  */
 public class SettingsActivity extends BaseActivity<SettingsViewModel> implements
         SettingsFragment.ActivityListener,
-        ConfirmationDialogFragment.DialogInteractionListener,
+        LeaveGroupDialogFragment.DialogInteractionListener,
         DeleteAccountDialogFragment.DialogInteractionListener,
         LogoutWorkerListener {
 
@@ -54,20 +54,20 @@ public class SettingsActivity extends BaseActivity<SettingsViewModel> implements
             case INTENT_REQUEST_SETTINGS_PROFILE:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
-                        Snackbar.make(mToolbar, getString(R.string.toast_profile_update),
-                                Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(mToolbar, getString(R.string.toast_profile_update), Snackbar.LENGTH_LONG).show();
                         break;
-                    case Result.CHANGES_DISCARDED:
+                    case SettingsProfileViewModel.Result.CHANGES_DISCARDED:
                         Snackbar.make(mToolbar, getString(R.string.toast_changes_discarded), Snackbar.LENGTH_LONG).show();
                         break;
                 }
                 break;
             case INTENT_REQUEST_SETTINGS_ADD_GROUP:
-                if (resultCode == Activity.RESULT_OK) {
-                    final String newGroupName = data.getStringExtra(
-                            SettingsAddGroupFragment.RESULT_DATA_GROUP);
-                    Snackbar.make(mToolbar, getString(R.string.toast_group_added, newGroupName),
-                            Snackbar.LENGTH_LONG).show();
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        final String newGroupName =
+                                data.getStringExtra(SettingsAddGroupFragment.RESULT_DATA_GROUP);
+                        mViewModel.onGroupAdded(newGroupName);
+                        break;
                 }
                 break;
         }
@@ -79,8 +79,8 @@ public class SettingsActivity extends BaseActivity<SettingsViewModel> implements
     }
 
     @Override
-    public void onActionConfirmed() {
-        mViewModel.onActionConfirmed();
+    public void onLeaveGroupSelected() {
+        mViewModel.onLeaveGroupSelected();
     }
 
     @Override

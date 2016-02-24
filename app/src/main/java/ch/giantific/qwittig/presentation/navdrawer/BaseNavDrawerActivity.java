@@ -73,7 +73,7 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
 
         switch (dataType) {
             case LocalBroadcast.DataType.GROUP_UPDATED:
-                mNavDrawerViewModel.onIdentityChanged();
+                mNavDrawerViewModel.onIdentitiesChanged();
                 break;
         }
     }
@@ -203,14 +203,14 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
     protected void onStart() {
         super.onStart();
 
-        mNavDrawerViewModel.onScreenVisible();
+        mNavDrawerViewModel.onViewVisible();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
 
-        mNavDrawerViewModel.onScreenGone();
+        mNavDrawerViewModel.onViewGone();
     }
 
     @Override
@@ -232,10 +232,10 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
                         mNavDrawerViewModel.onLogout();
                         break;
                     case SettingsViewModel.Result.GROUP_SELECTED:
-                        mNavDrawerViewModel.onSettingsIdentitySelected();
+                        mNavDrawerViewModel.onIdentityChanged();
                         break;
                     case SettingsViewModel.Result.GROUP_CHANGED:
-                        mNavDrawerViewModel.onIdentityChanged();
+                        mNavDrawerViewModel.onIdentitiesChanged();
                         break;
                 }
                 break;
@@ -285,23 +285,6 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
     }
 
     @Override
-    public void showMessage(@StringRes int resId) {
-        Snackbar.make(mToolbar, resId, Snackbar.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void showMessage(@StringRes int resId, @NonNull String... args) {
-        Snackbar.make(mToolbar, getString(resId, args), Snackbar.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void showMessageWithAction(@StringRes int resId, @NonNull MessageAction action) {
-        Snackbar.make(mToolbar, resId, Snackbar.LENGTH_LONG)
-                .setAction(action.getActionText(), action)
-                .show();
-    }
-
-    @Override
     public void notifyHeaderIdentitiesChanged() {
         mHeaderIdentitiesAdapter.notifyDataSetChanged();
     }
@@ -326,15 +309,5 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
     @Override
     public void onIdentitySelected() {
         mViewModel.onIdentitySelected();
-    }
-
-    @Override
-    public boolean isNetworkAvailable() {
-        return Utils.isNetworkAvailable(this);
-    }
-
-    @Override
-    public void removeWorker(@NonNull String workerTag) {
-        // do nothing
     }
 }

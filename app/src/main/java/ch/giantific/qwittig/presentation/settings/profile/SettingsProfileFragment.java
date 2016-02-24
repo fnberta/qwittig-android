@@ -208,21 +208,6 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileViewMod
     }
 
     @Override
-    public void startSaveAnim() {
-        mActivity.startProgressAnim();
-    }
-
-    @Override
-    public void stopSaveAnim() {
-        mActivity.stopProgressAnim();
-    }
-
-    @Override
-    public void showSaveFinishedAnim() {
-        mActivity.startFinalProgressAnim();
-    }
-
-    @Override
     public void finishScreen(int result) {
         final FragmentActivity activity = getActivity();
         activity.setResult(result);
@@ -242,20 +227,5 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileViewMod
          * @param viewModel the view model to set
          */
         void setProfileViewModel(@NonNull SettingsProfileViewModel viewModel);
-
-        /**
-         * Indicates to start the loading animation of the {@link FabProgress}.
-         */
-        void startProgressAnim();
-
-        /**
-         * Indicates to start the final loading animation of the {@link FabProgress}.
-         */
-        void startFinalProgressAnim();
-
-        /**
-         * Indicates to hide the loading animation of the {@link FabProgress}.
-         */
-        void stopProgressAnim();
     }
 }

@@ -94,9 +94,14 @@ public class LoginAccountsViewModelImpl extends ViewModelBaseImpl<LoginAccountsV
     }
 
     @Override
-    public void onLoginGoogleClick(View view) {
-        setLoading(true);
-        mView.loginWithGoogle();
+    public View.OnClickListener getLoginGoogleClickListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setLoading(true);
+                mView.loginWithGoogle();
+            }
+        };
     }
 
     @Override

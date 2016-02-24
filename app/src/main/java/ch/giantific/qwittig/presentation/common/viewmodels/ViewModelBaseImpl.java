@@ -35,12 +35,11 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
                              @NonNull UserRepository userRepository) {
         mView = view;
         mUserRepo = userRepository;
-        updateCurrentUserAndIdentity();
+        mCurrentUser = mUserRepo.getCurrentUser();
+        setCurrentIdentity();
     }
 
-    @CallSuper
-    protected void updateCurrentUserAndIdentity() {
-        mCurrentUser = mUserRepo.getCurrentUser();
+    private void setCurrentIdentity() {
         if (mCurrentUser != null) {
             mCurrentIdentity = mCurrentUser.getCurrentIdentity();
         }
@@ -62,18 +61,18 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
 
     @Override
     @CallSuper
-    public void onScreenVisible() {
-        // empty default implementation
+    public void onViewVisible() {
+        setCurrentIdentity();
     }
 
     @Override
     @CallSuper
     public void onIdentitySelected() {
-        updateCurrentUserAndIdentity();
+        setCurrentIdentity();
     }
 
     @Override
-    public void onScreenGone() {
+    public void onViewGone() {
         if (mSubscriptions.hasSubscriptions()) {
             mSubscriptions.unsubscribe();
         }

@@ -23,7 +23,7 @@ public interface LoginAccountsViewModel extends ViewModel, LoadingViewModel, Log
 
     void onLoginFacebookClick(View view);
 
-    void onLoginGoogleClick(View view);
+    View.OnClickListener getLoginGoogleClickListener();
 
     void onUseEmailClick(View view);
 

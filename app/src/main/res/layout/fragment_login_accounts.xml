@@ -58,6 +58,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/small_space"
+                android:onClickListener="@{viewModel.loginGoogleClickListener}"
                 app:buttonSize="wide"
                 app:colorScheme="auto"
                 />
@@ -71,11 +72,11 @@
                 />
 
             <Button
+                style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="@{viewModel.onUseEmailClick}"
                 android:text="@string/login_button_email"
-                android:theme="@style/Widget.AppCompat.Button.AccentColor"
                 />
 
             <TextView

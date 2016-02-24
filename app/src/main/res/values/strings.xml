@@ -250,7 +250,7 @@
     <string name="toast_note_edited">Edited note</string>
     <string name="login_button_email">Or use your email</string>
     <string name="login_disclaimer">By using Qwittig, you agree to the terms of use and the data privacy statement.</string>
-    <string name="facebook_app_id" translatable="false">1525413547783898</string>
+    <string name="facebook_app_id" translatable="false">483474338502548</string>
     <string name="action_settings_profile_unlink_facebook">Unlink from Facebook</string>
     <string name="action_settings_profile_unlink_google">Unlink from Google</string>
     <string name="toast_profile_update">Profile updated</string>
@@ -291,5 +291,6 @@
     <string name="toast_error_drawer_load_groups">Failed to load group selection</string>
     <string name="toast_error_settings_group_add">Failed to create group</string>
     <string name="toast_error_settings_users_add">Failed to add user</string>
+    <string name="toast_password_reset">An email with a link to rest your password was sent</string>
 
 </resources>

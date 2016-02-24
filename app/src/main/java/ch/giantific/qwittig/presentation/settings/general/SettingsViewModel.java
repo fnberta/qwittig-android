@@ -11,14 +11,14 @@ import android.support.annotation.StringRes;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import ch.giantific.qwittig.presentation.common.fragments.ConfirmationDialogFragment;
+import ch.giantific.qwittig.presentation.common.fragments.LeaveGroupDialogFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 
 /**
  * Defines an observable view model for the main settings screen.
  */
 public interface SettingsViewModel extends ViewModel,
-        ConfirmationDialogFragment.DialogInteractionListener,
+        LeaveGroupDialogFragment.DialogInteractionListener,
         LogoutWorkerListener,
         DeleteAccountDialogFragment.DialogInteractionListener {
 
@@ -29,6 +29,8 @@ public interface SettingsViewModel extends ViewModel,
     void onGroupNameChanged(@NonNull String newName);
 
     void onLeaveGroupClick();
+
+    void onGroupAdded(@NonNull String groupName);
 
     void onLogoutMenuClick();
 

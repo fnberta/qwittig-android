@@ -40,6 +40,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
@@ -130,12 +131,6 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                             }
                         });
                     }
-                })
-                .doOnSuccess(new Action1<User>() {
-                    @Override
-                    public void call(User user) {
-//                        addUserToInstallation(user);
-                    }
                 });
     }
 
@@ -195,66 +190,53 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
 
     @Override
     public Single<User> loginFacebook(@NonNull final Fragment fragment) {
-        return Single
-                .create(new Single.OnSubscribe<User>() {
+        return Single.create(new Single.OnSubscribe<User>() {
+            @Override
+            public void call(final SingleSubscriber<? super User> singleSubscriber) {
+                final List<String> permissions = Arrays.asList("public_profile", "email");
+                ParseFacebookUtils.logInWithReadPermissionsInBackground(fragment, permissions, new LogInCallback() {
                     @Override
-                    public void call(final SingleSubscriber<? super User> singleSubscriber) {
-                        final List<String> permissions = Arrays.asList("public_profile", "email");
-                        ParseFacebookUtils.logInWithReadPermissionsInBackground(fragment, permissions, new LogInCallback() {
-                            @Override
-                            public void done(ParseUser user, ParseException e) {
-                                if (singleSubscriber.isUnsubscribed()) {
-                                    return;
-                                }
+                    public void done(ParseUser user, ParseException e) {
+                        if (singleSubscriber.isUnsubscribed()) {
+                            return;
+                        }
 
-                                if (e != null) {
-                                    singleSubscriber.onError(e);
-                                } else {
-                                    singleSubscriber.onSuccess((User) user);
-                                }
-                            }
-                        });
-                    }
-                }).flatMap(new Func1<User, Single<? extends User>>() {
-                    @Override
-                    public Single<? extends User> call(final User user) {
-                        if (!user.isNew()) {
-                            return Single.just(user);
+                        if (e != null) {
+                            singleSubscriber.onError(e);
                         } else {
-                            return getFacebookUserData()
-                                    .flatMap(new Func1<JSONObject, Single<? extends User>>() {
-                                        @Override
-                                        public Single<? extends User> call(JSONObject facebookData) {
-                                            final String name = facebookData.optString("first_name");
-                                            if (!TextUtils.isEmpty(name)) {
-//                                                user.setNickname(name);
-                                            }
-                                            final String email = facebookData.optString("email");
-                                            if (!TextUtils.isEmpty(email)) {
-                                                user.setUsername(email);
-                                            }
-
-                                            // TODO: prompt for email is not available (do we really need the email?)
-
-                                            final String id = facebookData.optString("id");
-                                            return getFacebookUserProfileImage(fragment, id)
-                                                    .map(new Func1<ParseFile, User>() {
-                                                        @Override
-                                                        public User call(ParseFile avatar) {
-//                                                            user.setAvatar(avatar);
-                                                            return user;
-                                                        }
-                                                    });
-                                        }
-                                    });
-
+                            singleSubscriber.onSuccess((User) user);
                         }
                     }
-                })
-                .doOnSuccess(new Action1<User>() {
+                });
+            }
+        });
+    }
+
+    @Override
+    public Single<User> setFacebookData(@NonNull final User user, @NonNull final Identity identity,
+                                        @NonNull final Fragment fragment) {
+        return getFacebookUserData()
+                .flatMap(new Func1<JSONObject, Single<ParseFile>>() {
                     @Override
-                    public void call(User user) {
-//                        addUserToInstallation(user);
+                    public Single<ParseFile> call(JSONObject facebookData) {
+                        final String email = facebookData.optString("email");
+                        user.setUsername(TextUtils.isEmpty(email)
+                                ? UUID.randomUUID().toString()
+                                : email);
+                        final String name = facebookData.optString("first_name");
+                        if (!TextUtils.isEmpty(name)) {
+                            identity.setNickname(name);
+                        }
+
+                        final String id = facebookData.optString("id");
+                        return getFacebookUserAvatar(fragment, id);
+                    }
+                })
+                .flatMap(new Func1<ParseFile, Single<? extends User>>() {
+                    @Override
+                    public Single<? extends User> call(ParseFile avatar) {
+                        identity.setAvatar(avatar);
+                        return save(user);
                     }
                 });
     }
@@ -286,8 +268,8 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
         });
     }
 
-    private Single<ParseFile> getFacebookUserProfileImage(@NonNull final Fragment fragment,
-                                                          @NonNull String facebookId) {
+    private Single<ParseFile> getFacebookUserAvatar(@NonNull final Fragment fragment,
+                                                    @NonNull String facebookId) {
         final String pictureUrl = "http://graph.facebook.com/" + facebookId + "/picture?type=large";
         return Single
                 .create(new Single.OnSubscribe<byte[]>() {
@@ -327,41 +309,14 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
     }
 
     @Override
-    public Single<User> loginGoogle(@NonNull final Fragment fragment,
-                                    @NonNull String idToken,
-                                    @NonNull final String displayName,
-                                    @NonNull final Uri photoUrl) {
+    public Single<User> loginGoogle(@NonNull String idToken, @NonNull final Fragment fragment) {
         return verifyGoogleLogin(idToken)
                 .flatMap(new Func1<JSONObject, Single<? extends User>>() {
                     @Override
                     public Single<? extends User> call(JSONObject token) {
                         final String sessionToken = token.optString("sessionToken");
                         final boolean isNew = token.optBoolean("isNew");
-                        if (!isNew) {
-                            return becomeUser(sessionToken);
-                        }
-
-                        return becomeUser(sessionToken)
-                                .flatMap(new Func1<User, Single<? extends User>>() {
-                                    @Override
-                                    public Single<? extends User> call(final User user) {
-//                                        user.setNickname(displayName);
-                                        return getGoogleProfileImage(fragment, photoUrl)
-                                                .map(new Func1<ParseFile, User>() {
-                                                    @Override
-                                                    public User call(ParseFile avatar) {
-//                                                    user.setAvatar(avatar);
-                                                        return user;
-                                                    }
-                                                });
-                                    }
-                                });
-                    }
-                })
-                .doOnSuccess(new Action1<User>() {
-                    @Override
-                    public void call(User user) {
-//                        addUserToInstallation(user);
+                        return becomeUser(sessionToken);
                     }
                 });
     }
@@ -406,8 +361,11 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
         });
     }
 
-    private Single<ParseFile> getGoogleProfileImage(@NonNull final Fragment fragment,
-                                                    @NonNull final Uri photoUrl) {
+    @Override
+    public Single<User> setGoogleData(@NonNull final User user, @NonNull final Identity identity,
+                                      @NonNull final String displayName,
+                                      @NonNull final Uri photoUrl,
+                                      @NonNull final Fragment fragment) {
         return Single
                 .create(new Single.OnSubscribe<byte[]>() {
                     @Override
@@ -441,6 +399,14 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                     public Single<? extends ParseFile> call(byte[] bytes) {
                         final ParseFile avatar = new ParseFile(IdentityRepository.FILE_NAME, bytes);
                         return saveFile(avatar);
+                    }
+                })
+                .flatMap(new Func1<ParseFile, Single<? extends User>>() {
+                    @Override
+                    public Single<? extends User> call(ParseFile parseFile) {
+                        identity.setNickname(displayName);
+                        identity.setAvatar(parseFile);
+                        return save(user);
                     }
                 });
     }
@@ -521,7 +487,7 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
     }
 
     @Override
-    public Observable<ParseInstallation> setupInstallation(@NonNull final User user) {
+    public Single<User> setupInstallation(@NonNull final User user) {
         return Observable.from(user.getIdentities())
                 .map(new Func1<Identity, String>() {
                     @Override
@@ -530,13 +496,20 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                     }
                 })
                 .toList()
-                .flatMap(new Func1<List<String>, Observable<ParseInstallation>>() {
+                .toSingle()
+                .flatMap(new Func1<List<String>, Single<ParseInstallation>>() {
                     @Override
-                    public Observable<ParseInstallation> call(List<String> channels) {
+                    public Single<ParseInstallation> call(List<String> channels) {
                         final ParseInstallation installation = ParseInstallation.getCurrentInstallation();
                         installation.addAllUnique(ParseInstallationUtils.CHANNELS, channels);
                         installation.put(ParseInstallationUtils.USER, user);
-                        return save(installation).toObservable();
+                        return save(installation);
+                    }
+                })
+                .map(new Func1<ParseInstallation, User>() {
+                    @Override
+                    public User call(ParseInstallation installation) {
+                        return user;
                     }
                 });
     }

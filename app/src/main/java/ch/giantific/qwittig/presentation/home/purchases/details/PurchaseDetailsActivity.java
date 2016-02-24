@@ -21,8 +21,8 @@ import org.json.JSONObject;
 import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivityPurchaseDetailsBinding;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.AddEditPurchaseViewModel;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseAddEditViewModel;
 import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesFragment;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.data.receivers.PushBroadcastReceiver;
@@ -108,10 +108,10 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
 
         if (requestCode == INTENT_REQUEST_PURCHASE_MODIFY) {
             switch (resultCode) {
-                case PurchaseAddEditViewModel.PurchaseResult.PURCHASE_SAVED:
+                case AddEditPurchaseViewModel.PurchaseResult.PURCHASE_SAVED:
                     showMessage(R.string.toast_changes_saved);
                     break;
-                case PurchaseAddEditViewModel.PurchaseResult.PURCHASE_DISCARDED:
+                case AddEditPurchaseViewModel.PurchaseResult.PURCHASE_DISCARDED:
                     showMessage(R.string.toast_changes_discarded);
                     break;
             }

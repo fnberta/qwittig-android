@@ -26,6 +26,7 @@ public class User extends ParseUser {
     public static final String NAME = "username";
     public static final String PASSWORD = "password";
     public static final String IDENTITIES = "identities";
+    public static final String ARCHIVED_IDENTITIES = "archivedIdentities";
     public static final String CURRENT_IDENTITY = "currentIdentity";
     public static final String GOOGLE_ID = "googleId";
 
@@ -52,12 +53,54 @@ public class User extends ParseUser {
         put(IDENTITIES, identities);
     }
 
+    @NonNull
+    public List<Identity> getArchivedIdentities() {
+        final List<Identity> identities = getList(ARCHIVED_IDENTITIES);
+        if (identities == null) {
+            return Collections.emptyList();
+        }
+
+        return identities;
+    }
+
+    public void setArchivedIdentities(@NonNull List<Identity> identities) {
+        put(ARCHIVED_IDENTITIES, identities);
+    }
+
+    public void addArchivedIdentity(@NonNull Identity identity) {
+        addUnique(ARCHIVED_IDENTITIES, identity);
+    }
+
     public Identity getCurrentIdentity() {
         return (Identity) getParseObject(CURRENT_IDENTITY);
     }
 
     public void setCurrentIdentity(@NonNull Identity currentIdentity) {
         put(CURRENT_IDENTITY, currentIdentity);
+    }
+
+    /**
+     * Archives the current identity and sets the first in the list as the user's new current
+     * identity.
+     *
+     * @return the new current identity.
+     */
+    public Identity archiveCurrentIdentity() {
+        final Identity currentIdentity = getCurrentIdentity();
+
+        // remove from active list
+        final List<Identity> identities = new ArrayList<>();
+        identities.add(currentIdentity);
+        removeAll(IDENTITIES, identities);
+
+        // add to archived list
+        currentIdentity.setActive(false);
+        addArchivedIdentity(currentIdentity);
+
+        // set new current identity and return it
+        final Identity newCurrent = getIdentities().get(0);
+        setCurrentIdentity(newCurrent);
+        return newCurrent;
     }
 
     public String getGoogleId() {

@@ -158,12 +158,6 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
                                                      @NonNull Identity currentIdentity) {
         final String currentIdentityGroupId = currentIdentity.getGroup().getObjectId();
         return Observable.from(identities)
-                .filter(new Func1<Identity, Boolean>() {
-                    @Override
-                    public Boolean call(Identity identity) {
-                        return identity.isActive();
-                    }
-                })
                 .flatMap(new Func1<Identity, Observable<Purchase>>() {
                     @Override
                     public Observable<Purchase> call(Identity identity) {
@@ -249,10 +243,6 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     public boolean updatePurchases(@NonNull final List<Identity> identities,
                                    @NonNull final Identity currentIdentity) {
         for (Identity identity : identities) {
-            if (!identity.isActive()) {
-                continue;
-            }
-
             try {
                 final ParseQuery<Purchase> query = getPurchasesOnlineQuery(identity);
                 final List<Purchase> purchases = query.find();

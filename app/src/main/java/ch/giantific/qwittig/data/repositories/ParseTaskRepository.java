@@ -16,11 +16,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ch.giantific.qwittig.data.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
-import ch.giantific.qwittig.data.receivers.PushBroadcastReceiver;
 import rx.Observable;
 import rx.Single;
 import rx.functions.Func1;
@@ -106,12 +106,6 @@ public class ParseTaskRepository extends ParseBaseRepository implements TaskRepo
     @Override
     public Observable<Task> updateTasksAsync(@NonNull List<Identity> identities) {
         return Observable.from(identities)
-                .filter(new Func1<Identity, Boolean>() {
-                    @Override
-                    public Boolean call(Identity identity) {
-                        return identity.isActive();
-                    }
-                })
                 .map(new Func1<Identity, Group>() {
                     @Override
                     public Group call(Identity identity) {
@@ -163,9 +157,7 @@ public class ParseTaskRepository extends ParseBaseRepository implements TaskRepo
     public boolean updateTasks(@NonNull List<Identity> identities) {
         final List<Group> groups = new ArrayList<>();
         for (Identity identity : identities) {
-            if (identity.isActive()) {
-                groups.add(identity.getGroup());
-            }
+            groups.add(identity.getGroup());
         }
 
         try {

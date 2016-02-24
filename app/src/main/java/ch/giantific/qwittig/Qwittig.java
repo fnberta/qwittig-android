@@ -66,7 +66,6 @@ public class Qwittig extends Application {
         }
 
         buildAppComponent();
-        initialiseFacebookSdk();
         initialiseParse();
     }
 
@@ -75,10 +74,6 @@ public class Qwittig extends Application {
                 .applicationModule(new ApplicationModule(this))
                 .restServiceModule(new RestServiceModule())
                 .build();
-    }
-
-    private void initialiseFacebookSdk() {
-        FacebookSdk.sdkInitialize(getApplicationContext());
     }
 
     private void initialiseParse() {

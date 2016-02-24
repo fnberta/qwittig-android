@@ -76,13 +76,13 @@
             android:parentActivityName=".presentation.home.HomeActivity"
             android:theme="@style/AppTheme.DrawStatusBar.Explode" />
         <activity
-            android:name=".presentation.home.purchases.addedit.PurchaseAddActivity"
+            android:name=".presentation.home.purchases.addedit.AddPurchaseActivity"
             android:label="@string/title_activity_add_purchase"
             android:parentActivityName=".presentation.home.HomeActivity"
             android:theme="@style/AppTheme.SlideBottom"
             android:windowSoftInputMode="stateUnchanged" />
         <activity
-            android:name=".presentation.home.purchases.addedit.PurchaseEditActivity"
+            android:name=".presentation.home.purchases.addedit.EditPurchaseActivity"
             android:label="@string/title_activity_edit_purchase"
             android:parentActivityName=".presentation.home.purchases.details.PurchaseDetailsActivity"
             android:theme="@style/AppTheme.SlideEnd"

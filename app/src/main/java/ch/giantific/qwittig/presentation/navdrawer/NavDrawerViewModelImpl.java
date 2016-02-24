@@ -21,7 +21,6 @@ import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.Subscriber;
-import rx.functions.Func1;
 
 /**
  * Provides an implementation of the {@link NavDrawerViewModel}.
@@ -42,8 +41,8 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
     }
 
     @Override
-    public void onScreenVisible() {
-        super.onScreenVisible();
+    public void onViewVisible() {
+        super.onViewVisible();
 
         if (mCurrentUser != null) {
             loadIdentities();
@@ -52,12 +51,6 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
 
     private void loadIdentities() {
         getSubscriptions().add(mIdentityRepo.fetchIdentitiesDataAsync(mCurrentUser.getIdentities())
-                .filter(new Func1<Identity, Boolean>() {
-                    @Override
-                    public Boolean call(Identity identity) {
-                        return identity.isActive();
-                    }
-                })
                 .subscribe(new Subscriber<Identity>() {
                     @Override
                     public void onStart() {
@@ -121,12 +114,16 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
 
     @Override
     public void onLoginSuccessful() {
-        updateCurrentUserAndIdentity();
+        mCurrentUser = mUserRepo.getCurrentUser();
+        if (mCurrentUser != null) {
+            mCurrentIdentity = mCurrentUser.getCurrentIdentity();
+        }
     }
 
     @Override
     public void onLogout() {
-        updateCurrentUserAndIdentity();
+        // TODO: needed?
+        mCurrentUser = null;
         mView.startHomeActivityAndFinish();
     }
 
@@ -138,26 +135,21 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
     }
 
     @Override
-    public void onIdentityChanged() {
+    public void onIdentitiesChanged() {
         mIdentities.clear();
         final List<Identity> identities = mCurrentUser.getIdentities();
         if (!identities.isEmpty()) {
             for (Identity identity : identities) {
-                if (identity.isActive()) {
-                    mIdentities.add(identity);
-                }
+                mIdentities.add(identity);
             }
         }
         mView.notifyHeaderIdentitiesChanged();
-        onSettingsIdentitySelected();
+        onIdentityChanged();
     }
 
     @Override
-    public void onSettingsIdentitySelected() {
-        mCurrentIdentity = mCurrentUser.getCurrentIdentity();
+    public void onIdentityChanged() {
         notifyPropertyChanged(BR.selectedIdentity);
-
-        mView.onIdentitySelected();
     }
 
     @Override

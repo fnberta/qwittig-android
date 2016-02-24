@@ -39,6 +39,8 @@ public interface SettingsAddGroupViewModel extends ViewModel, AddGroupWorkerList
 
         void toggleProgressDialog(boolean show);
 
+        void setResult(@NonNull String name);
+
         void showAddUsersFragment();
     }
 }

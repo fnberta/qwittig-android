@@ -31,7 +31,7 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.presentation.common.fragments.ConfirmationDialogFragment;
+import ch.giantific.qwittig.presentation.common.fragments.LeaveGroupDialogFragment;
 import ch.giantific.qwittig.presentation.settings.addgroup.SettingsAddGroupActivity;
 import ch.giantific.qwittig.presentation.settings.general.di.DaggerSettingsComponent;
 import ch.giantific.qwittig.presentation.settings.general.di.SettingsViewModelModule;
@@ -179,7 +179,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
     public void onStart() {
         super.onStart();
 
-        mViewModel.onScreenVisible();
+        mViewModel.onViewVisible();
     }
 
     @Override
@@ -233,7 +233,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
     public void onStop() {
         super.onStop();
 
-        mViewModel.onScreenGone();
+        mViewModel.onViewGone();
     }
 
     @Override
@@ -300,8 +300,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
 
     @Override
     public void showLeaveGroupDialog(@StringRes int message) {
-        ConfirmationDialogFragment.display(getFragmentManager(), getString(message),
-                R.string.dialog_positive_leave);
+        LeaveGroupDialogFragment.display(getFragmentManager(), message);
     }
 
     @Override

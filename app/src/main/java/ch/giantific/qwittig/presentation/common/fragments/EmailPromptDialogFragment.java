@@ -9,17 +9,16 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
-import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.databinding.DialogPromptEmailBinding;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
@@ -43,8 +42,7 @@ public class EmailPromptDialogFragment extends BaseDialogFragment<EmailPromptDia
     private int mMessage;
     private int mPosAction;
     private String mEmail;
-    private TextInputLayout mTextInputLayoutEmail;
-    private EditText mEditTextEmail;
+    private DialogPromptEmailBinding mBinding;
 
     /**
      * Shows a new instance of {@link EmailPromptDialogFragment}.
@@ -86,19 +84,17 @@ public class EmailPromptDialogFragment extends BaseDialogFragment<EmailPromptDia
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.dialog_prompt_email, null);
+        final FragmentActivity activity = getActivity();
+        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity);
+        mBinding = DialogPromptEmailBinding.inflate(activity.getLayoutInflater());
 
-        mTextInputLayoutEmail = (TextInputLayout) view.findViewById(R.id.til_dialog_email);
-        mEditTextEmail = mTextInputLayoutEmail.getEditText();
         if (!TextUtils.isEmpty(mEmail)) {
-            mEditTextEmail.setText(mEmail);
+            mBinding.etDialogEmail.setText(mEmail);
         }
 
         dialogBuilder.setTitle(mTitle)
                 .setMessage(mMessage)
-                .setView(view)
+                .setView(mBinding.getRoot())
                 .setPositiveButton(mPosAction, null)
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                     @Override
@@ -122,13 +118,13 @@ public class EmailPromptDialogFragment extends BaseDialogFragment<EmailPromptDia
             positiveButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mEmail = mEditTextEmail.getText().toString();
+                    mEmail = mBinding.etDialogEmail.getText().toString();
                     if (Utils.isEmailValid(mEmail)) {
-                        mTextInputLayoutEmail.setErrorEnabled(false);
+                        mBinding.tilDialogEmail.setErrorEnabled(false);
                         mActivity.onValidEmailEntered(mEmail);
                         dismiss();
                     } else {
-                        mTextInputLayoutEmail.setError(getString(R.string.error_email));
+                        mBinding.tilDialogEmail.setError(getString(R.string.error_email));
                     }
                 }
             });

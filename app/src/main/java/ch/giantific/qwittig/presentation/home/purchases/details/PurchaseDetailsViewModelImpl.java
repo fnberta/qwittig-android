@@ -156,14 +156,14 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<Purchase
             }
         }
 
-        boolean userIsBuyer = false;
+        boolean showEdit = false;
         if (allUsersAreValid) {
             final String buyerId = mPurchase.getBuyer().getObjectId();
-            userIsBuyer = buyerId.equals(mCurrentIdentity.getObjectId());
+            showEdit = buyerId.equals(mCurrentIdentity.getObjectId());
         }
-        boolean hasForeignCurrency = !mCurrentIdentity.getGroup().getCurrency().equals(mPurchase.getCurrency());
-
-        mView.toggleMenuOptions(userIsBuyer, mPurchase.getReceipt() != null, hasForeignCurrency);
+        final boolean foreignCurrency = !mCurrentIdentity.getGroup().getCurrency().equals(mPurchase.getCurrency());
+        final boolean receiptImage = mPurchase.getReceipt() != null;
+        mView.toggleMenuOptions(showEdit, receiptImage, foreignCurrency);
     }
 
     private void updateReadBy() {

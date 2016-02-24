@@ -65,10 +65,8 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
         final List<String> identityEntries = new ArrayList<>();
         final List<String> identityValues = new ArrayList<>();
         for (Identity identity : identities) {
-            if (identity.isActive()) {
-                identityEntries.add(identity.getGroup().getName());
-                identityValues.add(identity.getObjectId());
-            }
+            identityEntries.add(identity.getGroup().getName());
+            identityValues.add(identity.getObjectId());
         }
 
         final int size = identityEntries.size();
@@ -141,6 +139,28 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
     }
 
     @Override
+    public void onLeaveGroupSelected() {
+        mGroupRepo.unSubscribeGroup(mCurrentIdentity.getGroup());
+        mCurrentIdentity = mCurrentUser.archiveCurrentIdentity();
+        mCurrentUser.saveEventually();
+
+        loadIdentitySelection();
+
+        // NavDrawer group setting needs to be updated
+        mView.setResult(Result.GROUP_CHANGED);
+    }
+
+    @Override
+    public void onGroupAdded(@NonNull String groupName) {
+        mView.showMessage(R.string.toast_group_added, groupName);
+        setupCurrentGroupCategory();
+        loadIdentitySelection();
+
+        // NavDrawer group setting needs to be updated
+        mView.setResult(Result.GROUP_CHANGED);
+    }
+
+    @Override
     public void onLogoutMenuClick() {
         if (!mView.isNetworkAvailable()) {
             mView.showMessage(R.string.toast_no_connection);
@@ -165,27 +185,6 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
 
         mView.showProgressDialog(R.string.progress_account_delete);
         mView.loadLogoutWorker(true);
-    }
-
-    @Override
-    public void onActionConfirmed() {
-        mGroupRepo.unSubscribeGroup(mCurrentIdentity.getGroup());
-        mCurrentIdentity.setActive(false);
-
-        final List<Identity> identities = mCurrentUser.getIdentities();
-        for (Identity identity : identities) {
-            if (identity.isActive()) {
-                mCurrentIdentity = identity;
-                mCurrentUser.setCurrentIdentity(identity);
-                mCurrentUser.saveEventually();
-                break;
-            }
-        }
-
-        loadIdentitySelection();
-
-        // NavDrawer group setting needs to be updated
-        mView.setResult(Result.GROUP_CHANGED);
     }
 
     @Override

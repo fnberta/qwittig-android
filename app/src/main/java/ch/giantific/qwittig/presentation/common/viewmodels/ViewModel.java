@@ -28,7 +28,7 @@ public interface ViewModel
     /**
      * Sets up RxJava composite subscriptions and loads the data for the view.
      */
-    void onScreenVisible();
+    void onViewVisible();
 
     /**
      * Loads the appropriate data for the newly set group.
@@ -39,7 +39,7 @@ public interface ViewModel
      * Cleans up any long living tasks, e.g. RxJava subscriptions, in order to allow the view model
      * and the view it references to be garbage collected.
      */
-    void onScreenGone();
+    void onViewGone();
 
     /**
      * Defines the interaction with the attached view.

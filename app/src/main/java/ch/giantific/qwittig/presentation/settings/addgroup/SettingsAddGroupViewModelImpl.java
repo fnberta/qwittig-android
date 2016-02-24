@@ -17,7 +17,6 @@ import java.util.List;
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.Single;
@@ -105,14 +104,15 @@ public class SettingsAddGroupViewModelImpl extends ViewModelBaseImpl<SettingsAdd
     }
 
     @Override
-    public void setCreateGroupStream(@NonNull Single<User> single, @NonNull final String workerTag) {
+    public void setCreateGroupStream(@NonNull Single<Identity> single, @NonNull final String workerTag) {
         getSubscriptions().add(single
-                .subscribe(new SingleSubscriber<User>() {
+                .subscribe(new SingleSubscriber<Identity>() {
                     @Override
-                    public void onSuccess(User user) {
+                    public void onSuccess(Identity identity) {
                         mView.removeWorker(workerTag);
                         mView.toggleProgressDialog(false);
 
+                        mView.setResult(mName);
                         mView.showAddUsersFragment();
                     }
 

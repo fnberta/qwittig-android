@@ -10,9 +10,11 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.view.View;
 
 import java.util.List;
 
+import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
@@ -42,6 +44,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     private final boolean mGoogleUser;
     private boolean mValidate;
     private boolean mSaving;
+    private boolean mAnimStop;
     private boolean mUnlinkThirdParty;
     private String mAvatar;
     private String mEmail;
@@ -87,6 +90,31 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
         outState.putString(STATE_NICKNAME, mNickname);
         outState.putString(STATE_PASSWORD, mPassword);
         outState.putString(STATE_PASSWORD_REPEAT, mPasswordRepeat);
+    }
+
+    @Override
+    @Bindable
+    public boolean isSaving() {
+        return mSaving;
+    }
+
+    @Override
+    @Bindable
+    public boolean isAnimStop() {
+        return mAnimStop;
+    }
+
+    @Override
+    public void startSaving() {
+        mSaving = true;
+        notifyPropertyChanged(BR.saving);
+    }
+
+    @Override
+    public void stopSaving(boolean anim) {
+        mSaving = false;
+        mAnimStop = anim;
+        notifyPropertyChanged(BR.saving);
     }
 
     @Override
@@ -181,15 +209,6 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
         return mGoogleUser && !mUnlinkThirdParty;
     }
 
-    private void setSaving(boolean saving) {
-        mSaving = saving;
-        if (saving) {
-            mView.startSaveAnim();
-        } else {
-            mView.stopSaveAnim();
-        }
-    }
-
     @Override
     public void onPickAvatarMenuClick() {
         mView.showAvatarPicker();
@@ -216,7 +235,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     }
 
     @Override
-    public void onUpOrBackClick() {
+    public void onExitClick() {
         if (mSaving) {
             mView.showMessage(R.string.toast_saving_profile);
             return;
@@ -239,11 +258,6 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     @Override
     public void onDiscardChangesSelected() {
         mView.finishScreen(Result.CHANGES_DISCARDED);
-    }
-
-    @Override
-    public void onSaveAnimFinished() {
-        mView.finishScreen(Activity.RESULT_OK);
     }
 
     @Override
@@ -287,7 +301,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     }
 
     @Override
-    public void onFabSaveChangesClick() {
+    public void onFabSaveProfileClick(View view) {
         if (mSaving || !validate()) {
             return;
         }
@@ -299,7 +313,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
         final boolean emptyAvatar = TextUtils.isEmpty(mAvatar);
         final boolean newAvatar = !emptyAvatar && !mAvatar.equals(mCurrentIdentity.getAvatarUrl());
         if (newAvatar) {
-            setSaving(true);
+            startSaving();
             getSubscriptions().add(mView.encodeAvatar(mAvatar)
                     .subscribe(new SingleSubscriber<byte[]>() {
                         @Override
@@ -319,10 +333,25 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
                 if (emptyAvatar) {
                     identity.removeAvatar();
                 }
-                identity.saveEventually();
+            }
+
+            if (!mUnlinkThirdParty) {
+                mCurrentUser.saveEventually();
                 mView.finishScreen(Activity.RESULT_OK);
+            } else {
+                handleThirdParty();
             }
         }
+    }
+
+    @Override
+    public ProgressFinalAnimationListener getProgressFinalAnimationListener() {
+        return new ProgressFinalAnimationListener() {
+            @Override
+            public void onProgressFinalAnimationComplete() {
+                mView.finishScreen(Activity.RESULT_OK);
+            }
+        };
     }
 
     private boolean validate() {
@@ -332,10 +361,10 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
 
     private void handleThirdParty() {
         if (mGoogleUser) {
-            setSaving(true);
+            startSaving();
             mView.loadUnlinkThirdPartyWorker(ProfileAction.UNLINK_GOOGLE);
         } else if (mFacebookUser) {
-            setSaving(true);
+            startSaving();
             mView.loadUnlinkThirdPartyWorker(ProfileAction.UNLINK_FACEBOOK);
         }
     }
@@ -351,8 +380,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
                                 mView.removeWorker(workerTag);
 
                                 if (!mUnlinkThirdParty) {
-                                    mSaving = false;
-                                    mView.showSaveFinishedAnim();
+                                    stopSaving(true);
                                 } else {
                                     handleThirdParty();
                                 }
@@ -361,7 +389,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
                             @Override
                             public void onError(Throwable error) {
                                 mView.removeWorker(workerTag);
-                                setSaving(false);
+                                stopSaving(false);
 
                                 mView.showMessage(R.string.toast_error_profile);
                             }
@@ -375,15 +403,13 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
                             @Override
                             public void onSuccess(User value) {
                                 mView.removeWorker(workerTag);
-
-                                mSaving = false;
-                                mView.showSaveFinishedAnim();
+                                stopSaving(true);
                             }
 
                             @Override
                             public void onError(Throwable error) {
                                 mView.removeWorker(workerTag);
-                                setSaving(false);
+                                stopSaving(false);
 
                                 mView.showMessage(R.string.toast_error_unlink_failed);
                             }

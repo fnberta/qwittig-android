@@ -11,19 +11,17 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 
-import com.parse.ParseInstallation;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.List;
 
 import javax.inject.Inject;
 
-import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
+import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;
 import rx.Single;
@@ -221,30 +219,33 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
                 final String username = args.getString(KEY_USERNAME, "");
                 final String password = args.getString(KEY_PASSWORD, "");
                 return mUserRepo.loginEmail(username, password)
-                        .flatMapObservable(new Func1<User, Observable<User>>() {
+                        .flatMap(new Func1<User, Single<User>>() {
                             @Override
-                            public Observable<User> call(final User user) {
+                            public Single<User> call(final User user) {
                                 return mIdentityRepo.fetchIdentitiesDataAsync(user.getIdentities())
                                         .toList()
-                                        .flatMap(new Func1<List<Identity>, Observable<ParseInstallation>>() {
+                                        .toSingle()
+                                        .flatMap(new Func1<List<Identity>, Single<User>>() {
                                             @Override
-                                            public Observable<ParseInstallation> call(List<Identity> identities) {
+                                            public Single<User> call(List<Identity> identities) {
                                                 return mUserRepo.setupInstallation(user);
-                                            }
-                                        })
-                                        .map(new Func1<ParseInstallation, User>() {
-                                            @Override
-                                            public User call(ParseInstallation installation) {
-                                                return user;
                                             }
                                         });
                             }
-                        });
+                        })
+                        .toObservable();
             }
-//            case Type.RESET_PASSWORD: {
-//                final String username = args.getString(KEY_USERNAME, "");
-//                return mUserRepo.requestPasswordReset(username).toObservable();
-//            }
+            case Type.RESET_PASSWORD: {
+                final String username = args.getString(KEY_USERNAME, "");
+                return mUserRepo.requestPasswordReset(username)
+                        .map(new Func1<String, User>() {
+                            @Override
+                            public User call(String s) {
+                                return mUserRepo.getCurrentUser();
+                            }
+                        })
+                        .toObservable();
+            }
             case Type.SIGN_UP_EMAIL: {
                 final String username = args.getString(KEY_USERNAME, "");
                 final String password = args.getString(KEY_PASSWORD, "");
@@ -260,33 +261,109 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
                                             }
                                         });
                             }
-                        }).flatMapObservable(new Func1<User, Observable<User>>() {
+                        }).flatMap(new Func1<User, Single<User>>() {
                             @Override
-                            public Observable<User> call(final User user) {
+                            public Single<User> call(final User user) {
                                 return mIdentityRepo.fetchIdentityDataAsync(user.getCurrentIdentity())
-                                        .flatMap(new Func1<Identity, Observable<ParseInstallation>>() {
+                                        .flatMap(new Func1<Identity, Single<Identity>>() {
                                             @Override
-                                            public Observable<ParseInstallation> call(Identity identity) {
-                                                return mUserRepo.setupInstallation(user);
+                                            public Single<Identity> call(Identity identity) {
+                                                return mIdentityRepo.saveIdentityLocalAsync(identity);
                                             }
                                         })
-                                        .map(new Func1<ParseInstallation, User>() {
+                                        .flatMap(new Func1<Identity, Single<User>>() {
                                             @Override
-                                            public User call(ParseInstallation installation) {
-                                                return user;
+                                            public Single<User> call(Identity identity) {
+                                                return mUserRepo.setupInstallation(user);
                                             }
                                         });
                             }
-                        });
+                        })
+                        .toObservable();
             }
             case Type.LOGIN_FACEBOOK: {
-                return mUserRepo.loginFacebook(this).toObservable();
+                final LoginWorker worker = this;
+                return mUserRepo.loginFacebook(worker)
+                        .flatMap(new Func1<User, Single<User>>() {
+                            @Override
+                            public Single<User> call(final User user) {
+                                if (!user.isNew()) {
+                                    return Single.just(user);
+                                }
+
+                                return mGroupRepo.addNewGroup("Qwittig Rocks", "CHF")
+                                        .flatMap(new Func1<String, Single<User>>() {
+                                            @Override
+                                            public Single<User> call(String result) {
+                                                return mUserRepo.updateUser(user);
+                                            }
+                                        });
+                            }
+                        })
+                        .flatMap(new Func1<User, Single<User>>() {
+                            @Override
+                            public Single<User> call(final User user) {
+                                return mIdentityRepo.fetchIdentityDataAsync(user.getCurrentIdentity())
+                                        .flatMap(new Func1<Identity, Single<Identity>>() {
+                                            @Override
+                                            public Single<Identity> call(Identity identity) {
+                                                return mIdentityRepo.saveIdentityLocalAsync(identity);
+                                            }
+                                        })
+                                        .flatMap(new Func1<Identity, Single<User>>() {
+                                            @Override
+                                            public Single<User> call(Identity identity) {
+                                                return mUserRepo.setFacebookData(user, identity, worker);
+                                            }
+                                        });
+                            }
+                        })
+                        .flatMap(new Func1<User, Single<User>>() {
+                            @Override
+                            public Single<User> call(final User user) {
+                                return mUserRepo.setupInstallation(user);
+                            }
+                        })
+                        .toObservable();
             }
             case Type.LOGIN_GOOGLE: {
+                final LoginWorker worker = this;
                 final String username = args.getString(KEY_USERNAME, "");
                 final String idToken = args.getString(KEY_GOOGLE_ID_TOKEN, "");
                 final Uri photoUrl = Uri.parse(args.getString(KEY_GOOGLE_PHOTO_URL, ""));
-                return mUserRepo.loginGoogle(this, idToken, username, photoUrl).toObservable();
+                return mUserRepo.loginGoogle(idToken, this)
+                        .flatMap(new Func1<User, Single<User>>() {
+                            @Override
+                            public Single<User> call(final User user) {
+                                return mIdentityRepo.fetchIdentitiesDataAsync(user.getIdentities())
+                                        .toList()
+                                        .toSingle()
+                                        .flatMap(new Func1<List<Identity>, Single<User>>() {
+                                            @Override
+                                            public Single<User> call(List<Identity> identities) {
+                                                if (user.isNew()) {
+                                                    final Identity identity = user.getCurrentIdentity();
+                                                    return mIdentityRepo.saveIdentityLocalAsync(identity)
+                                                            .flatMap(new Func1<Identity, Single<User>>() {
+                                                                @Override
+                                                                public Single<User> call(Identity identity) {
+                                                                    return mUserRepo.setGoogleData(user, identity, username, photoUrl, worker);
+                                                                }
+                                                            });
+                                                }
+
+                                                return Single.just(user);
+                                            }
+                                        });
+                            }
+                        })
+                        .flatMap(new Func1<User, Single<User>>() {
+                            @Override
+                            public Single<User> call(final User user) {
+                                return mUserRepo.setupInstallation(user);
+                            }
+                        })
+                        .toObservable();
             }
         }
 

@@ -26,7 +26,7 @@ import ch.giantific.qwittig.databinding.FragmentPurchaseDetailsBinding;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.PurchaseEditActivity;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.EditPurchaseActivity;
 import ch.giantific.qwittig.presentation.home.purchases.details.di.DaggerPurchaseDetailsComponent;
 import ch.giantific.qwittig.presentation.home.purchases.details.di.PurchaseDetailsViewModelModule;
 
@@ -155,7 +155,7 @@ public class PurchaseDetailsFragment extends BaseRecyclerViewFragment<PurchaseDe
     @Override
     public void startPurchaseEditScreen(@NonNull String purchaseId) {
         final Activity activity = getActivity();
-        final Intent intent = new Intent(activity, PurchaseEditActivity.class);
+        final Intent intent = new Intent(activity, EditPurchaseActivity.class);
         intent.putExtra(INTENT_PURCHASE_ID, purchaseId);
         final ActivityOptionsCompat activityOptionsCompat =
                 ActivityOptionsCompat.makeSceneTransitionAnimation(activity);

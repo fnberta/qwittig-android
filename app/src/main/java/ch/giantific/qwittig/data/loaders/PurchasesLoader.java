@@ -17,6 +17,7 @@ import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import rx.Observable;
+import rx.Single;
 import rx.functions.Func1;
 
 /**
@@ -47,7 +48,7 @@ public class PurchasesLoader extends BaseRxLoader<Purchase> {
         final User currentUser = mUserRepo.getCurrentUser();
         if (currentUser != null) {
             return mIdentityRepo.fetchIdentityDataAsync(currentUser.getCurrentIdentity())
-                    .flatMap(new Func1<Identity, Observable<Purchase>>() {
+                    .flatMapObservable(new Func1<Identity, Observable<Purchase>>() {
                         @Override
                         public Observable<Purchase> call(Identity identity) {
                             return mPurchaseRepo.getPurchasesLocalAsync(identity, false);

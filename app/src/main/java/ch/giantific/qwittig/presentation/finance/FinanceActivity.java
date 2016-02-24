@@ -70,7 +70,9 @@ public class FinanceActivity extends BaseNavDrawerActivity<CompsUnpaidViewModel>
         super.handleLocalBroadcast(intent, dataType);
         switch (dataType) {
             case DataType.IDENTITIES_UPDATED:
-                mIdentitiesViewModel.loadData();
+                if (mIdentitiesViewModel != null) {
+                    mIdentitiesViewModel.loadData();
+                }
                 break;
             case DataType.COMPENSATIONS_UPDATED:
                 final boolean paid = intent.getBooleanExtra(LocalBroadcastImpl.INTENT_EXTRA_COMPENSATION_PAID, false);
