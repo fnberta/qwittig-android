@@ -18,6 +18,8 @@ public interface HomeViewModel extends ViewModel,
         JoinGroupDialogFragment.DialogInteractionListener,
         JoinGroupWorkerListener {
 
+    void onLoginSuccessful();
+
     @Bindable
     boolean isDraftsAvailable();
 

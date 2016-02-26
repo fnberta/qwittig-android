@@ -225,28 +225,34 @@ public class CompsUnpaidViewModelImpl
 
             final Compensation compensation = ((CompsUnpaidItem) item).getCompensation();
             if (compensation.getObjectId().equals(mCompConfirmingId)) {
+                boolean amountChanged = false;
                 final BigFraction originalAmount = compensation.getAmountFraction();
                 final double diff = originalAmount.doubleValue() - amount;
                 if (Math.abs(diff) >= MoneyUtils.MIN_DIFF) {
                     compensation.setAmountFraction(new BigFraction(amount));
+                    amountChanged = true;
                 }
-                confirmCompensation(compensation, i);
+                confirmCompensation(compensation, i, amountChanged);
                 return;
             }
         }
     }
 
-    private void confirmCompensation(Compensation compensation, final int position) {
+    private void confirmCompensation(Compensation compensation, final int position,
+                                     final boolean amountChanged) {
         mCompsRepo.saveCompensationPaid(compensation)
                 .subscribe(new SingleSubscriber<Compensation>() {
                     @Override
                     public void onSuccess(Compensation compensation) {
-                        mItems.remove(position);
-                        mView.notifyItemRemoved(position);
                         mView.showMessage(R.string.toast_compensation_accepted);
 
-                        // new compensations are calculated on the server
-                        setLoading(true);
+                        if (amountChanged) {
+                            // new compensations are calculated on the server
+                            setLoading(true);
+                        } else {
+                            mItems.remove(position);
+                            mView.notifyItemRemoved(position);
+                        }
                     }
 
                     @Override

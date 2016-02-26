@@ -39,7 +39,7 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
         setCurrentIdentity();
     }
 
-    private void setCurrentIdentity() {
+    protected void setCurrentIdentity() {
         if (mCurrentUser != null) {
             mCurrentIdentity = mCurrentUser.getCurrentIdentity();
         }

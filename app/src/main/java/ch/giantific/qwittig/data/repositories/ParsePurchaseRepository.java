@@ -43,14 +43,11 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
 
     private static final String DELETE_PARSE_FILE = "deleteParseFile";
     private static final String PARAM_FILE_NAME = "fileName";
-    private static final String DRAFTS_AVAILABLE = "DRAFTS_AVAILABLE";
+    private static final String DRAFTS_AVAILABLE = "DRAFTS_AVAILABLE_";
     private static final String EXCHANGE_RATE_LAST_FETCHED_TIME = "EXCHANGE_RATE_LAST_FETCHED_TIME";
     private static final long EXCHANGE_RATE_REFRESH_INTERVAL = 24 * 60 * 60 * 1000;
     private SharedPreferences mSharedPrefs;
     private ExchangeRates mExchangeRates;
-
-    public ParsePurchaseRepository() {
-    }
 
     public ParsePurchaseRepository(@NonNull SharedPreferences sharedPreferences,
                                    @NonNull ExchangeRates exchangeRates) {
@@ -66,19 +63,34 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public Observable<Purchase> getPurchasesLocalAsync(@NonNull Identity currentIdentity,
+    public Observable<Purchase> getPurchasesLocalAsync(@NonNull Identity identity,
                                                        boolean getDrafts) {
-        final ParseQuery<Purchase> query = getPurchasesLocalQuery();
-        query.whereEqualTo(Purchase.GROUP, currentIdentity.getGroup());
+        final ParseQuery<Purchase> buyerQuery = ParseQuery.getQuery(Purchase.CLASS);
+        buyerQuery.whereEqualTo(Purchase.BUYER, identity);
+        final ParseQuery<Purchase> involvedQuery = ParseQuery.getQuery(Purchase.CLASS);
+        involvedQuery.whereEqualTo(Purchase.IDENTITIES, identity);
+
+        final List<ParseQuery<Purchase>> queries = new ArrayList<>();
+        queries.add(buyerQuery);
+        queries.add(involvedQuery);
+
+        final ParseQuery<Purchase> query = ParseQuery.or(queries);
+        query.whereEqualTo(Purchase.GROUP, identity.getGroup());
+        query.fromLocalDatastore();
+        query.ignoreACLs();
+        query.include(Purchase.ITEMS);
+        query.include(Purchase.BUYER);
+        query.include(Purchase.IDENTITIES);
+        query.orderByDescending(Purchase.DATE);
         if (getDrafts) {
             query.whereExists(Purchase.DRAFT_ID);
-            query.whereEqualTo(Purchase.BUYER, currentIdentity);
+            query.whereEqualTo(Purchase.BUYER, identity);
         } else {
             query.whereDoesNotExist(Purchase.DRAFT_ID);
         }
 
         return find(query)
-                .flatMap(new Func1<List<Purchase>, Observable<Purchase>>() {
+                .concatMap(new Func1<List<Purchase>, Observable<Purchase>>() {
                     @Override
                     public Observable<Purchase> call(List<Purchase> purchases) {
                         return Observable.from(purchases);
@@ -88,17 +100,6 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
 
     @Override
     public Single<Purchase> getPurchaseLocalAsync(@NonNull String purchaseId, boolean isDraft) {
-        final ParseQuery<Purchase> query = getPurchasesLocalQuery();
-        if (isDraft) {
-            query.whereEqualTo(Purchase.DRAFT_ID, purchaseId);
-            return first(query);
-        }
-
-        return get(query, purchaseId);
-    }
-
-    @NonNull
-    private ParseQuery<Purchase> getPurchasesLocalQuery() {
         final ParseQuery<Purchase> query = ParseQuery.getQuery(Purchase.CLASS);
         query.fromLocalDatastore();
         query.ignoreACLs();
@@ -106,7 +107,12 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
         query.include(Purchase.BUYER);
         query.include(Purchase.IDENTITIES);
         query.orderByDescending(Purchase.DATE);
-        return query;
+        if (isDraft) {
+            query.whereEqualTo(Purchase.DRAFT_ID, purchaseId);
+            return first(query);
+        }
+
+        return get(query, purchaseId);
     }
 
     @Override
@@ -116,9 +122,8 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public Single<Purchase> removePurchaseLocalAsync(@NonNull final Purchase purchase,
-                                                     @NonNull String tag) {
-        return unpin(purchase, tag)
+    public Single<Purchase> removeDraft(@NonNull final Purchase purchase) {
+        return unpin(purchase, Purchase.PIN_LABEL_DRAFT)
                 .flatMap(new Func1<Purchase, Single<Integer>>() {
                     @Override
                     public Single<Integer> call(Purchase purchase) {
@@ -128,7 +133,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
                 .map(new Func1<Integer, Purchase>() {
                     @Override
                     public Purchase call(Integer count) {
-                        toggleDraftsAvailable(count > 0);
+                        toggleDraftsAvailable(purchase.getBuyer(), count > 0);
                         return purchase;
                     }
                 });
@@ -167,19 +172,19 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
 
                         final ParseQuery<Purchase> query = getPurchasesOnlineQuery(identity);
                         return find(query)
-                                .flatMap(new Func1<List<Purchase>, Observable<List<Purchase>>>() {
+                                .concatMap(new Func1<List<Purchase>, Observable<List<Purchase>>>() {
                                     @Override
                                     public Observable<List<Purchase>> call(List<Purchase> purchases) {
                                         return unpinAll(purchases, pinLabel);
                                     }
                                 })
-                                .flatMap(new Func1<List<Purchase>, Observable<List<Purchase>>>() {
+                                .concatMap(new Func1<List<Purchase>, Observable<List<Purchase>>>() {
                                     @Override
                                     public Observable<List<Purchase>> call(List<Purchase> purchases) {
                                         return pinAll(purchases, pinLabel);
                                     }
                                 })
-                                .flatMap(new Func1<List<Purchase>, Observable<Purchase>>() {
+                                .concatMap(new Func1<List<Purchase>, Observable<Purchase>>() {
                                     @Override
                                     public Observable<Purchase> call(List<Purchase> purchases) {
                                         return Observable.from(purchases);
@@ -225,13 +230,13 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
         query.setSkip(skip);
 
         return find(query)
-                .flatMap(new Func1<List<Purchase>, Observable<List<Purchase>>>() {
+                .concatMap(new Func1<List<Purchase>, Observable<List<Purchase>>>() {
                     @Override
                     public Observable<List<Purchase>> call(List<Purchase> purchases) {
                         return pinAll(purchases, pinLabel);
                     }
                 })
-                .flatMap(new Func1<List<Purchase>, Observable<Purchase>>() {
+                .concatMap(new Func1<List<Purchase>, Observable<Purchase>>() {
                     @Override
                     public Observable<Purchase> call(List<Purchase> purchases) {
                         return Observable.from(purchases);
@@ -358,7 +363,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
                 .doOnSuccess(new Action1<Purchase>() {
                     @Override
                     public void call(Purchase purchase) {
-                        toggleDraftsAvailable(true);
+                        toggleDraftsAvailable(purchase.getBuyer(), true);
                     }
                 });
     }
@@ -385,14 +390,14 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public boolean isDraftsAvailable() {
-        return mSharedPrefs.getBoolean(DRAFTS_AVAILABLE, false);
+    public boolean isDraftsAvailable(@NonNull Identity identity) {
+        return mSharedPrefs.getBoolean(DRAFTS_AVAILABLE + identity.getObjectId(), false);
     }
 
     @Override
-    public void toggleDraftsAvailable(boolean available) {
+    public void toggleDraftsAvailable(@NonNull Identity identity, boolean available) {
         mSharedPrefs.edit()
-                .putBoolean(DRAFTS_AVAILABLE, available)
+                .putBoolean(DRAFTS_AVAILABLE + identity.getObjectId(), available)
                 .apply();
     }
 

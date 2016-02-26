@@ -61,18 +61,19 @@ public class ParseTaskRepository extends ParseBaseRepository implements TaskRepo
         queries.add(asNeededQuery);
 
         ParseQuery<Task> query = ParseQuery.or(queries);
+        query.whereEqualTo(Task.GROUP, identity.getGroup());
         query.fromLocalDatastore();
         query.ignoreACLs();
-        query.whereEqualTo(Task.GROUP, identity.getGroup());
         query.include(Task.IDENTITIES);
         query.orderByAscending(Task.DEADLINE);
 
-        return find(query).concatMap(new Func1<List<Task>, Observable<Task>>() {
-            @Override
-            public Observable<Task> call(List<Task> tasks) {
-                return Observable.from(tasks);
-            }
-        });
+        return find(query)
+                .concatMap(new Func1<List<Task>, Observable<Task>>() {
+                    @Override
+                    public Observable<Task> call(List<Task> tasks) {
+                        return Observable.from(tasks);
+                    }
+                });
     }
 
     @Override

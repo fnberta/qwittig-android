@@ -74,7 +74,7 @@ public class EditPurchaseDraftViewModelImpl extends EditPurchaseViewModelImpl im
 
     @Override
     public void onDeleteDraftClick() {
-        getSubscriptions().add(mPurchaseRepo.removePurchaseLocalAsync(mEditPurchase, Purchase.PIN_LABEL_DRAFT)
+        getSubscriptions().add(mPurchaseRepo.removeDraft(mEditPurchase)
                 .subscribe(new SingleSubscriber<Purchase>() {
                     @Override
                     public void onSuccess(Purchase value) {

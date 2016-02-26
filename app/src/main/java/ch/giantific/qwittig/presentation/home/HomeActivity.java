@@ -107,6 +107,8 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
         injectViewModel(savedInstanceState);
 
         if (mUserLoggedIn) {
+            mViewModel.onLoginSuccessful();
+
             if (savedInstanceState == null) {
                 addFragments();
                 checkForInvitations();
@@ -191,7 +193,9 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     protected void onResume() {
         super.onResume();
 
-        checkDrafts();
+        if (mUserLoggedIn) {
+            checkDrafts();
+        }
     }
 
     @Override
@@ -299,6 +303,17 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     }
 
     @Override
+    protected void onLoginSuccessful() {
+        super.onLoginSuccessful();
+
+        mViewModel.onLoginSuccessful();
+        checkDrafts();
+        checkForInvitations();
+        // TODO: fix setLoading(true) because online query is still happening
+        addFragments();
+    }
+
+    @Override
     public void showGroupJoinDialog(@NonNull String groupName) {
         JoinGroupDialogFragment.display(getSupportFragmentManager(), groupName);
     }
@@ -352,19 +367,11 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     }
 
     @Override
-    protected void onLoginSuccessful() {
-        super.onLoginSuccessful();
-
-        checkForInvitations();
-        // TODO: fix setLoading(true) because online query is still happening
-        addFragments();
-    }
-
-    @Override
     public void onIdentitySelected() {
         super.onIdentitySelected();
 
         mPurchasesViewModel.onIdentitySelected();
+        checkDrafts();
         if (mViewModel.isDraftsAvailable()) {
             mDraftsViewModel.onIdentitySelected();
         }

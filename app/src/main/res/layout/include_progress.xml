@@ -5,6 +5,7 @@
 
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     >
 
     <data>
@@ -24,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:indeterminate="true"
-        android:visibility="@{viewModel.loading ? View.VISIBLE : View.GONE}"
+        app:contentLoading="@{viewModel.loading}"
         />
 
 </layout>

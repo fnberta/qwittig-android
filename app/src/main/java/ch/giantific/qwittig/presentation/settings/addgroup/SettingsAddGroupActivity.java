@@ -85,7 +85,7 @@ public class SettingsAddGroupActivity extends BaseActivity<SettingsAddGroupViewM
     }
 
     @Override
-    public void setAddUserStream(@NonNull Single<String> single, @NonNull String workerTag) {
+    public void setAddUserStream(@NonNull Single<Identity> single, @NonNull String workerTag) {
         mAddUsersViewModel.setAddUserStream(single, workerTag);
     }
 }

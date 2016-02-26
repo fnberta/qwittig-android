@@ -4,7 +4,7 @@
 
 package ch.giantific.qwittig.presentation.settings.users.items;
 
-import android.os.Parcel;
+import android.annotation.SuppressLint;
 import android.support.annotation.StringRes;
 
 import ch.giantific.qwittig.presentation.common.viewmodels.HeaderRowViewModelBaseImpl;
@@ -14,26 +14,11 @@ import ch.giantific.qwittig.presentation.common.viewmodels.HeaderRowViewModelBas
  * <p/>
  * Subclass of {@link HeaderRowViewModelBaseImpl}.
  */
+@SuppressLint("ParcelCreator")
 public class SettingsUsersHeaderItem extends HeaderRowViewModelBaseImpl implements SettingsUsersBaseItem {
-
-    public static final Creator<SettingsUsersHeaderItem> CREATOR = new Creator<SettingsUsersHeaderItem>() {
-        @Override
-        public SettingsUsersHeaderItem createFromParcel(Parcel source) {
-            return new SettingsUsersHeaderItem(source);
-        }
-
-        @Override
-        public SettingsUsersHeaderItem[] newArray(int size) {
-            return new SettingsUsersHeaderItem[size];
-        }
-    };
 
     public SettingsUsersHeaderItem(@StringRes int header) {
         super(header);
-    }
-
-    private SettingsUsersHeaderItem(Parcel in) {
-        super(in);
     }
 
     @Override

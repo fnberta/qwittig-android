@@ -14,6 +14,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.View;
 import android.widget.ImageView;
@@ -199,6 +200,15 @@ public class BindingUtils {
         }
     }
 
+    @BindingAdapter({"contentLoading"})
+    public static void setContentLoadingProgressBarLoading(ContentLoadingProgressBar view,
+                                                           boolean loading) {
+        if (loading) {
+            view.show();
+        } else {
+            view.hide();
+        }
+    }
 
     @BindingAdapter({"deadline"})
     public static void setTaskDeadline(TextView view, int daysToDeadline) {

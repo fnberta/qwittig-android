@@ -13,6 +13,7 @@ import android.text.TextUtils;
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.domain.models.Group;
+import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
@@ -23,7 +24,7 @@ import rx.Observable;
  * <p/>
  * Subclasses {@link BaseWorker}.
  */
-public class AddUserWorker extends BaseWorker<String, AddUserWorkerListener> {
+public class AddUserWorker extends BaseWorker<Identity, AddUserWorkerListener> {
 
     private static final String WORKER_TAG = AddUserWorker.class.getCanonicalName();
     private static final String KEY_NICKNAME = "NICKNAME";
@@ -78,7 +79,7 @@ public class AddUserWorker extends BaseWorker<String, AddUserWorkerListener> {
 
     @Nullable
     @Override
-    protected Observable<String> getObservable(@NonNull Bundle args) {
+    protected Observable<Identity> getObservable(@NonNull Bundle args) {
         final String nickname = args.getString(KEY_NICKNAME);
         final String groupId = args.getString(KEY_GROUP_ID);
         final String groupName = args.getString(KEY_GROUP_NAME);
@@ -90,7 +91,7 @@ public class AddUserWorker extends BaseWorker<String, AddUserWorkerListener> {
     }
 
     @Override
-    protected void setStream(@NonNull Observable<String> observable) {
+    protected void setStream(@NonNull Observable<Identity> observable) {
         mActivity.setAddUserStream(observable.toSingle(), WORKER_TAG);
     }
 }

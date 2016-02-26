@@ -90,7 +90,6 @@ public class SettingsUsersRecyclerAdapter extends RecyclerView.Adapter {
                 final RowSettingsUsersNicknameBinding binding = row.getBinding();
                 final SettingsUsersNicknameItem nicknameItem = (SettingsUsersNicknameItem) item;
 
-                nicknameItem.setAddListener(mViewModel);
                 binding.setNicknameItem(nicknameItem);
                 binding.executePendingBindings();
                 break;
@@ -101,7 +100,6 @@ public class SettingsUsersRecyclerAdapter extends RecyclerView.Adapter {
                 final RowSettingsUsersUserBinding binding = row.getBinding();
                 final SettingsUsersUserItem userItem = (SettingsUsersUserItem) item;
 
-                userItem.setShareListener(mViewModel);
                 binding.setUserItem(userItem);
                 binding.executePendingBindings();
                 break;

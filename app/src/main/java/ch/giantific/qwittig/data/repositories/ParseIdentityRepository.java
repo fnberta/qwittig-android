@@ -5,9 +5,7 @@
 package ch.giantific.qwittig.data.repositories;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -23,7 +21,6 @@ import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import rx.Observable;
 import rx.Single;
-import rx.SingleSubscriber;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
@@ -33,7 +30,7 @@ import rx.functions.Func1;
  */
 public class ParseIdentityRepository extends ParseBaseRepository implements IdentityRepository {
 
-    private static final String CALCULATE_BALANCE = "calculateBalance";
+    private static final String CALCULATE_BALANCES = "calculateBalances";
 
     public ParseIdentityRepository() {
         super();
@@ -46,12 +43,12 @@ public class ParseIdentityRepository extends ParseBaseRepository implements Iden
 
     @Override
     public Single<String> calcUserBalances() {
-        return callFunctionInBackground(CALCULATE_BALANCE, Collections.<String, Object>emptyMap());
+        return callFunctionInBackground(CALCULATE_BALANCES, Collections.<String, Object>emptyMap());
     }
 
     @Override
-    public Single<String> addIdentity(@NonNull String nickname, @NonNull String groupId,
-                                      @NonNull final String groupName) {
+    public Single<Identity> addIdentity(@NonNull String nickname, @NonNull String groupId,
+                                        @NonNull final String groupName) {
         final Group group = (Group) ParseObject.createWithoutData(Group.CLASS, groupId);
         final Identity identity = new Identity(group, nickname, true);
         return save(identity)
@@ -59,12 +56,6 @@ public class ParseIdentityRepository extends ParseBaseRepository implements Iden
                     @Override
                     public Single<? extends Identity> call(Identity identity) {
                         return pin(identity, Identity.PIN_LABEL);
-                    }
-                })
-                .map(new Func1<Identity, String>() {
-                    @Override
-                    public String call(Identity identity) {
-                        return getInvitationUrl(identity, groupName);
                     }
                 });
     }
@@ -126,7 +117,7 @@ public class ParseIdentityRepository extends ParseBaseRepository implements Iden
             query.whereEqualTo(Identity.PENDING, false);
         }
         return find(query)
-                .flatMap(new Func1<List<Identity>, Observable<Identity>>() {
+                .concatMap(new Func1<List<Identity>, Observable<Identity>>() {
                     @Override
                     public Observable<Identity> call(List<Identity> identities) {
                         return Observable.from(identities);
@@ -135,8 +126,14 @@ public class ParseIdentityRepository extends ParseBaseRepository implements Iden
     }
 
     @Override
-    public Observable<Identity> updateIdentitiesAsync(@NonNull List<Identity> identities) {
-        return Observable.from(identities)
+    public Observable<Identity> updateIdentitiesAsync(@NonNull final List<Identity> identities) {
+        return calcUserBalances()
+                .flatMapObservable(new Func1<String, Observable<? extends Identity>>() {
+                    @Override
+                    public Observable<? extends Identity> call(String s) {
+                        return Observable.from(identities);
+                    }
+                })
                 .map(new Func1<Identity, Group>() {
                     @Override
                     public Group call(Identity identity) {
@@ -156,19 +153,19 @@ public class ParseIdentityRepository extends ParseBaseRepository implements Iden
                         return find(identityParseQuery);
                     }
                 })
-                .flatMap(new Func1<List<Identity>, Observable<List<Identity>>>() {
+                .concatMap(new Func1<List<Identity>, Observable<List<Identity>>>() {
                     @Override
                     public Observable<List<Identity>> call(List<Identity> identities) {
                         return unpinAll(identities, Identity.PIN_LABEL);
                     }
                 })
-                .flatMap(new Func1<List<Identity>, Observable<List<Identity>>>() {
+                .concatMap(new Func1<List<Identity>, Observable<List<Identity>>>() {
                     @Override
                     public Observable<List<Identity>> call(List<Identity> identities) {
                         return pinAll(identities, Identity.PIN_LABEL);
                     }
                 })
-                .flatMap(new Func1<List<Identity>, Observable<Identity>>() {
+                .concatMap(new Func1<List<Identity>, Observable<Identity>>() {
                     @Override
                     public Observable<Identity> call(List<Identity> identities) {
                         return Observable.from(identities);
@@ -223,6 +220,18 @@ public class ParseIdentityRepository extends ParseBaseRepository implements Iden
                                         identity.saveEventually();
                                     }
                                 });
+                    }
+                });
+    }
+
+    @Override
+    public Single<Identity> removePendingIdentity(@NonNull Identity identity) {
+        identity.setActive(false);
+        return unpin(identity, Identity.PIN_LABEL)
+                .doOnSuccess(new Action1<Identity>() {
+                    @Override
+                    public void call(Identity identity) {
+                        identity.saveEventually();
                     }
                 });
     }

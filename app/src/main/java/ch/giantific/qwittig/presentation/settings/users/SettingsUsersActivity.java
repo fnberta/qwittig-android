@@ -12,6 +12,7 @@ import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import rx.Single;
 
@@ -59,7 +60,7 @@ public class SettingsUsersActivity extends BaseActivity<SettingsUsersViewModel>
     }
 
     @Override
-    public void setAddUserStream(@NonNull Single<String> single, @NonNull String workerTag) {
+    public void setAddUserStream(@NonNull Single<Identity> single, @NonNull String workerTag) {
         mViewModel.setAddUserStream(single, workerTag);
     }
 }

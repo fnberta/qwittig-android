@@ -6,6 +6,7 @@ package ch.giantific.qwittig.presentation.settings.users;
 
 import android.support.annotation.NonNull;
 
+import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorkerListener;
 import rx.Single;
 
@@ -19,5 +20,5 @@ public interface AddUserWorkerListener extends BaseWorkerListener {
      * @param single    the single emitting the user invitation
      * @param workerTag the tag of the worker fragment
      */
-    void setAddUserStream(@NonNull Single<String> single, @NonNull String workerTag);
+    void setAddUserStream(@NonNull Single<Identity> single, @NonNull String workerTag);
 }

@@ -31,7 +31,7 @@ public abstract class OnlineListViewModelBaseImpl<T, S extends OnlineListViewMod
         super(savedState, view, identityRepository, userRepository);
 
         if (savedState != null) {
-            setRefreshing(savedState.getBoolean(STATE_REFRESHING, false));
+            mRefreshing = savedState.getBoolean(STATE_REFRESHING, false);
         }
     }
 

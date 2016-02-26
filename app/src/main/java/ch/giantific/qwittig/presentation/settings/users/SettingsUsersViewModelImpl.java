@@ -8,6 +8,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.apache.commons.math3.fraction.BigFraction;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
@@ -16,11 +19,11 @@ import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
-import ch.giantific.qwittig.presentation.settings.users.items.SettingsUsersUserItem;
+import ch.giantific.qwittig.presentation.settings.users.items.SettingsUsersBaseItem;
 import ch.giantific.qwittig.presentation.settings.users.items.SettingsUsersHeaderItem;
 import ch.giantific.qwittig.presentation.settings.users.items.SettingsUsersIntroItem;
 import ch.giantific.qwittig.presentation.settings.users.items.SettingsUsersNicknameItem;
-import ch.giantific.qwittig.presentation.settings.users.items.SettingsUsersBaseItem;
+import ch.giantific.qwittig.presentation.settings.users.items.SettingsUsersUserItem;
 import rx.Single;
 import rx.SingleSubscriber;
 import rx.functions.Func1;
@@ -31,7 +34,6 @@ import rx.functions.Func1;
 public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUsersBaseItem, SettingsUsersViewModel.ViewListener>
         implements SettingsUsersViewModel {
 
-    private static final String STATE_ITEMS = "STATE_ITEMS";
     private static final int POS_NICKNAME = 1;
 
     public SettingsUsersViewModelImpl(@Nullable Bundle savedState,
@@ -41,26 +43,16 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
         super(savedState, view, identityRepo, userRepository);
 
         if (savedState != null) {
-            mItems = savedState.getParcelableArrayList(STATE_ITEMS);
+            mItems = new ArrayList<>();
         }
-    }
-
-    @Override
-    public void saveState(@NonNull Bundle outState) {
-        super.saveState(outState);
-
-        outState.putParcelableArrayList(STATE_ITEMS, mItems);
     }
 
     @Override
     public void loadData() {
-        if (!mItems.isEmpty()) {
-            // list is already filled, return immediately
-            return;
-        }
+        final SettingsUsersViewModel listener = this;
 
         mItems.add(new SettingsUsersIntroItem());
-        mItems.add(new SettingsUsersNicknameItem());
+        mItems.add(new SettingsUsersNicknameItem(listener));
         mItems.add(new SettingsUsersHeaderItem(R.string.header_settings_users));
 
         final Group group = mCurrentIdentity.getGroup();
@@ -77,8 +69,9 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
                     @Override
                     public SettingsUsersUserItem call(Identity identity) {
                         return identity.isPending()
-                                ? new SettingsUsersUserItem(identity.getNickname(), mIdentityRepo.getInvitationUrl(identity, groupName))
-                                : new SettingsUsersUserItem(identity.getNickname());
+                                ? new SettingsUsersUserItem(listener, identity,
+                                mIdentityRepo.getInvitationUrl(identity, groupName))
+                                : new SettingsUsersUserItem(listener, identity);
                     }
                 })
                 .toSortedList()
@@ -106,17 +99,22 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
     }
 
     @Override
-    public void setAddUserStream(@NonNull Single<String> single, @NonNull final String workerTag) {
-        getSubscriptions().add(single.subscribe(new SingleSubscriber<String>() {
+    public void setAddUserStream(@NonNull Single<Identity> single, @NonNull final String workerTag) {
+        final SettingsUsersViewModel listener = this;
+        getSubscriptions().add(single.subscribe(new SingleSubscriber<Identity>() {
                     @Override
-                    public void onSuccess(String invitationUrl) {
+                    public void onSuccess(Identity identity) {
                         mView.removeWorker(workerTag);
                         mView.toggleProgressDialog(false);
 
+                        final Group group = mCurrentIdentity.getGroup();
+                        final String groupName = group.getName();
+                        mItems.add(new SettingsUsersUserItem(listener, identity,
+                                mIdentityRepo.getInvitationUrl(identity, groupName)));
+                        mView.notifyItemInserted(getLastPosition());
+
                         final SettingsUsersNicknameItem nicknameItem =
                                 ((SettingsUsersNicknameItem) mItems.get(POS_NICKNAME));
-                        mItems.add(new SettingsUsersUserItem(nicknameItem.getNickname(), invitationUrl));
-                        mView.notifyItemInserted(getLastPosition());
                         nicknameItem.setValidate(false);
                         nicknameItem.setNickname("");
                     }
@@ -125,7 +123,6 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
                     public void onError(Throwable error) {
                         mView.removeWorker(workerTag);
                         mView.toggleProgressDialog(false);
-
                         mView.showMessage(R.string.toast_error_settings_users_add);
                     }
                 })
@@ -140,5 +137,36 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
     @Override
     public int getItemViewType(int position) {
         return mItems.get(position).getType();
+    }
+
+    @Override
+    public boolean isItemDismissable(int position) {
+        if (getItemViewType(position) != SettingsUsersBaseItem.Type.USER) {
+            return false;
+        }
+
+        final SettingsUsersUserItem userItem = (SettingsUsersUserItem) mItems.get(position);
+        return userItem.isPending() && userItem.getIdentity().getBalance().equals(BigFraction.ZERO);
+    }
+
+    @Override
+    public void onItemDismiss(final int position) {
+        final SettingsUsersUserItem userItem = (SettingsUsersUserItem) mItems.get(position);
+        final Identity identity = userItem.getIdentity();
+        getSubscriptions().add(mIdentityRepo.removePendingIdentity(identity)
+                .subscribe(new SingleSubscriber<Identity>() {
+                    @Override
+                    public void onSuccess(Identity value) {
+                        mItems.remove(position);
+                        mView.notifyItemRemoved(position);
+                        mView.showMessage(R.string.toast_settings_users_removed);
+                    }
+
+                    @Override
+                    public void onError(Throwable error) {
+                        mView.showMessage(R.string.toast_error_settings_users_remove);
+                    }
+                })
+        );
     }
 }

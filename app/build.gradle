@@ -4,8 +4,6 @@
 
 apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
-apply plugin: 'com.getkeepsafe.dexcount'
-apply plugin: 'com.parse'
 
 android {
     compileSdkVersion 23
@@ -34,13 +32,8 @@ android {
     }
 }
 
-parse {
-    parseProjectDir "/Users/fabio/Software/Android_Development/Projects/Qwittig/ParseCloudCode"
-    uploadSymbols true
-}
-
 ext {
-    supportLibVersion = '23.1.1'
+    supportLibVersion = '23.2.0'
     playServicesVersion = '8.4.0'
     retrofitVersion = '2.0.0-beta4'
     leakCanaryVersion = '1.4-beta1'

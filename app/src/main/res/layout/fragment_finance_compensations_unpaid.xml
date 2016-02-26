@@ -22,6 +22,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
         tools:context=".presentation.finance.unpaid.CompsUnpaidFragment"
         >
 
@@ -38,6 +39,7 @@
             android:layout_gravity="center"
             android:drawablePadding="@dimen/small_space"
             android:drawableTop="@drawable/ic_attach_money_black_144dp"
+            android:gravity="center_horizontal"
             android:text="@string/no_compensations"
             android:visibility="@{!viewModel.empty ? View.GONE : viewModel.loading ? View.GONE : View.VISIBLE}"
             tools:visibility="visible"

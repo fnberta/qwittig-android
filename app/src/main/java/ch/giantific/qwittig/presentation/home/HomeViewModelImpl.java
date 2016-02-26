@@ -36,7 +36,13 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
         super(savedState, view, userRepository);
 
         mPurchaseRepo = purchaseRepo;
-        mDraftsAvailable = mPurchaseRepo.isDraftsAvailable();
+    }
+
+    @Override
+    public void onLoginSuccessful() {
+        mCurrentUser = mUserRepo.getCurrentUser();
+        setCurrentIdentity();
+        mDraftsAvailable = mPurchaseRepo.isDraftsAvailable(mCurrentIdentity);
     }
 
     @Override
@@ -53,7 +59,7 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
 
     @Override
     public boolean updateDraftsAvailable() {
-        final boolean draftsAvailable = mPurchaseRepo.isDraftsAvailable();
+        final boolean draftsAvailable = mPurchaseRepo.isDraftsAvailable(mCurrentIdentity);
         setDraftsAvailable(draftsAvailable);
 
         return draftsAvailable;

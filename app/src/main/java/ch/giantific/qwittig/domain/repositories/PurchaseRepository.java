@@ -55,10 +55,9 @@ public interface PurchaseRepository extends BaseRepository {
      * Removes a purchase from the local data store.
      *
      * @param purchase the purchase to remove
-     * @param tag      the pin tag the purchase uses
      * @return a {@link Single} emitting the result
      */
-    Single<Purchase> removePurchaseLocalAsync(@NonNull Purchase purchase, @NonNull String tag);
+    Single<Purchase> removeDraft(@NonNull Purchase purchase);
 
     /**
      * Removes a purchase from the local data store.
@@ -156,15 +155,17 @@ public interface PurchaseRepository extends BaseRepository {
      * Returns whether drafts are available for the current identity of the user.
      *
      * @return whether drafts are available
+     * @param identity
      */
-    boolean isDraftsAvailable();
+    boolean isDraftsAvailable(Identity identity);
 
     /**
      * Toggle the save setting whether drafts are available or not.
      *
+     * @param identity
      * @param available whether drafts are available or not
      */
-    void toggleDraftsAvailable(boolean available);
+    void toggleDraftsAvailable(Identity identity, boolean available);
 
     /**
      * Returns the exchange rate for the given currency.

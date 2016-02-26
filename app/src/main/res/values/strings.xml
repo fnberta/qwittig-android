@@ -292,5 +292,7 @@
     <string name="toast_error_settings_group_add">Failed to create group</string>
     <string name="toast_error_settings_users_add">Failed to add user</string>
     <string name="toast_password_reset">An email with a link to rest your password was sent</string>
+    <string name="toast_settings_users_removed">Removed user from group</string>
+    <string name="toast_error_settings_users_remove">Failed to remove user from group</string>
 
 </resources>

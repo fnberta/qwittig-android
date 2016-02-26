@@ -314,15 +314,6 @@ public class ParseQueryService extends IntentService {
         }
     }
 
-    private void setTaskDone(@NonNull String taskId) {
-        final Task task = mTasksRepo.fetchTaskDataLocal(taskId);
-        if (task != null) {
-            task.addHistoryEvent(mCurrentIdentity);
-            task.saveEventually();
-            mLocalBroadcast.sendTasksUpdated();
-        }
-    }
-
     private void queryGroup(@NonNull String groupId, boolean isNew) {
         if (isNew && mGroupRepo.isAlreadySavedLocal(groupId)) {
             return;
@@ -362,6 +353,15 @@ public class ParseQueryService extends IntentService {
 
     private void queryTasks() {
         if (mTasksRepo.updateTasks(mIdentities)) {
+            mLocalBroadcast.sendTasksUpdated();
+        }
+    }
+
+    private void setTaskDone(@NonNull String taskId) {
+        final Task task = mTasksRepo.fetchTaskDataLocal(taskId);
+        if (task != null) {
+            task.addHistoryEvent(mCurrentIdentity);
+            task.saveEventually();
             mLocalBroadcast.sendTasksUpdated();
         }
     }

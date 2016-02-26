@@ -43,9 +43,9 @@ public interface IdentityRepository extends BaseRepository {
      * @param groupName the name of the group the new identity is created for, user for the link
      * @return a {@link Single} emitting the result
      */
-    Single<String> addIdentity(@NonNull String nickname,
-                               @NonNull String groupId,
-                               @NonNull String groupName);
+    Single<Identity> addIdentity(@NonNull String nickname,
+                                 @NonNull String groupId,
+                                 @NonNull String groupName);
 
     Single<Identity> saveIdentityLocalAsync(@NonNull Identity identity);
 
@@ -113,4 +113,6 @@ public interface IdentityRepository extends BaseRepository {
     Observable<Identity> saveIdentitiesWithAvatar(@NonNull List<Identity> identities,
                                                   @NonNull String nickname,
                                                   @NonNull byte[] avatarBytes);
+
+    Single<Identity> removePendingIdentity(@NonNull Identity identity);
 }

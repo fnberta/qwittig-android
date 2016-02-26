@@ -6,60 +6,40 @@ package ch.giantific.qwittig.presentation.settings.users.items;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
 
-import ch.giantific.qwittig.BR;
+import ch.giantific.qwittig.domain.models.Identity;
 
 /**
  * Provides an implementation of the {@link SettingsUsersBaseItem} for a group user row.
  */
 public class SettingsUsersUserItem extends BaseObservable implements SettingsUsersBaseItem, Comparable<SettingsUsersUserItem> {
 
-    public static final Parcelable.Creator<SettingsUsersUserItem> CREATOR = new Parcelable.Creator<SettingsUsersUserItem>() {
-        @Override
-        public SettingsUsersUserItem createFromParcel(Parcel source) {
-            return new SettingsUsersUserItem(source);
-        }
-
-        @Override
-        public SettingsUsersUserItem[] newArray(int size) {
-            return new SettingsUsersUserItem[size];
-        }
-    };
     private ShareListener mShareListener;
-    private String mNickname;
+    private Identity mIdentity;
     private String mShareLink;
 
-    public SettingsUsersUserItem(@NonNull String nickname) {
-        mNickname = nickname;
+    public SettingsUsersUserItem(@NonNull ShareListener shareListener, @NonNull Identity identity) {
+        mShareListener = shareListener;
+        mIdentity = identity;
     }
 
-    public SettingsUsersUserItem(@NonNull String nickname, @NonNull String shareLink) {
-        mNickname = nickname;
+    public SettingsUsersUserItem(@NonNull ShareListener shareListener, @NonNull Identity identity,
+                                 @NonNull String shareLink) {
+        mShareListener = shareListener;
+        mIdentity = identity;
         mShareLink = shareLink;
     }
 
-    private SettingsUsersUserItem(Parcel in) {
-        mNickname = in.readString();
-        mShareLink = in.readString();
-    }
-
-    public void setShareListener(@NonNull ShareListener shareListener) {
-        mShareListener = shareListener;
+    public Identity getIdentity() {
+        return mIdentity;
     }
 
     @Bindable
     public String getNickname() {
-        return mNickname;
-    }
-
-    public void setNickname(@NonNull String nickname) {
-        mNickname = nickname;
-        notifyPropertyChanged(BR.nickname);
+        return mIdentity.getNickname();
     }
 
     @Bindable
@@ -77,19 +57,8 @@ public class SettingsUsersUserItem extends BaseObservable implements SettingsUse
     }
 
     @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(mNickname);
-        dest.writeString(mShareLink);
-    }
-
-    @Override
     public int compareTo(@NonNull SettingsUsersUserItem another) {
-        return mNickname.compareToIgnoreCase(another.getNickname());
+        return getNickname().compareToIgnoreCase(another.getNickname());
     }
 
     /**

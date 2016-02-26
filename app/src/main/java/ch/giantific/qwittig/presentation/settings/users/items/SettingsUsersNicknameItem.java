@@ -6,8 +6,6 @@ package ch.giantific.qwittig.presentation.settings.users.items;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
@@ -19,30 +17,11 @@ import ch.giantific.qwittig.BR;
  */
 public class SettingsUsersNicknameItem extends BaseObservable implements SettingsUsersBaseItem {
 
-    public static final Parcelable.Creator<SettingsUsersNicknameItem> CREATOR = new Parcelable.Creator<SettingsUsersNicknameItem>() {
-        @Override
-        public SettingsUsersNicknameItem createFromParcel(Parcel source) {
-            return new SettingsUsersNicknameItem(source);
-        }
-
-        @Override
-        public SettingsUsersNicknameItem[] newArray(int size) {
-            return new SettingsUsersNicknameItem[size];
-        }
-    };
     private AddListener mAddListener;
     private String mNickname;
     private boolean mValidate;
 
-    public SettingsUsersNicknameItem() {
-    }
-
-    protected SettingsUsersNicknameItem(Parcel in) {
-        mNickname = in.readString();
-        mValidate = in.readByte() != 0;
-    }
-
-    public void setAddListener(@NonNull AddListener addListener) {
+    public SettingsUsersNicknameItem(@NonNull AddListener addListener) {
         mAddListener = addListener;
     }
 
@@ -94,18 +73,16 @@ public class SettingsUsersNicknameItem extends BaseObservable implements Setting
         return Type.NICKNAME;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(mNickname);
-        dest.writeByte(mValidate ? (byte) 1 : (byte) 0);
-    }
-
+    /**
+     * Defines the actions to take when the user clicks on add user.
+     */
     public interface AddListener {
+
+        /**
+         * Adds the entered nickname as a new identity.
+         *
+         * @param nickname the nickname entered
+         */
         void onValidUserEntered(@NonNull String nickname);
     }
 }

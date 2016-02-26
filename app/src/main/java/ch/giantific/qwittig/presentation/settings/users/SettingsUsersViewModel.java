@@ -17,6 +17,10 @@ import ch.giantific.qwittig.presentation.settings.users.items.SettingsUsersBaseI
 public interface SettingsUsersViewModel extends ListViewModel<SettingsUsersBaseItem>, AddUserWorkerListener,
         SettingsUsersNicknameItem.AddListener, SettingsUsersUserItem.ShareListener {
 
+    boolean isItemDismissable(int position);
+
+    void onItemDismiss(int position);
+
     /**
      * Defines the interaction with the attached view.
      */

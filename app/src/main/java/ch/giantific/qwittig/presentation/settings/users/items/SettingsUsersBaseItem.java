@@ -4,7 +4,6 @@
 
 package ch.giantific.qwittig.presentation.settings.users.items;
 
-import android.os.Parcelable;
 import android.support.annotation.IntDef;
 
 import java.lang.annotation.Retention;
@@ -13,7 +12,7 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * Defines a list item in the manage users settings screen.
  */
-public interface SettingsUsersBaseItem extends Parcelable {
+public interface SettingsUsersBaseItem {
 
     @Type
     int getType();

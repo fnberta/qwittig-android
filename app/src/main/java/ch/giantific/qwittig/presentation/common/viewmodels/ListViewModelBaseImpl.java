@@ -38,7 +38,7 @@ public abstract class ListViewModelBaseImpl<T, S extends ListViewModel.ViewListe
         mIdentityRepo = identityRepo;
 
         if (savedState != null) {
-            mLoading = (savedState.getBoolean(STATE_LOADING, false));
+            mLoading = savedState.getBoolean(STATE_LOADING, false);
         } else {
             mLoading = true;
             mItems = new ArrayList<>();

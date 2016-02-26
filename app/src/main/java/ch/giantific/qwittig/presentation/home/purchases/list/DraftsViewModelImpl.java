@@ -188,7 +188,7 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, DraftsV
     }
 
     private void deleteDraft(@NonNull Purchase draft, final int pos) {
-        getSubscriptions().add(mPurchaseRepo.removePurchaseLocalAsync(draft, Purchase.PIN_LABEL_DRAFT)
+        getSubscriptions().add(mPurchaseRepo.removeDraft(draft)
                 .subscribe(new SingleSubscriber<Purchase>() {
                     @Override
                     public void onSuccess(Purchase value) {

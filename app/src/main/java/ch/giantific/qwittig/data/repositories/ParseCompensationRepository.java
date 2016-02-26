@@ -55,13 +55,13 @@ public class ParseCompensationRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public Observable<Compensation> getCompensationsLocalUnpaidAsync(@NonNull Identity currentIdentity) {
-        ParseQuery<Compensation> query = getCompensationsLocalQuery(currentIdentity.getGroup());
+    public Observable<Compensation> getCompensationsLocalUnpaidAsync(@NonNull Identity identity) {
+        ParseQuery<Compensation> query = getCompensationsLocalQuery(identity);
         query.whereEqualTo(Compensation.PAID, false);
         query.orderByAscending(DATE_CREATED);
 
         return find(query)
-                .flatMap(new Func1<List<Compensation>, Observable<Compensation>>() {
+                .concatMap(new Func1<List<Compensation>, Observable<Compensation>>() {
                     @Override
                     public Observable<Compensation> call(List<Compensation> compensations) {
                         return Observable.from(compensations);
@@ -70,13 +70,13 @@ public class ParseCompensationRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public Observable<Compensation> getCompensationsLocalPaidAsync(@NonNull Identity currentIdentity) {
-        final ParseQuery<Compensation> query = getCompensationsLocalQuery(currentIdentity.getGroup());
+    public Observable<Compensation> getCompensationsLocalPaidAsync(@NonNull Identity identity) {
+        final ParseQuery<Compensation> query = getCompensationsLocalQuery(identity);
         query.whereEqualTo(Compensation.PAID, true);
         query.orderByDescending(DATE_UPDATED);
 
         return find(query)
-                .flatMap(new Func1<List<Compensation>, Observable<Compensation>>() {
+                .concatMap(new Func1<List<Compensation>, Observable<Compensation>>() {
                     @Override
                     public Observable<Compensation> call(List<Compensation> compensations) {
                         return Observable.from(compensations);
@@ -85,9 +85,18 @@ public class ParseCompensationRepository extends ParseBaseRepository implements
     }
 
     @NonNull
-    private ParseQuery<Compensation> getCompensationsLocalQuery(@NonNull Group group) {
-        final ParseQuery<Compensation> query = ParseQuery.getQuery(Compensation.CLASS);
-        query.whereEqualTo(Compensation.GROUP, group);
+    private ParseQuery<Compensation> getCompensationsLocalQuery(@NonNull Identity identity) {
+        final ParseQuery<Compensation> debtorQuery = ParseQuery.getQuery(Compensation.CLASS);
+        debtorQuery.whereEqualTo(Compensation.DEBTOR, identity);
+        final ParseQuery<Compensation> creditorQuery = ParseQuery.getQuery(Compensation.CLASS);
+        creditorQuery.whereEqualTo(Compensation.CREDITOR, identity);
+
+        final List<ParseQuery<Compensation>> queries = new ArrayList<>();
+        queries.add(debtorQuery);
+        queries.add(creditorQuery);
+
+        final ParseQuery<Compensation> query = ParseQuery.or(queries);
+        query.whereEqualTo(Compensation.GROUP, identity.getGroup());
         query.fromLocalDatastore();
         query.ignoreACLs();
         return query;
@@ -135,19 +144,19 @@ public class ParseCompensationRepository extends ParseBaseRepository implements
                         return find(query);
                     }
                 })
-                .flatMap(new Func1<List<Compensation>, Observable<List<Compensation>>>() {
+                .concatMap(new Func1<List<Compensation>, Observable<List<Compensation>>>() {
                     @Override
                     public Observable<List<Compensation>> call(List<Compensation> compensations) {
                         return unpinAll(compensations, Compensation.PIN_LABEL_UNPAID);
                     }
                 })
-                .flatMap(new Func1<List<Compensation>, Observable<List<Compensation>>>() {
+                .concatMap(new Func1<List<Compensation>, Observable<List<Compensation>>>() {
                     @Override
                     public Observable<List<Compensation>> call(List<Compensation> compensations) {
                         return pinAll(compensations, Compensation.PIN_LABEL_UNPAID);
                     }
                 })
-                .flatMap(new Func1<List<Compensation>, Observable<Compensation>>() {
+                .concatMap(new Func1<List<Compensation>, Observable<Compensation>>() {
                     @Override
                     public Observable<Compensation> call(List<Compensation> compensations) {
                         return Observable.from(compensations);
@@ -205,19 +214,19 @@ public class ParseCompensationRepository extends ParseBaseRepository implements
                         query.whereEqualTo(Compensation.PAID, true);
                         query.setLimit(QUERY_ITEMS_PER_PAGE);
                         return find(query)
-                                .flatMap(new Func1<List<Compensation>, Observable<List<Compensation>>>() {
+                                .concatMap(new Func1<List<Compensation>, Observable<List<Compensation>>>() {
                                     @Override
                                     public Observable<List<Compensation>> call(List<Compensation> compensations) {
                                         return unpinAll(compensations, pinLabel);
                                     }
                                 })
-                                .flatMap(new Func1<List<Compensation>, Observable<List<Compensation>>>() {
+                                .concatMap(new Func1<List<Compensation>, Observable<List<Compensation>>>() {
                                     @Override
                                     public Observable<List<Compensation>> call(List<Compensation> compensations) {
                                         return pinAll(compensations, pinLabel);
                                     }
                                 })
-                                .flatMap(new Func1<List<Compensation>, Observable<Compensation>>() {
+                                .concatMap(new Func1<List<Compensation>, Observable<Compensation>>() {
                                     @Override
                                     public Observable<Compensation> call(List<Compensation> compensations) {
                                         return Observable.from(compensations);
@@ -242,14 +251,14 @@ public class ParseCompensationRepository extends ParseBaseRepository implements
         query.whereEqualTo(Compensation.PAID, true);
 
         return find(query)
-                .flatMap(new Func1<List<Compensation>, Observable<List<Compensation>>>() {
+                .concatMap(new Func1<List<Compensation>, Observable<List<Compensation>>>() {
                     @Override
                     public Observable<List<Compensation>> call(List<Compensation> compensations) {
                         final String tag = Compensation.PIN_LABEL_PAID + currentGroup.getObjectId();
                         return pinAll(compensations, tag);
                     }
                 })
-                .flatMap(new Func1<List<Compensation>, Observable<Compensation>>() {
+                .concatMap(new Func1<List<Compensation>, Observable<Compensation>>() {
                     @Override
                     public Observable<Compensation> call(List<Compensation> compensations) {
                         return Observable.from(compensations);
@@ -303,7 +312,6 @@ public class ParseCompensationRepository extends ParseBaseRepository implements
                 final String pinLabel = isPaid
                         ? Compensation.PIN_LABEL_PAID + groupId
                         : Compensation.PIN_LABEL_UNPAID;
-
                 compensation.pin(pinLabel);
             } else if (isPaid) {
                 compensation.unpin(Compensation.PIN_LABEL_UNPAID);
