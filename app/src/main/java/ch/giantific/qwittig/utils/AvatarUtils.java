@@ -18,16 +18,11 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.utils.Utils;
 
 /**
  * Provides useful methods to properly format a user's avatar image.
  */
 public class AvatarUtils {
-
-    public static final int JPEG_COMPRESSION_RATE = 60;
-    public static final int HEIGHT = 720;
-    public static final int WIDTH = 720;
 
     private AvatarUtils() {
         // class cannot be instantiated
@@ -42,7 +37,7 @@ public class AvatarUtils {
      */
     @NonNull
     public static Drawable getFallbackDrawableRect(@NonNull Context context, boolean withRipple) {
-        Drawable avatar = ContextCompat.getDrawable(context, R.drawable.ic_account_box_black_144dp);
+        final Drawable avatar = ContextCompat.getDrawable(context, R.drawable.ic_account_box_black_144dp);
 
         return withRipple && Utils.isRunningLollipopAndHigher() ?
                 createRippleDrawable(context, avatar) : avatar;
@@ -59,9 +54,9 @@ public class AvatarUtils {
     @NonNull
     public static Drawable getFallbackDrawable(@NonNull Context context, boolean getBigSize,
                                                boolean withRipple) {
-        int drawableId = getBigSize ? R.drawable.ic_account_circle_black_80dp :
+        final int drawableId = getBigSize ? R.drawable.ic_account_circle_black_80dp :
                 R.drawable.ic_account_circle_black_40dp;
-        Drawable avatar = ContextCompat.getDrawable(context, drawableId);
+        final Drawable avatar = ContextCompat.getDrawable(context, drawableId);
 
         return withRipple && Utils.isRunningLollipopAndHigher() ?
                 createRippleDrawable(context, avatar) : avatar;
@@ -71,9 +66,9 @@ public class AvatarUtils {
     @NonNull
     private static RippleDrawable createRippleDrawable(@NonNull Context context,
                                                        @NonNull Drawable drawable) {
-        int[] attrs = new int[]{R.attr.colorControlHighlight};
-        TypedArray typedArray = context.obtainStyledAttributes(attrs);
-        int rippleColor = typedArray.getResourceId(0, 0);
+        final int[] attrs = new int[]{R.attr.colorControlHighlight};
+        final TypedArray typedArray = context.obtainStyledAttributes(attrs);
+        final int rippleColor = typedArray.getResourceId(0, 0);
         typedArray.recycle();
 
         return new RippleDrawable(ColorStateList.valueOf(rippleColor), drawable, null);
@@ -90,7 +85,7 @@ public class AvatarUtils {
     @NonNull
     public static Drawable getRoundedDrawable(@NonNull Context context, @NonNull Bitmap bitmap,
                                               boolean withRipple) {
-        RoundedBitmapDrawable roundedDrawable = RoundedBitmapDrawableFactory.create(
+        final RoundedBitmapDrawable roundedDrawable = RoundedBitmapDrawableFactory.create(
                 context.getResources(), bitmap);
         roundedDrawable.setCornerRadius(Math.min(roundedDrawable.getMinimumWidth(),
                 roundedDrawable.getMinimumHeight()));

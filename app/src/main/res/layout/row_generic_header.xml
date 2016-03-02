@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.common.viewmodels.HeaderRowViewModel"
+            />
+    </data>
+
+    <TextView
+        style="@style/SubHeader"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/subheader_height"
+        android:clickable="false"
+        android:gravity="center_vertical"
+        android:paddingEnd="@dimen/key_line_1"
+        android:paddingStart="@dimen/key_line_1"
+        android:text="@{viewModel.header}"
+        tools:text="Items"/>
+
+</layout>

@@ -3,31 +3,37 @@
   ~ Copyright (c) 2015 Fabio Berta
   -->
 
-<LinearLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     >
 
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/til_note"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/dialog_padding"
-        android:layout_marginStart="@dimen/dialog_padding"
-        android:layout_marginTop="@dimen/small_space"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
         >
 
-        <EditText
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/til_dialog_purchase_note"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/header_note"
-            android:inputType="textMultiLine|textCapSentences"
-            tools:text="Die ist eine Test, die hoffentlich über eine Zeile hinausgeht. Falls nicht, füge ich gleich nochmals eine Zeile an."
-            />
+            android:layout_marginEnd="@dimen/dialog_padding"
+            android:layout_marginStart="@dimen/dialog_padding"
+            android:layout_marginTop="@dimen/small_space"
+            >
 
-    </android.support.design.widget.TextInputLayout>
+            <EditText
+                android:id="@+id/et_dialog_purchase_note"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/header_note"
+                android:inputType="textMultiLine|textCapSentences"
+                tools:text="Die ist ein Text, die hoffentlich über eine Zeile hinausgeht. Falls nicht, füge ich gleich nochmals eine Zeile an."
+                />
 
-</LinearLayout>
+        </android.support.design.widget.TextInputLayout>
+
+    </LinearLayout>
+
+</layout>

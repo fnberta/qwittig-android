@@ -5,24 +5,30 @@
 package ch.giantific.qwittig;
 
 import android.app.Application;
-import android.util.Log;
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.multidex.MultiDex;
 
 import com.facebook.FacebookSdk;
 import com.parse.Parse;
 import com.parse.ParseACL;
-import com.parse.ParseCrashReporting;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
-import com.squareup.leakcanary.LeakCanary;
 
-import ch.giantific.qwittig.domain.models.parse.Compensation;
-import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.Item;
-import ch.giantific.qwittig.domain.models.parse.Purchase;
-import ch.giantific.qwittig.domain.models.parse.Task;
-import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.di.ApplicationComponent;
+import ch.giantific.qwittig.di.ApplicationModule;
+import ch.giantific.qwittig.di.DaggerApplicationComponent;
+import ch.giantific.qwittig.di.RestServiceModule;
+import ch.giantific.qwittig.domain.models.Compensation;
+import ch.giantific.qwittig.domain.models.Group;
+import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.Item;
+import ch.giantific.qwittig.domain.models.Purchase;
+import ch.giantific.qwittig.domain.models.Task;
+import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.utils.parse.ParseConfigUtils;
+import timber.log.Timber;
 
 /**
  * Handles the initialisation of the Parse.com framework.
@@ -31,19 +37,49 @@ import ch.giantific.qwittig.utils.parse.ParseConfigUtils;
  */
 public class Qwittig extends Application {
 
+    private ApplicationComponent mAppComponent;
+
+    public static ApplicationComponent getAppComponent(@NonNull Context context) {
+        return ((Qwittig) context.getApplicationContext()).getAppComponent();
+    }
+
+    private ApplicationComponent getAppComponent() {
+        return mAppComponent;
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+
+        if (BuildConfig.DEBUG) {
+            MultiDex.install(this);
+        }
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
 
-//        if (BuildConfig.DEBUG) {
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
 //            LeakCanary.install(this);
-//        }
+        }
 
-        // initialise Facebook SDK
-        FacebookSdk.sdkInitialize(getApplicationContext());
+        buildAppComponent();
+        initialiseParse();
+    }
 
+    private void buildAppComponent() {
+        mAppComponent = DaggerApplicationComponent.builder()
+                .applicationModule(new ApplicationModule(this))
+                .restServiceModule(new RestServiceModule())
+                .build();
+    }
+
+    private void initialiseParse() {
         // register ParseObject subclasses
         ParseObject.registerSubclass(Group.class);
+        ParseObject.registerSubclass(Identity.class);
         ParseObject.registerSubclass(User.class);
         ParseObject.registerSubclass(Purchase.class);
         ParseObject.registerSubclass(Item.class);
@@ -52,9 +88,6 @@ public class Qwittig extends Application {
 
         // enable local data store
         Parse.enableLocalDatastore(this);
-
-        // Enable Crash Reporting
-        ParseCrashReporting.enable(this);
 
         // initialise Parse
         Parse.initialize(this, "yLuL6xJB2dUD2hjfh4W2EcZizcPsJZKDgDzbrPji",

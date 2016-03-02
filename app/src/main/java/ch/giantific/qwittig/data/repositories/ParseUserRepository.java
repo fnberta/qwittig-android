@@ -5,115 +5,518 @@
 package ch.giantific.qwittig.data.repositories;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 
-import com.parse.DeleteCallback;
-import com.parse.FindCallback;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.parse.GetCallback;
+import com.parse.LogInCallback;
+import com.parse.LogOutCallback;
 import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
+import com.parse.ParseFacebookUtils;
+import com.parse.ParseFile;
+import com.parse.ParseInstallation;
+import com.parse.ParseSession;
 import com.parse.ParseUser;
+import com.parse.RequestPasswordResetCallback;
 import com.parse.SaveCallback;
+import com.parse.SignUpCallback;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
-import ch.giantific.qwittig.ParseErrorHandler;
-import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.User;
+import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.utils.googleapi.GoogleApiClientSignOut;
+import ch.giantific.qwittig.utils.googleapi.GoogleApiClientUnlink;
+import ch.giantific.qwittig.utils.parse.ParseInstallationUtils;
+import rx.Observable;
+import rx.Single;
+import rx.SingleSubscriber;
+import rx.exceptions.Exceptions;
+import rx.functions.Action1;
+import rx.functions.Func1;
 
 /**
  * Provides an implementation of {@link UserRepository} that uses the Parse.com framework as
  * the local and online data store.
  */
-public class ParseUserRepository extends ParseGenericRepository implements UserRepository {
+public class ParseUserRepository extends ParseBaseRepository implements UserRepository {
 
-    private static final String LOG_TAG = ParseUserRepository.class.getSimpleName();
+    private static final String VERIFY_GOOGLE_LOGIN = "loginWithGoogle";
+    private static final String HANDLE_INVITATION = "checkIdentity";
+    private static final String PARAM_ID_TOKEN = "idToken";
+    private static final String PARAM_IDENTITY_ID = "identityId";
 
-    public ParseUserRepository(Context context) {
-        super(context);
+    public ParseUserRepository() {
+        super();
     }
 
     @Override
-    public void getUsersLocalAsync(@NonNull Group group,
-                                   @NonNull final GetUsersLocalListener listener) {
-        ParseQuery<ParseUser> query = ParseUser.getQuery();
-        query.fromLocalDatastore();
-        query.whereEqualTo(User.GROUPS, group);
-        query.whereEqualTo(User.IS_DELETED, false);
-        query.ignoreACLs();
-        query.findInBackground(new FindCallback<ParseUser>() {
-            @Override
-            public void done(List<ParseUser> parseUsers, @Nullable ParseException e) {
-                if (e == null) {
-                    listener.onUsersLocalLoaded(parseUsers);
-                }
-            }
-        });
+    protected String getClassName() {
+        return User.CLASS;
+    }
+
+    @Nullable
+    @Override
+    public User getCurrentUser() {
+        return (User) ParseUser.getCurrentUser();
     }
 
     @Override
-    public void updateUsersAsync(@NonNull List<ParseObject> groups,
-                                 @NonNull final UpdateUsersListener listener) {
-        ParseQuery<ParseUser> query = getUsersOnlineQuery(groups);
-        query.findInBackground(new FindCallback<ParseUser>() {
-            @Override
-            public void done(@NonNull final List<ParseUser> userList, @Nullable ParseException e) {
-                if (e != null) {
-                    listener.onUserUpdateFailed(ParseErrorHandler.handleParseError(mContext, e));
-                    return;
-                }
+    public Single<User> updateUser(@NonNull User user) {
+        return fetch(user);
+    }
 
-                ParseObject.unpinAllInBackground(User.PIN_LABEL, new DeleteCallback() {
+    @Override
+    public Single<String> getUserSessionToken() {
+        return Single.create(new Single.OnSubscribe<String>() {
+            @Override
+            public void call(final SingleSubscriber<? super String> singleSubscriber) {
+                ParseSession.getCurrentSessionInBackground(new GetCallback<ParseSession>() {
                     @Override
-                    public void done(@Nullable ParseException e) {
-                        if (e != null) {
-                            listener.onUserUpdateFailed(ParseErrorHandler.handleParseError(mContext, e));
+                    public void done(@NonNull ParseSession parseSession, @Nullable ParseException e) {
+                        if (singleSubscriber.isUnsubscribed()) {
                             return;
                         }
 
-                        ParseObject.pinAllInBackground(User.PIN_LABEL, userList, new SaveCallback() {
-                            @Override
-                            public void done(@Nullable ParseException e) {
-                                if (e != null) {
-                                    listener.onUserUpdateFailed(ParseErrorHandler.handleParseError(mContext, e));
-                                    return;
-                                }
-
-                                listener.onUsersUpdated();
-                            }
-                        });
+                        if (e != null) {
+                            singleSubscriber.onError(e);
+                        } else {
+                            singleSubscriber.onSuccess(parseSession.getSessionToken());
+                        }
                     }
                 });
             }
         });
     }
 
-    @NonNull
-    private ParseQuery<ParseUser> getUsersOnlineQuery(@NonNull List<ParseObject> groups) {
-        ParseQuery<ParseUser> query = User.getQuery();
-        query.whereContainedIn(User.GROUPS, groups);
-        query.whereEqualTo(User.IS_DELETED, false);
-        return query;
+    @Override
+    public Single<User> loginEmail(@NonNull final String username, @NonNull final String password) {
+        return Single
+                .create(new Single.OnSubscribe<User>() {
+                    @Override
+                    public void call(final SingleSubscriber<? super User> singleSubscriber) {
+                        ParseUser.logInInBackground(username, password, new LogInCallback() {
+                            @Override
+                            public void done(ParseUser parseUser, @Nullable ParseException e) {
+                                if (singleSubscriber.isUnsubscribed()) {
+                                    return;
+                                }
+
+                                if (e != null) {
+                                    singleSubscriber.onError(e);
+                                } else {
+                                    singleSubscriber.onSuccess((User) parseUser);
+                                }
+                            }
+                        });
+                    }
+                });
     }
 
     @Override
-    public boolean updateUsers(@NonNull List<ParseObject> groups) {
-        try {
-            List<ParseUser> onlineUsers = getUsersOnline(groups);
-            ParseObject.unpinAll(User.PIN_LABEL);
-            ParseObject.pinAll(User.PIN_LABEL, onlineUsers);
-        } catch (ParseException e) {
-            return false;
-        }
+    public Single<String> requestPasswordReset(@NonNull final String email) {
+        return Single.create(new Single.OnSubscribe<String>() {
+            @Override
+            public void call(final SingleSubscriber<? super String> singleSubscriber) {
+                ParseUser.requestPasswordResetInBackground(email, new RequestPasswordResetCallback() {
+                    @Override
+                    public void done(@Nullable ParseException e) {
+                        if (singleSubscriber.isUnsubscribed()) {
+                            return;
+                        }
 
-        return true;
+                        if (e != null) {
+                            singleSubscriber.onError(e);
+                        } else {
+                            singleSubscriber.onSuccess(email);
+                        }
+                    }
+                });
+            }
+        });
     }
 
-    private List<ParseUser> getUsersOnline(@NonNull List<ParseObject> groups) throws ParseException {
-        ParseQuery<ParseUser> query = getUsersOnlineQuery(groups);
-        return query.find();
+    @Override
+    public Single<User> signUpEmail(@NonNull final String username, @NonNull final String password) {
+        return Single
+                .create(new Single.OnSubscribe<User>() {
+                    @Override
+                    public void call(final SingleSubscriber<? super User> singleSubscriber) {
+                        final User user = new User(username, password);
+                        user.signUpInBackground(new SignUpCallback() {
+                            @Override
+                            public void done(@Nullable ParseException e) {
+                                if (singleSubscriber.isUnsubscribed()) {
+                                    return;
+                                }
+
+                                if (e != null) {
+                                    singleSubscriber.onError(e);
+                                } else {
+                                    singleSubscriber.onSuccess(user);
+                                }
+                            }
+                        });
+                    }
+                })
+                .flatMap(new Func1<User, Single<? extends User>>() {
+                    @Override
+                    public Single<? extends User> call(User user) {
+                        return loginEmail(username, password);
+                    }
+                });
     }
 
+    @Override
+    public Single<User> loginFacebook(@NonNull final Fragment fragment) {
+        return Single.create(new Single.OnSubscribe<User>() {
+            @Override
+            public void call(final SingleSubscriber<? super User> singleSubscriber) {
+                final List<String> permissions = Arrays.asList("public_profile", "email");
+                ParseFacebookUtils.logInWithReadPermissionsInBackground(fragment, permissions, new LogInCallback() {
+                    @Override
+                    public void done(ParseUser user, ParseException e) {
+                        if (singleSubscriber.isUnsubscribed()) {
+                            return;
+                        }
+
+                        if (e != null) {
+                            singleSubscriber.onError(e);
+                        } else {
+                            singleSubscriber.onSuccess((User) user);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
+    public Single<User> setFacebookData(@NonNull final User user, @NonNull final Identity identity,
+                                        @NonNull final Fragment fragment) {
+        return getFacebookUserData()
+                .flatMap(new Func1<JSONObject, Single<ParseFile>>() {
+                    @Override
+                    public Single<ParseFile> call(JSONObject facebookData) {
+                        final String email = facebookData.optString("email");
+                        user.setUsername(TextUtils.isEmpty(email)
+                                ? UUID.randomUUID().toString()
+                                : email);
+                        final String name = facebookData.optString("first_name");
+                        if (!TextUtils.isEmpty(name)) {
+                            identity.setNickname(name);
+                        }
+
+                        final String id = facebookData.optString("id");
+                        return getFacebookUserAvatar(fragment, id);
+                    }
+                })
+                .flatMap(new Func1<ParseFile, Single<? extends User>>() {
+                    @Override
+                    public Single<? extends User> call(ParseFile avatar) {
+                        identity.setAvatar(avatar);
+                        return save(user);
+                    }
+                });
+    }
+
+    private Single<JSONObject> getFacebookUserData() {
+        return Single.create(new Single.OnSubscribe<JSONObject>() {
+            @Override
+            public void call(final SingleSubscriber<? super JSONObject> singleSubscriber) {
+                final GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(),
+                        new GraphRequest.GraphJSONObjectCallback() {
+                            @Override
+                            public void onCompleted(JSONObject object, GraphResponse response) {
+                                if (singleSubscriber.isUnsubscribed()) {
+                                    return;
+                                }
+
+                                if (object == null) {
+                                    singleSubscriber.onError(response.getError().getException());
+                                } else {
+                                    singleSubscriber.onSuccess(object);
+                                }
+                            }
+                        });
+                final Bundle parameters = new Bundle();
+                parameters.putString("fields", "id,email,first_name");
+                request.setParameters(parameters);
+                request.executeAsync();
+            }
+        });
+    }
+
+    private Single<ParseFile> getFacebookUserAvatar(@NonNull final Fragment fragment,
+                                                    @NonNull String facebookId) {
+        final String pictureUrl = "http://graph.facebook.com/" + facebookId + "/picture?type=large";
+        return Single
+                .create(new Single.OnSubscribe<byte[]>() {
+                    @Override
+                    public void call(final SingleSubscriber<? super byte[]> singleSubscriber) {
+                        Glide.with(fragment)
+                                .load(pictureUrl)
+                                .asBitmap()
+                                .toBytes(Bitmap.CompressFormat.JPEG, IdentityRepository.JPEG_COMPRESSION_RATE)
+                                .centerCrop()
+                                .into(new SimpleTarget<byte[]>(IdentityRepository.WIDTH, IdentityRepository.HEIGHT) {
+                                    @Override
+                                    public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
+                                        if (!singleSubscriber.isUnsubscribed()) {
+                                            singleSubscriber.onSuccess(resource);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                                        super.onLoadFailed(e, errorDrawable);
+
+                                        if (!singleSubscriber.isUnsubscribed()) {
+                                            singleSubscriber.onError(e);
+                                        }
+                                    }
+                                });
+                    }
+                })
+                .flatMap(new Func1<byte[], Single<? extends ParseFile>>() {
+                    @Override
+                    public Single<? extends ParseFile> call(byte[] bytes) {
+                        final ParseFile avatar = new ParseFile(IdentityRepository.FILE_NAME, bytes);
+                        return saveFile(avatar);
+                    }
+                });
+    }
+
+    @Override
+    public Single<User> loginGoogle(@NonNull String idToken, @NonNull final Fragment fragment) {
+        return verifyGoogleLogin(idToken)
+                .flatMap(new Func1<JSONObject, Single<? extends User>>() {
+                    @Override
+                    public Single<? extends User> call(JSONObject token) {
+                        final String sessionToken = token.optString("sessionToken");
+                        final boolean isNew = token.optBoolean("isNew");
+                        return becomeUser(sessionToken);
+                    }
+                });
+    }
+
+    @Override
+    public Single<JSONObject> verifyGoogleLogin(@NonNull String idToken) {
+        Map<String, Object> params = new HashMap<>();
+        params.put(PARAM_ID_TOKEN, idToken);
+
+        return this.<String>callFunctionInBackground(VERIFY_GOOGLE_LOGIN, params)
+                .map(new Func1<String, JSONObject>() {
+                    @Override
+                    public JSONObject call(String s) {
+                        try {
+                            return new JSONObject(s);
+                        } catch (JSONException e) {
+                            throw Exceptions.propagate(e);
+                        }
+                    }
+                });
+    }
+
+    private Single<User> becomeUser(@NonNull final String sessionToken) {
+        return Single.create(new Single.OnSubscribe<User>() {
+            @Override
+            public void call(final SingleSubscriber<? super User> singleSubscriber) {
+                ParseUser.becomeInBackground(sessionToken, new LogInCallback() {
+                    @Override
+                    public void done(ParseUser user, ParseException e) {
+                        if (singleSubscriber.isUnsubscribed()) {
+                            return;
+                        }
+
+                        if (e != null) {
+                            singleSubscriber.onError(e);
+                        } else {
+                            singleSubscriber.onSuccess((User) user);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
+    public Single<User> setGoogleData(@NonNull final User user, @NonNull final Identity identity,
+                                      @NonNull final String displayName,
+                                      @NonNull final Uri photoUrl,
+                                      @NonNull final Fragment fragment) {
+        return Single
+                .create(new Single.OnSubscribe<byte[]>() {
+                    @Override
+                    public void call(final SingleSubscriber<? super byte[]> singleSubscriber) {
+                        Glide.with(fragment)
+                                .load(photoUrl)
+                                .asBitmap()
+                                .toBytes(Bitmap.CompressFormat.JPEG, IdentityRepository.JPEG_COMPRESSION_RATE)
+                                .centerCrop()
+                                .into(new SimpleTarget<byte[]>(IdentityRepository.WIDTH, IdentityRepository.HEIGHT) {
+                                    @Override
+                                    public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
+                                        if (!singleSubscriber.isUnsubscribed()) {
+                                            singleSubscriber.onSuccess(resource);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                                        super.onLoadFailed(e, errorDrawable);
+
+                                        if (!singleSubscriber.isUnsubscribed()) {
+                                            singleSubscriber.onError(e);
+                                        }
+                                    }
+                                });
+                    }
+                })
+                .flatMap(new Func1<byte[], Single<? extends ParseFile>>() {
+                    @Override
+                    public Single<? extends ParseFile> call(byte[] bytes) {
+                        final ParseFile avatar = new ParseFile(IdentityRepository.FILE_NAME, bytes);
+                        return saveFile(avatar);
+                    }
+                })
+                .flatMap(new Func1<ParseFile, Single<? extends User>>() {
+                    @Override
+                    public Single<? extends User> call(ParseFile parseFile) {
+                        identity.setNickname(displayName);
+                        identity.setAvatar(parseFile);
+                        return save(user);
+                    }
+                });
+    }
+
+    @Override
+    public Single<String> handleInvitation(@NonNull String identityId) {
+        final Map<String, Object> params = new HashMap<>();
+        params.put(PARAM_IDENTITY_ID, identityId);
+        return callFunctionInBackground(HANDLE_INVITATION, params);
+    }
+
+    @Override
+    public Single<User> logOut(@NonNull final User user) {
+        return Single.create(new Single.OnSubscribe<User>() {
+            @Override
+            public void call(final SingleSubscriber<? super User> singleSubscriber) {
+                ParseUser.logOutInBackground(new LogOutCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (singleSubscriber.isUnsubscribed()) {
+                            return;
+                        }
+
+                        if (e != null) {
+                            singleSubscriber.onError(e);
+                        } else {
+                            singleSubscriber.onSuccess(user);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
+    public Single<User> unlinkFacebook(@NonNull final User user) {
+        return Single.create(new Single.OnSubscribe<User>() {
+            @Override
+            public void call(final SingleSubscriber<? super User> singleSubscriber) {
+                ParseFacebookUtils.unlinkInBackground(user, new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (singleSubscriber.isUnsubscribed()) {
+                            return;
+                        }
+
+                        if (e != null) {
+                            singleSubscriber.onError(e);
+                        } else {
+                            singleSubscriber.onSuccess(user);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
+    public Single<Void> signOutGoogle(@NonNull Context context) {
+        return GoogleApiClientSignOut.create(context);
+    }
+
+    @Override
+    public Single<User> unlinkGoogle(@NonNull Context context, @NonNull final User user) {
+        return GoogleApiClientUnlink.create(context)
+                .flatMap(new Func1<Void, Single<? extends User>>() {
+                    @Override
+                    public Single<? extends User> call(Void aVoid) {
+                        user.removeGoogleId();
+                        return save(user);
+                    }
+                });
+    }
+
+    @Override
+    public Single<User> deleteUser(@NonNull User user) {
+        return delete(user);
+    }
+
+    @Override
+    public Single<User> setupInstallation(@NonNull final User user) {
+        return Observable.from(user.getIdentities())
+                .map(new Func1<Identity, String>() {
+                    @Override
+                    public String call(Identity identity) {
+                        return identity.getGroup().getObjectId();
+                    }
+                })
+                .toList()
+                .toSingle()
+                .flatMap(new Func1<List<String>, Single<ParseInstallation>>() {
+                    @Override
+                    public Single<ParseInstallation> call(List<String> channels) {
+                        final ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+                        installation.addAllUnique(ParseInstallationUtils.CHANNELS, channels);
+                        installation.put(ParseInstallationUtils.USER, user);
+                        return save(installation);
+                    }
+                })
+                .map(new Func1<ParseInstallation, User>() {
+                    @Override
+                    public User call(ParseInstallation installation) {
+                        return user;
+                    }
+                });
+    }
+
+    @Override
+    public Single<ParseInstallation> clearInstallation() {
+        final ParseInstallation installation = ParseInstallationUtils.getResetInstallation();
+        return save(installation);
+    }
 }

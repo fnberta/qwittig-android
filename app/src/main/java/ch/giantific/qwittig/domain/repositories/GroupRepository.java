@@ -6,33 +6,41 @@ package ch.giantific.qwittig.domain.repositories;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 
-import com.parse.ParseObject;
-
-import ch.giantific.qwittig.domain.models.parse.Group;
+import ch.giantific.qwittig.domain.models.Group;
+import rx.Observable;
+import rx.Single;
 
 /**
  * Provides the methods to get, update and remove groups from the local and online data store.
  */
-public interface GroupRepository {
+public interface GroupRepository extends BaseRepository {
+
+    /**
+     * Adds a new group and corresponding identity for the user.
+     *
+     * @param groupName     the name of the new group
+     * @param groupCurrency the currency of the new group
+     * @return a {@link Single} emitting the result
+     */
+    Single<String> addNewGroup(@NonNull String groupName, @NonNull String groupCurrency);
+
     /**
      * Fetches the data of a {@link Group} object from the local data store. If there is no data
      * available in the local data store it will try to fetch the data online.
-     *  @param group    the group to fetch the data for
-     * @param listener the callback called when the query finishes
+     *
+     * @param group the group to fetch the data for
+     * @return a {@link Observable} emitting the results
      */
-    void fetchGroupDataAsync(@NonNull ParseObject group,
-                             @NonNull GetGroupLocalListener listener);
+    Observable<Group> fetchGroupDataAsync(@NonNull Group group);
 
     /**
      * Queries a group from the online data store.
      *
-     * @param groupId  the object id of the group to get
-     * @param listener the callback when the group is queried
+     * @param groupId the object id of the group to get
+     * @return a {@link Single} emitting the result
      */
-    void getGroupOnlineAsync(@NonNull String groupId,
-                             @NonNull GetGroupOnlineListener listener);
+    Single<Group> getGroupOnlineAsync(@NonNull String groupId);
 
     /**
      * Returns a {@link Group} object queried from the online data store or null if the query does
@@ -45,33 +53,17 @@ public interface GroupRepository {
     Group getGroupOnline(@NonNull String groupId);
 
     /**
-     * Defines the callback when a group is loaded from the local data store.
+     * Subscribes the user to push messages for the group
+     *
+     * @param group the group to subscribe
+     * @return a {@link Single} emitting the result
      */
-    interface GetGroupLocalListener {
-        /**
-         * Called when a local group was successfully loaded.
-         *
-         * @param group the loaded group
-         */
-        void onGroupLocalLoaded(@NonNull Group group);
-    }
+    Single<Group> subscribeGroup(@NonNull Group group);
 
     /**
-     * Defines the callback when a group is loaded from the online data store.
+     * Un-subscribes the user for push message from the group
+     *
+     * @param group the group to un-subscribe from
      */
-    interface GetGroupOnlineListener {
-        /**
-         * Called when online group was successfully loaded.
-         *
-         * @param group the loaded group
-         */
-        void onGroupOnlineLoaded(@NonNull Group group);
-
-        /**
-         * Called when the group load failed.
-         *
-         * @param errorMessage the error message from the exception thrown in the process
-         */
-        void onGroupOnlineLoadFailed(@StringRes int errorMessage);
-    }
+    void unSubscribeGroup(@NonNull Group group);
 }

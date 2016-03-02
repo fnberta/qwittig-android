@@ -1,0 +1,142 @@
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".presentation.settings.addgroup.SettingsAddGroupFragment"
+    >
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.settings.addgroup.SettingsAddGroupViewModel"
+            />
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/small_space"
+        android:transitionGroup="true"
+        tools:targetApi="lollipop"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+
+            <TextView
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/small_space"
+                android:layout_marginEnd="@dimen/key_line_1"
+                android:layout_marginStart="@dimen/key_line_2"
+                android:layout_marginTop="@dimen/small_space"
+                android:text="@string/desc_group_add_new"
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/small_space"
+                android:layout_marginTop="@dimen/small_space"
+                android:orientation="horizontal"
+                >
+
+                <ImageView
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+                    android:layout_marginStart="@dimen/key_line_1"
+                    android:contentDescription="@string/dialog_users_involved_title"
+                    android:src="@drawable/ic_group_black_24dp"
+                    />
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/key_line_1"
+                    android:error="@{!viewModel.validate ? null : viewModel.nameComplete ? null : @string/error_group_name}"
+                    android:transitionGroup="true"
+                    tools:targetApi="lollipop"
+                    >
+
+                    <EditText
+                        android:id="@+id/et_settings_group_add_new_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_group_name"
+                        android:inputType="text|textCapSentences"
+                        android:onTextChanged="@{viewModel.onNameChanged}"
+                        />
+                </android.support.design.widget.TextInputLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/small_space"
+                android:orientation="horizontal"
+                >
+
+                <ImageView
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+                    android:layout_marginStart="@dimen/key_line_1"
+                    android:contentDescription="@string/hint_group_currency"
+                    android:src="@drawable/ic_attach_money_black_24dp"
+                    />
+
+                <Spinner
+                    android:id="@+id/sp_settings_group_add_new_currency"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/key_line_1"
+                    android:onItemSelected="@{viewModel.onCurrencySelected}"
+                    />
+            </LinearLayout>
+
+            <View
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="@dimen/normal_space"
+                android:layout_marginEnd="@dimen/key_line_1"
+                android:layout_marginStart="@dimen/key_line_1"
+                android:layout_marginTop="@dimen/normal_space"
+                android:background="?android:attr/listDivider"
+                />
+
+            <TextView
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/key_line_1"
+                android:layout_marginStart="@dimen/key_line_1"
+                android:gravity="center_horizontal"
+                android:text="@string/desc_group_add_new_create"
+                />
+
+            <android.support.design.widget.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="@dimen/key_line_1"
+                android:onClick="@{viewModel.onFabCreateClick}"
+                android:src="@drawable/ic_arrow_forward_black_24dp"
+                />
+        </LinearLayout>
+    </ScrollView>
+
+</layout>

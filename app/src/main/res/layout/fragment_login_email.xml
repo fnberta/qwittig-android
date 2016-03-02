@@ -2,77 +2,150 @@
   ~ Copyright (c) 2015 Fabio Berta
   -->
 
-<FrameLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_height="match_parent"
-    android:layout_width="match_parent"
-    android:animateLayoutChanges="true"
-    android:transitionGroup="true"
-    tools:context="ch.giantific.qwittig.ui.fragments.LoginEmailFragment"
     >
 
-    <LinearLayout
-        android:id="@+id/ll_login_main"
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.login.LoginEmailViewModel"
+            />
+    </data>
+
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginStart="@dimen/key_line_1"
-        android:layout_marginEnd="@dimen/key_line_1"
-        android:orientation="vertical"
+        android:animateLayoutChanges="true"
+        android:transitionGroup="true"
+        tools:context=".presentation.login.LoginEmailFragment"
+        tools:targetApi="lollipop"
         >
 
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/til_login_email_email"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/small_space"
-            android:layout_marginBottom="@dimen/small_space"
-            android:transitionGroup="true">
+            android:layout_height="match_parent"
+            android:layout_marginEnd="@dimen/key_line_1"
+            android:layout_marginStart="@dimen/key_line_1"
+            android:animateLayoutChanges="true"
+            android:orientation="vertical"
+            android:visibility="@{viewModel.loading ? View.GONE : View.VISIBLE}"
+            >
 
-            <AutoCompleteTextView
-                android:id="@+id/et_login_email"
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/til_login_email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
-                android:imeOptions="actionNext"
-                android:hint="@string/hint_email"/>
+                android:layout_marginBottom="@dimen/small_space"
+                android:layout_marginTop="@dimen/small_space"
+                android:error="@{!viewModel.validate ? null : viewModel.emailComplete ? null : @string/error_email}"
+                android:transitionGroup="true"
+                >
 
-        </android.support.design.widget.TextInputLayout>
+                <AutoCompleteTextView
+                    android:id="@+id/et_login_email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_email"
+                    android:imeOptions="actionNext"
+                    android:inputType="textEmailAddress"
+                    android:onTextChanged="@{viewModel.onEmailChanged}"
+                    />
 
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/til_login_password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/small_space"
-            android:transitionGroup="true">
+            </android.support.design.widget.TextInputLayout>
 
-            <EditText
-                android:id="@+id/et_login_password"
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/til_login_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:hint="@string/hint_password"/>
+                android:layout_marginBottom="@dimen/small_space"
+                android:error="@{!viewModel.validate ? null : viewModel.passwordComplete ? null : @string/error_password}"
+                android:transitionGroup="true"
+                >
 
-        </android.support.design.widget.TextInputLayout>
+                <EditText
+                    android:id="@+id/et_login_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_password"
+                    android:inputType="textPassword"
+                    android:onTextChanged="@{viewModel.onPasswordChanged}"
+                    />
 
-        <Button
-            android:id="@+id/bt_login_email"
-            android:theme="@style/Widget.AppCompat.Button.AccentColor"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/login_button_log_in"/>
+            </android.support.design.widget.TextInputLayout>
 
-        <TextView
-            android:id="@+id/tv_reset_password"
-            style="@style/TextAppearance.AppCompat.Caption"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/touch_target_min"
-            android:layout_gravity="center_horizontal"
-            android:gravity="center_vertical"
-            android:text="@string/login_text_forgot_credentials"/>
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/small_space"
+                android:transitionGroup="true"
+                android:visibility="@{viewModel.signUp ? View.VISIBLE : View.GONE}"
+                >
 
-    </LinearLayout>
+                <EditText
+                    android:id="@+id/et_login_password_repeat"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_password_repeat"
+                    android:inputType="textPassword"
+                    android:onTextChanged="@{viewModel.onPasswordRepeatChanged}"
+                    />
 
-    <include layout="@layout/include_progress_login" />
-</FrameLayout>
+            </android.support.design.widget.TextInputLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                >
+
+                <Button
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:id="@+id/bt_login_email_login"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:onClick="@{viewModel.onLoginClick}"
+                    android:text="@string/login_button_log_in"
+                    tools:ignore="ButtonStyle"
+                    />
+
+                <Button
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:id="@+id/bt_login_email_sign_up"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:onClick="@{viewModel.onSignUpClick}"
+                    android:text="@string/login_button_sign_up"
+                    tools:ignore="ButtonStyle"
+                    />
+
+            </LinearLayout>
+
+            <TextView
+                style="@style/TextAppearance.AppCompat.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/touch_target_min"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_vertical"
+                android:onClick="@{viewModel.onResetPasswordClick}"
+                android:text="@string/login_text_forgot_credentials"
+                />
+
+        </LinearLayout>
+
+        <include
+            layout="@layout/include_progress_login"
+            app:viewModel="@{viewModel}"
+            />
+
+    </FrameLayout>
+</layout>
+
 

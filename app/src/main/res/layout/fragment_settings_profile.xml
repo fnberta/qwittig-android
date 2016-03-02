@@ -2,145 +2,177 @@
   ~ Copyright (c) 2015 Fabio Berta
   -->
 
-<android.support.v4.widget.NestedScrollView
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingTop="@dimen/small_space"
-    android:clipToPadding="false">
+    >
 
-    <LinearLayout
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.settings.profile.SettingsProfileViewModel"
+            />
+    </data>
+
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        tools:context="ch.giantific.qwittig.ui.fragments.SettingsProfileFragment">
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingTop="@dimen/small_space"
+        tools:targetApi="lollipop"
+        >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="@dimen/small_space"
-            android:layout_marginBottom="@dimen/small_space">
+            android:orientation="vertical"
+            tools:context=".presentation.settings.profile.SettingsProfileFragment"
+            >
 
-            <ImageView
-                android:id="@+id/iv_nickname"
-                android:layout_width="@dimen/icon_size"
-                android:layout_height="@dimen/icon_size"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="@dimen/key_line_1"
-                android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
-                android:contentDescription="@string/hint_nickname"
-                android:src="@drawable/ic_account_box_black_24dp"
-                />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/small_space"
+                android:layout_marginTop="@dimen/small_space"
+                android:orientation="horizontal"
+                >
+
+                <ImageView
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+                    android:layout_marginStart="@dimen/key_line_1"
+                    android:contentDescription="@string/hint_nickname"
+                    android:src="@drawable/ic_account_box_black_24dp"
+                    />
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/key_line_1"
+                    android:transitionGroup="true"
+                    android:error="@{!viewModel.validate ? null : viewModel.nicknameComplete ? null : @string/error_nickname}"
+                    >
+
+                    <EditText
+                        android:id="@+id/et_settings_profile_nickname"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_nickname"
+                        android:inputType="textPersonName"
+                        android:text="@{viewModel.nickname}"
+                        android:onTextChanged="@{viewModel.onNicknameChanged}"
+                        />
+
+                </android.support.design.widget.TextInputLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/small_space"
+                android:orientation="horizontal"
+                android:visibility="@{viewModel.emailAndPasswordVisible ? View.VISIBLE : View.GONE}"
+                >
+
+                <ImageView
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+                    android:layout_marginStart="@dimen/key_line_1"
+                    android:contentDescription="@string/hint_email"
+                    android:src="@drawable/ic_email_black_24dp"
+                    />
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/key_line_1"
+                    android:transitionGroup="true"
+                    android:error="@{!viewModel.validate ? null : viewModel.emailValid ? null : @string/error_email}"
+                    >
+
+                    <EditText
+                        android:id="@+id/et_settings_profile_email"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_email"
+                        android:inputType="textEmailAddress"
+                        android:text="@{viewModel.email}"
+                        android:onTextChanged="@{viewModel.onEmailChanged}"
+                        />
+
+                </android.support.design.widget.TextInputLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/small_space"
+                android:orientation="horizontal"
+                android:visibility="@{viewModel.emailAndPasswordVisible ? View.VISIBLE : View.GONE}"
+                >
+
+                <ImageView
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+                    android:layout_marginStart="@dimen/key_line_1"
+                    android:contentDescription="@string/hint_email"
+                    android:src="@drawable/ic_security_black_24dp"
+                    />
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/key_line_1"
+                    android:transitionGroup="true"
+                    android:error="@{!viewModel.validate ? null : viewModel.passwordValid ? null : @string/error_password}"
+                    >
+
+                    <EditText
+                        android:id="@+id/et_settings_profile_password"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_password_new"
+                        android:inputType="textPassword"
+                        android:onTextChanged="@{viewModel.onPasswordChanged}"
+                        />
+
+                </android.support.design.widget.TextInputLayout>
+
+            </LinearLayout>
 
             <android.support.design.widget.TextInputLayout
-                android:id="@+id/til_nickname"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/key_line_1"
-                android:transitionGroup="true">
+                android:layout_marginStart="@dimen/key_line_2"
+                android:layout_marginTop="@dimen/small_space"
+                android:transitionGroup="true"
+                android:visibility="@{viewModel.emailAndPasswordVisible ? View.VISIBLE : View.GONE}"
+                android:error="@{!viewModel.validate ? null : viewModel.passwordEqual ? null : @string/error_password_match}"
+                >
 
                 <EditText
-                    android:id="@+id/et_nickname"
+                    android:id="@+id/et_settings_profile_password_repeat"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textPersonName"
-                    android:hint="@string/hint_nickname"/>
-
-            </android.support.design.widget.TextInputLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="@dimen/small_space">
-
-            <ImageView
-                android:id="@+id/iv_email"
-                android:layout_width="@dimen/icon_size"
-                android:layout_height="@dimen/icon_size"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="@dimen/key_line_1"
-                android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
-                android:contentDescription="@string/hint_email"
-                android:src="@drawable/ic_email_black_24dp"
-                />
-
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/til_email"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/key_line_1"
-                android:transitionGroup="true">
-
-                <EditText
-                    android:id="@+id/et_email"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textEmailAddress"
-                    android:hint="@string/hint_email"/>
-
-            </android.support.design.widget.TextInputLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/ll_password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="@dimen/small_space">
-
-            <ImageView
-                android:id="@+id/iv_password"
-                android:layout_width="@dimen/icon_size"
-                android:layout_height="@dimen/icon_size"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="@dimen/key_line_1"
-                android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
-                android:contentDescription="@string/hint_email"
-                android:src="@drawable/ic_security_black_24dp"
-                />
-
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/til_password"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/key_line_1"
-                android:transitionGroup="true">
-
-                <EditText
-                    android:id="@+id/et_password"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_password_repeat"
                     android:inputType="textPassword"
-                    android:hint="@string/hint_password_new"/>
+                    android:onTextChanged="@{viewModel.onPasswordRepeatChanged}"
+                    />
 
             </android.support.design.widget.TextInputLayout>
 
         </LinearLayout>
-
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/til_password_repeat"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/small_space"
-            android:layout_marginStart="@dimen/key_line_2"
-            android:layout_marginEnd="@dimen/key_line_1"
-            android:transitionGroup="true">
-
-            <EditText
-                android:id="@+id/et_password_repeat"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:hint="@string/hint_password_repeat"/>
-
-        </android.support.design.widget.TextInputLayout>
-
-    </LinearLayout>
-</android.support.v4.widget.NestedScrollView>
-
+    </android.support.v4.widget.NestedScrollView>
+</layout>

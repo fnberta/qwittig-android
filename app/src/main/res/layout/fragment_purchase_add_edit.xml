@@ -1,17 +1,59 @@
 <!--
   ~ Copyright (c) 2015 Fabio Berta
   -->
-
-<ScrollView
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:paddingBottom="@dimen/small_space"
-    android:clipToPadding="false"
-    tools:context="ch.giantific.qwittig.ui.fragments.PurchaseAddFragment">
+    >
 
-    <include layout="@layout/include_purchase_add_edit"/>
+    <data>
 
-</ScrollView>
+        <import type="android.view.View"/>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.home.purchases.addedit.AddEditPurchaseViewModel"
+            />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            >
+
+            <include
+                layout="@layout/include_progress"
+                app:viewModel="@{viewModel}"
+                />
+
+            <TextView
+                style="@style/TextAppearance.AppCompat.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/small_space"
+                android:text="@string/progress_purchase_auto"
+                android:visibility="@{viewModel.loading ? View.VISIBLE : View.GONE}"
+                />
+        </LinearLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_purchase_add_edit"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="@dimen/small_space"
+            android:visibility="@{viewModel.loading ? View.GONE : View.VISIBLE}"
+            tools:context=".presentation.home.purchases.addedit.AddPurchaseFragment"
+            />
+    </FrameLayout>
+
+</layout>

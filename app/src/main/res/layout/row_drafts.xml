@@ -4,51 +4,66 @@
   ~ Copyright (c) 2015 Fabio Berta
   -->
 
-<RelativeLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="@dimen/list_avatar_with_text"
-    android:background="@drawable/selectable_item_background"
     >
 
-    <TextView
-        android:id="@+id/tv_date"
-        style="@style/TextAppearance.AppCompat.Caption"
-        android:layout_width="@dimen/avatar_size"
-        android:layout_height="@dimen/avatar_size"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="true"
-        android:layout_marginEnd="@dimen/normal_space"
-        android:layout_marginStart="@dimen/key_line_1"
-        android:background="@color/grey_light"
-        android:gravity="center"
-        android:lines="2"
-        android:paddingEnd="@dimen/min_space"
-        android:paddingStart="@dimen/min_space"
-        android:textAllCaps="true"
-        tools:text="FEB\n24"/>
+    <data>
 
-    <TextView
-        android:id="@+id/tv_store"
-        style="@style/TextAppearance.AppCompat.Subhead.List"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@id/tv_date"
-        android:layout_toStartOf="@+id/tv_total_value"
-        android:gravity="center_vertical"
-        tools:text="Denner"/>
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.home.purchases.list.DraftsRowViewModel"
+            />
+    </data>
 
-    <TextView
-        android:id="@id/tv_total_value"
-        style="@style/TextAppearance.AppCompat.Subhead.List"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="@dimen/key_line_1"
-        android:layout_marginStart="@dimen/normal_space"
-        android:gravity="center"
-        tools:text="-50"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/list_avatar_with_text"
+        android:background="@drawable/selectable_item_background"
+        android:activated="@{viewModel.draftSelected}"
+        >
 
-</RelativeLayout>
+        <TextView
+            android:id="@+id/tv_date"
+            style="@style/TextAppearance.AppCompat.Caption"
+            android:layout_width="@dimen/avatar_size"
+            android:layout_height="@dimen/avatar_size"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/normal_space"
+            android:layout_marginStart="@dimen/key_line_1"
+            android:background="@color/grey_300"
+            android:gravity="center"
+            android:lines="2"
+            android:paddingEnd="@dimen/min_space"
+            android:paddingStart="@dimen/min_space"
+            android:textAllCaps="true"
+            android:text="@{viewModel.draftDate}"
+            tools:text="FEB\n24"/>
+
+        <TextView
+            style="@style/TextAppearance.AppCompat.Subhead.List"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@id/tv_date"
+            android:layout_toStartOf="@+id/tv_total_value"
+            android:gravity="center_vertical"
+            android:text="@{viewModel.draftStore}"
+            tools:text="Denner"/>
+
+        <TextView
+            android:id="@id/tv_total_value"
+            style="@style/TextAppearance.AppCompat.Subhead.List"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="@dimen/key_line_1"
+            android:layout_marginStart="@dimen/normal_space"
+            android:gravity="center"
+            android:text="@{viewModel.draftTotalPrice}"
+            tools:text="-50"/>
+
+    </RelativeLayout>
+</layout>

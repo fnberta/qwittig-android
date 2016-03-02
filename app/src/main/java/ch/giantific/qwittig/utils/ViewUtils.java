@@ -43,14 +43,14 @@ public class ViewUtils {
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public static Animator getCircularRevealAnimator(@NonNull View view) {
         // get the center for the clipping circle
-        int cx = view.getWidth() / 2;
-        int cy = view.getHeight() / 2;
+        final int cx = view.getWidth() / 2;
+        final int cy = view.getHeight() / 2;
 
         // get the final radius for the clipping circle
-        int finalRadius = Math.max(view.getWidth(), view.getHeight()) / 2;
+        final int finalRadius = Math.max(view.getWidth(), view.getHeight()) / 2;
 
         // create the animator for this view (the start radius is zero)
-        Animator animator = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
+        final Animator animator = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
         animator.setStartDelay(FAB_CIRCULAR_REVEAL_DELAY);
 
         return animator;
@@ -64,11 +64,11 @@ public class ViewUtils {
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public static Animator getCircularHideAnimator(@NonNull View view) {
         // get the center for the clipping circle
-        int cx = view.getWidth() / 2;
-        int cy = view.getHeight() / 2;
+        final int cx = view.getWidth() / 2;
+        final int cy = view.getHeight() / 2;
 
         // get the initial radius for the clipping circle
-        int initialRadius = view.getWidth();
+        final int initialRadius = view.getWidth();
 
         // create the animator for this view (the start radius is zero) and return it
         return ViewAnimationUtils.createCircularReveal(view, cx, cy, initialRadius, 0);
@@ -79,8 +79,8 @@ public class ViewUtils {
      *
      * @param activity the activity to get the focused view
      */
-    public static void hideSoftKeyboard(Activity activity) {
-        InputMethodManager inputMethodManager = (InputMethodManager)
+    public static void hideSoftKeyboard(@NonNull Activity activity) {
+        final InputMethodManager inputMethodManager = (InputMethodManager)
                 activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         // Find the currently focused view, so we can grab the correct window token from it.
         View view = activity.getCurrentFocus();

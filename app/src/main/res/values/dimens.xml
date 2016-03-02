@@ -6,7 +6,6 @@
 <resources>
 
     <!-- Text sizes -->
-    <dimen name="text_size_avatar_with_text">16sp</dimen>
     <dimen name="text_size_subheader">14sp</dimen>
 
     <!-- Spacing -->
@@ -14,28 +13,23 @@
     <dimen name="key_line_2">72dp</dimen>
     <dimen name="key_line_2_minus_key_line_1_minus_avatar_size">16dp</dimen>
     <dimen name="key_line_2_minus_key_line_1_minus_icon_size">32dp</dimen>
-    <dimen name="key_line_2_minus_key_line_1">56dp</dimen>
     <dimen name="min_space">4dp</dimen>
     <dimen name="small_space">8dp</dimen>
     <dimen name="normal_space">16dp</dimen>
 
     <!-- System -->
-    <dimen name="status_bar_height">24dp</dimen>
     <dimen name="touch_target_min">48dp</dimen>
 
     <!-- Avatar and Icons-->
     <dimen name="avatar_size">40dp</dimen>
-    <dimen name="avatar_size_2x">80dp</dimen>
     <dimen name="icon_size">24dp</dimen>
+    <dimen name="icon_padding">12dp</dimen>
     <dimen name="icon_compound_drawable_padding_end">32dp</dimen>
 
     <!-- Checkbox special margins -->
-    <dimen name="key_line_1_minus_checkbox_margin">12dp</dimen>
-    <dimen name="key_line_2_minus_key_line_1_minus_checkbox">28dp</dimen>
 
     <!-- Toolbar -->
     <dimen name="toolbar_height_x2">112dp</dimen>
-    <dimen name="toolbar_height_x3">168dp</dimen>
     <dimen name="toolbar_task_add">168dp</dimen>
     <dimen name="toolbar_height_x4">224dp</dimen>
     <dimen name="toolbar_height_x5">280dp</dimen>
@@ -50,7 +44,6 @@
     <dimen name="list_icon_with_text">56dp</dimen>
     <dimen name="list_avatar_with_text">56dp</dimen>
     <dimen name="list_avatar_with_two_line_text">72dp</dimen>
-    <dimen name="list_avatar_with_three_line_text">88dp</dimen>
     <dimen name="avatar_plus_caption_plus_padding">72dp</dimen>
     <dimen name="subheader_height">48dp</dimen>
 
@@ -58,10 +51,8 @@
     <dimen name="dialog_padding">24dp</dimen>
 
     <!-- FAB -->
-    <dimen name="fab_elevation">6dp</dimen>
     <dimen name="fab_margin_toolbar_x4">196dp</dimen>
     <dimen name="fab_margin_toolbar_x2">84dp</dimen>
-    <dimen name="fab_mini_margin_toolbar_x2">92dp</dimen>
 
     <!-- CardView -->
     <dimen name="card_elevation">2dp</dimen>

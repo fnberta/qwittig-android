@@ -5,48 +5,53 @@
 package ch.giantific.qwittig.domain.repositories;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
-
-import com.parse.ParseObject;
 
 import java.util.Date;
 import java.util.List;
 
-import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.Task;
+import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.Task;
+import rx.Observable;
+import rx.Single;
 
 /**
  * Provides the methods to get, update and remove tasks from the local and online data store.
  */
-public interface TaskRepository {
+public interface TaskRepository extends BaseRepository {
+
+    /**
+     * Saves the task to the local data store.
+     *
+     * @param task the task to save
+     * @param tag  the tag for the local data store
+     * @return a {@link Single} emitting the result
+     */
+    Single<Task> saveTaskLocalAsync(@NonNull Task task, @NonNull String tag);
 
     /**
      * Queries the local data store for tasks.
      *
-     * @param group    the for which to get the tasks for
+     * @param identity the for which to get the tasks for
      * @param deadline the deadline until which to get queries
-     * @param listener the callback called when the query finishes
+     * @return an {@link Observable} emitting the results
      */
-    void getTasksLocalAsync(@NonNull Group group, @NonNull Date deadline,
-                            @NonNull GetTasksLocalListener listener);
+    Observable<Task> getTasksLocalAsync(@NonNull Identity identity, @NonNull Date deadline);
 
     /**
      * Queries the local data store for a single task.
      *
-     * @param taskId   the object id of the task to query
-     * @param listener the callback called when the query finishes
+     * @param taskId the object id of the task to query
+     * @return a {@link Single} emitting the result
      */
-    void getTaskLocalAsync(@NonNull String taskId,
-                           @NonNull GetTaskLocalListener listener);
+    Single<Task> getTaskLocalAsync(@NonNull String taskId);
 
     /**
      * Fetches the data of a task from the local data store.
      *
-     * @param taskId   the object id of the task to fetch
-     * @param listener the callback when the fetch finishes
+     * @param taskId the object id of the task to fetch
+     * @return a {@link Single} emitting the result
      */
-    void fetchTaskDataLocalAsync(@NonNull String taskId,
-                                 @NonNull GetTaskLocalListener listener);
+    Single<Task> fetchTaskDataLocalAsync(@NonNull String taskId);
 
     /**
      * Removes a task from the local data store.
@@ -60,19 +65,18 @@ public interface TaskRepository {
      * Updates all tasks in the local data store by deleting all tasks from the local data
      * store, querying and saving new ones.
      *
-     * @param groups   the groups for which to update the tasks
-     * @param listener the callback when a query finishes, fails or all queries are finished
+     * @param identities the groups for which to update the tasks
+     * @return an {@link Observable} emitting the results
      */
-    void updateTasksAsync(@NonNull List<ParseObject> groups,
-                          @NonNull UpdateTasksListener listener);
+    Observable<Task> updateTasksAsync(@NonNull List<Identity> identities);
 
     /**
      * Deletes all tasks from the local data store and saves new ones.
      *
-     * @param groups the groups for which to update the tasks
+     * @param identities the groups for which to update the tasks
      * @return whether the update was successful or not
      */
-    boolean updateTasks(@NonNull List<ParseObject> groups);
+    boolean updateTasks(@NonNull List<Identity> identities);
 
     /**
      * Updates a task if is already available in the local data store (by simply querying it) or
@@ -93,44 +97,10 @@ public interface TaskRepository {
     Task fetchTaskDataLocal(@NonNull String taskId);
 
     /**
-     * Defines the callback when tasks are loaded from the local data store.
+     * Sends a push notification to remind a user to finish a task.
+     *
+     * @param taskId the object id of the task that should be finished
+     * @return a {@link Single} emitting the result
      */
-    interface GetTasksLocalListener {
-        /**
-         * Called when local tasks were successfully loaded.
-         *
-         * @param tasks the loaded tasks
-         */
-        void onTasksLocalLoaded(@NonNull List<ParseObject> tasks);
-    }
-
-    /**
-     * Defines the callback when a task is loaded from the local data store.
-     */
-    interface GetTaskLocalListener {
-        /**
-         * Called when a local task was successfully loaded.
-         *
-         * @param task the loaded task
-         */
-        void onTaskLocalLoaded(@NonNull Task task);
-    }
-
-    /**
-     * Defines the callback when tasks in the local data store are updated from the online data
-     * store.
-     */
-    interface UpdateTasksListener {
-        /**
-         * Called when local tasks were successfully updated.
-         */
-        void onTasksUpdated();
-
-        /**
-         * Called when tasks update failed.
-         *
-         * @param errorMessage the error message from the exception thrown in the process
-         */
-        void onTaskUpdateFailed(@StringRes int errorMessage);
-    }
+    Single<String> pushTaskReminder(@NonNull String taskId);
 }

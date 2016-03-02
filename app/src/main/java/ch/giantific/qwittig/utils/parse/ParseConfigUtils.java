@@ -13,12 +13,7 @@ import com.parse.ParseException;
  */
 public class ParseConfigUtils {
 
-    public static final String TEST_USERS_PASSWORD = "testUsersPassword";
-    public static final String TEST_USERS_NICKNAMES = "testUsersNicknames";
     public static final String SUPPORTED_CURRENCIES = "supportedCurrencies";
-    public static final String DEFAULT_STORES = "defaultStores";
-    public static final String FREE_PURCHASES_LIMIT = "freePurchasesLimit";
-
     private static final long CONFIG_REFRESH_INTERVAL = 12 * 60 * 60 * 1000;
     private static long sLastFetchedTime;
 

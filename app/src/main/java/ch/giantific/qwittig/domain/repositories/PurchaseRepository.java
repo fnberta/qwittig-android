@@ -5,48 +5,59 @@
 package ch.giantific.qwittig.domain.repositories;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
+import android.support.annotation.Nullable;
 
-import com.parse.ParseObject;
+import com.parse.ParseFile;
 
 import java.util.List;
 
-import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.Purchase;
-import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.Purchase;
+import rx.Observable;
+import rx.Single;
 
 /**
  * Provides the methods to get, update and remove purchases from the local and online data store.
  */
-public interface PurchaseRepository {
+public interface PurchaseRepository extends BaseRepository {
+
+    String FILE_NAME = "receipt.jpg";
+    int JPEG_COMPRESSION_RATE = 80; // TODO: figure out real value
+    int HEIGHT = 720; // TODO: figure out real height and width
+    int WIDTH = 720;
 
     /**
-     * Queries the local data store for purchases .
+     * Queries the local data store for purchases.
      *
-     * @param currentUser the current user
-     * @param getDrafts   whether to query for drafts or purchases
-     * @param listener    the callback when the query finishes
+     * @param currentIdentity the current identity of the user
+     * @param getDrafts       whether to query for drafts or purchases
+     * @return a {@link Observable} emitting the results
      */
-    void getPurchasesLocalAsync(@NonNull User currentUser, boolean getDrafts,
-                                @NonNull GetPurchasesLocalListener listener);
+    Observable<Purchase> getPurchasesLocalAsync(@NonNull Identity currentIdentity, boolean getDrafts);
 
     /**
      * Queries the local data store for a single purchase.
      *
      * @param purchaseId the object id of the purchase to query
-     * @param listener   the callback when the query finishes
+     * @return a {@link Single} emitting the result
      */
-    void getPurchaseLocalAsync(@NonNull String purchaseId, boolean isDraft,
-                               @NonNull GetPurchaseLocalListener listener);
+    Single<Purchase> getPurchaseLocalAsync(@NonNull String purchaseId, boolean isDraft);
 
     /**
      * Fetches the data of a purchase from the local data store.
      *
      * @param purchaseId the object id of the purchase to fetch
-     * @param listener   the callback when the fetch finishes
+     * @return a {@link Single} emitting the result
      */
-    void fetchPurchaseDataLocalAsync(@NonNull String purchaseId,
-                                     @NonNull GetPurchaseLocalListener listener);
+    Single<Purchase> fetchPurchaseDataLocalAsync(@NonNull String purchaseId);
+
+    /**
+     * Removes a purchase from the local data store.
+     *
+     * @param purchase the purchase to remove
+     * @return a {@link Single} emitting the result
+     */
+    Single<Purchase> removeDraft(@NonNull Purchase purchase);
 
     /**
      * Removes a purchase from the local data store.
@@ -61,34 +72,30 @@ public interface PurchaseRepository {
      * Updates all purchases in the local data store by deleting all purchases from the local data
      * store, querying and saving new ones.
      *
-     * @param currentUser    the current user
-     * @param groups         the groups for which to update the purchases
-     * @param currentGroupId the object id of the user's current group
-     * @param listener       the callback when a query finishes, fails or all queries are finished
+     * @param identities      the identities of the current user
+     * @param currentIdentity the user's current identity
+     * @return a {@link Observable} emitting the results
      */
-    void updatePurchasesAsync(@NonNull User currentUser, @NonNull List<ParseObject> groups,
-                              @NonNull String currentGroupId,
-                              @NonNull UpdatePurchasesListener listener);
+    Observable<Purchase> updatePurchasesAsync(@NonNull List<Identity> identities,
+                                              @NonNull Identity currentIdentity);
 
     /**
      * Queries purchases from the online data store and saves them in the local data store.
      *
-     * @param currentUser the current user
-     * @param group       the group for which to get purchases for
-     * @param skip        the number of purchases to skip for the query
-     * @param listener    the callback when the new purchases are saved in the local data store
+     * @param currentIdentity the current identity of the user
+     * @param skip            the number of purchases to skip for the query
+     * @return a {@link Observable} emitting the results
      */
-    void getPurchasesOnlineAsync(@NonNull User currentUser, @NonNull Group group, int skip,
-                                 @NonNull GetPurchasesOnlineListener listener);
+    Observable<Purchase> getPurchasesOnlineAsync(@NonNull Identity currentIdentity, int skip);
 
     /**
      * Deletes all purchases from the local data store and saves new ones.
      *
-     * @param currentUser the current user
-     * @param groups      the groups for which to update the purchases
+     * @param identities      the identities of the current user
+     * @param currentIdentity the user's current identity
      * @return whether the update was successful or not
      */
-    boolean updatePurchases(@NonNull User currentUser, @NonNull List<ParseObject> groups);
+    boolean updatePurchases(@NonNull final List<Identity> identities, @NonNull final Identity currentIdentity);
 
     /**
      * Updates a purchase if is already available in the local data store (by simply querying it) or
@@ -100,72 +107,72 @@ public interface PurchaseRepository {
      */
     boolean updatePurchase(@NonNull String purchaseId, boolean isNew);
 
+    /**
+     * Saves a {@link Purchase} object to the online and offline storage.
+     *
+     * @param purchase     the purchase to save
+     * @param tag          the tag to save the purchase in the offline storage
+     * @param receiptImage the receipt image to attach to the purchase
+     * @param isDraft      whether to save the purchase as a draft
+     * @return a {@link Single} emitting the result
+     */
+    Single<Purchase> savePurchaseAsync(@NonNull Purchase purchase, @NonNull String tag,
+                                       @Nullable byte[] receiptImage, boolean isDraft);
 
     /**
-     * Defines the callback when purchases are loaded from the local data store.
+     * Saves a {@link Purchase} object as a draft, meaning only to the local offline datastore.
+     *
+     * @param purchase the purchase to save
+     * @param tag      the tag save the purchase in the offline storage
+     * @return a {@link Single} emitting the result
      */
-    interface GetPurchasesLocalListener {
-        /**
-         * Called when local purchases were successfully loaded.
-         *
-         * @param purchases the loaded purchases
-         */
-        void onPurchasesLocalLoaded(@NonNull List<ParseObject> purchases);
-    }
+    Single<Purchase> savePurchaseAsDraftAsync(@NonNull Purchase purchase, @NonNull String tag);
 
     /**
-     * Defines the callback when a purchase is loaded from the local data store.
+     * Deletes the the specified {@link ParseFile}, probably a receipt image that is no longer
+     * needed.
+     *
+     * @param fileName the file name of the {@link ParseFile} to delete
+     * @return a {@link Single} emitting the result
      */
-    interface GetPurchaseLocalListener {
-        /**
-         * Called when a local purchase was successfully loaded.
-         *
-         * @param purchase the loaded purchase
-         */
-        void onPurchaseLocalLoaded(@NonNull Purchase purchase);
-    }
+    Single<String> deleteReceipt(@NonNull String fileName);
 
     /**
-     * Defines the callback when purchases are loaded from the online data store.
+     * Deletes the items with the specified object ids.
+     *
+     * @param itemIds the ids of the items to delete
      */
-    interface GetPurchasesOnlineListener {
-        /**
-         * Called when online purchases were successfully loaded.
-         *
-         * @param purchases the loaded purchases
-         */
-        void onPurchasesOnlineLoaded(@NonNull List<ParseObject> purchases);
-
-        /**
-         * Called when the purchases load failed.
-         *
-         * @param errorMessage the error message from the exception thrown in the process
-         */
-        void onPurchaseOnlineLoadFailed(@StringRes int errorMessage);
-    }
+    void deleteItemsByIds(@NonNull List<String> itemIds);
 
     /**
-     * Defines the callback when purchases in the local data store are updated from the online data
-     * store.
+     * Deletes the purchase.
+     *
+     * @param purchase the purchase to delete
      */
-    interface UpdatePurchasesListener {
-        /**
-         * Called when local purchases were successfully updated.
-         *
-         * @param isCurrentGroup whether the updated purchases belong to the current group
-         */
-        void onPurchasesUpdated(boolean isCurrentGroup);
+    void deletePurchase(@NonNull Purchase purchase);
 
-        /**
-         * Called when purchases update failed.
-         *
-         * @param errorMessage the error message from the exception thrown in the process
-         */
-        void onPurchaseUpdateFailed(@StringRes int errorMessage);
+    /**
+     * Returns whether drafts are available for the current identity of the user.
+     *
+     * @return whether drafts are available
+     * @param identity
+     */
+    boolean isDraftsAvailable(Identity identity);
 
-        /**
-         * Called when all purchases from all group were successfully updated.
-         */
-        void onAllPurchasesUpdated();
-    }
+    /**
+     * Toggle the save setting whether drafts are available or not.
+     *
+     * @param identity
+     * @param available whether drafts are available or not
+     */
+    void toggleDraftsAvailable(Identity identity, boolean available);
+
+    /**
+     * Returns the exchange rate for the given currency.
+     *
+     * @param baseCurrency the base currency of which to calculate the rate
+     * @param currency     the currency to get the rate for
+     * @return a {@link Single} emitting the result
+     */
+    Single<Float> getExchangeRate(@NonNull String baseCurrency, @NonNull String currency);
 }

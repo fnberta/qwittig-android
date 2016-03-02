@@ -3,23 +3,42 @@
   ~ Copyright (c) 2015 Fabio Berta
   -->
 
-<FrameLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     >
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_purchase_details"
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.home.purchases.details.PurchaseDetailsViewModel"
+            />
+    </data>
+
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="@dimen/small_space"
-        android:clipToPadding="false"
-        android:visibility="gone"
-        tools:visibility="visible"/>
+        >
 
-    <include layout="@layout/include_progress"/>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_purchase_details"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="@dimen/small_space"
+            android:visibility="@{viewModel.loading ? View.GONE : View.VISIBLE}"
+            />
 
-</FrameLayout>
+        <include
+            layout="@layout/include_progress"
+            app:viewModel="@{viewModel}"
+            />
+
+    </FrameLayout>
+
+</layout>
+
 

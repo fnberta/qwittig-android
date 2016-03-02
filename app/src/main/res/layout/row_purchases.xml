@@ -3,86 +3,102 @@
   ~ Copyright (c) 2015 Fabio Berta
   -->
 
-<RelativeLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/rl_purchase"
-    android:layout_width="match_parent"
-    android:layout_height="@dimen/list_avatar_with_two_line_text"
-    android:background="?selectableItemBackground"
     >
 
-    <ImageView
-        android:id="@+id/iv_avatar"
-        android:layout_width="@dimen/avatar_size"
-        android:layout_height="@dimen/avatar_size"
-        android:layout_marginStart="@dimen/key_line_1"
-        android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_avatar_size"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="true"
-        android:contentDescription="@string/user_avatar"
-        tools:src="@drawable/ic_account_circle_black_40dp"
-        />
+    <data>
 
-    <LinearLayout
-        android:id="@+id/ll_store_user_date"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@id/iv_avatar"
-        android:layout_toStartOf="@+id/ll_share"
-        android:layout_marginEnd="@dimen/normal_space"
-        android:gravity="center_vertical"
+        <import type="android.R"/>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.home.purchases.list.PurchaseRowViewModel"
+            />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/list_avatar_with_two_line_text"
+        app:purchaseBackground="@{viewModel.purchaseRead}"
         >
 
-        <TextView
-            android:id="@+id/tv_store"
-            style="@style/TextAppearance.AppCompat.Subhead.List"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            tools:text="Denner"
+        <ImageView
+            android:id="@+id/iv_avatar"
+            android:layout_width="@dimen/avatar_size"
+            android:layout_height="@dimen/avatar_size"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_avatar_size"
+            android:layout_marginStart="@dimen/key_line_1"
+            android:contentDescription="@string/user_avatar"
+            app:avatar="@{viewModel.purchaseBuyerAvatar}"
+            app:fallback="@{@drawable/ic_account_circle_black_40dp}"
+            tools:src="@drawable/ic_account_circle_black_40dp"
             />
 
-        <TextView
-            android:id="@+id/tv_user_date"
-            style="@style/TextAppearance.AppCompat.Body1"
+        <LinearLayout
+            android:id="@+id/ll_store_user_date"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:textColor="?android:textColorSecondary"
-            tools:text="Vera, 24.02.2015"
-            />
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_marginEnd="@dimen/normal_space"
+            android:layout_toEndOf="@id/iv_avatar"
+            android:layout_toStartOf="@+id/ll_share"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            >
 
-    </LinearLayout>
+            <TextView
+                style="@style/TextAppearance.AppCompat.Subhead.List"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:text="@{viewModel.purchaseStore}"
+                tools:text="Denner"
+                />
 
-    <LinearLayout
-        android:id="@+id/ll_share"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="@dimen/key_line_1"
-        android:gravity="center_vertical"
-        >
+            <TextView
+                style="@style/TextAppearance.AppCompat.Body1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:text="@{viewModel.purchaseBuyerAndDate}"
+                android:textColor="?android:textColorSecondary"
+                tools:text="Vera, 24.02.2015"
+                />
 
-        <TextView
-            android:id="@+id/tv_total"
-            style="@style/TextAppearance.AppCompat.Subhead.List"
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_share"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|top"
-            tools:text="56.20"/>
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="@dimen/key_line_1"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            >
 
-        <TextView
-            android:id="@+id/tv_my_share"
-            style="@style/TextAppearance.AppCompat.Body1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
-            android:textColor="?android:textColorSecondary"
-            tools:text="2.30"/>
-    </LinearLayout>
+            <TextView
+                style="@style/TextAppearance.AppCompat.Subhead.List"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|top"
+                android:text="@{viewModel.purchaseTotalPrice}"
+                tools:text="56.20"/>
 
-</RelativeLayout>
+            <TextView
+                style="@style/TextAppearance.AppCompat.Body1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|bottom"
+                android:text="@{viewModel.purchaseMyShare}"
+                android:textColor="?android:textColorSecondary"
+                tools:text="2.30"/>
+        </LinearLayout>
+
+    </RelativeLayout>
+</layout>

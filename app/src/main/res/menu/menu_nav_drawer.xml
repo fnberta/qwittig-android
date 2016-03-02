@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group
+        android:id="@+id/nav_group_main"
+        android:checkableBehavior="single"
+        >
+        <item
+            android:id="@+id/nav_home"
+            android:checked="true"
+            android:icon="@drawable/ic_nav_shopping_cart"
+            android:title="@string/title_activity_home"
+            />
+        <item
+            android:id="@+id/nav_finance"
+            android:icon="@drawable/ic_nav_attach_money"
+            android:title="@string/title_activity_finance"
+            />
+        <item
+            android:id="@+id/nav_tasks"
+            android:icon="@drawable/ic_nav_assignment"
+            android:title="@string/title_activity_tasks"
+            android:visible="false"
+            />
+        <item
+            android:id="@+id/nav_stats"
+            android:icon="@drawable/ic_nav_assessment"
+            android:title="@string/title_activity_stats"
+            android:visible="false"
+            />
+    </group>
+
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@drawable/ic_nav_settings"
+        android:title="@string/title_activity_settings"
+        />
+    <item
+        android:id="@+id/nav_help_feedback"
+        android:icon="@drawable/ic_nav_help"
+        android:title="@string/title_activity_help_feedback"
+        />
+
+</menu>

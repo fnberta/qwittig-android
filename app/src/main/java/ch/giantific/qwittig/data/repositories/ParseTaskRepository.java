@@ -4,95 +4,92 @@
 
 package ch.giantific.qwittig.data.repositories;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import com.parse.DeleteCallback;
-import com.parse.FindCallback;
-import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import ch.giantific.qwittig.ParseErrorHandler;
-import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.Task;
+import ch.giantific.qwittig.data.receivers.PushBroadcastReceiver;
+import ch.giantific.qwittig.domain.models.Group;
+import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
+import rx.Observable;
+import rx.Single;
+import rx.functions.Func1;
 
 /**
  * Provides an implementation of {@link TaskRepository} that uses the Parse.com framework as
  * the local and online data store.
  */
-public class ParseTaskRepository extends ParseGenericRepository implements TaskRepository {
+public class ParseTaskRepository extends ParseBaseRepository implements TaskRepository {
 
-    public ParseTaskRepository(Context context) {
-        super(context);
+    private static final String PUSH_TASK_REMIND = "pushTaskRemind";
+
+    public ParseTaskRepository() {
+        super();
     }
 
     @Override
-    public void getTasksLocalAsync(@NonNull Group group, @NonNull Date deadline,
-                                   @NonNull final GetTasksLocalListener listener) {
-        ParseQuery<ParseObject> deadlineQuery = ParseQuery.getQuery(Task.CLASS);
+    protected String getClassName() {
+        return Task.CLASS;
+    }
+
+    @Override
+    public Single<Task> saveTaskLocalAsync(@NonNull Task task, @NonNull String tag) {
+        return pin(task, tag);
+    }
+
+    @Override
+    public Observable<Task> getTasksLocalAsync(@NonNull Identity identity,
+                                               @NonNull Date deadline) {
+        ParseQuery<Task> deadlineQuery = ParseQuery.getQuery(Task.CLASS);
         deadlineQuery.whereLessThan(Task.DEADLINE, deadline);
 
-        ParseQuery<ParseObject> asNeededQuery = ParseQuery.getQuery(Task.CLASS);
+        ParseQuery<Task> asNeededQuery = ParseQuery.getQuery(Task.CLASS);
         asNeededQuery.whereDoesNotExist(Task.DEADLINE);
 
-        List<ParseQuery<ParseObject>> queries = new ArrayList<>();
+        List<ParseQuery<Task>> queries = new ArrayList<>();
         queries.add(deadlineQuery);
         queries.add(asNeededQuery);
 
-        ParseQuery<ParseObject> query = ParseQuery.or(queries);
+        ParseQuery<Task> query = ParseQuery.or(queries);
+        query.whereEqualTo(Task.GROUP, identity.getGroup());
         query.fromLocalDatastore();
         query.ignoreACLs();
-        query.whereEqualTo(Task.GROUP, group);
-        query.include(Task.USERS_INVOLVED);
+        query.include(Task.IDENTITIES);
         query.orderByAscending(Task.DEADLINE);
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> parseObjects, @Nullable ParseException e) {
-                if (e == null) {
-                    listener.onTasksLocalLoaded(parseObjects);
-                }
-            }
-        });
+
+        return find(query)
+                .concatMap(new Func1<List<Task>, Observable<Task>>() {
+                    @Override
+                    public Observable<Task> call(List<Task> tasks) {
+                        return Observable.from(tasks);
+                    }
+                });
     }
 
     @Override
-    public void getTaskLocalAsync(@NonNull String taskId,
-                                  @NonNull final GetTaskLocalListener listener) {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(Task.CLASS);
+    public Single<Task> getTaskLocalAsync(@NonNull String taskId) {
+        ParseQuery<Task> query = ParseQuery.getQuery(Task.CLASS);
         query.fromLocalDatastore();
         query.ignoreACLs();
-        query.include(Task.USERS_INVOLVED);
-        query.getInBackground(taskId, new GetCallback<ParseObject>() {
-            @Override
-            public void done(ParseObject object, @Nullable ParseException e) {
-                if (e == null) {
-                    listener.onTaskLocalLoaded((Task) object);
-                }
-            }
-        });
+        query.include(Task.IDENTITIES);
+
+        return get(query, taskId);
     }
 
     @Override
-    public void fetchTaskDataLocalAsync(@NonNull String taskId,
-                                        @NonNull final GetTaskLocalListener listener) {
-        ParseObject parseObject = ParseObject.createWithoutData(Task.CLASS, taskId);
-        parseObject.fetchFromLocalDatastoreInBackground(new GetCallback<ParseObject>() {
-            @Override
-            public void done(ParseObject parseObject, @Nullable ParseException e) {
-                if (e == null) {
-                    listener.onTaskLocalLoaded((Task) parseObject);
-                }
-            }
-        });
+    public Single<Task> fetchTaskDataLocalAsync(@NonNull final String taskId) {
+        final Task task = (Task) Task.createWithoutData(Task.CLASS, taskId);
+        return fetchLocal(task);
     }
 
     @Override
@@ -108,54 +105,65 @@ public class ParseTaskRepository extends ParseGenericRepository implements TaskR
     }
 
     @Override
-    public void updateTasksAsync(@NonNull List<ParseObject> groups,
-                                 @NonNull final UpdateTasksListener listener) {
-        ParseQuery<ParseObject> query = getTasksOnlineQuery(groups);
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(@NonNull final List<ParseObject> parseObjects, @Nullable ParseException e) {
-                if (e != null) {
-                    listener.onTaskUpdateFailed(ParseErrorHandler.handleParseError(mContext, e));
-                    return;
-                }
-
-                ParseObject.unpinAllInBackground(Task.PIN_LABEL, new DeleteCallback() {
+    public Observable<Task> updateTasksAsync(@NonNull List<Identity> identities) {
+        return Observable.from(identities)
+                .map(new Func1<Identity, Group>() {
                     @Override
-                    public void done(@Nullable ParseException e) {
-                        if (e != null) {
-                            listener.onTaskUpdateFailed(ParseErrorHandler.handleParseError(mContext, e));
-                            return;
-                        }
-
-                        ParseObject.pinAllInBackground(Task.PIN_LABEL, parseObjects, new SaveCallback() {
-                            @Override
-                            public void done(@Nullable ParseException e) {
-                                if (e != null) {
-                                    listener.onTaskUpdateFailed(ParseErrorHandler.handleParseError(mContext, e));
-                                    return;
-                                }
-
-                                listener.onTasksUpdated();
-                            }
-                        });
+                    public Group call(Identity identity) {
+                        return identity.getGroup();
+                    }
+                })
+                .toList()
+                .map(new Func1<List<Group>, ParseQuery<Task>>() {
+                    @Override
+                    public ParseQuery<Task> call(List<Group> groups) {
+                        return getTasksOnlineQuery(groups);
+                    }
+                })
+                .flatMap(new Func1<ParseQuery<Task>, Observable<List<Task>>>() {
+                    @Override
+                    public Observable<List<Task>> call(ParseQuery<Task> taskParseQuery) {
+                        return find(taskParseQuery);
+                    }
+                })
+                .concatMap(new Func1<List<Task>, Observable<List<Task>>>() {
+                    @Override
+                    public Observable<List<Task>> call(List<Task> tasks) {
+                        return unpinAll(tasks, Task.PIN_LABEL);
+                    }
+                })
+                .concatMap(new Func1<List<Task>, Observable<List<Task>>>() {
+                    @Override
+                    public Observable<List<Task>> call(List<Task> tasks) {
+                        return pinAll(tasks, Task.PIN_LABEL);
+                    }
+                })
+                .concatMap(new Func1<List<Task>, Observable<Task>>() {
+                    @Override
+                    public Observable<Task> call(List<Task> tasks) {
+                        return Observable.from(tasks);
                     }
                 });
-            }
-        });
     }
 
     @NonNull
-    private ParseQuery<ParseObject> getTasksOnlineQuery(@NonNull List<ParseObject> groups) {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(Task.CLASS);
+    private ParseQuery<Task> getTasksOnlineQuery(@NonNull List<Group> groups) {
+        ParseQuery<Task> query = ParseQuery.getQuery(Task.CLASS);
         query.whereContainedIn(Task.GROUP, groups);
-        query.include(Task.USERS_INVOLVED);
+        query.include(Task.IDENTITIES);
         return query;
     }
 
     @Override
-    public boolean updateTasks(@NonNull List<ParseObject> groups) {
+    public boolean updateTasks(@NonNull List<Identity> identities) {
+        final List<Group> groups = new ArrayList<>();
+        for (Identity identity : identities) {
+            groups.add(identity.getGroup());
+        }
+
         try {
-            List<ParseObject> tasks = getTasksOnline(groups);
+            final ParseQuery<Task> query = getTasksOnlineQuery(groups);
+            final List<Task> tasks = query.find();
             ParseObject.unpinAll(Task.PIN_LABEL);
             ParseObject.pinAll(Task.PIN_LABEL, tasks);
         } catch (ParseException e) {
@@ -165,15 +173,10 @@ public class ParseTaskRepository extends ParseGenericRepository implements TaskR
         return true;
     }
 
-    private List<ParseObject> getTasksOnline(@NonNull List<ParseObject> groups) throws ParseException {
-        ParseQuery<ParseObject> query = getTasksOnlineQuery(groups);
-        return query.find();
-    }
-
     @Override
     public boolean updateTask(@NonNull String taskId, boolean isNew) {
         try {
-            Task task = getTaskOnline(taskId);
+            final Task task = getTaskOnline(taskId);
             if (isNew) {
                 task.pin(Task.PIN_LABEL);
             }
@@ -185,21 +188,28 @@ public class ParseTaskRepository extends ParseGenericRepository implements TaskR
     }
 
     private Task getTaskOnline(@NonNull String taskId) throws ParseException {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(Task.CLASS);
-        query.include(Task.USERS_INVOLVED);
+        final ParseQuery<ParseObject> query = ParseQuery.getQuery(Task.CLASS);
+        query.include(Task.IDENTITIES);
         return (Task) query.get(taskId);
     }
 
     @Override
     public Task fetchTaskDataLocal(@NonNull String taskId) {
-        ParseObject parseObject = ParseObject.createWithoutData(Task.CLASS, taskId);
+        final Task task = (Task) ParseObject.createWithoutData(Task.CLASS, taskId);
         try {
-            parseObject.fetchFromLocalDatastore();
+            task.fetchFromLocalDatastore();
         } catch (ParseException e) {
             return null;
         }
 
-        return (Task) parseObject;
+        return task;
     }
 
+
+    @Override
+    public Single<String> pushTaskReminder(@NonNull String taskId) {
+        final Map<String, Object> params = new HashMap<>();
+        params.put(PushBroadcastReceiver.PUSH_PARAM_TASK_ID, taskId);
+        return callFunctionInBackground(PUSH_TASK_REMIND, params);
+    }
 }

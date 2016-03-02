@@ -6,39 +6,53 @@ package ch.giantific.qwittig.domain.repositories;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-
-import com.parse.ParseObject;
 
 import java.util.List;
 
-import ch.giantific.qwittig.domain.models.parse.Group;
-import ch.giantific.qwittig.domain.models.parse.User;
+import ch.giantific.qwittig.domain.models.Compensation;
+import ch.giantific.qwittig.domain.models.Group;
+import ch.giantific.qwittig.domain.models.Identity;
+import rx.Observable;
+import rx.Single;
 
 /**
  * Provides the methods to get, update and remove compensations from the local and online data
  * store.
  */
-public interface CompensationRepository {
+public interface CompensationRepository extends BaseRepository {
+
+    /**
+     * Calculates the compensations for the group.
+     *
+     * @param group the group to calculate for
+     * @return the response from the server
+     */
+    Single<String> calculateCompensations(@NonNull Group group);
+
     /**
      * Queries the local data store for unpaid compensations.
      *
-     * @param group    the group for which to get compensations for
-     * @param listener the callback when the query finishes
+     * @param currentIdentity the current user
+     * @return a {@link Observable} emitting the results
      */
-    void getCompensationsLocalUnpaidAsync(@NonNull Group group,
-                                          @NonNull GetCompensationsLocalListener listener);
+    Observable<Compensation> getCompensationsLocalUnpaidAsync(@NonNull Identity currentIdentity);
 
     /**
      * Queries the local data store for paid compensations where the current user is either the
      * buyer or the beneficiary.
      *
-     * @param currentUser the current user
-     * @param group       the group for which to get compensations for
-     * @param listener    the callback when the query finishes
+     * @param currentIdentity the current user
+     * @return a {@link Observable} emitting the results
      */
-    void getCompensationsLocalPaidAsync(@NonNull User currentUser, @NonNull Group group,
-                                        @NonNull GetCompensationsLocalListener listener);
+    Observable<Compensation> getCompensationsLocalPaidAsync(@NonNull Identity currentIdentity);
+
+    /**
+     * Saves a {@link Compensation} object to the online and offline storage
+     *
+     * @param compensation the compensation to save
+     * @return a {@link Single} emitting the result
+     */
+    Single<Compensation> saveCompensationAsync(@NonNull Compensation compensation);
 
     /**
      * Removes a compensation from the local data store.
@@ -52,41 +66,38 @@ public interface CompensationRepository {
      * Updates all unpaid compensations in the local data store by deleting all compensations from the
      * local data store, querying and saving new ones.
      *
-     * @param groups   the group for which to update the compensations
-     * @param listener the callback when a query finishes, fails or all queries are finished
+     * @param identities all identities from the current user
+     * @return a {@link Observable} emitting the results
      */
-    void updateCompensationsUnpaidAsync(@NonNull List<ParseObject> groups,
-                                        @NonNull UpdateCompensationsListener listener);
+    Observable<Compensation> updateCompensationsUnpaidAsync(@NonNull List<Identity> identities);
 
     /**
      * Updates all paid compensations in the local data store by deleting all compensations from the
      * local data store, querying and saving new ones.
      *
-     * @param groups         the group for which to update the compensations
-     * @param currentGroupId the object id of the user's current group
-     * @param listener       the callback when a query finishes, fails or all queries are finished
+     * @param currentIdentity the current identity
+     * @param identities      all identities from the current user
+     * @return a {@link Observable} emitting the results
      */
-    void updateCompensationsPaidAsync(@NonNull List<ParseObject> groups,
-                                      @NonNull String currentGroupId,
-                                      @NonNull UpdateCompensationsListener listener);
+    Observable<Compensation> updateCompensationsPaidAsync(@NonNull Identity currentIdentity,
+                                                          @NonNull List<Identity> identities);
 
     /**
      * Queries paid compensations from the online data store and saves them in the local data store.
      *
-     * @param group    the group for which to get compensations for
-     * @param skip     the number of compensations to skip for the query
-     * @param listener the callback when the new compensations are saved in the local data store
+     * @param currentIdentity the group for which to get compensations for
+     * @param skip            the number of compensations to skip for the query
+     * @return a {@link Observable} emitting the results
      */
-    void getCompensationsPaidOnlineAsync(@NonNull Group group, int skip,
-                                         @NonNull GetCompensationsOnlineListener listener);
+    Observable<Compensation> getCompensationsPaidOnlineAsync(@NonNull Identity currentIdentity, int skip);
 
     /**
      * Deletes all compensations from the local data store and saves new ones.
      *
-     * @param groups the groups for which to update the compensations
+     * @param identities the groups for which to update the compensations
      * @return whether the update was successful or not
      */
-    boolean updateCompensations(@NonNull List<ParseObject> groups);
+    boolean updateCompensations(@NonNull List<Identity> identities);
 
     /**
      * Updates a compensation if is already available in the local data store (by simply querying
@@ -101,63 +112,20 @@ public interface CompensationRepository {
     Boolean updateCompensation(@NonNull String compensationId, boolean isNew);
 
     /**
-     * Defines the callback when compensations are loaded from the local data store.
+     * Marks the compensation as paid and saves it to the offline and online data stores.
+     *
+     * @param compensation the compensation to save
+     * @return a {@link Single} emitting the result
      */
-    interface GetCompensationsLocalListener {
-        /**
-         * Called when local compensations were successfully loaded.
-         *
-         * @param compensations the loaded compensations
-         */
-        void onCompensationsLocalLoaded(@NonNull List<ParseObject> compensations);
-    }
+    Single<Compensation> saveCompensationPaid(@NonNull Compensation compensation);
 
     /**
-     * Defines the callback when compensations are loaded from the online data store.
+     * Sends a push notification to remind a user to pay a compensation.
+     *
+     * @param compensationId the object id of the compensation that needs to be paid
+     * @param currencyCode   the currency code to format the price in the push notification
+     * @return a {@link Single} emitting the result
      */
-    interface GetCompensationsOnlineListener {
-        /**
-         * Called when online paid compensations were successfully loaded.
-         *
-         * @param compensations the loaded compensations
-         */
-        void onCompensationsPaidOnlineLoaded(@NonNull List<ParseObject> compensations);
-
-        /**
-         * Called when the compensations load failed.
-         *
-         * @param errorMessage the error message from the exception thrown in the process
-         */
-        void onCompensationsPaidOnlineLoadFailed(@StringRes int errorMessage);
-    }
-
-    /**
-     * Defines the callback when compensations in the local data store are updated from the online
-     * data store.
-     */
-    interface UpdateCompensationsListener {
-        /**
-         * Called when local paid compensations were successfully updated.
-         *
-         * @param isCurrentGroup whether the updated compensations belong to the current group
-         */
-        void onCompensationsPaidUpdated(boolean isCurrentGroup);
-
-        /**
-         * Called when all paid compensations from all group were successfully updated.
-         */
-        void onAllCompensationsPaidUpdated();
-
-        /**
-         * Called when local unpaid compensations were successfully updated.
-         */
-        void onCompensationsUnpaidUpdated();
-
-        /**
-         * Called when compensations update failed.
-         *
-         * @param errorMessage the error message from the exception thrown in the process
-         */
-        void onCompensationUpdateFailed(@StringRes int errorMessage);
-    }
+    Single<String> pushCompensationReminder(@NonNull String compensationId,
+                                            @NonNull String currencyCode);
 }

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2016 Fabio Berta
+  -->
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="itemRow"
+            type="ch.giantific.qwittig.presentation.home.purchases.addedit.items.AddEditPurchaseItem"
+            />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/small_space"
+        android:orientation="horizontal"
+        android:weightSum="10"
+        >
+
+        <ImageView
+            android:id="@+id/iv_purchase_add_toggle_users"
+            android:layout_width="@dimen/touch_target_min"
+            android:layout_height="@dimen/touch_target_min"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="@dimen/min_space"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/header_settings_users"
+            android:padding="@dimen/icon_padding"
+            android:src="@drawable/ic_group_black_24dp"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:baselineAligned="false"
+            android:orientation="horizontal"
+            android:weightSum="10"
+            >
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="7"
+                android:error="@{!itemRow.validate ? null : itemRow.nameComplete ? null : @string/error_item_name}"
+                >
+
+                <EditText
+                    android:id="@+id/et_purchase_add_item_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="@string/hint_item_name"
+                    android:imeOptions="actionNext"
+                    android:inputType="text|textCapSentences"
+                    android:onTextChanged="@{itemRow.onNameChanged}"
+                    android:text="@{itemRow.name}"
+                    />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/normal_space"
+                android:layout_weight="3"
+                android:error="@{!itemRow.validate ? null : itemRow.priceComplete ? null : @string/error_item_price}"
+                >
+
+                <EditText
+                    android:id="@+id/et_purchase_add_item_price"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="end"
+                    android:hint="@string/hint_item_price"
+                    android:inputType="numberDecimal"
+                    android:maxLength="9"
+                    android:onFocusChange="@{itemRow.onPriceFocusChange}"
+                    android:onTextChanged="@{itemRow.onPriceChanged}"
+                    android:selectAllOnFocus="true"
+                    android:text="@{itemRow.price}"
+                    />
+
+            </android.support.design.widget.TextInputLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</layout>

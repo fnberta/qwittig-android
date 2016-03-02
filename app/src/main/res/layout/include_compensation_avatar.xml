@@ -3,15 +3,28 @@
   ~ Copyright (c) 2015 Fabio Berta
   -->
 
-<ImageView
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@id/iv_avatar"
-    android:layout_width="100dp"
-    android:layout_height="143dp"
-    android:layout_alignParentStart="true"
-    android:layout_alignParentTop="true"
-    android:contentDescription="@string/user_avatar"
-    android:scaleType="centerCrop"
-    tools:src="@drawable/ic_account_circle_black_80dp"/>
+    >
+
+    <data>
+
+        <variable
+            name="item"
+            type="ch.giantific.qwittig.presentation.finance.unpaid.items.CompsUnpaidItem"
+            />
+    </data>
+
+    <ImageView
+        android:id="@id/iv_avatar"
+        android:contentDescription="@string/user_avatar"
+        android:scaleType="centerCrop"
+        app:avatarSquare="@{item.compUserAvatar}"
+        app:fallback="@{@drawable/ic_account_circle_black_80dp}"
+        tools:src="@drawable/ic_account_circle_black_80dp"
+        />
+
+</layout>
 

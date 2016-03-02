@@ -4,13 +4,13 @@
   -->
 
 <TextView
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@android:id/text1"
     style="@style/TextAppearance.AppCompat.Body1"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center_vertical"
-    android:paddingEnd="@dimen/small_space"
-    android:lines="1"
     android:ellipsize="marquee"
+    android:lines="1"
+    android:paddingEnd="@dimen/small_space"
     />

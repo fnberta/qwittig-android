@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.navdrawer.NavDrawerViewModel"
+            />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/navdrawer_chosen_account_height"
+        >
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/user_avatar"
+            android:scaleType="centerCrop"
+            app:backdrop="@{viewModel.identityAvatar}"
+            tools:src="@drawable/ic_account_box_black_144dp"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/scrim_solid"
+            android:orientation="vertical"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark"
+            >
+
+            <ImageView
+                android:layout_width="@dimen/navdrawer_profile_avatar_size"
+                android:layout_height="@dimen/navdrawer_profile_avatar_size"
+                android:layout_marginBottom="@dimen/small_space"
+                android:layout_marginEnd="@dimen/key_line_1"
+                android:layout_marginStart="@dimen/key_line_1"
+                android:layout_marginTop="@dimen/navdrawer_status_bar_plus_normal_space"
+                android:contentDescription="@string/user_avatar"
+                android:onClick="@{viewModel.onAvatarClick}"
+                app:avatarRipple="@{viewModel.identityAvatar}"
+                app:fallback="@{@drawable/ic_account_circle_black_80dp}"
+                tools:src="@drawable/ic_account_circle_black_80dp"
+                />
+
+            <TextView
+                style="@style/TextAppearance.AppCompat.Body2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/key_line_1"
+                android:layout_marginStart="@dimen/key_line_1"
+                android:text="@{viewModel.identityNickname}"
+                tools:text="beeeezn"
+                />
+
+            <Spinner
+                android:id="@+id/sp_drawer_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/key_line_1"
+                android:layout_marginStart="@dimen/key_line_1"
+                android:onItemSelected="@{viewModel.onIdentitySelected}"
+                android:selection="@{viewModel.selectedIdentity}"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                />
+        </LinearLayout>
+
+    </FrameLayout>
+</layout>

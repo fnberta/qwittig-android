@@ -2,17 +2,28 @@
   ~ Copyright (c) 2015 Fabio Berta
   -->
 
-<ProgressBar
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/pb_card"
-    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_alignParentTop="true"
-    android:layout_alignParentStart="true"
-    android:layout_marginTop="@dimen/pb_top_negative_margin"
-    android:indeterminate="true"
-    android:visibility="gone"
-    tools:visibility="visible"
-    />
+    >
+
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.common.viewmodels.CardTopProgressViewModel"
+            />
+    </data>
+
+    <ProgressBar
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/pb_top_negative_margin"
+        android:indeterminate="true"
+        android:visibility="@{viewModel.itemLoading ? View.VISIBLE : View.GONE}"
+        tools:visibility="visible"
+        />
+</layout>

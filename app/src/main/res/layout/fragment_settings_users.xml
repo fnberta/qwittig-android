@@ -1,0 +1,29 @@
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.settings.users.SettingsUsersViewModel"
+            />
+    </data>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_settings_users"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/small_space"
+        android:transitionGroup="true"
+        tools:targetApi="lollipop"
+        />
+
+</layout>

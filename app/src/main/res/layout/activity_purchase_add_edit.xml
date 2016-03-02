@@ -2,40 +2,60 @@
   ~ Copyright (c) 2015 Fabio Berta
   -->
 
-<android.support.design.widget.CoordinatorLayout
-    android:id="@+id/main_layout"
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:clipChildren="false"
-    android:transitionGroup="true"
-    tools:context="ch.giantific.qwittig.ui.activities.PurchaseBaseActivity"
     >
 
-    <FrameLayout
-        android:id="@+id/container"
+    <data>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.home.purchases.addedit.AddEditPurchaseViewModel"
+            />
+    </data>
+
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/main_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/toolbar_height_x2"
-        tools:ignore="MergeRootFrame"/>
+        android:clipChildren="false"
+        android:transitionGroup="true"
+        tools:context=".presentation.home.purchases.addedit.AddPurchaseActivity"
+        tools:targetApi="lollipop"
+        >
 
-    <include layout="@layout/include_appbar_x2"/>
+        <FrameLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/toolbar_height_x2"
+            tools:ignore="MergeRootFrame"
+            />
 
-    <ch.berta.fabio.fabprogress.FabProgress
-        android:id="@+id/fab_purchase_save"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|end"
-        android:layout_marginEnd="@dimen/key_line_1"
-        android:layout_marginTop="@dimen/fab_margin_toolbar_x2"
-        android:src="@drawable/ic_save_black_24dp"
-        android:visibility="gone"
-        app:fp_arcColor="@color/green"
-        app:fp_finalIcon="@drawable/ic_done_black_24dp"
-        tools:visibility="visible"
-        />
+        <include layout="@layout/include_appbar_x2"/>
 
-</android.support.design.widget.CoordinatorLayout>
+        <ch.berta.fabio.fabprogress.FabProgress
+            android:id="@+id/fab_purchase_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
+            android:layout_marginEnd="@dimen/key_line_1"
+            android:layout_marginTop="@dimen/fab_margin_toolbar_x2"
+            android:onClick="@{viewModel.onFabSavePurchaseClick}"
+            android:progressFinalAnimationListener="@{viewModel.progressFinalAnimationListener}"
+            android:src="@drawable/ic_save_black_24dp"
+            android:visibility="gone"
+            app:progress="@{viewModel.saving}"
+            app:animStop="@{viewModel.animStop}"
+            app:fp_arcColor="@color/green_500"
+            app:fp_finalIcon="@drawable/ic_done_black_24dp"
+            tools:visibility="visible"
+            />
+
+    </android.support.design.widget.CoordinatorLayout>
+
+</layout>
+
 

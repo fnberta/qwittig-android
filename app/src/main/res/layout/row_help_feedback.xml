@@ -3,16 +3,32 @@
   ~ Copyright (c) 2015 Fabio Berta
   -->
 
-<TextView
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/tv_help_title"
-    style="@style/TextAppearance.AppCompat.Subhead.List"
-    android:layout_width="match_parent"
-    android:layout_height="@dimen/list_icon_with_text"
-    android:paddingStart="@dimen/key_line_1"
-    android:paddingEnd="@dimen/key_line_1"
-    android:gravity="center_vertical"
-    android:drawablePadding="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
-    android:background="?selectableItemBackground"
-    tools:text="Send Feedback"/>
+    >
+
+    <data>
+
+        <variable
+            name="item"
+            type="ch.giantific.qwittig.presentation.helpfeedback.items.HelpFeedbackItem"
+            />
+    </data>
+
+    <TextView
+        style="@style/TextAppearance.AppCompat.Subhead.List"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/list_icon_with_text"
+        android:background="?selectableItemBackground"
+        android:drawablePadding="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+        android:gravity="center_vertical"
+        android:paddingEnd="@dimen/key_line_1"
+        android:paddingStart="@dimen/key_line_1"
+        android:text="@{item.title}"
+        app:drawableStartBounds="@{item.icon}"
+        tools:text="Send Feedback"
+        />
+
+</layout>

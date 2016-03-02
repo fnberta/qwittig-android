@@ -16,7 +16,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.view.View;
 
 import org.apache.commons.math3.fraction.BigFraction;
 import org.apache.commons.math3.fraction.Fraction;
@@ -39,9 +38,8 @@ public class Utils {
      * @param email the email address to test
      * @return whether the email address is valid or not
      */
-    public static boolean emailIsValid(@NonNull String email) {
+    public static boolean isEmailValid(@NonNull String email) {
         String pattern = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}";
-
         return !TextUtils.isEmpty(email) && email.matches(pattern);
     }
 
@@ -51,7 +49,7 @@ public class Utils {
      * @param password the password to test
      * @return whether the password is valid or not
      */
-    public static boolean passwordIsValid(@NonNull String password) {
+    public static boolean isPasswordValid(@NonNull String password) {
         // TODO: add real validation
         return !TextUtils.isEmpty(password);
     }
@@ -140,21 +138,6 @@ public class Utils {
     }
 
     /**
-     * Returns the value of a view's tag if it is an int.
-     *
-     * @param v the view to read tag from
-     * @return the view's tag value or 0 if it is not an int
-     */
-    public static int getViewPositionFromTag(@NonNull View v) {
-        int value = 0;
-
-        if (v.getTag() instanceof Integer) {
-            value = (Integer) v.getTag();
-        }
-        return value;
-    }
-
-    /**
      * Returns whether the running Android version is lollipop and higher or an older version.
      *
      * @return whether the running Android version is lollipop and higher or an older version
@@ -172,11 +155,11 @@ public class Utils {
      * @param context the context to use to get the {@link ConnectivityManager}
      * @return whether there is an active network connection or not
      */
-    public static boolean isConnected(@NonNull Context context) {
-        ConnectivityManager cm =
+    public static boolean isNetworkAvailable(@NonNull Context context) {
+        final ConnectivityManager cm =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        final NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
@@ -232,5 +215,4 @@ public class Utils {
         }
         return true;
     }
-
 }
