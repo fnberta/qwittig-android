@@ -7,6 +7,7 @@ package ch.giantific.qwittig.data.repositories;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.webkit.MimeTypeMap;
 
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -303,7 +304,8 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
             return saveAndPinPurchase(purchase, tag, isDraft);
         }
 
-        final ParseFile receipt = new ParseFile(PurchaseRepository.FILE_NAME, receiptImage);
+        final String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("jpg");
+        final ParseFile receipt = new ParseFile(PurchaseRepository.FILE_NAME, receiptImage, mimeType);
         return saveFile(receipt)
                 .flatMap(new Func1<ParseFile, Single<? extends Purchase>>() {
                     @Override

@@ -157,6 +157,18 @@ public class CompsUnpaidViewModelImpl
     }
 
     @Override
+    public boolean isEmpty() {
+        for (CompsUnpaidBaseItem item : mItems) {
+            final int type = item.getType();
+            if (type == Type.CREDIT || type == Type.DEBT) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
     protected void refreshItems() {
         if (!mView.isNetworkAvailable()) {
             setRefreshing(false);
@@ -252,7 +264,10 @@ public class CompsUnpaidViewModelImpl
                         } else {
                             mItems.remove(position);
                             mView.notifyItemRemoved(position);
+                            notifyPropertyChanged(BR.empty);
                         }
+
+                        mView.onCompensationConfirmed();
                     }
 
                     @Override

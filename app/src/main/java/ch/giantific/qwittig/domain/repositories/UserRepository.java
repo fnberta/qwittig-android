@@ -107,7 +107,7 @@ public interface UserRepository extends BaseRepository {
      * @param idToken the token obtained from the Google login
      * @return a {@link Single} emitting the result
      */
-    Single<JSONObject> verifyGoogleLogin(@NonNull String idToken);
+    Single<String> verifyGoogleLogin(@NonNull String idToken);
 
     /**
      * Sets the information from google (email, nickname and avatar) for the user and its identity.

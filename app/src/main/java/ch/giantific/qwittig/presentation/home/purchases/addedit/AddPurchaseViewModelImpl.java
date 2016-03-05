@@ -20,6 +20,7 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -49,7 +50,6 @@ import ch.giantific.qwittig.presentation.home.purchases.addedit.items.AddEditPur
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.utils.MoneyUtils;
-import ch.giantific.qwittig.utils.parse.ParseUtils;
 import rx.Single;
 import rx.SingleSubscriber;
 import rx.functions.Func1;
@@ -75,7 +75,7 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
     private static final String STATE_FETCHING_RATES = "STATE_FETCHING_RATES";
     final PurchaseRepository mPurchaseRepo;
     private final NumberFormat mExchangeRateFormatter;
-    private final List<String> mSupportedCurrencies = ParseUtils.getSupportedCurrencyCodes();
+    private final List<String> mSupportedCurrencies = Arrays.asList(MoneyUtils.SUPPORTED_CURRENCIES);
     private final Group mCurrentGroup;
     private final DateFormat mDateFormatter;
     String mCurrency;

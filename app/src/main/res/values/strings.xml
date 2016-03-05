@@ -294,5 +294,6 @@
     <string name="toast_password_reset">An email with a link to rest your password was sent</string>
     <string name="toast_settings_users_removed">Removed user from group</string>
     <string name="toast_error_settings_users_remove">Failed to remove user from group</string>
+    <string name="toast_settings_min_one_group">Please create a new group before leaving this one</string>
 
 </resources>

@@ -35,6 +35,7 @@ public class LoginActivity extends BaseActivity<LoginAccountsViewModel> implemen
         LoginWorkerListener {
 
     private static final String FRAGMENT_ACCOUNTS = "FRAGMENT_ACCOUNTS";
+    private static final String GOOGLE_SERVER_ID = "982871908066-1scsmdngvfsj68t7kq5o42t35oubujme.apps.googleusercontent.com";
     private static final int RC_SIGN_IN = 9001;
     private GoogleApiClient mGoogleApiClient;
     private LoginEmailViewModel mEmailViewModel;
@@ -61,6 +62,7 @@ public class LoginActivity extends BaseActivity<LoginAccountsViewModel> implemen
     private void setupGoogleLogin() {
         final GoogleSignInOptions gso =
                 new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestIdToken(GOOGLE_SERVER_ID)
                         .requestEmail()
                         .build();
 
@@ -92,6 +94,7 @@ public class LoginActivity extends BaseActivity<LoginAccountsViewModel> implemen
             if (acct != null) {
                 final String idToken = acct.getIdToken();
                 final String displayName = acct.getDisplayName();
+                final String email = acct.getEmail();
                 final Uri photoUrl = acct.getPhotoUrl();
                 mViewModel.onGoogleSignedIn(idToken, displayName, photoUrl);
             } else {

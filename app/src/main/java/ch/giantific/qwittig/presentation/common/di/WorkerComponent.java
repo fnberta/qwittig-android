@@ -10,7 +10,7 @@ import ch.giantific.qwittig.di.scopes.PerFragment;
 import ch.giantific.qwittig.presentation.finance.unpaid.CompRemindWorker;
 import ch.giantific.qwittig.presentation.finance.unpaid.CompSaveWorker;
 import ch.giantific.qwittig.presentation.finance.paid.CompsQueryMoreWorker;
-import ch.giantific.qwittig.presentation.finance.unpaid.CompsUpdateWorker;
+import ch.giantific.qwittig.presentation.finance.CompsUpdateWorker;
 import ch.giantific.qwittig.presentation.finance.identities.IdentitiesUpdateWorker;
 import ch.giantific.qwittig.presentation.home.JoinGroupWorker;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.AddPurchaseSaveWorker;

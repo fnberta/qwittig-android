@@ -45,39 +45,4 @@ public class ParseUtils {
     private static String getGroupRoleName(@NonNull Group group) {
         return Group.ROLE_PREFIX + group.getObjectId();
     }
-
-    /**
-     * Returns the currently supported currencies as
-     * {@link Currency} objects with a name and currency code.
-     * Reads the information from {@link ParseConfig}.
-     *
-     * @return the currently supported currencies
-     */
-    @NonNull
-    public static List<Currency> getSupportedCurrencies() {
-        final ParseConfig config = ParseConfig.getCurrentConfig();
-        final List<String> currencyCodes = config.getList(ParseConfigUtils.SUPPORTED_CURRENCIES);
-        final List<String> currencyNames = MoneyUtils.getCurrencyDisplayNames(currencyCodes);
-
-        final int currencyNamesLength = currencyNames.size();
-        final List<Currency> currencies =
-                new ArrayList<>(currencyNamesLength);
-        for (int i = 0; i < currencyNamesLength; i++) {
-            currencies.add(new Currency(currencyNames.get(i),
-                    currencyCodes.get(i)));
-        }
-
-        return currencies;
-    }
-
-    /**
-     * Returns the currently supported currency codes. Reads the information from
-     * {@link ParseConfig}.
-     *
-     * @return the currently supported currency codes
-     */
-    public static List<String> getSupportedCurrencyCodes() {
-        final ParseConfig config = ParseConfig.getCurrentConfig();
-        return config.getList(ParseConfigUtils.SUPPORTED_CURRENCIES, new ArrayList<String>());
-    }
 }

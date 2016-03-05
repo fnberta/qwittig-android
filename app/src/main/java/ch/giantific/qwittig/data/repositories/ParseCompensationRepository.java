@@ -337,7 +337,7 @@ public class ParseCompensationRepository extends ParseBaseRepository implements
                 .flatMap(new Func1<Compensation, Single<Compensation>>() {
                     @Override
                     public Single<Compensation> call(Compensation compensation) {
-                        return pin(compensation, Compensation.PIN_LABEL_PAID);
+                        return pin(compensation, Compensation.PIN_LABEL_PAID + compensation.getGroup().getObjectId());
                     }
                 })
                 .doOnSuccess(new Action1<Compensation>() {

@@ -75,3 +75,5 @@ dependencies {
     releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
     testCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
 }
+
+apply plugin: 'com.google.gms.google-services'

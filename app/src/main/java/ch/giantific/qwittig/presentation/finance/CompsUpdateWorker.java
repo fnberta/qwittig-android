@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.finance.unpaid;
+package ch.giantific.qwittig.presentation.finance;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -77,13 +77,7 @@ public class CompsUpdateWorker extends BaseQueryWorker<Compensation, CompsUpdate
                             if (mQueryPaid) {
                                 return mCompsRepo.updateCompensationsPaidAsync(mCurrentIdentity, mIdentities);
                             } else {
-                                return mCompsRepo.calculateCompensations(mCurrentIdentity.getGroup())
-                                        .flatMapObservable(new Func1<String, Observable<? extends Compensation>>() {
-                                            @Override
-                                            public Observable<? extends Compensation> call(String s) {
-                                                return mCompsRepo.updateCompensationsUnpaidAsync(mIdentities);
-                                            }
-                                        });
+                                return mCompsRepo.updateCompensationsUnpaidAsync(mIdentities);
                             }
                         }
                     });

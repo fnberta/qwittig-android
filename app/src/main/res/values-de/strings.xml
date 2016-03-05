@@ -288,5 +288,6 @@
     <string name="toast_password_reset">Du erhälst eine Email mit einem Link um dein Passwort zurückzusetzen</string>
     <string name="toast_settings_users_removed">Nutzer aus Gruppe entfernt</string>
     <string name="toast_error_settings_users_remove">Entfernen des Nutzers aus der Gruppe fehlgeschlagen</string>
+    <string name="toast_settings_min_one_group">Bitte erstelle eine neue Gruppe bevor du diese verlässt</string>
 
 </resources>

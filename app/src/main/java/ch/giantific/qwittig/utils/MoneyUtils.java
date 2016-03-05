@@ -8,6 +8,8 @@ import android.annotation.TargetApi;
 import android.os.Build;
 import android.support.annotation.NonNull;
 
+import com.parse.ParseConfig;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
@@ -24,6 +26,7 @@ public class MoneyUtils {
 
     // TODO: replace with currency dependent value
     public static final double MIN_DIFF = 0.01;
+    public static final String[] SUPPORTED_CURRENCIES = new String[]{"CHF", "EUR", "USD", "GBP"};
     private static final int EXCHANGE_RATE_FRACTION_DIGITS = 6;
     private static final int CONVERTED_PRICE_FRACTION_DIGITS = 4;
 
@@ -140,18 +143,27 @@ public class MoneyUtils {
     }
 
     /**
-     * Returns the display names for the currency codes.
+     * Returns the currently supported currencies as
+     * {@link ch.giantific.qwittig.presentation.settings.addgroup.Currency} objects with a name and currency code.
+     * Reads the information from {@link ParseConfig}.
      *
-     * @param currencyCodes the currency codes to get the display names for
-     * @return the display names for the currency codes
+     * @return the currently supported currencies
      */
     @NonNull
-    public static List<String> getCurrencyDisplayNames(@NonNull List<String> currencyCodes) {
-        final List<String> displayNames = new ArrayList<>(currencyCodes.size());
-        for (String currencyCode : currencyCodes) {
+    public static List<ch.giantific.qwittig.presentation.settings.addgroup.Currency> getSupportedCurrencies() {
+        final List<String> displayNames = new ArrayList<>(SUPPORTED_CURRENCIES.length);
+        for (String currencyCode : SUPPORTED_CURRENCIES) {
             displayNames.add(getCurrencyDisplayName(currencyCode));
         }
-        return displayNames;
+
+        final List<ch.giantific.qwittig.presentation.settings.addgroup.Currency> currencies =
+                new ArrayList<>(SUPPORTED_CURRENCIES.length);
+        for (int i = 0; i < SUPPORTED_CURRENCIES.length; i++) {
+            currencies.add(new ch.giantific.qwittig.presentation.settings.addgroup.Currency(displayNames.get(i),
+                    SUPPORTED_CURRENCIES[i]));
+        }
+
+        return currencies;
     }
 
     /**
@@ -163,7 +175,7 @@ public class MoneyUtils {
      * @return the display name for currency code
      */
     @TargetApi(Build.VERSION_CODES.KITKAT)
-    public static String getCurrencyDisplayName(@NonNull String currencyCode) {
+    private static String getCurrencyDisplayName(@NonNull String currencyCode) {
         final Currency currency = Currency.getInstance(currencyCode);
         return currency.getDisplayName(Locale.getDefault());
     }

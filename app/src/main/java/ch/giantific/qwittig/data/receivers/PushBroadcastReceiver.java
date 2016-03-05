@@ -77,6 +77,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     public static final String PUSH_PARAM_GROUP_NAME = "groupName";
     public static final String PUSH_PARAM_CURRENCY_CODE = "currencyCode";
     public static final String PUSH_PARAM_TASK_TITLE = "taskTitle";
+    public static final String PUSH_PARAM_COMP_DID_CALC_NEW = "didCalcNew";
     public static final String INTENT_EXTRA_FINANCE_FRAGMENT = "INTENT_EXTRA_FINANCE_FRAGMENT";
     private static final String NOTIFICATION_TYPE = "type";
     private static final String TYPE_PURCHASE_NEW = "purchaseNew";
@@ -218,6 +219,9 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 // update balance for all identities
                 ParseQueryService.startQueryIdentities(context);
 
+                // update compensations for all identities
+                ParseQueryService.startQueryCompensations(context);
+
                 // query purchase only for identities in purchase's identities
                 final List<String> identitiesIds = getIdentitiesIds(jsonExtras);
                 if (!currentUser.hasIdentity(identitiesIds)) {
@@ -250,6 +254,9 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 // update balance for all identities
                 ParseQueryService.startQueryIdentities(context);
 
+                // update compensations for all identities
+                ParseQueryService.startQueryCompensations(context);
+
                 // only update purchase for identities in purchase's identities
                 final List<String> identitiesIds = getIdentitiesIds(jsonExtras);
                 if (!currentUser.hasIdentity(identitiesIds)) {
@@ -262,6 +269,9 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
             case TYPE_PURCHASE_DELETE: {
                 // update balance for all identities
                 ParseQueryService.startQueryIdentities(context);
+
+                // update compensations for all identities
+                ParseQueryService.startQueryCompensations(context);
 
                 // only unpin local purchase for identities in purchase's identities
                 final List<String> identitiesIds = getIdentitiesIds(jsonExtras);
@@ -277,11 +287,12 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 // update balance for all users
                 ParseQueryService.startQueryIdentities(context);
 
-                // update all compensations, TODO: only query all if amount was changed
-                ParseQueryService.startQueryCompensations(context);
-
-                // update compensation for all users
-//                queryCompensation(context, jsonExtras, false);
+                final boolean calcNew = jsonExtras.optBoolean(PUSH_PARAM_COMP_DID_CALC_NEW);
+                if (calcNew) {
+                    ParseQueryService.startQueryCompensations(context);
+                } else {
+                    queryCompensation(context, jsonExtras, false);
+                }
 
                 // only show notification for payer
                 final String payerId = jsonExtras.optString(PUSH_PARAM_DEBTOR_ID);
@@ -505,7 +516,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 break;
             }
             case TYPE_TASK_NEW: {
-                title = jsonExtras.optString(PUSH_PARAM_TASK_TITLE);
+                title = jsonExtras.optString(PUSH_PARAM_COMP_DID_CALC_NEW);
                 alert = context.getString(R.string.push_task_new_alert, user);
 
                 // set title and alert
@@ -513,7 +524,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 break;
             }
             case TYPE_TASK_DELETE: {
-                final String taskTitle = jsonExtras.optString(PUSH_PARAM_TASK_TITLE);
+                final String taskTitle = jsonExtras.optString(PUSH_PARAM_COMP_DID_CALC_NEW);
                 title = context.getString(R.string.push_task_delete_title, taskTitle);
                 alert = context.getString(R.string.push_task_delete_alert, user);
 
@@ -522,7 +533,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 break;
             }
             case TYPE_TASK_REMIND_USER: {
-                final String taskTitle = jsonExtras.optString(PUSH_PARAM_TASK_TITLE);
+                final String taskTitle = jsonExtras.optString(PUSH_PARAM_COMP_DID_CALC_NEW);
                 title = context.getString(R.string.push_task_remind_title, taskTitle);
                 alert = context.getString(R.string.push_task_remind_alert, user);
 

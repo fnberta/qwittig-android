@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.webkit.MimeTypeMap;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
@@ -302,7 +303,8 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                 .flatMap(new Func1<byte[], Single<? extends ParseFile>>() {
                     @Override
                     public Single<? extends ParseFile> call(byte[] bytes) {
-                        final ParseFile avatar = new ParseFile(IdentityRepository.FILE_NAME, bytes);
+                        final String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("jpg");
+                        final ParseFile avatar = new ParseFile(IdentityRepository.FILE_NAME, bytes, mimeType);
                         return saveFile(avatar);
                     }
                 });
@@ -311,32 +313,20 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
     @Override
     public Single<User> loginGoogle(@NonNull String idToken, @NonNull final Fragment fragment) {
         return verifyGoogleLogin(idToken)
-                .flatMap(new Func1<JSONObject, Single<? extends User>>() {
+                .flatMap(new Func1<String, Single<? extends User>>() {
                     @Override
-                    public Single<? extends User> call(JSONObject token) {
-                        final String sessionToken = token.optString("sessionToken");
-                        final boolean isNew = token.optBoolean("isNew");
+                    public Single<? extends User> call(String sessionToken) {
                         return becomeUser(sessionToken);
                     }
                 });
     }
 
     @Override
-    public Single<JSONObject> verifyGoogleLogin(@NonNull String idToken) {
+    public Single<String> verifyGoogleLogin(@NonNull String idToken) {
         Map<String, Object> params = new HashMap<>();
         params.put(PARAM_ID_TOKEN, idToken);
 
-        return this.<String>callFunctionInBackground(VERIFY_GOOGLE_LOGIN, params)
-                .map(new Func1<String, JSONObject>() {
-                    @Override
-                    public JSONObject call(String s) {
-                        try {
-                            return new JSONObject(s);
-                        } catch (JSONException e) {
-                            throw Exceptions.propagate(e);
-                        }
-                    }
-                });
+        return callFunctionInBackground(VERIFY_GOOGLE_LOGIN, params);
     }
 
     private Single<User> becomeUser(@NonNull final String sessionToken) {
@@ -397,7 +387,8 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                 .flatMap(new Func1<byte[], Single<? extends ParseFile>>() {
                     @Override
                     public Single<? extends ParseFile> call(byte[] bytes) {
-                        final ParseFile avatar = new ParseFile(IdentityRepository.FILE_NAME, bytes);
+                        final String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("jpg");
+                        final ParseFile avatar = new ParseFile(IdentityRepository.FILE_NAME, bytes, mimeType);
                         return saveFile(avatar);
                     }
                 })
@@ -430,11 +421,8 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                             return;
                         }
 
-                        if (e != null) {
-                            singleSubscriber.onError(e);
-                        } else {
-                            singleSubscriber.onSuccess(user);
-                        }
+                        // ignore exception, currentUser will always be null now
+                        singleSubscriber.onSuccess(user);
                     }
                 });
             }
@@ -483,7 +471,13 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
 
     @Override
     public Single<User> deleteUser(@NonNull User user) {
-        return delete(user);
+        return delete(user)
+                .flatMap(new Func1<User, Single<? extends User>>() {
+                    @Override
+                    public Single<? extends User> call(User user) {
+                        return logOut(user);
+                    }
+                });
     }
 
     @Override

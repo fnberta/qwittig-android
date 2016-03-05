@@ -20,7 +20,7 @@ import ch.giantific.qwittig.databinding.FragmentFinanceCompensationsPaidBinding;
 import ch.giantific.qwittig.presentation.finance.paid.di.DaggerFinanceCompsPaidComponent;
 import ch.giantific.qwittig.presentation.finance.paid.di.FinanceCompsPaidViewModelModule;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewOnlineFragment;
-import ch.giantific.qwittig.presentation.finance.unpaid.CompsUpdateWorker;
+import ch.giantific.qwittig.presentation.finance.CompsUpdateWorker;
 
 /**
  * Displays recent paid compensations in a {@link RecyclerView} list.

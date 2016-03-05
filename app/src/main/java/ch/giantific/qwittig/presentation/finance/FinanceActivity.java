@@ -36,7 +36,6 @@ import ch.giantific.qwittig.presentation.finance.unpaid.CompConfirmAmountDialogF
 import ch.giantific.qwittig.presentation.finance.unpaid.CompRemindWorkerListener;
 import ch.giantific.qwittig.presentation.finance.unpaid.CompsUnpaidFragment;
 import ch.giantific.qwittig.presentation.finance.unpaid.CompsUnpaidViewModel;
-import ch.giantific.qwittig.presentation.finance.unpaid.CompsUpdateWorkerListener;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
 import ch.giantific.qwittig.utils.Utils;
@@ -181,6 +180,11 @@ public class FinanceActivity extends BaseNavDrawerActivity<CompsUnpaidViewModel>
         mToolbar.setBackgroundColor(color);
         mBinding.tabs.setBackgroundColor(color);
         setStatusBarBackgroundColor(colorDark);
+    }
+
+    @Override
+    public void reloadCompsPaid() {
+        mCompsPaidViewModel.loadData();
     }
 
     @Override

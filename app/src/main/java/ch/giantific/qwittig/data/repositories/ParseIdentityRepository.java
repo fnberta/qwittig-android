@@ -5,6 +5,7 @@
 package ch.giantific.qwittig.data.repositories;
 
 import android.support.annotation.NonNull;
+import android.webkit.MimeTypeMap;
 
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -206,7 +207,8 @@ public class ParseIdentityRepository extends ParseBaseRepository implements Iden
     public Observable<Identity> saveIdentitiesWithAvatar(@NonNull final List<Identity> identities,
                                                          @NonNull final String nickname,
                                                          @NonNull byte[] avatarBytes) {
-        final ParseFile avatar = new ParseFile(IdentityRepository.FILE_NAME, avatarBytes);
+        final String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("jpg");
+        final ParseFile avatar = new ParseFile(IdentityRepository.FILE_NAME, avatarBytes, mimeType);
         return saveFile(avatar)
                 .flatMapObservable(new Func1<ParseFile, Observable<? extends Identity>>() {
                     @Override

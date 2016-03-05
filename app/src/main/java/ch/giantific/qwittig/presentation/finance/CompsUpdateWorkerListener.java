@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.finance.unpaid;
+package ch.giantific.qwittig.presentation.finance;
 
 import android.support.annotation.NonNull;
 

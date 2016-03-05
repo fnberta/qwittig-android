@@ -7,7 +7,7 @@ package ch.giantific.qwittig.presentation.finance.paid;
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.presentation.common.viewmodels.LoadMoreViewModel;
 import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModel;
-import ch.giantific.qwittig.presentation.finance.unpaid.CompsUpdateWorkerListener;
+import ch.giantific.qwittig.presentation.finance.CompsUpdateWorkerListener;
 
 /**
  * Defines an observable view model for a screen showing a list of paid compensations.

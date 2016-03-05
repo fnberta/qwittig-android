@@ -25,8 +25,8 @@ import ch.giantific.qwittig.presentation.settings.addgroup.di.DaggerSettingsAddG
 import ch.giantific.qwittig.presentation.settings.addgroup.di.SettingsAddGroupViewModelModule;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.settings.users.SettingsUsersFragment;
+import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.Utils;
-import ch.giantific.qwittig.utils.parse.ParseUtils;
 
 /**
  * Displays the settings screen that allows the user to create a new group and invite users to it.
@@ -68,7 +68,7 @@ public class SettingsAddGroupFragment extends BaseFragment<SettingsAddGroupViewM
         super.onViewCreated(view, savedInstanceState);
 
         final ArrayAdapter<Currency> spinnerCurrencyAdapter = new ArrayAdapter<>(getActivity(),
-                R.layout.spinner_item, ParseUtils.getSupportedCurrencies());
+                R.layout.spinner_item, MoneyUtils.getSupportedCurrencies());
         spinnerCurrencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mBinding.spSettingsGroupAddNewCurrency.setAdapter(spinnerCurrencyAdapter);
     }

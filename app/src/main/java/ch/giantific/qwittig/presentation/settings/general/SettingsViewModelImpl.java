@@ -117,6 +117,11 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
             return;
         }
 
+        if (mCurrentUser.getIdentities().size() < 2) {
+            mView.showMessage(R.string.toast_settings_min_one_group);
+            return;
+        }
+
         getSubscriptions().add(mIdentityRepo.getIdentitiesLocalAsync(mCurrentIdentity.getGroup(), false)
                 .toList()
                 .toSingle()

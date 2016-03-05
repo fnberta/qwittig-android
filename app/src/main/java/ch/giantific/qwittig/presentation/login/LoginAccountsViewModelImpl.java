@@ -84,6 +84,7 @@ public class LoginAccountsViewModelImpl extends ViewModelBaseImpl<LoginAccountsV
 
     @Override
     public void onGoogleLoginFailed() {
+        setLoading(false);
         mView.showMessage(R.string.toast_login_failed_google);
     }
 
