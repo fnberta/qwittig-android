@@ -23,7 +23,6 @@ import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Task;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
@@ -40,9 +39,9 @@ import rx.functions.Func1;
 public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<DetailsItem, TaskDetailsViewModel.ViewListener>
         implements TaskDetailsViewModel {
 
-    private Task mTask;
     private final String mTaskId;
     private final TaskRepository mTaskRepo;
+    private Task mTask;
     private String mTaskTitle;
     @StringRes
     private int mTaskTimeFrame;
@@ -52,10 +51,9 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<DetailsItem,
     public TaskDetailsViewModelImpl(@Nullable Bundle savedState,
                                     @NonNull TaskDetailsViewModel.ViewListener view,
                                     @NonNull UserRepository userRepository,
-                                    @NonNull IdentityRepository identityRepository,
                                     @NonNull TaskRepository taskRepository,
                                     @NonNull String taskId) {
-        super(savedState, view, identityRepository, userRepository);
+        super(savedState, view, userRepository);
 
         mTaskRepo = taskRepository;
         mTaskId = taskId;
@@ -158,7 +156,7 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<DetailsItem,
     private Observable<TaskHistoryItem> getTaskHistory() {
         final Map<String, List<Date>> history = mTask.getHistory();
         final Set<String> keys = history.keySet();
-        return mIdentityRepo.getIdentitiesLocalAsync(mCurrentIdentity.getGroup(), true)
+        return mUserRepo.getIdentitiesLocalAsync(mCurrentIdentity.getGroup(), true)
                 .filter(new Func1<Identity, Boolean>() {
                     @Override
                     public Boolean call(Identity identity) {

@@ -21,7 +21,6 @@ import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.Single;
@@ -33,18 +32,10 @@ import rx.SingleSubscriber;
 public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.ViewListener>
         implements SettingsViewModel {
 
-    private final GroupRepository mGroupRepo;
-    private final IdentityRepository mIdentityRepo;
-
     public SettingsViewModelImpl(@Nullable Bundle savedState,
                                  @NonNull SettingsViewModel.ViewListener view,
-                                 @NonNull UserRepository userRepository,
-                                 @NonNull GroupRepository groupRepository,
-                                 @NonNull IdentityRepository identityRepository) {
+                                 @NonNull UserRepository userRepository) {
         super(savedState, view, userRepository);
-
-        mGroupRepo = groupRepository;
-        mIdentityRepo = identityRepository;
     }
 
     @Override
@@ -122,7 +113,7 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
             return;
         }
 
-        getSubscriptions().add(mIdentityRepo.getIdentitiesLocalAsync(mCurrentIdentity.getGroup(), false)
+        getSubscriptions().add(mUserRepo.getIdentitiesLocalAsync(mCurrentIdentity.getGroup(), false)
                 .toList()
                 .toSingle()
                 .subscribe(new SingleSubscriber<List<Identity>>() {
@@ -145,7 +136,7 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
 
     @Override
     public void onLeaveGroupSelected() {
-        mGroupRepo.unSubscribeGroup(mCurrentIdentity.getGroup());
+        mUserRepo.unSubscribeGroup(mCurrentIdentity.getGroup());
         mCurrentIdentity = mCurrentUser.archiveCurrentIdentity();
         mCurrentUser.saveEventually();
 

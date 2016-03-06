@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
@@ -32,10 +31,8 @@ public class PurchasesListViewModelModule extends BaseViewModelModule<PurchasesV
 
     @PerFragment
     @Provides
-    PurchasesViewModel providesHomePurchasesViewModel(@NonNull IdentityRepository identityRepository,
-                                                      @NonNull UserRepository userRepository,
+    PurchasesViewModel providesHomePurchasesViewModel(@NonNull UserRepository userRepository,
                                                       @NonNull PurchaseRepository purchaseRepository) {
-        return new PurchasesViewModelImpl(mSavedState, mView, identityRepository, userRepository,
-                purchaseRepository);
+        return new PurchasesViewModelImpl(mSavedState, mView, userRepository, purchaseRepository);
     }
 }

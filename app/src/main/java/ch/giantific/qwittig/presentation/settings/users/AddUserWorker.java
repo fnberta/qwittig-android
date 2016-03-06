@@ -10,11 +10,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 
-import javax.inject.Inject;
-
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;
@@ -30,8 +27,6 @@ public class AddUserWorker extends BaseWorker<Identity, AddUserWorkerListener> {
     private static final String KEY_NICKNAME = "NICKNAME";
     private static final String KEY_GROUP_ID = "GROUP_ID";
     private static final String KEY_GROUP_NAME = "GROUP_NAME";
-    @Inject
-    IdentityRepository mIdentityRepo;
 
     public AddUserWorker() {
         // empty default constructor
@@ -84,7 +79,7 @@ public class AddUserWorker extends BaseWorker<Identity, AddUserWorkerListener> {
         final String groupId = args.getString(KEY_GROUP_ID);
         final String groupName = args.getString(KEY_GROUP_NAME);
         if (!TextUtils.isEmpty(nickname) && !TextUtils.isEmpty(groupId) && !TextUtils.isEmpty(groupName)) {
-            return mIdentityRepo.addIdentity(nickname, groupId, groupName).toObservable();
+            return mUserRepo.addIdentity(nickname, groupId, groupName).toObservable();
         }
 
         return null;

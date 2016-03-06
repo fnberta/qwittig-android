@@ -19,13 +19,11 @@ import java.util.List;
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModelBaseImpl;
 import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Observable;
-import rx.Single;
 import rx.SingleSubscriber;
 import rx.functions.Func1;
 
@@ -40,9 +38,8 @@ public class IdentitiesViewModelImpl
 
     public IdentitiesViewModelImpl(@Nullable Bundle savedState,
                                    @NonNull IdentitiesViewModel.ViewListener view,
-                                   @NonNull IdentityRepository identityRepository,
                                    @NonNull UserRepository userRepository) {
-        super(savedState, view, identityRepository, userRepository);
+        super(savedState, view, userRepository);
 
         if (savedState != null) {
             mItems = new ArrayList<>();
@@ -59,13 +56,13 @@ public class IdentitiesViewModelImpl
 
     @Override
     public void loadData() {
-        getSubscriptions().add(mIdentityRepo.fetchIdentityDataAsync(mCurrentIdentity)
+        getSubscriptions().add(mUserRepo.fetchIdentityDataAsync(mCurrentIdentity)
                 .flatMapObservable(new Func1<Identity, Observable<Identity>>() {
                     @Override
                     public Observable<Identity> call(Identity identity) {
                         final String currency = mCurrentIdentity.getGroup().getCurrency();
                         mMoneyFormatter = MoneyUtils.getMoneyFormatter(currency, true, true);
-                        return mIdentityRepo.getIdentitiesLocalAsync(identity.getGroup(), true);
+                        return mUserRepo.getIdentitiesLocalAsync(identity.getGroup(), true);
                     }
                 })
                 .filter(new Func1<Identity, Boolean>() {

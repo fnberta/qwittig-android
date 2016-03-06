@@ -8,11 +8,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.AddEditPurchaseViewModel;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.AddPurchaseViewModelImpl;
 import dagger.Module;
@@ -31,10 +30,8 @@ public class AddPurchaseViewModelModule extends BaseViewModelModule<AddEditPurch
 
     @PerFragment
     @Provides
-    AddEditPurchaseViewModel providesPurchaseAddViewModel(@NonNull IdentityRepository identityRepository,
-                                                          @NonNull UserRepository userRepository,
+    AddEditPurchaseViewModel providesPurchaseAddViewModel(@NonNull UserRepository userRepository,
                                                           @NonNull PurchaseRepository purchaseRepository) {
-        return new AddPurchaseViewModelImpl(mSavedState, mView, identityRepository,
-                userRepository, purchaseRepository);
+        return new AddPurchaseViewModelImpl(mSavedState, mView, userRepository, purchaseRepository);
     }
 }

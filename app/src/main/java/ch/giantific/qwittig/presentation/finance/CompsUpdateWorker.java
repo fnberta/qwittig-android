@@ -69,7 +69,7 @@ public class CompsUpdateWorker extends BaseQueryWorker<Compensation, CompsUpdate
         mQueryPaid = args.getBoolean(KEY_QUERY_PAID);
 
         if (checkIdentities()) {
-            return mIdentityRepo.updateIdentitiesAsync(mIdentities)
+            return mUserRepo.updateIdentitiesAsync(mIdentities)
                     .toList()
                     .flatMap(new Func1<List<Identity>, Observable<Compensation>>() {
                         @Override

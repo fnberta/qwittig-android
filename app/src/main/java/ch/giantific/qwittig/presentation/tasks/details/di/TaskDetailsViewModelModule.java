@@ -8,11 +8,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.tasks.details.TaskDetailsViewModel;
 import ch.giantific.qwittig.presentation.tasks.details.TaskDetailsViewModelImpl;
 import dagger.Module;
@@ -37,10 +36,8 @@ public class TaskDetailsViewModelModule extends BaseViewModelModule<TaskDetailsV
     @PerFragment
     @Provides
     TaskDetailsViewModel providesTaskDetailsViewModel(@NonNull UserRepository userRepository,
-                                                      @NonNull IdentityRepository identityRepository,
                                                       @NonNull TaskRepository taskRepository) {
-        return new TaskDetailsViewModelImpl(mSavedState, mView, userRepository, identityRepository,
-                taskRepository, mTaskId);
+        return new TaskDetailsViewModelImpl(mSavedState, mView, userRepository, taskRepository, mTaskId);
     }
 
 }

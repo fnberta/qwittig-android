@@ -16,7 +16,6 @@ import java.util.List;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
 import ch.giantific.qwittig.presentation.settings.users.items.SettingsUsersBaseItem;
@@ -38,9 +37,8 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
 
     public SettingsUsersViewModelImpl(@Nullable Bundle savedState,
                                       @NonNull SettingsUsersViewModel.ViewListener view,
-                                      @NonNull IdentityRepository identityRepo,
                                       @NonNull UserRepository userRepository) {
-        super(savedState, view, identityRepo, userRepository);
+        super(savedState, view, userRepository);
 
         if (savedState != null) {
             mItems = new ArrayList<>();
@@ -58,7 +56,7 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
         final Group group = mCurrentIdentity.getGroup();
         final String groupName = group.getName();
         final String currentId = mCurrentIdentity.getObjectId();
-        getSubscriptions().add(mIdentityRepo.getIdentitiesLocalAsync(group, true)
+        getSubscriptions().add(mUserRepo.getIdentitiesLocalAsync(group, true)
                 .filter(new Func1<Identity, Boolean>() {
                     @Override
                     public Boolean call(Identity identity) {
@@ -70,7 +68,7 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
                     public SettingsUsersUserItem call(Identity identity) {
                         return identity.isPending()
                                 ? new SettingsUsersUserItem(listener, identity,
-                                mIdentityRepo.getInvitationUrl(identity, groupName))
+                                mUserRepo.getInvitationUrl(identity, groupName))
                                 : new SettingsUsersUserItem(listener, identity);
                     }
                 })
@@ -110,7 +108,7 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
                         final Group group = mCurrentIdentity.getGroup();
                         final String groupName = group.getName();
                         mItems.add(new SettingsUsersUserItem(listener, identity,
-                                mIdentityRepo.getInvitationUrl(identity, groupName)));
+                                mUserRepo.getInvitationUrl(identity, groupName)));
                         mView.notifyItemInserted(getLastPosition());
 
                         final SettingsUsersNicknameItem nicknameItem =
@@ -153,7 +151,7 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
     public void onItemDismiss(final int position) {
         final SettingsUsersUserItem userItem = (SettingsUsersUserItem) mItems.get(position);
         final Identity identity = userItem.getIdentity();
-        getSubscriptions().add(mIdentityRepo.removePendingIdentity(identity)
+        getSubscriptions().add(mUserRepo.removePendingIdentity(identity)
                 .subscribe(new SingleSubscriber<Identity>() {
                     @Override
                     public void onSuccess(Identity value) {

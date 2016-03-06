@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
@@ -32,10 +31,8 @@ public class DraftsListViewModelModule extends BaseViewModelModule<DraftsViewMod
 
     @PerFragment
     @Provides
-    DraftsViewModel providesHomeDraftsViewModel(@NonNull IdentityRepository identityRepository,
-                                                @NonNull UserRepository userRepository,
+    DraftsViewModel providesHomeDraftsViewModel(@NonNull UserRepository userRepository,
                                                 @NonNull PurchaseRepository purchaseRepository) {
-        return new DraftsViewModelImpl(mSavedState, mView, identityRepository, userRepository,
-                purchaseRepository);
+        return new DraftsViewModelImpl(mSavedState, mView, userRepository, purchaseRepository);
     }
 }

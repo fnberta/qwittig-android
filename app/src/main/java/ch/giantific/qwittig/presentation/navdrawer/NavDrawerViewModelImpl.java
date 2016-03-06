@@ -17,7 +17,6 @@ import java.util.List;
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.Subscriber;
@@ -28,16 +27,12 @@ import rx.Subscriber;
 public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel.ViewListener>
         implements NavDrawerViewModel {
 
-    private final IdentityRepository mIdentityRepo;
     private final List<Identity> mIdentities = new ArrayList<>();
 
     public NavDrawerViewModelImpl(@Nullable Bundle savedState,
                                   @NonNull NavDrawerViewModel.ViewListener view,
-                                  @NonNull UserRepository userRepository,
-                                  @NonNull IdentityRepository identityRepository) {
+                                  @NonNull UserRepository userRepository) {
         super(savedState, view, userRepository);
-
-        mIdentityRepo = identityRepository;
     }
 
     @Override
@@ -50,7 +45,7 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
     }
 
     private void loadIdentities() {
-        getSubscriptions().add(mIdentityRepo.fetchIdentitiesDataAsync(mCurrentUser.getIdentities())
+        getSubscriptions().add(mUserRepo.fetchIdentitiesDataAsync(mCurrentUser.getIdentities())
                 .subscribe(new Subscriber<Identity>() {
                     @Override
                     public void onStart() {

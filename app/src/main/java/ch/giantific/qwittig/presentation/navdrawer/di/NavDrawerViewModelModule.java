@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.di.scopes.PerActivity;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.navdrawer.NavDrawerViewModel;
@@ -31,9 +30,8 @@ public class NavDrawerViewModelModule extends BaseViewModelModule<NavDrawerViewM
 
     @PerActivity
     @Provides
-    NavDrawerViewModel providesNavDrawerViewModel(@NonNull UserRepository userRepository,
-                                                  @NonNull IdentityRepository identityRepository) {
-        return new NavDrawerViewModelImpl(mSavedState, mView, userRepository, identityRepository);
+    NavDrawerViewModel providesNavDrawerViewModel(@NonNull UserRepository userRepository) {
+        return new NavDrawerViewModelImpl(mSavedState, mView, userRepository);
     }
 
 }

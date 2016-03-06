@@ -23,6 +23,7 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.ActivityHomeBinding;
+import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.adapters.TabsAdapter;
@@ -334,7 +335,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     }
 
     @Override
-    public void setJoinGroupStream(@NonNull Single<User> single, @NonNull String workerTag) {
+    public void setJoinGroupStream(@NonNull Single<Identity> single, @NonNull String workerTag) {
         mViewModel.setJoinGroupStream(single, workerTag);
     }
 

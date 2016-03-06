@@ -11,7 +11,6 @@ import com.google.gson.Gson;
 
 import ch.giantific.qwittig.data.repositories.ParseCompensationRepository;
 import ch.giantific.qwittig.data.repositories.ParseGroupRepository;
-import ch.giantific.qwittig.data.repositories.ParseIdentityRepository;
 import ch.giantific.qwittig.data.repositories.ParsePurchaseRepository;
 import ch.giantific.qwittig.data.repositories.ParseStatsRepository;
 import ch.giantific.qwittig.data.repositories.ParseTaskRepository;
@@ -19,7 +18,6 @@ import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.data.rest.ExchangeRates;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.StatsRepository;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
@@ -50,11 +48,6 @@ public class RepositoriesModule {
     PurchaseRepository providesPurchaseRepository(@NonNull SharedPreferences sharedPreferences,
                                                   @NonNull ExchangeRates exchangeRates) {
         return new ParsePurchaseRepository(sharedPreferences, exchangeRates);
-    }
-
-    @Provides
-    IdentityRepository providesIdentityRepository() {
-        return new ParseIdentityRepository();
     }
 
     @Provides

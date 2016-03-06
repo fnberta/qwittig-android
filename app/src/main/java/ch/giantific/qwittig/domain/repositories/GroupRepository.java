@@ -17,15 +17,6 @@ import rx.Single;
 public interface GroupRepository extends BaseRepository {
 
     /**
-     * Adds a new group and corresponding identity for the user.
-     *
-     * @param groupName     the name of the new group
-     * @param groupCurrency the currency of the new group
-     * @return a {@link Single} emitting the result
-     */
-    Single<String> addNewGroup(@NonNull String groupName, @NonNull String groupCurrency);
-
-    /**
      * Fetches the data of a {@link Group} object from the local data store. If there is no data
      * available in the local data store it will try to fetch the data online.
      *
@@ -51,19 +42,4 @@ public interface GroupRepository extends BaseRepository {
      */
     @Nullable
     Group getGroupOnline(@NonNull String groupId);
-
-    /**
-     * Subscribes the user to push messages for the group
-     *
-     * @param group the group to subscribe
-     * @return a {@link Single} emitting the result
-     */
-    Single<Group> subscribeGroup(@NonNull Group group);
-
-    /**
-     * Un-subscribes the user for push message from the group
-     *
-     * @param group the group to un-subscribe from
-     */
-    void unSubscribeGroup(@NonNull Group group);
 }

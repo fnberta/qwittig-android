@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.settings.users.SettingsUsersViewModel;
@@ -31,9 +30,8 @@ public class SettingsUsersViewModelModule extends BaseViewModelModule<SettingsUs
 
     @PerFragment
     @Provides
-    SettingsUsersViewModel providesSettingsAddUsersViewModel(@NonNull UserRepository userRepository,
-                                                             @NonNull IdentityRepository identityRepository) {
-        return new SettingsUsersViewModelImpl(mSavedState, mView, identityRepository, userRepository);
+    SettingsUsersViewModel providesSettingsAddUsersViewModel(@NonNull UserRepository userRepository) {
+        return new SettingsUsersViewModelImpl(mSavedState, mView, userRepository);
     }
 
 }

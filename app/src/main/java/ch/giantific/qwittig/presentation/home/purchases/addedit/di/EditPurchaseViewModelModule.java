@@ -9,14 +9,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.AddEditPurchaseViewModel;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.EditPurchaseDraftViewModel;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.EditPurchaseViewModelImpl;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.EditPurchaseDraftViewModelImpl;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.EditPurchaseViewModelImpl;
 import dagger.Module;
 import dagger.Provides;
 
@@ -38,19 +37,17 @@ public class EditPurchaseViewModelModule extends BaseViewModelModule<AddEditPurc
 
     @PerFragment
     @Provides
-    AddEditPurchaseViewModel providesPurchaseEditViewModel(@NonNull IdentityRepository identityRepository,
-                                                           @NonNull UserRepository userRepository,
+    AddEditPurchaseViewModel providesPurchaseEditViewModel(@NonNull UserRepository userRepository,
                                                            @NonNull PurchaseRepository purchaseRepository) {
-        return new EditPurchaseViewModelImpl(mSavedState, mView, identityRepository,
-                userRepository, purchaseRepository, mEditPurchaseId);
+        return new EditPurchaseViewModelImpl(mSavedState, mView, userRepository, purchaseRepository,
+                mEditPurchaseId);
     }
 
     @PerFragment
     @Provides
-    EditPurchaseDraftViewModel providesPurchaseEditDraftViewModel(@NonNull IdentityRepository identityRepository,
-                                                                  @NonNull UserRepository userRepository,
+    EditPurchaseDraftViewModel providesPurchaseEditDraftViewModel(@NonNull UserRepository userRepository,
                                                                   @NonNull PurchaseRepository purchaseRepository) {
-        return new EditPurchaseDraftViewModelImpl(mSavedState, mView, identityRepository,
-                userRepository, purchaseRepository, mEditPurchaseId);
+        return new EditPurchaseDraftViewModelImpl(mSavedState, mView, userRepository,
+                purchaseRepository, mEditPurchaseId);
     }
 }

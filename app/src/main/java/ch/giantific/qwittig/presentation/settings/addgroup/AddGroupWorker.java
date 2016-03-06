@@ -16,12 +16,9 @@ import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;
-import rx.Single;
-import rx.functions.Func1;
 
 /**
  * Creates a new {@link Group}, saves it to the online Parse.com database and invites the users
@@ -36,8 +33,6 @@ public class AddGroupWorker extends BaseWorker<Identity, AddGroupWorkerListener>
     private static final String KEY_GROUP_CURRENCY = "GROUP_CURRENCY";
     @Inject
     GroupRepository mGroupRepo;
-    @Inject
-    IdentityRepository mIdentityRepo;
 
     public AddGroupWorker() {
         // empty default constructor
@@ -81,27 +76,7 @@ public class AddGroupWorker extends BaseWorker<Identity, AddGroupWorkerListener>
         final String groupCurrency = args.getString(KEY_GROUP_CURRENCY);
         final User user = mUserRepo.getCurrentUser();
         if (user != null && !TextUtils.isEmpty(groupName) && !TextUtils.isEmpty(groupCurrency)) {
-            return mGroupRepo.addNewGroup(groupName, groupCurrency)
-                    .flatMap(new Func1<String, Single<User>>() {
-                        @Override
-                        public Single<User> call(String s) {
-                            return mUserRepo.updateUser(user);
-                        }
-                    })
-                    .flatMap(new Func1<User, Single<Identity>>() {
-                        @Override
-                        public Single<Identity> call(User user) {
-                            final Identity newIdentity = user.getCurrentIdentity();
-                            return mIdentityRepo.fetchIdentityDataAsync(newIdentity);
-                        }
-                    })
-                    .flatMap(new Func1<Identity, Single<Identity>>() {
-                        @Override
-                        public Single<Identity> call(Identity identity) {
-                            return mIdentityRepo.saveIdentityLocalAsync(identity);
-                        }
-                    })
-                    .toObservable();
+            return mUserRepo.addNewGroup(user, groupName, groupCurrency).toObservable();
         }
 
         return null;

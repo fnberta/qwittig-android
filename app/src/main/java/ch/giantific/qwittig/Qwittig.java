@@ -87,7 +87,8 @@ public class Qwittig extends Application {
         // initialise Parse
         Parse.initialize(new Parse.Configuration.Builder(this)
                 .applicationId("yLuL6xJB2dUD2hjfh4W2EcZizcPsJZKDgDzbrPji")
-                .server("http://217.162.254.212:3000/api/data/")
+                .server("https://qwittig.com/api/data/")
+                .clientKey(null)
                 .enableLocalDataStore()
                 .build()
         );

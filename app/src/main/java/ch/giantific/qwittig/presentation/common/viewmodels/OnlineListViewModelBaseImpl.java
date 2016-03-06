@@ -11,7 +11,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 
 import ch.giantific.qwittig.BR;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 
 /**
@@ -26,9 +25,8 @@ public abstract class OnlineListViewModelBaseImpl<T, S extends OnlineListViewMod
 
     public OnlineListViewModelBaseImpl(@Nullable Bundle savedState,
                                        @NonNull S view,
-                                       @NonNull IdentityRepository identityRepository,
                                        @NonNull UserRepository userRepository) {
-        super(savedState, view, identityRepository, userRepository);
+        super(savedState, view, userRepository);
 
         if (savedState != null) {
             mRefreshing = savedState.getBoolean(STATE_REFRESHING, false);

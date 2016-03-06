@@ -35,7 +35,6 @@ import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Item;
 import ch.giantific.qwittig.domain.models.Purchase;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
@@ -95,10 +94,9 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
 
     public AddPurchaseViewModelImpl(@Nullable Bundle savedState,
                                     @NonNull AddEditPurchaseViewModel.ViewListener view,
-                                    @NonNull IdentityRepository identityRepository,
                                     @NonNull UserRepository userRepository,
                                     @NonNull PurchaseRepository purchaseRepo) {
-        super(savedState, view, identityRepository, userRepository);
+        super(savedState, view, userRepository);
 
         mPurchaseRepo = purchaseRepo;
         mCurrentGroup = mCurrentIdentity.getGroup();
@@ -286,7 +284,7 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
 
     @Override
     public void loadData() {
-        getSubscriptions().add(mIdentityRepo.getIdentitiesLocalAsync(mCurrentGroup, true)
+        getSubscriptions().add(mUserRepo.getIdentitiesLocalAsync(mCurrentGroup, true)
                 .toSortedList()
                 .toSingle()
                 .subscribe(new SingleSubscriber<List<Identity>>() {

@@ -19,7 +19,6 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Item;
 import ch.giantific.qwittig.domain.models.Purchase;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.items.AddEditPurchaseBaseItem;
@@ -57,11 +56,10 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
 
     public EditPurchaseViewModelImpl(@Nullable Bundle savedState,
                                      @NonNull AddEditPurchaseViewModel.ViewListener view,
-                                     @NonNull IdentityRepository identityRepository,
                                      @NonNull UserRepository userRepository,
                                      @NonNull PurchaseRepository purchaseRepo,
                                      @NonNull String editPurchaseId) {
-        super(savedState, view, identityRepository, userRepository, purchaseRepo);
+        super(savedState, view, userRepository, purchaseRepo);
 
         mEditPurchaseId = editPurchaseId;
 

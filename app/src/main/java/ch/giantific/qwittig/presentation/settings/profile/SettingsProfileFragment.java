@@ -27,10 +27,9 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
-import ch.berta.fabio.fabprogress.FabProgress;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentSettingsProfileBinding;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
+import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.settings.profile.di.DaggerSettingsProfileComponent;
 import ch.giantific.qwittig.presentation.settings.profile.di.SettingsProfileViewModelModule;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
@@ -179,9 +178,9 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileViewMod
                 Glide.with(frag)
                         .load(avatar)
                         .asBitmap()
-                        .toBytes(Bitmap.CompressFormat.JPEG, IdentityRepository.JPEG_COMPRESSION_RATE)
+                        .toBytes(Bitmap.CompressFormat.JPEG, UserRepository.JPEG_COMPRESSION_RATE)
                         .centerCrop()
-                        .into(new SimpleTarget<byte[]>(IdentityRepository.WIDTH, IdentityRepository.HEIGHT) {
+                        .into(new SimpleTarget<byte[]>(UserRepository.WIDTH, UserRepository.HEIGHT) {
                             @Override
                             public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
                                 if (!singleSubscriber.isUnsubscribed()) {

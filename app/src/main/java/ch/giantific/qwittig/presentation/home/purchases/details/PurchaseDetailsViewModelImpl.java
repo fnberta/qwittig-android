@@ -20,7 +20,6 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Item;
 import ch.giantific.qwittig.domain.models.Purchase;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
@@ -49,11 +48,10 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<Purchase
 
     public PurchaseDetailsViewModelImpl(@Nullable Bundle savedState,
                                         @NonNull PurchaseDetailsViewModel.ViewListener view,
-                                        @NonNull IdentityRepository identityRepository,
                                         @NonNull UserRepository userRepository,
                                         @NonNull PurchaseRepository purchaseRepo,
                                         @NonNull String purchaseId) {
-        super(savedState, view, identityRepository, userRepository);
+        super(savedState, view, userRepository);
 
         mPurchaseRepo = purchaseRepo;
         mPurchaseId = purchaseId;

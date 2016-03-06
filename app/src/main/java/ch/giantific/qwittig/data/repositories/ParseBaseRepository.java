@@ -13,17 +13,21 @@ import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.FunctionCallback;
 import com.parse.GetCallback;
+import com.parse.LogInCallback;
+import com.parse.LogOutCallback;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.List;
 import java.util.Map;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.BaseRepository;
 import rx.Observable;
 import rx.Single;
@@ -447,6 +451,50 @@ public abstract class ParseBaseRepository implements BaseRepository {
                         } else {
                             singleSubscriber.onSuccess(object);
                         }
+                    }
+                });
+            }
+        });
+    }
+
+    @NonNull
+    final Single<User> login(@NonNull final String username, @NonNull final String password) {
+        return Single
+                .create(new Single.OnSubscribe<User>() {
+                    @Override
+                    public void call(final SingleSubscriber<? super User> singleSubscriber) {
+                        ParseUser.logInInBackground(username, password, new LogInCallback() {
+                            @Override
+                            public void done(ParseUser parseUser, @Nullable ParseException e) {
+                                if (singleSubscriber.isUnsubscribed()) {
+                                    return;
+                                }
+
+                                if (e != null) {
+                                    singleSubscriber.onError(e);
+                                } else {
+                                    singleSubscriber.onSuccess((User) parseUser);
+                                }
+                            }
+                        });
+                    }
+                });
+    }
+
+    @NonNull
+    final Single<User> logout(@NonNull final User user) {
+        return Single.create(new Single.OnSubscribe<User>() {
+            @Override
+            public void call(final SingleSubscriber<? super User> singleSubscriber) {
+                ParseUser.logOutInBackground(new LogOutCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (singleSubscriber.isUnsubscribed()) {
+                            return;
+                        }
+
+                        // ignore exception, currentUser will always be null now
+                        singleSubscriber.onSuccess(user);
                     }
                 });
             }

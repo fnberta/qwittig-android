@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 
@@ -22,10 +21,9 @@ public class AddPurchaseViewModelAutoImpl extends AddPurchaseViewModelImpl {
 
     public AddPurchaseViewModelAutoImpl(@Nullable Bundle savedState,
                                         @NonNull AddEditPurchaseViewModel.ViewListener view,
-                                        @NonNull IdentityRepository identityRepository,
                                         @NonNull UserRepository userRepository,
                                         @NonNull PurchaseRepository purchaseRepo) {
-        super(savedState, view, identityRepository, userRepository, purchaseRepo);
+        super(savedState, view, userRepository, purchaseRepo);
 
         if (savedState == null) {
             mLoading = true;

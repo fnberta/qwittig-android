@@ -6,11 +6,8 @@ package ch.giantific.qwittig.presentation.common.workers;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 
 /**
  * Provides an abstract base class for worker fragments whose task it is to query data from the
@@ -21,8 +18,6 @@ import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 public abstract class BaseQueryWorker<T, S extends BaseWorkerListener>
         extends BaseWorker<T, S> {
 
-    @Inject
-    protected IdentityRepository mIdentityRepo;
     protected Identity mCurrentIdentity;
     protected List<Identity> mIdentities;
 

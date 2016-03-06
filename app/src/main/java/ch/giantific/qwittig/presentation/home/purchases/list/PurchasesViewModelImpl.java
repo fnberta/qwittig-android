@@ -15,7 +15,6 @@ import java.util.List;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModelBaseImpl;
@@ -37,10 +36,9 @@ public class PurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purchase
 
     public PurchasesViewModelImpl(@Nullable Bundle savedState,
                                   @NonNull PurchasesViewModel.ViewListener view,
-                                  @NonNull IdentityRepository identityRepository,
                                   @NonNull UserRepository userRepository,
                                   @NonNull PurchaseRepository purchaseRepo) {
-        super(savedState, view, identityRepository, userRepository);
+        super(savedState, view, userRepository);
 
         mPurchaseRepo = purchaseRepo;
 
@@ -60,7 +58,7 @@ public class PurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purchase
     @Override
     public void loadData() {
         getSubscriptions().add(
-                mIdentityRepo.fetchIdentityDataAsync(mCurrentIdentity)
+                mUserRepo.fetchIdentityDataAsync(mCurrentIdentity)
                         .flatMapObservable(new Func1<Identity, Observable<Purchase>>() {
                             @Override
                             public Observable<Purchase> call(Identity identity) {

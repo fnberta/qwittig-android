@@ -8,11 +8,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.tasks.addedit.TaskAddEditViewModel;
 import ch.giantific.qwittig.presentation.tasks.addedit.TaskAddEditViewModelAddImpl;
 import dagger.Module;
@@ -32,10 +31,8 @@ public class TaskAddViewModelModule extends BaseViewModelModule<TaskAddEditViewM
     @PerFragment
     @Provides
     TaskAddEditViewModel providesTaskAddEditViewModel(@NonNull UserRepository userRepository,
-                                                      @NonNull IdentityRepository identityRepository,
                                                       @NonNull TaskRepository taskRepository) {
-        return new TaskAddEditViewModelAddImpl(mSavedState, mView, identityRepository,
-                userRepository, taskRepository);
+        return new TaskAddEditViewModelAddImpl(mSavedState, mView, userRepository, taskRepository);
     }
 
 }

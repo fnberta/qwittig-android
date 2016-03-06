@@ -10,9 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -43,8 +41,6 @@ import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileActivit
 import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileViewModel;
 import ch.giantific.qwittig.presentation.stats.StatsActivity;
 import ch.giantific.qwittig.presentation.tasks.list.TasksActivity;
-import ch.giantific.qwittig.utils.MessageAction;
-import ch.giantific.qwittig.utils.Utils;
 
 /**
  * Provides an abstract base class that sets up the navigation drawer and implements a couple of

@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
@@ -37,10 +36,9 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, DraftsV
 
     public DraftsViewModelImpl(@Nullable Bundle savedState,
                                @NonNull DraftsViewModel.ViewListener view,
-                               @NonNull IdentityRepository identityRepository,
                                @NonNull UserRepository userRepository,
                                @NonNull PurchaseRepository purchaseRepo) {
-        super(savedState, view, identityRepository, userRepository);
+        super(savedState, view, userRepository);
 
         mPurchaseRepo = purchaseRepo;
         if (savedState != null) {
@@ -62,7 +60,7 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, DraftsV
 
     @Override
     public void loadData() {
-        getSubscriptions().add(mIdentityRepo.fetchIdentityDataAsync(mCurrentIdentity)
+        getSubscriptions().add(mUserRepo.fetchIdentityDataAsync(mCurrentIdentity)
                 .flatMapObservable(new Func1<Identity, Observable<Purchase>>() {
                     @Override
                     public Observable<Purchase> call(Identity identity) {

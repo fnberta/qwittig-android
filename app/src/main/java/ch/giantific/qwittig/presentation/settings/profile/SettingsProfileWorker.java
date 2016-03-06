@@ -17,10 +17,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
+import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;
 import rx.functions.Func1;
@@ -36,8 +35,6 @@ public class SettingsProfileWorker extends BaseWorker<User, SettingsProfileWorke
     private static final String KEY_AVATAR = "AVATAR";
     @Inject
     Application mAppContext;
-    @Inject
-    IdentityRepository mIdentityRepo;
     @ProfileAction
     private int mType;
 
@@ -118,7 +115,7 @@ public class SettingsProfileWorker extends BaseWorker<User, SettingsProfileWorke
                 case ProfileAction.SAVE_AVATAR:
                     final String nickname = args.getString(KEY_NICKNAME, "");
                     final byte[] avatar = args.getByteArray(KEY_AVATAR);
-                    return mIdentityRepo.saveIdentitiesWithAvatar(user.getIdentities(), nickname, avatar)
+                    return mUserRepo.saveIdentitiesWithAvatar(user.getIdentities(), nickname, avatar)
                             .toList()
                             .map(new Func1<List<Identity>, User>() {
                                 @Override
@@ -127,10 +124,10 @@ public class SettingsProfileWorker extends BaseWorker<User, SettingsProfileWorke
                                 }
                             });
                 case ProfileAction.UNLINK_FACEBOOK: {
-                    return mUserRepo.unlinkFacebook(user).toObservable();
+                    return mUserRepo.unlinkFacebook(user, false).toObservable();
                 }
                 case ProfileAction.UNLINK_GOOGLE: {
-                    return mUserRepo.unlinkGoogle(mAppContext, user).toObservable();
+                    return mUserRepo.unlinkGoogle(mAppContext, user, false).toObservable();
                 }
             }
         }

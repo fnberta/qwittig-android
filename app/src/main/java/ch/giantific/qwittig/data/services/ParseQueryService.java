@@ -18,8 +18,8 @@ import java.util.List;
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.BuildConfig;
-import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.Qwittig;
+import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.data.services.di.DaggerQueryServiceComponent;
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Group;
@@ -29,7 +29,6 @@ import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
@@ -65,8 +64,6 @@ public class ParseQueryService extends IntentService {
     TaskRepository mTasksRepo;
     @Inject
     GroupRepository mGroupRepo;
-    @Inject
-    IdentityRepository mIdentityRepo;
     private Identity mCurrentIdentity;
     private List<Identity> mIdentities;
 
@@ -339,7 +336,7 @@ public class ParseQueryService extends IntentService {
     }
 
     private void queryIdentities() {
-        if (mIdentityRepo.updateIdentities(mIdentities)) {
+        if (mUserRepo.updateIdentities(mIdentities)) {
             mLocalBroadcast.sendUsersUpdated();
         }
     }

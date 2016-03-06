@@ -19,14 +19,13 @@ import java.util.List;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Task;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModelBaseImpl;
 import ch.giantific.qwittig.presentation.tasks.list.items.HeaderItem;
-import ch.giantific.qwittig.presentation.tasks.list.items.TaskItem;
 import ch.giantific.qwittig.presentation.tasks.list.items.ListItem;
 import ch.giantific.qwittig.presentation.tasks.list.items.ListItem.Type;
+import ch.giantific.qwittig.presentation.tasks.list.items.TaskItem;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MessageAction;
 import rx.Observable;
@@ -48,10 +47,9 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<ListItem, Ta
 
     public TasksViewModelImpl(@Nullable Bundle savedState,
                               @NonNull TasksViewModel.ViewListener view,
-                              @NonNull IdentityRepository identityRepository,
                               @NonNull UserRepository userRepository,
                               @NonNull TaskRepository taskRepo) {
-        super(savedState, view, identityRepository, userRepository);
+        super(savedState, view, userRepository);
 
         mTaskRepo = taskRepo;
         mDeadlineSelected = new Date(Long.MAX_VALUE);
@@ -77,7 +75,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<ListItem, Ta
 
     @Override
     public void loadData() {
-        getSubscriptions().add(mIdentityRepo.fetchIdentityDataAsync(mCurrentIdentity)
+        getSubscriptions().add(mUserRepo.fetchIdentityDataAsync(mCurrentIdentity)
                 .flatMapObservable(new Func1<Identity, Observable<Task>>() {
                     @Override
                     public Observable<Task> call(Identity identity) {

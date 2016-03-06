@@ -22,7 +22,6 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModelBaseImpl;
 import ch.giantific.qwittig.presentation.finance.unpaid.items.CompsUnpaidBaseItem;
@@ -55,10 +54,9 @@ public class CompsUnpaidViewModelImpl
 
     public CompsUnpaidViewModelImpl(@Nullable Bundle savedState,
                                     @NonNull CompsUnpaidViewModel.ViewListener view,
-                                    @NonNull IdentityRepository identityRepository,
                                     @NonNull UserRepository userRepository,
                                     @NonNull CompensationRepository compsRepo) {
-        super(savedState, view, identityRepository, userRepository);
+        super(savedState, view, userRepository);
 
         mCompsRepo = compsRepo;
 
@@ -91,7 +89,7 @@ public class CompsUnpaidViewModelImpl
 
     @Override
     public void loadData() {
-        getSubscriptions().add(mIdentityRepo.fetchIdentityDataAsync(mCurrentIdentity)
+        getSubscriptions().add(mUserRepo.fetchIdentityDataAsync(mCurrentIdentity)
                 .flatMapObservable(new Func1<Identity, Observable<Compensation>>() {
                     @Override
                     public Observable<Compensation> call(Identity identity) {

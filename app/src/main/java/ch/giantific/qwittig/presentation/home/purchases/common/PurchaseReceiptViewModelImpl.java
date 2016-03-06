@@ -28,7 +28,6 @@ public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseRece
     private final PurchaseRepository mPurchaseRepo;
     private boolean mLoading;
     private String mReceiptImagePath;
-    private byte[] mReceiptImageData;
     private String mPurchaseId;
     private boolean mDraft;
 

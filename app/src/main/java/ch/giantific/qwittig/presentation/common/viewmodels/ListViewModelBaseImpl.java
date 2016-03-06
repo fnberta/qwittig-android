@@ -14,7 +14,6 @@ import java.util.ArrayList;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 
 /**
@@ -25,17 +24,13 @@ public abstract class ListViewModelBaseImpl<T, S extends ListViewModel.ViewListe
         implements ListViewModel<T> {
 
     private static final String STATE_LOADING = "STATE_LOADING";
-    protected final IdentityRepository mIdentityRepo;
     protected ArrayList<T> mItems;
     protected boolean mLoading;
 
     public ListViewModelBaseImpl(@Nullable Bundle savedState,
                                  @NonNull S view,
-                                 @NonNull IdentityRepository identityRepo,
                                  @NonNull UserRepository userRepository) {
         super(savedState, view, userRepository);
-
-        mIdentityRepo = identityRepo;
 
         if (savedState != null) {
             mLoading = savedState.getBoolean(STATE_LOADING, false);

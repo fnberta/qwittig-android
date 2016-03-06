@@ -14,12 +14,10 @@ import com.parse.ParseInstallation;
 
 import javax.inject.Inject;
 
-import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.domain.models.User;
+import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;
-import rx.Single;
-import rx.functions.Func1;
 
 /**
  * Resets the device's {@link ParseInstallation} object and logs out the current user.
@@ -75,66 +73,17 @@ public class LogoutWorker extends BaseWorker<User, LogoutWorkerListener> {
         }
 
         if (user.isGoogleUser()) {
-            if (delete) {
-                return mUserRepo.unlinkGoogle(mAppContext, user)
-                        .flatMap(new Func1<User, Single<ParseInstallation>>() {
-                            @Override
-                            public Single<ParseInstallation> call(User user) {
-                                return mUserRepo.clearInstallation();
-                            }
-                        })
-                        .flatMap(new Func1<ParseInstallation, Single<User>>() {
-                            @Override
-                            public Single<User> call(ParseInstallation parseInstallation) {
-                                return mUserRepo.deleteUser(user);
-                            }
-                        })
-                        .toObservable();
-            }
+            return delete
+                    ? mUserRepo.unlinkGoogle(mAppContext, user, true).toObservable()
+                    : mUserRepo.signOutGoogle(mAppContext, user).toObservable();
 
-            return mUserRepo.signOutGoogle(mAppContext)
-                    .flatMap(new Func1<Void, Single<ParseInstallation>>() {
-                        @Override
-                        public Single<ParseInstallation> call(Void aVoid) {
-                            return mUserRepo.clearInstallation();
-                        }
-                    })
-                    .flatMap(new Func1<ParseInstallation, Single<User>>() {
-                        @Override
-                        public Single<User> call(ParseInstallation parseInstallation) {
-                            return mUserRepo.logOut(user);
-                        }
-                    })
-                    .toObservable();
         }
 
         if (user.isFacebookUser() && delete) {
-            return mUserRepo.unlinkFacebook(user)
-                    .flatMap(new Func1<User, Single<ParseInstallation>>() {
-                        @Override
-                        public Single<ParseInstallation> call(User user) {
-                            return mUserRepo.clearInstallation();
-                        }
-                    })
-                    .flatMap(new Func1<ParseInstallation, Single<User>>() {
-                        @Override
-                        public Single<User> call(ParseInstallation parseInstallation) {
-                            return mUserRepo.deleteUser(user);
-                        }
-                    })
-                    .toObservable();
+            return mUserRepo.unlinkFacebook(user, true).toObservable();
         }
 
-        return mUserRepo.clearInstallation()
-                .flatMap(new Func1<ParseInstallation, Single<User>>() {
-                    @Override
-                    public Single<User> call(ParseInstallation parseInstallation) {
-                        return delete
-                                ? mUserRepo.deleteUser(user)
-                                : mUserRepo.logOut(user);
-                    }
-                })
-                .toObservable();
+        return mUserRepo.logoutUser(user, delete).toObservable();
     }
 
     @Override

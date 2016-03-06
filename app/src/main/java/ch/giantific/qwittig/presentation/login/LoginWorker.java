@@ -13,18 +13,14 @@ import android.support.v4.app.FragmentManager;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.List;
 
 import javax.inject.Inject;
 
-import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;
-import rx.Single;
 import rx.functions.Func1;
 
 /**
@@ -46,8 +42,6 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
     private static final String KEY_PASSWORD = "PASSWORD";
     private static final String KEY_GOOGLE_ID_TOKEN = "ID_TOKEN";
     private static final String KEY_GOOGLE_PHOTO_URL = "GOOGLE_PHOTO_URL";
-    @Inject
-    IdentityRepository mIdentityRepo;
     @Inject
     GroupRepository mGroupRepo;
     @Type
@@ -218,22 +212,7 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
             case Type.LOGIN_EMAIL: {
                 final String username = args.getString(KEY_USERNAME, "");
                 final String password = args.getString(KEY_PASSWORD, "");
-                return mUserRepo.loginEmail(username, password)
-                        .flatMap(new Func1<User, Single<User>>() {
-                            @Override
-                            public Single<User> call(final User user) {
-                                return mIdentityRepo.fetchIdentitiesDataAsync(user.getIdentities())
-                                        .toList()
-                                        .toSingle()
-                                        .flatMap(new Func1<List<Identity>, Single<User>>() {
-                                            @Override
-                                            public Single<User> call(List<Identity> identities) {
-                                                return mUserRepo.setupInstallation(user);
-                                            }
-                                        });
-                            }
-                        })
-                        .toObservable();
+                return mUserRepo.loginEmail(username, password).toObservable();
             }
             case Type.RESET_PASSWORD: {
                 final String username = args.getString(KEY_USERNAME, "");
@@ -249,121 +228,17 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
             case Type.SIGN_UP_EMAIL: {
                 final String username = args.getString(KEY_USERNAME, "");
                 final String password = args.getString(KEY_PASSWORD, "");
-                return mUserRepo.signUpEmail(username, password)
-                        .flatMap(new Func1<User, Single<User>>() {
-                            @Override
-                            public Single<User> call(final User user) {
-                                return mGroupRepo.addNewGroup("Qwittig Rocks", "CHF")
-                                        .flatMap(new Func1<String, Single<User>>() {
-                                            @Override
-                                            public Single<User> call(String result) {
-                                                return mUserRepo.updateUser(user);
-                                            }
-                                        });
-                            }
-                        }).flatMap(new Func1<User, Single<User>>() {
-                            @Override
-                            public Single<User> call(final User user) {
-                                return mIdentityRepo.fetchIdentityDataAsync(user.getCurrentIdentity())
-                                        .flatMap(new Func1<Identity, Single<Identity>>() {
-                                            @Override
-                                            public Single<Identity> call(Identity identity) {
-                                                return mIdentityRepo.saveIdentityLocalAsync(identity);
-                                            }
-                                        })
-                                        .flatMap(new Func1<Identity, Single<User>>() {
-                                            @Override
-                                            public Single<User> call(Identity identity) {
-                                                return mUserRepo.setupInstallation(user);
-                                            }
-                                        });
-                            }
-                        })
-                        .toObservable();
+                return mUserRepo.signUpEmail(username, password).toObservable();
             }
             case Type.LOGIN_FACEBOOK: {
                 final LoginWorker worker = this;
-                return mUserRepo.loginFacebook(worker)
-                        .flatMap(new Func1<User, Single<User>>() {
-                            @Override
-                            public Single<User> call(final User user) {
-                                if (!user.isNew()) {
-                                    return Single.just(user);
-                                }
-
-                                return mGroupRepo.addNewGroup("Qwittig Rocks", "CHF")
-                                        .flatMap(new Func1<String, Single<User>>() {
-                                            @Override
-                                            public Single<User> call(String result) {
-                                                return mUserRepo.updateUser(user);
-                                            }
-                                        });
-                            }
-                        })
-                        .flatMap(new Func1<User, Single<User>>() {
-                            @Override
-                            public Single<User> call(final User user) {
-                                return mIdentityRepo.fetchIdentityDataAsync(user.getCurrentIdentity())
-                                        .flatMap(new Func1<Identity, Single<Identity>>() {
-                                            @Override
-                                            public Single<Identity> call(Identity identity) {
-                                                return mIdentityRepo.saveIdentityLocalAsync(identity);
-                                            }
-                                        })
-                                        .flatMap(new Func1<Identity, Single<User>>() {
-                                            @Override
-                                            public Single<User> call(Identity identity) {
-                                                return mUserRepo.setFacebookData(user, identity, worker);
-                                            }
-                                        });
-                            }
-                        })
-                        .flatMap(new Func1<User, Single<User>>() {
-                            @Override
-                            public Single<User> call(final User user) {
-                                return mUserRepo.setupInstallation(user);
-                            }
-                        })
-                        .toObservable();
+                return mUserRepo.loginFacebook(worker).toObservable();
             }
             case Type.LOGIN_GOOGLE: {
-                final LoginWorker worker = this;
                 final String username = args.getString(KEY_USERNAME, "");
                 final String idToken = args.getString(KEY_GOOGLE_ID_TOKEN, "");
                 final Uri photoUrl = Uri.parse(args.getString(KEY_GOOGLE_PHOTO_URL, ""));
-                return mUserRepo.loginGoogle(idToken, this)
-                        .flatMap(new Func1<User, Single<User>>() {
-                            @Override
-                            public Single<User> call(final User user) {
-                                return mIdentityRepo.fetchIdentitiesDataAsync(user.getIdentities())
-                                        .toList()
-                                        .toSingle()
-                                        .flatMap(new Func1<List<Identity>, Single<User>>() {
-                                            @Override
-                                            public Single<User> call(List<Identity> identities) {
-                                                if (user.isNew()) {
-                                                    final Identity identity = user.getCurrentIdentity();
-                                                    return mIdentityRepo.saveIdentityLocalAsync(identity)
-                                                            .flatMap(new Func1<Identity, Single<User>>() {
-                                                                @Override
-                                                                public Single<User> call(Identity identity) {
-                                                                    return mUserRepo.setGoogleData(user, identity, username, photoUrl, worker);
-                                                                }
-                                                            });
-                                                }
-
-                                                return Single.just(user);
-                                            }
-                                        });
-                            }
-                        })
-                        .flatMap(new Func1<User, Single<User>>() {
-                            @Override
-                            public Single<User> call(final User user) {
-                                return mUserRepo.setupInstallation(user);
-                            }
-                        })
-                        .toObservable();
+                return mUserRepo.loginGoogle(idToken, username, photoUrl, this).toObservable();
             }
         }
 

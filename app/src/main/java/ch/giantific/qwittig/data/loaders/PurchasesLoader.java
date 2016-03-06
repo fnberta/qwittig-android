@@ -13,11 +13,9 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.models.User;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import rx.Observable;
-import rx.Single;
 import rx.functions.Func1;
 
 /**
@@ -28,17 +26,14 @@ import rx.functions.Func1;
 public class PurchasesLoader extends BaseRxLoader<Purchase> {
 
     private final UserRepository mUserRepo;
-    private final IdentityRepository mIdentityRepo;
     private final PurchaseRepository mPurchaseRepo;
 
     @Inject
     public PurchasesLoader(@NonNull Application context, @NonNull UserRepository userRepository,
-                           @NonNull IdentityRepository identityRepository,
                            @NonNull PurchaseRepository purchaseRepository) {
         super(context);
 
         mUserRepo = userRepository;
-        mIdentityRepo = identityRepository;
         mPurchaseRepo = purchaseRepository;
     }
 
@@ -47,7 +42,7 @@ public class PurchasesLoader extends BaseRxLoader<Purchase> {
     protected Observable<Purchase> getObservable() {
         final User currentUser = mUserRepo.getCurrentUser();
         if (currentUser != null) {
-            return mIdentityRepo.fetchIdentityDataAsync(currentUser.getCurrentIdentity())
+            return mUserRepo.fetchIdentityDataAsync(currentUser.getCurrentIdentity())
                     .flatMapObservable(new Func1<Identity, Observable<Purchase>>() {
                         @Override
                         public Observable<Purchase> call(Identity identity) {

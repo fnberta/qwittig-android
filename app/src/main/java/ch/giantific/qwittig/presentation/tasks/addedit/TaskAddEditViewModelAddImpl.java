@@ -26,7 +26,6 @@ import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Task;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
@@ -43,7 +42,6 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
     private static final String STATE_USERS_INVOLVED = "STATE_USERS_INVOLVED";
     final ArrayList<TaskUser> mTaskIdentities;
     final TaskRepository mTaskRepo;
-    private final IdentityRepository mIdentityRepo;
     private final List<Identity> mIdentitiesAvailable = new ArrayList<>();
     private final DateFormat mDateFormatter;
     Date mTaskDeadline;
@@ -52,12 +50,10 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
 
     public TaskAddEditViewModelAddImpl(@Nullable Bundle savedState,
                                        @NonNull TaskAddEditViewModel.ViewListener view,
-                                       @NonNull IdentityRepository identityRepository,
                                        @NonNull UserRepository userRepository,
                                        @NonNull TaskRepository taskRepository) {
         super(savedState, view, userRepository);
 
-        mIdentityRepo = identityRepository;
         mTaskRepo = taskRepository;
 
         if (savedState != null) {
@@ -88,7 +84,7 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
     }
 
     void loadTaskUsers() {
-        getSubscriptions().add(mIdentityRepo.getIdentitiesLocalAsync(mCurrentIdentity.getGroup(), true)
+        getSubscriptions().add(mUserRepo.getIdentitiesLocalAsync(mCurrentIdentity.getGroup(), true)
                 .toList()
                 .toSingle()
                 .subscribe(new SingleSubscriber<List<Identity>>() {

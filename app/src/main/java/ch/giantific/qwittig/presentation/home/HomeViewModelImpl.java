@@ -12,6 +12,7 @@ import android.view.View;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
@@ -93,10 +94,10 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
     }
 
     @Override
-    public void setJoinGroupStream(@NonNull Single<User> single, @NonNull final String workerTag) {
-        getSubscriptions().add(single.subscribe(new SingleSubscriber<User>() {
+    public void setJoinGroupStream(@NonNull Single<Identity> single, @NonNull final String workerTag) {
+        getSubscriptions().add(single.subscribe(new SingleSubscriber<Identity>() {
             @Override
-            public void onSuccess(User value) {
+            public void onSuccess(Identity identity) {
                 mView.removeWorker(workerTag);
                 mView.hideProgressDialog();
 
