@@ -9,28 +9,27 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.FragmentTasksBinding;
-import ch.giantific.qwittig.presentation.tasks.list.di.DaggerTasksListComponent;
-import ch.giantific.qwittig.presentation.tasks.list.di.TasksListViewModelModule;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
-import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewOnlineFragment;
+import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
 import ch.giantific.qwittig.presentation.tasks.addedit.TaskAddActivity;
 import ch.giantific.qwittig.presentation.tasks.details.TaskDetailsActivity;
+import ch.giantific.qwittig.presentation.tasks.list.di.DaggerTasksListComponent;
+import ch.giantific.qwittig.presentation.tasks.list.di.TasksListViewModelModule;
 
 /**
  * Displays a {@link RecyclerView} list of all the ongoing tasks in a group in card base interface.
  * <p/>
- * Subclass {@link BaseRecyclerViewOnlineFragment}.
+ * Subclass {@link BaseRecyclerViewFragment}.
  */
-public class TasksFragment extends BaseRecyclerViewOnlineFragment<TasksViewModel, TasksFragment.ActivityListener>
+public class TasksFragment extends BaseRecyclerViewFragment<TasksViewModel, TasksFragment.ActivityListener>
         implements TasksViewModel.ViewListener {
 
     public static final String INTENT_TASK_ID = "ch.giantific.qwittig.INTENT_TASK_ID";
@@ -70,11 +69,6 @@ public class TasksFragment extends BaseRecyclerViewOnlineFragment<TasksViewModel
     @Override
     protected RecyclerView.Adapter getRecyclerAdapter() {
         return new TasksRecyclerAdapter(mViewModel);
-    }
-
-    @Override
-    protected SwipeRefreshLayout getSrl() {
-        return mBinding.srlRv.srlBase;
     }
 
     @Override

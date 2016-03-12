@@ -24,7 +24,7 @@
         android:animateLayoutChanges="true"
         >
 
-        <android.support.v4.widget.SwipeRefreshLayout
+        <ch.giantific.qwittig.presentation.common.widgets.SwipeRefreshLayoutHack
             android:id="@+id/srl_base"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -43,7 +43,7 @@
                 android:visibility="@{viewModel.loading ? View.GONE : View.VISIBLE}"
                 />
 
-        </android.support.v4.widget.SwipeRefreshLayout>
+        </ch.giantific.qwittig.presentation.common.widgets.SwipeRefreshLayoutHack>
 
         <include
             layout="@layout/include_progress"

@@ -7,7 +7,6 @@ package ch.giantific.qwittig.presentation.finance.paid;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,17 +16,17 @@ import com.mugen.Mugen;
 import com.mugen.MugenCallbacks;
 
 import ch.giantific.qwittig.databinding.FragmentFinanceCompensationsPaidBinding;
+import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
+import ch.giantific.qwittig.presentation.finance.CompsUpdateWorker;
 import ch.giantific.qwittig.presentation.finance.paid.di.DaggerFinanceCompsPaidComponent;
 import ch.giantific.qwittig.presentation.finance.paid.di.FinanceCompsPaidViewModelModule;
-import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewOnlineFragment;
-import ch.giantific.qwittig.presentation.finance.CompsUpdateWorker;
 
 /**
  * Displays recent paid compensations in a {@link RecyclerView} list.
  * <p/>
- * Subclass of {@link BaseRecyclerViewOnlineFragment}.
+ * Subclass of {@link BaseRecyclerViewFragment}.
  */
-public class CompsPaidFragment extends BaseRecyclerViewOnlineFragment<CompsPaidViewModel, CompsPaidFragment.ActivityListener>
+public class CompsPaidFragment extends BaseRecyclerViewFragment<CompsPaidViewModel, CompsPaidFragment.ActivityListener>
         implements CompsPaidViewModel.ViewListener {
 
     private FragmentFinanceCompensationsPaidBinding mBinding;
@@ -87,11 +86,6 @@ public class CompsPaidFragment extends BaseRecyclerViewOnlineFragment<CompsPaidV
     }
 
     @Override
-    protected SwipeRefreshLayout getSrl() {
-        return mBinding.srlRv.srlBase;
-    }
-
-    @Override
     protected void setViewModelToActivity() {
         mActivity.setCompsPaidViewModel(mViewModel);
     }
@@ -107,7 +101,7 @@ public class CompsPaidFragment extends BaseRecyclerViewOnlineFragment<CompsPaidV
     }
 
 
-    public interface ActivityListener extends BaseRecyclerViewOnlineFragment.ActivityListener {
+    public interface ActivityListener extends BaseRecyclerViewFragment.ActivityListener {
         void setCompsPaidViewModel(@NonNull CompsPaidViewModel viewModel);
     }
 }

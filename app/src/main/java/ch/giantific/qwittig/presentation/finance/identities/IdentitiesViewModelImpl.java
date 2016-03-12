@@ -99,7 +99,6 @@ public class IdentitiesViewModelImpl
             return;
         }
 
-        setRefreshing(true);
         mView.loadUpdateUsersWorker();
     }
 

@@ -57,6 +57,7 @@ public abstract class OnlineListViewModelBaseImpl<T, S extends OnlineListViewMod
         return new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                mRefreshing = true;
                 refreshItems();
             }
         };

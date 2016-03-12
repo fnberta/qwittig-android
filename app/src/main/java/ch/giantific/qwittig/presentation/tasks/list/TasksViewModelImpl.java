@@ -188,7 +188,6 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<ListItem, Ta
             return;
         }
 
-        setRefreshing(true);
         mView.loadUpdateTasksWorker();
     }
 

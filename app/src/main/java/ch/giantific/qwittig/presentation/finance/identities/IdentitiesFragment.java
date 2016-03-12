@@ -7,7 +7,6 @@ package ch.giantific.qwittig.presentation.finance.identities;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -17,18 +16,18 @@ import android.view.ViewGroup;
 import org.apache.commons.math3.fraction.BigFraction;
 
 import ch.giantific.qwittig.databinding.FragmentFinanceIdentitiesBinding;
+import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
 import ch.giantific.qwittig.presentation.finance.identities.di.DaggerFinanceIdentitiesComponent;
 import ch.giantific.qwittig.presentation.finance.identities.di.FinanceIdentitiesViewModelModule;
-import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewOnlineFragment;
 
 /**
  * Displays the users of a group and their current balances in a {@link RecyclerView} list. Does not
  * include the current user whose balance is displayed in the {@link Toolbar} of the hosting
  * {@link Activity}.
  * <p/>
- * Subclass of {@link BaseRecyclerViewOnlineFragment}.
+ * Subclass of {@link BaseRecyclerViewFragment}.
  */
-public class IdentitiesFragment extends BaseRecyclerViewOnlineFragment<IdentitiesViewModel, IdentitiesFragment.ActivityListener>
+public class IdentitiesFragment extends BaseRecyclerViewFragment<IdentitiesViewModel, IdentitiesFragment.ActivityListener>
         implements IdentitiesViewModel.ViewListener {
 
     private FragmentFinanceIdentitiesBinding mBinding;
@@ -64,11 +63,6 @@ public class IdentitiesFragment extends BaseRecyclerViewOnlineFragment<Identitie
     }
 
     @Override
-    protected SwipeRefreshLayout getSrl() {
-        return mBinding.srlRv.srlBase;
-    }
-
-    @Override
     protected void setViewModelToActivity() {
         mActivity.setIdentitiesViewModel(mViewModel);
     }
@@ -83,7 +77,7 @@ public class IdentitiesFragment extends BaseRecyclerViewOnlineFragment<Identitie
         mActivity.setColorTheme(balance);
     }
 
-    public interface ActivityListener extends BaseRecyclerViewOnlineFragment.ActivityListener {
+    public interface ActivityListener extends BaseRecyclerViewFragment.ActivityListener {
 
         void setIdentitiesViewModel(@NonNull IdentitiesViewModel viewModel);
 

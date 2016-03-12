@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,19 +20,19 @@ import com.mugen.MugenCallbacks;
 
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.databinding.FragmentHomePurchasesBinding;
-import ch.giantific.qwittig.presentation.home.purchases.list.di.DaggerPurchasesListComponent;
-import ch.giantific.qwittig.presentation.home.purchases.list.di.PurchasesListViewModelModule;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
-import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewOnlineFragment;
+import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
 import ch.giantific.qwittig.presentation.home.purchases.details.PurchaseDetailsActivity;
+import ch.giantific.qwittig.presentation.home.purchases.list.di.DaggerPurchasesListComponent;
+import ch.giantific.qwittig.presentation.home.purchases.list.di.PurchasesListViewModelModule;
 
 /**
  * Displays recent purchases in a {@link RecyclerView} list.
  * <p/>
- * Subclass of {@link BaseRecyclerViewOnlineFragment}.
+ * Subclass of {@link BaseRecyclerViewFragment}.
  */
-public class PurchasesFragment extends BaseRecyclerViewOnlineFragment<PurchasesViewModel, PurchasesFragment.ActivityListener>
+public class PurchasesFragment extends BaseRecyclerViewFragment<PurchasesViewModel, PurchasesFragment.ActivityListener>
         implements PurchasesViewModel.ViewListener {
 
     public static final String INTENT_PURCHASE_ID = "INTENT_PURCHASE_ID";
@@ -95,11 +94,6 @@ public class PurchasesFragment extends BaseRecyclerViewOnlineFragment<PurchasesV
     }
 
     @Override
-    protected SwipeRefreshLayout getSrl() {
-        return mBinding.srlRv.srlBase;
-    }
-
-    @Override
     protected void setViewModelToActivity() {
         mActivity.setPurchasesViewModel(mViewModel);
     }
@@ -130,9 +124,9 @@ public class PurchasesFragment extends BaseRecyclerViewOnlineFragment<PurchasesV
     /**
      * Defines the interaction with the hosting activity.
      * <p/>
-     * Subclass of {@link BaseRecyclerViewOnlineFragment.ActivityListener}.
+     * Subclass of {@link BaseRecyclerViewFragment.ActivityListener}.
      */
-    public interface ActivityListener extends BaseRecyclerViewOnlineFragment.ActivityListener {
+    public interface ActivityListener extends BaseRecyclerViewFragment.ActivityListener {
         void setPurchasesViewModel(@NonNull PurchasesViewModel viewModel);
     }
 }

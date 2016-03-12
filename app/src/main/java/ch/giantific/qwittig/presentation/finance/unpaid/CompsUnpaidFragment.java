@@ -7,7 +7,6 @@ package ch.giantific.qwittig.presentation.finance.unpaid;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,10 +15,10 @@ import android.view.ViewGroup;
 import org.apache.commons.math3.fraction.BigFraction;
 
 import ch.giantific.qwittig.databinding.FragmentFinanceCompensationsUnpaidBinding;
+import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
 import ch.giantific.qwittig.presentation.finance.CompsUpdateWorker;
 import ch.giantific.qwittig.presentation.finance.unpaid.di.DaggerFinanceCompsUnpaidComponent;
 import ch.giantific.qwittig.presentation.finance.unpaid.di.FinanceCompsUnpaidViewModelModule;
-import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewOnlineFragment;
 
 /**
  * Displays all currently open unpaid compensations in the group in card based {@link RecyclerView}
@@ -27,9 +26,9 @@ import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewOnline
  * <p/>
  * Allows the user to create a new settlement if there are no open unpaid compensations.
  * <p/>
- * Subclass of {@link BaseRecyclerViewOnlineFragment}.
+ * Subclass of {@link BaseRecyclerViewFragment}.
  */
-public class CompsUnpaidFragment extends BaseRecyclerViewOnlineFragment<CompsUnpaidViewModel, CompsUnpaidFragment.ActivityListener>
+public class CompsUnpaidFragment extends BaseRecyclerViewFragment<CompsUnpaidViewModel, CompsUnpaidFragment.ActivityListener>
         implements CompsUnpaidViewModel.ViewListener {
 
     private FragmentFinanceCompensationsUnpaidBinding mBinding;
@@ -67,11 +66,6 @@ public class CompsUnpaidFragment extends BaseRecyclerViewOnlineFragment<CompsUnp
     }
 
     @Override
-    protected SwipeRefreshLayout getSrl() {
-        return mBinding.srlRv.srlBase;
-    }
-
-    @Override
     protected void setViewModelToActivity() {
         mActivity.setCompsUnpaidViewModel(mViewModel);
     }
@@ -104,7 +98,7 @@ public class CompsUnpaidFragment extends BaseRecyclerViewOnlineFragment<CompsUnp
         mActivity.reloadCompsPaid();
     }
 
-    public interface ActivityListener extends BaseRecyclerViewOnlineFragment.ActivityListener {
+    public interface ActivityListener extends BaseRecyclerViewFragment.ActivityListener {
         void setCompsUnpaidViewModel(@NonNull CompsUnpaidViewModel viewModel);
 
         void setColorTheme(@NonNull BigFraction balance);
