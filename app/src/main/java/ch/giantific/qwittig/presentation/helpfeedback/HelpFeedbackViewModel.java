@@ -42,5 +42,7 @@ public interface HelpFeedbackViewModel extends ViewModel,
         void sendEmail(@NonNull String recipient, @StringRes int subject, @StringRes int body);
 
         void openAppInPlayStore();
+
+        void startAppInvite();
     }
 }

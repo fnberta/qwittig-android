@@ -83,7 +83,7 @@ public class HelpFeedbackViewModelImpl extends ViewModelBaseImpl<HelpFeedbackVie
                 mView.openAppInPlayStore();
                 break;
             case HELP_RECOMMEND:
-                // TODO: use google app recommend
+                mView.startAppInvite();
                 break;
         }
     }

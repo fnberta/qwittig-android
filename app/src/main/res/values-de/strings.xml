@@ -289,5 +289,11 @@
     <string name="toast_settings_users_removed">Nutzer aus Gruppe entfernt</string>
     <string name="toast_error_settings_users_remove">Entfernen des Nutzers aus der Gruppe fehlgeschlagen</string>
     <string name="toast_settings_min_one_group">Bitte erstelle eine neue Gruppe bevor du diese verlässt</string>
+    <string name="toast_recommend_failed">Keine Empfehlungen versendet</string>
+    <string name="toast_error_not_supported">Wird von deinem Gerät nicht unterstützt</string>
+    <string name="toast_recommend_sent">%1$d Empfehlungen gesendet</string>
+    <string name="recommend_title">Hol dir Qwittig!</string>
+    <string name="recommend_message">Qwittig ist genial, downloade jetzt die App!</string>
+    <string name="recommend_CTA">Installieren!</string>
 
 </resources>

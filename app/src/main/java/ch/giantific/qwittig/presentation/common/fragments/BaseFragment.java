@@ -99,7 +99,7 @@ public abstract class BaseFragment<T extends ViewModel, S extends BaseFragment.A
     }
 
     @Override
-    public void showMessage(@StringRes int resId, @NonNull String... args) {
+    public void showMessage(@StringRes int resId, @NonNull Object... args) {
         Snackbar.make(getSnackbarView(), getString(resId, args), Snackbar.LENGTH_LONG).show();
     }
 

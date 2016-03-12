@@ -49,7 +49,7 @@ public interface ViewModel
 
         void showMessage(@StringRes int resId);
 
-        void showMessage(@StringRes int resId, @NonNull String... args);
+        void showMessage(@StringRes int resId, @NonNull Object... args);
 
         void showMessageWithAction(@StringRes int resId, @NonNull MessageAction action);
 

@@ -341,7 +341,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
     }
 
     @Override
-    public void showMessage(@StringRes int resId, @NonNull String... args) {
+    public void showMessage(@StringRes int resId, @NonNull Object... args) {
         Snackbar.make(getView(), getString(resId, args), Snackbar.LENGTH_LONG).show();
     }
 

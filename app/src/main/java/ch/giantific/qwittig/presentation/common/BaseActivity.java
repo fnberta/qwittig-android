@@ -111,7 +111,7 @@ public abstract class BaseActivity<T extends ViewModel>
     }
 
     @Override
-    public void showMessage(@StringRes int resId, @NonNull String... args) {
+    public void showMessage(@StringRes int resId, @NonNull Object... args) {
         Snackbar.make(mToolbar, getString(resId, args), Snackbar.LENGTH_LONG).show();
     }
 
