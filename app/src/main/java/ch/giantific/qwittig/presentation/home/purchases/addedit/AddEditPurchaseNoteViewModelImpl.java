@@ -15,7 +15,7 @@ import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 
 /**
- * Created by fabio on 23.02.16.
+ * Provides an implementation of the {@link AddEditPurchaseNoteViewModel} interface.
  */
 public class AddEditPurchaseNoteViewModelImpl extends ViewModelBaseImpl<AddEditPurchaseNoteViewModel.ViewListener>
         implements AddEditPurchaseNoteViewModel {

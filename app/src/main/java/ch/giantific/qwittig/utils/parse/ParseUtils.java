@@ -7,14 +7,8 @@ package ch.giantific.qwittig.utils.parse;
 import android.support.annotation.NonNull;
 
 import com.parse.ParseACL;
-import com.parse.ParseConfig;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import ch.giantific.qwittig.domain.models.Group;
-import ch.giantific.qwittig.presentation.settings.addgroup.Currency;
-import ch.giantific.qwittig.utils.MoneyUtils;
 
 /**
  * Provides useful static utility methods related to the Parse.com framework.
@@ -28,7 +22,7 @@ public class ParseUtils {
     /**
      * Returns a default {@link ParseACL} with read/write access for the role of the passed group.
      *
-     * @param group the group to get the role from
+     * @param group           the group to get the role from
      * @param roleWriteAccess whether to give the group role write access
      * @return a default {@link ParseACL}
      */

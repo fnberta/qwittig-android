@@ -8,19 +8,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.parse.ParseException;
-import com.parse.ParsePush;
 import com.parse.ParseQuery;
-import com.parse.SaveCallback;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import ch.giantific.qwittig.data.receivers.PushBroadcastReceiver;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
-import rx.Observable;
-import rx.Single;
-import rx.SingleSubscriber;
 
 /**
  * Provides an implementation of {@link GroupRepository} that uses the Parse.com framework as
@@ -36,23 +27,6 @@ public class ParseGroupRepository extends ParseBaseRepository implements GroupRe
     @Override
     protected String getClassName() {
         return Group.CLASS;
-    }
-
-    @Override
-    public Observable<Group> fetchGroupDataAsync(@NonNull final Group group) {
-        if (group.isDataAvailable()) {
-            return Observable.just(group);
-        }
-
-        return fetchLocal(group)
-                .toObservable()
-                .onErrorResumeNext(fetchIfNeeded(group).toObservable());
-    }
-
-    @Override
-    public Single<Group> getGroupOnlineAsync(@NonNull final String groupId) {
-        final ParseQuery<Group> query = ParseQuery.getQuery(Group.CLASS);
-        return get(query, groupId);
     }
 
     @Override

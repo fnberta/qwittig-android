@@ -8,30 +8,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.domain.models.Group;
-import rx.Observable;
-import rx.Single;
 
 /**
  * Provides the methods to get, update and remove groups from the local and online data store.
  */
 public interface GroupRepository extends BaseRepository {
-
-    /**
-     * Fetches the data of a {@link Group} object from the local data store. If there is no data
-     * available in the local data store it will try to fetch the data online.
-     *
-     * @param group the group to fetch the data for
-     * @return a {@link Observable} emitting the results
-     */
-    Observable<Group> fetchGroupDataAsync(@NonNull Group group);
-
-    /**
-     * Queries a group from the online data store.
-     *
-     * @param groupId the object id of the group to get
-     * @return a {@link Single} emitting the result
-     */
-    Single<Group> getGroupOnlineAsync(@NonNull String groupId);
 
     /**
      * Returns a {@link Group} object queried from the online data store or null if the query does

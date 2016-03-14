@@ -17,8 +17,8 @@ import ch.giantific.qwittig.domain.models.Identity;
  */
 public class SettingsUsersUserItem extends BaseObservable implements SettingsUsersBaseItem, Comparable<SettingsUsersUserItem> {
 
-    private ShareListener mShareListener;
-    private Identity mIdentity;
+    private final ShareListener mShareListener;
+    private final Identity mIdentity;
     private String mShareLink;
 
     public SettingsUsersUserItem(@NonNull ShareListener shareListener, @NonNull Identity identity) {

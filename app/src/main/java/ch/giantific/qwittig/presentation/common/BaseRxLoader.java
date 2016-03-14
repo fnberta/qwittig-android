@@ -2,9 +2,9 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.loaders;
+package ch.giantific.qwittig.presentation.common;
 
-import android.app.Application;
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
@@ -22,7 +22,7 @@ public abstract class BaseRxLoader<T> extends Loader<Observable<T>> {
     private Subscription mSubscription;
     private ReplaySubject<T> mSubject = ReplaySubject.create();
 
-    public BaseRxLoader(@NonNull Application context) {
+    public BaseRxLoader(@NonNull Context context) {
         super(context);
     }
 
