@@ -302,5 +302,6 @@
     <string name="recommend_message">Awesome Qwittig app, get it now!</string>
     <string name="recommend_CTA">Download!</string>
     <string name="recommend_ios_id" translatable="false">ch.giantific.qwittig</string>
+    <string name="toast_error_stats_load">Failed to load the stats data</string>
 
 </resources>

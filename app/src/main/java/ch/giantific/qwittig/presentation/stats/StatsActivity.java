@@ -4,14 +4,15 @@
 
 package ch.giantific.qwittig.presentation.stats;
 
+import android.content.Context;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.Spinner;
+import android.widget.ArrayAdapter;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -19,13 +20,15 @@ import java.util.Collections;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
+import ch.giantific.qwittig.databinding.ActivityStatsBinding;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
-import ch.giantific.qwittig.presentation.common.adapters.StringResSpinnerAdapter;
-import ch.giantific.qwittig.presentation.common.adapters.ThemedArrayAdapter;
+import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
+import ch.giantific.qwittig.presentation.stats.StatsViewModel.StatsType;
 import ch.giantific.qwittig.presentation.stats.models.Month;
-import ch.giantific.qwittig.presentation.stats.models.Stats;
-import rx.Single;
+import ch.giantific.qwittig.presentation.stats.models.StatsPage;
+import ch.giantific.qwittig.presentation.stats.pie.currencies.StatsCurrenciesFragment;
+import ch.giantific.qwittig.presentation.stats.pie.stores.StatsStoresFragment;
+import ch.giantific.qwittig.presentation.stats.spending.StatsSpendingFragment;
 
 /**
  * Hosts the different stats fragments, {@link StatsSpendingFragment}, {@link StatsStoresFragment}
@@ -36,77 +39,67 @@ import rx.Single;
  * <p/>
  * Subclass of {@link BaseNavDrawerActivity}.
  */
-public class StatsActivity extends BaseNavDrawerActivity implements
-        StatsBaseFragment.FragmentInteractionListener,
-        StatsCalcListener {
+public class StatsActivity extends BaseNavDrawerActivity<StatsViewModel> implements
+        StatsSpendingFragment.ActivityListener {
 
-    private static final String STATE_STATS_FRAGMENT = "STATE_STATS_FRAGMENT";
     private static final int NUMBER_OF_MONTHS = 12;
-    private Spinner mSpinnerStatsType;
-    private Spinner mSpinnerYear;
-    private Spinner mSpinnerMonth;
-    @Nullable
-    private StatsBaseFragment mStatsFragment;
+    private ActivityStatsBinding mBinding;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_stats);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_stats);
 
         // check item in NavDrawer
         checkNavDrawerItem(R.id.nav_stats);
 
-        ActionBar actionBar = getSupportActionBar();
+        final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setTitle(null);
         }
 
-        mSpinnerStatsType = (Spinner) findViewById(R.id.sp_stats_type);
         setupTypeSpinner();
-        mSpinnerYear = (Spinner) findViewById(R.id.sp_year);
         setupYearSpinner();
-        mSpinnerMonth = (Spinner) findViewById(R.id.sp_month);
         setupMonthSpinner();
 
-        if (mUserLoggedIn) {
-            if (savedInstanceState == null) {
-                addFirstFragment();
-            } else {
-                mStatsFragment = (StatsBaseFragment) getSupportFragmentManager()
-                        .getFragment(savedInstanceState, STATE_STATS_FRAGMENT);
-            }
+        if (mUserLoggedIn && savedInstanceState == null) {
+            addFirstFragment();
         }
     }
 
     @Override
     protected void injectNavDrawerDependencies(@NonNull NavDrawerComponent navComp) {
+        navComp.inject(this);
     }
 
+    @SuppressWarnings("ConstantConditions")
     private void setupTypeSpinner() {
-        final int[] types = new int[]{
-                R.string.tab_stats_spending,
-                R.string.tab_stats_stores,
-                R.string.tab_stats_currencies};
-        final StringResSpinnerAdapter typesAdapter =
-                new StringResSpinnerAdapter(this, R.layout.spinner_item_toolbar, types);
-        mSpinnerStatsType.setAdapter(typesAdapter);
+        final StatsPage[] pages = new StatsPage[]{
+                new StatsPage(getString(R.string.tab_stats_spending), StatsType.SPENDING),
+                new StatsPage(getString(R.string.tab_stats_stores), StatsType.STORES),
+                new StatsPage(getString(R.string.tab_stats_currencies), StatsType.CURRENCIES)
+        };
+        final Context themedContext = getSupportActionBar().getThemedContext();
+        final ArrayAdapter<StatsPage> adapter =
+                new ArrayAdapter<>(themedContext, R.layout.spinner_item_toolbar, pages);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mBinding.spStatsType.setAdapter(adapter);
     }
 
     private void setupYearSpinner() {
-        ThemedArrayAdapter<String> spinnerYearAdapter =
-                new ThemedArrayAdapter<>(this, R.layout.spinner_item_stats_period, getLastYears(5));
-        spinnerYearAdapter.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item);
-        mSpinnerYear.setAdapter(spinnerYearAdapter);
+        final ArrayAdapter<String> adapter =
+                new ArrayAdapter<>(this, R.layout.spinner_item_stats_period, getLastYears(5));
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mBinding.spYear.setAdapter(adapter);
     }
 
     @NonNull
     private List<String> getLastYears(int timeToGoBack) {
-        List<String> lastYears = new ArrayList<>();
-        Calendar calendar = Calendar.getInstance();
-        int yearNow = calendar.get(Calendar.YEAR);
-        int year = yearNow - timeToGoBack;
+        final List<String> lastYears = new ArrayList<>();
+        final Calendar calendar = Calendar.getInstance();
+        final int yearNow = calendar.get(Calendar.YEAR);
 
+        int year = yearNow - timeToGoBack;
         while (year <= yearNow) {
             lastYears.add(String.valueOf(year));
             year++;
@@ -117,156 +110,66 @@ public class StatsActivity extends BaseNavDrawerActivity implements
     }
 
     private void setupMonthSpinner() {
-        List<Month> months = new ArrayList<>();
+        final ArrayAdapter<Month> adapter =
+                new ArrayAdapter<>(this, R.layout.spinner_item_stats_period, getMonths());
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mBinding.spMonth.setAdapter(adapter);
+    }
+
+    @NonNull
+    private List<Month> getMonths() {
+        final List<Month> months = new ArrayList<>();
         months.add(new Month(getString(R.string.stats_month_all)));
         for (int i = 1; i <= NUMBER_OF_MONTHS; i++) {
             months.add(new Month(i));
         }
-
-        ThemedArrayAdapter<Month> spinnerMonthAdapter =
-                new ThemedArrayAdapter<>(this, R.layout.spinner_item_stats_period, months);
-        spinnerMonthAdapter.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item);
-        mSpinnerMonth.setAdapter(spinnerMonthAdapter);
+        return months;
     }
 
     private void addFirstFragment() {
-        mStatsFragment = new StatsSpendingFragment();
+        final String year = (String) mBinding.spYear.getSelectedItem();
+        final Month month = (Month) mBinding.spMonth.getSelectedItem();
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.container, mStatsFragment)
+                .add(R.id.container, StatsSpendingFragment.newInstance(year, month))
                 .commit();
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
+    protected void onLoginSuccessful() {
+        super.onLoginSuccessful();
 
-        if (mUserLoggedIn) {
-            getSupportFragmentManager().putFragment(outState, STATE_STATS_FRAGMENT, mStatsFragment);
-        }
+        addFirstFragment();
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-
-        if (mUserLoggedIn) {
-            setSpinnerListeners();
-        }
+    public void setStatsViewModel(@NonNull StatsViewModel viewModel) {
+        mViewModel = viewModel;
+        mBinding.setViewModel(mViewModel);
     }
 
-    /**
-     * Adds itemSelectedListeners for spinners with a Runnable. The reason being that they should
-     * not fire when the spinners are first laid out. Maybe use GlobalLayoutListener for a more
-     * elegant solution.
-     */
-    private void setSpinnerListeners() {
-        mSpinnerStatsType.post(new Runnable() {
-            @Override
-            public void run() {
-                mSpinnerStatsType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(@NonNull AdapterView<?> parent, View view, int position, long id) {
-                        int statsType = (int) parent.getItemAtPosition(position);
-                        switchFragment(statsType);
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-
-                    }
-                });
-            }
-        });
-
-        mSpinnerYear.post(new Runnable() {
-            @Override
-            public void run() {
-                mSpinnerYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        onPeriodSelected();
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-
-                    }
-                });
-            }
-        });
-
-        mSpinnerMonth.post(new Runnable() {
-            @Override
-            public void run() {
-                mSpinnerMonth.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        onPeriodSelected();
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-
-                    }
-                });
-            }
-        });
-    }
-
-    private void switchFragment(int statsType) {
-        StatsBaseFragment fragment = null;
+    @Override
+    public void switchFragment(@StatsType int statsType) {
+        final String year = (String) mBinding.spYear.getSelectedItem();
+        final Month month = (Month) mBinding.spMonth.getSelectedItem();
+        Fragment fragment;
         switch (statsType) {
-            case R.string.tab_stats_spending:
-                fragment = new StatsSpendingFragment();
+            case StatsType.CURRENCIES:
+                fragment = StatsCurrenciesFragment.newInstance(year, month);
                 break;
-            case R.string.tab_stats_stores:
-                fragment = new StatsStoresFragment();
+            case StatsType.SPENDING:
+                fragment = StatsSpendingFragment.newInstance(year, month);
                 break;
-            case R.string.tab_stats_currencies:
-                fragment = new StatsCurrenciesFragment();
+            case StatsType.STORES:
+                fragment = StatsStoresFragment.newInstance(year, month);
                 break;
+            default:
+                fragment = null;
         }
 
         if (fragment != null) {
-            mStatsFragment = fragment;
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container, mStatsFragment)
+                    .replace(R.id.container, fragment)
                     .commit();
         }
-    }
-
-    private void onPeriodSelected() {
-        if (mStatsFragment != null) {
-            mStatsFragment.loadData();
-        }
-    }
-
-//    @Override
-//    void afterLoginSetup() {
-//        super.afterLoginSetup();
-//
-//        addFirstFragment();
-//        setSpinnerListeners();
-//        if (userIsInGroup()) {
-//            ParseQueryService.startQueryAll(this);
-//        }
-//    }
-
-    @NonNull
-    @Override
-    public String getYear() {
-        return (String) mSpinnerYear.getSelectedItem();
-    }
-
-    @NonNull
-    @Override
-    public Month getMonth() {
-        return (Month) mSpinnerMonth.getSelectedItem();
-    }
-
-    @Override
-    public void setStatsCalcStream(@NonNull Single<Stats> single, int statsType, @NonNull String workerTag) {
-
     }
 }

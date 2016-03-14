@@ -136,7 +136,7 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
             }
         };
 
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
     }
 
     protected int getSelfNavDrawerItem() {

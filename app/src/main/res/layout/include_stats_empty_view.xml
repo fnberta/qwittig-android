@@ -3,13 +3,28 @@
   ~ Copyright (c) 2015 Fabio Berta
   -->
 
-<TextView
-    android:id="@+id/tv_empty_view"
-    style="@style/TextAppearance.AppCompat.Title"
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    android:text="@string/no_stats_data"
-    android:visibility="gone"
-    />
+    >
+
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.stats.StatsViewModel"
+            />
+    </data>
+
+    <TextView
+        android:id="@+id/tv_empty_view"
+        style="@style/TextAppearance.AppCompat.Title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/no_stats_data"
+        android:visibility="@{!viewModel.dataEmpty ? View.GONE : viewModel.loading ? View.GONE : View.VISIBLE}"
+        />
+
+</layout>

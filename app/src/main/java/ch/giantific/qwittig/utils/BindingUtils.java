@@ -23,6 +23,8 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.PieData;
 
 import java.util.List;
 
@@ -32,6 +34,8 @@ import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.home.purchases.details.widgets.CircleDisplay;
 import ch.giantific.qwittig.presentation.navdrawer.BlurTransformation;
 import ch.giantific.qwittig.presentation.settings.profile.AvatarLoadListener;
+import ch.giantific.qwittig.presentation.stats.widgets.BarChart;
+import ch.giantific.qwittig.presentation.stats.widgets.PieChart;
 
 /**
  * Contains generic binding adapters.
@@ -207,6 +211,36 @@ public class BindingUtils {
             view.show();
         } else {
             view.hide();
+        }
+    }
+
+    @BindingAdapter({"barData", "dataEmpty"})
+    public static void setBarChartData(BarChart view, BarData barData, boolean dataEmpty) {
+        if (barData != null) {
+            view.setData(barData);
+            if (!view.isEmpty() && !dataEmpty) {
+                view.animateY(BarChart.ANIMATION_Y_TIME);
+            }
+        }
+    }
+
+    @BindingAdapter({"pieData", "dataEmpty"})
+    public static void setPieChartData(PieChart view, PieData pieData, boolean dataEmpty) {
+        if (pieData != null) {
+            view.setData(pieData);
+            if (!view.isEmpty() && !dataEmpty) {
+                view.animateY(PieChart.ANIMATION_Y_TIME);
+            }
+        }
+    }
+
+    @BindingAdapter({"pieData"})
+    public static void setPieChartRowData(PieChart view, PieData pieData) {
+        if (pieData != null) {
+            view.setData(pieData);
+            if (!view.isEmpty()) {
+                view.animateY(PieChart.ANIMATION_Y_TIME);
+            }
         }
     }
 

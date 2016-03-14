@@ -42,9 +42,8 @@ public class PieChart extends com.github.mikephil.charting.charts.PieChart {
         setTransparentCircleRadius(40f);
         setDescription("");
         setCenterTextSize(20f);
-        setCenterTextWordWrapEnabled(true);
 
-        Legend legend = getLegend();
+        final Legend legend = getLegend();
         legend.setPosition(Legend.LegendPosition.RIGHT_OF_CHART);
     }
 }

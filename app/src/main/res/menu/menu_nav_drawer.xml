@@ -30,7 +30,7 @@
             android:id="@+id/nav_stats"
             android:icon="@drawable/ic_nav_assessment"
             android:title="@string/title_activity_stats"
-            android:visible="false"
+            android:visible="true"
             />
     </group>
 

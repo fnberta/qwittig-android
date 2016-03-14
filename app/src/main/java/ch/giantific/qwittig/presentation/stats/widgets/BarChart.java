@@ -40,8 +40,11 @@ public class BarChart extends com.github.mikephil.charting.charts.BarChart {
         setNoDataText("");
         setDescription("");
 
-        YAxis yAxisRight = getAxisRight();
+        final YAxis yAxisRight = getAxisRight();
         yAxisRight.setDrawLabels(false);
+
+        final YAxis yAxisLeft = getAxisLeft();
+        yAxisLeft.setAxisMinValue(0f);
     }
 
 }

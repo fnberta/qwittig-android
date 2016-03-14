@@ -9,6 +9,7 @@ import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.presentation.finance.FinanceActivity;
 import ch.giantific.qwittig.presentation.home.HomeActivity;
 import ch.giantific.qwittig.presentation.home.purchases.details.PurchaseDetailsActivity;
+import ch.giantific.qwittig.presentation.stats.StatsActivity;
 import ch.giantific.qwittig.presentation.tasks.details.TaskDetailsActivity;
 import ch.giantific.qwittig.presentation.tasks.list.TasksActivity;
 import dagger.Component;
@@ -29,4 +30,6 @@ public interface NavDrawerComponent {
     void inject(TaskDetailsActivity taskDetailsActivity);
 
     void inject(PurchaseDetailsActivity purchaseDetailsActivity);
+
+    void inject(StatsActivity statsActivity);
 }

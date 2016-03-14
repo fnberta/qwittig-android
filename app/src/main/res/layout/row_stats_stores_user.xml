@@ -3,13 +3,30 @@
   ~ Copyright (c) 2015 Fabio Berta
   -->
 
-<ch.giantific.qwittig.presentation.stats.widgets.PieChart
-    android:id="@+id/pc_stores_user"
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="@dimen/pc_multiple_size"
-    android:layout_marginBottom="@dimen/normal_space"
-    android:layout_marginEnd="@dimen/key_line_1"
-    android:layout_marginStart="@dimen/key_line_1"
-    android:clipToPadding="false"
-    />
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.stats.pie.PieChartRowViewModel"
+            />
+    </data>
+
+    <ch.giantific.qwittig.presentation.stats.widgets.PieChart
+        android:id="@+id/pc_stores_user"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/pc_multiple_size"
+        android:layout_marginBottom="@dimen/normal_space"
+        android:layout_marginEnd="@dimen/key_line_1"
+        android:layout_marginStart="@dimen/key_line_1"
+        android:centerText="@{viewModel.centerText}"
+        android:clipToPadding="false"
+        app:pieData="@{viewModel.pieData}"
+        />
+
+</layout>
+

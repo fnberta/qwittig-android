@@ -20,7 +20,6 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.domain.models.User;
-import ch.giantific.qwittig.domain.repositories.IdentityRepository;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.tasks.list.TasksViewModel;
@@ -49,8 +48,6 @@ public class TasksViewModelImplTest {
     @Mock
     private TaskRepository mMockTaskRepo;
     @Mock
-    private IdentityRepository mMockIdentityRepo;
-    @Mock
     private UserRepository mMockUserRepo;
 
     private TasksViewModelImpl mViewModel;
@@ -59,7 +56,7 @@ public class TasksViewModelImplTest {
     @Before
     public void setUp() throws Exception {
         final User currentUser = mMockUserRepo.getCurrentUser();
-        mViewModel = new TasksViewModelImpl(mMockBundle, mMockView, mMockIdentityRepo, mMockUserRepo, mMockTaskRepo);
+        mViewModel = new TasksViewModelImpl(mMockBundle, mMockView, mMockUserRepo, mMockTaskRepo);
         mTasks = new ArrayList<>();
         mTasks.add(new TaskItem(mMockTask, currentUser.getCurrentIdentity()));
         mViewModel.setItems(mTasks);
