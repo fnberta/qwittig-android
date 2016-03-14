@@ -11,14 +11,15 @@ import com.google.gson.Gson;
 import java.util.HashMap;
 import java.util.Map;
 
-import ch.giantific.qwittig.presentation.stats.models.Stats;
-import ch.giantific.qwittig.domain.repositories.StatsRepository;
 import ch.giantific.qwittig.data.receivers.PushBroadcastReceiver;
+import ch.giantific.qwittig.domain.repositories.StatsRepository;
+import ch.giantific.qwittig.presentation.stats.models.Stats;
 import rx.Single;
 import rx.functions.Func1;
 
 /**
- * Created by fabio on 09.02.16.
+ * Provides an implementation of the {@link StatsRepository} interface that connects to the server
+ * via Parse.com CloudCode calls.
  */
 public class ParseStatsRepository extends ParseBaseRepository implements StatsRepository {
 
