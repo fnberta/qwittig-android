@@ -10,7 +10,6 @@ import android.support.annotation.NonNull;
 
 import java.text.NumberFormat;
 
-import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.presentation.common.viewmodels.CardTopProgressViewModel;
 

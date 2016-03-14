@@ -47,8 +47,8 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     private static final String DRAFTS_AVAILABLE = "DRAFTS_AVAILABLE_";
     private static final String EXCHANGE_RATE_LAST_FETCHED_TIME = "EXCHANGE_RATE_LAST_FETCHED_TIME";
     private static final long EXCHANGE_RATE_REFRESH_INTERVAL = 24 * 60 * 60 * 1000;
-    private SharedPreferences mSharedPrefs;
-    private ExchangeRates mExchangeRates;
+    private final SharedPreferences mSharedPrefs;
+    private final ExchangeRates mExchangeRates;
 
     public ParsePurchaseRepository(@NonNull SharedPreferences sharedPreferences,
                                    @NonNull ExchangeRates exchangeRates) {

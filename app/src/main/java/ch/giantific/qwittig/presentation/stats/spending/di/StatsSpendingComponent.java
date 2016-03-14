@@ -8,10 +8,7 @@ import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerFragment;
 import ch.giantific.qwittig.domain.repositories.StatsRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.presentation.stats.pie.currencies.di.StatsCurrenciesViewModelModule;
-import ch.giantific.qwittig.presentation.stats.pie.stores.di.StatsStoresViewModelModule;
 import ch.giantific.qwittig.presentation.stats.spending.StatsSpendingFragment;
-import ch.giantific.qwittig.presentation.stats.spending.di.StatsSpendingViewModelModule;
 import dagger.Component;
 
 /**

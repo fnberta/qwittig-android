@@ -18,14 +18,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.gms.appinvite.AppInviteInvitation;
-import com.google.android.gms.appinvite.AppInviteInvitation.IntentBuilder.PlatformMode;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentHelpFeedbackBinding;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
 import ch.giantific.qwittig.presentation.helpfeedback.di.DaggerHelpFeedbackComponent;
 import ch.giantific.qwittig.presentation.helpfeedback.di.HelpFeedbackViewModelModule;
-import timber.log.Timber;
 
 /**
  * Displays help and feedback items in a {@link RecyclerView} list.

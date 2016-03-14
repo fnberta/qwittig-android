@@ -14,7 +14,6 @@ import android.view.MenuItem;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.settings.users.AddUserWorkerListener;
 import ch.giantific.qwittig.presentation.settings.users.SettingsUsersFragment;

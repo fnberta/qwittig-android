@@ -19,15 +19,17 @@ import ch.giantific.qwittig.presentation.stats.models.Stats;
 import rx.Observable;
 
 /**
- * Created by fabio on 13.03.16.
+ * Handles the loading of statistical data and presents them as an {@link Observable}.
+ * <p/>
+ * Subclass of {@link BaseRxLoader}.
  */
 public class StatsLoader extends BaseRxLoader<Stats> {
 
-    private UserRepository mUserRepo;
-    private StatsRepository mStatsRepo;
-    private int mStatsType;
-    private String mYear;
-    private int mMonthNumber;
+    private final UserRepository mUserRepo;
+    private final StatsRepository mStatsRepo;
+    private final int mStatsType;
+    private final String mYear;
+    private final int mMonthNumber;
 
     public StatsLoader(@NonNull Context context, @NonNull UserRepository userRepo,
                        @NonNull StatsRepository statsRepo, @StatsType int statsType,

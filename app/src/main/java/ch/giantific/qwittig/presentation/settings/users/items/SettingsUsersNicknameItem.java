@@ -17,7 +17,7 @@ import ch.giantific.qwittig.BR;
  */
 public class SettingsUsersNicknameItem extends BaseObservable implements SettingsUsersBaseItem {
 
-    private AddListener mAddListener;
+    private final AddListener mAddListener;
     private String mNickname;
     private boolean mValidate;
 

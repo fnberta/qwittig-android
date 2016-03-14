@@ -25,7 +25,6 @@ import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.ActivityHomeBinding;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
-import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.adapters.TabsAdapter;
 import ch.giantific.qwittig.presentation.home.di.DaggerHomeComponent;
 import ch.giantific.qwittig.presentation.home.di.HomeComponent;

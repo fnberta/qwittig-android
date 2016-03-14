@@ -13,9 +13,9 @@ import ch.giantific.qwittig.presentation.stats.StatsViewModel.StatsType;
  */
 public class StatsPage {
 
-    private String mTitle;
+    private final String mTitle;
     @StatsType
-    private int mType;
+    private final int mType;
 
     public StatsPage(@NonNull String title, @StatsType int type) {
         mTitle = title;

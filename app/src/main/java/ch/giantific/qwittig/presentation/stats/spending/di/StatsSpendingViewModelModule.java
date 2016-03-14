@@ -24,8 +24,8 @@ import dagger.Provides;
 @Module
 public class StatsSpendingViewModelModule extends BaseViewModelModule<StatsSpendingViewModel.ViewListener> {
 
-    private String mYear;
-    private Month mMonth;
+    private final String mYear;
+    private final Month mMonth;
 
     public StatsSpendingViewModelModule(@Nullable Bundle savedState,
                                         @NonNull StatsSpendingViewModel.ViewListener view,

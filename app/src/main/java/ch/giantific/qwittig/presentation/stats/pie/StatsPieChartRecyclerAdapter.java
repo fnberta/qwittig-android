@@ -19,7 +19,7 @@ import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
  */
 public class StatsPieChartRecyclerAdapter extends RecyclerView.Adapter<BindingRow<RowStatsStoresUserBinding>> {
 
-    private StatsPieViewModel mViewModel;
+    private final StatsPieViewModel mViewModel;
 
     /**
      * Constructs a new {@link StatsPieChartRecyclerAdapter}.

@@ -15,8 +15,8 @@ import com.github.mikephil.charting.data.PieData;
  */
 public class PieChartRowViewModel extends BaseObservable implements PieChartViewModel {
 
+    private final boolean mShowPercentage;
     private PieData mPieData;
-    private boolean mShowPercentage;
     private String mCenterText;
 
     public PieChartRowViewModel(@NonNull PieData pieData, boolean showPercentage,
