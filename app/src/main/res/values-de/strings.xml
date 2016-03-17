@@ -300,5 +300,6 @@
     <string name="toast_error_tasks_update">Aktualiseren der Aufgaben fehlgeschlagen</string>
     <string name="toast_error_users_update">Aktualiseren der Nutzer fehlgeschlagen</string>
     <string name="toast_error_comps_update">Aktualiseren der Abrechnungen fehlgeschlagen</string>
+    <string name="toast_profile_nickname_taken">Dieser Spitzname ist bereits vergeben in dieser Grupp</string>
 
 </resources>

@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
@@ -25,6 +26,8 @@ import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileWorker.
 import ch.giantific.qwittig.utils.Utils;
 import rx.Single;
 import rx.SingleSubscriber;
+import rx.Subscriber;
+import rx.functions.Func1;
 
 /**
  * Provides an implementation of the {@link SettingsProfileViewModel}.
@@ -51,6 +54,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     private String mNickname;
     private String mPassword;
     private String mPasswordRepeat;
+    private List<String> mGroupNicknames = new ArrayList<>();
 
     public SettingsProfileViewModelImpl(@Nullable Bundle savedState,
                                         @NonNull SettingsProfileViewModel.ViewListener view,
@@ -210,6 +214,42 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     }
 
     @Override
+    public void onViewVisible() {
+        super.onViewVisible();
+
+        getSubscriptions().add(mUserRepo.getIdentities(mCurrentIdentity.getGroup(), true)
+                .filter(new Func1<Identity, Boolean>() {
+                    @Override
+                    public Boolean call(Identity identity) {
+                        return !mCurrentIdentity.getObjectId().equals(identity.getObjectId());
+                    }
+                })
+                .map(new Func1<Identity, String>() {
+                    @Override
+                    public String call(Identity identity) {
+                        return identity.getNickname();
+                    }
+                })
+                .subscribe(new Subscriber<String>() {
+                    @Override
+                    public void onCompleted() {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onNext(String nickname) {
+                        mGroupNicknames.add(nickname);
+                    }
+                })
+        );
+    }
+
+    @Override
     public void onPickAvatarMenuClick() {
         mView.showAvatarPicker();
     }
@@ -303,6 +343,11 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     @Override
     public void onFabSaveProfileClick(View view) {
         if (mSaving || !validate()) {
+            return;
+        }
+
+        if (mGroupNicknames.contains(mNickname)) {
+            mView.showMessage(R.string.toast_profile_nickname_taken);
             return;
         }
 
