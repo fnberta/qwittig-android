@@ -116,7 +116,7 @@ public abstract class StatsPieViewModelBaseImpl<T extends StatsPieViewModel.View
             return;
         }
 
-        getSubscriptions().add(mUserRepo.fetchIdentityDataAsync(mCurrentIdentity)
+        getSubscriptions().add(mUserRepo.fetchIdentityData(mCurrentIdentity)
                 .flatMap(new Func1<Identity, Single<Stats>>() {
                     @Override
                     public Single<Stats> call(Identity identity) {

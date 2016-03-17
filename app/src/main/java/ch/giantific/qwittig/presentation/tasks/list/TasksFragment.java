@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.FragmentTasksBinding;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
@@ -72,8 +73,8 @@ public class TasksFragment extends BaseRecyclerViewFragment<TasksViewModel, Task
     }
 
     @Override
-    public void loadUpdateTasksWorker() {
-        TasksUpdateWorker.attach(getFragmentManager());
+    public void startUpdateTasksService() {
+        ParseQueryService.startUpdateTasks(getActivity());
     }
 
     @SuppressWarnings("unchecked")

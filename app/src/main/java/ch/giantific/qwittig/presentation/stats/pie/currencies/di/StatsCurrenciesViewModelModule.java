@@ -8,7 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import ch.giantific.qwittig.di.scopes.PerFragment;
+import ch.giantific.qwittig.di.scopes.PerScreen;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.stats.pie.currencies.StatsCurrenciesViewModelImpl;
@@ -36,7 +36,7 @@ public class StatsCurrenciesViewModelModule extends BaseViewModelModule<StatsPie
         mMonth = month;
     }
 
-    @PerFragment
+    @PerScreen
     @Provides
     StatsPieViewModel providesStatsPieViewModel(@NonNull UserRepository userRepository) {
         return new StatsCurrenciesViewModelImpl(mSavedState, mView, userRepository, mYear, mMonth);

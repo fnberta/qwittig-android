@@ -69,7 +69,7 @@ public class PurchasesQueryMoreWorker extends BaseQueryWorker<Purchase, Purchase
     protected Observable<Purchase> getObservable(@NonNull Bundle args) {
         if (checkIdentities()) {
             final int skip = args.getInt(KEY_SKIP, 0);
-            return mPurchaseRepo.getPurchasesOnlineAsync(mCurrentIdentity, skip);
+            return mPurchaseRepo.queryMorePurchases(mCurrentIdentity, skip);
         }
 
         return null;

@@ -64,8 +64,8 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public Observable<Purchase> getPurchasesLocalAsync(@NonNull Identity identity,
-                                                       boolean getDrafts) {
+    public Observable<Purchase> getPurchases(@NonNull Identity identity,
+                                             boolean getDrafts) {
         final ParseQuery<Purchase> buyerQuery = ParseQuery.getQuery(Purchase.CLASS);
         buyerQuery.whereEqualTo(Purchase.BUYER, identity);
         final ParseQuery<Purchase> involvedQuery = ParseQuery.getQuery(Purchase.CLASS);
@@ -100,7 +100,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public Single<Purchase> getPurchaseLocalAsync(@NonNull String purchaseId, boolean isDraft) {
+    public Single<Purchase> getPurchase(@NonNull String purchaseId, boolean isDraft) {
         final ParseQuery<Purchase> query = ParseQuery.getQuery(Purchase.CLASS);
         query.fromLocalDatastore();
         query.ignoreACLs();
@@ -117,7 +117,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public Single<Purchase> fetchPurchaseDataLocalAsync(@NonNull String purchaseId) {
+    public Single<Purchase> fetchPurchaseData(@NonNull String purchaseId) {
         final Purchase purchase = (Purchase) Purchase.createWithoutData(Purchase.CLASS, purchaseId);
         return fetchLocal(purchase);
     }
@@ -148,7 +148,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public boolean removePurchaseLocal(@NonNull String purchaseId, @NonNull String groupId) {
+    public boolean removePurchase(@NonNull String purchaseId, @NonNull String groupId) {
         final ParseObject purchase = ParseObject.createWithoutData(Purchase.CLASS, purchaseId);
         try {
             purchase.unpin(Purchase.PIN_LABEL + groupId);
@@ -160,43 +160,24 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public Observable<Purchase> updatePurchasesAsync(@NonNull final List<Identity> identities,
-                                                     @NonNull Identity currentIdentity) {
-        final String currentIdentityGroupId = currentIdentity.getGroup().getObjectId();
-        return Observable.from(identities)
-                .flatMap(new Func1<Identity, Observable<Purchase>>() {
-                    @Override
-                    public Observable<Purchase> call(Identity identity) {
-                        final Group group = identity.getGroup();
-                        final String groupId = group.getObjectId();
-                        final String pinLabel = Purchase.PIN_LABEL + groupId;
+    public Observable<Purchase> queryMorePurchases(@NonNull Identity currentIdentity,
+                                                   int skip) {
+        final Group currentGroup = currentIdentity.getGroup();
+        final String pinLabel = Purchase.PIN_LABEL + currentGroup.getObjectId();
+        final ParseQuery<Purchase> query = getPurchasesOnlineQuery(currentIdentity);
+        query.setSkip(skip);
 
-                        final ParseQuery<Purchase> query = getPurchasesOnlineQuery(identity);
-                        return find(query)
-                                .concatMap(new Func1<List<Purchase>, Observable<List<Purchase>>>() {
-                                    @Override
-                                    public Observable<List<Purchase>> call(List<Purchase> purchases) {
-                                        return unpinAll(purchases, pinLabel);
-                                    }
-                                })
-                                .concatMap(new Func1<List<Purchase>, Observable<List<Purchase>>>() {
-                                    @Override
-                                    public Observable<List<Purchase>> call(List<Purchase> purchases) {
-                                        return pinAll(purchases, pinLabel);
-                                    }
-                                })
-                                .concatMap(new Func1<List<Purchase>, Observable<Purchase>>() {
-                                    @Override
-                                    public Observable<Purchase> call(List<Purchase> purchases) {
-                                        return Observable.from(purchases);
-                                    }
-                                })
-                                .filter(new Func1<Purchase, Boolean>() {
-                                    @Override
-                                    public Boolean call(Purchase purchase) {
-                                        return groupId.equals(currentIdentityGroupId);
-                                    }
-                                });
+        return find(query)
+                .concatMap(new Func1<List<Purchase>, Observable<List<Purchase>>>() {
+                    @Override
+                    public Observable<List<Purchase>> call(List<Purchase> purchases) {
+                        return pinAll(purchases, pinLabel);
+                    }
+                })
+                .concatMap(new Func1<List<Purchase>, Observable<Purchase>>() {
+                    @Override
+                    public Observable<Purchase> call(List<Purchase> purchases) {
+                        return Observable.from(purchases);
                     }
                 });
     }
@@ -220,29 +201,6 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
         query.setLimit(QUERY_ITEMS_PER_PAGE);
         query.orderByDescending(Purchase.DATE);
         return query;
-    }
-
-    @Override
-    public Observable<Purchase> getPurchasesOnlineAsync(@NonNull Identity currentIdentity,
-                                                        int skip) {
-        final Group currentGroup = currentIdentity.getGroup();
-        final String pinLabel = Purchase.PIN_LABEL + currentGroup.getObjectId();
-        final ParseQuery<Purchase> query = getPurchasesOnlineQuery(currentIdentity);
-        query.setSkip(skip);
-
-        return find(query)
-                .concatMap(new Func1<List<Purchase>, Observable<List<Purchase>>>() {
-                    @Override
-                    public Observable<List<Purchase>> call(List<Purchase> purchases) {
-                        return pinAll(purchases, pinLabel);
-                    }
-                })
-                .concatMap(new Func1<List<Purchase>, Observable<Purchase>>() {
-                    @Override
-                    public Observable<Purchase> call(List<Purchase> purchases) {
-                        return Observable.from(purchases);
-                    }
-                });
     }
 
     @Override
@@ -296,10 +254,10 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public Single<Purchase> savePurchaseAsync(@NonNull final Purchase purchase,
-                                              @NonNull final String tag,
-                                              @Nullable byte[] receiptImage,
-                                              final boolean isDraft) {
+    public Single<Purchase> savePurchase(@NonNull final Purchase purchase,
+                                         @NonNull final String tag,
+                                         @Nullable byte[] receiptImage,
+                                         final boolean isDraft) {
         if (receiptImage == null) {
             return saveAndPinPurchase(purchase, tag, isDraft);
         }
@@ -359,8 +317,8 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public Single<Purchase> savePurchaseAsDraftAsync(@NonNull Purchase purchase,
-                                                     @NonNull String tag) {
+    public Single<Purchase> savePurchaseAsDraft(@NonNull Purchase purchase,
+                                                @NonNull String tag) {
         return pin(purchase, tag)
                 .doOnSuccess(new Action1<Purchase>() {
                     @Override

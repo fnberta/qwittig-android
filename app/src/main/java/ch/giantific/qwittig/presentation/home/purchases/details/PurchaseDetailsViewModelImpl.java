@@ -83,7 +83,7 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<Purchase
 
     @Override
     public void loadData() {
-        getSubscriptions().add(mPurchaseRepo.getPurchaseLocalAsync(mPurchaseId, false)
+        getSubscriptions().add(mPurchaseRepo.getPurchase(mPurchaseId, false)
                 .subscribe(new SingleSubscriber<Purchase>() {
                     @Override
                     public void onSuccess(Purchase purchase) {

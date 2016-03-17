@@ -8,7 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import ch.giantific.qwittig.di.scopes.PerFragment;
+import ch.giantific.qwittig.di.scopes.PerScreen;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.helpfeedback.HelpFeedbackViewModel;
@@ -27,7 +27,7 @@ public class HelpFeedbackViewModelModule extends BaseViewModelModule<HelpFeedbac
         super(savedState, view);
     }
 
-    @PerFragment
+    @PerScreen
     @Provides
     HelpFeedbackViewModel providesHelpFeedbackViewModel(@NonNull UserRepository userRepository) {
         return new HelpFeedbackViewModelImpl(mSavedState, mView, userRepository);

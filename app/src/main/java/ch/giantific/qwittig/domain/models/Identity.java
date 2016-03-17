@@ -55,7 +55,7 @@ public class Identity extends ParseObject implements Comparable<Identity> {
     }
 
     private void setAccessRights(@NonNull Group group) {
-        final ParseACL acl = ParseUtils.getDefaultAcl(group, false);
+        final ParseACL acl = ParseUtils.getDefaultAcl(group, true);
         setACL(acl);
     }
 

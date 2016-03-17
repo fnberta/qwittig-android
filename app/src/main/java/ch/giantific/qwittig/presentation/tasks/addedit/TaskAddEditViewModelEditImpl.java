@@ -64,7 +64,7 @@ public class TaskAddEditViewModelEditImpl extends TaskAddEditViewModelAddImpl {
 
     @Override
     void loadTaskUsers() {
-        getSubscriptions().add(mTaskRepo.fetchTaskDataLocalAsync(mEditTaskId)
+        getSubscriptions().add(mTaskRepo.fetchTaskData(mEditTaskId)
                 .subscribe(new SingleSubscriber<Task>() {
                     @Override
                     public void onSuccess(Task task) {

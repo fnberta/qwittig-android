@@ -58,11 +58,11 @@ public class PurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purchase
     @Override
     public void loadData() {
         getSubscriptions().add(
-                mUserRepo.fetchIdentityDataAsync(mCurrentIdentity)
+                mUserRepo.fetchIdentityData(mCurrentIdentity)
                         .flatMapObservable(new Func1<Identity, Observable<Purchase>>() {
                             @Override
                             public Observable<Purchase> call(Identity identity) {
-                                return mPurchaseRepo.getPurchasesLocalAsync(identity, false);
+                                return mPurchaseRepo.getPurchases(identity, false);
                             }
                         })
                         .subscribe(new Subscriber<Purchase>() {
@@ -104,15 +104,6 @@ public class PurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purchase
     }
 
     @Override
-    public int getItemViewType(int position) {
-        if (mItems.get(position) == null) {
-            return TYPE_PROGRESS;
-        }
-
-        return TYPE_ITEM;
-    }
-
-    @Override
     protected void refreshItems() {
         if (!mView.isNetworkAvailable()) {
             setRefreshing(false);
@@ -120,7 +111,7 @@ public class PurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purchase
             return;
         }
 
-        mView.loadUpdatePurchasesWorker();
+        mView.startUpdatePurchasesService();
     }
 
     @NonNull
@@ -135,36 +126,19 @@ public class PurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purchase
     }
 
     @Override
-    public void onPurchaseRowItemClick(int position) {
-        final Purchase purchase = getItemAtPosition(position);
-        mView.startPurchaseDetailsActivity(purchase);
+    public void onDataUpdated(boolean successful) {
+        setRefreshing(false);
+        if (successful) {
+            loadData();
+        } else {
+            mView.showMessageWithAction(R.string.toast_error_purchases_update, getRefreshAction());
+        }
     }
 
     @Override
-    public void setPurchasesUpdateStream(@NonNull Observable<Purchase> observable,
-                                         @NonNull final String workerTag) {
-        getSubscriptions().add(observable
-                .toList()
-                .toSingle()
-                .subscribe(new SingleSubscriber<List<Purchase>>() {
-                    @Override
-                    public void onSuccess(List<Purchase> purchases) {
-                        mView.removeWorker(workerTag);
-                        setRefreshing(false);
-
-                        loadData();
-                    }
-
-                    @Override
-                    public void onError(Throwable error) {
-                        mView.removeWorker(workerTag);
-                        setRefreshing(false);
-
-                        mView.showMessageWithAction(mPurchaseRepo.getErrorMessage(error),
-                                getRefreshAction());
-                    }
-                })
-        );
+    public void onPurchaseRowItemClick(int position) {
+        final Purchase purchase = getItemAtPosition(position);
+        mView.startPurchaseDetailsActivity(purchase);
     }
 
     @Override
@@ -220,5 +194,14 @@ public class PurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purchase
     @Override
     public boolean isLoadingMore() {
         return !mView.isNetworkAvailable() || mIsLoadingMore || isRefreshing();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (mItems.get(position) == null) {
+            return TYPE_PROGRESS;
+        }
+
+        return TYPE_ITEM;
     }
 }

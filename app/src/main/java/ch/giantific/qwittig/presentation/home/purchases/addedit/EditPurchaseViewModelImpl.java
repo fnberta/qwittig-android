@@ -119,7 +119,7 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
     }
 
     Single<Purchase> fetchEditPurchase() {
-        return mPurchaseRepo.fetchPurchaseDataLocalAsync(mEditPurchaseId);
+        return mPurchaseRepo.fetchPurchaseData(mEditPurchaseId);
     }
 
     private void setOldPurchaseValues() {

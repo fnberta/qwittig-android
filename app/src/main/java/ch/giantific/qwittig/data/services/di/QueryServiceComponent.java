@@ -6,7 +6,6 @@ package ch.giantific.qwittig.data.services.di;
 
 import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.di.ApplicationComponent;
-import ch.giantific.qwittig.di.LocalBroadcastModule;
 import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerBroadcastReceive;
 import dagger.Component;
@@ -18,7 +17,7 @@ import dagger.Component;
  */
 @PerBroadcastReceive
 @Component(dependencies = {ApplicationComponent.class},
-        modules = {RepositoriesModule.class, LocalBroadcastModule.class})
+        modules = {RepositoriesModule.class})
 public interface QueryServiceComponent {
     void inject(ParseQueryService parseQueryService);
 }

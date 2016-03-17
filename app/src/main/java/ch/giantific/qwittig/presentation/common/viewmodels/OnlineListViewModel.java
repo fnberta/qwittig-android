@@ -12,7 +12,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
  * refreshed with online content.
  */
 public interface OnlineListViewModel<T>
-        extends ListViewModel<T> {
+        extends ListViewModel<T>, DataRefreshViewModel {
 
     @Bindable
     boolean isRefreshing();

@@ -56,7 +56,7 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
         final Group group = mCurrentIdentity.getGroup();
         final String groupName = group.getName();
         final String currentId = mCurrentIdentity.getObjectId();
-        getSubscriptions().add(mUserRepo.getIdentitiesLocalAsync(group, true)
+        getSubscriptions().add(mUserRepo.getIdentities(group, true)
                 .filter(new Func1<Identity, Boolean>() {
                     @Override
                     public Boolean call(Identity identity) {

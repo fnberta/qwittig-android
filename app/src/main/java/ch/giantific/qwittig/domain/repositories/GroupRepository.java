@@ -22,5 +22,5 @@ public interface GroupRepository extends BaseRepository {
      * @return a {@link Group} object queried from the online data store
      */
     @Nullable
-    Group getGroupOnline(@NonNull String groupId);
+    Group queryGroup(@NonNull String groupId);
 }

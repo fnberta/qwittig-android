@@ -75,11 +75,11 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<ListItem, Ta
 
     @Override
     public void loadData() {
-        getSubscriptions().add(mUserRepo.fetchIdentityDataAsync(mCurrentIdentity)
+        getSubscriptions().add(mUserRepo.fetchIdentityData(mCurrentIdentity)
                 .flatMapObservable(new Func1<Identity, Observable<Task>>() {
                     @Override
                     public Observable<Task> call(Identity identity) {
-                        return mTaskRepo.getTasksLocalAsync(identity, mDeadlineSelected);
+                        return mTaskRepo.getTasks(identity, mDeadlineSelected);
                     }
                 })
                 .filter(new Func1<Task, Boolean>() {
@@ -130,6 +130,16 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<ListItem, Ta
                     }
                 })
         );
+    }
+
+    @Override
+    public void onDataUpdated(boolean successful) {
+        setRefreshing(false);
+        if (successful) {
+            loadData();
+        } else {
+            mView.showMessageWithAction(R.string.toast_error_tasks_update, getRefreshAction());
+        }
     }
 
     @Override
@@ -188,27 +198,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<ListItem, Ta
             return;
         }
 
-        mView.loadUpdateTasksWorker();
-    }
-
-    @Override
-    public void setTasksUpdateStream(@NonNull Observable<Task> observable, @NonNull final String workerTag) {
-        getSubscriptions().add(observable.toSingle()
-                .subscribe(new SingleSubscriber<Task>() {
-                    @Override
-                    public void onSuccess(Task value) {
-                        mView.removeWorker(workerTag);
-                        loadData();
-                    }
-
-                    @Override
-                    public void onError(Throwable error) {
-                        mView.removeWorker(workerTag);
-                        mView.showMessageWithAction(mTaskRepo.getErrorMessage(error),
-                                getRefreshAction());
-                    }
-                })
-        );
+        mView.startUpdateTasksService();
     }
 
     @NonNull

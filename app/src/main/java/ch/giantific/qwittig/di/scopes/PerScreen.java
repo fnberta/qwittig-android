@@ -4,12 +4,16 @@
 
 package ch.giantific.qwittig.di.scopes;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 import javax.inject.Scope;
 
 /**
  * Defines a custom di scope indicating that the injected modules should live as long as the
- * fragment that contains them.
+ * activity or fragment that contains them.
  */
 @Scope
-public @interface PerFragment {
+@Retention(RetentionPolicy.RUNTIME)
+public @interface PerScreen {
 }

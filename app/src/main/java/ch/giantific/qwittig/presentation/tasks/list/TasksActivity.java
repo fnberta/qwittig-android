@@ -14,16 +14,14 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.databinding.ActivityTasksBinding;
-import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
-import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.presentation.common.adapters.StringResSpinnerAdapter;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
+import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
 import ch.giantific.qwittig.presentation.tasks.addedit.TaskAddEditViewModel.TaskResult;
 import ch.giantific.qwittig.presentation.tasks.details.TaskDetailsViewModel.TaskDetailsResult;
-import rx.Observable;
 import rx.Single;
 
 /**
@@ -37,7 +35,6 @@ import rx.Single;
  */
 public class TasksActivity extends BaseNavDrawerActivity<TasksViewModel> implements
         TasksFragment.ActivityListener,
-        TasksUpdateWorkerListener,
         TaskRemindWorkerListener {
 
     private ActivityTasksBinding mBinding;
@@ -47,7 +44,8 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksViewModel> impleme
         super.handleLocalBroadcast(intent, dataType);
 
         if (dataType == LocalBroadcast.DataType.TASKS_UPDATED) {
-            mViewModel.loadData();
+            final boolean successful = intent.getBooleanExtra(LocalBroadcast.INTENT_EXTRA_SUCCESSFUL, false);
+            mViewModel.onDataUpdated(successful);
         }
     }
 
@@ -73,7 +71,7 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksViewModel> impleme
     }
 
     @Override
-    protected void injectNavDrawerDependencies(@NonNull NavDrawerComponent navComp) {
+    protected void injectDependencies(@NonNull NavDrawerComponent navComp, Bundle savedInstanceState) {
         navComp.inject(this);
     }
 
@@ -145,12 +143,6 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksViewModel> impleme
     public void setViewModel(@NonNull TasksViewModel viewModel) {
         mViewModel = viewModel;
         mBinding.setViewModel(viewModel);
-    }
-
-    @Override
-    public void setTasksUpdateStream(@NonNull Observable<Task> observable,
-                                     @NonNull String workerTag) {
-        mViewModel.setTasksUpdateStream(observable, workerTag);
     }
 
     @Override

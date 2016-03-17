@@ -15,7 +15,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModel;
  */
 public interface PurchasesViewModel extends OnlineListViewModel<Purchase>,
         PurchasesRecyclerAdapter.AdapterInteractionListener,
-        PurchasesUpdateWorkerListener, PurchasesQueryMoreWorkerListener, LoadMoreViewModel {
+        PurchasesQueryMoreWorkerListener, LoadMoreViewModel {
 
     int TYPE_ITEM = 0;
     int TYPE_PROGRESS = 1;
@@ -25,7 +25,7 @@ public interface PurchasesViewModel extends OnlineListViewModel<Purchase>,
      */
     interface ViewListener extends OnlineListViewModel.ViewListener {
 
-        void loadUpdatePurchasesWorker();
+        void startUpdatePurchasesService();
 
         void loadQueryMorePurchasesWorker(int skip);
 

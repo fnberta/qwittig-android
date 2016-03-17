@@ -8,7 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import ch.giantific.qwittig.di.scopes.PerFragment;
+import ch.giantific.qwittig.di.scopes.PerScreen;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
@@ -28,7 +28,7 @@ public class AddPurchaseAutoViewModelModule extends BaseViewModelModule<AddEditP
         super(savedState, view);
     }
 
-    @PerFragment
+    @PerScreen
     @Provides
     AddEditPurchaseViewModel providesPurchaseAddAutoViewModel(@NonNull UserRepository userRepository,
                                                               @NonNull PurchaseRepository purchaseRepository) {

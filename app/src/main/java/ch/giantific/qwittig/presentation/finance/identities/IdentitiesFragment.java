@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
+import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.FragmentFinanceIdentitiesBinding;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
 import ch.giantific.qwittig.presentation.finance.identities.di.DaggerFinanceIdentitiesComponent;
@@ -68,8 +69,8 @@ public class IdentitiesFragment extends BaseRecyclerViewFragment<IdentitiesViewM
     }
 
     @Override
-    public void loadUpdateUsersWorker() {
-        IdentitiesUpdateWorker.attach(getFragmentManager());
+    public void startUpdateIdentitiesService() {
+        ParseQueryService.startUpdateIdentities(getActivity());
     }
 
     @Override

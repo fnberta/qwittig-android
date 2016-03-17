@@ -4,6 +4,9 @@
 
 package ch.giantific.qwittig.di.scopes;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 import javax.inject.Scope;
 
 /**
@@ -11,5 +14,6 @@ import javax.inject.Scope;
  * onReceive() broadcast call.
  */
 @Scope
+@Retention(RetentionPolicy.RUNTIME)
 public @interface PerBroadcastReceive {
 }

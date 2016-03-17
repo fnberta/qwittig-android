@@ -112,7 +112,7 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
             return;
         }
 
-        getSubscriptions().add(mUserRepo.getIdentitiesLocalAsync(mCurrentIdentity.getGroup(), false)
+        getSubscriptions().add(mUserRepo.getIdentities(mCurrentIdentity.getGroup(), false)
                 .toList()
                 .toSingle()
                 .subscribe(new SingleSubscriber<List<Identity>>() {

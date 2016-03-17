@@ -35,7 +35,7 @@ public interface CompensationRepository extends BaseRepository {
      * @param currentIdentity the current user
      * @return a {@link Observable} emitting the results
      */
-    Observable<Compensation> getCompensationsLocalUnpaidAsync(@NonNull Identity currentIdentity);
+    Observable<Compensation> getCompensationsUnpaid(@NonNull Identity currentIdentity);
 
     /**
      * Queries the local data store for paid compensations where the current user is either the
@@ -44,7 +44,7 @@ public interface CompensationRepository extends BaseRepository {
      * @param currentIdentity the current user
      * @return a {@link Observable} emitting the results
      */
-    Observable<Compensation> getCompensationsLocalPaidAsync(@NonNull Identity currentIdentity);
+    Observable<Compensation> getCompensationsPaid(@NonNull Identity currentIdentity);
 
     /**
      * Saves a {@link Compensation} object to the online and offline storage
@@ -52,7 +52,7 @@ public interface CompensationRepository extends BaseRepository {
      * @param compensation the compensation to save
      * @return a {@link Single} emitting the result
      */
-    Single<Compensation> saveCompensationAsync(@NonNull Compensation compensation);
+    Single<Compensation> saveCompensation(@NonNull Compensation compensation);
 
     /**
      * Removes a compensation from the local data store.
@@ -63,41 +63,29 @@ public interface CompensationRepository extends BaseRepository {
     boolean removeCompensationLocal(@NonNull String compensationId);
 
     /**
-     * Updates all unpaid compensations in the local data store by deleting all compensations from the
-     * local data store, querying and saving new ones.
-     *
-     * @param identities all identities from the current user
-     * @return a {@link Observable} emitting the results
-     */
-    Observable<Compensation> updateCompensationsUnpaidAsync(@NonNull List<Identity> identities);
-
-    /**
-     * Updates all paid compensations in the local data store by deleting all compensations from the
-     * local data store, querying and saving new ones.
-     *
-     * @param currentIdentity the current identity
-     * @param identities      all identities from the current user
-     * @return a {@link Observable} emitting the results
-     */
-    Observable<Compensation> updateCompensationsPaidAsync(@NonNull Identity currentIdentity,
-                                                          @NonNull List<Identity> identities);
-
-    /**
      * Queries paid compensations from the online data store and saves them in the local data store.
      *
      * @param currentIdentity the group for which to get compensations for
      * @param skip            the number of compensations to skip for the query
      * @return a {@link Observable} emitting the results
      */
-    Observable<Compensation> getCompensationsPaidOnlineAsync(@NonNull Identity currentIdentity, int skip);
+    Observable<Compensation> queryMoreCompensationsPaid(@NonNull Identity currentIdentity, int skip);
 
     /**
-     * Deletes all compensations from the local data store and saves new ones.
+     * Deletes all paid compensations from the local data store and saves new ones.
      *
      * @param identities the groups for which to update the compensations
      * @return whether the update was successful or not
      */
-    boolean updateCompensations(@NonNull List<Identity> identities);
+    boolean updateCompensationsPaid(@NonNull List<Identity> identities);
+
+    /**
+     * Deletes all unpaid compensations from the local data store and saves new ones.
+     *
+     * @param identities the groups for which to update the compensations
+     * @return whether the update was successful or not
+     */
+    boolean updateCompensationsUnpaid(@NonNull List<Identity> identities);
 
     /**
      * Updates a compensation if is already available in the local data store (by simply querying

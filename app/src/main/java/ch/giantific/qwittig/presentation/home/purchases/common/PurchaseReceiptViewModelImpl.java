@@ -91,7 +91,7 @@ public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseRece
             mView.setReceiptImage(mReceiptImagePath);
             setLoading(false);
         } else if (mDraft) {
-            getSubscriptions().add(mPurchaseRepo.getPurchaseLocalAsync(mPurchaseId, true)
+            getSubscriptions().add(mPurchaseRepo.getPurchase(mPurchaseId, true)
                     .subscribe(new SingleSubscriber<Purchase>() {
                         @Override
                         public void onSuccess(Purchase purchase) {
@@ -105,7 +105,7 @@ public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseRece
                         }
                     }));
         } else {
-            getSubscriptions().add(mPurchaseRepo.fetchPurchaseDataLocalAsync(mPurchaseId)
+            getSubscriptions().add(mPurchaseRepo.fetchPurchaseData(mPurchaseId)
                     .subscribe(new SingleSubscriber<Purchase>() {
                         @Override
                         public void onSuccess(Purchase purchase) {

@@ -68,7 +68,7 @@ public class StatsActivity extends BaseNavDrawerActivity<StatsViewModel> impleme
     }
 
     @Override
-    protected void injectNavDrawerDependencies(@NonNull NavDrawerComponent navComp) {
+    protected void injectDependencies(@NonNull NavDrawerComponent navComp, Bundle savedInstanceState) {
         navComp.inject(this);
     }
 

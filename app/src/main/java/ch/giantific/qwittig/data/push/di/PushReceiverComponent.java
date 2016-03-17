@@ -2,9 +2,9 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.receivers.di;
+package ch.giantific.qwittig.data.push.di;
 
-import ch.giantific.qwittig.data.receivers.PushBroadcastReceiver;
+import ch.giantific.qwittig.data.push.PushBroadcastReceiver;
 import ch.giantific.qwittig.di.ApplicationComponent;
 import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.SystemServiceModule;

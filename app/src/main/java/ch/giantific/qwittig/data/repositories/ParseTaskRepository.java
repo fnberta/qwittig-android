@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ch.giantific.qwittig.data.receivers.PushBroadcastReceiver;
+import ch.giantific.qwittig.data.push.PushBroadcastReceiver;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Task;
@@ -43,13 +43,13 @@ public class ParseTaskRepository extends ParseBaseRepository implements TaskRepo
     }
 
     @Override
-    public Single<Task> saveTaskLocalAsync(@NonNull Task task, @NonNull String tag) {
+    public Single<Task> saveTaskLocal(@NonNull Task task, @NonNull String tag) {
         return pin(task, tag);
     }
 
     @Override
-    public Observable<Task> getTasksLocalAsync(@NonNull Identity identity,
-                                               @NonNull Date deadline) {
+    public Observable<Task> getTasks(@NonNull Identity identity,
+                                     @NonNull Date deadline) {
         ParseQuery<Task> deadlineQuery = ParseQuery.getQuery(Task.CLASS);
         deadlineQuery.whereLessThan(Task.DEADLINE, deadline);
 
@@ -77,7 +77,7 @@ public class ParseTaskRepository extends ParseBaseRepository implements TaskRepo
     }
 
     @Override
-    public Single<Task> getTaskLocalAsync(@NonNull String taskId) {
+    public Single<Task> getTask(@NonNull String taskId) {
         ParseQuery<Task> query = ParseQuery.getQuery(Task.CLASS);
         query.fromLocalDatastore();
         query.ignoreACLs();
@@ -87,7 +87,7 @@ public class ParseTaskRepository extends ParseBaseRepository implements TaskRepo
     }
 
     @Override
-    public Single<Task> fetchTaskDataLocalAsync(@NonNull final String taskId) {
+    public Single<Task> fetchTaskData(@NonNull final String taskId) {
         final Task task = (Task) Task.createWithoutData(Task.CLASS, taskId);
         return fetchLocal(task);
     }
@@ -102,56 +102,6 @@ public class ParseTaskRepository extends ParseBaseRepository implements TaskRepo
         }
 
         return true;
-    }
-
-    @Override
-    public Observable<Task> updateTasksAsync(@NonNull List<Identity> identities) {
-        return Observable.from(identities)
-                .map(new Func1<Identity, Group>() {
-                    @Override
-                    public Group call(Identity identity) {
-                        return identity.getGroup();
-                    }
-                })
-                .toList()
-                .map(new Func1<List<Group>, ParseQuery<Task>>() {
-                    @Override
-                    public ParseQuery<Task> call(List<Group> groups) {
-                        return getTasksOnlineQuery(groups);
-                    }
-                })
-                .flatMap(new Func1<ParseQuery<Task>, Observable<List<Task>>>() {
-                    @Override
-                    public Observable<List<Task>> call(ParseQuery<Task> taskParseQuery) {
-                        return find(taskParseQuery);
-                    }
-                })
-                .concatMap(new Func1<List<Task>, Observable<List<Task>>>() {
-                    @Override
-                    public Observable<List<Task>> call(List<Task> tasks) {
-                        return unpinAll(tasks, Task.PIN_LABEL);
-                    }
-                })
-                .concatMap(new Func1<List<Task>, Observable<List<Task>>>() {
-                    @Override
-                    public Observable<List<Task>> call(List<Task> tasks) {
-                        return pinAll(tasks, Task.PIN_LABEL);
-                    }
-                })
-                .concatMap(new Func1<List<Task>, Observable<Task>>() {
-                    @Override
-                    public Observable<Task> call(List<Task> tasks) {
-                        return Observable.from(tasks);
-                    }
-                });
-    }
-
-    @NonNull
-    private ParseQuery<Task> getTasksOnlineQuery(@NonNull List<Group> groups) {
-        ParseQuery<Task> query = ParseQuery.getQuery(Task.CLASS);
-        query.whereContainedIn(Task.GROUP, groups);
-        query.include(Task.IDENTITIES);
-        return query;
     }
 
     @Override
@@ -171,6 +121,14 @@ public class ParseTaskRepository extends ParseBaseRepository implements TaskRepo
         }
 
         return true;
+    }
+
+    @NonNull
+    private ParseQuery<Task> getTasksOnlineQuery(@NonNull List<Group> groups) {
+        ParseQuery<Task> query = ParseQuery.getQuery(Task.CLASS);
+        query.whereContainedIn(Task.GROUP, groups);
+        query.include(Task.IDENTITIES);
+        return query;
     }
 
     @Override

@@ -95,7 +95,7 @@ public class StatsSpendingViewModelImpl extends StatsViewModelBaseImpl<StatsSpen
             return;
         }
 
-        getSubscriptions().add(mUserRepo.fetchIdentityDataAsync(mCurrentIdentity)
+        getSubscriptions().add(mUserRepo.fetchIdentityData(mCurrentIdentity)
                 .doOnSuccess(new Action1<Identity>() {
                     @Override
                     public void call(Identity identity) {

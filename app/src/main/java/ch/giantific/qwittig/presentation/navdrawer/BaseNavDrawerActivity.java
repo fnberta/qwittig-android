@@ -22,6 +22,7 @@ import android.widget.ArrayAdapter;
 
 import javax.inject.Inject;
 
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.data.services.ParseQueryService;
@@ -79,14 +80,16 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
         super.onCreate(savedInstanceState);
 
         final NavDrawerComponent navComp = DaggerNavDrawerComponent.builder()
+                .applicationComponent(Qwittig.getAppComponent(this))
                 .navDrawerViewModelModule(new NavDrawerViewModelModule(savedInstanceState, this))
                 .build();
-        injectNavDrawerDependencies(navComp);
+        injectDependencies(navComp, savedInstanceState);
 
         mUserLoggedIn = mNavDrawerViewModel.isUserLoggedIn();
     }
 
-    protected abstract void injectNavDrawerDependencies(@NonNull NavDrawerComponent navComp);
+    protected abstract void injectDependencies(@NonNull NavDrawerComponent navComp,
+                                               @Nullable Bundle savedInstanceState);
 
     @Override
     public void setContentView(int layoutResID) {
@@ -250,7 +253,7 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
 
     @CallSuper
     protected void onLoginSuccessful() {
-        ParseQueryService.startQueryAll(this);
+        ParseQueryService.startUpdateAll(this);
     }
 
     protected final void setStatusBarBackgroundColor(int color) {

@@ -6,12 +6,23 @@ package ch.giantific.qwittig.presentation.finance;
 
 import android.databinding.Bindable;
 import android.databinding.Observable;
+import android.support.annotation.NonNull;
+
+import org.apache.commons.math3.fraction.BigFraction;
+
+import ch.giantific.qwittig.presentation.common.viewmodels.DataRefreshViewModel;
+import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 
 /**
  * Defines a view model for header that show a user's current identity balance.
  */
-public interface BalanceHeaderViewModel extends Observable {
+public interface BalanceHeaderViewModel extends ViewModel, DataRefreshViewModel {
 
     @Bindable
     String getCurrentIdentityBalance();
+
+    interface ViewListener extends ViewModel.ViewListener {
+
+        void setColorTheme(@NonNull BigFraction balance);
+    }
 }

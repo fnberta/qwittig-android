@@ -33,7 +33,7 @@ public interface PurchaseRepository extends BaseRepository {
      * @param getDrafts       whether to query for drafts or purchases
      * @return a {@link Observable} emitting the results
      */
-    Observable<Purchase> getPurchasesLocalAsync(@NonNull Identity currentIdentity, boolean getDrafts);
+    Observable<Purchase> getPurchases(@NonNull Identity currentIdentity, boolean getDrafts);
 
     /**
      * Queries the local data store for a single purchase.
@@ -41,7 +41,7 @@ public interface PurchaseRepository extends BaseRepository {
      * @param purchaseId the object id of the purchase to query
      * @return a {@link Single} emitting the result
      */
-    Single<Purchase> getPurchaseLocalAsync(@NonNull String purchaseId, boolean isDraft);
+    Single<Purchase> getPurchase(@NonNull String purchaseId, boolean isDraft);
 
     /**
      * Fetches the data of a purchase from the local data store.
@@ -49,7 +49,7 @@ public interface PurchaseRepository extends BaseRepository {
      * @param purchaseId the object id of the purchase to fetch
      * @return a {@link Single} emitting the result
      */
-    Single<Purchase> fetchPurchaseDataLocalAsync(@NonNull String purchaseId);
+    Single<Purchase> fetchPurchaseData(@NonNull String purchaseId);
 
     /**
      * Removes a purchase from the local data store.
@@ -66,18 +66,7 @@ public interface PurchaseRepository extends BaseRepository {
      * @param groupId    the object id of the group the purchase belongs to
      * @return whether the removal was successful or not
      */
-    boolean removePurchaseLocal(@NonNull String purchaseId, @NonNull String groupId);
-
-    /**
-     * Updates all purchases in the local data store by deleting all purchases from the local data
-     * store, querying and saving new ones.
-     *
-     * @param identities      the identities of the current user
-     * @param currentIdentity the user's current identity
-     * @return a {@link Observable} emitting the results
-     */
-    Observable<Purchase> updatePurchasesAsync(@NonNull List<Identity> identities,
-                                              @NonNull Identity currentIdentity);
+    boolean removePurchase(@NonNull String purchaseId, @NonNull String groupId);
 
     /**
      * Queries purchases from the online data store and saves them in the local data store.
@@ -86,7 +75,7 @@ public interface PurchaseRepository extends BaseRepository {
      * @param skip            the number of purchases to skip for the query
      * @return a {@link Observable} emitting the results
      */
-    Observable<Purchase> getPurchasesOnlineAsync(@NonNull Identity currentIdentity, int skip);
+    Observable<Purchase> queryMorePurchases(@NonNull Identity currentIdentity, int skip);
 
     /**
      * Deletes all purchases from the local data store and saves new ones.
@@ -116,8 +105,8 @@ public interface PurchaseRepository extends BaseRepository {
      * @param isDraft      whether to save the purchase as a draft
      * @return a {@link Single} emitting the result
      */
-    Single<Purchase> savePurchaseAsync(@NonNull Purchase purchase, @NonNull String tag,
-                                       @Nullable byte[] receiptImage, boolean isDraft);
+    Single<Purchase> savePurchase(@NonNull Purchase purchase, @NonNull String tag,
+                                  @Nullable byte[] receiptImage, boolean isDraft);
 
     /**
      * Saves a {@link Purchase} object as a draft, meaning only to the local offline datastore.
@@ -126,7 +115,7 @@ public interface PurchaseRepository extends BaseRepository {
      * @param tag      the tag save the purchase in the offline storage
      * @return a {@link Single} emitting the result
      */
-    Single<Purchase> savePurchaseAsDraftAsync(@NonNull Purchase purchase, @NonNull String tag);
+    Single<Purchase> savePurchaseAsDraft(@NonNull Purchase purchase, @NonNull String tag);
 
     /**
      * Deletes the the specified {@link ParseFile}, probably a receipt image that is no longer
@@ -157,7 +146,7 @@ public interface PurchaseRepository extends BaseRepository {
      * @return whether drafts are available
      * @param identity
      */
-    boolean isDraftsAvailable(Identity identity);
+    boolean isDraftsAvailable(@NonNull Identity identity);
 
     /**
      * Toggle the save setting whether drafts are available or not.
@@ -165,7 +154,7 @@ public interface PurchaseRepository extends BaseRepository {
      * @param identity
      * @param available whether drafts are available or not
      */
-    void toggleDraftsAvailable(Identity identity, boolean available);
+    void toggleDraftsAvailable(@NonNull Identity identity, boolean available);
 
     /**
      * Returns the exchange rate for the given currency.

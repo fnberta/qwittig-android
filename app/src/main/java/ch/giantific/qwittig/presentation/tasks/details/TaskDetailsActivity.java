@@ -25,7 +25,7 @@ import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.presentation.tasks.addedit.TaskAddEditViewModel;
 import ch.giantific.qwittig.presentation.tasks.list.TasksFragment;
-import ch.giantific.qwittig.data.receivers.PushBroadcastReceiver;
+import ch.giantific.qwittig.data.push.PushBroadcastReceiver;
 
 /**
  * Hosts {@link TaskDetailsFragment} that shows the details of a task.
@@ -49,7 +49,7 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity<TaskDetailsViewMo
     }
 
     @Override
-    protected void injectNavDrawerDependencies(@NonNull NavDrawerComponent navComp) {
+    protected void injectDependencies(@NonNull NavDrawerComponent navComp, Bundle savedInstanceState) {
         navComp.inject(this);
     }
 

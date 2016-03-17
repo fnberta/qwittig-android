@@ -19,6 +19,7 @@ import com.mugen.Mugen;
 import com.mugen.MugenCallbacks;
 
 import ch.giantific.qwittig.Qwittig;
+import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.FragmentHomePurchasesBinding;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
@@ -99,8 +100,8 @@ public class PurchasesFragment extends BaseRecyclerViewFragment<PurchasesViewMod
     }
 
     @Override
-    public void loadUpdatePurchasesWorker() {
-        PurchasesUpdateWorker.attach(getFragmentManager());
+    public void startUpdatePurchasesService() {
+        ParseQueryService.startUpdatePurchases(getActivity());
     }
 
     @Override

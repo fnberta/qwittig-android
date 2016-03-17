@@ -15,9 +15,9 @@ import android.view.ViewGroup;
 import com.mugen.Mugen;
 import com.mugen.MugenCallbacks;
 
+import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.FragmentFinanceCompensationsPaidBinding;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
-import ch.giantific.qwittig.presentation.finance.CompsUpdateWorker;
 import ch.giantific.qwittig.presentation.finance.paid.di.DaggerFinanceCompsPaidComponent;
 import ch.giantific.qwittig.presentation.finance.paid.di.FinanceCompsPaidViewModelModule;
 
@@ -91,8 +91,9 @@ public class CompsPaidFragment extends BaseRecyclerViewFragment<CompsPaidViewMod
     }
 
     @Override
-    public void loadUpdateCompensationsPaidWorker() {
-        CompsUpdateWorker.attach(getFragmentManager(), true);
+    public void startUpdateCompensationsPaidService() {
+        ParseQueryService.startUpdateIdentities(getActivity());
+        ParseQueryService.startUpdateCompensationsPaid(getActivity());
     }
 
     @Override

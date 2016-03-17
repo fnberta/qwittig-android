@@ -195,7 +195,7 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".data.receivers.PushBroadcastReceiver"
+            android:name=".data.push.PushBroadcastReceiver"
             android:exported="false"
             >
             <intent-filter>

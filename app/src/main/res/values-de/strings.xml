@@ -296,5 +296,9 @@
     <string name="recommend_message">Qwittig ist genial, downloade jetzt die App!</string>
     <string name="recommend_CTA">Installieren!</string>
     <string name="toast_error_stats_load">Laden der Statistik Daten fehlgeschlagen</string>
+    <string name="toast_error_purchases_update">Aktualiseren der Einkäufe fehlgeschlagen</string>
+    <string name="toast_error_tasks_update">Aktualiseren der Aufgaben fehlgeschlagen</string>
+    <string name="toast_error_users_update">Aktualiseren der Nutzer fehlgeschlagen</string>
+    <string name="toast_error_comps_update">Aktualiseren der Abrechnungen fehlgeschlagen</string>
 
 </resources>

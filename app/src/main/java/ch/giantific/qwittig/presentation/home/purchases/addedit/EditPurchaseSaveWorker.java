@@ -89,7 +89,7 @@ public class EditPurchaseSaveWorker extends AddPurchaseSaveWorker {
     Observable<Purchase> getPurchaseObservable(@NonNull final String tag) {
         if (mReceiptImage != null) {
             if (mDraft) {
-                return mPurchaseRepo.savePurchaseAsync(mPurchase, tag, mReceiptImage, true).toObservable();
+                return mPurchaseRepo.savePurchase(mPurchase, tag, mReceiptImage, true).toObservable();
             }
 
             if (mReceiptParseFileOld != null) {
@@ -97,29 +97,29 @@ public class EditPurchaseSaveWorker extends AddPurchaseSaveWorker {
                         .flatMap(new Func1<String, Single<? extends Purchase>>() {
                             @Override
                             public Single<? extends Purchase> call(String s) {
-                                return mPurchaseRepo.savePurchaseAsync(mPurchase, tag, mReceiptImage, false);
+                                return mPurchaseRepo.savePurchase(mPurchase, tag, mReceiptImage, false);
                             }
                         })
                         .toObservable();
             }
 
-            return mPurchaseRepo.savePurchaseAsync(mPurchase, tag, mReceiptImage, false).toObservable();
+            return mPurchaseRepo.savePurchase(mPurchase, tag, mReceiptImage, false).toObservable();
         }
 
         if (mDraft) {
-            return mPurchaseRepo.savePurchaseAsync(mPurchase, tag, null, true).toObservable();
+            return mPurchaseRepo.savePurchase(mPurchase, tag, null, true).toObservable();
         }
 
         if (mReceiptParseFileOld != null && mDeleteOldReceipt) {
             return deleteOldReceiptFile().flatMapObservable(new Func1<String, Observable<? extends Purchase>>() {
                 @Override
                 public Observable<? extends Purchase> call(String s) {
-                    return mPurchaseRepo.savePurchaseAsync(mPurchase, tag, null, false).toObservable();
+                    return mPurchaseRepo.savePurchase(mPurchase, tag, null, false).toObservable();
                 }
             });
         }
 
-        return mPurchaseRepo.savePurchaseAsync(mPurchase, tag, null, false).toObservable();
+        return mPurchaseRepo.savePurchase(mPurchase, tag, null, false).toObservable();
 
     }
 

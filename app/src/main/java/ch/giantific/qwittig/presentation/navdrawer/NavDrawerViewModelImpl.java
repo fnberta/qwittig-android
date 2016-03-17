@@ -45,7 +45,7 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
     }
 
     private void loadIdentities() {
-        getSubscriptions().add(mUserRepo.fetchIdentitiesDataAsync(mCurrentUser.getIdentities())
+        getSubscriptions().add(mUserRepo.fetchIdentitiesData(mCurrentUser.getIdentities())
                 .subscribe(new Subscriber<Identity>() {
                     @Override
                     public void onStart() {

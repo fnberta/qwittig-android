@@ -36,7 +36,7 @@ public class EditPurchaseDraftViewModelImpl extends EditPurchaseViewModelImpl im
 
     @Override
     Single<Purchase> fetchEditPurchase() {
-        return mPurchaseRepo.getPurchaseLocalAsync(mEditPurchaseId, true);
+        return mPurchaseRepo.getPurchase(mEditPurchaseId, true);
     }
 
     @Override

@@ -5,14 +5,14 @@
 package ch.giantific.qwittig.presentation.finance.unpaid.di;
 
 import ch.giantific.qwittig.di.RepositoriesModule;
-import ch.giantific.qwittig.di.scopes.PerFragment;
+import ch.giantific.qwittig.di.scopes.PerScreen;
 import ch.giantific.qwittig.presentation.finance.unpaid.CompsUnpaidFragment;
 import dagger.Component;
 
 /**
  * Provides the dependencies for the unpaid compensations screen.
  */
-@PerFragment
+@PerScreen
 @Component(modules = {FinanceCompsUnpaidViewModelModule.class, RepositoriesModule.class})
 public interface FinanceCompsUnpaidComponent {
 

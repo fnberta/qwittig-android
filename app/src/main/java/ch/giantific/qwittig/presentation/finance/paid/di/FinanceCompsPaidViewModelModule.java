@@ -8,7 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import ch.giantific.qwittig.di.scopes.PerFragment;
+import ch.giantific.qwittig.di.scopes.PerScreen;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
@@ -29,7 +29,7 @@ public class FinanceCompsPaidViewModelModule extends BaseViewModelModule<CompsPa
         super(savedState, view);
     }
 
-    @PerFragment
+    @PerScreen
     @Provides
     CompsPaidViewModel providesFinanceCompsPaidViewModel(@NonNull UserRepository userRepository,
                                                          @NonNull CompensationRepository compsRepository) {

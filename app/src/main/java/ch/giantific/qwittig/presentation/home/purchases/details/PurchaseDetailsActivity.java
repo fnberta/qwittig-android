@@ -25,7 +25,7 @@ import ch.giantific.qwittig.presentation.home.purchases.addedit.AddEditPurchaseV
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
 import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesFragment;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
-import ch.giantific.qwittig.data.receivers.PushBroadcastReceiver;
+import ch.giantific.qwittig.data.push.PushBroadcastReceiver;
 
 /**
  * Hosts {@link PurchaseDetailsFragment} that displays the details of a purchase and
@@ -82,7 +82,7 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
     }
 
     @Override
-    protected void injectNavDrawerDependencies(@NonNull NavDrawerComponent navComp) {
+    protected void injectDependencies(@NonNull NavDrawerComponent navComp, Bundle savedInstanceState) {
         navComp.inject(this);
     }
 

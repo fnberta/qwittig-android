@@ -18,7 +18,6 @@ import ch.giantific.qwittig.presentation.tasks.list.items.ListItem;
  */
 public interface TasksViewModel extends OnlineListViewModel<ListItem>,
         TasksRecyclerAdapter.AdapterInteractionListener,
-        TasksUpdateWorkerListener,
         TaskRemindWorkerListener {
 
     void onAddTaskFabClick(View view);
@@ -29,7 +28,7 @@ public interface TasksViewModel extends OnlineListViewModel<ListItem>,
      * Defines the interaction with the attached view.
      */
     interface ViewListener extends OnlineListViewModel.ViewListener {
-        void loadUpdateTasksWorker();
+        void startUpdateTasksService();
 
         void startTaskDetailsActivity(@NonNull Task task);
 

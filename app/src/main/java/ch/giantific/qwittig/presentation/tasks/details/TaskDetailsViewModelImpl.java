@@ -111,7 +111,7 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<DetailsItem,
 
     @Override
     public void loadData() {
-        getSubscriptions().add(mTaskRepo.getTaskLocalAsync(mTaskId)
+        getSubscriptions().add(mTaskRepo.getTask(mTaskId)
                 .flatMapObservable(new Func1<Task, Observable<TaskHistoryItem>>() {
                     @Override
                     public Observable<TaskHistoryItem> call(Task task) {
@@ -156,7 +156,7 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<DetailsItem,
     private Observable<TaskHistoryItem> getTaskHistory() {
         final Map<String, List<Date>> history = mTask.getHistory();
         final Set<String> keys = history.keySet();
-        return mUserRepo.getIdentitiesLocalAsync(mCurrentIdentity.getGroup(), true)
+        return mUserRepo.getIdentities(mCurrentIdentity.getGroup(), true)
                 .filter(new Func1<Identity, Boolean>() {
                     @Override
                     public Boolean call(Identity identity) {

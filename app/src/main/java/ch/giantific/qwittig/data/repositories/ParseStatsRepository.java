@@ -11,7 +11,7 @@ import com.google.gson.Gson;
 import java.util.HashMap;
 import java.util.Map;
 
-import ch.giantific.qwittig.data.receivers.PushBroadcastReceiver;
+import ch.giantific.qwittig.data.push.PushBroadcastReceiver;
 import ch.giantific.qwittig.domain.repositories.StatsRepository;
 import ch.giantific.qwittig.presentation.stats.models.Stats;
 import rx.Single;

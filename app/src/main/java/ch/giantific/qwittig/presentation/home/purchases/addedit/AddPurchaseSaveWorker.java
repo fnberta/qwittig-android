@@ -99,7 +99,7 @@ public class AddPurchaseSaveWorker extends BaseWorker<Purchase, AddPurchaseSaveW
 
     @NonNull
     Observable<Purchase> getPurchaseObservable(@NonNull String tag) {
-        return mPurchaseRepo.savePurchaseAsync(mPurchase, tag, mReceiptImage, false).toObservable();
+        return mPurchaseRepo.savePurchase(mPurchase, tag, mReceiptImage, false).toObservable();
     }
 
     @Override

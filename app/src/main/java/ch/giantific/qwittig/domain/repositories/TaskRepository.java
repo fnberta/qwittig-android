@@ -26,7 +26,7 @@ public interface TaskRepository extends BaseRepository {
      * @param tag  the tag for the local data store
      * @return a {@link Single} emitting the result
      */
-    Single<Task> saveTaskLocalAsync(@NonNull Task task, @NonNull String tag);
+    Single<Task> saveTaskLocal(@NonNull Task task, @NonNull String tag);
 
     /**
      * Queries the local data store for tasks.
@@ -35,7 +35,7 @@ public interface TaskRepository extends BaseRepository {
      * @param deadline the deadline until which to get queries
      * @return an {@link Observable} emitting the results
      */
-    Observable<Task> getTasksLocalAsync(@NonNull Identity identity, @NonNull Date deadline);
+    Observable<Task> getTasks(@NonNull Identity identity, @NonNull Date deadline);
 
     /**
      * Queries the local data store for a single task.
@@ -43,7 +43,7 @@ public interface TaskRepository extends BaseRepository {
      * @param taskId the object id of the task to query
      * @return a {@link Single} emitting the result
      */
-    Single<Task> getTaskLocalAsync(@NonNull String taskId);
+    Single<Task> getTask(@NonNull String taskId);
 
     /**
      * Fetches the data of a task from the local data store.
@@ -51,7 +51,7 @@ public interface TaskRepository extends BaseRepository {
      * @param taskId the object id of the task to fetch
      * @return a {@link Single} emitting the result
      */
-    Single<Task> fetchTaskDataLocalAsync(@NonNull String taskId);
+    Single<Task> fetchTaskData(@NonNull String taskId);
 
     /**
      * Removes a task from the local data store.
@@ -60,15 +60,6 @@ public interface TaskRepository extends BaseRepository {
      * @return whether the removal was successful or not
      */
     boolean removeTaskLocal(@NonNull String taskId);
-
-    /**
-     * Updates all tasks in the local data store by deleting all tasks from the local data
-     * store, querying and saving new ones.
-     *
-     * @param identities the groups for which to update the tasks
-     * @return an {@link Observable} emitting the results
-     */
-    Observable<Task> updateTasksAsync(@NonNull List<Identity> identities);
 
     /**
      * Deletes all tasks from the local data store and saves new ones.

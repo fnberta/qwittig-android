@@ -84,7 +84,7 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
     }
 
     void loadTaskUsers() {
-        getSubscriptions().add(mUserRepo.getIdentitiesLocalAsync(mCurrentIdentity.getGroup(), true)
+        getSubscriptions().add(mUserRepo.getIdentities(mCurrentIdentity.getGroup(), true)
                 .toList()
                 .toSingle()
                 .subscribe(new SingleSubscriber<List<Identity>>() {
@@ -227,7 +227,7 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
         }
 
         final Task task = getTask(taskTitle, timeFrame, identities);
-        getSubscriptions().add(mTaskRepo.saveTaskLocalAsync(task, Task.PIN_LABEL)
+        getSubscriptions().add(mTaskRepo.saveTaskLocal(task, Task.PIN_LABEL)
                 .subscribe(new SingleSubscriber<Task>() {
                     @Override
                     public void onSuccess(Task value) {

@@ -215,7 +215,7 @@ public interface UserRepository extends BaseRepository {
      * @param identity the identity to save
      * @return a {@link Single} emitting the result
      */
-    Single<Identity> saveIdentityLocalAsync(@NonNull Identity identity);
+    Single<Identity> saveIdentityLocal(@NonNull Identity identity);
 
     /**
      * Returns the invitation url for the invited identity
@@ -233,7 +233,7 @@ public interface UserRepository extends BaseRepository {
      * @param identity the identity to fetch the data for
      * @return a {@link Observable} emitting the results
      */
-    Single<Identity> fetchIdentityDataAsync(@NonNull Identity identity);
+    Single<Identity> fetchIdentityData(@NonNull Identity identity);
 
     /**
      * Fetches the data of multiple {@link Identity} objects from the local data store.If there is
@@ -242,7 +242,7 @@ public interface UserRepository extends BaseRepository {
      * @param identities the identities to fetch data for
      * @return a {@link Observable} emitting the results
      */
-    Observable<Identity> fetchIdentitiesDataAsync(@NonNull List<Identity> identities);
+    Observable<Identity> fetchIdentitiesData(@NonNull List<Identity> identities);
 
     /**
      * Queries the local data store for identities.
@@ -251,16 +251,7 @@ public interface UserRepository extends BaseRepository {
      * @param includePending whether to include pending identities
      * @return a {@link Observable} emitting the results
      */
-    Observable<Identity> getIdentitiesLocalAsync(@NonNull Group group, boolean includePending);
-
-    /**
-     * Updates all users in the local data store by deleting all identities from the local data
-     * store, querying and saving new ones.
-     *
-     * @param identities the groups for which to update the identities
-     * @return a {@link Observable} emitting the results
-     */
-    Observable<Identity> updateIdentitiesAsync(@NonNull List<Identity> identities);
+    Observable<Identity> getIdentities(@NonNull Group group, boolean includePending);
 
     /**
      * Deletes all identities from the local data store and saves new ones.

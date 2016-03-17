@@ -26,8 +26,7 @@ import ch.giantific.qwittig.databinding.ActivityHomeBinding;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.adapters.TabsAdapter;
-import ch.giantific.qwittig.presentation.home.di.DaggerHomeComponent;
-import ch.giantific.qwittig.presentation.home.di.HomeComponent;
+import ch.giantific.qwittig.presentation.home.di.HomeSubcomponent;
 import ch.giantific.qwittig.presentation.home.di.HomeViewModelModule;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.AddEditPurchaseViewModel;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.AddPurchaseActivity;
@@ -36,7 +35,6 @@ import ch.giantific.qwittig.presentation.home.purchases.list.DraftsFragment;
 import ch.giantific.qwittig.presentation.home.purchases.list.DraftsViewModel;
 import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesFragment;
 import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesQueryMoreWorkerListener;
-import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesUpdateWorkerListener;
 import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesViewModel;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
@@ -58,7 +56,6 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
         HomeViewModel.ViewListener,
         PurchasesFragment.ActivityListener,
         DraftsFragment.ActivityListener,
-        PurchasesUpdateWorkerListener,
         PurchasesQueryMoreWorkerListener,
         JoinGroupDialogFragment.DialogInteractionListener,
         JoinGroupWorkerListener {
@@ -79,7 +76,8 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
         super.handleLocalBroadcast(intent, dataType);
 
         if (dataType == LocalBroadcast.DataType.PURCHASES_UPDATED) {
-            mPurchasesViewModel.loadData();
+            final boolean successful = intent.getBooleanExtra(LocalBroadcast.INTENT_EXTRA_SUCCESSFUL, false);
+            mPurchasesViewModel.onDataUpdated(successful);
         }
     }
 
@@ -87,6 +85,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_home);
+        mBinding.setViewModel(mViewModel);
 
         // check item in NavDrawer
         checkNavDrawerItem(R.id.nav_home);
@@ -103,8 +102,6 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
                 mBinding.fabMenu.showMenuButton(true);
             }
         }, ViewUtils.FAB_CIRCULAR_REVEAL_DELAY * 4);
-
-        injectViewModel(savedInstanceState);
 
         if (mUserLoggedIn) {
             mViewModel.onLoginSuccessful();
@@ -125,13 +122,13 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
         }
     }
 
-    private void injectViewModel(@Nullable Bundle savedInstanceState) {
-        final HomeComponent comp = DaggerHomeComponent.builder()
-                .applicationComponent(Qwittig.getAppComponent(this))
-                .homeViewModelModule(new HomeViewModelModule(savedInstanceState, this))
-                .build();
-        mViewModel = comp.getHomeViewModel();
-        mBinding.setViewModel(mViewModel);
+    @Override
+    protected void injectDependencies(@NonNull NavDrawerComponent navComp,
+                                      @Nullable Bundle savedInstanceState) {
+        final HomeSubcomponent component =
+                navComp.plus(new HomeViewModelModule(savedInstanceState, this));
+        component.inject(this);
+        mViewModel = component.getHomeViewModel();
     }
 
     private void addFragments() {
@@ -241,11 +238,6 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     }
 
     @Override
-    protected void injectNavDrawerDependencies(@NonNull NavDrawerComponent navComp) {
-        navComp.inject(this);
-    }
-
-    @Override
     protected void onStart() {
         super.onStart();
 
@@ -352,7 +344,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
 
     @Override
     public void onGroupJoined() {
-        ParseQueryService.startQueryAll(this);
+        ParseQueryService.startUpdateAll(this);
         mNavDrawerViewModel.onIdentitiesChanged();
     }
 
@@ -398,11 +390,6 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
         }
 
         mBinding.fabMenu.close();
-    }
-
-    @Override
-    public void setPurchasesUpdateStream(@NonNull Observable<Purchase> observable, @NonNull String workerTag) {
-        mPurchasesViewModel.setPurchasesUpdateStream(observable, workerTag);
     }
 
     @Override

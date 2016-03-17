@@ -4,7 +4,6 @@
 
 package ch.giantific.qwittig.presentation.finance.unpaid;
 
-import android.databinding.Bindable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -80,22 +79,14 @@ public class CompsUnpaidViewModelImpl
     }
 
     @Override
-    @Bindable
-    public String getCurrentIdentityBalance() {
-        final BigFraction balance = mCurrentIdentity.getBalance();
-        mView.setColorTheme(balance);
-        return mMoneyFormatter.format(balance);
-    }
-
-    @Override
     public void loadData() {
-        getSubscriptions().add(mUserRepo.fetchIdentityDataAsync(mCurrentIdentity)
+        getSubscriptions().add(mUserRepo.fetchIdentityData(mCurrentIdentity)
                 .flatMapObservable(new Func1<Identity, Observable<Compensation>>() {
                     @Override
                     public Observable<Compensation> call(Identity identity) {
                         final String currency = mCurrentIdentity.getGroup().getCurrency();
                         mMoneyFormatter = MoneyUtils.getMoneyFormatter(currency, true, true);
-                        return mCompsRepo.getCompensationsLocalUnpaidAsync(identity);
+                        return mCompsRepo.getCompensationsUnpaid(identity);
                     }
                 })
                 .subscribe(new Subscriber<Compensation>() {
@@ -125,7 +116,6 @@ public class CompsUnpaidViewModelImpl
                             }
                         }
 
-                        notifyPropertyChanged(BR.currentIdentityBalance);
                         setLoading(false);
                         mView.notifyDataSetChanged();
                     }
@@ -147,6 +137,16 @@ public class CompsUnpaidViewModelImpl
                     }
                 })
         );
+    }
+
+    @Override
+    public void onDataUpdated(boolean successful) {
+        setRefreshing(false);
+        if (successful) {
+            loadData();
+        } else {
+            mView.showMessageWithAction(R.string.toast_error_comps_update, getRefreshAction());
+        }
     }
 
     @Override
@@ -174,7 +174,7 @@ public class CompsUnpaidViewModelImpl
             return;
         }
 
-        mView.loadUpdateCompensationsUnpaidWorker();
+        mView.startUpdateCompensationsUnpaidService();
     }
 
     @NonNull
@@ -185,33 +185,6 @@ public class CompsUnpaidViewModelImpl
                 refreshItems();
             }
         };
-    }
-
-    @Override
-    public void setCompensationsUpdateStream(@NonNull Observable<Compensation> observable,
-                                             boolean paid, @NonNull final String workerTag) {
-        getSubscriptions().add(observable
-                .toList()
-                .toSingle()
-                .subscribe(new SingleSubscriber<List<Compensation>>() {
-                    @Override
-                    public void onSuccess(List<Compensation> value) {
-                        mView.removeWorker(workerTag);
-                        setRefreshing(false);
-
-                        loadData();
-                    }
-
-                    @Override
-                    public void onError(Throwable error) {
-                        mView.removeWorker(workerTag);
-                        setRefreshing(false);
-
-                        mView.showMessageWithAction(mCompsRepo.getErrorMessage(error),
-                                getRefreshAction());
-                    }
-                })
-        );
     }
 
     @Override

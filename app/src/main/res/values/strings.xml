@@ -303,5 +303,9 @@
     <string name="recommend_CTA">Download!</string>
     <string name="recommend_ios_id" translatable="false">ch.giantific.qwittig</string>
     <string name="toast_error_stats_load">Failed to load the stats data</string>
+    <string name="toast_error_purchases_update">Failed to update purchases</string>
+    <string name="toast_error_tasks_update">Failed to update tasks</string>
+    <string name="toast_error_users_update">Failed to update users</string>
+    <string name="toast_error_comps_update">Failed to update compensations</string>
 
 </resources>

@@ -57,11 +57,11 @@ public class CompsPaidViewModelImpl
 
     @Override
     public void loadData() {
-        getSubscriptions().add(mUserRepo.fetchIdentityDataAsync(mCurrentIdentity)
+        getSubscriptions().add(mUserRepo.fetchIdentityData(mCurrentIdentity)
                 .flatMapObservable(new Func1<Identity, Observable<Compensation>>() {
                     @Override
                     public Observable<Compensation> call(Identity identity) {
-                        return mCompsRepo.getCompensationsLocalPaidAsync(identity);
+                        return mCompsRepo.getCompensationsPaid(identity);
                     }
                 }).subscribe(new Subscriber<Compensation>() {
                     @Override
@@ -102,6 +102,16 @@ public class CompsPaidViewModelImpl
     }
 
     @Override
+    public void onDataUpdated(boolean successful) {
+        setRefreshing(false);
+        if (successful) {
+            loadData();
+        } else {
+            mView.showMessageWithAction(R.string.toast_error_comps_update, getRefreshAction());
+        }
+    }
+
+    @Override
     protected void refreshItems() {
         if (!mView.isNetworkAvailable()) {
             setRefreshing(false);
@@ -109,7 +119,7 @@ public class CompsPaidViewModelImpl
             return;
         }
 
-        mView.loadUpdateCompensationsPaidWorker();
+        mView.startUpdateCompensationsPaidService();
     }
 
     @NonNull
@@ -170,33 +180,6 @@ public class CompsPaidViewModelImpl
         final int finalPosition = getLastPosition();
         mItems.remove(finalPosition);
         mView.notifyItemRemoved(finalPosition);
-    }
-
-    @Override
-    public void setCompensationsUpdateStream(@NonNull Observable<Compensation> observable,
-                                             boolean paid, @NonNull final String workerTag) {
-        getSubscriptions().add(observable
-                .toList()
-                .toSingle()
-                .subscribe(new SingleSubscriber<List<Compensation>>() {
-                    @Override
-                    public void onSuccess(List<Compensation> compensations) {
-                        mView.removeWorker(workerTag);
-                        setRefreshing(false);
-
-                        loadData();
-                    }
-
-                    @Override
-                    public void onError(Throwable error) {
-                        mView.removeWorker(workerTag);
-                        setRefreshing(false);
-
-                        mView.showMessageWithAction(mCompsRepo.getErrorMessage(error),
-                                getRefreshAction());
-                    }
-                })
-        );
     }
 
     @Override

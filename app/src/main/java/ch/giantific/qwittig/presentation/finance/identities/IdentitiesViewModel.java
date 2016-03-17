@@ -15,8 +15,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModel;
 /**
  * Defines an observable view model for the identities list screen.
  */
-public interface IdentitiesViewModel extends OnlineListViewModel<Identity>,
-        IdentitiesUpdateWorkerListener {
+public interface IdentitiesViewModel extends OnlineListViewModel<Identity> {
 
     @Bindable
     String getCurrentUserBalance();
@@ -26,7 +25,7 @@ public interface IdentitiesViewModel extends OnlineListViewModel<Identity>,
      */
     interface ViewListener extends OnlineListViewModel.ViewListener {
 
-        void loadUpdateUsersWorker();
+        void startUpdateIdentitiesService();
 
         void setColorTheme(@NonNull BigFraction balance);
     }

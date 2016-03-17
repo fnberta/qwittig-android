@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-package ch.giantific.qwittig.data.receivers;
+package ch.giantific.qwittig.data.push;
 
 import android.app.Activity;
 import android.app.Notification;
@@ -34,7 +34,7 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.receivers.di.DaggerPushReceiverComponent;
+import ch.giantific.qwittig.data.push.di.DaggerPushReceiverComponent;
 import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.di.SystemServiceModule;
 import ch.giantific.qwittig.domain.models.Compensation;
@@ -216,19 +216,22 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 notificationId = NEW_PURCHASE_NOTIFICATION_ID;
                 notificationTag = jsonExtras.optString(PUSH_PARAM_GROUP_ID);
 
-                // update balance for all identities
-                ParseQueryService.startQueryIdentities(context);
+                // update balance for all user identities
+                ParseQueryService.startUpdateIdentities(context);
 
-                // update compensations for all identities
-                ParseQueryService.startQueryCompensations(context);
+                // update compensations for all user identities, compensations might have changed
+                // even if the user is not involved in the purchase
+                ParseQueryService.startUpdateCompensations(context);
 
-                // query purchase only for identities in purchase's identities
+                // update purchase only for identities in purchase's identities
                 final List<String> identitiesIds = getIdentitiesIds(jsonExtras);
                 if (!currentUser.hasIdentity(identitiesIds)) {
                     return;
                 }
+
+                // query purchase
                 final String purchaseId = jsonExtras.optString(PUSH_PARAM_PURCHASE_ID);
-                ParseQueryService.startQueryObject(context, Purchase.CLASS, purchaseId, true);
+                ParseQueryService.startUpdateObject(context, Purchase.CLASS, purchaseId, true);
 
                 // don't show notification for buyer
                 final String buyerId = jsonExtras.optString(PUSH_PARAM_BUYER_ID);
@@ -252,58 +255,68 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
             }
             case TYPE_PURCHASE_EDIT: {
                 // update balance for all identities
-                ParseQueryService.startQueryIdentities(context);
+                ParseQueryService.startUpdateIdentities(context);
 
-                // update compensations for all identities
-                ParseQueryService.startQueryCompensations(context);
+                // update compensations for all user identities, compensations might have changed
+                // even if the user is not involved in the purchase
+                ParseQueryService.startUpdateCompensations(context);
 
                 // only update purchase for identities in purchase's identities
                 final List<String> identitiesIds = getIdentitiesIds(jsonExtras);
                 if (!currentUser.hasIdentity(identitiesIds)) {
                     return;
                 }
+
+                // update purchase
                 final String purchaseId = jsonExtras.optString(PUSH_PARAM_PURCHASE_ID);
-                ParseQueryService.startQueryObject(context, Purchase.CLASS, purchaseId, false);
+                ParseQueryService.startUpdateObject(context, Purchase.CLASS, purchaseId, false);
                 break;
             }
             case TYPE_PURCHASE_DELETE: {
                 // update balance for all identities
-                ParseQueryService.startQueryIdentities(context);
+                ParseQueryService.startUpdateIdentities(context);
 
-                // update compensations for all identities
-                ParseQueryService.startQueryCompensations(context);
+                // update compensations for all user identities, compensations might have changed
+                // even if the user is not involved in the purchase
+                ParseQueryService.startUpdateCompensations(context);
 
                 // only unpin local purchase for identities in purchase's identities
                 final List<String> identitiesIds = getIdentitiesIds(jsonExtras);
                 if (!currentUser.hasIdentity(identitiesIds)) {
                     return;
                 }
+
+                // delete purchase locally
                 final String purchaseId = jsonExtras.optString(PUSH_PARAM_PURCHASE_ID);
                 final String groupId = jsonExtras.optString(PUSH_PARAM_GROUP_ID);
                 ParseQueryService.startUnpinObject(context, Purchase.CLASS, purchaseId, groupId);
                 break;
             }
             case TYPE_COMPENSATION_EXISTING_PAID: {
-                // update balance for all users
-                ParseQueryService.startQueryIdentities(context);
+                // update balance for all user identities
+                ParseQueryService.startUpdateIdentities(context);
 
+                // If compensations were newly calculated, all recipients of the push should fetch
+                // the new ones. If no new calculation was done, only the creditor and debtor need
+                // to update.
+                final String debtorId = jsonExtras.optString(PUSH_PARAM_DEBTOR_ID);
+                final String creditorId = jsonExtras.optString(PUSH_PARAM_CREDITOR_ID);
                 final boolean calcNew = jsonExtras.optBoolean(PUSH_PARAM_COMP_DID_CALC_NEW);
                 if (calcNew) {
-                    ParseQueryService.startQueryCompensations(context);
-                } else {
+                    ParseQueryService.startUpdateCompensations(context);
+                } else if (currentUser.hasIdentity(debtorId) || currentUser.hasIdentity(creditorId)) {
                     queryCompensation(context, jsonExtras, false);
                 }
 
-                // only show notification for payer
-                final String payerId = jsonExtras.optString(PUSH_PARAM_DEBTOR_ID);
-                if (!currentUser.hasIdentity(payerId)) {
+                // only show notification for debtor
+                if (!currentUser.hasIdentity(debtorId)) {
                     return;
                 }
                 break;
             }
             case TYPE_TASK_NEW: {
                 final String taskId = jsonExtras.optString(PUSH_PARAM_TASK_ID);
-                ParseQueryService.startQueryObject(context, Task.CLASS, taskId, true);
+                ParseQueryService.startUpdateObject(context, Task.CLASS, taskId, true);
 
                 // don't show notification for initiator of task
                 final String initiatorId = jsonExtras.optString(PUSH_PARAM_INITIATOR_ID);
@@ -314,7 +327,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
             }
             case TYPE_TASK_EDIT: {
                 final String taskId = jsonExtras.optString(PUSH_PARAM_TASK_ID);
-                ParseQueryService.startQueryObject(context, Task.CLASS, taskId, false);
+                ParseQueryService.startUpdateObject(context, Task.CLASS, taskId, false);
                 break;
             }
             case TYPE_TASK_DELETE: {
@@ -333,18 +346,18 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 break;
             }
             case TYPE_USER_DELETED: {
-                ParseQueryService.startQueryAll(context);
+                ParseQueryService.startUpdateAll(context);
                 break;
             }
             case TYPE_USER_JOINED:
                 // fall through
             case TYPE_USER_LEFT: {
-                ParseQueryService.startQueryIdentities(context);
+                ParseQueryService.startUpdateIdentities(context);
                 break;
             }
             case TYPE_GROUP_NAME_CHANGED: {
                 final String groupId = jsonExtras.optString(PUSH_PARAM_GROUP_ID);
-                ParseQueryService.startQueryObject(context, Group.CLASS, groupId, false);
+                ParseQueryService.startUpdateObject(context, Group.CLASS, groupId, false);
                 break;
 
             }
@@ -366,9 +379,8 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     }
 
     private String getNotificationType(@NonNull Intent intent) {
-        JSONObject jsonExtras;
         try {
-            jsonExtras = getData(intent);
+            JSONObject jsonExtras = getData(intent);
             return jsonExtras.optString(NOTIFICATION_TYPE);
         } catch (JSONException e) {
             return "";
@@ -388,7 +400,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     private void queryCompensation(@NonNull Context context, @NonNull JSONObject jsonExtras,
                                    boolean isNew) {
         final String compensationId = jsonExtras.optString(PUSH_PARAM_COMPENSATION_ID);
-        ParseQueryService.startQueryObject(context, Compensation.CLASS, compensationId, isNew);
+        ParseQueryService.startUpdateObject(context, Compensation.CLASS, compensationId, isNew);
     }
 
     private boolean isSilentNotification(@NonNull String type) {
@@ -398,7 +410,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
 
     @Override
     protected Notification getNotification(@NonNull Context context, @NonNull Intent intent) {
-        JSONObject jsonExtras;
+        final JSONObject jsonExtras;
         try {
             jsonExtras = getData(intent);
         } catch (JSONException e) {
@@ -463,7 +475,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                     for (String purchaseNotification : mPurchaseNotifications) {
                         inboxStyle.addLine(purchaseNotification);
                     }
-                    int size = mPurchaseNotifications.size();
+                    final int size = mPurchaseNotifications.size();
                     final String summaryText = size > MAX_LINES_INBOX_STYLE
                             ? "+" + String.valueOf(size - MAX_LINES_INBOX_STYLE) + " " +
                             context.getString(R.string.push_purchase_new_multiple_more)
@@ -498,7 +510,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 final Intent acceptContentIntent = new Intent(ACTION_PUSH_BUTTON_ACCEPT);
                 acceptContentIntent.setPackage(packageName);
                 acceptContentIntent.putExtras(extras);
-                int acceptContentIntentRequestCode = random.nextInt();
+                final int acceptContentIntentRequestCode = random.nextInt();
                 final PendingIntent pAcceptContentIntent = PendingIntent.getBroadcast(context,
                         acceptContentIntentRequestCode, acceptContentIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT);
@@ -599,7 +611,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     protected void onPushOpen(Context context, @NonNull Intent intent) {
         final String type = getNotificationType(intent);
         if (!isSilentNotification(type)) {
-            String groupId;
+            final String groupId;
             try {
                 groupId = getGroupId(intent);
             } catch (JSONException e) {
@@ -644,7 +656,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
         String type = getNotificationType(intent);
         switch (type) {
             case TYPE_PURCHASE_NEW: {
-                String groupId;
+                final String groupId;
                 try {
                     groupId = getGroupId(intent);
                 } catch (JSONException e) {
@@ -675,7 +687,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
             case TYPE_TASK_NEW:
                 // fall through
             case TYPE_TASK_REMIND_USER: {
-                String groupId;
+                final String groupId;
                 try {
                     groupId = getGroupId(intent);
                 } catch (JSONException e) {
@@ -699,7 +711,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     /**
      * Clears stored notifications in sharedPreferences
      */
-    private void clearStoredPurchaseNotifications(String groupId) {
+    private void clearStoredPurchaseNotifications(@NonNull String groupId) {
         mSharedPrefs.edit()
                 .remove(STORED_PURCHASE_NOTIFICATIONS + groupId)
                 .apply();

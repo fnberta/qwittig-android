@@ -10,14 +10,13 @@ import org.apache.commons.math3.fraction.BigFraction;
 
 import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModel;
 import ch.giantific.qwittig.presentation.finance.BalanceHeaderViewModel;
-import ch.giantific.qwittig.presentation.finance.CompsUpdateWorkerListener;
 import ch.giantific.qwittig.presentation.finance.unpaid.items.CompsUnpaidBaseItem;
 
 /**
  * Defines the view model for a screen showing a list of unpaid compensations.
  */
 public interface CompsUnpaidViewModel extends OnlineListViewModel<CompsUnpaidBaseItem>,
-        BalanceHeaderViewModel, CompsUpdateWorkerListener, CompRemindWorkerListener,
+        CompRemindWorkerListener,
         CompsUnpaidRecyclerAdapter.AdapterInteractionListener,
         CompConfirmAmountDialogFragment.DialogInteractionListener {
 
@@ -26,15 +25,13 @@ public interface CompsUnpaidViewModel extends OnlineListViewModel<CompsUnpaidBas
      */
     interface ViewListener extends OnlineListViewModel.ViewListener {
 
-        void loadUpdateCompensationsUnpaidWorker();
+        void startUpdateCompensationsUnpaidService();
 
         void loadCompensationRemindWorker(@NonNull String compensationId);
 
         void showCompensationAmountConfirmDialog(@NonNull BigFraction amount,
                                                  @NonNull String debtorNickname,
                                                  @NonNull String currency);
-
-        void setColorTheme(@NonNull BigFraction balance);
 
         void onCompensationConfirmed();
     }

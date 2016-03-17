@@ -56,13 +56,13 @@ public class IdentitiesViewModelImpl
 
     @Override
     public void loadData() {
-        getSubscriptions().add(mUserRepo.fetchIdentityDataAsync(mCurrentIdentity)
+        getSubscriptions().add(mUserRepo.fetchIdentityData(mCurrentIdentity)
                 .flatMapObservable(new Func1<Identity, Observable<Identity>>() {
                     @Override
                     public Observable<Identity> call(Identity identity) {
                         final String currency = mCurrentIdentity.getGroup().getCurrency();
                         mMoneyFormatter = MoneyUtils.getMoneyFormatter(currency, true, true);
-                        return mUserRepo.getIdentitiesLocalAsync(identity.getGroup(), true);
+                        return mUserRepo.getIdentities(identity.getGroup(), true);
                     }
                 })
                 .filter(new Func1<Identity, Boolean>() {
@@ -92,6 +92,17 @@ public class IdentitiesViewModelImpl
     }
 
     @Override
+    public void onDataUpdated(boolean successful) {
+        setRefreshing(false);
+        if (successful) {
+            notifyPropertyChanged(BR.currentUserBalance);
+            loadData();
+        } else {
+            mView.showMessageWithAction(R.string.toast_error_users_update, getRefreshAction());
+        }
+    }
+
+    @Override
     protected void refreshItems() {
         if (!mView.isNetworkAvailable()) {
             setRefreshing(false);
@@ -99,7 +110,7 @@ public class IdentitiesViewModelImpl
             return;
         }
 
-        mView.loadUpdateUsersWorker();
+        mView.startUpdateIdentitiesService();
     }
 
     @NonNull
@@ -110,31 +121,6 @@ public class IdentitiesViewModelImpl
                 refreshItems();
             }
         };
-    }
-
-    @Override
-    public void setIdentitiesUpdateStream(@NonNull Observable<Identity> observable,
-                                          @NonNull final String workerTag) {
-        getSubscriptions().add(observable.toSingle()
-                .subscribe(new SingleSubscriber<Identity>() {
-                    @Override
-                    public void onSuccess(Identity identity) {
-                        mView.removeWorker(workerTag);
-                        setRefreshing(false);
-
-                        notifyPropertyChanged(BR.currentUserBalance);
-                        loadData();
-                    }
-
-                    @Override
-                    public void onError(Throwable error) {
-                        mView.removeWorker(workerTag);
-                        setRefreshing(false);
-                        mView.showMessageWithAction(mUserRepo.getErrorMessage(error),
-                                getRefreshAction());
-                    }
-                })
-        );
     }
 
     @Override

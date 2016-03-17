@@ -60,11 +60,11 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, DraftsV
 
     @Override
     public void loadData() {
-        getSubscriptions().add(mUserRepo.fetchIdentityDataAsync(mCurrentIdentity)
+        getSubscriptions().add(mUserRepo.fetchIdentityData(mCurrentIdentity)
                 .flatMapObservable(new Func1<Identity, Observable<Purchase>>() {
                     @Override
                     public Observable<Purchase> call(Identity identity) {
-                        return mPurchaseRepo.getPurchasesLocalAsync(identity, true);
+                        return mPurchaseRepo.getPurchases(identity, true);
                     }
                 })
                 .subscribe(new Subscriber<Purchase>() {

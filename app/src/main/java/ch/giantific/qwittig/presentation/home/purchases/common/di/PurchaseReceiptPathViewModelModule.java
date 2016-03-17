@@ -8,7 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import ch.giantific.qwittig.di.scopes.PerFragment;
+import ch.giantific.qwittig.di.scopes.PerScreen;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
@@ -34,7 +34,7 @@ public class PurchaseReceiptPathViewModelModule extends BaseViewModelModule<Purc
         mReceiptImagePath = receiptImagePath;
     }
 
-    @PerFragment
+    @PerScreen
     @Provides
     PurchaseReceiptViewModel providesPurchaseReceiptViewModel(@NonNull UserRepository userRepository,
                                                               @NonNull PurchaseRepository purchaseRepository) {

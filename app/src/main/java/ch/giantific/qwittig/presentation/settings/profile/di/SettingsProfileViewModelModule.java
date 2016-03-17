@@ -8,7 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import ch.giantific.qwittig.di.scopes.PerFragment;
+import ch.giantific.qwittig.di.scopes.PerScreen;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileViewModel;
@@ -28,7 +28,7 @@ public class SettingsProfileViewModelModule extends BaseViewModelModule<Settings
         super(savedState, view);
     }
 
-    @PerFragment
+    @PerScreen
     @Provides
     SettingsProfileViewModel providesSettingsProfileViewModel(@NonNull UserRepository userRepository) {
         return new SettingsProfileViewModelImpl(mSavedState, mView, userRepository);

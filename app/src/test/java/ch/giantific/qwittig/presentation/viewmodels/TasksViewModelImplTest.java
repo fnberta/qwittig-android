@@ -77,7 +77,7 @@ public class TasksViewModelImplTest {
 //
 //        mViewModel.refreshItems();
 //        assertTrue(mViewModel.isRefreshing());
-//        verify(mMockView).loadUpdateTasksWorker();
+//        verify(mMockView).startUpdateTasksService();
 //    }
 
     @Test
@@ -94,7 +94,7 @@ public class TasksViewModelImplTest {
 //        when(mCurrentUser.getCurrentGroup()).thenReturn(group);
 //
 //        mViewModel.onDeadlineSelected(R.string.deadline_all);
-//        verify(mMockTaskRepo).getTasksLocalAsync(group, new Date(Long.MAX_VALUE));
+//        verify(mMockTaskRepo).getTasks(group, new Date(Long.MAX_VALUE));
 //    }
 //
 //    @Test
@@ -103,7 +103,7 @@ public class TasksViewModelImplTest {
 //        when(mCurrentUser.getCurrentGroup()).thenReturn(group);
 //
 //        mViewModel.onDeadlineSelected(R.string.deadline_today);
-//        verify(mMockTaskRepo).getTasksLocalAsync(group, new Date(1452470400));
+//        verify(mMockTaskRepo).getTasks(group, new Date(1452470400));
 //    }
 //
 //    @Test
@@ -112,7 +112,7 @@ public class TasksViewModelImplTest {
 //        when(mCurrentUser.getCurrentGroup()).thenReturn(group);
 //
 //        mViewModel.onDeadlineSelected(R.string.deadline_week);
-//        verify(mMockTaskRepo).getTasksLocalAsync(group, new Date(1452470400));
+//        verify(mMockTaskRepo).getTasks(group, new Date(1452470400));
 //    }
 //
 //    @Test
@@ -121,7 +121,7 @@ public class TasksViewModelImplTest {
 //        when(mCurrentUser.getCurrentGroup()).thenReturn(group);
 //
 //        mViewModel.onDeadlineSelected(R.string.deadline_month);
-//        verify(mMockTaskRepo).getTasksLocalAsync(group, new Date(1454284800));
+//        verify(mMockTaskRepo).getTasks(group, new Date(1454284800));
 //    }
 //
 //    @Test
@@ -130,7 +130,7 @@ public class TasksViewModelImplTest {
 //        when(mCurrentUser.getCurrentGroup()).thenReturn(group);
 //
 //        mViewModel.onDeadlineSelected(R.string.deadline_year);
-//        verify(mMockTaskRepo).getTasksLocalAsync(group, new Date(1483228800));
+//        verify(mMockTaskRepo).getTasks(group, new Date(1483228800));
 //    }
 
     @Test
@@ -168,7 +168,7 @@ public class TasksViewModelImplTest {
 //        when(mCurrentUser.getObjectId()).thenReturn("someId");
 
         mViewModel.onDoneButtonClicked(0);
-//        verify(mMockTaskRepo).getTasksLocalAsync(new Group(), new Date());
+//        verify(mMockTaskRepo).getTasks(new Group(), new Date());
     }
 
     @Test

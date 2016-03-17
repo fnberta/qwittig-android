@@ -14,9 +14,9 @@ import android.view.ViewGroup;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
+import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.FragmentFinanceCompensationsUnpaidBinding;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
-import ch.giantific.qwittig.presentation.finance.CompsUpdateWorker;
 import ch.giantific.qwittig.presentation.finance.unpaid.di.DaggerFinanceCompsUnpaidComponent;
 import ch.giantific.qwittig.presentation.finance.unpaid.di.FinanceCompsUnpaidViewModelModule;
 
@@ -71,8 +71,9 @@ public class CompsUnpaidFragment extends BaseRecyclerViewFragment<CompsUnpaidVie
     }
 
     @Override
-    public void loadUpdateCompensationsUnpaidWorker() {
-        CompsUpdateWorker.attach(getFragmentManager(), false);
+    public void startUpdateCompensationsUnpaidService() {
+        ParseQueryService.startUpdateIdentities(getActivity());
+        ParseQueryService.startUpdateCompensationsUnpaid(getActivity());
     }
 
     @Override
@@ -89,19 +90,12 @@ public class CompsUnpaidFragment extends BaseRecyclerViewFragment<CompsUnpaidVie
     }
 
     @Override
-    public void setColorTheme(@NonNull BigFraction balance) {
-        mActivity.setColorTheme(balance);
-    }
-
-    @Override
     public void onCompensationConfirmed() {
         mActivity.reloadCompsPaid();
     }
 
     public interface ActivityListener extends BaseRecyclerViewFragment.ActivityListener {
         void setCompsUnpaidViewModel(@NonNull CompsUnpaidViewModel viewModel);
-
-        void setColorTheme(@NonNull BigFraction balance);
 
         void reloadCompsPaid();
     }

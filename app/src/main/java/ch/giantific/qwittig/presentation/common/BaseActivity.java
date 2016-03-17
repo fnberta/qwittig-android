@@ -18,7 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.bus.LocalBroadcastImpl;
+import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorkerListener;
@@ -48,7 +48,7 @@ public abstract class BaseActivity<T extends ViewModel>
     private final BroadcastReceiver mLocalBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, @NonNull Intent intent) {
-            final int dataType = intent.getIntExtra(LocalBroadcastImpl.INTENT_DATA_TYPE, 0);
+            final int dataType = intent.getIntExtra(LocalBroadcast.INTENT_DATA_TYPE, 0);
             handleLocalBroadcast(intent, dataType);
         }
     };
@@ -84,7 +84,7 @@ public abstract class BaseActivity<T extends ViewModel>
         super.onStart();
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mLocalBroadcastReceiver,
-                new IntentFilter(LocalBroadcastImpl.INTENT_FILTER_DATA_NEW));
+                new IntentFilter(LocalBroadcast.INTENT_FILTER_DATA_NEW));
     }
 
     @Override

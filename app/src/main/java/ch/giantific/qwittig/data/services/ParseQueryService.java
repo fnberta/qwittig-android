@@ -41,13 +41,17 @@ import ch.giantific.qwittig.domain.repositories.UserRepository;
  */
 public class ParseQueryService extends IntentService {
 
-    private static final String SERVICE_NAME = "ParseQueryService";
+    private static final String SERVICE_NAME = ParseQueryService.class.getSimpleName();
     private static final String ACTION_UNPIN_OBJECT = BuildConfig.APPLICATION_ID + ".data.services.action.UNPIN_OBJECT";
-    private static final String ACTION_QUERY_OBJECT = BuildConfig.APPLICATION_ID + ".data.services.action.QUERY_OBJECT";
-    private static final String ACTION_QUERY_IDENTITIES = BuildConfig.APPLICATION_ID + ".data.services.action.QUERY_IDENTITIES";
-    private static final String ACTION_QUERY_COMPS = BuildConfig.APPLICATION_ID + ".data.services.action.QUERY_COMPS";
-    private static final String ACTION_QUERY_ALL = BuildConfig.APPLICATION_ID + ".data.services.action.QUERY_ALL";
-    private static final String ACTION_QUERY_TASK_DONE = BuildConfig.APPLICATION_ID + ".data.services.action.TASK_DONE";
+    private static final String ACTION_UPDATE_OBJECT = BuildConfig.APPLICATION_ID + ".data.services.action.UPDATE_OBJECT";
+    private static final String ACTION_UPDATE_IDENTITIES = BuildConfig.APPLICATION_ID + ".data.services.action.UPDATE_IDENTITIES";
+    private static final String ACTION_UPDATE_PURCHASES = BuildConfig.APPLICATION_ID + ".data.services.action.UPDATE_PURCHASES";
+    private static final String ACTION_UPDATE_COMPENSATIONS = BuildConfig.APPLICATION_ID + ".data.services.action.UPDATE_COMPENSATIONS";
+    private static final String ACTION_UPDATE_COMPENSATIONS_PAID = BuildConfig.APPLICATION_ID + ".data.services.action.UPDATE_COMPENSATIONS_PAID";
+    private static final String ACTION_UPDATE_COMPENSATIONS_UNPAID = BuildConfig.APPLICATION_ID + ".data.services.action.UPDATE_COMPENSATIONS_UNPAID";
+    private static final String ACTION_UPDATE_TASKS = BuildConfig.APPLICATION_ID + ".data.services.action.UPDATE_TASKS";
+    private static final String ACTION_UPDATE_ALL = BuildConfig.APPLICATION_ID + ".data.services.action.UPDATE_ALL";
+    private static final String ACTION_SET_TASK_DONE = BuildConfig.APPLICATION_ID + ".data.services.action.SET_TASK_DONE";
     private static final String EXTRA_OBJECT_CLASS = BuildConfig.APPLICATION_ID + ".data.services.extra.OBJECT_CLASS";
     private static final String EXTRA_OBJECT_ID = BuildConfig.APPLICATION_ID + ".data.services.extra.OBJECT_ID";
     private static final String EXTRA_OBJECT_IS_NEW = BuildConfig.APPLICATION_ID + ".data.services.extra.OBJECT_IS_NEW";
@@ -80,20 +84,6 @@ public class ParseQueryService extends IntentService {
      * @param context   the context to use to start the service
      * @param className the class of the object to unpin
      * @param objectId  the id of the object to unpin
-     * @see IntentService
-     */
-    public static void startUnpinObject(@NonNull Context context,
-                                        @NonNull @ClassType String className,
-                                        @NonNull String objectId) {
-        startUnpinObject(context, className, objectId, "");
-    }
-
-    /**
-     * Starts this service to unpin a specific ParseObject.
-     *
-     * @param context   the context to use to start the service
-     * @param className the class of the object to unpin
-     * @param objectId  the id of the object to unpin
      * @param groupId   the group id used to construct the correct pin label
      * @see IntentService
      */
@@ -118,12 +108,12 @@ public class ParseQueryService extends IntentService {
      * @param isNew     whether the object was already queried once
      * @see IntentService
      */
-    public static void startQueryObject(@NonNull Context context,
-                                        @NonNull @ClassType String className,
-                                        @NonNull String objectId,
-                                        boolean isNew) {
+    public static void startUpdateObject(@NonNull Context context,
+                                         @NonNull @ClassType String className,
+                                         @NonNull String objectId,
+                                         boolean isNew) {
         Intent intent = new Intent(context, ParseQueryService.class);
-        intent.setAction(ACTION_QUERY_OBJECT);
+        intent.setAction(ACTION_UPDATE_OBJECT);
         intent.putExtra(EXTRA_OBJECT_CLASS, className);
         intent.putExtra(EXTRA_OBJECT_ID, objectId);
         intent.putExtra(EXTRA_OBJECT_IS_NEW, isNew);
@@ -136,9 +126,21 @@ public class ParseQueryService extends IntentService {
      * @param context the context to use to start the service
      * @see IntentService
      */
-    public static void startQueryIdentities(@NonNull Context context) {
+    public static void startUpdateIdentities(@NonNull Context context) {
         Intent intent = new Intent(context, ParseQueryService.class);
-        intent.setAction(ACTION_QUERY_IDENTITIES);
+        intent.setAction(ACTION_UPDATE_IDENTITIES);
+        context.startService(intent);
+    }
+
+    /**
+     * Starts this service to query all purchases.
+     *
+     * @param context the context to use to start the service
+     * @see IntentService
+     */
+    public static void startUpdatePurchases(@NonNull Context context) {
+        Intent intent = new Intent(context, ParseQueryService.class);
+        intent.setAction(ACTION_UPDATE_PURCHASES);
         context.startService(intent);
     }
 
@@ -148,9 +150,45 @@ public class ParseQueryService extends IntentService {
      * @param context the context to use to start the service
      * @see IntentService
      */
-    public static void startQueryCompensations(@NonNull Context context) {
+    public static void startUpdateCompensations(@NonNull Context context) {
         Intent intent = new Intent(context, ParseQueryService.class);
-        intent.setAction(ACTION_QUERY_COMPS);
+        intent.setAction(ACTION_UPDATE_COMPENSATIONS);
+        context.startService(intent);
+    }
+
+    /**
+     * Starts this service to query all paid compensations.
+     *
+     * @param context the context to use to start the service
+     * @see IntentService
+     */
+    public static void startUpdateCompensationsPaid(@NonNull Context context) {
+        Intent intent = new Intent(context, ParseQueryService.class);
+        intent.setAction(ACTION_UPDATE_COMPENSATIONS_PAID);
+        context.startService(intent);
+    }
+
+    /**
+     * Starts this service to query all unpaidcompensations.
+     *
+     * @param context the context to use to start the service
+     * @see IntentService
+     */
+    public static void startUpdateCompensationsUnpaid(@NonNull Context context) {
+        Intent intent = new Intent(context, ParseQueryService.class);
+        intent.setAction(ACTION_UPDATE_COMPENSATIONS_UNPAID);
+        context.startService(intent);
+    }
+
+    /**
+     * Starts this service to query all tasks.
+     *
+     * @param context the context to use to start the service
+     * @see IntentService
+     */
+    public static void startUpdateTasks(@NonNull Context context) {
+        Intent intent = new Intent(context, ParseQueryService.class);
+        intent.setAction(ACTION_UPDATE_TASKS);
         context.startService(intent);
     }
 
@@ -160,9 +198,9 @@ public class ParseQueryService extends IntentService {
      * @param context the context to use to start the service
      * @see IntentService
      */
-    public static void startQueryAll(@NonNull Context context) {
+    public static void startUpdateAll(@NonNull Context context) {
         Intent intent = new Intent(context, ParseQueryService.class);
-        intent.setAction(ACTION_QUERY_ALL);
+        intent.setAction(ACTION_UPDATE_ALL);
         context.startService(intent);
     }
 
@@ -175,7 +213,7 @@ public class ParseQueryService extends IntentService {
      */
     public static void startTaskDone(@NonNull Context context, @NonNull String taskId) {
         Intent intent = new Intent(context, ParseQueryService.class);
-        intent.setAction(ACTION_QUERY_TASK_DONE);
+        intent.setAction(ACTION_SET_TASK_DONE);
         intent.putExtra(EXTRA_OBJECT_ID, taskId);
         context.startService(intent);
     }
@@ -187,7 +225,6 @@ public class ParseQueryService extends IntentService {
         }
 
         injectDependencies();
-
         final User currentUser = mUserRepo.getCurrentUser();
         if (currentUser == null) {
             return;
@@ -205,26 +242,47 @@ public class ParseQueryService extends IntentService {
                 unpinObject(className, objectId, groupId);
                 break;
             }
-            case ACTION_QUERY_OBJECT: {
+            case ACTION_UPDATE_OBJECT: {
                 final String className = intent.getStringExtra(EXTRA_OBJECT_CLASS);
                 final String objectId = intent.getStringExtra(EXTRA_OBJECT_ID);
                 final boolean isNew = intent.getBooleanExtra(EXTRA_OBJECT_IS_NEW, false);
-                queryObject(className, objectId, isNew);
+                updateObject(className, objectId, isNew);
                 break;
             }
-            case ACTION_QUERY_IDENTITIES: {
-                queryIdentities();
+            case ACTION_UPDATE_IDENTITIES: {
+                updateIdentities();
                 break;
             }
-            case ACTION_QUERY_COMPS: {
-                queryCompensations();
+            case ACTION_UPDATE_PURCHASES: {
+                updatePurchases();
                 break;
             }
-            case ACTION_QUERY_ALL: {
-                queryAll();
+            case ACTION_UPDATE_COMPENSATIONS: {
+                updateCompensationsPaid();
+                updateCompensationsUnpaid();
                 break;
             }
-            case ACTION_QUERY_TASK_DONE: {
+            case ACTION_UPDATE_COMPENSATIONS_PAID: {
+                updateCompensationsPaid();
+                break;
+            }
+            case ACTION_UPDATE_COMPENSATIONS_UNPAID: {
+                updateCompensationsUnpaid();
+                break;
+            }
+            case ACTION_UPDATE_TASKS: {
+                updateTasks();
+                break;
+            }
+            case ACTION_UPDATE_ALL: {
+                updatePurchases();
+                updateIdentities();
+                updateCompensationsPaid();
+                updateCompensationsUnpaid();
+                updateTasks();
+                break;
+            }
+            case ACTION_SET_TASK_DONE: {
                 final String taskId = intent.getStringExtra(EXTRA_OBJECT_ID);
                 setTaskDone(taskId);
                 break;
@@ -243,115 +301,105 @@ public class ParseQueryService extends IntentService {
                              @NonNull String groupId) {
         switch (className) {
             case Purchase.CLASS: {
-                if (mPurchaseRepo.removePurchaseLocal(objectId, groupId)) {
-                    mLocalBroadcast.sendPurchasesUpdated();
-                }
+                final boolean successful = mPurchaseRepo.removePurchase(objectId, groupId);
+                mLocalBroadcast.sendPurchasesUpdated(successful);
                 break;
             }
             case Compensation.CLASS: {
-                if (mCompsRepo.removeCompensationLocal(objectId)) {
-                    mLocalBroadcast.sendCompensationsUpdated(false);
-                }
+                final boolean successful = mCompsRepo.removeCompensationLocal(objectId);
+                mLocalBroadcast.sendCompensationsUpdated(successful, false);
                 break;
             }
             case Task.CLASS: {
-                if (mTasksRepo.removeTaskLocal(objectId)) {
-                    mLocalBroadcast.sendTasksUpdated();
-                }
+                final boolean successful = mTasksRepo.removeTaskLocal(objectId);
+                mLocalBroadcast.sendTasksUpdated(successful);
                 break;
             }
         }
     }
 
-    private void queryObject(@NonNull String className, @NonNull String objectId, boolean isNew) {
+    private void updateObject(@NonNull String className, @NonNull String objectId, boolean isNew) {
         switch (className) {
             case Purchase.CLASS:
-                queryPurchase(objectId, isNew);
+                updatePurchase(objectId, isNew);
                 break;
             case Compensation.CLASS:
-                queryCompensation(objectId, isNew);
+                updateCompensation(objectId, isNew);
                 break;
             case Task.CLASS:
-                queryTask(objectId, isNew);
+                updateTask(objectId, isNew);
                 break;
             case Group.CLASS:
-                queryGroup(objectId, isNew);
+                updateGroup(objectId, isNew);
                 break;
         }
     }
 
-    private void queryPurchase(@NonNull String purchaseId, boolean isNew) {
+    private void updatePurchase(@NonNull String purchaseId, boolean isNew) {
         if (isNew && mPurchaseRepo.isAlreadySavedLocal(purchaseId)) {
             return;
         }
 
-        if (mPurchaseRepo.updatePurchase(purchaseId, isNew)) {
-            mLocalBroadcast.sendPurchasesUpdated();
-        }
+        final boolean successful = mPurchaseRepo.updatePurchase(purchaseId, isNew);
+        mLocalBroadcast.sendPurchasesUpdated(successful);
     }
 
-    private void queryCompensation(@NonNull String compensationId, boolean isNew) {
+    private void updateCompensation(@NonNull String compensationId, boolean isNew) {
         if (isNew && mCompsRepo.isAlreadySavedLocal(compensationId)) {
             return;
         }
 
         final Boolean isPaid = mCompsRepo.updateCompensation(compensationId, isNew);
         if (isPaid != null) {
-            mLocalBroadcast.sendCompensationsUpdated(isPaid);
+            mLocalBroadcast.sendCompensationsUpdated(true, isPaid);
         }
+
+        // TODO: no broadcast is sent if update failed, probably won't matter
     }
 
-    private void queryTask(@NonNull String taskId, boolean isNew) {
+    private void updateTask(@NonNull String taskId, boolean isNew) {
         if (isNew && mTasksRepo.isAlreadySavedLocal(taskId)) {
             return;
         }
 
-        if (mTasksRepo.updateTask(taskId, isNew)) {
-            mLocalBroadcast.sendTasksUpdated();
-        }
+        final boolean successful = mTasksRepo.updateTask(taskId, isNew);
+        mLocalBroadcast.sendTasksUpdated(successful);
     }
 
-    private void queryGroup(@NonNull String groupId, boolean isNew) {
+    private void updateGroup(@NonNull String groupId, boolean isNew) {
         if (isNew && mGroupRepo.isAlreadySavedLocal(groupId)) {
             return;
         }
 
-        final Group group = mGroupRepo.getGroupOnline(groupId);
+        final Group group = mGroupRepo.queryGroup(groupId);
         if (group != null) {
             mLocalBroadcast.sendGroupUpdated();
         }
     }
 
-    private void queryAll() {
-        queryPurchases();
-        queryIdentities();
-        queryCompensations();
-        queryTasks();
+    private void updatePurchases() {
+        final boolean successful = mPurchaseRepo.updatePurchases(mIdentities, mCurrentIdentity);
+        mLocalBroadcast.sendPurchasesUpdated(successful);
     }
 
-    private void queryPurchases() {
-        if (mPurchaseRepo.updatePurchases(mIdentities, mCurrentIdentity)) {
-            mLocalBroadcast.sendPurchasesUpdated();
-        }
+    private void updateIdentities() {
+        final boolean successful = mUserRepo.updateIdentities(mIdentities);
+        mLocalBroadcast.sendIdentitiesUpdated(successful);
     }
 
-    private void queryIdentities() {
-        if (mUserRepo.updateIdentities(mIdentities)) {
-            mLocalBroadcast.sendUsersUpdated();
-        }
+    private void updateCompensationsPaid() {
+        final boolean successful = mCompsRepo.updateCompensationsPaid(mIdentities);
+        mLocalBroadcast.sendCompensationsUpdated(successful, true);
     }
 
-    private void queryCompensations() {
-        if (mCompsRepo.updateCompensations(mIdentities)) {
-            mLocalBroadcast.sendCompensationsUpdated(false);
-            mLocalBroadcast.sendCompensationsUpdated(true);
-        }
+    private void updateCompensationsUnpaid() {
+        final boolean successful = mCompsRepo.updateCompensationsUnpaid(mIdentities);
+        mLocalBroadcast.sendCompensationsUpdated(successful, false);
     }
 
-    private void queryTasks() {
-        if (mTasksRepo.updateTasks(mIdentities)) {
-            mLocalBroadcast.sendTasksUpdated();
-        }
+    private void updateTasks() {
+        final boolean successful = mTasksRepo.updateTasks(mIdentities);
+        mLocalBroadcast.sendTasksUpdated(successful);
     }
 
     private void setTaskDone(@NonNull String taskId) {
@@ -359,7 +407,7 @@ public class ParseQueryService extends IntentService {
         if (task != null) {
             task.addHistoryEvent(mCurrentIdentity);
             task.saveEventually();
-            mLocalBroadcast.sendTasksUpdated();
+            mLocalBroadcast.sendTasksUpdated(true);
         }
     }
 

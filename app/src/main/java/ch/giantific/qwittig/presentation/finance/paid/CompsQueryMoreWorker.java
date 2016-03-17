@@ -69,7 +69,7 @@ public class CompsQueryMoreWorker extends BaseQueryWorker<Compensation, CompsQue
     protected Observable<Compensation> getObservable(@NonNull Bundle args) {
         if (checkIdentities()) {
             final int skip = args.getInt(KEY_SKIP, 0);
-            return mCompsRepo.getCompensationsPaidOnlineAsync(mCurrentIdentity, skip);
+            return mCompsRepo.queryMoreCompensationsPaid(mCurrentIdentity, skip);
         }
 
         return null;

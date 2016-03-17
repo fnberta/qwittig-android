@@ -82,7 +82,7 @@ public class CompSaveWorker extends BaseWorker<Compensation, CompSaveWorkerListe
     @Nullable
     @Override
     protected Observable<Compensation> getObservable(@NonNull Bundle args) {
-        return mCompsRepo.saveCompensationAsync(mCompensation).toObservable();
+        return mCompsRepo.saveCompensation(mCompensation).toObservable();
     }
 
     @Override

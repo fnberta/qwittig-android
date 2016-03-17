@@ -45,7 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ch.giantific.qwittig.data.receivers.PushBroadcastReceiver;
+import ch.giantific.qwittig.data.push.PushBroadcastReceiver;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
@@ -123,7 +123,7 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                 .flatMap(new Func1<User, Single<User>>() {
                     @Override
                     public Single<User> call(final User user) {
-                        return fetchIdentitiesDataAsync(user.getIdentities())
+                        return fetchIdentitiesData(user.getIdentities())
                                 .toList()
                                 .toSingle()
                                 .flatMap(new Func1<List<Identity>, Single<? extends User>>() {
@@ -213,13 +213,13 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                 .flatMap(new Func1<User, Single<Identity>>() {
                     @Override
                     public Single<Identity> call(final User user) {
-                        return fetchIdentityDataAsync(user.getCurrentIdentity());
+                        return fetchIdentityData(user.getCurrentIdentity());
                     }
                 })
                 .flatMap(new Func1<Identity, Single<Identity>>() {
                     @Override
                     public Single<Identity> call(Identity identity) {
-                        return saveIdentityLocalAsync(identity);
+                        return saveIdentityLocal(identity);
                     }
                 });
     }
@@ -260,7 +260,7 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                                     });
                         }
 
-                        return fetchIdentitiesDataAsync(user.getIdentities())
+                        return fetchIdentitiesData(user.getIdentities())
                                 .toList()
                                 .toSingle()
                                 .map(new Func1<List<Identity>, User>() {
@@ -398,7 +398,7 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                                     });
                         }
 
-                        return fetchIdentitiesDataAsync(user.getIdentities())
+                        return fetchIdentitiesData(user.getIdentities())
                                 .toList()
                                 .toSingle()
                                 .map(new Func1<List<Identity>, User>() {
@@ -507,13 +507,13 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                 .flatMap(new Func1<User, Single<Identity>>() {
                     @Override
                     public Single<Identity> call(User user) {
-                        return fetchIdentityDataAsync(user.getCurrentIdentity());
+                        return fetchIdentityData(user.getCurrentIdentity());
                     }
                 })
                 .flatMap(new Func1<Identity, Single<Identity>>() {
                     @Override
                     public Single<Identity> call(Identity identity) {
-                        return saveIdentityLocalAsync(identity);
+                        return saveIdentityLocal(identity);
                     }
                 })
                 .flatMap(new Func1<Identity, Single<Group>>() {
@@ -702,13 +702,13 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                     @Override
                     public Single<Identity> call(User user) {
                         final Identity newIdentity = user.getCurrentIdentity();
-                        return fetchIdentityDataAsync(newIdentity);
+                        return fetchIdentityData(newIdentity);
                     }
                 })
                 .flatMap(new Func1<Identity, Single<Identity>>() {
                     @Override
                     public Single<Identity> call(Identity identity) {
-                        return saveIdentityLocalAsync(identity);
+                        return saveIdentityLocal(identity);
                     }
                 })
                 .flatMap(new Func1<Identity, Single<Group>>() {
@@ -748,7 +748,7 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
     }
 
     @Override
-    public Single<Identity> saveIdentityLocalAsync(@NonNull Identity identity) {
+    public Single<Identity> saveIdentityLocal(@NonNull Identity identity) {
         return pin(identity, Identity.PIN_LABEL);
     }
 
@@ -759,7 +759,7 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
     }
 
     @Override
-    public Single<Identity> fetchIdentityDataAsync(@NonNull final Identity identity) {
+    public Single<Identity> fetchIdentityData(@NonNull final Identity identity) {
         if (identity.isDataAvailable() && identity.getGroup().isDataAvailable()) {
             return Single.just(identity);
         }
@@ -783,18 +783,18 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
     }
 
     @Override
-    public Observable<Identity> fetchIdentitiesDataAsync(@NonNull List<Identity> identities) {
+    public Observable<Identity> fetchIdentitiesData(@NonNull List<Identity> identities) {
         return Observable.from(identities)
                 .flatMap(new Func1<Identity, Observable<Identity>>() {
                     @Override
                     public Observable<Identity> call(Identity identity) {
-                        return fetchIdentityDataAsync(identity).toObservable();
+                        return fetchIdentityData(identity).toObservable();
                     }
                 });
     }
 
     @Override
-    public Observable<Identity> getIdentitiesLocalAsync(@NonNull Group group, boolean includePending) {
+    public Observable<Identity> getIdentities(@NonNull Group group, boolean includePending) {
         final ParseQuery<Identity> query = ParseQuery.getQuery(Identity.CLASS);
         query.fromLocalDatastore();
         query.ignoreACLs();
@@ -810,63 +810,6 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                         return Observable.from(identities);
                     }
                 });
-    }
-
-    @Override
-    public Observable<Identity> updateIdentitiesAsync(@NonNull final List<Identity> identities) {
-        return calcUserBalances()
-                .flatMapObservable(new Func1<String, Observable<? extends Identity>>() {
-                    @Override
-                    public Observable<? extends Identity> call(String s) {
-                        return Observable.from(identities);
-                    }
-                })
-                .map(new Func1<Identity, Group>() {
-                    @Override
-                    public Group call(Identity identity) {
-                        return identity.getGroup();
-                    }
-                })
-                .toList()
-                .map(new Func1<List<Group>, ParseQuery<Identity>>() {
-                    @Override
-                    public ParseQuery<Identity> call(List<Group> groups) {
-                        return getIdentitiesOnlineQuery(groups);
-                    }
-                })
-                .flatMap(new Func1<ParseQuery<Identity>, Observable<List<Identity>>>() {
-                    @Override
-                    public Observable<List<Identity>> call(ParseQuery<Identity> identityParseQuery) {
-                        return find(identityParseQuery);
-                    }
-                })
-                .concatMap(new Func1<List<Identity>, Observable<List<Identity>>>() {
-                    @Override
-                    public Observable<List<Identity>> call(List<Identity> identities) {
-                        return unpinAll(identities, Identity.PIN_LABEL);
-                    }
-                })
-                .concatMap(new Func1<List<Identity>, Observable<List<Identity>>>() {
-                    @Override
-                    public Observable<List<Identity>> call(List<Identity> identities) {
-                        return pinAll(identities, Identity.PIN_LABEL);
-                    }
-                })
-                .concatMap(new Func1<List<Identity>, Observable<Identity>>() {
-                    @Override
-                    public Observable<Identity> call(List<Identity> identities) {
-                        return Observable.from(identities);
-                    }
-                });
-    }
-
-    @NonNull
-    private ParseQuery<Identity> getIdentitiesOnlineQuery(@NonNull List<Group> groups) {
-        final ParseQuery<Identity> query = ParseQuery.getQuery(Identity.CLASS);
-        query.whereContainedIn(Identity.GROUP, groups);
-        query.whereEqualTo(Identity.ACTIVE, true);
-        query.include(Identity.GROUP);
-        return query;
     }
 
     @Override
@@ -887,6 +830,15 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
         }
 
         return true;
+    }
+
+    @NonNull
+    private ParseQuery<Identity> getIdentitiesOnlineQuery(@NonNull List<Group> groups) {
+        final ParseQuery<Identity> query = ParseQuery.getQuery(Identity.CLASS);
+        query.whereContainedIn(Identity.GROUP, groups);
+        query.whereEqualTo(Identity.ACTIVE, true);
+        query.include(Identity.GROUP);
+        return query;
     }
 
     @Override

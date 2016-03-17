@@ -284,7 +284,7 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
 
     @Override
     public void loadData() {
-        getSubscriptions().add(mUserRepo.getIdentitiesLocalAsync(mCurrentGroup, true)
+        getSubscriptions().add(mUserRepo.getIdentities(mCurrentGroup, true)
                 .toSortedList()
                 .toSingle()
                 .subscribe(new SingleSubscriber<List<Identity>>() {
@@ -725,7 +725,7 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
                         @Override
                         public Single<Purchase> call(byte[] bytes) {
                             purchase.setReceiptData(bytes);
-                            return mPurchaseRepo.savePurchaseAsDraftAsync(purchase, Purchase.PIN_LABEL_DRAFT);
+                            return mPurchaseRepo.savePurchaseAsDraft(purchase, Purchase.PIN_LABEL_DRAFT);
                         }
                     })
                     .subscribe(new SingleSubscriber<Purchase>() {
@@ -741,7 +741,7 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
                     })
             );
         } else {
-            getSubscriptions().add(mPurchaseRepo.savePurchaseAsDraftAsync(purchase, Purchase.PIN_LABEL_DRAFT)
+            getSubscriptions().add(mPurchaseRepo.savePurchaseAsDraft(purchase, Purchase.PIN_LABEL_DRAFT)
                     .subscribe(new SingleSubscriber<Purchase>() {
                         @Override
                         public void onSuccess(Purchase value) {

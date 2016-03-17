@@ -31,7 +31,7 @@ public class ParseGroupRepository extends ParseBaseRepository implements GroupRe
 
     @Override
     @Nullable
-    public Group getGroupOnline(@NonNull String groupId) {
+    public Group queryGroup(@NonNull String groupId) {
         final ParseQuery<Group> query = ParseQuery.getQuery(Group.CLASS);
         try {
             return query.get(groupId);
