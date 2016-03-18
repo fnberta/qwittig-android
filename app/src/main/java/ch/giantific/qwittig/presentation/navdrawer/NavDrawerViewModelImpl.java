@@ -117,8 +117,6 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
 
     @Override
     public void onLogout() {
-        // TODO: needed?
-        mCurrentUser = null;
         mView.startHomeActivityAndFinish();
     }
 

@@ -144,9 +144,4 @@ public class LoginActivity extends BaseActivity<LoginAccountsViewModel> implemen
     public void onValidEmailEntered(@NonNull String email) {
         mEmailViewModel.onValidEmailEntered(email);
     }
-
-    @Override
-    public void onNoEmailEntered() {
-        mEmailViewModel.onNoEmailEntered();
-    }
 }

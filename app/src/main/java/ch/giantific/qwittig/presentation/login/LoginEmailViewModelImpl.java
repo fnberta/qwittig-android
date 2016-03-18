@@ -203,9 +203,4 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
     public void onValidEmailEntered(@NonNull String email) {
         mView.loadResetPasswordWorker(email);
     }
-
-    @Override
-    public void onNoEmailEntered() {
-        // TODO: what do we do?
-    }
 }

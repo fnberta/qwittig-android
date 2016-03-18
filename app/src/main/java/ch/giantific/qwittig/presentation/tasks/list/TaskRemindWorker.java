@@ -66,7 +66,6 @@ public class TaskRemindWorker extends BaseWorker<String, TaskRemindWorkerListene
 
     @Override
     protected void onError() {
-        // TODO: check tag
         mActivity.onWorkerError(WORKER_TAG + mTaskId);
     }
 

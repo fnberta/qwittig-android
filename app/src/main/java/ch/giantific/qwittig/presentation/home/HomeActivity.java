@@ -301,7 +301,6 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
         mViewModel.onLoginSuccessful();
         checkDrafts();
         checkForInvitations();
-        // TODO: fix setLoading(true) because online query is still happening
         addFragments();
     }
 

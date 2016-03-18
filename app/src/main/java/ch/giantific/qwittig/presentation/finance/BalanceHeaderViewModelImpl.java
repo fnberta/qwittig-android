@@ -14,6 +14,7 @@ import org.apache.commons.math3.fraction.BigFraction;
 import java.text.NumberFormat;
 
 import ch.giantific.qwittig.BR;
+import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
@@ -65,7 +66,7 @@ public class BalanceHeaderViewModelImpl extends ViewModelBaseImpl<BalanceHeaderV
 
                     @Override
                     public void onError(Throwable error) {
-                        // TODO: handle error
+                        mView.showMessage(R.string.toast_error_balance_load);
                     }
                 })
         );

@@ -155,7 +155,6 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksViewModel> impleme
     protected void onLoginSuccessful() {
         super.onLoginSuccessful();
 
-        // TODO: fix setLoading(true) because online query is still happening
         addTasksFragment();
     }
 }

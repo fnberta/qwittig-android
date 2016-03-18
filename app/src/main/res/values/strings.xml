@@ -308,5 +308,6 @@
     <string name="toast_error_users_update">Failed to update users</string>
     <string name="toast_error_comps_update">Failed to update compensations</string>
     <string name="toast_profile_nickname_taken">This nickname is already taken in this group</string>
+    <string name="toast_error_balance_load">Failed to load your current balance</string>
 
 </resources>

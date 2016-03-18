@@ -155,7 +155,6 @@ public class FinanceActivity extends BaseNavDrawerActivity<BalanceHeaderViewMode
     protected void onLoginSuccessful() {
         super.onLoginSuccessful();
 
-        // TODO: fix setLoading(true) because online query is still happening
         setupTabs();
     }
 

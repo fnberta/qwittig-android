@@ -131,13 +131,6 @@ public class EmailPromptDialogFragment extends BaseDialogFragment<EmailPromptDia
         }
     }
 
-    @Override
-    public void onCancel(DialogInterface dialog) {
-        super.onCancel(dialog);
-
-        mActivity.onNoEmailEntered();
-    }
-
     /**
      * Defines the actions to take when user clicks on one of the dialog's buttons.
      */
@@ -148,11 +141,5 @@ public class EmailPromptDialogFragment extends BaseDialogFragment<EmailPromptDia
          * @param email the email address entered
          */
         void onValidEmailEntered(@NonNull String email);
-
-        /**
-         * Defines the action to take when user cancels the dialog by pressing cancel, back or
-         * anywhere outside the dialog.
-         */
-        void onNoEmailEntered();
     }
 }
