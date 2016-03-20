@@ -24,7 +24,7 @@ import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.tasks.list.TasksViewModel;
 import ch.giantific.qwittig.presentation.tasks.list.TasksViewModelImpl;
-import ch.giantific.qwittig.presentation.tasks.list.items.ListItem;
+import ch.giantific.qwittig.presentation.tasks.list.items.TasksBaseItem;
 import ch.giantific.qwittig.presentation.tasks.list.items.TaskItem;
 
 import static org.junit.Assert.assertFalse;
@@ -51,14 +51,14 @@ public class TasksViewModelImplTest {
     private UserRepository mMockUserRepo;
 
     private TasksViewModelImpl mViewModel;
-    private ArrayList<ListItem> mTasks;
+    private ArrayList<TasksBaseItem> mTasks;
 
     @Before
     public void setUp() throws Exception {
         final User currentUser = mMockUserRepo.getCurrentUser();
         mViewModel = new TasksViewModelImpl(mMockBundle, mMockView, mMockUserRepo, mMockTaskRepo);
         mTasks = new ArrayList<>();
-        mTasks.add(new TaskItem(mMockTask, currentUser.getCurrentIdentity()));
+        mTasks.add(new TaskItem(view, mMockTask, currentUser.getCurrentIdentity()));
         mViewModel.setItems(mTasks);
     }
 
@@ -85,7 +85,7 @@ public class TasksViewModelImplTest {
 //        when(mCurrentUser.getCurrentGroup()).thenReturn(new Group());
 
         mViewModel.onAddTaskFabClick(Mockito.mock(View.class));
-        verify(mMockView).startTaskAddActivity();
+        verify(mMockView).startTaskAddScreen();
     }
 
 //    @Test
@@ -136,7 +136,7 @@ public class TasksViewModelImplTest {
     @Test
     public void onTaskRowClick_shouldStartDetailsActivity() throws Exception {
         mViewModel.onTaskRowClicked(1);
-        verify(mMockView).startTaskDetailsActivity(mMockTask);
+        verify(mMockView).startTaskDetailsScreen(mMockTask);
     }
 
     @Test
@@ -156,15 +156,15 @@ public class TasksViewModelImplTest {
 
         mViewModel.onDoneButtonClicked(0);
         verify(mMockTask).updateDeadline();
-//        verify(mMockTask).addHistoryEvent(mCurrentUser);
+//        verify(mMockTask).rotateIdentities(mCurrentUser);
         verify(mMockTask).saveEventually();
     }
 
     @Test
     public void onDoneClick_shouldReloadWholeDataSetIfOldOrNewUserResponsibleIsCurrentUser() throws Exception {
         when(mMockTask.getTimeFrame()).thenReturn(Task.TimeFrame.MONTHLY);
-//        when(mMockTask.getUserResponsible()).thenReturn(mCurrentUser);
-//        when(mMockTask.addHistoryEvent(mCurrentUser)).thenReturn(mCurrentUser);
+//        when(mMockTask.getIdentityResponsible()).thenReturn(mCurrentUser);
+//        when(mMockTask.rotateIdentities(mCurrentUser)).thenReturn(mCurrentUser);
 //        when(mCurrentUser.getObjectId()).thenReturn("someId");
 
         mViewModel.onDoneButtonClicked(0);
@@ -176,8 +176,8 @@ public class TasksViewModelImplTest {
         final Identity identity = Mockito.mock(Identity.class);
         when(identity.getObjectId()).thenReturn("someOtherId");
         when(mMockTask.getTimeFrame()).thenReturn(Task.TimeFrame.MONTHLY);
-        when(mMockTask.getUserResponsible()).thenReturn(identity);
-//        when(mMockTask.addHistoryEvent(mCurrentUser)).thenReturn(user);
+        when(mMockTask.getIdentityResponsible()).thenReturn(identity);
+//        when(mMockTask.rotateIdentities(mCurrentUser)).thenReturn(user);
 //        when(mCurrentUser.getObjectId()).thenReturn("someId");
 
         mViewModel.onDoneButtonClicked(0);

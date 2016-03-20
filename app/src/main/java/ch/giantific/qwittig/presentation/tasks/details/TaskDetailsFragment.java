@@ -28,14 +28,14 @@ import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentTaskDetailsBinding;
-import ch.giantific.qwittig.presentation.tasks.details.di.DaggerTaskDetailsComponent;
-import ch.giantific.qwittig.presentation.tasks.details.di.TaskDetailsViewModelModule;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
 import ch.giantific.qwittig.presentation.tasks.addedit.TaskEditActivity;
+import ch.giantific.qwittig.presentation.tasks.details.di.DaggerTaskDetailsComponent;
+import ch.giantific.qwittig.presentation.tasks.details.di.TaskDetailsViewModelModule;
 import ch.giantific.qwittig.presentation.tasks.list.TasksFragment;
 
 /**
@@ -150,7 +150,7 @@ public class TaskDetailsFragment extends BaseRecyclerViewFragment<TaskDetailsVie
     public void startEditTaskActivity(@NonNull String taskId) {
         final FragmentActivity activity = getActivity();
         final Intent intent = new Intent(activity, TaskEditActivity.class);
-        intent.putExtra(TasksFragment.INTENT_TASK_ID, taskId);
+        intent.putExtra(TasksFragment.INTENT_EXTRA_TASK_ID, taskId);
         final ActivityOptionsCompat options =
                 ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
         activity.startActivityForResult(intent, BaseActivity.INTENT_REQUEST_TASK_MODIFY,
@@ -159,8 +159,8 @@ public class TaskDetailsFragment extends BaseRecyclerViewFragment<TaskDetailsVie
 
     @NonNull
     @Override
-    public SpannableStringBuilder buildUsersInvolvedString(@NonNull List<Identity> identities,
-                                                           @NonNull Identity identityResponsible) {
+    public SpannableStringBuilder buildTaskIdentitiesString(@NonNull List<Identity> identities,
+                                                            @NonNull Identity identityResponsible) {
         final SpannableStringBuilder stringBuilder = new SpannableStringBuilder();
         final int usersInvolvedSize = identities.size();
         stringBuilder.append(identityResponsible.getNickname());

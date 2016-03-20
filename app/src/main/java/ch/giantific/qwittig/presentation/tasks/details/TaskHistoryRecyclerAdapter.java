@@ -12,10 +12,10 @@ import android.view.ViewGroup;
 import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
 import ch.giantific.qwittig.databinding.RowTaskDetailsHistoryBinding;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.tasks.details.items.DetailsItem;
-import ch.giantific.qwittig.presentation.tasks.details.items.DetailsItem.Type;
-import ch.giantific.qwittig.presentation.tasks.details.items.HeaderItem;
-import ch.giantific.qwittig.presentation.tasks.details.items.TaskHistoryItem;
+import ch.giantific.qwittig.presentation.tasks.details.items.TaskDetailsBaseItem;
+import ch.giantific.qwittig.presentation.tasks.details.items.TaskDetailsBaseItem.Type;
+import ch.giantific.qwittig.presentation.tasks.details.items.TaskDetailsHeaderItem;
+import ch.giantific.qwittig.presentation.tasks.details.items.TaskDetailsHistoryItem;
 
 
 /**
@@ -74,7 +74,7 @@ public class TaskHistoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerVie
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        final DetailsItem detailsItem = mViewModel.getItemAtPosition(position);
+        final TaskDetailsBaseItem detailsItem = mViewModel.getItemAtPosition(position);
         final int viewType = getItemViewType(position);
         switch (viewType) {
             case Type.HISTORY: {
@@ -82,7 +82,7 @@ public class TaskHistoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerVie
                         (BindingRow<RowTaskDetailsHistoryBinding>) viewHolder;
                 final RowTaskDetailsHistoryBinding binding = historyRow.getBinding();
 
-                binding.setItem((TaskHistoryItem) detailsItem);
+                binding.setItem((TaskDetailsHistoryItem) detailsItem);
                 binding.executePendingBindings();
                 break;
             }
@@ -90,7 +90,7 @@ public class TaskHistoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerVie
                 final BindingRow<RowGenericHeaderBinding> headerRow = (BindingRow<RowGenericHeaderBinding>) viewHolder;
                 final RowGenericHeaderBinding binding = headerRow.getBinding();
 
-                binding.setViewModel((HeaderItem) detailsItem);
+                binding.setViewModel((TaskDetailsHeaderItem) detailsItem);
                 binding.executePendingBindings();
                 break;
             }

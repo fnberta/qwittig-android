@@ -16,10 +16,11 @@ import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.tasks.addedit.models.TaskUser;
 import rx.SingleSubscriber;
 
 /**
- * Created by fabio on 16.01.16.
+ * Provides an implementation of the {@link TaskAddEditViewModel} interface for the edit task screen.
  */
 public class TaskAddEditViewModelEditImpl extends TaskAddEditViewModelAddImpl {
 
@@ -146,7 +147,7 @@ public class TaskAddEditViewModelEditImpl extends TaskAddEditViewModelAddImpl {
 
     @Override
     boolean changesWereMade() {
-        if (!mOldTaskTitle.equals(mView.getTaskTitle()) ||
+        if (!mOldTaskTitle.equals(mTaskTitle) ||
                 !mOldTaskTimeFrame.equals(getTimeFrameSelected()) ||
                 mOldTaskDeadline.compareTo(mTaskDeadline) != 0) {
             return true;

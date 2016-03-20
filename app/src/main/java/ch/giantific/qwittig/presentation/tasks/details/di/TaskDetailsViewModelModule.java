@@ -18,7 +18,8 @@ import dagger.Module;
 import dagger.Provides;
 
 /**
- * Created by fabio on 12.01.16.
+ * Defines which implementation to use for the task details screen view model and how to
+ * instantiate it.
  */
 @Module
 public class TaskDetailsViewModelModule extends BaseViewModelModule<TaskDetailsViewModel.ViewListener> {

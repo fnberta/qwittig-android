@@ -12,22 +12,23 @@ import android.view.View;
 import android.widget.AdapterView;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Task;
+import ch.giantific.qwittig.domain.models.TaskHistoryEvent;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModelBaseImpl;
-import ch.giantific.qwittig.presentation.tasks.list.items.HeaderItem;
-import ch.giantific.qwittig.presentation.tasks.list.items.ListItem;
-import ch.giantific.qwittig.presentation.tasks.list.items.ListItem.Type;
 import ch.giantific.qwittig.presentation.tasks.list.items.TaskItem;
-import ch.giantific.qwittig.utils.DateUtils;
+import ch.giantific.qwittig.presentation.tasks.list.items.TasksBaseItem;
+import ch.giantific.qwittig.presentation.tasks.list.items.TasksBaseItem.Type;
+import ch.giantific.qwittig.presentation.tasks.list.items.TasksHeaderItem;
+import ch.giantific.qwittig.presentation.tasks.list.models.TaskDeadline;
 import ch.giantific.qwittig.utils.MessageAction;
+import rx.Completable;
 import rx.Observable;
 import rx.Single;
 import rx.SingleSubscriber;
@@ -35,28 +36,31 @@ import rx.Subscriber;
 import rx.functions.Func1;
 
 /**
- * Created by fabio on 09.01.16.
+ * Provides an implementation of the {@link TasksViewModel} interface.
  */
-public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<ListItem, TasksViewModel.ViewListener>
+public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<TasksBaseItem, TasksViewModel.ViewListener>
         implements TasksViewModel {
 
     private static final String STATE_LOADING_TASKS = "STATE_LOADING_TASKS";
+    private static final String STATE_DEADLINE = "STATE_DEADLINE";
     private final TaskRepository mTaskRepo;
     private ArrayList<String> mLoadingTasks;
-    private Date mDeadlineSelected;
+    private TaskDeadline mDeadline;
 
     public TasksViewModelImpl(@Nullable Bundle savedState,
                               @NonNull TasksViewModel.ViewListener view,
                               @NonNull UserRepository userRepository,
-                              @NonNull TaskRepository taskRepo) {
+                              @NonNull TaskRepository taskRepo,
+                              @NonNull TaskDeadline deadline) {
         super(savedState, view, userRepository);
 
         mTaskRepo = taskRepo;
-        mDeadlineSelected = new Date(Long.MAX_VALUE);
         if (savedState != null) {
             mItems = new ArrayList<>();
+            mDeadline = savedState.getParcelable(STATE_DEADLINE);
             mLoadingTasks = savedState.getStringArrayList(STATE_LOADING_TASKS);
         } else {
+            mDeadline = deadline;
             mLoadingTasks = new ArrayList<>();
         }
     }
@@ -70,6 +74,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<ListItem, Ta
     public void saveState(@NonNull Bundle outState) {
         super.saveState(outState);
 
+        outState.putParcelable(STATE_DEADLINE, mDeadline);
         outState.putStringArrayList(STATE_LOADING_TASKS, mLoadingTasks);
     }
 
@@ -79,7 +84,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<ListItem, Ta
                 .flatMapObservable(new Func1<Identity, Observable<Task>>() {
                     @Override
                     public Observable<Task> call(Identity identity) {
-                        return mTaskRepo.getTasks(identity, mDeadlineSelected);
+                        return mTaskRepo.getTasks(identity, mDeadline.getDate());
                     }
                 })
                 .filter(new Func1<Task, Boolean>() {
@@ -90,8 +95,8 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<ListItem, Ta
                     }
                 })
                 .subscribe(new Subscriber<Task>() {
-                    List<ListItem> tasksUser;
-                    List<ListItem> tasksGroup;
+                    List<TasksBaseItem> tasksUser;
+                    List<TasksBaseItem> tasksGroup;
 
                     @Override
                     public void onStart() {
@@ -103,9 +108,9 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<ListItem, Ta
 
                     @Override
                     public void onCompleted() {
-                        mItems.add(new HeaderItem(R.string.task_header_my));
+                        mItems.add(new TasksHeaderItem(R.string.task_header_my));
                         mItems.addAll(tasksUser);
-                        mItems.add(new HeaderItem(R.string.task_header_group));
+                        mItems.add(new TasksHeaderItem(R.string.task_header_group));
                         mItems.addAll(tasksGroup);
 
                         setLoading(false);
@@ -119,7 +124,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<ListItem, Ta
 
                     @Override
                     public void onNext(Task task) {
-                        final Identity identityResponsible = task.getUserResponsible();
+                        final Identity identityResponsible = task.getIdentityResponsible();
                         if (mCurrentIdentity.getObjectId().equals(identityResponsible.getObjectId())) {
                             tasksUser.add(new TaskItem(task, mCurrentIdentity));
                         } else {
@@ -149,45 +154,16 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<ListItem, Ta
 
     @Override
     public void onAddTaskFabClick(View view) {
-        mView.startTaskAddActivity();
+        mView.startTaskAddScreen();
     }
 
     @Override
     public void onDeadlineSelected(@NonNull AdapterView<?> parent, View view, int position, long id) {
-        int deadline = (int) parent.getItemAtPosition(position);
-        if (deadline == R.string.deadline_all) {
-            mDeadlineSelected = new Date(Long.MAX_VALUE);
+        final TaskDeadline deadline = (TaskDeadline) parent.getItemAtPosition(position);
+        if (!deadline.equals(mDeadline)) {
+            mDeadline = deadline;
             loadData();
-            return;
         }
-
-        Calendar cal = DateUtils.getCalendarInstanceUTC();
-        switch (deadline) {
-            case R.string.deadline_today: {
-                cal.add(Calendar.DAY_OF_YEAR, 1);
-                break;
-            }
-            case R.string.deadline_week: {
-                int firstDayOfWeek = cal.getFirstDayOfWeek();
-                cal.set(Calendar.DAY_OF_WEEK, firstDayOfWeek);
-                cal.add(Calendar.WEEK_OF_YEAR, 1);
-                break;
-            }
-            case R.string.deadline_month: {
-                cal.set(Calendar.DAY_OF_MONTH, 1);
-                cal.add(Calendar.MONTH, 1);
-                break;
-            }
-            case R.string.deadline_year: {
-                cal.set(Calendar.DAY_OF_YEAR, 1);
-                cal.add(Calendar.YEAR, 1);
-                break;
-            }
-        }
-
-        cal = DateUtils.resetToMidnight(cal);
-        mDeadlineSelected = cal.getTime();
-        loadData();
     }
 
     @Override
@@ -214,7 +190,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<ListItem, Ta
     @Override
     public void onTaskRowClicked(int position) {
         final Task task = ((TaskItem) mItems.get(position)).getTask();
-        mView.startTaskDetailsActivity(task);
+        mView.startTaskDetailsScreen(task);
     }
 
     @Override
@@ -230,14 +206,16 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<ListItem, Ta
             return;
         }
 
-        task.updateDeadline();
-        final Identity identityResponsible = task.getUserResponsible();
-        final Identity identityResponsibleNew = task.addHistoryEvent(mCurrentIdentity);
+        final TaskHistoryEvent newEvent = new TaskHistoryEvent(task, mCurrentIdentity, new Date());
+        getSubscriptions().add(Completable.fromSingle(mTaskRepo.saveTaskHistoryEvent(newEvent)).subscribe());
+
+        final Identity identityResponsible = task.getIdentityResponsible();
+        final Identity identityResponsibleNew = task.handleHistoryEvent();
         task.saveEventually();
 
-        String currentUserId = mCurrentUser.getObjectId();
-        if (identityResponsible != null && identityResponsible.getObjectId().equals(currentUserId) ||
-                identityResponsibleNew != null && identityResponsibleNew.getObjectId().equals(currentUserId)) {
+        final String currentIdentityId = mCurrentIdentity.getObjectId();
+        if (identityResponsible != null && identityResponsible.getObjectId().equals(currentIdentityId) ||
+                identityResponsibleNew != null && identityResponsibleNew.getObjectId().equals(currentIdentityId)) {
             loadData();
         } else {
             mView.notifyItemChanged(position);
@@ -251,7 +229,8 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<ListItem, Ta
             return;
         }
 
-        final Task task = ((TaskItem) mItems.get(position)).getTask();
+        final TaskItem taskItem = (TaskItem) mItems.get(position);
+        final Task task = taskItem.getTask();
         final String taskId = task.getObjectId();
         if (mLoadingTasks.contains(taskId)) {
             return;
@@ -261,7 +240,8 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<ListItem, Ta
         mView.loadRemindUserWorker(taskId);
     }
 
-    private void setTaskLoading(@NonNull Task task, String objectId, int position, boolean isLoading) {
+    private void setTaskLoading(@NonNull Task task, @NonNull String objectId, int position,
+                                boolean isLoading) {
         task.setLoading(isLoading);
         mView.notifyItemChanged(position);
 
@@ -301,12 +281,13 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<ListItem, Ta
     @Nullable
     private Task stopTaskLoading(@NonNull String taskId) {
         for (int i = 0, tasksSize = mItems.size(); i < tasksSize; i++) {
-            final ListItem taskListItem = mItems.get(i);
+            final TasksBaseItem taskListItem = mItems.get(i);
             if (taskListItem.getType() != Type.TASK) {
                 continue;
             }
 
-            final Task task = (Task) taskListItem;
+            final TaskItem taskItem = (TaskItem) taskListItem;
+            final Task task = taskItem.getTask();
             if (taskId.equals(task.getObjectId())) {
                 setTaskLoading(task, taskId, i, false);
                 return task;

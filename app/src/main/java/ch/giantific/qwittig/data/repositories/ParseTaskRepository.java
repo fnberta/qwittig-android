@@ -20,9 +20,11 @@ import ch.giantific.qwittig.data.push.PushBroadcastReceiver;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Task;
+import ch.giantific.qwittig.domain.models.TaskHistoryEvent;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import rx.Observable;
 import rx.Single;
+import rx.functions.Action1;
 import rx.functions.Func1;
 
 /**
@@ -78,12 +80,39 @@ public class ParseTaskRepository extends ParseBaseRepository implements TaskRepo
 
     @Override
     public Single<Task> getTask(@NonNull String taskId) {
-        ParseQuery<Task> query = ParseQuery.getQuery(Task.CLASS);
+        final ParseQuery<Task> query = ParseQuery.getQuery(Task.CLASS);
         query.fromLocalDatastore();
         query.ignoreACLs();
         query.include(Task.IDENTITIES);
 
         return get(query, taskId);
+    }
+
+    @Override
+    public Observable<TaskHistoryEvent> getTaskHistoryEvents(@NonNull Task task) {
+        final ParseQuery<TaskHistoryEvent> query = ParseQuery.getQuery(TaskHistoryEvent.CLASS);
+        query.whereEqualTo(TaskHistoryEvent.TASK, task);
+        query.fromLocalDatastore();
+        query.ignoreACLs();
+        query.include(TaskHistoryEvent.IDENTITY);
+        return find(query)
+                .concatMap(new Func1<List<TaskHistoryEvent>, Observable<? extends TaskHistoryEvent>>() {
+                    @Override
+                    public Observable<? extends TaskHistoryEvent> call(List<TaskHistoryEvent> taskHistoryEvents) {
+                        return Observable.from(taskHistoryEvents);
+                    }
+                });
+    }
+
+    @Override
+    public Single<TaskHistoryEvent> saveTaskHistoryEvent(@NonNull TaskHistoryEvent taskHistoryEvent) {
+        return pin(taskHistoryEvent, TaskHistoryEvent.PIN_LABEL)
+                .doOnSuccess(new Action1<TaskHistoryEvent>() {
+                    @Override
+                    public void call(TaskHistoryEvent taskHistoryEvent) {
+                        taskHistoryEvent.saveEventually();
+                    }
+                });
     }
 
     @Override
@@ -94,7 +123,7 @@ public class ParseTaskRepository extends ParseBaseRepository implements TaskRepo
 
     @Override
     public boolean removeTaskLocal(@NonNull String taskId) {
-        ParseObject task = ParseObject.createWithoutData(Task.CLASS, taskId);
+        final Task task = (Task) Task.createWithoutData(Task.CLASS, taskId);
         try {
             task.unpin(Task.PIN_LABEL);
         } catch (ParseException e) {
@@ -116,11 +145,22 @@ public class ParseTaskRepository extends ParseBaseRepository implements TaskRepo
             final List<Task> tasks = query.find();
             ParseObject.unpinAll(Task.PIN_LABEL);
             ParseObject.pinAll(Task.PIN_LABEL, tasks);
+
+            updateTaskHistoryEvents(tasks);
         } catch (ParseException e) {
             return false;
         }
 
         return true;
+    }
+
+    private void updateTaskHistoryEvents(List<Task> tasks) throws ParseException {
+        final ParseQuery<TaskHistoryEvent> query = ParseQuery.getQuery(TaskHistoryEvent.CLASS);
+        query.whereContainedIn(TaskHistoryEvent.TASK, tasks);
+        query.include(TaskHistoryEvent.IDENTITY);
+        final List<TaskHistoryEvent> events = query.find();
+        ParseObject.unpinAll(TaskHistoryEvent.PIN_LABEL);
+        ParseObject.pinAll(TaskHistoryEvent.PIN_LABEL, events);
     }
 
     @NonNull
@@ -134,7 +174,9 @@ public class ParseTaskRepository extends ParseBaseRepository implements TaskRepo
     @Override
     public boolean updateTask(@NonNull String taskId, boolean isNew) {
         try {
-            final Task task = getTaskOnline(taskId);
+            final ParseQuery<Task> query = ParseQuery.getQuery(Task.CLASS);
+            query.include(Task.IDENTITIES);
+            final Task task = query.get(taskId);
             if (isNew) {
                 task.pin(Task.PIN_LABEL);
             }
@@ -145,24 +187,22 @@ public class ParseTaskRepository extends ParseBaseRepository implements TaskRepo
         return true;
     }
 
-    private Task getTaskOnline(@NonNull String taskId) throws ParseException {
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery(Task.CLASS);
-        query.include(Task.IDENTITIES);
-        return (Task) query.get(taskId);
-    }
-
     @Override
-    public Task fetchTaskDataLocal(@NonNull String taskId) {
-        final Task task = (Task) ParseObject.createWithoutData(Task.CLASS, taskId);
+    public boolean setTaskDone(@NonNull String taskId, @NonNull Identity identity) {
         try {
+            final Task task = (Task) Task.createWithoutData(Task.CLASS, taskId);
             task.fetchFromLocalDatastore();
+            final TaskHistoryEvent newEvent = new TaskHistoryEvent(task, identity, new Date());
+            newEvent.pin(TaskHistoryEvent.PIN_LABEL);
+            newEvent.save();
+            task.handleHistoryEvent();
+            task.save();
         } catch (ParseException e) {
-            return null;
+            return false;
         }
 
-        return task;
+        return true;
     }
-
 
     @Override
     public Single<String> pushTaskReminder(@NonNull String taskId) {

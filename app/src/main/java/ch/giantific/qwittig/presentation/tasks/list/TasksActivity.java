@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.presentation.tasks.list;
 
+import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -13,15 +14,16 @@ import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ArrayAdapter;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.databinding.ActivityTasksBinding;
-import ch.giantific.qwittig.presentation.common.adapters.StringResSpinnerAdapter;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
 import ch.giantific.qwittig.presentation.tasks.addedit.TaskAddEditViewModel.TaskResult;
 import ch.giantific.qwittig.presentation.tasks.details.TaskDetailsViewModel.TaskDetailsResult;
+import ch.giantific.qwittig.presentation.tasks.list.models.TaskDeadline;
 import rx.Single;
 
 /**
@@ -38,6 +40,7 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksViewModel> impleme
         TaskRemindWorkerListener {
 
     private ActivityTasksBinding mBinding;
+    private TaskDeadline[] mDeadlines;
 
     @Override
     protected void handleLocalBroadcast(Intent intent, int dataType) {
@@ -71,7 +74,8 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksViewModel> impleme
     }
 
     @Override
-    protected void injectDependencies(@NonNull NavDrawerComponent navComp, Bundle savedInstanceState) {
+    protected void injectDependencies(@NonNull NavDrawerComponent navComp,
+                                      @Nullable Bundle savedInstanceState) {
         navComp.inject(this);
     }
 
@@ -89,20 +93,25 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksViewModel> impleme
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
     private void setupDeadlineSpinner() {
-        final int[] deadlines = new int[]{
-                R.string.deadline_all,
-                R.string.deadline_today,
-                R.string.deadline_week,
-                R.string.deadline_month,
-                R.string.deadline_year};
-        final StringResSpinnerAdapter stringResSpinnerAdapter =
-                new StringResSpinnerAdapter(this, R.layout.spinner_item_toolbar, deadlines);
-        mBinding.spTasksDeadline.setAdapter(stringResSpinnerAdapter);
+        mDeadlines = new TaskDeadline[]{
+                TaskDeadline.newAllInstance(getString(R.string.deadline_all)),
+                TaskDeadline.newTodayInstance(getString(R.string.deadline_today)),
+                TaskDeadline.newWeekInstance(getString(R.string.deadline_week)),
+                TaskDeadline.newMonthInstance(getString(R.string.deadline_month)),
+                TaskDeadline.newYearInstance(getString(R.string.deadline_year))};
+
+        final ActionBar actionBar = getSupportActionBar();
+        final Context themedContext = actionBar.getThemedContext();
+        final ArrayAdapter<TaskDeadline> adapter =
+                new ArrayAdapter<>(themedContext, R.layout.spinner_item_toolbar, mDeadlines);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mBinding.spTasksDeadline.setAdapter(adapter);
     }
 
     private void addTasksFragment() {
-        final TasksFragment tasksFragment = new TasksFragment();
+        final TasksFragment tasksFragment = TasksFragment.newInstance(mDeadlines[0]);
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.container, tasksFragment)
                 .commit();

@@ -10,7 +10,7 @@ import ch.giantific.qwittig.presentation.tasks.list.TasksFragment;
 import dagger.Component;
 
 /**
- * Created by fabio on 12.01.16.
+ * Provides the dependencies for the task list screen.
  */
 @PerScreen
 @Component(modules = {TasksListViewModelModule.class, RepositoriesModule.class})

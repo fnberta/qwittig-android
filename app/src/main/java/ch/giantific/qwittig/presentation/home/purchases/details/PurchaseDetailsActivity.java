@@ -18,14 +18,14 @@ import android.view.View;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.LocalBroadcast;
+import ch.giantific.qwittig.data.push.PushBroadcastReceiver;
 import ch.giantific.qwittig.databinding.ActivityPurchaseDetailsBinding;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.AddEditPurchaseViewModel;
-import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
 import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesFragment;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
-import ch.giantific.qwittig.data.push.PushBroadcastReceiver;
+import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
 
 /**
  * Hosts {@link PurchaseDetailsFragment} that displays the details of a purchase and
@@ -45,7 +45,10 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
         super.handleLocalBroadcast(intent, dataType);
 
         if (dataType == LocalBroadcast.DataType.PURCHASES_UPDATED) {
-            mViewModel.loadData();
+            final boolean successful = intent.getBooleanExtra(LocalBroadcast.INTENT_EXTRA_SUCCESSFUL, false);
+            if (successful) {
+                mViewModel.loadData();
+            }
         }
     }
 

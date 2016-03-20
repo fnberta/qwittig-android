@@ -26,11 +26,8 @@ import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.PieData;
 
-import java.util.List;
-
 import ch.berta.fabio.fabprogress.FabProgress;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.home.purchases.details.widgets.CircleDisplay;
 import ch.giantific.qwittig.presentation.navdrawer.BlurTransformation;
 import ch.giantific.qwittig.presentation.settings.profile.AvatarLoadListener;
@@ -244,48 +241,10 @@ public class BindingUtils {
         }
     }
 
-    @BindingAdapter({"deadline"})
-    public static void setTaskDeadline(TextView view, int daysToDeadline) {
-        final Context context = view.getContext();
-        final String deadlineString;
-        final int color;
-        if (daysToDeadline == 0) {
-            deadlineString = context.getString(R.string.deadline_today);
-            color = R.color.green_500;
-        } else if (daysToDeadline == -1) {
-            deadlineString = context.getString(R.string.yesterday);
-            color = R.color.red_500;
-        } else if (daysToDeadline < 0) {
-            deadlineString = context.getString(R.string.deadline_text_neg, daysToDeadline * -1);
-            color = R.color.red_500;
-        } else {
-            deadlineString = context.getString(R.string.deadline_text_pos, daysToDeadline);
-            color = R.color.green_500;
+    @BindingAdapter({"taskTimeFrame"})
+    public static void setTaskTimeFrame(TextView view, int timeFrameRes) {
+        if (timeFrameRes > 0) {
+            view.setText(timeFrameRes);
         }
-
-        view.setText(deadlineString);
-        view.setTextColor(ContextCompat.getColor(context, color));
-    }
-
-    @BindingAdapter({"identities"})
-    public static void setTaskIdentities(TextView view, List<Identity> identities) {
-        final Context context = view.getContext();
-        final Identity identityResponsible = identities.get(0);
-        String usersInvolvedString = "";
-        if (identities.size() > 1) {
-            final StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(context.getString(R.string.task_users_involved_next)).append(" ");
-            for (Identity identity : identities) {
-                if (!identity.getObjectId().equals(identityResponsible.getObjectId())) {
-                    stringBuilder.append(identity.getNickname()).append(" - ");
-                }
-            }
-            // delete last -
-            final int length = stringBuilder.length();
-            stringBuilder.delete(length - 3, length - 1);
-            usersInvolvedString = stringBuilder.toString();
-        }
-
-        view.setText(usersInvolvedString);
     }
 }

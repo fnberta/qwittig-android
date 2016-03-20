@@ -10,7 +10,7 @@ import ch.giantific.qwittig.presentation.tasks.details.TaskDetailsFragment;
 import dagger.Component;
 
 /**
- * Created by fabio on 12.01.16.
+ * Provides the dependencies for the task details screen.
  */
 @PerScreen
 @Component(modules = {TaskDetailsViewModelModule.class, RepositoriesModule.class})

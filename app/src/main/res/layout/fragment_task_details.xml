@@ -31,7 +31,7 @@
             android:clipToPadding="false"
             android:paddingBottom="@dimen/small_space"
             android:scrollbars="vertical"
-            android:visibility="@{viewModel.loading ? View.GONE : View.VISIBLE}"
+            android:visibility="@{viewModel.loading ? View.GONE : viewModel.empty ? View.GONE : View.VISIBLE}"
             />
 
         <TextView

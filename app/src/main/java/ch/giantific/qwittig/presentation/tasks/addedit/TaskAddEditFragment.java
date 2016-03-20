@@ -13,21 +13,22 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentTaskAddBinding;
-import ch.giantific.qwittig.presentation.tasks.addedit.di.DaggerTaskAddComponent;
-import ch.giantific.qwittig.presentation.tasks.addedit.di.DaggerTaskEditComponent;
-import ch.giantific.qwittig.presentation.tasks.addedit.di.TaskAddViewModelModule;
-import ch.giantific.qwittig.presentation.tasks.addedit.di.TaskEditViewModelModule;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.presentation.common.adapters.StringResSpinnerAdapter;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.fragments.DatePickerDialogFragment;
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
+import ch.giantific.qwittig.presentation.tasks.addedit.di.DaggerTaskAddComponent;
+import ch.giantific.qwittig.presentation.tasks.addedit.di.DaggerTaskEditComponent;
+import ch.giantific.qwittig.presentation.tasks.addedit.di.TaskAddViewModelModule;
+import ch.giantific.qwittig.presentation.tasks.addedit.di.TaskEditViewModelModule;
 
 /**
  * Provides an interface for the user to add a new {@link Task}. Allows the selection of the time
@@ -43,9 +44,9 @@ public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, Task
     private static final String DATE_PICKER_DIALOG = "DATE_PICKER_DIALOG";
     private static final String DISCARD_TASK_CHANGES_DIALOG = "DISCARD_TASK_CHANGES_DIALOG";
     private StringResSpinnerAdapter mTimeFrameAdapter;
-    private TaskAddEditUsersRecyclerAdapter mUsersRecyclerAdapter;
+    private TaskAddEditUsersRecyclerAdapter mIdentitiesRecyclerAdapter;
     private FragmentTaskAddBinding mBinding;
-    private ItemTouchHelper mUsersItemTouchHelper;
+    private ItemTouchHelper mIdentitiesItemTouchHelper;
 
     public TaskAddEditFragment() {
         // required empty constructor
@@ -80,16 +81,16 @@ public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, Task
         super.onCreate(savedInstanceState);
 
         final Bundle args = getArguments();
-        if (args != null) {
-            final String editTaskId = args.getString(KEY_EDIT_TASK_ID, "");
-            DaggerTaskEditComponent.builder()
-                    .taskEditViewModelModule(new TaskEditViewModelModule(savedInstanceState, this,
-                            editTaskId))
+        final String editTaskId = args.getString(KEY_EDIT_TASK_ID, "");
+        if (TextUtils.isEmpty(editTaskId)) {
+            DaggerTaskAddComponent.builder()
+                    .taskAddViewModelModule(new TaskAddViewModelModule(savedInstanceState, this))
                     .build()
                     .inject(this);
         } else {
-            DaggerTaskAddComponent.builder()
-                    .taskAddViewModelModule(new TaskAddViewModelModule(savedInstanceState, this))
+            DaggerTaskEditComponent.builder()
+                    .taskEditViewModelModule(new TaskEditViewModelModule(savedInstanceState, this,
+                            editTaskId))
                     .build()
                     .inject(this);
         }
@@ -107,26 +108,22 @@ public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, Task
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        setupUsersInvolvedRecyclerView();
+        setupIdentitiesRecyclerView();
         setupTimeFrameSpinner();
     }
 
-    @Override
-    protected void setViewModelToActivity() {
-        mActivity.setViewModel(mViewModel);
-    }
-
-    private void setupUsersInvolvedRecyclerView() {
+    private void setupIdentitiesRecyclerView() {
         mBinding.rvTaskUsersInvolved.setHasFixedSize(true);
         mBinding.rvTaskUsersInvolved.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mUsersRecyclerAdapter = new TaskAddEditUsersRecyclerAdapter(mViewModel);
-        mBinding.rvTaskUsersInvolved.setAdapter(mUsersRecyclerAdapter);
+        mIdentitiesRecyclerAdapter = new TaskAddEditUsersRecyclerAdapter(mViewModel);
+        mBinding.rvTaskUsersInvolved.setAdapter(mIdentitiesRecyclerAdapter);
 
-        mUsersItemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
+        mIdentitiesItemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
                 ItemTouchHelper.UP | ItemTouchHelper.DOWN,
                 ItemTouchHelper.START | ItemTouchHelper.END) {
             @Override
-            public boolean onMove(RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder source, @NonNull RecyclerView.ViewHolder target) {
+            public boolean onMove(RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder source,
+                                  @NonNull RecyclerView.ViewHolder target) {
                 if (source.getItemViewType() != target.getItemViewType()) {
                     return false;
                 }
@@ -145,7 +142,7 @@ public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, Task
                 return false;
             }
         });
-        mUsersItemTouchHelper.attachToRecyclerView(mBinding.rvTaskUsersInvolved);
+        mIdentitiesItemTouchHelper.attachToRecyclerView(mBinding.rvTaskUsersInvolved);
     }
 
     private void setupTimeFrameSpinner() {
@@ -158,6 +155,11 @@ public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, Task
                 R.string.time_frame_one_time};
         mTimeFrameAdapter = new StringResSpinnerAdapter(getActivity(), R.layout.spinner_item, timeFrames);
         mBinding.spTaskTimeFrame.setAdapter(mTimeFrameAdapter);
+    }
+
+    @Override
+    protected void setViewModelToActivity() {
+        mActivity.setViewModel(mViewModel);
     }
 
     @Override
@@ -178,11 +180,6 @@ public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, Task
     }
 
     @Override
-    public String getTaskTitle() {
-        return mActivity.getTaskTitle();
-    }
-
-    @Override
     public void finishScreen(@TaskAddEditViewModel.TaskResult int taskResult) {
         final Activity activity = getActivity();
         activity.setResult(taskResult);
@@ -197,27 +194,27 @@ public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, Task
 
     @Override
     public void onStartUserDrag(@NonNull RecyclerView.ViewHolder viewHolder) {
-        mUsersItemTouchHelper.startDrag(viewHolder);
+        mIdentitiesItemTouchHelper.startDrag(viewHolder);
     }
 
     @Override
     public void notifyDataSetChanged() {
-        mUsersRecyclerAdapter.notifyDataSetChanged();
+        mIdentitiesRecyclerAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void notifyItemChanged(int position) {
-        mUsersRecyclerAdapter.notifyItemChanged(position);
+        mIdentitiesRecyclerAdapter.notifyItemChanged(position);
     }
 
     @Override
     public void notifyItemMoved(int fromPosition, int toPosition) {
-        mUsersRecyclerAdapter.notifyItemMoved(fromPosition, toPosition);
+        mIdentitiesRecyclerAdapter.notifyItemMoved(fromPosition, toPosition);
     }
 
     @Override
     public void notifyItemRemoved(int position) {
-        mUsersRecyclerAdapter.notifyItemRemoved(position);
+        mIdentitiesRecyclerAdapter.notifyItemRemoved(position);
     }
 
     @Override
@@ -233,14 +230,11 @@ public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, Task
      */
     public interface ActivityListener extends BaseFragment.ActivityListener {
 
-        void setViewModel(@NonNull TaskAddEditViewModel viewModel);
-
         /**
-         * Gets the title of task.
+         * Sets and binds the view model to the activity's layout.
          *
-         * @return the title of the task
+         * @param viewModel the view model to bind
          */
-        @NonNull
-        String getTaskTitle();
+        void setViewModel(@NonNull TaskAddEditViewModel viewModel);
     }
 }

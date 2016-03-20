@@ -339,7 +339,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     @Override
     public void deleteItemsByIds(@NonNull List<String> itemIds) {
         for (String itemId : itemIds) {
-            final ParseObject item = ParseObject.createWithoutData(Item.CLASS, itemId);
+            final Item item = (Item) Item.createWithoutData(Item.CLASS, itemId);
             item.deleteEventually();
         }
     }

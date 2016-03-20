@@ -12,13 +12,13 @@ import android.text.TextUtils;
 
 import javax.inject.Inject;
 
-import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
+import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;
 
 /**
- * Calls Parse.com cloud functions to remind a user that he/she should finish a task.
+ * Calls cloud functions to remind a user that he/she should finish a task.
  * <p/>
  * Subclass of {@link BaseWorker}.
  */
@@ -40,28 +40,17 @@ public class TaskRemindWorker extends BaseWorker<String, TaskRemindWorkerListene
     public static TaskRemindWorker attach(@NonNull FragmentManager fm, @NonNull String taskId) {
         TaskRemindWorker worker = (TaskRemindWorker) fm.findFragmentByTag(WORKER_TAG);
         if (worker == null) {
-            worker = TaskRemindWorker.newInstance(taskId);
+            worker = new TaskRemindWorker();
+            final Bundle args = new Bundle();
+            args.putString(KEY_TASK_ID, taskId);
+            worker.setArguments(args);
+
             fm.beginTransaction()
                     .add(worker, WORKER_TAG + taskId)
                     .commit();
         }
 
         return worker;
-    }
-
-    /**
-     * Returns a new instance of {@link TaskRemindWorker} with an argument.
-     *
-     * @param taskId the object id of the task that should be finished
-     * @return a new instance of {@link TaskRemindWorker}
-     */
-    @NonNull
-    private static TaskRemindWorker newInstance(@NonNull String taskId) {
-        TaskRemindWorker fragment = new TaskRemindWorker();
-        Bundle args = new Bundle();
-        args.putString(KEY_TASK_ID, taskId);
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override

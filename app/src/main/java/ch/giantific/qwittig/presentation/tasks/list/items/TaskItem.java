@@ -18,14 +18,16 @@ import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.domain.models.Task.TimeFrame;
 import ch.giantific.qwittig.presentation.common.viewmodels.CardTopProgressViewModel;
+import ch.giantific.qwittig.presentation.tasks.details.items.TaskDetailsBaseItem;
 import ch.giantific.qwittig.utils.DateUtils;
 
 /**
- * Created by fabio on 16.01.16.
+ * Provides an implementation of the {@link TaskDetailsBaseItem} interface for a task item.
  */
-public class TaskItem extends BaseObservable implements ListItem, CardTopProgressViewModel {
+public class TaskItem extends BaseObservable implements TasksBaseItem, CardTopProgressViewModel {
 
     private final Identity mCurrentIdentity;
+    private ViewListener mView;
     private Task mTask;
     private Identity mTaskIdentityResponsible;
     private List<Identity> mTaskIdentities;
@@ -37,7 +39,7 @@ public class TaskItem extends BaseObservable implements ListItem, CardTopProgres
 
     private void setTaskInfo(@NonNull Task task) {
         mTask = task;
-        mTaskIdentityResponsible = task.getUserResponsible();
+        mTaskIdentityResponsible = task.getIdentityResponsible();
         mTaskIdentities = mTask.getIdentities();
     }
 
@@ -49,6 +51,10 @@ public class TaskItem extends BaseObservable implements ListItem, CardTopProgres
     public void updateTaskInfo(@NonNull Task task) {
         setTaskInfo(task);
         notifyChange();
+    }
+
+    public void setView(@NonNull ViewListener view) {
+        mView = view;
     }
 
     public Task getTask() {
@@ -93,8 +99,28 @@ public class TaskItem extends BaseObservable implements ListItem, CardTopProgres
     }
 
     @Bindable
-    public List<Identity> getTaskIdentities() {
-        return mTaskIdentities;
+    public String getTaskIdentities() {
+        return mView.buildTaskIdentitiesString(mTaskIdentities);
+    }
+
+    @Bindable
+    public String getTaskDeadline() {
+        final int daysToDeadline = getDaysToTaskDeadline();
+        if (daysToDeadline == 0) {
+            return mView.buildTaskDeadlineString(R.string.deadline_today);
+        } else if (daysToDeadline == -1) {
+            return mView.buildTaskDeadlineString(R.string.yesterday);
+        } else if (daysToDeadline < 0) {
+            return mView.buildTaskDeadlineString(R.string.deadline_text_neg, daysToDeadline * -1);
+        } else {
+            return mView.buildTaskDeadlineString(R.string.deadline_text_pos, daysToDeadline);
+        }
+    }
+
+    @Bindable
+    public boolean isTaskDeadlinePast() {
+        final int daysToDeadline = getDaysToTaskDeadline();
+        return daysToDeadline != 0 && (daysToDeadline == -1 || daysToDeadline < 0);
     }
 
     /**
@@ -102,8 +128,7 @@ public class TaskItem extends BaseObservable implements ListItem, CardTopProgres
      *
      * @return the number of days until the deadline is reached
      */
-    @Bindable
-    public int getDaysToTaskDeadline() {
+    private int getDaysToTaskDeadline() {
         final Date deadlineDate = mTask.getDeadline();
 
         final Calendar today = DateUtils.getCalendarInstanceUTC();
@@ -173,5 +198,11 @@ public class TaskItem extends BaseObservable implements ListItem, CardTopProgres
     @Override
     public int getType() {
         return Type.TASK;
+    }
+
+    public interface ViewListener {
+        String buildTaskIdentitiesString(@NonNull List<Identity> identities);
+
+        String buildTaskDeadlineString(@StringRes int deadline, Object... args);
     }
 }

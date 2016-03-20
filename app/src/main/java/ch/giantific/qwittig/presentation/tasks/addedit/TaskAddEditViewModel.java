@@ -23,7 +23,7 @@ import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFr
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 
 /**
- * Created by fabio on 09.01.16.
+ * Defines an observable view model for the add or edit task screen.
  */
 public interface TaskAddEditViewModel extends ViewModel,
         DiscardChangesDialogFragment.DialogInteractionListener,
@@ -41,7 +41,7 @@ public interface TaskAddEditViewModel extends ViewModel,
     void setTaskDeadline(@NonNull Date deadline);
 
     @Bindable
-    int getTaskDeadlineVisibility();
+    boolean isAsNeededTask();
 
     @Bindable
     int getTaskTimeFrame();
@@ -52,11 +52,11 @@ public interface TaskAddEditViewModel extends ViewModel,
      * Checks whether the user has made an changes to the data on the screen. If yes shows a
      * dialog that asks if the changes should be discarded. If no, finishes.
      */
-    void checkForChangesAndExit();
+    void onUpOrBackClick();
 
     Identity getIdentityAtPosition(int position);
 
-    boolean isUserAtPositionInvolved(int position);
+    float getIdentityAlpha(int position);
 
     int getItemCount();
 
@@ -78,6 +78,8 @@ public interface TaskAddEditViewModel extends ViewModel,
     void onItemDismiss(int position);
 
     void onDeadlineClicked(View view);
+
+    void onTitleChanged(CharSequence s, int start, int before, int count);
 
     /**
      * Saves the new {@link Task} object if the title is not empty. If it is a one-time
@@ -102,8 +104,6 @@ public interface TaskAddEditViewModel extends ViewModel,
         void showDiscardChangesDialog();
 
         void showDatePickerDialog();
-
-        String getTaskTitle();
 
         /**
          * Sets the result depending on the action taken and finishes the screen

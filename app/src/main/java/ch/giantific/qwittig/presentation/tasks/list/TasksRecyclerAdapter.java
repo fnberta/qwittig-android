@@ -4,19 +4,25 @@
 
 package ch.giantific.qwittig.presentation.tasks.list;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.List;
+
+import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
 import ch.giantific.qwittig.databinding.RowTasksBinding;
+import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.tasks.list.items.HeaderItem;
 import ch.giantific.qwittig.presentation.tasks.list.items.TaskItem;
-import ch.giantific.qwittig.presentation.tasks.list.items.ListItem;
-import ch.giantific.qwittig.presentation.tasks.list.items.ListItem.Type;
+import ch.giantific.qwittig.presentation.tasks.list.items.TasksBaseItem;
+import ch.giantific.qwittig.presentation.tasks.list.items.TasksBaseItem.Type;
+import ch.giantific.qwittig.presentation.tasks.list.items.TasksHeaderItem;
 
 /**
  * Handles the display of recent tasks assigned to users in a group.
@@ -45,7 +51,7 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter {
         switch (viewType) {
             case Type.TASK: {
                 final RowTasksBinding binding = RowTasksBinding.inflate(inflater, parent, false);
-                return new TaskRow(binding, mViewModel);
+                return new TaskRow(parent.getContext(), binding, mViewModel);
             }
             case Type.HEADER: {
                 final RowGenericHeaderBinding binding = RowGenericHeaderBinding.inflate(inflater, parent, false);
@@ -60,23 +66,26 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter {
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, @Type int position) {
-        final ListItem taskListItem = mViewModel.getItemAtPosition(position);
+        final TasksBaseItem tasksBaseItem = mViewModel.getItemAtPosition(position);
         final int viewType = getItemViewType(position);
         switch (viewType) {
             case Type.TASK: {
                 final TaskRow taskRow = (TaskRow) viewHolder;
                 final RowTasksBinding binding = taskRow.getBinding();
 
-                binding.setItem((TaskItem) taskListItem);
+                final TaskItem taskItem = (TaskItem) tasksBaseItem;
+                taskItem.setView(taskRow);
+                binding.setItem(taskItem);
                 binding.executePendingBindings();
 
                 break;
             }
             case Type.HEADER: {
-                final BindingRow<RowGenericHeaderBinding> headerRow = (BindingRow<RowGenericHeaderBinding>) viewHolder;
+                final BindingRow<RowGenericHeaderBinding> headerRow =
+                        (BindingRow<RowGenericHeaderBinding>) viewHolder;
                 final RowGenericHeaderBinding binding = headerRow.getBinding();
 
-                binding.setViewModel((HeaderItem) taskListItem);
+                binding.setViewModel((TasksHeaderItem) tasksBaseItem);
                 binding.executePendingBindings();
 
                 break;
@@ -125,16 +134,21 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter {
      * <p/>
      * Subclass of {@link RecyclerView.ViewHolder}.
      */
-    private static class TaskRow extends BindingRow<RowTasksBinding> {
+    private static class TaskRow extends BindingRow<RowTasksBinding>
+            implements TaskItem.ViewListener {
+
+        private final Context mContext;
 
         /**
          * Constructs a new {@link TaskRow} and sets the click listeners.
          *
          * @param binding the binding for the view
          */
-        public TaskRow(@NonNull RowTasksBinding binding, @NonNull final TasksViewModel viewModel) {
+        public TaskRow(@NonNull Context context, @NonNull RowTasksBinding binding,
+                       @NonNull final TasksViewModel viewModel) {
             super(binding);
 
+            mContext = context;
             binding.getRoot().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -153,6 +167,32 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter {
                     viewModel.onRemindButtonClicked(getAdapterPosition());
                 }
             });
+        }
+
+        @Override
+        public String buildTaskIdentitiesString(@NonNull List<Identity> identities) {
+            final Identity identityResponsible = identities.get(0);
+            String identitiesFormatted = "";
+            if (identities.size() > 1) {
+                final StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append(mContext.getString(R.string.task_users_involved_next)).append(" ");
+                for (Identity identity : identities) {
+                    if (!identity.getObjectId().equals(identityResponsible.getObjectId())) {
+                        stringBuilder.append(identity.getNickname()).append(" - ");
+                    }
+                }
+                // delete last -
+                final int length = stringBuilder.length();
+                stringBuilder.delete(length - 3, length - 1);
+                identitiesFormatted = stringBuilder.toString();
+            }
+
+            return identitiesFormatted;
+        }
+
+        @Override
+        public String buildTaskDeadlineString(@StringRes int deadline, Object... args) {
+            return mContext.getString(deadline, args);
         }
     }
 }

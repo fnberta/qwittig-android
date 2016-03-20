@@ -10,7 +10,7 @@ import ch.giantific.qwittig.presentation.tasks.addedit.TaskAddEditFragment;
 import dagger.Component;
 
 /**
- * Created by fabio on 12.01.16.
+ * Provides the dependencies for the edit task screen.
  */
 @PerScreen
 @Component(modules = {TaskEditViewModelModule.class, RepositoriesModule.class})

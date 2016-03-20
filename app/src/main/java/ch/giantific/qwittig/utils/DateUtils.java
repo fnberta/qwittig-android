@@ -120,15 +120,11 @@ public class DateUtils {
      * midnight.
      *
      * @param cal the {@link Calendar} instance to reset
-     * @return a {@link Calendar} instance reset to midnight
      */
-    @NonNull
-    public static Calendar resetToMidnight(@NonNull Calendar cal) {
+    public static void resetToMidnight(@NonNull Calendar cal) {
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
-
-        return cal;
     }
 }

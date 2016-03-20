@@ -403,12 +403,8 @@ public class ParseQueryService extends IntentService {
     }
 
     private void setTaskDone(@NonNull String taskId) {
-        final Task task = mTasksRepo.fetchTaskDataLocal(taskId);
-        if (task != null) {
-            task.addHistoryEvent(mCurrentIdentity);
-            task.saveEventually();
-            mLocalBroadcast.sendTasksUpdated(true);
-        }
+        final boolean successful = mTasksRepo.setTaskDone(taskId, mCurrentIdentity);
+        mLocalBroadcast.sendTasksUpdated(successful);
     }
 
     @StringDef({User.CLASS, Group.CLASS, Purchase.CLASS, Compensation.CLASS, Group.CLASS, Task.CLASS})

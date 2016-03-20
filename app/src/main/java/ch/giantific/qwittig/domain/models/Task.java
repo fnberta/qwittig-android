@@ -14,13 +14,10 @@ import com.parse.ParseObject;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.parse.ParseUtils;
@@ -40,7 +37,6 @@ public class Task extends ParseObject {
     public static final String TIME_FRAME = "timeFrame";
     public static final String DEADLINE = "deadline";
     public static final String IDENTITIES = "identities";
-    public static final String HISTORY = "history";
     public static final String PIN_LABEL = "tasksPinLabel";
     private boolean mLoading;
 
@@ -63,7 +59,7 @@ public class Task extends ParseObject {
     }
 
     private void setAccessRights(@NonNull Group group) {
-        ParseACL acl = ParseUtils.getDefaultAcl(group, true);
+        final ParseACL acl = ParseUtils.getDefaultAcl(group, true);
         setACL(acl);
     }
 
@@ -93,7 +89,7 @@ public class Task extends ParseObject {
 
     @TimeFrame
     public String getTimeFrame() {
-        @TimeFrame String timeFrame = getString(TIME_FRAME);
+        @TimeFrame final String timeFrame = getString(TIME_FRAME);
         return timeFrame;
     }
 
@@ -123,20 +119,6 @@ public class Task extends ParseObject {
         put(IDENTITIES, identities);
     }
 
-    @NonNull
-    public Map<String, List<Date>> getHistory() {
-        Map<String, List<Date>> history = getMap(HISTORY);
-        if (history == null) {
-            return Collections.emptyMap();
-        }
-
-        return history;
-    }
-
-    public void setHistory(@NonNull Map<String, List<Date>> history) {
-        put(HISTORY, history);
-    }
-
     public boolean isLoading() {
         return mLoading;
     }
@@ -154,12 +136,26 @@ public class Task extends ParseObject {
         if (deadline == null) {
             remove(DEADLINE);
         } else {
-            Calendar cal = DateUtils.getCalendarInstanceUTC();
+            final Calendar cal = DateUtils.getCalendarInstanceUTC();
             cal.setTime(deadline);
-            cal = DateUtils.resetToMidnight(cal);
+            DateUtils.resetToMidnight(cal);
 
             setDeadline(cal.getTime());
         }
+    }
+
+    /**
+     * Returns the identity that is currently responsible for finishing the task.
+     *
+     * @return the identity currently responsible for finishing the task
+     */
+    public Identity getIdentityResponsible() {
+        return getIdentities().get(0);
+    }
+
+    public Identity handleHistoryEvent() {
+        updateDeadline();
+        return rotateIdentities();
     }
 
     /**
@@ -167,14 +163,14 @@ public class Task extends ParseObject {
      * frame to the date the task was finished and not to the date when it was supposed to be
      * finished.
      */
-    public void updateDeadline() {
-        String timeFrame = getTimeFrame();
+    private void updateDeadline() {
+        final String timeFrame = getTimeFrame();
         if (timeFrame.equals(TimeFrame.AS_NEEDED)) {
             // as needed tasks have no deadline
             return;
         }
 
-        Calendar deadline = DateUtils.getCalendarInstanceUTC();
+        final Calendar deadline = DateUtils.getCalendarInstanceUTC();
         deadline.setTime(new Date());
         switch (timeFrame) {
             case TimeFrame.DAILY:
@@ -190,54 +186,19 @@ public class Task extends ParseObject {
                 deadline.add(Calendar.YEAR, 1);
                 break;
         }
-
-        deadline = DateUtils.resetToMidnight(deadline);
+        DateUtils.resetToMidnight(deadline);
         setDeadline(deadline.getTime());
     }
 
     /**
-     * Returns the user that is currently responsible for finishing the task.
+     * Rotates the identities after a task was finished and returns the first in the list.
      *
-     * @return the user currently responsible for finishing the task
+     * @return the new identity responsible for the task
      */
-    public Identity getUserResponsible() {
-        return getIdentities().get(0);
-    }
-
-    /**
-     * Adds a history event to the task.
-     * <p/>
-     * A history event simply contains the object id of the user who completed the task and the
-     * date on which he/she did.
-     *
-     * @param currentIdentity the current user who just completed the task
-     * @return the new user responsible
-     */
-    @Nullable
-    public Identity addHistoryEvent(@Nullable Identity currentIdentity) {
-        if (currentIdentity == null) {
-            return null;
-        }
-
-        List<Identity> identities = getIdentities();
+    private Identity rotateIdentities() {
+        final List<Identity> identities = getIdentities();
         Collections.rotate(identities, -1);
-
-        final String currentUserId = currentIdentity.getObjectId();
-        Map<String, List<Date>> historyNew = new HashMap<>();
-
-        Map<String, List<Date>> historyOld = getHistory();
-        if (!historyOld.isEmpty()) {
-            historyNew.putAll(historyOld);
-        }
-
-        List<Date> entries = historyNew.get(currentUserId);
-        if (entries == null) {
-            entries = new ArrayList<>();
-        }
-        entries.add(new Date());
-        historyNew.put(currentUserId, entries);
-        put(HISTORY, historyNew);
-
+        put(IDENTITIES, identities);
         return identities.get(0);
     }
 

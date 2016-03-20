@@ -5,7 +5,6 @@
 package ch.giantific.qwittig.presentation.finance;
 
 import android.databinding.Bindable;
-import android.databinding.Observable;
 import android.support.annotation.NonNull;
 
 import org.apache.commons.math3.fraction.BigFraction;

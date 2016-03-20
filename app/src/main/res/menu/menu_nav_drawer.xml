@@ -24,7 +24,7 @@
             android:id="@+id/nav_tasks"
             android:icon="@drawable/ic_nav_assignment"
             android:title="@string/title_activity_tasks"
-            android:visible="false"
+            android:visible="true"
             />
         <item
             android:id="@+id/nav_stats"

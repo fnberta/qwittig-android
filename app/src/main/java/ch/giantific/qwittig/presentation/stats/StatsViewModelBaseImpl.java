@@ -35,6 +35,8 @@ public abstract class StatsViewModelBaseImpl<T extends StatsViewModel.ViewListen
     private static final String STATE_PERIOD_TYPE = "STATE_PERIOD_TYPE";
     private static final String STATE_LOADING = "STATE_LOADING";
     private static final String STATE_EMPTY = "STATE_EMPTY";
+    private static final String STATE_YEAR= "STATE_YEAR";
+    private static final String STATE_MONTH = "STATE_MONTH";
     protected boolean mLoading;
     protected boolean mDataEmpty;
     protected String mYear;
@@ -48,14 +50,15 @@ public abstract class StatsViewModelBaseImpl<T extends StatsViewModel.ViewListen
                                   @NonNull Month defaultMonth) {
         super(savedState, view, userRepository);
 
-        mYear = defaultYear;
-        mMonth = defaultMonth;
-
         if (savedState != null) {
+            mYear = savedState.getString(STATE_YEAR);
+            mMonth = savedState.getParcelable(STATE_MONTH);
             mPeriodType = savedState.getInt(STATE_PERIOD_TYPE);
             mLoading = savedState.getBoolean(STATE_LOADING);
             mDataEmpty = savedState.getBoolean(STATE_EMPTY);
         } else {
+            mYear = defaultYear;
+            mMonth = defaultMonth;
             mLoading = true;
             mDataEmpty = true;
         }
@@ -65,6 +68,8 @@ public abstract class StatsViewModelBaseImpl<T extends StatsViewModel.ViewListen
     public void saveState(@NonNull Bundle outState) {
         super.saveState(outState);
 
+        outState.putString(STATE_YEAR, mYear);
+        outState.putParcelable(STATE_MONTH, mMonth);
         outState.putInt(STATE_PERIOD_TYPE, mPeriodType);
         outState.putBoolean(STATE_LOADING, mLoading);
         outState.putBoolean(STATE_EMPTY, mDataEmpty);

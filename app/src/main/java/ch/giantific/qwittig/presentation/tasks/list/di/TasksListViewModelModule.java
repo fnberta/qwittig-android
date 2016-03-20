@@ -14,25 +14,32 @@ import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.tasks.list.TasksViewModel;
 import ch.giantific.qwittig.presentation.tasks.list.TasksViewModelImpl;
+import ch.giantific.qwittig.presentation.tasks.list.models.TaskDeadline;
 import dagger.Module;
 import dagger.Provides;
 
 /**
- * Created by fabio on 12.01.16.
- */
+ * Defines which implementation to use for the task list screen view model and how to
+ * instantiate it.
+ * */
 @Module
 public class TasksListViewModelModule extends BaseViewModelModule<TasksViewModel.ViewListener> {
 
+    private final TaskDeadline mTaskDeadline;
+
     public TasksListViewModelModule(@Nullable Bundle savedState,
-                                    @NonNull TasksViewModel.ViewListener view) {
+                                    @NonNull TasksViewModel.ViewListener view,
+                                    @NonNull TaskDeadline taskDeadline) {
         super(savedState, view);
+
+        mTaskDeadline = taskDeadline;
     }
 
     @PerScreen
     @Provides
     TasksViewModel providesTasksListViewModel(@NonNull UserRepository userRepository,
                                               @NonNull TaskRepository taskRepository) {
-        return new TasksViewModelImpl(mSavedState, mView, userRepository, taskRepository);
+        return new TasksViewModelImpl(mSavedState, mView, userRepository, taskRepository, mTaskDeadline);
     }
 
 }
