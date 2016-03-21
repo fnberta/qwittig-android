@@ -85,6 +85,8 @@ public interface TaskRepository extends BaseRepository {
 
     boolean setTaskDone(@NonNull String taskId, @NonNull Identity identity);
 
+    boolean updateTaskHistoryEvent(@NonNull String eventId, boolean isNew);
+
     /**
      * Sends a push notification to remind a user to finish a task.
      *

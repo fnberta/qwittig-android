@@ -211,6 +211,22 @@ public class ParseTaskRepository extends ParseBaseRepository implements TaskRepo
     }
 
     @Override
+    public boolean updateTaskHistoryEvent(@NonNull String eventId, boolean isNew) {
+        try {
+            final ParseQuery<TaskHistoryEvent> query = ParseQuery.getQuery(TaskHistoryEvent.CLASS);
+            query.include(TaskHistoryEvent.IDENTITY);
+            final TaskHistoryEvent event = query.get(eventId);
+            if (isNew) {
+                event.pin(TaskHistoryEvent.PIN_LABEL);
+            }
+        } catch (ParseException e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
     public Single<String> pushTaskReminder(@NonNull String taskId) {
         final Map<String, Object> params = new HashMap<>();
         params.put(PushBroadcastReceiver.PUSH_PARAM_TASK_ID, taskId);

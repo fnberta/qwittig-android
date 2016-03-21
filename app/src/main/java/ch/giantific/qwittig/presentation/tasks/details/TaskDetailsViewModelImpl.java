@@ -114,7 +114,6 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsB
 
                         updateToolbarHeader();
                         updateToolbarMenu();
-                        mView.startPostponedEnterTransition();
 
                         return mTaskRepo.getTaskHistoryEvents(task);
                     }
@@ -138,11 +137,13 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsB
                         mItems.add(0, new TaskDetailsHeaderItem(R.string.header_task_history));
                         mView.notifyDataSetChanged();
                         setLoading(false);
+                        mView.startPostponedEnterTransition();
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         setLoading(false);
+                        mView.startPostponedEnterTransition();
                         mView.showMessage(R.string.toast_error_task_details_load);
                     }
 

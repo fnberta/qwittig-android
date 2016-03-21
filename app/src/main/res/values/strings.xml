@@ -310,5 +310,7 @@
     <string name="toast_profile_nickname_taken">This nickname is already taken in this group</string>
     <string name="toast_error_balance_load">Failed to load your current balance</string>
     <string name="toast_error_task_done">Failed to mark task as done</string>
+    <string name="push_task_finished_title">%1$s finished</string>
+    <string name="push_task_finished_alert">%1$s finished the task</string>
 
 </resources>
