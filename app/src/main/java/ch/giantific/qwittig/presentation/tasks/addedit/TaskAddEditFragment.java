@@ -9,11 +9,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +21,7 @@ import ch.giantific.qwittig.databinding.FragmentTaskAddEditBinding;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.presentation.common.adapters.StringResSpinnerAdapter;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
+import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
 import ch.giantific.qwittig.presentation.common.fragments.DatePickerDialogFragment;
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.tasks.addedit.di.DaggerTaskAddComponent;
@@ -37,16 +36,13 @@ import ch.giantific.qwittig.presentation.tasks.addedit.di.TaskEditViewModelModul
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, TaskAddEditFragment.ActivityListener>
+public class TaskAddEditFragment extends BaseRecyclerViewFragment<TaskAddEditViewModel, TaskAddEditFragment.ActivityListener>
         implements TaskAddEditViewModel.ViewListener {
 
     private static final String KEY_EDIT_TASK_ID = "EDIT_TASK_ID";
-    private static final String DATE_PICKER_DIALOG = "DATE_PICKER_DIALOG";
-    private static final String DISCARD_TASK_CHANGES_DIALOG = "DISCARD_TASK_CHANGES_DIALOG";
     private StringResSpinnerAdapter mTimeFrameAdapter;
-    private TaskAddEditUsersRecyclerAdapter mIdentitiesRecyclerAdapter;
     private FragmentTaskAddEditBinding mBinding;
-    private ItemTouchHelper mIdentitiesItemTouchHelper;
+    private ItemTouchHelper mItemTouchHelper;
 
     public TaskAddEditFragment() {
         // required empty constructor
@@ -108,17 +104,34 @@ public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, Task
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        setupIdentitiesRecyclerView();
         setupTimeFrameSpinner();
+        setupIdentitiesSwipeHelper();
     }
 
-    private void setupIdentitiesRecyclerView() {
-        mBinding.rvTaskUsersInvolved.setHasFixedSize(true);
-        mBinding.rvTaskUsersInvolved.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mIdentitiesRecyclerAdapter = new TaskAddEditUsersRecyclerAdapter(mViewModel);
-        mBinding.rvTaskUsersInvolved.setAdapter(mIdentitiesRecyclerAdapter);
+    @Override
+    protected RecyclerView getRecyclerView() {
+        return mBinding.rvTaskUsersInvolved;
+    }
 
-        mIdentitiesItemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
+    @Override
+    protected RecyclerView.Adapter getRecyclerAdapter() {
+        return new TaskAddEditUsersRecyclerAdapter(mViewModel);
+    }
+
+    private void setupTimeFrameSpinner() {
+        final int[] timeFrames = new int[]{
+                R.string.time_frame_daily,
+                R.string.time_frame_weekly,
+                R.string.time_frame_monthly,
+                R.string.time_frame_yearly,
+                R.string.time_frame_as_needed,
+                R.string.time_frame_one_time};
+        mTimeFrameAdapter = new StringResSpinnerAdapter(getActivity(), R.layout.spinner_item, timeFrames);
+        mBinding.spTaskTimeFrame.setAdapter(mTimeFrameAdapter);
+    }
+
+    private void setupIdentitiesSwipeHelper() {
+        mItemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
                 ItemTouchHelper.UP | ItemTouchHelper.DOWN,
                 ItemTouchHelper.START | ItemTouchHelper.END) {
             @Override
@@ -142,19 +155,7 @@ public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, Task
                 return false;
             }
         });
-        mIdentitiesItemTouchHelper.attachToRecyclerView(mBinding.rvTaskUsersInvolved);
-    }
-
-    private void setupTimeFrameSpinner() {
-        final int[] timeFrames = new int[]{
-                R.string.time_frame_daily,
-                R.string.time_frame_weekly,
-                R.string.time_frame_monthly,
-                R.string.time_frame_yearly,
-                R.string.time_frame_as_needed,
-                R.string.time_frame_one_time};
-        mTimeFrameAdapter = new StringResSpinnerAdapter(getActivity(), R.layout.spinner_item, timeFrames);
-        mBinding.spTaskTimeFrame.setAdapter(mTimeFrameAdapter);
+        mItemTouchHelper.attachToRecyclerView(mBinding.rvTaskUsersInvolved);
     }
 
     @Override
@@ -169,14 +170,12 @@ public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, Task
 
     @Override
     public void showDiscardChangesDialog() {
-        final DiscardChangesDialogFragment dialog = new DiscardChangesDialogFragment();
-        dialog.show(getFragmentManager(), DISCARD_TASK_CHANGES_DIALOG);
+        DiscardChangesDialogFragment.display(getFragmentManager());
     }
 
     @Override
     public void showDatePickerDialog() {
-        final DatePickerDialogFragment dialog = new DatePickerDialogFragment();
-        dialog.show(getFragmentManager(), DATE_PICKER_DIALOG);
+        DatePickerDialogFragment.display(getFragmentManager());
     }
 
     @Override
@@ -187,34 +186,8 @@ public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, Task
     }
 
     @Override
-    public void setUserListMinimumHeight(int numberOfUsers) {
-        mBinding.rvTaskUsersInvolved.setMinimumHeight(numberOfUsers *
-                getResources().getDimensionPixelSize(R.dimen.list_avatar_with_text));
-    }
-
-    @Override
     public void onStartUserDrag(@NonNull RecyclerView.ViewHolder viewHolder) {
-        mIdentitiesItemTouchHelper.startDrag(viewHolder);
-    }
-
-    @Override
-    public void notifyDataSetChanged() {
-        mIdentitiesRecyclerAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void notifyItemChanged(int position) {
-        mIdentitiesRecyclerAdapter.notifyItemChanged(position);
-    }
-
-    @Override
-    public void notifyItemMoved(int fromPosition, int toPosition) {
-        mIdentitiesRecyclerAdapter.notifyItemMoved(fromPosition, toPosition);
-    }
-
-    @Override
-    public void notifyItemRemoved(int position) {
-        mIdentitiesRecyclerAdapter.notifyItemRemoved(position);
+        mItemTouchHelper.startDrag(viewHolder);
     }
 
     @Override

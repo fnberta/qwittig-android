@@ -129,9 +129,4 @@ public class IdentitiesViewModelImpl
 
         notifyPropertyChanged(BR.currentIdentityBalance);
     }
-
-    @Override
-    public int getItemViewType(int position) {
-        throw new UnsupportedOperationException("there is only one view type for this view");
-    }
 }

@@ -20,12 +20,12 @@ import java.util.Date;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
 
 /**
  * Defines an observable view model for the add or edit task screen.
  */
-public interface TaskAddEditViewModel extends ViewModel,
+public interface TaskAddEditViewModel extends ListViewModel<Identity>,
         DiscardChangesDialogFragment.DialogInteractionListener,
         DatePickerDialog.OnDateSetListener,
         TaskAddEditUsersRecyclerAdapter.AdapterInteractionListener {
@@ -54,11 +54,7 @@ public interface TaskAddEditViewModel extends ViewModel,
      */
     void onUpOrBackClick();
 
-    Identity getIdentityAtPosition(int position);
-
     float getIdentityAlpha(int position);
-
-    int getItemCount();
 
     /**
      * Called when an item has been dragged far enough to trigger a move. This is called every time
@@ -100,7 +96,7 @@ public interface TaskAddEditViewModel extends ViewModel,
     /**
      * Defines the interaction with the attached view.
      */
-    interface ViewListener extends ViewModel.ViewListener {
+    interface ViewListener extends ListViewModel.ViewListener {
         void showDiscardChangesDialog();
 
         void showDatePickerDialog();
@@ -112,17 +108,7 @@ public interface TaskAddEditViewModel extends ViewModel,
          */
         void finishScreen(int taskResult);
 
-        void setUserListMinimumHeight(int numberOfUsers);
-
         void onStartUserDrag(@NonNull RecyclerView.ViewHolder viewHolder);
-
-        void notifyDataSetChanged();
-
-        void notifyItemChanged(int position);
-
-        void notifyItemMoved(int fromPosition, int toPosition);
-
-        void notifyItemRemoved(int position);
 
         void setTimeFramePosition(int timeFrame);
     }

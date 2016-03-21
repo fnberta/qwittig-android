@@ -89,6 +89,11 @@ public abstract class BaseRecyclerViewFragment<T extends ViewModel, S extends Ba
     }
 
     @Override
+    public void notifyItemMoved(int fromPosition, int toPosition) {
+        mRecyclerAdapter.notifyItemMoved(fromPosition, toPosition);
+    }
+
+    @Override
     public void scrollToPosition(int position) {
         mRecyclerView.scrollToPosition(position);
     }

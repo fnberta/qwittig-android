@@ -88,6 +88,11 @@ public abstract class ListViewModelBaseImpl<T, S extends ListViewModel.ViewListe
     }
 
     @Override
+    public int getItemViewType(int position) {
+        throw new UnsupportedOperationException("Only one view type for this list!");
+    }
+
+    @Override
     public int getItemCount() {
         return mItems.size();
     }

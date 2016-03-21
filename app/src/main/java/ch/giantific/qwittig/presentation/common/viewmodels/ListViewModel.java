@@ -85,6 +85,8 @@ public interface ListViewModel<T>
 
         void notifyItemRangeInserted(int positionStart, int itemCount);
 
+        void notifyItemMoved(int fromPosition, int toPosition);
+
         void scrollToPosition(int position);
     }
 }

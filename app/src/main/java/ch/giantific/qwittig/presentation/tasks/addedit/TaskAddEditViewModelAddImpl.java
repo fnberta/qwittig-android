@@ -28,7 +28,7 @@ import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
+import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
 import ch.giantific.qwittig.presentation.tasks.addedit.models.TaskUser;
 import ch.giantific.qwittig.utils.DateUtils;
 import rx.SingleSubscriber;
@@ -38,7 +38,7 @@ import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;
 /**
  * Provides an implementation of the {@link TaskAddEditViewModel} interface for the add task screen.
  */
-public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditViewModel.ViewListener>
+public class TaskAddEditViewModelAddImpl extends ListViewModelBaseImpl<Identity, TaskAddEditViewModel.ViewListener>
         implements TaskAddEditViewModel {
 
     private static final String STATE_DEADLINE_SELECTED = "STATE_DEADLINE_SELECTED";
@@ -46,7 +46,6 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
     private static final String STATE_TITLE = "STATE_TITLE";
     final ArrayList<TaskUser> mTaskIdentities;
     final TaskRepository mTaskRepo;
-    private final List<Identity> mIdentitiesAvailable = new ArrayList<>();
     private final DateFormat mDateFormatter;
     Date mTaskDeadline;
     String mTaskTitle;
@@ -61,6 +60,7 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
         mTaskRepo = taskRepository;
 
         if (savedState != null) {
+            mItems = new ArrayList<>();
             mTaskTitle = savedState.getString(STATE_TITLE);
             mTaskDeadline = new Date(savedState.getLong(STATE_DEADLINE_SELECTED));
             mTaskIdentities = savedState.getParcelableArrayList(STATE_IDENTITIES);
@@ -82,26 +82,20 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
     }
 
     @Override
-    public void onViewVisible() {
-        super.onViewVisible();
-
-        loadTaskUsers();
-    }
-
-    void loadTaskUsers() {
+    public void loadData() {
         getSubscriptions().add(mUserRepo.getIdentities(mCurrentIdentity.getGroup(), true)
                 .toList()
                 .toSingle()
                 .subscribe(new SingleSubscriber<List<Identity>>() {
                     @Override
                     public void onSuccess(List<Identity> identities) {
-                        mIdentitiesAvailable.clear();
+                        mItems.clear();
 
                         final int size = identities.size();
                         if (mTaskIdentities.isEmpty()) {
                             for (int i = 0; i < size; i++) {
                                 final Identity identity = identities.get(i);
-                                mIdentitiesAvailable.add(identity);
+                                mItems.add(identity);
                                 mTaskIdentities.add(new TaskUser(identity.getObjectId(), true));
                             }
                         } else {
@@ -123,14 +117,13 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
                                 }
                             }
 
-                            Collections.addAll(mIdentitiesAvailable, userArray);
+                            Collections.addAll(mItems, userArray);
                             for (Identity identity : identities) {
-                                mIdentitiesAvailable.add(identity);
+                                mItems.add(identity);
                                 mTaskIdentities.add(new TaskUser(identity.getObjectId(), false));
                             }
                         }
 
-                        mView.setUserListMinimumHeight(size);
                         mView.notifyDataSetChanged();
                     }
 
@@ -197,18 +190,8 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
     }
 
     @Override
-    public Identity getIdentityAtPosition(int position) {
-        return mIdentitiesAvailable.get(position);
-    }
-
-    @Override
     public float getIdentityAlpha(int position) {
         return mTaskIdentities.get(position).isInvolved() ? 1f : DISABLED_ALPHA;
-    }
-
-    @Override
-    public int getItemCount() {
-        return mIdentitiesAvailable.size();
     }
 
     @Override
@@ -276,7 +259,7 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
         for (int i = 0, usersInvolvedSize = mTaskIdentities.size(); i < usersInvolvedSize; i++) {
             TaskUser taskUser = mTaskIdentities.get(i);
             if (taskUser.isInvolved()) {
-                identities.add(mIdentitiesAvailable.get(i));
+                identities.add(mItems.get(i));
             }
         }
 
@@ -339,14 +322,14 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
 
     @Override
     public void onItemMove(int fromPosition, int toPosition) {
-        Collections.swap(mIdentitiesAvailable, fromPosition, toPosition);
+        Collections.swap(mItems, fromPosition, toPosition);
         Collections.swap(mTaskIdentities, fromPosition, toPosition);
         mView.notifyItemMoved(fromPosition, toPosition);
     }
 
     @Override
     public void onItemDismiss(int position) {
-        mIdentitiesAvailable.remove(position);
+        mItems.remove(position);
         mTaskIdentities.remove(position);
         mView.notifyItemRemoved(position);
     }

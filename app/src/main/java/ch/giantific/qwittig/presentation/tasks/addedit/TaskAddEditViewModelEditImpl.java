@@ -63,8 +63,7 @@ public class TaskAddEditViewModelEditImpl extends TaskAddEditViewModelAddImpl {
         outState.putLong(STATE_OLD_DEADLINE, mOldTaskDeadline.getTime());
     }
 
-    @Override
-    void loadTaskUsers() {
+    public void loadData() {
         getSubscriptions().add(mTaskRepo.fetchTaskData(mEditTaskId)
                 .subscribe(new SingleSubscriber<Task>() {
                     @Override
@@ -87,7 +86,7 @@ public class TaskAddEditViewModelEditImpl extends TaskAddEditViewModelAddImpl {
     }
 
     private void onOldTaskLoaded() {
-        super.loadTaskUsers();
+        super.loadData();
     }
 
     private void restoreOldValues() {

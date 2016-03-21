@@ -50,7 +50,7 @@ public class TaskAddEditUsersRecyclerAdapter extends RecyclerView.Adapter<TaskAd
         final RowTaskAddEditUserBinding binding = holder.getBinding();
         final TaskAddEditIdentityViewModel viewModel = binding.getViewModel();
 
-        final Identity identity = mViewModel.getIdentityAtPosition(position);
+        final Identity identity = mViewModel.getItemAtPosition(position);
         final float userAlpha = mViewModel.getIdentityAlpha(position);
         if (viewModel == null) {
             binding.setViewModel(new TaskAddEditIdentityViewModel(identity, userAlpha));

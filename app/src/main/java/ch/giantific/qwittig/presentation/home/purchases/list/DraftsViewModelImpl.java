@@ -94,11 +94,6 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, DraftsV
     }
 
     @Override
-    public int getItemViewType(int position) {
-        throw new UnsupportedOperationException("There is only one view type for this view");
-    }
-
-    @Override
     public void onReadyForSelectionMode() {
         if (!mSelectionModeEnabled) {
             return;

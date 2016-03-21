@@ -11,8 +11,8 @@
         <import type="android.view.View"/>
 
         <variable
-            name="userItem"
-            type="ch.giantific.qwittig.presentation.settings.users.items.SettingsUsersUserItem"
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.settings.users.models.SettingsUsersUserRowViewModel"
             />
     </data>
 
@@ -40,7 +40,7 @@
             android:layout_toEndOf="@id/iv_add_users_person"
             android:layout_toStartOf="@+id/iv_add_users_share"
             android:gravity="center_vertical"
-            android:text="@{userItem.nickname}"
+            android:text="@{viewModel.nickname}"
             tools:text="lexli"
             />
 
@@ -51,10 +51,10 @@
             android:layout_alignParentEnd="true"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/action_share"
-            android:onClick="@{userItem.onShareClick}"
+            android:onClick="@{viewModel.onShareClick}"
             android:padding="@dimen/icon_padding"
             android:src="@drawable/ic_share_black_24dp"
-            android:visibility="@{userItem.pending ? View.VISIBLE : View.GONE}"
+            android:visibility="@{viewModel.pending ? View.VISIBLE : View.GONE}"
             />
 
     </RelativeLayout>

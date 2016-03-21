@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.settings.users.items;
+package ch.giantific.qwittig.presentation.settings.users.models;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
@@ -13,21 +13,22 @@ import android.view.View;
 import ch.giantific.qwittig.domain.models.Identity;
 
 /**
- * Provides an implementation of the {@link SettingsUsersBaseItem} for a group user row.
+ * Defines an observable view model for an invited user row.
  */
-public class SettingsUsersUserItem extends BaseObservable implements SettingsUsersBaseItem, Comparable<SettingsUsersUserItem> {
+public class SettingsUsersUserRowViewModel extends BaseObservable
+        implements Comparable<SettingsUsersUserRowViewModel> {
 
     private final ShareListener mShareListener;
     private final Identity mIdentity;
     private String mShareLink;
 
-    public SettingsUsersUserItem(@NonNull ShareListener shareListener, @NonNull Identity identity) {
+    public SettingsUsersUserRowViewModel(@NonNull ShareListener shareListener, @NonNull Identity identity) {
         mShareListener = shareListener;
         mIdentity = identity;
     }
 
-    public SettingsUsersUserItem(@NonNull ShareListener shareListener, @NonNull Identity identity,
-                                 @NonNull String shareLink) {
+    public SettingsUsersUserRowViewModel(@NonNull ShareListener shareListener, @NonNull Identity identity,
+                                         @NonNull String shareLink) {
         mShareListener = shareListener;
         mIdentity = identity;
         mShareLink = shareLink;
@@ -52,12 +53,7 @@ public class SettingsUsersUserItem extends BaseObservable implements SettingsUse
     }
 
     @Override
-    public int getType() {
-        return Type.USER;
-    }
-
-    @Override
-    public int compareTo(@NonNull SettingsUsersUserItem another) {
+    public int compareTo(@NonNull SettingsUsersUserRowViewModel another) {
         return getNickname().compareToIgnoreCase(another.getNickname());
     }
 
