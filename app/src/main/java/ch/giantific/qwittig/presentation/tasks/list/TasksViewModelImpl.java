@@ -108,10 +108,14 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<TasksBaseIte
 
                     @Override
                     public void onCompleted() {
-                        mItems.add(new TasksHeaderItem(R.string.task_header_my));
-                        mItems.addAll(tasksUser);
-                        mItems.add(new TasksHeaderItem(R.string.task_header_group));
-                        mItems.addAll(tasksGroup);
+                        if (!tasksUser.isEmpty()) {
+                            mItems.add(new TasksHeaderItem(R.string.task_header_my));
+                            mItems.addAll(tasksUser);
+                        }
+                        if (!tasksGroup.isEmpty()) {
+                            mItems.add(new TasksHeaderItem(R.string.task_header_group));
+                            mItems.addAll(tasksGroup);
+                        }
 
                         setLoading(false);
                         mView.notifyDataSetChanged();

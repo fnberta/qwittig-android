@@ -19,7 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.databinding.FragmentTaskAddBinding;
+import ch.giantific.qwittig.databinding.FragmentTaskAddEditBinding;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.presentation.common.adapters.StringResSpinnerAdapter;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
@@ -45,7 +45,7 @@ public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, Task
     private static final String DISCARD_TASK_CHANGES_DIALOG = "DISCARD_TASK_CHANGES_DIALOG";
     private StringResSpinnerAdapter mTimeFrameAdapter;
     private TaskAddEditUsersRecyclerAdapter mIdentitiesRecyclerAdapter;
-    private FragmentTaskAddBinding mBinding;
+    private FragmentTaskAddEditBinding mBinding;
     private ItemTouchHelper mIdentitiesItemTouchHelper;
 
     public TaskAddEditFragment() {
@@ -81,13 +81,13 @@ public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, Task
         super.onCreate(savedInstanceState);
 
         final Bundle args = getArguments();
-        final String editTaskId = args.getString(KEY_EDIT_TASK_ID, "");
-        if (TextUtils.isEmpty(editTaskId)) {
+        if (args == null) {
             DaggerTaskAddComponent.builder()
                     .taskAddViewModelModule(new TaskAddViewModelModule(savedInstanceState, this))
                     .build()
                     .inject(this);
         } else {
+            final String editTaskId = args.getString(KEY_EDIT_TASK_ID, "");
             DaggerTaskEditComponent.builder()
                     .taskEditViewModelModule(new TaskEditViewModelModule(savedInstanceState, this,
                             editTaskId))
@@ -99,7 +99,7 @@ public class TaskAddEditFragment extends BaseFragment<TaskAddEditViewModel, Task
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentTaskAddBinding.inflate(inflater, container, false);
+        mBinding = FragmentTaskAddEditBinding.inflate(inflater, container, false);
         mBinding.setViewModel(mViewModel);
         return mBinding.getRoot();
     }

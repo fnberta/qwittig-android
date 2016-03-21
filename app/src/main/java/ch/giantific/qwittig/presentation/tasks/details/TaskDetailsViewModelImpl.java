@@ -114,6 +114,7 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsB
 
                         updateToolbarHeader();
                         updateToolbarMenu();
+                        mView.startPostponedEnterTransition();
 
                         return mTaskRepo.getTaskHistoryEvents(task);
                     }
@@ -135,9 +136,8 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsB
                     public void onCompleted() {
                         Collections.sort(mItems, Collections.reverseOrder());
                         mItems.add(0, new TaskDetailsHeaderItem(R.string.header_task_history));
-                        setLoading(false);
                         mView.notifyDataSetChanged();
-                        mView.startPostponedEnterTransition();
+                        setLoading(false);
                     }
 
                     @Override
@@ -193,8 +193,7 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsB
     private void updateIdentities() {
         final List<Identity> identities = mTask.getIdentities();
         final Identity identityResponsible = identities.get(0);
-        setCurrentUserResponsible(mCurrentIdentity.getObjectId().equals(
-                identities.get(0).getObjectId()));
+        setCurrentUserResponsible(mCurrentIdentity.getObjectId().equals(identityResponsible.getObjectId()));
 
         final SpannableStringBuilder stringBuilder = mView.buildTaskIdentitiesString(identities,
                 identityResponsible);
@@ -265,6 +264,7 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsB
                         updateToolbarHeader();
                         mItems.add(new TaskDetailsHistoryItem(event));
                         mView.notifyItemInserted(mItems.size());
+                        notifyPropertyChanged(BR.empty);
                     }
 
                     @Override

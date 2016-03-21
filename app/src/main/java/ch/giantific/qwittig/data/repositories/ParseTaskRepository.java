@@ -45,8 +45,14 @@ public class ParseTaskRepository extends ParseBaseRepository implements TaskRepo
     }
 
     @Override
-    public Single<Task> saveTaskLocal(@NonNull Task task, @NonNull String tag) {
-        return pin(task, tag);
+    public Single<Task> saveTask(@NonNull Task task) {
+        return pin(task, Task.PIN_LABEL)
+                .doOnSuccess(new Action1<Task>() {
+                    @Override
+                    public void call(Task task) {
+                        task.saveEventually();
+                    }
+                });
     }
 
     @Override

@@ -24,10 +24,9 @@ public interface TaskRepository extends BaseRepository {
      * Saves the task to the local data store.
      *
      * @param task the task to save
-     * @param tag  the tag for the local data store
      * @return a {@link Single} emitting the result
      */
-    Single<Task> saveTaskLocal(@NonNull Task task, @NonNull String tag);
+    Single<Task> saveTask(@NonNull Task task);
 
     /**
      * Queries the local data store for tasks.

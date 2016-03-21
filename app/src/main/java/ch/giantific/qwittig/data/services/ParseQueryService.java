@@ -301,7 +301,7 @@ public class ParseQueryService extends IntentService {
                              @NonNull String groupId) {
         switch (className) {
             case Purchase.CLASS: {
-                final boolean successful = mPurchaseRepo.removePurchase(objectId, groupId);
+                final boolean successful = mPurchaseRepo.removePurchaseLocal(objectId, groupId);
                 mLocalBroadcast.sendPurchasesUpdated(successful);
                 break;
             }

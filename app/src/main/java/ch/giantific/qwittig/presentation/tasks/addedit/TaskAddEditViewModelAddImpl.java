@@ -236,11 +236,10 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
         }
 
         final Task task = getTask(mTaskTitle, timeFrame, identities);
-        getSubscriptions().add(mTaskRepo.saveTaskLocal(task, Task.PIN_LABEL)
+        getSubscriptions().add(mTaskRepo.saveTask(task)
                 .subscribe(new SingleSubscriber<Task>() {
                     @Override
                     public void onSuccess(Task value) {
-                        task.saveEventually();
                         mView.finishScreen(TaskAddEditViewModel.TaskResult.TASK_SAVED);
                     }
 

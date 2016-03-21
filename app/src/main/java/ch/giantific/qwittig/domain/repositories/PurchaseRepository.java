@@ -66,7 +66,7 @@ public interface PurchaseRepository extends BaseRepository {
      * @param groupId    the object id of the group the purchase belongs to
      * @return whether the removal was successful or not
      */
-    boolean removePurchase(@NonNull String purchaseId, @NonNull String groupId);
+    boolean removePurchaseLocal(@NonNull String purchaseId, @NonNull String groupId);
 
     /**
      * Queries purchases from the online data store and saves them in the local data store.

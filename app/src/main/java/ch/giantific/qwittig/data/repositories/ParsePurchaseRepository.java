@@ -148,7 +148,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public boolean removePurchase(@NonNull String purchaseId, @NonNull String groupId) {
+    public boolean removePurchaseLocal(@NonNull String purchaseId, @NonNull String groupId) {
         final ParseObject purchase = ParseObject.createWithoutData(Purchase.CLASS, purchaseId);
         try {
             purchase.unpin(Purchase.PIN_LABEL + groupId);
