@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import org.apache.commons.math3.fraction.BigFraction;
 
 import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModel;
-import ch.giantific.qwittig.presentation.finance.BalanceHeaderViewModel;
 import ch.giantific.qwittig.presentation.finance.unpaid.items.CompsUnpaidBaseItem;
 
 /**

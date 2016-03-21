@@ -16,7 +16,9 @@ public interface TaskRemindWorkerListener extends BaseWorkerListener {
 
     /**
      * Handles the successful reminder of a user to finish a task.
-     *  @param single the object id of the task to be finished
+     *
+     * @param single    a {@link Single} emitting the result
+     * @param taskId    the object id of the task to be finished
      * @param workerTag the tag of the worker fragment
      */
     void setTaskReminderStream(@NonNull Single<String> single,

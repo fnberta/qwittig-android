@@ -601,7 +601,7 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
             public void onSuccess(OcrPurchase ocrPurchase) {
                 mView.removeWorker(workerTag);
 
-//                setDate(ocrPurchase.getDate());
+//                setDate(ocrPurchase.getTaskEventDate());
                 setStore(ocrPurchase.getStore());
 
                 final List<OcrItem> ocrItems = ocrPurchase.getItems();

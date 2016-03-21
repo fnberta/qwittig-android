@@ -54,7 +54,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     private String mNickname;
     private String mPassword;
     private String mPasswordRepeat;
-    private List<String> mGroupNicknames = new ArrayList<>();
+    private final List<String> mGroupNicknames = new ArrayList<>();
 
     public SettingsProfileViewModelImpl(@Nullable Bundle savedState,
                                         @NonNull SettingsProfileViewModel.ViewListener view,

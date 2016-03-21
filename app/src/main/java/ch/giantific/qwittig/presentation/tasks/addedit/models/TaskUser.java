@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.tasks.addedit;
+package ch.giantific.qwittig.presentation.tasks.addedit.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -31,26 +31,26 @@ public class TaskUser implements Parcelable {
         }
     };
     private String mIdentityId;
-    private boolean mIsInvolved;
+    private boolean mInvolved;
     private int mPosition;
 
-    public TaskUser(@NonNull String identityId, boolean isInvolved) {
+    public TaskUser(@NonNull String identityId, boolean involved) {
         mIdentityId = identityId;
-        mIsInvolved = isInvolved;
+        mInvolved = involved;
     }
 
     private TaskUser(@NonNull Parcel in) {
         mIdentityId = in.readString();
-        mIsInvolved = in.readByte() != 0;
+        mInvolved = in.readByte() != 0;
         mPosition = in.readInt();
     }
 
     public boolean isInvolved() {
-        return mIsInvolved;
+        return mInvolved;
     }
 
-    public void setIsInvolved(boolean isInvolved) {
-        mIsInvolved = isInvolved;
+    public void setIsInvolved(boolean involved) {
+        mInvolved = involved;
     }
 
     public String getIdentityId() {
@@ -77,7 +77,7 @@ public class TaskUser implements Parcelable {
     @Override
     public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(mIdentityId);
-        dest.writeByte(mIsInvolved ? (byte) 1 : (byte) 0);
+        dest.writeByte(mInvolved ? (byte) 1 : (byte) 0);
         dest.writeInt(mPosition);
     }
 }

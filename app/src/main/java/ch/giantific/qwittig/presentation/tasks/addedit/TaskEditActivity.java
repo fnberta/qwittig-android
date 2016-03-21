@@ -18,7 +18,7 @@ public class TaskEditActivity extends TaskAddActivity {
 
     @Override
     TaskAddEditFragment getTaskFragment() {
-        final String editTaskId = getIntent().getStringExtra(TasksFragment.INTENT_TASK_ID);
+        final String editTaskId = getIntent().getStringExtra(TasksFragment.INTENT_EXTRA_TASK_ID);
         return TaskAddEditFragment.newEditInstance(editTaskId);
     }
 }

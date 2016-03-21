@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.tasks.details.items;
+package ch.giantific.qwittig.presentation.tasks.list.items;
 
 import android.support.annotation.IntDef;
 
@@ -10,17 +10,17 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Created by fabio on 11.02.16.
+ * Defines the view model for a row item on the task list screen.
  */
-public interface DetailsItem {
+public interface TasksBaseItem {
 
     @Type
     int getType();
 
-    @IntDef({Type.HEADER, Type.HISTORY})
+    @IntDef({Type.HEADER, Type.TASK})
     @Retention(RetentionPolicy.SOURCE)
     @interface Type {
         int HEADER = 0;
-        int HISTORY = 1;
+        int TASK = 1;
     }
 }

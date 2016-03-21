@@ -9,7 +9,6 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -18,14 +17,14 @@ import android.view.View;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.LocalBroadcast;
+import ch.giantific.qwittig.data.push.PushBroadcastReceiver;
 import ch.giantific.qwittig.databinding.ActivityTaskDetailsBinding;
-import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
+import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
 import ch.giantific.qwittig.presentation.tasks.addedit.TaskAddEditViewModel;
 import ch.giantific.qwittig.presentation.tasks.list.TasksFragment;
-import ch.giantific.qwittig.data.push.PushBroadcastReceiver;
 
 /**
  * Hosts {@link TaskDetailsFragment} that shows the details of a task.
@@ -44,7 +43,10 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity<TaskDetailsViewMo
         super.handleLocalBroadcast(intent, dataType);
 
         if (dataType == LocalBroadcast.DataType.TASKS_UPDATED) {
-            mViewModel.loadData();
+            final boolean successful = intent.getBooleanExtra(LocalBroadcast.INTENT_EXTRA_SUCCESSFUL, false);
+            if (successful) {
+                mViewModel.loadData();
+            }
         }
     }
 
@@ -93,15 +95,14 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity<TaskDetailsViewMo
 
     private String getTaskObjectId() {
         final Intent intent = getIntent();
-        String taskId = intent.getStringExtra(TasksFragment.INTENT_TASK_ID); // started from TaskFragment
+        String taskId = intent.getStringExtra(TasksFragment.INTENT_EXTRA_TASK_ID); // started from TaskFragment
 
         if (taskId == null) { // started via Push Notification
             try {
-                JSONObject jsonExtras = PushBroadcastReceiver.getData(intent);
+                final JSONObject jsonExtras = PushBroadcastReceiver.getData(intent);
                 taskId = jsonExtras.optString(PushBroadcastReceiver.PUSH_PARAM_TASK_ID);
             } catch (JSONException e) {
-                Snackbar.make(mToolbar, R.string.toast_error_task_details_load,
-                        Snackbar.LENGTH_LONG).show();
+                showMessage(R.string.toast_error_task_details_load);
             }
         }
 

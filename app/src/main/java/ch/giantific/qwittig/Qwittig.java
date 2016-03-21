@@ -25,6 +25,7 @@ import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Item;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.models.Task;
+import ch.giantific.qwittig.domain.models.TaskHistoryEvent;
 import ch.giantific.qwittig.domain.models.User;
 import timber.log.Timber;
 
@@ -83,6 +84,7 @@ public class Qwittig extends Application {
         ParseObject.registerSubclass(Item.class);
         ParseObject.registerSubclass(Compensation.class);
         ParseObject.registerSubclass(Task.class);
+        ParseObject.registerSubclass(TaskHistoryEvent.class);
 
         // initialise Parse
         Parse.initialize(new Parse.Configuration.Builder(this)

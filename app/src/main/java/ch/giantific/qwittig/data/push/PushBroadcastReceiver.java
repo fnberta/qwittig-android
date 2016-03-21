@@ -42,6 +42,7 @@ import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.models.Task;
+import ch.giantific.qwittig.domain.models.TaskHistoryEvent;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.finance.FinanceActivity;
@@ -69,7 +70,9 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     public static final String PUSH_PARAM_CREDITOR_ID = "creditorId";
     public static final String PUSH_PARAM_BUYER_ID = "buyerId";
     public static final String PUSH_PARAM_INITIATOR_ID = "initiatorId";
+    public static final String PUSH_PARAM_DELETE_ID = "deleteId";
     public static final String PUSH_PARAM_TASK_ID = "taskId";
+    public static final String PUSH_PARAM_TASK_EVENT_ID = "eventId";
     public static final String PUSH_PARAM_IDENTITIES_IDS = "identitiesIds";
     public static final String PUSH_PARAM_USER = "user";
     public static final String PUSH_PARAM_AMOUNT = "amount";
@@ -77,6 +80,8 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     public static final String PUSH_PARAM_GROUP_NAME = "groupName";
     public static final String PUSH_PARAM_CURRENCY_CODE = "currencyCode";
     public static final String PUSH_PARAM_TASK_TITLE = "taskTitle";
+    public static final String PUSH_PARAM_TASK_TIME_FRAME = "timeFrame";
+    public static final String PUSH_PARAM_TASK_EVENT_FINISHER_ID = "finisherId";
     public static final String PUSH_PARAM_COMP_DID_CALC_NEW = "didCalcNew";
     public static final String INTENT_EXTRA_FINANCE_FRAGMENT = "INTENT_EXTRA_FINANCE_FRAGMENT";
     private static final String NOTIFICATION_TYPE = "type";
@@ -94,6 +99,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     private static final String TYPE_TASK_DELETE = "taskDelete";
     private static final String TYPE_TASK_EDIT = "taskEdit";
     private static final String TYPE_TASK_REMIND_USER = "taskRemindUser";
+    private static final String TYPE_TASK_NEW_EVENT = "taskNewEvent";
     private static final String ACTION_PUSH_BUTTON_ACCEPT = "ch.giantific.qwittig.push.intent.ACCEPT";
     private static final String NOTIFICATION_ID = "NOTIFICATION_ID";
     private static final int NEW_PURCHASE_NOTIFICATION_ID = 1;
@@ -315,6 +321,12 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 break;
             }
             case TYPE_TASK_NEW: {
+                // is user is not in task identities, return early
+                final List<String> identityIds = getIdentitiesIds(jsonExtras);
+                if (!currentUser.hasIdentity(identityIds)) {
+                    return;
+                }
+
                 final String taskId = jsonExtras.optString(PUSH_PARAM_TASK_ID);
                 ParseQueryService.startUpdateObject(context, Task.CLASS, taskId, true);
 
@@ -326,23 +338,49 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 break;
             }
             case TYPE_TASK_EDIT: {
+                // is user is not in task identities, return early
+                final List<String> identityIds = getIdentitiesIds(jsonExtras);
+                if (!currentUser.hasIdentity(identityIds)) {
+                    return;
+                }
+
                 final String taskId = jsonExtras.optString(PUSH_PARAM_TASK_ID);
                 ParseQueryService.startUpdateObject(context, Task.CLASS, taskId, false);
                 break;
             }
             case TYPE_TASK_DELETE: {
+                // is user is not in task identities, return early
+                final List<String> identityIds = getIdentitiesIds(jsonExtras);
+                if (!currentUser.hasIdentity(identityIds)) {
+                    return;
+                }
+
                 final String taskId = jsonExtras.optString(PUSH_PARAM_TASK_ID);
                 final String groupId = jsonExtras.optString(PUSH_PARAM_GROUP_ID);
                 ParseQueryService.startUnpinObject(context, Task.CLASS, taskId, groupId);
 
-                // don't show notification for initiator of task,
-                // TODO: actually we don't want to show for the user that deleted the task / finished a one-time task
-                final String initiatorId = jsonExtras.optString(PUSH_PARAM_INITIATOR_ID);
-                if (currentUser.hasIdentity(initiatorId)) {
+                // don't show notification for user who deleted the task
+                final String deleteId = jsonExtras.optString(PUSH_PARAM_DELETE_ID);
+                if (currentUser.hasIdentity(deleteId)) {
+                    return;
+                }
+                break;
+            }
+            case TYPE_TASK_NEW_EVENT: {
+                // is user is not in task identities, return early
+                final List<String> identityIds = getIdentitiesIds(jsonExtras);
+                if (!currentUser.hasIdentity(identityIds)) {
                     return;
                 }
 
-                // don't show notification if task was one-time
+                final String eventId = jsonExtras.optString(PUSH_PARAM_TASK_EVENT_ID);
+                ParseQueryService.startUpdateObject(context, TaskHistoryEvent.CLASS, eventId, true);
+
+                // don't show notification for user who finished the task
+                final String finisherId = jsonExtras.optString(PUSH_PARAM_TASK_EVENT_FINISHER_ID);
+                if (currentUser.hasIdentity(finisherId)) {
+                    return;
+                }
                 break;
             }
             case TYPE_USER_DELETED: {
@@ -528,7 +566,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 break;
             }
             case TYPE_TASK_NEW: {
-                title = jsonExtras.optString(PUSH_PARAM_COMP_DID_CALC_NEW);
+                title = jsonExtras.optString(PUSH_PARAM_TASK_TITLE);
                 alert = context.getString(R.string.push_task_new_alert, user);
 
                 // set title and alert
@@ -536,16 +574,22 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 break;
             }
             case TYPE_TASK_DELETE: {
-                final String taskTitle = jsonExtras.optString(PUSH_PARAM_COMP_DID_CALC_NEW);
-                title = context.getString(R.string.push_task_delete_title, taskTitle);
-                alert = context.getString(R.string.push_task_delete_alert, user);
+                final String taskTitle = jsonExtras.optString(PUSH_PARAM_TASK_TITLE);
+                final String timeFrame = jsonExtras.optString(PUSH_PARAM_TASK_TIME_FRAME);
+                if (timeFrame.equals(Task.TimeFrame.ONE_TIME)) {
+                    title = context.getString(R.string.push_task_finished_title, taskTitle);
+                    alert = context.getString(R.string.push_task_finished_alert, user);
+                } else {
+                    title = context.getString(R.string.push_task_delete_title, taskTitle);
+                    alert = context.getString(R.string.push_task_delete_alert, user);
+                }
 
                 // set title and alert
                 builder.setContentTitle(title).setContentText(alert);
                 break;
             }
             case TYPE_TASK_REMIND_USER: {
-                final String taskTitle = jsonExtras.optString(PUSH_PARAM_COMP_DID_CALC_NEW);
+                final String taskTitle = jsonExtras.optString(PUSH_PARAM_TASK_TITLE);
                 title = context.getString(R.string.push_task_remind_title, taskTitle);
                 alert = context.getString(R.string.push_task_remind_alert, user);
 
@@ -562,6 +606,15 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                         PendingIntent.FLAG_UPDATE_CURRENT);
                 builder.addAction(R.drawable.ic_done_black_24dp,
                         context.getString(R.string.push_action_finished), pAcceptContentIntent);
+                break;
+            }
+            case TYPE_TASK_NEW_EVENT: {
+                final String taskTitle = jsonExtras.optString(PUSH_PARAM_TASK_TITLE);
+                title = context.getString(R.string.push_task_finished_title, taskTitle);
+                alert = context.getString(R.string.push_task_finished_alert, user);
+
+                // set title and alert
+                builder.setContentTitle(title).setContentText(alert);
                 break;
             }
             case TYPE_USER_DELETED: {
@@ -685,6 +738,8 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
             case TYPE_COMPENSATION_REMIND_USER_HAS_PAID:
                 return FinanceActivity.class;
             case TYPE_TASK_NEW:
+                // fall through
+            case TYPE_TASK_NEW_EVENT:
                 // fall through
             case TYPE_TASK_REMIND_USER: {
                 final String groupId;

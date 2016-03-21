@@ -15,8 +15,7 @@ import android.view.ViewGroup;
 import ch.giantific.qwittig.databinding.RowTaskAddEditUserBinding;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-
-import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;
+import ch.giantific.qwittig.presentation.tasks.addedit.models.TaskAddEditIdentityViewModel;
 
 
 /**
@@ -52,11 +51,11 @@ public class TaskAddEditUsersRecyclerAdapter extends RecyclerView.Adapter<TaskAd
         final TaskAddEditIdentityViewModel viewModel = binding.getViewModel();
 
         final Identity identity = mViewModel.getIdentityAtPosition(position);
-        final float userAlpha = mViewModel.isUserAtPositionInvolved(position) ? 1f : DISABLED_ALPHA;
+        final float userAlpha = mViewModel.getIdentityAlpha(position);
         if (viewModel == null) {
-            binding.setViewModel(new TaskAddEditIdentityViewModel(identity, userAlpha, false));
+            binding.setViewModel(new TaskAddEditIdentityViewModel(identity, userAlpha));
         } else {
-            viewModel.updateIdentity(identity, userAlpha, false);
+            viewModel.updateIdentity(identity, userAlpha);
         }
 
         binding.executePendingBindings();

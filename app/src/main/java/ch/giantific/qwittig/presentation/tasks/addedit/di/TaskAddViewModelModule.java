@@ -18,7 +18,7 @@ import dagger.Module;
 import dagger.Provides;
 
 /**
- * Created by fabio on 12.01.16.
+ * Defines which implementation to use for the add task screen view model and how to instantiate it.
  */
 @Module
 public class TaskAddViewModelModule extends BaseViewModelModule<TaskAddEditViewModel.ViewListener> {

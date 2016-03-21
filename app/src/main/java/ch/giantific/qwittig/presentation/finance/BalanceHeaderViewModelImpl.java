@@ -22,7 +22,7 @@ import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.SingleSubscriber;
 
 /**
- * Created by fabio on 16.03.16.
+ * Defines an observable view model for the header showing the user's balance.
  */
 public class BalanceHeaderViewModelImpl extends ViewModelBaseImpl<BalanceHeaderViewModel.ViewListener>
         implements BalanceHeaderViewModel {

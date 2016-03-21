@@ -17,18 +17,16 @@ import java.util.List;
 
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
-import ch.giantific.qwittig.presentation.tasks.details.items.DetailsItem;
+import ch.giantific.qwittig.presentation.tasks.details.items.TaskDetailsBaseItem;
 
 /**
- * Created by fabio on 09.01.16.
+ * Defines an observable view model for the task details screen.
  */
 public interface TaskDetailsViewModel extends
-        ListViewModel<DetailsItem> {
+        ListViewModel<TaskDetailsBaseItem> {
 
     @Bindable
     String getTaskTitle();
-
-    void setTaskTitle(@NonNull String taskTitle);
 
     @Bindable
     @StringRes
@@ -37,9 +35,9 @@ public interface TaskDetailsViewModel extends
     void setTaskTimeFrame(@StringRes int taskTimeFrame);
 
     @Bindable
-    SpannableStringBuilder getTaskUsersInvolved();
+    SpannableStringBuilder getTaskIdentities();
 
-    void setTaskUsersInvolved(@NonNull SpannableStringBuilder taskUsersInvolved);
+    void setTaskIdentities(@NonNull SpannableStringBuilder taskUsersInvolved);
 
     @Bindable
     boolean isCurrentUserResponsible();
@@ -91,8 +89,8 @@ public interface TaskDetailsViewModel extends
          * @param identityResponsible the identity currently responsible for the task
          * @return a {@link SpannableStringBuilder} with the appropriate string
          */
-        SpannableStringBuilder buildUsersInvolvedString(@NonNull List<Identity> identities,
-                                                        @NonNull Identity identityResponsible);
+        SpannableStringBuilder buildTaskIdentitiesString(@NonNull List<Identity> identities,
+                                                         @NonNull Identity identityResponsible);
 
         /**
          * Finishes the task detail screen.

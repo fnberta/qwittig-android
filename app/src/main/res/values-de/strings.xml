@@ -302,5 +302,8 @@
     <string name="toast_error_comps_update">Aktualiseren der Abrechnungen fehlgeschlagen</string>
     <string name="toast_profile_nickname_taken">Dieser Spitzname ist bereits vergeben in dieser Grupp</string>
     <string name="toast_error_balance_load">Laden deines aktuellen Kontostandes fehlgeschlagen</string>
+    <string name="toast_error_task_done">Aufgabe abhaken fehlgeschlagen</string>
+    <string name="push_task_finished_title">%1$s erledigt</string>
+    <string name="push_task_finished_alert">%1$s hat die Aufgabe erledigt</string>
 
 </resources>

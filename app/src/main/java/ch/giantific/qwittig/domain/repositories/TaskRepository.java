@@ -11,6 +11,7 @@ import java.util.List;
 
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Task;
+import ch.giantific.qwittig.domain.models.TaskHistoryEvent;
 import rx.Observable;
 import rx.Single;
 
@@ -23,10 +24,9 @@ public interface TaskRepository extends BaseRepository {
      * Saves the task to the local data store.
      *
      * @param task the task to save
-     * @param tag  the tag for the local data store
      * @return a {@link Single} emitting the result
      */
-    Single<Task> saveTaskLocal(@NonNull Task task, @NonNull String tag);
+    Single<Task> saveTask(@NonNull Task task);
 
     /**
      * Queries the local data store for tasks.
@@ -44,6 +44,10 @@ public interface TaskRepository extends BaseRepository {
      * @return a {@link Single} emitting the result
      */
     Single<Task> getTask(@NonNull String taskId);
+
+    Observable<TaskHistoryEvent> getTaskHistoryEvents(@NonNull Task task);
+
+    Single<TaskHistoryEvent> saveTaskHistoryEvent(@NonNull TaskHistoryEvent taskHistoryEvent);
 
     /**
      * Fetches the data of a task from the local data store.
@@ -79,13 +83,9 @@ public interface TaskRepository extends BaseRepository {
      */
     boolean updateTask(@NonNull String taskId, boolean isNew);
 
-    /**
-     * Returns the a {@link Task} object with its data fetched.
-     *
-     * @param taskId the object id of the task to fetch
-     * @return a fetched {@link Task} object
-     */
-    Task fetchTaskDataLocal(@NonNull String taskId);
+    boolean setTaskDone(@NonNull String taskId, @NonNull Identity identity);
+
+    boolean updateTaskHistoryEvent(@NonNull String eventId, boolean isNew);
 
     /**
      * Sends a push notification to remind a user to finish a task.

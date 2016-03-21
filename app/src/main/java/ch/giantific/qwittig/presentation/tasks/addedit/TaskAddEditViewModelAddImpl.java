@@ -29,23 +29,27 @@ import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
+import ch.giantific.qwittig.presentation.tasks.addedit.models.TaskUser;
 import ch.giantific.qwittig.utils.DateUtils;
 import rx.SingleSubscriber;
 
+import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;
+
 /**
- * Created by fabio on 16.01.16.
+ * Provides an implementation of the {@link TaskAddEditViewModel} interface for the add task screen.
  */
 public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditViewModel.ViewListener>
         implements TaskAddEditViewModel {
 
     private static final String STATE_DEADLINE_SELECTED = "STATE_DEADLINE_SELECTED";
-    private static final String STATE_USERS_INVOLVED = "STATE_USERS_INVOLVED";
+    private static final String STATE_IDENTITIES = "STATE_IDENTITIES";
+    private static final String STATE_TITLE = "STATE_TITLE";
     final ArrayList<TaskUser> mTaskIdentities;
     final TaskRepository mTaskRepo;
     private final List<Identity> mIdentitiesAvailable = new ArrayList<>();
     private final DateFormat mDateFormatter;
     Date mTaskDeadline;
-    private String mTaskTitle;
+    String mTaskTitle;
     private int mTaskTimeFrame;
 
     public TaskAddEditViewModelAddImpl(@Nullable Bundle savedState,
@@ -57,9 +61,9 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
         mTaskRepo = taskRepository;
 
         if (savedState != null) {
+            mTaskTitle = savedState.getString(STATE_TITLE);
             mTaskDeadline = new Date(savedState.getLong(STATE_DEADLINE_SELECTED));
-            ArrayList<TaskUser> usersInvolved = savedState.getParcelableArrayList(STATE_USERS_INVOLVED);
-            mTaskIdentities = usersInvolved != null ? usersInvolved : new ArrayList<TaskUser>();
+            mTaskIdentities = savedState.getParcelableArrayList(STATE_IDENTITIES);
         } else {
             mTaskDeadline = new Date();
             mTaskIdentities = new ArrayList<>();
@@ -72,8 +76,9 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
     public void saveState(@NonNull Bundle outState) {
         super.saveState(outState);
 
+        outState.putString(STATE_TITLE, mTaskTitle);
         outState.putLong(STATE_DEADLINE_SELECTED, mTaskDeadline.getTime());
-        outState.putParcelableArrayList(STATE_USERS_INVOLVED, mTaskIdentities);
+        outState.putParcelableArrayList(STATE_IDENTITIES, mTaskIdentities);
     }
 
     @Override
@@ -162,8 +167,8 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
 
     @Override
     @Bindable
-    public int getTaskDeadlineVisibility() {
-        return mTaskTimeFrame == R.string.time_frame_as_needed ? View.GONE : View.VISIBLE;
+    public boolean isAsNeededTask() {
+        return mTaskTimeFrame == R.string.time_frame_as_needed;
     }
 
     @Override
@@ -179,7 +184,7 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
     }
 
     @Override
-    public void checkForChangesAndExit() {
+    public void onUpOrBackClick() {
         if (changesWereMade()) {
             mView.showDiscardChangesDialog();
         } else {
@@ -188,7 +193,7 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
     }
 
     boolean changesWereMade() {
-        return !TextUtils.isEmpty(mView.getTaskTitle());
+        return !TextUtils.isEmpty(mTaskTitle);
     }
 
     @Override
@@ -197,13 +202,18 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
     }
 
     @Override
-    public boolean isUserAtPositionInvolved(int position) {
-        return mTaskIdentities.get(position).isInvolved();
+    public float getIdentityAlpha(int position) {
+        return mTaskIdentities.get(position).isInvolved() ? 1f : DISABLED_ALPHA;
     }
 
     @Override
     public int getItemCount() {
         return mIdentitiesAvailable.size();
+    }
+
+    @Override
+    public void onTitleChanged(CharSequence s, int start, int before, int count) {
+        mTaskTitle = s.toString();
     }
 
     @Override
@@ -213,8 +223,7 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
 
     @Override
     public void onFabSaveTaskClick(View view) {
-        final String taskTitle = mView.getTaskTitle();
-        if (TextUtils.isEmpty(taskTitle)) {
+        if (TextUtils.isEmpty(mTaskTitle)) {
             mView.showMessage(R.string.error_task_title);
             return;
         }
@@ -226,12 +235,11 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
             return;
         }
 
-        final Task task = getTask(taskTitle, timeFrame, identities);
-        getSubscriptions().add(mTaskRepo.saveTaskLocal(task, Task.PIN_LABEL)
+        final Task task = getTask(mTaskTitle, timeFrame, identities);
+        getSubscriptions().add(mTaskRepo.saveTask(task)
                 .subscribe(new SingleSubscriber<Task>() {
                     @Override
                     public void onSuccess(Task value) {
-                        task.saveEventually();
                         mView.finishScreen(TaskAddEditViewModel.TaskResult.TASK_SAVED);
                     }
 
@@ -284,9 +292,8 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
 
     @Override
     public void onTimeFrameSelected(@NonNull AdapterView<?> parent, View view, int position, long id) {
-        final int timeFrame = (int) parent.getItemAtPosition(position);
-        setTaskTimeFrame(timeFrame);
-        notifyPropertyChanged(BR.taskDeadlineVisibility);
+        mTaskTimeFrame = (int) parent.getItemAtPosition(position);
+        notifyPropertyChanged(BR.asNeededTask);
     }
 
     @Override

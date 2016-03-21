@@ -10,12 +10,12 @@ import android.support.annotation.StringRes;
 import ch.giantific.qwittig.presentation.common.viewmodels.HeaderRowViewModelBaseImpl;
 
 /**
- * Created by fabio on 11.02.16.
+ * Provides an implementation of the {@link TaskDetailsBaseItem} interface for a header row.
  */
 @SuppressLint("ParcelCreator")
-public class HeaderItem extends HeaderRowViewModelBaseImpl implements DetailsItem {
+public class TaskDetailsHeaderItem extends HeaderRowViewModelBaseImpl implements TaskDetailsBaseItem {
 
-    public HeaderItem(@StringRes int header) {
+    public TaskDetailsHeaderItem(@StringRes int header) {
         super(header);
     }
 

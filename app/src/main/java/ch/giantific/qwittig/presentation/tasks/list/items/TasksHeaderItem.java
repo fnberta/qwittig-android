@@ -8,14 +8,15 @@ import android.annotation.SuppressLint;
 import android.support.annotation.StringRes;
 
 import ch.giantific.qwittig.presentation.common.viewmodels.HeaderRowViewModelBaseImpl;
+import ch.giantific.qwittig.presentation.tasks.details.items.TaskDetailsBaseItem;
 
 /**
- * Created by fabio on 11.02.16.
+ * Provides an implementation of the {@link TaskDetailsBaseItem} interface for a header item.
  */
 @SuppressLint("ParcelCreator")
-public class HeaderItem extends HeaderRowViewModelBaseImpl implements ListItem {
+public class TasksHeaderItem extends HeaderRowViewModelBaseImpl implements TasksBaseItem {
 
-    public HeaderItem(@StringRes int header) {
+    public TasksHeaderItem(@StringRes int header) {
         super(header);
     }
 

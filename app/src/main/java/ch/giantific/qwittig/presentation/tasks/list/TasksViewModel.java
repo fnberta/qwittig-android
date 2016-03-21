@@ -11,12 +11,12 @@ import android.widget.AdapterView;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModel;
 import ch.giantific.qwittig.presentation.tasks.addedit.TaskAddActivity;
-import ch.giantific.qwittig.presentation.tasks.list.items.ListItem;
+import ch.giantific.qwittig.presentation.tasks.list.items.TasksBaseItem;
 
 /**
- * Created by fabio on 09.01.16.
+ * Defines an observable view model for the task list screen.
  */
-public interface TasksViewModel extends OnlineListViewModel<ListItem>,
+public interface TasksViewModel extends OnlineListViewModel<TasksBaseItem>,
         TasksRecyclerAdapter.AdapterInteractionListener,
         TaskRemindWorkerListener {
 
@@ -30,12 +30,12 @@ public interface TasksViewModel extends OnlineListViewModel<ListItem>,
     interface ViewListener extends OnlineListViewModel.ViewListener {
         void startUpdateTasksService();
 
-        void startTaskDetailsActivity(@NonNull Task task);
+        void startTaskDetailsScreen(@NonNull Task task);
 
         /**
          * Starts {@link TaskAddActivity} to let the user add a new {@link Task}.
          */
-        void startTaskAddActivity();
+        void startTaskAddScreen();
 
         void loadRemindUserWorker(@NonNull String taskId);
     }

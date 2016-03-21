@@ -20,8 +20,8 @@ import android.widget.DatePicker;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivityTaskAddEditBinding;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
-import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.TransitionListenerAdapter;
+import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
@@ -38,18 +38,12 @@ public class TaskAddActivity extends BaseActivity<TaskAddEditViewModel>
 
     private ActivityTaskAddEditBinding mBinding;
 
-    @NonNull
-    @Override
-    public String getTaskTitle() {
-        return mBinding.etTaskAddTitle.getText().toString();
-    }
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_task_add_edit);
 
-        ActionBar actionBar = getSupportActionBar();
+        final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setTitle(null);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white_24dp);
@@ -62,16 +56,10 @@ public class TaskAddActivity extends BaseActivity<TaskAddEditViewModel>
                 mBinding.fabTaskSave.show();
             }
 
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, getTaskFragment())
-                    .commit();
+            addFragment();
         } else {
             mBinding.fabTaskSave.show();
         }
-    }
-
-    TaskAddEditFragment getTaskFragment() {
-        return TaskAddEditFragment.newAddInstance();
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -88,6 +76,16 @@ public class TaskAddActivity extends BaseActivity<TaskAddEditViewModel>
         });
     }
 
+    private void addFragment() {
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.container, getTaskFragment())
+                .commit();
+    }
+
+    TaskAddEditFragment getTaskFragment() {
+        return TaskAddEditFragment.newAddInstance();
+    }
+
     @Override
     public void setViewModel(@NonNull TaskAddEditViewModel viewModel) {
         mViewModel = viewModel;
@@ -99,7 +97,7 @@ public class TaskAddActivity extends BaseActivity<TaskAddEditViewModel>
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home:
-                mViewModel.checkForChangesAndExit();
+                mViewModel.onUpOrBackClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -118,6 +116,6 @@ public class TaskAddActivity extends BaseActivity<TaskAddEditViewModel>
 
     @Override
     public void onBackPressed() {
-        mViewModel.checkForChangesAndExit();
+        mViewModel.onUpOrBackClick();
     }
 }

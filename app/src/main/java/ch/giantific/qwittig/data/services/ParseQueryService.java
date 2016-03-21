@@ -26,6 +26,7 @@ import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.models.Task;
+import ch.giantific.qwittig.domain.models.TaskHistoryEvent;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
@@ -301,7 +302,7 @@ public class ParseQueryService extends IntentService {
                              @NonNull String groupId) {
         switch (className) {
             case Purchase.CLASS: {
-                final boolean successful = mPurchaseRepo.removePurchase(objectId, groupId);
+                final boolean successful = mPurchaseRepo.removePurchaseLocal(objectId, groupId);
                 mLocalBroadcast.sendPurchasesUpdated(successful);
                 break;
             }
@@ -328,6 +329,9 @@ public class ParseQueryService extends IntentService {
                 break;
             case Task.CLASS:
                 updateTask(objectId, isNew);
+                break;
+            case TaskHistoryEvent.CLASS:
+                updateTaskHistoryEvent(objectId, isNew);
                 break;
             case Group.CLASS:
                 updateGroup(objectId, isNew);
@@ -363,6 +367,13 @@ public class ParseQueryService extends IntentService {
         }
 
         final boolean successful = mTasksRepo.updateTask(taskId, isNew);
+        mLocalBroadcast.sendTasksUpdated(successful);
+    }
+
+    private void updateTaskHistoryEvent(@NonNull String eventId, boolean isNew) {
+        // TODO: check if new and already queried, if yes return immediately
+
+        final boolean successful = mTasksRepo.updateTaskHistoryEvent(eventId, isNew);
         mLocalBroadcast.sendTasksUpdated(successful);
     }
 
@@ -403,15 +414,12 @@ public class ParseQueryService extends IntentService {
     }
 
     private void setTaskDone(@NonNull String taskId) {
-        final Task task = mTasksRepo.fetchTaskDataLocal(taskId);
-        if (task != null) {
-            task.addHistoryEvent(mCurrentIdentity);
-            task.saveEventually();
-            mLocalBroadcast.sendTasksUpdated(true);
-        }
+        final boolean successful = mTasksRepo.setTaskDone(taskId, mCurrentIdentity);
+        mLocalBroadcast.sendTasksUpdated(successful);
     }
 
-    @StringDef({User.CLASS, Group.CLASS, Purchase.CLASS, Compensation.CLASS, Group.CLASS, Task.CLASS})
+    @StringDef({User.CLASS, Group.CLASS, Purchase.CLASS, Compensation.CLASS, Group.CLASS,
+            Task.CLASS, TaskHistoryEvent.CLASS})
     @Retention(RetentionPolicy.SOURCE)
     public @interface ClassType {
     }

@@ -5,7 +5,7 @@
 package ch.giantific.qwittig.presentation.common.viewmodels;
 
 /**
- * Created by fabio on 16.03.16.
+ * Defines a view model for a screen that allows the underlying data to be refreshed.
  */
 public interface DataRefreshViewModel {
 
