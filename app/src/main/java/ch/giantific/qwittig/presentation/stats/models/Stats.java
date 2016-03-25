@@ -88,20 +88,20 @@ public class Stats {
      */
     public static class Member {
 
-        @SerializedName("memberId")
-        private String mMemberId;
+        @SerializedName("nickname")
+        private String mNickname;
         @SerializedName("units")
         private List<Unit> mUnits = new ArrayList<>();
 
         public Member() {
         }
 
-        public String getMemberId() {
-            return mMemberId;
+        public String getNickname() {
+            return mNickname;
         }
 
-        public void setMemberId(String name) {
-            mMemberId = name;
+        public void setNickname(String nickname) {
+            mNickname = nickname;
         }
 
         public List<Unit> getUnits() {
@@ -114,7 +114,7 @@ public class Stats {
 
         @Override
         public String toString() {
-            return getMemberId();
+            return mNickname;
         }
     }
 

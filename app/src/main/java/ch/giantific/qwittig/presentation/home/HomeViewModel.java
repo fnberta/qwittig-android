@@ -7,8 +7,8 @@ package ch.giantific.qwittig.presentation.home;
 import android.databinding.Bindable;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
-import android.view.View;
 
+import ch.berta.fabio.fabspeeddial.FabMenu;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 
 /**
@@ -29,9 +29,7 @@ public interface HomeViewModel extends ViewModel,
 
     void handleInvitation(@NonNull String identityId, @NonNull String groupName);
 
-    void onFabAddPurchaseManualClick(View view);
-
-    void onFabAddPurchaseAutoClick(View view);
+    FabMenu.FabMenuItemClickListener getFabMenuItemClickListener();
 
     /**
      * Defines the interaction with the attached view.

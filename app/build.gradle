@@ -69,9 +69,9 @@ dependencies {
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.github.PhilJay:MPAndroidChart:v2.2.3'
     compile 'com.vinaysshenoy:mugen:1.0.2'
-    compile 'com.github.fnberta:FabSpeedDial:0.2'
     compile 'com.github.fnberta:FabProgress:0.1'
     compile 'com.jakewharton.timber:timber:4.1.0'
+    compile project(':fabMenu')
     debugCompile "com.squareup.leakcanary:leakcanary-android:${leakCanaryVersion}"
     releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
     testCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"

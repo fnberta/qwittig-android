@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2016 Fabio Berta
+  -->
+
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+
+    <item
+        android:id="@+id/action_fab_home_auto"
+        android:icon="@drawable/ic_camera_alt_black_24dp"
+        android:orderInCategory="1"
+        android:title="@string/fab_label_auto"
+        />
+
+    <item
+        android:id="@+id/action_fab_home_manual"
+        android:icon="@drawable/ic_create_black_24dp"
+        android:orderInCategory="2"
+        android:title="@string/fab_label_manual"
+        />
+
+</menu>

@@ -159,9 +159,7 @@ public abstract class StatsPieViewModelBaseImpl<T extends StatsPieViewModel.View
             final List<Entry> yVals = new ArrayList<>();
             final List<String> xVals = new ArrayList<>();
 
-            final String userId = member.getMemberId();
-            final Identity identity = (Identity) Identity.createWithoutData(Identity.CLASS, userId);
-            mUserNicknames.add(identity.getNickname());
+            mUserNicknames.add(member.getNickname());
 
             final List<Stats.Unit> units = member.getUnits();
             for (int i = 0, unitsSize = units.size(); i < unitsSize; i++) {

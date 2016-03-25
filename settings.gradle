@@ -2,4 +2,4 @@
  * Copyright (c) 2015 Fabio Berta
  */
 
-include ':app'
+include ':app', ':fabMenu'

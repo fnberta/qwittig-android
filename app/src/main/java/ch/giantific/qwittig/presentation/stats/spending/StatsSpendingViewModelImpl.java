@@ -160,13 +160,11 @@ public class StatsSpendingViewModelImpl extends StatsViewModelBaseImpl<StatsSpen
         final int userDataSize = userData.size();
         final List<IBarDataSet> barDataSets = new ArrayList<>(userDataSize);
         for (int i = 0; i < userDataSize; i++) {
-            final Stats.Member user = userData.get(i);
-            final List<Stats.Unit> units = user.getUnits();
+            final Stats.Member member = userData.get(i);
+            final List<Stats.Unit> units = member.getUnits();
             final List<BarEntry> barEntries = getBarEntries(units);
 
-            final String userId = user.getMemberId();
-            final Identity buyer = (Identity) Identity.createWithoutData(Identity.CLASS, userId);
-            final BarDataSet barDataSet = new BarDataSet(barEntries, buyer.getNickname());
+            final BarDataSet barDataSet = new BarDataSet(barEntries, member.getNickname());
             barDataSet.setColor(getColor(i));
 
             barDataSets.add(barDataSet);

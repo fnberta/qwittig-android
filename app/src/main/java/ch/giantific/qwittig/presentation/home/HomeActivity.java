@@ -95,14 +95,6 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
             actionBar.setTitle(R.string.title_activity_home);
         }
 
-        mBinding.fabMenu.hideMenuButton(false);
-        mBinding.fabMenu.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mBinding.fabMenu.showMenuButton(true);
-            }
-        }, ViewUtils.FAB_CIRCULAR_REVEAL_DELAY * 4);
-
         if (mUserLoggedIn) {
             mViewModel.onLoginSuccessful();
 
@@ -387,8 +379,6 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
             startActivityForResult(intent, HomeActivity.INTENT_REQUEST_PURCHASE_MODIFY,
                     activityOptionsCompat.toBundle());
         }
-
-        mBinding.fabMenu.close();
     }
 
     @Override

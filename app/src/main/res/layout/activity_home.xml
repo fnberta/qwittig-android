@@ -77,29 +77,12 @@
 
             <ch.berta.fabio.fabspeeddial.FabMenu
                 android:id="@+id/fab_menu"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
-                android:layout_margin="@dimen/normal_space"
-                app:labels="@array/fab_labels"
-                >
-
-                <android.support.design.widget.FloatingActionButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:onClick="@{viewModel.onFabAddPurchaseManualClick}"
-                    android:src="@drawable/ic_create_black_24dp"
-                    app:fabSize="mini"
-                    />
-
-                <android.support.design.widget.FloatingActionButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:onClick="@{viewModel.onFabAddPurchaseAutoClick}"
-                    android:src="@drawable/ic_camera_alt_black_24dp"
-                    app:fabSize="mini"
-                    />
-            </ch.berta.fabio.fabspeeddial.FabMenu>
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="bottom|end"
+                android:fabMenuItemClickListener="@{viewModel.fabMenuItemClickListener}"
+                app:fabMenu_menu="@menu/menu_fab_home"
+                />
 
         </android.support.design.widget.CoordinatorLayout>
 

@@ -8,8 +8,9 @@ import android.databinding.Bindable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.view.View;
+import android.view.MenuItem;
 
+import ch.berta.fabio.fabspeeddial.FabMenu;
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
@@ -66,13 +67,21 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
     }
 
     @Override
-    public void onFabAddPurchaseManualClick(View view) {
-        mView.startPurchaseAddActivity(false);
-    }
-
-    @Override
-    public void onFabAddPurchaseAutoClick(View view) {
-        mView.startPurchaseAddActivity(true);
+    public FabMenu.FabMenuItemClickListener getFabMenuItemClickListener() {
+        return new FabMenu.FabMenuItemClickListener() {
+            @Override
+            public void onFabMenuItemClicked(@NonNull MenuItem menuItem) {
+                final int id = menuItem.getItemId();
+                switch (id) {
+                    case R.id.action_fab_home_auto:
+                        mView.startPurchaseAddActivity(true);
+                        break;
+                    case R.id.action_fab_home_manual:
+                        mView.startPurchaseAddActivity(false);
+                        break;
+                }
+            }
+        };
     }
 
     @Override

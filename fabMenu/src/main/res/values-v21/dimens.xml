@@ -1,0 +1,21 @@
+<resources>
+
+    <dimen name="normal_space">16dp</dimen>
+    <dimen name="small_space">8dp</dimen>
+
+    <dimen name="menu_margin_start">16dp</dimen>
+    <dimen name="menu_margin_end">16dp</dimen>
+    <dimen name="menu_margin_top">16dp</dimen>
+    <dimen name="menu_margin_bottom">16dp</dimen>
+
+    <dimen name="child_view_anim_y_offset">64dp</dimen>
+
+    <dimen name="label_elevation">2dp</dimen>
+    <dimen name="label_round_corners">2dp</dimen>
+    <dimen name="label_padding">6dp</dimen>
+    <dimen name="label_margin_end">16dp</dimen>
+
+    <dimen name="fab_menu_content_size">24dp</dimen>
+    <dimen name="fab_menu_fab_size_normal">56dp</dimen>
+    <dimen name="fab_child_margin_top_bottom">8dp</dimen>
+</resources>
