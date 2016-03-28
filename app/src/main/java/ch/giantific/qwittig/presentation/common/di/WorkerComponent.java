@@ -9,9 +9,7 @@ import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerScreen;
 import ch.giantific.qwittig.presentation.finance.paid.CompsQueryMoreWorker;
 import ch.giantific.qwittig.presentation.finance.unpaid.CompRemindWorker;
-import ch.giantific.qwittig.presentation.finance.unpaid.CompSaveWorker;
 import ch.giantific.qwittig.presentation.home.JoinGroupWorker;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.AddPurchaseSaveWorker;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.OcrWorker;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.RatesWorker;
 import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesQueryMoreWorker;
@@ -31,19 +29,15 @@ import dagger.Component;
         modules = {RepositoriesModule.class})
 public interface WorkerComponent {
 
-    void inject(AddPurchaseSaveWorker addPurchaseSaveWorker);
-
-    void inject(CompSaveWorker compSaveWorker);
-
     void inject(RatesWorker ratesWorker);
 
     void inject(OcrWorker ocrWorker);
 
     void inject(AddUserWorker addUserWorker);
 
-    void inject(JoinGroupWorker joinGroupWorker);
-
     void inject(AddGroupWorker addGroupWorker);
+
+    void inject(JoinGroupWorker joinGroupWorker);
 
     void inject(TaskRemindWorker taskRemindWorker);
 

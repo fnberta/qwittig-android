@@ -5,9 +5,6 @@
 package ch.giantific.qwittig.domain.repositories;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
-import com.parse.ParseFile;
 
 import java.util.List;
 
@@ -41,7 +38,7 @@ public interface PurchaseRepository extends BaseRepository {
      * @param purchaseId the object id of the purchase to query
      * @return a {@link Single} emitting the result
      */
-    Single<Purchase> getPurchase(@NonNull String purchaseId, boolean isDraft);
+    Single<Purchase> getPurchase(@NonNull String purchaseId);
 
     /**
      * Fetches the data of a purchase from the local data store.
@@ -57,7 +54,7 @@ public interface PurchaseRepository extends BaseRepository {
      * @param purchase the purchase to remove
      * @return a {@link Single} emitting the result
      */
-    Single<Purchase> removeDraft(@NonNull Purchase purchase);
+    Single<Purchase> deleteDraft(@NonNull Purchase purchase);
 
     /**
      * Removes a purchase from the local data store.
@@ -66,7 +63,7 @@ public interface PurchaseRepository extends BaseRepository {
      * @param groupId    the object id of the group the purchase belongs to
      * @return whether the removal was successful or not
      */
-    boolean removePurchaseLocal(@NonNull String purchaseId, @NonNull String groupId);
+    boolean deletePurchaseLocal(@NonNull String purchaseId, @NonNull String groupId);
 
     /**
      * Queries purchases from the online data store and saves them in the local data store.
@@ -99,39 +96,18 @@ public interface PurchaseRepository extends BaseRepository {
     /**
      * Saves a {@link Purchase} object to the online and offline storage.
      *
-     * @param purchase     the purchase to save
-     * @param tag          the tag to save the purchase in the offline storage
-     * @param receiptImage the receipt image to attach to the purchase
-     * @param isDraft      whether to save the purchase as a draft
-     * @return a {@link Single} emitting the result
-     */
-    Single<Purchase> savePurchase(@NonNull Purchase purchase, @NonNull String tag,
-                                  @Nullable byte[] receiptImage, boolean isDraft);
-
-    /**
-     * Saves a {@link Purchase} object as a draft, meaning only to the local offline datastore.
-     *
      * @param purchase the purchase to save
-     * @param tag      the tag save the purchase in the offline storage
      * @return a {@link Single} emitting the result
      */
-    Single<Purchase> savePurchaseAsDraft(@NonNull Purchase purchase, @NonNull String tag);
+    Single<Purchase> savePurchase(@NonNull Purchase purchase);
 
-    /**
-     * Deletes the the specified {@link ParseFile}, probably a receipt image that is no longer
-     * needed.
-     *
-     * @param fileName the file name of the {@link ParseFile} to delete
-     * @return a {@link Single} emitting the result
-     */
-    Single<String> deleteReceipt(@NonNull String fileName);
+    Single<Purchase> savePurchaseEdit(@NonNull final Purchase purchase,
+                                      final boolean deleteOldReceipt);
 
-    /**
-     * Deletes the items with the specified object ids.
-     *
-     * @param itemIds the ids of the items to delete
-     */
-    void deleteItemsByIds(@NonNull List<String> itemIds);
+    boolean uploadPurchase(@NonNull String tempId);
+
+    boolean uploadPurchaseEdit(@NonNull String purchaseId,
+                               boolean wasDraft, boolean deleteOldReceipt);
 
     /**
      * Deletes the purchase.
@@ -143,15 +119,15 @@ public interface PurchaseRepository extends BaseRepository {
     /**
      * Returns whether drafts are available for the current identity of the user.
      *
+     * @param identity the identity for which to check for drafts
      * @return whether drafts are available
-     * @param identity
      */
     boolean isDraftsAvailable(@NonNull Identity identity);
 
     /**
      * Toggle the save setting whether drafts are available or not.
      *
-     * @param identity
+     * @param identity  the identity to toggle the drafts availability for
      * @param available whether drafts are available or not
      */
     void toggleDraftsAvailable(@NonNull Identity identity, boolean available);

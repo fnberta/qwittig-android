@@ -11,7 +11,6 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -36,18 +35,15 @@ import rx.SingleSubscriber;
 public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
 
     private static final String STATE_ITEMS_SET = "STATE_ITEMS_SET";
-    private static final String STATE_OLD_ITEM_IDS = "STATE_OLD_ITEM_IDS";
     private static final String STATE_OLD_STORE = "STATE_OLD_STORE";
     private static final String STATE_OLD_DATE = "STATE_OLD_DATE";
     private static final String STATE_OLD_CURRENCY = "STATE_OLD_CURRENCY";
     private static final String STATE_OLD_EXCHANGE_RATE = "STATE_OLD_EXCHANGE_RATE";
     private static final String STATE_OLD_NOTE = "STATE_OLD_NOTE";
     final String mEditPurchaseId;
-    private final ArrayList<String> mOldItemIds;
     Purchase mEditPurchase;
     boolean mDeleteOldReceipt;
     private boolean mOldValuesSet;
-    private List<Item> mOldItems;
     private String mOldStore;
     private Date mOldDate;
     private String mOldCurrency;
@@ -64,8 +60,7 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
         mEditPurchaseId = editPurchaseId;
 
         if (savedState != null) {
-            mOldValuesSet = savedState.getBoolean(STATE_ITEMS_SET);
-            mOldItemIds = savedState.getStringArrayList(STATE_OLD_ITEM_IDS);
+            mOldValuesSet = savedState.getBoolean(STATE_ITEMS_SET, false);
             mOldStore = savedState.getString(STATE_OLD_STORE, "");
             mOldDate = new Date(savedState.getLong(STATE_OLD_DATE));
             mOldCurrency = savedState.getString(STATE_OLD_CURRENCY, "");
@@ -73,7 +68,6 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
             mOldNote = savedState.getString(STATE_OLD_NOTE, "");
         } else {
             mOldValuesSet = false;
-            mOldItemIds = new ArrayList<>();
         }
     }
 
@@ -82,7 +76,6 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
         super.saveState(outState);
 
         outState.putBoolean(STATE_ITEMS_SET, mOldValuesSet);
-        outState.putStringArrayList(STATE_OLD_ITEM_IDS, mOldItemIds);
         outState.putString(STATE_OLD_STORE, mOldStore);
         outState.putLong(STATE_OLD_DATE, mOldDate.getTime());
         outState.putString(STATE_OLD_CURRENCY, mOldCurrency);
@@ -123,17 +116,11 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
     }
 
     private void setOldPurchaseValues() {
-        // get old items and save in class wide list
-        mOldItems = mEditPurchase.getItems();
-        for (Item itemOld : mOldItems) {
-            mOldItemIds.add(itemOld.getObjectId());
-        }
-
         // check if there is a receipt image file and update action bar menu accordingly
         mView.toggleReceiptMenuOption(hasOldReceiptFile());
 
         // set note to value from original purchase
-        String oldNote = mEditPurchase.getNote();
+        final String oldNote = mEditPurchase.getNote();
         mOldNote = oldNote != null ? oldNote : "";
         mNote = mOldNote;
         // check if purchase has a note and update action bar menu accordingly
@@ -161,10 +148,12 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
     }
 
     private void setOldItemValues() {
-        for (Item item : mOldItems) {
+        final List<Item> oldItems = mEditPurchase.getItems();
+        for (Item item : oldItems) {
             final List<Identity> identities = item.getIdentities();
             final String price = mMoneyFormatter.format(item.getPriceForeign(mOldExchangeRate));
-            final AddEditPurchaseItem purchaseAddEditItem = new AddEditPurchaseItem(item.getName(), price, getItemUsers(identities));
+            final AddEditPurchaseItem purchaseAddEditItem =
+                    new AddEditPurchaseItem(item.getName(), price, getItemUsers(identities));
             mItems.add(getLastPosition() - 1, purchaseAddEditItem);
             mView.notifyItemInserted(mItems.indexOf(purchaseAddEditItem));
         }
@@ -197,7 +186,7 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
 
     @Override
     public void onShowReceiptImageMenuClick() {
-        mView.showReceiptImage(mEditPurchaseId, mReceiptImagePath, false);
+        mView.showReceiptImage(mEditPurchaseId, mReceiptImagePath);
     }
 
     @Override
@@ -208,24 +197,8 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
     }
 
     @Override
-    void loadSavePurchaseWorker(@NonNull Purchase purchase, @Nullable byte[] receiptImage) {
-        mView.loadSavePurchaseWorker(purchase, receiptImage, purchase.getReceipt(),
-                mDeleteOldReceipt, false);
-    }
-
-    @Override
-    void onPurchaseSaved() {
-        deleteOldItems();
-        super.onPurchaseSaved();
-    }
-
-    /**
-     * Deletes old items in the online database.
-     * <p/>
-     * Should be called only after the purchase with the new items were successfully saved.
-     */
-    private void deleteOldItems() {
-        mPurchaseRepo.deleteItemsByIds(mOldItemIds);
+    Single<Purchase> getSavePurchaseAction(@NonNull Purchase purchase) {
+        return mPurchaseRepo.savePurchaseEdit(purchase, mDeleteOldReceipt);
     }
 
     @Override
@@ -243,11 +216,7 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
             return true;
         }
 
-        // after recreation mOldItems is null, hence check for it and if true fetch it again
-        if (mOldItems == null) {
-            mOldItems = mEditPurchase.getItems();
-        }
-
+        final List<Item> oldItems = mEditPurchase.getItems();
         for (int i = 0, size = mItems.size(), skipCount = 0; i < size; i++) {
             final AddEditPurchaseBaseItem addEditItem = mItems.get(i);
             if (addEditItem.getType() != Type.ITEM) {
@@ -257,7 +226,7 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
 
             final Item itemOld;
             try {
-                itemOld = mOldItems.get(i - skipCount);
+                itemOld = oldItems.get(i - skipCount);
             } catch (IndexOutOfBoundsException e) {
                 return true;
             }

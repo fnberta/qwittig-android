@@ -47,14 +47,6 @@ public interface CompensationRepository extends BaseRepository {
     Observable<Compensation> getCompensationsPaid(@NonNull Identity currentIdentity);
 
     /**
-     * Saves a {@link Compensation} object to the online and offline storage
-     *
-     * @param compensation the compensation to save
-     * @return a {@link Single} emitting the result
-     */
-    Single<Compensation> saveCompensation(@NonNull Compensation compensation);
-
-    /**
      * Removes a compensation from the local data store.
      *
      * @param compensationId the object id of the compensation to remove

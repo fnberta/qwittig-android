@@ -5,13 +5,9 @@
 package ch.giantific.qwittig.presentation.home.purchases.addedit;
 
 import android.app.Activity;
-import android.databinding.Bindable;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.View;
-
-import com.parse.ParseFile;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -19,8 +15,6 @@ import java.text.NumberFormat;
 import java.util.Date;
 import java.util.List;
 
-import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
-import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.items.AddEditPurchaseBaseItem;
@@ -39,18 +33,7 @@ public interface AddEditPurchaseViewModel extends ListViewModel<AddEditPurchaseB
         AddEditPurchaseTotalRowViewModel, AddEditPurchaseItemUsersClickListener,
         NoteDialogFragment.DialogInteractionListener,
         DiscardChangesDialogFragment.DialogInteractionListener, OcrWorkerListener,
-        ExchangeRateDialogFragment.DialogInteractionListener, RatesWorkerListener,
-        AddPurchaseSaveWorkerListener {
-
-    @Bindable
-    boolean isSaving();
-
-    @Bindable
-    boolean isAnimStop();
-
-    void startSaving();
-
-    void stopSaving(boolean anim);
+        ExchangeRateDialogFragment.DialogInteractionListener, RatesWorkerListener {
 
     void onDateSet(@NonNull Date date);
 
@@ -96,8 +79,6 @@ public interface AddEditPurchaseViewModel extends ListViewModel<AddEditPurchaseB
      */
     void onFabSavePurchaseClick(View view);
 
-    ProgressFinalAnimationListener getProgressFinalAnimationListener();
-
     /**
      * Saves the purchase as a draft to the local data store.
      */
@@ -133,12 +114,6 @@ public interface AddEditPurchaseViewModel extends ListViewModel<AddEditPurchaseB
 
         void loadOcrWorker(@NonNull String receiptImagePath);
 
-        void loadSavePurchaseWorker(@NonNull Purchase purchase, @Nullable byte[] receiptImage);
-
-        void loadSavePurchaseWorker(@NonNull Purchase purchase, @Nullable byte[] receiptImage,
-                                    @Nullable ParseFile receiptParseFileOld,
-                                    boolean deleteOldReceipt, boolean draft);
-
         void showDatePickerDialog();
 
         void showManualExchangeRateSelectorDialog(@NonNull String exchangeRate);
@@ -153,8 +128,7 @@ public interface AddEditPurchaseViewModel extends ListViewModel<AddEditPurchaseB
 
         void showReceiptImage(@NonNull String receiptImagePath);
 
-        void showReceiptImage(@NonNull String objectId, @NonNull String receiptImagePath,
-                              boolean isDraft);
+        void showReceiptImage(@NonNull String objectId, @NonNull String receiptImagePath);
 
         void showNote(@NonNull String note);
 

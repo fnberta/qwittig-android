@@ -221,7 +221,7 @@ public class CompsUnpaidViewModelImpl
         }
     }
 
-    private void confirmCompensation(Compensation compensation, final int position,
+    private void confirmCompensation(@NonNull Compensation compensation, final int position,
                                      final boolean amountChanged) {
         mCompsRepo.saveCompensationPaid(compensation)
                 .subscribe(new SingleSubscriber<Compensation>() {

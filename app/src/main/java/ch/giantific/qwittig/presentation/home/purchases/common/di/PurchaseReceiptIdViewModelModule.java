@@ -25,22 +25,20 @@ import dagger.Provides;
 public class PurchaseReceiptIdViewModelModule extends BaseViewModelModule<PurchaseReceiptViewModel.ViewListener> {
 
     private final String mPurchaseId;
-    private final boolean mDraft;
 
     public PurchaseReceiptIdViewModelModule(@Nullable Bundle savedState,
                                             @NonNull PurchaseReceiptViewModel.ViewListener view,
-                                            @NonNull String purchaseId, boolean draft) {
+                                            @NonNull String purchaseId) {
         super(savedState, view);
 
         mPurchaseId = purchaseId;
-        mDraft = draft;
     }
 
     @PerScreen
     @Provides
     PurchaseReceiptViewModel providesPurchaseReceiptIdViewModel(@NonNull UserRepository userRepository,
                                                                 @NonNull PurchaseRepository purchaseRepository) {
-        return new PurchaseReceiptViewModelImpl(mSavedState, mView, userRepository,
-                purchaseRepository, mPurchaseId, mDraft);
+        return PurchaseReceiptViewModelImpl.createPurchaseIdInstance(mSavedState, mView, userRepository,
+                purchaseRepository, mPurchaseId);
     }
 }

@@ -251,7 +251,6 @@
     <string name="toast_error_unlink_failed">Verbindung aufheben fehlgeschlagen</string>
     <string name="toast_unlink_password_required">Setze ein Passwort um die Verbindung aufzuheben</string>
     <string name="toast_saving_profile">Speichere Profil…</string>
-    <string name="toast_saving_purchase">Speichere Einkauf…</string>
     <string name="toast_invalid_session">Deine Sitzung ist nicht mehr gültig</string>
     <string name="toast_login_failed_google">Login mit Google ist fehlgeschlagen</string>
     <string name="toast_error_tasks_load">Laden der Aufgaben fehlgeschlagen</string>

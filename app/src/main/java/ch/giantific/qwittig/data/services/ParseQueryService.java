@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.data.bus.LocalBroadcast;
-import ch.giantific.qwittig.data.services.di.DaggerQueryServiceComponent;
+import ch.giantific.qwittig.data.services.di.DaggerServiceComponent;
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
@@ -292,7 +292,7 @@ public class ParseQueryService extends IntentService {
     }
 
     private void injectDependencies() {
-        DaggerQueryServiceComponent.builder()
+        DaggerServiceComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .build()
                 .inject(this);
@@ -302,7 +302,7 @@ public class ParseQueryService extends IntentService {
                              @NonNull String groupId) {
         switch (className) {
             case Purchase.CLASS: {
-                final boolean successful = mPurchaseRepo.removePurchaseLocal(objectId, groupId);
+                final boolean successful = mPurchaseRepo.deletePurchaseLocal(objectId, groupId);
                 mLocalBroadcast.sendPurchasesUpdated(successful);
                 break;
             }

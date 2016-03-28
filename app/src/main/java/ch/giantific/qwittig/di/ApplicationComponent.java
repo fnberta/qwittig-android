@@ -8,6 +8,8 @@ import android.app.Application;
 import android.content.SharedPreferences;
 import android.support.v4.content.LocalBroadcastManager;
 
+import com.google.android.gms.gcm.GcmNetworkManager;
+
 import javax.inject.Singleton;
 
 import ch.giantific.qwittig.Qwittig;
@@ -33,4 +35,6 @@ public interface ApplicationComponent {
     ReceiptOcr getReceiptOcr();
 
     ExchangeRates getExchangeRates();
+
+    GcmNetworkManager getGcmNetworkManager();
 }

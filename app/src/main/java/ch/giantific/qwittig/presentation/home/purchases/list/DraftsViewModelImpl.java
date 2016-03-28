@@ -106,7 +106,7 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, DraftsV
             int firstPos = 0;
             for (int i = 0, size = mItems.size(); i < size; i++) {
                 final Purchase draft = mItems.get(i);
-                if (firstSelected.equals(draft.getDraftId())) {
+                if (firstSelected.equals(draft.getTempId())) {
                     firstPos = i;
                     break;
                 }
@@ -154,7 +154,7 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, DraftsV
     @Override
     public void toggleSelection(int position) {
         final Purchase draft = mItems.get(position);
-        final String draftId = draft.getDraftId();
+        final String draftId = draft.getTempId();
         if (mDraftsSelected.contains(draftId)) {
             mDraftsSelected.remove(draftId);
         } else {
@@ -169,7 +169,7 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, DraftsV
         for (int i = mItems.size() - 1; i >= 0; i--) {
             final Purchase draft = mItems.get(i);
             if (isSelected(draft)) {
-                mDraftsSelected.remove(draft.getDraftId());
+                mDraftsSelected.remove(draft.getTempId());
 
                 if (mDeleteSelectedItems) {
                     deleteDraft(draft, i);
@@ -181,7 +181,7 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, DraftsV
     }
 
     private void deleteDraft(@NonNull Purchase draft, final int pos) {
-        getSubscriptions().add(mPurchaseRepo.removeDraft(draft)
+        getSubscriptions().add(mPurchaseRepo.deleteDraft(draft)
                 .subscribe(new SingleSubscriber<Purchase>() {
                     @Override
                     public void onSuccess(Purchase value) {
@@ -200,6 +200,6 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, DraftsV
 
     @Override
     public boolean isSelected(@NonNull Purchase draft) {
-        return mDraftsSelected.contains(draft.getDraftId());
+        return mDraftsSelected.contains(draft.getTempId());
     }
 }

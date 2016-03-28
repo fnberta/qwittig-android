@@ -6,9 +6,10 @@ package ch.giantific.qwittig.data.repositories;
 
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.webkit.MimeTypeMap;
 
+import com.google.android.gms.gcm.GcmNetworkManager;
+import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -22,12 +23,14 @@ import java.util.Map;
 
 import ch.giantific.qwittig.data.rest.CurrencyRates;
 import ch.giantific.qwittig.data.rest.ExchangeRates;
+import ch.giantific.qwittig.data.services.SavePurchaseTaskService;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Item;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.utils.MoneyUtils;
+import ch.giantific.qwittig.utils.parse.ParseUtils;
 import rx.Observable;
 import rx.Single;
 import rx.android.schedulers.AndroidSchedulers;
@@ -49,13 +52,16 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     private static final long EXCHANGE_RATE_REFRESH_INTERVAL = 24 * 60 * 60 * 1000;
     private final SharedPreferences mSharedPrefs;
     private final ExchangeRates mExchangeRates;
+    private final GcmNetworkManager mGcmNetworkManager;
 
     public ParsePurchaseRepository(@NonNull SharedPreferences sharedPreferences,
-                                   @NonNull ExchangeRates exchangeRates) {
+                                   @NonNull ExchangeRates exchangeRates,
+                                   @NonNull GcmNetworkManager gcmNetworkManager) {
         super();
 
         mSharedPrefs = sharedPreferences;
         mExchangeRates = exchangeRates;
+        mGcmNetworkManager = gcmNetworkManager;
     }
 
     @Override
@@ -64,8 +70,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public Observable<Purchase> getPurchases(@NonNull Identity identity,
-                                             boolean getDrafts) {
+    public Observable<Purchase> getPurchases(@NonNull Identity identity, boolean getDrafts) {
         final ParseQuery<Purchase> buyerQuery = ParseQuery.getQuery(Purchase.CLASS);
         buyerQuery.whereEqualTo(Purchase.BUYER, identity);
         final ParseQuery<Purchase> involvedQuery = ParseQuery.getQuery(Purchase.CLASS);
@@ -76,18 +81,18 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
         queries.add(involvedQuery);
 
         final ParseQuery<Purchase> query = ParseQuery.or(queries);
-        query.whereEqualTo(Purchase.GROUP, identity.getGroup());
         query.fromLocalDatastore();
         query.ignoreACLs();
+        query.whereEqualTo(Purchase.GROUP, identity.getGroup());
         query.include(Purchase.ITEMS);
         query.include(Purchase.BUYER);
         query.include(Purchase.IDENTITIES);
         query.orderByDescending(Purchase.DATE);
         if (getDrafts) {
-            query.whereExists(Purchase.DRAFT_ID);
+            query.whereEqualTo(Purchase.DRAFT, true);
             query.whereEqualTo(Purchase.BUYER, identity);
         } else {
-            query.whereDoesNotExist(Purchase.DRAFT_ID);
+            query.whereDoesNotExist(Purchase.DRAFT);
         }
 
         return find(query)
@@ -100,16 +105,15 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public Single<Purchase> getPurchase(@NonNull String purchaseId, boolean isDraft) {
+    public Single<Purchase> getPurchase(@NonNull String purchaseId) {
         final ParseQuery<Purchase> query = ParseQuery.getQuery(Purchase.CLASS);
         query.fromLocalDatastore();
         query.ignoreACLs();
         query.include(Purchase.ITEMS);
         query.include(Purchase.BUYER);
         query.include(Purchase.IDENTITIES);
-        query.orderByDescending(Purchase.DATE);
-        if (isDraft) {
-            query.whereEqualTo(Purchase.DRAFT_ID, purchaseId);
+        if (!ParseUtils.isObjectId(purchaseId)) {
+            query.whereEqualTo(Purchase.TEMP_ID, purchaseId);
             return first(query);
         }
 
@@ -123,32 +127,36 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public Single<Purchase> removeDraft(@NonNull final Purchase purchase) {
-        return unpin(purchase, Purchase.PIN_LABEL_DRAFT)
-                .flatMap(new Func1<Purchase, Single<Integer>>() {
+    public Single<Purchase> deleteDraft(@NonNull Purchase purchase) {
+        return unpin(purchase, Purchase.PIN_LABEL_DRAFTS)
+                .flatMap(new Func1<Purchase, Single<? extends Purchase>>() {
                     @Override
-                    public Single<Integer> call(Purchase purchase) {
-                        return countDrafts(purchase.getGroup());
-                    }
-                })
-                .map(new Func1<Integer, Purchase>() {
-                    @Override
-                    public Purchase call(Integer count) {
-                        toggleDraftsAvailable(purchase.getBuyer(), count > 0);
-                        return purchase;
+                    public Single<? extends Purchase> call(final Purchase purchase) {
+                        final Identity buyer = purchase.getBuyer();
+                        return countDrafts(buyer)
+                                .map(new Func1<Integer, Purchase>() {
+                                    @Override
+                                    public Purchase call(Integer count) {
+                                        toggleDraftsAvailable(buyer, count > 0);
+                                        return purchase;
+                                    }
+                                });
                     }
                 });
     }
 
-    private Single<Integer> countDrafts(@NonNull Group currentGroup) {
+    private Single<Integer> countDrafts(@NonNull Identity identity) {
         final ParseQuery<Purchase> query = ParseQuery.getQuery(Purchase.CLASS);
-        query.fromPin(Purchase.PIN_LABEL_DRAFT);
-        query.whereEqualTo(Purchase.GROUP, currentGroup);
+        query.fromLocalDatastore();
+        query.ignoreACLs();
+        query.whereEqualTo(Purchase.DRAFT, true);
+        query.whereEqualTo(Purchase.GROUP, identity.getGroup());
+        query.whereEqualTo(Purchase.BUYER, identity);
         return count(query);
     }
 
     @Override
-    public boolean removePurchaseLocal(@NonNull String purchaseId, @NonNull String groupId) {
+    public boolean deletePurchaseLocal(@NonNull String purchaseId, @NonNull String groupId) {
         final ParseObject purchase = ParseObject.createWithoutData(Purchase.CLASS, purchaseId);
         try {
             purchase.unpin(Purchase.PIN_LABEL + groupId);
@@ -186,7 +194,6 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     private ParseQuery<Purchase> getPurchasesOnlineQuery(@NonNull Identity identity) {
         final ParseQuery<Purchase> buyerQuery = ParseQuery.getQuery(Purchase.CLASS);
         buyerQuery.whereEqualTo(Purchase.BUYER, identity);
-
         final ParseQuery<Purchase> involvedQuery = ParseQuery.getQuery(Purchase.CLASS);
         involvedQuery.whereEqualTo(Purchase.IDENTITIES, identity);
 
@@ -225,8 +232,13 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
 
     @Override
     public boolean updatePurchase(@NonNull String purchaseId, boolean isNew) {
+        final ParseQuery<ParseObject> query = ParseQuery.getQuery(Purchase.CLASS);
+        query.include(Purchase.ITEMS);
+        query.include(Purchase.IDENTITIES);
+        query.include(Purchase.BUYER);
+
         try {
-            final Purchase purchase = getPurchaseOnline(purchaseId);
+            final Purchase purchase = (Purchase) query.get(purchaseId);
             final String groupId = purchase.getGroup().getObjectId();
             final String pinLabel = Purchase.PIN_LABEL + groupId;
 
@@ -245,53 +257,34 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
         return true;
     }
 
-    private Purchase getPurchaseOnline(@NonNull String objectId) throws ParseException {
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery(Purchase.CLASS);
-        query.include(Purchase.ITEMS);
-        query.include(Purchase.IDENTITIES);
-        query.include(Purchase.BUYER);
-        return (Purchase) query.get(objectId);
-    }
-
     @Override
-    public Single<Purchase> savePurchase(@NonNull final Purchase purchase,
-                                         @NonNull final String tag,
-                                         @Nullable byte[] receiptImage,
-                                         final boolean isDraft) {
-        if (receiptImage == null) {
-            return saveAndPinPurchase(purchase, tag, isDraft);
+    public Single<Purchase> savePurchase(@NonNull final Purchase purchase) {
+        purchase.setRandomTempId();
+        convertPrices(purchase, true);
+        if (purchase.isDraft()) {
+            return pin(purchase, Purchase.PIN_LABEL_DRAFTS)
+                    .doOnSuccess(new Action1<Purchase>() {
+                        @Override
+                        public void call(Purchase purchase) {
+                            toggleDraftsAvailable(purchase.getBuyer(), true);
+                        }
+                    })
+                    .doOnError(new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            convertPrices(purchase, false);
+                        }
+                    });
         }
 
-        final String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("jpg");
-        final ParseFile receipt = new ParseFile(PurchaseRepository.FILE_NAME, receiptImage, mimeType);
-        return saveFile(receipt)
-                .flatMap(new Func1<ParseFile, Single<? extends Purchase>>() {
+        final String groupId = purchase.getGroup().getObjectId();
+        final String pinLabel = Purchase.PIN_LABEL + groupId;
+        return pin(purchase, pinLabel)
+                .doOnSuccess(new Action1<Purchase>() {
                     @Override
-                    public Single<? extends Purchase> call(ParseFile parseFile) {
-                        purchase.setReceipt(parseFile);
-                        return saveAndPinPurchase(purchase, tag, isDraft);
-                    }
-                });
-    }
-
-    private Single<Purchase> saveAndPinPurchase(@NonNull final Purchase purchase,
-                                                @NonNull final String tag, final boolean isDraft) {
-        convertPrices(purchase, true);
-        return save(purchase)
-                .flatMap(new Func1<Purchase, Single<? extends Purchase>>() {
-                    @Override
-                    public Single<? extends Purchase> call(Purchase purchase) {
-                        if (isDraft) {
-                            return unpin(purchase, Purchase.PIN_LABEL_DRAFT)
-                                    .flatMap(new Func1<Purchase, Single<? extends Purchase>>() {
-                                        @Override
-                                        public Single<? extends Purchase> call(Purchase purchase) {
-                                            return pin(purchase, tag);
-                                        }
-                                    });
-                        } else {
-                            return pin(purchase, tag);
-                        }
+                    public void call(Purchase purchase) {
+                        SavePurchaseTaskService.scheduleSaveNew(mGcmNetworkManager,
+                                purchase.getTempId());
                     }
                 })
                 .doOnError(new Action1<Throwable>() {
@@ -308,7 +301,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
             return;
         }
 
-        List<Item> items = purchase.getItems();
+        final List<Item> items = purchase.getItems();
         for (Item item : items) {
             item.convertPrice(exchangeRate, toGroupCurrency);
         }
@@ -317,31 +310,144 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public Single<Purchase> savePurchaseAsDraft(@NonNull Purchase purchase,
-                                                @NonNull String tag) {
-        return pin(purchase, tag)
+    public Single<Purchase> savePurchaseEdit(@NonNull final Purchase purchase,
+                                             final boolean deleteOldReceipt) {
+        final boolean wasDraft = purchase.isDraft();
+        if (wasDraft) {
+            purchase.removeDraft();
+        }
+
+        convertPrices(purchase, true);
+        // we need to unpin and re-pin also for a non draft because the items have changed
+        final String groupId = purchase.getGroup().getObjectId();
+        final String pinLabel = Purchase.PIN_LABEL + groupId;
+        return unpin(purchase, wasDraft ? Purchase.PIN_LABEL_DRAFTS : pinLabel)
+                .flatMap(new Func1<Purchase, Single<? extends Purchase>>() {
+                    @Override
+                    public Single<? extends Purchase> call(final Purchase purchase) {
+                        return pin(purchase, pinLabel);
+                    }
+                })
+                .flatMap(new Func1<Purchase, Single<? extends Purchase>>() {
+                    @Override
+                    public Single<? extends Purchase> call(final Purchase purchase) {
+                        if (wasDraft) {
+                            final Identity identity = purchase.getBuyer();
+                            return countDrafts(identity)
+                                    .map(new Func1<Integer, Purchase>() {
+                                        @Override
+                                        public Purchase call(Integer count) {
+                                            toggleDraftsAvailable(identity, count > 0);
+                                            return purchase;
+                                        }
+                                    });
+                        }
+
+                        return Single.just(purchase);
+                    }
+                })
                 .doOnSuccess(new Action1<Purchase>() {
                     @Override
                     public void call(Purchase purchase) {
-                        toggleDraftsAvailable(purchase.getBuyer(), true);
+                        final String id = wasDraft
+                                ? purchase.getTempId()
+                                : purchase.getObjectId();
+                        SavePurchaseTaskService.scheduleSaveEdit(mGcmNetworkManager, id, wasDraft,
+                                deleteOldReceipt);
+                    }
+                })
+                .doOnError(new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        convertPrices(purchase, false);
+                        if (wasDraft) {
+                            purchase.setDraft(true);
+                        }
                     }
                 });
     }
 
     @Override
-    public Single<String> deleteReceipt(@NonNull String fileName) {
-        Map<String, Object> params = new HashMap<>();
-        params.put(PARAM_FILE_NAME, fileName);
+    public boolean uploadPurchase(@NonNull String tempId) {
+        final Purchase purchase;
+        try {
+            purchase = getPurchaseForUpload(tempId);
+            final byte[] receiptData = purchase.getReceiptData();
+            if (receiptData != null) {
+                saveReceiptFile(purchase, receiptData);
+            }
+        } catch (ParseException e) {
+            return false;
+        }
 
-        return callFunctionInBackground(DELETE_PARSE_FILE, params);
+        try {
+            purchase.removeTempId();
+            purchase.save();
+        } catch (ParseException e) {
+            purchase.setTempId(tempId);
+            return false;
+        }
+
+        return true;
+    }
+
+    private Purchase getPurchaseForUpload(@NonNull String purchaseId) throws ParseException {
+        final ParseQuery<Purchase> query = ParseQuery.getQuery(Purchase.CLASS);
+        query.fromLocalDatastore();
+        query.ignoreACLs();
+        if (!ParseUtils.isObjectId(purchaseId)) {
+            query.whereEqualTo(Purchase.TEMP_ID, purchaseId);
+            return query.getFirst();
+        }
+
+        return query.get(purchaseId);
+    }
+
+    private void saveReceiptFile(@NonNull Purchase purchase, byte[] receiptData) throws ParseException {
+        final String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("jpg");
+        final ParseFile receipt = new ParseFile(PurchaseRepository.FILE_NAME, receiptData, mimeType);
+        receipt.save();
+        purchase.removeReceiptData();
+        purchase.setReceipt(receipt);
     }
 
     @Override
-    public void deleteItemsByIds(@NonNull List<String> itemIds) {
-        for (String itemId : itemIds) {
-            final Item item = (Item) Item.createWithoutData(Item.CLASS, itemId);
-            item.deleteEventually();
+    public boolean uploadPurchaseEdit(@NonNull String purchaseId, boolean wasDraft,
+                                      boolean deleteOldReceipt) {
+        final Purchase purchase;
+        try {
+            purchase = getPurchaseForUpload(purchaseId);
+            if (deleteOldReceipt) {
+                deleteOldReceipt(purchase.getReceipt().getName());
+            }
+
+            final byte[] receiptData = purchase.getReceiptData();
+            if (receiptData != null) {
+                saveReceiptFile(purchase, receiptData);
+            }
+        } catch (ParseException e) {
+            return false;
         }
+
+        try {
+            purchase.removeTempId();
+            purchase.save();
+        } catch (ParseException e) {
+            if (wasDraft) {
+                purchase.setTempId(purchaseId);
+                purchase.setDraft(true);
+                toggleDraftsAvailable(purchase.getBuyer(), true);
+            }
+            return false;
+        }
+
+        return true;
+    }
+
+    private void deleteOldReceipt(@NonNull String receiptName) throws ParseException {
+        final Map<String, Object> params = new HashMap<>();
+        params.put(PARAM_FILE_NAME, receiptName);
+        ParseCloud.callFunction(DELETE_PARSE_FILE, params);
     }
 
     @Override

@@ -10,6 +10,8 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 
+import com.google.android.gms.gcm.GcmNetworkManager;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -43,5 +45,11 @@ public class ApplicationModule {
     @Singleton
     LocalBroadcastManager providesLocalBroadcastManager(Application application) {
         return LocalBroadcastManager.getInstance(application);
+    }
+
+    @Provides
+    @Singleton
+    GcmNetworkManager providesGcmNetworkManager(Application application) {
+        return GcmNetworkManager.getInstance(application);
     }
 }

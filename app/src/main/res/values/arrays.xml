@@ -4,11 +4,6 @@
   -->
 
 <resources>
-    <string-array name="fab_labels">
-        <item>@string/fab_label_manual</item>
-        <item>@string/fab_label_auto</item>
-    </string-array>
-
     <integer-array name="stats_colors">
         <item>@color/red_500</item>
         <item>@color/indigo_500</item>

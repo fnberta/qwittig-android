@@ -38,7 +38,7 @@ public class PurchaseReceiptPathViewModelModule extends BaseViewModelModule<Purc
     @Provides
     PurchaseReceiptViewModel providesPurchaseReceiptViewModel(@NonNull UserRepository userRepository,
                                                               @NonNull PurchaseRepository purchaseRepository) {
-        return new PurchaseReceiptViewModelImpl(mSavedState, mView, userRepository,
+        return PurchaseReceiptViewModelImpl.createImagePathInstance(mSavedState, mView, userRepository,
                 purchaseRepository, mReceiptImagePath);
     }
 }

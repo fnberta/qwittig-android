@@ -38,7 +38,6 @@ import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesQueryMoreW
 import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesViewModel;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
-import ch.giantific.qwittig.utils.ViewUtils;
 import rx.Observable;
 import rx.Single;
 

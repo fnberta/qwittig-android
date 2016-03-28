@@ -7,6 +7,7 @@ package ch.giantific.qwittig.di;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
+import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.gson.Gson;
 
 import ch.giantific.qwittig.data.repositories.ParseCompensationRepository;
@@ -46,8 +47,9 @@ public class RepositoriesModule {
 
     @Provides
     PurchaseRepository providesPurchaseRepository(@NonNull SharedPreferences sharedPreferences,
-                                                  @NonNull ExchangeRates exchangeRates) {
-        return new ParsePurchaseRepository(sharedPreferences, exchangeRates);
+                                                  @NonNull ExchangeRates exchangeRates,
+                                                  @NonNull GcmNetworkManager networkManager) {
+        return new ParsePurchaseRepository(sharedPreferences, exchangeRates, networkManager);
     }
 
     @Provides

@@ -16,6 +16,7 @@ import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
+import ch.giantific.qwittig.utils.parse.ParseUtils;
 import rx.SingleSubscriber;
 
 /**
@@ -26,20 +27,21 @@ public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseRece
 
     private static final String STATE_LOADING = "STATE_LOADING";
     private final PurchaseRepository mPurchaseRepo;
+    private final String mPurchaseId;
     private boolean mLoading;
     private String mReceiptImagePath;
-    private String mPurchaseId;
-    private boolean mDraft;
 
-    public PurchaseReceiptViewModelImpl(@Nullable Bundle savedState,
-                                        @NonNull PurchaseReceiptViewModel.ViewListener view,
-                                        @NonNull UserRepository userRepository,
-                                        @NonNull PurchaseRepository purchaseRepo,
-                                        @NonNull String receiptImagePath) {
+    private PurchaseReceiptViewModelImpl(@Nullable Bundle savedState,
+                                         @NonNull PurchaseReceiptViewModel.ViewListener view,
+                                         @NonNull UserRepository userRepository,
+                                         @NonNull PurchaseRepository purchaseRepo,
+                                         @Nullable String purchaseId,
+                                         @Nullable String imagePath) {
         super(savedState, view, userRepository);
 
         mPurchaseRepo = purchaseRepo;
-        mReceiptImagePath = receiptImagePath;
+        mPurchaseId = purchaseId;
+        mReceiptImagePath = imagePath;
 
         if (savedState != null) {
             mLoading = savedState.getBoolean(STATE_LOADING, false);
@@ -48,16 +50,20 @@ public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseRece
         }
     }
 
-    public PurchaseReceiptViewModelImpl(@Nullable Bundle savedState,
-                                        @NonNull PurchaseReceiptViewModel.ViewListener view,
-                                        @NonNull UserRepository userRepository,
-                                        @NonNull PurchaseRepository purchaseRepo,
-                                        @NonNull String purchaseId, boolean draft) {
-        super(savedState, view, userRepository);
+    public static PurchaseReceiptViewModelImpl createImagePathInstance(@Nullable Bundle savedState,
+                                                                       @NonNull PurchaseReceiptViewModel.ViewListener view,
+                                                                       @NonNull UserRepository userRepository,
+                                                                       @NonNull PurchaseRepository purchaseRepo,
+                                                                       @NonNull String imagePath) {
+        return new PurchaseReceiptViewModelImpl(savedState, view, userRepository, purchaseRepo, null, imagePath);
+    }
 
-        mPurchaseRepo = purchaseRepo;
-        mPurchaseId = purchaseId;
-        mDraft = draft;
+    public static PurchaseReceiptViewModelImpl createPurchaseIdInstance(@Nullable Bundle savedState,
+                                                                        @NonNull PurchaseReceiptViewModel.ViewListener view,
+                                                                        @NonNull UserRepository userRepository,
+                                                                        @NonNull PurchaseRepository purchaseRepo,
+                                                                        @NonNull String purchaseId) {
+        return new PurchaseReceiptViewModelImpl(savedState, view, userRepository, purchaseRepo, purchaseId, null);
     }
 
     @Override
@@ -90,21 +96,7 @@ public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseRece
         if (!TextUtils.isEmpty(mReceiptImagePath)) {
             mView.setReceiptImage(mReceiptImagePath);
             setLoading(false);
-        } else if (mDraft) {
-            getSubscriptions().add(mPurchaseRepo.getPurchase(mPurchaseId, true)
-                    .subscribe(new SingleSubscriber<Purchase>() {
-                        @Override
-                        public void onSuccess(Purchase purchase) {
-                            setLoading(false);
-                            mView.setReceiptImage(purchase.getReceiptData());
-                        }
-
-                        @Override
-                        public void onError(Throwable error) {
-                            onReceiptLoadFailed();
-                        }
-                    }));
-        } else {
+        } else if (ParseUtils.isObjectId(mPurchaseId)) {
             getSubscriptions().add(mPurchaseRepo.fetchPurchaseData(mPurchaseId)
                     .subscribe(new SingleSubscriber<Purchase>() {
                         @Override
@@ -119,6 +111,20 @@ public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseRece
                         }
                     })
             );
+        } else {
+            getSubscriptions().add(mPurchaseRepo.getPurchase(mPurchaseId)
+                    .subscribe(new SingleSubscriber<Purchase>() {
+                        @Override
+                        public void onSuccess(Purchase purchase) {
+                            setLoading(false);
+                            mView.setReceiptImage(purchase.getReceiptData());
+                        }
+
+                        @Override
+                        public void onError(Throwable error) {
+                            onReceiptLoadFailed();
+                        }
+                    }));
         }
     }
 

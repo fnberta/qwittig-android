@@ -124,7 +124,7 @@ public class DraftsFragment extends BaseRecyclerViewFragment<DraftsViewModel, Dr
     public void startPurchaseEditActivity(@NonNull Purchase draft) {
         final Activity activity = getActivity();
         final Intent intent = new Intent(activity, EditPurchaseActivity.class);
-        intent.putExtra(PurchasesFragment.INTENT_PURCHASE_ID, draft.getDraftId());
+        intent.putExtra(PurchasesFragment.INTENT_PURCHASE_ID, draft.getTempId());
         intent.putExtra(INTENT_PURCHASE_EDIT_DRAFT, true);
         final ActivityOptionsCompat activityOptionsCompat =
                 ActivityOptionsCompat.makeSceneTransitionAnimation(activity);

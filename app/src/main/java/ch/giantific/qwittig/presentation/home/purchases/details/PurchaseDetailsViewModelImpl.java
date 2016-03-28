@@ -9,6 +9,7 @@ import android.databinding.Bindable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -83,7 +84,7 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<Purchase
 
     @Override
     public void loadData() {
-        getSubscriptions().add(mPurchaseRepo.getPurchase(mPurchaseId, false)
+        getSubscriptions().add(mPurchaseRepo.getPurchase(mPurchaseId)
                 .subscribe(new SingleSubscriber<Purchase>() {
                     @Override
                     public void onSuccess(Purchase purchase) {
@@ -145,22 +146,21 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<Purchase
      */
     private void updateActionBarMenu() {
         final List<Identity> identities = mPurchase.getIdentities();
-        boolean allUsersAreValid = true;
-
+        boolean valid = !TextUtils.isEmpty(mPurchase.getObjectId());
         for (Identity identity : identities) {
             if (!identity.isActive()) {
-                allUsersAreValid = false;
+                valid = false;
                 break;
             }
         }
 
         boolean showEdit = false;
-        if (allUsersAreValid) {
+        if (valid) {
             final String buyerId = mPurchase.getBuyer().getObjectId();
             showEdit = buyerId.equals(mCurrentIdentity.getObjectId());
         }
         final boolean foreignCurrency = !mCurrentIdentity.getGroup().getCurrency().equals(mPurchase.getCurrency());
-        final boolean receiptImage = mPurchase.getReceipt() != null;
+        final boolean receiptImage = mPurchase.getReceipt() != null || mPurchase.getReceiptData() != null;
         mView.toggleMenuOptions(showEdit, receiptImage, foreignCurrency);
     }
 

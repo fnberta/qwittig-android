@@ -36,7 +36,6 @@ public class AddEditPurchaseReceiptFragment extends PurchaseReceiptBaseFragment<
 
     private static final String KEY_RECEIPT_IMAGE_PATH = "RECEIPT_IMAGE_PATH";
     private static final String KEY_PURCHASE_ID = "PURCHASE_ID";
-    private static final String KEY_DRAFT = "DRAFT";
     private static final int INTENT_REQUEST_IMAGE_CAPTURE = 1;
     private String mReceiptImagePath;
 
@@ -63,16 +62,13 @@ public class AddEditPurchaseReceiptFragment extends PurchaseReceiptBaseFragment<
      * Returns a new instance of {@link AddEditPurchaseReceiptFragment}.
      *
      * @param purchaseId the object id of the purchase of which the receipt image should be shown
-     * @param isDraft    whether the purchase is a draft or not
      * @return a new instance of {@link AddEditPurchaseReceiptFragment}
      */
     @NonNull
-    public static AddEditPurchaseReceiptFragment newEditInstance(@NonNull String purchaseId,
-                                                                 boolean isDraft) {
+    public static AddEditPurchaseReceiptFragment newEditInstance(@NonNull String purchaseId) {
         final AddEditPurchaseReceiptFragment fragment = new AddEditPurchaseReceiptFragment();
         final Bundle args = new Bundle();
         args.putString(KEY_PURCHASE_ID, purchaseId);
-        args.putBoolean(KEY_DRAFT, isDraft);
         fragment.setArguments(args);
         return fragment;
     }
@@ -86,7 +82,6 @@ public class AddEditPurchaseReceiptFragment extends PurchaseReceiptBaseFragment<
         final Bundle args = getArguments();
         final String receiptImagePath = args.getString(KEY_RECEIPT_IMAGE_PATH, "");
         final String purchaseId = args.getString(KEY_PURCHASE_ID, "");
-        final boolean draft = args.getBoolean(KEY_DRAFT, false);
 
         if (!TextUtils.isEmpty(receiptImagePath)) {
             DaggerPurchaseReceiptPathComponent.builder()
@@ -97,7 +92,7 @@ public class AddEditPurchaseReceiptFragment extends PurchaseReceiptBaseFragment<
         } else {
             DaggerPurchaseReceiptIdComponent.builder()
                     .applicationComponent(Qwittig.getAppComponent(getActivity()))
-                    .purchaseReceiptIdViewModelModule(new PurchaseReceiptIdViewModelModule(savedInstanceState, this, purchaseId, draft))
+                    .purchaseReceiptIdViewModelModule(new PurchaseReceiptIdViewModelModule(savedInstanceState, this, purchaseId))
                     .build()
                     .inject(this);
         }

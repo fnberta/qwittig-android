@@ -257,7 +257,6 @@
     <string name="toast_error_unlink_failed">Unlink failed</string>
     <string name="toast_unlink_password_required">Set a password to unlink your account</string>
     <string name="toast_saving_profile">Saving profile…</string>
-    <string name="toast_saving_purchase">Still saving Purchase…</string>
     <string name="toast_invalid_session">Your session is no longer valid</string>
     <string name="toast_login_failed_google">Login with Google failed</string>
     <string name="toast_error_tasks_load">Failed to load tasks</string>

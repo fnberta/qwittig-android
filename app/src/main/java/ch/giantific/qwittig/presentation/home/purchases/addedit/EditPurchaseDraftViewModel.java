@@ -9,5 +9,5 @@ package ch.giantific.qwittig.presentation.home.purchases.addedit;
  */
 public interface EditPurchaseDraftViewModel extends AddEditPurchaseViewModel {
 
-    void onDeleteDraftClick();
+    void onDeleteDraftMenuClick();
 }

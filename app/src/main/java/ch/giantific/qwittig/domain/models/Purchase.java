@@ -45,9 +45,10 @@ public class Purchase extends ParseObject {
     public static final String RECEIPT = "receipt";
     public static final String RECEIPT_BYTE = "receiptByte";
     public static final String NOTE = "note";
-    public static final String DRAFT_ID = "draftId";
+    public static final String TEMP_ID = "tempId";
+    public static final String DRAFT = "draft";
     public static final String PIN_LABEL = "purchasesPinLabel";
-    public static final String PIN_LABEL_DRAFT = "purchaseDraftsPinLabel";
+    public static final String PIN_LABEL_DRAFTS = "purchaseDraftsPinLabel";
 
     public Purchase() {
         // A default constructor is required.
@@ -176,12 +177,24 @@ public class Purchase extends ParseObject {
         put(NOTE, note);
     }
 
-    public String getDraftId() {
-        return getString(DRAFT_ID);
+    public String getTempId() {
+        return getString(TEMP_ID);
     }
 
-    public void setDraftId(@NonNull String draftId) {
-        put(DRAFT_ID, draftId);
+    public void setTempId(@NonNull String tempId) {
+        put(TEMP_ID, tempId);
+    }
+
+    public boolean isDraft() {
+        return getBoolean(DRAFT);
+    }
+
+    public void setDraft(boolean draft) {
+        put(DRAFT, draft);
+    }
+
+    public void removeDraft() {
+        remove(DRAFT);
     }
 
     @NonNull
@@ -194,11 +207,12 @@ public class Purchase extends ParseObject {
         return readBy;
     }
 
-    public void setReadBy(List<Identity> identities) {
+    public void setReadBy(@NonNull List<Identity> identities) {
         put(READ_BY, identities);
     }
 
-    public void replaceItems(List<Item> items) {
+    public void replaceItems(@NonNull List<Item> items) {
+        // TODO: delete old items
         put(ITEMS, items);
     }
 
@@ -233,18 +247,8 @@ public class Purchase extends ParseObject {
         put(READ_BY, readBy);
     }
 
-    public void removeReceiptParseFile() {
+    public void removeReceipt() {
         remove(RECEIPT);
-    }
-
-    /**
-     * Removes the receipt parse file and instead sets the provided byte array.
-     *
-     * @param bytes the byte array representation of the receipt
-     */
-    public void swapReceiptParseFileToData(@NonNull byte[] bytes) {
-        put(RECEIPT_BYTE, bytes);
-        removeReceiptParseFile();
     }
 
     public void removeReceiptData() {
@@ -256,7 +260,8 @@ public class Purchase extends ParseObject {
     }
 
     /**
-     * Returns and sets a random id for purchase, identifying it as draft.
+     * Returns and sets a random id for purchase, identifying it as draft or a not yet online
+     * saved purchase.
      * <p/>
      * This is needed because {@link ParseObject} and its subclasses only receive an object id when
      * they are saved online in the database. Because we need to be able to reference drafts, which
@@ -264,19 +269,19 @@ public class Purchase extends ParseObject {
      *
      * @return a random id
      */
-    public String setRandomDraftId() {
-        String draftId = getDraftId();
+    public String setRandomTempId() {
+        String tempId = getTempId();
 
-        if (TextUtils.isEmpty(draftId)) {
-            draftId = UUID.randomUUID().toString();
-            put(DRAFT_ID, draftId);
+        if (TextUtils.isEmpty(tempId)) {
+            tempId = UUID.randomUUID().toString();
+            put(TEMP_ID, tempId);
         }
 
-        return draftId;
+        return tempId;
     }
 
-    public void removeDraftId() {
-        remove(DRAFT_ID);
+    public void removeTempId() {
+        remove(TEMP_ID);
     }
 
     /**

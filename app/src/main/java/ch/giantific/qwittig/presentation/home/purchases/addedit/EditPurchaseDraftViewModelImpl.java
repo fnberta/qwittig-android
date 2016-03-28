@@ -8,11 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import java.util.List;
-
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.models.Item;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
@@ -24,7 +20,8 @@ import rx.SingleSubscriber;
  * <p/>
  * Subclass of {@link EditPurchaseViewModelImpl}.
  */
-public class EditPurchaseDraftViewModelImpl extends EditPurchaseViewModelImpl implements EditPurchaseDraftViewModel {
+public class EditPurchaseDraftViewModelImpl extends EditPurchaseViewModelImpl
+        implements EditPurchaseDraftViewModel {
 
     public EditPurchaseDraftViewModelImpl(@Nullable Bundle savedState,
                                           @NonNull AddEditPurchaseViewModel.ViewListener view,
@@ -36,33 +33,12 @@ public class EditPurchaseDraftViewModelImpl extends EditPurchaseViewModelImpl im
 
     @Override
     Single<Purchase> fetchEditPurchase() {
-        return mPurchaseRepo.getPurchase(mEditPurchaseId, true);
+        return mPurchaseRepo.getPurchase(mEditPurchaseId);
     }
 
     @Override
     boolean hasOldReceiptFile() {
         return mEditPurchase.getReceiptData() != null;
-    }
-
-    @NonNull
-    @Override
-    Purchase createPurchase(@NonNull List<Identity> purchaseIdentities,
-                            @NonNull List<Item> purchaseItems, int fractionDigits) {
-        final Purchase purchase = super.createPurchase(purchaseIdentities, purchaseItems, fractionDigits);
-        purchase.removeDraftId();
-        return purchase;
-    }
-
-    @Override
-    void loadSavePurchaseWorker(@NonNull Purchase purchase, @Nullable byte[] receiptImage) {
-        mView.loadSavePurchaseWorker(purchase, receiptImage, purchase.getReceipt(),
-                mDeleteOldReceipt, true);
-    }
-
-    @Override
-    void onPurchaseSaveError() {
-        mEditPurchase.setDraftId(mEditPurchaseId);
-        super.onPurchaseSaveError();
     }
 
     @Override
@@ -71,8 +47,8 @@ public class EditPurchaseDraftViewModelImpl extends EditPurchaseViewModelImpl im
     }
 
     @Override
-    public void onDeleteDraftClick() {
-        getSubscriptions().add(mPurchaseRepo.removeDraft(mEditPurchase)
+    public void onDeleteDraftMenuClick() {
+        getSubscriptions().add(mPurchaseRepo.deleteDraft(mEditPurchase)
                 .subscribe(new SingleSubscriber<Purchase>() {
                     @Override
                     public void onSuccess(Purchase value) {

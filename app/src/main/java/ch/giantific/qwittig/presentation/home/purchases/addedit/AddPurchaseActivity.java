@@ -23,7 +23,6 @@ import java.util.Date;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.rest.OcrPurchase;
 import ch.giantific.qwittig.databinding.ActivityPurchaseAddEditBinding;
-import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.TransitionListenerAdapter;
 import ch.giantific.qwittig.utils.DateUtils;
@@ -39,7 +38,7 @@ public class AddPurchaseActivity extends BaseActivity<AddEditPurchaseViewModel> 
         AddEditPurchaseBaseFragment.ActivityListener,
         AddEditPurchaseNoteFragment.ActivityListener,
         AddEditPurchaseReceiptFragment.ActivityListener,
-        AddPurchaseSaveWorkerListener, RatesWorkerListener, DatePickerDialog.OnDateSetListener,
+        RatesWorkerListener, DatePickerDialog.OnDateSetListener,
         NoteDialogFragment.DialogInteractionListener,
         ExchangeRateDialogFragment.DialogInteractionListener,
         DiscardPurchaseDialogFragment.DialogInteractionListener,
@@ -238,11 +237,6 @@ public class AddPurchaseActivity extends BaseActivity<AddEditPurchaseViewModel> 
     @Override
     public void setOcrStream(@NonNull Single<OcrPurchase> single, @NonNull String workerTag) {
         mViewModel.setOcrStream(single, workerTag);
-    }
-
-    @Override
-    public void setPurchaseSaveStream(@NonNull Single<Purchase> single, @NonNull String workerTag) {
-        mViewModel.setPurchaseSaveStream(single, workerTag);
     }
 
     @Override

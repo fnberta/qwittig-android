@@ -68,7 +68,7 @@ public class EditPurchaseDraftFragment extends AddEditPurchaseBaseFragment<EditP
                 mViewModel.onSaveAsDraftMenuClick();
                 return true;
             case R.id.action_purchase_edit_draft_delete:
-                mViewModel.onDeleteDraftClick();
+                mViewModel.onDeleteDraftMenuClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

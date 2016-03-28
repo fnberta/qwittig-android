@@ -103,17 +103,6 @@ public class ParseCompensationRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public Single<Compensation> saveCompensation(@NonNull final Compensation compensation) {
-        return save(compensation)
-                .doOnError(new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        compensation.setPaid(false);
-                    }
-                });
-    }
-
-    @Override
     public boolean removeCompensationLocal(@NonNull String compensationId) {
         final Compensation compensation = (Compensation)
                 ParseObject.createWithoutData(Compensation.CLASS, compensationId);
@@ -258,7 +247,9 @@ public class ParseCompensationRepository extends ParseBaseRepository implements
                 .flatMap(new Func1<Compensation, Single<Compensation>>() {
                     @Override
                     public Single<Compensation> call(Compensation compensation) {
-                        return pin(compensation, Compensation.PIN_LABEL_PAID + compensation.getGroup().getObjectId());
+                        final String groupId = compensation.getGroup().getObjectId();
+                        final String pinLabel = Compensation.PIN_LABEL_PAID + groupId;
+                        return pin(compensation, pinLabel);
                     }
                 })
                 .doOnSuccess(new Action1<Compensation>() {

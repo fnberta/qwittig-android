@@ -39,4 +39,14 @@ public class ParseUtils {
     private static String getGroupRoleName(@NonNull Group group) {
         return Group.ROLE_PREFIX + group.getObjectId();
     }
+
+    /**
+     * Returns whether the id as a valid Parse Object Id.
+     *
+     * @param id the id to check
+     * @return whether the id as a valid Parse Object Id
+     */
+    public static boolean isObjectId(@NonNull String id) {
+        return id.length() == 10;
+    }
 }

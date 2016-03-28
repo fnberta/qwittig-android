@@ -6,7 +6,6 @@ package ch.giantific.qwittig.presentation.home.purchases.addedit;
 
 import android.databinding.Bindable;
 import android.os.Bundle;
-import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -25,7 +24,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.R;
@@ -63,7 +61,6 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
     // add permission to manifest when enabling!
     static final boolean USE_CUSTOM_CAMERA = false;
     private static final String STATE_ROW_ITEMS = "STATE_ROW_ITEMS";
-    private static final String STATE_SAVING = "STATE_SAVING";
     private static final String STATE_DATE = "STATE_DATE";
     private static final String STATE_STORE = "STATE_STORE";
     private static final String STATE_CURRENCY = "STATE_CURRENCY";
@@ -85,8 +82,6 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
     double mTotalPrice = 0;
     double mExchangeRate;
     NumberFormat mMoneyFormatter;
-    private boolean mSaving;
-    private boolean mAnimStop;
     private List<Identity> mIdentities = new ArrayList<>();
     private double mMyShare = 0;
     private boolean mFetchingExchangeRates;
@@ -103,7 +98,6 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
 
         if (savedState != null) {
             mItems = savedState.getParcelableArrayList(STATE_ROW_ITEMS);
-            mSaving = savedState.getBoolean(STATE_SAVING);
             mDate = new Date(savedState.getLong(STATE_DATE));
             mStore = savedState.getString(STATE_STORE);
             setCurrency(savedState.getString(STATE_CURRENCY, mCurrentGroup.getCurrency()));
@@ -144,7 +138,6 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
         super.saveState(outState);
 
         outState.putParcelableArrayList(STATE_ROW_ITEMS, mItems);
-        outState.putBoolean(STATE_SAVING, mSaving);
         outState.putLong(STATE_DATE, mDate.getTime());
         outState.putString(STATE_STORE, mStore);
         outState.putString(STATE_CURRENCY, mCurrency);
@@ -155,31 +148,6 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
             outState.putStringArrayList(STATE_RECEIPT_IMAGE_PATHS, mReceiptImagePaths);
         }
         outState.putBoolean(STATE_FETCHING_RATES, mFetchingExchangeRates);
-    }
-
-    @Override
-    @Bindable
-    public boolean isSaving() {
-        return mSaving;
-    }
-
-    @Override
-    @Bindable
-    public boolean isAnimStop() {
-        return mAnimStop;
-    }
-
-    @Override
-    public void startSaving() {
-        mSaving = true;
-        notifyPropertyChanged(BR.saving);
-    }
-
-    @Override
-    public void stopSaving(boolean anim) {
-        mSaving = false;
-        mAnimStop = anim;
-        notifyPropertyChanged(BR.saving);
     }
 
     @Override
@@ -630,15 +598,6 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
 
     @Override
     public void onFabSavePurchaseClick(View view) {
-        if (mSaving) {
-            return;
-        }
-
-        if (!mView.isNetworkAvailable()) {
-            mView.showMessage(R.string.toast_no_connection);
-            return;
-        }
-
         if (mFetchingExchangeRates) {
             mView.showMessage(R.string.toast_exchange_rate_fetching);
             return;
@@ -664,106 +623,63 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
             return;
         }
 
-        startSaving();
-        final Purchase purchase = getPurchase();
-        if (!TextUtils.isEmpty(mReceiptImagePath)) {
-            getSubscriptions().add(mView.encodeReceiptImage(mReceiptImagePath)
-                    .subscribe(new SingleSubscriber<byte[]>() {
-                        @Override
-                        public void onSuccess(byte[] receiptImage) {
-                            loadSavePurchaseWorker(purchase, receiptImage);
-                        }
-
-                        @Override
-                        public void onError(Throwable error) {
-                            stopSaving(false);
-                            onPurchaseSaveError();
-                        }
-                    })
-            );
-        } else {
-            loadSavePurchaseWorker(purchase, null);
-        }
+        savePurchase(false);
     }
 
-    /**
-     * Loads the save purchase worker. EditImpl will send additional parameters.
-     *
-     * @param purchase     the purchase to save
-     * @param receiptImage the receipt image
-     */
-    void loadSavePurchaseWorker(@NonNull Purchase purchase, @Nullable byte[] receiptImage) {
-        mView.loadSavePurchaseWorker(purchase, receiptImage);
-    }
-
-    @Override
-    public ProgressFinalAnimationListener getProgressFinalAnimationListener() {
-        return new ProgressFinalAnimationListener() {
+    private void savePurchase(final boolean asDraft) {
+        final SingleSubscriber<Purchase> subscriber = new SingleSubscriber<Purchase>() {
             @Override
-            public void onProgressFinalAnimationComplete() {
-                mView.finishScreen(PurchaseResult.PURCHASE_SAVED);
+            public void onSuccess(Purchase purchase) {
+                deleteTakenImages();
+                mView.finishScreen(asDraft ? getDraftFinishedResult() : PurchaseResult.PURCHASE_SAVED);
+            }
+
+            @Override
+            public void onError(Throwable error) {
+                mView.showMessage(asDraft
+                        ? R.string.toast_error_purchase_save_draft
+                        : R.string.toast_error_purchase_save);
             }
         };
-    }
-
-    @Override
-    public void onSaveAsDraftMenuClick() {
-        if (mSaving) {
-            return;
-        }
-
-        if (mFetchingExchangeRates) {
-            mView.showMessage(R.string.toast_exchange_rate_fetching);
-            return;
-        }
 
         final Purchase purchase = getPurchase();
-        purchase.setRandomDraftId();
+        if (asDraft) {
+            purchase.setDraft(true);
+        }
         if (!TextUtils.isEmpty(mReceiptImagePath)) {
             getSubscriptions().add(mView.encodeReceiptImage(mReceiptImagePath)
                     .flatMap(new Func1<byte[], Single<Purchase>>() {
                         @Override
                         public Single<Purchase> call(byte[] bytes) {
                             purchase.setReceiptData(bytes);
-                            return mPurchaseRepo.savePurchaseAsDraft(purchase, Purchase.PIN_LABEL_DRAFT);
+                            return getSavePurchaseAction(purchase);
                         }
                     })
-                    .subscribe(new SingleSubscriber<Purchase>() {
-                        @Override
-                        public void onSuccess(Purchase value) {
-                            onDraftSaved();
-                        }
-
-                        @Override
-                        public void onError(Throwable error) {
-                            mView.showMessage(R.string.toast_error_purchase_save_draft);
-                        }
-                    })
+                    .subscribe(subscriber)
             );
         } else {
-            getSubscriptions().add(mPurchaseRepo.savePurchaseAsDraft(purchase, Purchase.PIN_LABEL_DRAFT)
-                    .subscribe(new SingleSubscriber<Purchase>() {
-                        @Override
-                        public void onSuccess(Purchase value) {
-                            onDraftSaved();
-                        }
-
-                        @Override
-                        public void onError(Throwable error) {
-                            mView.showMessage(R.string.toast_error_purchase_save_draft);
-                        }
-                    })
+            getSubscriptions().add(getSavePurchaseAction(purchase)
+                    .subscribe(subscriber)
             );
         }
     }
 
-    private void onDraftSaved() {
-        deleteTakenImages();
-        mView.finishScreen(getDraftFinishedResult());
+    Single<Purchase> getSavePurchaseAction(@NonNull Purchase purchase) {
+        return mPurchaseRepo.savePurchase(purchase);
     }
 
     int getDraftFinishedResult() {
         return PurchaseResult.PURCHASE_DRAFT;
+    }
+
+    @Override
+    public void onSaveAsDraftMenuClick() {
+        if (mFetchingExchangeRates) {
+            mView.showMessage(R.string.toast_exchange_rate_fetching);
+            return;
+        }
+
+        savePurchase(true);
     }
 
     private boolean validateItems() {
@@ -856,49 +772,6 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
         return identities;
     }
 
-    @Override
-    public void setPurchaseSaveStream(@NonNull Single<Purchase> single,
-                                      @NonNull final String workerTag) {
-        getSubscriptions().add(single.subscribe(new SingleSubscriber<Purchase>() {
-            @Override
-            public void onSuccess(Purchase value) {
-                mView.removeWorker(workerTag);
-                onPurchaseSaved();
-            }
-
-            @Override
-            public void onError(Throwable error) {
-                mView.removeWorker(workerTag);
-                onPurchaseSaveError();
-                // TODO: maybe give user action to save as draft
-//                    ParseFile receipt = mPurchase.getReceipt();
-//                    if (receipt != null) {
-//                        receipt.getDataInBackground(new GetDataCallback() {
-//                            @Override
-//                            public void done(@NonNull byte[] data, ParseException e) {
-//                                mPurchase.swapReceiptParseFileToData(data);
-//                                pinPurchaseAsDraft();
-//                            }
-//                        });
-//                    } else {
-//                        pinPurchaseAsDraft();
-//                    }
-            }
-        }));
-    }
-
-    @CallSuper
-    void onPurchaseSaved() {
-        deleteTakenImages();
-        stopSaving(true);
-    }
-
-    @CallSuper
-    void onPurchaseSaveError() {
-        stopSaving(false);
-        mView.showMessage(R.string.toast_error_purchase_save);
-    }
-
     private void deleteTakenImages() {
         if (USE_CUSTOM_CAMERA) {
             if (!mReceiptImagePaths.isEmpty()) {
@@ -943,11 +816,7 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
 
     @Override
     public void onExitClick() {
-        if (mSaving) {
-            mView.showMessage(R.string.toast_saving_purchase);
-        } else {
-            askToDiscard();
-        }
+        askToDiscard();
     }
 
     /**
