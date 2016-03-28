@@ -69,6 +69,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     private PurchasesFragment mPurchasesFragment;
     private DraftsFragment mDraftsFragment;
     private ProgressDialog mProgressDialog;
+    private HomeTabsAdapter mTabsAdapter;
 
     @Override
     protected void handleLocalBroadcast(Intent intent, int dataType) {
@@ -107,8 +108,8 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
                 if (mViewModel.isDraftsAvailable()) {
                     mDraftsFragment = (DraftsFragment)
                             fragmentManager.getFragment(savedInstanceState, STATE_DRAFTS_FRAGMENT);
-                    setupTabs();
                 }
+                setupTabs();
             }
         }
     }
@@ -125,23 +126,19 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     private void addFragments() {
         mPurchasesFragment = new PurchasesFragment();
         if (mViewModel.isDraftsAvailable()) {
-            showViewPager();
-        } else {
-            showPurchasesFragment();
+            mDraftsFragment = new DraftsFragment();
         }
-    }
-
-    private void showViewPager() {
-        mDraftsFragment = new DraftsFragment();
         setupTabs();
-        toggleToolbarScrollFlags(true);
     }
 
     private void setupTabs() {
-        final TabsAdapter tabsAdapter = new TabsAdapter(getSupportFragmentManager());
-        tabsAdapter.addFragment(mPurchasesFragment, getString(R.string.tab_purchases));
-        tabsAdapter.addFragment(mDraftsFragment, getString(R.string.title_activity_purchase_drafts));
-        mBinding.viewpager.setAdapter(tabsAdapter);
+        mTabsAdapter = new HomeTabsAdapter(getSupportFragmentManager());
+        mTabsAdapter.addInitialFragment(mPurchasesFragment, getString(R.string.tab_purchases));
+        if (mViewModel.isDraftsAvailable()) {
+            toggleToolbarScrollFlags(true);
+            mTabsAdapter.addInitialFragment(mDraftsFragment, getString(R.string.title_activity_purchase_drafts));
+        }
+        mBinding.viewpager.setAdapter(mTabsAdapter);
         mBinding.tabs.setupWithViewPager(mBinding.viewpager);
     }
 
@@ -153,12 +150,6 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
                 AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS |
                 AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP
                 : 0);
-    }
-
-    private void showPurchasesFragment() {
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.container, mPurchasesFragment)
-                .commit();
     }
 
     private void checkForInvitations() {
@@ -190,28 +181,18 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     public void checkDrafts() {
         final boolean draftsAvailable = mViewModel.isDraftsAvailable();
         if (draftsAvailable != mViewModel.updateDraftsAvailable()) {
-            switchFragments();
+            toggleDraftTab();
         }
     }
 
-    private void switchFragments() {
-        final FragmentManager fragmentManager = getSupportFragmentManager();
+    private void toggleDraftTab() {
         if (mViewModel.isDraftsAvailable()) {
-            fragmentManager
-                    .beginTransaction()
-                    .remove(mPurchasesFragment)
-                    .commit();
-            fragmentManager.executePendingTransactions();
-            showViewPager();
+            toggleToolbarScrollFlags(true);
+            mDraftsFragment = new DraftsFragment();
+            mTabsAdapter.addFragment(mDraftsFragment, getString(R.string.title_activity_purchase_drafts));
         } else {
-            fragmentManager
-                    .beginTransaction()
-                    .remove(mPurchasesFragment)
-                    .remove(mDraftsFragment)
-                    .commit();
-            fragmentManager.executePendingTransactions();
-            showPurchasesFragment();
             toggleToolbarScrollFlags(false);
+            mTabsAdapter.removeFragment(mDraftsFragment);
         }
     }
 

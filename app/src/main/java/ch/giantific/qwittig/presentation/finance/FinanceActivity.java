@@ -117,8 +117,8 @@ public class FinanceActivity extends BaseNavDrawerActivity<BalanceHeaderViewMode
                 PushBroadcastReceiver.INTENT_EXTRA_FINANCE_FRAGMENT, FragmentTabs.NONE);
 
         final TabsAdapter tabsAdapter = new TabsAdapter(getSupportFragmentManager());
-        tabsAdapter.addFragment(new CompsUnpaidFragment(), getString(R.string.tab_compensations_new));
-        tabsAdapter.addFragment(new CompsPaidFragment(), getString(R.string.tab_compensations_archive));
+        tabsAdapter.addInitialFragment(new CompsUnpaidFragment(), getString(R.string.tab_compensations_new));
+        tabsAdapter.addInitialFragment(new CompsPaidFragment(), getString(R.string.tab_compensations_archive));
         mBinding.viewpager.setAdapter(tabsAdapter);
         if (tabToSelect != FragmentTabs.NONE) {
             mBinding.viewpager.setCurrentItem(tabToSelect);

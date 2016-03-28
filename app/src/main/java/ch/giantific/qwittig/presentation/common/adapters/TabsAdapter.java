@@ -20,8 +20,8 @@ import java.util.List;
  */
 public class TabsAdapter extends FragmentPagerAdapter {
 
-    private final List<Fragment> mFragments = new ArrayList<>();
-    private final List<String> mFragmentTitles = new ArrayList<>();
+    protected final List<Fragment> mFragments = new ArrayList<>();
+    protected final List<String> mFragmentTitles = new ArrayList<>();
 
     /**
      * Constructs a new {@link TabsAdapter}.
@@ -33,12 +33,12 @@ public class TabsAdapter extends FragmentPagerAdapter {
     }
 
     /**
-     * Adds a fragment to the adapter.
+     * Adds an initial fragment to the adapter.
      *
      * @param fragment the fragment to add
      * @param title    the title of the fragment to be displayed in the tab
      */
-    public void addFragment(@NonNull Fragment fragment, @NonNull String title) {
+    public void addInitialFragment(@NonNull Fragment fragment, @NonNull String title) {
         mFragments.add(fragment);
         mFragmentTitles.add(title);
     }
