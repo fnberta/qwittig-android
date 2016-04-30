@@ -48,7 +48,7 @@ public class Purchase extends ParseObject {
     public static final String TEMP_ID = "tempId";
     public static final String DRAFT = "draft";
     public static final String PIN_LABEL = "purchasesPinLabel";
-    public static final String PIN_LABEL_DRAFTS = "purchaseDraftsPinLabel";
+    public static final String PIN_LABEL_TEMP = "purchasesTempPinLabel";
 
     public Purchase() {
         // A default constructor is required.

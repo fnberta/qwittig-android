@@ -128,7 +128,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
 
     @Override
     public Single<Purchase> deleteDraft(@NonNull Purchase purchase) {
-        return unpin(purchase, Purchase.PIN_LABEL_DRAFTS)
+        return unpin(purchase, Purchase.PIN_LABEL_TEMP)
                 .flatMap(new Func1<Purchase, Single<? extends Purchase>>() {
                     @Override
                     public Single<? extends Purchase> call(final Purchase purchase) {
@@ -261,30 +261,17 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     public Single<Purchase> savePurchase(@NonNull final Purchase purchase) {
         purchase.setRandomTempId();
         convertPrices(purchase, true);
-        if (purchase.isDraft()) {
-            return pin(purchase, Purchase.PIN_LABEL_DRAFTS)
-                    .doOnSuccess(new Action1<Purchase>() {
-                        @Override
-                        public void call(Purchase purchase) {
-                            toggleDraftsAvailable(purchase.getBuyer(), true);
-                        }
-                    })
-                    .doOnError(new Action1<Throwable>() {
-                        @Override
-                        public void call(Throwable throwable) {
-                            convertPrices(purchase, false);
-                        }
-                    });
-        }
 
-        final String groupId = purchase.getGroup().getObjectId();
-        final String pinLabel = Purchase.PIN_LABEL + groupId;
-        return pin(purchase, pinLabel)
+        return pin(purchase, Purchase.PIN_LABEL_TEMP)
                 .doOnSuccess(new Action1<Purchase>() {
                     @Override
                     public void call(Purchase purchase) {
-                        SavePurchaseTaskService.scheduleSaveNew(mGcmNetworkManager,
-                                purchase.getTempId());
+                        if (purchase.isDraft()) {
+                            toggleDraftsAvailable(purchase.getBuyer(), true);
+                        } else {
+                            SavePurchaseTaskService.scheduleSaveNew(mGcmNetworkManager,
+                                    purchase.getTempId());
+                        }
                     }
                 })
                 .doOnError(new Action1<Throwable>() {
@@ -321,11 +308,11 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
         // we need to unpin and re-pin also for a non draft because the items have changed
         final String groupId = purchase.getGroup().getObjectId();
         final String pinLabel = Purchase.PIN_LABEL + groupId;
-        return unpin(purchase, wasDraft ? Purchase.PIN_LABEL_DRAFTS : pinLabel)
+        return unpin(purchase, wasDraft ? Purchase.PIN_LABEL_TEMP : pinLabel)
                 .flatMap(new Func1<Purchase, Single<? extends Purchase>>() {
                     @Override
                     public Single<? extends Purchase> call(final Purchase purchase) {
-                        return pin(purchase, pinLabel);
+                        return pin(purchase, Purchase.PIN_LABEL_TEMP);
                     }
                 })
                 .flatMap(new Func1<Purchase, Single<? extends Purchase>>() {
@@ -388,6 +375,15 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
             return false;
         }
 
+        try {
+            purchase.unpin(Purchase.PIN_LABEL_TEMP);
+            final String groupId = purchase.getGroup().getObjectId();
+            final String pinLabel = Purchase.PIN_LABEL + groupId;
+            purchase.pin(pinLabel);
+        } catch (ParseException e) {
+            return false;
+        }
+
         return true;
     }
 
@@ -438,6 +434,15 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
                 purchase.setDraft(true);
                 toggleDraftsAvailable(purchase.getBuyer(), true);
             }
+            return false;
+        }
+
+        try {
+            purchase.unpin(Purchase.PIN_LABEL_TEMP);
+            final String groupId = purchase.getGroup().getObjectId();
+            final String pinLabel = Purchase.PIN_LABEL + groupId;
+            purchase.pin(pinLabel);
+        } catch (ParseException e) {
             return false;
         }
 
