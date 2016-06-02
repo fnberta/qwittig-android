@@ -88,6 +88,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     private static final String TYPE_PURCHASE_NEW = "purchaseNew";
     private static final String TYPE_PURCHASE_EDIT = "purchaseEdit";
     private static final String TYPE_PURCHASE_DELETE = "purchaseDelete";
+    private static final String TYPE_PURCHASE_READY_BY_CHANGED = "purchaseReadByChanged";
     private static final String TYPE_COMPENSATION_EXISTING_PAID = "compensationExistingPaid";
     private static final String TYPE_COMPENSATION_REMIND_USER = "compensationRemindUser";
     private static final String TYPE_COMPENSATION_REMIND_USER_HAS_PAID = "compensationRemindUserHasPaid";
@@ -443,7 +444,8 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
 
     private boolean isSilentNotification(@NonNull String type) {
         return type.equals(TYPE_PURCHASE_EDIT) || type.equals(TYPE_PURCHASE_DELETE) ||
-                type.equals(TYPE_GROUP_NAME_CHANGED) || type.equals(TYPE_TASK_EDIT);
+                type.equals(TYPE_GROUP_NAME_CHANGED) || type.equals(TYPE_TASK_EDIT) ||
+                type.equals(TYPE_PURCHASE_READY_BY_CHANGED);
     }
 
     @Override

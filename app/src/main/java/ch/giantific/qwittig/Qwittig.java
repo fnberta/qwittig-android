@@ -27,6 +27,7 @@ import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.domain.models.TaskHistoryEvent;
 import ch.giantific.qwittig.domain.models.User;
+import io.branch.referral.Branch;
 import timber.log.Timber;
 
 /**
@@ -66,6 +67,7 @@ public class Qwittig extends Application {
 
         buildAppComponent();
         initialiseParse();
+        Branch.getAutoInstance(this);
     }
 
     private void buildAppComponent() {
@@ -89,7 +91,7 @@ public class Qwittig extends Application {
         // initialise Parse
         Parse.initialize(new Parse.Configuration.Builder(this)
                 .applicationId("yLuL6xJB2dUD2hjfh4W2EcZizcPsJZKDgDzbrPji")
-                .server("http://10.0.2.2:3000/api/data/")
+                .server("https://qwittig.com/api/data/")
                 .clientKey(null)
                 .enableLocalDataStore()
                 .build()

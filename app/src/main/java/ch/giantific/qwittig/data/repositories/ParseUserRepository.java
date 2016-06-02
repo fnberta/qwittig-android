@@ -53,6 +53,10 @@ import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.utils.googleapi.GoogleApiClientSignOut;
 import ch.giantific.qwittig.utils.googleapi.GoogleApiClientUnlink;
 import ch.giantific.qwittig.utils.parse.ParseInstallationUtils;
+import io.branch.indexing.BranchUniversalObject;
+import io.branch.referral.Branch;
+import io.branch.referral.BranchError;
+import io.branch.referral.util.LinkProperties;
 import rx.Observable;
 import rx.Single;
 import rx.SingleSubscriber;
@@ -66,7 +70,7 @@ import rx.functions.Func1;
 public class ParseUserRepository extends ParseBaseRepository implements UserRepository {
 
     private static final String VERIFY_GOOGLE_LOGIN = "loginWithGoogle";
-    private static final String HANDLE_INVITATION = "checkIdentity";
+    private static final String ADD_IDENTITY_TO_USER = "addIdentityToUser";
     private static final String PARAM_ID_TOKEN = "idToken";
     private static final String PARAM_IDENTITY_ID = "identityId";
     private static final String CALCULATE_BALANCES = "calculateBalances";
@@ -118,8 +122,25 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
     }
 
     @Override
-    public Single<User> loginEmail(@NonNull final String username, @NonNull final String password) {
+    public Single<User> loginEmail(@NonNull final String username, @NonNull final String password,
+                                   @NonNull final String identityId) {
         return login(username, password)
+                .flatMap(new Func1<User, Single<? extends User>>() {
+                    @Override
+                    public Single<? extends User> call(final User user) {
+                        if (TextUtils.isEmpty(identityId)) {
+                            return Single.just(user);
+                        }
+
+                        return addIdentityToUser(identityId)
+                                .flatMap(new Func1<String, Single<User>>() {
+                                    @Override
+                                    public Single<User> call(String s) {
+                                        return updateUser(user);
+                                    }
+                                });
+                    }
+                })
                 .flatMap(new Func1<User, Single<User>>() {
                     @Override
                     public Single<User> call(final User user) {
@@ -160,7 +181,8 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
     }
 
     @Override
-    public Single<User> signUpEmail(@NonNull final String username, @NonNull final String password) {
+    public Single<User> signUpEmail(@NonNull final String username,
+                                    @NonNull final String password, @NonNull final String identityId) {
         return Single
                 .create(new Single.OnSubscribe<User>() {
                     @Override
@@ -184,14 +206,8 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                 })
                 .flatMap(new Func1<User, Single<? extends User>>() {
                     @Override
-                    public Single<? extends User> call(User user) {
-                        return login(username, password);
-                    }
-                })
-                .flatMap(new Func1<User, Single<? extends User>>() {
-                    @Override
                     public Single<? extends User> call(final User user) {
-                        return addFirstGroup(user)
+                        return addFirstGroup(user, identityId)
                                 .flatMap(new Func1<Identity, Single<User>>() {
                                     @Override
                                     public Single<User> call(Identity identity) {
@@ -202,8 +218,9 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                 });
     }
 
-    private Single<Identity> addFirstGroup(@NonNull final User user) {
-        return addGroup(FIRST_GROUP_NAME, FIRST_GROUP_CURRENCY)
+    private Single<Identity> addFirstGroup(@NonNull final User user, @NonNull String identityId) {
+        final Single<String> addGroup = TextUtils.isEmpty(identityId) ? addGroup(FIRST_GROUP_NAME, FIRST_GROUP_CURRENCY) : addIdentityToUser(identityId);
+        return addGroup
                 .flatMap(new Func1<String, Single<? extends User>>() {
                     @Override
                     public Single<? extends User> call(String result) {
@@ -225,7 +242,7 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
     }
 
     @Override
-    public Single<User> loginFacebook(@NonNull final Fragment fragment) {
+    public Single<User> loginFacebook(@NonNull final Fragment fragment, @NonNull final String identityId) {
         return Single
                 .create(new Single.OnSubscribe<User>() {
                     @Override
@@ -251,7 +268,7 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                     @Override
                     public Single<User> call(final User user) {
                         if (user.isNew()) {
-                            return addFirstGroup(user)
+                            return addFirstGroup(user, identityId)
                                     .flatMap(new Func1<Identity, Single<? extends User>>() {
                                         @Override
                                         public Single<? extends User> call(Identity identity) {
@@ -376,7 +393,7 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
     public Single<User> loginGoogle(@NonNull String idToken,
                                     @NonNull final String username,
                                     @NonNull final Uri photoUrl,
-                                    @NonNull final Fragment fragment) {
+                                    @NonNull final String identityId, @NonNull final Fragment fragment) {
         return verifyGoogleLogin(idToken)
                 .flatMap(new Func1<String, Single<? extends User>>() {
                     @Override
@@ -388,7 +405,7 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                     @Override
                     public Single<User> call(final User user) {
                         if (user.isNew()) {
-                            return addFirstGroup(user)
+                            return addFirstGroup(user, identityId)
                                     .flatMap(new Func1<Identity, Single<? extends User>>() {
                                         @Override
                                         public Single<? extends User> call(Identity identity) {
@@ -497,7 +514,7 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
 
     @Override
     public Single<Identity> handleInvitation(@NonNull final User user, @NonNull String identityId) {
-        return checkIdentity(identityId)
+        return addIdentityToUser(identityId)
                 .flatMap(new Func1<String, Single<User>>() {
                     @Override
                     public Single<User> call(String s) {
@@ -530,10 +547,10 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                 });
     }
 
-    private Single<String> checkIdentity(@NonNull String identityId) {
+    private Single<String> addIdentityToUser(@NonNull String identityId) {
         final Map<String, Object> params = new HashMap<>();
         params.put(PARAM_IDENTITY_ID, identityId);
-        return callFunctionInBackground(HANDLE_INVITATION, params);
+        return callFunctionInBackground(ADD_IDENTITY_TO_USER, params);
     }
 
     @Override
@@ -734,8 +751,9 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
     }
 
     @Override
-    public Single<Identity> addIdentity(@NonNull String nickname, @NonNull String groupId,
-                                        @NonNull final String groupName) {
+    public Single<Identity> addIdentity(@NonNull final Context context, @NonNull String nickname,
+                                        @NonNull String groupId, @NonNull final String groupName,
+                                        @NonNull final String inviterNickname) {
         final Group group = (Group) ParseObject.createWithoutData(Group.CLASS, groupId);
         final Identity identity = new Identity(group, nickname, true);
         return save(identity)
@@ -743,6 +761,19 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                     @Override
                     public Single<? extends Identity> call(Identity identity) {
                         return pin(identity, Identity.PIN_LABEL);
+                    }
+                })
+                .flatMap(new Func1<Identity, Single<String>>() {
+                    @Override
+                    public Single<String> call(Identity identity) {
+                        return getInvitationUrl(context, identity, groupName, inviterNickname);
+                    }
+                })
+                .flatMap(new Func1<String, Single<? extends Identity>>() {
+                    @Override
+                    public Single<? extends Identity> call(String link) {
+                        identity.setInvitationLink(link);
+                        return save(identity);
                     }
                 });
     }
@@ -754,8 +785,42 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
 
     @NonNull
     @Override
-    public String getInvitationUrl(Identity identity, @NonNull String groupName) {
-        return UserRepository.INVITATION_LINK + "?id=" + identity.getObjectId() + "&group=" + groupName;
+    public Single<String> getInvitationUrl(@NonNull final Context context,
+                                           @NonNull final Identity identity,
+                                           @NonNull String groupName,
+                                           @NonNull String inviterNickname) {
+        final BranchUniversalObject universalObject = new BranchUniversalObject()
+                .setCanonicalIdentifier("invitation")
+                .setTitle(String.format("You are invited to join %s", groupName))
+                .setContentDescription("Click on this link to open or install Qwittig and accept the invitation.")
+                .addContentMetadata("identityId", identity.getObjectId())
+                .addContentMetadata("groupName", groupName)
+                .addContentMetadata("inviterNickname", inviterNickname);
+
+        final LinkProperties properties = new LinkProperties()
+                .setFeature("invitation")
+                .setChannel("all");
+
+        return Single
+                .create(new Single.OnSubscribe<String>() {
+                    @Override
+                    public void call(final SingleSubscriber<? super String> singleSubscriber) {
+                        universalObject.generateShortUrl(context, properties, new Branch.BranchLinkCreateListener() {
+                            @Override
+                            public void onLinkCreate(String url, BranchError error) {
+                                if (singleSubscriber.isUnsubscribed()) {
+                                    return;
+                                }
+
+                                if (error != null) {
+                                    singleSubscriber.onError(new Throwable(error.getMessage()));
+                                } else {
+                                    singleSubscriber.onSuccess(url);
+                                }
+                            }
+                        });
+                    }
+                });
     }
 
     @Override
@@ -839,6 +904,66 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
         query.whereEqualTo(Identity.ACTIVE, true);
         query.include(Identity.GROUP);
         return query;
+    }
+
+    public Observable<Identity> saveCurrentUserProfile(@NonNull final String newNickname,
+                                                       @NonNull final byte[] newAvatar) {
+        final User currentUser = getCurrentUser();
+        if (currentUser == null) {
+            return Observable.error(new Exception("currentUser is null"));
+        }
+
+        final List<Identity> identities = currentUser.getIdentities();
+        return Observable.from(identities)
+                .flatMap(new Func1<Identity, Observable<Identity>>() {
+                    @Override
+                    public Observable<Identity> call(Identity identity) {
+                        identity.setNickname(newNickname);
+                        identity.setAvatarData(newAvatar);
+                        return pin(identity, Identity.PIN_LABEL_TEMP).toObservable();
+                    }
+                });
+    }
+
+    @Override
+    public boolean uploadCurrentUserProfile() {
+        final User currentUser = getCurrentUser();
+        if (currentUser == null) {
+            return false;
+        }
+
+        final String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("jpg");
+        final List<Identity> identities = currentUser.getIdentities();
+
+        final byte[] avatar = identities.get(0).getAvatarData();
+        final ParseFile newAvatar = new ParseFile(UserRepository.FILE_NAME, avatar, mimeType);
+        try {
+            newAvatar.save();
+        } catch (ParseException e) {
+            return false;
+        }
+
+        for (Identity identity : identities) {
+            try {
+                identity.setAvatar(newAvatar);
+                identity.removeAvatarData();
+                identity.save();
+            } catch (ParseException e) {
+                identity.setAvatarData(avatar);
+                return false;
+            }
+        }
+
+        for (Identity identity : identities) {
+            try {
+                identity.unpin(Identity.PIN_LABEL_TEMP);
+                identity.pin(Identity.PIN_LABEL);
+            } catch (ParseException e) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override

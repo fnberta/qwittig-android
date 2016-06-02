@@ -8,7 +8,10 @@ import android.databinding.Bindable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.MenuItem;
+
+import org.stringtemplate.v4.ST;
 
 import ch.berta.fabio.fabspeeddial.FabMenu;
 import ch.giantific.qwittig.BR;
@@ -26,6 +29,7 @@ import rx.SingleSubscriber;
 public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListener>
         implements HomeViewModel {
 
+    private static final String STATE_INVITATION_ID = "STATE_INVITATION_ID";
     private final PurchaseRepository mPurchaseRepo;
     private boolean mDraftsAvailable;
     private String mInvitationIdentityId;
@@ -37,6 +41,18 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
         super(savedState, view, userRepository);
 
         mPurchaseRepo = purchaseRepo;
+        if (savedState != null) {
+            mInvitationIdentityId = savedState.getString(STATE_INVITATION_ID);
+        }
+    }
+
+    @Override
+    public void saveState(@NonNull Bundle outState) {
+        super.saveState(outState);
+
+        if (!TextUtils.isEmpty(mInvitationIdentityId)) {
+            outState.putString(STATE_INVITATION_ID, mInvitationIdentityId);
+        }
     }
 
     @Override
@@ -85,9 +101,10 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
     }
 
     @Override
-    public void handleInvitation(@NonNull String identityId, @NonNull String groupName) {
+    public void handleInvitation(@NonNull String identityId, @NonNull String groupName,
+                                 @NonNull String inviterNickname) {
         mInvitationIdentityId = identityId;
-        mView.showGroupJoinDialog(groupName);
+        mView.showGroupJoinDialog(groupName, inviterNickname);
     }
 
     @Override

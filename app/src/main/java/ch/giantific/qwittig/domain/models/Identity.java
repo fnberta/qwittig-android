@@ -34,8 +34,11 @@ public class Identity extends ParseObject implements Comparable<Identity> {
     public static final String PENDING = "pending";
     public static final String NICKNAME = "nickname";
     public static final String AVATAR = "avatar";
+    public static final String AVATAR_BYTES = "avatarBytes";
     public static final String BALANCE = "balance";
+    public static final String INVITATION_LINK = "invitationLink";
     public static final String PIN_LABEL = "identitiesPinLabel";
+    public static final String PIN_LABEL_TEMP = "identitiesTempPinLabel";
 
     public Identity() {
         // A default constructor is required.
@@ -108,6 +111,18 @@ public class Identity extends ParseObject implements Comparable<Identity> {
         remove(AVATAR);
     }
 
+    public byte[] getAvatarData() {
+        return getBytes(AVATAR_BYTES);
+    }
+
+    public void setAvatarData(@NonNull byte[] bytes) {
+        put(AVATAR_BYTES, bytes);
+    }
+
+    public void removeAvatarData() {
+        remove(AVATAR_BYTES);
+    }
+
     @NonNull
     public BigFraction getBalance() {
         final List<Number> numbers = getList(BALANCE);
@@ -127,6 +142,14 @@ public class Identity extends ParseObject implements Comparable<Identity> {
 
         final long[] numbers = new long[]{num.longValue(), den.longValue()};
         put(BALANCE, numbers);
+    }
+
+    public String getInvitationLink() {
+        return getString(INVITATION_LINK);
+    }
+
+    public void setInvitationLink(@NonNull String link) {
+        put(INVITATION_LINK, link);
     }
 
     @Override

@@ -5,6 +5,7 @@
 package ch.giantific.qwittig.presentation.login;
 
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 
@@ -15,6 +16,8 @@ import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
  * Defines an observable view model for the login accounts screen.
  */
 public interface LoginAccountsViewModel extends ViewModel, LoadingViewModel, LoginWorkerListener {
+
+    void setInvitationIdentityId(@NonNull String identityId);
 
     void onGoogleSignedIn(@Nullable String tokenId, @Nullable String displayName,
                           @Nullable Uri photoUrl);
@@ -32,15 +35,17 @@ public interface LoginAccountsViewModel extends ViewModel, LoadingViewModel, Log
      */
     interface ViewListener extends ViewModel.ViewListener {
 
-        void loadFacebookLoginWorker();
+        void loadFacebookLoginWorker(@NonNull String identityId);
 
         void loginWithGoogle();
 
         void loadGoogleTokenVerifyWorker(@Nullable String tokenId, @Nullable String displayName,
-                                         @Nullable Uri photoUrl);
+                                         @Nullable Uri photoUrl, @NonNull String identityId);
 
-        void showEmailFragment();
+        void showEmailFragment(@NonNull String identityId);
 
         void finishScreen(int result);
+
+        void showProfileFragment();
     }
 }

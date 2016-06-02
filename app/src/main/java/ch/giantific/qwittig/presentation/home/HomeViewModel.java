@@ -27,7 +27,8 @@ public interface HomeViewModel extends ViewModel,
 
     boolean updateDraftsAvailable();
 
-    void handleInvitation(@NonNull String identityId, @NonNull String groupName);
+    void handleInvitation(@NonNull String identityId, @NonNull String groupName,
+                          @NonNull String inviterNickname);
 
     FabMenu.FabMenuItemClickListener getFabMenuItemClickListener();
 
@@ -37,7 +38,7 @@ public interface HomeViewModel extends ViewModel,
     interface ViewListener extends ViewModel.ViewListener {
         void startPurchaseAddActivity(boolean autoMode);
 
-        void showGroupJoinDialog(@NonNull String groupName);
+        void showGroupJoinDialog(@NonNull String groupName, @NonNull String inviterNickname);
 
         void loadJoinGroupWorker(@NonNull String identityId);
 

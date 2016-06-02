@@ -60,11 +60,12 @@ public interface UserRepository extends BaseRepository {
     /**
      * Logs the user in using his email address and password.
      *
-     * @param username the email address for the login
-     * @param password the pass word for the login
+     * @param username   the email address for the login
+     * @param password   the pass word for the login
+     * @param identityId the identity id the user is invited to, empty if no invite pending
      * @return a {@link Single} emitting the result
      */
-    Single<User> loginEmail(@NonNull String username, @NonNull String password);
+    Single<User> loginEmail(@NonNull String username, @NonNull String password, @NonNull String identityId);
 
     /**
      * Sends the user an email with a link to reset his password
@@ -79,28 +80,32 @@ public interface UserRepository extends BaseRepository {
      *
      * @param username the user's email to use as username
      * @param password the user's password
+     * @param identityId the identity id the user is invited to, empty if no invite pending
      * @return a {@link Single} emitting the result
      */
-    Single<User> signUpEmail(@NonNull String username, @NonNull String password);
+    Single<User> signUpEmail(@NonNull String username, @NonNull String password,
+                             @NonNull String identityId);
 
     /**
      * Logs in a user using his facebook account
      *
      * @param fragment the fragment that is initiating the login
+     * @param identityId the identity id the user is invited to, empty if no invite pending
      * @return a {@link Single} emitting the result
      */
-    Single<User> loginFacebook(@NonNull Fragment fragment);
+    Single<User> loginFacebook(@NonNull Fragment fragment, @NonNull String identityId);
 
     /**
      * Logs in the user using his google account.
      *
      * @param idToken the google id token
+     * @param identityId the identity id the user is invited to, empty if no invite pending
      * @return a {@link Single} emitting the result
      */
     Single<User> loginGoogle(@NonNull String idToken,
                              @NonNull final String username,
                              @NonNull final Uri photoUrl,
-                             @NonNull final Fragment fragment);
+                             @NonNull String identityId, @NonNull final Fragment fragment);
 
     /**
      * Handles an invitation link by calling a function in the cloud.
@@ -200,14 +205,17 @@ public interface UserRepository extends BaseRepository {
      * Creates a new identity and generates an invitation link for it. Allows the user to interact
      * with the identity even if no one has yet accepted the invitation.
      *
+     *
+     * @param context
      * @param nickname  the nickname to use in the new identity
      * @param groupId   the object id of the group
      * @param groupName the name of the group the new identity is created for, user for the link
+     * @param inviterNickname
      * @return a {@link Single} emitting the result
      */
-    Single<Identity> addIdentity(@NonNull String nickname,
+    Single<Identity> addIdentity(@NonNull Context context, @NonNull String nickname,
                                  @NonNull String groupId,
-                                 @NonNull String groupName);
+                                 @NonNull String groupName, @NonNull String inviterNickname);
 
     /**
      * Saves an identity to the local data store.
@@ -220,11 +228,15 @@ public interface UserRepository extends BaseRepository {
     /**
      * Returns the invitation url for the invited identity
      *
+     *
+     * @param context
      * @param identity  the identity that is invited
      * @param groupName the name of the group
+     * @param inviterNickname
      * @return the invitation url
      */
-    String getInvitationUrl(Identity identity, @NonNull String groupName);
+    Single<String> getInvitationUrl(@NonNull Context context, @NonNull Identity identity,
+                                    @NonNull String groupName, @NonNull String inviterNickname);
 
     /**
      * Fetches the data of a {@link Identity} object from the local data store. If there is no data
@@ -260,6 +272,11 @@ public interface UserRepository extends BaseRepository {
      * @return whether the update was successful or not
      */
     boolean updateIdentities(@NonNull List<Identity> identities);
+
+    Observable<Identity> saveCurrentUserProfile(@NonNull final String newNickname,
+                                                @NonNull final byte[] newAvatar);
+
+    boolean uploadCurrentUserProfile();
 
     /**
      * Saves the identities with a nickname and avatar.

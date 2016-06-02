@@ -20,18 +20,10 @@ public class SettingsUsersUserRowViewModel extends BaseObservable
 
     private final ShareListener mShareListener;
     private final Identity mIdentity;
-    private String mShareLink;
 
     public SettingsUsersUserRowViewModel(@NonNull ShareListener shareListener, @NonNull Identity identity) {
         mShareListener = shareListener;
         mIdentity = identity;
-    }
-
-    public SettingsUsersUserRowViewModel(@NonNull ShareListener shareListener, @NonNull Identity identity,
-                                         @NonNull String shareLink) {
-        mShareListener = shareListener;
-        mIdentity = identity;
-        mShareLink = shareLink;
     }
 
     public Identity getIdentity() {
@@ -45,11 +37,11 @@ public class SettingsUsersUserRowViewModel extends BaseObservable
 
     @Bindable
     public boolean isPending() {
-        return !TextUtils.isEmpty(mShareLink);
+        return mIdentity.isPending();
     }
 
     public void onShareClick(View view) {
-        mShareListener.onShareClick(mShareLink);
+        mShareListener.onShareClick(mIdentity.getInvitationLink());
     }
 
     @Override

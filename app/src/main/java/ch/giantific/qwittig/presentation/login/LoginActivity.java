@@ -31,10 +31,11 @@ import rx.Single;
 public class LoginActivity extends BaseActivity<LoginAccountsViewModel> implements
         LoginAccountsFragment.ActivityListener,
         LoginEmailFragment.ActivityListener,
+        LoginInvitationFragment.ActivityListener,
         EmailPromptDialogFragment.DialogInteractionListener,
         LoginWorkerListener {
 
-    private static final String FRAGMENT_ACCOUNTS = "FRAGMENT_ACCOUNTS";
+    public static final String FRAGMENT_LOGIN = "FRAGMENT_LOGIN";
     private static final String GOOGLE_SERVER_ID = "982871908066-1scsmdngvfsj68t7kq5o42t35oubujme.apps.googleusercontent.com";
     private static final int RC_SIGN_IN = 9001;
     private GoogleApiClient mGoogleApiClient;
@@ -53,9 +54,8 @@ public class LoginActivity extends BaseActivity<LoginAccountsViewModel> implemen
     }
 
     private void addAccountsFragment() {
-        final LoginAccountsFragment fragment = new LoginAccountsFragment();
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.container, fragment, FRAGMENT_ACCOUNTS)
+                .add(R.id.container, new LoginAccountsFragment(), FRAGMENT_LOGIN)
                 .commit();
     }
 
@@ -143,5 +143,13 @@ public class LoginActivity extends BaseActivity<LoginAccountsViewModel> implemen
     @Override
     public void onValidEmailEntered(@NonNull String email) {
         mEmailViewModel.onValidEmailEntered(email);
+    }
+
+    @Override
+    public void popBackStack(boolean accepted) {
+        getSupportFragmentManager().popBackStack();
+        if (!accepted) {
+            mViewModel.setInvitationIdentityId("");
+        }
     }
 }

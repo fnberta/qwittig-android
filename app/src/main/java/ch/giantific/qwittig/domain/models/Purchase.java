@@ -43,7 +43,7 @@ public class Purchase extends ParseObject {
     public static final String EXCHANGE_RATE = "exchangeRate";
     public static final String READ_BY = "readBy";
     public static final String RECEIPT = "receipt";
-    public static final String RECEIPT_BYTE = "receiptByte";
+    public static final String RECEIPT_BYTES = "receiptBytes";
     public static final String NOTE = "note";
     public static final String TEMP_ID = "tempId";
     public static final String DRAFT = "draft";
@@ -162,11 +162,11 @@ public class Purchase extends ParseObject {
     }
 
     public byte[] getReceiptData() {
-        return getBytes(RECEIPT_BYTE);
+        return getBytes(RECEIPT_BYTES);
     }
 
     public void setReceiptData(@NonNull byte[] bytes) {
-        put(RECEIPT_BYTE, bytes);
+        put(RECEIPT_BYTES, bytes);
     }
 
     public String getNote() {
@@ -252,7 +252,7 @@ public class Purchase extends ParseObject {
     }
 
     public void removeReceiptData() {
-        remove(RECEIPT_BYTE);
+        remove(RECEIPT_BYTES);
     }
 
     public void removeNote() {

@@ -14,10 +14,7 @@ import android.support.v4.app.FragmentManager;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import javax.inject.Inject;
-
 import ch.giantific.qwittig.domain.models.User;
-import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;
@@ -40,10 +37,9 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
     private static final String KEY_TYPE = "TYPE";
     private static final String KEY_USERNAME = "USERNAME";
     private static final String KEY_PASSWORD = "PASSWORD";
+    private static final String KEY_IDENTITY_ID = "IDENTITY_ID";
     private static final String KEY_GOOGLE_ID_TOKEN = "ID_TOKEN";
     private static final String KEY_GOOGLE_PHOTO_URL = "GOOGLE_PHOTO_URL";
-    @Inject
-    GroupRepository mGroupRepo;
     @Type
     private int mType;
 
@@ -55,14 +51,16 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
      * Attaches a new instance of {@link LoginWorker} with a username and a password as arguments.
      * This will log in the user.
      *
-     * @param fm       the fragment manager to user for the transaction
-     * @param username the name of the user
-     * @param password the password of the user
+     * @param fm         the fragment manager to user for the transaction
+     * @param username   the name of the user
+     * @param password   the password of the user
+     * @param identityId the identity id the user is invited to, empty if no invite is pending
      * @return a new instance of {@link LoginWorker} that will log in the user
      */
     public static LoginWorker attachEmailLoginInstance(@NonNull FragmentManager fm,
                                                        @NonNull String username,
-                                                       @NonNull String password) {
+                                                       @NonNull String password,
+                                                       @NonNull String identityId) {
         LoginWorker worker = (LoginWorker) fm.findFragmentByTag(WORKER_TAG);
         if (worker == null) {
             worker = new LoginWorker();
@@ -71,6 +69,7 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
             args.putInt(KEY_TYPE, Type.LOGIN_EMAIL);
             args.putString(KEY_USERNAME, username);
             args.putString(KEY_PASSWORD, password);
+            args.putString(KEY_IDENTITY_ID, identityId);
             worker.setArguments(args);
 
             fm.beginTransaction()
@@ -114,16 +113,18 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
      * optionally an avatar image. This will create a new account for the user and then log him/her
      * in.
      *
-     * @param fm       the fragment manager to user for the transaction
-     * @param username the name of the user
-     * @param password the password of the user
+     * @param fm         the fragment manager to user for the transaction
+     * @param username   the name of the user
+     * @param password   the password of the user
+     * @param identityId the identity id the user is invited to, empty if no invite is pending
      * @return a new instance of {@link LoginWorker} that will create a new account for the user
      * and log him/her in
      */
     @NonNull
     public static LoginWorker attachEmailSignUpInstance(@NonNull FragmentManager fm,
                                                         @NonNull String username,
-                                                        @NonNull String password) {
+                                                        @NonNull String password,
+                                                        @NonNull String identityId) {
         LoginWorker worker = (LoginWorker) fm.findFragmentByTag(WORKER_TAG);
         if (worker == null) {
             worker = new LoginWorker();
@@ -132,6 +133,7 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
             args.putInt(KEY_TYPE, Type.SIGN_UP_EMAIL);
             args.putString(KEY_USERNAME, username);
             args.putString(KEY_PASSWORD, password);
+            args.putString(KEY_IDENTITY_ID, identityId);
             worker.setArguments(args);
 
             fm.beginTransaction()
@@ -147,16 +149,19 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
      * credentials. If the login was successful, sets the email address and profile image the user
      * has set in facebook.
      *
-     * @param fm the fragment manager to user for the transaction
+     * @param fm         the fragment manager to user for the transaction
+     * @param identityId the identity id the user is invited to, empty if no invite is pending
      * @return a new instance of {@link LoginWorker} that logs in the user with facebook
      */
-    public static LoginWorker attachFacebookLoginInstance(@NonNull FragmentManager fm) {
+    public static LoginWorker attachFacebookLoginInstance(@NonNull FragmentManager fm,
+                                                          @NonNull String identityId) {
         LoginWorker worker = (LoginWorker) fm.findFragmentByTag(WORKER_TAG);
         if (worker == null) {
             worker = new LoginWorker();
 
             final Bundle args = new Bundle();
             args.putInt(KEY_TYPE, Type.LOGIN_FACEBOOK);
+            args.putString(KEY_IDENTITY_ID, identityId);
             worker.setArguments(args);
 
             fm.beginTransaction()
@@ -172,13 +177,15 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
      * credentials. Sends the idToken received form GoogleApiClient to the server where it gets
      * verified and the user gets logged in (or a new account is created).
      *
-     * @param idToken the token received from GoogleApiClient
+     * @param idToken    the token received from GoogleApiClient
+     * @param identityId the identity id the user is invited to, empty if no invite is pending
      * @return a new instance of {@link LoginWorker} that logs in the user with Google
      */
     public static LoginWorker attachGoogleVerifyTokenInstance(@NonNull FragmentManager fm,
                                                               @Nullable String idToken,
                                                               @Nullable String displayName,
-                                                              @Nullable Uri photoUrl) {
+                                                              @Nullable Uri photoUrl,
+                                                              @NonNull String identityId) {
         LoginWorker worker = (LoginWorker) fm.findFragmentByTag(WORKER_TAG);
         if (worker == null) {
             worker = new LoginWorker();
@@ -188,6 +195,7 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
             args.putString(KEY_GOOGLE_ID_TOKEN, idToken);
             args.putString(KEY_USERNAME, displayName);
             args.putString(KEY_GOOGLE_PHOTO_URL, photoUrl != null ? photoUrl.toString() : "");
+            args.putString(KEY_IDENTITY_ID, identityId);
             worker.setArguments(args);
 
             fm.beginTransaction()
@@ -212,7 +220,8 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
             case Type.LOGIN_EMAIL: {
                 final String username = args.getString(KEY_USERNAME, "");
                 final String password = args.getString(KEY_PASSWORD, "");
-                return mUserRepo.loginEmail(username, password).toObservable();
+                final String identityId = args.getString(KEY_IDENTITY_ID, "");
+                return mUserRepo.loginEmail(username, password, identityId).toObservable();
             }
             case Type.RESET_PASSWORD: {
                 final String username = args.getString(KEY_USERNAME, "");
@@ -228,17 +237,19 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
             case Type.SIGN_UP_EMAIL: {
                 final String username = args.getString(KEY_USERNAME, "");
                 final String password = args.getString(KEY_PASSWORD, "");
-                return mUserRepo.signUpEmail(username, password).toObservable();
+                final String identityId = args.getString(KEY_IDENTITY_ID, "");
+                return mUserRepo.signUpEmail(username, password, identityId).toObservable();
             }
             case Type.LOGIN_FACEBOOK: {
-                final LoginWorker worker = this;
-                return mUserRepo.loginFacebook(worker).toObservable();
+                final String identityId = args.getString(KEY_IDENTITY_ID, "");
+                return mUserRepo.loginFacebook(this, identityId).toObservable();
             }
             case Type.LOGIN_GOOGLE: {
                 final String username = args.getString(KEY_USERNAME, "");
                 final String idToken = args.getString(KEY_GOOGLE_ID_TOKEN, "");
                 final Uri photoUrl = Uri.parse(args.getString(KEY_GOOGLE_PHOTO_URL, ""));
-                return mUserRepo.loginGoogle(idToken, username, photoUrl, this).toObservable();
+                final String identityId = args.getString(KEY_IDENTITY_ID, "");
+                return mUserRepo.loginGoogle(idToken, username, photoUrl, identityId, this).toObservable();
             }
         }
 

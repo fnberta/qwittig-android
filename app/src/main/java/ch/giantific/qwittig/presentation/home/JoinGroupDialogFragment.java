@@ -23,7 +23,7 @@ public class JoinGroupDialogFragment extends BaseDialogFragment<JoinGroupDialogF
 
     private static final String DIALOG_TAG = JoinGroupDialogFragment.class.getCanonicalName();
     private static final String KEY_GROUP_NAME = "GROUP_NAME";
-    private String mGroupName;
+    private static final String KEY_INVITER_NICKNAME = "INVITER_NICKNAME";
 
     /**
      * Returns a new instance of {@link JoinGroupDialogFragment}.
@@ -34,30 +34,28 @@ public class JoinGroupDialogFragment extends BaseDialogFragment<JoinGroupDialogF
      */
     @NonNull
     public static JoinGroupDialogFragment display(@NonNull FragmentManager fm,
-                                                  @NonNull String groupName) {
+                                                  @NonNull String groupName,
+                                                  @NonNull String inviterNickname) {
         final JoinGroupDialogFragment dialog = new JoinGroupDialogFragment();
         final Bundle args = new Bundle();
         args.putString(KEY_GROUP_NAME, groupName);
+        args.putString(KEY_INVITER_NICKNAME, inviterNickname);
         dialog.setArguments(args);
         dialog.show(fm, DIALOG_TAG);
 
         return dialog;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        mGroupName = getArguments().getString(KEY_GROUP_NAME);
-    }
-
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
+        final Bundle args = getArguments();
+        final String inviterNickname = args.getString(KEY_INVITER_NICKNAME);
+        final String groupName = args.getString(KEY_GROUP_NAME);
 
-        dialogBuilder.setTitle(getString(R.string.dialog_group_join_title, mGroupName))
-                .setMessage(getString(R.string.dialog_group_join_message_no_initiator, mGroupName))
+        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
+        dialogBuilder.setTitle(getString(R.string.dialog_group_join_title, groupName))
+                .setMessage(getString(R.string.dialog_group_join_message, inviterNickname, groupName))
                 .setPositiveButton(R.string.dialog_positive_join, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         mActivity.onJoinInvitedGroupSelected();

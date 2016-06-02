@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.View;
 
 import ch.giantific.qwittig.BR;
@@ -27,14 +28,21 @@ public class LoginAccountsViewModelImpl extends ViewModelBaseImpl<LoginAccountsV
         implements LoginAccountsViewModel {
 
     private static final String STATE_LOADING = "STATE_LOADING";
+    private static final String STATE_IDENTITY_ID = "STATE_IDENTITY_ID";
     private boolean mLoading;
+    private String mIdentityId;
 
     public LoginAccountsViewModelImpl(@Nullable Bundle savedState,
                                       @NonNull LoginAccountsViewModel.ViewListener view,
                                       @NonNull UserRepository userRepository) {
         super(savedState, view, userRepository);
 
-        mLoading = savedState != null && savedState.getBoolean(STATE_LOADING);
+        if (savedState != null) {
+            mLoading = savedState.getBoolean(STATE_LOADING);
+            mIdentityId = savedState.getString(STATE_IDENTITY_ID, "");
+        } else {
+            mLoading = false;
+        }
     }
 
     @Override
@@ -42,6 +50,9 @@ public class LoginAccountsViewModelImpl extends ViewModelBaseImpl<LoginAccountsV
         super.saveState(outState);
 
         outState.putBoolean(STATE_LOADING, mLoading);
+        if (!TextUtils.isEmpty(mIdentityId)) {
+            outState.putString(STATE_IDENTITY_ID, mIdentityId);
+        }
     }
 
     @Override
@@ -60,26 +71,36 @@ public class LoginAccountsViewModelImpl extends ViewModelBaseImpl<LoginAccountsV
     public void setUserLoginStream(@NonNull Single<User> single, @NonNull final String workerTag,
                                    @LoginWorker.Type int type) {
         getSubscriptions().add(single.subscribe(new SingleSubscriber<User>() {
-            @Override
-            public void onSuccess(User value) {
-                mView.removeWorker(workerTag);
-                mView.finishScreen(Activity.RESULT_OK);
-            }
+                    @Override
+                    public void onSuccess(User user) {
+                        mView.removeWorker(workerTag);
+                        if (user.isNew()) {
+                            mView.showProfileFragment();
+                        } else {
+                            mView.finishScreen(Activity.RESULT_OK);
+                        }
+                    }
 
-            @Override
-            public void onError(Throwable error) {
-                mView.removeWorker(workerTag);
-                setLoading(false);
+                    @Override
+                    public void onError(Throwable error) {
+                        mView.removeWorker(workerTag);
+                        setLoading(false);
 
-                mView.showMessage(mUserRepo.getErrorMessage(error));
-            }
-        }));
+                        mView.showMessage(mUserRepo.getErrorMessage(error));
+                    }
+                })
+        );
+    }
+
+    @Override
+    public void setInvitationIdentityId(@NonNull String identityId) {
+        mIdentityId = identityId;
     }
 
     @Override
     public void onGoogleSignedIn(@Nullable String tokenId, @Nullable String displayName,
                                  @Nullable Uri photoUrl) {
-        mView.loadGoogleTokenVerifyWorker(tokenId, displayName, photoUrl);
+        mView.loadGoogleTokenVerifyWorker(tokenId, displayName, photoUrl, mIdentityId);
     }
 
     @Override
@@ -91,7 +112,7 @@ public class LoginAccountsViewModelImpl extends ViewModelBaseImpl<LoginAccountsV
     @Override
     public void onLoginFacebookClick(View view) {
         setLoading(true);
-        mView.loadFacebookLoginWorker();
+        mView.loadFacebookLoginWorker(mIdentityId);
     }
 
     @Override
@@ -107,6 +128,6 @@ public class LoginAccountsViewModelImpl extends ViewModelBaseImpl<LoginAccountsV
 
     @Override
     public void onUseEmailClick(View view) {
-        mView.showEmailFragment();
+        mView.showEmailFragment(mIdentityId);
     }
 }

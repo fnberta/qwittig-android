@@ -154,7 +154,7 @@
     <string name="push_purchase_new_multiple_title">%1$d new items</string>
     <string name="push_purchase_new_multiple_more">more</string>
     <string name="action_retry">Retry</string>
-    <string name="dialog_group_join_message_no_initiator">Your were invited to join %1$s. By accepting the invitation your current group will change to the new one.</string>
+    <string name="dialog_group_join_message">%1$s invited you to join %2$s. By accepting the invitation your current group will change to the new one.</string>
     <string name="toast_draft_deleted">Draft deleted</string>
     <string name="action_draft_delete">Delete draft</string>
     <string name="title_activity_stats">Stats</string>
@@ -311,5 +311,13 @@
     <string name="toast_error_task_done">Failed to mark task as done</string>
     <string name="push_task_finished_title">%1$s finished</string>
     <string name="push_task_finished_alert">%1$s finished the task</string>
+    <string name="login_lets_go">Let\'s go!</string>
+    <string name="login_group_currency_info">Choose a name and currency for your group. Purchases made in other currencies will be converted to this currency.</string>
+    <string name="invite_group">%1$s invited you to join %2$s.</string>
+    <string name="invite_accept">Accept the invitation?</string>
+    <string name="invite_accept_no">Ignore</string>
+    <string name="invite_accept_yes">Accept</string>
+    <string name="toast_invitation_accept_login">Login to accept the invitation</string>
+    <string name="toast_invitation_ignore">Invitation ignored. Click again on the link if you change your mind.</string>
 
 </resources>

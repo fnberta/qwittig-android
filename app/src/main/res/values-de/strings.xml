@@ -154,7 +154,7 @@
     <string name="push_purchase_new_multiple_title">%1$d neue Einkäufe</string>
     <string name="push_purchase_new_multiple_more">weitere</string>
     <string name="action_retry">Wiederholen</string>
-    <string name="dialog_group_join_message_no_initiator">Du wurdest eingeladen %1$s beizutreten. Wenn du die Einladung annimmst, wird deine aktive Gruppe auf die neue gewechselt.</string>
+    <string name="dialog_group_join_message">%1$s hat dich eingeladen, %2$s beizutreten. Wenn du die Einladung annimmst, wird deine aktive Gruppe auf die neue gewechselt.</string>
     <string name="toast_draft_deleted">Entwurf gelöscht</string>
     <string name="action_draft_delete">Entwurf löschen</string>
     <string name="title_activity_stats">Statistiken</string>
@@ -304,5 +304,13 @@
     <string name="toast_error_task_done">Aufgabe abhaken fehlgeschlagen</string>
     <string name="push_task_finished_title">%1$s erledigt</string>
     <string name="push_task_finished_alert">%1$s hat die Aufgabe erledigt</string>
+    <string name="login_lets_go">Los gehts!</string>
+    <string name="login_group_currency_info">Wähle einen Nahmen und eine Währung für deine Gruppe. Einkäufe in einer Fremdwährung werden in diese Währung konvertiert.</string>
+    <string name="invite_group">%1$s hat dich eingeladen, %2$s beizutreten.</string>
+    <string name="invite_accept">Einladung aktzeptieren?</string>
+    <string name="invite_accept_no">Ignorieren</string>
+    <string name="invite_accept_yes">Akzeptieren</string>
+    <string name="toast_invitation_accept_login">Melde dich an um die Einladung anzunehmen</string>
+    <string name="toast_invitation_ignore">Einladung ignoriert. Klick nochmals auf den Link wenn du deine Meinung änderst.</string>
 
 </resources>

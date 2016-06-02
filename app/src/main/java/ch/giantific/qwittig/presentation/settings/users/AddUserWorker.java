@@ -12,6 +12,7 @@ import android.text.TextUtils;
 
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;
@@ -75,11 +76,13 @@ public class AddUserWorker extends BaseWorker<Identity, AddUserWorkerListener> {
     @Nullable
     @Override
     protected Observable<Identity> getObservable(@NonNull Bundle args) {
+        final User currentUser = mUserRepo.getCurrentUser();
         final String nickname = args.getString(KEY_NICKNAME);
         final String groupId = args.getString(KEY_GROUP_ID);
         final String groupName = args.getString(KEY_GROUP_NAME);
-        if (!TextUtils.isEmpty(nickname) && !TextUtils.isEmpty(groupId) && !TextUtils.isEmpty(groupName)) {
-            return mUserRepo.addIdentity(nickname, groupId, groupName).toObservable();
+        if (currentUser != null && !TextUtils.isEmpty(nickname) && !TextUtils.isEmpty(groupId) && !TextUtils.isEmpty(groupName)) {
+            final Identity currentIdentity = currentUser.getCurrentIdentity();
+            return mUserRepo.addIdentity(getActivity(), nickname, groupId, groupName, currentIdentity.getNickname()).toObservable();
         }
 
         return null;

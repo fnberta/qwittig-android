@@ -7,7 +7,11 @@ apply plugin: 'com.neenbedankt.android-apt'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion '23.0.2'
+    buildToolsVersion '23.0.3'
+
+    dexOptions {
+        javaMaxHeapSize "3g"
+    }
 
     defaultConfig {
         applicationId 'ch.giantific.qwittig'
@@ -34,9 +38,10 @@ android {
 
 ext {
     supportLibVersion = '23.2.1'
-    playServicesVersion = '8.4.0'
+    playServicesVersion = '9.0.1'
     retrofitVersion = '2.0.0'
     leakCanaryVersion = '1.4-beta1'
+    daggerVersion = '2.2'
 }
 
 dependencies {
@@ -51,16 +56,19 @@ dependencies {
     compile "com.android.support:preference-v14:${supportLibVersion}"
     compile "com.android.support:support-annotations:${supportLibVersion}"
     compile "com.google.android.gms:play-services-auth:${playServicesVersion}"
-    compile "com.google.android.gms:play-services-appinvite:${playServicesVersion}"
     compile "com.google.android.gms:play-services-gcm:${playServicesVersion}"
-    compile 'com.google.dagger:dagger:2.0.2'
-    apt 'com.google.dagger:dagger-compiler:2.0.2'
+    compile "com.google.firebase:firebase-core:${playServicesVersion}"
+    compile "com.google.firebase:firebase-invites:${playServicesVersion}"
+//    compile "com.google.firebase:firebase-crash:${playServicesVersion}"
+    compile "com.google.dagger:dagger:${daggerVersion}"
+    apt "com.google.dagger:dagger-compiler:${daggerVersion}"
     provided 'javax.annotation:jsr250-api:1.0'
     compile 'io.reactivex:rxandroid:1.1.0'
     compile 'io.reactivex:rxjava:1.1.1'
     compile "com.squareup.retrofit2:retrofit:${retrofitVersion}"
     compile "com.squareup.retrofit2:converter-gson:${retrofitVersion}"
     compile "com.squareup.retrofit2:adapter-rxjava:${retrofitVersion}"
+    compile 'io.branch.sdk.android:library:1.+'
     compile 'com.google.code.gson:gson:2.4'
     compile 'com.parse:parse-android:1.13.0'
     compile 'com.parse.bolts:bolts-android:1.4.0'

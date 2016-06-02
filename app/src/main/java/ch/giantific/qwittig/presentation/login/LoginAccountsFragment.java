@@ -17,12 +17,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.json.JSONObject;
+
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentLoginAccountsBinding;
+import ch.giantific.qwittig.presentation.home.HomeActivity;
 import ch.giantific.qwittig.presentation.login.di.DaggerLoginAccountsComponent;
 import ch.giantific.qwittig.presentation.login.di.LoginAccountsViewModelModule;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.utils.Utils;
+import io.branch.referral.Branch;
+import io.branch.referral.BranchError;
+import timber.log.Timber;
 
 /**
  * Displays the login screen asking the user for the username and password.
@@ -32,7 +38,6 @@ import ch.giantific.qwittig.utils.Utils;
 public class LoginAccountsFragment extends BaseFragment<LoginAccountsViewModel, LoginAccountsFragment.ActivityListener>
         implements LoginAccountsViewModel.ViewListener {
 
-    private static final String FRAGMENT_LOGIN = "FRAGMENT_LOGIN";
     private FragmentLoginAccountsBinding mBinding;
 
     public LoginAccountsFragment() {
@@ -58,6 +63,51 @@ public class LoginAccountsFragment extends BaseFragment<LoginAccountsViewModel, 
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+
+        checkBranchLink();
+    }
+
+    private void checkBranchLink() {
+        final FragmentActivity activity = getActivity();
+        final Branch branch = Branch.getInstance();
+        branch.initSession(new Branch.BranchReferralInitListener() {
+            @Override
+            public void onInitFinished(JSONObject referringParams, BranchError error) {
+                if (error != null) {
+                    Timber.e("deep link error, %s", error);
+                    return;
+                }
+
+                final boolean openedWithInvite = referringParams.optBoolean(HomeActivity.BRANCH_IS_INVITE, false);
+                if (openedWithInvite) {
+                    final String identityId = referringParams.optString(HomeActivity.BRANCH_IDENTITY_ID);
+                    final String groupName = referringParams.optString(HomeActivity.BRANCH_GROUP_NAME);
+                    final String inviterNickname = referringParams.optString(HomeActivity.BRANCH_INVITER_NICKNAME);
+
+                    mViewModel.setInvitationIdentityId(identityId);
+                    showInvitationFragment(identityId, groupName, inviterNickname);
+                }
+            }
+        }, activity.getIntent().getData(), activity);
+    }
+
+    private void showInvitationFragment(@NonNull String identityId, @NonNull String groupName,
+                                        @NonNull String inviterNickname) {
+        final LoginInvitationFragment fragment =
+                LoginInvitationFragment.newInstance(identityId, groupName, inviterNickname);
+        if (Utils.isRunningLollipopAndHigher()) {
+            fragment.setEnterTransition(new Slide(Gravity.BOTTOM));
+        }
+
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container, fragment, LoginActivity.FRAGMENT_LOGIN)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    @Override
     protected void setViewModelToActivity() {
         mActivity.setAccountsViewModel(mViewModel);
     }
@@ -68,8 +118,8 @@ public class LoginAccountsFragment extends BaseFragment<LoginAccountsViewModel, 
     }
 
     @Override
-    public void loadFacebookLoginWorker() {
-        LoginWorker.attachFacebookLoginInstance(getFragmentManager());
+    public void loadFacebookLoginWorker(@NonNull String identityId) {
+        LoginWorker.attachFacebookLoginInstance(getFragmentManager(), identityId);
     }
 
     @Override
@@ -79,21 +129,21 @@ public class LoginAccountsFragment extends BaseFragment<LoginAccountsViewModel, 
 
     @Override
     public void loadGoogleTokenVerifyWorker(@Nullable String tokenId, @Nullable String displayName,
-                                            @Nullable Uri photoUrl) {
+                                            @Nullable Uri photoUrl, @NonNull String identityId) {
         LoginWorker.attachGoogleVerifyTokenInstance(getFragmentManager(), tokenId, displayName,
-                photoUrl);
+                photoUrl, identityId);
     }
 
     @Override
-    public void showEmailFragment() {
-        final LoginEmailFragment fragment = new LoginEmailFragment();
+    public void showEmailFragment(@NonNull String identityId) {
+        final LoginEmailFragment fragment = LoginEmailFragment.newInstance(identityId);
         if (Utils.isRunningLollipopAndHigher()) {
             setExitTransition(new Slide(Gravity.BOTTOM));
             fragment.setEnterTransition(new Slide(Gravity.BOTTOM));
         }
 
         getFragmentManager().beginTransaction()
-                .replace(R.id.container, fragment, FRAGMENT_LOGIN)
+                .replace(R.id.container, fragment, LoginActivity.FRAGMENT_LOGIN)
                 .addToBackStack(null)
                 .commit();
     }
@@ -103,6 +153,20 @@ public class LoginAccountsFragment extends BaseFragment<LoginAccountsViewModel, 
         final FragmentActivity activity = getActivity();
         activity.setResult(result);
         ActivityCompat.finishAfterTransition(activity);
+    }
+
+    @Override
+    public void showProfileFragment() {
+        final LoginProfileFragment fragment = new LoginProfileFragment();
+        if (Utils.isRunningLollipopAndHigher()) {
+            setExitTransition(new Slide(Gravity.START));
+            fragment.setEnterTransition(new Slide(Gravity.END));
+        }
+
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container, fragment, LoginActivity.FRAGMENT_LOGIN)
+                .addToBackStack(null)
+                .commit();
     }
 
     /**

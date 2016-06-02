@@ -274,16 +274,6 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
     }
 
     @Override
-    public void startLoginActivity() {
-        final Intent intentLogin = new Intent(this, LoginActivity.class);
-//        Starting an activity with forResult and transitions during a lifecycle method results on
-//        onActivityResult not being called
-//        ActivityOptionsCompat activityOptionsCompat =
-//                ActivityOptionsCompat.makeSceneTransitionAnimation(this);
-        startActivityForResult(intentLogin, INTENT_REQUEST_LOGIN);
-    }
-
-    @Override
     public void notifyHeaderIdentitiesChanged() {
         mHeaderIdentitiesAdapter.notifyDataSetChanged();
     }
@@ -308,5 +298,16 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
     @Override
     public void onIdentitySelected() {
         mViewModel.onIdentitySelected();
+    }
+
+    @Override
+    public void startLoginActivity() {
+        final Intent intentLogin = new Intent(this, LoginActivity.class);
+        intentLogin.setData(getIntent().getData());
+//        Starting an activity with forResult and transitions during a lifecycle method results on
+//        onActivityResult not being called
+//        ActivityOptionsCompat activityOptionsCompat =
+//                ActivityOptionsCompat.makeSceneTransitionAnimation(this);
+        startActivityForResult(intentLogin, INTENT_REQUEST_LOGIN);
     }
 }

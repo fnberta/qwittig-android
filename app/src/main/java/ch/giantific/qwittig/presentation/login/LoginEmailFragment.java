@@ -19,6 +19,8 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.transition.Slide;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +35,7 @@ import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.fragments.EmailPromptDialogFragment;
 import ch.giantific.qwittig.presentation.login.di.DaggerLoginEmailComponent;
 import ch.giantific.qwittig.presentation.login.di.LoginEmailViewModelModule;
+import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.ViewUtils;
 
 /**
@@ -49,10 +52,19 @@ public class LoginEmailFragment extends BaseFragment<LoginEmailViewModel, LoginE
             ContactsContract.CommonDataKinds.Email.IS_PRIMARY,
     };
     private static final int COL_INDEX_ADDRESS = 0;
+    private static final String KEY_IDENTITY_ID = "IDENTITY_ID";
     private FragmentLoginEmailBinding mBinding;
 
     public LoginEmailFragment() {
         // required empty constructor
+    }
+
+    public static LoginEmailFragment newInstance(@NonNull String identityId) {
+        final LoginEmailFragment fragment = new LoginEmailFragment();
+        final Bundle args = new Bundle();
+        args.putString(KEY_IDENTITY_ID, identityId);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
@@ -190,12 +202,14 @@ public class LoginEmailFragment extends BaseFragment<LoginEmailViewModel, LoginE
 
     @Override
     public void loadEmailLoginWorker(@NonNull String email, @NonNull String password) {
-        LoginWorker.attachEmailLoginInstance(getFragmentManager(), email, password);
+        final String identityId = getArguments().getString(KEY_IDENTITY_ID, "");
+        LoginWorker.attachEmailLoginInstance(getFragmentManager(), email, password, identityId);
     }
 
     @Override
     public void loadEmailSignUpWorker(@NonNull String email, @NonNull String password) {
-        LoginWorker.attachEmailSignUpInstance(getFragmentManager(), email, password);
+        final String identityId = getArguments().getString(KEY_IDENTITY_ID, "");
+        LoginWorker.attachEmailSignUpInstance(getFragmentManager(), email, password, identityId);
     }
 
     @Override
@@ -222,6 +236,20 @@ public class LoginEmailFragment extends BaseFragment<LoginEmailViewModel, LoginE
         final FragmentActivity activity = getActivity();
         activity.setResult(result);
         ActivityCompat.finishAfterTransition(activity);
+    }
+
+    @Override
+    public void showProfileFragment() {
+        final LoginProfileFragment fragment = new LoginProfileFragment();
+        if (Utils.isRunningLollipopAndHigher()) {
+            setExitTransition(new Slide(Gravity.START));
+            fragment.setEnterTransition(new Slide(Gravity.END));
+        }
+
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container, fragment, LoginActivity.FRAGMENT_LOGIN)
+                .addToBackStack(null)
+                .commit();
     }
 
     /**

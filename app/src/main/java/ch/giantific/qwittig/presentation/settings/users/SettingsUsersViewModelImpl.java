@@ -88,7 +88,6 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
     public void loadData() {
         final SettingsUsersViewModel listener = this;
         final Group group = mCurrentIdentity.getGroup();
-        final String groupName = group.getName();
         final String currentId = mCurrentIdentity.getObjectId();
         getSubscriptions().add(mUserRepo.getIdentities(group, true)
                 .filter(new Func1<Identity, Boolean>() {
@@ -100,10 +99,7 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
                 .map(new Func1<Identity, SettingsUsersUserRowViewModel>() {
                     @Override
                     public SettingsUsersUserRowViewModel call(Identity identity) {
-                        return identity.isPending()
-                                ? new SettingsUsersUserRowViewModel(listener, identity,
-                                mUserRepo.getInvitationUrl(identity, groupName))
-                                : new SettingsUsersUserRowViewModel(listener, identity);
+                        return new SettingsUsersUserRowViewModel(listener, identity);
                     }
                 })
                 .toSortedList()
@@ -189,10 +185,7 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
                         mView.removeWorker(workerTag);
                         mView.toggleProgressDialog(false);
 
-                        final Group group = mCurrentIdentity.getGroup();
-                        final String groupName = group.getName();
-                        mItems.add(new SettingsUsersUserRowViewModel(listener, identity,
-                                mUserRepo.getInvitationUrl(identity, groupName)));
+                        mItems.add(new SettingsUsersUserRowViewModel(listener, identity));
                         mView.notifyItemInserted(getLastPosition());
 
                         setValidate(false);

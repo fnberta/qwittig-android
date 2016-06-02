@@ -6,6 +6,7 @@ package ch.giantific.qwittig.data.services.di;
 
 import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.data.services.SavePurchaseTaskService;
+import ch.giantific.qwittig.data.services.SaveUserTaskService;
 import ch.giantific.qwittig.di.ApplicationComponent;
 import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerService;
@@ -21,4 +22,6 @@ public interface ServiceComponent {
     void inject(ParseQueryService parseQueryService);
 
     void inject(SavePurchaseTaskService savePurchaseTaskService);
+
+    void inject(SaveUserTaskService saveUserTaskService);
 }

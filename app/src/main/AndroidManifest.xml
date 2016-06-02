@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--   ~ Copyright (c) 2015 Fabio Berta -->
 <manifest
-    package="ch.giantific.qwittig"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="ch.giantific.qwittig"
     >
 
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -37,44 +38,56 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        >
         <activity
             android:name=".presentation.home.HomeActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.DrawStatusBar">
+            android:theme="@style/AppTheme.DrawStatusBar"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
             <intent-filter>
+                <data
+                    android:host="open"
+                    android:scheme="qwittig"
+                    />
                 <action android:name="android.intent.action.VIEW"/>
 
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                    android:host="qwittig.ch"
-                    android:pathPrefix="/invitation"
-                    android:scheme="https"
-                    />
-                <data
-                    android:host="www.qwittig.ch"
-                    android:pathPrefix="/invitation"
-                    android:scheme="https"
-                    />
-                <data
-                    android:host="qwittig.com"
-                    android:pathPrefix="/invitation"
-                    android:scheme="https"
-                    />
-                <data
-                    android:host="www.qwittig.com"
-                    android:pathPrefix="/invitation"
-                    android:scheme="https"
-                    />
-                <data android:scheme="qwittig"/>
             </intent-filter>
+            <!--<intent-filter>-->
+            <!--<action android:name="android.intent.action.VIEW"/>-->
+
+            <!--<category android:name="android.intent.category.DEFAULT"/>-->
+            <!--<category android:name="android.intent.category.BROWSABLE"/>-->
+
+            <!--<data-->
+            <!--android:host="qwittig.ch"-->
+            <!--android:pathPrefix="/invitation"-->
+            <!--android:scheme="https"-->
+            <!--/>-->
+            <!--<data-->
+            <!--android:host="www.qwittig.ch"-->
+            <!--android:pathPrefix="/invitation"-->
+            <!--android:scheme="https"-->
+            <!--/>-->
+            <!--<data-->
+            <!--android:host="qwittig.com"-->
+            <!--android:pathPrefix="/invitation"-->
+            <!--android:scheme="https"-->
+            <!--/>-->
+            <!--<data-->
+            <!--android:host="www.qwittig.com"-->
+            <!--android:pathPrefix="/invitation"-->
+            <!--android:scheme="https"-->
+            <!--/>-->
+            <!--<data android:scheme="qwittig"/>-->
+            <!--</intent-filter>-->
         </activity>
         <activity
             android:name=".presentation.settings.general.SettingsActivity"
@@ -218,6 +231,15 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name="io.branch.referral.InstallListener"
+            android:exported="true"
+            >
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER"/>
+            </intent-filter>
+        </receiver>
+
         <meta-data
             android:name="com.parse.push.notification_icon"
             android:resource="@drawable/ic_shopping_cart_white_24dp"
@@ -229,6 +251,10 @@
         <meta-data
             android:name="com.parse.push.gcm_sender_id"
             android:value="id:982871908066"
+            />
+        <meta-data
+            android:name="io.branch.sdk.BranchKey"
+            android:value="key_live_acnS5GHRD6gburgxVhUKEfjoFycGimNB"
             />
     </application>
 

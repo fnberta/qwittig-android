@@ -65,5 +65,7 @@ public interface LoginEmailViewModel extends ViewModel, LoadingViewModel,
         void hideKeyboard();
 
         void finishScreen(int result);
+
+        void showProfileFragment();
     }
 }

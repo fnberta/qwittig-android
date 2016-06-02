@@ -118,11 +118,13 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
         getSubscriptions().add(single
                 .subscribe(new SingleSubscriber<User>() {
                     @Override
-                    public void onSuccess(User value) {
+                    public void onSuccess(User user) {
                         mView.removeWorker(workerTag);
 
                         if (type == LoginWorker.Type.RESET_PASSWORD) {
                             mView.showMessage(R.string.toast_password_reset);
+                        } else if (user.isNew()) {
+                            mView.showProfileFragment();
                         } else {
                             mView.finishScreen(Activity.RESULT_OK);
                         }
