@@ -32,7 +32,7 @@ public interface AddEditPurchaseViewModel extends ListViewModel<AddEditPurchaseB
         AddEditPurchaseDateRowViewModel, AddEditPurchaseStoreRowViewModel,
         AddEditPurchaseTotalRowViewModel, AddEditPurchaseItemUsersClickListener,
         NoteDialogFragment.DialogInteractionListener,
-        DiscardChangesDialogFragment.DialogInteractionListener, OcrWorkerListener,
+        DiscardChangesDialogFragment.DialogInteractionListener,
         ExchangeRateDialogFragment.DialogInteractionListener, RatesWorkerListener {
 
     void onDateSet(@NonNull Date date);
@@ -46,7 +46,7 @@ public interface AddEditPurchaseViewModel extends ListViewModel<AddEditPurchaseB
 
     void onReceiptImageTaken();
 
-    void onReceiptImageFailed();
+    void onReceiptImageTakeFailed();
 
     /**
      * Sets the receipt image paths, only used when custom camera is enabled
@@ -90,8 +90,7 @@ public interface AddEditPurchaseViewModel extends ListViewModel<AddEditPurchaseB
 
     @IntDef({PurchaseResult.PURCHASE_SAVED, PurchaseResult.PURCHASE_SAVED_AUTO,
             PurchaseResult.PURCHASE_DRAFT, PurchaseResult.PURCHASE_DRAFT_CHANGES,
-            PurchaseResult.PURCHASE_ERROR, PurchaseResult.PURCHASE_DISCARDED,
-            PurchaseResult.PURCHASE_DRAFT_DELETED,
+            PurchaseResult.PURCHASE_DISCARDED, PurchaseResult.PURCHASE_DRAFT_DELETED,
             Activity.RESULT_CANCELED})
     @Retention(RetentionPolicy.SOURCE)
     @interface PurchaseResult {
@@ -99,9 +98,8 @@ public interface AddEditPurchaseViewModel extends ListViewModel<AddEditPurchaseB
         int PURCHASE_SAVED_AUTO = 3;
         int PURCHASE_DRAFT = 4;
         int PURCHASE_DRAFT_CHANGES = 5;
-        int PURCHASE_ERROR = 6;
-        int PURCHASE_DISCARDED = 7;
-        int PURCHASE_DRAFT_DELETED = 8;
+        int PURCHASE_DISCARDED = 6;
+        int PURCHASE_DRAFT_DELETED = 7;
     }
 
     /**
@@ -111,8 +109,6 @@ public interface AddEditPurchaseViewModel extends ListViewModel<AddEditPurchaseB
         Single<byte[]> encodeReceiptImage(@NonNull String imagePath);
 
         void loadFetchExchangeRatesWorker(@NonNull String baseCurrency, @NonNull String currency);
-
-        void loadOcrWorker(@NonNull String receiptImagePath);
 
         void showDatePickerDialog();
 

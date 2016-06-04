@@ -128,7 +128,7 @@ public abstract class AddEditPurchaseBaseFragment<T extends AddEditPurchaseViewM
                         mViewModel.onReceiptImageTaken();
                         break;
                     case Activity.RESULT_CANCELED:
-                        mViewModel.onReceiptImageFailed();
+                        mViewModel.onReceiptImageTakeFailed();
                         break;
                 }
                 break;
@@ -139,7 +139,7 @@ public abstract class AddEditPurchaseBaseFragment<T extends AddEditPurchaseViewM
                         mViewModel.onReceiptImagesTaken(paths);
                         break;
                     case Activity.RESULT_CANCELED:
-                        mViewModel.onReceiptImageFailed();
+                        mViewModel.onReceiptImageTakeFailed();
                         break;
                 }
                 break;
@@ -201,19 +201,6 @@ public abstract class AddEditPurchaseBaseFragment<T extends AddEditPurchaseViewM
     public void loadFetchExchangeRatesWorker(@NonNull String baseCurrency, @NonNull String currency) {
         RatesWorker.attach(getFragmentManager(), baseCurrency, currency);
     }
-
-    @Override
-    public void loadOcrWorker(@NonNull String receiptImagePath) {
-        OcrWorker.attach(getFragmentManager(), receiptImagePath);
-    }
-
-//    @Override
-//    public void loadSavePurchaseWorker(@NonNull Purchase purchase, @Nullable byte[] receiptImage,
-//                                       @Nullable ParseFile receiptFileOld,
-//                                       boolean deleteOldReceipt, boolean draft) {
-//        EditPurchaseSaveWorker.attach(getFragmentManager(), purchase, receiptImage, receiptFileOld,
-//                deleteOldReceipt, draft);
-//    }
 
     @Override
     public void showDatePickerDialog() {
@@ -352,11 +339,11 @@ public abstract class AddEditPurchaseBaseFragment<T extends AddEditPurchaseViewM
             startActivityForResult(intent, INTENT_REQUEST_IMAGE_CAPTURE);
         } else {
             final Context context = getActivity();
-            File imageFile;
+            final File imageFile;
             try {
                 imageFile = CameraUtils.createImageFile(context);
             } catch (IOException e) {
-                finishScreen(PurchaseResult.PURCHASE_ERROR);
+                mViewModel.onReceiptImageTakeFailed();
                 return;
             }
 

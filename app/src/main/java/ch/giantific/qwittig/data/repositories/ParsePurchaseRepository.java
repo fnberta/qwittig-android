@@ -15,6 +15,7 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,14 +24,19 @@ import java.util.Map;
 
 import ch.giantific.qwittig.data.rest.CurrencyRates;
 import ch.giantific.qwittig.data.rest.ExchangeRates;
+import ch.giantific.qwittig.data.rest.ReceiptOcr;
 import ch.giantific.qwittig.data.services.SavePurchaseTaskService;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Item;
+import ch.giantific.qwittig.domain.models.OcrPurchase;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.parse.ParseUtils;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import rx.Observable;
 import rx.Single;
 import rx.android.schedulers.AndroidSchedulers;
@@ -52,15 +58,18 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     private static final long EXCHANGE_RATE_REFRESH_INTERVAL = 24 * 60 * 60 * 1000;
     private final SharedPreferences mSharedPrefs;
     private final ExchangeRates mExchangeRates;
+    private final ReceiptOcr mReceiptOcr;
     private final GcmNetworkManager mGcmNetworkManager;
 
     public ParsePurchaseRepository(@NonNull SharedPreferences sharedPreferences,
                                    @NonNull ExchangeRates exchangeRates,
+                                   @NonNull ReceiptOcr receiptOcr,
                                    @NonNull GcmNetworkManager gcmNetworkManager) {
         super();
 
         mSharedPrefs = sharedPreferences;
         mExchangeRates = exchangeRates;
+        mReceiptOcr = receiptOcr;
         mGcmNetworkManager = gcmNetworkManager;
     }
 
@@ -157,7 +166,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
 
     @Override
     public boolean deletePurchaseLocal(@NonNull String purchaseId, @NonNull String groupId) {
-        final ParseObject purchase = ParseObject.createWithoutData(Purchase.CLASS, purchaseId);
+        final Purchase purchase = (Purchase) ParseObject.createWithoutData(Purchase.CLASS, purchaseId);
         try {
             purchase.unpin(Purchase.PIN_LABEL + groupId);
         } catch (ParseException e) {
@@ -232,13 +241,13 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
 
     @Override
     public boolean updatePurchase(@NonNull String purchaseId, boolean isNew) {
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery(Purchase.CLASS);
+        final ParseQuery<Purchase> query = ParseQuery.getQuery(Purchase.CLASS);
         query.include(Purchase.ITEMS);
         query.include(Purchase.IDENTITIES);
         query.include(Purchase.BUYER);
 
         try {
-            final Purchase purchase = (Purchase) query.get(purchaseId);
+            final Purchase purchase = query.get(purchaseId);
             final String groupId = purchase.getGroup().getObjectId();
             final String pinLabel = Purchase.PIN_LABEL + groupId;
 
@@ -461,6 +470,28 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     }
 
     @Override
+    public Observable<String> uploadReceipt(@NonNull String sessionToken, @NonNull final String receiptPath) {
+        final RequestBody tokenPart = RequestBody.create(
+                MediaType.parse("text/plain"), sessionToken);
+
+        final File file = new File(receiptPath);
+        final RequestBody receiptPart = RequestBody.create(
+                MediaType.parse("image/jpeg"), file);
+        final MultipartBody.Part body =
+                MultipartBody.Part.createFormData("receipt", file.getName(), receiptPart);
+
+        return mReceiptOcr.uploadReceipt(tokenPart, body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .map(new Func1<Void, String>() {
+                    @Override
+                    public String call(Void aVoid) {
+                        return receiptPath;
+                    }
+                });
+    }
+
+    @Override
     public boolean isDraftsAvailable(@NonNull Identity identity) {
         return mSharedPrefs.getBoolean(DRAFTS_AVAILABLE + identity.getObjectId(), false);
     }
@@ -524,5 +555,24 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
                         return exchangeRates.get(currency);
                     }
                 });
+    }
+
+    @Override
+    public Single<OcrPurchase> fetchOcrPurchaseData(@NonNull String ocrPurchaseId) {
+        final OcrPurchase purchase = (OcrPurchase) ParseObject.createWithoutData(OcrPurchase.CLASS, ocrPurchaseId);
+        return fetchLocal(purchase);
+    }
+
+    @Override
+    public boolean updateOcrPurchase(@NonNull String ocrPurchaseId) {
+        final ParseQuery<OcrPurchase> query = ParseQuery.getQuery(OcrPurchase.CLASS);
+        try {
+            final OcrPurchase ocrPurchase = query.get(ocrPurchaseId);
+            ocrPurchase.pin();
+        } catch (ParseException e) {
+            return false;
+        }
+
+        return true;
     }
 }

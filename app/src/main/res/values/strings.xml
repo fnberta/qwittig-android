@@ -319,5 +319,7 @@
     <string name="invite_accept_yes">Accept</string>
     <string name="toast_invitation_accept_login">Login to accept the invitation</string>
     <string name="toast_invitation_ignore">Invitation ignored. Click again on the link if you change your mind.</string>
+    <string name="push_purchase_ocr_title">Purchase ready</string>
+    <string name="push_purchase_ocr_alert">Purchase is processed and ready to be saved</string>
 
 </resources>

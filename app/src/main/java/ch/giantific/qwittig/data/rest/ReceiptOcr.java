@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.data.rest;
 
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
@@ -22,7 +23,7 @@ public interface ReceiptOcr {
      * @return the result as an {@link Observable}
      */
     @Multipart
-    @POST("/api/receipt")
-    Observable<OcrPurchase> uploadReceipt(@Part("sessionToken") RequestBody sessionToken,
-                                          @Part("receipt") RequestBody receipt);
+    @POST("receipt")
+    Observable<Void> uploadReceipt(@Part("sessionToken") RequestBody sessionToken,
+                                   @Part MultipartBody.Part receipt);
 }

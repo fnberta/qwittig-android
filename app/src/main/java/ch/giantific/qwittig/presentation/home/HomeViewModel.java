@@ -6,6 +6,7 @@ package ch.giantific.qwittig.presentation.home;
 
 import android.databinding.Bindable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 
 import ch.berta.fabio.fabspeeddial.FabMenu;
@@ -16,7 +17,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
  */
 public interface HomeViewModel extends ViewModel,
         JoinGroupDialogFragment.DialogInteractionListener,
-        JoinGroupWorkerListener {
+        JoinGroupWorkerListener, OcrWorkerListener {
 
     void onLoginSuccessful();
 
@@ -30,14 +31,20 @@ public interface HomeViewModel extends ViewModel,
     void handleInvitation(@NonNull String identityId, @NonNull String groupName,
                           @NonNull String inviterNickname);
 
+    void onReceiptImageTaken(@NonNull String receiptImagePath);
+
+    void onReceiptImageFailed();
+
+    void onOcrPurchaseReady(@NonNull String ocrPurchaseId);
+
+    void onOcrPurchaseFailed();
+
     FabMenu.FabMenuItemClickListener getFabMenuItemClickListener();
 
     /**
      * Defines the interaction with the attached view.
      */
     interface ViewListener extends ViewModel.ViewListener {
-        void startPurchaseAddActivity(boolean autoMode);
-
         void showGroupJoinDialog(@NonNull String groupName, @NonNull String inviterNickname);
 
         void loadJoinGroupWorker(@NonNull String identityId);
@@ -47,5 +54,11 @@ public interface HomeViewModel extends ViewModel,
         void hideProgressDialog();
 
         void onGroupJoined();
+
+        void captureImage();
+
+        void loadOcrWorker(@NonNull String receiptImagePath);
+
+        void startPurchaseAddScreen(@Nullable String ocrPurchaseId);
     }
 }

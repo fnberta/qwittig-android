@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.presentation.home;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -18,6 +19,9 @@ import android.support.v7.app.ActionBar;
 import android.view.ActionMode;
 
 import org.json.JSONObject;
+
+import java.io.File;
+import java.io.IOException;
 
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
@@ -36,10 +40,9 @@ import ch.giantific.qwittig.presentation.home.purchases.list.DraftsViewModel;
 import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesFragment;
 import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesQueryMoreWorkerListener;
 import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesViewModel;
-import ch.giantific.qwittig.presentation.login.LoginActivity;
-import ch.giantific.qwittig.presentation.login.LoginInvitationFragment;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
+import ch.giantific.qwittig.utils.CameraUtils;
 import io.branch.referral.Branch;
 import io.branch.referral.BranchError;
 import rx.Observable;
@@ -62,7 +65,8 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
         DraftsFragment.ActivityListener,
         PurchasesQueryMoreWorkerListener,
         JoinGroupDialogFragment.DialogInteractionListener,
-        JoinGroupWorkerListener {
+        JoinGroupWorkerListener,
+        OcrWorkerListener {
 
     public static final String BRANCH_IS_INVITE = "+clicked_branch_link";
     public static final String BRANCH_IDENTITY_ID = "identityId";
@@ -77,14 +81,28 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     private DraftsFragment mDraftsFragment;
     private ProgressDialog mProgressDialog;
     private HomeTabsAdapter mTabsAdapter;
+    private String mReceiptImagePath;
 
     @Override
     protected void handleLocalBroadcast(Intent intent, int dataType) {
         super.handleLocalBroadcast(intent, dataType);
 
-        if (dataType == LocalBroadcast.DataType.PURCHASES_UPDATED) {
-            final boolean successful = intent.getBooleanExtra(LocalBroadcast.INTENT_EXTRA_SUCCESSFUL, false);
-            mPurchasesViewModel.onDataUpdated(successful);
+        switch (dataType) {
+            case LocalBroadcast.DataType.PURCHASES_UPDATED: {
+                final boolean successful = intent.getBooleanExtra(LocalBroadcast.INTENT_EXTRA_SUCCESSFUL, false);
+                mPurchasesViewModel.onDataUpdated(successful);
+                break;
+            }
+            case LocalBroadcast.DataType.OCR_PURCHASE_UPDATED: {
+                final boolean successful = intent.getBooleanExtra(LocalBroadcast.INTENT_EXTRA_SUCCESSFUL, false);
+                if (successful) {
+                    final String ocrPurchaseId = intent.getStringExtra(LocalBroadcast.INTENT_EXTRA_OCR_PURCHASE_ID);
+                    mViewModel.onOcrPurchaseReady(ocrPurchaseId);
+                } else {
+                    mViewModel.onOcrPurchaseFailed();
+                }
+                break;
+            }
         }
     }
 
@@ -226,18 +244,25 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
                     case AddEditPurchaseViewModel.PurchaseResult.PURCHASE_DISCARDED:
                         showMessage(R.string.toast_purchase_discarded);
                         break;
-                    case AddEditPurchaseViewModel.PurchaseResult.PURCHASE_ERROR:
-                        showMessage(R.string.toast_create_image_file_failed);
-                        break;
                 }
                 break;
-            case HomeActivity.INTENT_REQUEST_PURCHASE_DETAILS:
+            case INTENT_REQUEST_PURCHASE_DETAILS:
                 switch (resultCode) {
                     case PurchaseDetailsResult.PURCHASE_DELETED:
                         showMessage(R.string.toast_purchase_deleted);
                         break;
                     case PurchaseDetailsResult.GROUP_CHANGED:
                         mNavDrawerViewModel.onIdentityChanged();
+                        break;
+                }
+                break;
+            case INTENT_REQUEST_IMAGE_CAPTURE:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        mViewModel.onReceiptImageTaken(mReceiptImagePath);
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        mViewModel.onReceiptImageFailed();
                         break;
                 }
                 break;
@@ -335,22 +360,6 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
         return mToolbar.startActionMode(mDraftsFragment);
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public void startPurchaseAddActivity(boolean autoMode) {
-        final Intent intent = new Intent(this, AddPurchaseActivity.class);
-        if (autoMode) {
-            intent.putExtra(AddPurchaseActivity.INTENT_PURCHASE_NEW_AUTO, true);
-            startActivityForResult(intent, HomeActivity.INTENT_REQUEST_PURCHASE_MODIFY);
-        } else {
-            intent.putExtra(AddPurchaseActivity.INTENT_PURCHASE_NEW_AUTO, false);
-            final ActivityOptionsCompat activityOptionsCompat =
-                    ActivityOptionsCompat.makeSceneTransitionAnimation(this);
-            startActivityForResult(intent, HomeActivity.INTENT_REQUEST_PURCHASE_MODIFY,
-                    activityOptionsCompat.toBundle());
-        }
-    }
-
     @Override
     public void showGroupJoinDialog(@NonNull String groupName, @NonNull String inviterNickname) {
         JoinGroupDialogFragment.display(getSupportFragmentManager(), groupName, inviterNickname);
@@ -377,6 +386,49 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     public void onGroupJoined() {
         ParseQueryService.startUpdateAll(this);
         mNavDrawerViewModel.onIdentitiesChanged();
+    }
+
+    @Override
+    public void captureImage() {
+        if (!CameraUtils.hasCameraHardware(this)) {
+            showMessage(R.string.toast_no_camera);
+            return;
+        }
+
+        final File imageFile;
+        try {
+            imageFile = CameraUtils.createImageFile(this);
+        } catch (IOException e) {
+            showMessage(R.string.toast_create_image_file_failed);
+            return;
+        }
+
+        mReceiptImagePath = imageFile.getAbsolutePath();
+        final Intent cameraIntent = CameraUtils.getCameraIntent(this, imageFile);
+        if (cameraIntent != null) {
+            startActivityForResult(cameraIntent, INTENT_REQUEST_IMAGE_CAPTURE);
+        }
+    }
+
+    @Override
+    public void loadOcrWorker(@NonNull String receiptImagePath) {
+        OcrWorker.attach(getSupportFragmentManager(), receiptImagePath);
+    }
+
+    @Override
+    public void setOcrStream(@NonNull Single<String> single, @NonNull String workerTag) {
+        mViewModel.setOcrStream(single, workerTag);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void startPurchaseAddScreen(@Nullable String ocrPurchaseId) {
+        final Intent intent = new Intent(this, AddPurchaseActivity.class);
+        intent.putExtra(AddPurchaseActivity.INTENT_OCR_PURCHASE_ID, ocrPurchaseId);
+        final ActivityOptionsCompat activityOptionsCompat =
+                ActivityOptionsCompat.makeSceneTransitionAnimation(this);
+        startActivityForResult(intent, HomeActivity.INTENT_REQUEST_PURCHASE_MODIFY,
+                activityOptionsCompat.toBundle());
     }
 
     @Override

@@ -10,7 +10,7 @@ import ch.giantific.qwittig.di.scopes.PerScreen;
 import ch.giantific.qwittig.presentation.finance.paid.CompsQueryMoreWorker;
 import ch.giantific.qwittig.presentation.finance.unpaid.CompRemindWorker;
 import ch.giantific.qwittig.presentation.home.JoinGroupWorker;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.OcrWorker;
+import ch.giantific.qwittig.presentation.home.OcrWorker;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.RatesWorker;
 import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesQueryMoreWorker;
 import ch.giantific.qwittig.presentation.login.LoginWorker;

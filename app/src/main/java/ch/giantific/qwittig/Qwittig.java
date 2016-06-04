@@ -23,6 +23,7 @@ import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Item;
+import ch.giantific.qwittig.domain.models.OcrPurchase;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.domain.models.TaskHistoryEvent;
@@ -83,6 +84,7 @@ public class Qwittig extends Application {
         ParseObject.registerSubclass(Identity.class);
         ParseObject.registerSubclass(User.class);
         ParseObject.registerSubclass(Purchase.class);
+        ParseObject.registerSubclass(OcrPurchase.class);
         ParseObject.registerSubclass(Item.class);
         ParseObject.registerSubclass(Compensation.class);
         ParseObject.registerSubclass(Task.class);

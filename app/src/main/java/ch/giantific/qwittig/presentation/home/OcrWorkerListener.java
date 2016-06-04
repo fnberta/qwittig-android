@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.home.purchases.addedit;
+package ch.giantific.qwittig.presentation.home;
 
 import android.support.annotation.NonNull;
 
@@ -20,5 +20,5 @@ public interface OcrWorkerListener extends BaseWorkerListener {
      * @param single    the {@link Single} that represents the ocr processing process
      * @param workerTag the tag of the worker
      */
-    void setOcrStream(@NonNull Single<OcrPurchase> single, @NonNull String workerTag);
+    void setOcrStream(@NonNull Single<String> single, @NonNull String workerTag);
 }

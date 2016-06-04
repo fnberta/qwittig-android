@@ -10,6 +10,8 @@ import ch.giantific.qwittig.data.rest.ExchangeRates;
 import ch.giantific.qwittig.data.rest.ReceiptOcr;
 import dagger.Module;
 import dagger.Provides;
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -20,8 +22,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 @Module
 public class RestServiceModule {
 
-    private static final String BASE_URL_OCR = "http://37.120.165.175:3000";
-    private static final String BASE_URL_EXCHANGE_RATES = "http://api.fixer.io";
+    private static final String BASE_URL_OCR = "https://qwittig.com/api/";
+    private static final String BASE_URL_EXCHANGE_RATES = "http://api.fixer.io/";
 
     @Provides
     @Singleton

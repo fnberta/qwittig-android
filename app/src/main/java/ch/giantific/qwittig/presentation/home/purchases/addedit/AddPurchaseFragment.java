@@ -7,6 +7,7 @@ package ch.giantific.qwittig.presentation.home.purchases.addedit;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -14,9 +15,9 @@ import android.view.MenuItem;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.di.AddPurchaseAutoViewModelModule;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.di.AddPurchaseOcrViewModelModule;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.di.AddPurchaseViewModelModule;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.di.DaggerAddPurchaseAutoComponent;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.di.DaggerAddPurchaseOcrComponent;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.di.DaggerAddPurchaseComponent;
 
 /**
@@ -28,7 +29,7 @@ import ch.giantific.qwittig.presentation.home.purchases.addedit.di.DaggerAddPurc
 public class AddPurchaseFragment extends AddEditPurchaseBaseFragment<AddEditPurchaseViewModel, AddEditPurchaseBaseFragment.ActivityListener>
         implements AddEditPurchaseViewModel.ViewListener {
 
-    private static final String KEY_AUTO_MODE = "AUTO_MODE";
+    private static final String KEY_OCR_PURCHASE_ID = "OCR_PURCHASE_ID";
 
     public AddPurchaseFragment() {
         // required empty constructor
@@ -43,7 +44,6 @@ public class AddPurchaseFragment extends AddEditPurchaseBaseFragment<AddEditPurc
     public static AddPurchaseFragment newAddInstance() {
         final AddPurchaseFragment fragment = new AddPurchaseFragment();
         final Bundle args = new Bundle();
-        args.putBoolean(KEY_AUTO_MODE, false);
         fragment.setArguments(args);
         return fragment;
     }
@@ -54,10 +54,10 @@ public class AddPurchaseFragment extends AddEditPurchaseBaseFragment<AddEditPurc
      * @return a new instance of {@link AddPurchaseFragment}
      */
     @NonNull
-    public static AddPurchaseFragment newAddAutoInstance() {
+    public static AddPurchaseFragment newAddOcrInstance(@NonNull String ocrPurchaseId) {
         final AddPurchaseFragment fragment = new AddPurchaseFragment();
         final Bundle args = new Bundle();
-        args.putBoolean(KEY_AUTO_MODE, true);
+        args.putString(KEY_OCR_PURCHASE_ID, ocrPurchaseId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -71,17 +71,17 @@ public class AddPurchaseFragment extends AddEditPurchaseBaseFragment<AddEditPurc
     }
 
     private void injectDependencies(@Nullable Bundle savedInstanceState) {
-        final boolean auto = getArguments().getBoolean(KEY_AUTO_MODE, false);
-        if (auto) {
-            DaggerAddPurchaseAutoComponent.builder()
-                    .applicationComponent(Qwittig.getAppComponent(getActivity()))
-                    .addPurchaseAutoViewModelModule(new AddPurchaseAutoViewModelModule(savedInstanceState, this))
-                    .build()
-                    .inject(this);
-        } else {
+        final String ocrPurchaseId = getArguments().getString(KEY_OCR_PURCHASE_ID, "");
+        if (TextUtils.isEmpty(ocrPurchaseId)) {
             DaggerAddPurchaseComponent.builder()
                     .applicationComponent(Qwittig.getAppComponent(getActivity()))
                     .addPurchaseViewModelModule(new AddPurchaseViewModelModule(savedInstanceState, this))
+                    .build()
+                    .inject(this);
+        } else {
+            DaggerAddPurchaseOcrComponent.builder()
+                    .applicationComponent(Qwittig.getAppComponent(getActivity()))
+                    .addPurchaseOcrViewModelModule(new AddPurchaseOcrViewModelModule(savedInstanceState, this, ocrPurchaseId))
                     .build()
                     .inject(this);
         }

@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import java.util.List;
 
 import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.OcrPurchase;
 import ch.giantific.qwittig.domain.models.Purchase;
 import rx.Observable;
 import rx.Single;
@@ -19,9 +20,9 @@ import rx.Single;
 public interface PurchaseRepository extends BaseRepository {
 
     String FILE_NAME = "receipt.jpg";
-    int JPEG_COMPRESSION_RATE = 80; // TODO: figure out real value
-    int HEIGHT = 720; // TODO: figure out real height and width
-    int WIDTH = 720;
+    int JPEG_COMPRESSION_RATE = 100; // TODO: figure out real value
+    int HEIGHT = 1000; // TODO: figure out real height and width
+    int WIDTH = 1000;
 
     /**
      * Queries the local data store for purchases.
@@ -116,6 +117,8 @@ public interface PurchaseRepository extends BaseRepository {
      */
     void deletePurchase(@NonNull Purchase purchase);
 
+    Observable<String> uploadReceipt(@NonNull String sessionToken, @NonNull String receiptPath);
+
     /**
      * Returns whether drafts are available for the current identity of the user.
      *
@@ -140,4 +143,8 @@ public interface PurchaseRepository extends BaseRepository {
      * @return a {@link Single} emitting the result
      */
     Single<Float> getExchangeRate(@NonNull String baseCurrency, @NonNull String currency);
+
+    Single<OcrPurchase> fetchOcrPurchaseData(@NonNull String ocrPurchaseId);
+
+    boolean updateOcrPurchase(@NonNull String ocrPurchaseId);
 }
