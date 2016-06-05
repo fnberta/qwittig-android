@@ -49,7 +49,7 @@ public class CameraUtils {
 
     public static File createImageFile(Context context) throws IOException {
         final String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-        final String imageFileName = "JPEG_" + timeStamp + "_";
+        final String imageFileName = "JPEG_" + timeStamp + "_" + "receipt";
         final File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         return File.createTempFile(
                 imageFileName,  /* prefix */

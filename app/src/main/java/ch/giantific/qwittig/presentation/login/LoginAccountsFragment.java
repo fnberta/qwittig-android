@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 
 import org.json.JSONObject;
 
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentLoginAccountsBinding;
 import ch.giantific.qwittig.presentation.home.HomeActivity;
@@ -49,6 +50,7 @@ public class LoginAccountsFragment extends BaseFragment<LoginAccountsViewModel, 
         super.onCreate(savedInstanceState);
 
         DaggerLoginAccountsComponent.builder()
+                .applicationComponent(Qwittig.getAppComponent(getActivity()))
                 .loginAccountsViewModelModule(new LoginAccountsViewModelModule(savedInstanceState, this))
                 .build()
                 .inject(this);

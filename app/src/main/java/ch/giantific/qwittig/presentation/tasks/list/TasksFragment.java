@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.BuildConfig;
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.FragmentTasksBinding;
 import ch.giantific.qwittig.domain.models.Task;
@@ -64,6 +65,7 @@ public class TasksFragment extends BaseRecyclerViewFragment<TasksViewModel, Task
         final TaskDeadline taskDeadline = args.getParcelable(KEY_DEADLINE);
 
         DaggerTasksListComponent.builder()
+                .applicationComponent(Qwittig.getAppComponent(getActivity()))
                 .tasksListViewModelModule(new TasksListViewModelModule(savedInstanceState, this, taskDeadline))
                 .build()
                 .inject(this);

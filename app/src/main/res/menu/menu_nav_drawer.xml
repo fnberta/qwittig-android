@@ -24,13 +24,13 @@
             android:id="@+id/nav_tasks"
             android:icon="@drawable/ic_nav_assignment"
             android:title="@string/title_activity_tasks"
-            android:visible="true"
+            android:visible="false"
             />
         <item
             android:id="@+id/nav_stats"
             android:icon="@drawable/ic_nav_assessment"
             android:title="@string/title_activity_stats"
-            android:visible="true"
+            android:visible="false"
             />
     </group>
 

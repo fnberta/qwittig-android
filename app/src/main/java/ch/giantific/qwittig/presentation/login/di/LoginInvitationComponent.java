@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.presentation.login.di;
 
+import ch.giantific.qwittig.di.ApplicationComponent;
 import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerScreen;
 import ch.giantific.qwittig.presentation.login.LoginFirstGroupFragment;
@@ -14,7 +15,8 @@ import dagger.Component;
  * Provides the dependencies for the login accounts screen.
  */
 @PerScreen
-@Component(modules = {LoginInvitationViewModelModule.class, RepositoriesModule.class})
+@Component(dependencies = {ApplicationComponent.class},
+        modules = {LoginInvitationViewModelModule.class, RepositoriesModule.class})
 public interface LoginInvitationComponent {
     void inject(LoginInvitationFragment loginInvitationFragment);
 }

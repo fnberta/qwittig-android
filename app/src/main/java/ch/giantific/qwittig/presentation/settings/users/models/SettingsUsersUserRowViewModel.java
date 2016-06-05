@@ -18,11 +18,9 @@ import ch.giantific.qwittig.domain.models.Identity;
 public class SettingsUsersUserRowViewModel extends BaseObservable
         implements Comparable<SettingsUsersUserRowViewModel> {
 
-    private final ShareListener mShareListener;
     private final Identity mIdentity;
 
-    public SettingsUsersUserRowViewModel(@NonNull ShareListener shareListener, @NonNull Identity identity) {
-        mShareListener = shareListener;
+    public SettingsUsersUserRowViewModel(@NonNull Identity identity) {
         mIdentity = identity;
     }
 
@@ -36,28 +34,17 @@ public class SettingsUsersUserRowViewModel extends BaseObservable
     }
 
     @Bindable
-    public boolean isPending() {
-        return mIdentity.isPending();
+    public String getAvatar() {
+        return mIdentity.getAvatarUrl();
     }
 
-    public void onShareClick(View view) {
-        mShareListener.onShareClick(mIdentity.getInvitationLink());
+    @Bindable
+    public boolean isPending() {
+        return mIdentity.isPending();
     }
 
     @Override
     public int compareTo(@NonNull SettingsUsersUserRowViewModel another) {
         return getNickname().compareToIgnoreCase(another.getNickname());
-    }
-
-    /**
-     * Defines the actions to take when the user wants to share the invitation link.
-     */
-    public interface ShareListener {
-        /**
-         * Called when the share link button is clicked
-         *
-         * @param shareLink the invitation link for identity
-         */
-        void onShareClick(@NonNull String shareLink);
     }
 }

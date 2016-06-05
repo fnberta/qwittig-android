@@ -21,6 +21,7 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.google.android.gms.gcm.GcmNetworkManager;
 import com.parse.GetCallback;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
@@ -38,14 +39,18 @@ import com.parse.SignUpCallback;
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
+import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.data.push.PushBroadcastReceiver;
+import ch.giantific.qwittig.data.services.SaveIdentityTaskService;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
@@ -60,8 +65,10 @@ import io.branch.referral.util.LinkProperties;
 import rx.Observable;
 import rx.Single;
 import rx.SingleSubscriber;
+import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import timber.log.Timber;
 
 /**
  * Provides an implementation of {@link UserRepository} that uses the Parse.com framework as
@@ -77,9 +84,12 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
     private static final String ADD_NEW_GROUP = "addGroup";
     private static final String FIRST_GROUP_NAME = "Qwittig";
     private static final String FIRST_GROUP_CURRENCY = "CHF";
+    private final GcmNetworkManager mGcmNetworkManager;
 
-    public ParseUserRepository() {
+    public ParseUserRepository(@NonNull GcmNetworkManager gcmNetworkManager) {
         super();
+
+        mGcmNetworkManager = gcmNetworkManager;
     }
 
     @Override
@@ -906,8 +916,9 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
         return query;
     }
 
-    public Observable<Identity> saveCurrentUserProfile(@NonNull final String newNickname,
-                                                       @NonNull final byte[] newAvatar) {
+    @Override
+    public Observable<Identity> saveCurrentUserIdentitiesWithAvatar(@Nullable final String newNickname,
+                                                                    @NonNull final String localAvatarPath) {
         final User currentUser = getCurrentUser();
         if (currentUser == null) {
             return Observable.error(new Exception("currentUser is null"));
@@ -918,41 +929,50 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                 .flatMap(new Func1<Identity, Observable<Identity>>() {
                     @Override
                     public Observable<Identity> call(Identity identity) {
-                        identity.setNickname(newNickname);
-                        identity.setAvatarData(newAvatar);
-                        return pin(identity, Identity.PIN_LABEL_TEMP).toObservable();
+                        if (!TextUtils.isEmpty(newNickname)) {
+                            identity.setNickname(newNickname);
+                        }
+                        identity.setAvatarLocal(localAvatarPath);
+                        return unpin(identity, Identity.PIN_LABEL)
+                                .flatMap(new Func1<Identity, Single<Identity>>() {
+                                    @Override
+                                    public Single<Identity> call(Identity identity) {
+                                        return pin(identity, Identity.PIN_LABEL_TEMP);
+                                    }
+                                })
+                                .toObservable();
+                    }
+                })
+                .doOnCompleted(new Action0() {
+                    @Override
+                    public void call() {
+                        SaveIdentityTaskService.scheduleCurrentUser(mGcmNetworkManager);
                     }
                 });
     }
 
     @Override
-    public boolean uploadCurrentUserProfile() {
-        final User currentUser = getCurrentUser();
-        if (currentUser == null) {
-            return false;
-        }
-
-        final String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("jpg");
-        final List<Identity> identities = currentUser.getIdentities();
-
-        final byte[] avatar = identities.get(0).getAvatarData();
-        final ParseFile newAvatar = new ParseFile(UserRepository.FILE_NAME, avatar, mimeType);
+    public boolean uploadIdentities(@NonNull Context context, @NonNull List<Identity> identities) {
+        final String localAvatarPath = identities.get(0).getAvatarLocal();
+        final ParseFile avatar;
         try {
-            newAvatar.save();
-        } catch (ParseException e) {
+            avatar = saveAvatar(context, localAvatarPath);
+        } catch (ExecutionException | InterruptedException | ParseException e) {
             return false;
         }
 
         for (Identity identity : identities) {
             try {
-                identity.setAvatar(newAvatar);
-                identity.removeAvatarData();
+                identity.setAvatar(avatar);
+                identity.removeAvatarLocal();
                 identity.save();
             } catch (ParseException e) {
-                identity.setAvatarData(avatar);
+                identity.setAvatarLocal(localAvatarPath);
                 return false;
             }
         }
+
+        deleteLocalAvatar(localAvatarPath);
 
         for (Identity identity : identities) {
             try {
@@ -966,27 +986,88 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
         return true;
     }
 
-    @Override
-    public Observable<Identity> saveIdentitiesWithAvatar(@NonNull final List<Identity> identities,
-                                                         @NonNull final String nickname,
-                                                         @NonNull byte[] avatarBytes) {
+    private ParseFile saveAvatar(@NonNull Context context, @NonNull String localAvatarPath)
+            throws ExecutionException, InterruptedException, ParseException {
         final String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("jpg");
-        final ParseFile avatar = new ParseFile(UserRepository.FILE_NAME, avatarBytes, mimeType);
-        return saveFile(avatar)
-                .flatMapObservable(new Func1<ParseFile, Observable<? extends Identity>>() {
+        final byte[] avatar = encodeAvatar(context, localAvatarPath);
+        final ParseFile avatarFile = new ParseFile(UserRepository.FILE_NAME, avatar, mimeType);
+        avatarFile.save();
+
+        return avatarFile;
+    }
+
+    private byte[] encodeAvatar(@NonNull Context context, @NonNull String path)
+            throws ExecutionException, InterruptedException {
+        return Glide.with(context)
+                .load(path)
+                .asBitmap()
+                .toBytes(Bitmap.CompressFormat.JPEG, UserRepository.JPEG_COMPRESSION_RATE)
+                .centerCrop()
+                .into(UserRepository.WIDTH, UserRepository.HEIGHT)
+                .get();
+    }
+
+    private void deleteLocalAvatar(String localAvatarPath) {
+        final File avatarFile = new File(localAvatarPath);
+        final boolean deleteSuccessful = avatarFile.delete();
+        if (!deleteSuccessful && BuildConfig.DEBUG) {
+            Timber.e("Failed to delete local avatar file");
+        }
+    }
+
+    @Override
+    public Single<Identity> saveIdentityWithAvatar(@NonNull Identity identity,
+                                                   @Nullable String newNickname,
+                                                   @NonNull String localAvatarPath) {
+        if (!TextUtils.isEmpty(newNickname)) {
+            identity.setNickname(newNickname);
+        }
+        identity.setAvatarLocal(localAvatarPath);
+        return pin(identity, Identity.PIN_LABEL_TEMP)
+                .doOnSuccess(new Action1<Identity>() {
                     @Override
-                    public Observable<? extends Identity> call(ParseFile parseFile) {
-                        return Observable.from(identities)
-                                .doOnNext(new Action1<Identity>() {
-                                    @Override
-                                    public void call(Identity identity) {
-                                        identity.setNickname(nickname);
-                                        identity.setAvatar(avatar);
-                                        identity.saveEventually();
-                                    }
-                                });
+                    public void call(Identity identity) {
+                        SaveIdentityTaskService.scheduleIdentity(mGcmNetworkManager, identity.getObjectId());
                     }
                 });
+    }
+
+    @Override
+    public boolean uploadIdentityId(@NonNull Context context, @NonNull String identityId) {
+        final Identity identity = (Identity) ParseObject.createWithoutData(Identity.CLASS, identityId);
+        try {
+            identity.fetchFromLocalDatastore();
+        } catch (ParseException e) {
+            return false;
+        }
+
+        final String localAvatarPath = identity.getAvatarLocal();
+        final ParseFile avatar;
+        try {
+            avatar = saveAvatar(context, localAvatarPath);
+        } catch (ExecutionException | InterruptedException | ParseException e) {
+            return false;
+        }
+
+        try {
+            identity.setAvatar(avatar);
+            identity.removeAvatarLocal();
+            identity.save();
+        } catch (ParseException e) {
+            identity.setAvatarLocal(localAvatarPath);
+            return false;
+        }
+
+        deleteLocalAvatar(localAvatarPath);
+
+        try {
+            identity.unpin(Identity.PIN_LABEL_TEMP);
+            identity.pin(Identity.PIN_LABEL);
+        } catch (ParseException e) {
+            return false;
+        }
+
+        return true;
     }
 
     @Override

@@ -16,7 +16,7 @@ import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesQueryMoreW
 import ch.giantific.qwittig.presentation.login.LoginWorker;
 import ch.giantific.qwittig.presentation.settings.addgroup.AddGroupWorker;
 import ch.giantific.qwittig.presentation.settings.general.LogoutWorker;
-import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileWorker;
+import ch.giantific.qwittig.presentation.settings.profile.UnlinkThirdPartyWorker;
 import ch.giantific.qwittig.presentation.settings.users.AddUserWorker;
 import ch.giantific.qwittig.presentation.tasks.list.TaskRemindWorker;
 import dagger.Component;
@@ -51,5 +51,5 @@ public interface WorkerComponent {
 
     void inject(LogoutWorker logoutWorker);
 
-    void inject(SettingsProfileWorker settingsProfileWorker);
+    void inject(UnlinkThirdPartyWorker settingsProfileWorker);
 }

@@ -50,7 +50,5 @@ public interface LoginProfileViewModel extends ViewModel {
         void showFirstGroupFragment();
 
         void showAvatarPicker();
-
-        Single<byte[]> encodeAvatar(@NonNull String avatar);
     }
 }

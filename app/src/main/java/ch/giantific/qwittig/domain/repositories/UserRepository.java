@@ -273,22 +273,16 @@ public interface UserRepository extends BaseRepository {
      */
     boolean updateIdentities(@NonNull List<Identity> identities);
 
-    Observable<Identity> saveCurrentUserProfile(@NonNull final String newNickname,
-                                                @NonNull final byte[] newAvatar);
+    Observable<Identity> saveCurrentUserIdentitiesWithAvatar(@Nullable String newNickname,
+                                                             @NonNull String localAvatarPath);
 
-    boolean uploadCurrentUserProfile();
+    boolean uploadIdentities(@NonNull Context context, @NonNull List<Identity> identities);
 
-    /**
-     * Saves the identities with a nickname and avatar.
-     *
-     * @param identities  the identities to save
-     * @param nickname    the nickname
-     * @param avatarBytes the avatar
-     * @return a {@link Observable} emitting the results
-     */
-    Observable<Identity> saveIdentitiesWithAvatar(@NonNull List<Identity> identities,
-                                                  @NonNull String nickname,
-                                                  @NonNull byte[] avatarBytes);
+    Single<Identity> saveIdentityWithAvatar(@NonNull Identity identity,
+                                            @Nullable String newNickname,
+                                            @NonNull String localAvatarPath);
+
+    boolean uploadIdentityId(@NonNull Context context, @NonNull String identityId);
 
     Single<Identity> removePendingIdentity(@NonNull Identity identity);
 }

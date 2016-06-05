@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentPurchaseShowNoteBinding;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
@@ -57,6 +58,7 @@ public class AddEditPurchaseNoteFragment extends BaseFragment<AddEditPurchaseNot
 
         final String note = getArguments().getString(KEY_NOTE, "");
         DaggerAddEditPurchaseNoteComponent.builder()
+                .applicationComponent(Qwittig.getAppComponent(getActivity()))
                 .addEditPurchaseNoteViewModelModule(new AddEditPurchaseNoteViewModelModule(savedInstanceState, this, note))
                 .build()
                 .inject(this);

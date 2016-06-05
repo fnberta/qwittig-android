@@ -34,7 +34,7 @@ public class Identity extends ParseObject implements Comparable<Identity> {
     public static final String PENDING = "pending";
     public static final String NICKNAME = "nickname";
     public static final String AVATAR = "avatar";
-    public static final String AVATAR_BYTES = "avatarBytes";
+    public static final String AVATAR_LOCAL = "avatarLocal";
     public static final String BALANCE = "balance";
     public static final String INVITATION_LINK = "invitationLink";
     public static final String PIN_LABEL = "identitiesPinLabel";
@@ -95,6 +95,11 @@ public class Identity extends ParseObject implements Comparable<Identity> {
     }
 
     public String getAvatarUrl() {
+        final String localPath = getAvatarLocal();
+        if (!TextUtils.isEmpty(localPath)) {
+            return localPath;
+        }
+
         final ParseFile avatar = getAvatar();
         return avatar != null ? avatar.getUrl() : "";
     }
@@ -111,16 +116,16 @@ public class Identity extends ParseObject implements Comparable<Identity> {
         remove(AVATAR);
     }
 
-    public byte[] getAvatarData() {
-        return getBytes(AVATAR_BYTES);
+    public String getAvatarLocal() {
+        return getString(AVATAR_LOCAL);
     }
 
-    public void setAvatarData(@NonNull byte[] bytes) {
-        put(AVATAR_BYTES, bytes);
+    public void setAvatarLocal(@NonNull String avatarPath) {
+        put(AVATAR_LOCAL, avatarPath);
     }
 
-    public void removeAvatarData() {
-        remove(AVATAR_BYTES);
+    public void removeAvatarLocal() {
+        remove(AVATAR_LOCAL);
     }
 
     @NonNull

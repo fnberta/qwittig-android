@@ -8,14 +8,26 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RippleDrawable;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import ch.giantific.qwittig.R;
 
@@ -93,5 +105,30 @@ public class AvatarUtils {
 
         return withRipple && Utils.isRunningLollipopAndHigher() ?
                 createRippleDrawable(context, roundedDrawable) : roundedDrawable;
+    }
+
+    public static String copyAvatarLocal(@NonNull Context context,
+                                         @NonNull Uri avatarUri) throws IOException {
+        final String[] projection = {MediaStore.Images.Media.DATA};
+        final Cursor cursor = context.getContentResolver().query(avatarUri, projection, null, null, null);
+        if (cursor == null) {
+            return "";
+        }
+
+        final String localAvatarPath;
+        try {
+            int columnIndex = cursor.getColumnIndexOrThrow(projection[0]);
+            cursor.moveToFirst();
+            localAvatarPath = cursor.getString(columnIndex);
+        } finally {
+            cursor.close();
+        }
+
+        final String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
+        final String imageFileName = "JPEG_" + timeStamp + "_" + "avatar";
+        final File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        final File avatar = new File(storageDir, imageFileName);
+        FileUtils.copyFile(new File(localAvatarPath), avatar);
+        return avatar.getAbsolutePath();
     }
 }

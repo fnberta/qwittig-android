@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentTaskAddEditBinding;
 import ch.giantific.qwittig.domain.models.Task;
@@ -79,12 +80,14 @@ public class TaskAddEditFragment extends BaseRecyclerViewFragment<TaskAddEditVie
         final Bundle args = getArguments();
         if (args == null) {
             DaggerTaskAddComponent.builder()
+                    .applicationComponent(Qwittig.getAppComponent(getActivity()))
                     .taskAddViewModelModule(new TaskAddViewModelModule(savedInstanceState, this))
                     .build()
                     .inject(this);
         } else {
             final String editTaskId = args.getString(KEY_EDIT_TASK_ID, "");
             DaggerTaskEditComponent.builder()
+                    .applicationComponent(Qwittig.getAppComponent(getActivity()))
                     .taskEditViewModelModule(new TaskEditViewModelModule(savedInstanceState, this,
                             editTaskId))
                     .build()

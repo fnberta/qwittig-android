@@ -127,9 +127,6 @@ public abstract class AddEditPurchaseBaseFragment<T extends AddEditPurchaseViewM
                     case Activity.RESULT_OK:
                         mViewModel.onReceiptImageTaken();
                         break;
-                    case Activity.RESULT_CANCELED:
-                        mViewModel.onReceiptImageTakeFailed();
-                        break;
                 }
                 break;
             case INTENT_REQUEST_IMAGE_CAPTURE_CUSTOM:
@@ -137,9 +134,6 @@ public abstract class AddEditPurchaseBaseFragment<T extends AddEditPurchaseViewM
                     case Activity.RESULT_OK:
                         final List<String> paths = data.getStringArrayListExtra(CameraActivity.INTENT_EXTRA_PATHS);
                         mViewModel.onReceiptImagesTaken(paths);
-                        break;
-                    case Activity.RESULT_CANCELED:
-                        mViewModel.onReceiptImageTakeFailed();
                         break;
                 }
                 break;

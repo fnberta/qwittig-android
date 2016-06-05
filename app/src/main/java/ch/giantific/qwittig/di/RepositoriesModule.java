@@ -55,8 +55,8 @@ public class RepositoriesModule {
     }
 
     @Provides
-    UserRepository providesUserRepository() {
-        return new ParseUserRepository();
+    UserRepository providesUserRepository(@NonNull GcmNetworkManager networkManager) {
+        return new ParseUserRepository(networkManager);
     }
 
     @Provides

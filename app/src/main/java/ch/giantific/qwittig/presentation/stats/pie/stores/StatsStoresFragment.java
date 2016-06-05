@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.stats.StatsLoader;
 import ch.giantific.qwittig.presentation.stats.StatsViewModel;
@@ -51,6 +52,7 @@ public class StatsStoresFragment extends StatsPieBaseFragment<StatsStoresViewMod
     @Override
     protected void injectDependencies(@Nullable Bundle savedState, @NonNull String year, @NonNull Month month) {
         mComponent = DaggerStatsStoresComponent.builder()
+                .applicationComponent(Qwittig.getAppComponent(getActivity()))
                 .statsStoresViewModelModule(new StatsStoresViewModelModule(savedState, this, year, month))
                 .build();
         mComponent.inject(this);

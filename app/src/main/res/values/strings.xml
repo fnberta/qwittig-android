@@ -38,7 +38,7 @@
     <string name="hint_store">Store</string>
     <string name="hint_users">User</string>
     <string name="title_activity_settings_users">Users</string>
-    <string name="desc_user_invite">To add a new taskEventIdentity, simply enter his nickname and click on add. Qwittig generates an invitation link that you\'ll send him.</string>
+    <string name="desc_user_invite_new">Add a new user to %1$s by entering a nickname.</string>
     <string name="error_group_name">Please enter a group name</string>
     <string name="error_email">Please enter a valid email address</string>
     <string name="error_item_name">Please enter an article name</string>
@@ -89,7 +89,7 @@
     <string name="toast_error_unknown">Unknown error has occurred</string>
     <string name="push_compensation_payment_done_title">Payment done</string>
     <string name="push_compensation_payment_done_alert">%1$s accepted your payment of %2$s</string>
-    <string name="toast_min_one_user">Please select at least one taskEventIdentity.</string>
+    <string name="toast_min_one_user">Please select at least one user.</string>
     <string name="toast_min_one_item">Add at least one item</string>
     <string name="pref_category_me">Me</string>
     <string name="pref_category_current_group">Current group</string>
@@ -132,7 +132,8 @@
     <string name="toast_group_already_in_list">Group already exists</string>
     <string name="dialog_group_leave_delete_message">You are the last member of this group. Leaving it will delete the group and all its items!</string>
     <string name="error_valid_amount">Please enter a valid amount</string>
-    <string name="header_settings_users">Users</string>
+    <string name="header_settings_users_new">Add user</string>
+    <string name="header_settings_users_existing">Existing users</string>
     <string name="tab_compensations_new">Settlement</string>
     <string name="tab_compensations_archive">Archive</string>
     <string name="header_purchase">Details</string>
@@ -160,7 +161,7 @@
     <string name="title_activity_stats">Stats</string>
     <string name="tab_stats_spending">Spending</string>
     <string name="tab_stats_stores">Stores</string>
-    <string name="action_sort_by_user">Sort by taskEventIdentity</string>
+    <string name="action_sort_by_user">Sort by user</string>
     <string name="no_stats_data">"No data for this period"</string>
     <string name="tab_stats_currencies">Currencies</string>
     <string name="action_show_average">Show average numbers</string>
@@ -232,7 +233,7 @@
     <string name="push_task_delete_title">%1$s deleted</string>
     <string name="push_task_delete_alert">%1$s deleted the task</string>
     <string name="time_frame_one_time">One time</string>
-    <string name="toast_task_max_one_user_one_time">Please select exactly one taskEventIdentity for a one-time task</string>
+    <string name="toast_task_max_one_user_one_time">Please select exactly one user for a one-time task</string>
     <string name="yesterday">Yesterday</string>
     <string name="title_activity_camera">CameraActivity</string>
     <string name="camera_redo">Redo capture</string>
@@ -279,7 +280,7 @@
     <string name="action_share">Share</string>
     <string name="toast_error_profile">Failed to save profile</string>
     <string name="progress_add_group">Creating group…</string>
-    <string name="progress_add_user">Adding taskEventIdentity…</string>
+    <string name="progress_add_user">Adding user…</string>
     <string name="progress_joining_group">Joining group…</string>
     <string name="toast_group_joined">Joined and switched to the new group</string>
     <string name="toast_error_draft_delete">Failed to delete draft</string>
@@ -289,10 +290,10 @@
     <string name="toast_error_purchase_edit_load">Failed to load purchase</string>
     <string name="toast_error_drawer_load_groups">Failed to load group selection</string>
     <string name="toast_error_settings_group_add">Failed to create group</string>
-    <string name="toast_error_settings_users_add">Failed to add taskEventIdentity</string>
+    <string name="toast_error_settings_users_add">Failed to add user</string>
     <string name="toast_password_reset">An email with a link to rest your password was sent</string>
-    <string name="toast_settings_users_removed">Removed taskEventIdentity from group</string>
-    <string name="toast_error_settings_users_remove">Failed to remove taskEventIdentity from group</string>
+    <string name="toast_settings_users_removed">Removed user from group</string>
+    <string name="toast_error_settings_users_remove">Failed to remove user from group</string>
     <string name="toast_settings_min_one_group">Please create a new group before leaving this one</string>
     <string name="toast_recommend_failed">No recommendations sent</string>
     <string name="toast_error_not_supported">Not supported by your device</string>
@@ -321,5 +322,10 @@
     <string name="toast_invitation_ignore">Invitation ignored. Click again on the link if you change your mind.</string>
     <string name="push_purchase_ocr_title">Purchase ready</string>
     <string name="push_purchase_ocr_alert">Purchase is processed and ready to be saved</string>
+    <string name="action_edit_nickname">Edit nickname</string>
+    <string name="action_edit_avatar">Edit profile picture</string>
+    <string name="action_remove">Remove</string>
+    <string name="desc_user_invite_existing">Invite users anytime by sharing the generated link.</string>
+    <string name="dialog_change_nickname_message">Enter new nickname</string>
 
 </resources>

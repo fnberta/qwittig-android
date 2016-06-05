@@ -1,0 +1,41 @@
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".presentation.settings.users.models.SettingsUsersUserRowViewModel"
+    >
+
+    <item
+        android:id="@+id/action_settings_users_user_invite"
+        android:orderInCategory="1"
+        android:title="@string/action_share"
+        android:icon="@drawable/ic_share_black_24dp"
+        app:showAsAction="ifRoom"
+        />
+
+    <item
+        android:id="@+id/action_settings_users_user_edit_nickname"
+        android:orderInCategory="2"
+        android:title="@string/action_edit_nickname"
+        app:showAsAction="never"
+        />
+
+    <item
+        android:id="@+id/action_settings_users_user_edit_avatar"
+        android:orderInCategory="3"
+        android:title="@string/action_edit_avatar"
+        app:showAsAction="never"
+        />
+
+    <item
+        android:id="@+id/action_settings_users_user_remove"
+        android:orderInCategory="4"
+        android:title="@string/action_remove"
+        app:showAsAction="never"
+        />
+
+</menu>

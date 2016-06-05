@@ -41,7 +41,7 @@
     <string name="action_purchase_edit">Einkauf bearbeiten</string>
     <string name="hint_store">Geschäft</string>
     <string name="hint_users">Nutzer</string>
-    <string name="desc_user_invite">Um einen neuen Nutzer hinzuzufügen, gib einfach seinen Spitznamen ein und klicke auf hinzufügen. Qiwttig generiert dir einen Einladungslink, den du deinem Kumpel zusendest.</string>
+    <string name="desc_user_invite_new">Füge einen neuen Nutzer zu %1$s hinzu, indem du einen Spitznamen eingibst.</string>
     <string name="title_activity_settings_users">Nutzer</string>
     <string name="error_group_name">Bitte gib einen Gruppennamen an</string>
     <string name="error_email">Bitte gib eine gültige Email Adresse ein</string>
@@ -134,7 +134,8 @@
     <string name="error_valid_amount">Bitte gib einen gültigen Betrag an</string>
     <string name="tab_compensations_archive">Archiv</string>
     <string name="tab_compensations_new">Abrechnung</string>
-    <string name="header_settings_users">Nutzer</string>
+    <string name="header_settings_users_new">Neuer Nutzer/-in</string>
+    <string name="header_settings_users_existing">Bestehende Nutzer/-innen</string>
     <string name="header_purchase">Details</string>
     <string name="action_purchase_edit_save_changes_draft">Speichere Änderungen im Entwurf</string>
     <string name="toast_changes_saved_as_draft">Änderungen im Entwurf gespeichert</string>
@@ -314,5 +315,10 @@
     <string name="toast_invitation_ignore">Einladung ignoriert. Klick nochmals auf den Link wenn du deine Meinung änderst.</string>
     <string name="push_purchase_ocr_title">Einkauf bereit</string>
     <string name="push_purchase_ocr_alert">Einkauf wurde verarbeitet und ist bereit zum speichern</string>
+    <string name="action_edit_nickname">Spitzname bearbeiten</string>
+    <string name="action_edit_avatar">Profilbild bearbeiten</string>
+    <string name="action_remove">Löschen</string>
+    <string name="desc_user_invite_existing">Lade Nutzer ein, indem du den generierten Link teilst.</string>
+    <string name="dialog_change_nickname_message">Gib einen neuen Spitznamen ein</string>
 
 </resources>

@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 
 import com.google.android.gms.appinvite.AppInviteInvitation;
 
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentHelpFeedbackBinding;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
@@ -43,6 +44,7 @@ public class HelpFeedbackFragment extends BaseRecyclerViewFragment<HelpFeedbackV
         super.onCreate(savedInstanceState);
 
         DaggerHelpFeedbackComponent.builder()
+                .applicationComponent(Qwittig.getAppComponent(getActivity()))
                 .helpFeedbackViewModelModule(new HelpFeedbackViewModelModule(savedInstanceState, this))
                 .build()
                 .inject(this);

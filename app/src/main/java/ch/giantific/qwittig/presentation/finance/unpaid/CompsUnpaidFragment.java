@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.FragmentFinanceCompensationsUnpaidBinding;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
@@ -42,6 +43,7 @@ public class CompsUnpaidFragment extends BaseRecyclerViewFragment<CompsUnpaidVie
         super.onCreate(savedInstanceState);
 
         DaggerFinanceCompsUnpaidComponent.builder()
+                .applicationComponent(Qwittig.getAppComponent(getActivity()))
                 .financeCompsUnpaidViewModelModule(new FinanceCompsUnpaidViewModelModule(savedInstanceState, this))
                 .build()
                 .inject(this);

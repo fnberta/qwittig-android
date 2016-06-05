@@ -63,8 +63,6 @@ import timber.log.Timber;
  */
 public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
 
-    public static final String PUSH_PARAM_TITLE = "title";
-    public static final String PUSH_PARAM_ALERT = "alert";
     public static final String PUSH_PARAM_PURCHASE_ID = "purchaseId";
     public static final String PUSH_PARAM_COMPENSATION_ID = "compensationId";
     public static final String PUSH_PARAM_GROUP_ID = "groupId";

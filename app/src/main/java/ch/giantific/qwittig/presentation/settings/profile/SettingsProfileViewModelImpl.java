@@ -22,7 +22,7 @@ import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
-import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileWorker.ProfileAction;
+import ch.giantific.qwittig.presentation.settings.profile.UnlinkThirdPartyWorker.ProfileAction;
 import ch.giantific.qwittig.utils.Utils;
 import rx.Single;
 import rx.SingleSubscriber;
@@ -45,6 +45,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     private static final String STATE_PASSWORD_REPEAT = "STATE_PASSWORD_REPEAT";
     private final boolean mFacebookUser;
     private final boolean mGoogleUser;
+    private final List<String> mGroupNicknames = new ArrayList<>();
     private boolean mValidate;
     private boolean mSaving;
     private boolean mAnimStop;
@@ -54,7 +55,6 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     private String mNickname;
     private String mPassword;
     private String mPasswordRepeat;
-    private final List<String> mGroupNicknames = new ArrayList<>();
 
     public SettingsProfileViewModelImpl(@Nullable Bundle savedState,
                                         @NonNull SettingsProfileViewModel.ViewListener view,
@@ -358,17 +358,25 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
         final boolean emptyAvatar = TextUtils.isEmpty(mAvatar);
         final boolean newAvatar = !emptyAvatar && !mAvatar.equals(mCurrentIdentity.getAvatarUrl());
         if (newAvatar) {
-            startSaving();
-            getSubscriptions().add(mView.encodeAvatar(mAvatar)
-                    .subscribe(new SingleSubscriber<byte[]>() {
+            getSubscriptions().add(mUserRepo.saveCurrentUserIdentitiesWithAvatar(mNickname, mAvatar)
+                    .subscribe(new Subscriber<Identity>() {
                         @Override
-                        public void onSuccess(byte[] value) {
-                            mView.loadSaveAvatarWorker(mNickname, value);
+                        public void onCompleted() {
+                            if (!mUnlinkThirdParty) {
+                                mView.finishScreen(Activity.RESULT_OK);
+                            } else {
+                                handleThirdParty();
+                            }
                         }
 
                         @Override
-                        public void onError(Throwable error) {
+                        public void onError(Throwable e) {
                             mView.showMessage(R.string.toast_error_profile);
+                        }
+
+                        @Override
+                        public void onNext(Identity identity) {
+                            // do nothing
                         }
                     })
             );
@@ -415,52 +423,23 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     }
 
     @Override
-    public void setProfileActionStream(@NonNull Single<User> single, @NonNull final String workerTag,
-                                       @ProfileAction int action) {
-        switch (action) {
-            case ProfileAction.SAVE_AVATAR:
-                getSubscriptions().add(single.subscribe(new SingleSubscriber<User>() {
-                            @Override
-                            public void onSuccess(User user) {
-                                mView.removeWorker(workerTag);
+    public void setUnlinkActionStream(@NonNull Single<User> single, @NonNull final String workerTag,
+                                      @ProfileAction int action) {
+        getSubscriptions().add(single.subscribe(new SingleSubscriber<User>() {
+                    @Override
+                    public void onSuccess(User value) {
+                        mView.removeWorker(workerTag);
+                        stopSaving(true);
+                    }
 
-                                if (!mUnlinkThirdParty) {
-                                    stopSaving(true);
-                                } else {
-                                    handleThirdParty();
-                                }
-                            }
+                    @Override
+                    public void onError(Throwable error) {
+                        mView.removeWorker(workerTag);
+                        stopSaving(false);
 
-                            @Override
-                            public void onError(Throwable error) {
-                                mView.removeWorker(workerTag);
-                                stopSaving(false);
-
-                                mView.showMessage(R.string.toast_error_profile);
-                            }
-                        })
-                );
-                break;
-            case ProfileAction.UNLINK_FACEBOOK:
-                // fall through
-            case ProfileAction.UNLINK_GOOGLE:
-                getSubscriptions().add(single.subscribe(new SingleSubscriber<User>() {
-                            @Override
-                            public void onSuccess(User value) {
-                                mView.removeWorker(workerTag);
-                                stopSaving(true);
-                            }
-
-                            @Override
-                            public void onError(Throwable error) {
-                                mView.removeWorker(workerTag);
-                                stopSaving(false);
-
-                                mView.showMessage(R.string.toast_error_unlink_failed);
-                            }
-                        })
-                );
-                break;
-        }
+                        mView.showMessage(R.string.toast_error_unlink_failed);
+                    }
+                })
+        );
     }
 }

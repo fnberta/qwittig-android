@@ -10,6 +10,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
+import android.webkit.MimeTypeMap;
+
+import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseObject;
+import com.parse.SaveCallback;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
@@ -26,6 +32,7 @@ import ch.giantific.qwittig.presentation.settings.users.models.SettingsUsersUser
 import rx.Single;
 import rx.SingleSubscriber;
 import rx.functions.Func1;
+import timber.log.Timber;
 
 /**
  * Provides an implementation of the {@link SettingsUsersViewModel}.
@@ -35,8 +42,10 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
 
     private static final String STATE_NICKNAME = "STATE_NICKNAME";
     private static final String STATE_VALIDATE = "STATE_VALIDATE";
+    private static final String STATE_AVATAR_IDENTITY_ID = "STATE_AVATAR_IDENTITY_ID";
     private String mNickname;
     private boolean mValidate;
+    private int mAvatarIdentityPos;
 
     public SettingsUsersViewModelImpl(@Nullable Bundle savedState,
                                       @NonNull SettingsUsersViewModel.ViewListener view,
@@ -47,6 +56,7 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
             mItems = new ArrayList<>();
             mNickname = savedState.getString(STATE_NICKNAME, "");
             mValidate = savedState.getBoolean(STATE_VALIDATE, false);
+            mAvatarIdentityPos = savedState.getInt(STATE_AVATAR_IDENTITY_ID);
         }
     }
 
@@ -56,9 +66,19 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
 
         outState.putString(STATE_NICKNAME, mNickname);
         outState.putBoolean(STATE_VALIDATE, mValidate);
+        if (mAvatarIdentityPos > 0) {
+            outState.putInt(STATE_AVATAR_IDENTITY_ID, mAvatarIdentityPos);
+        }
     }
 
     @Override
+    @Bindable
+    public String getGroupName() {
+        return mCurrentIdentity.getGroup().getName();
+    }
+
+    @Override
+    @Bindable
     public String getNickname() {
         return mNickname;
     }
@@ -69,11 +89,13 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
         notifyPropertyChanged(BR.nickname);
     }
 
+    @Override
     @Bindable
     public boolean isNicknameComplete() {
         return !TextUtils.isEmpty(mNickname);
     }
 
+    @Override
     @Bindable
     public boolean isValidate() {
         return mValidate;
@@ -86,7 +108,6 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
 
     @Override
     public void loadData() {
-        final SettingsUsersViewModel listener = this;
         final Group group = mCurrentIdentity.getGroup();
         final String currentId = mCurrentIdentity.getObjectId();
         getSubscriptions().add(mUserRepo.getIdentities(group, true)
@@ -99,7 +120,7 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
                 .map(new Func1<Identity, SettingsUsersUserRowViewModel>() {
                     @Override
                     public SettingsUsersUserRowViewModel call(Identity identity) {
-                        return new SettingsUsersUserRowViewModel(listener, identity);
+                        return new SettingsUsersUserRowViewModel(identity);
                     }
                 })
                 .toSortedList()
@@ -123,20 +144,60 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
     }
 
     @Override
-    public void onShareClick(@NonNull String shareLink) {
-        mView.loadLinkShareOptions(shareLink);
+    public void onInviteClick(int position) {
+        final SettingsUsersUserRowViewModel userItem = getItemAtPosition(position);
+        mView.loadLinkShareOptions(userItem.getIdentity().getInvitationLink());
     }
 
     @Override
-    public boolean isItemDismissable(int position) {
-        final SettingsUsersUserRowViewModel userItem = mItems.get(position);
-        return userItem.isPending() && userItem.getIdentity().getBalance().equals(BigFraction.ZERO);
+    public void onEditNicknameClick(int position) {
+        final SettingsUsersUserRowViewModel userItem = getItemAtPosition(position);
+        mView.showChangeNicknameDialog(userItem.getNickname(), position);
     }
 
     @Override
-    public void onItemDismiss(final int position) {
-        final SettingsUsersUserRowViewModel userItem = mItems.get(position);
+    public void onValidNicknameEntered(@NonNull String nickname, int position) {
+        final SettingsUsersUserRowViewModel userItem = getItemAtPosition(position);
         final Identity identity = userItem.getIdentity();
+        identity.setNickname(nickname);
+        identity.saveEventually();
+        mView.notifyItemChanged(position);
+    }
+
+    @Override
+    public void onEditAvatarClick(int position) {
+        mAvatarIdentityPos = position;
+        mView.showAvatarPicker();
+    }
+
+    @Override
+    public void onNewAvatarTaken(@NonNull String avatarPath) {
+        final SettingsUsersUserRowViewModel userItem = getItemAtPosition(mAvatarIdentityPos);
+        final Identity identity = userItem.getIdentity();
+        getSubscriptions().add(mUserRepo.saveIdentityWithAvatar(identity, null, avatarPath)
+            .subscribe(new SingleSubscriber<Identity>() {
+                @Override
+                public void onSuccess(Identity value) {
+                    mView.notifyItemChanged(mAvatarIdentityPos);
+                }
+
+                @Override
+                public void onError(Throwable error) {
+                    mView.showMessage(R.string.toast_error_profile);
+                }
+            })
+        );
+    }
+
+    @Override
+    public void onRemoveClick(final int position) {
+        final SettingsUsersUserRowViewModel userItem = getItemAtPosition(position);
+        final Identity identity = userItem.getIdentity();
+        if (identity.getBalance().equals(BigFraction.ZERO)) {
+            mView.showMessage(R.string.toast_balance_not_zero);
+            return;
+        }
+
         getSubscriptions().add(mUserRepo.removePendingIdentity(identity)
                 .subscribe(new SingleSubscriber<Identity>() {
                     @Override
@@ -178,14 +239,13 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
 
     @Override
     public void setAddUserStream(@NonNull Single<Identity> single, @NonNull final String workerTag) {
-        final SettingsUsersViewModel listener = this;
         getSubscriptions().add(single.subscribe(new SingleSubscriber<Identity>() {
                     @Override
                     public void onSuccess(Identity identity) {
                         mView.removeWorker(workerTag);
                         mView.toggleProgressDialog(false);
 
-                        mItems.add(new SettingsUsersUserRowViewModel(listener, identity));
+                        mItems.add(new SettingsUsersUserRowViewModel(identity));
                         mView.notifyItemInserted(getLastPosition());
 
                         setValidate(false);
