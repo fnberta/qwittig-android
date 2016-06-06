@@ -13,7 +13,7 @@ import android.view.MenuItem;
 
 import java.io.File;
 
-import ch.berta.fabio.fabspeeddial.FabMenu;
+import ch.berta.fabio.fabspeeddial.FabMenuClickListener;
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.R;
@@ -33,7 +33,10 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
 
     private static final String STATE_INVITATION_ID = "STATE_INVITATION_ID";
     private static final String STATE_OCR_PURCHASE_ID = "OCR_PURCHASE_ID";
+    private static final String STATE_OCR_PROCESSING = "STATE_OCR_PROCESSING";
     private final PurchaseRepository mPurchaseRepo;
+    private boolean mOcrProcessing;
+    private boolean mAnimStop;
     private boolean mDraftsAvailable;
     private String mInvitationIdentityId;
     private String mOcrPurchaseId;
@@ -48,6 +51,7 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
         if (savedState != null) {
             mInvitationIdentityId = savedState.getString(STATE_INVITATION_ID, "");
             mOcrPurchaseId = savedState.getString(STATE_OCR_PURCHASE_ID, "");
+            mOcrProcessing = savedState.getBoolean(STATE_OCR_PROCESSING);
         }
     }
 
@@ -61,6 +65,7 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
         if (!TextUtils.isEmpty(mOcrPurchaseId)) {
             outState.putString(STATE_OCR_PURCHASE_ID, mOcrPurchaseId);
         }
+        outState.putBoolean(STATE_OCR_PROCESSING, mOcrProcessing);
     }
 
     @Override
@@ -68,6 +73,18 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
         mCurrentUser = mUserRepo.getCurrentUser();
         setCurrentIdentity();
         mDraftsAvailable = mPurchaseRepo.isDraftsAvailable(mCurrentIdentity);
+    }
+
+    @Override
+    @Bindable
+    public boolean isOcrProcessing() {
+        return mOcrProcessing;
+    }
+
+    @Override
+    @Bindable
+    public boolean isAnimStop() {
+        return mAnimStop;
     }
 
     @Override
@@ -133,7 +150,8 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
 
     @Override
     public void onReceiptImageTaken(@NonNull String receiptImagePath) {
-        // TODO: start fab spinning animation
+        startProgress();
+//        mView.showMessage(R.string.toast_purchase_ocr_started);
         mView.loadOcrWorker(receiptImagePath);
     }
 
@@ -148,7 +166,6 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
                     @Override
                     public void onSuccess(String receiptPath) {
                         mView.removeWorker(workerTag);
-
                         deleteReceiptImage(receiptPath);
                     }
 
@@ -157,7 +174,7 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
                         mView.removeWorker(workerTag);
 
                         mView.showMessage(mPurchaseRepo.getErrorMessage(error));
-                        // TODO: stop fab spinning animation
+                        stopProgress(false);
                     }
                 })
         );
@@ -165,7 +182,8 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
 
     private void deleteReceiptImage(@NonNull String receiptPath) {
         if (!TextUtils.isEmpty(receiptPath)) {
-            boolean fileDeleted = new File(receiptPath).delete();
+            final File receipt = new File(receiptPath);
+            final boolean fileDeleted = receipt.delete();
             if (!fileDeleted && BuildConfig.DEBUG) {
                 Timber.e("failed to delete receipt image file");
             }
@@ -175,16 +193,18 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
     @Override
     public void onOcrPurchaseReady(@NonNull String ocrPurchaseId) {
         mOcrPurchaseId = ocrPurchaseId;
+        stopProgress(true);
     }
 
     @Override
     public void onOcrPurchaseFailed() {
-        // TODO: stop fab spinning animation
+        stopProgress(false);
+        mView.showMessage(R.string.toast_error_purchase_ocr_process);
     }
 
     @Override
-    public FabMenu.FabMenuItemClickListener getFabMenuItemClickListener() {
-        return new FabMenu.FabMenuItemClickListener() {
+    public FabMenuClickListener getFabMenuClickListener() {
+        return new FabMenuClickListener() {
             @Override
             public void onFabMenuItemClicked(@NonNull MenuItem menuItem) {
                 final int id = menuItem.getItemId();
@@ -193,10 +213,26 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
                         mView.captureImage();
                         break;
                     case R.id.action_fab_home_manual:
-                        mView.startPurchaseAddScreen(mOcrPurchaseId);
+                        mView.startPurchaseAddScreen(null);
                         break;
                 }
             }
+
+            @Override
+            public void onFabCompleteClicked() {
+                mView.startPurchaseAddScreen(mOcrPurchaseId);
+            }
         };
+    }
+
+    private void startProgress() {
+        mOcrProcessing = true;
+        notifyPropertyChanged(BR.ocrProcessing);
+    }
+
+    private void stopProgress(boolean animate) {
+        mOcrProcessing = false;
+        mAnimStop = animate;
+        notifyPropertyChanged(BR.ocrProcessing);
     }
 }

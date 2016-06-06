@@ -9,7 +9,7 @@
 
     <item
         android:id="@+id/action_fab_home_auto"
-        android:icon="@drawable/ic_camera_alt_black_24dp"
+        android:icon="@drawable/ic_photo_camera_black_24dp"
         android:orderInCategory="1"
         android:title="@string/fab_label_auto"
         />

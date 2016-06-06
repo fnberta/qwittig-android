@@ -169,8 +169,6 @@
     <string name="action_show_percent">Zeige Prozentwerte</string>
     <string name="progress_purchase_auto">Hochladen und verarbeiten….</string>
     <string name="dialog_compensation_confirm_amount_message">%1$s schuldet dir %2$s, bitte bestätige die Zahlung. Falls nötig, kannst du den Betrag ändern.</string>
-    <string name="fab_label_auto">Magisch</string>
-    <string name="fab_label_manual">Von Hand</string>
     <string name="toast_exchange_no_data">Keine Wechselkursdaten, bitte versuche es später noch einmal</string>
     <string name="toast_exchange_rate_fetching">Wechselkurs noch nicht abgerufen</string>
     <string name="hint_exchange_rate">Wechselkurs</string>
@@ -321,5 +319,7 @@
     <string name="desc_user_invite_existing">Lade Nutzer ein, indem du den generierten Link teilst.</string>
     <string name="dialog_change_nickname_message">Gib einen neuen Spitznamen ein</string>
     <string name="toast_error_purchase_ocr_load">Laden des Einkaufs fehlgeschlagen. Bitte versuche es noch einmal.</string>
+    <string name="toast_error_purchase_ocr_process">Verarbeitung des Einkaufs fehlgeschalgen. Bitte versuche es noch einmal..</string>
+    <string name="toast_purchase_ocr_started">Verarbeite Einkauf…</string>
 
 </resources>

@@ -18,4 +18,6 @@
     <dimen name="fab_menu_content_size">24dp</dimen>
     <dimen name="fab_menu_fab_size_normal">56dp</dimen>
     <dimen name="fab_child_margin_top_bottom">8dp</dimen>
+
+    <dimen name="fp_progress_arc_stroke_width">2dp</dimen>
 </resources>

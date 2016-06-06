@@ -9,7 +9,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 
-import ch.berta.fabio.fabspeeddial.FabMenu;
+import ch.berta.fabio.fabspeeddial.FabMenuClickListener;
+import ch.berta.fabio.fabspeeddial.ProgressFinalAnimationListener;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 
 /**
@@ -20,6 +21,12 @@ public interface HomeViewModel extends ViewModel,
         JoinGroupWorkerListener, OcrWorkerListener {
 
     void onLoginSuccessful();
+
+    @Bindable
+    boolean isOcrProcessing();
+
+    @Bindable
+    boolean isAnimStop();
 
     @Bindable
     boolean isDraftsAvailable();
@@ -39,7 +46,7 @@ public interface HomeViewModel extends ViewModel,
 
     void onOcrPurchaseFailed();
 
-    FabMenu.FabMenuItemClickListener getFabMenuItemClickListener();
+    FabMenuClickListener getFabMenuClickListener();
 
     /**
      * Defines the interaction with the attached view.

@@ -6,58 +6,91 @@
     >
 
     <LinearLayout
-        android:id="@+id/ll_items"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="@dimen/normal_space"
-        android:layout_marginStart="@dimen/normal_space"
-        android:clipChildren="false"
-        android:gravity="end"
-        android:orientation="vertical"
-        android:visibility="gone"
-        />
-
-    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginBottom="@dimen/menu_margin_bottom"
-        android:layout_marginEnd="@dimen/menu_margin_end"
-        android:layout_marginStart="@dimen/menu_margin_start"
-        android:layout_marginTop="@dimen/menu_margin_top"
-        android:orientation="horizontal"
+        android:layout_marginEnd="@dimen/normal_space"
+        android:layout_marginStart="@dimen/normal_space"
+        android:clipChildren="false"
+        android:orientation="vertical"
         >
 
-        <android.support.v7.widget.CardView
-            android:id="@+id/cv_label_main"
+        <LinearLayout
+            android:id="@+id/ll_items"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginEnd="@dimen/normal_space"
+            android:clipChildren="false"
+            android:gravity="end"
+            android:orientation="vertical"
             android:visibility="gone"
-            app:cardCornerRadius="@dimen/label_elevation"
-            app:cardElevation="@dimen/label_elevation"
-            app:contentPadding="@dimen/label_padding"
-            tools:visibility="visible"
+            />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginTop="@dimen/menu_margin_top"
+            android:clipChildren="false"
+            android:orientation="horizontal"
             >
 
-            <TextView
-                android:id="@+id/tv_label_main"
-                style="@style/TextAppearance.AppCompat.Body2"
+            <android.support.v7.widget.CardView
+                android:id="@+id/cv_label_main"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                />
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="@dimen/normal_space"
+                android:visibility="gone"
+                app:cardCornerRadius="@dimen/label_elevation"
+                app:cardElevation="@dimen/label_elevation"
+                app:contentPadding="@dimen/label_padding"
+                tools:visibility="visible"
+                >
 
-        </android.support.v7.widget.CardView>
+                <TextView
+                    android:id="@+id/tv_label_main"
+                    style="@style/TextAppearance.AppCompat.Body2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_main"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/fab_selection"
-            />
+            </android.support.v7.widget.CardView>
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
+                >
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/fab_main"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/fab_selection"
+                    />
+
+                <ch.berta.fabio.fabspeeddial.ProgressArc
+                    android:id="@+id/pa_main"
+                    android:layout_width="@dimen/fab_menu_fab_size_normal"
+                    android:layout_height="@dimen/fab_menu_fab_size_normal"
+                    />
+            </FrameLayout>
+
+        </LinearLayout>
     </LinearLayout>
 
+    <ch.berta.fabio.fabspeeddial.CompleteView
+        android:id="@+id/cv_main"
+        android:layout_width="@dimen/fab_menu_fab_size_normal"
+        android:layout_height="@dimen/fab_menu_fab_size_normal"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="@dimen/menu_margin_bottom"
+        android:layout_marginEnd="@dimen/menu_margin_end"
+        android:alpha="0"
+        android:background="@drawable/success"
+        android:visibility="gone"
+        tools:visibility="visible"
+        />
 
 </merge>
