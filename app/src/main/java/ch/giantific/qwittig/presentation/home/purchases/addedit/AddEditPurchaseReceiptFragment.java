@@ -93,8 +93,6 @@ public class AddEditPurchaseReceiptFragment extends PurchaseReceiptBaseFragment<
     /**
      * Checks whether the permissions to take an image are granted and if yes initiates the creation
      * of the image file.
-     * <p/>
-     * TODO: check permissions if we decide to use custom camera!
      */
     private void captureImage() {
         if (!CameraUtils.hasCameraHardware(getActivity())) {

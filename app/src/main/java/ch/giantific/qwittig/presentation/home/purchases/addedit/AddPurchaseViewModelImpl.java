@@ -47,7 +47,6 @@ import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Single;
 import rx.SingleSubscriber;
-import rx.functions.Func1;
 import timber.log.Timber;
 
 /**
@@ -56,8 +55,6 @@ import timber.log.Timber;
 public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurchaseBaseItem, ViewListener>
         implements AddEditPurchaseViewModel {
 
-    // add permission to manifest when enabling!
-    static final boolean USE_CUSTOM_CAMERA = false;
     private static final String STATE_ROW_ITEMS = "STATE_ROW_ITEMS";
     private static final String STATE_DATE = "STATE_DATE";
     private static final String STATE_STORE = "STATE_STORE";
@@ -65,7 +62,6 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
     private static final String STATE_EXCHANGE_RATE = "STATE_EXCHANGE_RATE";
     private static final String STATE_NOTE = "STATE_NOTE";
     private static final String STATE_RECEIPT_IMAGE_PATH = "STATE_RECEIPT_IMAGE_PATH";
-    private static final String STATE_RECEIPT_IMAGE_PATHS = "STATE_RECEIPT_IMAGE_PATHS";
     private static final String STATE_FETCHING_RATES = "STATE_FETCHING_RATES";
     final PurchaseRepository mPurchaseRepo;
     final Group mCurrentGroup;
@@ -83,7 +79,6 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
     List<Identity> mIdentities = new ArrayList<>();
     private double mMyShare = 0;
     private boolean mFetchingExchangeRates;
-    private ArrayList<String> mReceiptImagePaths;
 
     public AddPurchaseViewModelImpl(@Nullable Bundle savedState,
                                     @NonNull AddEditPurchaseViewModel.ViewListener view,
@@ -102,9 +97,6 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
             mExchangeRate = savedState.getDouble(STATE_EXCHANGE_RATE);
             mNote = savedState.getString(STATE_NOTE);
             mReceiptImagePath = savedState.getString(STATE_RECEIPT_IMAGE_PATH);
-            if (USE_CUSTOM_CAMERA) {
-                mReceiptImagePaths = savedState.getStringArrayList(STATE_RECEIPT_IMAGE_PATHS);
-            }
             mFetchingExchangeRates = savedState.getBoolean(STATE_FETCHING_RATES);
         } else {
             initFixedRows();
@@ -112,9 +104,6 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
             mDate = new Date();
             mCurrency = mCurrentGroup.getCurrency();
             mExchangeRate = 1;
-            if (USE_CUSTOM_CAMERA) {
-                mReceiptImagePaths = new ArrayList<>();
-            }
         }
 
         mMoneyFormatter = MoneyUtils.getMoneyFormatter(mCurrency, false, true);
@@ -142,9 +131,6 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
         outState.putDouble(STATE_EXCHANGE_RATE, mExchangeRate);
         outState.putString(STATE_NOTE, mNote);
         outState.putString(STATE_RECEIPT_IMAGE_PATH, mReceiptImagePath);
-        if (USE_CUSTOM_CAMERA) {
-            outState.putStringArrayList(STATE_RECEIPT_IMAGE_PATHS, mReceiptImagePaths);
-        }
         outState.putBoolean(STATE_FETCHING_RATES, mFetchingExchangeRates);
     }
 
@@ -488,7 +474,7 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
 
     @Override
     public void onAddReceiptImageMenuClick() {
-        mView.captureImage(USE_CUSTOM_CAMERA);
+        mView.captureImage();
     }
 
     @Override
@@ -505,15 +491,6 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
     @Override
     public void onReceiptImageTakeFailed() {
         mView.showMessage(R.string.toast_create_image_file_failed);
-    }
-
-    @Override
-    public void onReceiptImagesTaken(@NonNull List<String> receiptImagePaths) {
-        mReceiptImagePaths.clear();
-        if (!receiptImagePaths.isEmpty()) {
-            mReceiptImagePaths.addAll(receiptImagePaths);
-        }
-        mReceiptImagePath = mReceiptImagePaths.get(0);
     }
 
     @Override
@@ -722,26 +699,6 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
         return identities;
     }
 
-    private void deleteReceiptImage() {
-        if (USE_CUSTOM_CAMERA) {
-            if (!mReceiptImagePaths.isEmpty()) {
-                for (String path : mReceiptImagePaths) {
-                    final boolean fileDeleted = new File(path).delete();
-                    if (!fileDeleted && BuildConfig.DEBUG) {
-                        Timber.e("failed to delete file");
-                    }
-                }
-                mReceiptImagePaths.clear();
-            }
-        } else if (!TextUtils.isEmpty(mReceiptImagePath)) {
-            boolean fileDeleted = new File(mReceiptImagePath).delete();
-            if (!fileDeleted && BuildConfig.DEBUG) {
-                Timber.e("failed to delete file");
-            }
-            mReceiptImagePath = "";
-        }
-    }
-
     @Override
     public void onShowReceiptImageMenuClick() {
         mView.showReceiptImage(mReceiptImagePath);
@@ -752,6 +709,15 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
         mView.toggleReceiptMenuOption(false);
         mView.showMessage(R.string.toast_receipt_deleted);
         deleteReceiptImage();
+        mReceiptImagePath = "";
+    }
+
+    private void deleteReceiptImage() {
+        final File receipt = new File(mReceiptImagePath);
+        boolean fileDeleted = receipt.delete();
+        if (!fileDeleted && BuildConfig.DEBUG) {
+            Timber.e("failed to delete file");
+        }
     }
 
     @Override

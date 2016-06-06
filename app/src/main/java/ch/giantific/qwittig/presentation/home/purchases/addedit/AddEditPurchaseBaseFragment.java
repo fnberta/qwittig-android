@@ -50,9 +50,7 @@ public abstract class AddEditPurchaseBaseFragment<T extends AddEditPurchaseViewM
 
     public static final String PURCHASE_NOTE_FRAGMENT = "PURCHASE_NOTE_FRAGMENT";
     static final String KEY_EDIT_PURCHASE_ID = "EDIT_PURCHASE_ID";
-    private static final int PERMISSIONS_REQUEST_CAPTURE_IMAGES = 1;
     private static final int INTENT_REQUEST_IMAGE_CAPTURE = 1;
-    private static final int INTENT_REQUEST_IMAGE_CAPTURE_CUSTOM = 2;
     private static final String PURCHASE_RECEIPT_FRAGMENT = "PURCHASE_RECEIPT_FRAGMENT";
     private FragmentPurchaseAddEditBinding mBinding;
 
@@ -115,14 +113,6 @@ public abstract class AddEditPurchaseBaseFragment<T extends AddEditPurchaseViewM
                 switch (resultCode) {
                     case Activity.RESULT_OK:
                         mViewModel.onReceiptImageTaken();
-                        break;
-                }
-                break;
-            case INTENT_REQUEST_IMAGE_CAPTURE_CUSTOM:
-                switch (resultCode) {
-                    case Activity.RESULT_OK:
-                        final List<String> paths = data.getStringArrayListExtra(CameraActivity.INTENT_EXTRA_PATHS);
-                        mViewModel.onReceiptImagesTaken(paths);
                         break;
                 }
                 break;
@@ -208,83 +198,25 @@ public abstract class AddEditPurchaseBaseFragment<T extends AddEditPurchaseViewM
     }
 
     @Override
-    public void captureImage(boolean useCustomCamera) {
+    public void captureImage() {
         if (!CameraUtils.hasCameraHardware(getActivity())) {
             showMessage(R.string.toast_no_camera);
             return;
         }
 
-        if (permissionsAreGranted(useCustomCamera)) {
-            getImage(useCustomCamera);
-        }
-    }
-
-    private boolean permissionsAreGranted(boolean useCustomCamera) {
-        if (useCustomCamera) {
-            int hasCameraPerm = ContextCompat.checkSelfPermission(
-                    getActivity(), Manifest.permission.CAMERA);
-            if (hasCameraPerm != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.CAMERA},
-                        PERMISSIONS_REQUEST_CAPTURE_IMAGES);
-                return false;
-            }
-
-            return true;
+        final Context context = getActivity();
+        final File imageFile;
+        try {
+            imageFile = CameraUtils.createImageFile(context);
+        } catch (IOException e) {
+            mViewModel.onReceiptImageTakeFailed();
+            return;
         }
 
-        return true;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_CAPTURE_IMAGES:
-                if (Utils.verifyPermissions(grantResults)) {
-                    getImage(true);
-                } else {
-                    showMessageWithAction(R.string.snackbar_permission_storage_denied,
-                            new MessageAction(R.string.snackbar_action_open_settings) {
-                                @Override
-                                public void onClick(View v) {
-                                    startSystemSettings();
-                                }
-                            });
-                }
-
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
-
-    private void startSystemSettings() {
-        final Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        intent.setData(Uri.parse("package:" + getActivity().getPackageName()));
-        startActivity(intent);
-    }
-
-    private void getImage(boolean useCustomCamera) {
-        if (useCustomCamera) {
-            final Intent intent = new Intent(getActivity(), CameraActivity.class);
-            startActivityForResult(intent, INTENT_REQUEST_IMAGE_CAPTURE);
-        } else {
-            final Context context = getActivity();
-            final File imageFile;
-            try {
-                imageFile = CameraUtils.createImageFile(context);
-            } catch (IOException e) {
-                mViewModel.onReceiptImageTakeFailed();
-                return;
-            }
-
-            mViewModel.onReceiptImagePathSet(imageFile.getAbsolutePath());
-            final Intent cameraIntent = CameraUtils.getCameraIntent(context, imageFile);
-            if (cameraIntent != null) {
-                startActivityForResult(cameraIntent, INTENT_REQUEST_IMAGE_CAPTURE);
-            }
+        mViewModel.onReceiptImagePathSet(imageFile.getAbsolutePath());
+        final Intent cameraIntent = CameraUtils.getCameraIntent(context, imageFile);
+        if (cameraIntent != null) {
+            startActivityForResult(cameraIntent, INTENT_REQUEST_IMAGE_CAPTURE);
         }
     }
 

@@ -48,13 +48,6 @@ public interface AddEditPurchaseViewModel extends ListViewModel<AddEditPurchaseB
 
     void onReceiptImageTakeFailed();
 
-    /**
-     * Sets the receipt image paths, only used when custom camera is enabled
-     *
-     * @param receiptImagePaths the paths of the receipt images
-     */
-    void onReceiptImagesTaken(@NonNull List<String> receiptImagePaths);
-
     void onItemDismiss(int position);
 
     /**
@@ -133,7 +126,7 @@ public interface AddEditPurchaseViewModel extends ListViewModel<AddEditPurchaseB
          * Checks whether the permissions to take an image are granted and if yes initiates the creation
          * of the image file.
          */
-        void captureImage(boolean useCustomCamera);
+        void captureImage();
 
         void finishScreen(int purchaseResult);
     }
