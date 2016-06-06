@@ -10,12 +10,16 @@ import android.view.View;
 
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
 import ch.giantific.qwittig.presentation.settings.users.models.SettingsUsersUserRowViewModel;
+import rx.Single;
 
 /**
  * Defines an observable view model for the manage users settings screen.
  */
 public interface SettingsUsersViewModel extends ListViewModel<SettingsUsersUserRowViewModel>, AddUserWorkerListener,
-        SettingsUsersUserRowViewModel.ShareListener {
+        SettingsUsersRecyclerAdapter.AdapterInteractionListener, NicknamePromptDialogFragment.DialogInteractionListener {
+
+    @Bindable
+    String getGroupName();
 
     @Bindable
     String getNickname();
@@ -30,9 +34,7 @@ public interface SettingsUsersViewModel extends ListViewModel<SettingsUsersUserR
 
     void setValidate(boolean validate);
 
-    boolean isItemDismissable(int position);
-
-    void onItemDismiss(int position);
+    void onNewAvatarTaken(@NonNull String avatarPath);
 
     void onNicknameChanged(CharSequence s, int start, int before, int count);
 
@@ -49,5 +51,9 @@ public interface SettingsUsersViewModel extends ListViewModel<SettingsUsersUserR
         void loadLinkShareOptions(@NonNull String link);
 
         void toggleProgressDialog(boolean show);
+
+        void showChangeNicknameDialog(@NonNull String nickname, int position);
+
+        void showAvatarPicker();
     }
 }

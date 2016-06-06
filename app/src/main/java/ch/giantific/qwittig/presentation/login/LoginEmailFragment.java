@@ -29,6 +29,7 @@ import android.widget.ArrayAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentLoginEmailBinding;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
@@ -72,6 +73,7 @@ public class LoginEmailFragment extends BaseFragment<LoginEmailViewModel, LoginE
         super.onCreate(savedInstanceState);
 
         DaggerLoginEmailComponent.builder()
+                .applicationComponent(Qwittig.getAppComponent(getActivity()))
                 .loginEmailViewModelModule(new LoginEmailViewModelModule(savedInstanceState, this))
                 .build()
                 .inject(this);

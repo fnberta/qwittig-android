@@ -160,7 +160,7 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<Purchase
             showEdit = buyerId.equals(mCurrentIdentity.getObjectId());
         }
         final boolean foreignCurrency = !mCurrentIdentity.getGroup().getCurrency().equals(mPurchase.getCurrency());
-        final boolean receiptImage = mPurchase.getReceipt() != null || mPurchase.getReceiptData() != null;
+        final boolean receiptImage = !TextUtils.isEmpty(mPurchase.getReceiptUrl());
         mView.toggleMenuOptions(showEdit, receiptImage, foreignCurrency);
     }
 
@@ -173,7 +173,7 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<Purchase
 
     @Override
     public void onShowReceiptImageClick() {
-        mView.showReceiptImage(mPurchaseId);
+        mView.showReceiptImage(mPurchase.getReceiptUrl());
     }
 
     @Override

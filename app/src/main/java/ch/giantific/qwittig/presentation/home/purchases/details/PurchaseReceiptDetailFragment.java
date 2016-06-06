@@ -10,8 +10,8 @@ import android.support.annotation.NonNull;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.presentation.home.purchases.common.PurchaseReceiptBaseFragment;
 import ch.giantific.qwittig.presentation.home.purchases.common.PurchaseReceiptViewModel;
-import ch.giantific.qwittig.presentation.home.purchases.common.di.DaggerPurchaseReceiptIdComponent;
-import ch.giantific.qwittig.presentation.home.purchases.common.di.PurchaseReceiptIdViewModelModule;
+import ch.giantific.qwittig.presentation.home.purchases.common.di.DaggerPurchaseReceiptComponent;
+import ch.giantific.qwittig.presentation.home.purchases.common.di.PurchaseReceiptViewModelModule;
 
 
 /**
@@ -21,7 +21,7 @@ import ch.giantific.qwittig.presentation.home.purchases.common.di.PurchaseReceip
  */
 public class PurchaseReceiptDetailFragment extends PurchaseReceiptBaseFragment<PurchaseReceiptViewModel, PurchaseReceiptBaseFragment.ActivityListener> {
 
-    private static final String KEY_PURCHASE_ID = "PURCHASE_ID";
+    private static final String KEY_RECEIPT_IMAGE_URI = "RECEIPT_IMAGE_URI";
 
     public PurchaseReceiptDetailFragment() {
         // required empty constructor
@@ -30,15 +30,15 @@ public class PurchaseReceiptDetailFragment extends PurchaseReceiptBaseFragment<P
     /**
      * Returns a new instance of {@link PurchaseReceiptDetailFragment}.
      *
-     * @param purchaseId the object id of the purchase of which the receipt image should be
+     * @param receiptImageUri the object id of the purchase of which the receipt image should be
      *                   displayed
      * @return a new instance of {@link PurchaseReceiptDetailFragment}
      */
     @NonNull
-    public static PurchaseReceiptDetailFragment newInstance(@NonNull String purchaseId) {
+    public static PurchaseReceiptDetailFragment newInstance(@NonNull String receiptImageUri) {
         final PurchaseReceiptDetailFragment fragment = new PurchaseReceiptDetailFragment();
         final Bundle args = new Bundle();
-        args.putString(KEY_PURCHASE_ID, purchaseId);
+        args.putString(KEY_RECEIPT_IMAGE_URI, receiptImageUri);
         fragment.setArguments(args);
         return fragment;
     }
@@ -47,10 +47,10 @@ public class PurchaseReceiptDetailFragment extends PurchaseReceiptBaseFragment<P
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final String purchaseId = getArguments().getString(KEY_PURCHASE_ID, "");
-        DaggerPurchaseReceiptIdComponent.builder()
+        final String receiptImageUri = getArguments().getString(KEY_RECEIPT_IMAGE_URI, "");
+        DaggerPurchaseReceiptComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(getActivity()))
-                .purchaseReceiptIdViewModelModule(new PurchaseReceiptIdViewModelModule(savedInstanceState, this, purchaseId))
+                .purchaseReceiptViewModelModule(new PurchaseReceiptViewModelModule(savedInstanceState, this, receiptImageUri))
                 .build()
                 .inject(this);
     }

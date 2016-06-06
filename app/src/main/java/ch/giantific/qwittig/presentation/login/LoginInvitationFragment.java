@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentLoginInvitationBinding;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
@@ -55,6 +56,7 @@ public class LoginInvitationFragment extends BaseFragment<LoginInvitationViewMod
         final String inviterNickname = args.getString(KEY_INVITER_NICKNAME, "");
 
         DaggerLoginInvitationComponent.builder()
+                .applicationComponent(Qwittig.getAppComponent(getActivity()))
                 .loginInvitationViewModelModule(new LoginInvitationViewModelModule(savedInstanceState, this, groupName, inviterNickname))
                 .build()
                 .inject(this);

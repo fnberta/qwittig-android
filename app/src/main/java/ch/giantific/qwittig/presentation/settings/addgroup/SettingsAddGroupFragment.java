@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentSettingsAddGroupBinding;
 import ch.giantific.qwittig.presentation.settings.addgroup.di.DaggerSettingsAddGroupComponent;
@@ -50,6 +51,7 @@ public class SettingsAddGroupFragment extends BaseFragment<SettingsAddGroupViewM
         super.onCreate(savedInstanceState);
 
         DaggerSettingsAddGroupComponent.builder()
+                .applicationComponent(Qwittig.getAppComponent(getActivity()))
                 .settingsAddGroupViewModelModule(new SettingsAddGroupViewModelModule(savedInstanceState, this))
                 .build()
                 .inject(this);

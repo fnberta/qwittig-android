@@ -32,7 +32,7 @@ public interface AddEditPurchaseViewModel extends ListViewModel<AddEditPurchaseB
         AddEditPurchaseDateRowViewModel, AddEditPurchaseStoreRowViewModel,
         AddEditPurchaseTotalRowViewModel, AddEditPurchaseItemUsersClickListener,
         NoteDialogFragment.DialogInteractionListener,
-        DiscardChangesDialogFragment.DialogInteractionListener, OcrWorkerListener,
+        DiscardChangesDialogFragment.DialogInteractionListener,
         ExchangeRateDialogFragment.DialogInteractionListener, RatesWorkerListener {
 
     void onDateSet(@NonNull Date date);
@@ -46,14 +46,7 @@ public interface AddEditPurchaseViewModel extends ListViewModel<AddEditPurchaseB
 
     void onReceiptImageTaken();
 
-    void onReceiptImageFailed();
-
-    /**
-     * Sets the receipt image paths, only used when custom camera is enabled
-     *
-     * @param receiptImagePaths the paths of the receipt images
-     */
-    void onReceiptImagesTaken(@NonNull List<String> receiptImagePaths);
+    void onReceiptImageTakeFailed();
 
     void onItemDismiss(int position);
 
@@ -90,8 +83,7 @@ public interface AddEditPurchaseViewModel extends ListViewModel<AddEditPurchaseB
 
     @IntDef({PurchaseResult.PURCHASE_SAVED, PurchaseResult.PURCHASE_SAVED_AUTO,
             PurchaseResult.PURCHASE_DRAFT, PurchaseResult.PURCHASE_DRAFT_CHANGES,
-            PurchaseResult.PURCHASE_ERROR, PurchaseResult.PURCHASE_DISCARDED,
-            PurchaseResult.PURCHASE_DRAFT_DELETED,
+            PurchaseResult.PURCHASE_DISCARDED, PurchaseResult.PURCHASE_DRAFT_DELETED,
             Activity.RESULT_CANCELED})
     @Retention(RetentionPolicy.SOURCE)
     @interface PurchaseResult {
@@ -99,20 +91,15 @@ public interface AddEditPurchaseViewModel extends ListViewModel<AddEditPurchaseB
         int PURCHASE_SAVED_AUTO = 3;
         int PURCHASE_DRAFT = 4;
         int PURCHASE_DRAFT_CHANGES = 5;
-        int PURCHASE_ERROR = 6;
-        int PURCHASE_DISCARDED = 7;
-        int PURCHASE_DRAFT_DELETED = 8;
+        int PURCHASE_DISCARDED = 6;
+        int PURCHASE_DRAFT_DELETED = 7;
     }
 
     /**
      * Defines the interaction with the attached view.
      */
     interface ViewListener extends ListViewModel.ViewListener {
-        Single<byte[]> encodeReceiptImage(@NonNull String imagePath);
-
         void loadFetchExchangeRatesWorker(@NonNull String baseCurrency, @NonNull String currency);
-
-        void loadOcrWorker(@NonNull String receiptImagePath);
 
         void showDatePickerDialog();
 
@@ -126,9 +113,7 @@ public interface AddEditPurchaseViewModel extends ListViewModel<AddEditPurchaseB
 
         void toggleNoteMenuOption(boolean show);
 
-        void showReceiptImage(@NonNull String receiptImagePath);
-
-        void showReceiptImage(@NonNull String objectId, @NonNull String receiptImagePath);
+        void showReceiptImage(@NonNull String receiptImageUri);
 
         void showNote(@NonNull String note);
 
@@ -141,9 +126,7 @@ public interface AddEditPurchaseViewModel extends ListViewModel<AddEditPurchaseB
          * Checks whether the permissions to take an image are granted and if yes initiates the creation
          * of the image file.
          */
-        void captureImage(boolean useCustomCamera);
-
-        void showOptionsMenu();
+        void captureImage();
 
         void finishScreen(int purchaseResult);
     }

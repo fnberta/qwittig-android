@@ -16,7 +16,7 @@ import ch.giantific.qwittig.databinding.ActivitySettingsProfileBinding;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
-import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileWorker.ProfileAction;
+import ch.giantific.qwittig.presentation.settings.profile.UnlinkThirdPartyWorker.ProfileAction;
 import rx.Single;
 
 /**
@@ -33,7 +33,7 @@ import rx.Single;
 public class SettingsProfileActivity extends BaseActivity<SettingsProfileViewModel> implements
         SettingsProfileFragment.ActivityListener,
         DiscardChangesDialogFragment.DialogInteractionListener,
-        SettingsProfileWorkerListener {
+        UnlinkThirdPartyWorkerListener {
 
     private ActivitySettingsProfileBinding mBinding;
 
@@ -80,9 +80,9 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileViewMod
     }
 
     @Override
-    public void setProfileActionStream(@NonNull Single<User> single, @NonNull String workerTag,
-                                       @ProfileAction int action) {
-        mViewModel.setProfileActionStream(single, workerTag, action);
+    public void setUnlinkActionStream(@NonNull Single<User> single, @NonNull String workerTag,
+                                      @ProfileAction int action) {
+        mViewModel.setUnlinkActionStream(single, workerTag, action);
     }
 
     @Override

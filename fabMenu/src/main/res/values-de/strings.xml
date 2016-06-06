@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="purchase_is_ready">Einkauf ist bereit</string>
+    <string name="fab_label_auto">Magisch</string>
+    <string name="fab_label_manual">Von Hand</string>
+</resources>

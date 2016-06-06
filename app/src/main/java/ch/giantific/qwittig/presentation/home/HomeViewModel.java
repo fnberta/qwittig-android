@@ -6,9 +6,11 @@ package ch.giantific.qwittig.presentation.home;
 
 import android.databinding.Bindable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 
-import ch.berta.fabio.fabspeeddial.FabMenu;
+import ch.berta.fabio.fabspeeddial.FabMenuClickListener;
+import ch.berta.fabio.fabspeeddial.ProgressFinalAnimationListener;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 
 /**
@@ -16,9 +18,15 @@ import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
  */
 public interface HomeViewModel extends ViewModel,
         JoinGroupDialogFragment.DialogInteractionListener,
-        JoinGroupWorkerListener {
+        JoinGroupWorkerListener, OcrWorkerListener {
 
     void onLoginSuccessful();
+
+    @Bindable
+    boolean isOcrProcessing();
+
+    @Bindable
+    boolean isAnimStop();
 
     @Bindable
     boolean isDraftsAvailable();
@@ -30,14 +38,20 @@ public interface HomeViewModel extends ViewModel,
     void handleInvitation(@NonNull String identityId, @NonNull String groupName,
                           @NonNull String inviterNickname);
 
-    FabMenu.FabMenuItemClickListener getFabMenuItemClickListener();
+    void onReceiptImageTaken(@NonNull String receiptImagePath);
+
+    void onReceiptImageFailed();
+
+    void onOcrPurchaseReady(@NonNull String ocrPurchaseId);
+
+    void onOcrPurchaseFailed();
+
+    FabMenuClickListener getFabMenuClickListener();
 
     /**
      * Defines the interaction with the attached view.
      */
     interface ViewListener extends ViewModel.ViewListener {
-        void startPurchaseAddActivity(boolean autoMode);
-
         void showGroupJoinDialog(@NonNull String groupName, @NonNull String inviterNickname);
 
         void loadJoinGroupWorker(@NonNull String identityId);
@@ -47,5 +61,11 @@ public interface HomeViewModel extends ViewModel,
         void hideProgressDialog();
 
         void onGroupJoined();
+
+        void captureImage();
+
+        void loadOcrWorker(@NonNull String receiptImagePath);
+
+        void startPurchaseAddScreen(@Nullable String ocrPurchaseId);
     }
 }

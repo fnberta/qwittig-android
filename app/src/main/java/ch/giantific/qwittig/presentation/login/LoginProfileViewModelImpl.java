@@ -112,36 +112,29 @@ public class LoginProfileViewModelImpl extends ViewModelBaseImpl<LoginProfileVie
             return;
         }
 
-        final boolean avatarSet = !TextUtils.isEmpty(mAvatar) && !mAvatar.equals(mCurrentIdentity.getAvatarUrl());
-        if (avatarSet) {
-            getSubscriptions().add(mView.encodeAvatar(mAvatar)
-                    .flatMapObservable(new Func1<byte[], Observable<Identity>>() {
-                        @Override
-                        public Observable<Identity> call(byte[] avatar) {
-                            return mUserRepo.saveCurrentUserProfile(mNickname, avatar);
+        if (!TextUtils.isEmpty(mAvatar) && !mAvatar.equals(mCurrentIdentity.getAvatarUrl())) {
+            getSubscriptions().add(mUserRepo.saveCurrentUserIdentitiesWithAvatar(mNickname, mAvatar)
+                .subscribe(new Subscriber<Identity>() {
+                    @Override
+                    public void onCompleted() {
+                        // TODO: add real check if it's default group or not
+                        if (mCurrentIdentity.getGroup().getName().equals("Qwittig")) {
+                            mView.showFirstGroupFragment();
+                        } else {
+                            mView.finishScreen(Activity.RESULT_OK);
                         }
-                    })
-                    .subscribe(new Subscriber<Identity>() {
-                        @Override
-                        public void onCompleted() {
-                            // TODO: add real check if it's default group or not
-                            if (mCurrentIdentity.getGroup().getName().equals("Qwittig")) {
-                                mView.showFirstGroupFragment();
-                            } else {
-                                mView.finishScreen(Activity.RESULT_OK);
-                            }
-                        }
+                    }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            // TODO: handle error
-                        }
+                    @Override
+                    public void onError(Throwable e) {
+                        // TODO: handle error
+                    }
 
-                        @Override
-                        public void onNext(Identity identity) {
-                            // do nothing
-                        }
-                    })
+                    @Override
+                    public void onNext(Identity identity) {
+                        // do nothing
+                    }
+                })
             );
         } else {
             mCurrentIdentity.setNickname(mNickname);

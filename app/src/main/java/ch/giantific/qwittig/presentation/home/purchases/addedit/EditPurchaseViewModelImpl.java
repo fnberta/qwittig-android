@@ -26,6 +26,8 @@ import ch.giantific.qwittig.presentation.home.purchases.addedit.items.AddEditPur
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Single;
 import rx.SingleSubscriber;
+import rx.functions.Action1;
+import rx.functions.Func1;
 
 /**
  * Provides an implementation of the {@link AddEditPurchaseViewModel} for the edit purchase screen.
@@ -84,21 +86,34 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
     }
 
     @Override
-    void onIdentitiesReady() {
-        if (mOldValuesSet) {
-            super.onIdentitiesReady();
-        }
-
-        getSubscriptions().add(fetchEditPurchase()
+    public void loadData() {
+        getSubscriptions().add(mUserRepo.getIdentities(mCurrentGroup, true)
+                .toSortedList()
+                .toSingle()
+                .doOnSuccess(new Action1<List<Identity>>() {
+                    @Override
+                    public void call(List<Identity> identities) {
+                        identities.remove(mCurrentIdentity);
+                        identities.add(0, mCurrentIdentity);
+                        mIdentities = identities;
+                    }
+                })
+                .flatMap(new Func1<List<Identity>, Single<Purchase>>() {
+                    @Override
+                    public Single<Purchase> call(List<Identity> identities) {
+                        return fetchEditPurchase();
+                    }
+                })
                 .subscribe(new SingleSubscriber<Purchase>() {
                     @Override
                     public void onSuccess(Purchase purchase) {
                         mEditPurchase = purchase;
 
-                        if (!mOldValuesSet) {
+                        if (mOldValuesSet) {
+                            updateRows();
+                        } else {
                             setOldPurchaseValues();
                             setOldItemValues();
-
                             mOldValuesSet = true;
                         }
                     }
@@ -117,7 +132,7 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
 
     private void setOldPurchaseValues() {
         // check if there is a receipt image file and update action bar menu accordingly
-        mView.toggleReceiptMenuOption(hasOldReceiptFile());
+        mView.toggleReceiptMenuOption(mEditPurchase.hasReceipt());
 
         // set note to value from original purchase
         final String oldNote = mEditPurchase.getNote();
@@ -143,10 +158,6 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
         setExchangeRate(mOldExchangeRate);
     }
 
-    boolean hasOldReceiptFile() {
-        return mEditPurchase.getReceipt() != null;
-    }
-
     private void setOldItemValues() {
         final List<Item> oldItems = mEditPurchase.getItems();
         for (Item item : oldItems) {
@@ -154,11 +165,11 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
             final String price = mMoneyFormatter.format(item.getPriceForeign(mOldExchangeRate));
             final AddEditPurchaseItem purchaseAddEditItem =
                     new AddEditPurchaseItem(item.getName(), price, getItemUsers(identities));
+            purchaseAddEditItem.setMoneyFormatter(mMoneyFormatter);
+            purchaseAddEditItem.setPriceChangedListener(this);
             mItems.add(getLastPosition() - 1, purchaseAddEditItem);
             mView.notifyItemInserted(mItems.indexOf(purchaseAddEditItem));
         }
-
-        super.onIdentitiesReady();
     }
 
     @NonNull
@@ -186,7 +197,7 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
 
     @Override
     public void onShowReceiptImageMenuClick() {
-        mView.showReceiptImage(mEditPurchaseId, mReceiptImagePath);
+        mView.showReceiptImage(!TextUtils.isEmpty(mReceiptImagePath) ? mReceiptImagePath : mEditPurchase.getReceiptUrl());
     }
 
     @Override

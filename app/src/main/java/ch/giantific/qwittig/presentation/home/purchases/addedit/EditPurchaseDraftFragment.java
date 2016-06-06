@@ -23,6 +23,8 @@ import ch.giantific.qwittig.presentation.home.purchases.addedit.di.EditPurchaseV
  */
 public class EditPurchaseDraftFragment extends AddEditPurchaseBaseFragment<EditPurchaseDraftViewModel, AddEditPurchaseBaseFragment.ActivityListener> {
 
+    private static final String KEY_PURCHASE_DRAFT_ID = "PURCHASE_DRAFT_ID";
+
     public EditPurchaseDraftFragment() {
         // required empty constructor
     }
@@ -37,7 +39,7 @@ public class EditPurchaseDraftFragment extends AddEditPurchaseBaseFragment<EditP
     public static EditPurchaseDraftFragment newInstance(@NonNull String draftId) {
         EditPurchaseDraftFragment fragment = new EditPurchaseDraftFragment();
         final Bundle args = new Bundle();
-        args.putString(KEY_EDIT_PURCHASE_ID, draftId);
+        args.putString(KEY_PURCHASE_DRAFT_ID, draftId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -48,7 +50,7 @@ public class EditPurchaseDraftFragment extends AddEditPurchaseBaseFragment<EditP
 
         setHasOptionsMenu(true);
 
-        final String editPurchaseId = getArguments().getString(KEY_EDIT_PURCHASE_ID, "");
+        final String editPurchaseId = getArguments().getString(KEY_PURCHASE_DRAFT_ID, "");
         DaggerEditPurchaseComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(getActivity()))
                 .editPurchaseViewModelModule(new EditPurchaseViewModelModule(savedInstanceState, this, editPurchaseId))

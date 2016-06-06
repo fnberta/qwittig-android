@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import com.mugen.Mugen;
 import com.mugen.MugenCallbacks;
 
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.FragmentFinanceCompensationsPaidBinding;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
@@ -40,6 +41,7 @@ public class CompsPaidFragment extends BaseRecyclerViewFragment<CompsPaidViewMod
         super.onCreate(savedInstanceState);
 
         DaggerFinanceCompsPaidComponent.builder()
+                .applicationComponent(Qwittig.getAppComponent(getActivity()))
                 .financeCompsPaidViewModelModule(new FinanceCompsPaidViewModelModule(savedInstanceState, this))
                 .build()
                 .inject(this);

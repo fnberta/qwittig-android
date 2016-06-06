@@ -11,13 +11,30 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RippleDrawable;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
+
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.domain.repositories.UserRepository;
+import timber.log.Timber;
 
 /**
  * Provides useful methods to properly format a user's avatar image.
@@ -93,5 +110,34 @@ public class AvatarUtils {
 
         return withRipple && Utils.isRunningLollipopAndHigher() ?
                 createRippleDrawable(context, roundedDrawable) : roundedDrawable;
+    }
+
+    public static void saveImageLocal(@NonNull final Fragment fragment,
+                                      @NonNull Uri imageUri,
+                                      @NonNull final AvatarLocalSaveListener listener) {
+        Glide.with(fragment)
+                .load(imageUri)
+                .asBitmap()
+                .toBytes(Bitmap.CompressFormat.JPEG, UserRepository.JPEG_COMPRESSION_RATE)
+                .centerCrop()
+                .into(new SimpleTarget<byte[]>(UserRepository.WIDTH, UserRepository.HEIGHT) {
+                    @Override
+                    public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
+                        final String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
+                        final String imageFileName = "AVATAR_" + timeStamp + ".jpg";
+                        final File storageDir = fragment.getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+                        final File avatar = new File(storageDir, imageFileName);
+                        try {
+                            FileUtils.writeByteArrayToFile(avatar, resource);
+                            listener.onAvatarSaved(avatar.getAbsolutePath());
+                        } catch (IOException e) {
+                            Timber.e(e, "Failed to pick profile image");
+                        }
+                    }
+                });
+    }
+
+    public interface AvatarLocalSaveListener {
+        void onAvatarSaved(@NonNull String path);
     }
 }

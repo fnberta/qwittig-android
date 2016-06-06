@@ -18,6 +18,6 @@ public interface ExchangeRates {
      * @param baseCurrency the base currency to base the rates on
      * @return the result as an {@link Single}
      */
-    @GET("/latest")
+    @GET("latest")
     Single<CurrencyRates> getRates(@Query("base") String baseCurrency);
 }

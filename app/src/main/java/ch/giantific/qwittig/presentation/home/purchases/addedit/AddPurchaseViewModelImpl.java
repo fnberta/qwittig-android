@@ -27,8 +27,6 @@ import java.util.List;
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.rest.OcrItem;
-import ch.giantific.qwittig.data.rest.OcrPurchase;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Item;
@@ -49,7 +47,6 @@ import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Single;
 import rx.SingleSubscriber;
-import rx.functions.Func1;
 import timber.log.Timber;
 
 /**
@@ -58,8 +55,6 @@ import timber.log.Timber;
 public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurchaseBaseItem, ViewListener>
         implements AddEditPurchaseViewModel {
 
-    // add permission to manifest when enabling!
-    static final boolean USE_CUSTOM_CAMERA = false;
     private static final String STATE_ROW_ITEMS = "STATE_ROW_ITEMS";
     private static final String STATE_DATE = "STATE_DATE";
     private static final String STATE_STORE = "STATE_STORE";
@@ -67,12 +62,11 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
     private static final String STATE_EXCHANGE_RATE = "STATE_EXCHANGE_RATE";
     private static final String STATE_NOTE = "STATE_NOTE";
     private static final String STATE_RECEIPT_IMAGE_PATH = "STATE_RECEIPT_IMAGE_PATH";
-    private static final String STATE_RECEIPT_IMAGE_PATHS = "STATE_RECEIPT_IMAGE_PATHS";
     private static final String STATE_FETCHING_RATES = "STATE_FETCHING_RATES";
     final PurchaseRepository mPurchaseRepo;
+    final Group mCurrentGroup;
     private final NumberFormat mExchangeRateFormatter;
     private final List<String> mSupportedCurrencies = Arrays.asList(MoneyUtils.SUPPORTED_CURRENCIES);
-    private final Group mCurrentGroup;
     private final DateFormat mDateFormatter;
     String mCurrency;
     String mReceiptImagePath;
@@ -82,10 +76,9 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
     double mTotalPrice = 0;
     double mExchangeRate;
     NumberFormat mMoneyFormatter;
-    private List<Identity> mIdentities = new ArrayList<>();
+    List<Identity> mIdentities = new ArrayList<>();
     private double mMyShare = 0;
     private boolean mFetchingExchangeRates;
-    private ArrayList<String> mReceiptImagePaths;
 
     public AddPurchaseViewModelImpl(@Nullable Bundle savedState,
                                     @NonNull AddEditPurchaseViewModel.ViewListener view,
@@ -104,9 +97,6 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
             mExchangeRate = savedState.getDouble(STATE_EXCHANGE_RATE);
             mNote = savedState.getString(STATE_NOTE);
             mReceiptImagePath = savedState.getString(STATE_RECEIPT_IMAGE_PATH);
-            if (USE_CUSTOM_CAMERA) {
-                mReceiptImagePaths = savedState.getStringArrayList(STATE_RECEIPT_IMAGE_PATHS);
-            }
             mFetchingExchangeRates = savedState.getBoolean(STATE_FETCHING_RATES);
         } else {
             initFixedRows();
@@ -114,9 +104,6 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
             mDate = new Date();
             mCurrency = mCurrentGroup.getCurrency();
             mExchangeRate = 1;
-            if (USE_CUSTOM_CAMERA) {
-                mReceiptImagePaths = new ArrayList<>();
-            }
         }
 
         mMoneyFormatter = MoneyUtils.getMoneyFormatter(mCurrency, false, true);
@@ -144,9 +131,6 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
         outState.putDouble(STATE_EXCHANGE_RATE, mExchangeRate);
         outState.putString(STATE_NOTE, mNote);
         outState.putString(STATE_RECEIPT_IMAGE_PATH, mReceiptImagePath);
-        if (USE_CUSTOM_CAMERA) {
-            outState.putStringArrayList(STATE_RECEIPT_IMAGE_PATHS, mReceiptImagePaths);
-        }
         outState.putBoolean(STATE_FETCHING_RATES, mFetchingExchangeRates);
     }
 
@@ -262,7 +246,7 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
                         identities.add(0, mCurrentIdentity);
                         mIdentities = identities;
 
-                        onIdentitiesReady();
+                        updateRows();
                     }
 
                     @Override
@@ -273,7 +257,7 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
         );
     }
 
-    void onIdentitiesReady() {
+    final void updateRows() {
         boolean hasItems = false;
         for (int i = 0, size = mItems.size(); i < size; i++) {
             final AddEditPurchaseBaseItem addEditItem = mItems.get(i);
@@ -490,7 +474,7 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
 
     @Override
     public void onAddReceiptImageMenuClick() {
-        mView.captureImage(USE_CUSTOM_CAMERA);
+        mView.captureImage();
     }
 
     @Override
@@ -505,17 +489,8 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
     }
 
     @Override
-    public void onReceiptImageFailed() {
-        mView.finishScreen(PurchaseResult.PURCHASE_DISCARDED);
-    }
-
-    @Override
-    public void onReceiptImagesTaken(@NonNull List<String> receiptImagePaths) {
-        mReceiptImagePaths.clear();
-        if (!receiptImagePaths.isEmpty()) {
-            mReceiptImagePaths.addAll(receiptImagePaths);
-        }
-        mReceiptImagePath = mReceiptImagePaths.get(0);
+    public void onReceiptImageTakeFailed() {
+        mView.showMessage(R.string.toast_create_image_file_failed);
     }
 
     @Override
@@ -560,43 +535,6 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
     }
 
     @Override
-    public void setOcrStream(@NonNull final Single<OcrPurchase> single,
-                             @NonNull final String workerTag) {
-        final AddEditPurchaseItem.PriceChangedListener priceListener = this;
-
-        getSubscriptions().add(single.subscribe(new SingleSubscriber<OcrPurchase>() {
-            @Override
-            public void onSuccess(OcrPurchase ocrPurchase) {
-                mView.removeWorker(workerTag);
-
-//                setDate(ocrPurchase.getTaskEventDate());
-                setStore(ocrPurchase.getStore());
-
-                final List<OcrItem> ocrItems = ocrPurchase.getItems();
-                for (OcrItem ocrItem : ocrItems) {
-                    final String price = mMoneyFormatter.format(ocrItem.getPrice());
-                    final AddEditPurchaseItem purchaseAddEditItem = new AddEditPurchaseItem(ocrItem.getName(), price,
-                            getItemUsers(mIdentities));
-                    purchaseAddEditItem.setMoneyFormatter(mMoneyFormatter);
-                    purchaseAddEditItem.setPriceChangedListener(priceListener);
-                    mItems.add(purchaseAddEditItem);
-                    mView.notifyItemInserted(mItems.indexOf(purchaseAddEditItem));
-                }
-
-                setLoading(false);
-            }
-
-            @Override
-            public void onError(Throwable error) {
-                mView.removeWorker(workerTag);
-
-                mView.showMessage(mPurchaseRepo.getErrorMessage(error));
-                setLoading(false);
-            }
-        }));
-    }
-
-    @Override
     public void onFabSavePurchaseClick(View view) {
         if (mFetchingExchangeRates) {
             mView.showMessage(R.string.toast_exchange_rate_fetching);
@@ -627,41 +565,26 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
     }
 
     private void savePurchase(final boolean asDraft) {
-        final SingleSubscriber<Purchase> subscriber = new SingleSubscriber<Purchase>() {
-            @Override
-            public void onSuccess(Purchase purchase) {
-                deleteTakenImages();
-                mView.finishScreen(asDraft ? getDraftFinishedResult() : PurchaseResult.PURCHASE_SAVED);
-            }
-
-            @Override
-            public void onError(Throwable error) {
-                mView.showMessage(asDraft
-                        ? R.string.toast_error_purchase_save_draft
-                        : R.string.toast_error_purchase_save);
-            }
-        };
-
         final Purchase purchase = getPurchase();
         if (asDraft) {
             purchase.setDraft(true);
         }
-        if (!TextUtils.isEmpty(mReceiptImagePath)) {
-            getSubscriptions().add(mView.encodeReceiptImage(mReceiptImagePath)
-                    .flatMap(new Func1<byte[], Single<Purchase>>() {
-                        @Override
-                        public Single<Purchase> call(byte[] bytes) {
-                            purchase.setReceiptData(bytes);
-                            return getSavePurchaseAction(purchase);
-                        }
-                    })
-                    .subscribe(subscriber)
-            );
-        } else {
-            getSubscriptions().add(getSavePurchaseAction(purchase)
-                    .subscribe(subscriber)
-            );
-        }
+
+        getSubscriptions().add(getSavePurchaseAction(purchase)
+                .subscribe(new SingleSubscriber<Purchase>() {
+                    @Override
+                    public void onSuccess(Purchase purchase) {
+                        mView.finishScreen(asDraft ? getDraftFinishedResult() : PurchaseResult.PURCHASE_SAVED);
+                    }
+
+                    @Override
+                    public void onError(Throwable error) {
+                        mView.showMessage(asDraft
+                                ? R.string.toast_error_purchase_save_draft
+                                : R.string.toast_error_purchase_save);
+                    }
+                })
+        );
     }
 
     Single<Purchase> getSavePurchaseAction(@NonNull Purchase purchase) {
@@ -757,6 +680,10 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
         if (!TextUtils.isEmpty(mNote)) {
             purchase.setNote(mNote);
         }
+        if (!TextUtils.isEmpty(mReceiptImagePath)) {
+            purchase.setReceiptLocal(mReceiptImagePath);
+        }
+
         return purchase;
     }
 
@@ -772,26 +699,6 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
         return identities;
     }
 
-    private void deleteTakenImages() {
-        if (USE_CUSTOM_CAMERA) {
-            if (!mReceiptImagePaths.isEmpty()) {
-                for (String path : mReceiptImagePaths) {
-                    final boolean fileDeleted = new File(path).delete();
-                    if (!fileDeleted && BuildConfig.DEBUG) {
-                        Timber.e("failed to delete file");
-                    }
-                }
-                mReceiptImagePaths.clear();
-            }
-        } else if (!TextUtils.isEmpty(mReceiptImagePath)) {
-            boolean fileDeleted = new File(mReceiptImagePath).delete();
-            if (!fileDeleted && BuildConfig.DEBUG) {
-                Timber.e("failed to delete file");
-            }
-            mReceiptImagePath = "";
-        }
-    }
-
     @Override
     public void onShowReceiptImageMenuClick() {
         mView.showReceiptImage(mReceiptImagePath);
@@ -801,7 +708,16 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
     public void onDeleteReceiptImageMenuClick() {
         mView.toggleReceiptMenuOption(false);
         mView.showMessage(R.string.toast_receipt_deleted);
-        deleteTakenImages();
+        deleteReceiptImage();
+        mReceiptImagePath = "";
+    }
+
+    private void deleteReceiptImage() {
+        final File receipt = new File(mReceiptImagePath);
+        boolean fileDeleted = receipt.delete();
+        if (!fileDeleted && BuildConfig.DEBUG) {
+            Timber.e("failed to delete file");
+        }
     }
 
     @Override

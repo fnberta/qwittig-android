@@ -17,13 +17,12 @@ import java.lang.annotation.RetentionPolicy;
 import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
-import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileWorker.ProfileAction;
-import rx.Single;
+import ch.giantific.qwittig.presentation.settings.profile.UnlinkThirdPartyWorker.ProfileAction;
 
 /**
  * Defines a observable view model for profile settings screen.
  */
-public interface SettingsProfileViewModel extends ViewModel, SettingsProfileWorkerListener,
+public interface SettingsProfileViewModel extends ViewModel, UnlinkThirdPartyWorkerListener,
         AvatarLoadListener,
         DiscardChangesDialogFragment.DialogInteractionListener {
 
@@ -111,8 +110,6 @@ public interface SettingsProfileViewModel extends ViewModel, SettingsProfileWork
 
         void startPostponedEnterTransition();
 
-        void loadSaveAvatarWorker(@NonNull String nickname, @NonNull byte[] avatar);
-
         void loadUnlinkThirdPartyWorker(@ProfileAction int unlinkAction);
 
         void showDiscardChangesDialog();
@@ -122,8 +119,6 @@ public interface SettingsProfileViewModel extends ViewModel, SettingsProfileWork
         void showSetPasswordMessage(@StringRes int message);
 
         void dismissSetPasswordMessage();
-
-        Single<byte[]> encodeAvatar(@NonNull String avatar);
 
         void reloadOptionsMenu();
 

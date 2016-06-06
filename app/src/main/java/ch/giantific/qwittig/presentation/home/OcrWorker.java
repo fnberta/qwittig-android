@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.home.purchases.addedit;
+package ch.giantific.qwittig.presentation.home;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,20 +10,14 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 
-import java.io.File;
-
 import javax.inject.Inject;
 
-import ch.giantific.qwittig.data.rest.OcrPurchase;
 import ch.giantific.qwittig.data.rest.ReceiptOcr;
+import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
 import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 /**
  * Sends the image of receipt to the server to analyse and ocr it using
@@ -31,13 +25,12 @@ import rx.schedulers.Schedulers;
  * <p/>
  * Subclass of {@link BaseWorker}.
  */
-public class OcrWorker extends BaseWorker<OcrPurchase, OcrWorkerListener> {
+public class OcrWorker extends BaseWorker<String, OcrWorkerListener> {
 
     private static final String WORKER_TAG = OcrWorker.class.getCanonicalName();
     private static final String KEY_RECEIPT_PATH = "RECEIPT_PATH";
-    private static final int MAX_RETRIES = 0;
     @Inject
-    ReceiptOcr mReceiptOcr;
+    PurchaseRepository mPurchaseRepo;
 
     public OcrWorker() {
         // empty default constructor
@@ -73,23 +66,14 @@ public class OcrWorker extends BaseWorker<OcrPurchase, OcrWorkerListener> {
 
     @Nullable
     @Override
-    protected Observable<OcrPurchase> getObservable(@NonNull Bundle args) {
-        // TODO: implement retries
-
+    protected Observable<String> getObservable(@NonNull Bundle args) {
         final String receiptPath = args.getString(KEY_RECEIPT_PATH, "");
         if (!TextUtils.isEmpty(receiptPath)) {
             return mUserRepo.getUserSessionToken()
-                    .flatMapObservable(new Func1<String, Observable<OcrPurchase>>() {
+                    .flatMapObservable(new Func1<String, Observable<String>>() {
                         @Override
-                        public Observable<OcrPurchase> call(String sessionToken) {
-                            final RequestBody tokenPart = RequestBody.create(
-                                    MediaType.parse("text/plain"), sessionToken);
-                            final RequestBody receiptPart = RequestBody.create(
-                                    MediaType.parse("image/jpeg"), new File(receiptPath));
-
-                            return mReceiptOcr.uploadReceipt(tokenPart, receiptPart)
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread());
+                        public Observable<String> call(String sessionToken) {
+                            return mPurchaseRepo.uploadReceipt(sessionToken, receiptPath);
                         }
                     });
         }
@@ -103,7 +87,7 @@ public class OcrWorker extends BaseWorker<OcrPurchase, OcrWorkerListener> {
     }
 
     @Override
-    protected void setStream(@NonNull Observable<OcrPurchase> observable) {
+    protected void setStream(@NonNull Observable<String> observable) {
         mActivity.setOcrStream(observable.toSingle(), WORKER_TAG);
     }
 }

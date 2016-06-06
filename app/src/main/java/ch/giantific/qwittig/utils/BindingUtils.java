@@ -27,6 +27,7 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.PieData;
 
 import ch.berta.fabio.fabprogress.FabProgress;
+import ch.berta.fabio.fabspeeddial.FabMenu;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.home.purchases.details.widgets.CircleDisplay;
 import ch.giantific.qwittig.presentation.navdrawer.BlurTransformation;
@@ -192,6 +193,17 @@ public class BindingUtils {
 
     @BindingAdapter({"progress", "animStop"})
     public static void setFabProgressAnim(FabProgress view, boolean start, boolean animStop) {
+        if (start) {
+            view.startProgress();
+        } else if (animStop) {
+            view.startProgressFinalAnimation();
+        } else {
+            view.stopProgress();
+        }
+    }
+
+    @BindingAdapter({"progress", "animStop"})
+    public static void setFabMenuProgressAnim(FabMenu view, boolean start, boolean animStop) {
         if (start) {
             view.startProgress();
         } else if (animStop) {

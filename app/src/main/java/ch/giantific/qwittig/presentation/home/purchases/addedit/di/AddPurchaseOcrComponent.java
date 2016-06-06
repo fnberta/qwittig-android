@@ -15,8 +15,8 @@ import dagger.Component;
  */
 @PerScreen
 @Component(dependencies = {ApplicationComponent.class},
-        modules = {AddPurchaseAutoViewModelModule.class, RepositoriesModule.class})
-public interface AddPurchaseAutoComponent {
+        modules = {AddPurchaseOcrViewModelModule.class, RepositoriesModule.class})
+public interface AddPurchaseOcrComponent {
 
     void inject(AddPurchaseFragment addPurchaseFragment);
 }

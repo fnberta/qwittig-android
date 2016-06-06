@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.di.scopes.PerScreen;
-import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.home.purchases.common.PurchaseReceiptViewModel;
@@ -22,13 +21,13 @@ import dagger.Provides;
  * instantiate it.
  */
 @Module
-public class PurchaseReceiptPathViewModelModule extends BaseViewModelModule<PurchaseReceiptViewModel.ViewListener> {
+public class PurchaseReceiptViewModelModule extends BaseViewModelModule<PurchaseReceiptViewModel.ViewListener> {
 
     private final String mReceiptImagePath;
 
-    public PurchaseReceiptPathViewModelModule(@Nullable Bundle savedState,
-                                              @NonNull PurchaseReceiptViewModel.ViewListener view,
-                                              @NonNull String receiptImagePath) {
+    public PurchaseReceiptViewModelModule(@Nullable Bundle savedState,
+                                          @NonNull PurchaseReceiptViewModel.ViewListener view,
+                                          @NonNull String receiptImagePath) {
         super(savedState, view);
 
         mReceiptImagePath = receiptImagePath;
@@ -36,9 +35,7 @@ public class PurchaseReceiptPathViewModelModule extends BaseViewModelModule<Purc
 
     @PerScreen
     @Provides
-    PurchaseReceiptViewModel providesPurchaseReceiptViewModel(@NonNull UserRepository userRepository,
-                                                              @NonNull PurchaseRepository purchaseRepository) {
-        return PurchaseReceiptViewModelImpl.createImagePathInstance(mSavedState, mView, userRepository,
-                purchaseRepository, mReceiptImagePath);
+    PurchaseReceiptViewModel providesPurchaseReceiptViewModel(@NonNull UserRepository userRepository) {
+        return new PurchaseReceiptViewModelImpl(mSavedState, mView, userRepository, mReceiptImagePath);
     }
 }

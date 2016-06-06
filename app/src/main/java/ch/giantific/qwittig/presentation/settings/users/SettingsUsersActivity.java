@@ -23,7 +23,8 @@ import rx.Single;
  * Subclass of {@link BaseActivity}.
  */
 public class SettingsUsersActivity extends BaseActivity<SettingsUsersViewModel>
-        implements SettingsUsersFragment.ActivityListener, AddUserWorkerListener {
+        implements SettingsUsersFragment.ActivityListener, AddUserWorkerListener,
+        NicknamePromptDialogFragment.DialogInteractionListener {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -62,5 +63,10 @@ public class SettingsUsersActivity extends BaseActivity<SettingsUsersViewModel>
     @Override
     public void setAddUserStream(@NonNull Single<Identity> single, @NonNull String workerTag) {
         mViewModel.setAddUserStream(single, workerTag);
+    }
+
+    @Override
+    public void onValidNicknameEntered(@NonNull String nickname, int position) {
+        mViewModel.onValidNicknameEntered(nickname, position);
     }
 }

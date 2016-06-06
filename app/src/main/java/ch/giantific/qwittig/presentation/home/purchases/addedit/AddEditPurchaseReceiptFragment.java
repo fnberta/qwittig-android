@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -21,10 +20,8 @@ import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.home.purchases.common.PurchaseReceiptBaseFragment;
 import ch.giantific.qwittig.presentation.home.purchases.common.PurchaseReceiptViewModel;
-import ch.giantific.qwittig.presentation.home.purchases.common.di.DaggerPurchaseReceiptIdComponent;
-import ch.giantific.qwittig.presentation.home.purchases.common.di.DaggerPurchaseReceiptPathComponent;
-import ch.giantific.qwittig.presentation.home.purchases.common.di.PurchaseReceiptIdViewModelModule;
-import ch.giantific.qwittig.presentation.home.purchases.common.di.PurchaseReceiptPathViewModelModule;
+import ch.giantific.qwittig.presentation.home.purchases.common.di.DaggerPurchaseReceiptComponent;
+import ch.giantific.qwittig.presentation.home.purchases.common.di.PurchaseReceiptViewModelModule;
 import ch.giantific.qwittig.utils.CameraUtils;
 
 /**
@@ -34,8 +31,7 @@ import ch.giantific.qwittig.utils.CameraUtils;
  */
 public class AddEditPurchaseReceiptFragment extends PurchaseReceiptBaseFragment<PurchaseReceiptViewModel, AddEditPurchaseReceiptFragment.ActivityListener> {
 
-    private static final String KEY_RECEIPT_IMAGE_PATH = "RECEIPT_IMAGE_PATH";
-    private static final String KEY_PURCHASE_ID = "PURCHASE_ID";
+    private static final String KEY_RECEIPT_IMAGE_URI = "RECEIPT_IMAGE_URI";
     private static final int INTENT_REQUEST_IMAGE_CAPTURE = 1;
     private String mReceiptImagePath;
 
@@ -46,31 +42,16 @@ public class AddEditPurchaseReceiptFragment extends PurchaseReceiptBaseFragment<
     /**
      * Returns a new instance of {@link AddEditPurchaseReceiptFragment}.
      *
-     * @param imagePath the path to the receipt image taken
+     * @param receiptImageUri the path to the receipt image taken
      * @return a new instance of {@link AddEditPurchaseReceiptFragment}
      */
     @NonNull
-    public static AddEditPurchaseReceiptFragment newAddInstance(@NonNull String imagePath) {
+    public static AddEditPurchaseReceiptFragment newInstance(@NonNull String receiptImageUri) {
         final AddEditPurchaseReceiptFragment purchaseReceiptAddFragment = new AddEditPurchaseReceiptFragment();
         final Bundle args = new Bundle();
-        args.putString(KEY_RECEIPT_IMAGE_PATH, imagePath);
+        args.putString(KEY_RECEIPT_IMAGE_URI, receiptImageUri);
         purchaseReceiptAddFragment.setArguments(args);
         return purchaseReceiptAddFragment;
-    }
-
-    /**
-     * Returns a new instance of {@link AddEditPurchaseReceiptFragment}.
-     *
-     * @param purchaseId the object id of the purchase of which the receipt image should be shown
-     * @return a new instance of {@link AddEditPurchaseReceiptFragment}
-     */
-    @NonNull
-    public static AddEditPurchaseReceiptFragment newEditInstance(@NonNull String purchaseId) {
-        final AddEditPurchaseReceiptFragment fragment = new AddEditPurchaseReceiptFragment();
-        final Bundle args = new Bundle();
-        args.putString(KEY_PURCHASE_ID, purchaseId);
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override
@@ -80,22 +61,13 @@ public class AddEditPurchaseReceiptFragment extends PurchaseReceiptBaseFragment<
         setHasOptionsMenu(true);
 
         final Bundle args = getArguments();
-        final String receiptImagePath = args.getString(KEY_RECEIPT_IMAGE_PATH, "");
-        final String purchaseId = args.getString(KEY_PURCHASE_ID, "");
+        final String receiptImagePath = args.getString(KEY_RECEIPT_IMAGE_URI, "");
 
-        if (!TextUtils.isEmpty(receiptImagePath)) {
-            DaggerPurchaseReceiptPathComponent.builder()
-                    .applicationComponent(Qwittig.getAppComponent(getActivity()))
-                    .purchaseReceiptPathViewModelModule(new PurchaseReceiptPathViewModelModule(savedInstanceState, this, receiptImagePath))
-                    .build()
-                    .inject(this);
-        } else {
-            DaggerPurchaseReceiptIdComponent.builder()
-                    .applicationComponent(Qwittig.getAppComponent(getActivity()))
-                    .purchaseReceiptIdViewModelModule(new PurchaseReceiptIdViewModelModule(savedInstanceState, this, purchaseId))
-                    .build()
-                    .inject(this);
-        }
+        DaggerPurchaseReceiptComponent.builder()
+                .applicationComponent(Qwittig.getAppComponent(getActivity()))
+                .purchaseReceiptViewModelModule(new PurchaseReceiptViewModelModule(savedInstanceState, this, receiptImagePath))
+                .build()
+                .inject(this);
     }
 
     @Override
@@ -121,8 +93,6 @@ public class AddEditPurchaseReceiptFragment extends PurchaseReceiptBaseFragment<
     /**
      * Checks whether the permissions to take an image are granted and if yes initiates the creation
      * of the image file.
-     * <p/>
-     * TODO: check permissions if we decide to use custom camera!
      */
     private void captureImage() {
         if (!CameraUtils.hasCameraHardware(getActivity())) {

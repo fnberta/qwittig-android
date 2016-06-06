@@ -21,6 +21,8 @@ import ch.giantific.qwittig.presentation.home.purchases.addedit.di.EditPurchaseV
 public class EditPurchaseFragment extends AddEditPurchaseBaseFragment<AddEditPurchaseViewModel, AddEditPurchaseBaseFragment.ActivityListener>
         implements AddEditPurchaseViewModel.ViewListener {
 
+    private static final String KEY_EDIT_PURCHASE_ID = "EDIT_PURCHASE_ID";
+
     public EditPurchaseFragment() {
         // required empty constructor
     }

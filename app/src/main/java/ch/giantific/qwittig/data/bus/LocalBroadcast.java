@@ -26,6 +26,7 @@ public class LocalBroadcast {
     public static final String INTENT_DATA_TYPE = BuildConfig.APPLICATION_ID + ".intents.DATA_TYPE";
     public static final String INTENT_EXTRA_SUCCESSFUL = BuildConfig.APPLICATION_ID + ".intents.SUCCESSFUL";
     public static final String INTENT_EXTRA_COMPENSATION_PAID = BuildConfig.APPLICATION_ID + ".intents.COMPENSATION_PAID";
+    public static final String INTENT_EXTRA_OCR_PURCHASE_ID = BuildConfig.APPLICATION_ID + ".intents.OCR_PURCHASE_ID";
     private final LocalBroadcastManager mBroadcastManager;
 
     @Inject
@@ -87,6 +88,13 @@ public class LocalBroadcast {
         send(intent);
     }
 
+    public void sendOcrPurchaseUpdated(boolean successful, @NonNull String ocrPurchaseId) {
+        final Intent intent = getIntent(DataType.OCR_PURCHASE_UPDATED);
+        intent.putExtra(INTENT_EXTRA_SUCCESSFUL, successful);
+        intent.putExtra(INTENT_EXTRA_OCR_PURCHASE_ID, ocrPurchaseId);
+        send(intent);
+    }
+
     private Intent getIntent(@DataType int dataType) {
         final Intent intent = new Intent(INTENT_FILTER_DATA_NEW);
         intent.putExtra(INTENT_DATA_TYPE, dataType);
@@ -98,7 +106,8 @@ public class LocalBroadcast {
     }
 
     @IntDef({DataType.ALL, DataType.PURCHASES_UPDATED, DataType.IDENTITIES_UPDATED,
-            DataType.COMPENSATIONS_UPDATED, DataType.GROUP_UPDATED, DataType.TASKS_UPDATED})
+            DataType.COMPENSATIONS_UPDATED, DataType.GROUP_UPDATED, DataType.TASKS_UPDATED,
+            DataType.OCR_PURCHASE_UPDATED})
     @Retention(RetentionPolicy.SOURCE)
     public @interface DataType {
         int ALL = 1;
@@ -107,5 +116,6 @@ public class LocalBroadcast {
         int COMPENSATIONS_UPDATED = 4;
         int GROUP_UPDATED = 5;
         int TASKS_UPDATED = 6;
+        int OCR_PURCHASE_UPDATED = 7;
     }
 }

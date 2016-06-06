@@ -40,6 +40,7 @@ import ch.giantific.qwittig.di.SystemServiceModule;
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.models.OcrPurchase;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.domain.models.TaskHistoryEvent;
@@ -47,6 +48,7 @@ import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.finance.FinanceActivity;
 import ch.giantific.qwittig.presentation.home.HomeActivity;
+import ch.giantific.qwittig.presentation.home.purchases.addedit.AddPurchaseActivity;
 import ch.giantific.qwittig.presentation.home.purchases.details.PurchaseDetailsActivity;
 import ch.giantific.qwittig.presentation.tasks.details.TaskDetailsActivity;
 import ch.giantific.qwittig.presentation.tasks.list.TasksActivity;
@@ -61,8 +63,6 @@ import timber.log.Timber;
  */
 public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
 
-    public static final String PUSH_PARAM_TITLE = "title";
-    public static final String PUSH_PARAM_ALERT = "alert";
     public static final String PUSH_PARAM_PURCHASE_ID = "purchaseId";
     public static final String PUSH_PARAM_COMPENSATION_ID = "compensationId";
     public static final String PUSH_PARAM_GROUP_ID = "groupId";
@@ -83,8 +83,11 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     public static final String PUSH_PARAM_TASK_TIME_FRAME = "timeFrame";
     public static final String PUSH_PARAM_TASK_EVENT_FINISHER_ID = "finisherId";
     public static final String PUSH_PARAM_COMP_DID_CALC_NEW = "didCalcNew";
+    public static final String PUSH_PARAM_OCR_PURCHASE_ID= "ocrPurchaseId";
     public static final String INTENT_EXTRA_FINANCE_FRAGMENT = "INTENT_EXTRA_FINANCE_FRAGMENT";
     private static final String NOTIFICATION_TYPE = "type";
+    private static final String TYPE_PURCHASE_OCR_SUCCEEDED = "ocrSucceeded";
+    private static final String TYPE_PURCHASE_OCR_FAILED = "ocrFailed";
     private static final String TYPE_PURCHASE_NEW = "purchaseNew";
     private static final String TYPE_PURCHASE_EDIT = "purchaseEdit";
     private static final String TYPE_PURCHASE_DELETE = "purchaseDelete";
@@ -123,13 +126,9 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
      * @throws JSONException if the intent does not contain data in <code>KEY_PUSH_DATA</code>
      */
     public static JSONObject getData(@NonNull Intent intent) throws JSONException {
-        JSONObject extras;
-        if (intent.hasExtra(KEY_PUSH_DATA)) {
-            extras = new JSONObject(intent.getStringExtra(KEY_PUSH_DATA));
-        } else {
-            extras = new JSONObject("");
-        }
-        return extras;
+        return intent.hasExtra(KEY_PUSH_DATA)
+                ? new JSONObject(intent.getStringExtra(KEY_PUSH_DATA))
+                : new JSONObject("");
     }
 
     @Override
@@ -218,6 +217,15 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
         String notificationTag = null;
         final String type = getNotificationType(intent);
         switch (type) {
+            case TYPE_PURCHASE_OCR_SUCCEEDED: {
+                final String ocrPurchaseId = jsonExtras.optString(PUSH_PARAM_OCR_PURCHASE_ID);
+                ParseQueryService.startUpdateObject(context, OcrPurchase.CLASS, ocrPurchaseId, true);
+                break;
+            }
+            case TYPE_PURCHASE_OCR_FAILED: {
+                // TODO: send broadcast failed
+                break;
+            }
             case TYPE_PURCHASE_NEW: {
                 // set notification id and tag
                 notificationId = NEW_PURCHASE_NOTIFICATION_ID;
@@ -458,11 +466,6 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
             return super.getNotification(context, intent);
         }
 
-        // if push has non empty title and/or alert, fall back to super implementation
-        if (jsonExtras.has(PUSH_PARAM_TITLE) || jsonExtras.has(PUSH_PARAM_ALERT)) {
-            return super.getNotification(context, intent);
-        }
-
         // get extras
         final Bundle extras = intent.getExtras();
         final String packageName = context.getPackageName();
@@ -497,6 +500,14 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
         String alert;
         final String type = getNotificationType(intent);
         switch (type) {
+            case TYPE_PURCHASE_OCR_SUCCEEDED: {
+                title = context.getString(R.string.push_purchase_ocr_title);
+                alert = context.getString(R.string.push_purchase_ocr_alert);
+
+                // set title and alert
+                builder.setContentTitle(title).setContentText(alert);
+                break;
+            }
             case TYPE_PURCHASE_NEW: {
                 final String store = jsonExtras.optString(PUSH_PARAM_STORE);
                 final String totalAmountFormatted = getAmount(jsonExtras);
@@ -710,6 +721,9 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     protected Class<? extends Activity> getActivity(@NonNull Context context, @NonNull Intent intent) {
         String type = getNotificationType(intent);
         switch (type) {
+            case TYPE_PURCHASE_OCR_SUCCEEDED: {
+                return AddPurchaseActivity.class;
+            }
             case TYPE_PURCHASE_NEW: {
                 final String groupId;
                 try {

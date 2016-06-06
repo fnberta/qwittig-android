@@ -6,8 +6,6 @@ package ch.giantific.qwittig.presentation.settings.profile;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -23,19 +21,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
-
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentSettingsProfileBinding;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.presentation.settings.profile.di.DaggerSettingsProfileComponent;
-import ch.giantific.qwittig.presentation.settings.profile.di.SettingsProfileViewModelModule;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
-import rx.Single;
-import rx.SingleSubscriber;
+import ch.giantific.qwittig.presentation.settings.profile.di.DaggerSettingsProfileComponent;
+import ch.giantific.qwittig.presentation.settings.profile.di.SettingsProfileViewModelModule;
+import ch.giantific.qwittig.utils.AvatarUtils;
 
 /**
  * Displays the profile details of the current user, allowing him/her to edit them.
@@ -61,6 +54,7 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileViewMod
         setHasOptionsMenu(true);
 
         DaggerSettingsProfileComponent.builder()
+                .applicationComponent(Qwittig.getAppComponent(getActivity()))
                 .settingsProfileViewModelModule(new SettingsProfileViewModelModule(savedInstanceState, this))
                 .build()
                 .inject(this);
@@ -116,7 +110,12 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileViewMod
             case INTENT_REQUEST_IMAGE:
                 if (resultCode == Activity.RESULT_OK) {
                     final Uri imageUri = data.getData();
-                    mViewModel.onNewAvatarTaken(imageUri.toString());
+                    AvatarUtils.saveImageLocal(this, imageUri, new AvatarUtils.AvatarLocalSaveListener() {
+                        @Override
+                        public void onAvatarSaved(@NonNull String path) {
+                            mViewModel.onNewAvatarTaken(path);
+                        }
+                    });
                 }
         }
     }
@@ -137,13 +136,8 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileViewMod
     }
 
     @Override
-    public void loadSaveAvatarWorker(@NonNull String nickname, @NonNull byte[] avatar) {
-        SettingsProfileWorker.attachSaveAvatar(getFragmentManager(), nickname, avatar);
-    }
-
-    @Override
-    public void loadUnlinkThirdPartyWorker(@SettingsProfileWorker.ProfileAction int unlinkAction) {
-        SettingsProfileWorker.attachUnlink(getFragmentManager(), unlinkAction);
+    public void loadUnlinkThirdPartyWorker(@UnlinkThirdPartyWorker.ProfileAction int unlinkAction) {
+        UnlinkThirdPartyWorker.attachUnlink(getFragmentManager(), unlinkAction);
     }
 
     @Override
@@ -167,38 +161,6 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileViewMod
     @Override
     public void dismissSetPasswordMessage() {
         mSnackbar.dismiss();
-    }
-
-    @Override
-    public Single<byte[]> encodeAvatar(@NonNull final String avatar) {
-        final SettingsProfileFragment frag = this;
-        return Single.create(new Single.OnSubscribe<byte[]>() {
-            @Override
-            public void call(final SingleSubscriber<? super byte[]> singleSubscriber) {
-                Glide.with(frag)
-                        .load(avatar)
-                        .asBitmap()
-                        .toBytes(Bitmap.CompressFormat.JPEG, UserRepository.JPEG_COMPRESSION_RATE)
-                        .centerCrop()
-                        .into(new SimpleTarget<byte[]>(UserRepository.WIDTH, UserRepository.HEIGHT) {
-                            @Override
-                            public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
-                                if (!singleSubscriber.isUnsubscribed()) {
-                                    singleSubscriber.onSuccess(resource);
-                                }
-                            }
-
-                            @Override
-                            public void onLoadFailed(Exception e, Drawable errorDrawable) {
-                                super.onLoadFailed(e, errorDrawable);
-
-                                if (!singleSubscriber.isUnsubscribed()) {
-                                    singleSubscriber.onError(e);
-                                }
-                            }
-                        });
-            }
-        });
     }
 
     @Override

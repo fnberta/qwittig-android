@@ -4,10 +4,14 @@
 
 package ch.giantific.qwittig.data.repositories;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
@@ -15,28 +19,37 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
+import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.data.rest.CurrencyRates;
 import ch.giantific.qwittig.data.rest.ExchangeRates;
+import ch.giantific.qwittig.data.rest.ReceiptOcr;
 import ch.giantific.qwittig.data.services.SavePurchaseTaskService;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Item;
+import ch.giantific.qwittig.domain.models.OcrPurchase;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.parse.ParseUtils;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import rx.Observable;
 import rx.Single;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import timber.log.Timber;
 
 /**
  * Provides an implementation of {@link PurchaseRepository} that uses the Parse.com framework as
@@ -52,15 +65,18 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     private static final long EXCHANGE_RATE_REFRESH_INTERVAL = 24 * 60 * 60 * 1000;
     private final SharedPreferences mSharedPrefs;
     private final ExchangeRates mExchangeRates;
+    private final ReceiptOcr mReceiptOcr;
     private final GcmNetworkManager mGcmNetworkManager;
 
     public ParsePurchaseRepository(@NonNull SharedPreferences sharedPreferences,
                                    @NonNull ExchangeRates exchangeRates,
+                                   @NonNull ReceiptOcr receiptOcr,
                                    @NonNull GcmNetworkManager gcmNetworkManager) {
         super();
 
         mSharedPrefs = sharedPreferences;
         mExchangeRates = exchangeRates;
+        mReceiptOcr = receiptOcr;
         mGcmNetworkManager = gcmNetworkManager;
     }
 
@@ -157,7 +173,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
 
     @Override
     public boolean deletePurchaseLocal(@NonNull String purchaseId, @NonNull String groupId) {
-        final ParseObject purchase = ParseObject.createWithoutData(Purchase.CLASS, purchaseId);
+        final Purchase purchase = (Purchase) ParseObject.createWithoutData(Purchase.CLASS, purchaseId);
         try {
             purchase.unpin(Purchase.PIN_LABEL + groupId);
         } catch (ParseException e) {
@@ -232,13 +248,13 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
 
     @Override
     public boolean updatePurchase(@NonNull String purchaseId, boolean isNew) {
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery(Purchase.CLASS);
+        final ParseQuery<Purchase> query = ParseQuery.getQuery(Purchase.CLASS);
         query.include(Purchase.ITEMS);
         query.include(Purchase.IDENTITIES);
         query.include(Purchase.BUYER);
 
         try {
-            final Purchase purchase = (Purchase) query.get(purchaseId);
+            final Purchase purchase = query.get(purchaseId);
             final String groupId = purchase.getGroup().getObjectId();
             final String pinLabel = Purchase.PIN_LABEL + groupId;
 
@@ -355,16 +371,25 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public boolean uploadPurchase(@NonNull String tempId) {
+    public boolean uploadPurchase(@NonNull Context context, @NonNull String tempId) {
         final Purchase purchase;
         try {
             purchase = getPurchaseForUpload(tempId);
-            final byte[] receiptData = purchase.getReceiptData();
-            if (receiptData != null) {
-                saveReceiptFile(purchase, receiptData);
-            }
         } catch (ParseException e) {
             return false;
+        }
+
+        final String localReceiptPath = purchase.getReceiptLocal();
+        if (purchase.getReceipt() == null && !TextUtils.isEmpty(localReceiptPath)) {
+            try {
+                final ParseFile receipt = saveReceiptFile(context, purchase, localReceiptPath);
+                purchase.removeReceiptLocal();
+                purchase.setReceipt(receipt);
+            } catch (ParseException | ExecutionException | InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            deleteLocalReceipt(localReceiptPath);
         }
 
         try {
@@ -374,6 +399,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
             purchase.setTempId(tempId);
             return false;
         }
+
 
         try {
             purchase.unpin(Purchase.PIN_LABEL_TEMP);
@@ -399,16 +425,32 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
         return query.get(purchaseId);
     }
 
-    private void saveReceiptFile(@NonNull Purchase purchase, byte[] receiptData) throws ParseException {
+    private ParseFile saveReceiptFile(@NonNull Context context, @NonNull Purchase purchase,
+                                 @NonNull String localReceiptPath)
+            throws ParseException, ExecutionException, InterruptedException {
         final String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("jpg");
-        final ParseFile receipt = new ParseFile(PurchaseRepository.FILE_NAME, receiptData, mimeType);
+        final byte[] bytes = Glide.with(context)
+                .load(localReceiptPath)
+                .asBitmap()
+                .toBytes(Bitmap.CompressFormat.JPEG, PurchaseRepository.JPEG_COMPRESSION_RATE)
+                .into(PurchaseRepository.WIDTH, PurchaseRepository.HEIGHT)
+                .get();
+        final ParseFile receipt = new ParseFile(PurchaseRepository.FILE_NAME, bytes, mimeType);
         receipt.save();
-        purchase.removeReceiptData();
-        purchase.setReceipt(receipt);
+        return receipt;
+    }
+
+    private void deleteLocalReceipt(@NonNull String localReceiptPath) {
+        final File file = new File(localReceiptPath);
+        final boolean fileDeleted = file.delete();
+        if (!fileDeleted && BuildConfig.DEBUG) {
+            Timber.e("Failed to delete local receipt file");
+        }
     }
 
     @Override
-    public boolean uploadPurchaseEdit(@NonNull String purchaseId, boolean wasDraft,
+    public boolean uploadPurchaseEdit(@NonNull Context context, @NonNull String purchaseId,
+                                      boolean wasDraft,
                                       boolean deleteOldReceipt) {
         final Purchase purchase;
         try {
@@ -416,13 +458,21 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
             if (deleteOldReceipt) {
                 deleteOldReceipt(purchase.getReceipt().getName());
             }
-
-            final byte[] receiptData = purchase.getReceiptData();
-            if (receiptData != null) {
-                saveReceiptFile(purchase, receiptData);
-            }
         } catch (ParseException e) {
             return false;
+        }
+
+        final String localReceiptPath = purchase.getReceiptLocal();
+        if (!TextUtils.isEmpty(localReceiptPath)) {
+            try {
+                final ParseFile receipt = saveReceiptFile(context, purchase, localReceiptPath);
+                purchase.removeReceiptLocal();
+                purchase.setReceipt(receipt);
+            } catch (ParseException | ExecutionException | InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            deleteLocalReceipt(localReceiptPath);
         }
 
         try {
@@ -458,6 +508,29 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     @Override
     public void deletePurchase(@NonNull Purchase purchase) {
         purchase.deleteEventually();
+    }
+
+    @Override
+    public Observable<String> uploadReceipt(@NonNull String sessionToken,
+                                            @NonNull final String receiptPath) {
+        final RequestBody tokenPart = RequestBody.create(
+                MediaType.parse("text/plain"), sessionToken);
+
+        final File file = new File(receiptPath);
+        final RequestBody receiptPart = RequestBody.create(
+                MediaType.parse("image/jpeg"), file);
+        final MultipartBody.Part body =
+                MultipartBody.Part.createFormData("receipt", file.getName(), receiptPart);
+
+        return mReceiptOcr.uploadReceipt(tokenPart, body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .map(new Func1<Void, String>() {
+                    @Override
+                    public String call(Void aVoid) {
+                        return receiptPath;
+                    }
+                });
     }
 
     @Override
@@ -524,5 +597,24 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
                         return exchangeRates.get(currency);
                     }
                 });
+    }
+
+    @Override
+    public Single<OcrPurchase> fetchOcrPurchaseData(@NonNull String ocrPurchaseId) {
+        final OcrPurchase purchase = (OcrPurchase) ParseObject.createWithoutData(OcrPurchase.CLASS, ocrPurchaseId);
+        return fetchLocal(purchase);
+    }
+
+    @Override
+    public boolean updateOcrPurchase(@NonNull String ocrPurchaseId) {
+        final ParseQuery<OcrPurchase> query = ParseQuery.getQuery(OcrPurchase.CLASS);
+        try {
+            final OcrPurchase ocrPurchase = query.get(ocrPurchaseId);
+            ocrPurchase.pin();
+        } catch (ParseException e) {
+            return false;
+        }
+
+        return true;
     }
 }

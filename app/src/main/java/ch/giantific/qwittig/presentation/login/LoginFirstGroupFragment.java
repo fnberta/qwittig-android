@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentLoginFirstGroupBinding;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
@@ -40,6 +41,7 @@ public class LoginFirstGroupFragment extends BaseFragment<LoginFirstGroupViewMod
         super.onCreate(savedInstanceState);
 
         DaggerLoginFirstGroupComponent.builder()
+                .applicationComponent(Qwittig.getAppComponent(getActivity()))
                 .loginFirstGroupViewModelModule(new LoginFirstGroupViewModelModule(savedInstanceState, this))
                 .build()
                 .inject(this);

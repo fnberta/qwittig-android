@@ -6,25 +6,31 @@ package ch.giantific.qwittig.presentation.home.purchases.addedit;
 
 import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewCompat;
+import android.text.TextUtils;
 import android.transition.Transition;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Date;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.rest.OcrPurchase;
+import ch.giantific.qwittig.data.push.PushBroadcastReceiver;
 import ch.giantific.qwittig.databinding.ActivityPurchaseAddEditBinding;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.TransitionListenerAdapter;
+import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesFragment;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.Utils;
 import rx.Single;
@@ -41,10 +47,9 @@ public class AddPurchaseActivity extends BaseActivity<AddEditPurchaseViewModel> 
         RatesWorkerListener, DatePickerDialog.OnDateSetListener,
         NoteDialogFragment.DialogInteractionListener,
         ExchangeRateDialogFragment.DialogInteractionListener,
-        DiscardPurchaseDialogFragment.DialogInteractionListener,
-        OcrWorkerListener {
+        DiscardPurchaseDialogFragment.DialogInteractionListener {
 
-    public static final String INTENT_PURCHASE_NEW_AUTO = "INTENT_PURCHASE_NEW_AUTO";
+    public static final String INTENT_OCR_PURCHASE_ID = "INTENT_OCR_PURCHASE_ID";
     private static final String STATE_HAS_RECEIPT_FILE = "STATE_HAS_RECEIPT_FILE";
     private static final String STATE_HAS_NOTE = "STATE_HAS_NOTE";
     private ActivityPurchaseAddEditBinding mBinding;
@@ -95,8 +100,7 @@ public class AddPurchaseActivity extends BaseActivity<AddEditPurchaseViewModel> 
         });
     }
 
-    @Override
-    public void showFab() {
+    private void showFab() {
         if (ViewCompat.isLaidOut(mBinding.fabPurchaseSave)) {
             mBinding.fabPurchaseSave.show();
         } else {
@@ -112,10 +116,27 @@ public class AddPurchaseActivity extends BaseActivity<AddEditPurchaseViewModel> 
 
     @NonNull
     AddEditPurchaseBaseFragment getPurchaseAddEditFragment() {
-        final boolean autoMode = getIntent().getBooleanExtra(INTENT_PURCHASE_NEW_AUTO, false);
-        return autoMode
-                ? AddPurchaseFragment.newAddAutoInstance()
-                : AddPurchaseFragment.newAddInstance();
+        final String ocrPurchaseId = getOcrPurchaseId();
+        if (!TextUtils.isEmpty(ocrPurchaseId)) {
+            return AddPurchaseFragment.newAddOcrInstance(ocrPurchaseId);
+        }
+
+        return AddPurchaseFragment.newAddInstance();
+    }
+
+    private String getOcrPurchaseId() {
+        final Intent intent = getIntent();
+        String ocrPurchaseId = intent.getStringExtra(INTENT_OCR_PURCHASE_ID);
+
+        if (TextUtils.isEmpty(ocrPurchaseId)) {
+            try {
+                final JSONObject jsonExtras = PushBroadcastReceiver.getData(intent);
+                ocrPurchaseId = jsonExtras.optString(PushBroadcastReceiver.PUSH_PARAM_OCR_PURCHASE_ID);
+            } catch (JSONException ignored) {
+            }
+        }
+
+        return ocrPurchaseId;
     }
 
     @Override
@@ -232,11 +253,6 @@ public class AddPurchaseActivity extends BaseActivity<AddEditPurchaseViewModel> 
     public void setRateFetchStream(@NonNull Single<Float> single,
                                    @NonNull String workerTag) {
         mViewModel.setRateFetchStream(single, workerTag);
-    }
-
-    @Override
-    public void setOcrStream(@NonNull Single<OcrPurchase> single, @NonNull String workerTag) {
-        mViewModel.setOcrStream(single, workerTag);
     }
 
     @Override

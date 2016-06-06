@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentTaskDetailsBinding;
 import ch.giantific.qwittig.domain.models.Identity;
@@ -80,6 +81,7 @@ public class TaskDetailsFragment extends BaseRecyclerViewFragment<TaskDetailsVie
 
         final String taskId = getArguments().getString(KEY_TASK_ID, "");
         DaggerTaskDetailsComponent.builder()
+                .applicationComponent(Qwittig.getAppComponent(getActivity()))
                 .taskDetailsViewModelModule(new TaskDetailsViewModelModule(savedInstanceState, this, taskId))
                 .build()
                 .inject(this);

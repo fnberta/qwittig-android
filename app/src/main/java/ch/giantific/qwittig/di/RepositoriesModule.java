@@ -17,6 +17,7 @@ import ch.giantific.qwittig.data.repositories.ParseStatsRepository;
 import ch.giantific.qwittig.data.repositories.ParseTaskRepository;
 import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.data.rest.ExchangeRates;
+import ch.giantific.qwittig.data.rest.ReceiptOcr;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
@@ -48,13 +49,14 @@ public class RepositoriesModule {
     @Provides
     PurchaseRepository providesPurchaseRepository(@NonNull SharedPreferences sharedPreferences,
                                                   @NonNull ExchangeRates exchangeRates,
+                                                  @NonNull ReceiptOcr receiptOcr,
                                                   @NonNull GcmNetworkManager networkManager) {
-        return new ParsePurchaseRepository(sharedPreferences, exchangeRates, networkManager);
+        return new ParsePurchaseRepository(sharedPreferences, exchangeRates, receiptOcr, networkManager);
     }
 
     @Provides
-    UserRepository providesUserRepository() {
-        return new ParseUserRepository();
+    UserRepository providesUserRepository(@NonNull GcmNetworkManager networkManager) {
+        return new ParseUserRepository(networkManager);
     }
 
     @Provides

@@ -39,7 +39,7 @@ android {
 ext {
     supportLibVersion = '23.2.1'
     playServicesVersion = '9.0.1'
-    retrofitVersion = '2.0.0'
+    retrofitVersion = '2.0.2'
     leakCanaryVersion = '1.4-beta1'
     daggerVersion = '2.2'
 }
@@ -68,6 +68,7 @@ dependencies {
     compile "com.squareup.retrofit2:retrofit:${retrofitVersion}"
     compile "com.squareup.retrofit2:converter-gson:${retrofitVersion}"
     compile "com.squareup.retrofit2:adapter-rxjava:${retrofitVersion}"
+    compile 'com.squareup.okhttp3:logging-interceptor:3.3.1'
     compile 'io.branch.sdk.android:library:1.+'
     compile 'com.google.code.gson:gson:2.4'
     compile 'com.parse:parse-android:1.13.0'
@@ -75,6 +76,7 @@ dependencies {
     compile 'com.parse:parsefacebookutils-v4-android:1.10.4@aar'
     compile 'com.facebook.android:facebook-android-sdk:4.10.0'
     compile 'org.apache.commons:commons-math3:3.5'
+    compile 'commons-io:commons-io:2.5'
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.github.PhilJay:MPAndroidChart:v2.2.3'
     compile 'com.vinaysshenoy:mugen:1.0.2'

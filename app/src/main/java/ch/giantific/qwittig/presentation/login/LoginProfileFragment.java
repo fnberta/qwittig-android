@@ -6,8 +6,6 @@ package ch.giantific.qwittig.presentation.login;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -20,19 +18,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
-
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentLoginProfileBinding;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.login.di.DaggerLoginProfileComponent;
 import ch.giantific.qwittig.presentation.login.di.LoginProfileViewModelModule;
+import ch.giantific.qwittig.utils.AvatarUtils;
 import ch.giantific.qwittig.utils.Utils;
-import rx.Single;
-import rx.SingleSubscriber;
 
 /**
  * Displays the login screen asking the user for the username and password.
@@ -54,6 +47,7 @@ public class LoginProfileFragment extends BaseFragment<LoginProfileViewModel, Ba
         super.onCreate(savedInstanceState);
 
         DaggerLoginProfileComponent.builder()
+                .applicationComponent(Qwittig.getAppComponent(getActivity()))
                 .loginProfileViewModelModule(new LoginProfileViewModelModule(savedInstanceState, this))
                 .build()
                 .inject(this);
@@ -75,7 +69,12 @@ public class LoginProfileFragment extends BaseFragment<LoginProfileViewModel, Ba
             case INTENT_REQUEST_IMAGE:
                 if (resultCode == Activity.RESULT_OK) {
                     final Uri imageUri = data.getData();
-                    mViewModel.onNewAvatarTaken(imageUri.toString());
+                    AvatarUtils.saveImageLocal(this, imageUri, new AvatarUtils.AvatarLocalSaveListener() {
+                        @Override
+                        public void onAvatarSaved(@NonNull String path) {
+                            mViewModel.onNewAvatarTaken(path);
+                        }
+                    });
                 }
         }
     }
@@ -116,37 +115,5 @@ public class LoginProfileFragment extends BaseFragment<LoginProfileViewModel, Ba
         final Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
         startActivityForResult(intent, INTENT_REQUEST_IMAGE);
-    }
-
-    @Override
-    public Single<byte[]> encodeAvatar(@NonNull final String avatar) {
-        final LoginProfileFragment frag = this;
-        return Single.create(new Single.OnSubscribe<byte[]>() {
-            @Override
-            public void call(final SingleSubscriber<? super byte[]> singleSubscriber) {
-                Glide.with(frag)
-                        .load(avatar)
-                        .asBitmap()
-                        .toBytes(Bitmap.CompressFormat.JPEG, UserRepository.JPEG_COMPRESSION_RATE)
-                        .centerCrop()
-                        .into(new SimpleTarget<byte[]>(UserRepository.WIDTH, UserRepository.HEIGHT) {
-                            @Override
-                            public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
-                                if (!singleSubscriber.isUnsubscribed()) {
-                                    singleSubscriber.onSuccess(resource);
-                                }
-                            }
-
-                            @Override
-                            public void onLoadFailed(Exception e, Drawable errorDrawable) {
-                                super.onLoadFailed(e, errorDrawable);
-
-                                if (!singleSubscriber.isUnsubscribed()) {
-                                    singleSubscriber.onError(e);
-                                }
-                            }
-                        });
-            }
-        });
     }
 }

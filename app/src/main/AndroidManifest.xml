@@ -2,7 +2,6 @@
 <!--   ~ Copyright (c) 2015 Fabio Berta -->
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="ch.giantific.qwittig"
     >
 
@@ -200,6 +199,16 @@
 
         <service
             android:name=".data.services.SavePurchaseTaskService"
+            android:exported="true"
+            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"
+            >
+            <intent-filter>
+                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY"/>
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".data.services.SaveIdentityTaskService"
             android:exported="true"
             android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"
             >
