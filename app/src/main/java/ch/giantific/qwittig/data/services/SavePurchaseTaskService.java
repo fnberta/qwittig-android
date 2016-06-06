@@ -83,7 +83,7 @@ public class SavePurchaseTaskService extends GcmTaskService {
             final int type = extras.getInt(KEY_TYPE, 0);
             switch (type) {
                 case Type.NEW: {
-                    return mPurchaseRepo.uploadPurchase(purchaseId)
+                    return mPurchaseRepo.uploadPurchase(this, purchaseId)
                             ? GcmNetworkManager.RESULT_SUCCESS
                             : GcmNetworkManager.RESULT_RESCHEDULE;
                 }
@@ -91,7 +91,7 @@ public class SavePurchaseTaskService extends GcmTaskService {
                     final boolean wasDraft = extras.getBoolean(KEY_DRAFT);
                     final boolean deleteOldReceipt = extras.getBoolean(KEY_DELETE_OLD_RECEIPT);
 
-                    return mPurchaseRepo.uploadPurchaseEdit(purchaseId, wasDraft, deleteOldReceipt)
+                    return mPurchaseRepo.uploadPurchaseEdit(this, purchaseId, wasDraft, deleteOldReceipt)
                             ? GcmNetworkManager.RESULT_SUCCESS
                             : GcmNetworkManager.RESULT_RESCHEDULE;
                 }

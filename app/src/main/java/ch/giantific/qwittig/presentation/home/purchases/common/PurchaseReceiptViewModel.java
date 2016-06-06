@@ -24,8 +24,6 @@ public interface PurchaseReceiptViewModel extends ViewModel,
      */
     interface ViewListener extends ViewModel.ViewListener {
 
-        void setReceiptImage(@NonNull String receiptImagePath);
-
-        void setReceiptImage(@NonNull byte[] receiptImage);
+        void setReceiptImage(@NonNull String receiptImageUri);
     }
 }

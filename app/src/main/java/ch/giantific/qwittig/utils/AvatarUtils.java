@@ -8,18 +8,21 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RippleDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 
 import org.apache.commons.io.FileUtils;
 
@@ -30,6 +33,8 @@ import java.util.Date;
 import java.util.Locale;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.domain.repositories.UserRepository;
+import timber.log.Timber;
 
 /**
  * Provides useful methods to properly format a user's avatar image.
@@ -107,28 +112,32 @@ public class AvatarUtils {
                 createRippleDrawable(context, roundedDrawable) : roundedDrawable;
     }
 
-    public static String copyAvatarLocal(@NonNull Context context,
-                                         @NonNull Uri avatarUri) throws IOException {
-        final String[] projection = {MediaStore.Images.Media.DATA};
-        final Cursor cursor = context.getContentResolver().query(avatarUri, projection, null, null, null);
-        if (cursor == null) {
-            return "";
-        }
+    public static void saveImageLocal(@NonNull final Fragment fragment,
+                                      @NonNull Uri imageUri,
+                                      @NonNull final AvatarLocalSaveListener listener) {
+        Glide.with(fragment)
+                .load(imageUri)
+                .asBitmap()
+                .toBytes(Bitmap.CompressFormat.JPEG, UserRepository.JPEG_COMPRESSION_RATE)
+                .centerCrop()
+                .into(new SimpleTarget<byte[]>(UserRepository.WIDTH, UserRepository.HEIGHT) {
+                    @Override
+                    public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
+                        final String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
+                        final String imageFileName = "AVATAR_" + timeStamp + ".jpg";
+                        final File storageDir = fragment.getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+                        final File avatar = new File(storageDir, imageFileName);
+                        try {
+                            FileUtils.writeByteArrayToFile(avatar, resource);
+                            listener.onAvatarSaved(avatar.getAbsolutePath());
+                        } catch (IOException e) {
+                            Timber.e(e, "Failed to pick profile image");
+                        }
+                    }
+                });
+    }
 
-        final String localAvatarPath;
-        try {
-            int columnIndex = cursor.getColumnIndexOrThrow(projection[0]);
-            cursor.moveToFirst();
-            localAvatarPath = cursor.getString(columnIndex);
-        } finally {
-            cursor.close();
-        }
-
-        final String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-        final String imageFileName = "JPEG_" + timeStamp + "_" + "avatar";
-        final File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        final File avatar = new File(storageDir, imageFileName);
-        FileUtils.copyFile(new File(localAvatarPath), avatar);
-        return avatar.getAbsolutePath();
+    public interface AvatarLocalSaveListener {
+        void onAvatarSaved(@NonNull String path);
     }
 }

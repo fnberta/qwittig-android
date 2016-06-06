@@ -132,7 +132,7 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
 
     private void setOldPurchaseValues() {
         // check if there is a receipt image file and update action bar menu accordingly
-        mView.toggleReceiptMenuOption(hasOldReceiptFile());
+        mView.toggleReceiptMenuOption(mEditPurchase.hasReceipt());
 
         // set note to value from original purchase
         final String oldNote = mEditPurchase.getNote();
@@ -156,10 +156,6 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
         // get original exchangeRate to convert prices
         mOldExchangeRate = mEditPurchase.getExchangeRate();
         setExchangeRate(mOldExchangeRate);
-    }
-
-    boolean hasOldReceiptFile() {
-        return mEditPurchase.getReceipt() != null;
     }
 
     private void setOldItemValues() {
@@ -201,7 +197,7 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
 
     @Override
     public void onShowReceiptImageMenuClick() {
-        mView.showReceiptImage(mEditPurchaseId, mReceiptImagePath);
+        mView.showReceiptImage(!TextUtils.isEmpty(mReceiptImagePath) ? mReceiptImagePath : mEditPurchase.getReceiptUrl());
     }
 
     @Override

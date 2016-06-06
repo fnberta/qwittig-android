@@ -130,9 +130,11 @@ public class AddPurchaseViewModelOcrImpl extends AddPurchaseViewModelImpl {
 
     @NonNull
     @Override
-    Purchase createPurchase(@NonNull List<Identity> purchaseIdentities, @NonNull List<Item> purchaseItems, int fractionDigits) {
+    Purchase createPurchase(@NonNull List<Identity> purchaseIdentities,
+                            @NonNull List<Item> purchaseItems, int fractionDigits) {
         final Purchase purchase =  super.createPurchase(purchaseIdentities, purchaseItems, fractionDigits);
         purchase.setReceipt(mOcrPurchase.getReceipt());
+        purchase.setOcr(mOcrPurchase);
 
         return purchase;
     }

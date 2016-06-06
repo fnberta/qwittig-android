@@ -37,11 +37,6 @@ public class EditPurchaseDraftViewModelImpl extends EditPurchaseViewModelImpl
     }
 
     @Override
-    boolean hasOldReceiptFile() {
-        return mEditPurchase.getReceiptData() != null;
-    }
-
-    @Override
     int getDraftFinishedResult() {
         return AddEditPurchaseViewModel.PurchaseResult.PURCHASE_DRAFT_CHANGES;
     }

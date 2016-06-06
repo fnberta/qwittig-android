@@ -4,10 +4,8 @@
 
 package ch.giantific.qwittig.presentation.settings.profile;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,7 +13,6 @@ import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,18 +21,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.io.IOException;
-
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentSettingsProfileBinding;
-import ch.giantific.qwittig.presentation.settings.profile.di.DaggerSettingsProfileComponent;
-import ch.giantific.qwittig.presentation.settings.profile.di.SettingsProfileViewModelModule;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
+import ch.giantific.qwittig.presentation.settings.profile.di.DaggerSettingsProfileComponent;
+import ch.giantific.qwittig.presentation.settings.profile.di.SettingsProfileViewModelModule;
 import ch.giantific.qwittig.utils.AvatarUtils;
-import ch.giantific.qwittig.utils.Utils;
-import timber.log.Timber;
 
 /**
  * Displays the profile details of the current user, allowing him/her to edit them.
@@ -46,7 +39,6 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileViewMod
         implements SettingsProfileViewModel.ViewListener {
 
     private static final int INTENT_REQUEST_IMAGE = 1;
-    private static final int PERMISSIONS_REQUEST_EXT_STORAGE = 1;
     private Snackbar mSnackbar;
 
     private FragmentSettingsProfileBinding mBinding;
@@ -118,26 +110,13 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileViewMod
             case INTENT_REQUEST_IMAGE:
                 if (resultCode == Activity.RESULT_OK) {
                     final Uri imageUri = data.getData();
-                    try {
-                        final String avatarPath = AvatarUtils.copyAvatarLocal(getActivity(), imageUri);
-                        mViewModel.onNewAvatarTaken(avatarPath);
-                    } catch (IOException e) {
-                        Timber.e(e, "Failed to pick profile image");
-                    }
+                    AvatarUtils.saveImageLocal(this, imageUri, new AvatarUtils.AvatarLocalSaveListener() {
+                        @Override
+                        public void onAvatarSaved(@NonNull String path) {
+                            mViewModel.onNewAvatarTaken(path);
+                        }
+                    });
                 }
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_EXT_STORAGE:
-                if (Utils.verifyPermissions(grantResults)) {
-                    loadImagePicker();
-                }
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 
@@ -168,24 +147,6 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileViewMod
 
     @Override
     public void showAvatarPicker() {
-        if (permissionsAreGranted()) {
-            loadImagePicker();
-        }
-    }
-
-    private boolean permissionsAreGranted() {
-        final int readStorage = ContextCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.READ_EXTERNAL_STORAGE);
-        if (readStorage != PackageManager.PERMISSION_GRANTED) {
-            final String[] permissionsArray = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
-            requestPermissions(permissionsArray, PERMISSIONS_REQUEST_EXT_STORAGE);
-            return false;
-        }
-
-        return true;
-    }
-
-    private void loadImagePicker() {
         final Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
         startActivityForResult(intent, INTENT_REQUEST_IMAGE);

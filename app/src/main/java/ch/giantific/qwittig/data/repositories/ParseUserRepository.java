@@ -954,10 +954,10 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
     @Override
     public boolean uploadIdentities(@NonNull Context context, @NonNull List<Identity> identities) {
         final String localAvatarPath = identities.get(0).getAvatarLocal();
-        final ParseFile avatar;
+        final ParseFile avatar = new ParseFile(new File(localAvatarPath));
         try {
-            avatar = saveAvatar(context, localAvatarPath);
-        } catch (ExecutionException | InterruptedException | ParseException e) {
+            avatar.save();
+        } catch (ParseException e) {
             return false;
         }
 
@@ -986,28 +986,7 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
         return true;
     }
 
-    private ParseFile saveAvatar(@NonNull Context context, @NonNull String localAvatarPath)
-            throws ExecutionException, InterruptedException, ParseException {
-        final String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("jpg");
-        final byte[] avatar = encodeAvatar(context, localAvatarPath);
-        final ParseFile avatarFile = new ParseFile(UserRepository.FILE_NAME, avatar, mimeType);
-        avatarFile.save();
-
-        return avatarFile;
-    }
-
-    private byte[] encodeAvatar(@NonNull Context context, @NonNull String path)
-            throws ExecutionException, InterruptedException {
-        return Glide.with(context)
-                .load(path)
-                .asBitmap()
-                .toBytes(Bitmap.CompressFormat.JPEG, UserRepository.JPEG_COMPRESSION_RATE)
-                .centerCrop()
-                .into(UserRepository.WIDTH, UserRepository.HEIGHT)
-                .get();
-    }
-
-    private void deleteLocalAvatar(String localAvatarPath) {
+    private void deleteLocalAvatar(@NonNull String localAvatarPath) {
         final File avatarFile = new File(localAvatarPath);
         final boolean deleteSuccessful = avatarFile.delete();
         if (!deleteSuccessful && BuildConfig.DEBUG) {
@@ -1042,10 +1021,10 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
         }
 
         final String localAvatarPath = identity.getAvatarLocal();
-        final ParseFile avatar;
+        final ParseFile avatar = new ParseFile(new File(localAvatarPath));
         try {
-            avatar = saveAvatar(context, localAvatarPath);
-        } catch (ExecutionException | InterruptedException | ParseException e) {
+            avatar.save();
+        } catch (ParseException e) {
             return false;
         }
 

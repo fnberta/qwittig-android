@@ -4,10 +4,14 @@
 
 package ch.giantific.qwittig.data.repositories;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
@@ -21,7 +25,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
+import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.data.rest.CurrencyRates;
 import ch.giantific.qwittig.data.rest.ExchangeRates;
 import ch.giantific.qwittig.data.rest.ReceiptOcr;
@@ -43,6 +49,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import timber.log.Timber;
 
 /**
  * Provides an implementation of {@link PurchaseRepository} that uses the Parse.com framework as
@@ -364,16 +371,25 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public boolean uploadPurchase(@NonNull String tempId) {
+    public boolean uploadPurchase(@NonNull Context context, @NonNull String tempId) {
         final Purchase purchase;
         try {
             purchase = getPurchaseForUpload(tempId);
-            final byte[] receiptData = purchase.getReceiptData();
-            if (receiptData != null) {
-                saveReceiptFile(purchase, receiptData);
-            }
         } catch (ParseException e) {
             return false;
+        }
+
+        final String localReceiptPath = purchase.getReceiptLocal();
+        if (purchase.getReceipt() == null && !TextUtils.isEmpty(localReceiptPath)) {
+            try {
+                final ParseFile receipt = saveReceiptFile(context, purchase, localReceiptPath);
+                purchase.removeReceiptLocal();
+                purchase.setReceipt(receipt);
+            } catch (ParseException | ExecutionException | InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            deleteLocalReceipt(localReceiptPath);
         }
 
         try {
@@ -383,6 +399,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
             purchase.setTempId(tempId);
             return false;
         }
+
 
         try {
             purchase.unpin(Purchase.PIN_LABEL_TEMP);
@@ -408,16 +425,32 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
         return query.get(purchaseId);
     }
 
-    private void saveReceiptFile(@NonNull Purchase purchase, byte[] receiptData) throws ParseException {
+    private ParseFile saveReceiptFile(@NonNull Context context, @NonNull Purchase purchase,
+                                 @NonNull String localReceiptPath)
+            throws ParseException, ExecutionException, InterruptedException {
         final String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("jpg");
-        final ParseFile receipt = new ParseFile(PurchaseRepository.FILE_NAME, receiptData, mimeType);
+        final byte[] bytes = Glide.with(context)
+                .load(localReceiptPath)
+                .asBitmap()
+                .toBytes(Bitmap.CompressFormat.JPEG, PurchaseRepository.JPEG_COMPRESSION_RATE)
+                .into(PurchaseRepository.WIDTH, PurchaseRepository.HEIGHT)
+                .get();
+        final ParseFile receipt = new ParseFile(PurchaseRepository.FILE_NAME, bytes, mimeType);
         receipt.save();
-        purchase.removeReceiptData();
-        purchase.setReceipt(receipt);
+        return receipt;
+    }
+
+    private void deleteLocalReceipt(@NonNull String localReceiptPath) {
+        final File file = new File(localReceiptPath);
+        final boolean fileDeleted = file.delete();
+        if (!fileDeleted && BuildConfig.DEBUG) {
+            Timber.e("Failed to delete local receipt file");
+        }
     }
 
     @Override
-    public boolean uploadPurchaseEdit(@NonNull String purchaseId, boolean wasDraft,
+    public boolean uploadPurchaseEdit(@NonNull Context context, @NonNull String purchaseId,
+                                      boolean wasDraft,
                                       boolean deleteOldReceipt) {
         final Purchase purchase;
         try {
@@ -425,13 +458,21 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
             if (deleteOldReceipt) {
                 deleteOldReceipt(purchase.getReceipt().getName());
             }
-
-            final byte[] receiptData = purchase.getReceiptData();
-            if (receiptData != null) {
-                saveReceiptFile(purchase, receiptData);
-            }
         } catch (ParseException e) {
             return false;
+        }
+
+        final String localReceiptPath = purchase.getReceiptLocal();
+        if (!TextUtils.isEmpty(localReceiptPath)) {
+            try {
+                final ParseFile receipt = saveReceiptFile(context, purchase, localReceiptPath);
+                purchase.removeReceiptLocal();
+                purchase.setReceipt(receipt);
+            } catch (ParseException | ExecutionException | InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            deleteLocalReceipt(localReceiptPath);
         }
 
         try {
@@ -470,7 +511,8 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public Observable<String> uploadReceipt(@NonNull String sessionToken, @NonNull final String receiptPath) {
+    public Observable<String> uploadReceipt(@NonNull String sessionToken,
+                                            @NonNull final String receiptPath) {
         final RequestBody tokenPart = RequestBody.create(
                 MediaType.parse("text/plain"), sessionToken);
 

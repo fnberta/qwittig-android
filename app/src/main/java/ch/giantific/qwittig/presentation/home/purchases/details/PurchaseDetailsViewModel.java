@@ -52,7 +52,7 @@ public interface PurchaseDetailsViewModel extends ListViewModel<PurchaseDetailsB
 
         void startPurchaseEditScreen(@NonNull String purchaseId);
 
-        void showReceiptImage(@NonNull String purchaseId);
+        void showReceiptImage(@NonNull String receiptImageUri);
 
         void toggleMenuOptions(boolean showEditOptions, boolean hasReceiptImage,
                                boolean hasForeignCurrency);

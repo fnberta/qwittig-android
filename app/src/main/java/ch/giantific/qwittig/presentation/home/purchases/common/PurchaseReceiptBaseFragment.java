@@ -50,16 +50,9 @@ public abstract class PurchaseReceiptBaseFragment<T extends PurchaseReceiptViewM
     }
 
     @Override
-    public void setReceiptImage(@NonNull byte[] receiptImage) {
+    public void setReceiptImage(@NonNull String receiptImageUri) {
         Glide.with(this)
-                .load(receiptImage)
-                .into(mBinding.ivReceipt);
-    }
-
-    @Override
-    public void setReceiptImage(@NonNull String receiptPath) {
-        Glide.with(this)
-                .load(receiptPath)
+                .load(receiptImageUri)
                 .into(mBinding.ivReceipt);
     }
 

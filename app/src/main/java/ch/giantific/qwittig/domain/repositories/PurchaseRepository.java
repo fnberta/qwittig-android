@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.domain.repositories;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 import java.util.List;
@@ -105,9 +106,9 @@ public interface PurchaseRepository extends BaseRepository {
     Single<Purchase> savePurchaseEdit(@NonNull final Purchase purchase,
                                       final boolean deleteOldReceipt);
 
-    boolean uploadPurchase(@NonNull String tempId);
+    boolean uploadPurchase(@NonNull Context context, @NonNull String tempId);
 
-    boolean uploadPurchaseEdit(@NonNull String purchaseId,
+    boolean uploadPurchaseEdit(@NonNull Context context, @NonNull String purchaseId,
                                boolean wasDraft, boolean deleteOldReceipt);
 
     /**

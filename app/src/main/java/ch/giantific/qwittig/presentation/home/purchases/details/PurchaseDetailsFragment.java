@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -164,12 +163,9 @@ public class PurchaseDetailsFragment extends BaseRecyclerViewFragment<PurchaseDe
     }
 
     @Override
-    public void showReceiptImage(@NonNull String purchaseId) {
-        final FragmentManager fragmentManager = getFragmentManager();
-        final PurchaseReceiptDetailFragment fragment = PurchaseReceiptDetailFragment.newInstance(purchaseId);
-
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, fragment, PURCHASE_RECEIPT_FRAGMENT)
+    public void showReceiptImage(@NonNull String receiptImageUri) {
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container, PurchaseReceiptDetailFragment.newInstance(receiptImageUri), PURCHASE_RECEIPT_FRAGMENT)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .addToBackStack(null)
                 .commit();

@@ -106,8 +106,6 @@ public interface AddEditPurchaseViewModel extends ListViewModel<AddEditPurchaseB
      * Defines the interaction with the attached view.
      */
     interface ViewListener extends ListViewModel.ViewListener {
-        Single<byte[]> encodeReceiptImage(@NonNull String imagePath);
-
         void loadFetchExchangeRatesWorker(@NonNull String baseCurrency, @NonNull String currency);
 
         void showDatePickerDialog();
@@ -122,9 +120,7 @@ public interface AddEditPurchaseViewModel extends ListViewModel<AddEditPurchaseB
 
         void toggleNoteMenuOption(boolean show);
 
-        void showReceiptImage(@NonNull String receiptImagePath);
-
-        void showReceiptImage(@NonNull String objectId, @NonNull String receiptImagePath);
+        void showReceiptImage(@NonNull String receiptImageUri);
 
         void showNote(@NonNull String note);
 
@@ -138,8 +134,6 @@ public interface AddEditPurchaseViewModel extends ListViewModel<AddEditPurchaseB
          * of the image file.
          */
         void captureImage(boolean useCustomCamera);
-
-        void showOptionsMenu();
 
         void finishScreen(int purchaseResult);
     }

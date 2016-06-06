@@ -43,8 +43,9 @@ public class Purchase extends ParseObject {
     public static final String EXCHANGE_RATE = "exchangeRate";
     public static final String READ_BY = "readBy";
     public static final String RECEIPT = "receipt";
-    public static final String RECEIPT_BYTES = "receiptBytes";
+    public static final String RECEIPT_LOCAL = "receiptLocal";
     public static final String NOTE = "note";
+    public static final String OCR = "ocr";
     public static final String TEMP_ID = "tempId";
     public static final String DRAFT = "draft";
     public static final String PIN_LABEL = "purchasesPinLabel";
@@ -148,11 +149,6 @@ public class Purchase extends ParseObject {
         put(EXCHANGE_RATE, exchangeRate);
     }
 
-    public String getReceiptUrl() {
-        final ParseFile receipt = getReceipt();
-        return receipt != null ? receipt.getUrl() : "";
-    }
-
     public ParseFile getReceipt() {
         return getParseFile(RECEIPT);
     }
@@ -161,12 +157,30 @@ public class Purchase extends ParseObject {
         put(RECEIPT, file);
     }
 
-    public byte[] getReceiptData() {
-        return getBytes(RECEIPT_BYTES);
+    public String getReceiptUrl() {
+        final String localPath = getReceiptLocal();
+        if (!TextUtils.isEmpty(localPath)) {
+            return localPath;
+        }
+
+        final ParseFile receipt = getReceipt();
+        return receipt != null ? receipt.getUrl() : "";
     }
 
-    public void setReceiptData(@NonNull byte[] bytes) {
-        put(RECEIPT_BYTES, bytes);
+    public String getReceiptLocal() {
+        return getString(RECEIPT_LOCAL);
+    }
+
+    public void setReceiptLocal(@NonNull String localReceiptPath) {
+        put(RECEIPT_LOCAL, localReceiptPath);
+    }
+
+    public void removeReceiptLocal() {
+        remove(RECEIPT_LOCAL);
+    }
+
+    public boolean hasReceipt() {
+        return getReceipt() != null || !TextUtils.isEmpty(getReceiptLocal());
     }
 
     public String getNote() {
@@ -175,6 +189,18 @@ public class Purchase extends ParseObject {
 
     public void setNote(@NonNull String note) {
         put(NOTE, note);
+    }
+
+    public void removeNote() {
+        remove(NOTE);
+    }
+
+    public OcrPurchase getOcr() {
+        return (OcrPurchase) getParseObject(OCR);
+    }
+
+    public void setOcr(@NonNull OcrPurchase ocr) {
+        put(OCR, ocr);
     }
 
     public String getTempId() {
@@ -245,18 +271,6 @@ public class Purchase extends ParseObject {
         final List<Identity> readBy = new ArrayList<>();
         readBy.add(identity);
         put(READ_BY, readBy);
-    }
-
-    public void removeReceipt() {
-        remove(RECEIPT);
-    }
-
-    public void removeReceiptData() {
-        remove(RECEIPT_BYTES);
-    }
-
-    public void removeNote() {
-        remove(NOTE);
     }
 
     /**

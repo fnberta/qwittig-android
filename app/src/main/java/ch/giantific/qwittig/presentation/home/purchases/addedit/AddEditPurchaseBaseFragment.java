@@ -9,8 +9,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -21,14 +19,9 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,18 +29,14 @@ import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentPurchaseAddEditBinding;
-import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
 import ch.giantific.qwittig.presentation.common.fragments.DatePickerDialogFragment;
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.AddEditPurchaseViewModel.PurchaseResult;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.items.AddEditPurchaseBaseItem.Type;
 import ch.giantific.qwittig.presentation.home.purchases.common.PurchaseReceiptBaseFragment;
 import ch.giantific.qwittig.utils.CameraUtils;
 import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.utils.Utils;
-import rx.Single;
-import rx.SingleSubscriber;
 
 /**
  * Displays the interface where the user can add a new purchase by setting store, date, users
@@ -156,42 +145,6 @@ public abstract class AddEditPurchaseBaseFragment<T extends AddEditPurchaseViewM
     }
 
     @Override
-    public void showOptionsMenu() {
-        setMenuVisibility(true);
-    }
-
-    @Override
-    public Single<byte[]> encodeReceiptImage(@NonNull final String imagePath) {
-        final AddEditPurchaseBaseFragment fragment = this;
-        return Single.create(new Single.OnSubscribe<byte[]>() {
-            @Override
-            public void call(final SingleSubscriber<? super byte[]> singleSubscriber) {
-                Glide.with(fragment).load(imagePath)
-                        .asBitmap()
-                        .toBytes(Bitmap.CompressFormat.JPEG, PurchaseRepository.JPEG_COMPRESSION_RATE)
-                        .centerCrop()
-                        .into(new SimpleTarget<byte[]>(PurchaseRepository.WIDTH, PurchaseRepository.HEIGHT) {
-                            @Override
-                            public void onResourceReady(@NonNull byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
-                                if (!singleSubscriber.isUnsubscribed()) {
-                                    singleSubscriber.onSuccess(resource);
-                                }
-                            }
-
-                            @Override
-                            public void onLoadFailed(Exception e, Drawable errorDrawable) {
-                                super.onLoadFailed(e, errorDrawable);
-
-                                if (!singleSubscriber.isUnsubscribed()) {
-                                    singleSubscriber.onError(e);
-                                }
-                            }
-                        });
-            }
-        });
-    }
-
-    @Override
     public void loadFetchExchangeRatesWorker(@NonNull String baseCurrency, @NonNull String currency) {
         RatesWorker.attach(getFragmentManager(), baseCurrency, currency);
     }
@@ -229,21 +182,7 @@ public abstract class AddEditPurchaseBaseFragment<T extends AddEditPurchaseViewM
     @Override
     public void showReceiptImage(@NonNull String receiptImagePath) {
         final PurchaseReceiptBaseFragment fragment =
-                AddEditPurchaseReceiptFragment.newAddInstance(receiptImagePath);
-
-        getFragmentManager().beginTransaction()
-                .replace(R.id.container, fragment, PURCHASE_RECEIPT_FRAGMENT)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .addToBackStack(null)
-                .commit();
-    }
-
-    @Override
-    public void showReceiptImage(@NonNull String objectId,
-                                 @NonNull String receiptImagePath) {
-        final PurchaseReceiptBaseFragment fragment = !TextUtils.isEmpty(receiptImagePath)
-                ? AddEditPurchaseReceiptFragment.newAddInstance(receiptImagePath)
-                : AddEditPurchaseReceiptFragment.newEditInstance(objectId);
+                AddEditPurchaseReceiptFragment.newInstance(receiptImagePath);
 
         getFragmentManager().beginTransaction()
                 .replace(R.id.container, fragment, PURCHASE_RECEIPT_FRAGMENT)

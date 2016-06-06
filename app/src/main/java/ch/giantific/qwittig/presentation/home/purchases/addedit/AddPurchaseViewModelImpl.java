@@ -588,41 +588,26 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
     }
 
     private void savePurchase(final boolean asDraft) {
-        final SingleSubscriber<Purchase> subscriber = new SingleSubscriber<Purchase>() {
-            @Override
-            public void onSuccess(Purchase purchase) {
-                deleteReceiptImage();
-                mView.finishScreen(asDraft ? getDraftFinishedResult() : PurchaseResult.PURCHASE_SAVED);
-            }
-
-            @Override
-            public void onError(Throwable error) {
-                mView.showMessage(asDraft
-                        ? R.string.toast_error_purchase_save_draft
-                        : R.string.toast_error_purchase_save);
-            }
-        };
-
         final Purchase purchase = getPurchase();
         if (asDraft) {
             purchase.setDraft(true);
         }
-        if (!TextUtils.isEmpty(mReceiptImagePath)) {
-            getSubscriptions().add(mView.encodeReceiptImage(mReceiptImagePath)
-                    .flatMap(new Func1<byte[], Single<Purchase>>() {
-                        @Override
-                        public Single<Purchase> call(byte[] bytes) {
-                            purchase.setReceiptData(bytes);
-                            return getSavePurchaseAction(purchase);
-                        }
-                    })
-                    .subscribe(subscriber)
-            );
-        } else {
-            getSubscriptions().add(getSavePurchaseAction(purchase)
-                    .subscribe(subscriber)
-            );
-        }
+
+        getSubscriptions().add(getSavePurchaseAction(purchase)
+                .subscribe(new SingleSubscriber<Purchase>() {
+                    @Override
+                    public void onSuccess(Purchase purchase) {
+                        mView.finishScreen(asDraft ? getDraftFinishedResult() : PurchaseResult.PURCHASE_SAVED);
+                    }
+
+                    @Override
+                    public void onError(Throwable error) {
+                        mView.showMessage(asDraft
+                                ? R.string.toast_error_purchase_save_draft
+                                : R.string.toast_error_purchase_save);
+                    }
+                })
+        );
     }
 
     Single<Purchase> getSavePurchaseAction(@NonNull Purchase purchase) {
@@ -718,6 +703,10 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
         if (!TextUtils.isEmpty(mNote)) {
             purchase.setNote(mNote);
         }
+        if (!TextUtils.isEmpty(mReceiptImagePath)) {
+            purchase.setReceiptLocal(mReceiptImagePath);
+        }
+
         return purchase;
     }
 
