@@ -100,8 +100,7 @@ public class AddPurchaseActivity extends BaseActivity<AddEditPurchaseViewModel> 
         });
     }
 
-    @Override
-    public void showFab() {
+    private void showFab() {
         if (ViewCompat.isLaidOut(mBinding.fabPurchaseSave)) {
             mBinding.fabPurchaseSave.show();
         } else {

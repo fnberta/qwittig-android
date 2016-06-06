@@ -4,19 +4,14 @@
 
 package ch.giantific.qwittig.presentation.home.purchases.addedit;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
@@ -25,7 +20,6 @@ import android.view.ViewGroup;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentPurchaseAddEditBinding;
@@ -35,8 +29,6 @@ import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFr
 import ch.giantific.qwittig.presentation.home.purchases.addedit.items.AddEditPurchaseBaseItem.Type;
 import ch.giantific.qwittig.presentation.home.purchases.common.PurchaseReceiptBaseFragment;
 import ch.giantific.qwittig.utils.CameraUtils;
-import ch.giantific.qwittig.utils.MessageAction;
-import ch.giantific.qwittig.utils.Utils;
 
 /**
  * Displays the interface where the user can add a new purchase by setting store, date, users
@@ -48,9 +40,8 @@ public abstract class AddEditPurchaseBaseFragment<T extends AddEditPurchaseViewM
         extends BaseRecyclerViewFragment<T, S>
         implements AddEditPurchaseViewModel.ViewListener {
 
-    public static final String PURCHASE_NOTE_FRAGMENT = "PURCHASE_NOTE_FRAGMENT";
-    static final String KEY_EDIT_PURCHASE_ID = "EDIT_PURCHASE_ID";
     private static final int INTENT_REQUEST_IMAGE_CAPTURE = 1;
+    private static final String PURCHASE_NOTE_FRAGMENT = "PURCHASE_NOTE_FRAGMENT";
     private static final String PURCHASE_RECEIPT_FRAGMENT = "PURCHASE_RECEIPT_FRAGMENT";
     private FragmentPurchaseAddEditBinding mBinding;
 
@@ -91,17 +82,6 @@ public abstract class AddEditPurchaseBaseFragment<T extends AddEditPurchaseViewM
             }
         });
         touchHelper.attachToRecyclerView(mBinding.rvPurchaseAddEdit);
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        if (savedInstanceState != null) {
-            if (!mViewModel.isLoading()) {
-                mActivity.showFab();
-            }
-        }
     }
 
     @Override
@@ -237,11 +217,6 @@ public abstract class AddEditPurchaseBaseFragment<T extends AddEditPurchaseViewM
          * @param viewModel the view model to set
          */
         void setAddEditViewModel(@NonNull AddEditPurchaseViewModel viewModel);
-
-        /**
-         * Indicates that the {@link FloatingActionButton} should be revealed.
-         */
-        void showFab();
 
         /**
          * Handles the update of action bar menu of the activity regarding the receipt file menu

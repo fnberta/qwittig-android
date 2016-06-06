@@ -109,17 +109,21 @@ public class AddPurchaseViewModelOcrImpl extends AddPurchaseViewModelImpl {
         final Map<String, Object> ocrData = ocrPurchase.getData();
 //        setDate(ocrData.get("date"));
         final List<String> stores = (List<String>) ocrData.get("store");
-        setStore(stores.get(0));
+        if (!stores.isEmpty()) {
+            setStore(stores.get(0));
+        }
         final List<Map<String, Object>> items = (List<Map<String, Object>>) ocrData.get("items");
-        for (Map<String, Object> item : items) {
-            final String price = mMoneyFormatter.format(item.get("price"));
-            final String name = (String) item.get("name");
-            final AddEditPurchaseItem purchaseAddEditItem =
-                    new AddEditPurchaseItem(name, price, getItemUsers(mIdentities));
-            purchaseAddEditItem.setMoneyFormatter(mMoneyFormatter);
-            purchaseAddEditItem.setPriceChangedListener(this);
-            mItems.add(getLastPosition() - 1, purchaseAddEditItem);
-            mView.notifyItemInserted(mItems.indexOf(purchaseAddEditItem));
+        if (!items.isEmpty()) {
+            for (Map<String, Object> item : items) {
+                final String price = mMoneyFormatter.format(item.get("price"));
+                final String name = (String) item.get("name");
+                final AddEditPurchaseItem purchaseAddEditItem =
+                        new AddEditPurchaseItem(name, price, getItemUsers(mIdentities));
+                purchaseAddEditItem.setMoneyFormatter(mMoneyFormatter);
+                purchaseAddEditItem.setPriceChangedListener(this);
+                mItems.add(getLastPosition() - 1, purchaseAddEditItem);
+                mView.notifyItemInserted(mItems.indexOf(purchaseAddEditItem));
+            }
         }
     }
 
