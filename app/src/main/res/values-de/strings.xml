@@ -320,5 +320,6 @@
     <string name="action_remove">Löschen</string>
     <string name="desc_user_invite_existing">Lade Nutzer ein, indem du den generierten Link teilst.</string>
     <string name="dialog_change_nickname_message">Gib einen neuen Spitznamen ein</string>
+    <string name="toast_error_purchase_ocr_load">Laden des Einkaufs fehlgeschlagen. Bitte versuche es noch einmal.</string>
 
 </resources>

@@ -16,6 +16,7 @@ import org.stringtemplate.v4.ST;
 import java.util.List;
 import java.util.Map;
 
+import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Item;
 import ch.giantific.qwittig.domain.models.OcrPurchase;
@@ -98,7 +99,7 @@ public class AddPurchaseViewModelOcrImpl extends AddPurchaseViewModelImpl {
 
                     @Override
                     public void onError(Throwable error) {
-                        Timber.e(error, "something went wrong with fetching");
+                        mView.showMessage(R.string.toast_error_purchase_ocr_load);
                     }
                 })
         );
