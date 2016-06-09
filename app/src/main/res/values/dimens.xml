@@ -16,6 +16,7 @@
     <dimen name="min_space">4dp</dimen>
     <dimen name="small_space">8dp</dimen>
     <dimen name="normal_space">16dp</dimen>
+    <dimen name="big_space">32dp</dimen>
 
     <!-- System -->
     <dimen name="touch_target_min">48dp</dimen>

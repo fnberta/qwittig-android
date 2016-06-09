@@ -281,6 +281,10 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
                 return;
             }
         }
+
+        // hack: run another update total and my share run because after configuration change,
+        // recycler is not yet able to receive the update calls before
+        updateTotalAndMyShare();
     }
 
     final AddEditPurchaseItemUsersUser[] getItemUsers(@NonNull List<Identity> identities) {
@@ -332,10 +336,10 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
 
         // TODO: only needed once we support currencies with other than 2 decimal values
 //        updateItemsPriceFormatting();
-
         // update total price and my share formatting
-        notifyPropertyChanged(BR.totalPrice);
-        notifyPropertyChanged(BR.myShare);
+//        notifyPropertyChanged(BR.totalPrice);
+//        notifyPropertyChanged(BR.myShare);
+
         // update my share currency field
         notifyPropertyChanged(BR.currency);
 

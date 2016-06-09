@@ -21,10 +21,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="@dimen/normal_space"
         android:layout_marginEnd="@dimen/key_line_1"
         android:layout_marginStart="@dimen/key_line_1"
-        android:layout_marginTop="@dimen/normal_space"
         android:transitionGroup="true"
         tools:context=".presentation.login.LoginProfileViewModel"
         tools:targetApi="lollipop"
@@ -36,12 +34,12 @@
             android:layout_height="@dimen/avatar_size_3x"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="32dp"
+            android:layout_marginBottom="@dimen/big_space"
             android:contentDescription="@string/user_avatar"
             android:onClick="@{viewModel.onAvatarClick}"
             app:avatar="@{viewModel.avatar}"
             app:fallback="@{@drawable/ic_account_circle_black_80dp}"
-            tools:src="@drawable/ic_account_circle_black_40dp"
+            tools:src="@drawable/ic_account_circle_black_80dp"
             />
 
 
@@ -51,7 +49,6 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/iv_login_profile_avatar"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="@dimen/small_space"
             android:error="@{!viewModel.validate ? null : viewModel.nicknameComplete ? null : @string/error_nickname}"
             android:transitionGroup="true"
             >
@@ -75,6 +72,7 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_gravity="bottom"
+            android:layout_marginTop="@dimen/normal_space"
             android:layout_marginBottom="@dimen/normal_space"
             android:onClick="@{viewModel.onFabDoneClick}"
             android:src="@drawable/ic_arrow_forward_black_24dp"

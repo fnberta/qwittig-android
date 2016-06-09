@@ -268,7 +268,7 @@
     <string name="dialog_compensation_confirm_amount_title">Zahlung bestätigen</string>
     <string name="dialog_positive_confirm">Bestätigen</string>
     <string name="error_valid_amount_too_big">Der Betrag kann max. doppelt so gross wie der ursprüngliche sein</string>
-    <string name="desc_group_add_new_create">Klicke auf den Button um die neue Gruppe zu erstellen und mit dem Hinzufügen von Nutzern weiterzufahren.</string>
+    <string name="desc_group_add_new_create">Wähle einen Nahmen und eine Währung für deine Gruppe. Einkäufe in einer Fremdwährung werden in diese Währung konvertiert. Wenn du bereit bist, klicke auf den Button um die neue Gruppe zu erstellen und neue Nutzern hinzuzufügen.</string>
     <string name="action_share">Teilen</string>
     <string name="toast_error_profile">Speichern des Profils fehlgeschlagen</string>
     <string name="progress_add_group">Erstelle neue Gruppe…</string>
@@ -319,7 +319,10 @@
     <string name="desc_user_invite_existing">Lade Nutzer ein, indem du den generierten Link teilst.</string>
     <string name="dialog_change_nickname_message">Gib einen neuen Spitznamen ein</string>
     <string name="toast_error_purchase_ocr_load">Laden des Einkaufs fehlgeschlagen. Bitte versuche es noch einmal.</string>
-    <string name="toast_error_purchase_ocr_process">Verarbeitung des Einkaufs fehlgeschalgen. Bitte versuche es noch einmal..</string>
+    <string name="toast_error_purchase_ocr_process">Verarbeitung des Einkaufs fehlgeschalgen. Bitte versuche es noch einmal.</string>
     <string name="toast_purchase_ocr_started">Verarbeite Einkauf…</string>
+    <string name="toast_error_join_group">Beitreten der Gruppe fehlgeschlagen. Bitte versuche es noch einmal.</string>
+    <string name="header_settings_group_add">Neue Gruppe</string>
+    <string name="header_login_first_group">Erste Gruppe</string>
 
 </resources>

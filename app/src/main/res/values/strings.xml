@@ -274,7 +274,7 @@
     <string name="dialog_compensation_confirm_amount_title">Confirm payment</string>
     <string name="dialog_positive_confirm">Confirm</string>
     <string name="error_valid_amount_too_big">Amount can be max. double the original one</string>
-    <string name="desc_group_add_new_create">Press the button to create the group and continue with the addition of users.</string>
+    <string name="desc_group_add_new_create">Choose a name and currency for your group. Purchases made in other currencies will be converted to this currency. When you\'re ready, press the button to create the group and start adding users.</string>
     <string name="action_share">Share</string>
     <string name="toast_error_profile">Failed to save profile</string>
     <string name="progress_add_group">Creating group…</string>
@@ -328,5 +328,8 @@
     <string name="toast_error_purchase_ocr_load">Failed to load purchase. Please try again.</string>
     <string name="toast_error_purchase_ocr_process">Failed to process the purchase. Please try again.</string>
     <string name="toast_purchase_ocr_started">Processing purchase…</string>
+    <string name="toast_error_join_group">Failed to join the new group. Please try again.</string>
+    <string name="header_settings_group_add">New group</string>
+    <string name="header_login_first_group">First group</string>
 
 </resources>

@@ -142,8 +142,7 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
                 mView.removeWorker(workerTag);
                 mView.hideProgressDialog();
 
-                mView.showMessage(R.string.toast_error_unknown);
-                // TODO: show proper error message, define error codes in cloud code
+                mView.showMessage(R.string.toast_error_join_group);
             }
         }));
     }

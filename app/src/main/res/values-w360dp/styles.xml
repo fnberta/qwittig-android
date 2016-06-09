@@ -6,8 +6,4 @@
     <style name="HomeToolbarTitle">
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.Display2</item>
     </style>
-
-    <style name="LoginHeader">
-        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Display4</item>
-    </style>
 </resources>
