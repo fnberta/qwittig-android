@@ -4,20 +4,26 @@
 
 package ch.giantific.qwittig.presentation.home;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.AppBarLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.view.ActionMode;
+import android.view.View;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
@@ -26,7 +32,7 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.List;
 
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.Qwittig;
@@ -50,6 +56,8 @@ import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesViewModel;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
 import ch.giantific.qwittig.utils.CameraUtils;
+import ch.giantific.qwittig.utils.MessageAction;
+import ch.giantific.qwittig.utils.Utils;
 import io.branch.referral.Branch;
 import io.branch.referral.BranchError;
 import rx.Observable;
@@ -81,6 +89,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     public static final String BRANCH_INVITER_NICKNAME = "inviterNickname";
     private static final String STATE_DRAFTS_FRAGMENT = "STATE_DRAFTS_FRAGMENT";
     private static final String STATE_PURCHASES_FRAGMENT = "STATE_PURCHASES_FRAGMENT";
+    private static final int PERMISSIONS_REQUEST_CAPTURE_IMAGES = 1;
     private ActivityHomeBinding mBinding;
     private PurchasesViewModel mPurchasesViewModel;
     private DraftsViewModel mDraftsViewModel;
@@ -88,7 +97,6 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     private DraftsFragment mDraftsFragment;
     private ProgressDialog mProgressDialog;
     private HomeTabsAdapter mTabsAdapter;
-    private String mReceiptImagePath;
 
     @Override
     protected void handleLocalBroadcast(Intent intent, int dataType) {
@@ -266,7 +274,8 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
             case INTENT_REQUEST_IMAGE_CAPTURE:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
-                        encodeReceipt();
+                        final List<String> paths = data.getStringArrayListExtra(CameraActivity.INTENT_EXTRA_PATHS);
+                        encodeReceipt(paths.get(0));
                         break;
                     case Activity.RESULT_CANCELED:
                         mViewModel.onReceiptImageFailed();
@@ -276,16 +285,16 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
         }
     }
 
-    private void encodeReceipt() {
+    private void encodeReceipt(@NonNull final String receiptImagePath) {
         Glide.with(this)
-                .load(mReceiptImagePath)
+                .load(receiptImagePath)
                 .asBitmap()
                 .toBytes(Bitmap.CompressFormat.JPEG, PurchaseRepository.JPEG_COMPRESSION_RATE)
                 .into(new SimpleTarget<byte[]>(PurchaseRepository.WIDTH, PurchaseRepository.HEIGHT) {
                     @Override
                     public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
                         mViewModel.onReceiptImageTaken(resource);
-                        final File origReceipt = new File(mReceiptImagePath);
+                        final File origReceipt = new File(receiptImagePath);
                         if (!origReceipt.delete() && BuildConfig.DEBUG) {
                             Timber.e("failed to delete receipt image file");
                         }
@@ -419,19 +428,53 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
             return;
         }
 
-        final File imageFile;
-        try {
-            imageFile = CameraUtils.createImageFile(this);
-        } catch (IOException e) {
-            showMessage(R.string.toast_create_image_file_failed);
-            return;
+        if (permissionsAreGranted()) {
+            getImage();
+        }
+    }
+
+    private boolean permissionsAreGranted() {
+        int hasCameraPerm = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+        if (hasCameraPerm != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
+                    PERMISSIONS_REQUEST_CAPTURE_IMAGES);
+            return false;
         }
 
-        mReceiptImagePath = imageFile.getAbsolutePath();
-        final Intent cameraIntent = CameraUtils.getCameraIntent(this, imageFile);
-        if (cameraIntent != null) {
-            startActivityForResult(cameraIntent, INTENT_REQUEST_IMAGE_CAPTURE);
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_CAPTURE_IMAGES:
+                if (Utils.verifyPermissions(grantResults)) {
+                    getImage();
+                } else {
+                    showMessageWithAction(R.string.snackbar_permission_storage_denied,
+                            new MessageAction(R.string.snackbar_action_open_settings) {
+                                @Override
+                                public void onClick(View v) {
+                                    startSystemSettings();
+                                }
+                            });
+                }
+
+                break;
         }
+    }
+
+    private void getImage() {
+        final Intent intent = new Intent(this, CameraActivity.class);
+        startActivityForResult(intent, INTENT_REQUEST_IMAGE_CAPTURE);
+    }
+
+    private void startSystemSettings() {
+        final Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.setData(Uri.parse("package:" + getPackageName()));
+        startActivity(intent);
     }
 
     @Override
@@ -456,7 +499,8 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     }
 
     @Override
-    public void setPurchasesQueryMoreStream(@NonNull Observable<Purchase> observable, @NonNull String workerTag) {
+    public void setPurchasesQueryMoreStream
+            (@NonNull Observable<Purchase> observable, @NonNull String workerTag) {
         mPurchasesViewModel.setPurchasesQueryMoreStream(observable, workerTag);
     }
 }

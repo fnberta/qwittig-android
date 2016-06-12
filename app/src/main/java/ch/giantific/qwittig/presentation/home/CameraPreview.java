@@ -7,6 +7,7 @@ package ch.giantific.qwittig.presentation.home;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.hardware.Camera;
+import android.support.annotation.NonNull;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -35,11 +36,11 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         super(context);
 
         mCamera = camera;
-        SurfaceHolder holder = getHolder();
+        final SurfaceHolder holder = getHolder();
         holder.addCallback(this);
     }
 
-    public void setCamera(Camera camera) {
+    public void setCamera(@NonNull Camera camera) {
         mCamera = camera;
     }
 
@@ -50,14 +51,14 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCamera.setDisplayOrientation(90);
             mCamera.startPreview();
         } catch (IOException e) {
-            Timber.d(e, "Error setting camera preview: ");
+            Timber.e(e, "Error setting camera preview:");
             // TODO: tell user
         }
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        // we are locked to portrait, hence the surface should not able to be changed
+        // we are locked to portrait, hence the surface should not be able to be changed
     }
 
     @Override

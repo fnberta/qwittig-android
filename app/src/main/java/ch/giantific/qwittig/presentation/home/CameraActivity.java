@@ -67,10 +67,10 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     private final Camera.PictureCallback mPicture = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(@NonNull byte[] data, Camera camera) {
-            File imageFile;
+            final File imageFile;
             try {
                 imageFile = createImageFile();
-                FileOutputStream fos = new FileOutputStream(imageFile);
+                final FileOutputStream fos = new FileOutputStream(imageFile);
                 fos.write(data);
                 fos.close();
             } catch (IOException e) {
@@ -84,14 +84,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     };
 
     private File createImageFile() throws IOException {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        return File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
+        return CameraUtils.createImageFile(this);
     }
 
     private void showErrorToast() {
@@ -124,33 +117,43 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
         // Create our Preview view and set it as the content of our activity.
         mPreview = new CameraPreview(this, mCamera);
-        FrameLayout preview = (FrameLayout) findViewById(R.id.fl_camera_preview);
-        preview.addView(mPreview);
+        final FrameLayout preview = (FrameLayout) findViewById(R.id.fl_camera_preview);
+        if (preview != null) {
+            preview.addView(mPreview);
+        }
 
         mLinearLayoutTaken = (LinearLayout) findViewById(R.id.ll_camera_image_taken);
         mFabCapture = (FloatingActionButton) findViewById(R.id.fab_camera_capture);
-        mFabCapture.setOnClickListener(this);
+        if (mFabCapture != null) {
+            mFabCapture.setOnClickListener(this);
+        }
         mViewBottom = findViewById(R.id.rl_camera_bottom);
 
-        ImageView done = (ImageView) findViewById(R.id.iv_camera_bottom_done);
-        done.setOnClickListener(this);
-        ImageView add = (ImageView) findViewById(R.id.iv_camera_bottom_add);
-        add.setOnClickListener(this);
-        ImageView redo = (ImageView) findViewById(R.id.iv_camera_bottom_redo);
-        redo.setOnClickListener(this);
+        final ImageView done = (ImageView) findViewById(R.id.iv_camera_bottom_done);
+        if (done != null) {
+            done.setOnClickListener(this);
+        }
+        final ImageView add = (ImageView) findViewById(R.id.iv_camera_bottom_add);
+        if (add != null) {
+            add.setOnClickListener(this);
+        }
+        final ImageView redo = (ImageView) findViewById(R.id.iv_camera_bottom_redo);
+        if (redo != null) {
+            redo.setOnClickListener(this);
+        }
     }
 
     private void loadCamera() throws Exception {
         mCamera = CameraUtils.getCameraInstance();
 
-        Camera.Parameters params = mCamera.getParameters();
-        List<String> focusModes = params.getSupportedFocusModes();
+        final Camera.Parameters params = mCamera.getParameters();
+        final List<String> focusModes = params.getSupportedFocusModes();
         if (focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
             params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
         }
-        List<String> flashModes = params.getSupportedFlashModes();
+        final List<String> flashModes = params.getSupportedFlashModes();
         if (flashModes.contains(Camera.Parameters.FLASH_MODE_ON)) {
-            params.setFlashMode(Camera.Parameters.FLASH_MODE_ON);
+            params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
         }
         setRotation(params, 0);
         mCamera.setParameters(params);
@@ -162,17 +165,13 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
             return params;
         }
 
-        Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
+        final Camera.CameraInfo info = new Camera.CameraInfo();
         Camera.getCameraInfo(0, info);
         orientation = (orientation + 45) / 90 * 90;
         Timber.e("info.orientation %1$s", info.orientation);
-        int rotation;
-        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            rotation = (info.orientation - orientation + 360) % 360;
-        } else {  // back-facing camera
-            rotation = (info.orientation + orientation) % 360;
-        }
-
+        final int rotation = info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT
+                ? (info.orientation - orientation + 360) % 360
+                : (info.orientation + orientation) % 360;
         Timber.e("rotation %1$s", rotation);
         params.setRotation(rotation);
         return params;
@@ -195,7 +194,6 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    // TODO: think about api 17
     private void setImmersiveMode() {
         getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -211,21 +209,21 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         int id = v.getId();
         switch (id) {
             case R.id.fab_camera_capture:
-                mCamera.autoFocus(new Camera.AutoFocusCallback() {
-                    @Override
-                    public void onAutoFocus(boolean success, Camera camera) {
-                        if (success) {
-                            mCamera.takePicture(null, null, mPicture);
-                        } else {
-                            Timber.e("autoFocus failed");
-                        }
-                    }
-                });
+                mCamera.takePicture(null, null, mPicture);
+//                mCamera.autoFocus(new Camera.AutoFocusCallback() {
+//                    @Override
+//                    public void onAutoFocus(boolean success, Camera camera) {
+//                        if (success) {
+//                            mCamera.takePicture(null, null, mPicture);
+//                        } else {
+//                            Timber.e("autoFocus failed");
+//                        }
+//                    }
+//                });
                 break;
             case R.id.iv_camera_bottom_redo:
-                File image = mImageFiles.get(mImageFiles.size() - 1);
-                boolean isDeleted = image.delete();
-                if (!isDeleted && BuildConfig.DEBUG) {
+                final File image = mImageFiles.get(mImageFiles.size() - 1);
+                if (!image.delete() && BuildConfig.DEBUG) {
                     Timber.e("failed to delete file");
                 }
                 mImageFiles.remove(image);
@@ -268,19 +266,19 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void finishCapture() {
-        int filesSize = mImageFiles.size();
+        final int filesSize = mImageFiles.size();
         if (filesSize == 0) {
             setResult(RESULT_CANCELED);
             finish();
             return;
         }
 
-        ArrayList<String> paths = new ArrayList<>(filesSize);
+        final ArrayList<String> paths = new ArrayList<>(filesSize);
         for (File file : mImageFiles) {
             paths.add(file.getAbsolutePath());
         }
 
-        Intent intent = new Intent();
+        final Intent intent = new Intent();
         intent.putStringArrayListExtra(INTENT_EXTRA_PATHS, paths);
         setResult(RESULT_OK, intent);
         finish();
