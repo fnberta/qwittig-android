@@ -23,8 +23,10 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import ch.giantific.qwittig.BuildConfig;
@@ -35,7 +37,7 @@ import ch.giantific.qwittig.data.services.SavePurchaseTaskService;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Item;
-import ch.giantific.qwittig.domain.models.OcrPurchase;
+import ch.giantific.qwittig.domain.models.OcrData;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.utils.MoneyUtils;
@@ -62,6 +64,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     private static final String PARAM_FILE_NAME = "fileName";
     private static final String DRAFTS_AVAILABLE = "DRAFTS_AVAILABLE_";
     private static final String EXCHANGE_RATE_LAST_FETCHED_TIME = "EXCHANGE_RATE_LAST_FETCHED_TIME";
+    private static final String OLD_EDIT_ITEMS = "OLD_EDIT_ITEMS";
     private static final long EXCHANGE_RATE_REFRESH_INTERVAL = 24 * 60 * 60 * 1000;
     private final SharedPreferences mSharedPrefs;
     private final ExchangeRates mExchangeRates;
@@ -496,6 +499,22 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
             return false;
         }
 
+        try {
+            final Set<String> oldItemIds = mSharedPrefs.getStringSet(OLD_EDIT_ITEMS, new HashSet<String>());
+            if (!oldItemIds.isEmpty()) {
+                final List<Item> items = new ArrayList<>(oldItemIds.size());
+                for (String id : oldItemIds) {
+                    final Item item = (Item) ParseObject.createWithoutData(Item.CLASS, id);
+                    items.add(item);
+                }
+                ParseObject.deleteAll(items);
+            }
+
+            mSharedPrefs.edit().remove(OLD_EDIT_ITEMS).apply();
+        } catch (ParseException e) {
+            return false;
+        }
+
         return true;
     }
 
@@ -511,26 +530,19 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public Observable<String> uploadReceipt(@NonNull String sessionToken,
-                                            @NonNull final String receiptPath) {
+    public Observable<Void> uploadReceipt(@NonNull String sessionToken,
+                                          @NonNull final byte[] receipt) {
         final RequestBody tokenPart = RequestBody.create(
                 MediaType.parse("text/plain"), sessionToken);
 
-        final File file = new File(receiptPath);
         final RequestBody receiptPart = RequestBody.create(
-                MediaType.parse("image/jpeg"), file);
+                MediaType.parse("image/jpeg"), receipt);
         final MultipartBody.Part body =
-                MultipartBody.Part.createFormData("receipt", file.getName(), receiptPart);
+                MultipartBody.Part.createFormData("receipt", "receipt.jpg", receiptPart);
 
         return mReceiptOcr.uploadReceipt(tokenPart, body)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .map(new Func1<Void, String>() {
-                    @Override
-                    public String call(Void aVoid) {
-                        return receiptPath;
-                    }
-                });
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     @Override
@@ -600,21 +612,26 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public Single<OcrPurchase> fetchOcrPurchaseData(@NonNull String ocrPurchaseId) {
-        final OcrPurchase purchase = (OcrPurchase) ParseObject.createWithoutData(OcrPurchase.CLASS, ocrPurchaseId);
+    public Single<OcrData> fetchOcrPurchaseData(@NonNull String ocrPurchaseId) {
+        final OcrData purchase = (OcrData) ParseObject.createWithoutData(OcrData.CLASS, ocrPurchaseId);
         return fetchLocal(purchase);
     }
 
     @Override
     public boolean updateOcrPurchase(@NonNull String ocrPurchaseId) {
-        final ParseQuery<OcrPurchase> query = ParseQuery.getQuery(OcrPurchase.CLASS);
+        final ParseQuery<OcrData> query = ParseQuery.getQuery(OcrData.CLASS);
         try {
-            final OcrPurchase ocrPurchase = query.get(ocrPurchaseId);
-            ocrPurchase.pin();
+            final OcrData ocrData = query.get(ocrPurchaseId);
+            ocrData.pin();
         } catch (ParseException e) {
             return false;
         }
 
         return true;
+    }
+
+    @Override
+    public void cacheOldEditItems(@NonNull Set<String> itemIds) {
+        mSharedPrefs.edit().putStringSet(OLD_EDIT_ITEMS, itemIds).apply();
     }
 }

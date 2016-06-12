@@ -45,7 +45,7 @@ public class Purchase extends ParseObject {
     public static final String RECEIPT = "receipt";
     public static final String RECEIPT_LOCAL = "receiptLocal";
     public static final String NOTE = "note";
-    public static final String OCR = "ocr";
+    public static final String OCR_DATA = "ocrData";
     public static final String TEMP_ID = "tempId";
     public static final String DRAFT = "draft";
     public static final String PIN_LABEL = "purchasesPinLabel";
@@ -195,12 +195,12 @@ public class Purchase extends ParseObject {
         remove(NOTE);
     }
 
-    public OcrPurchase getOcr() {
-        return (OcrPurchase) getParseObject(OCR);
+    public OcrData getOcrData() {
+        return (OcrData) getParseObject(OCR_DATA);
     }
 
-    public void setOcr(@NonNull OcrPurchase ocr) {
-        put(OCR, ocr);
+    public void setOcrData(@NonNull OcrData ocrData) {
+        put(OCR_DATA, ocrData);
     }
 
     public String getTempId() {
@@ -238,7 +238,6 @@ public class Purchase extends ParseObject {
     }
 
     public void replaceItems(@NonNull List<Item> items) {
-        // TODO: delete old items
         put(ITEMS, items);
     }
 

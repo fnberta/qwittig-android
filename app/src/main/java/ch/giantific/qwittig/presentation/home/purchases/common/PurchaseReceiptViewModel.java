@@ -4,6 +4,7 @@
 
 package ch.giantific.qwittig.presentation.home.purchases.common;
 
+import android.databinding.Bindable;
 import android.support.annotation.NonNull;
 
 import ch.giantific.qwittig.presentation.common.viewmodels.LoadingViewModel;
@@ -15,15 +16,10 @@ import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 public interface PurchaseReceiptViewModel extends ViewModel,
         LoadingViewModel {
 
+    @Bindable
+    String getReceiptImage();
+
     void onReceiptImagePathSet(@NonNull String receiptImagePath);
 
     void onReceiptImageCaptured();
-
-    /**
-     * Defines the interaction with the attached view.
-     */
-    interface ViewListener extends ViewModel.ViewListener {
-
-        void setReceiptImage(@NonNull String receiptImageUri);
-    }
 }

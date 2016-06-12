@@ -49,6 +49,12 @@ public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseRece
 
     @Override
     @Bindable
+    public String getReceiptImage() {
+        return mReceiptImageUri;
+    }
+
+    @Override
+    @Bindable
     public boolean isLoading() {
         return mLoading;
     }
@@ -60,30 +66,13 @@ public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseRece
     }
 
     @Override
-    public void onViewVisible() {
-        super.onViewVisible();
-
-        loadReceipt();
-    }
-
-    private void loadReceipt() {
-        if (!TextUtils.isEmpty(mReceiptImageUri)) {
-            mView.setReceiptImage(mReceiptImageUri);
-            setLoading(false);
-        } else {
-            setLoading(false);
-            mView.showMessage(R.string.toast_error_receipt_load);
-        }
-    }
-
-    @Override
     public void onReceiptImagePathSet(@NonNull String receiptImageUri) {
         mReceiptImageUri = receiptImageUri;
     }
 
     @Override
     public void onReceiptImageCaptured() {
-        mView.setReceiptImage(mReceiptImageUri);
+        notifyPropertyChanged(BR.receiptImage);
         mView.showMessage(R.string.toast_receipt_changed);
     }
 }

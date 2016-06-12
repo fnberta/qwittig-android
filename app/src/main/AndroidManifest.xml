@@ -259,7 +259,7 @@
             />
         <meta-data
             android:name="com.parse.push.gcm_sender_id"
-            android:value="id:982871908066"
+            android:value="id:1027430235430"
             />
         <meta-data
             android:name="io.branch.sdk.BranchKey"

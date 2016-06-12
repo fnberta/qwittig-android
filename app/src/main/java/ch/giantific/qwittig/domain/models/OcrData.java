@@ -9,15 +9,15 @@ import java.util.Map;
 /**
  * Created by fabio on 02.06.16.
  */
-@ParseClassName("OcrPurchase")
-public class OcrPurchase extends ParseObject {
+@ParseClassName("OcrData")
+public class OcrData extends ParseObject {
 
-    public static final String CLASS = "OcrPurchase";
+    public static final String CLASS = "OcrData";
     public static final String DATA = "data";
     public static final String RECEIPT = "receipt";
 
 
-    public OcrPurchase() {
+    public OcrData() {
         // a default constructor is required.
     }
 

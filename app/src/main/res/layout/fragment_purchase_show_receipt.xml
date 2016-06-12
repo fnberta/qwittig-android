@@ -25,17 +25,11 @@
         tools:context=".presentation.home.purchases.details.PurchaseReceiptDetailFragment"
         >
 
-        <include
-            layout="@layout/include_progress"
-            app:viewModel="@{viewModel}"
-            />
-
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:paddingBottom="@dimen/small_space"
-            android:visibility="@{viewModel.loading ? View.GONE : View.VISIBLE}"
             >
 
             <LinearLayout
@@ -63,10 +57,17 @@
                     android:layout_marginEnd="@dimen/key_line_1"
                     android:layout_marginStart="@dimen/key_line_1"
                     android:contentDescription="@string/purchase_receipt"
+                    app:receiptImage="@{viewModel.receiptImage}"
+                    app:loadListener="@{viewModel}"
                     />
             </LinearLayout>
 
         </ScrollView>
+
+        <include
+            layout="@layout/include_progress"
+            app:viewModel="@{viewModel}"
+            />
 
     </FrameLayout>
 </layout>

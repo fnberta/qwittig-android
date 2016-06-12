@@ -162,7 +162,9 @@ public class LoginAccountsFragment extends BaseFragment<LoginAccountsViewModel, 
         final LoginProfileFragment fragment = new LoginProfileFragment();
         if (Utils.isRunningLollipopAndHigher()) {
             setExitTransition(new Slide(Gravity.START));
+            setAllowReturnTransitionOverlap(false);
             fragment.setEnterTransition(new Slide(Gravity.END));
+            fragment.setAllowEnterTransitionOverlap(false);
         }
 
         getFragmentManager().beginTransaction()

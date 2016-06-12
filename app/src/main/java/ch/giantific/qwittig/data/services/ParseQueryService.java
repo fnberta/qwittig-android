@@ -24,7 +24,7 @@ import ch.giantific.qwittig.data.services.di.DaggerServiceComponent;
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.models.OcrPurchase;
+import ch.giantific.qwittig.domain.models.OcrData;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.domain.models.TaskHistoryEvent;
@@ -337,7 +337,7 @@ public class ParseQueryService extends IntentService {
             case Group.CLASS:
                 updateGroup(objectId, isNew);
                 break;
-            case OcrPurchase.CLASS: {
+            case OcrData.CLASS: {
                 updateOcrPurchase(objectId);
                 break;
             }
@@ -429,7 +429,7 @@ public class ParseQueryService extends IntentService {
     }
 
     @StringDef({User.CLASS, Group.CLASS, Purchase.CLASS, Compensation.CLASS, Group.CLASS,
-            Task.CLASS, TaskHistoryEvent.CLASS, OcrPurchase.CLASS})
+            Task.CLASS, TaskHistoryEvent.CLASS, OcrData.CLASS})
     @Retention(RetentionPolicy.SOURCE)
     public @interface ClassType {
     }

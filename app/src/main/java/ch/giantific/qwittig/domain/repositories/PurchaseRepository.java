@@ -8,9 +8,10 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import java.util.List;
+import java.util.Set;
 
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.models.OcrPurchase;
+import ch.giantific.qwittig.domain.models.OcrData;
 import ch.giantific.qwittig.domain.models.Purchase;
 import rx.Observable;
 import rx.Single;
@@ -118,7 +119,7 @@ public interface PurchaseRepository extends BaseRepository {
      */
     void deletePurchase(@NonNull Purchase purchase);
 
-    Observable<String> uploadReceipt(@NonNull String sessionToken, @NonNull String receiptPath);
+    Observable<Void> uploadReceipt(@NonNull String sessionToken, @NonNull byte[] receipt);
 
     /**
      * Returns whether drafts are available for the current identity of the user.
@@ -145,7 +146,9 @@ public interface PurchaseRepository extends BaseRepository {
      */
     Single<Float> getExchangeRate(@NonNull String baseCurrency, @NonNull String currency);
 
-    Single<OcrPurchase> fetchOcrPurchaseData(@NonNull String ocrPurchaseId);
+    Single<OcrData> fetchOcrPurchaseData(@NonNull String ocrPurchaseId);
 
     boolean updateOcrPurchase(@NonNull String ocrPurchaseId);
+
+    void cacheOldEditItems(@NonNull Set<String> itemIds);
 }

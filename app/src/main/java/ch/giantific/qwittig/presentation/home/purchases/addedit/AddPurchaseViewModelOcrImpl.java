@@ -8,18 +8,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.stringtemplate.v4.ST;
-
 import java.util.List;
 import java.util.Map;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Item;
-import ch.giantific.qwittig.domain.models.OcrPurchase;
+import ch.giantific.qwittig.domain.models.OcrData;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
@@ -28,7 +23,6 @@ import rx.Single;
 import rx.SingleSubscriber;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import timber.log.Timber;
 
 /**
  * Provides an implementation of the {@link AddEditPurchaseViewModel} for the screen where the
@@ -40,7 +34,7 @@ public class AddPurchaseViewModelOcrImpl extends AddPurchaseViewModelImpl {
 
     private static final String STATE_OCR_VALUES_SET = "STATE_OCR_VALUES_SET";
     private String mOcrPurchaseId;
-    private OcrPurchase mOcrPurchase;
+    private OcrData mOcrData;
     private boolean mOcrValuesSet;
 
     public AddPurchaseViewModelOcrImpl(@Nullable Bundle savedState,
@@ -78,21 +72,21 @@ public class AddPurchaseViewModelOcrImpl extends AddPurchaseViewModelImpl {
                         mIdentities = identities;
                     }
                 })
-                .flatMap(new Func1<List<Identity>, Single<OcrPurchase>>() {
+                .flatMap(new Func1<List<Identity>, Single<OcrData>>() {
                     @Override
-                    public Single<OcrPurchase> call(List<Identity> identities) {
+                    public Single<OcrData> call(List<Identity> identities) {
                         return mPurchaseRepo.fetchOcrPurchaseData(mOcrPurchaseId);
                     }
                 })
-                .subscribe(new SingleSubscriber<OcrPurchase>() {
+                .subscribe(new SingleSubscriber<OcrData>() {
                     @Override
-                    public void onSuccess(OcrPurchase ocrPurchase) {
-                        mOcrPurchase = ocrPurchase;
+                    public void onSuccess(OcrData ocrData) {
+                        mOcrData = ocrData;
 
                         if (mOcrValuesSet) {
                             updateRows();
                         } else {
-                            setOcrData(ocrPurchase);
+                            setOcrData(ocrData);
                             mOcrValuesSet = true;
                         }
                     }
@@ -106,14 +100,16 @@ public class AddPurchaseViewModelOcrImpl extends AddPurchaseViewModelImpl {
     }
 
     @SuppressWarnings("unchecked")
-    private void setOcrData(@NonNull OcrPurchase ocrPurchase) {
-        final Map<String, Object> ocrData = ocrPurchase.getData();
-//        setDate(ocrData.get("date"));
-        final List<String> stores = (List<String>) ocrData.get("store");
+    private void setOcrData(@NonNull OcrData ocrData) {
+        mView.toggleReceiptMenuOption(true);
+
+        final Map<String, Object> data = ocrData.getData();
+//        setDate(data.get("date"));
+        final List<String> stores = (List<String>) data.get("store");
         if (!stores.isEmpty()) {
             setStore(stores.get(0));
         }
-        final List<Map<String, Object>> items = (List<Map<String, Object>>) ocrData.get("items");
+        final List<Map<String, Object>> items = (List<Map<String, Object>>) data.get("items");
         if (!items.isEmpty()) {
             for (Map<String, Object> item : items) {
                 final String price = mMoneyFormatter.format(item.get("price"));
@@ -130,7 +126,7 @@ public class AddPurchaseViewModelOcrImpl extends AddPurchaseViewModelImpl {
 
     @Override
     public void onShowReceiptImageMenuClick() {
-        mView.showReceiptImage(mOcrPurchase.getReceipt().getUrl());
+        mView.showReceiptImage(mOcrData.getReceipt().getUrl());
     }
 
     @NonNull
@@ -138,8 +134,8 @@ public class AddPurchaseViewModelOcrImpl extends AddPurchaseViewModelImpl {
     Purchase createPurchase(@NonNull List<Identity> purchaseIdentities,
                             @NonNull List<Item> purchaseItems, int fractionDigits) {
         final Purchase purchase =  super.createPurchase(purchaseIdentities, purchaseItems, fractionDigits);
-        purchase.setReceipt(mOcrPurchase.getReceipt());
-        purchase.setOcr(mOcrPurchase);
+        purchase.setReceipt(mOcrData.getReceipt());
+        purchase.setOcrData(mOcrData);
 
         return purchase;
     }

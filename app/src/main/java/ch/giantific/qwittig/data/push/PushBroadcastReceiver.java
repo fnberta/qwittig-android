@@ -34,13 +34,14 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.data.push.di.DaggerPushReceiverComponent;
 import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.di.SystemServiceModule;
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.models.OcrPurchase;
+import ch.giantific.qwittig.domain.models.OcrData;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.domain.models.TaskHistoryEvent;
@@ -115,6 +116,8 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     UserRepository mUserRepo;
     @Inject
     NotificationManager mNotificationManager;
+    @Inject
+    LocalBroadcast mLocalBroadcast;
     @Nullable
     private Set<String> mPurchaseNotifications;
 
@@ -219,11 +222,11 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
         switch (type) {
             case TYPE_PURCHASE_OCR_SUCCEEDED: {
                 final String ocrPurchaseId = jsonExtras.optString(PUSH_PARAM_OCR_PURCHASE_ID);
-                ParseQueryService.startUpdateObject(context, OcrPurchase.CLASS, ocrPurchaseId, true);
+                ParseQueryService.startUpdateObject(context, OcrData.CLASS, ocrPurchaseId, true);
                 break;
             }
             case TYPE_PURCHASE_OCR_FAILED: {
-                // TODO: send broadcast failed
+                mLocalBroadcast.sendOcrPurchaseUpdated(false, null);
                 break;
             }
             case TYPE_PURCHASE_NEW: {
@@ -503,6 +506,14 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
             case TYPE_PURCHASE_OCR_SUCCEEDED: {
                 title = context.getString(R.string.push_purchase_ocr_title);
                 alert = context.getString(R.string.push_purchase_ocr_alert);
+
+                // set title and alert
+                builder.setContentTitle(title).setContentText(alert);
+                break;
+            }
+            case TYPE_PURCHASE_OCR_FAILED: {
+                title = context.getString(R.string.push_purchase_ocr_failed_title);
+                alert = context.getString(R.string.toast_error_purchase_ocr_process);
 
                 // set title and alert
                 builder.setContentTitle(title).setContentText(alert);

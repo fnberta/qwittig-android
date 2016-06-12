@@ -35,13 +35,10 @@ public interface AddEditPurchaseViewModel extends ListViewModel<AddEditPurchaseB
         DiscardChangesDialogFragment.DialogInteractionListener,
         ExchangeRateDialogFragment.DialogInteractionListener, RatesWorkerListener {
 
-    void onDateSet(@NonNull Date date);
+    List<String> getSupportedCurrencies();
 
-    /**
-     * Sets the receipt image path field.
-     *
-     * @param receiptImagePath the path to the receipt image
-     */
+    NumberFormat getMoneyFormatter();
+
     void onReceiptImagePathSet(@NonNull String receiptImagePath);
 
     void onReceiptImageTaken();
@@ -50,9 +47,6 @@ public interface AddEditPurchaseViewModel extends ListViewModel<AddEditPurchaseB
 
     void onItemDismiss(int position);
 
-    /**
-     * Launches the camera that allows the user to add a receipt image to the purchase.
-     */
     void onAddReceiptImageMenuClick();
 
     void onDeleteReceiptImageMenuClick();
@@ -65,21 +59,9 @@ public interface AddEditPurchaseViewModel extends ListViewModel<AddEditPurchaseB
 
     void onExitClick();
 
-    /**
-     * Saves the purchase to the online and offline local data store.
-     *
-     * @param view the fab that was clicked
-     */
     void onFabSavePurchaseClick(View view);
 
-    /**
-     * Saves the purchase as a draft to the local data store.
-     */
     void onSaveAsDraftMenuClick();
-
-    List<String> getSupportedCurrencies();
-
-    NumberFormat getMoneyFormatter();
 
     @IntDef({PurchaseResult.PURCHASE_SAVED, PurchaseResult.PURCHASE_SAVED_AUTO,
             PurchaseResult.PURCHASE_DRAFT, PurchaseResult.PURCHASE_DRAFT_CHANGES,
@@ -117,15 +99,8 @@ public interface AddEditPurchaseViewModel extends ListViewModel<AddEditPurchaseB
 
         void showNote(@NonNull String note);
 
-        /**
-         * Opens a dialog that allows the user to add or edit the note.
-         */
         void showAddEditNoteDialog(@NonNull String note);
 
-        /**
-         * Checks whether the permissions to take an image are granted and if yes initiates the creation
-         * of the image file.
-         */
         void captureImage();
 
         void finishScreen(int purchaseResult);

@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,11 +19,16 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.view.ActionMode;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
+
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
 
+import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.LocalBroadcast;
@@ -30,6 +36,7 @@ import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.ActivityHomeBinding;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
+import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.presentation.home.di.HomeSubcomponent;
 import ch.giantific.qwittig.presentation.home.di.HomeViewModelModule;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.AddEditPurchaseViewModel;
@@ -259,7 +266,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
             case INTENT_REQUEST_IMAGE_CAPTURE:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
-                        mViewModel.onReceiptImageTaken(mReceiptImagePath);
+                        encodeReceipt();
                         break;
                     case Activity.RESULT_CANCELED:
                         mViewModel.onReceiptImageFailed();
@@ -267,6 +274,23 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
                 }
                 break;
         }
+    }
+
+    private void encodeReceipt() {
+        Glide.with(this)
+                .load(mReceiptImagePath)
+                .asBitmap()
+                .toBytes(Bitmap.CompressFormat.JPEG, PurchaseRepository.JPEG_COMPRESSION_RATE)
+                .into(new SimpleTarget<byte[]>(PurchaseRepository.WIDTH, PurchaseRepository.HEIGHT) {
+                    @Override
+                    public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
+                        mViewModel.onReceiptImageTaken(resource);
+                        final File origReceipt = new File(mReceiptImagePath);
+                        if (!origReceipt.delete() && BuildConfig.DEBUG) {
+                            Timber.e("failed to delete receipt image file");
+                        }
+                    }
+                });
     }
 
     @Override
@@ -411,12 +435,12 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     }
 
     @Override
-    public void loadOcrWorker(@NonNull String receiptImagePath) {
-        OcrWorker.attach(getSupportFragmentManager(), receiptImagePath);
+    public void loadOcrWorker(@NonNull byte[] receipt) {
+        OcrWorker.attach(getSupportFragmentManager(), receipt);
     }
 
     @Override
-    public void setOcrStream(@NonNull Single<String> single, @NonNull String workerTag) {
+    public void setOcrStream(@NonNull Single<Void> single, @NonNull String workerTag) {
         mViewModel.setOcrStream(single, workerTag);
     }
 

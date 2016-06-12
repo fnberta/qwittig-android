@@ -21,5 +21,7 @@ public interface AddEditPurchaseDateRowViewModel extends Observable {
 
     void setDate(@NonNull Date date);
 
+    void onDateSet(@NonNull Date date);
+
     void onDateClick(View view);
 }

@@ -88,6 +88,19 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
     }
 
     @Override
+    public void startProgress() {
+        mOcrProcessing = true;
+        notifyPropertyChanged(BR.ocrProcessing);
+    }
+
+    @Override
+    public void stopProgress(boolean animate) {
+        mOcrProcessing = false;
+        mAnimStop = animate;
+        notifyPropertyChanged(BR.ocrProcessing);
+    }
+
+    @Override
     @Bindable
     public boolean isDraftsAvailable() {
         return mDraftsAvailable;
@@ -148,10 +161,10 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
     }
 
     @Override
-    public void onReceiptImageTaken(@NonNull String receiptImagePath) {
+    public void onReceiptImageTaken(@NonNull byte[] receipt) {
         startProgress();
 //        mView.showMessage(R.string.toast_purchase_ocr_started);
-        mView.loadOcrWorker(receiptImagePath);
+        mView.loadOcrWorker(receipt);
     }
 
     @Override
@@ -160,12 +173,11 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
     }
 
     @Override
-    public void setOcrStream(@NonNull Single<String> single, @NonNull final String workerTag) {
-        getSubscriptions().add(single.subscribe(new SingleSubscriber<String>() {
+    public void setOcrStream(@NonNull Single<Void> single, @NonNull final String workerTag) {
+        getSubscriptions().add(single.subscribe(new SingleSubscriber<Void>() {
                     @Override
-                    public void onSuccess(String receiptPath) {
+                    public void onSuccess(Void aVoid) {
                         mView.removeWorker(workerTag);
-                        deleteReceiptImage(receiptPath);
                     }
 
                     @Override
@@ -177,16 +189,6 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
                     }
                 })
         );
-    }
-
-    private void deleteReceiptImage(@NonNull String receiptPath) {
-        if (!TextUtils.isEmpty(receiptPath)) {
-            final File receipt = new File(receiptPath);
-            final boolean fileDeleted = receipt.delete();
-            if (!fileDeleted && BuildConfig.DEBUG) {
-                Timber.e("failed to delete receipt image file");
-            }
-        }
     }
 
     @Override
@@ -224,14 +226,10 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
         };
     }
 
-    private void startProgress() {
-        mOcrProcessing = true;
-        notifyPropertyChanged(BR.ocrProcessing);
-    }
+    @Override
+    public void onViewGone() {
+        super.onViewGone();
 
-    private void stopProgress(boolean animate) {
-        mOcrProcessing = false;
-        mAnimStop = animate;
-        notifyPropertyChanged(BR.ocrProcessing);
+        stopProgress(false);
     }
 }

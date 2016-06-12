@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
@@ -191,6 +192,7 @@ public class PurchaseDetailsRecyclerAdapter extends RecyclerView.Adapter<Recycle
         public void setIdentities(@NonNull List<Identity> identities) {
             mIdentities.clear();
             mIdentities.addAll(identities);
+            Collections.sort(mIdentities);
             mRecyclerAdapter.notifyDataSetChanged();
         }
     }

@@ -45,7 +45,8 @@ public class AddEditPurchaseItem extends BaseObservable implements AddEditPurcha
         this("", "", users);
     }
 
-    public AddEditPurchaseItem(@NonNull String name, @NonNull String price, @NonNull AddEditPurchaseItemUsersUser[] users) {
+    public AddEditPurchaseItem(@NonNull String name, @NonNull String price,
+                               @NonNull AddEditPurchaseItemUsersUser[] users) {
         mName = name;
         mPrice = price;
         mUsers = users;

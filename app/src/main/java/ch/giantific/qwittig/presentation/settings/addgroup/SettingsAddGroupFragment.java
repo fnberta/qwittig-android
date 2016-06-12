@@ -112,7 +112,9 @@ public class SettingsAddGroupFragment extends BaseFragment<SettingsAddGroupViewM
         final SettingsUsersFragment fragment = new SettingsUsersFragment();
         if (Utils.isRunningLollipopAndHigher()) {
             setExitTransition(new Slide(Gravity.START));
+            setAllowReturnTransitionOverlap(false);
             fragment.setEnterTransition(new Slide(Gravity.END));
+            fragment.setAllowEnterTransitionOverlap(false);
         }
 
         getFragmentManager().beginTransaction()

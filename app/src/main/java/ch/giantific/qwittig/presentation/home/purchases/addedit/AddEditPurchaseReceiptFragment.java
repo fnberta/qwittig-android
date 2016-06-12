@@ -9,16 +9,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 
 import java.io.File;
 import java.io.IOException;
 
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.presentation.home.purchases.common.PurchaseReceiptBaseFragment;
+import ch.giantific.qwittig.databinding.FragmentPurchaseShowReceiptBinding;
+import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.home.purchases.common.PurchaseReceiptViewModel;
 import ch.giantific.qwittig.presentation.home.purchases.common.di.DaggerPurchaseReceiptComponent;
 import ch.giantific.qwittig.presentation.home.purchases.common.di.PurchaseReceiptViewModelModule;
@@ -27,12 +31,13 @@ import ch.giantific.qwittig.utils.CameraUtils;
 /**
  * Shows the receipt image taken by the user when adding a new purchase.
  * <p/>
- * Subclass of {@link PurchaseReceiptBaseFragment}.
+ * Subclass of {@link BaseFragment}.
  */
-public class AddEditPurchaseReceiptFragment extends PurchaseReceiptBaseFragment<PurchaseReceiptViewModel, AddEditPurchaseReceiptFragment.ActivityListener> {
+public class AddEditPurchaseReceiptFragment extends BaseFragment<PurchaseReceiptViewModel, AddEditPurchaseReceiptFragment.ActivityListener> {
 
     private static final String KEY_RECEIPT_IMAGE_URI = "RECEIPT_IMAGE_URI";
     private static final int INTENT_REQUEST_IMAGE_CAPTURE = 1;
+    private FragmentPurchaseShowReceiptBinding mBinding;
     private String mReceiptImagePath;
 
     public AddEditPurchaseReceiptFragment() {
@@ -71,6 +76,14 @@ public class AddEditPurchaseReceiptFragment extends PurchaseReceiptBaseFragment<
     }
 
     @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        mBinding = FragmentPurchaseShowReceiptBinding.inflate(inflater, container, false);
+        mBinding.setViewModel(mViewModel);
+        return mBinding.getRoot();
+    }
+
+    @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         menu.clear();
         inflater.inflate(R.menu.menu_purchase_edit_receipt_fragment, menu);
@@ -88,6 +101,16 @@ public class AddEditPurchaseReceiptFragment extends PurchaseReceiptBaseFragment<
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    protected void setViewModelToActivity() {
+        // do nothing
+    }
+
+    @Override
+    protected View getSnackbarView() {
+        return mBinding.ivReceipt;
     }
 
     /**
@@ -131,7 +154,7 @@ public class AddEditPurchaseReceiptFragment extends PurchaseReceiptBaseFragment<
     /**
      * Defines the interaction with the hosting {@link Activity}.
      */
-    public interface ActivityListener extends PurchaseReceiptBaseFragment.ActivityListener {
+    public interface ActivityListener extends BaseFragment.ActivityListener {
         /**
          * Handles the request to delete the receipt image file from online Parse.com database.
          */

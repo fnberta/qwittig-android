@@ -97,7 +97,7 @@
     <string name="toast_min_one_item">Füge mindestens einen Artikel hinzu</string>
     <string name="pref_category_me">Ich</string>
     <string name="pref_category_current_group">Aktuelle Gruppe</string>
-    <string name="toast_balance_not_zero">Bitte fordere dein Guthaben ein und begleiche alle Schulden bevor du diese Gruppe verlässt</string>
+    <string name="toast_leave_group_balance_not_zero">Bitte fordere dein Guthaben ein und begleiche alle Schulden bevor du diese Gruppe verlässt</string>
     <string name="dialog_positive_leave">Verlassen</string>
     <string name="dialog_positive_reset">Zurücksetzen</string>
     <string name="dialog_group_join_title">%1$s beitreten?</string>
@@ -324,5 +324,7 @@
     <string name="toast_error_join_group">Beitreten der Gruppe fehlgeschlagen. Bitte versuche es noch einmal.</string>
     <string name="header_settings_group_add">Neue Gruppe</string>
     <string name="header_login_first_group">Erste Gruppe</string>
+    <string name="push_purchase_ocr_failed_title">Processing failed</string>
+    <string name="toast_del_identity_balance_not_zero">Fordere Guthaben ein und begleiche Schulden bevor du diesen Nutzer löschst</string>
 
 </resources>

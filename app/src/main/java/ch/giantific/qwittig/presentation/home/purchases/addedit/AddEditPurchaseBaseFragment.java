@@ -27,7 +27,6 @@ import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragme
 import ch.giantific.qwittig.presentation.common.fragments.DatePickerDialogFragment;
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.items.AddEditPurchaseBaseItem.Type;
-import ch.giantific.qwittig.presentation.home.purchases.common.PurchaseReceiptBaseFragment;
 import ch.giantific.qwittig.utils.CameraUtils;
 
 /**
@@ -151,7 +150,7 @@ public abstract class AddEditPurchaseBaseFragment<T extends AddEditPurchaseViewM
 
     @Override
     public void showReceiptImage(@NonNull String receiptImagePath) {
-        final PurchaseReceiptBaseFragment fragment =
+        final AddEditPurchaseReceiptFragment fragment =
                 AddEditPurchaseReceiptFragment.newInstance(receiptImagePath);
 
         getFragmentManager().beginTransaction()

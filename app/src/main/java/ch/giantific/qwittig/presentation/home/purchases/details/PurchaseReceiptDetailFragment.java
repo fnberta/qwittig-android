@@ -6,9 +6,13 @@ package ch.giantific.qwittig.presentation.home.purchases.details;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import ch.giantific.qwittig.Qwittig;
-import ch.giantific.qwittig.presentation.home.purchases.common.PurchaseReceiptBaseFragment;
+import ch.giantific.qwittig.databinding.FragmentPurchaseShowReceiptBinding;
+import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.home.purchases.common.PurchaseReceiptViewModel;
 import ch.giantific.qwittig.presentation.home.purchases.common.di.DaggerPurchaseReceiptComponent;
 import ch.giantific.qwittig.presentation.home.purchases.common.di.PurchaseReceiptViewModelModule;
@@ -17,11 +21,12 @@ import ch.giantific.qwittig.presentation.home.purchases.common.di.PurchaseReceip
 /**
  * Shows the receipt image of a purchase when viewing its details.
  * <p/>
- * Subclass of {@link PurchaseReceiptBaseFragment}.
+ * Subclass of {@link BaseFragment}.
  */
-public class PurchaseReceiptDetailFragment extends PurchaseReceiptBaseFragment<PurchaseReceiptViewModel, PurchaseReceiptBaseFragment.ActivityListener> {
+public class PurchaseReceiptDetailFragment extends BaseFragment<PurchaseReceiptViewModel, BaseFragment.ActivityListener> {
 
     private static final String KEY_RECEIPT_IMAGE_URI = "RECEIPT_IMAGE_URI";
+    private FragmentPurchaseShowReceiptBinding mBinding;
 
     public PurchaseReceiptDetailFragment() {
         // required empty constructor
@@ -31,7 +36,7 @@ public class PurchaseReceiptDetailFragment extends PurchaseReceiptBaseFragment<P
      * Returns a new instance of {@link PurchaseReceiptDetailFragment}.
      *
      * @param receiptImageUri the object id of the purchase of which the receipt image should be
-     *                   displayed
+     *                        displayed
      * @return a new instance of {@link PurchaseReceiptDetailFragment}
      */
     @NonNull
@@ -53,5 +58,23 @@ public class PurchaseReceiptDetailFragment extends PurchaseReceiptBaseFragment<P
                 .purchaseReceiptViewModelModule(new PurchaseReceiptViewModelModule(savedInstanceState, this, receiptImageUri))
                 .build()
                 .inject(this);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        mBinding = FragmentPurchaseShowReceiptBinding.inflate(inflater, container, false);
+        mBinding.setViewModel(mViewModel);
+        return mBinding.getRoot();
+    }
+
+    @Override
+    protected void setViewModelToActivity() {
+        // do nothing
+    }
+
+    @Override
+    protected View getSnackbarView() {
+        return mBinding.ivReceipt;
     }
 }

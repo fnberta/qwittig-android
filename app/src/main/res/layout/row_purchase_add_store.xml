@@ -43,8 +43,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/hint_store"
                 android:inputType="textCapWords"
-                android:onTextChanged="@{viewModel.onStoreChanged}"
-                android:text="@{viewModel.store}"
+                android:text="@={viewModel.store}"
                 />
 
         </android.support.design.widget.TextInputLayout>

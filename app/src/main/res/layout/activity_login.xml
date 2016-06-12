@@ -36,7 +36,7 @@
         <View
             android:id="@+id/divider"
             android:layout_width="match_parent"
-            android:layout_height="2dp"
+            android:layout_height="3dp"
             android:layout_marginBottom="@dimen/normal_space"
             android:layout_marginEnd="@dimen/key_line_1"
             android:layout_marginStart="@dimen/key_line_1"

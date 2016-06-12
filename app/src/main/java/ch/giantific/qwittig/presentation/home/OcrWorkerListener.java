@@ -20,5 +20,5 @@ public interface OcrWorkerListener extends BaseWorkerListener {
      * @param single    the {@link Single} that represents the ocr processing process
      * @param workerTag the tag of the worker
      */
-    void setOcrStream(@NonNull Single<String> single, @NonNull String workerTag);
+    void setOcrStream(@NonNull Single<Void> single, @NonNull String workerTag);
 }

@@ -11,8 +11,9 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
@@ -37,20 +38,10 @@ import rx.functions.Func1;
 public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
 
     private static final String STATE_ITEMS_SET = "STATE_ITEMS_SET";
-    private static final String STATE_OLD_STORE = "STATE_OLD_STORE";
-    private static final String STATE_OLD_DATE = "STATE_OLD_DATE";
-    private static final String STATE_OLD_CURRENCY = "STATE_OLD_CURRENCY";
-    private static final String STATE_OLD_EXCHANGE_RATE = "STATE_OLD_EXCHANGE_RATE";
-    private static final String STATE_OLD_NOTE = "STATE_OLD_NOTE";
     final String mEditPurchaseId;
     Purchase mEditPurchase;
     boolean mDeleteOldReceipt;
     private boolean mOldValuesSet;
-    private String mOldStore;
-    private Date mOldDate;
-    private String mOldCurrency;
-    private double mOldExchangeRate;
-    private String mOldNote;
 
     public EditPurchaseViewModelImpl(@Nullable Bundle savedState,
                                      @NonNull AddEditPurchaseViewModel.ViewListener view,
@@ -63,11 +54,6 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
 
         if (savedState != null) {
             mOldValuesSet = savedState.getBoolean(STATE_ITEMS_SET, false);
-            mOldStore = savedState.getString(STATE_OLD_STORE, "");
-            mOldDate = new Date(savedState.getLong(STATE_OLD_DATE));
-            mOldCurrency = savedState.getString(STATE_OLD_CURRENCY, "");
-            mOldExchangeRate = savedState.getDouble(STATE_OLD_EXCHANGE_RATE);
-            mOldNote = savedState.getString(STATE_OLD_NOTE, "");
         } else {
             mOldValuesSet = false;
         }
@@ -78,11 +64,6 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
         super.saveState(outState);
 
         outState.putBoolean(STATE_ITEMS_SET, mOldValuesSet);
-        outState.putString(STATE_OLD_STORE, mOldStore);
-        outState.putLong(STATE_OLD_DATE, mOldDate.getTime());
-        outState.putString(STATE_OLD_CURRENCY, mOldCurrency);
-        outState.putDouble(STATE_OLD_EXCHANGE_RATE, mOldExchangeRate);
-        outState.putString(STATE_OLD_NOTE, mOldNote);
     }
 
     @Override
@@ -131,45 +112,35 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
     }
 
     private void setOldPurchaseValues() {
-        // check if there is a receipt image file and update action bar menu accordingly
         mView.toggleReceiptMenuOption(mEditPurchase.hasReceipt());
 
-        // set note to value from original purchase
         final String oldNote = mEditPurchase.getNote();
-        mOldNote = oldNote != null ? oldNote : "";
-        mNote = mOldNote;
-        // check if purchase has a note and update action bar menu accordingly
+        mNote = oldNote != null ? oldNote : "";
         mView.toggleNoteMenuOption(!TextUtils.isEmpty(mNote));
 
-        // set store to value from original purchase
-        mOldStore = mEditPurchase.getStore();
-        setStore(mOldStore);
-
-        // set date to value from original purchase
-        mOldDate = mEditPurchase.getDate();
-        setDate(mOldDate);
-
-        // set currency from original purchase
-        mOldCurrency = mEditPurchase.getCurrency();
-        setCurrency(mOldCurrency);
-
-        // get original exchangeRate to convert prices
-        mOldExchangeRate = mEditPurchase.getExchangeRate();
-        setExchangeRate(mOldExchangeRate);
+        setStore(mEditPurchase.getStore());
+        setDate(mEditPurchase.getDate());
+        setCurrency(mEditPurchase.getCurrency());
+        setExchangeRate(mEditPurchase.getExchangeRate());
     }
 
     private void setOldItemValues() {
         final List<Item> oldItems = mEditPurchase.getItems();
+        final Set<String> oldItemIds = new HashSet<>(oldItems.size());
         for (Item item : oldItems) {
             final List<Identity> identities = item.getIdentities();
-            final String price = mMoneyFormatter.format(item.getPriceForeign(mOldExchangeRate));
+            final String price = mMoneyFormatter.format(item.getPriceForeign(mExchangeRate));
             final AddEditPurchaseItem purchaseAddEditItem =
                     new AddEditPurchaseItem(item.getName(), price, getItemUsers(identities));
             purchaseAddEditItem.setMoneyFormatter(mMoneyFormatter);
             purchaseAddEditItem.setPriceChangedListener(this);
             mItems.add(getLastPosition() - 1, purchaseAddEditItem);
             mView.notifyItemInserted(mItems.indexOf(purchaseAddEditItem));
+
+            oldItemIds.add(item.getObjectId());
         }
+
+        mPurchaseRepo.cacheOldEditItems(oldItemIds);
     }
 
     @NonNull
@@ -213,7 +184,7 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
     }
 
     @Override
-    void askToDiscard() {
+    public void onExitClick() {
         if (changesWereMade()) {
             mView.showDiscardEditChangesDialog();
         } else {
@@ -222,8 +193,8 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
     }
 
     private boolean changesWereMade() {
-        if (mOldDate.compareTo(mDate) != 0 || !mOldStore.equals(mStore) ||
-                !mOldCurrency.equals(mCurrency) || !mOldNote.equals(mNote)) {
+        if (mEditPurchase.getDate().compareTo(mDate) != 0 || !mEditPurchase.getStore().equals(mStore) ||
+                !mEditPurchase.getCurrency().equals(mCurrency) || !mEditPurchase.getNote().equals(mNote)) {
             return true;
         }
 
@@ -246,7 +217,7 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
                 return true;
             }
 
-            final double oldPrice = itemOld.getPriceForeign(mOldExchangeRate);
+            final double oldPrice = itemOld.getPriceForeign(mEditPurchase.getExchangeRate());
             final double newPrice = purchaseAddEditItem.parsePrice();
             if (Math.abs(oldPrice - newPrice) >= MoneyUtils.MIN_DIFF) {
                 return true;

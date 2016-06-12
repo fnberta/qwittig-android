@@ -101,7 +101,9 @@ public class LoginProfileFragment extends BaseFragment<LoginProfileViewModel, Ba
         final LoginFirstGroupFragment fragment = new LoginFirstGroupFragment();
         if (Utils.isRunningLollipopAndHigher()) {
             setExitTransition(new Slide(Gravity.START));
+            setAllowReturnTransitionOverlap(false);
             fragment.setEnterTransition(new Slide(Gravity.END));
+            fragment.setAllowEnterTransitionOverlap(false);
         }
 
         getFragmentManager().beginTransaction()

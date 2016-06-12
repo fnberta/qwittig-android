@@ -21,14 +21,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.bumptech.glide.request.target.Target;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.PieData;
 
 import ch.berta.fabio.fabprogress.FabProgress;
 import ch.berta.fabio.fabspeeddial.FabMenu;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.presentation.common.viewmodels.LoadingViewModel;
 import ch.giantific.qwittig.presentation.home.purchases.details.widgets.CircleDisplay;
 import ch.giantific.qwittig.presentation.navdrawer.BlurTransformation;
 import ch.giantific.qwittig.presentation.settings.profile.AvatarLoadListener;
@@ -68,28 +72,26 @@ public class BindingUtils {
     }
 
     @BindingAdapter({"avatarSquare", "fallback", "listener"})
-    public static void loadAvatarSquareListener(ImageView view, String avatarUrl,
-                                                Drawable fallback, final AvatarLoadListener listener) {
+    public static void loadAvatarSquare(ImageView view, String avatarUrl,
+                                        Drawable fallback, final AvatarLoadListener listener) {
         final Context context = view.getContext();
         Glide.with(context)
                 .load(avatarUrl)
-                .asBitmap()
                 .error(fallback)
-                .into(new BitmapImageViewTarget(view) {
+                .listener(new RequestListener<String, GlideDrawable>() {
                     @Override
-                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                        super.onResourceReady(resource, glideAnimation);
-
+                    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
                         listener.onAvatarLoaded();
+                        return false;
                     }
 
                     @Override
-                    public void onLoadFailed(Exception e, Drawable errorDrawable) {
-                        super.onLoadFailed(e, errorDrawable);
-
+                    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
                         listener.onAvatarLoaded();
+                        return false;
                     }
-                });
+                })
+                .into(view);
     }
 
     @BindingAdapter({"avatar", "fallback"})
@@ -123,6 +125,27 @@ public class BindingUtils {
         Glide.with(context)
                 .load(avatarUrl)
                 .bitmapTransform(new BlurTransformation(context))
+                .into(view);
+    }
+
+    @BindingAdapter({"receiptImage", "loadListener"})
+    public static void loadReceiptImage(ImageView view, String receiptUri, final LoadingViewModel listener) {
+        final Context context = view.getContext();
+        Glide.with(context)
+                .load(receiptUri)
+                .listener(new RequestListener<String, GlideDrawable>() {
+                    @Override
+                    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                        listener.setLoading(false);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                        listener.setLoading(false);
+                        return false;
+                    }
+                })
                 .into(view);
     }
 

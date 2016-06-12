@@ -170,6 +170,6 @@ public class Identity extends ParseObject implements Comparable<Identity> {
             compareRhs = nicknameRhs;
         }
 
-        return compareLhs.compareToIgnoreCase(compareRhs.toLowerCase());
+        return compareLhs.compareToIgnoreCase(compareRhs);
     }
 }

@@ -10,12 +10,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
-import android.webkit.MimeTypeMap;
-
-import com.parse.ParseException;
-import com.parse.ParseFile;
-import com.parse.ParseObject;
-import com.parse.SaveCallback;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
@@ -32,7 +26,6 @@ import ch.giantific.qwittig.presentation.settings.users.models.SettingsUsersUser
 import rx.Single;
 import rx.SingleSubscriber;
 import rx.functions.Func1;
-import timber.log.Timber;
 
 /**
  * Provides an implementation of the {@link SettingsUsersViewModel}.
@@ -193,8 +186,8 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
     public void onRemoveClick(final int position) {
         final SettingsUsersUserRowViewModel userItem = getItemAtPosition(position);
         final Identity identity = userItem.getIdentity();
-        if (identity.getBalance().equals(BigFraction.ZERO)) {
-            mView.showMessage(R.string.toast_balance_not_zero);
+        if (!identity.getBalance().equals(BigFraction.ZERO)) {
+            mView.showMessage(R.string.toast_del_identity_balance_not_zero);
             return;
         }
 

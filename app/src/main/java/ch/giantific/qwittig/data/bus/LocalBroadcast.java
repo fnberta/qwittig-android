@@ -7,7 +7,9 @@ package ch.giantific.qwittig.data.bus;
 import android.content.Intent;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -88,10 +90,12 @@ public class LocalBroadcast {
         send(intent);
     }
 
-    public void sendOcrPurchaseUpdated(boolean successful, @NonNull String ocrPurchaseId) {
+    public void sendOcrPurchaseUpdated(boolean successful, @Nullable String ocrPurchaseId) {
         final Intent intent = getIntent(DataType.OCR_PURCHASE_UPDATED);
         intent.putExtra(INTENT_EXTRA_SUCCESSFUL, successful);
-        intent.putExtra(INTENT_EXTRA_OCR_PURCHASE_ID, ocrPurchaseId);
+        if (!TextUtils.isEmpty(ocrPurchaseId)) {
+            intent.putExtra(INTENT_EXTRA_OCR_PURCHASE_ID, ocrPurchaseId);
+        }
         send(intent);
     }
 

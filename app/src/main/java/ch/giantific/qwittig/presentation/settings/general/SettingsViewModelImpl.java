@@ -103,7 +103,7 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
     @Override
     public void onLeaveGroupClick() {
         if (!BigFraction.ZERO.equals(mCurrentIdentity.getBalance())) {
-            mView.showMessage(R.string.toast_balance_not_zero);
+            mView.showMessage(R.string.toast_leave_group_balance_not_zero);
             return;
         }
 

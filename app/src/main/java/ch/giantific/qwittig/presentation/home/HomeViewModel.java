@@ -11,6 +11,7 @@ import android.support.annotation.StringRes;
 
 import ch.berta.fabio.fabspeeddial.FabMenuClickListener;
 import ch.berta.fabio.fabspeeddial.ProgressFinalAnimationListener;
+import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 
 /**
@@ -28,6 +29,10 @@ public interface HomeViewModel extends ViewModel,
     @Bindable
     boolean isAnimStop();
 
+    void startProgress();
+
+    void stopProgress(boolean animate);
+
     @Bindable
     boolean isDraftsAvailable();
 
@@ -38,7 +43,7 @@ public interface HomeViewModel extends ViewModel,
     void handleInvitation(@NonNull String identityId, @NonNull String groupName,
                           @NonNull String inviterNickname);
 
-    void onReceiptImageTaken(@NonNull String receiptImagePath);
+    void onReceiptImageTaken(@NonNull byte[] receipt);
 
     void onReceiptImageFailed();
 
@@ -64,7 +69,7 @@ public interface HomeViewModel extends ViewModel,
 
         void captureImage();
 
-        void loadOcrWorker(@NonNull String receiptImagePath);
+        void loadOcrWorker(@NonNull byte[] receipt);
 
         void startPurchaseAddScreen(@Nullable String ocrPurchaseId);
     }

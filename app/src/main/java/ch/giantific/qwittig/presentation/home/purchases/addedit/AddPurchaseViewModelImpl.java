@@ -135,6 +135,16 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
     }
 
     @Override
+    public NumberFormat getMoneyFormatter() {
+        return mMoneyFormatter;
+    }
+
+    @Override
+    public List<String> getSupportedCurrencies() {
+        return mSupportedCurrencies;
+    }
+
+    @Override
     @Bindable
     public String getDate() {
         return mDateFormatter.format(mDate);
@@ -147,19 +157,25 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
     }
 
     @Override
+    public void onDateSet(@NonNull Date date) {
+        setDate(date);
+    }
+
+    @Override
+    public void onDateClick(View view) {
+        mView.showDatePickerDialog();
+    }
+
+    @Override
     @Bindable
     public String getStore() {
         return mStore;
     }
 
-    public void setStore(String store) {
+    @Override
+    public void setStore(@NonNull String store) {
         mStore = store;
         notifyPropertyChanged(BR.store);
-    }
-
-    @Override
-    public void onStoreChanged(CharSequence s, int start, int before, int count) {
-        mStore = s.toString();
     }
 
     @Override
@@ -187,16 +203,6 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
     }
 
     @Override
-    public NumberFormat getMoneyFormatter() {
-        return mMoneyFormatter;
-    }
-
-    @Override
-    public List<String> getSupportedCurrencies() {
-        return mSupportedCurrencies;
-    }
-
-    @Override
     @Bindable
     public String getCurrency() {
         return mCurrency;
@@ -216,6 +222,39 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
     }
 
     @Override
+    public void onCurrencySelected(@NonNull AdapterView<?> parent, View view, int position, long id) {
+        final String currency = (String) parent.getItemAtPosition(position);
+        if (currency.equals(mCurrency)) {
+            return;
+        }
+
+        mCurrency = currency;
+        mMoneyFormatter = MoneyUtils.getMoneyFormatter(currency, false, true);
+
+        // TODO: only needed once we support currencies with other than 2 decimal values
+//        updateItemsPriceFormatting();
+        // update total price and my share formatting
+//        notifyPropertyChanged(BR.totalPrice);
+//        notifyPropertyChanged(BR.myShare);
+
+        // update my share currency field
+        notifyPropertyChanged(BR.currency);
+
+        // get new exchange rate
+        mView.loadFetchExchangeRatesWorker(mCurrentGroup.getCurrency(), mCurrency);
+    }
+
+    private void updateItemsPriceFormatting() {
+        for (int i = 0, size = mItems.size(); i < size; i++) {
+            final AddEditPurchaseBaseItem addEditItem = mItems.get(i);
+            if (addEditItem.getType() == Type.ITEM) {
+                final AddEditPurchaseItem purchaseAddEditItem = (AddEditPurchaseItem) addEditItem;
+                purchaseAddEditItem.updatePriceFormat(mMoneyFormatter);
+            }
+        }
+    }
+
+    @Override
     @Bindable
     public String getExchangeRate() {
         return mExchangeRateFormatter.format(mExchangeRate);
@@ -232,6 +271,131 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
     @Bindable
     public boolean isExchangeRateVisible() {
         return mExchangeRate != 1;
+    }
+
+    @Override
+    public void onExchangeRateClick(View view) {
+        mView.showManualExchangeRateSelectorDialog(((TextView) view).getText().toString());
+    }
+
+    @Override
+    public void onExchangeRateManuallySet(double exchangeRate) {
+        final BigDecimal roundedExchangeRate = MoneyUtils.roundExchangeRate(exchangeRate);
+        setExchangeRate(roundedExchangeRate.doubleValue());
+    }
+
+    @Override
+    public void setRateFetchStream(@NonNull Single<Float> single,
+                                   @NonNull final String workerTag) {
+        getSubscriptions().add(single
+                .subscribe(new SingleSubscriber<Float>() {
+                    @Override
+                    public void onSuccess(Float exchangeRate) {
+                        mView.removeWorker(workerTag);
+                        mFetchingExchangeRates = false;
+
+                        setExchangeRate(exchangeRate);
+                    }
+
+                    @Override
+                    public void onError(Throwable error) {
+                        mView.removeWorker(workerTag);
+                        mFetchingExchangeRates = false;
+
+                        mView.showMessageWithAction(R.string.toast_error_exchange_rate,
+                                new MessageAction(R.string.action_retry) {
+                                    @Override
+                                    public void onClick(View v) {
+                                        mView.loadFetchExchangeRatesWorker(mCurrentGroup.getCurrency(), mCurrency);
+                                    }
+                                });
+                    }
+                })
+        );
+    }
+
+    @Override
+    public void onAddNoteMenuClick() {
+        mView.showAddEditNoteDialog(mNote);
+    }
+
+    @Override
+    public void onShowNoteMenuClick() {
+        mView.showNote(mNote);
+    }
+
+    @Override
+    public void onNoteSet(@NonNull String note) {
+        mNote = note;
+        final boolean noteEmpty = TextUtils.isEmpty(note);
+        mView.toggleNoteMenuOption(!noteEmpty);
+        if (noteEmpty) {
+            mView.showMessage(R.string.toast_note_deleted);
+        }
+    }
+
+    @Override
+    public void onShowReceiptImageMenuClick() {
+        mView.showReceiptImage(mReceiptImagePath);
+    }
+
+    @Override
+    public void onDeleteReceiptImageMenuClick() {
+        mView.toggleReceiptMenuOption(false);
+        mView.showMessage(R.string.toast_receipt_deleted);
+        deleteReceiptImage();
+        mReceiptImagePath = "";
+    }
+
+    private void deleteReceiptImage() {
+        final File receipt = new File(mReceiptImagePath);
+        boolean fileDeleted = receipt.delete();
+        if (!fileDeleted && BuildConfig.DEBUG) {
+            Timber.e("failed to delete file");
+        }
+    }
+
+    @Override
+    public void onRowPriceChanged() {
+        updateTotalAndMyShare();
+    }
+
+    private void updateTotalAndMyShare() {
+        double totalPrice = 0;
+        double myShare = 0;
+        final String currentIdentityId = mCurrentIdentity.getObjectId();
+        for (AddEditPurchaseBaseItem addEditItem : mItems) {
+            if (addEditItem.getType() != Type.ITEM) {
+                continue;
+            }
+
+            final AddEditPurchaseItem purchaseAddEditItem = (AddEditPurchaseItem) addEditItem;
+            final double itemPrice = purchaseAddEditItem.parsePrice();
+
+            // update total price
+            totalPrice += itemPrice;
+
+            // update my share
+            final AddEditPurchaseItemUsersUser[] itemUsersRows = purchaseAddEditItem.getUsers();
+            int selectedCount = 0;
+            boolean currentIdentityInvolved = false;
+            for (AddEditPurchaseItemUsersUser addEditPurchaseItemUsersUser : itemUsersRows) {
+                if (!addEditPurchaseItemUsersUser.isSelected()) {
+                    continue;
+                }
+
+                selectedCount++;
+                if (addEditPurchaseItemUsersUser.getObjectId().equals(currentIdentityId)) {
+                    currentIdentityInvolved = true;
+                }
+            }
+            if (currentIdentityInvolved) {
+                myShare += (itemPrice / selectedCount);
+            }
+        }
+
+        setTotalPrice(totalPrice);
+        setMyShare(myShare);
     }
 
     @Override
@@ -292,113 +456,13 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
         final AddEditPurchaseItemUsersUser[] itemUsersRow = new AddEditPurchaseItemUsersUser[size];
         for (int i = 0; i < size; i++) {
             final Identity identity = mIdentities.get(i);
-            if (identities.contains(identity)) {
-                itemUsersRow[i] = new AddEditPurchaseItemUsersUser(identity.getObjectId(),
-                        identity.getNickname(), identity.getAvatarUrl(), true);
-            } else {
-                itemUsersRow[i] = new AddEditPurchaseItemUsersUser(identity.getObjectId(),
-                        identity.getNickname(), identity.getAvatarUrl(), false);
-            }
+            itemUsersRow[i] = new AddEditPurchaseItemUsersUser(identity.getObjectId(),
+                    identity.getNickname(), identity.getAvatarUrl(), identities.contains(identity));
         }
 
         return itemUsersRow;
     }
 
-    @Override
-    public void onDateSet(@NonNull Date date) {
-        setDate(date);
-    }
-
-    @Override
-    public void onDateClick(View view) {
-        mView.showDatePickerDialog();
-    }
-
-    @Override
-    public void onNoteSet(@NonNull String note) {
-        mNote = note;
-        final boolean noteEmpty = TextUtils.isEmpty(note);
-        mView.toggleNoteMenuOption(!noteEmpty);
-        if (noteEmpty) {
-            mView.showMessage(R.string.toast_note_deleted);
-        }
-    }
-
-    @Override
-    public void onCurrencySelected(@NonNull AdapterView<?> parent, View view, int position, long id) {
-        final String currency = (String) parent.getItemAtPosition(position);
-        if (currency.equals(mCurrency)) {
-            return;
-        }
-
-        mCurrency = currency;
-        mMoneyFormatter = MoneyUtils.getMoneyFormatter(currency, false, true);
-
-        // TODO: only needed once we support currencies with other than 2 decimal values
-//        updateItemsPriceFormatting();
-        // update total price and my share formatting
-//        notifyPropertyChanged(BR.totalPrice);
-//        notifyPropertyChanged(BR.myShare);
-
-        // update my share currency field
-        notifyPropertyChanged(BR.currency);
-
-        // get new exchange rate
-        mView.loadFetchExchangeRatesWorker(mCurrentGroup.getCurrency(), mCurrency);
-    }
-
-    private void updateItemsPriceFormatting() {
-        for (int i = 0, size = mItems.size(); i < size; i++) {
-            final AddEditPurchaseBaseItem addEditItem = mItems.get(i);
-            if (addEditItem.getType() == Type.ITEM) {
-                final AddEditPurchaseItem purchaseAddEditItem = (AddEditPurchaseItem) addEditItem;
-                purchaseAddEditItem.updatePriceFormat(mMoneyFormatter);
-            }
-        }
-    }
-
-    @Override
-    public void onRowPriceChanged() {
-        updateTotalAndMyShare();
-    }
-
-    private void updateTotalAndMyShare() {
-        double totalPrice = 0;
-        double myShare = 0;
-        final String currentIdentityId = mCurrentIdentity.getObjectId();
-        for (AddEditPurchaseBaseItem addEditItem : mItems) {
-            if (addEditItem.getType() != Type.ITEM) {
-                continue;
-            }
-
-            final AddEditPurchaseItem purchaseAddEditItem = (AddEditPurchaseItem) addEditItem;
-            final double itemPrice = purchaseAddEditItem.parsePrice();
-
-            // update total price
-            totalPrice += itemPrice;
-
-            // update my share
-            final AddEditPurchaseItemUsersUser[] itemUsersRows = purchaseAddEditItem.getUsers();
-            int selectedCount = 0;
-            boolean currentIdentityInvolved = false;
-            for (AddEditPurchaseItemUsersUser addEditPurchaseItemUsersUser : itemUsersRows) {
-                if (!addEditPurchaseItemUsersUser.isSelected()) {
-                    continue;
-                }
-
-                selectedCount++;
-                if (addEditPurchaseItemUsersUser.getObjectId().equals(currentIdentityId)) {
-                    currentIdentityInvolved = true;
-                }
-            }
-            if (currentIdentityInvolved) {
-                myShare += (itemPrice / selectedCount);
-            }
-        }
-
-        setTotalPrice(totalPrice);
-        setMyShare(myShare);
-    }
 
     @Override
     public int getItemViewType(int position) {
@@ -495,47 +559,6 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
     @Override
     public void onReceiptImageTakeFailed() {
         mView.showMessage(R.string.toast_create_image_file_failed);
-    }
-
-    @Override
-    public void setRateFetchStream(@NonNull Single<Float> single,
-                                   @NonNull final String workerTag) {
-        getSubscriptions().add(single
-                .subscribe(new SingleSubscriber<Float>() {
-                    @Override
-                    public void onSuccess(Float exchangeRate) {
-                        mView.removeWorker(workerTag);
-                        mFetchingExchangeRates = false;
-
-                        setExchangeRate(exchangeRate);
-                    }
-
-                    @Override
-                    public void onError(Throwable error) {
-                        mView.removeWorker(workerTag);
-                        mFetchingExchangeRates = false;
-
-                        mView.showMessageWithAction(R.string.toast_error_exchange_rate,
-                                new MessageAction(R.string.action_retry) {
-                                    @Override
-                                    public void onClick(View v) {
-                                        mView.loadFetchExchangeRatesWorker(mCurrentGroup.getCurrency(), mCurrency);
-                                    }
-                                });
-                    }
-                })
-        );
-    }
-
-    @Override
-    public void onExchangeRateClick(View view) {
-        mView.showManualExchangeRateSelectorDialog(((TextView) view).getText().toString());
-    }
-
-    @Override
-    public void onExchangeRateManuallySet(double exchangeRate) {
-        final BigDecimal roundedExchangeRate = MoneyUtils.roundExchangeRate(exchangeRate);
-        setExchangeRate(roundedExchangeRate.doubleValue());
     }
 
     @Override
@@ -704,46 +727,7 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
     }
 
     @Override
-    public void onShowReceiptImageMenuClick() {
-        mView.showReceiptImage(mReceiptImagePath);
-    }
-
-    @Override
-    public void onDeleteReceiptImageMenuClick() {
-        mView.toggleReceiptMenuOption(false);
-        mView.showMessage(R.string.toast_receipt_deleted);
-        deleteReceiptImage();
-        mReceiptImagePath = "";
-    }
-
-    private void deleteReceiptImage() {
-        final File receipt = new File(mReceiptImagePath);
-        boolean fileDeleted = receipt.delete();
-        if (!fileDeleted && BuildConfig.DEBUG) {
-            Timber.e("failed to delete file");
-        }
-    }
-
-    @Override
-    public void onAddNoteMenuClick() {
-        mView.showAddEditNoteDialog(mNote);
-    }
-
-    @Override
-    public void onShowNoteMenuClick() {
-        mView.showNote(mNote);
-    }
-
-    @Override
     public void onExitClick() {
-        askToDiscard();
-    }
-
-    /**
-     * Asks the user if he really wants to discard the purchase or if he wants to save it as a
-     * draft instead. EditImpl will show different dialog.
-     */
-    void askToDiscard() {
         mView.showPurchaseDiscardDialog();
     }
 

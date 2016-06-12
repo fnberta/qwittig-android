@@ -4,7 +4,6 @@
 
 package ch.giantific.qwittig.presentation.helpfeedback;
 
-import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
@@ -16,8 +15,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.google.android.gms.appinvite.AppInviteInvitation;
 
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
@@ -124,32 +121,32 @@ public class HelpFeedbackFragment extends BaseRecyclerViewFragment<HelpFeedbackV
     @Override
     public void startAppInvite() {
         // TODO: customize email HTML message
-        final Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.recommend_title))
-                .setMessage(getString(R.string.recommend_message))
-                .setCallToActionText(getString(R.string.recommend_CTA))
-                // TODO: add iOS
+//        final Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.recommend_title))
+//                .setMessage(getString(R.string.recommend_message))
+//                .setCallToActionText(getString(R.string.recommend_CTA))
+        // TODO: add iOS
 //                .setOtherPlatformsTargetApplication(PlatformMode.PROJECT_PLATFORM_IOS, getString(R.string.recommend_ios_id))
-                .build();
-        try {
-            startActivityForResult(intent, RC_INVITE);
-        } catch (ActivityNotFoundException e) {
-            showMessage(R.string.toast_error_not_supported);
-        }
+//                .build();
+//        try {
+//            startActivityForResult(intent, RC_INVITE);
+//        } catch (ActivityNotFoundException e) {
+//            showMessage(R.string.toast_error_not_supported);
+//        }
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        switch (requestCode) {
-            case RC_INVITE:
-                if (resultCode == Activity.RESULT_OK) {
-                    final String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
-                    showMessage(R.string.toast_recommend_sent, ids.length);
-                } else {
-                    showMessage(R.string.toast_recommend_failed);
-                }
-                break;
-        }
+//        switch (requestCode) {
+//            case RC_INVITE:
+//                if (resultCode == Activity.RESULT_OK) {
+//                    final String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
+//                    showMessage(R.string.toast_recommend_sent, ids.length);
+//                } else {
+//                    showMessage(R.string.toast_recommend_failed);
+//                }
+//                break;
+//        }
     }
 }

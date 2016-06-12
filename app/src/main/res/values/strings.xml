@@ -93,7 +93,7 @@
     <string name="toast_min_one_item">Add at least one item</string>
     <string name="pref_category_me">Me</string>
     <string name="pref_category_current_group">Current group</string>
-    <string name="toast_balance_not_zero">Please clear all outstanding debts and credits before leaving this group</string>
+    <string name="toast_leave_group_balance_not_zero">Please clear all outstanding debts and credits before leaving this group</string>
     <string name="dialog_positive_leave">Leave</string>
     <string name="dialog_positive_reset">Reset</string>
     <string name="dialog_group_join_title">Join %1$s?</string>
@@ -331,5 +331,7 @@
     <string name="toast_error_join_group">Failed to join the new group. Please try again.</string>
     <string name="header_settings_group_add">New group</string>
     <string name="header_login_first_group">First group</string>
+    <string name="push_purchase_ocr_failed_title">Processing failed</string>
+    <string name="toast_del_identity_balance_not_zero">Clear all outstanding debts and credits before deleting this user</string>
 
 </resources>
