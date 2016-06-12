@@ -84,7 +84,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     public static final String PUSH_PARAM_TASK_TIME_FRAME = "timeFrame";
     public static final String PUSH_PARAM_TASK_EVENT_FINISHER_ID = "finisherId";
     public static final String PUSH_PARAM_COMP_DID_CALC_NEW = "didCalcNew";
-    public static final String PUSH_PARAM_OCR_PURCHASE_ID= "ocrPurchaseId";
+    public static final String PUSH_PARAM_OCR_DATA_ID = "ocrDataId";
     public static final String INTENT_EXTRA_FINANCE_FRAGMENT = "INTENT_EXTRA_FINANCE_FRAGMENT";
     private static final String NOTIFICATION_TYPE = "type";
     private static final String TYPE_PURCHASE_OCR_SUCCEEDED = "ocrSucceeded";
@@ -221,8 +221,8 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
         final String type = getNotificationType(intent);
         switch (type) {
             case TYPE_PURCHASE_OCR_SUCCEEDED: {
-                final String ocrPurchaseId = jsonExtras.optString(PUSH_PARAM_OCR_PURCHASE_ID);
-                ParseQueryService.startUpdateObject(context, OcrData.CLASS, ocrPurchaseId, true);
+                final String ocrDataId = jsonExtras.optString(PUSH_PARAM_OCR_DATA_ID);
+                ParseQueryService.startUpdateObject(context, OcrData.CLASS, ocrDataId, true);
                 break;
             }
             case TYPE_PURCHASE_OCR_FAILED: {

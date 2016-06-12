@@ -100,6 +100,12 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
     }
 
     @Override
+    @Bindable
+    public boolean isGroupEmpty() {
+        return mItems.isEmpty();
+    }
+
+    @Override
     public void loadData() {
         final Group group = mCurrentIdentity.getGroup();
         final String currentId = mCurrentIdentity.getObjectId();
@@ -125,6 +131,7 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
                         if (!items.isEmpty()) {
                             mItems.addAll(items);
                         }
+                        notifyPropertyChanged(BR.groupEmpty);
                         mView.notifyDataSetChanged();
                     }
 
@@ -197,6 +204,7 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
                     public void onSuccess(Identity value) {
                         mItems.remove(position);
                         mView.notifyItemRemoved(position);
+                        notifyPropertyChanged(BR.groupEmpty);
                         mView.showMessage(R.string.toast_settings_users_removed);
                     }
 
@@ -239,6 +247,7 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
                         mView.toggleProgressDialog(false);
 
                         mItems.add(new SettingsUsersUserRowViewModel(identity));
+                        notifyPropertyChanged(BR.groupEmpty);
                         mView.notifyItemInserted(getLastPosition());
 
                         setValidate(false);

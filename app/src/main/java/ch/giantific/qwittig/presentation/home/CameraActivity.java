@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.home.purchases.addedit;
+package ch.giantific.qwittig.presentation.home;
 
 import android.content.Intent;
 import android.graphics.Bitmap;

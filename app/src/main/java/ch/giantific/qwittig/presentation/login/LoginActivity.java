@@ -36,7 +36,7 @@ public class LoginActivity extends BaseActivity<LoginAccountsViewModel> implemen
         LoginWorkerListener {
 
     public static final String FRAGMENT_LOGIN = "FRAGMENT_LOGIN";
-    private static final String GOOGLE_SERVER_ID = "982871908066-1scsmdngvfsj68t7kq5o42t35oubujme.apps.googleusercontent.com";
+    private static final String GOOGLE_SERVER_ID = "1027430235430-ut0u3v7uh443akc3q6s3rhhvu3pfrsgi.apps.googleusercontent.com";
     private static final int RC_SIGN_IN = 9001;
     private GoogleApiClient mGoogleApiClient;
     private LoginEmailViewModel mEmailViewModel;

@@ -23,14 +23,19 @@ import dagger.Provides;
 @Module
 public class LoginProfileViewModelModule extends BaseViewModelModule<LoginProfileViewModel.ViewListener> {
 
+    private boolean mWithInvitation;
+
     public LoginProfileViewModelModule(@Nullable Bundle savedState,
-                                       @NonNull LoginProfileViewModel.ViewListener view) {
+                                       @NonNull LoginProfileViewModel.ViewListener view,
+                                       boolean withInvitation) {
         super(savedState, view);
+
+        mWithInvitation = withInvitation;
     }
 
     @PerScreen
     @Provides
     LoginProfileViewModel providesLoginProfileViewModel(@NonNull UserRepository userRepository) {
-        return new LoginProfileViewModelImpl(mSavedState, mView, userRepository);
+        return new LoginProfileViewModelImpl(mSavedState, mView, userRepository, mWithInvitation);
     }
 }

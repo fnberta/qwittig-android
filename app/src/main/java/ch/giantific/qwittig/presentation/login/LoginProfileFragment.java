@@ -35,6 +35,7 @@ import ch.giantific.qwittig.utils.Utils;
 public class LoginProfileFragment extends BaseFragment<LoginProfileViewModel, BaseFragment.ActivityListener>
         implements LoginProfileViewModel.ViewListener {
 
+    private static final String KEY_WITH_INVITATION = "WITH_INVITATION";
     private static final int INTENT_REQUEST_IMAGE = 1;
     private FragmentLoginProfileBinding mBinding;
 
@@ -42,13 +43,22 @@ public class LoginProfileFragment extends BaseFragment<LoginProfileViewModel, Ba
         // required empty constructor
     }
 
+    public static LoginProfileFragment newInstance(boolean withInvitation) {
+        final LoginProfileFragment fragment = new LoginProfileFragment();
+        final Bundle args = new Bundle();
+        args.putBoolean(KEY_WITH_INVITATION, withInvitation);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        final boolean withInvitation = getArguments().getBoolean(KEY_WITH_INVITATION, false);
         DaggerLoginProfileComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(getActivity()))
-                .loginProfileViewModelModule(new LoginProfileViewModelModule(savedInstanceState, this))
+                .loginProfileViewModelModule(new LoginProfileViewModelModule(savedInstanceState, this, withInvitation))
                 .build()
                 .inject(this);
     }

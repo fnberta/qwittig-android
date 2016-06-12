@@ -75,7 +75,7 @@ public class LoginAccountsViewModelImpl extends ViewModelBaseImpl<LoginAccountsV
                     public void onSuccess(User user) {
                         mView.removeWorker(workerTag);
                         if (user.isNew()) {
-                            mView.showProfileFragment();
+                            mView.showProfileFragment(!TextUtils.isEmpty(mIdentityId));
                         } else {
                             mView.finishScreen(Activity.RESULT_OK);
                         }

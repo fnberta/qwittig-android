@@ -242,7 +242,7 @@ public class LoginWorker extends BaseWorker<User, LoginWorkerListener> {
             }
             case Type.LOGIN_FACEBOOK: {
                 final String identityId = args.getString(KEY_IDENTITY_ID, "");
-                return mUserRepo.loginFacebook(this, identityId).toObservable();
+                return mUserRepo.loginFacebook(getActivity(), identityId).toObservable();
             }
             case Type.LOGIN_GOOGLE: {
                 final String username = args.getString(KEY_USERNAME, "");

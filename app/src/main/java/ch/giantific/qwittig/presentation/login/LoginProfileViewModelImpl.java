@@ -12,9 +12,7 @@ import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
-import rx.Observable;
 import rx.Subscriber;
-import rx.functions.Func1;
 
 /**
  * Created by fabio on 01.05.16.
@@ -25,14 +23,18 @@ public class LoginProfileViewModelImpl extends ViewModelBaseImpl<LoginProfileVie
     private static final String STATE_VALIDATE = "STATE_VALIDATE";
     private static final String STATE_AVATAR = "STATE_AVATAR";
     private static final String STATE_NICKNAME = "STATE_NICKNAME";
+    private boolean mWithInvitation;
     private String mAvatar;
     private String mNickname;
     private boolean mValidate;
 
     public LoginProfileViewModelImpl(@Nullable Bundle savedState,
                                      @NonNull LoginProfileViewModel.ViewListener view,
-                                     @NonNull UserRepository userRepository) {
+                                     @NonNull UserRepository userRepository,
+                                     boolean withInvitation) {
         super(savedState, view, userRepository);
+
+        mWithInvitation = withInvitation;
 
         if (savedState != null) {
             mValidate = savedState.getBoolean(STATE_VALIDATE);
@@ -114,32 +116,35 @@ public class LoginProfileViewModelImpl extends ViewModelBaseImpl<LoginProfileVie
 
         if (!TextUtils.isEmpty(mAvatar) && !mAvatar.equals(mCurrentIdentity.getAvatarUrl())) {
             getSubscriptions().add(mUserRepo.saveCurrentUserIdentitiesWithAvatar(mNickname, mAvatar)
-                .subscribe(new Subscriber<Identity>() {
-                    @Override
-                    public void onCompleted() {
-                        // TODO: add real check if it's default group or not
-                        if (mCurrentIdentity.getGroup().getName().equals("Qwittig")) {
-                            mView.showFirstGroupFragment();
-                        } else {
-                            mView.finishScreen(Activity.RESULT_OK);
+                    .subscribe(new Subscriber<Identity>() {
+                        @Override
+                        public void onCompleted() {
+                            if (mWithInvitation) {
+                                mView.finishScreen(Activity.RESULT_OK);
+                            } else {
+                                mView.showFirstGroupFragment();
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        // TODO: handle error
-                    }
+                        @Override
+                        public void onError(Throwable e) {
+                            // TODO: handle error
+                        }
 
-                    @Override
-                    public void onNext(Identity identity) {
-                        // do nothing
-                    }
-                })
+                        @Override
+                        public void onNext(Identity identity) {
+                            // do nothing
+                        }
+                    })
             );
         } else {
             mCurrentIdentity.setNickname(mNickname);
             mCurrentIdentity.saveEventually();
-            mView.showFirstGroupFragment();
+            if (mWithInvitation) {
+                mView.finishScreen(Activity.RESULT_OK);
+            } else {
+                mView.showFirstGroupFragment();
+            }
         }
     }
 

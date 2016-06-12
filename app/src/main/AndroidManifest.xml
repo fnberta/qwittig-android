@@ -180,7 +180,7 @@
             android:theme="@style/AppTheme.SlideEnd"
             />
         <activity
-            android:name=".presentation.home.purchases.addedit.CameraActivity"
+            android:name=".presentation.home.CameraActivity"
             android:label="@string/title_activity_camera"
             android:screenOrientation="portrait"
             />

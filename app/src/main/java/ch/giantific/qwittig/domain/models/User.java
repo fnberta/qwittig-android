@@ -186,5 +186,9 @@ public class User extends ParseUser {
 
         return null;
     }
+
+    public boolean isVanilla() {
+        return getIdentities().isEmpty();
+    }
 }
 

@@ -9,6 +9,8 @@
 
     <data>
 
+        <import type="android.view.View"/>
+
         <variable
             name="viewModel"
             type="ch.giantific.qwittig.presentation.settings.users.SettingsUsersViewModel"
@@ -107,6 +109,7 @@
                 android:paddingEnd="@dimen/key_line_1"
                 android:paddingStart="@dimen/key_line_1"
                 android:text="@string/header_settings_users_existing"
+                android:visibility="@{viewModel.groupEmpty ? View.GONE : View.VISIBLE}"
                 />
 
             <TextView
@@ -119,6 +122,7 @@
                 android:layout_marginEnd="@dimen/key_line_1"
                 android:layout_marginStart="@dimen/key_line_1"
                 android:text="@string/desc_user_invite_existing"
+                android:visibility="@{viewModel.groupEmpty ? View.GONE : View.VISIBLE}"
                 />
 
             <android.support.v7.widget.RecyclerView
@@ -126,6 +130,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/tv_settings_users_desc_existing"
+                android:visibility="@{viewModel.groupEmpty ? View.GONE : View.VISIBLE}"
                 />
         </RelativeLayout>
 

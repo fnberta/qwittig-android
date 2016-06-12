@@ -158,8 +158,8 @@ public class LoginAccountsFragment extends BaseFragment<LoginAccountsViewModel, 
     }
 
     @Override
-    public void showProfileFragment() {
-        final LoginProfileFragment fragment = new LoginProfileFragment();
+    public void showProfileFragment(boolean withInvitation) {
+        final LoginProfileFragment fragment = LoginProfileFragment.newInstance(withInvitation);
         if (Utils.isRunningLollipopAndHigher()) {
             setExitTransition(new Slide(Gravity.START));
             setAllowReturnTransitionOverlap(false);

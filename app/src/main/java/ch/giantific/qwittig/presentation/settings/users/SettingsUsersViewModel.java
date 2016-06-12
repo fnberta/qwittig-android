@@ -34,6 +34,9 @@ public interface SettingsUsersViewModel extends ListViewModel<SettingsUsersUserR
 
     void setValidate(boolean validate);
 
+    @Bindable
+    boolean isGroupEmpty();
+
     void onNewAvatarTaken(@NonNull String avatarPath);
 
     void onNicknameChanged(CharSequence s, int start, int before, int count);

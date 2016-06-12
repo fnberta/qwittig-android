@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
@@ -46,7 +47,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.data.push.PushBroadcastReceiver;
@@ -252,13 +252,14 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
     }
 
     @Override
-    public Single<User> loginFacebook(@NonNull final Fragment fragment, @NonNull final String identityId) {
+    public Single<User> loginFacebook(@NonNull final FragmentActivity activity,
+                                      @NonNull final String identityId) {
         return Single
                 .create(new Single.OnSubscribe<User>() {
                     @Override
                     public void call(final SingleSubscriber<? super User> singleSubscriber) {
                         final List<String> permissions = Arrays.asList("public_profile", "email");
-                        ParseFacebookUtils.logInWithReadPermissionsInBackground(fragment, permissions, new LogInCallback() {
+                        ParseFacebookUtils.logInWithReadPermissionsInBackground(activity, permissions, new LogInCallback() {
                             @Override
                             public void done(ParseUser user, ParseException e) {
                                 if (singleSubscriber.isUnsubscribed()) {
@@ -277,12 +278,12 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                 .flatMap(new Func1<User, Single<User>>() {
                     @Override
                     public Single<User> call(final User user) {
-                        if (user.isNew()) {
+                        if (user.isVanilla()) {
                             return addFirstGroup(user, identityId)
                                     .flatMap(new Func1<Identity, Single<? extends User>>() {
                                         @Override
                                         public Single<? extends User> call(Identity identity) {
-                                            return setFacebookData(user, identity, fragment);
+                                            return setFacebookData(activity, user, identity);
                                         }
                                     });
                         }
@@ -306,8 +307,9 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                 });
     }
 
-    private Single<User> setFacebookData(@NonNull final User user, @NonNull final Identity identity,
-                                         @NonNull final Fragment fragment) {
+    private Single<User> setFacebookData(@NonNull final FragmentActivity activity,
+                                         @NonNull final User user,
+                                         @NonNull final Identity identity) {
         return Single
                 .create(new Single.OnSubscribe<JSONObject>() {
                     @Override
@@ -346,7 +348,7 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                         }
 
                         final String id = facebookData.optString("id");
-                        return getFacebookUserAvatar(fragment, id);
+                        return getFacebookUserAvatar(activity, id);
                     }
                 })
                 .flatMap(new Func1<ParseFile, Single<? extends User>>() {
@@ -358,14 +360,14 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                 });
     }
 
-    private Single<ParseFile> getFacebookUserAvatar(@NonNull final Fragment fragment,
+    private Single<ParseFile> getFacebookUserAvatar(@NonNull final FragmentActivity activity,
                                                     @NonNull String facebookId) {
         final String pictureUrl = "http://graph.facebook.com/" + facebookId + "/picture?type=large";
         return Single
                 .create(new Single.OnSubscribe<byte[]>() {
                     @Override
                     public void call(final SingleSubscriber<? super byte[]> singleSubscriber) {
-                        Glide.with(fragment)
+                        Glide.with(activity)
                                 .load(pictureUrl)
                                 .asBitmap()
                                 .toBytes(Bitmap.CompressFormat.JPEG, UserRepository.JPEG_COMPRESSION_RATE)
@@ -414,7 +416,7 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                 .flatMap(new Func1<User, Single<User>>() {
                     @Override
                     public Single<User> call(final User user) {
-                        if (user.isNew()) {
+                        if (user.isVanilla()) {
                             return addFirstGroup(user, identityId)
                                     .flatMap(new Func1<Identity, Single<? extends User>>() {
                                         @Override

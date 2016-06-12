@@ -19,6 +19,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.text.TextUtils;
 import android.transition.Slide;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -242,7 +243,8 @@ public class LoginEmailFragment extends BaseFragment<LoginEmailViewModel, LoginE
 
     @Override
     public void showProfileFragment() {
-        final LoginProfileFragment fragment = new LoginProfileFragment();
+        final String identityId = getArguments().getString(KEY_IDENTITY_ID, "");
+        final LoginProfileFragment fragment = LoginProfileFragment.newInstance(!TextUtils.isEmpty(identityId));
         if (Utils.isRunningLollipopAndHigher()) {
             setExitTransition(new Slide(Gravity.START));
             setAllowReturnTransitionOverlap(false);

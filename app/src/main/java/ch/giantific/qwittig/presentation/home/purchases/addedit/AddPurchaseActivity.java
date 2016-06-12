@@ -30,7 +30,6 @@ import ch.giantific.qwittig.data.push.PushBroadcastReceiver;
 import ch.giantific.qwittig.databinding.ActivityPurchaseAddEditBinding;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.TransitionListenerAdapter;
-import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesFragment;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.Utils;
 import rx.Single;
@@ -131,7 +130,7 @@ public class AddPurchaseActivity extends BaseActivity<AddEditPurchaseViewModel> 
         if (TextUtils.isEmpty(ocrPurchaseId)) {
             try {
                 final JSONObject jsonExtras = PushBroadcastReceiver.getData(intent);
-                ocrPurchaseId = jsonExtras.optString(PushBroadcastReceiver.PUSH_PARAM_OCR_PURCHASE_ID);
+                ocrPurchaseId = jsonExtras.optString(PushBroadcastReceiver.PUSH_PARAM_OCR_DATA_ID);
             } catch (JSONException ignored) {
             }
         }

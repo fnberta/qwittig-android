@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 
 import com.parse.ParseInstallation;
 
@@ -89,11 +90,11 @@ public interface UserRepository extends BaseRepository {
     /**
      * Logs in a user using his facebook account
      *
-     * @param fragment the fragment that is initiating the login
+     * @param activity the fragment that is initiating the login
      * @param identityId the identity id the user is invited to, empty if no invite pending
      * @return a {@link Single} emitting the result
      */
-    Single<User> loginFacebook(@NonNull Fragment fragment, @NonNull String identityId);
+    Single<User> loginFacebook(@NonNull FragmentActivity activity, @NonNull String identityId);
 
     /**
      * Logs in the user using his google account.

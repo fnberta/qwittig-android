@@ -46,6 +46,6 @@ public interface LoginAccountsViewModel extends ViewModel, LoadingViewModel, Log
 
         void finishScreen(int result);
 
-        void showProfileFragment();
+        void showProfileFragment(boolean withInvitation);
     }
 }
