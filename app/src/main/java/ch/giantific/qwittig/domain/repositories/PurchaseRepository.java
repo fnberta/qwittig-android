@@ -22,9 +22,9 @@ import rx.Single;
 public interface PurchaseRepository extends BaseRepository {
 
     String FILE_NAME = "receipt.jpg";
-    int JPEG_COMPRESSION_RATE = 100; // TODO: figure out real value
-    int HEIGHT = 1000; // TODO: figure out real height and width
-    int WIDTH = 1000;
+    int JPEG_COMPRESSION_RATE = 100;
+    int HEIGHT = 2048;
+    int WIDTH = 1024;
 
     /**
      * Queries the local data store for purchases.

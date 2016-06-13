@@ -386,7 +386,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
         final String localReceiptPath = purchase.getReceiptLocal();
         if (purchase.getReceipt() == null && !TextUtils.isEmpty(localReceiptPath)) {
             try {
-                final ParseFile receipt = saveReceiptFile(context, purchase, localReceiptPath);
+                final ParseFile receipt = saveReceiptFile(context, localReceiptPath);
                 purchase.removeReceiptLocal();
                 purchase.setReceipt(receipt);
             } catch (ParseException | ExecutionException | InterruptedException e) {
@@ -429,8 +429,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
         return query.get(purchaseId);
     }
 
-    private ParseFile saveReceiptFile(@NonNull Context context, @NonNull Purchase purchase,
-                                 @NonNull String localReceiptPath)
+    private ParseFile saveReceiptFile(@NonNull Context context, @NonNull String localReceiptPath)
             throws ParseException, ExecutionException, InterruptedException {
         final String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("jpg");
         final byte[] bytes = Glide.with(context)
@@ -468,7 +467,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
         final String localReceiptPath = purchase.getReceiptLocal();
         if (!TextUtils.isEmpty(localReceiptPath)) {
             try {
-                final ParseFile receipt = saveReceiptFile(context, purchase, localReceiptPath);
+                final ParseFile receipt = saveReceiptFile(context, localReceiptPath);
                 purchase.removeReceiptLocal();
                 purchase.setReceipt(receipt);
             } catch (ParseException | ExecutionException | InterruptedException e) {
