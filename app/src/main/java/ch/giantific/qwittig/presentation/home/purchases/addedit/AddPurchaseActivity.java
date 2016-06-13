@@ -11,7 +11,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
+import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.text.TextUtils;
 import android.transition.Transition;
@@ -63,7 +63,14 @@ public class AddPurchaseActivity extends BaseActivity<AddEditPurchaseViewModel> 
 
         if (savedInstanceState == null) {
             if (Utils.isRunningLollipopAndHigher()) {
-                addActivityTransitionListener();
+                // check if activity was started from push notification, we have no activity
+                // transition then and need to show the fab
+                final String ocrPurchaseId = getOcrIdFromPush(getIntent());
+                if (!TextUtils.isEmpty(ocrPurchaseId)) {
+                    showFab();
+                } else {
+                    addActivityTransitionListener();
+                }
             } else {
                 showFab();
             }
@@ -115,27 +122,31 @@ public class AddPurchaseActivity extends BaseActivity<AddEditPurchaseViewModel> 
 
     @NonNull
     AddEditPurchaseBaseFragment getPurchaseAddEditFragment() {
-        final String ocrPurchaseId = getOcrPurchaseId();
-        if (!TextUtils.isEmpty(ocrPurchaseId)) {
-            return AddPurchaseFragment.newAddOcrInstance(ocrPurchaseId);
-        }
-
-        return AddPurchaseFragment.newAddInstance();
+        final String ocrPurchaseId = getOcrDataId();
+        return !TextUtils.isEmpty(ocrPurchaseId)
+                ? AddPurchaseFragment.newAddOcrInstance(ocrPurchaseId)
+                : AddPurchaseFragment.newAddInstance();
     }
 
-    private String getOcrPurchaseId() {
+    @Nullable
+    private String getOcrDataId() {
         final Intent intent = getIntent();
-        String ocrPurchaseId = intent.getStringExtra(INTENT_OCR_PURCHASE_ID);
-
-        if (TextUtils.isEmpty(ocrPurchaseId)) {
-            try {
-                final JSONObject jsonExtras = PushBroadcastReceiver.getData(intent);
-                ocrPurchaseId = jsonExtras.optString(PushBroadcastReceiver.PUSH_PARAM_OCR_DATA_ID);
-            } catch (JSONException ignored) {
-            }
+        String ocrDataId = intent.getStringExtra(INTENT_OCR_PURCHASE_ID);
+        if (TextUtils.isEmpty(ocrDataId)) {
+            ocrDataId = getOcrIdFromPush(intent);
         }
 
-        return ocrPurchaseId;
+        return ocrDataId;
+    }
+
+    @Nullable
+    private String getOcrIdFromPush(@NonNull Intent intent) {
+        try {
+            final JSONObject jsonExtras = PushBroadcastReceiver.getData(intent);
+            return jsonExtras.optString(PushBroadcastReceiver.PUSH_PARAM_OCR_DATA_ID);
+        } catch (JSONException e) {
+            return null;
+        }
     }
 
     @Override
@@ -236,7 +247,7 @@ public class AddPurchaseActivity extends BaseActivity<AddEditPurchaseViewModel> 
         if (mNoteViewModel != null) {
             mNoteViewModel.onNoteSet(note);
         } else {
-            Snackbar.make(mToolbar, R.string.toast_note_added, Snackbar.LENGTH_LONG).show();
+            showMessage(R.string.toast_note_added);
         }
 
         mViewModel.onNoteSet(note);
