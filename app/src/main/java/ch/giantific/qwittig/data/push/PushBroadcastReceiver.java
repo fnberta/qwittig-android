@@ -226,7 +226,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
                 break;
             }
             case TYPE_PURCHASE_OCR_FAILED: {
-                mLocalBroadcast.sendOcrPurchaseUpdated(false, null);
+                mLocalBroadcast.sendOcrDataUpdated(false, null);
                 break;
             }
             case TYPE_PURCHASE_NEW: {

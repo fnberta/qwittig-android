@@ -327,7 +327,7 @@
     <string name="dialog_change_nickname_message">Enter new nickname</string>
     <string name="toast_error_purchase_ocr_load">Failed to load purchase. Please try again.</string>
     <string name="toast_error_purchase_ocr_process">Failed to process the purchase. Please try again.</string>
-    <string name="toast_purchase_ocr_started">Processing purchase…</string>
+    <string name="toast_purchase_ocr_started">Processing purchase… You will be notified when it is ready.</string>
     <string name="toast_error_join_group">Failed to join the new group. Please try again.</string>
     <string name="header_settings_group_add">New group</string>
     <string name="header_login_first_group">First group</string>

@@ -162,8 +162,8 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
 
     @Override
     public void onReceiptImageTaken(@NonNull byte[] receipt) {
-        startProgress();
-//        mView.showMessage(R.string.toast_purchase_ocr_started);
+//        startProgress();
+        mView.showMessage(R.string.toast_purchase_ocr_started);
         mView.loadOcrWorker(receipt);
     }
 
@@ -199,12 +199,12 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
     @Override
     public void onOcrPurchaseReady(@NonNull String ocrPurchaseId) {
         mOcrPurchaseId = ocrPurchaseId;
-        stopProgress(true);
+//        stopProgress(true);
     }
 
     @Override
     public void onOcrPurchaseFailed() {
-        stopProgress(false);
+//        stopProgress(false);
         mView.showMessage(R.string.toast_error_purchase_ocr_process);
     }
 
@@ -231,10 +231,10 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
         };
     }
 
-    @Override
-    public void onViewGone() {
-        super.onViewGone();
-
-        stopProgress(false);
-    }
+//    @Override
+//    public void onViewGone() {
+//        super.onViewGone();
+//
+//        stopProgress(false);
+//    }
 }

@@ -45,10 +45,9 @@ public class AddPurchaseViewModelOcrImpl extends AddPurchaseViewModelImpl {
         super(savedState, view, userRepository, purchaseRepo);
 
         mOcrPurchaseId = ocrPurchaseId;
-        if (savedState != null) {
-            mOcrValuesSet = savedState.getBoolean(STATE_OCR_VALUES_SET, false);
-        } else {
-            mOcrValuesSet = false;
+        mOcrValuesSet = savedState != null && savedState.getBoolean(STATE_OCR_VALUES_SET, false);
+        if (!mOcrValuesSet) {
+            mLoading = true;
         }
     }
 
@@ -88,6 +87,7 @@ public class AddPurchaseViewModelOcrImpl extends AddPurchaseViewModelImpl {
                         } else {
                             setOcrData(ocrData);
                             mOcrValuesSet = true;
+                            setLoading(false);
                         }
                     }
 

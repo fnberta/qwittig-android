@@ -338,7 +338,7 @@ public class ParseQueryService extends IntentService {
                 updateGroup(objectId, isNew);
                 break;
             case OcrData.CLASS: {
-                updateOcrPurchase(objectId);
+                updateOcrData(objectId);
                 break;
             }
         }
@@ -393,9 +393,9 @@ public class ParseQueryService extends IntentService {
         }
     }
 
-    private void updateOcrPurchase(@NonNull String ocrPurchaseId) {
+    private void updateOcrData(@NonNull String ocrPurchaseId) {
         final boolean successful = mPurchaseRepo.updateOcrPurchase(ocrPurchaseId);
-        mLocalBroadcast.sendOcrPurchaseUpdated(successful, ocrPurchaseId);
+        mLocalBroadcast.sendOcrDataUpdated(successful, ocrPurchaseId);
     }
 
     private void updatePurchases() {

@@ -90,7 +90,7 @@ public class LocalBroadcast {
         send(intent);
     }
 
-    public void sendOcrPurchaseUpdated(boolean successful, @Nullable String ocrPurchaseId) {
+    public void sendOcrDataUpdated(boolean successful, @Nullable String ocrPurchaseId) {
         final Intent intent = getIntent(DataType.OCR_PURCHASE_UPDATED);
         intent.putExtra(INTENT_EXTRA_SUCCESSFUL, successful);
         if (!TextUtils.isEmpty(ocrPurchaseId)) {

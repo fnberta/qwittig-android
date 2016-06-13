@@ -26,6 +26,7 @@ import org.json.JSONObject;
 import java.util.Date;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.data.push.PushBroadcastReceiver;
 import ch.giantific.qwittig.databinding.ActivityPurchaseAddEditBinding;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
@@ -55,6 +56,21 @@ public class AddPurchaseActivity extends BaseActivity<AddEditPurchaseViewModel> 
     private AddEditPurchaseNoteViewModel mNoteViewModel;
     private boolean mHasReceiptFile;
     private boolean mHasNote;
+
+    @Override
+    protected void handleLocalBroadcast(Intent intent, int dataType) {
+        super.handleLocalBroadcast(intent, dataType);
+
+        switch (dataType) {
+            case LocalBroadcast.DataType.OCR_PURCHASE_UPDATED: {
+                final boolean successful = intent.getBooleanExtra(LocalBroadcast.INTENT_EXTRA_SUCCESSFUL, false);
+                if (successful) {
+                    mViewModel.loadData();
+                }
+                break;
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
