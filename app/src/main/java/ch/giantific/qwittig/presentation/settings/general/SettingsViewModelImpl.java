@@ -15,6 +15,7 @@ import org.apache.commons.math3.fraction.BigFraction;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Group;
@@ -88,7 +89,7 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
     @Override
     public void onGroupNameChanged(@NonNull String newName) {
         final Group group = mCurrentIdentity.getGroup();
-        if (!TextUtils.isEmpty(newName) && !group.getName().equals(newName)) {
+        if (!TextUtils.isEmpty(newName) && !Objects.equals(group.getName(), newName)) {
             group.setName(newName);
             group.saveEventually();
 
@@ -102,7 +103,7 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
 
     @Override
     public void onLeaveGroupClick() {
-        if (!BigFraction.ZERO.equals(mCurrentIdentity.getBalance())) {
+        if (!Objects.equals(BigFraction.ZERO, mCurrentIdentity.getBalance())) {
             mView.showMessage(R.string.toast_leave_group_balance_not_zero);
             return;
         }
@@ -119,7 +120,7 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
                     @Override
                     public void onSuccess(List<Identity> identities) {
                         final int message = identities.size() == 1 &&
-                                identities.get(0).getObjectId().equals(mCurrentIdentity.getObjectId())
+                                Objects.equals(identities.get(0).getObjectId(), mCurrentIdentity.getObjectId())
                                 ? R.string.dialog_group_leave_delete_message
                                 : R.string.dialog_group_leave_message;
                         mView.showLeaveGroupDialog(message);

@@ -14,6 +14,7 @@ import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
 import ch.giantific.qwittig.BR;
@@ -194,7 +195,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     @Override
     @Bindable
     public boolean isPasswordEqual() {
-        return mPassword.equals(mPasswordRepeat);
+        return Objects.equals(mPassword, mPasswordRepeat);
     }
 
     @Override
@@ -221,7 +222,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
                 .filter(new Func1<Identity, Boolean>() {
                     @Override
                     public Boolean call(Identity identity) {
-                        return !mCurrentIdentity.getObjectId().equals(identity.getObjectId());
+                        return !Objects.equals(mCurrentIdentity.getObjectId(), identity.getObjectId());
                     }
                 })
                 .map(new Func1<Identity, String>() {
@@ -290,8 +291,8 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
 
     private boolean changesWereMade() {
         // TODO: check for avatar changes
-        return !mEmail.equals(mCurrentUser.getUsername())
-                || !mNickname.equals(mCurrentIdentity.getNickname())
+        return !Objects.equals(mEmail, mCurrentUser.getUsername())
+                || !Objects.equals(mNickname, mCurrentIdentity.getNickname())
                 || !TextUtils.isEmpty(mPassword);
     }
 
@@ -356,7 +357,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
 
         final List<Identity> identities = mCurrentUser.getIdentities();
         final boolean emptyAvatar = TextUtils.isEmpty(mAvatar);
-        final boolean newAvatar = !emptyAvatar && !mAvatar.equals(mCurrentIdentity.getAvatarUrl());
+        final boolean newAvatar = !emptyAvatar && !Objects.equals(mAvatar, mCurrentIdentity.getAvatarUrl());
         if (newAvatar) {
             getSubscriptions().add(mUserRepo.saveCurrentUserIdentitiesWithAvatar(mNickname, mAvatar)
                     .subscribe(new Subscriber<Identity>() {

@@ -14,6 +14,7 @@ import android.widget.AdapterView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
@@ -121,7 +122,7 @@ public abstract class StatsViewModelBaseImpl<T extends StatsViewModel.ViewListen
     @Override
     public void onYearSelected(AdapterView<?> parent, View view, int position, long id) {
         final String year = (String) parent.getItemAtPosition(position);
-        if (!year.equals(mYear)) {
+        if (!Objects.equals(year, mYear)) {
             mYear = year;
             reloadData();
         }
@@ -130,7 +131,7 @@ public abstract class StatsViewModelBaseImpl<T extends StatsViewModel.ViewListen
     @Override
     public void onMonthSelected(AdapterView<?> parent, View view, int position, long id) {
         final Month month = (Month) parent.getItemAtPosition(position);
-        if (!month.equals(mMonth)) {
+        if (!Objects.equals(month, mMonth)) {
             mMonth = month;
             reloadData();
         }

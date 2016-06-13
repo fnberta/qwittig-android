@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
@@ -223,7 +224,7 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
     @Override
     public void onCurrencySelected(@NonNull AdapterView<?> parent, View view, int position, long id) {
         final String currency = (String) parent.getItemAtPosition(position);
-        if (currency.equals(mCurrency)) {
+        if (Objects.equals(currency, mCurrency)) {
             return;
         }
 
@@ -383,7 +384,7 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
                 }
 
                 selectedCount++;
-                if (addEditPurchaseItemUsersUser.getObjectId().equals(currentIdentityId)) {
+                if (Objects.equals(addEditPurchaseItemUsersUser.getObjectId(), currentIdentityId)) {
                     currentIdentityInvolved = true;
                 }
             }
@@ -562,7 +563,7 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
             return;
         }
 
-        if (!mCurrency.equals(mCurrentGroup.getCurrency()) && mExchangeRate == 1) {
+        if (!Objects.equals(mCurrency, mCurrentGroup.getCurrency()) && mExchangeRate == 1) {
             mView.showMessageWithAction(R.string.toast_exchange_no_data,
                     new MessageAction(R.string.action_purchase_save_draft) {
                         @Override

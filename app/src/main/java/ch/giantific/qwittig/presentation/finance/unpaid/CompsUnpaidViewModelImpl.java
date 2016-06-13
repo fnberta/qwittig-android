@@ -15,6 +15,7 @@ import org.apache.commons.math3.fraction.BigFraction;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
@@ -128,7 +129,7 @@ public class CompsUnpaidViewModelImpl
 
                     @Override
                     public void onNext(Compensation compensation) {
-                        if (compensation.getDebtor().getObjectId().equals(currentIdentityId)) {
+                        if (Objects.equals(compensation.getDebtor().getObjectId(), currentIdentityId)) {
                             debts.add(compensation);
                         } else {
                             credits.add(compensation);
@@ -207,7 +208,7 @@ public class CompsUnpaidViewModelImpl
             }
 
             final Compensation compensation = ((CompsUnpaidItem) item).getCompensation();
-            if (compensation.getObjectId().equals(mCompConfirmingId)) {
+            if (Objects.equals(compensation.getObjectId(), mCompConfirmingId)) {
                 boolean amountChanged = false;
                 final BigFraction originalAmount = compensation.getAmountFraction();
                 final double diff = originalAmount.doubleValue() - amount;
@@ -312,7 +313,7 @@ public class CompsUnpaidViewModelImpl
 
             final CompsUnpaidItem unpaidItem = (CompsUnpaidItem) item;
             final Compensation compensation = unpaidItem.getCompensation();
-            if (compId.equals(compensation.getObjectId())) {
+            if (Objects.equals(compId, compensation.getObjectId())) {
                 setCompensationLoading(compensation, compId, i, false);
                 return compensation;
             }

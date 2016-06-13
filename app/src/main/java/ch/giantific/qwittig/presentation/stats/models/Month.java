@@ -9,6 +9,8 @@ import android.os.Parcelable;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 
+import java.util.Objects;
+
 import ch.giantific.qwittig.utils.DateUtils;
 
 /**
@@ -79,7 +81,7 @@ public class Month implements Parcelable {
         }
 
         final Month month = (Month) o;
-        return mNameShort.equals(month.getNameShort());
+        return Objects.equals(mNameShort, month.getNameShort());
 
     }
 

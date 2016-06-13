@@ -8,6 +8,8 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 
+import java.util.Objects;
+
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
@@ -114,7 +116,7 @@ public class LoginProfileViewModelImpl extends ViewModelBaseImpl<LoginProfileVie
             return;
         }
 
-        if (!TextUtils.isEmpty(mAvatar) && !mAvatar.equals(mCurrentIdentity.getAvatarUrl())) {
+        if (!TextUtils.isEmpty(mAvatar) && !Objects.equals(mAvatar, mCurrentIdentity.getAvatarUrl())) {
             getSubscriptions().add(mUserRepo.saveCurrentUserIdentitiesWithAvatar(mNickname, mAvatar)
                     .subscribe(new Subscriber<Identity>() {
                         @Override

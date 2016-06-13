@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import java.util.List;
+import java.util.Objects;
 
 import ch.giantific.qwittig.databinding.RowPurchaseDetailsIdentitiesIdentityBinding;
 import ch.giantific.qwittig.domain.models.Identity;
@@ -47,7 +48,7 @@ public class PurchaseDetailsIdentitiesRecyclerAdapter extends RecyclerView.Adapt
         final RowPurchaseDetailsIdentitiesIdentityBinding binding = holder.getBinding();
         PurchaseDetailsIdentitiesItemIdentity item = binding.getItem();
 
-        final boolean boldName = mViewModel.getPurchaseBuyer().getObjectId().equals(identity.getObjectId());
+        final boolean boldName = Objects.equals(mViewModel.getPurchaseBuyer().getObjectId(), identity.getObjectId());
         if (item == null) {
             item = new PurchaseDetailsIdentitiesItemIdentity(identity, boldName);
             binding.setItem(item);

@@ -18,6 +18,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.parse.ParseUtils;
@@ -165,7 +166,7 @@ public class Task extends ParseObject {
      */
     private void updateDeadline() {
         final String timeFrame = getTimeFrame();
-        if (timeFrame.equals(TimeFrame.AS_NEEDED)) {
+        if (Objects.equals(timeFrame, TimeFrame.AS_NEEDED)) {
             // as needed tasks have no deadline
             return;
         }

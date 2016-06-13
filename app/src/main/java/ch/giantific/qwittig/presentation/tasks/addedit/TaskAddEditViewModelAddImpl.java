@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
@@ -213,7 +214,7 @@ public class TaskAddEditViewModelAddImpl extends ListViewModelBaseImpl<Identity,
 
         final String timeFrame = getTimeFrameSelected();
         final List<Identity> identities = getIdentitiesAvailable();
-        if (timeFrame.equals(Task.TimeFrame.ONE_TIME) && identities.size() > 1) {
+        if (Objects.equals(timeFrame, Task.TimeFrame.ONE_TIME) && identities.size() > 1) {
             mView.showMessage(R.string.toast_task_max_one_user_one_time);
             return;
         }

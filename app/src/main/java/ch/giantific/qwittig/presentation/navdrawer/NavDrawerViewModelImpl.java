@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
@@ -148,7 +149,7 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
     @Override
     public void onIdentitySelected(@NonNull AdapterView<?> parent, View view, int position, long id) {
         final Identity identity = (Identity) parent.getItemAtPosition(position);
-        if (mCurrentIdentity.getObjectId().equals(identity.getObjectId())) {
+        if (Objects.equals(mCurrentIdentity.getObjectId(), identity.getObjectId())) {
             return;
         }
 

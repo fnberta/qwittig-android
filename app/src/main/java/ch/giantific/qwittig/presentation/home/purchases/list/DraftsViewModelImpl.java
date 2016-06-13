@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
@@ -106,7 +107,7 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, DraftsV
             int firstPos = 0;
             for (int i = 0, size = mItems.size(); i < size; i++) {
                 final Purchase draft = mItems.get(i);
-                if (firstSelected.equals(draft.getTempId())) {
+                if (Objects.equals(firstSelected, draft.getTempId())) {
                     firstPos = i;
                     break;
                 }

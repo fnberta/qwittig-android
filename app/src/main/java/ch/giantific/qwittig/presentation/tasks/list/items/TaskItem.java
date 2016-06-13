@@ -12,6 +12,7 @@ import android.support.annotation.StringRes;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
@@ -170,7 +171,7 @@ public class TaskItem extends BaseObservable implements TasksBaseItem, CardTopPr
 
     @Bindable
     public boolean isCurrentUserResponsible() {
-        return mCurrentIdentity.getObjectId().equals(mTaskIdentityResponsible.getObjectId());
+        return Objects.equals(mCurrentIdentity.getObjectId(), mTaskIdentityResponsible.getObjectId());
     }
 
     @Bindable

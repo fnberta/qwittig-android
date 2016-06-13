@@ -14,6 +14,7 @@ import android.widget.AdapterView;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
@@ -129,7 +130,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<TasksBaseIte
                     @Override
                     public void onNext(Task task) {
                         final Identity identityResponsible = task.getIdentityResponsible();
-                        if (mCurrentIdentity.getObjectId().equals(identityResponsible.getObjectId())) {
+                        if (Objects.equals(mCurrentIdentity.getObjectId(), identityResponsible.getObjectId())) {
                             tasksUser.add(new TaskItem(task, mCurrentIdentity));
                         } else {
                             tasksGroup.add(new TaskItem(task, mCurrentIdentity));
@@ -164,7 +165,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<TasksBaseIte
     @Override
     public void onDeadlineSelected(@NonNull AdapterView<?> parent, View view, int position, long id) {
         final TaskDeadline deadline = (TaskDeadline) parent.getItemAtPosition(position);
-        if (!deadline.equals(mDeadline)) {
+        if (!Objects.equals(deadline, mDeadline)) {
             mDeadline = deadline;
             loadData();
         }
@@ -203,7 +204,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<TasksBaseIte
         final Task task = taskItem.getTask();
         final String timeFrame = task.getTimeFrame();
 
-        if (timeFrame.equals(Task.TimeFrame.ONE_TIME)) {
+        if (Objects.equals(timeFrame, Task.TimeFrame.ONE_TIME)) {
             task.deleteEventually();
             mItems.remove(taskItem);
             mView.notifyItemRemoved(position);
@@ -218,7 +219,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<TasksBaseIte
         task.saveEventually();
 
         final String currentIdentityId = mCurrentIdentity.getObjectId();
-        if (identityResponsible != null && identityResponsible.getObjectId().equals(currentIdentityId) ||
+        if (identityResponsible != null && Objects.equals(identityResponsible.getObjectId(), currentIdentityId) ||
                 identityResponsibleNew != null && identityResponsibleNew.getObjectId().equals(currentIdentityId)) {
             loadData();
         } else {
@@ -292,7 +293,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<TasksBaseIte
 
             final TaskItem taskItem = (TaskItem) taskListItem;
             final Task task = taskItem.getTask();
-            if (taskId.equals(task.getObjectId())) {
+            if (Objects.equals(taskId, task.getObjectId())) {
                 setTaskLoading(task, taskId, i, false);
                 return task;
             }

@@ -13,6 +13,7 @@ import android.text.TextUtils;
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import ch.giantific.qwittig.R;
@@ -193,8 +194,8 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
     }
 
     private boolean changesWereMade() {
-        if (mEditPurchase.getDate().compareTo(mDate) != 0 || !mEditPurchase.getStore().equals(mStore) ||
-                !mEditPurchase.getCurrency().equals(mCurrency) || !mEditPurchase.getNote().equals(mNote)) {
+        if (mEditPurchase.getDate().compareTo(mDate) != 0 || !Objects.equals(mEditPurchase.getStore(), mStore) ||
+                !Objects.equals(mEditPurchase.getCurrency(), mCurrency) || !Objects.equals(mEditPurchase.getNote(), mNote)) {
             return true;
         }
 
@@ -213,7 +214,7 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
                 return true;
             }
             final AddEditPurchaseItem purchaseAddEditItem = (AddEditPurchaseItem) addEditItem;
-            if (!itemOld.getName().equals(purchaseAddEditItem.getName())) {
+            if (!Objects.equals(itemOld.getName(), purchaseAddEditItem.getName())) {
                 return true;
             }
 

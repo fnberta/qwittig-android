@@ -16,6 +16,7 @@ import android.view.View;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
@@ -194,7 +195,7 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsB
     private void updateIdentities() {
         final List<Identity> identities = mTask.getIdentities();
         final Identity identityResponsible = identities.get(0);
-        setCurrentUserResponsible(mCurrentIdentity.getObjectId().equals(identityResponsible.getObjectId()));
+        setCurrentUserResponsible(Objects.equals(mCurrentIdentity.getObjectId(), identityResponsible.getObjectId()));
 
         final SpannableStringBuilder stringBuilder = mView.buildTaskIdentitiesString(identities,
                 identityResponsible);
@@ -203,7 +204,7 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsB
 
     private void updateToolbarMenu() {
         final Identity initiator = mTask.getInitiator();
-        boolean showEditOptions = initiator.getObjectId().equals(mCurrentIdentity.getObjectId());
+        boolean showEditOptions = Objects.equals(initiator.getObjectId(), mCurrentIdentity.getObjectId());
 
         if (showEditOptions) {
             final List<Identity> identities = mTask.getIdentities();
@@ -248,7 +249,7 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsB
     @Override
     public void onFabDoneClick(View view) {
         final String timeFrame = mTask.getTimeFrame();
-        if (timeFrame.equals(Task.TimeFrame.ONE_TIME)) {
+        if (Objects.equals(timeFrame, Task.TimeFrame.ONE_TIME)) {
             mTask.deleteEventually();
             mView.finishScreen(TaskDetailsResult.TASK_DELETED);
             return;

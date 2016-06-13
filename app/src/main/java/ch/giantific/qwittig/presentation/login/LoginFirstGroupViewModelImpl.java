@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.AdapterView;
 
 import java.util.List;
+import java.util.Objects;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.domain.models.Group;
@@ -98,7 +99,7 @@ public class LoginFirstGroupViewModelImpl extends ViewModelBaseImpl<LoginFirstGr
     @Override
     public int getSelectedGroupCurrency() {
         for (Currency currency : mCurrencies) {
-            if (currency.getCode().equals(mGroupCurrency)) {
+            if (Objects.equals(currency.getCode(), mGroupCurrency)) {
                 return mCurrencies.indexOf(currency);
             }
         }
@@ -116,11 +117,11 @@ public class LoginFirstGroupViewModelImpl extends ViewModelBaseImpl<LoginFirstGr
     public void onFabDoneClick(View view) {
         final Group group = mCurrentIdentity.getGroup();
         boolean changesMade = false;
-        if (!mGroupName.equals(group.getName())) {
+        if (!Objects.equals(mGroupName, group.getName())) {
             group.setName(mGroupName);
             changesMade = true;
         }
-        if (!mGroupCurrency.equals(group.getCurrency())) {
+        if (!Objects.equals(mGroupCurrency, group.getCurrency())) {
             group.setCurrency(mGroupCurrency);
             changesMade = true;
         }

@@ -12,6 +12,8 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 
+import java.util.Objects;
+
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.User;
@@ -97,7 +99,7 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
 
     @Override
     public boolean isPasswordsMatch() {
-        return mPassword.equals(mPasswordRepeat);
+        return Objects.equals(mPassword, mPasswordRepeat);
     }
 
     @Override

@@ -15,6 +15,7 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
@@ -157,9 +158,9 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<Purchase
         boolean showEdit = false;
         if (valid) {
             final String buyerId = mPurchase.getBuyer().getObjectId();
-            showEdit = buyerId.equals(mCurrentIdentity.getObjectId());
+            showEdit = Objects.equals(buyerId, mCurrentIdentity.getObjectId());
         }
-        final boolean foreignCurrency = !mCurrentIdentity.getGroup().getCurrency().equals(mPurchase.getCurrency());
+        final boolean foreignCurrency = !Objects.equals(mCurrentIdentity.getGroup().getCurrency(), mPurchase.getCurrency());
         final boolean receiptImage = !TextUtils.isEmpty(mPurchase.getReceiptUrl());
         mView.toggleMenuOptions(showEdit, receiptImage, foreignCurrency);
     }

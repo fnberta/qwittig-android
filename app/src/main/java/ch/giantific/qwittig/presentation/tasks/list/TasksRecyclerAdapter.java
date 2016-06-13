@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.List;
+import java.util.Objects;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
@@ -177,7 +178,7 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter {
                 final StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.append(mContext.getString(R.string.task_users_involved_next)).append(" ");
                 for (Identity identity : identities) {
-                    if (!identity.getObjectId().equals(identityResponsible.getObjectId())) {
+                    if (!Objects.equals(identity.getObjectId(), identityResponsible.getObjectId())) {
                         stringBuilder.append(identity.getNickname()).append(" - ");
                     }
                 }

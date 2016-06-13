@@ -8,8 +8,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
@@ -25,16 +25,9 @@ import rx.SingleSubscriber;
 public class TaskAddEditViewModelEditImpl extends TaskAddEditViewModelAddImpl {
 
     private static final String STATE_ITEMS_SET = "STATE_ITEMS_SET";
-    private static final String STATE_OLD_TITLE = "STATE_OLD_TITLE";
-    private static final String STATE_OLD_TIME_FRAME = "STATE_OLD_TIME_FRAME";
-    private static final String STATE_OLD_DEADLINE = "STATE_OLD_DEADLINE";
     private final String mEditTaskId;
     private boolean mOldValuesSet;
     private Task mEditTask;
-    private String mOldTaskTitle;
-    private String mOldTaskTimeFrame;
-    private Date mOldTaskDeadline;
-    private List<Identity> mOldTaskIdentities;
 
     public TaskAddEditViewModelEditImpl(@Nullable Bundle savedState,
                                         @NonNull TaskAddEditViewModel.ViewListener view,
@@ -47,9 +40,6 @@ public class TaskAddEditViewModelEditImpl extends TaskAddEditViewModelAddImpl {
 
         if (savedState != null) {
             mOldValuesSet = savedState.getBoolean(STATE_ITEMS_SET, false);
-            mOldTaskTitle = savedState.getString(STATE_OLD_TITLE, "");
-            mOldTaskTimeFrame = savedState.getString(STATE_OLD_TIME_FRAME, "");
-            mOldTaskDeadline = new Date(savedState.getLong(STATE_OLD_DEADLINE));
         }
     }
 
@@ -58,9 +48,6 @@ public class TaskAddEditViewModelEditImpl extends TaskAddEditViewModelAddImpl {
         super.saveState(outState);
 
         outState.putBoolean(STATE_ITEMS_SET, mOldValuesSet);
-        outState.putString(STATE_OLD_TITLE, mOldTaskTitle);
-        outState.putString(STATE_OLD_TIME_FRAME, mOldTaskTimeFrame);
-        outState.putLong(STATE_OLD_DEADLINE, mOldTaskDeadline.getTime());
     }
 
     public void loadData() {
@@ -90,19 +77,14 @@ public class TaskAddEditViewModelEditImpl extends TaskAddEditViewModelAddImpl {
     }
 
     private void restoreOldValues() {
-        mOldTaskTitle = mEditTask.getTitle();
-        setTaskTitle(mOldTaskTitle);
-
-        mOldTaskTimeFrame = mEditTask.getTimeFrame();
-        setTimeFrame(mOldTaskTimeFrame);
-
-        if (!mOldTaskTitle.equals(Task.TimeFrame.AS_NEEDED)) {
-            mOldTaskDeadline = mEditTask.getDeadline();
-            setTaskDeadline(mOldTaskDeadline);
+        setTaskTitle(mEditTask.getTitle());
+        final String timeFrame = mEditTask.getTimeFrame();
+        setTimeFrame(timeFrame);
+        if (!Objects.equals(timeFrame, Task.TimeFrame.AS_NEEDED)) {
+            setTaskDeadline(mEditTask.getDeadline());
         }
 
-        mOldTaskIdentities = mEditTask.getIdentities();
-        setUsersInvolved(mOldTaskIdentities);
+        setUsersInvolved(mEditTask.getIdentities());
 
         mOldValuesSet = true;
         mView.notifyDataSetChanged();
@@ -146,24 +128,21 @@ public class TaskAddEditViewModelEditImpl extends TaskAddEditViewModelAddImpl {
 
     @Override
     boolean changesWereMade() {
-        if (!mOldTaskTitle.equals(mTaskTitle) ||
-                !mOldTaskTimeFrame.equals(getTimeFrameSelected()) ||
-                mOldTaskDeadline.compareTo(mTaskDeadline) != 0) {
+        if (!Objects.equals(mEditTask.getTitle(), mTaskTitle) ||
+                !Objects.equals(mEditTask.getTimeFrame(), getTimeFrameSelected()) ||
+                mEditTask.getDeadline().compareTo(mTaskDeadline) != 0) {
             return true;
         }
 
-        if (mOldTaskIdentities == null) {
-            mOldTaskIdentities = mEditTask.getIdentities();
-        }
-
-        final int oldIdentitiesSize = mOldTaskIdentities.size();
+        final List<Identity> oldIdentities = mEditTask.getIdentities();
+        final int oldIdentitiesSize = oldIdentities.size();
         final List<Identity> newIdentities = getIdentitiesAvailable();
         if (oldIdentitiesSize != newIdentities.size()) {
             return true;
         }
 
         for (int i = 0; i < oldIdentitiesSize; i++) {
-            final Identity identityOld = mOldTaskIdentities.get(i);
+            final Identity identityOld = oldIdentities.get(i);
             final Identity identityNew = newIdentities.get(i);
 
             if (!identityOld.getObjectId().equals(identityNew.getObjectId())) {

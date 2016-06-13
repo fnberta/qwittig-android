@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import ch.giantific.qwittig.utils.MoneyUtils;
@@ -251,7 +252,7 @@ public class Purchase extends ParseObject {
         final List<Identity> readBy = getReadBy();
         final String identityId = identity.getObjectId();
         for (Identity readByIdentity : readBy) {
-            if (readByIdentity.getObjectId().equals(identityId)) {
+            if (Objects.equals(readByIdentity.getObjectId(), identityId)) {
                 return true;
             }
         }

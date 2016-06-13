@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 
@@ -454,9 +455,9 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     }
 
     private boolean isSilentNotification(@NonNull String type) {
-        return type.equals(TYPE_PURCHASE_EDIT) || type.equals(TYPE_PURCHASE_DELETE) ||
-                type.equals(TYPE_GROUP_NAME_CHANGED) || type.equals(TYPE_TASK_EDIT) ||
-                type.equals(TYPE_PURCHASE_READY_BY_CHANGED);
+        return Objects.equals(type, TYPE_PURCHASE_EDIT) || Objects.equals(type, TYPE_PURCHASE_DELETE) ||
+                Objects.equals(type, TYPE_GROUP_NAME_CHANGED) || Objects.equals(type, TYPE_TASK_EDIT) ||
+                Objects.equals(type, TYPE_PURCHASE_READY_BY_CHANGED);
     }
 
     @Override
@@ -600,7 +601,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
             case TYPE_TASK_DELETE: {
                 final String taskTitle = jsonExtras.optString(PUSH_PARAM_TASK_TITLE);
                 final String timeFrame = jsonExtras.optString(PUSH_PARAM_TASK_TIME_FRAME);
-                if (timeFrame.equals(Task.TimeFrame.ONE_TIME)) {
+                if (Objects.equals(timeFrame, Task.TimeFrame.ONE_TIME)) {
                     title = context.getString(R.string.push_task_finished_title, taskTitle);
                     alert = context.getString(R.string.push_task_finished_alert, user);
                 } else {
@@ -699,7 +700,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
             final User currentUser = mUserRepo.getCurrentUser();
             if (currentUser != null) {
                 final Group oldGroup = currentUser.getCurrentIdentity().getGroup();
-                if (!oldGroup.getObjectId().equals(groupId) && currentUser.isInGroup(groupId)) {
+                if (!Objects.equals(oldGroup.getObjectId(), groupId) && currentUser.isInGroup(groupId)) {
                     final Identity identity = currentUser.getIdentityForGroup(groupId);
                     if (identity != null) {
                         currentUser.setCurrentIdentity(identity);
@@ -802,7 +803,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
     @Override
     protected void onPushDismiss(Context context, @NonNull Intent intent) {
         final String type = getNotificationType(intent);
-        if (type.equals(TYPE_PURCHASE_NEW)) {
+        if (Objects.equals(type, TYPE_PURCHASE_NEW)) {
             String groupId;
             try {
                 groupId = getGroupId(intent);

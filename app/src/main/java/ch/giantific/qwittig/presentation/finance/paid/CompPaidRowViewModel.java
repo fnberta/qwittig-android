@@ -12,6 +12,7 @@ import org.apache.commons.math3.fraction.BigFraction;
 
 import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.util.Objects;
 
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Identity;
@@ -46,7 +47,7 @@ public class CompPaidRowViewModel extends BaseObservable {
         mCompDate = mDateFormatter.format(compensation.getCreatedAt());
         final Identity creditor = compensation.getCreditor();
         final BigFraction amount = compensation.getAmountFraction();
-        if (creditor.getObjectId().equals(mCurrentIdentity.getObjectId())) {
+        if (Objects.equals(creditor.getObjectId(), mCurrentIdentity.getObjectId())) {
             final Identity debtor = compensation.getDebtor();
             mCompUsername = debtor.getNickname();
             mCompUserAvatar = debtor.getAvatarUrl();

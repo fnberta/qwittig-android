@@ -15,6 +15,7 @@ import org.apache.commons.math3.fraction.BigFraction;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
@@ -113,7 +114,7 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
                 .filter(new Func1<Identity, Boolean>() {
                     @Override
                     public Boolean call(Identity identity) {
-                        return !identity.getObjectId().equals(currentId);
+                        return !Objects.equals(identity.getObjectId(), currentId);
                     }
                 })
                 .map(new Func1<Identity, SettingsUsersUserRowViewModel>() {
@@ -193,7 +194,7 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
     public void onRemoveClick(final int position) {
         final SettingsUsersUserRowViewModel userItem = getItemAtPosition(position);
         final Identity identity = userItem.getIdentity();
-        if (!identity.getBalance().equals(BigFraction.ZERO)) {
+        if (!Objects.equals(identity.getBalance(), BigFraction.ZERO)) {
             mView.showMessage(R.string.toast_del_identity_balance_not_zero);
             return;
         }

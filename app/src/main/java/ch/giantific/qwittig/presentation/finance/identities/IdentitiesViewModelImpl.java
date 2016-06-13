@@ -15,6 +15,7 @@ import org.apache.commons.math3.fraction.BigFraction;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
@@ -68,7 +69,7 @@ public class IdentitiesViewModelImpl
                 .filter(new Func1<Identity, Boolean>() {
                     @Override
                     public Boolean call(Identity identity) {
-                        return !identity.getObjectId().equals(mCurrentIdentity.getObjectId());
+                        return !Objects.equals(identity.getObjectId(), mCurrentIdentity.getObjectId());
                     }
                 })
                 .toSortedList()

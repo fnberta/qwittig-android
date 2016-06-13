@@ -14,6 +14,7 @@ import com.parse.ParseUser;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -145,7 +146,7 @@ public class User extends ParseUser {
     public boolean hasIdentity(@NonNull String identityId) {
         final List<Identity> userIdentities = getIdentities();
         for (Identity identity : userIdentities) {
-            if (identity.getObjectId().equals(identityId)) {
+            if (Objects.equals(identity.getObjectId(), identityId)) {
                 return true;
             }
         }
@@ -179,7 +180,7 @@ public class User extends ParseUser {
     public Identity getIdentityForGroup(@NonNull String groupId) {
         final List<Identity> identities = getIdentities();
         for (Identity identity : identities) {
-            if (identity.getGroup().getObjectId().equals(groupId)) {
+            if (Objects.equals(identity.getGroup().getObjectId(), groupId)) {
                 return identity;
             }
         }
