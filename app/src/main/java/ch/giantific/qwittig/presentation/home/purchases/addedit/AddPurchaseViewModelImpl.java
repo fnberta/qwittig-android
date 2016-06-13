@@ -349,9 +349,8 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
 
     private void deleteReceiptImage() {
         final File receipt = new File(mReceiptImagePath);
-        boolean fileDeleted = receipt.delete();
-        if (!fileDeleted && BuildConfig.DEBUG) {
-            Timber.e("failed to delete file");
+        if (!receipt.delete()) {
+            Timber.w("failed to delete file");
         }
     }
 

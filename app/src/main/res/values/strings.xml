@@ -333,5 +333,6 @@
     <string name="header_login_first_group">First group</string>
     <string name="push_purchase_ocr_failed_title">Processing failed</string>
     <string name="toast_del_identity_balance_not_zero">Clear all outstanding debts and credits before deleting this user</string>
+    <string name="camera_pick_image">Pick Image</string>
 
 </resources>

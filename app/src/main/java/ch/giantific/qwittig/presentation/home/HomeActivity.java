@@ -34,7 +34,6 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.List;
 
-import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.LocalBroadcast;
@@ -274,8 +273,8 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
             case INTENT_REQUEST_IMAGE_CAPTURE:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
-                        final List<String> paths = data.getStringArrayListExtra(CameraActivity.INTENT_EXTRA_PATHS);
-                        encodeReceipt(paths.get(0));
+                        final String imagePath = data.getStringExtra(CameraActivity.INTENT_EXTRA_IMAGE_PATH);
+                        encodeReceipt(imagePath);
                         break;
                     case Activity.RESULT_CANCELED:
                         mViewModel.onReceiptImageFailed();
@@ -294,12 +293,38 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
                     @Override
                     public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
                         mViewModel.onReceiptImageTaken(resource);
-                        final File origReceipt = new File(receiptImagePath);
-                        if (!origReceipt.delete() && BuildConfig.DEBUG) {
-                            Timber.e("failed to delete receipt image file");
-                        }
+                        deleteReceiptFile(receiptImagePath);
                     }
                 });
+    }
+
+    private void deleteReceiptFile(@NonNull String receiptImagePath) {
+        final File origReceipt = new File(receiptImagePath);
+        if (!origReceipt.delete()) {
+            Timber.w("failed to delete receipt image file");
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_CAPTURE_IMAGES:
+                if (Utils.verifyPermissions(grantResults)) {
+                    getImage();
+                } else {
+                    showMessageWithAction(R.string.snackbar_permission_storage_denied,
+                            new MessageAction(R.string.snackbar_action_open_settings) {
+                                @Override
+                                public void onClick(View v) {
+                                    startSystemSettings();
+                                }
+                            });
+                }
+
+                break;
+        }
     }
 
     @Override
@@ -442,28 +467,6 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
         }
 
         return true;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_CAPTURE_IMAGES:
-                if (Utils.verifyPermissions(grantResults)) {
-                    getImage();
-                } else {
-                    showMessageWithAction(R.string.snackbar_permission_storage_denied,
-                            new MessageAction(R.string.snackbar_action_open_settings) {
-                                @Override
-                                public void onClick(View v) {
-                                    startSystemSettings();
-                                }
-                            });
-                }
-
-                break;
-        }
     }
 
     private void getImage() {

@@ -990,9 +990,8 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
 
     private void deleteLocalAvatar(@NonNull String localAvatarPath) {
         final File avatarFile = new File(localAvatarPath);
-        final boolean deleteSuccessful = avatarFile.delete();
-        if (!deleteSuccessful && BuildConfig.DEBUG) {
-            Timber.e("Failed to delete local avatar file");
+        if (!avatarFile.delete()) {
+            Timber.w("Failed to delete local avatar file");
         }
     }
 

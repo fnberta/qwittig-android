@@ -198,12 +198,12 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
 
     @Override
     protected void onPushReceive(@NonNull Context context, @NonNull Intent intent) {
-        Timber.e("onPushReceive");
+        Timber.d("onPushReceive");
 
         final User currentUser = mUserRepo.getCurrentUser();
         // return immediately if no user is logged in
         if (currentUser == null) {
-            Timber.e("currentUser is null");
+            Timber.w("currentUser is null");
             return;
         }
 

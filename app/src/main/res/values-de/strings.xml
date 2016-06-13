@@ -326,5 +326,6 @@
     <string name="header_login_first_group">Erste Gruppe</string>
     <string name="push_purchase_ocr_failed_title">Processing failed</string>
     <string name="toast_del_identity_balance_not_zero">Fordere Guthaben ein und begleiche Schulden bevor du diesen Nutzer löschst</string>
+    <string name="camera_pick_image">Bild auswählen</string>
 
 </resources>

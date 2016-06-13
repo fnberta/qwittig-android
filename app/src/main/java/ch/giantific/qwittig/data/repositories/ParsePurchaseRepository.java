@@ -445,9 +445,8 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
 
     private void deleteLocalReceipt(@NonNull String localReceiptPath) {
         final File file = new File(localReceiptPath);
-        final boolean fileDeleted = file.delete();
-        if (!fileDeleted && BuildConfig.DEBUG) {
-            Timber.e("Failed to delete local receipt file");
+        if (!file.delete()) {
+            Timber.w("Failed to delete local receipt file");
         }
     }
 
