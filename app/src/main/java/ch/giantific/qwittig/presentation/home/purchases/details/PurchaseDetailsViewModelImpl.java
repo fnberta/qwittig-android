@@ -131,8 +131,8 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<Purchase
         final String myShareForeign = foreignFormatter.format(share / mPurchase.getExchangeRate());
         mItems.add(new PurchaseDetailsMyShareItem(myShare, myShareForeign));
 
-        final String note = mPurchase.getNote();
-        if (note != null) {
+        final String note = mPurchase.getNoteOrEmpty();
+        if (!TextUtils.isEmpty(note)) {
             mItems.add(new PurchaseDetailsHeaderItem(R.string.header_note));
             mItems.add(new PurchaseDetailsNoteItem(note));
         }
