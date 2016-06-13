@@ -168,8 +168,13 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
     }
 
     @Override
-    public void onReceiptImageFailed() {
+    public void onReceiptImageDiscarded() {
         mView.showMessage(R.string.toast_purchase_discarded);
+    }
+
+    @Override
+    public void onReceiptImageFailed() {
+        mView.showMessage(R.string.toast_create_image_file_failed);
     }
 
     @Override

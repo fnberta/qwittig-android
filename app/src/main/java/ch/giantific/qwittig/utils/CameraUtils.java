@@ -11,6 +11,7 @@ import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.io.File;
@@ -30,10 +31,11 @@ public class CameraUtils {
 
     /**
      * Returns whether the device has a camera or not.
+     *
      * @param context the context to get the {@link PackageManager}
      * @return whether the device has a camera or not
      */
-    public static boolean hasCameraHardware(Context context) {
+    public static boolean hasCameraHardware(@NonNull Context context) {
         return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
     }
 
@@ -47,7 +49,7 @@ public class CameraUtils {
         return Camera.open(0);
     }
 
-    public static File createImageFile(Context context) throws IOException {
+    public static File createImageFile(@NonNull Context context) throws IOException {
         final String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
         final String imageFileName = "RECEIPT_" + timeStamp;
         final File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
@@ -59,7 +61,7 @@ public class CameraUtils {
     }
 
     @Nullable
-    public static Intent getCameraIntent(Context context, File imageFile) {
+    public static Intent getCameraIntent(@NonNull Context context, @NonNull File imageFile) {
         final Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (cameraIntent.resolveActivity(context.getPackageManager()) != null) {
             cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(imageFile));

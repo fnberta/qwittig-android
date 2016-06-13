@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import ch.giantific.qwittig.BR;
-import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
@@ -349,9 +348,8 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
 
     private void deleteReceiptImage() {
         final File receipt = new File(mReceiptImagePath);
-        boolean fileDeleted = receipt.delete();
-        if (!fileDeleted && BuildConfig.DEBUG) {
-            Timber.e("failed to delete file");
+        if (!receipt.delete()) {
+            Timber.w("failed to delete file");
         }
     }
 
@@ -546,12 +544,8 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
     }
 
     @Override
-    public void onReceiptImagePathSet(@NonNull String receiptImagePath) {
+    public void onReceiptImageTaken(@NonNull String receiptImagePath) {
         mReceiptImagePath = receiptImagePath;
-    }
-
-    @Override
-    public void onReceiptImageTaken() {
         mView.toggleReceiptMenuOption(true);
         mView.showMessage(R.string.toast_receipt_added);
     }

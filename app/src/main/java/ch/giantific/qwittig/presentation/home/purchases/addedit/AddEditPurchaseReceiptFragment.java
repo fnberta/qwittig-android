@@ -4,11 +4,14 @@
 
 package ch.giantific.qwittig.presentation.home.purchases.addedit;
 
+import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,17 +19,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.io.File;
-import java.io.IOException;
-
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentPurchaseShowReceiptBinding;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
+import ch.giantific.qwittig.presentation.home.CameraActivity;
 import ch.giantific.qwittig.presentation.home.purchases.common.PurchaseReceiptViewModel;
 import ch.giantific.qwittig.presentation.home.purchases.common.di.DaggerPurchaseReceiptComponent;
 import ch.giantific.qwittig.presentation.home.purchases.common.di.PurchaseReceiptViewModelModule;
 import ch.giantific.qwittig.utils.CameraUtils;
+import ch.giantific.qwittig.utils.MessageAction;
+import ch.giantific.qwittig.utils.Utils;
 
 /**
  * Shows the receipt image taken by the user when adding a new purchase.
@@ -37,8 +40,8 @@ public class AddEditPurchaseReceiptFragment extends BaseFragment<PurchaseReceipt
 
     private static final String KEY_RECEIPT_IMAGE_URI = "RECEIPT_IMAGE_URI";
     private static final int INTENT_REQUEST_IMAGE_CAPTURE = 1;
+    private static final int PERMISSIONS_REQUEST_CAPTURE_IMAGES = 1;
     private FragmentPurchaseShowReceiptBinding mBinding;
-    private String mReceiptImagePath;
 
     public AddEditPurchaseReceiptFragment() {
         // required empty constructor
@@ -113,43 +116,77 @@ public class AddEditPurchaseReceiptFragment extends BaseFragment<PurchaseReceipt
         return mBinding.ivReceipt;
     }
 
-    /**
-     * Checks whether the permissions to take an image are granted and if yes initiates the creation
-     * of the image file.
-     */
     private void captureImage() {
         if (!CameraUtils.hasCameraHardware(getActivity())) {
             showMessage(R.string.toast_no_camera);
             return;
         }
 
-        final Context context = getActivity();
-        final File imageFile;
-        try {
-            imageFile = CameraUtils.createImageFile(context);
-        } catch (IOException e) {
-            return;
+        if (permissionsAreGranted()) {
+            getImage();
+        }
+    }
+
+    private boolean permissionsAreGranted() {
+        int hasCameraPerm = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA);
+        if (hasCameraPerm != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.CAMERA}, PERMISSIONS_REQUEST_CAPTURE_IMAGES);
+            return false;
         }
 
-        mReceiptImagePath = imageFile.getAbsolutePath();
-        mViewModel.onReceiptImagePathSet(mReceiptImagePath);
-        final Intent cameraIntent = CameraUtils.getCameraIntent(context, imageFile);
-        if (cameraIntent != null) {
-            startActivityForResult(cameraIntent, INTENT_REQUEST_IMAGE_CAPTURE);
-        }
+        return true;
+    }
+
+    private void getImage() {
+        final Intent intent = new Intent(getActivity(), CameraActivity.class);
+        startActivityForResult(intent, INTENT_REQUEST_IMAGE_CAPTURE);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == INTENT_REQUEST_IMAGE_CAPTURE) {
-            if (resultCode == Activity.RESULT_OK) {
-                mViewModel.onReceiptImageCaptured();
-                mActivity.setReceiptImagePath(mReceiptImagePath);
-            }
+        switch (requestCode) {
+            case INTENT_REQUEST_IMAGE_CAPTURE:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        final String imagePath = data.getStringExtra(CameraActivity.INTENT_EXTRA_IMAGE_PATH);
+                        mViewModel.onReceiptImageTaken(imagePath);
+                        mActivity.onReceiptImageTaken(imagePath);
+                        break;
+                }
+                break;
         }
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_CAPTURE_IMAGES:
+                if (Utils.verifyPermissions(grantResults)) {
+                    getImage();
+                } else {
+                    showMessageWithAction(R.string.snackbar_permission_storage_denied,
+                            new MessageAction(R.string.snackbar_action_open_settings) {
+                                @Override
+                                public void onClick(View v) {
+                                    startSystemSettings();
+                                }
+                            });
+                }
+
+                break;
+        }
+    }
+
+    private void startSystemSettings() {
+        final Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.setData(Uri.parse("package:" + getActivity().getPackageName()));
+        startActivity(intent);
+    }
+
 
     /**
      * Defines the interaction with the hosting {@link Activity}.
@@ -163,6 +200,6 @@ public class AddEditPurchaseReceiptFragment extends BaseFragment<PurchaseReceipt
         /**
          * Communicates the path to a newly taken receipt.
          */
-        void setReceiptImagePath(@NonNull String path);
+        void onReceiptImageTaken(@NonNull String path);
     }
 }

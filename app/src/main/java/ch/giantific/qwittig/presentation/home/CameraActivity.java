@@ -5,10 +5,9 @@
 package ch.giantific.qwittig.presentation.home;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.hardware.Camera;
+import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -16,23 +15,14 @@ import android.view.OrientationEventListener;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
-
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
-import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.utils.CameraUtils;
 import timber.log.Timber;
@@ -54,58 +44,53 @@ import timber.log.Timber;
 @SuppressWarnings("deprecation")
 public class CameraActivity extends AppCompatActivity implements View.OnClickListener {
 
-    public static final String INTENT_EXTRA_PATHS = "INTENT_EXTRA_PATHS";
-    private static final int MAX_NUMBER_IMAGES = 3;
+    public static final String INTENT_EXTRA_IMAGE_PATH = "INTENT_EXTRA_IMAGE_PATH";
+    public static final int RESULT_ERROR = 2;
+    private static final int INTENT_REQUEST_IMAGE = 1;
+    private File mFile;
     private Camera mCamera;
     private CameraPreview mPreview;
-    private LinearLayout mLinearLayoutTaken;
     private FloatingActionButton mFabCapture;
-    private View mViewBottom;
-    @NonNull
-    private final List<File> mImageFiles = new ArrayList<>();
+    private ImageView mTextViewDone;
+    private ImageView mImageViewRedo;
     @NonNull
     private final Camera.PictureCallback mPicture = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(@NonNull byte[] data, Camera camera) {
-            File imageFile;
+            final File imageFile;
             try {
                 imageFile = createImageFile();
-                FileOutputStream fos = new FileOutputStream(imageFile);
+                final FileOutputStream fos = new FileOutputStream(imageFile);
                 fos.write(data);
                 fos.close();
             } catch (IOException e) {
-                showErrorToast();
+                showErrorMessage();
                 return;
             }
 
-            mImageFiles.add(imageFile);
-            toggleBottomVisibility();
+            mFile = imageFile;
+            toggleDoneVisibility();
         }
     };
 
     private File createImageFile() throws IOException {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        return File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
+        return CameraUtils.createImageFile(this);
     }
 
-    private void showErrorToast() {
-        Toast.makeText(this, "Failed to capture the image. Pleas try again",
+    private void showErrorMessage() {
+        Toast.makeText(this, "Failed to capture the image. Please try again",
                 Toast.LENGTH_LONG).show();
     }
 
-    private void toggleBottomVisibility() {
+    private void toggleDoneVisibility() {
         if (mFabCapture.getVisibility() == View.VISIBLE) {
             mFabCapture.setVisibility(View.GONE);
-            mViewBottom.setVisibility(View.VISIBLE);
+            mImageViewRedo.setVisibility(View.VISIBLE);
+            mTextViewDone.setVisibility(View.VISIBLE);
         } else {
             mFabCapture.setVisibility(View.VISIBLE);
-            mViewBottom.setVisibility(View.GONE);
+            mImageViewRedo.setVisibility(View.GONE);
+            mTextViewDone.setVisibility(View.GONE);
         }
     }
 
@@ -117,40 +102,47 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         try {
             loadCamera();
         } catch (Exception e) {
-            setResult(RESULT_CANCELED);
+            setResult(RESULT_ERROR);
             finish();
             return;
         }
 
         // Create our Preview view and set it as the content of our activity.
         mPreview = new CameraPreview(this, mCamera);
-        FrameLayout preview = (FrameLayout) findViewById(R.id.fl_camera_preview);
-        preview.addView(mPreview);
+        final FrameLayout preview = (FrameLayout) findViewById(R.id.fl_camera_preview);
+        if (preview != null) {
+            preview.addView(mPreview);
+        }
 
-        mLinearLayoutTaken = (LinearLayout) findViewById(R.id.ll_camera_image_taken);
         mFabCapture = (FloatingActionButton) findViewById(R.id.fab_camera_capture);
-        mFabCapture.setOnClickListener(this);
-        mViewBottom = findViewById(R.id.rl_camera_bottom);
-
-        ImageView done = (ImageView) findViewById(R.id.iv_camera_bottom_done);
-        done.setOnClickListener(this);
-        ImageView add = (ImageView) findViewById(R.id.iv_camera_bottom_add);
-        add.setOnClickListener(this);
-        ImageView redo = (ImageView) findViewById(R.id.iv_camera_bottom_redo);
-        redo.setOnClickListener(this);
+        if (mFabCapture != null) {
+            mFabCapture.setOnClickListener(this);
+        }
+        mTextViewDone = (ImageView) findViewById(R.id.iv_camera_bottom_done);
+        if (mTextViewDone != null) {
+            mTextViewDone.setOnClickListener(this);
+        }
+        mImageViewRedo = (ImageView) findViewById(R.id.iv_camera_bottom_redo);
+        if (mImageViewRedo != null) {
+            mImageViewRedo.setOnClickListener(this);
+        }
+        final TextView pick = (TextView) findViewById(R.id.tv_camera_pick_image);
+        if (pick != null) {
+            pick.setOnClickListener(this);
+        }
     }
 
     private void loadCamera() throws Exception {
         mCamera = CameraUtils.getCameraInstance();
 
-        Camera.Parameters params = mCamera.getParameters();
-        List<String> focusModes = params.getSupportedFocusModes();
+        final Camera.Parameters params = mCamera.getParameters();
+        final List<String> focusModes = params.getSupportedFocusModes();
         if (focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
             params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
         }
-        List<String> flashModes = params.getSupportedFlashModes();
+        final List<String> flashModes = params.getSupportedFlashModes();
         if (flashModes.contains(Camera.Parameters.FLASH_MODE_ON)) {
-            params.setFlashMode(Camera.Parameters.FLASH_MODE_ON);
+            params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
         }
         setRotation(params, 0);
         mCamera.setParameters(params);
@@ -162,18 +154,12 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
             return params;
         }
 
-        Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
+        final Camera.CameraInfo info = new Camera.CameraInfo();
         Camera.getCameraInfo(0, info);
         orientation = (orientation + 45) / 90 * 90;
-        Timber.e("info.orientation %1$s", info.orientation);
-        int rotation;
-        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            rotation = (info.orientation - orientation + 360) % 360;
-        } else {  // back-facing camera
-            rotation = (info.orientation + orientation) % 360;
-        }
-
-        Timber.e("rotation %1$s", rotation);
+        final int rotation = info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT
+                ? (info.orientation - orientation + 360) % 360
+                : (info.orientation + orientation) % 360;
         params.setRotation(rotation);
         return params;
     }
@@ -195,7 +181,6 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    // TODO: think about api 17
     private void setImmersiveMode() {
         getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -217,31 +202,23 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                         if (success) {
                             mCamera.takePicture(null, null, mPicture);
                         } else {
-                            Timber.e("autoFocus failed");
+                            Timber.w("autoFocus failed");
                         }
                     }
                 });
                 break;
             case R.id.iv_camera_bottom_redo:
-                File image = mImageFiles.get(mImageFiles.size() - 1);
-                boolean isDeleted = image.delete();
-                if (!isDeleted && BuildConfig.DEBUG) {
-                    Timber.e("failed to delete file");
+                if (!mFile.delete()) {
+                    Timber.w("failed to delete file");
                 }
-                mImageFiles.remove(image);
+                mFile = null;
                 showPreview();
                 break;
             case R.id.iv_camera_bottom_done:
                 finishCapture();
                 break;
-            case R.id.iv_camera_bottom_add:
-                if (mImageFiles.size() < MAX_NUMBER_IMAGES) {
-                    showPreview();
-                    showImageThumbnail();
-                } else {
-                    Toast.makeText(this, "You can maximally take 3 photos per receipt",
-                            Toast.LENGTH_LONG).show();
-                }
+            case R.id.tv_camera_pick_image:
+                showImagePicker();
                 break;
         }
     }
@@ -249,41 +226,43 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     private void showPreview() {
         mCamera.cancelAutoFocus();
         mCamera.startPreview();
-        toggleBottomVisibility();
-    }
-
-    private void showImageThumbnail() {
-        final ImageView target = (ImageView) getLayoutInflater()
-                .inflate(R.layout.camera_image_taken, mLinearLayoutTaken, false);
-        Glide.with(this)
-                .load(mImageFiles.get(mImageFiles.size() - 1))
-                .asBitmap()
-                .into(new BitmapImageViewTarget(target) {
-                    @Override
-                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                        super.onResourceReady(resource, glideAnimation);
-                        mLinearLayoutTaken.addView(target);
-                    }
-                });
+        toggleDoneVisibility();
     }
 
     private void finishCapture() {
-        int filesSize = mImageFiles.size();
-        if (filesSize == 0) {
+        if (mFile == null) {
             setResult(RESULT_CANCELED);
             finish();
             return;
         }
 
-        ArrayList<String> paths = new ArrayList<>(filesSize);
-        for (File file : mImageFiles) {
-            paths.add(file.getAbsolutePath());
-        }
-
-        Intent intent = new Intent();
-        intent.putStringArrayListExtra(INTENT_EXTRA_PATHS, paths);
+        final Intent intent = new Intent();
+        intent.putExtra(INTENT_EXTRA_IMAGE_PATH, mFile.getAbsolutePath());
         setResult(RESULT_OK, intent);
         finish();
+    }
+
+    private void showImagePicker() {
+        final Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        startActivityForResult(intent, INTENT_REQUEST_IMAGE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case INTENT_REQUEST_IMAGE: {
+                if (resultCode == RESULT_OK) {
+                    final Uri imageUri = data.getData();
+                    final Intent intent = new Intent();
+                    intent.putExtra(INTENT_EXTRA_IMAGE_PATH, imageUri.toString());
+                    setResult(RESULT_OK, intent);
+                    finish();
+                }
+            }
+        }
     }
 
     @Override

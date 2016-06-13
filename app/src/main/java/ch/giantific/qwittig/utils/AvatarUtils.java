@@ -131,7 +131,7 @@ public class AvatarUtils {
                             FileUtils.writeByteArrayToFile(avatar, resource);
                             listener.onAvatarSaved(avatar.getAbsolutePath());
                         } catch (IOException e) {
-                            Timber.e(e, "Failed to pick profile image");
+                            Timber.e(e, "Failed to write profile image to disk");
                         }
                     }
                 });
