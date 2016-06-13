@@ -232,8 +232,8 @@ public class AddPurchaseActivity extends BaseActivity<AddEditPurchaseViewModel> 
     }
 
     @Override
-    public void setReceiptImagePath(@NonNull String path) {
-        mViewModel.onReceiptImagePathSet(path);
+    public void onReceiptImageTaken(@NonNull String receiptImagePath) {
+        mViewModel.onReceiptImageTaken(receiptImagePath);
     }
 
     @Override

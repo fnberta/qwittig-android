@@ -32,7 +32,6 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.List;
 
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
@@ -277,8 +276,10 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
                         encodeReceipt(imagePath);
                         break;
                     case Activity.RESULT_CANCELED:
-                        mViewModel.onReceiptImageFailed();
+                        mViewModel.onReceiptImageDiscarded();
                         break;
+                    case CameraActivity.RESULT_ERROR:
+                        mViewModel.onReceiptImageFailed();
                 }
                 break;
         }
@@ -325,6 +326,12 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
 
                 break;
         }
+    }
+
+    private void startSystemSettings() {
+        final Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.setData(Uri.parse("package:" + getPackageName()));
+        startActivity(intent);
     }
 
     @Override
@@ -472,12 +479,6 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     private void getImage() {
         final Intent intent = new Intent(this, CameraActivity.class);
         startActivityForResult(intent, INTENT_REQUEST_IMAGE_CAPTURE);
-    }
-
-    private void startSystemSettings() {
-        final Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        intent.setData(Uri.parse("package:" + getPackageName()));
-        startActivity(intent);
     }
 
     @Override

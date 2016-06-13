@@ -8,7 +8,6 @@ import android.databinding.Bindable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
@@ -54,6 +53,12 @@ public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseRece
     }
 
     @Override
+    public void setReceiptImage(@NonNull String receiptImagePath) {
+        mReceiptImageUri = receiptImagePath;
+        notifyPropertyChanged(BR.receiptImage);
+    }
+
+    @Override
     @Bindable
     public boolean isLoading() {
         return mLoading;
@@ -66,13 +71,8 @@ public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseRece
     }
 
     @Override
-    public void onReceiptImagePathSet(@NonNull String receiptImageUri) {
-        mReceiptImageUri = receiptImageUri;
-    }
-
-    @Override
-    public void onReceiptImageCaptured() {
-        notifyPropertyChanged(BR.receiptImage);
+    public void onReceiptImageTaken(@NonNull String receiptImagePath) {
+        setReceiptImage(receiptImagePath);
         mView.showMessage(R.string.toast_receipt_changed);
     }
 }

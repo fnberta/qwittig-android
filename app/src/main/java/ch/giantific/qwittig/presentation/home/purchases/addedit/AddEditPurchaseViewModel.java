@@ -39,9 +39,7 @@ public interface AddEditPurchaseViewModel extends ListViewModel<AddEditPurchaseB
 
     NumberFormat getMoneyFormatter();
 
-    void onReceiptImagePathSet(@NonNull String receiptImagePath);
-
-    void onReceiptImageTaken();
+    void onReceiptImageTaken(@NonNull String receiptImagePath);
 
     void onReceiptImageTakeFailed();
 

@@ -4,30 +4,33 @@
 
 package ch.giantific.qwittig.presentation.home.purchases.addedit;
 
+import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.io.File;
-import java.io.IOException;
-
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentPurchaseAddEditBinding;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
 import ch.giantific.qwittig.presentation.common.fragments.DatePickerDialogFragment;
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
+import ch.giantific.qwittig.presentation.home.CameraActivity;
 import ch.giantific.qwittig.presentation.home.purchases.addedit.items.AddEditPurchaseBaseItem.Type;
 import ch.giantific.qwittig.utils.CameraUtils;
+import ch.giantific.qwittig.utils.MessageAction;
+import ch.giantific.qwittig.utils.Utils;
 
 /**
  * Displays the interface where the user can add a new purchase by setting store, date, users
@@ -42,6 +45,7 @@ public abstract class AddEditPurchaseBaseFragment<T extends AddEditPurchaseViewM
     private static final int INTENT_REQUEST_IMAGE_CAPTURE = 1;
     private static final String PURCHASE_NOTE_FRAGMENT = "PURCHASE_NOTE_FRAGMENT";
     private static final String PURCHASE_RECEIPT_FRAGMENT = "PURCHASE_RECEIPT_FRAGMENT";
+    private static final int PERMISSIONS_REQUEST_CAPTURE_IMAGES = 12;
     private FragmentPurchaseAddEditBinding mBinding;
 
     @Nullable
@@ -91,11 +95,43 @@ public abstract class AddEditPurchaseBaseFragment<T extends AddEditPurchaseViewM
             case INTENT_REQUEST_IMAGE_CAPTURE:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
-                        mViewModel.onReceiptImageTaken();
+                        final String imagePath = data.getStringExtra(CameraActivity.INTENT_EXTRA_IMAGE_PATH);
+                        mViewModel.onReceiptImageTaken(imagePath);
+                        break;
+                    case CameraActivity.RESULT_ERROR:
+                        mViewModel.onReceiptImageTakeFailed();
                         break;
                 }
                 break;
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_CAPTURE_IMAGES:
+                if (Utils.verifyPermissions(grantResults)) {
+                    getImage();
+                } else {
+                    showMessageWithAction(R.string.snackbar_permission_storage_denied,
+                            new MessageAction(R.string.snackbar_action_open_settings) {
+                                @Override
+                                public void onClick(View v) {
+                                    startSystemSettings();
+                                }
+                            });
+                }
+
+                break;
+        }
+    }
+
+    private void startSystemSettings() {
+        final Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.setData(Uri.parse("package:" + getActivity().getPackageName()));
+        startActivity(intent);
     }
 
     @Override
@@ -183,20 +219,24 @@ public abstract class AddEditPurchaseBaseFragment<T extends AddEditPurchaseViewM
             return;
         }
 
-        final Context context = getActivity();
-        final File imageFile;
-        try {
-            imageFile = CameraUtils.createImageFile(context);
-        } catch (IOException e) {
-            mViewModel.onReceiptImageTakeFailed();
-            return;
+        if (permissionsAreGranted()) {
+            getImage();
+        }
+    }
+
+    private boolean permissionsAreGranted() {
+        int hasCameraPerm = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA);
+        if (hasCameraPerm != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.CAMERA}, PERMISSIONS_REQUEST_CAPTURE_IMAGES);
+            return false;
         }
 
-        mViewModel.onReceiptImagePathSet(imageFile.getAbsolutePath());
-        final Intent cameraIntent = CameraUtils.getCameraIntent(context, imageFile);
-        if (cameraIntent != null) {
-            startActivityForResult(cameraIntent, INTENT_REQUEST_IMAGE_CAPTURE);
-        }
+        return true;
+    }
+
+    private void getImage() {
+        final Intent intent = new Intent(getActivity(), CameraActivity.class);
+        startActivityForResult(intent, INTENT_REQUEST_IMAGE_CAPTURE);
     }
 
     @Override

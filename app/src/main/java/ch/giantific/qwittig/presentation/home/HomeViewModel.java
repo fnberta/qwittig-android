@@ -45,6 +45,8 @@ public interface HomeViewModel extends ViewModel,
 
     void onReceiptImageTaken(@NonNull byte[] receipt);
 
+    void onReceiptImageDiscarded();
+
     void onReceiptImageFailed();
 
     void onOcrPurchaseReady(@NonNull String ocrPurchaseId);

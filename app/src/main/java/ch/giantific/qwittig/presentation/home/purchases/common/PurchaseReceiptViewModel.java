@@ -19,7 +19,7 @@ public interface PurchaseReceiptViewModel extends ViewModel,
     @Bindable
     String getReceiptImage();
 
-    void onReceiptImagePathSet(@NonNull String receiptImagePath);
+    void setReceiptImage(@NonNull String receiptImagePath);
 
-    void onReceiptImageCaptured();
+    void onReceiptImageTaken(@NonNull String receiptImagePath);
 }

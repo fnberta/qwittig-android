@@ -45,6 +45,7 @@ import timber.log.Timber;
 public class CameraActivity extends AppCompatActivity implements View.OnClickListener {
 
     public static final String INTENT_EXTRA_IMAGE_PATH = "INTENT_EXTRA_IMAGE_PATH";
+    public static final int RESULT_ERROR = 2;
     private static final int INTENT_REQUEST_IMAGE = 1;
     private File mFile;
     private Camera mCamera;
@@ -101,7 +102,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         try {
             loadCamera();
         } catch (Exception e) {
-            setResult(RESULT_CANCELED);
+            setResult(RESULT_ERROR);
             finish();
             return;
         }
