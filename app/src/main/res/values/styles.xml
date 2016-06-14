@@ -5,9 +5,9 @@
 <resources>
 
     <style name="BaseThemeDark" parent="Theme.AppCompat.NoActionBar">
-        <item name="colorPrimary">@color/indigo_500</item>
+        <item name="colorPrimary">@color/blue</item>
         <item name="colorPrimaryDark">@color/indigo_700</item>
-        <item name="colorAccent">@color/amber_A700</item>
+        <item name="colorAccent">@color/yellow</item>
 
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
         <item name="windowActionModeOverlay">true</item>
@@ -22,9 +22,9 @@
     <style name="AppThemeDark.DrawStatusBar" parent="AppThemeDark"/>
 
     <style name="BaseTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/indigo_500</item>
+        <item name="colorPrimary">@color/blue</item>
         <item name="colorPrimaryDark">@color/indigo_700</item>
-        <item name="colorAccent">@color/amber_A700</item>
+        <item name="colorAccent">@color/yellow</item>
         <item name="colorButtonNormal">@android:color/white</item>
 
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
@@ -44,12 +44,12 @@
     <style name="AppTheme.DrawStatusBar.Explode" parent="AppTheme.DrawStatusBar"/>
 
     <style name="AppTheme.DrawStatusBar.Green" parent="AppTheme.DrawStatusBar">
-        <item name="colorPrimary">@color/green_500</item>
+        <item name="colorPrimary">@color/green</item>
         <item name="colorPrimaryDark">@color/green_700</item>
     </style>
 
     <style name="AppTheme.DrawStatusBar.Red" parent="AppTheme.DrawStatusBar">
-        <item name="colorPrimary">@color/red_500</item>
+        <item name="colorPrimary">@color/red</item>
         <item name="colorPrimaryDark">@color/red_700</item>
     </style>
 
