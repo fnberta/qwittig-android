@@ -6,9 +6,9 @@ package ch.giantific.qwittig.di;
 
 import android.app.Application;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.preference.PreferenceManager;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
 
