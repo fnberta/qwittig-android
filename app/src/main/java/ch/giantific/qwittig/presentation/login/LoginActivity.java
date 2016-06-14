@@ -64,7 +64,7 @@ public class LoginActivity extends BaseActivity<LoginAccountsViewModel> implemen
         if (isFirstRun) {
             final Intent intent = new Intent(this, AppIntroActivity.class);
             startActivity(intent);
-//            prefs.edit().putBoolean(PREF_IS_FIRST_RUN, false).apply();
+            prefs.edit().putBoolean(PREF_IS_FIRST_RUN, false).apply();
         }
     }
 
