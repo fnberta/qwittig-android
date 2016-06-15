@@ -152,7 +152,7 @@ public class EditPurchaseViewModelImpl extends AddPurchaseViewModelImpl {
         mEditPurchase.setDate(mDate);
         mEditPurchase.setStore(mStore);
         final BigDecimal totalPriceRounded =
-                new BigDecimal(mTotalPrice).setScale(fractionDigits, BigDecimal.ROUND_UP);
+                new BigDecimal(mTotalPrice).setScale(fractionDigits, BigDecimal.ROUND_HALF_UP);
         mEditPurchase.setTotalPrice(totalPriceRounded);
         mEditPurchase.setCurrency(mCurrency);
         mEditPurchase.setExchangeRate(mExchangeRate);

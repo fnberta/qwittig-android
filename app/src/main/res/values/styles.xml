@@ -6,7 +6,7 @@
 
     <style name="BaseThemeDark" parent="Theme.AppCompat.NoActionBar">
         <item name="colorPrimary">@color/blue</item>
-        <item name="colorPrimaryDark">@color/indigo_700</item>
+        <item name="colorPrimaryDark">@color/blue_dark</item>
         <item name="colorAccent">@color/yellow</item>
 
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
@@ -23,7 +23,7 @@
 
     <style name="BaseTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/blue</item>
-        <item name="colorPrimaryDark">@color/indigo_700</item>
+        <item name="colorPrimaryDark">@color/blue_dark</item>
         <item name="colorAccent">@color/yellow</item>
         <item name="colorButtonNormal">@android:color/white</item>
 
@@ -45,12 +45,16 @@
 
     <style name="AppTheme.DrawStatusBar.Green" parent="AppTheme.DrawStatusBar">
         <item name="colorPrimary">@color/green</item>
-        <item name="colorPrimaryDark">@color/green_700</item>
+        <item name="colorPrimaryDark">@color/green_dark</item>
     </style>
 
     <style name="AppTheme.DrawStatusBar.Red" parent="AppTheme.DrawStatusBar">
         <item name="colorPrimary">@color/red</item>
-        <item name="colorPrimaryDark">@color/red_700</item>
+        <item name="colorPrimaryDark">@color/red_dark</item>
+    </style>
+
+    <style name="AppTheme.DrawStatusBar.Launcher" parent="AppTheme.DrawStatusBar">
+        <item name="android:windowBackground">@drawable/launch_screen</item>
     </style>
 
     <style name="TextAppearance.AppCompat.Subhead.List" parent="TextAppearance.AppCompat.Subhead">

@@ -25,8 +25,13 @@
     <color name="grey_300">#E0E0E0</color>
 
     <color name="red">#F96C5F</color>
+    <color name="red_dark">#F73624</color>
+    <color name="red_light">#FEE1DF</color>
     <color name="blue">#337D9E</color>
+    <color name="blue_dark">#245870</color>
     <color name="green">#98D5CC</color>
+    <color name="green_dark">#6DC3B6</color>
+    <color name="green_light">#F6FBFB</color>
     <color name="purple">#9E7DAA</color>
     <color name="yellow">#FDF590</color>
 

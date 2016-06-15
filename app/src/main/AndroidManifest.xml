@@ -37,7 +37,7 @@
         <activity
             android:name=".presentation.home.HomeActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.DrawStatusBar">
+            android:theme="@style/AppTheme.DrawStatusBar.Launcher">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

@@ -121,6 +121,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.AppTheme_DrawStatusBar);
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_home);
         mBinding.setViewModel(mViewModel);

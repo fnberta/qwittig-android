@@ -681,11 +681,11 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
 
     private BigDecimal roundPrice(@NonNull String price, int fractionDigits) {
         try {
-            return new BigDecimal(price).setScale(fractionDigits, BigDecimal.ROUND_UP);
+            return new BigDecimal(price).setScale(fractionDigits, BigDecimal.ROUND_HALF_UP);
         } catch (NumberFormatException e) {
             try {
                 final double parsed = mMoneyFormatter.parse(price).doubleValue();
-                return new BigDecimal(parsed).setScale(fractionDigits, BigDecimal.ROUND_UP);
+                return new BigDecimal(parsed).setScale(fractionDigits, BigDecimal.ROUND_HALF_UP);
             } catch (ParseException e1) {
                 return BigDecimal.ZERO;
             }
@@ -696,7 +696,7 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
     Purchase createPurchase(@NonNull List<Identity> purchaseIdentities,
                             @NonNull List<Item> purchaseItems, int fractionDigits) {
         final BigDecimal totalPriceRounded =
-                new BigDecimal(mTotalPrice).setScale(fractionDigits, BigDecimal.ROUND_UP);
+                new BigDecimal(mTotalPrice).setScale(fractionDigits, BigDecimal.ROUND_HALF_UP);
         final Purchase purchase = new Purchase(mCurrentIdentity, mCurrentGroup, mDate, mStore,
                 purchaseItems, totalPriceRounded, purchaseIdentities, mCurrency, mExchangeRate);
         if (!TextUtils.isEmpty(mNote)) {

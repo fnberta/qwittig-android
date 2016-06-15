@@ -177,12 +177,12 @@ public class FinanceActivity extends BaseNavDrawerActivity<BalanceHeaderViewMode
         int colorDark;
         int style;
         if (Utils.isPositive(balance)) {
-            color = ContextCompat.getColor(this, R.color.green_500);
-            colorDark = ContextCompat.getColor(this, R.color.green_700);
+            color = ContextCompat.getColor(this, R.color.green);
+            colorDark = ContextCompat.getColor(this, R.color.green_dark);
             style = R.style.AppTheme_DrawStatusBar_Green;
         } else {
-            color = ContextCompat.getColor(this, R.color.red_500);
-            colorDark = ContextCompat.getColor(this, R.color.red_700);
+            color = ContextCompat.getColor(this, R.color.red);
+            colorDark = ContextCompat.getColor(this, R.color.red_dark);
             style = R.style.AppTheme_DrawStatusBar_Red;
         }
         setTheme(style);

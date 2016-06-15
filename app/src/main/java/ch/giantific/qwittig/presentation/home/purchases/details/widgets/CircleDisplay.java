@@ -6,12 +6,15 @@ package ch.giantific.qwittig.presentation.home.purchases.details.widgets;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.RectF;
+import android.support.annotation.ColorInt;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
@@ -85,10 +88,20 @@ public class CircleDisplay extends View {
 
         mArcPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mArcPaint.setStyle(Style.FILL);
-        mArcPaint.setColor(ContextCompat.getColor(context, R.color.amber_A700));
+        mArcPaint.setColor(fetchAccentColor(context));
 
         mDrawAnimator = ObjectAnimator.ofFloat(this, "phase", mPhase, 1.0f).setDuration(1000);
         mDrawAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+    }
+
+    @ColorInt
+    private int fetchAccentColor(Context context) {
+        final TypedValue typedValue = new TypedValue();
+        final TypedArray a = context.obtainStyledAttributes(typedValue.data, new int[] { R.attr.colorAccent });
+        final int color = a.getColor(0, 0);
+        a.recycle();
+
+        return color;
     }
 
     @Override
