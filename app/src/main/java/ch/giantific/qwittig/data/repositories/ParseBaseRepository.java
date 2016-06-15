@@ -93,7 +93,7 @@ public abstract class ParseBaseRepository implements BaseRepository {
 
     @Override
     public boolean isAlreadySavedLocal(@NonNull String objectId) {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery(getClassName());
+        final ParseQuery<ParseObject> query = ParseQuery.getQuery(getClassName());
         query.ignoreACLs();
         query.fromLocalDatastore();
         try {

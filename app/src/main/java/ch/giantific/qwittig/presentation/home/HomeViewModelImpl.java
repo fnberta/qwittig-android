@@ -189,7 +189,7 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
                     public void onError(Throwable error) {
                         mView.removeWorker(workerTag);
 
-                        mView.showMessage(mPurchaseRepo.getErrorMessage(error));
+                        mView.showMessage(R.string.toast_error_purchase_ocr_process);
                         stopProgress(false);
                     }
                 })
