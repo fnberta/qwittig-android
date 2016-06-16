@@ -19,6 +19,7 @@ import java.util.Objects;
 import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
@@ -59,8 +60,9 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
 
     public SettingsProfileViewModelImpl(@Nullable Bundle savedState,
                                         @NonNull SettingsProfileViewModel.ViewListener view,
+                                        @NonNull RxBus<Object> eventBus,
                                         @NonNull UserRepository userRepository) {
-        super(savedState, view, userRepository);
+        super(savedState, view, eventBus, userRepository);
 
         mFacebookUser = mCurrentUser.isFacebookUser();
         mGoogleUser = mCurrentUser.isGoogleUser();

@@ -11,9 +11,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.bus.events.EventIdentitySelected;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 
 /**
@@ -27,13 +30,16 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
 
     protected final T mView;
     protected final UserRepository mUserRepo;
+    protected final RxBus<Object> mEventBus;
     protected User mCurrentUser;
     protected Identity mCurrentIdentity;
     private CompositeSubscription mSubscriptions = new CompositeSubscription();
 
     public ViewModelBaseImpl(@Nullable Bundle savedState, @NonNull T view,
+                             @NonNull RxBus<Object> eventBus,
                              @NonNull UserRepository userRepository) {
         mView = view;
+        mEventBus = eventBus;
         mUserRepo = userRepository;
         mCurrentUser = mUserRepo.getCurrentUser();
         setCurrentIdentity();
@@ -63,12 +69,20 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
     @CallSuper
     public void onViewVisible() {
         setCurrentIdentity();
+
+        getSubscriptions().add(mEventBus.observeEvents(EventIdentitySelected.class)
+                .subscribe(new Action1<EventIdentitySelected>() {
+                    @Override
+                    public void call(EventIdentitySelected eventIdentitySelected) {
+                        onIdentitySelected(eventIdentitySelected.getIdentity());
+                    }
+                })
+        );
     }
 
-    @Override
     @CallSuper
-    public void onIdentitySelected() {
-        setCurrentIdentity();
+    protected void onIdentitySelected(@NonNull Identity identitySelected) {
+        mCurrentIdentity = identitySelected;
     }
 
     @Override

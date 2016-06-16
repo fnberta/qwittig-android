@@ -31,11 +31,6 @@ public interface ViewModel
     void onViewVisible();
 
     /**
-     * Loads the appropriate data for the newly set group.
-     */
-    void onIdentitySelected();
-
-    /**
      * Cleans up any long living tasks, e.g. RxJava subscriptions, in order to allow the view model
      * and the view it references to be garbage collected.
      */

@@ -17,6 +17,8 @@ import java.util.Objects;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.bus.events.EventIdentitySelected;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
@@ -32,8 +34,9 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
 
     public NavDrawerViewModelImpl(@Nullable Bundle savedState,
                                   @NonNull NavDrawerViewModel.ViewListener view,
+                                  @NonNull RxBus<Object> eventBus,
                                   @NonNull UserRepository userRepository) {
-        super(savedState, view, userRepository);
+        super(savedState, view, eventBus, userRepository);
     }
 
     @Override
@@ -153,11 +156,10 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
             return;
         }
 
-        mCurrentIdentity = identity;
         mCurrentUser.setCurrentIdentity(identity);
         mCurrentUser.saveEventually();
 
-        mView.onIdentitySelected();
+        mEventBus.post(new EventIdentitySelected(identity));
     }
 
     @Override

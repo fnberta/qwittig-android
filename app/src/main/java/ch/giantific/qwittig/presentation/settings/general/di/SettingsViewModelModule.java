@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.di.scopes.PerScreen;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
@@ -30,7 +31,8 @@ public class SettingsViewModelModule extends BaseViewModelModule<SettingsViewMod
 
     @PerScreen
     @Provides
-    SettingsViewModel providesSettingsViewModel(@NonNull UserRepository userRepository) {
-        return new SettingsViewModelImpl(mSavedState, mView, userRepository);
+    SettingsViewModel providesSettingsViewModel(@NonNull RxBus<Object> eventBus,
+                                                @NonNull UserRepository userRepository) {
+        return new SettingsViewModelImpl(mSavedState, mView, eventBus, userRepository);
     }
 }

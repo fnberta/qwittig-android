@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.di.scopes.PerScreen;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
@@ -30,7 +31,8 @@ public class SettingsAddGroupViewModelModule extends BaseViewModelModule<Setting
 
     @PerScreen
     @Provides
-    SettingsAddGroupViewModel providesSettingsAddGroupViewModel(@NonNull UserRepository userRepository) {
-        return new SettingsAddGroupViewModelImpl(mSavedState, mView, userRepository);
+    SettingsAddGroupViewModel providesSettingsAddGroupViewModel(@NonNull RxBus<Object> eventBus,
+                                                                @NonNull UserRepository userRepository) {
+        return new SettingsAddGroupViewModelImpl(mSavedState, mView, eventBus, userRepository);
     }
 }

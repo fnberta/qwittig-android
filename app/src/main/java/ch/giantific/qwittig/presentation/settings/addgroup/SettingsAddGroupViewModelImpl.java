@@ -16,6 +16,7 @@ import java.util.List;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
@@ -35,8 +36,9 @@ public class SettingsAddGroupViewModelImpl extends ViewModelBaseImpl<SettingsAdd
 
     public SettingsAddGroupViewModelImpl(@Nullable Bundle savedState,
                                          @NonNull SettingsAddGroupViewModel.ViewListener view,
+                                         @NonNull RxBus<Object> eventBus,
                                          @NonNull UserRepository userRepository) {
-        super(savedState, view, userRepository);
+        super(savedState, view, eventBus, userRepository);
 
         if (savedState != null) {
             mValidate = savedState.getBoolean(STATE_VALIDATE);

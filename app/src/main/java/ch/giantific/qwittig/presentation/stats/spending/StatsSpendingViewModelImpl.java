@@ -19,6 +19,7 @@ import java.util.List;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.stats.StatsViewModel;
@@ -46,10 +47,11 @@ public class StatsSpendingViewModelImpl extends StatsViewModelBaseImpl<StatsSpen
 
     public StatsSpendingViewModelImpl(@Nullable Bundle savedState,
                                       @NonNull StatsSpendingViewModel.ViewListener view,
+                                      @NonNull RxBus<Object> eventBus,
                                       @NonNull UserRepository userRepository,
                                       @NonNull String defaultYear,
                                       @NonNull Month defaultMonth) {
-        super(savedState, view, userRepository, defaultYear, defaultMonth);
+        super(savedState, view, eventBus, userRepository, defaultYear, defaultMonth);
 
         if (savedState != null) {
             mShowGroup = savedState.getBoolean(STATE_SHOW_GROUP, false);

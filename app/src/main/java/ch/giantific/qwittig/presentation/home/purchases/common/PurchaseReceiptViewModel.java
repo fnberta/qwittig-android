@@ -21,5 +21,16 @@ public interface PurchaseReceiptViewModel extends ViewModel,
 
     void setReceiptImage(@NonNull String receiptImagePath);
 
+    void onEditReceiptMenuClick();
+
     void onReceiptImageTaken(@NonNull String receiptImagePath);
+
+    void onDeleteReceiptMenuClick();
+
+    interface ViewListener extends ViewModel.ViewListener {
+
+        void captureImage();
+
+        void showPurchaseScreen();
+    }
 }

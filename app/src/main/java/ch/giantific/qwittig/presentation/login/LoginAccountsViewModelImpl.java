@@ -15,6 +15,7 @@ import android.view.View;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
@@ -34,8 +35,9 @@ public class LoginAccountsViewModelImpl extends ViewModelBaseImpl<LoginAccountsV
 
     public LoginAccountsViewModelImpl(@Nullable Bundle savedState,
                                       @NonNull LoginAccountsViewModel.ViewListener view,
+                                      @NonNull RxBus<Object> eventBus,
                                       @NonNull UserRepository userRepository) {
-        super(savedState, view, userRepository);
+        super(savedState, view, eventBus, userRepository);
 
         if (savedState != null) {
             mLoading = savedState.getBoolean(STATE_LOADING);

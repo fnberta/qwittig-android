@@ -16,6 +16,7 @@ import com.github.mikephil.charting.utils.ViewPortHandler;
 
 import java.text.NumberFormat;
 
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.stats.StatsViewModel;
 import ch.giantific.qwittig.presentation.stats.models.Month;
@@ -34,9 +35,10 @@ public class StatsStoresViewModelImpl extends StatsPieViewModelBaseImpl<StatsSto
 
     public StatsStoresViewModelImpl(@Nullable Bundle savedState,
                                     @NonNull StatsStoresViewModel.ViewListener view,
+                                    @NonNull RxBus<Object> eventBus,
                                     @NonNull UserRepository userRepository,
                                     @NonNull String year, @NonNull Month month) {
-        super(savedState, view, userRepository, year, month);
+        super(savedState, view, eventBus, userRepository, year, month);
 
         if (savedState != null) {
             mShowAverage = savedState.getBoolean(STATE_SHOW_AVERAGE, false);

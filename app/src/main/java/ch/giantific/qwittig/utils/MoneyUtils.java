@@ -168,13 +168,10 @@ public class MoneyUtils {
 
     /**
      * Returns the display name for currency code.
-     * <p/>
-     * TODO: only works on api >19
      *
      * @param currencyCode the currency code to get the display name for
      * @return the display name for currency code
      */
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     private static String getCurrencyDisplayName(@NonNull String currencyCode) {
         final Currency currency = Currency.getInstance(currencyCode);
         return currency.getDisplayName(Locale.getDefault());

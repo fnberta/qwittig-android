@@ -11,6 +11,10 @@ import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.bus.events.EventDraftDeleted;
+import ch.giantific.qwittig.data.bus.events.EventReceiptImageDeleted;
+import ch.giantific.qwittig.data.bus.events.EventReceiptImageTaken;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 
@@ -26,9 +30,10 @@ public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseRece
 
     public PurchaseReceiptViewModelImpl(@Nullable Bundle savedState,
                                         @NonNull PurchaseReceiptViewModel.ViewListener view,
+                                        @NonNull RxBus<Object> eventBus,
                                         @NonNull UserRepository userRepository,
                                         @NonNull String receiptImageUri) {
-        super(savedState, view, userRepository);
+        super(savedState, view, eventBus, userRepository);
 
         mReceiptImageUri = receiptImageUri;
 
@@ -64,6 +69,7 @@ public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseRece
         return mLoading;
     }
 
+
     @Override
     public void setLoading(boolean loading) {
         mLoading = loading;
@@ -71,8 +77,20 @@ public class PurchaseReceiptViewModelImpl extends ViewModelBaseImpl<PurchaseRece
     }
 
     @Override
+    public void onEditReceiptMenuClick() {
+        mView.captureImage();
+    }
+
+    @Override
     public void onReceiptImageTaken(@NonNull String receiptImagePath) {
         setReceiptImage(receiptImagePath);
+        mEventBus.post(new EventReceiptImageTaken(receiptImagePath));
         mView.showMessage(R.string.toast_receipt_changed);
+    }
+
+    @Override
+    public void onDeleteReceiptMenuClick() {
+        mView.showPurchaseScreen();
+        mEventBus.post(new EventReceiptImageDeleted());
     }
 }

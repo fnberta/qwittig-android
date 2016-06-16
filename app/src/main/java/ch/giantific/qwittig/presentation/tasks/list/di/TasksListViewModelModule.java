@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.di.scopes.PerScreen;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
@@ -37,9 +38,10 @@ public class TasksListViewModelModule extends BaseViewModelModule<TasksViewModel
 
     @PerScreen
     @Provides
-    TasksViewModel providesTasksListViewModel(@NonNull UserRepository userRepository,
+    TasksViewModel providesTasksListViewModel(@NonNull RxBus<Object> eventBus,
+                                              @NonNull UserRepository userRepository,
                                               @NonNull TaskRepository taskRepository) {
-        return new TasksViewModelImpl(mSavedState, mView, userRepository, taskRepository, mTaskDeadline);
+        return new TasksViewModelImpl(mSavedState, mView, eventBus, userRepository, taskRepository, mTaskDeadline);
     }
 
 }

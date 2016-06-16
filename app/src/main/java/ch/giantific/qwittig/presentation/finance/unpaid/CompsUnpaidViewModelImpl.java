@@ -19,6 +19,8 @@ import java.util.Objects;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.bus.events.EventCompensationConfirmed;
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
@@ -54,9 +56,10 @@ public class CompsUnpaidViewModelImpl
 
     public CompsUnpaidViewModelImpl(@Nullable Bundle savedState,
                                     @NonNull CompsUnpaidViewModel.ViewListener view,
+                                    @NonNull RxBus<Object> eventBus,
                                     @NonNull UserRepository userRepository,
                                     @NonNull CompensationRepository compsRepo) {
-        super(savedState, view, userRepository);
+        super(savedState, view, eventBus, userRepository);
 
         mCompsRepo = compsRepo;
 
@@ -239,7 +242,7 @@ public class CompsUnpaidViewModelImpl
                             notifyPropertyChanged(BR.empty);
                         }
 
-                        mView.onCompensationConfirmed();
+                        mEventBus.post(new EventCompensationConfirmed());
                     }
 
                     @Override

@@ -90,7 +90,6 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     private static final int PERMISSIONS_REQUEST_CAPTURE_IMAGES = 1;
     private ActivityHomeBinding mBinding;
     private PurchasesViewModel mPurchasesViewModel;
-    private DraftsViewModel mDraftsViewModel;
     private PurchasesFragment mPurchasesFragment;
     private DraftsFragment mDraftsFragment;
     private ProgressDialog mProgressDialog;
@@ -182,17 +181,25 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        if (mUserLoggedIn) {
+            final FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.putFragment(outState, STATE_PURCHASES_FRAGMENT, mPurchasesFragment);
+            if (mViewModel.isDraftsAvailable()) {
+                fragmentManager.putFragment(outState, STATE_DRAFTS_FRAGMENT, mDraftsFragment);
+            }
+        }
+    }
+
+    @Override
     protected void injectDependencies(@NonNull NavDrawerComponent navComp,
                                       @Nullable Bundle savedInstanceState) {
         final HomeSubcomponent component =
                 navComp.plus(new HomeViewModelModule(savedInstanceState, this));
         component.inject(this);
         mViewModel = component.getHomeViewModel();
-    }
-
-    @Override
-    protected int getSelfNavDrawerItem() {
-        return R.id.nav_home;
     }
 
     @Override
@@ -224,6 +231,27 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
                 }
             }
         }, getIntent().getData(), this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (mUserLoggedIn) {
+            mViewModel.checkDrafts();
+        }
+    }
+
+    @Override
+    public void toggleDraftTab(boolean draftsAvailable) {
+        if (draftsAvailable) {
+            toggleToolbarScrollFlags(true);
+            mDraftsFragment = new DraftsFragment();
+            mTabsAdapter.addFragment(mDraftsFragment, getString(R.string.title_activity_purchase_drafts));
+        } else {
+            toggleToolbarScrollFlags(false);
+            mTabsAdapter.removeFragment(mDraftsFragment);
+        }
     }
 
     @Override
@@ -340,60 +368,13 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
         super.onLoginSuccessful();
 
         mViewModel.onLoginSuccessful();
-        checkDrafts();
+        mViewModel.checkDrafts();
         addFragments();
     }
 
     @Override
-    public void checkDrafts() {
-        final boolean draftsAvailable = mViewModel.isDraftsAvailable();
-        if (draftsAvailable != mViewModel.updateDraftsAvailable()) {
-            toggleDraftTab();
-        }
-    }
-
-    private void toggleDraftTab() {
-        if (mViewModel.isDraftsAvailable()) {
-            toggleToolbarScrollFlags(true);
-            mDraftsFragment = new DraftsFragment();
-            mTabsAdapter.addFragment(mDraftsFragment, getString(R.string.title_activity_purchase_drafts));
-        } else {
-            toggleToolbarScrollFlags(false);
-            mTabsAdapter.removeFragment(mDraftsFragment);
-        }
-    }
-
-    @Override
-    public void onIdentitySelected() {
-        super.onIdentitySelected();
-
-        mPurchasesViewModel.onIdentitySelected();
-        checkDrafts();
-        if (mViewModel.isDraftsAvailable()) {
-            mDraftsViewModel.onIdentitySelected();
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        if (mUserLoggedIn) {
-            checkDrafts();
-        }
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        if (mUserLoggedIn) {
-            final FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.putFragment(outState, STATE_PURCHASES_FRAGMENT, mPurchasesFragment);
-            if (mViewModel.isDraftsAvailable()) {
-                fragmentManager.putFragment(outState, STATE_DRAFTS_FRAGMENT, mDraftsFragment);
-            }
-        }
+    protected int getSelfNavDrawerItem() {
+        return R.id.nav_home;
     }
 
     @Override
@@ -414,11 +395,6 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeViewModel> implement
     @Override
     public void setPurchasesViewModel(@NonNull PurchasesViewModel viewModel) {
         mPurchasesViewModel = viewModel;
-    }
-
-    @Override
-    public void setDraftsViewModel(@NonNull DraftsViewModel viewModel) {
-        mDraftsViewModel = viewModel;
     }
 
     @Override

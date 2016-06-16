@@ -20,6 +20,7 @@ import java.util.Objects;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.domain.models.TaskHistoryEvent;
@@ -50,10 +51,11 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsB
 
     public TaskDetailsViewModelImpl(@Nullable Bundle savedState,
                                     @NonNull TaskDetailsViewModel.ViewListener view,
+                                    @NonNull RxBus<Object> eventBus,
                                     @NonNull UserRepository userRepository,
                                     @NonNull TaskRepository taskRepository,
                                     @NonNull String taskId) {
-        super(savedState, view, userRepository);
+        super(savedState, view, eventBus, userRepository);
 
         mTaskRepo = taskRepository;
         mTaskId = taskId;
@@ -279,7 +281,7 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsB
 
     @SuppressLint("MissingSuperCall")
     @Override
-    public void onIdentitySelected() {
+    protected void onIdentitySelected(@NonNull Identity identitySelected) {
         mView.finishScreen(TaskDetailsResult.GROUP_CHANGED);
     }
 }

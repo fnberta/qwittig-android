@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.stats.StatsViewModel;
 import ch.giantific.qwittig.presentation.stats.models.Month;
@@ -25,9 +26,10 @@ public class StatsCurrenciesViewModelImpl extends StatsPieViewModelBaseImpl<Stat
 
     public StatsCurrenciesViewModelImpl(@Nullable Bundle savedState,
                                         @NonNull StatsPieViewModel.ViewListener view,
+                                        @NonNull RxBus<Object> eventBus,
                                         @NonNull UserRepository userRepository,
                                         @NonNull String year, @NonNull Month month) {
-        super(savedState, view, userRepository, year, month);
+        super(savedState, view, eventBus, userRepository, year, month);
     }
 
     @Override

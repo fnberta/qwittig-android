@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Objects;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
@@ -34,8 +35,9 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
 
     public SettingsViewModelImpl(@Nullable Bundle savedState,
                                  @NonNull SettingsViewModel.ViewListener view,
+                                 @NonNull RxBus<Object> eventBus,
                                  @NonNull UserRepository userRepository) {
-        super(savedState, view, userRepository);
+        super(savedState, view, eventBus, userRepository);
     }
 
     @Override

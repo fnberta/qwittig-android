@@ -11,6 +11,7 @@ import android.view.View;
 import java.util.Objects;
 
 import ch.giantific.qwittig.BR;
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
@@ -32,9 +33,10 @@ public class LoginProfileViewModelImpl extends ViewModelBaseImpl<LoginProfileVie
 
     public LoginProfileViewModelImpl(@Nullable Bundle savedState,
                                      @NonNull LoginProfileViewModel.ViewListener view,
+                                     @NonNull RxBus<Object> eventBus,
                                      @NonNull UserRepository userRepository,
                                      boolean withInvitation) {
-        super(savedState, view, userRepository);
+        super(savedState, view, eventBus, userRepository);
 
         mWithInvitation = withInvitation;
 

@@ -30,6 +30,5 @@ public interface PurchasesViewModel extends OnlineListViewModel<Purchase>,
         void loadQueryMorePurchasesWorker(int skip);
 
         void startPurchaseDetailsActivity(@NonNull Purchase purchase);
-
     }
 }

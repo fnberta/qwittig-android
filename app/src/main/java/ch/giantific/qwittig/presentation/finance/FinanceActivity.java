@@ -159,14 +159,6 @@ public class FinanceActivity extends BaseNavDrawerActivity<BalanceHeaderViewMode
     }
 
     @Override
-    public void onIdentitySelected() {
-        super.onIdentitySelected();
-
-        mCompsPaidViewModel.onIdentitySelected();
-        mCompsUnpaidViewModel.onIdentitySelected();
-    }
-
-    @Override
     protected int getSelfNavDrawerItem() {
         return R.id.nav_finance;
     }
@@ -189,11 +181,6 @@ public class FinanceActivity extends BaseNavDrawerActivity<BalanceHeaderViewMode
         mToolbar.setBackgroundColor(color);
         mBinding.tabs.setBackgroundColor(color);
         setStatusBarBackgroundColor(colorDark);
-    }
-
-    @Override
-    public void reloadCompsPaid() {
-        mCompsPaidViewModel.loadData();
     }
 
     @Override

@@ -22,11 +22,15 @@ public interface AddEditPurchaseNoteViewModel extends ViewModel,
 
     void onEditNoteMenuClick();
 
+    void onDeleteNoteMenuClick();
+
     /**
      * Defines the interaction with the attached view.
      */
     interface ViewListener extends ViewModel.ViewListener {
 
         void showEditNoteDialog(@NonNull String note);
+
+        void showPurchaseScreen();
     }
 }

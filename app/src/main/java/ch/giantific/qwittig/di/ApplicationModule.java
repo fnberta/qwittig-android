@@ -14,6 +14,7 @@ import com.google.android.gms.gcm.GcmNetworkManager;
 
 import javax.inject.Singleton;
 
+import ch.giantific.qwittig.data.bus.RxBus;
 import dagger.Module;
 import dagger.Provides;
 
@@ -51,5 +52,11 @@ public class ApplicationModule {
     @Singleton
     GcmNetworkManager providesGcmNetworkManager(Application application) {
         return GcmNetworkManager.getInstance(application);
+    }
+
+    @Provides
+    @Singleton
+    RxBus<Object> providesEventBus() {
+        return new RxBus<>();
     }
 }

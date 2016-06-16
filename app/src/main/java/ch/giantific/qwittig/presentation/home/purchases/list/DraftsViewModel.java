@@ -34,7 +34,5 @@ public interface DraftsViewModel extends ListViewModel<Purchase>,
         void stopSelectionMode();
 
         void setSelectionModeTitle(@StringRes int title, int draftsSelected);
-
-        void updateDraftsDisplay();
     }
 }

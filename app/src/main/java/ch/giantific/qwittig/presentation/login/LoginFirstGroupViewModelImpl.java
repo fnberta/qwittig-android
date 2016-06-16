@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Objects;
 
 import ch.giantific.qwittig.BR;
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
@@ -35,8 +36,9 @@ public class LoginFirstGroupViewModelImpl extends ViewModelBaseImpl<LoginFirstGr
 
     public LoginFirstGroupViewModelImpl(@Nullable Bundle savedState,
                                         @NonNull LoginFirstGroupViewModel.ViewListener view,
+                                        @NonNull RxBus<Object> eventBus,
                                         @NonNull UserRepository userRepository) {
-        super(savedState, view, userRepository);
+        super(savedState, view, eventBus, userRepository);
 
         mCurrencies = MoneyUtils.getSupportedCurrencies();
 

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.di.scopes.PerScreen;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
@@ -37,17 +38,19 @@ public class EditPurchaseViewModelModule extends BaseViewModelModule<AddEditPurc
 
     @PerScreen
     @Provides
-    AddEditPurchaseViewModel providesPurchaseEditViewModel(@NonNull UserRepository userRepository,
+    AddEditPurchaseViewModel providesPurchaseEditViewModel(@NonNull RxBus<Object> eventBus,
+                                                           @NonNull UserRepository userRepository,
                                                            @NonNull PurchaseRepository purchaseRepository) {
-        return new EditPurchaseViewModelImpl(mSavedState, mView, userRepository, purchaseRepository,
-                mEditPurchaseId);
+        return new EditPurchaseViewModelImpl(mSavedState, mView, eventBus, userRepository,
+                purchaseRepository, mEditPurchaseId);
     }
 
     @PerScreen
     @Provides
-    EditPurchaseDraftViewModel providesPurchaseEditDraftViewModel(@NonNull UserRepository userRepository,
+    EditPurchaseDraftViewModel providesPurchaseEditDraftViewModel(@NonNull RxBus<Object> eventBus,
+                                                                  @NonNull UserRepository userRepository,
                                                                   @NonNull PurchaseRepository purchaseRepository) {
-        return new EditPurchaseDraftViewModelImpl(mSavedState, mView, userRepository,
+        return new EditPurchaseDraftViewModelImpl(mSavedState, mView, eventBus, userRepository,
                 purchaseRepository, mEditPurchaseId);
     }
 }

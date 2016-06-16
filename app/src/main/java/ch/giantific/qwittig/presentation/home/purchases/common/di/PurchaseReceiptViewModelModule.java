@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.di.scopes.PerScreen;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
@@ -35,7 +36,8 @@ public class PurchaseReceiptViewModelModule extends BaseViewModelModule<Purchase
 
     @PerScreen
     @Provides
-    PurchaseReceiptViewModel providesPurchaseReceiptViewModel(@NonNull UserRepository userRepository) {
-        return new PurchaseReceiptViewModelImpl(mSavedState, mView, userRepository, mReceiptImagePath);
+    PurchaseReceiptViewModel providesPurchaseReceiptViewModel(@NonNull RxBus<Object> eventBus,
+                                                              @NonNull UserRepository userRepository) {
+        return new PurchaseReceiptViewModelImpl(mSavedState, mView, eventBus, userRepository, mReceiptImagePath);
     }
 }

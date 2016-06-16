@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
@@ -30,21 +31,22 @@ import rx.functions.Func1;
 public class PurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purchase, PurchasesViewModel.ViewListener>
         implements PurchasesViewModel {
 
-    private static final String STATE_IS_LOADING_MORE = "STATE_IS_LOADING_MORE";
+    private static final String STATE_LOADING_MORE = "STATE_LOADING_MORE";
     private final PurchaseRepository mPurchaseRepo;
-    private boolean mIsLoadingMore;
+    private boolean mLoadingMore;
 
     public PurchasesViewModelImpl(@Nullable Bundle savedState,
                                   @NonNull PurchasesViewModel.ViewListener view,
+                                  @NonNull RxBus<Object> eventBus,
                                   @NonNull UserRepository userRepository,
                                   @NonNull PurchaseRepository purchaseRepo) {
-        super(savedState, view, userRepository);
+        super(savedState, view, eventBus, userRepository);
 
         mPurchaseRepo = purchaseRepo;
 
         if (savedState != null) {
             mItems = new ArrayList<>();
-            mIsLoadingMore = savedState.getBoolean(STATE_IS_LOADING_MORE, false);
+            mLoadingMore = savedState.getBoolean(STATE_LOADING_MORE, false);
         }
     }
 
@@ -52,7 +54,7 @@ public class PurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purchase
     public void saveState(@NonNull Bundle outState) {
         super.saveState(outState);
 
-        outState.putBoolean(STATE_IS_LOADING_MORE, mIsLoadingMore);
+        outState.putBoolean(STATE_LOADING_MORE, mLoadingMore);
     }
 
     @Override
@@ -77,7 +79,7 @@ public class PurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purchase
                                 setLoading(false);
                                 mView.notifyDataSetChanged();
 
-                                if (mIsLoadingMore) {
+                                if (mLoadingMore) {
                                     addLoadMore();
                                     mView.scrollToPosition(getLastPosition());
                                 }
@@ -151,7 +153,7 @@ public class PurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purchase
                     @Override
                     public void onSuccess(List<Purchase> purchases) {
                         mView.removeWorker(workerTag);
-                        mIsLoadingMore = false;
+                        mLoadingMore = false;
 
                         removeLoadMore();
                         mItems.addAll(purchases);
@@ -168,7 +170,7 @@ public class PurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purchase
                                         onLoadMore();
                                     }
                                 });
-                        mIsLoadingMore = false;
+                        mLoadingMore = false;
 
                         removeLoadMore();
                     }
@@ -184,16 +186,15 @@ public class PurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purchase
 
     @Override
     public void onLoadMore() {
-        mIsLoadingMore = true;
+        mLoadingMore = true;
 
         addLoadMore();
-        final int skip = mItems.size();
-        mView.loadQueryMorePurchasesWorker(skip);
+        mView.loadQueryMorePurchasesWorker(mItems.size());
     }
 
     @Override
     public boolean isLoadingMore() {
-        return !mView.isNetworkAvailable() || mIsLoadingMore || isRefreshing();
+        return !mView.isNetworkAvailable() || mLoadingMore || isRefreshing();
     }
 
     @Override

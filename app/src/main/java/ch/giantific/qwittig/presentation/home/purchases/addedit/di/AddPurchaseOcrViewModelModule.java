@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.di.scopes.PerScreen;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
@@ -35,8 +36,10 @@ public class AddPurchaseOcrViewModelModule extends BaseViewModelModule<AddEditPu
 
     @PerScreen
     @Provides
-    AddEditPurchaseViewModel providesAddPurchaseOcrViewModel(@NonNull UserRepository userRepository,
+    AddEditPurchaseViewModel providesAddPurchaseOcrViewModel(@NonNull RxBus<Object> eventBus,
+                                                             @NonNull UserRepository userRepository,
                                                              @NonNull PurchaseRepository purchaseRepository) {
-        return new AddPurchaseViewModelOcrImpl(mSavedState, mView, userRepository, purchaseRepository, mOcrPurchaseId);
+        return new AddPurchaseViewModelOcrImpl(mSavedState, mView, eventBus, userRepository,
+                purchaseRepository, mOcrPurchaseId);
     }
 }

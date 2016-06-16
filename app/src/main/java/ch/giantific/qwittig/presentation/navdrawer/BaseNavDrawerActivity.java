@@ -296,11 +296,6 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
     }
 
     @Override
-    public void onIdentitySelected() {
-        mViewModel.onIdentitySelected();
-    }
-
-    @Override
     public void startLoginActivity() {
         final Intent intentLogin = new Intent(this, LoginActivity.class);
         intentLogin.setData(getIntent().getData());

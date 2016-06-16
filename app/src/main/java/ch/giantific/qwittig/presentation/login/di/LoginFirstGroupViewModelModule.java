@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.di.scopes.PerScreen;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
@@ -32,7 +33,8 @@ public class LoginFirstGroupViewModelModule extends BaseViewModelModule<LoginFir
 
     @PerScreen
     @Provides
-    LoginFirstGroupViewModel providesLoginFirstGroupViewModel(@NonNull UserRepository userRepository) {
-        return new LoginFirstGroupViewModelImpl(mSavedState, mView, userRepository);
+    LoginFirstGroupViewModel providesLoginFirstGroupViewModel(@NonNull RxBus<Object> eventBus,
+                                                              @NonNull UserRepository userRepository) {
+        return new LoginFirstGroupViewModelImpl(mSavedState, mView, eventBus, userRepository);
     }
 }

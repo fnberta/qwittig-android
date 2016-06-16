@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.di.scopes.PerScreen;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
@@ -40,7 +41,9 @@ public class LoginInvitationViewModelModule extends BaseViewModelModule<LoginInv
 
     @PerScreen
     @Provides
-    LoginInvitationViewModel providesLoginInvitationViewModel(@NonNull UserRepository userRepository) {
-        return new LoginInvitationViewModelImpl(mSavedState, mView, userRepository, mGroupName, mInviterNickname);
+    LoginInvitationViewModel providesLoginInvitationViewModel(@NonNull RxBus<Object> eventBus,
+                                                              @NonNull UserRepository userRepository) {
+        return new LoginInvitationViewModelImpl(mSavedState, mView, eventBus, userRepository,
+                mGroupName, mInviterNickname);
     }
 }

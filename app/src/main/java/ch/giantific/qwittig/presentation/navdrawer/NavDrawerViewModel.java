@@ -64,8 +64,6 @@ public interface NavDrawerViewModel extends ViewModel {
 
         void startHomeActivityAndFinish();
 
-        void onIdentitySelected();
-
         void startLoginActivity();
     }
 }

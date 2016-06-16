@@ -116,7 +116,7 @@ public class DraftsFragment extends BaseRecyclerViewFragment<DraftsViewModel, Dr
 
     @Override
     protected void setViewModelToActivity() {
-        mActivity.setDraftsViewModel(mViewModel);
+        // do nothing
     }
 
     @SuppressWarnings("unchecked")
@@ -148,11 +148,6 @@ public class DraftsFragment extends BaseRecyclerViewFragment<DraftsViewModel, Dr
     }
 
     @Override
-    public void updateDraftsDisplay() {
-        mActivity.checkDrafts();
-    }
-
-    @Override
     public void scrollToPosition(final int position) {
         // override to let RecyclerView layout its items first
         mRecyclerView.post(new Runnable() {
@@ -167,10 +162,6 @@ public class DraftsFragment extends BaseRecyclerViewFragment<DraftsViewModel, Dr
      * Defines the interaction with the hosting {@link Activity}.
      */
     public interface ActivityListener extends BaseFragment.ActivityListener {
-        void setDraftsViewModel(@NonNull DraftsViewModel viewModel);
-
         ActionMode startActionMode();
-
-        void checkDrafts();
     }
 }

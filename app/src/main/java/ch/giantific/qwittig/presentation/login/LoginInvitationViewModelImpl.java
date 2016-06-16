@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.view.View;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 
@@ -21,10 +22,11 @@ public class LoginInvitationViewModelImpl extends ViewModelBaseImpl<LoginInvitat
 
     public LoginInvitationViewModelImpl(@Nullable Bundle savedState,
                                         @NonNull LoginInvitationViewModel.ViewListener view,
+                                        @NonNull RxBus<Object> eventBus,
                                         @NonNull UserRepository userRepository,
                                         @NonNull String groupName,
                                         @NonNull String inviterNickname) {
-        super(savedState, view, userRepository);
+        super(savedState, view, eventBus, userRepository);
 
         mGroupName = groupName;
         mInviterNickname = inviterNickname;
@@ -44,13 +46,13 @@ public class LoginInvitationViewModelImpl extends ViewModelBaseImpl<LoginInvitat
 
     @Override
     public void onAcceptClick(View view) {
-        mView.showAccountsFragment(true);
+        mView.showAccountsScreen(true);
         mView.showMessage(R.string.toast_invitation_accept_login);
     }
 
     @Override
     public void onDeclineClick(View view) {
-        mView.showAccountsFragment(false);
+        mView.showAccountsScreen(false);
         mView.showMessage(R.string.toast_invitation_ignore);
     }
 }

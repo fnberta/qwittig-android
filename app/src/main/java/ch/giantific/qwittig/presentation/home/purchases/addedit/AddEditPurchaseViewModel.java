@@ -47,8 +47,6 @@ public interface AddEditPurchaseViewModel extends ListViewModel<AddEditPurchaseB
 
     void onAddReceiptImageMenuClick();
 
-    void onDeleteReceiptImageMenuClick();
-
     void onShowReceiptImageMenuClick();
 
     void onAddNoteMenuClick();

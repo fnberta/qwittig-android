@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
@@ -25,10 +26,11 @@ public class EditPurchaseDraftViewModelImpl extends EditPurchaseViewModelImpl
 
     public EditPurchaseDraftViewModelImpl(@Nullable Bundle savedState,
                                           @NonNull AddEditPurchaseViewModel.ViewListener view,
+                                          @NonNull RxBus<Object> eventBus,
                                           @NonNull UserRepository userRepository,
                                           @NonNull PurchaseRepository purchaseRepo,
                                           @NonNull String editPurchaseId) {
-        super(savedState, view, userRepository, purchaseRepo, editPurchaseId);
+        super(savedState, view, eventBus, userRepository, purchaseRepo, editPurchaseId);
     }
 
     @Override

@@ -20,6 +20,7 @@ import java.util.List;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.stats.StatsViewModelBaseImpl;
@@ -47,9 +48,10 @@ public abstract class StatsPieViewModelBaseImpl<T extends StatsPieViewModel.View
     private String mCenterText;
 
     public StatsPieViewModelBaseImpl(@Nullable Bundle savedState, @NonNull T view,
+                                     @NonNull RxBus<Object> eventBus,
                                      @NonNull UserRepository userRepository,
                                      @NonNull String year, @NonNull Month month) {
-        super(savedState, view, userRepository, year, month);
+        super(savedState, view, eventBus, userRepository, year, month);
 
         if (savedState != null) {
             mSortUsers = savedState.getBoolean(STATE_SORT_USERS, false);

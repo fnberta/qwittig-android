@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.bus.events.EventCompensationConfirmed;
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
@@ -22,6 +24,7 @@ import ch.giantific.qwittig.utils.MessageAction;
 import rx.Observable;
 import rx.SingleSubscriber;
 import rx.Subscriber;
+import rx.functions.Action1;
 import rx.functions.Func1;
 
 /**
@@ -37,9 +40,10 @@ public class CompsPaidViewModelImpl
 
     public CompsPaidViewModelImpl(@Nullable Bundle savedState,
                                   @NonNull CompsPaidViewModel.ViewListener view,
+                                  @NonNull RxBus<Object> eventBus,
                                   @NonNull UserRepository userRepository,
                                   @NonNull CompensationRepository compsRepo) {
-        super(savedState, view, userRepository);
+        super(savedState, view, eventBus, userRepository);
 
         mCompsRepo = compsRepo;
         if (savedState != null) {
@@ -53,6 +57,20 @@ public class CompsPaidViewModelImpl
         super.saveState(outState);
 
         outState.putBoolean(STATE_IS_LOADING_MORE, mIsLoadingMore);
+    }
+
+    @Override
+    public void onViewVisible() {
+        super.onViewVisible();
+
+        getSubscriptions().add(mEventBus.observeEvents(EventCompensationConfirmed.class)
+                .subscribe(new Action1<EventCompensationConfirmed>() {
+                    @Override
+                    public void call(EventCompensationConfirmed eventCompensationConfirmed) {
+                        loadData();
+                    }
+                })
+        );
     }
 
     @Override

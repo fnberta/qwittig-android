@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Objects;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.domain.models.TaskHistoryEvent;
@@ -50,10 +51,11 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<TasksBaseIte
 
     public TasksViewModelImpl(@Nullable Bundle savedState,
                               @NonNull TasksViewModel.ViewListener view,
+                              @NonNull RxBus<Object> eventBus,
                               @NonNull UserRepository userRepository,
                               @NonNull TaskRepository taskRepo,
                               @NonNull TaskDeadline deadline) {
-        super(savedState, view, userRepository);
+        super(savedState, view, eventBus, userRepository);
 
         mTaskRepo = taskRepo;
         if (savedState != null) {

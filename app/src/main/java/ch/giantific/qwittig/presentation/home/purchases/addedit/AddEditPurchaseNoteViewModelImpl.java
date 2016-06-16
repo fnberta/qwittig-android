@@ -11,6 +11,8 @@ import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.bus.events.EventNoteDeleted;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 
@@ -24,9 +26,10 @@ public class AddEditPurchaseNoteViewModelImpl extends ViewModelBaseImpl<AddEditP
 
     public AddEditPurchaseNoteViewModelImpl(@Nullable Bundle savedState,
                                             @NonNull AddEditPurchaseNoteViewModel.ViewListener view,
+                                            @NonNull RxBus<Object> eventBus,
                                             @NonNull UserRepository userRepository,
                                             @NonNull String note) {
-        super(savedState, view, userRepository);
+        super(savedState, view, eventBus, userRepository);
 
         mNote = note;
     }
@@ -52,5 +55,11 @@ public class AddEditPurchaseNoteViewModelImpl extends ViewModelBaseImpl<AddEditP
     public void onNoteSet(@NonNull String note) {
         setNote(note);
         mView.showMessage(R.string.toast_note_edited);
+    }
+
+    @Override
+    public void onDeleteNoteMenuClick() {
+        mView.showPurchaseScreen();
+        mEventBus.post(new EventNoteDeleted());
     }
 }

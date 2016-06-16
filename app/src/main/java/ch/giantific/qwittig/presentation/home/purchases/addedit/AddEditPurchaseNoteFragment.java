@@ -86,7 +86,7 @@ public class AddEditPurchaseNoteFragment extends BaseFragment<AddEditPurchaseNot
                 mViewModel.onEditNoteMenuClick();
                 return true;
             case R.id.action_purchase_edit_note_delete:
-                mActivity.deleteNote();
+                mViewModel.onDeleteNoteMenuClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -108,6 +108,11 @@ public class AddEditPurchaseNoteFragment extends BaseFragment<AddEditPurchaseNot
         NoteDialogFragment.display(getFragmentManager(), note);
     }
 
+    @Override
+    public void showPurchaseScreen() {
+        mActivity.popBackStack();
+    }
+
     /**
      * Defines the interaction with the hosting {@link Activity}.
      */
@@ -123,6 +128,6 @@ public class AddEditPurchaseNoteFragment extends BaseFragment<AddEditPurchaseNot
         /**
          * Handles the call to delete the note from the purchase.
          */
-        void deleteNote();
+        void popBackStack();
     }
 }

@@ -11,19 +11,18 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.MenuItem;
 
-import java.io.File;
-
 import ch.berta.fabio.fabspeeddial.FabMenuClickListener;
 import ch.giantific.qwittig.BR;
-import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.bus.events.EventDraftDeleted;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.Single;
 import rx.SingleSubscriber;
-import timber.log.Timber;
+import rx.functions.Action1;
 
 /**
  * Provides an implementation of the {@link HomeViewModel}.
@@ -43,9 +42,10 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
 
     public HomeViewModelImpl(@Nullable Bundle savedState,
                              @NonNull HomeViewModel.ViewListener view,
+                             @NonNull RxBus<Object> eventBus,
                              @NonNull UserRepository userRepository,
                              @NonNull PurchaseRepository purchaseRepo) {
-        super(savedState, view, userRepository);
+        super(savedState, view, eventBus, userRepository);
 
         mPurchaseRepo = purchaseRepo;
         if (savedState != null) {
@@ -69,10 +69,31 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
     }
 
     @Override
+    public void onViewVisible() {
+        super.onViewVisible();
+
+        getSubscriptions().add(mEventBus.observeEvents(EventDraftDeleted.class)
+                .subscribe(new Action1<EventDraftDeleted>() {
+                    @Override
+                    public void call(EventDraftDeleted eventDraftDeleted) {
+                        checkDrafts();
+                    }
+                })
+        );
+    }
+
+    @Override
     public void onLoginSuccessful() {
         mCurrentUser = mUserRepo.getCurrentUser();
         setCurrentIdentity();
         mDraftsAvailable = mPurchaseRepo.isDraftsAvailable(mCurrentIdentity);
+    }
+
+    @Override
+    protected void onIdentitySelected(@NonNull Identity identitySelected) {
+        super.onIdentitySelected(identitySelected);
+
+        checkDrafts();
     }
 
     @Override
@@ -110,6 +131,13 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
     public void setDraftsAvailable(boolean available) {
         mDraftsAvailable = available;
         notifyPropertyChanged(BR.draftsAvailable);
+    }
+
+    @Override
+    public void checkDrafts() {
+        if (mDraftsAvailable != updateDraftsAvailable()) {
+            mView.toggleDraftTab(mDraftsAvailable);
+        }
     }
 
     @Override

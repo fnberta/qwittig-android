@@ -15,6 +15,7 @@ import java.text.NumberFormat;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
@@ -31,8 +32,9 @@ public class BalanceHeaderViewModelImpl extends ViewModelBaseImpl<BalanceHeaderV
 
     public BalanceHeaderViewModelImpl(@Nullable Bundle savedState,
                                       @NonNull BalanceHeaderViewModel.ViewListener view,
+                                      @NonNull RxBus<Object> eventBus,
                                       @NonNull UserRepository userRepository) {
-        super(savedState, view, userRepository);
+        super(savedState, view, eventBus, userRepository);
     }
 
     @Override
@@ -80,8 +82,8 @@ public class BalanceHeaderViewModelImpl extends ViewModelBaseImpl<BalanceHeaderV
     }
 
     @Override
-    public void onIdentitySelected() {
-        super.onIdentitySelected();
+    protected void onIdentitySelected(@NonNull Identity identitySelected) {
+        super.onIdentitySelected(identitySelected);
 
         loadData();
     }

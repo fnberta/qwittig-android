@@ -6,6 +6,7 @@ package ch.giantific.qwittig.presentation.home.purchases.addedit;
 
 import android.databinding.Bindable;
 import android.os.Bundle;
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -27,6 +28,10 @@ import java.util.Objects;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.bus.events.EventNoteDeleted;
+import ch.giantific.qwittig.data.bus.events.EventReceiptImageDeleted;
+import ch.giantific.qwittig.data.bus.events.EventReceiptImageTaken;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Item;
@@ -47,6 +52,8 @@ import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Single;
 import rx.SingleSubscriber;
+import rx.functions.Action1;
+import rx.subscriptions.CompositeSubscription;
 import timber.log.Timber;
 
 /**
@@ -82,9 +89,10 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
 
     public AddPurchaseViewModelImpl(@Nullable Bundle savedState,
                                     @NonNull AddEditPurchaseViewModel.ViewListener view,
+                                    @NonNull RxBus<Object> eventBus,
                                     @NonNull UserRepository userRepository,
                                     @NonNull PurchaseRepository purchaseRepo) {
-        super(savedState, view, userRepository);
+        super(savedState, view, eventBus, userRepository);
 
         mPurchaseRepo = purchaseRepo;
         mCurrentGroup = mCurrentIdentity.getGroup();
@@ -340,21 +348,6 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
     }
 
     @Override
-    public void onDeleteReceiptImageMenuClick() {
-        mView.toggleReceiptMenuOption(false);
-        mView.showMessage(R.string.toast_receipt_deleted);
-        deleteReceiptImage();
-        mReceiptImagePath = "";
-    }
-
-    private void deleteReceiptImage() {
-        final File receipt = new File(mReceiptImagePath);
-        if (!receipt.delete()) {
-            Timber.w("failed to delete file");
-        }
-    }
-
-    @Override
     public void onRowPriceChanged() {
         updateTotalAndMyShare();
     }
@@ -395,6 +388,52 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
 
         setTotalPrice(totalPrice);
         setMyShare(myShare);
+    }
+
+    @Override
+    public void onViewVisible() {
+        super.onViewVisible();
+
+        final CompositeSubscription subscriptions = getSubscriptions();
+        subscriptions.add(mEventBus.observeEvents(EventReceiptImageTaken.class)
+                .subscribe(new Action1<EventReceiptImageTaken>() {
+                    @Override
+                    public void call(EventReceiptImageTaken eventReceiptImageTaken) {
+                        onReceiptImageTaken(eventReceiptImageTaken.getReceiptImagePath());
+                    }
+                })
+        );
+        subscriptions.add(mEventBus.observeEvents(EventReceiptImageDeleted.class)
+                .subscribe(new Action1<EventReceiptImageDeleted>() {
+                    @Override
+                    public void call(EventReceiptImageDeleted eventReceiptImageDeleted) {
+                        onReceiptImageDeleted();
+                    }
+                })
+        );
+        subscriptions.add(mEventBus.observeEvents(EventNoteDeleted.class)
+                .subscribe(new Action1<EventNoteDeleted>() {
+                    @Override
+                    public void call(EventNoteDeleted eventNoteDeleted) {
+                        onNoteSet("");
+                    }
+                })
+        );
+    }
+
+    @CallSuper
+    void onReceiptImageDeleted() {
+        mView.toggleReceiptMenuOption(false);
+        mView.showMessage(R.string.toast_receipt_deleted);
+        deleteReceiptImage();
+        mReceiptImagePath = "";
+    }
+
+    private void deleteReceiptImage() {
+        final File receipt = new File(mReceiptImagePath);
+        if (!receipt.delete()) {
+            Timber.w("failed to delete file");
+        }
     }
 
     @Override
@@ -697,8 +736,9 @@ public class AddPurchaseViewModelImpl extends ListViewModelBaseImpl<AddEditPurch
                             @NonNull List<Item> purchaseItems, int fractionDigits) {
         final BigDecimal totalPriceRounded =
                 new BigDecimal(mTotalPrice).setScale(fractionDigits, BigDecimal.ROUND_HALF_UP);
-        final Purchase purchase = new Purchase(mCurrentIdentity, mCurrentGroup, mDate, mStore,
-                purchaseItems, totalPriceRounded, purchaseIdentities, mCurrency, mExchangeRate);
+        final Purchase purchase = new Purchase(mCurrentIdentity, mCurrentGroup, mDate,
+                !TextUtils.isEmpty(mStore) ? mStore : "", purchaseItems, totalPriceRounded,
+                purchaseIdentities, mCurrency, mExchangeRate);
         if (!TextUtils.isEmpty(mNote)) {
             purchase.setNote(mNote);
         }

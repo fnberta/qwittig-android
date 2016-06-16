@@ -248,14 +248,8 @@ public class AddPurchaseActivity extends BaseActivity<AddEditPurchaseViewModel> 
     }
 
     @Override
-    public void onReceiptImageTaken(@NonNull String receiptImagePath) {
-        mViewModel.onReceiptImageTaken(receiptImagePath);
-    }
-
-    @Override
-    public void deleteReceipt() {
+    public void popBackStack() {
         getSupportFragmentManager().popBackStackImmediate();
-        mViewModel.onDeleteReceiptImageMenuClick();
     }
 
     @Override
@@ -266,13 +260,8 @@ public class AddPurchaseActivity extends BaseActivity<AddEditPurchaseViewModel> 
             showMessage(R.string.toast_note_added);
         }
 
+        // TODO: crashes after configuration change when note fragment is in foreground
         mViewModel.onNoteSet(note);
-    }
-
-    @Override
-    public void deleteNote() {
-        getSupportFragmentManager().popBackStackImmediate();
-        mViewModel.onNoteSet("");
     }
 
     @Override

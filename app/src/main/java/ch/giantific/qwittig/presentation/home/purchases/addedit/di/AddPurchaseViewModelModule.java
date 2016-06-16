@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.di.scopes.PerScreen;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
@@ -30,8 +31,9 @@ public class AddPurchaseViewModelModule extends BaseViewModelModule<AddEditPurch
 
     @PerScreen
     @Provides
-    AddEditPurchaseViewModel providesPurchaseAddViewModel(@NonNull UserRepository userRepository,
+    AddEditPurchaseViewModel providesPurchaseAddViewModel(@NonNull RxBus<Object> eventBus,
+                                                          @NonNull UserRepository userRepository,
                                                           @NonNull PurchaseRepository purchaseRepository) {
-        return new AddPurchaseViewModelImpl(mSavedState, mView, userRepository, purchaseRepository);
+        return new AddPurchaseViewModelImpl(mSavedState, mView, eventBus, userRepository, purchaseRepository);
     }
 }

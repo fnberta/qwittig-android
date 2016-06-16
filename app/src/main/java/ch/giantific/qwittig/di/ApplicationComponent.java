@@ -13,6 +13,7 @@ import com.google.android.gms.gcm.GcmNetworkManager;
 import javax.inject.Singleton;
 
 import ch.giantific.qwittig.Qwittig;
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.data.rest.ExchangeRates;
 import ch.giantific.qwittig.data.rest.ReceiptOcr;
 import dagger.Component;
@@ -37,4 +38,6 @@ public interface ApplicationComponent {
     ExchangeRates getExchangeRates();
 
     GcmNetworkManager getGcmNetworkManager();
+
+    RxBus<Object> getEventBus();
 }

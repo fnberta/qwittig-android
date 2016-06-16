@@ -13,6 +13,7 @@ import android.support.annotation.VisibleForTesting;
 import java.util.ArrayList;
 
 import ch.giantific.qwittig.BR;
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 
@@ -29,8 +30,9 @@ public abstract class ListViewModelBaseImpl<T, S extends ListViewModel.ViewListe
 
     public ListViewModelBaseImpl(@Nullable Bundle savedState,
                                  @NonNull S view,
+                                 @NonNull RxBus<Object> eventBus,
                                  @NonNull UserRepository userRepository) {
-        super(savedState, view, userRepository);
+        super(savedState, view, eventBus, userRepository);
 
         if (savedState != null) {
             mLoading = savedState.getBoolean(STATE_LOADING, false);
@@ -103,8 +105,8 @@ public abstract class ListViewModelBaseImpl<T, S extends ListViewModel.ViewListe
     }
 
     @Override
-    public void onIdentitySelected() {
-        super.onIdentitySelected();
+    protected void onIdentitySelected(@NonNull Identity identitySelected) {
+        super.onIdentitySelected(identitySelected);
 
         loadData();
     }

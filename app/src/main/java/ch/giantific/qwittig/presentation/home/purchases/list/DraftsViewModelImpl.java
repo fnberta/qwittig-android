@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.bus.events.EventDraftDeleted;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
@@ -37,9 +39,10 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, DraftsV
 
     public DraftsViewModelImpl(@Nullable Bundle savedState,
                                @NonNull DraftsViewModel.ViewListener view,
+                               @NonNull RxBus<Object> eventBus,
                                @NonNull UserRepository userRepository,
                                @NonNull PurchaseRepository purchaseRepo) {
-        super(savedState, view, userRepository);
+        super(savedState, view, eventBus, userRepository);
 
         mPurchaseRepo = purchaseRepo;
         if (savedState != null) {
@@ -188,7 +191,7 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, DraftsV
                     public void onSuccess(Purchase value) {
                         mItems.remove(pos);
                         mView.notifyItemRemoved(pos);
-                        mView.updateDraftsDisplay();
+                        mEventBus.post(new EventDraftDeleted());
                     }
 
                     @Override

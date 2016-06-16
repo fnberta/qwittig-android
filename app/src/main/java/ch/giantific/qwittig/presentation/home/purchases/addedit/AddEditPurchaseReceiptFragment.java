@@ -36,7 +36,8 @@ import ch.giantific.qwittig.utils.Utils;
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public class AddEditPurchaseReceiptFragment extends BaseFragment<PurchaseReceiptViewModel, AddEditPurchaseReceiptFragment.ActivityListener> {
+public class AddEditPurchaseReceiptFragment extends BaseFragment<PurchaseReceiptViewModel, AddEditPurchaseReceiptFragment.ActivityListener>
+        implements PurchaseReceiptViewModel.ViewListener {
 
     private static final String KEY_RECEIPT_IMAGE_URI = "RECEIPT_IMAGE_URI";
     private static final int INTENT_REQUEST_IMAGE_CAPTURE = 1;
@@ -96,10 +97,10 @@ public class AddEditPurchaseReceiptFragment extends BaseFragment<PurchaseReceipt
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_purchase_edit_receipt_edit:
-                captureImage();
+                mViewModel.onEditReceiptMenuClick();
                 return true;
             case R.id.action_purchase_edit_receipt_delete:
-                mActivity.deleteReceipt();
+                mViewModel.onDeleteReceiptMenuClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -116,32 +117,6 @@ public class AddEditPurchaseReceiptFragment extends BaseFragment<PurchaseReceipt
         return mBinding.ivReceipt;
     }
 
-    private void captureImage() {
-        if (!CameraUtils.hasCameraHardware(getActivity())) {
-            showMessage(R.string.toast_no_camera);
-            return;
-        }
-
-        if (permissionsAreGranted()) {
-            getImage();
-        }
-    }
-
-    private boolean permissionsAreGranted() {
-        int hasCameraPerm = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA);
-        if (hasCameraPerm != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.CAMERA}, PERMISSIONS_REQUEST_CAPTURE_IMAGES);
-            return false;
-        }
-
-        return true;
-    }
-
-    private void getImage() {
-        final Intent intent = new Intent(getActivity(), CameraActivity.class);
-        startActivityForResult(intent, INTENT_REQUEST_IMAGE_CAPTURE);
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -152,7 +127,6 @@ public class AddEditPurchaseReceiptFragment extends BaseFragment<PurchaseReceipt
                     case Activity.RESULT_OK:
                         final String imagePath = data.getStringExtra(CameraActivity.INTENT_EXTRA_IMAGE_PATH);
                         mViewModel.onReceiptImageTaken(imagePath);
-                        mActivity.onReceiptImageTaken(imagePath);
                         break;
                 }
                 break;
@@ -187,19 +161,43 @@ public class AddEditPurchaseReceiptFragment extends BaseFragment<PurchaseReceipt
         startActivity(intent);
     }
 
+    @Override
+    public void captureImage() {
+        if (!CameraUtils.hasCameraHardware(getActivity())) {
+            showMessage(R.string.toast_no_camera);
+            return;
+        }
+
+        if (permissionsAreGranted()) {
+            getImage();
+        }
+    }
+
+    private boolean permissionsAreGranted() {
+        int hasCameraPerm = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA);
+        if (hasCameraPerm != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.CAMERA}, PERMISSIONS_REQUEST_CAPTURE_IMAGES);
+            return false;
+        }
+
+        return true;
+    }
+
+    private void getImage() {
+        final Intent intent = new Intent(getActivity(), CameraActivity.class);
+        startActivityForResult(intent, INTENT_REQUEST_IMAGE_CAPTURE);
+    }
+
+    @Override
+    public void showPurchaseScreen() {
+        mActivity.popBackStack();
+    }
 
     /**
      * Defines the interaction with the hosting {@link Activity}.
      */
     public interface ActivityListener extends BaseFragment.ActivityListener {
-        /**
-         * Handles the request to delete the receipt image file from online Parse.com database.
-         */
-        void deleteReceipt();
 
-        /**
-         * Communicates the path to a newly taken receipt.
-         */
-        void onReceiptImageTaken(@NonNull String path);
+        void popBackStack();
     }
 }

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.di.scopes.PerScreen;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
@@ -30,8 +31,9 @@ public class HomeViewModelModule extends BaseViewModelModule<HomeViewModel.ViewL
 
     @PerScreen
     @Provides
-    HomeViewModel providesHomeViewModel(@NonNull UserRepository userRepository,
+    HomeViewModel providesHomeViewModel(@NonNull RxBus<Object> eventBus,
+                                        @NonNull UserRepository userRepository,
                                         @NonNull PurchaseRepository purchaseRepository) {
-        return new HomeViewModelImpl(mSavedState, mView, userRepository, purchaseRepository);
+        return new HomeViewModelImpl(mSavedState, mView, eventBus, userRepository, purchaseRepository);
     }
 }

@@ -23,7 +23,8 @@ import ch.giantific.qwittig.presentation.home.purchases.common.di.PurchaseReceip
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public class PurchaseReceiptDetailFragment extends BaseFragment<PurchaseReceiptViewModel, BaseFragment.ActivityListener> {
+public class PurchaseReceiptDetailFragment extends BaseFragment<PurchaseReceiptViewModel, BaseFragment.ActivityListener>
+        implements PurchaseReceiptViewModel.ViewListener {
 
     private static final String KEY_RECEIPT_IMAGE_URI = "RECEIPT_IMAGE_URI";
     private FragmentPurchaseShowReceiptBinding mBinding;
@@ -76,5 +77,15 @@ public class PurchaseReceiptDetailFragment extends BaseFragment<PurchaseReceiptV
     @Override
     protected View getSnackbarView() {
         return mBinding.ivReceipt;
+    }
+
+    @Override
+    public void captureImage() {
+        // not relevant
+    }
+
+    @Override
+    public void showPurchaseScreen() {
+        // not relevant
     }
 }

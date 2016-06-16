@@ -25,6 +25,7 @@ import java.util.Objects;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
@@ -54,9 +55,10 @@ public class TaskAddEditViewModelAddImpl extends ListViewModelBaseImpl<Identity,
 
     public TaskAddEditViewModelAddImpl(@Nullable Bundle savedState,
                                        @NonNull TaskAddEditViewModel.ViewListener view,
+                                       @NonNull RxBus<Object> eventBus,
                                        @NonNull UserRepository userRepository,
                                        @NonNull TaskRepository taskRepository) {
-        super(savedState, view, userRepository);
+        super(savedState, view, eventBus, userRepository);
 
         mTaskRepo = taskRepository;
 

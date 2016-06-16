@@ -81,7 +81,7 @@ public class LoginInvitationFragment extends BaseFragment<LoginInvitationViewMod
     }
 
     @Override
-    public void showAccountsFragment(boolean accept) {
+    public void showAccountsScreen(boolean accept) {
         mActivity.popBackStack(accept);
     }
 

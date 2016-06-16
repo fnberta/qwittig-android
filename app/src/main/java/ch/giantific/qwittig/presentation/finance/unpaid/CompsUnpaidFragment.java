@@ -91,14 +91,7 @@ public class CompsUnpaidFragment extends BaseRecyclerViewFragment<CompsUnpaidVie
                 currency);
     }
 
-    @Override
-    public void onCompensationConfirmed() {
-        mActivity.reloadCompsPaid();
-    }
-
     public interface ActivityListener extends BaseRecyclerViewFragment.ActivityListener {
         void setCompsUnpaidViewModel(@NonNull CompsUnpaidViewModel viewModel);
-
-        void reloadCompsPaid();
     }
 }

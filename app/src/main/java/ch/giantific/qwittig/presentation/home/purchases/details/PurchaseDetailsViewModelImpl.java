@@ -19,6 +19,7 @@ import java.util.Objects;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Item;
 import ch.giantific.qwittig.domain.models.Purchase;
@@ -50,10 +51,11 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<Purchase
 
     public PurchaseDetailsViewModelImpl(@Nullable Bundle savedState,
                                         @NonNull PurchaseDetailsViewModel.ViewListener view,
+                                        @NonNull RxBus<Object> eventBus,
                                         @NonNull UserRepository userRepository,
                                         @NonNull PurchaseRepository purchaseRepo,
                                         @NonNull String purchaseId) {
-        super(savedState, view, userRepository);
+        super(savedState, view, eventBus, userRepository);
 
         mPurchaseRepo = purchaseRepo;
         mPurchaseId = purchaseId;
@@ -203,7 +205,7 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<Purchase
 
     @SuppressLint("MissingSuperCall")
     @Override
-    public void onIdentitySelected() {
+    protected void onIdentitySelected(@NonNull Identity identitySelected) {
         mView.finishScreen(PurchaseDetailsResult.GROUP_CHANGED);
     }
 }

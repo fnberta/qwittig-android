@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Item;
 import ch.giantific.qwittig.domain.models.OcrData;
@@ -39,10 +40,11 @@ public class AddPurchaseViewModelOcrImpl extends AddPurchaseViewModelImpl {
 
     public AddPurchaseViewModelOcrImpl(@Nullable Bundle savedState,
                                        @NonNull AddEditPurchaseViewModel.ViewListener view,
+                                       @NonNull RxBus<Object> eventBus,
                                        @NonNull UserRepository userRepository,
                                        @NonNull PurchaseRepository purchaseRepo,
                                        @NonNull String ocrPurchaseId) {
-        super(savedState, view, userRepository, purchaseRepo);
+        super(savedState, view, eventBus, userRepository, purchaseRepo);
 
         mOcrPurchaseId = ocrPurchaseId;
         mOcrValuesSet = savedState != null && savedState.getBoolean(STATE_OCR_VALUES_SET, false);

@@ -31,7 +31,5 @@ public interface CompsUnpaidViewModel extends OnlineListViewModel<CompsUnpaidBas
         void showCompensationAmountConfirmDialog(@NonNull BigFraction amount,
                                                  @NonNull String debtorNickname,
                                                  @NonNull String currency);
-
-        void onCompensationConfirmed();
     }
 }

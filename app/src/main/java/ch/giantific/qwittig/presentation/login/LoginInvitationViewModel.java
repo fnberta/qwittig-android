@@ -29,6 +29,6 @@ public interface LoginInvitationViewModel extends ViewModel {
      * Defines the interaction with the attached view.
      */
     interface ViewListener extends ViewModel.ViewListener {
-        void showAccountsFragment(boolean accept);
+        void showAccountsScreen(boolean accept);
     }
 }

@@ -19,6 +19,7 @@ import java.util.Objects;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModelBaseImpl;
@@ -39,8 +40,9 @@ public class IdentitiesViewModelImpl
 
     public IdentitiesViewModelImpl(@Nullable Bundle savedState,
                                    @NonNull IdentitiesViewModel.ViewListener view,
+                                   @NonNull RxBus<Object> eventBus,
                                    @NonNull UserRepository userRepository) {
-        super(savedState, view, userRepository);
+        super(savedState, view, eventBus, userRepository);
 
         if (savedState != null) {
             mItems = new ArrayList<>();
@@ -125,8 +127,8 @@ public class IdentitiesViewModelImpl
     }
 
     @Override
-    public void onIdentitySelected() {
-        super.onIdentitySelected();
+    protected void onIdentitySelected(@NonNull Identity identitySelected) {
+        super.onIdentitySelected(identitySelected);
 
         notifyPropertyChanged(BR.currentIdentityBalance);
     }

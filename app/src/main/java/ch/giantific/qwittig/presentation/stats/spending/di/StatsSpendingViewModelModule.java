@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.di.scopes.PerScreen;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
@@ -38,7 +39,8 @@ public class StatsSpendingViewModelModule extends BaseViewModelModule<StatsSpend
 
     @PerScreen
     @Provides
-    StatsSpendingViewModel providesStatsSpendingViewModel(@NonNull UserRepository userRepository) {
-        return new StatsSpendingViewModelImpl(mSavedState, mView, userRepository, mYear, mMonth);
+    StatsSpendingViewModel providesStatsSpendingViewModel(@NonNull RxBus<Object> eventBus,
+                                                          @NonNull UserRepository userRepository) {
+        return new StatsSpendingViewModelImpl(mSavedState, mView, eventBus, userRepository, mYear, mMonth);
     }
 }

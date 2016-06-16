@@ -38,6 +38,8 @@ public interface HomeViewModel extends ViewModel,
 
     void setDraftsAvailable(boolean available);
 
+    void checkDrafts();
+
     boolean updateDraftsAvailable();
 
     void handleInvitation(@NonNull String identityId, @NonNull String groupName,
@@ -74,5 +76,7 @@ public interface HomeViewModel extends ViewModel,
         void loadOcrWorker(@NonNull byte[] receipt);
 
         void startPurchaseAddScreen(@Nullable String ocrPurchaseId);
+
+        void toggleDraftTab(boolean draftsAvailable);
     }
 }

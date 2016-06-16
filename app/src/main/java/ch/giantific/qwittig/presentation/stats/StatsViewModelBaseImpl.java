@@ -18,6 +18,7 @@ import java.util.Objects;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import ch.giantific.qwittig.presentation.stats.models.Month;
@@ -46,10 +47,11 @@ public abstract class StatsViewModelBaseImpl<T extends StatsViewModel.ViewListen
     protected int mPeriodType;
 
     public StatsViewModelBaseImpl(@Nullable Bundle savedState, @NonNull T view,
+                                  @NonNull RxBus<Object> eventBus,
                                   @NonNull UserRepository userRepository,
                                   @NonNull String defaultYear,
                                   @NonNull Month defaultMonth) {
-        super(savedState, view, userRepository);
+        super(savedState, view, eventBus, userRepository);
 
         if (savedState != null) {
             mYear = savedState.getString(STATE_YEAR);
