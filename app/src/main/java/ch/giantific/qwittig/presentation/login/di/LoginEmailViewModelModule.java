@@ -9,8 +9,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.di.scopes.PerScreen;
+import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.login.LoginEmailViewModel;
 import ch.giantific.qwittig.presentation.login.LoginEmailViewModelImpl;
@@ -22,17 +23,17 @@ import dagger.Provides;
  * instantiate it.
  */
 @Module
-public class LoginEmailViewModelModule extends BaseViewModelModule<LoginEmailViewModel.ViewListener> {
+public class LoginEmailViewModelModule extends BaseViewModelModule {
 
-    public LoginEmailViewModelModule(@Nullable Bundle savedState,
-                                     @NonNull LoginEmailViewModel.ViewListener view) {
-        super(savedState, view);
+    public LoginEmailViewModelModule(@Nullable Bundle savedState) {
+        super(savedState);
     }
 
-    @PerScreen
+    @PerActivity
     @Provides
-    LoginEmailViewModel providesLoginEmailViewModel(@NonNull RxBus<Object> eventBus,
+    LoginEmailViewModel providesLoginEmailViewModel(@NonNull Navigator navigator,
+                                                    @NonNull RxBus<Object> eventBus,
                                                     @NonNull UserRepository userRepository) {
-        return new LoginEmailViewModelImpl(mSavedState, mView, eventBus, userRepository);
+        return new LoginEmailViewModelImpl(mSavedState, navigator, eventBus, userRepository);
     }
 }

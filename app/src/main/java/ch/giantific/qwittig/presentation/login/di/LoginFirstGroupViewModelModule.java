@@ -9,13 +9,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.di.scopes.PerScreen;
+import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.login.LoginFirstGroupViewModel;
 import ch.giantific.qwittig.presentation.login.LoginFirstGroupViewModelImpl;
-import ch.giantific.qwittig.presentation.login.LoginProfileViewModel;
-import ch.giantific.qwittig.presentation.login.LoginProfileViewModelImpl;
 import dagger.Module;
 import dagger.Provides;
 
@@ -24,17 +23,17 @@ import dagger.Provides;
  * instantiate it.
  */
 @Module
-public class LoginFirstGroupViewModelModule extends BaseViewModelModule<LoginFirstGroupViewModel.ViewListener> {
+public class LoginFirstGroupViewModelModule extends BaseViewModelModule {
 
-    public LoginFirstGroupViewModelModule(@Nullable Bundle savedState,
-                                          @NonNull LoginFirstGroupViewModel.ViewListener view) {
-        super(savedState, view);
+    public LoginFirstGroupViewModelModule(@Nullable Bundle savedState) {
+        super(savedState);
     }
 
-    @PerScreen
+    @PerActivity
     @Provides
-    LoginFirstGroupViewModel providesLoginFirstGroupViewModel(@NonNull RxBus<Object> eventBus,
+    LoginFirstGroupViewModel providesLoginFirstGroupViewModel(@NonNull Navigator navigator,
+                                                              @NonNull RxBus<Object> eventBus,
                                                               @NonNull UserRepository userRepository) {
-        return new LoginFirstGroupViewModelImpl(mSavedState, mView, eventBus, userRepository);
+        return new LoginFirstGroupViewModelImpl(mSavedState, navigator, eventBus, userRepository);
     }
 }

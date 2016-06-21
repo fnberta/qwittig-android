@@ -15,7 +15,9 @@ import rx.Single;
 /**
  * Defines an observable view model for the login/sign-up with email screen.
  */
-public interface LoginProfileViewModel extends ViewModel {
+public interface LoginProfileViewModel extends ViewModel<LoginProfileViewModel.ViewListener> {
+
+    void setWithInvitation(boolean withInvitation);
 
     @Bindable
     boolean isValidate();
@@ -45,10 +47,6 @@ public interface LoginProfileViewModel extends ViewModel {
      * Defines the interaction with the attached view.
      */
     interface ViewListener extends ViewModel.ViewListener {
-        void finishScreen(int result);
-
-        void showFirstGroupFragment();
-
-        void showAvatarPicker();
+        void showFirstGroupScreen();
     }
 }

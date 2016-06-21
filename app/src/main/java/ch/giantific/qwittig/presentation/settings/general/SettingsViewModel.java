@@ -17,7 +17,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 /**
  * Defines an observable view model for the main settings screen.
  */
-public interface SettingsViewModel extends ViewModel,
+public interface SettingsViewModel extends ViewModel<SettingsViewModel.ViewListener>,
         LeaveGroupDialogFragment.DialogInteractionListener,
         LogoutWorkerListener,
         DeleteAccountDialogFragment.DialogInteractionListener {
@@ -68,8 +68,6 @@ public interface SettingsViewModel extends ViewModel,
 
         void hideProgressDialog();
 
-        void setResult(int result);
-
-        void finishScreen();
+        void setScreenResult(int result);
     }
 }

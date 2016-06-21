@@ -22,8 +22,7 @@ import ch.giantific.qwittig.presentation.tasks.details.items.TaskDetailsBaseItem
 /**
  * Defines an observable view model for the task details screen.
  */
-public interface TaskDetailsViewModel extends
-        ListViewModel<TaskDetailsBaseItem> {
+public interface TaskDetailsViewModel extends ListViewModel<TaskDetailsBaseItem, TaskDetailsViewModel.ViewListener> {
 
     @Bindable
     String getTaskTitle();
@@ -75,13 +74,6 @@ public interface TaskDetailsViewModel extends
         void toggleEditOptions(boolean showOptions);
 
         /**
-         * Starts the screen that allows the user to edit a task
-         *
-         * @param taskId the object id of the task to edit
-         */
-        void startEditTaskActivity(@NonNull String taskId);
-
-        /**
          * Builds the users involved string where the current user is in bold style and the rest of
          * the users use normal style
          *
@@ -91,12 +83,5 @@ public interface TaskDetailsViewModel extends
          */
         SpannableStringBuilder buildTaskIdentitiesString(@NonNull List<Identity> identities,
                                                          @NonNull Identity identityResponsible);
-
-        /**
-         * Finishes the task detail screen.
-         *
-         * @param result the result to pass to the calling screen
-         */
-        void finishScreen(int result);
     }
 }

@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.RowCompPaidBinding;
 import ch.giantific.qwittig.domain.models.Compensation;
+import ch.giantific.qwittig.presentation.common.ListInteraction;
+import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
 import ch.giantific.qwittig.presentation.common.adapters.rows.ProgressRow;
 
@@ -21,7 +23,7 @@ import ch.giantific.qwittig.presentation.common.adapters.rows.ProgressRow;
  * <p/>
  * Subclass of {@link RecyclerView.Adapter}.
  */
-public class CompsPaidRecyclerAdapter extends RecyclerView.Adapter {
+public class CompsPaidRecyclerAdapter extends BaseRecyclerAdapter {
 
     private final CompsPaidViewModel mViewModel;
 
@@ -52,8 +54,7 @@ public class CompsPaidRecyclerAdapter extends RecyclerView.Adapter {
                 return new ProgressRow(view);
             }
             default:
-                throw new RuntimeException("there is no type that matches the type " + viewType +
-                        " + make sure your using types correctly");
+                return super.onCreateViewHolder(parent, viewType);
         }
     }
 

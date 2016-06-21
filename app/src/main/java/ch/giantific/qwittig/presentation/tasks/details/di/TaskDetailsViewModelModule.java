@@ -9,9 +9,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.di.scopes.PerScreen;
+import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.tasks.details.TaskDetailsViewModel;
 import ch.giantific.qwittig.presentation.tasks.details.TaskDetailsViewModelImpl;
@@ -23,24 +24,25 @@ import dagger.Provides;
  * instantiate it.
  */
 @Module
-public class TaskDetailsViewModelModule extends BaseViewModelModule<TaskDetailsViewModel.ViewListener> {
+public class TaskDetailsViewModelModule extends BaseViewModelModule {
 
     private final String mTaskId;
 
     public TaskDetailsViewModelModule(@Nullable Bundle savedState,
-                                      @NonNull TaskDetailsViewModel.ViewListener view,
                                       @NonNull String taskId) {
-        super(savedState, view);
+        super(savedState);
 
         mTaskId = taskId;
     }
 
-    @PerScreen
+    @PerActivity
     @Provides
-    TaskDetailsViewModel providesTaskDetailsViewModel(@NonNull RxBus<Object> eventBus,
+    TaskDetailsViewModel providesTaskDetailsViewModel(@NonNull Navigator navigator,
+                                                      @NonNull RxBus<Object> eventBus,
                                                       @NonNull UserRepository userRepository,
                                                       @NonNull TaskRepository taskRepository) {
-        return new TaskDetailsViewModelImpl(mSavedState, mView, eventBus, userRepository, taskRepository, mTaskId);
+        return new TaskDetailsViewModelImpl(mSavedState, navigator, eventBus, userRepository,
+                taskRepository, mTaskId);
     }
 
 }

@@ -23,6 +23,7 @@ import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import ch.giantific.qwittig.presentation.settings.profile.UnlinkThirdPartyWorker.ProfileAction;
 import ch.giantific.qwittig.utils.Utils;
@@ -48,6 +49,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     private final boolean mFacebookUser;
     private final boolean mGoogleUser;
     private final List<String> mGroupNicknames = new ArrayList<>();
+    private final Navigator mNavigator;
     private boolean mValidate;
     private boolean mSaving;
     private boolean mAnimStop;
@@ -59,11 +61,12 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     private String mPasswordRepeat;
 
     public SettingsProfileViewModelImpl(@Nullable Bundle savedState,
-                                        @NonNull SettingsProfileViewModel.ViewListener view,
+                                        @NonNull Navigator navigator,
                                         @NonNull RxBus<Object> eventBus,
                                         @NonNull UserRepository userRepository) {
-        super(savedState, view, eventBus, userRepository);
+        super(savedState, eventBus, userRepository);
 
+        mNavigator = navigator;
         mFacebookUser = mCurrentUser.isFacebookUser();
         mGoogleUser = mCurrentUser.isGoogleUser();
 
@@ -254,7 +257,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
 
     @Override
     public void onPickAvatarMenuClick() {
-        mView.showAvatarPicker();
+        mNavigator.startImagePicker();
     }
 
     @Override
@@ -287,7 +290,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
         if (changesWereMade()) {
             mView.showDiscardChangesDialog();
         } else {
-            mView.finishScreen(Activity.RESULT_CANCELED);
+            mNavigator.finish(Activity.RESULT_CANCELED);
         }
     }
 
@@ -300,7 +303,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
 
     @Override
     public void onDiscardChangesSelected() {
-        mView.finishScreen(Result.CHANGES_DISCARDED);
+        mNavigator.finish(Result.CHANGES_DISCARDED);
     }
 
     @Override
@@ -366,7 +369,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
                         @Override
                         public void onCompleted() {
                             if (!mUnlinkThirdParty) {
-                                mView.finishScreen(Activity.RESULT_OK);
+                                mNavigator.finish(Activity.RESULT_OK);
                             } else {
                                 handleThirdParty();
                             }
@@ -393,7 +396,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
 
             if (!mUnlinkThirdParty) {
                 mCurrentUser.saveEventually();
-                mView.finishScreen(Activity.RESULT_OK);
+                mNavigator.finish(Activity.RESULT_OK);
             } else {
                 handleThirdParty();
             }
@@ -405,7 +408,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
         return new ProgressFinalAnimationListener() {
             @Override
             public void onProgressFinalAnimationComplete() {
-                mView.finishScreen(Activity.RESULT_OK);
+                mNavigator.finish(Activity.RESULT_OK);
             }
         };
     }

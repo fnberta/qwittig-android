@@ -5,13 +5,12 @@
 package ch.giantific.qwittig.presentation.common.fragments;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
+import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 
 /**
@@ -23,19 +22,18 @@ import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
  * @see RecyclerView
  * @see ProgressBar
  */
-public abstract class BaseRecyclerViewFragment<T extends ViewModel, S extends BaseFragment.ActivityListener>
-        extends BaseFragment<T, S>
-        implements ListViewModel.ViewListener {
+public abstract class BaseRecyclerViewFragment<U, T extends ViewModel, S extends BaseFragment.ActivityListener<U>>
+        extends BaseFragment<U, T, S> {
 
     protected RecyclerView mRecyclerView;
-    protected RecyclerView.Adapter mRecyclerAdapter;
+    protected BaseRecyclerAdapter mRecyclerAdapter;
 
     public BaseRecyclerViewFragment() {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
         mRecyclerView = getRecyclerView();
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -46,55 +44,10 @@ public abstract class BaseRecyclerViewFragment<T extends ViewModel, S extends Ba
 
     protected abstract RecyclerView getRecyclerView();
 
-    protected abstract RecyclerView.Adapter getRecyclerAdapter();
+    protected abstract BaseRecyclerAdapter getRecyclerAdapter();
 
     @Override
     protected View getSnackbarView() {
         return mRecyclerView;
-    }
-
-    @Override
-    public void notifyDataSetChanged() {
-        mRecyclerAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void notifyItemChanged(int position) {
-        mRecyclerAdapter.notifyItemChanged(position);
-    }
-
-    @Override
-    public void notifyItemRemoved(int position) {
-        mRecyclerAdapter.notifyItemRemoved(position);
-    }
-
-    @Override
-    public void notifyItemRangeRemoved(int positionStart, int itemCount) {
-        mRecyclerAdapter.notifyItemRangeRemoved(positionStart, itemCount);
-    }
-
-    @Override
-    public void notifyItemInserted(int position) {
-        mRecyclerAdapter.notifyItemInserted(position);
-    }
-
-    @Override
-    public void notifyItemRangeInserted(int positionStart, int itemCount) {
-        mRecyclerAdapter.notifyItemRangeInserted(positionStart, itemCount);
-    }
-
-    @Override
-    public void notifyItemRangeChanged(int positionStart, int itemCount) {
-        mRecyclerAdapter.notifyItemRangeChanged(positionStart, itemCount);
-    }
-
-    @Override
-    public void notifyItemMoved(int fromPosition, int toPosition) {
-        mRecyclerAdapter.notifyItemMoved(fromPosition, toPosition);
-    }
-
-    @Override
-    public void scrollToPosition(int position) {
-        mRecyclerView.scrollToPosition(position);
     }
 }

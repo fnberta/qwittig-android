@@ -14,6 +14,7 @@ import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.Subscriber;
 
@@ -26,19 +27,19 @@ public class LoginProfileViewModelImpl extends ViewModelBaseImpl<LoginProfileVie
     private static final String STATE_VALIDATE = "STATE_VALIDATE";
     private static final String STATE_AVATAR = "STATE_AVATAR";
     private static final String STATE_NICKNAME = "STATE_NICKNAME";
+    private final Navigator mNavigator;
     private boolean mWithInvitation;
     private String mAvatar;
     private String mNickname;
     private boolean mValidate;
 
     public LoginProfileViewModelImpl(@Nullable Bundle savedState,
-                                     @NonNull LoginProfileViewModel.ViewListener view,
+                                     @NonNull Navigator navigator,
                                      @NonNull RxBus<Object> eventBus,
-                                     @NonNull UserRepository userRepository,
-                                     boolean withInvitation) {
-        super(savedState, view, eventBus, userRepository);
+                                     @NonNull UserRepository userRepository) {
+        super(savedState, eventBus, userRepository);
 
-        mWithInvitation = withInvitation;
+        mNavigator = navigator;
 
         if (savedState != null) {
             mValidate = savedState.getBoolean(STATE_VALIDATE);
@@ -57,6 +58,11 @@ public class LoginProfileViewModelImpl extends ViewModelBaseImpl<LoginProfileVie
         outState.putBoolean(STATE_VALIDATE, mValidate);
         outState.putString(STATE_AVATAR, mAvatar);
         outState.putString(STATE_NICKNAME, mNickname);
+    }
+
+    @Override
+    public void setWithInvitation(boolean withInvitation) {
+        mWithInvitation = withInvitation;
     }
 
     @Override
@@ -104,7 +110,7 @@ public class LoginProfileViewModelImpl extends ViewModelBaseImpl<LoginProfileVie
 
     @Override
     public void onAvatarClick(View view) {
-        mView.showAvatarPicker();
+        mNavigator.startImagePicker();
     }
 
     @Override
@@ -124,9 +130,9 @@ public class LoginProfileViewModelImpl extends ViewModelBaseImpl<LoginProfileVie
                         @Override
                         public void onCompleted() {
                             if (mWithInvitation) {
-                                mView.finishScreen(Activity.RESULT_OK);
+                                mNavigator.finish(Activity.RESULT_OK);
                             } else {
-                                mView.showFirstGroupFragment();
+                                mView.showFirstGroupScreen();
                             }
                         }
 
@@ -145,9 +151,9 @@ public class LoginProfileViewModelImpl extends ViewModelBaseImpl<LoginProfileVie
             mCurrentIdentity.setNickname(mNickname);
             mCurrentIdentity.saveEventually();
             if (mWithInvitation) {
-                mView.finishScreen(Activity.RESULT_OK);
+                mNavigator.finish(Activity.RESULT_OK);
             } else {
-                mView.showFirstGroupFragment();
+                mView.showFirstGroupScreen();
             }
         }
     }

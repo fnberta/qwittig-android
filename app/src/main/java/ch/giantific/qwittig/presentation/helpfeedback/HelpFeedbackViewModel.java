@@ -13,7 +13,7 @@ import ch.giantific.qwittig.presentation.helpfeedback.items.HelpFeedbackBaseItem
 /**
  * Defines an observable view model for a screen showing a list of help and feedback items.
  */
-public interface HelpFeedbackViewModel extends ViewModel,
+public interface HelpFeedbackViewModel extends ViewModel<HelpFeedbackViewModel.ViewListener>,
         HelpFeedbackRecyclerAdapter.AdapterInteractionListener {
 
     /**

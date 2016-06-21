@@ -19,6 +19,7 @@ import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.ListInteraction;
 import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModelBaseImpl;
 import ch.giantific.qwittig.utils.MessageAction;
 import rx.Observable;
@@ -36,19 +37,18 @@ public class CompsPaidViewModelImpl
 
     private static final String STATE_IS_LOADING_MORE = "STATE_IS_LOADING_MORE";
     private final CompensationRepository mCompsRepo;
-    private boolean mIsLoadingMore;
+    private boolean mLoadingMore;
 
     public CompsPaidViewModelImpl(@Nullable Bundle savedState,
-                                  @NonNull CompsPaidViewModel.ViewListener view,
                                   @NonNull RxBus<Object> eventBus,
                                   @NonNull UserRepository userRepository,
                                   @NonNull CompensationRepository compsRepo) {
-        super(savedState, view, eventBus, userRepository);
+        super(savedState, eventBus, userRepository);
 
         mCompsRepo = compsRepo;
         if (savedState != null) {
             mItems = new ArrayList<>();
-            mIsLoadingMore = savedState.getBoolean(STATE_IS_LOADING_MORE, false);
+            mLoadingMore = savedState.getBoolean(STATE_IS_LOADING_MORE, false);
         }
     }
 
@@ -56,7 +56,7 @@ public class CompsPaidViewModelImpl
     public void saveState(@NonNull Bundle outState) {
         super.saveState(outState);
 
-        outState.putBoolean(STATE_IS_LOADING_MORE, mIsLoadingMore);
+        outState.putBoolean(STATE_IS_LOADING_MORE, mLoadingMore);
     }
 
     @Override
@@ -91,11 +91,11 @@ public class CompsPaidViewModelImpl
                     @Override
                     public void onCompleted() {
                         setLoading(false);
-                        mView.notifyDataSetChanged();
+                        mListInteraction.notifyDataSetChanged();
 
-                        if (mIsLoadingMore) {
+                        if (mLoadingMore) {
                             addLoadMore();
-                            mView.scrollToPosition(getLastPosition());
+                            mListInteraction.scrollToPosition(getLastPosition());
                         }
                     }
 
@@ -116,7 +116,7 @@ public class CompsPaidViewModelImpl
     private void addLoadMore() {
         mItems.add(null);
         final int lastPosition = getLastPosition();
-        mView.notifyItemInserted(lastPosition);
+        mListInteraction.notifyItemInserted(lastPosition);
     }
 
     @Override
@@ -169,11 +169,11 @@ public class CompsPaidViewModelImpl
                     @Override
                     public void onSuccess(List<Compensation> compensations) {
                         mView.removeWorker(workerTag);
-                        mIsLoadingMore = false;
+                        mLoadingMore = false;
 
                         removeLoadMore();
                         mItems.addAll(compensations);
-                        mView.notifyItemRangeInserted(getItemCount(), compensations.size());
+                        mListInteraction.notifyItemRangeInserted(getItemCount(), compensations.size());
                     }
 
                     @Override
@@ -186,7 +186,7 @@ public class CompsPaidViewModelImpl
                                         onLoadMore();
                                     }
                                 });
-                        mIsLoadingMore = false;
+                        mLoadingMore = false;
 
                         removeLoadMore();
                     }
@@ -197,12 +197,12 @@ public class CompsPaidViewModelImpl
     private void removeLoadMore() {
         final int finalPosition = getLastPosition();
         mItems.remove(finalPosition);
-        mView.notifyItemRemoved(finalPosition);
+        mListInteraction.notifyItemRemoved(finalPosition);
     }
 
     @Override
     public void onLoadMore() {
-        mIsLoadingMore = true;
+        mLoadingMore = true;
 
         addLoadMore();
         final int skip = mItems.size();
@@ -211,6 +211,6 @@ public class CompsPaidViewModelImpl
 
     @Override
     public boolean isLoadingMore() {
-        return !mView.isNetworkAvailable() || mIsLoadingMore || isRefreshing();
+        return !mView.isNetworkAvailable() || mLoadingMore || isRefreshing();
     }
 }

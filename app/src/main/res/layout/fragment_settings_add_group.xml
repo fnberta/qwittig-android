@@ -5,14 +5,14 @@
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".presentation.settings.addgroup.SettingsAddGroupFragment"
+    tools:context=".presentation.settings.groupusers.addgroup.SettingsAddGroupFragment"
     >
 
     <data>
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.settings.addgroup.SettingsAddGroupViewModel"
+            type="ch.giantific.qwittig.presentation.settings.groupusers.addgroup.SettingsAddGroupViewModel"
             />
     </data>
 

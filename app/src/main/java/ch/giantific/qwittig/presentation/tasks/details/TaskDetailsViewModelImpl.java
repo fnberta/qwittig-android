@@ -26,6 +26,7 @@ import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.domain.models.TaskHistoryEvent;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
 import ch.giantific.qwittig.presentation.tasks.details.items.TaskDetailsBaseItem;
 import ch.giantific.qwittig.presentation.tasks.details.items.TaskDetailsHeaderItem;
@@ -42,6 +43,7 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsB
         implements TaskDetailsViewModel {
 
     private final String mTaskId;
+    private final Navigator mNavigator;
     private final TaskRepository mTaskRepo;
     private Task mTask;
     @StringRes
@@ -50,13 +52,14 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsB
     private boolean mCurrentUserResponsible;
 
     public TaskDetailsViewModelImpl(@Nullable Bundle savedState,
-                                    @NonNull TaskDetailsViewModel.ViewListener view,
+                                    @NonNull Navigator navigator,
                                     @NonNull RxBus<Object> eventBus,
                                     @NonNull UserRepository userRepository,
                                     @NonNull TaskRepository taskRepository,
                                     @NonNull String taskId) {
-        super(savedState, view, eventBus, userRepository);
+        super(savedState, eventBus, userRepository);
 
+        mNavigator = navigator;
         mTaskRepo = taskRepository;
         mTaskId = taskId;
     }
@@ -138,7 +141,7 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsB
                     public void onCompleted() {
                         Collections.sort(mItems, Collections.reverseOrder());
                         mItems.add(0, new TaskDetailsHeaderItem(R.string.header_task_history));
-                        mView.notifyDataSetChanged();
+                        mListInteraction.notifyDataSetChanged();
                         setLoading(false);
                         mView.startPostponedEnterTransition();
                     }
@@ -240,12 +243,12 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsB
     @Override
     public void deleteTask() {
         mTask.deleteEventually();
-        mView.finishScreen(TaskDetailsResult.TASK_DELETED);
+        mNavigator.finish(TaskDetailsResult.TASK_DELETED);
     }
 
     @Override
     public void editTask() {
-        mView.startEditTaskActivity(mTaskId);
+        mNavigator.startTaskEdit(mTaskId);
     }
 
     @Override
@@ -253,7 +256,7 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsB
         final String timeFrame = mTask.getTimeFrame();
         if (Objects.equals(timeFrame, Task.TimeFrame.ONE_TIME)) {
             mTask.deleteEventually();
-            mView.finishScreen(TaskDetailsResult.TASK_DELETED);
+            mNavigator.finish(TaskDetailsResult.TASK_DELETED);
             return;
         }
 
@@ -267,7 +270,7 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsB
 
                         updateToolbarHeader();
                         mItems.add(new TaskDetailsHistoryItem(event));
-                        mView.notifyItemInserted(mItems.size());
+                        mListInteraction.notifyItemInserted(mItems.size());
                         notifyPropertyChanged(BR.empty);
                     }
 
@@ -282,6 +285,6 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsB
     @SuppressLint("MissingSuperCall")
     @Override
     protected void onIdentitySelected(@NonNull Identity identitySelected) {
-        mView.finishScreen(TaskDetailsResult.GROUP_CHANGED);
+        mNavigator.finish(TaskDetailsResult.GROUP_CHANGED);
     }
 }

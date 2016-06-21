@@ -15,8 +15,10 @@ import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 /**
  * Defines an observable view model for the login/sign-up with email screen.
  */
-public interface LoginEmailViewModel extends ViewModel, LoadingViewModel,
+public interface LoginEmailViewModel extends ViewModel<LoginEmailViewModel.ViewListener>, LoadingViewModel,
         LoginWorkerListener, EmailPromptDialogFragment.DialogInteractionListener {
+
+    void setIdentityId(@NonNull String identityId);
 
     @Bindable
     boolean isSignUp();
@@ -54,9 +56,11 @@ public interface LoginEmailViewModel extends ViewModel, LoadingViewModel,
      */
     interface ViewListener extends ViewModel.ViewListener {
 
-        void loadEmailLoginWorker(@NonNull final String email, @NonNull String password);
+        void loadEmailLoginWorker(@NonNull final String email, @NonNull String password,
+                                  @NonNull String identityId);
 
-        void loadEmailSignUpWorker(@NonNull final String email, @NonNull String password);
+        void loadEmailSignUpWorker(@NonNull final String email, @NonNull String password,
+                                   @NonNull String identityId);
 
         void loadResetPasswordWorker(@NonNull String email);
 
@@ -64,8 +68,6 @@ public interface LoginEmailViewModel extends ViewModel, LoadingViewModel,
 
         void hideKeyboard();
 
-        void finishScreen(int result);
-
-        void showProfileFragment();
+        void showProfileScreen(boolean accepted);
     }
 }

@@ -9,8 +9,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.di.scopes.PerScreen;
+import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileViewModel;
 import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileViewModelImpl;
@@ -22,17 +23,17 @@ import dagger.Provides;
  * instantiate it.
  */
 @Module
-public class SettingsProfileViewModelModule extends BaseViewModelModule<SettingsProfileViewModel.ViewListener> {
+public class SettingsProfileViewModelModule extends BaseViewModelModule {
 
-    public SettingsProfileViewModelModule(@Nullable Bundle savedState,
-                                          @NonNull SettingsProfileViewModel.ViewListener view) {
-        super(savedState, view);
+    public SettingsProfileViewModelModule(@Nullable Bundle savedState) {
+        super(savedState);
     }
 
-    @PerScreen
+    @PerActivity
     @Provides
-    SettingsProfileViewModel providesSettingsProfileViewModel(@NonNull RxBus<Object> eventBus,
+    SettingsProfileViewModel providesSettingsProfileViewModel(@NonNull Navigator navigator,
+                                                              @NonNull RxBus<Object> eventBus,
                                                               @NonNull UserRepository userRepository) {
-        return new SettingsProfileViewModelImpl(mSavedState, mView, eventBus, userRepository);
+        return new SettingsProfileViewModelImpl(mSavedState, navigator, eventBus, userRepository);
     }
 }

@@ -35,7 +35,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".presentation.home.HomeActivity"
+            android:name=".presentation.purchases.list.HomeActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.DrawStatusBar.Launcher">
             <intent-filter>
@@ -87,22 +87,22 @@
         <activity
             android:name=".presentation.settings.general.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".presentation.home.HomeActivity"/>
+            android:parentActivityName=".presentation.purchases.list.HomeActivity"/>
         <activity
-            android:name=".presentation.home.purchases.details.PurchaseDetailsActivity"
+            android:name=".presentation.purchases.details.PurchaseDetailsActivity"
             android:label="@string/title_activity_purchase_details"
-            android:parentActivityName=".presentation.home.HomeActivity"
+            android:parentActivityName=".presentation.purchases.list.HomeActivity"
             android:theme="@style/AppTheme.DrawStatusBar.Explode"/>
         <activity
-            android:name=".presentation.home.purchases.addedit.AddPurchaseActivity"
+            android:name=".presentation.purchases.addedit.PurchaseAddActivity"
             android:label="@string/title_activity_add_purchase"
-            android:parentActivityName=".presentation.home.HomeActivity"
+            android:parentActivityName=".presentation.purchases.list.HomeActivity"
             android:theme="@style/AppTheme.SlideBottom"
             android:windowSoftInputMode="stateUnchanged"/>
         <activity
-            android:name=".presentation.home.purchases.addedit.EditPurchaseActivity"
+            android:name=".presentation.purchases.addedit.PurchaseEditActivity"
             android:label="@string/title_activity_edit_purchase"
-            android:parentActivityName=".presentation.home.purchases.details.PurchaseDetailsActivity"
+            android:parentActivityName=".presentation.purchases.details.PurchaseDetailsActivity"
             android:theme="@style/AppTheme.SlideEnd"
             android:windowSoftInputMode="stateUnchanged"/>
         <activity
@@ -111,13 +111,13 @@
             android:theme="@style/AppThemeDark.Login"
             android:windowSoftInputMode="stateUnchanged|adjustPan"/>
         <activity
-            android:name=".presentation.settings.addgroup.SettingsAddGroupActivity"
+            android:name=".presentation.settings.groupusers.addgroup.SettingsAddGroupActivity"
             android:label="@string/title_activity_settings_group_new"
             android:parentActivityName=".presentation.settings.general.SettingsActivity"
             android:theme="@style/AppTheme.Explode"
             android:windowSoftInputMode="stateUnchanged"/>
         <activity
-            android:name=".presentation.settings.users.SettingsUsersActivity"
+            android:name=".presentation.settings.groupusers.users.SettingsUsersActivity"
             android:label="@string/title_activity_settings_users"
             android:parentActivityName=".presentation.settings.general.SettingsActivity"
             android:theme="@style/AppTheme.Explode"
@@ -131,12 +131,12 @@
         <activity
             android:name=".presentation.finance.FinanceActivity"
             android:label="@string/title_activity_finance"
-            android:parentActivityName=".presentation.home.HomeActivity"
+            android:parentActivityName=".presentation.purchases.list.HomeActivity"
             android:theme="@style/AppTheme.DrawStatusBar"/>
         <activity
             android:name=".presentation.helpfeedback.HelpFeedbackActivity"
             android:label="@string/title_activity_help_feedback"
-            android:parentActivityName=".presentation.home.HomeActivity"/>
+            android:parentActivityName=".presentation.purchases.list.HomeActivity"/>
         <activity
             android:name=".presentation.stats.StatsActivity"
             android:label="@string/title_activity_stats"
@@ -161,7 +161,7 @@
             android:parentActivityName=".presentation.tasks.details.TaskDetailsActivity"
             android:theme="@style/AppTheme.SlideEnd"/>
         <activity
-            android:name=".presentation.home.CameraActivity"
+            android:name=".presentation.purchases.list.CameraActivity"
             android:label="@string/title_activity_camera"
             android:screenOrientation="portrait"/>
         <activity

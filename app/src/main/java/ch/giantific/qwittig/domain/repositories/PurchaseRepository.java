@@ -146,7 +146,7 @@ public interface PurchaseRepository extends BaseRepository {
      */
     Single<Float> getExchangeRate(@NonNull String baseCurrency, @NonNull String currency);
 
-    Single<OcrData> fetchOcrPurchaseData(@NonNull String ocrPurchaseId);
+    Single<OcrData> fetchOcrData(@NonNull String ocrPurchaseId);
 
     boolean updateOcrPurchase(@NonNull String ocrPurchaseId);
 

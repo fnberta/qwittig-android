@@ -15,7 +15,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 /**
  * Defines a view model for header that show a user's current identity balance.
  */
-public interface BalanceHeaderViewModel extends ViewModel, DataRefreshViewModel {
+public interface BalanceHeaderViewModel extends ViewModel<BalanceHeaderViewModel.ViewListener>, DataRefreshViewModel {
 
     @Bindable
     String getCurrentIdentityBalance();

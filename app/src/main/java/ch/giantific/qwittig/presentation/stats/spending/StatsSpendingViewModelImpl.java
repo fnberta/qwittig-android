@@ -24,7 +24,6 @@ import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.stats.StatsViewModel;
 import ch.giantific.qwittig.presentation.stats.StatsViewModelBaseImpl;
-import ch.giantific.qwittig.presentation.stats.models.Month;
 import ch.giantific.qwittig.presentation.stats.models.Stats;
 import ch.giantific.qwittig.utils.DateUtils;
 import rx.Observable;
@@ -46,12 +45,9 @@ public class StatsSpendingViewModelImpl extends StatsViewModelBaseImpl<StatsSpen
     private boolean mShowAverage;
 
     public StatsSpendingViewModelImpl(@Nullable Bundle savedState,
-                                      @NonNull StatsSpendingViewModel.ViewListener view,
                                       @NonNull RxBus<Object> eventBus,
-                                      @NonNull UserRepository userRepository,
-                                      @NonNull String defaultYear,
-                                      @NonNull Month defaultMonth) {
-        super(savedState, view, eventBus, userRepository, defaultYear, defaultMonth);
+                                      @NonNull UserRepository userRepository) {
+        super(savedState, eventBus, userRepository);
 
         if (savedState != null) {
             mShowGroup = savedState.getBoolean(STATE_SHOW_GROUP, false);

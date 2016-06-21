@@ -15,14 +15,14 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.home.purchases.list.PurchasesViewModel"
+            type="ch.giantific.qwittig.presentation.purchases.list.purchases.PurchasesViewModel"
             />
     </data>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".presentation.home.purchases.list.PurchasesFragment"
+        tools:context=".presentation.purchases.list.purchases.PurchasesFragment"
         >
 
         <include

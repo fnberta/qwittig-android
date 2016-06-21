@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import ch.giantific.qwittig.databinding.RowCompUnpaidCreditBinding;
 import ch.giantific.qwittig.databinding.RowCompUnpaidDebtBinding;
 import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
+import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
 import ch.giantific.qwittig.presentation.finance.unpaid.items.CompsUnpaidBaseItem;
 import ch.giantific.qwittig.presentation.finance.unpaid.items.CompsUnpaidBaseItem.Type;
@@ -26,7 +27,7 @@ import ch.giantific.qwittig.presentation.finance.unpaid.items.CompsUnpaidHeaderI
  * <p/>
  * Subclass of {@link RecyclerView.Adapter}.
  */
-public class CompsUnpaidRecyclerAdapter extends RecyclerView.Adapter {
+public class CompsUnpaidRecyclerAdapter extends BaseRecyclerAdapter {
 
     private final CompsUnpaidViewModel mViewModel;
 
@@ -62,8 +63,7 @@ public class CompsUnpaidRecyclerAdapter extends RecyclerView.Adapter {
                 return new BindingRow<>(binding);
             }
             default:
-                throw new RuntimeException("there is no type that matches the type " + viewType +
-                        " + make sure your using types correctly");
+                return super.onCreateViewHolder(parent, viewType);
         }
     }
 

@@ -11,9 +11,8 @@ import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModel;
 /**
  * Defines an observable view model for a screen showing a list of paid compensations.
  */
-public interface CompsPaidViewModel extends OnlineListViewModel<Compensation>,
+public interface CompsPaidViewModel extends OnlineListViewModel<Compensation, CompsPaidViewModel.ViewListener>,
         CompsQueryMoreWorkerListener, LoadMoreViewModel {
-
 
     int TYPE_ITEM = 0;
     int TYPE_PROGRESS = 1;

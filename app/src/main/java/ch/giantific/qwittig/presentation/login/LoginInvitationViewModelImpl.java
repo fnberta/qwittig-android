@@ -21,15 +21,9 @@ public class LoginInvitationViewModelImpl extends ViewModelBaseImpl<LoginInvitat
     private String mInviterNickname;
 
     public LoginInvitationViewModelImpl(@Nullable Bundle savedState,
-                                        @NonNull LoginInvitationViewModel.ViewListener view,
                                         @NonNull RxBus<Object> eventBus,
-                                        @NonNull UserRepository userRepository,
-                                        @NonNull String groupName,
-                                        @NonNull String inviterNickname) {
-        super(savedState, view, eventBus, userRepository);
-
-        mGroupName = groupName;
-        mInviterNickname = inviterNickname;
+                                        @NonNull UserRepository userRepository) {
+        super(savedState, eventBus, userRepository);
     }
 
     @Override
@@ -39,9 +33,19 @@ public class LoginInvitationViewModelImpl extends ViewModelBaseImpl<LoginInvitat
     }
 
     @Override
+    public void setGroupName(@NonNull String groupName) {
+        mGroupName = groupName;
+    }
+
+    @Override
     @Bindable
     public String getInviterNickname() {
         return mInviterNickname;
+    }
+
+    @Override
+    public void setInviterNickname(@NonNull String inviterNickname) {
+        mInviterNickname = inviterNickname;
     }
 
     @Override

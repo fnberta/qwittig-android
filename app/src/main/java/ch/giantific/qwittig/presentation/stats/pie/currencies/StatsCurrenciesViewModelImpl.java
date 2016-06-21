@@ -14,22 +14,19 @@ import com.github.mikephil.charting.formatter.PercentFormatter;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.stats.StatsViewModel;
-import ch.giantific.qwittig.presentation.stats.models.Month;
 import ch.giantific.qwittig.presentation.stats.pie.StatsPieViewModel;
 import ch.giantific.qwittig.presentation.stats.pie.StatsPieViewModelBaseImpl;
 
 /**
  * Provides an implementation of the {@link StatsPieViewModel} interface for currencies stats screen.
  */
-public class StatsCurrenciesViewModelImpl extends StatsPieViewModelBaseImpl<StatsPieViewModel.ViewListener>
-        implements StatsPieViewModel {
+public class StatsCurrenciesViewModelImpl extends StatsPieViewModelBaseImpl<StatsCurrenciesViewModel.ViewListener>
+        implements StatsCurrenciesViewModel {
 
     public StatsCurrenciesViewModelImpl(@Nullable Bundle savedState,
-                                        @NonNull StatsPieViewModel.ViewListener view,
                                         @NonNull RxBus<Object> eventBus,
-                                        @NonNull UserRepository userRepository,
-                                        @NonNull String year, @NonNull Month month) {
-        super(savedState, view, eventBus, userRepository, year, month);
+                                        @NonNull UserRepository userRepository) {
+        super(savedState, eventBus, userRepository);
     }
 
     @Override

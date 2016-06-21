@@ -15,20 +15,32 @@ import android.support.v7.widget.Toolbar;
 import android.widget.ArrayAdapter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivityStatsBinding;
+import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
 import ch.giantific.qwittig.presentation.stats.StatsViewModel.StatsType;
+import ch.giantific.qwittig.presentation.stats.di.StatsCurrenciesViewModelModule;
+import ch.giantific.qwittig.presentation.stats.di.StatsSpendingViewModelModule;
+import ch.giantific.qwittig.presentation.stats.di.StatsStoresViewModelModule;
+import ch.giantific.qwittig.presentation.stats.di.StatsSubcomponent;
 import ch.giantific.qwittig.presentation.stats.models.Month;
 import ch.giantific.qwittig.presentation.stats.models.StatsPage;
+import ch.giantific.qwittig.presentation.stats.pie.StatsPieViewModel;
 import ch.giantific.qwittig.presentation.stats.pie.currencies.StatsCurrenciesFragment;
+import ch.giantific.qwittig.presentation.stats.pie.currencies.StatsCurrenciesViewModel;
 import ch.giantific.qwittig.presentation.stats.pie.stores.StatsStoresFragment;
+import ch.giantific.qwittig.presentation.stats.pie.stores.StatsStoresViewModel;
 import ch.giantific.qwittig.presentation.stats.spending.StatsSpendingFragment;
+import ch.giantific.qwittig.presentation.stats.spending.StatsSpendingViewModel;
 
 /**
  * Hosts the different stats fragments, {@link StatsSpendingFragment}, {@link StatsStoresFragment}
@@ -39,10 +51,16 @@ import ch.giantific.qwittig.presentation.stats.spending.StatsSpendingFragment;
  * <p/>
  * Subclass of {@link BaseNavDrawerActivity}.
  */
-public class StatsActivity extends BaseNavDrawerActivity<StatsViewModel> implements
+public class StatsActivity extends BaseNavDrawerActivity<StatsSubcomponent> implements
         StatsSpendingFragment.ActivityListener {
 
     private static final int NUMBER_OF_MONTHS = 12;
+    @Inject
+    StatsSpendingViewModel mSpendingViewModel;
+    @Inject
+    StatsStoresViewModel mStoresViewModel;
+    @Inject
+    StatsCurrenciesViewModel mCurrenciesViewModel;
     private ActivityStatsBinding mBinding;
 
     @Override
@@ -68,8 +86,17 @@ public class StatsActivity extends BaseNavDrawerActivity<StatsViewModel> impleme
     }
 
     @Override
-    protected void injectDependencies(@NonNull NavDrawerComponent navComp, Bundle savedInstanceState) {
-        navComp.inject(this);
+    protected void injectDependencies(@NonNull NavDrawerComponent navComp,
+                                      @Nullable Bundle savedInstanceState) {
+        mComponent = navComp.plus(new StatsSpendingViewModelModule(savedInstanceState),
+                new StatsCurrenciesViewModelModule(savedInstanceState),
+                new StatsStoresViewModelModule(savedInstanceState));
+        mComponent.inject(this);
+    }
+
+    @Override
+    protected List<ViewModel> getViewModels() {
+        return Arrays.asList(new ViewModel[]{mSpendingViewModel, mStoresViewModel, mCurrenciesViewModel});
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -129,8 +156,12 @@ public class StatsActivity extends BaseNavDrawerActivity<StatsViewModel> impleme
     private void addFirstFragment() {
         final String year = (String) mBinding.spYear.getSelectedItem();
         final Month month = (Month) mBinding.spMonth.getSelectedItem();
+        mSpendingViewModel.setYear(year);
+        mStoresViewModel.setMonth(month);
+        mBinding.setViewModel(mSpendingViewModel);
+
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.container, StatsSpendingFragment.newInstance(year, month))
+                .add(R.id.container, new StatsSpendingFragment())
                 .commit();
     }
 
@@ -142,25 +173,28 @@ public class StatsActivity extends BaseNavDrawerActivity<StatsViewModel> impleme
     }
 
     @Override
-    public void setStatsViewModel(@NonNull StatsViewModel viewModel) {
-        mViewModel = viewModel;
-        mBinding.setViewModel(mViewModel);
-    }
-
-    @Override
     public void switchFragment(@StatsType int statsType) {
         final String year = (String) mBinding.spYear.getSelectedItem();
         final Month month = (Month) mBinding.spMonth.getSelectedItem();
         Fragment fragment;
         switch (statsType) {
             case StatsType.CURRENCIES:
-                fragment = StatsCurrenciesFragment.newInstance(year, month);
+                mCurrenciesViewModel.setYear(year);
+                mCurrenciesViewModel.setMonth(month);
+                mBinding.setViewModel(mCurrenciesViewModel);
+                fragment = new StatsCurrenciesFragment();
                 break;
             case StatsType.SPENDING:
-                fragment = StatsSpendingFragment.newInstance(year, month);
+                mStoresViewModel.setYear(year);
+                mStoresViewModel.setMonth(month);
+                mBinding.setViewModel(mSpendingViewModel);
+                fragment = new StatsSpendingFragment();
                 break;
             case StatsType.STORES:
-                fragment = StatsStoresFragment.newInstance(year, month);
+                mStoresViewModel.setYear(year);
+                mStoresViewModel.setMonth(month);
+                mBinding.setViewModel(mStoresViewModel);
+                fragment = new StatsStoresFragment();
                 break;
             default:
                 fragment = null;

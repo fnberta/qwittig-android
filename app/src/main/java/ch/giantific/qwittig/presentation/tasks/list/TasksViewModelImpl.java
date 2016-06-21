@@ -23,6 +23,7 @@ import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.domain.models.TaskHistoryEvent;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModelBaseImpl;
 import ch.giantific.qwittig.presentation.tasks.list.items.TaskItem;
 import ch.giantific.qwittig.presentation.tasks.list.items.TasksBaseItem;
@@ -45,18 +46,20 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<TasksBaseIte
 
     private static final String STATE_LOADING_TASKS = "STATE_LOADING_TASKS";
     private static final String STATE_DEADLINE = "STATE_DEADLINE";
+    private final Navigator mNavigator;
     private final TaskRepository mTaskRepo;
     private ArrayList<String> mLoadingTasks;
     private TaskDeadline mDeadline;
 
     public TasksViewModelImpl(@Nullable Bundle savedState,
-                              @NonNull TasksViewModel.ViewListener view,
+                              @NonNull Navigator navigator,
                               @NonNull RxBus<Object> eventBus,
                               @NonNull UserRepository userRepository,
                               @NonNull TaskRepository taskRepo,
                               @NonNull TaskDeadline deadline) {
-        super(savedState, view, eventBus, userRepository);
+        super(savedState, eventBus, userRepository);
 
+        mNavigator = navigator;
         mTaskRepo = taskRepo;
         if (savedState != null) {
             mItems = new ArrayList<>();
@@ -121,7 +124,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<TasksBaseIte
                         }
 
                         setLoading(false);
-                        mView.notifyDataSetChanged();
+                        mListInteraction.notifyDataSetChanged();
                     }
 
                     @Override
@@ -161,7 +164,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<TasksBaseIte
 
     @Override
     public void onAddTaskFabClick(View view) {
-        mView.startTaskAddScreen();
+        mNavigator.startTaskAdd();
     }
 
     @Override
@@ -197,7 +200,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<TasksBaseIte
     @Override
     public void onTaskRowClicked(int position) {
         final Task task = ((TaskItem) mItems.get(position)).getTask();
-        mView.startTaskDetailsScreen(task);
+        mNavigator.startTaskDetails(task);
     }
 
     @Override
@@ -209,7 +212,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<TasksBaseIte
         if (Objects.equals(timeFrame, Task.TimeFrame.ONE_TIME)) {
             task.deleteEventually();
             mItems.remove(taskItem);
-            mView.notifyItemRemoved(position);
+            mListInteraction.notifyItemRemoved(position);
             return;
         }
 
@@ -225,7 +228,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<TasksBaseIte
                 identityResponsibleNew != null && identityResponsibleNew.getObjectId().equals(currentIdentityId)) {
             loadData();
         } else {
-            mView.notifyItemChanged(position);
+            mListInteraction.notifyItemChanged(position);
         }
     }
 
@@ -250,7 +253,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<TasksBaseIte
     private void setTaskLoading(@NonNull Task task, @NonNull String objectId, int position,
                                 boolean isLoading) {
         task.setLoading(isLoading);
-        mView.notifyItemChanged(position);
+        mListInteraction.notifyItemChanged(position);
 
         if (isLoading) {
             mLoadingTasks.add(objectId);

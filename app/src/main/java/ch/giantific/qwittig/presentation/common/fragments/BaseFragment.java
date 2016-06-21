@@ -14,8 +14,8 @@ import android.view.View;
 
 import javax.inject.Inject;
 
-import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.WorkerUtils;
 
@@ -26,9 +26,8 @@ import ch.giantific.qwittig.utils.WorkerUtils;
  * <p/>
  * Subclass of {@link Fragment}.
  */
-public abstract class BaseFragment<T extends ViewModel, S extends BaseFragment.ActivityListener>
-        extends Fragment
-        implements ViewModel.ViewListener {
+public abstract class BaseFragment<U, T extends ViewModel, S extends BaseFragment.ActivityListener<U>>
+        extends Fragment implements ViewModel.ViewListener {
 
     protected S mActivity;
     @Inject
@@ -55,10 +54,10 @@ public abstract class BaseFragment<T extends ViewModel, S extends BaseFragment.A
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        setViewModelToActivity();
+        injectDependencies(mActivity.getComponent());
     }
 
-    protected abstract void setViewModelToActivity();
+    protected abstract void injectDependencies(@NonNull U component);
 
     @Override
     public void onStart() {
@@ -72,13 +71,6 @@ public abstract class BaseFragment<T extends ViewModel, S extends BaseFragment.A
         super.onStop();
 
         mViewModel.onViewGone();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        mViewModel.saveState(outState);
     }
 
     @Override
@@ -117,6 +109,10 @@ public abstract class BaseFragment<T extends ViewModel, S extends BaseFragment.A
         WorkerUtils.removeWorker(getFragmentManager(), workerTag);
     }
 
-    public interface ActivityListener {
+    /**
+     * Default interaction listener with the hosting activity for subclasses to extend from.
+     */
+    public interface ActivityListener<T> {
+        T getComponent();
     }
 }

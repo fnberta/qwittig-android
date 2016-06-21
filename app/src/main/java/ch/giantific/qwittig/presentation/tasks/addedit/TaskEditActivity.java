@@ -4,21 +4,37 @@
 
 package ch.giantific.qwittig.presentation.tasks.addedit;
 
-import ch.giantific.qwittig.presentation.tasks.list.TasksFragment;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+
+import ch.giantific.qwittig.Qwittig;
+import ch.giantific.qwittig.presentation.common.Navigator;
+import ch.giantific.qwittig.presentation.tasks.addedit.di.DaggerTaskEditComponent;
+import ch.giantific.qwittig.presentation.tasks.addedit.di.TaskEditComponent;
+import ch.giantific.qwittig.presentation.tasks.addedit.di.TaskEditViewModelModule;
 
 /**
- * Hosts {@link TaskAddEditFragment} that allows the user to edit a task.
+ * Hosts {@link TaskAddFragment} that allows the user to edit a task.
  * <p/>
  * Almost identical to {@link TaskAddActivity}, but separate activity allows to set a different
  * transition in XML.
  * <p/>
  * Subclass of {@link TaskAddActivity}.
  */
-public class TaskEditActivity extends TaskAddActivity {
+public class TaskEditActivity extends BaseTaskAddEditActivity<TaskEditComponent> {
 
     @Override
-    TaskAddEditFragment getTaskFragment() {
-        final String editTaskId = getIntent().getStringExtra(TasksFragment.INTENT_EXTRA_TASK_ID);
-        return TaskAddEditFragment.newEditInstance(editTaskId);
+    protected void injectDependencies(@Nullable Bundle savedInstanceState) {
+        final String editTaskId = getIntent().getStringExtra(Navigator.INTENT_TASK_ID);
+        mComponent = DaggerTaskEditComponent.builder()
+                .applicationComponent(Qwittig.getAppComponent(this))
+                .taskEditViewModelModule(new TaskEditViewModelModule(savedInstanceState, editTaskId))
+                .build();
+        mComponent.inject(this);
+    }
+
+    @Override
+    protected BaseTaskAddEditFragment getTaskFragment() {
+        return new TaskEditFragment();
     }
 }

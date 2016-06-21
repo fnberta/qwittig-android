@@ -13,7 +13,7 @@
 
         <variable
             name="item"
-            type="ch.giantific.qwittig.presentation.home.purchases.addedit.items.AddEditPurchaseItemUsersUser"
+            type="ch.giantific.qwittig.presentation.purchases.addedit.items.PurchaseAddEditItemUsersUser"
             />
     </data>
 

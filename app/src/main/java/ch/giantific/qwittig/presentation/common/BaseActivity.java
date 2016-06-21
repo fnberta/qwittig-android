@@ -8,14 +8,18 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+
+import java.util.List;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.LocalBroadcast;
@@ -31,20 +35,9 @@ import ch.giantific.qwittig.utils.WorkerUtils;
  * <p/>
  * Subclass of {@link AppCompatActivity}.
  */
-public abstract class BaseActivity<T extends ViewModel>
-        extends AppCompatActivity
-        implements BaseFragment.ActivityListener, BaseWorkerListener, ViewModel.ViewListener {
+public abstract class BaseActivity<T> extends AppCompatActivity
+        implements BaseFragment.ActivityListener<T>, BaseWorkerListener, ViewModel.ViewListener {
 
-    public static final int INTENT_REQUEST_LOGIN = 1;
-    public static final int INTENT_REQUEST_SETTINGS = 2;
-    public static final int INTENT_REQUEST_PURCHASE_MODIFY = 3;
-    public static final int INTENT_REQUEST_PURCHASE_DETAILS = 4;
-    public static final int INTENT_REQUEST_IMAGE_CAPTURE = 5;
-    public static final int INTENT_REQUEST_SETTINGS_PROFILE = 6;
-    public static final int INTENT_REQUEST_SETTINGS_ADD_GROUP = 7;
-    public static final int INTENT_REQUEST_TASK_NEW = 8;
-    public static final int INTENT_REQUEST_TASK_MODIFY = 9;
-    public static final int INTENT_REQUEST_TASK_DETAILS = 10;
     @NonNull
     private final BroadcastReceiver mLocalBroadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -54,11 +47,40 @@ public abstract class BaseActivity<T extends ViewModel>
         }
     };
     protected Toolbar mToolbar;
-    protected T mViewModel;
+    protected T mComponent;
+    private List<ViewModel> mViewModels;
 
     @CallSuper
     protected void handleLocalBroadcast(Intent intent, int dataType) {
         // empty default implementation
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        injectDependencies(savedInstanceState);
+        mViewModels = getViewModels();
+    }
+
+    protected abstract void injectDependencies(@Nullable Bundle savedInstanceState);
+
+    @Override
+    public T getComponent() {
+        return mComponent;
+    }
+
+    protected abstract List<ViewModel> getViewModels();
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        for (ViewModel viewModel : mViewModels) {
+            if (viewModel != null) {
+                viewModel.saveState(outState);
+            }
+        }
     }
 
     @Override
@@ -96,11 +118,6 @@ public abstract class BaseActivity<T extends ViewModel>
     }
 
     @Override
-    public void onWorkerError(@NonNull String workerTag) {
-        mViewModel.onWorkerError(workerTag);
-    }
-
-    @Override
     public boolean isNetworkAvailable() {
         return Utils.isNetworkAvailable(this);
     }
@@ -125,5 +142,12 @@ public abstract class BaseActivity<T extends ViewModel>
     @Override
     public void removeWorker(@NonNull String workerTag) {
         WorkerUtils.removeWorker(getSupportFragmentManager(), workerTag);
+    }
+
+    @Override
+    public void onWorkerError(@NonNull String workerTag) {
+        for (ViewModel viewModel : mViewModels) {
+            viewModel.onWorkerError(workerTag);
+        }
     }
 }

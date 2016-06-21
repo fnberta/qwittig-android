@@ -25,20 +25,18 @@ import rx.subscriptions.CompositeSubscription;
  * Subclass of {@link BaseObservable} to make fields observable for data binding.
  */
 public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
-        extends BaseObservable
-        implements ViewModel {
+        extends BaseObservable implements ViewModel<T> {
 
-    protected final T mView;
+    protected T mView;
     protected final UserRepository mUserRepo;
     protected final RxBus<Object> mEventBus;
     protected User mCurrentUser;
     protected Identity mCurrentIdentity;
     private CompositeSubscription mSubscriptions = new CompositeSubscription();
 
-    public ViewModelBaseImpl(@Nullable Bundle savedState, @NonNull T view,
+    public ViewModelBaseImpl(@Nullable Bundle savedState,
                              @NonNull RxBus<Object> eventBus,
                              @NonNull UserRepository userRepository) {
-        mView = view;
         mEventBus = eventBus;
         mUserRepo = userRepository;
         mCurrentUser = mUserRepo.getCurrentUser();
@@ -49,6 +47,11 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
         if (mCurrentUser != null) {
             mCurrentIdentity = mCurrentUser.getCurrentIdentity();
         }
+    }
+
+    @Override
+    public void attachView(@NonNull T view) {
+        mView = view;
     }
 
     @Override

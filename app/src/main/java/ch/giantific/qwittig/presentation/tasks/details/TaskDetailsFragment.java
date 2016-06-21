@@ -5,13 +5,10 @@
 package ch.giantific.qwittig.presentation.tasks.details;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
@@ -26,18 +23,14 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
-import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentTaskDetailsBinding;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Task;
-import ch.giantific.qwittig.presentation.common.BaseActivity;
+import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
-import ch.giantific.qwittig.presentation.tasks.addedit.TaskEditActivity;
-import ch.giantific.qwittig.presentation.tasks.details.di.DaggerTaskDetailsComponent;
-import ch.giantific.qwittig.presentation.tasks.details.di.TaskDetailsViewModelModule;
-import ch.giantific.qwittig.presentation.tasks.list.TasksFragment;
+import ch.giantific.qwittig.presentation.tasks.details.di.TaskDetailsSubcomponent;
 
 /**
  * Shows the details of a {@link Task}. Most of the information gets displayed in the
@@ -46,31 +39,17 @@ import ch.giantific.qwittig.presentation.tasks.list.TasksFragment;
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public class TaskDetailsFragment extends BaseRecyclerViewFragment<TaskDetailsViewModel, TaskDetailsFragment.ActivityListener>
+public class TaskDetailsFragment extends BaseRecyclerViewFragment<TaskDetailsSubcomponent, TaskDetailsViewModel, BaseFragment.ActivityListener<TaskDetailsSubcomponent>>
         implements TaskDetailsViewModel.ViewListener {
 
-    private static final String KEY_TASK_ID = "TASK_ID";
     private FragmentTaskDetailsBinding mBinding;
     private boolean mShowEditOptions;
 
     public TaskDetailsFragment() {
     }
 
-    /**
-     * Returns a new instance of {@link TaskDetailsFragment}.
-     *
-     * @param taskId the object id of the task for which the details should be displayed
-     * @return a new instance of {@link TaskDetailsFragment}
-     */
-    @NonNull
-    public static TaskDetailsFragment newInstance(@NonNull String taskId) {
-        TaskDetailsFragment fragment = new TaskDetailsFragment();
-
-        Bundle args = new Bundle();
-        args.putString(KEY_TASK_ID, taskId);
-        fragment.setArguments(args);
-
-        return fragment;
+    public void setShowEditOptions(boolean showEditOptions) {
+        mShowEditOptions = showEditOptions;
     }
 
     @Override
@@ -78,21 +57,27 @@ public class TaskDetailsFragment extends BaseRecyclerViewFragment<TaskDetailsVie
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
-
-        final String taskId = getArguments().getString(KEY_TASK_ID, "");
-        DaggerTaskDetailsComponent.builder()
-                .applicationComponent(Qwittig.getAppComponent(getActivity()))
-                .taskDetailsViewModelModule(new TaskDetailsViewModelModule(savedInstanceState, this, taskId))
-                .build()
-                .inject(this);
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentTaskDetailsBinding.inflate(inflater, container, false);
-        mBinding.setViewModel(mViewModel);
         return mBinding.getRoot();
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        mViewModel.attachView(this);
+        mViewModel.setListInteraction(mRecyclerAdapter);
+        mBinding.setViewModel(mViewModel);
+    }
+
+    @Override
+    protected void injectDependencies(@NonNull TaskDetailsSubcomponent component) {
+        component.inject(this);
     }
 
     @Override
@@ -101,13 +86,8 @@ public class TaskDetailsFragment extends BaseRecyclerViewFragment<TaskDetailsVie
     }
 
     @Override
-    protected RecyclerView.Adapter getRecyclerAdapter() {
+    protected BaseRecyclerAdapter getRecyclerAdapter() {
         return new TaskHistoryRecyclerAdapter(mViewModel);
-    }
-
-    @Override
-    protected void setViewModelToActivity() {
-        mActivity.setViewModel(mViewModel);
     }
 
     @Override
@@ -147,18 +127,6 @@ public class TaskDetailsFragment extends BaseRecyclerViewFragment<TaskDetailsVie
         getActivity().invalidateOptionsMenu();
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public void startEditTaskActivity(@NonNull String taskId) {
-        final FragmentActivity activity = getActivity();
-        final Intent intent = new Intent(activity, TaskEditActivity.class);
-        intent.putExtra(TasksFragment.INTENT_EXTRA_TASK_ID, taskId);
-        final ActivityOptionsCompat options =
-                ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
-        activity.startActivityForResult(intent, BaseActivity.INTENT_REQUEST_TASK_MODIFY,
-                options.toBundle());
-    }
-
     @NonNull
     @Override
     public SpannableStringBuilder buildTaskIdentitiesString(@NonNull List<Identity> identities,
@@ -178,21 +146,5 @@ public class TaskDetailsFragment extends BaseRecyclerViewFragment<TaskDetailsVie
         }
 
         return stringBuilder;
-    }
-
-    @Override
-    public void finishScreen(int result) {
-        Activity activity = getActivity();
-        activity.setResult(result);
-        activity.finish();
-    }
-
-    /**
-     * Defines the interaction with the hosting {@link Activity}.
-     * <p/>
-     * Extends {@link BaseFragment.ActivityListener}.
-     */
-    public interface ActivityListener extends BaseFragment.ActivityListener {
-        void setViewModel(@NonNull TaskDetailsViewModel viewModel);
     }
 }

@@ -15,7 +15,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 /**
  * Defines an observable view model for the login accounts screen.
  */
-public interface LoginAccountsViewModel extends ViewModel, LoadingViewModel, LoginWorkerListener {
+public interface LoginAccountsViewModel extends ViewModel<LoginAccountsViewModel.ViewListener>, LoadingViewModel, LoginWorkerListener {
 
     void setInvitationIdentityId(@NonNull String identityId);
 
@@ -43,8 +43,6 @@ public interface LoginAccountsViewModel extends ViewModel, LoadingViewModel, Log
                                          @Nullable Uri photoUrl, @NonNull String identityId);
 
         void showEmailFragment(@NonNull String identityId);
-
-        void finishScreen(int result);
 
         void showProfileFragment(boolean withInvitation);
     }

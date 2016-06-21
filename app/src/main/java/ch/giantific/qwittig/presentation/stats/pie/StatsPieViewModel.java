@@ -13,7 +13,7 @@ import ch.giantific.qwittig.presentation.stats.StatsViewModel;
 /**
  * Defines a base observable view model for stats screens with a pie chart.
  */
-public interface StatsPieViewModel extends StatsViewModel, PieChartViewModel {
+public interface StatsPieViewModel<T extends StatsPieViewModel.ViewListener> extends StatsViewModel<T>, PieChartViewModel {
 
     @Bindable
     boolean isSortUsers();

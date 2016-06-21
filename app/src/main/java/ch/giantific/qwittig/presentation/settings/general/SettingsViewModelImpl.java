@@ -23,6 +23,7 @@ import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.Single;
 import rx.SingleSubscriber;
@@ -33,11 +34,15 @@ import rx.SingleSubscriber;
 public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.ViewListener>
         implements SettingsViewModel {
 
+    private final Navigator mNavigator;
+
     public SettingsViewModelImpl(@Nullable Bundle savedState,
-                                 @NonNull SettingsViewModel.ViewListener view,
+                                 @NonNull Navigator navigator,
                                  @NonNull RxBus<Object> eventBus,
                                  @NonNull UserRepository userRepository) {
-        super(savedState, view, eventBus, userRepository);
+        super(savedState, eventBus, userRepository);
+
+        mNavigator = navigator;
     }
 
     @Override
@@ -85,7 +90,7 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
         setupCurrentGroupCategory();
 
         // new group selected, tell calling activity to reload data
-        mView.setResult(Result.GROUP_SELECTED);
+        mView.setScreenResult(Result.GROUP_SELECTED);
     }
 
     @Override
@@ -99,7 +104,7 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
             loadIdentitySelection();
 
             // NavDrawer group setting needs to be updated
-            mView.setResult(Result.GROUP_CHANGED);
+            mView.setScreenResult(Result.GROUP_CHANGED);
         }
     }
 
@@ -145,7 +150,7 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
         loadIdentitySelection();
 
         // NavDrawer group setting needs to be updated
-        mView.setResult(Result.GROUP_CHANGED);
+        mView.setScreenResult(Result.GROUP_CHANGED);
     }
 
     @Override
@@ -155,7 +160,7 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
         loadIdentitySelection();
 
         // NavDrawer group setting needs to be updated
-        mView.setResult(Result.GROUP_CHANGED);
+        mView.setScreenResult(Result.GROUP_CHANGED);
     }
 
     @Override
@@ -193,8 +198,8 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
                 mView.removeWorker(workerTag);
                 mView.hideProgressDialog();
 
-                mView.setResult(Result.LOGOUT);
-                mView.finishScreen();
+                mView.setScreenResult(Result.LOGOUT);
+                mNavigator.finish();
             }
 
             @Override

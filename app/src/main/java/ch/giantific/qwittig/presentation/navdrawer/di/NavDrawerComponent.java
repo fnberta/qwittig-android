@@ -6,34 +6,51 @@ package ch.giantific.qwittig.presentation.navdrawer.di;
 
 import ch.giantific.qwittig.di.ApplicationComponent;
 import ch.giantific.qwittig.di.RepositoriesModule;
-import ch.giantific.qwittig.di.scopes.PerScreen;
-import ch.giantific.qwittig.presentation.finance.di.BalanceHeaderViewModelModule;
+import ch.giantific.qwittig.di.scopes.PerActivity;
+import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
+import ch.giantific.qwittig.presentation.finance.di.FinanceCompsPaidViewModelModule;
+import ch.giantific.qwittig.presentation.finance.di.FinanceCompsUnpaidViewModelModule;
+import ch.giantific.qwittig.presentation.finance.di.FinanceHeaderViewModelModule;
 import ch.giantific.qwittig.presentation.finance.di.FinanceSubcomponent;
-import ch.giantific.qwittig.presentation.home.di.HomeSubcomponent;
-import ch.giantific.qwittig.presentation.home.di.HomeViewModelModule;
-import ch.giantific.qwittig.presentation.home.purchases.details.PurchaseDetailsActivity;
-import ch.giantific.qwittig.presentation.stats.StatsActivity;
-import ch.giantific.qwittig.presentation.tasks.details.TaskDetailsActivity;
-import ch.giantific.qwittig.presentation.tasks.list.TasksActivity;
+import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsSubcomponent;
+import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsViewModelModule;
+import ch.giantific.qwittig.presentation.purchases.list.di.DraftsListViewModelModule;
+import ch.giantific.qwittig.presentation.purchases.list.di.HomeSubcomponent;
+import ch.giantific.qwittig.presentation.purchases.list.di.HomeViewModelModule;
+import ch.giantific.qwittig.presentation.purchases.list.di.PurchasesListViewModelModule;
+import ch.giantific.qwittig.presentation.stats.di.StatsCurrenciesViewModelModule;
+import ch.giantific.qwittig.presentation.stats.di.StatsSpendingViewModelModule;
+import ch.giantific.qwittig.presentation.stats.di.StatsStoresViewModelModule;
+import ch.giantific.qwittig.presentation.stats.di.StatsSubcomponent;
+import ch.giantific.qwittig.presentation.tasks.details.di.TaskDetailsSubcomponent;
+import ch.giantific.qwittig.presentation.tasks.details.di.TaskDetailsViewModelModule;
+import ch.giantific.qwittig.presentation.tasks.list.di.TasksListSubcomponent;
+import ch.giantific.qwittig.presentation.tasks.list.di.TasksListViewModelModule;
 import dagger.Component;
 
 /**
  * Provides the dependencies for the navigation drawer.
  */
-@PerScreen
+@PerActivity
 @Component(dependencies = {ApplicationComponent.class},
-        modules = {NavDrawerViewModelModule.class, RepositoriesModule.class})
+        modules = {NavDrawerViewModelModule.class, RepositoriesModule.class, NavigatorModule.class})
 public interface NavDrawerComponent {
 
-    void inject(TasksActivity tasksActivity);
+    HomeSubcomponent plus(HomeViewModelModule homeViewModelModule,
+                          PurchasesListViewModelModule purchasesListViewModelModule,
+                          DraftsListViewModelModule draftsListViewModelModule);
 
-    void inject(TaskDetailsActivity taskDetailsActivity);
+    FinanceSubcomponent plus(FinanceHeaderViewModelModule financeHeaderViewModelModule,
+                             FinanceCompsUnpaidViewModelModule compsUnpaidViewModelModule,
+                             FinanceCompsPaidViewModelModule compsPaidViewModelModule);
 
-    void inject(PurchaseDetailsActivity purchaseDetailsActivity);
+    PurchaseDetailsSubcomponent plus(PurchaseDetailsViewModelModule purchaseDetailsViewModelModule);
 
-    void inject(StatsActivity statsActivity);
+    TasksListSubcomponent plus(TasksListViewModelModule tasksListViewModelModule);
 
-    HomeSubcomponent plus(HomeViewModelModule viewModelModule);
+    TaskDetailsSubcomponent plus(TaskDetailsViewModelModule taskDetailsViewModelModule);
 
-    FinanceSubcomponent plus(BalanceHeaderViewModelModule viewModelModule);
+    StatsSubcomponent plus(StatsSpendingViewModelModule statsSpendingViewModelModule,
+                           StatsCurrenciesViewModelModule statsCurrenciesViewModelModule,
+                           StatsStoresViewModelModule statsStoresViewModelModule);
 }

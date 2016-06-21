@@ -7,22 +7,18 @@ package ch.giantific.qwittig.presentation.stats.pie.stores;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.presentation.stats.BaseStatsFragment;
 import ch.giantific.qwittig.presentation.stats.StatsLoader;
 import ch.giantific.qwittig.presentation.stats.StatsViewModel;
-import ch.giantific.qwittig.presentation.stats.models.Month;
+import ch.giantific.qwittig.presentation.stats.di.StatsSubcomponent;
 import ch.giantific.qwittig.presentation.stats.models.Stats;
-import ch.giantific.qwittig.presentation.stats.pie.StatsPieBaseFragment;
-import ch.giantific.qwittig.presentation.stats.pie.stores.di.DaggerStatsStoresComponent;
-import ch.giantific.qwittig.presentation.stats.pie.stores.di.StatsStoresComponent;
-import ch.giantific.qwittig.presentation.stats.pie.stores.di.StatsStoresViewModelModule;
+import ch.giantific.qwittig.presentation.stats.pie.BaseStatsPieFragment;
 import ch.giantific.qwittig.presentation.stats.widgets.PieChart;
 import rx.Observable;
 
@@ -30,39 +26,28 @@ import rx.Observable;
  * Displays the stores statistics in a {@link PieChart}. Shows the percentages of the stores
  * used in all purchases.
  * <p/>
- * Subclass of {@link StatsPieBaseFragment}.
+ * Subclass of {@link BaseStatsPieFragment}.
  */
-public class StatsStoresFragment extends StatsPieBaseFragment<StatsStoresViewModel, StatsPieBaseFragment.ActivityListener> {
+public class StatsStoresFragment extends BaseStatsPieFragment<StatsStoresViewModel, BaseStatsFragment.ActivityListener> {
 
-    private StatsStoresComponent mComponent;
+    private StatsSubcomponent mComponent;
 
     public StatsStoresFragment() {
         // Required empty public constructor
-    }
-
-    public static StatsStoresFragment newInstance(@NonNull String year, @NonNull Month month) {
-        final StatsStoresFragment fragment = new StatsStoresFragment();
-        final Bundle args = new Bundle();
-        args.putString(KEY_YEAR, year);
-        args.putParcelable(KEY_MONTH, month);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    protected void injectDependencies(@Nullable Bundle savedState, @NonNull String year, @NonNull Month month) {
-        mComponent = DaggerStatsStoresComponent.builder()
-                .applicationComponent(Qwittig.getAppComponent(getActivity()))
-                .statsStoresViewModelModule(new StatsStoresViewModelModule(savedState, this, year, month))
-                .build();
-        mComponent.inject(this);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        mViewModel.attachView(this);
         getLoaderManager().initLoader(StatsViewModel.StatsType.STORES, null, this);
+    }
+
+    @Override
+    protected void injectDependencies(@NonNull StatsSubcomponent component) {
+        mComponent = component;
+        mComponent.inject(this);
     }
 
     @Override
@@ -102,8 +87,8 @@ public class StatsStoresFragment extends StatsPieBaseFragment<StatsStoresViewMod
 
     @Override
     public Loader<Observable<Stats>> onCreateLoader(int id, Bundle args) {
-        return new StatsLoader(getActivity(), mComponent.getUserRepo(),
-                mComponent.getStatsRepo(), StatsViewModel.StatsType.STORES, mViewModel.getYear(),
+        return new StatsLoader(getActivity(), mComponent.getUserRepository(),
+                mComponent.getStatsRepository(), StatsViewModel.StatsType.STORES, mViewModel.getYear(),
                 mViewModel.getMonth().getNumber());
     }
 }

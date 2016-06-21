@@ -9,8 +9,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.di.scopes.PerScreen;
+import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.settings.general.SettingsViewModel;
 import ch.giantific.qwittig.presentation.settings.general.SettingsViewModelImpl;
@@ -22,17 +23,17 @@ import dagger.Provides;
  * instantiate it.
  */
 @Module
-public class SettingsViewModelModule extends BaseViewModelModule<SettingsViewModel.ViewListener> {
+public class SettingsViewModelModule extends BaseViewModelModule {
 
-    public SettingsViewModelModule(@Nullable Bundle savedState,
-                                   @NonNull SettingsViewModel.ViewListener view) {
-        super(savedState, view);
+    public SettingsViewModelModule(@Nullable Bundle savedState) {
+        super(savedState);
     }
 
-    @PerScreen
+    @PerActivity
     @Provides
-    SettingsViewModel providesSettingsViewModel(@NonNull RxBus<Object> eventBus,
+    SettingsViewModel providesSettingsViewModel(@NonNull Navigator navigator,
+                                                @NonNull RxBus<Object> eventBus,
                                                 @NonNull UserRepository userRepository) {
-        return new SettingsViewModelImpl(mSavedState, mView, eventBus, userRepository);
+        return new SettingsViewModelImpl(mSavedState, navigator, eventBus, userRepository);
     }
 }

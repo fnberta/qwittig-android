@@ -9,9 +9,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.di.scopes.PerScreen;
+import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.tasks.addedit.TaskAddEditViewModel;
 import ch.giantific.qwittig.presentation.tasks.addedit.TaskAddEditViewModelAddImpl;
@@ -22,19 +23,20 @@ import dagger.Provides;
  * Defines which implementation to use for the add task screen view model and how to instantiate it.
  */
 @Module
-public class TaskAddViewModelModule extends BaseViewModelModule<TaskAddEditViewModel.ViewListener> {
+public class TaskAddViewModelModule extends BaseViewModelModule {
 
-    public TaskAddViewModelModule(@Nullable Bundle savedState,
-                                  @NonNull TaskAddEditViewModel.ViewListener view) {
-        super(savedState, view);
+    public TaskAddViewModelModule(@Nullable Bundle savedState) {
+        super(savedState);
     }
 
-    @PerScreen
+    @PerActivity
     @Provides
-    TaskAddEditViewModel providesTaskAddEditViewModel(@NonNull RxBus<Object> eventBus,
+    TaskAddEditViewModel providesTaskAddEditViewModel(@NonNull Navigator navigator,
+                                                      @NonNull RxBus<Object> eventBus,
                                                       @NonNull UserRepository userRepository,
                                                       @NonNull TaskRepository taskRepository) {
-        return new TaskAddEditViewModelAddImpl(mSavedState, mView, eventBus, userRepository, taskRepository);
+        return new TaskAddEditViewModelAddImpl(mSavedState, navigator, eventBus, userRepository,
+                taskRepository);
     }
 
 }

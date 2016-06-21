@@ -47,10 +47,9 @@ public class HelpFeedbackViewModelImpl extends ViewModelBaseImpl<HelpFeedbackVie
     private static final String TWITTER_URL = "http://twitter.com/qwittig";
 
     public HelpFeedbackViewModelImpl(@Nullable Bundle savedState,
-                                     @NonNull HelpFeedbackViewModel.ViewListener view,
                                      @NonNull RxBus<Object> eventBus,
                                      @NonNull UserRepository userRepository) {
-        super(savedState, view, eventBus, userRepository);
+        super(savedState, eventBus, userRepository);
     }
 
     @Override

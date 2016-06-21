@@ -4,39 +4,28 @@
 
 package ch.giantific.qwittig.presentation.login;
 
-import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.transition.Slide;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.json.JSONObject;
-
-import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentLoginAccountsBinding;
-import ch.giantific.qwittig.presentation.home.HomeActivity;
-import ch.giantific.qwittig.presentation.login.di.DaggerLoginAccountsComponent;
-import ch.giantific.qwittig.presentation.login.di.LoginAccountsViewModelModule;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
+import ch.giantific.qwittig.presentation.login.di.LoginComponent;
 import ch.giantific.qwittig.utils.Utils;
-import io.branch.referral.Branch;
-import io.branch.referral.BranchError;
-import timber.log.Timber;
 
 /**
  * Displays the login screen asking the user for the username and password.
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public class LoginAccountsFragment extends BaseFragment<LoginAccountsViewModel, LoginAccountsFragment.ActivityListener>
+public class LoginAccountsFragment extends BaseFragment<LoginComponent, LoginAccountsViewModel, LoginAccountsFragment.ActivityListener>
         implements LoginAccountsViewModel.ViewListener {
 
     private FragmentLoginAccountsBinding mBinding;
@@ -46,72 +35,23 @@ public class LoginAccountsFragment extends BaseFragment<LoginAccountsViewModel, 
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        DaggerLoginAccountsComponent.builder()
-                .applicationComponent(Qwittig.getAppComponent(getActivity()))
-                .loginAccountsViewModelModule(new LoginAccountsViewModelModule(savedInstanceState, this))
-                .build()
-                .inject(this);
-    }
-
-    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentLoginAccountsBinding.inflate(inflater, container, false);
-        mBinding.setViewModel(mViewModel);
         return mBinding.getRoot();
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
-        checkBranchLink();
-    }
-
-    private void checkBranchLink() {
-        final FragmentActivity activity = getActivity();
-        final Branch branch = Branch.getInstance();
-        branch.initSession(new Branch.BranchReferralInitListener() {
-            @Override
-            public void onInitFinished(JSONObject referringParams, BranchError error) {
-                if (error != null) {
-                    Timber.e("deep link error, %s", error);
-                    return;
-                }
-
-                final boolean openedWithInvite = referringParams.optBoolean(HomeActivity.BRANCH_IS_INVITE, false);
-                if (openedWithInvite) {
-                    final String identityId = referringParams.optString(HomeActivity.BRANCH_IDENTITY_ID);
-                    final String groupName = referringParams.optString(HomeActivity.BRANCH_GROUP_NAME);
-                    final String inviterNickname = referringParams.optString(HomeActivity.BRANCH_INVITER_NICKNAME);
-
-                    mViewModel.setInvitationIdentityId(identityId);
-                    showInvitationFragment(identityId, groupName, inviterNickname);
-                }
-            }
-        }, activity.getIntent().getData(), activity);
-    }
-
-    private void showInvitationFragment(@NonNull String identityId, @NonNull String groupName,
-                                        @NonNull String inviterNickname) {
-        final LoginInvitationFragment fragment =
-                LoginInvitationFragment.newInstance(identityId, groupName, inviterNickname);
-        if (Utils.isRunningLollipopAndHigher()) {
-            fragment.setEnterTransition(new Slide(Gravity.BOTTOM));
-        }
-
-        getFragmentManager().beginTransaction()
-                .replace(R.id.container, fragment, LoginActivity.FRAGMENT_LOGIN)
-                .addToBackStack(null)
-                .commit();
+        mViewModel.attachView(this);
+        mBinding.setViewModel(mViewModel);
     }
 
     @Override
-    protected void setViewModelToActivity() {
-        mActivity.setAccountsViewModel(mViewModel);
+    protected void injectDependencies(@NonNull LoginComponent component) {
+        component.inject(this);
     }
 
     @Override
@@ -138,56 +78,26 @@ public class LoginAccountsFragment extends BaseFragment<LoginAccountsViewModel, 
 
     @Override
     public void showEmailFragment(@NonNull String identityId) {
-        final LoginEmailFragment fragment = LoginEmailFragment.newInstance(identityId);
-        if (Utils.isRunningLollipopAndHigher()) {
-            setExitTransition(new Slide(Gravity.BOTTOM));
-            fragment.setEnterTransition(new Slide(Gravity.BOTTOM));
-        }
-
-        getFragmentManager().beginTransaction()
-                .replace(R.id.container, fragment, LoginActivity.FRAGMENT_LOGIN)
-                .addToBackStack(null)
-                .commit();
-    }
-
-    @Override
-    public void finishScreen(int result) {
-        final FragmentActivity activity = getActivity();
-        activity.setResult(result);
-        ActivityCompat.finishAfterTransition(activity);
+        mActivity.showEmailFragment(identityId);
     }
 
     @Override
     public void showProfileFragment(boolean withInvitation) {
-        final LoginProfileFragment fragment = LoginProfileFragment.newInstance(withInvitation);
-        if (Utils.isRunningLollipopAndHigher()) {
-            setExitTransition(new Slide(Gravity.START));
-            setAllowReturnTransitionOverlap(false);
-            fragment.setEnterTransition(new Slide(Gravity.END));
-            fragment.setAllowEnterTransitionOverlap(false);
-        }
-
-        getFragmentManager().beginTransaction()
-                .replace(R.id.container, fragment, LoginActivity.FRAGMENT_LOGIN)
-                .addToBackStack(null)
-                .commit();
+        mActivity.showProfileFragment(withInvitation);
     }
 
     /**
-     * Defines the interaction with the hosting {@link Activity}.
+     * Defines the interaction with the hosting activity.
      */
-    public interface ActivityListener extends BaseFragment.ActivityListener {
-
-        /**
-         * Sets the view model to the activity.
-         *
-         * @param viewModel the view model to set
-         */
-        void setAccountsViewModel(@NonNull LoginAccountsViewModel viewModel);
+    public interface ActivityListener extends BaseFragment.ActivityListener<LoginComponent> {
 
         /**
          * Starts the login with Google process.
          */
         void loginWithGoogle();
+
+        void showEmailFragment(@NonNull String identityId);
+
+        void showProfileFragment(boolean withInvitation);
     }
 }

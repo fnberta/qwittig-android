@@ -14,7 +14,7 @@
 
         <variable
             name="item"
-            type="ch.giantific.qwittig.presentation.home.purchases.details.items.PurchaseDetailsTotalItem"
+            type="ch.giantific.qwittig.presentation.purchases.details.items.PurchaseDetailsTotalItem"
             />
     </data>
 

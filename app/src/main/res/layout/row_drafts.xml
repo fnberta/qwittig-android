@@ -13,7 +13,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.home.purchases.list.DraftsRowViewModel"
+            type="ch.giantific.qwittig.presentation.purchases.list.drafts.DraftsRowViewModel"
             />
     </data>
 

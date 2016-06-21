@@ -6,7 +6,6 @@ package ch.giantific.qwittig.presentation.stats.spending;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,18 +19,14 @@ import com.github.mikephil.charting.formatter.YAxisValueFormatter;
 
 import java.text.NumberFormat;
 
-import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentStatsSpendingBinding;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
-import ch.giantific.qwittig.presentation.stats.StatsBaseFragment;
+import ch.giantific.qwittig.presentation.stats.BaseStatsFragment;
 import ch.giantific.qwittig.presentation.stats.StatsLoader;
 import ch.giantific.qwittig.presentation.stats.StatsViewModel.StatsType;
-import ch.giantific.qwittig.presentation.stats.models.Month;
+import ch.giantific.qwittig.presentation.stats.di.StatsSubcomponent;
 import ch.giantific.qwittig.presentation.stats.models.Stats;
-import ch.giantific.qwittig.presentation.stats.spending.di.DaggerStatsSpendingComponent;
-import ch.giantific.qwittig.presentation.stats.spending.di.StatsSpendingComponent;
-import ch.giantific.qwittig.presentation.stats.spending.di.StatsSpendingViewModelModule;
 import ch.giantific.qwittig.presentation.stats.widgets.BarChart;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Observable;
@@ -42,39 +37,20 @@ import rx.Observable;
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public class StatsSpendingFragment extends StatsBaseFragment<StatsSpendingViewModel, StatsBaseFragment.ActivityListener>
+public class StatsSpendingFragment extends BaseStatsFragment<StatsSpendingViewModel, BaseStatsFragment.ActivityListener>
         implements StatsSpendingViewModel.ViewListener {
 
     private FragmentStatsSpendingBinding mBinding;
-    private StatsSpendingComponent mComponent;
+    private StatsSubcomponent mComponent;
 
     public StatsSpendingFragment() {
         // Required empty public constructor
-    }
-
-    public static StatsSpendingFragment newInstance(@NonNull String year, @NonNull Month month) {
-        final StatsSpendingFragment fragment = new StatsSpendingFragment();
-        final Bundle args = new Bundle();
-        args.putString(KEY_YEAR, year);
-        args.putParcelable(KEY_MONTH, month);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    protected void injectDependencies(@Nullable Bundle savedState, @NonNull String year, @NonNull Month month) {
-        mComponent = DaggerStatsSpendingComponent.builder()
-                .applicationComponent(Qwittig.getAppComponent(getActivity()))
-                .statsSpendingViewModelModule(new StatsSpendingViewModelModule(savedState, this, year, month))
-                .build();
-        mComponent.inject(this);
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentStatsSpendingBinding.inflate(inflater, container, false);
-        mBinding.setViewModel(mViewModel);
         return mBinding.getRoot();
     }
 
@@ -82,7 +58,15 @@ public class StatsSpendingFragment extends StatsBaseFragment<StatsSpendingViewMo
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        mViewModel.attachView(this);
+        mBinding.setViewModel(mViewModel);
         getLoaderManager().initLoader(StatsType.SPENDING, null, this);
+    }
+
+    @Override
+    protected void injectDependencies(@NonNull StatsSubcomponent component) {
+        mComponent = component;
+        mComponent.inject(this);
     }
 
     @Override
@@ -120,8 +104,8 @@ public class StatsSpendingFragment extends StatsBaseFragment<StatsSpendingViewMo
 
     @Override
     public Loader<Observable<Stats>> onCreateLoader(int id, Bundle args) {
-        return new StatsLoader(getActivity(), mComponent.getUserRepo(),
-                mComponent.getStatsRepo(), StatsType.SPENDING, mViewModel.getYear(),
+        return new StatsLoader(getActivity(), mComponent.getUserRepository(),
+                mComponent.getStatsRepository(), StatsType.SPENDING, mViewModel.getYear(),
                 mViewModel.getMonth().getNumber());
     }
 

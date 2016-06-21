@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.RowTaskAddEditUserBinding;
 import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
 import ch.giantific.qwittig.presentation.tasks.addedit.models.TaskAddEditIdentityViewModel;
 
@@ -24,7 +25,7 @@ import ch.giantific.qwittig.presentation.tasks.addedit.models.TaskAddEditIdentit
  * <p/>
  * Subclass of {@link RecyclerView.Adapter}.
  */
-public class TaskAddEditUsersRecyclerAdapter extends RecyclerView.Adapter<TaskAddEditUsersRecyclerAdapter.TaskUserInvolvedRow> {
+public class TaskAddEditUsersRecyclerAdapter extends BaseRecyclerAdapter<TaskAddEditUsersRecyclerAdapter.TaskUserInvolvedRow> {
 
     private final TaskAddEditViewModel mViewModel;
 

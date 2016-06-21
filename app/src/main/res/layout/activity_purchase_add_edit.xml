@@ -11,7 +11,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.home.purchases.addedit.AddEditPurchaseViewModel"
+            type="ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel"
             />
     </data>
 
@@ -21,7 +21,7 @@
         android:layout_height="match_parent"
         android:clipChildren="false"
         android:transitionGroup="true"
-        tools:context=".presentation.home.purchases.addedit.AddPurchaseActivity"
+        tools:context=".presentation.purchases.addedit.PurchaseAddActivity"
         tools:targetApi="lollipop"
         >
 

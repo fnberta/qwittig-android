@@ -12,7 +12,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.home.purchases.details.PurchaseDetailsViewModel"
+            type="ch.giantific.qwittig.presentation.purchases.details.PurchaseDetailsViewModel"
             />
     </data>
 
@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
-        tools:context=".presentation.home.purchases.details.PurchaseDetailsActivity"
+        tools:context=".presentation.purchases.details.PurchaseDetailsActivity"
         >
 
         <LinearLayout

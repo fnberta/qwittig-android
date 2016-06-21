@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
 import ch.giantific.qwittig.databinding.RowTaskDetailsHistoryBinding;
+import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
 import ch.giantific.qwittig.presentation.tasks.details.items.TaskDetailsBaseItem;
 import ch.giantific.qwittig.presentation.tasks.details.items.TaskDetailsBaseItem.Type;
@@ -24,7 +25,7 @@ import ch.giantific.qwittig.presentation.tasks.details.items.TaskDetailsHistoryI
  * <p/>
  * Subclass of {@link RecyclerView.Adapter}.
  */
-public class TaskHistoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class TaskHistoryRecyclerAdapter extends BaseRecyclerAdapter<RecyclerView.ViewHolder> {
 
     private final TaskDetailsViewModel mViewModel;
 

@@ -49,9 +49,9 @@ import ch.giantific.qwittig.domain.models.TaskHistoryEvent;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.finance.FinanceActivity;
-import ch.giantific.qwittig.presentation.home.HomeActivity;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.AddPurchaseActivity;
-import ch.giantific.qwittig.presentation.home.purchases.details.PurchaseDetailsActivity;
+import ch.giantific.qwittig.presentation.purchases.list.HomeActivity;
+import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddActivity;
+import ch.giantific.qwittig.presentation.purchases.details.PurchaseDetailsActivity;
 import ch.giantific.qwittig.presentation.tasks.details.TaskDetailsActivity;
 import ch.giantific.qwittig.presentation.tasks.list.TasksActivity;
 import ch.giantific.qwittig.utils.MoneyUtils;
@@ -734,7 +734,7 @@ public class PushBroadcastReceiver extends ParsePushBroadcastReceiver {
         String type = getNotificationType(intent);
         switch (type) {
             case TYPE_PURCHASE_OCR_SUCCEEDED: {
-                return AddPurchaseActivity.class;
+                return PurchaseAddActivity.class;
             }
             case TYPE_PURCHASE_NEW: {
                 final String groupId;

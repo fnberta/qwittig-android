@@ -12,13 +12,12 @@ import android.widget.AdapterView;
 import java.util.List;
 
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
-import ch.giantific.qwittig.presentation.settings.addgroup.Currency;
-import rx.Single;
+import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.Currency;
 
 /**
  * Defines an observable view model for the login/sign-up with email screen.
  */
-public interface LoginFirstGroupViewModel extends ViewModel {
+public interface LoginFirstGroupViewModel extends ViewModel<LoginFirstGroupViewModel.ViewListener> {
 
     @Bindable
     boolean isValidate();
@@ -46,6 +45,5 @@ public interface LoginFirstGroupViewModel extends ViewModel {
      * Defines the interaction with the attached view.
      */
     interface ViewListener extends ViewModel.ViewListener {
-        void finishScreen(int result);
     }
 }

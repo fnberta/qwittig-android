@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
 import ch.giantific.qwittig.databinding.RowHelpFeedbackBinding;
+import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
 import ch.giantific.qwittig.presentation.helpfeedback.items.HelpFeedbackItem;
 import ch.giantific.qwittig.presentation.helpfeedback.items.HelpFeedbackHeaderItem;
@@ -23,7 +24,7 @@ import ch.giantific.qwittig.presentation.helpfeedback.items.HelpFeedbackBaseItem
  * <p/>
  * Subclass of {@link RecyclerView.Adapter}.
  */
-public class HelpFeedbackRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class HelpFeedbackRecyclerAdapter extends BaseRecyclerAdapter {
 
     private final HelpFeedbackViewModel mViewModel;
 
@@ -53,8 +54,7 @@ public class HelpFeedbackRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
                 return new BindingRow<>(binding);
             }
             default:
-                throw new RuntimeException("there is no type that matches the type " + viewType +
-                        " + make sure your using types correctly");
+                return super.onCreateViewHolder(parent, viewType);
         }
     }
 

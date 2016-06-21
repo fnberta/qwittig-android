@@ -41,7 +41,7 @@ ext {
     playServicesVersion = '9.0.2'
     retrofitVersion = '2.0.2'
     leakCanaryVersion = '1.4-beta2'
-    daggerVersion = '2.2'
+    daggerVersion = '2.5'
 }
 
 dependencies {

@@ -16,13 +16,22 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ArrayAdapter;
 
+import java.util.Arrays;
+import java.util.List;
+
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.databinding.ActivityTasksBinding;
+import ch.giantific.qwittig.presentation.common.Navigator;
+import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
 import ch.giantific.qwittig.presentation.tasks.addedit.TaskAddEditViewModel.TaskResult;
 import ch.giantific.qwittig.presentation.tasks.details.TaskDetailsViewModel.TaskDetailsResult;
+import ch.giantific.qwittig.presentation.tasks.list.di.TasksListSubcomponent;
+import ch.giantific.qwittig.presentation.tasks.list.di.TasksListViewModelModule;
 import ch.giantific.qwittig.presentation.tasks.list.models.TaskDeadline;
 import rx.Single;
 
@@ -35,10 +44,11 @@ import rx.Single;
  * <p/>
  * Subclass of {@link BaseNavDrawerActivity}.
  */
-public class TasksActivity extends BaseNavDrawerActivity<TasksViewModel> implements
-        TasksFragment.ActivityListener,
-        TaskRemindWorkerListener {
+public class TasksActivity extends BaseNavDrawerActivity<TasksListSubcomponent>
+        implements TaskRemindWorkerListener {
 
+    @Inject
+    TasksViewModel mTasksViewModel;
     private ActivityTasksBinding mBinding;
     private TaskDeadline[] mDeadlines;
 
@@ -48,7 +58,7 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksViewModel> impleme
 
         if (dataType == LocalBroadcast.DataType.TASKS_UPDATED) {
             final boolean successful = intent.getBooleanExtra(LocalBroadcast.INTENT_EXTRA_SUCCESSFUL, false);
-            mViewModel.onDataUpdated(successful);
+            mTasksViewModel.onDataUpdated(successful);
         }
     }
 
@@ -56,6 +66,7 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksViewModel> impleme
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_tasks);
+        mBinding.setViewModel(mTasksViewModel);
 
         // check item in NavDrawer
         checkNavDrawerItem(R.id.nav_tasks);
@@ -76,7 +87,21 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksViewModel> impleme
     @Override
     protected void injectDependencies(@NonNull NavDrawerComponent navComp,
                                       @Nullable Bundle savedInstanceState) {
-        navComp.inject(this);
+        mDeadlines = new TaskDeadline[]{
+                TaskDeadline.newAllInstance(getString(R.string.deadline_all)),
+                TaskDeadline.newTodayInstance(getString(R.string.deadline_today)),
+                TaskDeadline.newWeekInstance(getString(R.string.deadline_week)),
+                TaskDeadline.newMonthInstance(getString(R.string.deadline_month)),
+                TaskDeadline.newYearInstance(getString(R.string.deadline_year))
+        };
+
+        mComponent = navComp.plus(new TasksListViewModelModule(savedInstanceState, mDeadlines[0]));
+        mComponent.inject(this);
+    }
+
+    @Override
+    protected List<ViewModel> getViewModels() {
+        return Arrays.asList(new ViewModel[]{mTasksViewModel});
     }
 
     private void showFab() {
@@ -95,13 +120,6 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksViewModel> impleme
 
     @SuppressWarnings("ConstantConditions")
     private void setupDeadlineSpinner() {
-        mDeadlines = new TaskDeadline[]{
-                TaskDeadline.newAllInstance(getString(R.string.deadline_all)),
-                TaskDeadline.newTodayInstance(getString(R.string.deadline_today)),
-                TaskDeadline.newWeekInstance(getString(R.string.deadline_week)),
-                TaskDeadline.newMonthInstance(getString(R.string.deadline_month)),
-                TaskDeadline.newYearInstance(getString(R.string.deadline_year))};
-
         final ActionBar actionBar = getSupportActionBar();
         final Context themedContext = actionBar.getThemedContext();
         final ArrayAdapter<TaskDeadline> adapter =
@@ -111,26 +129,25 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksViewModel> impleme
     }
 
     private void addTasksFragment() {
-        final TasksFragment tasksFragment = TasksFragment.newInstance(mDeadlines[0]);
+        final TasksFragment tasksFragment = new TasksFragment();
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.container, tasksFragment)
                 .commit();
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case INTENT_REQUEST_TASK_DETAILS:
+            case Navigator.INTENT_REQUEST_TASK_DETAILS:
                 switch (resultCode) {
                     case TaskDetailsResult.TASK_DELETED:
                         showMessage(R.string.toast_task_deleted);
                         break;
                 }
                 break;
-            case INTENT_REQUEST_TASK_NEW:
+            case Navigator.INTENT_REQUEST_TASK_NEW:
                 switch (resultCode) {
                     case TaskResult.TASK_SAVED:
                         showMessage(R.string.toast_task_added_new);
@@ -149,21 +166,15 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksViewModel> impleme
     }
 
     @Override
-    public void setViewModel(@NonNull TasksViewModel viewModel) {
-        mViewModel = viewModel;
-        mBinding.setViewModel(viewModel);
+    protected void onLoginSuccessful() {
+        super.onLoginSuccessful();
+
+        addTasksFragment();
     }
 
     @Override
     public void setTaskReminderStream(@NonNull Single<String> single, @NonNull String taskId,
                                       @NonNull String workerTag) {
-        mViewModel.setTaskReminderStream(single, taskId, workerTag);
-    }
-
-    @Override
-    protected void onLoginSuccessful() {
-        super.onLoginSuccessful();
-
-        addTasksFragment();
+        mTasksViewModel.setTaskReminderStream(single, taskId, workerTag);
     }
 }

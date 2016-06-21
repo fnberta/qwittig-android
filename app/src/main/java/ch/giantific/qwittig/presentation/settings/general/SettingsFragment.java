@@ -5,7 +5,6 @@
 package ch.giantific.qwittig.presentation.settings.general;
 
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -29,14 +28,14 @@ import android.view.MenuItem;
 
 import javax.inject.Inject;
 
-import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.presentation.common.Navigator;
+import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.fragments.LeaveGroupDialogFragment;
-import ch.giantific.qwittig.presentation.settings.addgroup.SettingsAddGroupActivity;
-import ch.giantific.qwittig.presentation.settings.general.di.DaggerSettingsComponent;
-import ch.giantific.qwittig.presentation.settings.general.di.SettingsViewModelModule;
+import ch.giantific.qwittig.presentation.settings.general.di.SettingsComponent;
+import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.SettingsAddGroupActivity;
+import ch.giantific.qwittig.presentation.settings.groupusers.users.SettingsUsersActivity;
 import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileActivity;
-import ch.giantific.qwittig.presentation.settings.users.SettingsUsersActivity;
 import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.WorkerUtils;
@@ -50,8 +49,8 @@ import ch.giantific.qwittig.utils.WorkerUtils;
  */
 @SuppressWarnings("unchecked")
 public class SettingsFragment extends PreferenceFragmentCompat
-        implements SettingsViewModel.ViewListener,
-        SharedPreferences.OnSharedPreferenceChangeListener {
+        implements SharedPreferences.OnSharedPreferenceChangeListener,
+        SettingsViewModel.ViewListener {
 
     private static final String PREF_PROFILE = "PREF_PROFILE";
     private static final String PREF_GROUP_CURRENT = "PREF_GROUP_CURRENT";
@@ -64,12 +63,12 @@ public class SettingsFragment extends PreferenceFragmentCompat
     SettingsViewModel mViewModel;
     @Inject
     SharedPreferences mSharedPrefs;
-    private ActivityListener mActivity;
-    private ProgressDialog mProgressDialog;
+    private BaseFragment.ActivityListener<SettingsComponent> mActivity;
     private PreferenceCategory mCategoryCurrentGroup;
     private ListPreference mListPreferenceGroupCurrent;
     private EditTextPreference mEditTextPreferenceGroupName;
     private Preference mPreferenceGroupLeave;
+    private ProgressDialog mProgressDialog;
 
     public SettingsFragment() {
         // required empty constructor
@@ -80,7 +79,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
         super.onAttach(context);
 
         try {
-            mActivity = (ActivityListener) context;
+            mActivity = (BaseFragment.ActivityListener<SettingsComponent>) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
                     + " must implement ActivityListener");
@@ -92,14 +91,6 @@ public class SettingsFragment extends PreferenceFragmentCompat
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
-
-        DaggerSettingsComponent.builder()
-                .applicationComponent(Qwittig.getAppComponent(getActivity()))
-                .settingsViewModelModule(new SettingsViewModelModule(savedInstanceState, this))
-                .build()
-                .inject(this);
-
-        mViewModel.onPreferencesLoaded();
     }
 
     @SuppressWarnings("unchecked")
@@ -131,7 +122,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
                 final Intent intent = new Intent(activity, SettingsProfileActivity.class);
                 final ActivityOptionsCompat activityOptionsCompat =
                         ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity());
-                activity.startActivityForResult(intent, SettingsActivity.INTENT_REQUEST_SETTINGS_PROFILE,
+                activity.startActivityForResult(intent, Navigator.INTENT_REQUEST_SETTINGS_PROFILE,
                         activityOptionsCompat.toBundle());
                 return true;
             }
@@ -143,7 +134,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
                 final Intent intent = new Intent(activity, SettingsAddGroupActivity.class);
                 final ActivityOptionsCompat activityOptionsCompat =
                         ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity());
-                activity.startActivityForResult(intent, SettingsActivity.INTENT_REQUEST_SETTINGS_ADD_GROUP,
+                activity.startActivityForResult(intent, Navigator.INTENT_REQUEST_SETTINGS_ADD_GROUP,
                         activityOptionsCompat.toBundle());
                 return true;
             }
@@ -172,7 +163,9 @@ public class SettingsFragment extends PreferenceFragmentCompat
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mActivity.setSettingsViewModel(mViewModel);
+        mActivity.getComponent().inject(this);
+        mViewModel.attachView(this);
+        mViewModel.onPreferencesLoaded();
     }
 
     @Override
@@ -321,13 +314,8 @@ public class SettingsFragment extends PreferenceFragmentCompat
     }
 
     @Override
-    public void setResult(int result) {
+    public void setScreenResult(int result) {
         getActivity().setResult(result);
-    }
-
-    @Override
-    public void finishScreen() {
-        getActivity().finish();
     }
 
     @Override
@@ -335,16 +323,19 @@ public class SettingsFragment extends PreferenceFragmentCompat
         return Utils.isNetworkAvailable(getActivity());
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void showMessage(@StringRes int resId) {
         Snackbar.make(getView(), resId, Snackbar.LENGTH_LONG).show();
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void showMessage(@StringRes int resId, @NonNull Object... args) {
         Snackbar.make(getView(), getString(resId, args), Snackbar.LENGTH_LONG).show();
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void showMessageWithAction(@StringRes int resId, @NonNull MessageAction action) {
         Snackbar.make(getView(), resId, Snackbar.LENGTH_LONG)
@@ -355,12 +346,5 @@ public class SettingsFragment extends PreferenceFragmentCompat
     @Override
     public void removeWorker(@NonNull String workerTag) {
         WorkerUtils.removeWorker(getFragmentManager(), workerTag);
-    }
-
-    /**
-     * Defines the interaction with the hosting {@link Activity}.
-     */
-    public interface ActivityListener {
-        void setSettingsViewModel(@NonNull SettingsViewModel viewModel);
     }
 }

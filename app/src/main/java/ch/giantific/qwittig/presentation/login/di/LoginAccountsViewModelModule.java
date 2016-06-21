@@ -9,8 +9,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.di.scopes.PerScreen;
+import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.login.LoginAccountsViewModel;
 import ch.giantific.qwittig.presentation.login.LoginAccountsViewModelImpl;
@@ -22,17 +23,17 @@ import dagger.Provides;
  * instantiate it.
  */
 @Module
-public class LoginAccountsViewModelModule extends BaseViewModelModule<LoginAccountsViewModel.ViewListener> {
+public class LoginAccountsViewModelModule extends BaseViewModelModule {
 
-    public LoginAccountsViewModelModule(@Nullable Bundle savedState,
-                                        @NonNull LoginAccountsViewModel.ViewListener view) {
-        super(savedState, view);
+    public LoginAccountsViewModelModule(@Nullable Bundle savedState) {
+        super(savedState);
     }
 
-    @PerScreen
+    @PerActivity
     @Provides
-    LoginAccountsViewModel providesLoginAccountsViewModel(@NonNull RxBus<Object> eventBus,
+    LoginAccountsViewModel providesLoginAccountsViewModel(@NonNull Navigator navigator,
+                                                          @NonNull RxBus<Object> eventBus,
                                                           @NonNull UserRepository userRepository) {
-        return new LoginAccountsViewModelImpl(mSavedState, mView, eventBus, userRepository);
+        return new LoginAccountsViewModelImpl(mSavedState, navigator, eventBus, userRepository);
     }
 }

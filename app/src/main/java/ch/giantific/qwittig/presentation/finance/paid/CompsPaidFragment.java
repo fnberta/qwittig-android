@@ -6,7 +6,6 @@ package ch.giantific.qwittig.presentation.finance.paid;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,19 +14,18 @@ import android.view.ViewGroup;
 import com.mugen.Mugen;
 import com.mugen.MugenCallbacks;
 
-import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.FragmentFinanceCompensationsPaidBinding;
+import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
-import ch.giantific.qwittig.presentation.finance.paid.di.DaggerFinanceCompsPaidComponent;
-import ch.giantific.qwittig.presentation.finance.paid.di.FinanceCompsPaidViewModelModule;
+import ch.giantific.qwittig.presentation.finance.di.FinanceSubcomponent;
 
 /**
  * Displays recent paid compensations in a {@link RecyclerView} list.
  * <p/>
  * Subclass of {@link BaseRecyclerViewFragment}.
  */
-public class CompsPaidFragment extends BaseRecyclerViewFragment<CompsPaidViewModel, CompsPaidFragment.ActivityListener>
+public class CompsPaidFragment extends BaseRecyclerViewFragment<FinanceSubcomponent, CompsPaidViewModel, BaseRecyclerViewFragment.ActivityListener<FinanceSubcomponent>>
         implements CompsPaidViewModel.ViewListener {
 
     private FragmentFinanceCompensationsPaidBinding mBinding;
@@ -37,28 +35,19 @@ public class CompsPaidFragment extends BaseRecyclerViewFragment<CompsPaidViewMod
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        DaggerFinanceCompsPaidComponent.builder()
-                .applicationComponent(Qwittig.getAppComponent(getActivity()))
-                .financeCompsPaidViewModelModule(new FinanceCompsPaidViewModelModule(savedInstanceState, this))
-                .build()
-                .inject(this);
-    }
-
-    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentFinanceCompensationsPaidBinding.inflate(inflater, container, false);
-        mBinding.setViewModel(mViewModel);
         return mBinding.getRoot();
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
+        mViewModel.attachView(this);
+        mViewModel.setListInteraction(mRecyclerAdapter);
+        mBinding.setViewModel(mViewModel);
         Mugen.with(mRecyclerView, new MugenCallbacks() {
             @Override
             public void onLoadMore() {
@@ -78,18 +67,18 @@ public class CompsPaidFragment extends BaseRecyclerViewFragment<CompsPaidViewMod
     }
 
     @Override
+    protected void injectDependencies(@NonNull FinanceSubcomponent component) {
+        component.inject(this);
+    }
+
+    @Override
     protected RecyclerView getRecyclerView() {
         return mBinding.srlRv.rvBase;
     }
 
     @Override
-    protected RecyclerView.Adapter getRecyclerAdapter() {
+    protected BaseRecyclerAdapter getRecyclerAdapter() {
         return new CompsPaidRecyclerAdapter(mViewModel);
-    }
-
-    @Override
-    protected void setViewModelToActivity() {
-        mActivity.setCompsPaidViewModel(mViewModel);
     }
 
     @Override
@@ -101,10 +90,5 @@ public class CompsPaidFragment extends BaseRecyclerViewFragment<CompsPaidViewMod
     @Override
     public void loadQueryMoreCompensationsPaidWorker(int skip) {
         CompsQueryMoreWorker.attach(getFragmentManager(), skip);
-    }
-
-
-    public interface ActivityListener extends BaseRecyclerViewFragment.ActivityListener {
-        void setCompsPaidViewModel(@NonNull CompsPaidViewModel viewModel);
     }
 }

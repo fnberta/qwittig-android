@@ -17,7 +17,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 /**
  * Defines an observable view model for the navigation drawer.
  */
-public interface NavDrawerViewModel extends ViewModel {
+public interface NavDrawerViewModel extends ViewModel<NavDrawerViewModel.ViewListener> {
 
     @Bindable
     String getIdentityNickname();
@@ -59,11 +59,5 @@ public interface NavDrawerViewModel extends ViewModel {
     interface ViewListener extends ViewModel.ViewListener {
 
         void notifyHeaderIdentitiesChanged();
-
-        void startProfileSettingsActivity();
-
-        void startHomeActivityAndFinish();
-
-        void startLoginActivity();
     }
 }

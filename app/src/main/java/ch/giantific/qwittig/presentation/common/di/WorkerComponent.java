@@ -6,25 +6,25 @@ package ch.giantific.qwittig.presentation.common.di;
 
 import ch.giantific.qwittig.di.ApplicationComponent;
 import ch.giantific.qwittig.di.RepositoriesModule;
-import ch.giantific.qwittig.di.scopes.PerScreen;
+import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.presentation.finance.paid.CompsQueryMoreWorker;
 import ch.giantific.qwittig.presentation.finance.unpaid.CompRemindWorker;
-import ch.giantific.qwittig.presentation.home.JoinGroupWorker;
-import ch.giantific.qwittig.presentation.home.OcrWorker;
-import ch.giantific.qwittig.presentation.home.purchases.addedit.RatesWorker;
-import ch.giantific.qwittig.presentation.home.purchases.list.PurchasesQueryMoreWorker;
+import ch.giantific.qwittig.presentation.purchases.list.JoinGroupWorker;
+import ch.giantific.qwittig.presentation.purchases.list.OcrWorker;
+import ch.giantific.qwittig.presentation.purchases.addedit.RatesWorker;
+import ch.giantific.qwittig.presentation.purchases.list.purchases.PurchasesQueryMoreWorker;
 import ch.giantific.qwittig.presentation.login.LoginWorker;
-import ch.giantific.qwittig.presentation.settings.addgroup.AddGroupWorker;
+import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.AddGroupWorker;
 import ch.giantific.qwittig.presentation.settings.general.LogoutWorker;
 import ch.giantific.qwittig.presentation.settings.profile.UnlinkThirdPartyWorker;
-import ch.giantific.qwittig.presentation.settings.users.AddUserWorker;
+import ch.giantific.qwittig.presentation.settings.groupusers.users.AddUserWorker;
 import ch.giantific.qwittig.presentation.tasks.list.TaskRemindWorker;
 import dagger.Component;
 
 /**
  * Defines the dependencies for headless worker fragments.
  */
-@PerScreen
+@PerActivity
 @Component(dependencies = {ApplicationComponent.class},
         modules = {RepositoriesModule.class})
 public interface WorkerComponent {

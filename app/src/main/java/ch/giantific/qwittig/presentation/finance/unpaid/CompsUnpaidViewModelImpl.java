@@ -55,11 +55,10 @@ public class CompsUnpaidViewModelImpl
     private NumberFormat mMoneyFormatter;
 
     public CompsUnpaidViewModelImpl(@Nullable Bundle savedState,
-                                    @NonNull CompsUnpaidViewModel.ViewListener view,
                                     @NonNull RxBus<Object> eventBus,
                                     @NonNull UserRepository userRepository,
                                     @NonNull CompensationRepository compsRepo) {
-        super(savedState, view, eventBus, userRepository);
+        super(savedState, eventBus, userRepository);
 
         mCompsRepo = compsRepo;
 
@@ -121,7 +120,7 @@ public class CompsUnpaidViewModelImpl
                         }
 
                         setLoading(false);
-                        mView.notifyDataSetChanged();
+                        mListInteraction.notifyDataSetChanged();
                     }
 
                     @Override
@@ -238,7 +237,7 @@ public class CompsUnpaidViewModelImpl
                             setLoading(true);
                         } else {
                             mItems.remove(position);
-                            mView.notifyItemRemoved(position);
+                            mListInteraction.notifyItemRemoved(position);
                             notifyPropertyChanged(BR.empty);
                         }
 
@@ -273,7 +272,7 @@ public class CompsUnpaidViewModelImpl
     private void setCompensationLoading(@NonNull Compensation compensation,
                                         @NonNull String objectId, int position, boolean isLoading) {
         compensation.setLoading(isLoading);
-        mView.notifyItemChanged(position);
+        mListInteraction.notifyItemChanged(position);
 
         if (isLoading) {
             mLoadingComps.add(objectId);

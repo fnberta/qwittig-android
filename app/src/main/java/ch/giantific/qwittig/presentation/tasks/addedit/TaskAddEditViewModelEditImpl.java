@@ -11,12 +11,14 @@ import android.support.annotation.Nullable;
 import java.util.List;
 import java.util.Objects;
 
+import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.tasks.addedit.models.TaskUser;
 import rx.SingleSubscriber;
 
@@ -31,12 +33,12 @@ public class TaskAddEditViewModelEditImpl extends TaskAddEditViewModelAddImpl {
     private Task mEditTask;
 
     public TaskAddEditViewModelEditImpl(@Nullable Bundle savedState,
-                                        @NonNull TaskAddEditViewModel.ViewListener view,
+                                        @NonNull Navigator navigator,
                                         @NonNull RxBus<Object> eventBus,
                                         @NonNull UserRepository userRepository,
                                         @NonNull TaskRepository taskRepository,
                                         @NonNull String editTaskId) {
-        super(savedState, view, eventBus, userRepository, taskRepository);
+        super(savedState, navigator, eventBus, userRepository, taskRepository);
 
         mEditTaskId = editTaskId;
 
@@ -89,7 +91,7 @@ public class TaskAddEditViewModelEditImpl extends TaskAddEditViewModelAddImpl {
         setUsersInvolved(mEditTask.getIdentities());
 
         mOldValuesSet = true;
-        mView.notifyDataSetChanged();
+        mListInteraction.notifyDataSetChanged();
     }
 
     private void setTimeFrame(@NonNull @Task.TimeFrame String timeFrame) {
@@ -118,7 +120,7 @@ public class TaskAddEditViewModelEditImpl extends TaskAddEditViewModelAddImpl {
         }
 
         if (res != -1) {
-            mView.setTimeFramePosition(res);
+            notifyPropertyChanged(BR.selectedTimeFrame);
         }
     }
 

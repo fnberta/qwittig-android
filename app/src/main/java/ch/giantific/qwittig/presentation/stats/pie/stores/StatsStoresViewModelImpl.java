@@ -19,7 +19,6 @@ import java.text.NumberFormat;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.stats.StatsViewModel;
-import ch.giantific.qwittig.presentation.stats.models.Month;
 import ch.giantific.qwittig.presentation.stats.models.Stats;
 import ch.giantific.qwittig.presentation.stats.pie.StatsPieViewModelBaseImpl;
 import ch.giantific.qwittig.utils.MoneyUtils;
@@ -34,11 +33,9 @@ public class StatsStoresViewModelImpl extends StatsPieViewModelBaseImpl<StatsSto
     private boolean mShowAverage;
 
     public StatsStoresViewModelImpl(@Nullable Bundle savedState,
-                                    @NonNull StatsStoresViewModel.ViewListener view,
                                     @NonNull RxBus<Object> eventBus,
-                                    @NonNull UserRepository userRepository,
-                                    @NonNull String year, @NonNull Month month) {
-        super(savedState, view, eventBus, userRepository, year, month);
+                                    @NonNull UserRepository userRepository) {
+        super(savedState, eventBus, userRepository);
 
         if (savedState != null) {
             mShowAverage = savedState.getBoolean(STATE_SHOW_AVERAGE, false);

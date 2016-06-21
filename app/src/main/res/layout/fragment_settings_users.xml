@@ -13,7 +13,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.settings.users.SettingsUsersViewModel"
+            type="ch.giantific.qwittig.presentation.settings.groupusers.users.SettingsUsersViewModel"
             />
     </data>
 
@@ -24,7 +24,7 @@
         android:fillViewport="true"
         android:paddingBottom="@dimen/small_space"
         android:transitionGroup="true"
-        tools:context=".presentation.settings.users.SettingsUsersFragment"
+        tools:context=".presentation.settings.groupusers.users.SettingsUsersFragment"
         tools:targetApi="lollipop"
         >
 

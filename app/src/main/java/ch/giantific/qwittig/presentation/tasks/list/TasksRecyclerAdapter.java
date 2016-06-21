@@ -19,6 +19,7 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
 import ch.giantific.qwittig.databinding.RowTasksBinding;
 import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
 import ch.giantific.qwittig.presentation.tasks.list.items.TaskItem;
 import ch.giantific.qwittig.presentation.tasks.list.items.TasksBaseItem;
@@ -30,7 +31,7 @@ import ch.giantific.qwittig.presentation.tasks.list.items.TasksHeaderItem;
  * <p/>
  * Subclass of {@link RecyclerView.Adapter}.
  */
-public class TasksRecyclerAdapter extends RecyclerView.Adapter {
+public class TasksRecyclerAdapter extends BaseRecyclerAdapter {
 
     private final TasksViewModel mViewModel;
 
@@ -59,8 +60,7 @@ public class TasksRecyclerAdapter extends RecyclerView.Adapter {
                 return new BindingRow<>(binding);
             }
             default:
-                throw new RuntimeException("there is no type that matches the type " + viewType +
-                        " + make sure your using types correctly");
+                return super.onCreateViewHolder(parent, viewType);
         }
     }
 

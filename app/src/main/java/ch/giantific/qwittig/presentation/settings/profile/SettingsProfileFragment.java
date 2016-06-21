@@ -4,15 +4,11 @@
 
 package ch.giantific.qwittig.presentation.settings.profile;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,27 +17,22 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentSettingsProfileBinding;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
-import ch.giantific.qwittig.presentation.settings.profile.di.DaggerSettingsProfileComponent;
-import ch.giantific.qwittig.presentation.settings.profile.di.SettingsProfileViewModelModule;
-import ch.giantific.qwittig.utils.AvatarUtils;
+import ch.giantific.qwittig.presentation.settings.profile.di.SettingsProfileComponent;
 
 /**
  * Displays the profile details of the current user, allowing him/her to edit them.
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public class SettingsProfileFragment extends BaseFragment<SettingsProfileViewModel, SettingsProfileFragment.ActivityListener>
-        implements SettingsProfileViewModel.ViewListener {
-
-    private static final int INTENT_REQUEST_IMAGE = 1;
-    private Snackbar mSnackbar;
+public class SettingsProfileFragment extends BaseFragment<SettingsProfileComponent, SettingsProfileViewModel, BaseFragment.ActivityListener<SettingsProfileComponent>> implements
+        SettingsProfileViewModel.ViewListener {
 
     private FragmentSettingsProfileBinding mBinding;
+    private Snackbar mSnackbarSetPassword;
 
     public SettingsProfileFragment() {
         // required empty constructor
@@ -52,20 +43,26 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileViewMod
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
-
-        DaggerSettingsProfileComponent.builder()
-                .applicationComponent(Qwittig.getAppComponent(getActivity()))
-                .settingsProfileViewModelModule(new SettingsProfileViewModelModule(savedInstanceState, this))
-                .build()
-                .inject(this);
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentSettingsProfileBinding.inflate(inflater, container, false);
-        mBinding.setViewModel(mViewModel);
         return mBinding.getRoot();
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        mViewModel.attachView(this);
+        mBinding.setViewModel(mViewModel);
+    }
+
+    @Override
+    protected void injectDependencies(@NonNull SettingsProfileComponent component) {
+        component.inject(this);
     }
 
     @Override
@@ -103,29 +100,6 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileViewMod
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @NonNull Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        switch (requestCode) {
-            case INTENT_REQUEST_IMAGE:
-                if (resultCode == Activity.RESULT_OK) {
-                    final Uri imageUri = data.getData();
-                    AvatarUtils.saveImageLocal(this, imageUri, new AvatarUtils.AvatarLocalSaveListener() {
-                        @Override
-                        public void onAvatarSaved(@NonNull String path) {
-                            mViewModel.onNewAvatarTaken(path);
-                        }
-                    });
-                }
-        }
-    }
-
-    @Override
-    protected void setViewModelToActivity() {
-        mActivity.setProfileViewModel(mViewModel);
-    }
-
-    @Override
     protected View getSnackbarView() {
         return mBinding.etSettingsProfileNickname;
     }
@@ -146,47 +120,18 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileViewMod
     }
 
     @Override
-    public void showAvatarPicker() {
-        final Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
-        startActivityForResult(intent, INTENT_REQUEST_IMAGE);
-    }
-
-    @Override
     public void showSetPasswordMessage(@StringRes int message) {
-        mSnackbar = Snackbar.make(getSnackbarView(), message, Snackbar.LENGTH_INDEFINITE);
-        mSnackbar.show();
+        mSnackbarSetPassword = Snackbar.make(getSnackbarView(), message, Snackbar.LENGTH_INDEFINITE);
+        mSnackbarSetPassword.show();
     }
 
     @Override
     public void dismissSetPasswordMessage() {
-        mSnackbar.dismiss();
+        mSnackbarSetPassword.dismiss();
     }
 
     @Override
     public void reloadOptionsMenu() {
         getActivity().invalidateOptionsMenu();
-    }
-
-    @Override
-    public void finishScreen(int result) {
-        final FragmentActivity activity = getActivity();
-        activity.setResult(result);
-        ActivityCompat.finishAfterTransition(activity);
-    }
-
-    /**
-     * Defines the interaction with the hosting {@link Activity}.
-     * <p/>
-     * Extends {@link BaseFragment.ActivityListener}.
-     */
-    public interface ActivityListener extends BaseFragment.ActivityListener {
-
-        /**
-         * Sets the view model to the activity.
-         *
-         * @param viewModel the view model to set
-         */
-        void setProfileViewModel(@NonNull SettingsProfileViewModel viewModel);
     }
 }

@@ -11,7 +11,6 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -28,20 +27,13 @@ import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.NavDrawerHeaderBinding;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
-import ch.giantific.qwittig.presentation.finance.FinanceActivity;
-import ch.giantific.qwittig.presentation.helpfeedback.HelpFeedbackActivity;
-import ch.giantific.qwittig.presentation.home.HomeActivity;
-import ch.giantific.qwittig.presentation.login.LoginActivity;
+import ch.giantific.qwittig.presentation.common.Navigator;
+import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
 import ch.giantific.qwittig.presentation.navdrawer.di.DaggerNavDrawerComponent;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerViewModelModule;
-import ch.giantific.qwittig.presentation.settings.general.SettingsActivity;
 import ch.giantific.qwittig.presentation.settings.general.SettingsViewModel;
-import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileActivity;
 import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileViewModel;
-import ch.giantific.qwittig.presentation.stats.StatsActivity;
-import ch.giantific.qwittig.presentation.tasks.list.TasksActivity;
 
 /**
  * Provides an abstract base class that sets up the navigation drawer and implements a couple of
@@ -49,14 +41,15 @@ import ch.giantific.qwittig.presentation.tasks.list.TasksActivity;
  * <p/>
  * Subclass of {@link BaseActivity}.
  */
-public abstract class BaseNavDrawerActivity<T extends ViewModel>
-        extends BaseActivity<T>
+public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
         implements NavDrawerViewModel.ViewListener {
 
     private static final int NAV_DRAWER_ITEM_INVALID = -1;
     protected boolean mUserLoggedIn;
     @Inject
     protected NavDrawerViewModel mNavDrawerViewModel;
+    @Inject
+    protected Navigator mNavigator;
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
     private Menu mNavigationViewMenu;
@@ -79,13 +72,18 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mUserLoggedIn = mNavDrawerViewModel.isUserLoggedIn();
+    }
+
+    @Override
+    protected void injectDependencies(@Nullable Bundle savedInstanceState) {
         final NavDrawerComponent navComp = DaggerNavDrawerComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
-                .navDrawerViewModelModule(new NavDrawerViewModelModule(savedInstanceState, this))
+                .navigatorModule(new NavigatorModule(this))
+                .navDrawerViewModelModule(new NavDrawerViewModelModule(savedInstanceState))
                 .build();
         injectDependencies(navComp, savedInstanceState);
-
-        mUserLoggedIn = mNavDrawerViewModel.isUserLoggedIn();
+        mNavDrawerViewModel.attachView(this);
     }
 
     protected abstract void injectDependencies(@NonNull NavDrawerComponent navComp,
@@ -147,35 +145,28 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
     }
 
     private void goToNavDrawerItem(int itemId) {
-        Intent intent;
         switch (itemId) {
             case R.id.nav_home:
-                intent = new Intent(this, HomeActivity.class);
-                startActivity(intent);
+                mNavigator.startHome();
                 finish();
                 break;
             case R.id.nav_finance:
-                intent = new Intent(this, FinanceActivity.class);
-                startActivity(intent);
+                mNavigator.startFinance();
                 finish();
                 break;
             case R.id.nav_tasks:
-                intent = new Intent(this, TasksActivity.class);
-                startActivity(intent);
+                mNavigator.startTasks();
                 finish();
                 break;
             case R.id.nav_stats:
-                intent = new Intent(this, StatsActivity.class);
-                startActivity(intent);
+                mNavigator.startStats();
                 finish();
                 break;
             case R.id.nav_settings:
-                intent = new Intent(this, SettingsActivity.class);
-                startActivityForResult(intent, INTENT_REQUEST_SETTINGS);
+                mNavigator.startSettings();
                 break;
             case R.id.nav_help_feedback:
-                intent = new Intent(this, HelpFeedbackActivity.class);
-                startActivity(intent);
+                mNavigator.startHelpFeedback();
                 break;
         }
     }
@@ -217,7 +208,7 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case INTENT_REQUEST_LOGIN:
+            case Navigator.INTENT_REQUEST_LOGIN:
                 if (resultCode == RESULT_OK) {
                     mNavDrawerViewModel.onLoginSuccessful();
                     onLoginSuccessful();
@@ -225,7 +216,7 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
                     finish();
                 }
                 break;
-            case INTENT_REQUEST_SETTINGS:
+            case Navigator.INTENT_REQUEST_SETTINGS:
                 switch (resultCode) {
                     case SettingsViewModel.Result.LOGOUT:
                         mNavDrawerViewModel.onLogout();
@@ -238,7 +229,7 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
                         break;
                 }
                 break;
-            case INTENT_REQUEST_SETTINGS_PROFILE:
+            case Navigator.INTENT_REQUEST_SETTINGS_PROFILE:
                 switch (resultCode) {
                     case RESULT_OK:
                         mNavDrawerViewModel.onProfileUpdated();
@@ -276,33 +267,5 @@ public abstract class BaseNavDrawerActivity<T extends ViewModel>
     @Override
     public void notifyHeaderIdentitiesChanged() {
         mHeaderIdentitiesAdapter.notifyDataSetChanged();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public void startProfileSettingsActivity() {
-        final Intent intent = new Intent(this, SettingsProfileActivity.class);
-        final ActivityOptionsCompat options =
-                ActivityOptionsCompat.makeSceneTransitionAnimation(this);
-        startActivityForResult(intent, SettingsActivity.INTENT_REQUEST_SETTINGS_PROFILE,
-                options.toBundle());
-    }
-
-    @Override
-    public void startHomeActivityAndFinish() {
-        final Intent intent = new Intent(this, HomeActivity.class);
-        startActivity(intent);
-        finish();
-    }
-
-    @Override
-    public void startLoginActivity() {
-        final Intent intentLogin = new Intent(this, LoginActivity.class);
-        intentLogin.setData(getIntent().getData());
-//        Starting an activity with forResult and transitions during a lifecycle method results on
-//        onActivityResult not being called
-//        ActivityOptionsCompat activityOptionsCompat =
-//                ActivityOptionsCompat.makeSceneTransitionAnimation(this);
-        startActivityForResult(intentLogin, INTENT_REQUEST_LOGIN);
     }
 }

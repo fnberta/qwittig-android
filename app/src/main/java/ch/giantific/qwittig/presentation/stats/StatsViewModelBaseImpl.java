@@ -30,14 +30,14 @@ import ch.giantific.qwittig.utils.MessageAction;
  * Provides an abstract base implementation of the {@link StatsViewModel} interface.
  */
 public abstract class StatsViewModelBaseImpl<T extends StatsViewModel.ViewListener> extends ViewModelBaseImpl<T>
-        implements StatsViewModel {
+        implements StatsViewModel<T> {
 
     protected static final int PERIOD_YEAR = 0;
     protected static final int PERIOD_MONTH = 1;
     private static final String STATE_PERIOD_TYPE = "STATE_PERIOD_TYPE";
     private static final String STATE_LOADING = "STATE_LOADING";
     private static final String STATE_EMPTY = "STATE_EMPTY";
-    private static final String STATE_YEAR= "STATE_YEAR";
+    private static final String STATE_YEAR = "STATE_YEAR";
     private static final String STATE_MONTH = "STATE_MONTH";
     protected boolean mLoading;
     protected boolean mDataEmpty;
@@ -46,12 +46,10 @@ public abstract class StatsViewModelBaseImpl<T extends StatsViewModel.ViewListen
     protected Stats mStatsData;
     protected int mPeriodType;
 
-    public StatsViewModelBaseImpl(@Nullable Bundle savedState, @NonNull T view,
+    public StatsViewModelBaseImpl(@Nullable Bundle savedState,
                                   @NonNull RxBus<Object> eventBus,
-                                  @NonNull UserRepository userRepository,
-                                  @NonNull String defaultYear,
-                                  @NonNull Month defaultMonth) {
-        super(savedState, view, eventBus, userRepository);
+                                  @NonNull UserRepository userRepository) {
+        super(savedState, eventBus, userRepository);
 
         if (savedState != null) {
             mYear = savedState.getString(STATE_YEAR);
@@ -60,8 +58,6 @@ public abstract class StatsViewModelBaseImpl<T extends StatsViewModel.ViewListen
             mLoading = savedState.getBoolean(STATE_LOADING);
             mDataEmpty = savedState.getBoolean(STATE_EMPTY);
         } else {
-            mYear = defaultYear;
-            mMonth = defaultMonth;
             mLoading = true;
             mDataEmpty = true;
         }
@@ -108,8 +104,18 @@ public abstract class StatsViewModelBaseImpl<T extends StatsViewModel.ViewListen
     }
 
     @Override
+    public void setYear(@NonNull String year) {
+        mYear = year;
+    }
+
+    @Override
     public Month getMonth() {
         return mMonth;
+    }
+
+    @Override
+    public void setMonth(@NonNull Month month) {
+        mMonth = month;
     }
 
     @Override

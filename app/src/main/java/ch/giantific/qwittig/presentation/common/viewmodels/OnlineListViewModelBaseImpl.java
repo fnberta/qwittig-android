@@ -18,17 +18,15 @@ import ch.giantific.qwittig.domain.repositories.UserRepository;
  * Provides an abstract base implementation of the {@link OnlineListViewModel}.
  */
 public abstract class OnlineListViewModelBaseImpl<T, S extends OnlineListViewModel.ViewListener>
-        extends ListViewModelBaseImpl<T, S>
-        implements OnlineListViewModel<T> {
+        extends ListViewModelBaseImpl<T, S> implements OnlineListViewModel<T, S> {
 
     private static final String STATE_REFRESHING = "STATE_REFRESHING";
     private boolean mRefreshing;
 
     public OnlineListViewModelBaseImpl(@Nullable Bundle savedState,
-                                       @NonNull S view,
                                        @NonNull RxBus<Object> eventBus,
                                        @NonNull UserRepository userRepository) {
-        super(savedState, view, eventBus, userRepository);
+        super(savedState, eventBus, userRepository);
 
         if (savedState != null) {
             mRefreshing = savedState.getBoolean(STATE_REFRESHING, false);

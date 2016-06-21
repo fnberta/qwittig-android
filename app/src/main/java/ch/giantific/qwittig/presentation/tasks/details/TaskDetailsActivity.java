@@ -17,14 +17,22 @@ import android.view.View;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Arrays;
+import java.util.List;
+
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.data.push.PushBroadcastReceiver;
 import ch.giantific.qwittig.databinding.ActivityTaskDetailsBinding;
+import ch.giantific.qwittig.presentation.common.Navigator;
+import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
 import ch.giantific.qwittig.presentation.tasks.addedit.TaskAddEditViewModel;
-import ch.giantific.qwittig.presentation.tasks.list.TasksFragment;
+import ch.giantific.qwittig.presentation.tasks.details.di.TaskDetailsSubcomponent;
+import ch.giantific.qwittig.presentation.tasks.details.di.TaskDetailsViewModelModule;
 
 /**
  * Hosts {@link TaskDetailsFragment} that shows the details of a task.
@@ -33,10 +41,11 @@ import ch.giantific.qwittig.presentation.tasks.list.TasksFragment;
  * <p/>
  * Subclass of {@link BaseNavDrawerActivity}.
  */
-public class TaskDetailsActivity extends BaseNavDrawerActivity<TaskDetailsViewModel>
-        implements TaskDetailsFragment.ActivityListener {
+public class TaskDetailsActivity extends BaseNavDrawerActivity<TaskDetailsSubcomponent> {
 
-    private ActivityTaskDetailsBinding mBinding;
+    private static final String FRAGMENT_TASK_DETAILS = "FRAGMENT_TASK_DETAILS";
+    @Inject
+    TaskDetailsViewModel mTaskDetailsViewModel;
 
     @Override
     protected void handleLocalBroadcast(Intent intent, int dataType) {
@@ -45,20 +54,17 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity<TaskDetailsViewMo
         if (dataType == LocalBroadcast.DataType.TASKS_UPDATED) {
             final boolean successful = intent.getBooleanExtra(LocalBroadcast.INTENT_EXTRA_SUCCESSFUL, false);
             if (successful) {
-                mViewModel.loadData();
+                mTaskDetailsViewModel.loadData();
             }
         }
     }
 
     @Override
-    protected void injectDependencies(@NonNull NavDrawerComponent navComp, Bundle savedInstanceState) {
-        navComp.inject(this);
-    }
-
-    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_task_details);
+        final ActivityTaskDetailsBinding binding =
+                DataBindingUtil.setContentView(this, R.layout.activity_task_details);
+        binding.setViewModel(mTaskDetailsViewModel);
 
         // disable default actionBar title
         ActionBar actionBar = getSupportActionBar();
@@ -76,26 +82,15 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity<TaskDetailsViewMo
         }
     }
 
-    private void setUpNavigation() {
-        final TaskDetailsActivity activity = this;
-        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                NavUtils.navigateUpFromSameTask(activity);
-            }
-        });
-    }
-
-    private void addDetailsFragment() {
-        final TaskDetailsFragment fragment = TaskDetailsFragment.newInstance(getTaskObjectId());
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.container, fragment)
-                .commit();
+    @Override
+    protected void injectDependencies(@NonNull NavDrawerComponent navComp, Bundle savedInstanceState) {
+        mComponent = navComp.plus(new TaskDetailsViewModelModule(savedInstanceState, getTaskObjectId()));
+        mComponent.inject(this);
     }
 
     private String getTaskObjectId() {
         final Intent intent = getIntent();
-        String taskId = intent.getStringExtra(TasksFragment.INTENT_EXTRA_TASK_ID); // started from TaskFragment
+        String taskId = intent.getStringExtra(Navigator.INTENT_TASK_ID); // started from TaskFragment
 
         if (taskId == null) { // started via Push Notification
             try {
@@ -110,11 +105,40 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity<TaskDetailsViewMo
     }
 
     @Override
+    protected List<ViewModel> getViewModels() {
+        return Arrays.asList(new ViewModel[]{mTaskDetailsViewModel});
+    }
+
+    private void setUpNavigation() {
+        final TaskDetailsActivity activity = this;
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NavUtils.navigateUpFromSameTask(activity);
+            }
+        });
+    }
+
+    private void addDetailsFragment() {
+        final TaskDetailsFragment fragment = new TaskDetailsFragment();
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.container, fragment, FRAGMENT_TASK_DETAILS)
+                .commit();
+    }
+
+    @Override
+    protected void onLoginSuccessful() {
+        super.onLoginSuccessful();
+
+        addDetailsFragment();
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case INTENT_REQUEST_TASK_MODIFY:
+            case Navigator.INTENT_REQUEST_TASK_MODIFY:
                 switch (resultCode) {
                     case TaskAddEditViewModel.TaskResult.TASK_DISCARDED:
                         showMessage(R.string.toast_changes_discarded);
@@ -125,18 +149,5 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity<TaskDetailsViewMo
                 }
                 break;
         }
-    }
-
-    @Override
-    public void setViewModel(@NonNull TaskDetailsViewModel viewModel) {
-        mViewModel = viewModel;
-        mBinding.setViewModel(viewModel);
-    }
-
-    @Override
-    protected void onLoginSuccessful() {
-        super.onLoginSuccessful();
-
-        addDetailsFragment();
     }
 }

@@ -9,7 +9,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".presentation.settings.users.SettingsUsersActivity"
+    tools:context=".presentation.settings.groupusers.users.SettingsUsersActivity"
     >
 
     <include layout="@layout/include_appbar"/>

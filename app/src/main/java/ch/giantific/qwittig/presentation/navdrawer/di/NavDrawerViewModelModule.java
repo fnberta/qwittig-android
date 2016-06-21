@@ -9,8 +9,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.di.scopes.PerScreen;
+import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.navdrawer.NavDrawerViewModel;
 import ch.giantific.qwittig.presentation.navdrawer.NavDrawerViewModelImpl;
@@ -22,18 +23,18 @@ import dagger.Provides;
  * it.
  */
 @Module
-public class NavDrawerViewModelModule extends BaseViewModelModule<NavDrawerViewModel.ViewListener> {
+public class NavDrawerViewModelModule extends BaseViewModelModule {
 
-    public NavDrawerViewModelModule(@Nullable Bundle savedState,
-                                    @NonNull NavDrawerViewModel.ViewListener view) {
-        super(savedState, view);
+    public NavDrawerViewModelModule(@Nullable Bundle savedState) {
+        super(savedState);
     }
 
-    @PerScreen
+    @PerActivity
     @Provides
-    NavDrawerViewModel providesNavDrawerViewModel(@NonNull RxBus<Object> eventBus,
+    NavDrawerViewModel providesNavDrawerViewModel(@NonNull Navigator navigator,
+                                                  @NonNull RxBus<Object> eventBus,
                                                   @NonNull UserRepository userRepository) {
-        return new NavDrawerViewModelImpl(mSavedState, mView, eventBus, userRepository);
+        return new NavDrawerViewModelImpl(mSavedState, navigator, eventBus, userRepository);
     }
 
 }

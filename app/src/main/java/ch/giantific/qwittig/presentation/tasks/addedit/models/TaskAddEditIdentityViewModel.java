@@ -9,13 +9,13 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.presentation.common.viewmodels.IdentityAvatarRowBaseViewModel;
+import ch.giantific.qwittig.presentation.common.viewmodels.BaseIdentityAvatarRowViewModel;
 
 /**
  * Defines a view model for a {@link RecyclerView} row that represents an identity available for
  * selection for a task.
  */
-public class TaskAddEditIdentityViewModel extends IdentityAvatarRowBaseViewModel {
+public class TaskAddEditIdentityViewModel extends BaseIdentityAvatarRowViewModel {
 
     private float mIdentityAlpha;
 

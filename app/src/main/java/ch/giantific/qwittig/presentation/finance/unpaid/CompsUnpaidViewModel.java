@@ -9,12 +9,13 @@ import android.support.annotation.NonNull;
 import org.apache.commons.math3.fraction.BigFraction;
 
 import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModel;
+import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.finance.unpaid.items.CompsUnpaidBaseItem;
 
 /**
  * Defines the view model for a screen showing a list of unpaid compensations.
  */
-public interface CompsUnpaidViewModel extends OnlineListViewModel<CompsUnpaidBaseItem>,
+public interface CompsUnpaidViewModel extends OnlineListViewModel<CompsUnpaidBaseItem, CompsUnpaidViewModel.ViewListener>,
         CompRemindWorkerListener,
         CompsUnpaidRecyclerAdapter.AdapterInteractionListener,
         CompConfirmAmountDialogFragment.DialogInteractionListener {
@@ -22,7 +23,7 @@ public interface CompsUnpaidViewModel extends OnlineListViewModel<CompsUnpaidBas
     /**
      * Defines the interaction with the attached view.
      */
-    interface ViewListener extends OnlineListViewModel.ViewListener {
+    interface ViewListener extends ViewModel.ViewListener {
 
         void startUpdateCompensationsUnpaidService();
 

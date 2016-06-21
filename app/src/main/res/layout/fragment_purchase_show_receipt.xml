@@ -14,7 +14,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.home.purchases.common.PurchaseReceiptViewModel"
+            type="ch.giantific.qwittig.presentation.common.viewmodels.PurchaseReceiptViewModel"
             />
     </data>
 
@@ -22,7 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
-        tools:context=".presentation.home.purchases.details.PurchaseReceiptDetailFragment"
+        tools:context=".presentation.purchases.details.PurchaseDetailsReceiptFragment"
         >
 
         <ScrollView

@@ -14,7 +14,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.home.HomeViewModel"
+            type="ch.giantific.qwittig.presentation.purchases.list.HomeViewModel"
             />
     </data>
 
@@ -23,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
-        tools:context=".presentation.home.HomeActivity"
+        tools:context=".presentation.purchases.list.HomeActivity"
         >
 
         <android.support.design.widget.CoordinatorLayout

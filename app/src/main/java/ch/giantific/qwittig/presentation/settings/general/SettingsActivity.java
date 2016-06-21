@@ -11,11 +11,23 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 
+import java.util.Arrays;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
+import ch.giantific.qwittig.presentation.common.Navigator;
+import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
 import ch.giantific.qwittig.presentation.common.fragments.LeaveGroupDialogFragment;
-import ch.giantific.qwittig.presentation.settings.addgroup.SettingsAddGroupFragment;
+import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.settings.general.di.DaggerSettingsComponent;
+import ch.giantific.qwittig.presentation.settings.general.di.SettingsComponent;
+import ch.giantific.qwittig.presentation.settings.general.di.SettingsViewModelModule;
+import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.SettingsAddGroupFragment;
 import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileViewModel;
 import rx.Single;
 
@@ -24,11 +36,13 @@ import rx.Single;
  * <p/>
  * Subclass of {@link BaseActivity}.
  */
-public class SettingsActivity extends BaseActivity<SettingsViewModel> implements
-        SettingsFragment.ActivityListener,
+public class SettingsActivity extends BaseActivity<SettingsComponent> implements
         LeaveGroupDialogFragment.DialogInteractionListener,
         DeleteAccountDialogFragment.DialogInteractionListener,
         LogoutWorkerListener {
+
+    @Inject
+    SettingsViewModel mSettingsViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,11 +61,26 @@ public class SettingsActivity extends BaseActivity<SettingsViewModel> implements
     }
 
     @Override
+    protected void injectDependencies(@Nullable Bundle savedInstanceState) {
+        mComponent = DaggerSettingsComponent.builder()
+                .applicationComponent(Qwittig.getAppComponent(this))
+                .navigatorModule(new NavigatorModule(this))
+                .settingsViewModelModule(new SettingsViewModelModule(savedInstanceState))
+                .build();
+        mComponent.inject(this);
+    }
+
+    @Override
+    protected List<ViewModel> getViewModels() {
+        return Arrays.asList(new ViewModel[]{mSettingsViewModel});
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case INTENT_REQUEST_SETTINGS_PROFILE:
+            case Navigator.INTENT_REQUEST_SETTINGS_PROFILE:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
                         Snackbar.make(mToolbar, getString(R.string.toast_profile_update), Snackbar.LENGTH_LONG).show();
@@ -61,12 +90,12 @@ public class SettingsActivity extends BaseActivity<SettingsViewModel> implements
                         break;
                 }
                 break;
-            case INTENT_REQUEST_SETTINGS_ADD_GROUP:
+            case Navigator.INTENT_REQUEST_SETTINGS_ADD_GROUP:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
                         final String newGroupName =
                                 data.getStringExtra(SettingsAddGroupFragment.RESULT_DATA_GROUP);
-                        mViewModel.onGroupAdded(newGroupName);
+                        mSettingsViewModel.onGroupAdded(newGroupName);
                         break;
                 }
                 break;
@@ -74,22 +103,17 @@ public class SettingsActivity extends BaseActivity<SettingsViewModel> implements
     }
 
     @Override
-    public void setSettingsViewModel(@NonNull SettingsViewModel viewModel) {
-        mViewModel = viewModel;
-    }
-
-    @Override
     public void onLeaveGroupSelected() {
-        mViewModel.onLeaveGroupSelected();
+        mSettingsViewModel.onLeaveGroupSelected();
     }
 
     @Override
     public void setLogoutStream(@NonNull Single<User> single, @NonNull String workerTag) {
-        mViewModel.setLogoutStream(single, workerTag);
+        mSettingsViewModel.setLogoutStream(single, workerTag);
     }
 
     @Override
     public void onDeleteAccountSelected() {
-        mViewModel.onDeleteAccountSelected();
+        mSettingsViewModel.onDeleteAccountSelected();
     }
 }

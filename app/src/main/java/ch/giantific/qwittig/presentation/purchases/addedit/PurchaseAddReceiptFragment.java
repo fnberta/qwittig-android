@@ -1,0 +1,27 @@
+/*
+ * Copyright (c) 2016 Fabio Berta
+ */
+
+package ch.giantific.qwittig.presentation.purchases.addedit;
+
+import android.support.annotation.NonNull;
+
+import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseAddComponent;
+
+/**
+ * Shows the receipt image taken by the user when adding a new purchase.
+ * <p/>
+ * Subclass of {@link BaseFragment}.
+ */
+public class PurchaseAddReceiptFragment extends BasePurchaseAddEditReceiptFragment<PurchaseAddComponent> {
+
+    public PurchaseAddReceiptFragment() {
+        // required empty constructor
+    }
+
+    @Override
+    protected void injectDependencies(@NonNull PurchaseAddComponent component) {
+        component.inject(this);
+    }
+}

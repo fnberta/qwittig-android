@@ -17,6 +17,7 @@ import android.widget.DatePicker;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
@@ -30,6 +31,8 @@ import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.ListDragInteraction;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
 import ch.giantific.qwittig.presentation.tasks.addedit.models.TaskUser;
 import ch.giantific.qwittig.utils.DateUtils;
@@ -48,18 +51,28 @@ public class TaskAddEditViewModelAddImpl extends ListViewModelBaseImpl<Identity,
     private static final String STATE_TITLE = "STATE_TITLE";
     final ArrayList<TaskUser> mTaskIdentities;
     final TaskRepository mTaskRepo;
+    private final Navigator mNavigator;
+    private final int[] mTimeFrames = new int[]{
+            R.string.time_frame_daily,
+            R.string.time_frame_weekly,
+            R.string.time_frame_monthly,
+            R.string.time_frame_yearly,
+            R.string.time_frame_as_needed,
+            R.string.time_frame_one_time};
     private final DateFormat mDateFormatter;
     Date mTaskDeadline;
     String mTaskTitle;
+    private ListDragInteraction mListDragInteraction;
     private int mTaskTimeFrame;
 
     public TaskAddEditViewModelAddImpl(@Nullable Bundle savedState,
-                                       @NonNull TaskAddEditViewModel.ViewListener view,
+                                       @NonNull Navigator navigator,
                                        @NonNull RxBus<Object> eventBus,
                                        @NonNull UserRepository userRepository,
                                        @NonNull TaskRepository taskRepository) {
-        super(savedState, view, eventBus, userRepository);
+        super(savedState, eventBus, userRepository);
 
+        mNavigator = navigator;
         mTaskRepo = taskRepository;
 
         if (savedState != null) {
@@ -82,6 +95,15 @@ public class TaskAddEditViewModelAddImpl extends ListViewModelBaseImpl<Identity,
         outState.putString(STATE_TITLE, mTaskTitle);
         outState.putLong(STATE_DEADLINE_SELECTED, mTaskDeadline.getTime());
         outState.putParcelableArrayList(STATE_IDENTITIES, mTaskIdentities);
+    }
+
+    public void setListDragInteraction(@NonNull ListDragInteraction listDragInteraction) {
+        mListDragInteraction = listDragInteraction;
+    }
+
+    @Override
+    public int[] getTimeFrames() {
+        return mTimeFrames;
     }
 
     @Override
@@ -127,7 +149,7 @@ public class TaskAddEditViewModelAddImpl extends ListViewModelBaseImpl<Identity,
                             }
                         }
 
-                        mView.notifyDataSetChanged();
+                        mListInteraction.notifyDataSetChanged();
                     }
 
                     @Override
@@ -169,8 +191,8 @@ public class TaskAddEditViewModelAddImpl extends ListViewModelBaseImpl<Identity,
 
     @Override
     @Bindable
-    public int getTaskTimeFrame() {
-        return mTaskTimeFrame;
+    public int getSelectedTimeFrame() {
+        return Arrays.asList(mTimeFrames).indexOf(mTaskTimeFrame);
     }
 
     @Override
@@ -184,7 +206,7 @@ public class TaskAddEditViewModelAddImpl extends ListViewModelBaseImpl<Identity,
         if (changesWereMade()) {
             mView.showDiscardChangesDialog();
         } else {
-            mView.finishScreen(Activity.RESULT_CANCELED);
+            mNavigator.finish(Activity.RESULT_CANCELED);
         }
     }
 
@@ -226,7 +248,7 @@ public class TaskAddEditViewModelAddImpl extends ListViewModelBaseImpl<Identity,
                 .subscribe(new SingleSubscriber<Task>() {
                     @Override
                     public void onSuccess(Task value) {
-                        mView.finishScreen(TaskAddEditViewModel.TaskResult.TASK_SAVED);
+                        mNavigator.finish(TaskAddEditViewModel.TaskResult.TASK_SAVED);
                     }
 
                     @Override
@@ -288,13 +310,13 @@ public class TaskAddEditViewModelAddImpl extends ListViewModelBaseImpl<Identity,
         if (taskUser.isInvolved()) {
             if (!userIsLastOneChecked()) {
                 taskUser.setIsInvolved(false);
-                mView.notifyItemChanged(position);
+                mListInteraction.notifyItemChanged(position);
             } else {
                 mView.showMessage(R.string.toast_min_one_user);
             }
         } else {
             taskUser.setIsInvolved(true);
-            mView.notifyItemChanged(position);
+            mListInteraction.notifyItemChanged(position);
         }
     }
 
@@ -315,26 +337,26 @@ public class TaskAddEditViewModelAddImpl extends ListViewModelBaseImpl<Identity,
 
     @Override
     public void onStartDrag(@NonNull RecyclerView.ViewHolder viewHolder) {
-        mView.onStartUserDrag(viewHolder);
+        mListDragInteraction.startDrag(viewHolder);
     }
 
     @Override
     public void onDiscardChangesSelected() {
-        mView.finishScreen(TaskAddEditViewModel.TaskResult.TASK_DISCARDED);
+        mNavigator.finish(TaskAddEditViewModel.TaskResult.TASK_DISCARDED);
     }
 
     @Override
     public void onItemMove(int fromPosition, int toPosition) {
         Collections.swap(mItems, fromPosition, toPosition);
         Collections.swap(mTaskIdentities, fromPosition, toPosition);
-        mView.notifyItemMoved(fromPosition, toPosition);
+        mListInteraction.notifyItemMoved(fromPosition, toPosition);
     }
 
     @Override
     public void onItemDismiss(int position) {
         mItems.remove(position);
         mTaskIdentities.remove(position);
-        mView.notifyItemRemoved(position);
+        mListInteraction.notifyItemRemoved(position);
     }
 
     @Override

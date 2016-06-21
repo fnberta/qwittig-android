@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
@@ -112,10 +113,10 @@ public class AvatarUtils {
                 createRippleDrawable(context, roundedDrawable) : roundedDrawable;
     }
 
-    public static void saveImageLocal(@NonNull final Fragment fragment,
+    public static void saveImageLocal(@NonNull final FragmentActivity activity,
                                       @NonNull Uri imageUri,
                                       @NonNull final AvatarLocalSaveListener listener) {
-        Glide.with(fragment)
+        Glide.with(activity)
                 .load(imageUri)
                 .asBitmap()
                 .toBytes(Bitmap.CompressFormat.JPEG, UserRepository.JPEG_COMPRESSION_RATE)
@@ -125,7 +126,7 @@ public class AvatarUtils {
                     public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
                         final String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
                         final String imageFileName = "AVATAR_" + timeStamp + ".jpg";
-                        final File storageDir = fragment.getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+                        final File storageDir = activity.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
                         final File avatar = new File(storageDir, imageFileName);
                         try {
                             FileUtils.writeByteArrayToFile(avatar, resource);

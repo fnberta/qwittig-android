@@ -18,6 +18,7 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.Single;
 import rx.SingleSubscriber;
@@ -30,14 +31,17 @@ public class LoginAccountsViewModelImpl extends ViewModelBaseImpl<LoginAccountsV
 
     private static final String STATE_LOADING = "STATE_LOADING";
     private static final String STATE_IDENTITY_ID = "STATE_IDENTITY_ID";
+    private final Navigator mNavigator;
     private boolean mLoading;
     private String mIdentityId;
 
     public LoginAccountsViewModelImpl(@Nullable Bundle savedState,
-                                      @NonNull LoginAccountsViewModel.ViewListener view,
+                                      @NonNull Navigator navigator,
                                       @NonNull RxBus<Object> eventBus,
                                       @NonNull UserRepository userRepository) {
-        super(savedState, view, eventBus, userRepository);
+        super(savedState, eventBus, userRepository);
+
+        mNavigator = navigator;
 
         if (savedState != null) {
             mLoading = savedState.getBoolean(STATE_LOADING);
@@ -79,7 +83,7 @@ public class LoginAccountsViewModelImpl extends ViewModelBaseImpl<LoginAccountsV
                         if (user.isNew()) {
                             mView.showProfileFragment(!TextUtils.isEmpty(mIdentityId));
                         } else {
-                            mView.finishScreen(Activity.RESULT_OK);
+                            mNavigator.finish(Activity.RESULT_OK);
                         }
                     }
 

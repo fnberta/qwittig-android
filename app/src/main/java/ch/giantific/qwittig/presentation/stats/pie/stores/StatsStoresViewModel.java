@@ -9,7 +9,7 @@ import ch.giantific.qwittig.presentation.stats.pie.StatsPieViewModel;
 /**
  * Defines an observable interface for the stores stats screen.
  */
-public interface StatsStoresViewModel extends StatsPieViewModel {
+public interface StatsStoresViewModel extends StatsPieViewModel<StatsPieViewModel.ViewListener> {
 
     boolean isShowAverage();
 

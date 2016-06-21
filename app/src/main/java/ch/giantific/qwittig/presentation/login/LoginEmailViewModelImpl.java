@@ -19,6 +19,7 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.Single;
 import rx.SingleSubscriber;
@@ -31,6 +32,8 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
 
     private static final String STATE_LOADING = "STATE_LOADING";
     private static final String STATE_SIGN_UP = "STATE_SIGN_UP";
+    private final Navigator mNavigator;
+    private String mIdentityId;
     private boolean mLoading;
     private boolean mSignUp;
     private String mEmail;
@@ -39,11 +42,12 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
     private boolean mValidate;
 
     public LoginEmailViewModelImpl(@Nullable Bundle savedState,
-                                   @NonNull LoginEmailViewModel.ViewListener view,
+                                   @NonNull Navigator navigator,
                                    @NonNull RxBus<Object> eventBus,
                                    @NonNull UserRepository userRepository) {
-        super(savedState, view, eventBus, userRepository);
+        super(savedState, eventBus, userRepository);
 
+        mNavigator = navigator;
 
         if (savedState != null) {
             mLoading = savedState.getBoolean(STATE_LOADING);
@@ -60,6 +64,11 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
 
         outState.putBoolean(STATE_LOADING, mLoading);
         outState.putBoolean(STATE_SIGN_UP, mSignUp);
+    }
+
+    @Override
+    public void setIdentityId(@NonNull String identityId) {
+        mIdentityId = identityId;
     }
 
     @Override
@@ -128,9 +137,9 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
                         if (type == LoginWorker.Type.RESET_PASSWORD) {
                             mView.showMessage(R.string.toast_password_reset);
                         } else if (user.isNew()) {
-                            mView.showProfileFragment();
+                            mView.showProfileScreen(!TextUtils.isEmpty(mIdentityId));
                         } else {
-                            mView.finishScreen(Activity.RESULT_OK);
+                            mNavigator.finish(Activity.RESULT_OK);
                         }
                     }
 
@@ -176,7 +185,7 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
     public void onLoginClick(View view) {
         if (validate()) {
             setLoading(true);
-            mView.loadEmailLoginWorker(mEmail, mPassword);
+            mView.loadEmailLoginWorker(mEmail, mPassword, mIdentityId);
         }
     }
 
@@ -189,7 +198,7 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
 
         if (validate()) {
             setLoading(true);
-            mView.loadEmailSignUpWorker(mEmail, mPassword);
+            mView.loadEmailSignUpWorker(mEmail, mPassword, mIdentityId);
         }
     }
 

@@ -23,7 +23,7 @@
         android:clipToPadding="false"
         android:paddingBottom="@dimen/small_space"
         android:fillViewport="true"
-        tools:context=".presentation.tasks.addedit.TaskAddEditFragment"
+        tools:context=".presentation.tasks.addedit.TaskAddFragment"
         >
 
         <LinearLayout
@@ -67,6 +67,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:onItemSelected="@{viewModel.onTimeFrameSelected}"
+                    android:selection="@{viewModel.selectedTimeFrame}"
                     />
 
             </LinearLayout>

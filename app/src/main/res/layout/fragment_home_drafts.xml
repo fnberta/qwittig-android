@@ -14,14 +14,14 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.home.purchases.list.DraftsViewModel"
+            type="ch.giantific.qwittig.presentation.purchases.list.drafts.DraftsViewModel"
             />
     </data>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".presentation.home.purchases.list.DraftsFragment"
+        tools:context=".presentation.purchases.list.drafts.DraftsFragment"
         >
 
         <android.support.v7.widget.RecyclerView

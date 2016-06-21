@@ -21,6 +21,7 @@ import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.data.bus.events.EventIdentitySelected;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.Subscriber;
 
@@ -31,12 +32,15 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
         implements NavDrawerViewModel {
 
     private final List<Identity> mIdentities = new ArrayList<>();
+    private final Navigator mNavigator;
 
     public NavDrawerViewModelImpl(@Nullable Bundle savedState,
-                                  @NonNull NavDrawerViewModel.ViewListener view,
+                                  @NonNull Navigator navigator,
                                   @NonNull RxBus<Object> eventBus,
                                   @NonNull UserRepository userRepository) {
-        super(savedState, view, eventBus, userRepository);
+        super(savedState, eventBus, userRepository);
+
+        mNavigator = navigator;
     }
 
     @Override
@@ -104,7 +108,7 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
     @Override
     public boolean isUserLoggedIn() {
         if (mCurrentUser == null) {
-            mView.startLoginActivity();
+            mNavigator.startLogin();
             return false;
         }
 
@@ -121,7 +125,8 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
 
     @Override
     public void onLogout() {
-        mView.startHomeActivityAndFinish();
+        mNavigator.startHome();
+        mNavigator.finish();
     }
 
     @Override
@@ -164,6 +169,6 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
 
     @Override
     public void onAvatarClick(View view) {
-        mView.startProfileSettingsActivity();
+        mNavigator.startProfileSettings();
     }
 }

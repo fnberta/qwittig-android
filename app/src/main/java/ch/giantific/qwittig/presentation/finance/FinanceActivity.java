@@ -17,6 +17,10 @@ import org.apache.commons.math3.fraction.BigFraction;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.LocalBroadcast;
@@ -25,7 +29,10 @@ import ch.giantific.qwittig.data.push.PushBroadcastReceiver;
 import ch.giantific.qwittig.databinding.ActivityFinanceBinding;
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.presentation.common.adapters.TabsAdapter;
-import ch.giantific.qwittig.presentation.finance.di.BalanceHeaderViewModelModule;
+import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.finance.di.FinanceCompsPaidViewModelModule;
+import ch.giantific.qwittig.presentation.finance.di.FinanceCompsUnpaidViewModelModule;
+import ch.giantific.qwittig.presentation.finance.di.FinanceHeaderViewModelModule;
 import ch.giantific.qwittig.presentation.finance.di.FinanceSubcomponent;
 import ch.giantific.qwittig.presentation.finance.paid.CompsPaidFragment;
 import ch.giantific.qwittig.presentation.finance.paid.CompsPaidViewModel;
@@ -48,17 +55,19 @@ import rx.Single;
  * <p/>
  * Subclass of {@link BaseNavDrawerActivity}.
  */
-public class FinanceActivity extends BaseNavDrawerActivity<BalanceHeaderViewModel> implements
+public class FinanceActivity extends BaseNavDrawerActivity<FinanceSubcomponent> implements
         BalanceHeaderViewModel.ViewListener,
-        CompsUnpaidFragment.ActivityListener,
-        CompsPaidFragment.ActivityListener,
         CompConfirmAmountDialogFragment.DialogInteractionListener,
         CompsQueryMoreWorkerListener,
         CompRemindWorkerListener {
 
+    @Inject
+    BalanceHeaderViewModel mHeaderViewModel;
+    @Inject
+    CompsPaidViewModel mCompsPaidViewModel;
+    @Inject
+    CompsUnpaidViewModel mCompsUnpaidViewModel;
     private ActivityFinanceBinding mBinding;
-    private CompsPaidViewModel mCompsPaidViewModel;
-    private CompsUnpaidViewModel mCompsUnpaidViewModel;
 
     @Override
     protected void handleLocalBroadcast(Intent intent, int dataType) {
@@ -67,7 +76,7 @@ public class FinanceActivity extends BaseNavDrawerActivity<BalanceHeaderViewMode
         switch (dataType) {
             case DataType.IDENTITIES_UPDATED: {
                 final boolean successful = intent.getBooleanExtra(LocalBroadcast.INTENT_EXTRA_SUCCESSFUL, false);
-                mViewModel.onDataUpdated(successful);
+                mHeaderViewModel.onDataUpdated(successful);
                 break;
             }
             case DataType.COMPENSATIONS_UPDATED: {
@@ -87,7 +96,7 @@ public class FinanceActivity extends BaseNavDrawerActivity<BalanceHeaderViewMode
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_finance);
-        mBinding.setViewModel(mViewModel);
+        mBinding.setViewModel(mHeaderViewModel);
 
         // check item in NavDrawer
         checkNavDrawerItem(R.id.nav_finance);
@@ -105,10 +114,17 @@ public class FinanceActivity extends BaseNavDrawerActivity<BalanceHeaderViewMode
     @Override
     protected void injectDependencies(@NonNull NavDrawerComponent navComp,
                                       @Nullable Bundle savedInstanceState) {
-        final FinanceSubcomponent component =
-                navComp.plus(new BalanceHeaderViewModelModule(savedInstanceState, this));
-        component.inject(this);
-        mViewModel = component.getBalanceHeaderViewModel();
+        mComponent = navComp.plus(new FinanceHeaderViewModelModule(savedInstanceState),
+                new FinanceCompsUnpaidViewModelModule(savedInstanceState),
+                new FinanceCompsPaidViewModelModule(savedInstanceState));
+        mComponent.inject(this);
+        mHeaderViewModel.attachView(this);
+    }
+
+    @Override
+    protected List<ViewModel> getViewModels() {
+        return Arrays.asList(new ViewModel[]{mHeaderViewModel, mCompsUnpaidViewModel,
+                mCompsPaidViewModel});
     }
 
     private void setupTabs() {
@@ -131,24 +147,14 @@ public class FinanceActivity extends BaseNavDrawerActivity<BalanceHeaderViewMode
     protected void onStart() {
         super.onStart();
 
-        mViewModel.onViewVisible();
+        mHeaderViewModel.onViewVisible();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
 
-        mViewModel.onViewGone();
-    }
-
-    @Override
-    public void setCompsUnpaidViewModel(@NonNull CompsUnpaidViewModel viewModel) {
-        mCompsUnpaidViewModel = viewModel;
-    }
-
-    @Override
-    public void setCompsPaidViewModel(@NonNull CompsPaidViewModel viewModel) {
-        mCompsPaidViewModel = viewModel;
+        mHeaderViewModel.onViewGone();
     }
 
     @Override
@@ -199,6 +205,12 @@ public class FinanceActivity extends BaseNavDrawerActivity<BalanceHeaderViewMode
                                             @NonNull String compensationId,
                                             @NonNull String workerTag) {
         mCompsUnpaidViewModel.setCompensationRemindStream(single, compensationId, workerTag);
+    }
+
+    @Override
+    public void onWorkerError(@NonNull String workerTag) {
+        mCompsPaidViewModel.onWorkerError(workerTag);
+        mCompsUnpaidViewModel.onWorkerError(workerTag);
     }
 
     @IntDef({FragmentTabs.NONE, FragmentTabs.COMPS_UNPAID, FragmentTabs.COMPS_PAID})

@@ -611,7 +611,7 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
     }
 
     @Override
-    public Single<OcrData> fetchOcrPurchaseData(@NonNull String ocrPurchaseId) {
+    public Single<OcrData> fetchOcrData(@NonNull String ocrPurchaseId) {
         final OcrData purchase = (OcrData) ParseObject.createWithoutData(OcrData.CLASS, ocrPurchaseId);
         return fetchLocal(purchase);
     }

@@ -15,8 +15,10 @@ import ch.giantific.qwittig.utils.MessageAction;
 /**
  * Defines an observable view model for a screen.
  */
-public interface ViewModel
+public interface ViewModel<T extends ViewModel.ViewListener>
         extends Observable, BaseWorkerListener {
+
+    void attachView(@NonNull T view);
 
     /**
      * Saves the state of the view model in a bundle before recreation.

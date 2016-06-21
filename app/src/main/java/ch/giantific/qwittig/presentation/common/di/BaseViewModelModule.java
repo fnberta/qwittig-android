@@ -13,13 +13,11 @@ import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 /**
  * Provides an abstract base class for modules defining the instantiation of view models.
  */
-public abstract class BaseViewModelModule<T extends ViewModel.ViewListener> {
+public abstract class BaseViewModelModule {
 
     protected final Bundle mSavedState;
-    protected final T mView;
 
-    public BaseViewModelModule(@Nullable Bundle savedState, @NonNull T view) {
+    public BaseViewModelModule(@Nullable Bundle savedState) {
         mSavedState = savedState;
-        mView = view;
     }
 }

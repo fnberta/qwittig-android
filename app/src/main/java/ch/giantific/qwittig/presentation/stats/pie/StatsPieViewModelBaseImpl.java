@@ -24,7 +24,6 @@ import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.stats.StatsViewModelBaseImpl;
-import ch.giantific.qwittig.presentation.stats.models.Month;
 import ch.giantific.qwittig.presentation.stats.models.Stats;
 import rx.Observable;
 import rx.Single;
@@ -36,7 +35,7 @@ import rx.functions.Func1;
  */
 public abstract class StatsPieViewModelBaseImpl<T extends StatsPieViewModel.ViewListener>
         extends StatsViewModelBaseImpl<T>
-        implements StatsPieViewModel {
+        implements StatsPieViewModel<T> {
 
     private static final String STATE_SORT_USERS = "STATE_SORT_USERS";
     private static final String STATE_SHOW_PERCENT = "STATE_SHOW_PERCENT";
@@ -47,11 +46,10 @@ public abstract class StatsPieViewModelBaseImpl<T extends StatsPieViewModel.View
     private PieData mPieData;
     private String mCenterText;
 
-    public StatsPieViewModelBaseImpl(@Nullable Bundle savedState, @NonNull T view,
+    public StatsPieViewModelBaseImpl(@Nullable Bundle savedState,
                                      @NonNull RxBus<Object> eventBus,
-                                     @NonNull UserRepository userRepository,
-                                     @NonNull String year, @NonNull Month month) {
-        super(savedState, view, eventBus, userRepository, year, month);
+                                     @NonNull UserRepository userRepository) {
+        super(savedState, eventBus, userRepository);
 
         if (savedState != null) {
             mSortUsers = savedState.getBoolean(STATE_SORT_USERS, false);

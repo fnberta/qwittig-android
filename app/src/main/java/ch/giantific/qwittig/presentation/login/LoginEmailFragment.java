@@ -5,21 +5,16 @@
 package ch.giantific.qwittig.presentation.login;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.text.TextUtils;
 import android.transition.Slide;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -30,13 +25,11 @@ import android.widget.ArrayAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentLoginEmailBinding;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.fragments.EmailPromptDialogFragment;
-import ch.giantific.qwittig.presentation.login.di.DaggerLoginEmailComponent;
-import ch.giantific.qwittig.presentation.login.di.LoginEmailViewModelModule;
+import ch.giantific.qwittig.presentation.login.di.LoginComponent;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.ViewUtils;
 
@@ -45,7 +38,7 @@ import ch.giantific.qwittig.utils.ViewUtils;
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public class LoginEmailFragment extends BaseFragment<LoginEmailViewModel, LoginEmailFragment.ActivityListener>
+public class LoginEmailFragment extends BaseFragment<LoginComponent, LoginEmailViewModel, LoginEmailFragment.ActivityListener>
         implements LoaderManager.LoaderCallbacks<Cursor>, LoginEmailViewModel.ViewListener {
 
     private static final int PERMISSIONS_REQUEST_CONTACTS = 1;
@@ -70,21 +63,9 @@ public class LoginEmailFragment extends BaseFragment<LoginEmailViewModel, LoginE
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        DaggerLoginEmailComponent.builder()
-                .applicationComponent(Qwittig.getAppComponent(getActivity()))
-                .loginEmailViewModelModule(new LoginEmailViewModelModule(savedInstanceState, this))
-                .build()
-                .inject(this);
-    }
-
-    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentLoginEmailBinding.inflate(inflater, container, false);
-        mBinding.setViewModel(mViewModel);
         return mBinding.getRoot();
     }
 
@@ -92,9 +73,18 @@ public class LoginEmailFragment extends BaseFragment<LoginEmailViewModel, LoginE
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        final String identityId = getArguments().getString(KEY_IDENTITY_ID, "");
+        mViewModel.setIdentityId(identityId);
+        mViewModel.attachView(this);
+        mBinding.setViewModel(mViewModel);
         if (permissionsAreGranted()) {
             initLoader();
         }
+    }
+
+    @Override
+    protected void injectDependencies(@NonNull LoginComponent component) {
+        component.inject(this);
     }
 
     private boolean permissionsAreGranted() {
@@ -194,24 +184,24 @@ public class LoginEmailFragment extends BaseFragment<LoginEmailViewModel, LoginE
     }
 
     @Override
-    protected void setViewModelToActivity() {
-        mActivity.setEmailViewModel(mViewModel);
-    }
-
-    @Override
     protected View getSnackbarView() {
         return mBinding.btLoginEmailLogin;
     }
 
     @Override
-    public void loadEmailLoginWorker(@NonNull String email, @NonNull String password) {
-        final String identityId = getArguments().getString(KEY_IDENTITY_ID, "");
+    public void showProfileScreen(boolean withInvitation) {
+        mActivity.showProfileFragment(withInvitation);
+    }
+
+    @Override
+    public void loadEmailLoginWorker(@NonNull String email, @NonNull String password,
+                                     @NonNull String identityId) {
         LoginWorker.attachEmailLoginInstance(getFragmentManager(), email, password, identityId);
     }
 
     @Override
-    public void loadEmailSignUpWorker(@NonNull String email, @NonNull String password) {
-        final String identityId = getArguments().getString(KEY_IDENTITY_ID, "");
+    public void loadEmailSignUpWorker(@NonNull String email, @NonNull String password,
+                                      @NonNull String identityId) {
         LoginWorker.attachEmailSignUpInstance(getFragmentManager(), email, password, identityId);
     }
 
@@ -234,34 +224,11 @@ public class LoginEmailFragment extends BaseFragment<LoginEmailViewModel, LoginE
         ViewUtils.hideSoftKeyboard(getActivity());
     }
 
-    @Override
-    public void finishScreen(int result) {
-        final FragmentActivity activity = getActivity();
-        activity.setResult(result);
-        ActivityCompat.finishAfterTransition(activity);
-    }
-
-    @Override
-    public void showProfileFragment() {
-        final String identityId = getArguments().getString(KEY_IDENTITY_ID, "");
-        final LoginProfileFragment fragment = LoginProfileFragment.newInstance(!TextUtils.isEmpty(identityId));
-        if (Utils.isRunningLollipopAndHigher()) {
-            setExitTransition(new Slide(Gravity.START));
-            setAllowReturnTransitionOverlap(false);
-            fragment.setEnterTransition(new Slide(Gravity.END));
-            fragment.setAllowEnterTransitionOverlap(false);
-        }
-
-        getFragmentManager().beginTransaction()
-                .replace(R.id.container, fragment, LoginActivity.FRAGMENT_LOGIN)
-                .addToBackStack(null)
-                .commit();
-    }
-
     /**
-     * Defines the interaction with the hosting {@link Activity}.
+     * Defines the interaction with the hosting activity.
      */
-    public interface ActivityListener extends BaseFragment.ActivityListener {
-        void setEmailViewModel(@NonNull LoginEmailViewModel viewModel);
+    public interface ActivityListener extends BaseFragment.ActivityListener<LoginComponent> {
+
+        void showProfileFragment(boolean withInvitation);
     }
 }

@@ -31,10 +31,9 @@ public class BalanceHeaderViewModelImpl extends ViewModelBaseImpl<BalanceHeaderV
     private NumberFormat mMoneyFormatter;
 
     public BalanceHeaderViewModelImpl(@Nullable Bundle savedState,
-                                      @NonNull BalanceHeaderViewModel.ViewListener view,
                                       @NonNull RxBus<Object> eventBus,
                                       @NonNull UserRepository userRepository) {
-        super(savedState, view, eventBus, userRepository);
+        super(savedState, eventBus, userRepository);
     }
 
     @Override

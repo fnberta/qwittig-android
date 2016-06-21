@@ -9,7 +9,6 @@ import android.app.DatePickerDialog;
 import android.databinding.Bindable;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.AdapterView;
 
@@ -19,16 +18,19 @@ import java.util.Date;
 
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Task;
+import ch.giantific.qwittig.presentation.common.ListDragInteraction;
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
 
 /**
  * Defines an observable view model for the add or edit task screen.
  */
-public interface TaskAddEditViewModel extends ListViewModel<Identity>,
+public interface TaskAddEditViewModel extends ListViewModel<Identity, TaskAddEditViewModel.ViewListener>,
         DiscardChangesDialogFragment.DialogInteractionListener,
         DatePickerDialog.OnDateSetListener,
         TaskAddEditUsersRecyclerAdapter.AdapterInteractionListener {
+
+    void setListDragInteraction(@NonNull ListDragInteraction listDragInteraction);
 
     @Bindable
     String getTaskTitle();
@@ -44,9 +46,11 @@ public interface TaskAddEditViewModel extends ListViewModel<Identity>,
     boolean isAsNeededTask();
 
     @Bindable
-    int getTaskTimeFrame();
+    int getSelectedTimeFrame();
 
     void setTaskTimeFrame(int taskTimeFrame);
+
+    int[] getTimeFrames();
 
     /**
      * Checks whether the user has made an changes to the data on the screen. If yes shows a
@@ -100,16 +104,5 @@ public interface TaskAddEditViewModel extends ListViewModel<Identity>,
         void showDiscardChangesDialog();
 
         void showDatePickerDialog();
-
-        /**
-         * Sets the result depending on the action taken and finishes the screen
-         *
-         * @param taskResult the task according to which to set the result
-         */
-        void finishScreen(int taskResult);
-
-        void onStartUserDrag(@NonNull RecyclerView.ViewHolder viewHolder);
-
-        void setTimeFramePosition(int timeFrame);
     }
 }

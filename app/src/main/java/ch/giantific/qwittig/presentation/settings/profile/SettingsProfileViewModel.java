@@ -22,7 +22,7 @@ import ch.giantific.qwittig.presentation.settings.profile.UnlinkThirdPartyWorker
 /**
  * Defines a observable view model for profile settings screen.
  */
-public interface SettingsProfileViewModel extends ViewModel, UnlinkThirdPartyWorkerListener,
+public interface SettingsProfileViewModel extends ViewModel<SettingsProfileViewModel.ViewListener>, UnlinkThirdPartyWorkerListener,
         AvatarLoadListener,
         DiscardChangesDialogFragment.DialogInteractionListener {
 
@@ -114,14 +114,10 @@ public interface SettingsProfileViewModel extends ViewModel, UnlinkThirdPartyWor
 
         void showDiscardChangesDialog();
 
-        void showAvatarPicker();
-
         void showSetPasswordMessage(@StringRes int message);
 
         void dismissSetPasswordMessage();
 
         void reloadOptionsMenu();
-
-        void finishScreen(@Result int result);
     }
 }

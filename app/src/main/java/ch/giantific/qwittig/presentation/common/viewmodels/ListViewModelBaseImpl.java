@@ -16,23 +16,23 @@ import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.ListInteraction;
 
 /**
  * Provides an abstract base implementation of the {@link ListViewModel}.
  */
 public abstract class ListViewModelBaseImpl<T, S extends ListViewModel.ViewListener>
-        extends ViewModelBaseImpl<S>
-        implements ListViewModel<T> {
+        extends ViewModelBaseImpl<S> implements ListViewModel<T, S> {
 
     private static final String STATE_LOADING = "STATE_LOADING";
     protected ArrayList<T> mItems;
+    protected ListInteraction mListInteraction;
     protected boolean mLoading;
 
     public ListViewModelBaseImpl(@Nullable Bundle savedState,
-                                 @NonNull S view,
                                  @NonNull RxBus<Object> eventBus,
                                  @NonNull UserRepository userRepository) {
-        super(savedState, view, eventBus, userRepository);
+        super(savedState, eventBus, userRepository);
 
         if (savedState != null) {
             mLoading = savedState.getBoolean(STATE_LOADING, false);
@@ -65,6 +65,11 @@ public abstract class ListViewModelBaseImpl<T, S extends ListViewModel.ViewListe
     @Bindable
     public boolean isEmpty() {
         return mItems.isEmpty();
+    }
+
+    @Override
+    public void setListInteraction(@NonNull ListInteraction listInteraction) {
+        mListInteraction = listInteraction;
     }
 
     @Override

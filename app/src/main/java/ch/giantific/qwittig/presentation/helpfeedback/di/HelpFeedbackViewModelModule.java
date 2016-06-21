@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.di.scopes.PerScreen;
+import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.helpfeedback.HelpFeedbackViewModel;
@@ -21,17 +21,16 @@ import dagger.Provides;
  * Defines the implementation to use for the help and feedback view model and how to instantiate it.
  */
 @Module
-public class HelpFeedbackViewModelModule extends BaseViewModelModule<HelpFeedbackViewModel.ViewListener> {
+public class HelpFeedbackViewModelModule extends BaseViewModelModule {
 
-    public HelpFeedbackViewModelModule(@Nullable Bundle savedState,
-                                       @NonNull HelpFeedbackViewModel.ViewListener view) {
-        super(savedState, view);
+    public HelpFeedbackViewModelModule(@Nullable Bundle savedState) {
+        super(savedState);
     }
 
-    @PerScreen
+    @PerActivity
     @Provides
     HelpFeedbackViewModel providesHelpFeedbackViewModel(@NonNull RxBus<Object> eventBus,
                                                         @NonNull UserRepository userRepository) {
-        return new HelpFeedbackViewModelImpl(mSavedState, mView, eventBus, userRepository);
+        return new HelpFeedbackViewModelImpl(mSavedState, eventBus, userRepository);
     }
 }

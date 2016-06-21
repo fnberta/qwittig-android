@@ -14,7 +14,7 @@ import ch.giantific.qwittig.presentation.stats.StatsViewModel;
 /**
  * Defines an observable view model for the spending stats screen.
  */
-public interface StatsSpendingViewModel extends StatsViewModel {
+public interface StatsSpendingViewModel extends StatsViewModel<StatsSpendingViewModel.ViewListener> {
 
     @Bindable
     BarData getBarData();

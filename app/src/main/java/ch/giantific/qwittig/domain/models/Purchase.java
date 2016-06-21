@@ -7,7 +7,6 @@ package ch.giantific.qwittig.domain.models;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.google.repacked.antlr.v4.runtime.misc.NotNull;
 import com.parse.ParseACL;
 import com.parse.ParseClassName;
 import com.parse.ParseFile;
@@ -169,6 +168,10 @@ public class Purchase extends ParseObject {
         return receipt != null ? receipt.getUrl() : "";
     }
 
+    public void removeReceipt() {
+        remove(RECEIPT);
+    }
+
     public String getReceiptLocal() {
         return getString(RECEIPT_LOCAL);
     }
@@ -189,14 +192,14 @@ public class Purchase extends ParseObject {
         return getString(NOTE);
     }
 
-    @NotNull
+    public void setNote(@NonNull String note) {
+        put(NOTE, note);
+    }
+
+    @NonNull
     public String getNoteOrEmpty() {
         final String note = getNote();
         return note != null ? note : "";
-    }
-
-    public void setNote(@NonNull String note) {
-        put(NOTE, note);
     }
 
     public void removeNote() {

@@ -6,7 +6,6 @@ package ch.giantific.qwittig.presentation.finance.unpaid;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,12 +13,11 @@ import android.view.ViewGroup;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
-import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.FragmentFinanceCompensationsUnpaidBinding;
+import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
-import ch.giantific.qwittig.presentation.finance.unpaid.di.DaggerFinanceCompsUnpaidComponent;
-import ch.giantific.qwittig.presentation.finance.unpaid.di.FinanceCompsUnpaidViewModelModule;
+import ch.giantific.qwittig.presentation.finance.di.FinanceSubcomponent;
 
 /**
  * Displays all currently open unpaid compensations in the group in card based {@link RecyclerView}
@@ -29,8 +27,8 @@ import ch.giantific.qwittig.presentation.finance.unpaid.di.FinanceCompsUnpaidVie
  * <p/>
  * Subclass of {@link BaseRecyclerViewFragment}.
  */
-public class CompsUnpaidFragment extends BaseRecyclerViewFragment<CompsUnpaidViewModel, CompsUnpaidFragment.ActivityListener>
-        implements CompsUnpaidViewModel.ViewListener {
+public class CompsUnpaidFragment extends BaseRecyclerViewFragment<FinanceSubcomponent, CompsUnpaidViewModel, BaseRecyclerViewFragment.ActivityListener<FinanceSubcomponent>>
+    implements CompsUnpaidViewModel.ViewListener {
 
     private FragmentFinanceCompensationsUnpaidBinding mBinding;
 
@@ -39,22 +37,24 @@ public class CompsUnpaidFragment extends BaseRecyclerViewFragment<CompsUnpaidVie
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        DaggerFinanceCompsUnpaidComponent.builder()
-                .applicationComponent(Qwittig.getAppComponent(getActivity()))
-                .financeCompsUnpaidViewModelModule(new FinanceCompsUnpaidViewModelModule(savedInstanceState, this))
-                .build()
-                .inject(this);
-    }
-
-    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentFinanceCompensationsUnpaidBinding.inflate(inflater, container, false);
-        mBinding.setViewModel(mViewModel);
         return mBinding.getRoot();
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        mViewModel.attachView(this);
+        mViewModel.setListInteraction(mRecyclerAdapter);
+        mBinding.setViewModel(mViewModel);
+    }
+
+    @Override
+    protected void injectDependencies(@NonNull FinanceSubcomponent component) {
+        component.inject(this);
     }
 
     @Override
@@ -63,13 +63,8 @@ public class CompsUnpaidFragment extends BaseRecyclerViewFragment<CompsUnpaidVie
     }
 
     @Override
-    protected RecyclerView.Adapter getRecyclerAdapter() {
+    protected BaseRecyclerAdapter getRecyclerAdapter() {
         return new CompsUnpaidRecyclerAdapter(mViewModel);
-    }
-
-    @Override
-    protected void setViewModelToActivity() {
-        mActivity.setCompsUnpaidViewModel(mViewModel);
     }
 
     @Override
@@ -87,11 +82,7 @@ public class CompsUnpaidFragment extends BaseRecyclerViewFragment<CompsUnpaidVie
     public void showCompensationAmountConfirmDialog(@NonNull BigFraction amount,
                                                     @NonNull String debtorNickname,
                                                     @NonNull String currency) {
-        CompConfirmAmountDialogFragment.display(getFragmentManager(), amount, debtorNickname,
-                currency);
-    }
-
-    public interface ActivityListener extends BaseRecyclerViewFragment.ActivityListener {
-        void setCompsUnpaidViewModel(@NonNull CompsUnpaidViewModel viewModel);
+        CompConfirmAmountDialogFragment.display(getFragmentManager(), amount,
+                debtorNickname, currency);
     }
 }

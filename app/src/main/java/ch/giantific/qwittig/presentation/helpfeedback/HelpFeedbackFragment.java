@@ -9,24 +9,22 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentHelpFeedbackBinding;
+import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
-import ch.giantific.qwittig.presentation.helpfeedback.di.DaggerHelpFeedbackComponent;
-import ch.giantific.qwittig.presentation.helpfeedback.di.HelpFeedbackViewModelModule;
+import ch.giantific.qwittig.presentation.helpfeedback.di.HelpFeedbackComponent;
 
 /**
  * Displays help and feedback items in a {@link RecyclerView} list.
  */
-public class HelpFeedbackFragment extends BaseRecyclerViewFragment<HelpFeedbackViewModel, BaseRecyclerViewFragment.ActivityListener>
+public class HelpFeedbackFragment extends BaseRecyclerViewFragment<HelpFeedbackComponent, HelpFeedbackViewModel, BaseRecyclerViewFragment.ActivityListener<HelpFeedbackComponent>>
         implements HelpFeedbackViewModel.ViewListener {
 
     private static final int RC_INVITE = 0;
@@ -37,22 +35,23 @@ public class HelpFeedbackFragment extends BaseRecyclerViewFragment<HelpFeedbackV
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        DaggerHelpFeedbackComponent.builder()
-                .applicationComponent(Qwittig.getAppComponent(getActivity()))
-                .helpFeedbackViewModelModule(new HelpFeedbackViewModelModule(savedInstanceState, this))
-                .build()
-                .inject(this);
-    }
-
-    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentHelpFeedbackBinding.inflate(inflater, container, false);
-        mBinding.setViewModel(mViewModel);
         return mBinding.getRoot();
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        mViewModel.attachView(this);
+        mBinding.setViewModel(mViewModel);
+    }
+
+    @Override
+    protected void injectDependencies(@NonNull HelpFeedbackComponent component) {
+        component.inject(this);
     }
 
     @Override
@@ -61,13 +60,24 @@ public class HelpFeedbackFragment extends BaseRecyclerViewFragment<HelpFeedbackV
     }
 
     @Override
-    protected RecyclerView.Adapter getRecyclerAdapter() {
+    protected BaseRecyclerAdapter getRecyclerAdapter() {
         return new HelpFeedbackRecyclerAdapter(mViewModel);
     }
 
     @Override
-    protected void setViewModelToActivity() {
-        // not relevant here
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+//        switch (requestCode) {
+//            case RC_INVITE:
+//                if (resultCode == Activity.RESULT_OK) {
+//                    final String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
+//                    showMessage(R.string.toast_recommend_sent, ids.length);
+//                } else {
+//                    showMessage(R.string.toast_recommend_failed);
+//                }
+//                break;
+//        }
     }
 
     @Override
@@ -131,22 +141,6 @@ public class HelpFeedbackFragment extends BaseRecyclerViewFragment<HelpFeedbackV
 //            startActivityForResult(intent, RC_INVITE);
 //        } catch (ActivityNotFoundException e) {
 //            showMessage(R.string.toast_error_not_supported);
-//        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-//        switch (requestCode) {
-//            case RC_INVITE:
-//                if (resultCode == Activity.RESULT_OK) {
-//                    final String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
-//                    showMessage(R.string.toast_recommend_sent, ids.length);
-//                } else {
-//                    showMessage(R.string.toast_recommend_failed);
-//                }
-//                break;
 //        }
     }
 }

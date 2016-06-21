@@ -6,6 +6,7 @@ package ch.giantific.qwittig.presentation.login;
 
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
+import android.support.annotation.NonNull;
 import android.view.View;
 
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
@@ -13,13 +14,17 @@ import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 /**
  * Defines an observable view model for the login/sign-up with email screen.
  */
-public interface LoginInvitationViewModel extends ViewModel {
+public interface LoginInvitationViewModel extends ViewModel<LoginInvitationViewModel.ViewListener> {
 
     @Bindable
     String getGroupName();
 
+    void setGroupName(@NonNull String groupName);
+
     @Bindable
     String getInviterNickname();
+
+    void setInviterNickname(@NonNull String inviterNickname);
 
     void onAcceptClick(View view);
 

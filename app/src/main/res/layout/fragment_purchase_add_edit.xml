@@ -12,7 +12,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.home.purchases.addedit.AddEditPurchaseViewModel"
+            type="ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel"
             />
     </data>
 
@@ -22,7 +22,7 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:paddingBottom="@dimen/small_space"
-        tools:context=".presentation.home.purchases.addedit.AddPurchaseFragment"
+        tools:context=".presentation.purchases.addedit.PurchaseAddFragment"
         />
 
 </layout>
