@@ -7,7 +7,9 @@ package ch.giantific.qwittig.presentation.purchases.list.di;
 import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.presentation.purchases.list.HomeActivity;
 import ch.giantific.qwittig.presentation.purchases.list.drafts.DraftsFragment;
+import ch.giantific.qwittig.presentation.purchases.list.drafts.DraftsViewModel;
 import ch.giantific.qwittig.presentation.purchases.list.purchases.PurchasesFragment;
+import ch.giantific.qwittig.presentation.purchases.list.purchases.PurchasesViewModel;
 import dagger.Subcomponent;
 
 /**
@@ -23,4 +25,8 @@ public interface HomeSubcomponent {
     void inject(PurchasesFragment purchasesFragment);
 
     void inject(DraftsFragment draftsFragment);
+
+    PurchasesViewModel getPurchasesViewModel();
+
+    DraftsViewModel getDraftsViewModel();
 }

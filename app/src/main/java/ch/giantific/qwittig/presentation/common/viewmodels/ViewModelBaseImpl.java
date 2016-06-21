@@ -27,9 +27,9 @@ import rx.subscriptions.CompositeSubscription;
 public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
         extends BaseObservable implements ViewModel<T> {
 
-    protected T mView;
     protected final UserRepository mUserRepo;
     protected final RxBus<Object> mEventBus;
+    protected T mView;
     protected User mCurrentUser;
     protected Identity mCurrentIdentity;
     private CompositeSubscription mSubscriptions = new CompositeSubscription();
@@ -39,11 +39,11 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
                              @NonNull UserRepository userRepository) {
         mEventBus = eventBus;
         mUserRepo = userRepository;
-        mCurrentUser = mUserRepo.getCurrentUser();
-        setCurrentIdentity();
+        setCurrentUserAndIdentity();
     }
 
-    protected void setCurrentIdentity() {
+    protected void setCurrentUserAndIdentity() {
+        mCurrentUser = mUserRepo.getCurrentUser();
         if (mCurrentUser != null) {
             mCurrentIdentity = mCurrentUser.getCurrentIdentity();
         }
@@ -71,8 +71,7 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
     @Override
     @CallSuper
     public void onViewVisible() {
-        setCurrentIdentity();
-
+        setCurrentUserAndIdentity();
         getSubscriptions().add(mEventBus.observeEvents(EventIdentitySelected.class)
                 .subscribe(new Action1<EventIdentitySelected>() {
                     @Override

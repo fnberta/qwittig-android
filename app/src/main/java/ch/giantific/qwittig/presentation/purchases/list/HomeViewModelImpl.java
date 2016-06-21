@@ -87,8 +87,7 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
 
     @Override
     public void onLoginSuccessful() {
-        mCurrentUser = mUserRepo.getCurrentUser();
-        setCurrentIdentity();
+        setCurrentUserAndIdentity();
         mDraftsAvailable = mPurchaseRepo.isDraftsAvailable(mCurrentIdentity);
     }
 
