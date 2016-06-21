@@ -40,6 +40,11 @@ public class PurchaseEditDraftViewModelImpl extends PurchaseEditViewModelImpl
     }
 
     @Override
+    Single<Purchase> getSavePurchaseAction(@NonNull Purchase purchase) {
+        return mPurchaseRepo.savePurchase(purchase);
+    }
+
+    @Override
     int getDraftFinishedResult() {
         return PurchaseAddEditViewModel.PurchaseResult.PURCHASE_DRAFT_CHANGES;
     }
