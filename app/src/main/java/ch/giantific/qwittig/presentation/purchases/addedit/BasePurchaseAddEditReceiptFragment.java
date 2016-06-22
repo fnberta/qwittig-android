@@ -53,6 +53,20 @@ public abstract class BasePurchaseAddEditReceiptFragment<T> extends BaseFragment
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+
+        mViewModel.setReceiptOrNoteShown(true);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        mViewModel.setReceiptOrNoteShown(false);
+    }
+
+    @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         menu.clear();
         inflater.inflate(R.menu.menu_purchase_edit_receipt_fragment, menu);

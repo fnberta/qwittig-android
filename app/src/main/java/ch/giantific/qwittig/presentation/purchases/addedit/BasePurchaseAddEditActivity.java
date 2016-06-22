@@ -240,7 +240,6 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
 
     @Override
     public void onBackPressed() {
-        mAddEditPurchaseViewModel.setReceiptOrNoteShown(false);
         if (!getSupportFragmentManager().popBackStackImmediate()) {
             mAddEditPurchaseViewModel.onExitClick();
         }

@@ -16,8 +16,6 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 
 import org.json.JSONException;
@@ -49,15 +47,16 @@ import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsVie
  * Subclass of {@link BaseNavDrawerActivity}.
  */
 public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetailsSubcomponent>
-        implements PurchaseDetailsViewModel.ViewListener {
+        implements PurchaseDetailsFragment.ActivityListener, PurchaseDetailsViewModel.ViewListener,
+        PurchaseDetailsReceiptFragment.ActivityListener {
 
     public static final String PURCHASE_DETAILS_FRAGMENT = "PURCHASE_DETAILS_FRAGMENT";
     public static final String PURCHASE_RECEIPT_FRAGMENT = "PURCHASE_RECEIPT_FRAGMENT";
     @Inject
     PurchaseDetailsViewModel mPurchaseDetailsViewModel;
     private boolean mShowEditOptions;
-    private boolean mHasForeignCurrency;
-    private boolean mHasReceiptFile;
+    private boolean mShowExchangeRate;
+    private boolean mShowReceipt;
 
     @Override
     protected void handleLocalBroadcast(Intent intent, int dataType) {
@@ -135,46 +134,6 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_purchase_details, menu);
-
-        if (mShowEditOptions) {
-            menu.findItem(R.id.action_purchase_edit).setVisible(true);
-            menu.findItem(R.id.action_purchase_delete).setVisible(true);
-        }
-        if (mHasForeignCurrency) {
-            menu.findItem(R.id.action_purchase_show_exchange_rate).setVisible(true);
-        }
-
-        if (mHasReceiptFile) {
-            menu.findItem(R.id.action_purchase_show_receipt).setVisible(true);
-        }
-
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.action_purchase_edit:
-                mPurchaseDetailsViewModel.onEditPurchaseClick();
-                return true;
-            case R.id.action_purchase_delete:
-                mPurchaseDetailsViewModel.onDeletePurchaseClick();
-                return true;
-            case R.id.action_purchase_show_exchange_rate:
-                mPurchaseDetailsViewModel.onShowExchangeRateClick();
-                return true;
-            case R.id.action_purchase_show_receipt:
-                mPurchaseDetailsViewModel.onShowReceiptImageClick();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -188,6 +147,21 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
                     break;
             }
         }
+    }
+
+    @Override
+    public boolean isShowEditOptions() {
+        return mShowEditOptions;
+    }
+
+    @Override
+    public boolean isShowExchangeRate() {
+        return mShowExchangeRate;
+    }
+
+    @Override
+    public boolean isShowReceipt() {
+        return mShowReceipt;
     }
 
     @Override
@@ -209,14 +183,8 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
     public void toggleMenuOptions(boolean showEditOptions, boolean hasReceiptImage,
                                   boolean hasForeignCurrency) {
         mShowEditOptions = showEditOptions;
-        mHasForeignCurrency = hasForeignCurrency;
-        mHasReceiptFile = hasReceiptImage;
+        mShowExchangeRate = hasForeignCurrency;
+        mShowReceipt = hasReceiptImage;
         invalidateOptionsMenu();
-    }
-
-    @Override
-    public void onBackPressed() {
-        mPurchaseDetailsViewModel.setReceiptShown(false);
-        super.onBackPressed();
     }
 }

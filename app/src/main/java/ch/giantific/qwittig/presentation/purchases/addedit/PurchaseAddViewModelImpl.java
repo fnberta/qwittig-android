@@ -383,7 +383,6 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<BasePurchase
 
     @Override
     public void onShowReceiptImageMenuClick() {
-        mReceiptOrNoteShown = true;
         mView.showReceiptImage(mReceiptImagePath);
     }
 
@@ -598,7 +597,6 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<BasePurchase
 
     @Override
     public void onDeleteReceiptMenuClick() {
-        mReceiptOrNoteShown = false;
         mView.showPurchaseScreen();
 
         mView.toggleReceiptMenuOption(false);

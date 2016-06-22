@@ -51,6 +51,20 @@ public abstract class BasePurchaseAddEditNoteFragment<T> extends BaseFragment<T,
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+
+        mViewModel.setReceiptOrNoteShown(true);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        mViewModel.setReceiptOrNoteShown(false);
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
         inflater.inflate(R.menu.menu_purchase_edit_note_fragment, menu);
