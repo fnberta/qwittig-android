@@ -75,7 +75,7 @@
                         android:layout_marginStart="@dimen/small_space"
                         android:numStars="4"
                         android:stepSize="1"
-                        android:onRatingChanged="@{viewModel.onRatingNamesChanged}"
+                        android:onRatingChanged="@{viewModel::onRatingNamesChanged}"
                         />
 
                     <TextView
@@ -123,7 +123,7 @@
                         android:layout_marginStart="@dimen/small_space"
                         android:numStars="4"
                         android:stepSize="1"
-                        android:onRatingChanged="@{viewModel.onRatingPricesChanged}"
+                        android:onRatingChanged="@{viewModel::onRatingPricesChanged}"
                         />
 
                     <TextView
@@ -171,7 +171,7 @@
                         android:layout_marginStart="@dimen/small_space"
                         android:numStars="4"
                         android:stepSize="1"
-                        android:onRatingChanged="@{viewModel.onRatingMissingChanged}"
+                        android:onRatingChanged="@{viewModel::onRatingMissingChanged}"
                         />
 
                     <TextView
@@ -219,7 +219,7 @@
                         android:layout_marginStart="@dimen/small_space"
                         android:numStars="4"
                         android:stepSize="1"
-                        android:onRatingChanged="@{viewModel.onRatingSpeedChanged}"
+                        android:onRatingChanged="@{viewModel::onRatingSpeedChanged}"
                         />
 
                     <TextView
@@ -240,7 +240,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/normal_space"
                 android:layout_marginBottom="@dimen/normal_space"
-                android:onClick="@{viewModel.onFabDetailsDoneClick}"
+                android:onClick="@{viewModel::onFabDetailsDoneClick}"
                 android:src="@drawable/ic_done_black_24dp"
                 />
 

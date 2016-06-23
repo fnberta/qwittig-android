@@ -60,7 +60,7 @@
             android:layout_marginEnd="@dimen/key_line_1"
             android:layout_marginStart="@dimen/min_space"
             android:layout_marginTop="@dimen/normal_space"
-            android:onItemSelected="@{viewModel.onCurrencySelected}"
+            android:onItemSelected="@{viewModel::onCurrencySelected}"
             android:selection="@{viewModel.currencySelected}"
             />
 
@@ -122,7 +122,7 @@
             android:layout_alignEnd="@id/tv_my_share_currency"
             android:layout_below="@id/tv_my_share_value"
             android:layout_marginTop="@dimen/small_space"
-            android:onClick="@{viewModel.onExchangeRateClick}"
+            android:onClick="@{viewModel::onExchangeRateClick}"
             android:text="@{viewModel.exchangeRate}"
             android:visibility="@{viewModel.exchangeRateVisible ? View.VISIBLE : View.GONE}"
             tools:text="1.34657564636"

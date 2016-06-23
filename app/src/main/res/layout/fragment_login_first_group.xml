@@ -62,7 +62,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_group_name"
                     android:inputType="textCapSentences"
-                    android:onTextChanged="@{viewModel.onGroupNameChanged}"
+                    android:onTextChanged="@{viewModel::onGroupNameChanged}"
                     android:text="@{viewModel.groupName}"
                     />
 
@@ -74,7 +74,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/key_line_1"
                 android:layout_marginStart="@dimen/key_line_1"
-                android:onItemSelected="@{viewModel.onGroupCurrencySelected}"
+                android:onItemSelected="@{viewModel::onGroupCurrencySelected}"
                 android:selection="@{viewModel.selectedGroupCurrency}"
                 />
 
@@ -110,7 +110,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="@dimen/normal_space"
-            android:onClick="@{viewModel.onFabDoneClick}"
+            android:onClick="@{viewModel::onFabDoneClick}"
             android:src="@drawable/ic_arrow_forward_black_24dp"
             />
 

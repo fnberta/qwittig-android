@@ -66,7 +66,7 @@
                     android:id="@+id/sp_task_time_frame"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:onItemSelected="@{viewModel.onTimeFrameSelected}"
+                    android:onItemSelected="@{viewModel::onTimeFrameSelected}"
                     android:selection="@{viewModel.selectedTimeFrame}"
                     />
 
@@ -81,7 +81,7 @@
                 android:drawablePadding="@dimen/icon_compound_drawable_padding_end"
                 android:drawableStart="@drawable/ic_assignment_turned_in_black_24dp"
                 android:gravity="center_vertical"
-                android:onClick="@{viewModel.onDeadlineClicked}"
+                android:onClick="@{viewModel::onDeadlineClicked}"
                 android:paddingEnd="@dimen/key_line_1"
                 android:paddingStart="@dimen/key_line_1"
                 android:text="@{viewModel.taskDeadline}"

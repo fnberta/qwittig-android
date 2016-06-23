@@ -58,7 +58,7 @@
                     android:layout_marginStart="@dimen/key_line_1"
                     android:numStars="4"
                     android:stepSize="1"
-                    android:onRatingChanged="@{viewModel.onSatisfactionChanged}"
+                    android:onRatingChanged="@{viewModel::onSatisfactionChanged}"
                     />
             </LinearLayout>
 
@@ -67,7 +67,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="@dimen/normal_space"
-                android:onClick="@{viewModel.onFabDoneClick}"
+                android:onClick="@{viewModel::onFabDoneClick}"
                 android:src="@drawable/ic_done_black_24dp"
                 />
 

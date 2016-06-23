@@ -79,7 +79,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_nickname"
                     android:inputType="textPersonName"
-                    android:onTextChanged="@{viewModel.onNicknameChanged}"
+                    android:onTextChanged="@{viewModel::onNicknameChanged}"
                     android:text="@{viewModel.nickname}"
                     tools:text="Vera"
                     />
@@ -94,7 +94,7 @@
                 android:layout_alignBottom="@id/til_settings_users_nickname"
                 android:layout_marginStart="@dimen/key_line_1"
                 android:layout_marginEnd="@dimen/key_line_1"
-                android:onClick="@{viewModel.onAddUserClick}"
+                android:onClick="@{viewModel::onAddUserClick}"
                 android:src="@drawable/ic_person_add_black_24dp"
                 />
 

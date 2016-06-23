@@ -68,7 +68,7 @@
                         android:imeOptions="actionDone"
                         android:inputType="text|textCapSentences"
                         android:text="@{viewModel.taskTitle}"
-                        android:onTextChanged="@{viewModel.onTitleChanged}"
+                        android:onTextChanged="@{viewModel::onTitleChanged}"
                         />
 
                 </android.support.design.widget.TextInputLayout>
@@ -81,7 +81,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/normal_space"
-            android:onClick="@{viewModel.onFabSaveTaskClick}"
+            android:onClick="@{viewModel::onFabSaveTaskClick}"
             android:src="@drawable/ic_save_black_24dp"
             app:layout_anchor="@id/appbar"
             app:layout_anchorGravity="bottom|end"

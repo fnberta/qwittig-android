@@ -55,7 +55,7 @@
                     android:hint="@string/hint_email"
                     android:imeOptions="actionNext"
                     android:inputType="textEmailAddress"
-                    android:onTextChanged="@{viewModel.onEmailChanged}"
+                    android:onTextChanged="@{viewModel::onEmailChanged}"
                     />
 
             </android.support.design.widget.TextInputLayout>
@@ -75,7 +75,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_password"
                     android:inputType="textPassword"
-                    android:onTextChanged="@{viewModel.onPasswordChanged}"
+                    android:onTextChanged="@{viewModel::onPasswordChanged}"
                     />
 
             </android.support.design.widget.TextInputLayout>
@@ -94,7 +94,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_password_repeat"
                     android:inputType="textPassword"
-                    android:onTextChanged="@{viewModel.onPasswordRepeatChanged}"
+                    android:onTextChanged="@{viewModel::onPasswordRepeatChanged}"
                     />
 
             </android.support.design.widget.TextInputLayout>
@@ -111,7 +111,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.5"
-                    android:onClick="@{viewModel.onLoginClick}"
+                    android:onClick="@{viewModel::onLoginClick}"
                     android:text="@string/login_button_log_in"
                     tools:ignore="ButtonStyle"
                     />
@@ -122,7 +122,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.5"
-                    android:onClick="@{viewModel.onSignUpClick}"
+                    android:onClick="@{viewModel::onSignUpClick}"
                     android:text="@string/login_button_sign_up"
                     tools:ignore="ButtonStyle"
                     />
@@ -135,7 +135,7 @@
                 android:layout_height="@dimen/touch_target_min"
                 android:layout_gravity="center_horizontal"
                 android:gravity="center_vertical"
-                android:onClick="@{viewModel.onResetPasswordClick}"
+                android:onClick="@{viewModel::onResetPasswordClick}"
                 android:text="@string/login_text_forgot_credentials"
                 />
 

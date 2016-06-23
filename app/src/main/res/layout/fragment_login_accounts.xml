@@ -42,7 +42,7 @@
                 android:background="@drawable/com_facebook_button_background"
                 android:drawablePadding="@dimen/com_facebook_share_button_compound_drawable_padding"
                 android:drawableStart="@drawable/com_facebook_button_icon"
-                android:onClick="@{viewModel.onLoginFacebookClick}"
+                android:onClick="@{viewModel::onLoginFacebookClick}"
                 android:paddingBottom="@dimen/com_facebook_share_button_padding_bottom"
                 android:paddingEnd="@dimen/com_facebook_share_button_padding_right"
                 android:paddingStart="@dimen/com_facebook_share_button_padding_left"
@@ -75,7 +75,7 @@
                 style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:onClick="@{viewModel.onUseEmailClick}"
+                android:onClick="@{viewModel::onUseEmailClick}"
                 android:text="@string/login_button_email"
                 />
 
