@@ -2,11 +2,13 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.purchases.addedit;
+package ch.giantific.qwittig.presentation.purchases.addedit.add;
 
 import android.support.annotation.NonNull;
 
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditReceiptFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseAddComponent;
 
 /**
@@ -14,7 +16,7 @@ import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseAddCompone
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public class PurchaseAddReceiptFragment extends BasePurchaseAddEditReceiptFragment<PurchaseAddComponent> {
+public class PurchaseAddReceiptFragment extends BasePurchaseAddEditReceiptFragment<PurchaseAddComponent, PurchaseAddEditViewModel> {
 
     public PurchaseAddReceiptFragment() {
         // required empty constructor

@@ -2,19 +2,22 @@
   ~ Copyright (c) 2015 Fabio Berta
   -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".presentation.purchases.addedit.PurchaseEditActivity">
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".presentation.purchases.addedit.edit.PurchaseEditDraftFragment"
+    >
+
     <item
         android:id="@+id/action_purchase_edit_save_changes_draft"
-        android:title="@string/action_purchase_edit_save_changes_draft"
         android:orderInCategory="2"
+        android:title="@string/action_purchase_edit_save_changes_draft"
         app:showAsAction="never"/>
 
     <item
         android:id="@+id/action_purchase_edit_draft_delete"
-        android:title="@string/action_draft_delete"
         android:orderInCategory="3"
+        android:title="@string/action_draft_delete"
         app:showAsAction="never"/>
 </menu>

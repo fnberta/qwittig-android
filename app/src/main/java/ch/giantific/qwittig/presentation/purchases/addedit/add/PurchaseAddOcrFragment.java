@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.purchases.addedit;
+package ch.giantific.qwittig.presentation.purchases.addedit.add;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,6 +12,7 @@ import android.view.MenuItem;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseAddComponent;
 
 /**
@@ -20,9 +21,9 @@ import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseAddCompone
  * <p/>
  * Subclass of {@link BaseRecyclerViewFragment}.
  */
-public class PurchaseAddFragment extends BasePurchaseAddEditFragment<PurchaseAddComponent, PurchaseAddEditViewModel, BasePurchaseAddEditFragment.ActivityListener<PurchaseAddComponent>> {
+public class PurchaseAddOcrFragment extends BasePurchaseAddEditFragment<PurchaseAddComponent, PurchaseAddOcrViewModel, BasePurchaseAddEditFragment.ActivityListener<PurchaseAddComponent>> {
 
-    public PurchaseAddFragment() {
+    public PurchaseAddOcrFragment() {
         // required empty constructor
     }
 
@@ -40,11 +41,6 @@ public class PurchaseAddFragment extends BasePurchaseAddEditFragment<PurchaseAdd
 
     @Override
     public void onCreateOptionsMenu(Menu menu, @NonNull MenuInflater inflater) {
-        if (mViewModel.isLoading()) {
-            setMenuVisibility(false);
-            return;
-        }
-
         inflater.inflate(R.menu.menu_purchase_add_fragment, menu);
     }
 

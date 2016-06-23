@@ -16,6 +16,8 @@ import ch.giantific.qwittig.presentation.common.ListInteraction;
 public interface ListViewModel<T, S extends ViewModel.ViewListener>
         extends ViewModel<S>, LoadingViewModel {
 
+    void setListInteraction(@NonNull ListInteraction listInteraction);
+
     /**
      * Returns whether the list is empty or not.
      *
@@ -28,8 +30,6 @@ public interface ListViewModel<T, S extends ViewModel.ViewListener>
      * Loads the data from the repository and propagates the ui.
      */
     void loadData();
-
-    void setListInteraction(@NonNull ListInteraction listInteraction);
 
     /**
      * Returns the current selected identity.

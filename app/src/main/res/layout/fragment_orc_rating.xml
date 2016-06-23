@@ -1,0 +1,79 @@
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.purchases.ocrrating.OcrRatingViewModel"
+            />
+    </data>
+
+    <ScrollView
+        android:id="@+id/sv_ocr_rating_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:paddingBottom="@dimen/small_space"
+        android:paddingTop="@dimen/normal_space">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                >
+
+                <TextView
+                    style="@style/TextAppearance.AppCompat.Headline"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/normal_space"
+                    android:layout_marginEnd="@dimen/key_line_1"
+                    android:layout_marginStart="@dimen/key_line_1"
+                    android:gravity="center"
+                    android:text="@string/rating_general"
+                    />
+
+                <RatingBar
+                    android:id="@+id/rb_ocr_rating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginEnd="@dimen/key_line_1"
+                    android:layout_marginStart="@dimen/key_line_1"
+                    android:numStars="4"
+                    android:stepSize="1"
+                    android:onRatingChanged="@{viewModel.onSatisfactionChanged}"
+                    />
+            </LinearLayout>
+
+            <android.support.design.widget.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="@dimen/normal_space"
+                android:onClick="@{viewModel.onFabDoneClick}"
+                android:src="@drawable/ic_done_black_24dp"
+                />
+
+        </LinearLayout>
+
+    </ScrollView>
+</layout>
+
+

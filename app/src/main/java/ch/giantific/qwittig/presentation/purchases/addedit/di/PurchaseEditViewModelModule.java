@@ -15,9 +15,9 @@ import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
-import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseEditDraftViewModel;
-import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseEditDraftViewModelImpl;
-import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseEditViewModelImpl;
+import ch.giantific.qwittig.presentation.purchases.addedit.edit.PurchaseEditDraftViewModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.edit.PurchaseEditDraftViewModelImpl;
+import ch.giantific.qwittig.presentation.purchases.addedit.edit.PurchaseEditViewModelImpl;
 import dagger.Module;
 import dagger.Provides;
 

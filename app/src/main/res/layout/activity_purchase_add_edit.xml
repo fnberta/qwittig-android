@@ -21,7 +21,7 @@
         android:layout_height="match_parent"
         android:clipChildren="false"
         android:transitionGroup="true"
-        tools:context=".presentation.purchases.addedit.PurchaseAddActivity"
+        tools:context=".presentation.purchases.addedit.add.PurchaseAddActivity"
         tools:targetApi="lollipop"
         >
 

@@ -8,6 +8,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".presentation.purchases.addedit.BasePurchaseAddEditNoteFragment"
     >
+
     <item
         android:id="@+id/action_purchase_edit_note_edit"
         android:icon="@drawable/ic_create_white_24dp"

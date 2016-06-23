@@ -2,11 +2,13 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.purchases.addedit;
+package ch.giantific.qwittig.presentation.purchases.addedit.edit;
 
 import android.support.annotation.NonNull;
 
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseEditComponent;
 
 /**

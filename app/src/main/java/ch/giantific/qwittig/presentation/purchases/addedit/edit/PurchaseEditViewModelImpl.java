@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.purchases.addedit;
+package ch.giantific.qwittig.presentation.purchases.addedit.edit;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Identity;
@@ -25,6 +24,8 @@ import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
+import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddViewModelImpl;
 import ch.giantific.qwittig.presentation.purchases.addedit.items.BasePurchaseAddEditItem;
 import ch.giantific.qwittig.presentation.purchases.addedit.items.BasePurchaseAddEditItem.Type;
 import ch.giantific.qwittig.presentation.purchases.addedit.items.PurchaseAddEditItem;
@@ -154,8 +155,8 @@ public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
 
     @NonNull
     @Override
-    Purchase createPurchase(@NonNull List<Identity> purchaseIdentities,
-                            @NonNull List<Item> purchaseItems, int fractionDigits) {
+    protected Purchase createPurchase(@NonNull List<Identity> purchaseIdentities,
+                                      @NonNull List<Item> purchaseItems, int fractionDigits) {
         mEditPurchase.replaceItems(purchaseItems);
         mEditPurchase.setIdentities(purchaseIdentities);
         mEditPurchase.setDate(mDate);
@@ -188,7 +189,7 @@ public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
     }
 
     @Override
-    Single<Purchase> getSavePurchaseAction(@NonNull Purchase purchase) {
+    protected Single<Purchase> getSavePurchaseAction(@NonNull Purchase purchase) {
         return mPurchaseRepo.savePurchaseEdit(purchase, mDeleteOldReceipt);
     }
 

@@ -22,7 +22,7 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:paddingBottom="@dimen/small_space"
-        tools:context=".presentation.purchases.addedit.PurchaseAddFragment"
+        tools:context=".presentation.purchases.addedit.add.PurchaseAddFragment"
         />
 
 </layout>

@@ -23,7 +23,7 @@ import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseAddCompone
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public abstract class BasePurchaseAddEditReceiptFragment<T> extends BaseFragment<T, PurchaseAddEditViewModel, BaseFragment.ActivityListener<T>> {
+public abstract class BasePurchaseAddEditReceiptFragment<T, S extends PurchaseAddEditViewModel> extends BaseFragment<T, S, BaseFragment.ActivityListener<T>> {
 
     private FragmentPurchaseShowReceiptBinding mBinding;
 

@@ -8,13 +8,15 @@ import ch.giantific.qwittig.di.ApplicationComponent;
 import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
-import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddActivity;
-import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditNoteFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddActivity;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
-import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddFragment;
-import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddNoteFragment;
-import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddOcrViewModel;
-import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddReceiptFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddNoteFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddOcrFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddOcrNoteFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddOcrReceiptFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddOcrViewModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddReceiptFragment;
 import dagger.Component;
 
 /**
@@ -29,9 +31,15 @@ public interface PurchaseAddComponent {
 
     void inject(PurchaseAddFragment purchaseAddFragment);
 
+    void inject(PurchaseAddOcrFragment purchaseAddOcrFragment);
+
     void inject(PurchaseAddReceiptFragment purchaseAddReceiptFragment);
 
+    void inject(PurchaseAddOcrReceiptFragment purchaseAddOcrReceiptFragment);
+
     void inject(PurchaseAddNoteFragment purchaseAddNoteFragment);
+
+    void inject(PurchaseAddOcrNoteFragment purchaseAddOcrNoteFragment);
 
     PurchaseAddEditViewModel getAddViewModel();
 

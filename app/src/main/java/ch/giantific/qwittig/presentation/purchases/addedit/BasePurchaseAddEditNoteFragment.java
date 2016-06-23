@@ -21,7 +21,7 @@ import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public abstract class BasePurchaseAddEditNoteFragment<T> extends BaseFragment<T, PurchaseAddEditViewModel, BaseFragment.ActivityListener<T>> {
+public abstract class BasePurchaseAddEditNoteFragment<T, S extends PurchaseAddEditViewModel> extends BaseFragment<T, S, BaseFragment.ActivityListener<T>> {
 
     private FragmentPurchaseShowNoteBinding mBinding;
 

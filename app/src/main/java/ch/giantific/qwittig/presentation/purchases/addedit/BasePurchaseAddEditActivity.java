@@ -40,6 +40,7 @@ import ch.giantific.qwittig.presentation.common.TransitionListenerAdapter;
 import ch.giantific.qwittig.presentation.common.fragments.DatePickerDialogFragment;
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddFragment;
 import ch.giantific.qwittig.presentation.purchases.list.CameraActivity;
 import ch.giantific.qwittig.utils.CameraUtils;
 import ch.giantific.qwittig.utils.DateUtils;
@@ -66,9 +67,9 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
     private static final String STATE_HAS_RECEIPT_FILE = "STATE_HAS_RECEIPT_FILE";
     private static final String STATE_HAS_NOTE = "STATE_HAS_NOTE";
     private static final int PERMISSIONS_REQUEST_CAPTURE_IMAGES = 12;
-    PurchaseAddEditViewModel mAddEditPurchaseViewModel;
+    protected PurchaseAddEditViewModel mAddEditPurchaseViewModel;
     @Inject
-    Navigator mNavigator;
+    protected Navigator mNavigator;
     private ActivityPurchaseAddEditBinding mBinding;
     private boolean mHasReceiptFile;
     private boolean mHasNote;
@@ -139,7 +140,7 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
         });
     }
 
-    final void showFab() {
+    protected final void showFab() {
         if (ViewCompat.isLaidOut(mBinding.fabPurchaseSave)) {
             mBinding.fabPurchaseSave.show();
         } else {
@@ -333,7 +334,6 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
     public void showAddEditNoteDialog(@NonNull String note) {
         NoteDialogFragment.display(getSupportFragmentManager(), note);
     }
-
 
     @Override
     public void onNoteSet(@NonNull String note) {

@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.purchases.addedit;
+package ch.giantific.qwittig.presentation.purchases.addedit.add;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,6 +16,10 @@ import org.json.JSONObject;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.data.push.PushBroadcastReceiver;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
+import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditActivity;
+import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditNoteFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditReceiptFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.DaggerPurchaseAddComponent;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseAddComponent;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseAddViewModelModule;
@@ -36,8 +40,8 @@ public class PurchaseAddActivity extends BasePurchaseAddEditActivity<PurchaseAdd
             if (Utils.isRunningLollipopAndHigher()) {
                 // check if activity was started from push notification, we have no activity
                 // transition then and need to show the fab
-                final String ocrPurchaseId = getOcrIdFromPush(getIntent());
-                if (!TextUtils.isEmpty(ocrPurchaseId)) {
+                final String ocrDataId = getOcrIdFromPush(getIntent());
+                if (!TextUtils.isEmpty(ocrDataId)) {
                     showFab();
                 }
             }
@@ -64,7 +68,7 @@ public class PurchaseAddActivity extends BasePurchaseAddEditActivity<PurchaseAdd
 
     @NonNull
     protected BasePurchaseAddEditFragment getPurchaseAddEditFragment() {
-        return new PurchaseAddFragment();
+        return TextUtils.isEmpty(getOcrDataId()) ? new PurchaseAddFragment() : new PurchaseAddOcrFragment();
     }
 
     @Nullable
@@ -90,11 +94,11 @@ public class PurchaseAddActivity extends BasePurchaseAddEditActivity<PurchaseAdd
 
     @Override
     protected BasePurchaseAddEditReceiptFragment getReceiptFragment() {
-        return new PurchaseAddReceiptFragment();
+        return TextUtils.isEmpty(getOcrDataId()) ? new PurchaseAddReceiptFragment() : new PurchaseAddOcrReceiptFragment();
     }
 
     @Override
     protected BasePurchaseAddEditNoteFragment getNoteFragment() {
-        return new PurchaseAddNoteFragment();
+        return TextUtils.isEmpty(getOcrDataId()) ? new PurchaseAddNoteFragment() : new PurchaseAddOcrNoteFragment();
     }
 }

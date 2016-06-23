@@ -9,12 +9,14 @@ import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
-import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseEditActivity;
-import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseEditDraftFragment;
-import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseEditDraftViewModel;
-import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseEditFragment;
-import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseEditNoteFragment;
-import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseEditReceiptFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.edit.PurchaseEditActivity;
+import ch.giantific.qwittig.presentation.purchases.addedit.edit.PurchaseEditDraftFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.edit.PurchaseEditDraftNoteFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.edit.PurchaseEditDraftReceiptFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.edit.PurchaseEditDraftViewModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.edit.PurchaseEditFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.edit.PurchaseEditNoteFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.edit.PurchaseEditReceiptFragment;
 import dagger.Component;
 
 /**
@@ -33,7 +35,11 @@ public interface PurchaseEditComponent {
 
     void inject(PurchaseEditReceiptFragment purchaseEditReceiptFragment);
 
+    void inject(PurchaseEditDraftReceiptFragment purchaseEditDraftReceiptFragment);
+
     void inject(PurchaseEditNoteFragment purchaseEditNoteFragment);
+
+    void inject(PurchaseEditDraftNoteFragment purchaseEditDraftNoteFragment);
 
     PurchaseAddEditViewModel getEditViewModel();
 

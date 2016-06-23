@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.purchases.addedit;
+package ch.giantific.qwittig.presentation.purchases.addedit.edit;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,6 +14,7 @@ import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
+import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
 import rx.Single;
 import rx.SingleSubscriber;
 
@@ -40,13 +41,13 @@ public class PurchaseEditDraftViewModelImpl extends PurchaseEditViewModelImpl
     }
 
     @Override
-    Single<Purchase> getSavePurchaseAction(@NonNull Purchase purchase) {
+    protected Single<Purchase> getSavePurchaseAction(@NonNull Purchase purchase) {
         return mPurchaseRepo.savePurchase(purchase);
     }
 
     @Override
-    int getDraftFinishedResult() {
-        return PurchaseAddEditViewModel.PurchaseResult.PURCHASE_DRAFT_CHANGES;
+    protected void onPurchaseSaved(boolean asDraft) {
+        mNavigator.finish(PurchaseResult.PURCHASE_DRAFT_CHANGES);
     }
 
     @Override

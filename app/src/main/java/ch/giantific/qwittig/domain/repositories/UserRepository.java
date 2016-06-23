@@ -29,7 +29,6 @@ public interface UserRepository extends BaseRepository {
     /**
      * The base url for the invitation link.
      */
-    String INVITATION_LINK = "https://qwittig.ch/invitation/";
     String FILE_NAME = "avatar.jpg";
     int JPEG_COMPRESSION_RATE = 60;
     int HEIGHT = 720;
@@ -79,8 +78,8 @@ public interface UserRepository extends BaseRepository {
     /**
      * Signs up and logs in a new user using his email address as username and a password.
      *
-     * @param username the user's email to use as username
-     * @param password the user's password
+     * @param username   the user's email to use as username
+     * @param password   the user's password
      * @param identityId the identity id the user is invited to, empty if no invite pending
      * @return a {@link Single} emitting the result
      */
@@ -90,7 +89,7 @@ public interface UserRepository extends BaseRepository {
     /**
      * Logs in a user using his facebook account
      *
-     * @param activity the fragment that is initiating the login
+     * @param activity   the fragment that is initiating the login
      * @param identityId the identity id the user is invited to, empty if no invite pending
      * @return a {@link Single} emitting the result
      */
@@ -99,7 +98,7 @@ public interface UserRepository extends BaseRepository {
     /**
      * Logs in the user using his google account.
      *
-     * @param idToken the google id token
+     * @param idToken    the google id token
      * @param identityId the identity id the user is invited to, empty if no invite pending
      * @return a {@link Single} emitting the result
      */
@@ -206,11 +205,10 @@ public interface UserRepository extends BaseRepository {
      * Creates a new identity and generates an invitation link for it. Allows the user to interact
      * with the identity even if no one has yet accepted the invitation.
      *
-     *
      * @param context
-     * @param nickname  the nickname to use in the new identity
-     * @param groupId   the object id of the group
-     * @param groupName the name of the group the new identity is created for, user for the link
+     * @param nickname        the nickname to use in the new identity
+     * @param groupId         the object id of the group
+     * @param groupName       the name of the group the new identity is created for, user for the link
      * @param inviterNickname
      * @return a {@link Single} emitting the result
      */
@@ -229,10 +227,9 @@ public interface UserRepository extends BaseRepository {
     /**
      * Returns the invitation url for the invited identity
      *
-     *
      * @param context
-     * @param identity  the identity that is invited
-     * @param groupName the name of the group
+     * @param identity        the identity that is invited
+     * @param groupName       the name of the group
      * @param inviterNickname
      * @return the invitation url
      */

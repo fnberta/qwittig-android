@@ -233,7 +233,7 @@
     <string name="time_frame_one_time">One time</string>
     <string name="toast_task_max_one_user_one_time">Please select exactly one user for a one-time task</string>
     <string name="yesterday">Yesterday</string>
-    <string name="title_activity_camera">CameraActivity</string>
+    <string name="title_activity_camera">Camera</string>
     <string name="camera_redo">Redo capture</string>
     <string name="camera_done">Done</string>
     <string name="camera_add">Add photo</string>
@@ -334,5 +334,15 @@
     <string name="push_purchase_ocr_failed_title">Processing failed</string>
     <string name="toast_del_identity_balance_not_zero">Clear all outstanding debts and credits before deleting this user</string>
     <string name="camera_pick_image">Pick Image</string>
+    <string name="rating_general">How satisfying was the automatic recognition?</string>
+    <string name="rating_names">Improve quality of recognized article names.</string>
+    <string name="rating_prices">Ensure all prices are recognized correctly.</string>
+    <string name="rating_missing">Ensure no articles are missing.</string>
+    <string name="rating_speed">Speed up the automatic recognition.</string>
+    <string name="rating_no_hurry">No hurry</string>
+    <string name="rating_urgent">urgent</string>
+    <string name="title_activity_ocr_rating">Feedback</string>
+    <string name="toast_ocr_rating_satisfaction">Please select a satisfaction rate</string>
+    <string name="toast_ocr_rating_details">Please tick every question</string>
 
 </resources>

@@ -249,7 +249,7 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
         }
 
         fm.beginTransaction()
-                .replace(R.id.container, fragment, LoginActivity.FRAGMENT_LOGIN)
+                .replace(R.id.container, fragment, FRAGMENT_LOGIN)
                 .addToBackStack(null)
                 .commit();
     }
@@ -268,7 +268,7 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
         }
 
         fm.beginTransaction()
-                .replace(R.id.container, fragment, LoginActivity.FRAGMENT_LOGIN)
+                .replace(R.id.container, fragment, FRAGMENT_LOGIN)
                 .addToBackStack(null)
                 .commit();
     }
@@ -287,7 +287,7 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
         }
 
         fm.beginTransaction()
-                .replace(R.id.container, fragment, LoginActivity.FRAGMENT_LOGIN)
+                .replace(R.id.container, fragment, FRAGMENT_LOGIN)
                 .addToBackStack(null)
                 .commit();
     }

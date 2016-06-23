@@ -327,5 +327,16 @@
     <string name="push_purchase_ocr_failed_title">Processing failed</string>
     <string name="toast_del_identity_balance_not_zero">Fordere Guthaben ein und begleiche Schulden bevor du diesen Nutzer löschst</string>
     <string name="camera_pick_image">Bild auswählen</string>
+    <string name="rating_general">Wie zufrieden bist du mit der automatischen Erkennung?</string>
+    <string name="rating_missing">Sicherstellen, dass keine Artikel fehlen.</string>
+    <string name="rating_names">Qualität der erkannten Artikelname verbessern.</string>
+    <string name="rating_prices">Sicherstellen, dass alle Preise korrekt erkennt werden.</string>
+    <string name="rating_speed">Autmatische Erkennung beschleunigen.</string>
+    <string name="rating_no_hurry">Kein Stress</string>
+    <string name="rating_urgent">Dringend</string>
+    <string name="title_activity_ocr_rating">Feedback</string>
+    <string name="title_activity_camera">Kamera</string>
+    <string name="toast_ocr_rating_satisfaction">Bitte wähle einen Zufriedenheitswert aus</string>
+    <string name="toast_ocr_rating_details">Gib bitte eine Antwort auf alle fragen</string>
 
 </resources>

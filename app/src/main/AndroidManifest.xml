@@ -94,13 +94,13 @@
             android:parentActivityName=".presentation.purchases.list.HomeActivity"
             android:theme="@style/AppTheme.DrawStatusBar.Explode"/>
         <activity
-            android:name=".presentation.purchases.addedit.PurchaseAddActivity"
+            android:name=".presentation.purchases.addedit.add.PurchaseAddActivity"
             android:label="@string/title_activity_add_purchase"
             android:parentActivityName=".presentation.purchases.list.HomeActivity"
             android:theme="@style/AppTheme.SlideBottom"
             android:windowSoftInputMode="stateUnchanged"/>
         <activity
-            android:name=".presentation.purchases.addedit.PurchaseEditActivity"
+            android:name=".presentation.purchases.addedit.edit.PurchaseEditActivity"
             android:label="@string/title_activity_edit_purchase"
             android:parentActivityName=".presentation.purchases.details.PurchaseDetailsActivity"
             android:theme="@style/AppTheme.SlideEnd"
@@ -166,7 +166,11 @@
             android:screenOrientation="portrait"/>
         <activity
             android:name=".presentation.intro.AppIntroActivity"
-            android:theme="@style/Theme.Intro"
+            android:theme="@style/Theme.Intro"/>
+        <activity
+            android:name=".presentation.purchases.ocrrating.OcrRatingActivity"
+            android:label="@string/title_activity_ocr_rating"
+            android:parentActivityName=".presentation.purchases.list.HomeActivity"
             />
         <activity
             android:name="com.facebook.FacebookActivity"

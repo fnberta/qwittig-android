@@ -16,8 +16,9 @@ import ch.giantific.qwittig.presentation.finance.FinanceActivity;
 import ch.giantific.qwittig.presentation.helpfeedback.HelpFeedbackActivity;
 import ch.giantific.qwittig.presentation.intro.AppIntroActivity;
 import ch.giantific.qwittig.presentation.login.LoginActivity;
-import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddActivity;
-import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseEditActivity;
+import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddActivity;
+import ch.giantific.qwittig.presentation.purchases.addedit.edit.PurchaseEditActivity;
+import ch.giantific.qwittig.presentation.purchases.ocrrating.OcrRatingActivity;
 import ch.giantific.qwittig.presentation.purchases.details.PurchaseDetailsActivity;
 import ch.giantific.qwittig.presentation.purchases.list.CameraActivity;
 import ch.giantific.qwittig.presentation.purchases.list.HomeActivity;
@@ -38,6 +39,7 @@ public class Navigator {
     public static final String INTENT_PURCHASE_ID = BuildConfig.APPLICATION_ID + ".intents.INTENT_PURCHASE_ID";
     public static final String INTENT_PURCHASE_EDIT_DRAFT = BuildConfig.APPLICATION_ID + ".intents.INTENT_PURCHASE_EDIT_DRAFT";
     public static final String INTENT_TASK_ID = BuildConfig.APPLICATION_ID + ".intents.INTENT_TASK_ID";
+    public static final String INTENT_OCR_DATA_ID = BuildConfig.APPLICATION_ID + ".intents.INTENT_OCR_DATA_ID";
     public static final int INTENT_REQUEST_LOGIN = 1;
     public static final int INTENT_REQUEST_SETTINGS = 2;
     public static final int INTENT_REQUEST_PURCHASE_MODIFY = 3;
@@ -122,6 +124,12 @@ public class Navigator {
         final ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(mActivity);
         mActivity.startActivityForResult(intent, INTENT_REQUEST_PURCHASE_DETAILS,
                 options.toBundle());
+    }
+
+    public void startOcrRating(@NonNull String ocrDataId) {
+        final Intent intent = new Intent(mActivity, OcrRatingActivity.class);
+        intent.putExtra(INTENT_OCR_DATA_ID, ocrDataId);
+        mActivity.startActivity(intent);
     }
 
     public void startFinance() {

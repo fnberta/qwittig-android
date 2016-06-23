@@ -15,9 +15,9 @@ import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
-import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddOcrViewModel;
-import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddViewModelImpl;
-import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddOcrViewModelImpl;
+import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddOcrViewModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddViewModelImpl;
+import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddOcrViewModelImpl;
 import dagger.Module;
 import dagger.Provides;
 
@@ -43,7 +43,7 @@ public class PurchaseAddViewModelModule extends BaseViewModelModule {
 
     @PerActivity
     @Provides
-    PurchaseAddOcrViewModel providesAddPurchaseOcrViewModel(@NonNull Navigator navigator,
+    PurchaseAddOcrViewModel providesPurchaseAddOcrViewModel(@NonNull Navigator navigator,
                                                             @NonNull RxBus<Object> eventBus,
                                                             @NonNull UserRepository userRepository,
                                                             @NonNull PurchaseRepository purchaseRepository) {

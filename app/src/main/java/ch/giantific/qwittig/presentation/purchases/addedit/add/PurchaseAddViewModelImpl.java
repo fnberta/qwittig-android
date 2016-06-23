@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.purchases.addedit;
+package ch.giantific.qwittig.presentation.purchases.addedit.add;
 
 import android.databinding.Bindable;
 import android.os.Bundle;
@@ -36,6 +36,7 @@ import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
+import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel.ViewListener;
 import ch.giantific.qwittig.presentation.purchases.addedit.items.BasePurchaseAddEditItem;
 import ch.giantific.qwittig.presentation.purchases.addedit.items.BasePurchaseAddEditItem.Type;
@@ -66,22 +67,22 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<BasePurchase
     private static final String STATE_RECEIPT_IMAGE_PATH = "STATE_RECEIPT_IMAGE_PATH";
     private static final String STATE_FETCHING_RATES = "STATE_FETCHING_RATES";
     private static final String STATE_RECEIPT_OR_NOTE_SHOWN = "STATE_RECEIPT_OR_NOTE_SHOWN";
-    final PurchaseRepository mPurchaseRepo;
-    final Group mCurrentGroup;
-    private final Navigator mNavigator;
+    protected final PurchaseRepository mPurchaseRepo;
+    protected final Group mCurrentGroup;
+    protected final Navigator mNavigator;
     private final NumberFormat mExchangeRateFormatter;
     private final List<String> mSupportedCurrencies = Arrays.asList(MoneyUtils.SUPPORTED_CURRENCIES);
     private final DateFormat mDateFormatter;
-    String mCurrency;
-    String mReceiptImagePath;
-    String mNote;
-    Date mDate;
-    String mStore;
-    double mTotalPrice = 0;
-    double mExchangeRate;
-    NumberFormat mMoneyFormatter;
-    List<Identity> mIdentities = new ArrayList<>();
-    boolean mReceiptOrNoteShown;
+    protected String mCurrency;
+    protected String mReceiptImagePath;
+    protected String mNote;
+    protected Date mDate;
+    protected String mStore;
+    protected double mTotalPrice = 0;
+    protected double mExchangeRate;
+    protected NumberFormat mMoneyFormatter;
+    protected List<Identity> mIdentities = new ArrayList<>();
+    protected boolean mReceiptOrNoteShown;
     private double mMyShare = 0;
     private boolean mFetchingExchangeRates;
 
@@ -454,7 +455,7 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<BasePurchase
         );
     }
 
-    final void updateRows() {
+    protected final void updateRows() {
         boolean hasItems = false;
         for (int i = 0, size = mItems.size(); i < size; i++) {
             final BasePurchaseAddEditItem addEditItem = mItems.get(i);
@@ -484,7 +485,7 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<BasePurchase
         updateTotalAndMyShare();
     }
 
-    final PurchaseAddEditItemUsersUser[] getItemUsers(@NonNull List<Identity> identities) {
+    protected final PurchaseAddEditItemUsersUser[] getItemUsers(@NonNull List<Identity> identities) {
         final int size = mIdentities.size();
         final PurchaseAddEditItemUsersUser[] itemUsersRow = new PurchaseAddEditItemUsersUser[size];
         for (int i = 0; i < size; i++) {
@@ -652,7 +653,7 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<BasePurchase
                 .subscribe(new SingleSubscriber<Purchase>() {
                     @Override
                     public void onSuccess(Purchase purchase) {
-                        mNavigator.finish(asDraft ? getDraftFinishedResult() : PurchaseResult.PURCHASE_SAVED);
+                        onPurchaseSaved(asDraft);
                     }
 
                     @Override
@@ -665,12 +666,12 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<BasePurchase
         );
     }
 
-    Single<Purchase> getSavePurchaseAction(@NonNull Purchase purchase) {
+    protected Single<Purchase> getSavePurchaseAction(@NonNull Purchase purchase) {
         return mPurchaseRepo.savePurchase(purchase);
     }
 
-    int getDraftFinishedResult() {
-        return PurchaseResult.PURCHASE_DRAFT;
+    protected void onPurchaseSaved(boolean asDraft) {
+        mNavigator.finish(asDraft ? PurchaseResult.PURCHASE_DRAFT : PurchaseResult.PURCHASE_SAVED);
     }
 
     @Override
@@ -749,7 +750,7 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<BasePurchase
     }
 
     @NonNull
-    Purchase createPurchase(@NonNull List<Identity> purchaseIdentities,
+    protected Purchase createPurchase(@NonNull List<Identity> purchaseIdentities,
                             @NonNull List<Item> purchaseItems, int fractionDigits) {
         final BigDecimal totalPriceRounded =
                 new BigDecimal(mTotalPrice).setScale(fractionDigits, BigDecimal.ROUND_HALF_UP);

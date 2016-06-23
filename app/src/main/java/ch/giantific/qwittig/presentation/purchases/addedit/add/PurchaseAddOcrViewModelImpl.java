@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.purchases.addedit;
+package ch.giantific.qwittig.presentation.purchases.addedit.add;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,7 +11,6 @@ import android.support.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 
-import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Identity;
@@ -21,6 +20,7 @@ import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
+import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.items.PurchaseAddEditItem;
 import rx.Single;
 import rx.SingleSubscriber;
@@ -35,6 +35,7 @@ import rx.functions.Func1;
  */
 public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implements PurchaseAddOcrViewModel {
 
+    private static final boolean SHOW_OCR_RATING_SCREEN = true;
     private static final String STATE_OCR_VALUES_SET = "STATE_OCR_VALUES_SET";
     private String mOcrDataId;
     private OcrData mOcrData;
@@ -47,9 +48,10 @@ public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implem
                                        @NonNull PurchaseRepository purchaseRepo) {
         super(savedState, navigator, eventBus, userRepository, purchaseRepo);
 
-        mOcrValuesSet = savedState != null && savedState.getBoolean(STATE_OCR_VALUES_SET, false);
-        if (!mOcrValuesSet) {
-            mLoading = true;
+        if (savedState != null) {
+            mOcrValuesSet = savedState.getBoolean(STATE_OCR_VALUES_SET, false);
+        } else {
+            mOcrValuesSet = false;
         }
     }
 
@@ -95,7 +97,6 @@ public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implem
                             } else {
                                 setOcrData(ocrData);
                                 mOcrValuesSet = true;
-                                setLoading(false);
                             }
                         }
                     }
@@ -118,7 +119,7 @@ public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implem
         if (!stores.isEmpty()) {
             setStore(stores.get(0));
         }
-        setReceiptImage(mOcrData.getReceipt().getUrl());
+        setReceiptImage(ocrData.getReceipt().getUrl());
 
         final List<Map<String, Object>> items = (List<Map<String, Object>>) data.get("items");
         if (!items.isEmpty()) {
@@ -137,12 +138,21 @@ public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implem
 
     @NonNull
     @Override
-    Purchase createPurchase(@NonNull List<Identity> purchaseIdentities,
-                            @NonNull List<Item> purchaseItems, int fractionDigits) {
+    protected Purchase createPurchase(@NonNull List<Identity> purchaseIdentities,
+                                      @NonNull List<Item> purchaseItems, int fractionDigits) {
         final Purchase purchase = super.createPurchase(purchaseIdentities, purchaseItems, fractionDigits);
         purchase.setReceipt(mOcrData.getReceipt());
         purchase.setOcrData(mOcrData);
 
         return purchase;
+    }
+
+    @Override
+    protected void onPurchaseSaved(boolean asDraft) {
+        if (SHOW_OCR_RATING_SCREEN) {
+            mNavigator.startOcrRating(mOcrDataId);
+        }
+
+        super.onPurchaseSaved(asDraft);
     }
 }

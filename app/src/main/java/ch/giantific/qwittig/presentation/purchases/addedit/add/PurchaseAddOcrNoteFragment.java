@@ -2,11 +2,12 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.purchases.addedit;
+package ch.giantific.qwittig.presentation.purchases.addedit.add;
 
 import android.support.annotation.NonNull;
 
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditNoteFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseAddComponent;
 
 /**
@@ -14,9 +15,9 @@ import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseAddCompone
  * <p/>
  * Subclass of {@link BaseFragment}.
  */
-public class PurchaseAddNoteFragment extends BasePurchaseAddEditNoteFragment<PurchaseAddComponent> {
+public class PurchaseAddOcrNoteFragment extends BasePurchaseAddEditNoteFragment<PurchaseAddComponent, PurchaseAddOcrViewModel> {
 
-    public PurchaseAddNoteFragment() {
+    public PurchaseAddOcrNoteFragment() {
         // required empty constructor
     }
 

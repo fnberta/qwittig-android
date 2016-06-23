@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.purchases.addedit;
+package ch.giantific.qwittig.presentation.purchases.addedit.edit;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,6 +14,12 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditActivity;
+import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditNoteFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditReceiptFragment;
+import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddActivity;
+import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.DaggerPurchaseEditComponent;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseEditComponent;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseEditViewModelModule;
@@ -49,26 +55,29 @@ public class PurchaseEditActivity extends BasePurchaseAddEditActivity<PurchaseEd
                 .build();
         mComponent.inject(this);
 
-        final boolean draft = getIntent().getBooleanExtra(Navigator.INTENT_PURCHASE_EDIT_DRAFT, false);
+        final boolean draft = isDraft();
         mAddEditPurchaseViewModel = draft ? mComponent.getEditDraftViewModel() : mComponent.getEditViewModel();
         mAddEditPurchaseViewModel.attachView(this);
+    }
+
+    private boolean isDraft() {
+        return getIntent().getBooleanExtra(Navigator.INTENT_PURCHASE_EDIT_DRAFT, false);
     }
 
     @NonNull
     @Override
     protected BasePurchaseAddEditFragment getPurchaseAddEditFragment() {
-        final boolean draft = getIntent().getBooleanExtra(Navigator.INTENT_PURCHASE_EDIT_DRAFT, false);
-        return draft ? new PurchaseEditDraftFragment() : new PurchaseEditFragment();
+        return isDraft() ? new PurchaseEditDraftFragment() : new PurchaseEditFragment();
     }
 
     @Override
     protected BasePurchaseAddEditReceiptFragment getReceiptFragment() {
-        return new PurchaseEditReceiptFragment();
+        return isDraft() ? new PurchaseEditDraftReceiptFragment() : new PurchaseEditReceiptFragment();
     }
 
     @Override
     protected BasePurchaseAddEditNoteFragment getNoteFragment() {
-        return new PurchaseEditNoteFragment();
+        return isDraft() ? new PurchaseEditDraftNoteFragment() : new PurchaseEditNoteFragment();
     }
 
     @Override

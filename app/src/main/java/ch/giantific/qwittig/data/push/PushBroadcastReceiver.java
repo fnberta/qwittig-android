@@ -50,7 +50,7 @@ import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.finance.FinanceActivity;
 import ch.giantific.qwittig.presentation.purchases.list.HomeActivity;
-import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddActivity;
+import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddActivity;
 import ch.giantific.qwittig.presentation.purchases.details.PurchaseDetailsActivity;
 import ch.giantific.qwittig.presentation.tasks.details.TaskDetailsActivity;
 import ch.giantific.qwittig.presentation.tasks.list.TasksActivity;
