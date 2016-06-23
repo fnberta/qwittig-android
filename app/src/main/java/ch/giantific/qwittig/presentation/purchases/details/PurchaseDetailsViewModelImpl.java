@@ -116,17 +116,19 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<Purchase
                     @Override
                     public void onSuccess(Purchase purchase) {
                         mPurchase = purchase;
-                        if (!mReceiptShown) {
+                        if (mReceiptShown) {
+                            updateActionBarMenu();
+                            notifyPropertyChanged(BR.receiptImage);
+                        } else {
+                            updateActionBarMenu();
                             updateItemList();
                             updateReadBy();
+                            setLoading(false);
                         }
-                        updateActionBarMenu();
 
                         notifyPropertyChanged(BR.purchaseStore);
                         notifyPropertyChanged(BR.purchaseDate);
-                        notifyPropertyChanged(BR.receiptImage);
 
-                        setLoading(false);
                         mView.startEnterTransition();
                     }
 
@@ -203,7 +205,7 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<Purchase
 
     @Override
     public void onShowReceiptImageClick() {
-        mReceiptShown = true;
+        setLoading(true);
         mView.showPurchaseDetailsReceipt();
     }
 
