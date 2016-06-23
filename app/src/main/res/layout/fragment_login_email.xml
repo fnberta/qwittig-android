@@ -48,7 +48,7 @@
                 android:transitionGroup="true"
                 >
 
-                <AutoCompleteTextView
+                <EditText
                     android:id="@+id/et_login_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
