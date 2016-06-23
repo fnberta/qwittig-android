@@ -41,7 +41,7 @@ import ch.giantific.qwittig.presentation.common.fragments.DatePickerDialogFragme
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddFragment;
-import ch.giantific.qwittig.presentation.purchases.list.CameraActivity;
+import ch.giantific.qwittig.presentation.camera.CameraActivity;
 import ch.giantific.qwittig.utils.CameraUtils;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MessageAction;

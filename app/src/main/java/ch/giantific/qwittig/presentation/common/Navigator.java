@@ -20,7 +20,7 @@ import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddActivi
 import ch.giantific.qwittig.presentation.purchases.addedit.edit.PurchaseEditActivity;
 import ch.giantific.qwittig.presentation.purchases.ocrrating.OcrRatingActivity;
 import ch.giantific.qwittig.presentation.purchases.details.PurchaseDetailsActivity;
-import ch.giantific.qwittig.presentation.purchases.list.CameraActivity;
+import ch.giantific.qwittig.presentation.camera.CameraActivity;
 import ch.giantific.qwittig.presentation.purchases.list.HomeActivity;
 import ch.giantific.qwittig.presentation.settings.general.SettingsActivity;
 import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileActivity;

@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.purchases.list;
+package ch.giantific.qwittig.presentation.camera;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

@@ -2,20 +2,19 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.purchases.list;
+package ch.giantific.qwittig.presentation.camera;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.databinding.DataBindingUtil;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.view.OrientationEventListener;
 import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -24,6 +23,8 @@ import java.io.IOException;
 import java.util.List;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.databinding.ActivityCameraBinding;
+import ch.giantific.qwittig.databinding.TutorialOverlayCameraBinding;
 import ch.giantific.qwittig.utils.CameraUtils;
 import timber.log.Timber;
 
@@ -47,12 +48,9 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     public static final String INTENT_EXTRA_IMAGE_PATH = "INTENT_EXTRA_IMAGE_PATH";
     public static final int RESULT_ERROR = 2;
     private static final int INTENT_REQUEST_IMAGE = 1;
+    private static final String PREF_FIRST_CAMERA_RUN = "PREF_FIRST_CAMERA_RUN";
+    private ActivityCameraBinding mBinding;
     private File mFile;
-    private Camera mCamera;
-    private CameraPreview mPreview;
-    private FloatingActionButton mFabCapture;
-    private ImageView mTextViewDone;
-    private ImageView mImageViewRedo;
     @NonNull
     private final Camera.PictureCallback mPicture = new Camera.PictureCallback() {
         @Override
@@ -72,6 +70,8 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
             toggleDoneVisibility();
         }
     };
+    private Camera mCamera;
+    private CameraPreview mPreview;
 
     private File createImageFile() throws IOException {
         return CameraUtils.createImageFile(this);
@@ -83,21 +83,21 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void toggleDoneVisibility() {
-        if (mFabCapture.getVisibility() == View.VISIBLE) {
-            mFabCapture.setVisibility(View.GONE);
-            mImageViewRedo.setVisibility(View.VISIBLE);
-            mTextViewDone.setVisibility(View.VISIBLE);
+        if (mBinding.fabCameraCapture.getVisibility() == View.VISIBLE) {
+            mBinding.fabCameraCapture.setVisibility(View.GONE);
+            mBinding.ivCameraBottomRedo.setVisibility(View.VISIBLE);
+            mBinding.ivCameraBottomDone.setVisibility(View.VISIBLE);
         } else {
-            mFabCapture.setVisibility(View.VISIBLE);
-            mImageViewRedo.setVisibility(View.GONE);
-            mTextViewDone.setVisibility(View.GONE);
+            mBinding.fabCameraCapture.setVisibility(View.VISIBLE);
+            mBinding.ivCameraBottomRedo.setVisibility(View.GONE);
+            mBinding.ivCameraBottomDone.setVisibility(View.GONE);
         }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_camera);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_camera);
 
         try {
             loadCamera();
@@ -109,26 +109,23 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
         // Create our Preview view and set it as the content of our activity.
         mPreview = new CameraPreview(this, mCamera);
-        final FrameLayout preview = (FrameLayout) findViewById(R.id.fl_camera_preview);
-        if (preview != null) {
-            preview.addView(mPreview);
-        }
+        mBinding.flCameraPreview.addView(mPreview);
 
-        mFabCapture = (FloatingActionButton) findViewById(R.id.fab_camera_capture);
-        if (mFabCapture != null) {
-            mFabCapture.setOnClickListener(this);
-        }
-        mTextViewDone = (ImageView) findViewById(R.id.iv_camera_bottom_done);
-        if (mTextViewDone != null) {
-            mTextViewDone.setOnClickListener(this);
-        }
-        mImageViewRedo = (ImageView) findViewById(R.id.iv_camera_bottom_redo);
-        if (mImageViewRedo != null) {
-            mImageViewRedo.setOnClickListener(this);
-        }
-        final TextView pick = (TextView) findViewById(R.id.tv_camera_pick_image);
-        if (pick != null) {
-            pick.setOnClickListener(this);
+        mBinding.fabCameraCapture.setOnClickListener(this);
+        mBinding.ivCameraBottomDone.setOnClickListener(this);
+        mBinding.ivCameraBottomRedo.setOnClickListener(this);
+        mBinding.tvCameraPickImage.setOnClickListener(this);
+
+        if (isFirstRun()) {
+            final TutorialOverlayCameraBinding tutBinding =
+                    TutorialOverlayCameraBinding.inflate(getLayoutInflater(), mBinding.flCameraMain, false);
+            mBinding.flCameraMain.addView(tutBinding.svTutCamera);
+            tutBinding.fabTutCameraDone.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mBinding.flCameraMain.removeView(tutBinding.svTutCamera);
+                }
+            });
         }
     }
 
@@ -162,6 +159,16 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                 : (info.orientation + orientation) % 360;
         params.setRotation(rotation);
         return params;
+    }
+
+    private boolean isFirstRun() {
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        final boolean isFirstRun = prefs.getBoolean(PREF_FIRST_CAMERA_RUN, true);
+        if (isFirstRun) {
+            prefs.edit().putBoolean(PREF_FIRST_CAMERA_RUN, false).apply();
+        }
+
+        return isFirstRun;
     }
 
     @Override

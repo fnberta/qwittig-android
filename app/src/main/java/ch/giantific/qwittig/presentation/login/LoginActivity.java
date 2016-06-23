@@ -69,7 +69,7 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
 
     public static final String FRAGMENT_LOGIN = "FRAGMENT_LOGIN";
     private static final String GOOGLE_SERVER_ID = "1027430235430-ut0u3v7uh443akc3q6s3rhhvu3pfrsgi.apps.googleusercontent.com";
-    private static final String PREF_IS_FIRST_RUN = "PREF_IS_FIRST_RUN";
+    private static final String PREF_FIRST_RUN = "PREF_FIRST_RUN";
     private static final int RC_SIGN_IN = 9001;
     LoginAccountsViewModel mAccountsViewModel;
     LoginEmailViewModel mEmailViewModel;
@@ -115,10 +115,10 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
 
     private void checkFirstRun() {
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        final boolean isFirstRun = prefs.getBoolean(PREF_IS_FIRST_RUN, true);
+        final boolean isFirstRun = prefs.getBoolean(PREF_FIRST_RUN, true);
         if (isFirstRun) {
             mNavigator.startFirstRun();
-            prefs.edit().putBoolean(PREF_IS_FIRST_RUN, false).apply();
+            prefs.edit().putBoolean(PREF_FIRST_RUN, false).apply();
         }
     }
 
