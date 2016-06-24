@@ -16,6 +16,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -169,8 +170,10 @@ public class BindingUtils {
             }
         }
 
-        view.setPadding(0, 0, 0, 0);
         final String avatar = selectedUser.getAvatar();
+        if (!TextUtils.isEmpty(avatar)) {
+            view.setPadding(0, 0, 0, 0);
+        }
         glideLoadAvatar(view, avatar, fallback, true);
     }
 
