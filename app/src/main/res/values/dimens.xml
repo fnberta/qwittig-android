@@ -70,6 +70,6 @@
     <!-- add/edit -->
     <dimen name="my_share_neg_margin">-8dp</dimen>
     <dimen name="camera_bottom_height">88dp</dimen>
-    <dimen name="camera_tut_done_bottom_margin">104dp</dimen>
+    <dimen name="tut_camera_receipt_height">300dp</dimen>
 
 </resources>
