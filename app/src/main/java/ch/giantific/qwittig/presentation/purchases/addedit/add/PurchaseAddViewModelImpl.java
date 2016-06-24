@@ -522,6 +522,16 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<BasePurchase
 
     @Override
     public void onItemRowUserClick(int position) {
+        for (int i = 0, mItemsSize = mItems.size(); i < mItemsSize; i++) {
+            final BasePurchaseAddEditItem item = mItems.get(i);
+            if (item.getType() != Type.USERS) {
+                continue;
+            }
+
+            final PurchaseAddEditItem addEditItem = (PurchaseAddEditItem) getItemAtPosition(i - 1);
+            addEditItem.notifyPropertyChanged(BR.users);
+        }
+
         updateTotalAndMyShare();
     }
 

@@ -33,8 +33,9 @@ import ch.berta.fabio.fabprogress.FabProgress;
 import ch.berta.fabio.fabspeeddial.FabMenu;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.common.viewmodels.LoadingViewModel;
-import ch.giantific.qwittig.presentation.purchases.details.widgets.CircleDisplay;
 import ch.giantific.qwittig.presentation.navdrawer.BlurTransformation;
+import ch.giantific.qwittig.presentation.purchases.addedit.items.PurchaseAddEditItemUsersUser;
+import ch.giantific.qwittig.presentation.purchases.details.widgets.CircleDisplay;
 import ch.giantific.qwittig.presentation.settings.profile.AvatarLoadListener;
 import ch.giantific.qwittig.presentation.stats.widgets.BarChart;
 import ch.giantific.qwittig.presentation.stats.widgets.PieChart;
@@ -147,6 +148,30 @@ public class BindingUtils {
                     }
                 })
                 .into(view);
+    }
+
+    @BindingAdapter({"itemUsers"})
+    public static void loadItemUsers(ImageView view, PurchaseAddEditItemUsersUser[] users) {
+        final Context context = view.getContext();
+        final Drawable fallback = ContextCompat.getDrawable(view.getContext(), R.drawable.ic_group_black_24dp);
+        int selected = 0;
+        PurchaseAddEditItemUsersUser selectedUser = users[0];
+        for (PurchaseAddEditItemUsersUser user : users) {
+            if (user.isSelected()) {
+                selectedUser = user;
+                selected++;
+                if (selected > 1) {
+                    final int padding = context.getResources().getDimensionPixelSize(R.dimen.small_space);
+                    view.setPadding(0, padding, padding, padding);
+                    view.setImageDrawable(fallback);
+                    return;
+                }
+            }
+        }
+
+        view.setPadding(0, 0, 0, 0);
+        final String avatar = selectedUser.getAvatar();
+        glideLoadAvatar(view, avatar, fallback, true);
     }
 
     @BindingAdapter({"percentage"})

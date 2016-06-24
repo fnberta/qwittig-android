@@ -6,6 +6,7 @@
 
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     >
 
     <data>
@@ -24,19 +25,18 @@
         android:layout_marginBottom="@dimen/small_space"
         android:orientation="horizontal"
         android:weightSum="10"
+        android:gravity="center_vertical"
         >
 
         <ImageView
             android:id="@+id/iv_purchase_add_toggle_users"
-            android:layout_width="@dimen/touch_target_min"
-            android:layout_height="@dimen/touch_target_min"
-            android:layout_gravity="center_vertical"
-            android:layout_marginEnd="20dp"
-            android:layout_marginStart="@dimen/min_space"
+            android:layout_width="@dimen/avatar_size"
+            android:layout_height="@dimen/avatar_size"
+            android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_avatar_size"
+            android:layout_marginStart="@dimen/key_line_1"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/header_users"
-            android:padding="@dimen/icon_padding"
-            android:src="@drawable/ic_group_black_24dp"
+            app:itemUsers="@{itemRow.users}"
             />
 
         <LinearLayout

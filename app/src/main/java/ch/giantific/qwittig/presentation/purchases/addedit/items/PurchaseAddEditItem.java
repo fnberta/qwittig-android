@@ -109,6 +109,7 @@ public class PurchaseAddEditItem extends BaseObservable implements BasePurchaseA
         }
     }
 
+    @Bindable
     public PurchaseAddEditItemUsersUser[] getUsers() {
         return mUsers;
     }

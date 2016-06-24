@@ -36,8 +36,8 @@ public class PurchaseAddEditItemUsersUser extends BaseObservable implements Parc
     private String mAvatar;
     private boolean mSelected;
 
-    public PurchaseAddEditItemUsersUser(@NonNull String objectId, @NonNull String nickname, @Nullable String avatar,
-                                        boolean selected) {
+    public PurchaseAddEditItemUsersUser(@NonNull String objectId, @NonNull String nickname,
+                                        @Nullable String avatar, boolean selected) {
         mObjectId = objectId;
         mNickname = nickname;
         mAvatar = avatar;
