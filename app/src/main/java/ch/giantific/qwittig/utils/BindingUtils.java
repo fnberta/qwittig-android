@@ -16,7 +16,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -170,11 +169,25 @@ public class BindingUtils {
             }
         }
 
-        final String avatar = selectedUser.getAvatar();
-        if (!TextUtils.isEmpty(avatar)) {
-            view.setPadding(0, 0, 0, 0);
-        }
-        glideLoadAvatar(view, avatar, fallback, true);
+        Glide.with(context)
+                .load(selectedUser.getAvatar())
+                .asBitmap()
+                .error(fallback)
+                .into(new BitmapImageViewTarget(view) {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                        view.setPadding(0, 0, 0, 0);
+                        view.setImageDrawable(AvatarUtils.getRoundedDrawable(context, resource, true));
+                    }
+
+                    @Override
+                    public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                        super.onLoadFailed(e, errorDrawable);
+
+                        final int padding = context.getResources().getDimensionPixelSize(R.dimen.small_space);
+                        view.setPadding(0, padding, padding, padding);
+                    }
+                });
     }
 
     @BindingAdapter({"percentage"})
