@@ -24,14 +24,14 @@ import ch.giantific.qwittig.databinding.RowPurchaseDetailsTotalBinding;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.purchases.details.items.PurchaseDetailsBaseItem;
-import ch.giantific.qwittig.presentation.purchases.details.items.PurchaseDetailsBaseItem.Type;
-import ch.giantific.qwittig.presentation.purchases.details.items.PurchaseDetailsHeaderItem;
-import ch.giantific.qwittig.presentation.purchases.details.items.PurchaseDetailsIdentitiesItem;
-import ch.giantific.qwittig.presentation.purchases.details.items.PurchaseDetailsItem;
-import ch.giantific.qwittig.presentation.purchases.details.items.PurchaseDetailsMyShareItem;
-import ch.giantific.qwittig.presentation.purchases.details.items.PurchaseDetailsNoteItem;
-import ch.giantific.qwittig.presentation.purchases.details.items.PurchaseDetailsTotalItem;
+import ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDetailsItemModel;
+import ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDetailsItemModel.Type;
+import ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDetailsHeaderItem;
+import ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDetailsIdentitiesItem;
+import ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDetailsItem;
+import ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDetailsMyShareItem;
+import ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDetailsNoteItem;
+import ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDetailsTotalItem;
 
 /**
  * Handles the display of the detail view of a purchase including the different headers,
@@ -91,7 +91,7 @@ public class PurchaseDetailsRecyclerAdapter extends BaseRecyclerAdapter<Recycler
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        final PurchaseDetailsBaseItem detailsItem = mViewModel.getItemAtPosition(position);
+        final PurchaseDetailsItemModel detailsItem = mViewModel.getItemAtPosition(position);
 
         @Type final int viewType = getItemViewType(position);
         switch (viewType) {
@@ -99,7 +99,7 @@ public class PurchaseDetailsRecyclerAdapter extends BaseRecyclerAdapter<Recycler
                 final BindingRow<RowGenericHeaderBinding> row = (BindingRow<RowGenericHeaderBinding>) holder;
                 final RowGenericHeaderBinding binding = row.getBinding();
 
-                binding.setViewModel((PurchaseDetailsHeaderItem) detailsItem);
+                binding.setItemModel((PurchaseDetailsHeaderItem) detailsItem);
                 binding.executePendingBindings();
                 break;
             }

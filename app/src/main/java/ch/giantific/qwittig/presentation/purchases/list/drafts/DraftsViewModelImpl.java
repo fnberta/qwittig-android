@@ -138,24 +138,25 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, DraftsV
     }
 
     @Override
-    public void onDraftRowClick(int position) {
+    public void onDraftRowClick(@NonNull Purchase draft) {
         if (!mSelectionModeEnabled) {
-            final Purchase draft = getItemAtPosition(position);
             mNavigator.startPurchaseEdit(draft);
         } else {
-            toggleSelection(position);
+            toggleSelection(mItems.indexOf(draft));
             mView.setSelectionModeTitle(R.string.cab_title_selected, mDraftsSelected.size());
         }
     }
 
     @Override
-    public void onDraftRowLongClick(int position) {
+    public boolean onDraftRowLongClick(@NonNull Purchase draft) {
         if (!mSelectionModeEnabled) {
-            toggleSelection(position);
+            toggleSelection(mItems.indexOf(draft));
             mView.startSelectionMode();
             mView.setSelectionModeTitle(R.string.cab_title_selected, mDraftsSelected.size());
             mSelectionModeEnabled = true;
         }
+
+        return true;
     }
 
     @Override

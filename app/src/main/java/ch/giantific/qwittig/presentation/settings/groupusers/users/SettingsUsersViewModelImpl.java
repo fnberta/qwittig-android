@@ -25,7 +25,7 @@ import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
-import ch.giantific.qwittig.presentation.settings.groupusers.users.models.SettingsUsersUserRowViewModel;
+import ch.giantific.qwittig.presentation.settings.groupusers.users.itemmodels.SettingsUsersUserRowItemModel;
 import rx.Single;
 import rx.SingleSubscriber;
 import rx.functions.Func1;
@@ -33,7 +33,7 @@ import rx.functions.Func1;
 /**
  * Provides an implementation of the {@link SettingsUsersViewModel}.
  */
-public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUsersUserRowViewModel, SettingsUsersViewModel.ViewListener>
+public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUsersUserRowItemModel, SettingsUsersViewModel.ViewListener>
         implements SettingsUsersViewModel {
 
     private static final String STATE_NICKNAME = "STATE_NICKNAME";
@@ -123,17 +123,17 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
                         return !Objects.equals(identity.getObjectId(), currentId);
                     }
                 })
-                .map(new Func1<Identity, SettingsUsersUserRowViewModel>() {
+                .map(new Func1<Identity, SettingsUsersUserRowItemModel>() {
                     @Override
-                    public SettingsUsersUserRowViewModel call(Identity identity) {
-                        return new SettingsUsersUserRowViewModel(identity);
+                    public SettingsUsersUserRowItemModel call(Identity identity) {
+                        return new SettingsUsersUserRowItemModel(identity);
                     }
                 })
                 .toSortedList()
                 .toSingle()
-                .subscribe(new SingleSubscriber<List<SettingsUsersUserRowViewModel>>() {
+                .subscribe(new SingleSubscriber<List<SettingsUsersUserRowItemModel>>() {
                     @Override
-                    public void onSuccess(List<SettingsUsersUserRowViewModel> items) {
+                    public void onSuccess(List<SettingsUsersUserRowItemModel> items) {
                         mItems.clear();
                         if (!items.isEmpty()) {
                             mItems.addAll(items);
@@ -152,19 +152,19 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
 
     @Override
     public void onInviteClick(int position) {
-        final SettingsUsersUserRowViewModel userItem = getItemAtPosition(position);
+        final SettingsUsersUserRowItemModel userItem = getItemAtPosition(position);
         mView.loadLinkShareOptions(userItem.getIdentity().getInvitationLink());
     }
 
     @Override
     public void onEditNicknameClick(int position) {
-        final SettingsUsersUserRowViewModel userItem = getItemAtPosition(position);
+        final SettingsUsersUserRowItemModel userItem = getItemAtPosition(position);
         mView.showChangeNicknameDialog(userItem.getNickname(), position);
     }
 
     @Override
     public void onValidNicknameEntered(@NonNull String nickname, int position) {
-        final SettingsUsersUserRowViewModel userItem = getItemAtPosition(position);
+        final SettingsUsersUserRowItemModel userItem = getItemAtPosition(position);
         final Identity identity = userItem.getIdentity();
         identity.setNickname(nickname);
         identity.saveEventually();
@@ -179,7 +179,7 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
 
     @Override
     public void onNewAvatarTaken(@NonNull String avatarPath) {
-        final SettingsUsersUserRowViewModel userItem = getItemAtPosition(mAvatarIdentityPos);
+        final SettingsUsersUserRowItemModel userItem = getItemAtPosition(mAvatarIdentityPos);
         final Identity identity = userItem.getIdentity();
         getSubscriptions().add(mUserRepo.saveIdentityWithAvatar(identity, null, avatarPath)
                 .subscribe(new SingleSubscriber<Identity>() {
@@ -198,7 +198,7 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
 
     @Override
     public void onRemoveClick(final int position) {
-        final SettingsUsersUserRowViewModel userItem = getItemAtPosition(position);
+        final SettingsUsersUserRowItemModel userItem = getItemAtPosition(position);
         final Identity identity = userItem.getIdentity();
         if (!Objects.equals(identity.getBalance(), BigFraction.ZERO)) {
             mView.showMessage(R.string.toast_del_identity_balance_not_zero);
@@ -253,7 +253,7 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
                         mView.removeWorker(workerTag);
                         mView.hideProgressDialog();
 
-                        mItems.add(new SettingsUsersUserRowViewModel(identity));
+                        mItems.add(new SettingsUsersUserRowItemModel(identity));
                         notifyPropertyChanged(BR.groupEmpty);
                         mListInteraction.notifyItemInserted(getLastPosition());
 

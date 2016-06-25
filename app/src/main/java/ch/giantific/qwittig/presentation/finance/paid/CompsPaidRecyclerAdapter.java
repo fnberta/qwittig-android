@@ -12,10 +12,10 @@ import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.RowCompPaidBinding;
 import ch.giantific.qwittig.domain.models.Compensation;
-import ch.giantific.qwittig.presentation.common.ListInteraction;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
 import ch.giantific.qwittig.presentation.common.adapters.rows.ProgressRow;
+import ch.giantific.qwittig.presentation.finance.paid.itemmodels.CompPaidItemModel;
 
 
 /**
@@ -68,12 +68,12 @@ public class CompsPaidRecyclerAdapter extends BaseRecyclerAdapter {
                 final RowCompPaidBinding binding = row.getBinding();
                 final Compensation compensation = mViewModel.getItemAtPosition(position);
 
-                CompPaidRowViewModel viewModel = binding.getViewModel();
-                if (viewModel == null) {
-                    viewModel = new CompPaidRowViewModel(compensation, mViewModel.getCurrentIdentity());
-                    binding.setViewModel(viewModel);
+                CompPaidItemModel itemModel = binding.getItemModel();
+                if (itemModel == null) {
+                    itemModel = new CompPaidItemModel(compensation, mViewModel.getCurrentIdentity());
+                    binding.setItemModel(itemModel);
                 } else {
-                    viewModel.updateCompInfo(compensation);
+                    itemModel.updateCompensation(compensation);
                 }
 
                 binding.executePendingBindings();

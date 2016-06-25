@@ -25,10 +25,10 @@ import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModelBaseImpl;
-import ch.giantific.qwittig.presentation.tasks.list.items.TaskItem;
-import ch.giantific.qwittig.presentation.tasks.list.items.TasksBaseItem;
-import ch.giantific.qwittig.presentation.tasks.list.items.TasksBaseItem.Type;
-import ch.giantific.qwittig.presentation.tasks.list.items.TasksHeaderItem;
+import ch.giantific.qwittig.presentation.tasks.list.itemmodels.TasksItem;
+import ch.giantific.qwittig.presentation.tasks.list.itemmodels.TasksItemModel;
+import ch.giantific.qwittig.presentation.tasks.list.itemmodels.TasksItemModel.Type;
+import ch.giantific.qwittig.presentation.tasks.list.itemmodels.TasksHeaderItem;
 import ch.giantific.qwittig.presentation.tasks.list.models.TaskDeadline;
 import ch.giantific.qwittig.utils.MessageAction;
 import rx.Completable;
@@ -41,7 +41,7 @@ import rx.functions.Func1;
 /**
  * Provides an implementation of the {@link TasksViewModel} interface.
  */
-public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<TasksBaseItem, TasksViewModel.ViewListener>
+public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<TasksItemModel, TasksViewModel.ViewListener>
         implements TasksViewModel {
 
     private static final String STATE_LOADING_TASKS = "STATE_LOADING_TASKS";
@@ -71,11 +71,6 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<TasksBaseIte
         }
     }
 
-    @VisibleForTesting
-    public void setLoadingTasks(@NonNull ArrayList<String> loadingTasks) {
-        mLoadingTasks = loadingTasks;
-    }
-
     @Override
     public void saveState(@NonNull Bundle outState) {
         super.saveState(outState);
@@ -101,8 +96,8 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<TasksBaseIte
                     }
                 })
                 .subscribe(new Subscriber<Task>() {
-                    List<TasksBaseItem> tasksUser;
-                    List<TasksBaseItem> tasksGroup;
+                    List<TasksItemModel> tasksUser;
+                    List<TasksItemModel> tasksGroup;
 
                     @Override
                     public void onStart() {
@@ -136,9 +131,9 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<TasksBaseIte
                     public void onNext(Task task) {
                         final Identity identityResponsible = task.getIdentityResponsible();
                         if (Objects.equals(mCurrentIdentity.getObjectId(), identityResponsible.getObjectId())) {
-                            tasksUser.add(new TaskItem(task, mCurrentIdentity));
+                            tasksUser.add(new TasksItem(task, mCurrentIdentity));
                         } else {
-                            tasksGroup.add(new TaskItem(task, mCurrentIdentity));
+                            tasksGroup.add(new TasksItem(task, mCurrentIdentity));
                         }
 
                         task.setLoading(mLoadingTasks.contains(task.getObjectId()));
@@ -198,21 +193,20 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<TasksBaseIte
     }
 
     @Override
-    public void onTaskRowClicked(int position) {
-        final Task task = ((TaskItem) mItems.get(position)).getTask();
-        mNavigator.startTaskDetails(task);
+    public void onTaskRowClick(@NonNull TasksItem itemModel) {
+        mNavigator.startTaskDetails(itemModel.getTask());
     }
 
     @Override
-    public void onDoneButtonClicked(int position) {
-        final TaskItem taskItem = (TaskItem) mItems.get(position);
-        final Task task = taskItem.getTask();
+    public void onDoneButtonClick(@NonNull TasksItem itemModel) {
+        final Task task = itemModel.getTask();
         final String timeFrame = task.getTimeFrame();
 
         if (Objects.equals(timeFrame, Task.TimeFrame.ONE_TIME)) {
             task.deleteEventually();
-            mItems.remove(taskItem);
-            mListInteraction.notifyItemRemoved(position);
+            final int pos = mItems.indexOf(itemModel);
+            mItems.remove(itemModel);
+            mListInteraction.notifyItemRemoved(pos);
             return;
         }
 
@@ -228,25 +222,26 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<TasksBaseIte
                 identityResponsibleNew != null && identityResponsibleNew.getObjectId().equals(currentIdentityId)) {
             loadData();
         } else {
-            mListInteraction.notifyItemChanged(position);
+            final int pos = mItems.indexOf(itemModel);
+            mListInteraction.notifyItemChanged(pos);
         }
     }
 
     @Override
-    public void onRemindButtonClicked(int position) {
+    public void onRemindButtonClick(@NonNull TasksItem itemModel) {
         if (!mView.isNetworkAvailable()) {
             mView.showMessage(R.string.toast_no_connection);
             return;
         }
 
-        final TaskItem taskItem = (TaskItem) mItems.get(position);
-        final Task task = taskItem.getTask();
+        final Task task = itemModel.getTask();
         final String taskId = task.getObjectId();
         if (mLoadingTasks.contains(taskId)) {
             return;
         }
 
-        setTaskLoading(task, taskId, position, true);
+        final int pos = mItems.indexOf(itemModel);
+        setTaskLoading(task, taskId, pos, true);
         mView.loadRemindUserWorker(taskId);
     }
 
@@ -291,13 +286,13 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<TasksBaseIte
     @Nullable
     private Task stopTaskLoading(@NonNull String taskId) {
         for (int i = 0, tasksSize = mItems.size(); i < tasksSize; i++) {
-            final TasksBaseItem taskListItem = mItems.get(i);
+            final TasksItemModel taskListItem = mItems.get(i);
             if (taskListItem.getType() != Type.TASK) {
                 continue;
             }
 
-            final TaskItem taskItem = (TaskItem) taskListItem;
-            final Task task = taskItem.getTask();
+            final TasksItem tasksItem = (TasksItem) taskListItem;
+            final Task task = tasksItem.getTask();
             if (Objects.equals(taskId, task.getObjectId())) {
                 setTaskLoading(task, taskId, i, false);
                 return task;

@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.List;
@@ -21,10 +20,10 @@ import ch.giantific.qwittig.databinding.RowTasksBinding;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.tasks.list.items.TaskItem;
-import ch.giantific.qwittig.presentation.tasks.list.items.TasksBaseItem;
-import ch.giantific.qwittig.presentation.tasks.list.items.TasksBaseItem.Type;
-import ch.giantific.qwittig.presentation.tasks.list.items.TasksHeaderItem;
+import ch.giantific.qwittig.presentation.tasks.list.itemmodels.TasksHeaderItem;
+import ch.giantific.qwittig.presentation.tasks.list.itemmodels.TasksItem;
+import ch.giantific.qwittig.presentation.tasks.list.itemmodels.TasksItemModel;
+import ch.giantific.qwittig.presentation.tasks.list.itemmodels.TasksItemModel.Type;
 
 /**
  * Handles the display of recent tasks assigned to users in a group.
@@ -53,7 +52,7 @@ public class TasksRecyclerAdapter extends BaseRecyclerAdapter {
         switch (viewType) {
             case Type.TASK: {
                 final RowTasksBinding binding = RowTasksBinding.inflate(inflater, parent, false);
-                return new TaskRow(parent.getContext(), binding, mViewModel);
+                return new TaskRow(parent.getContext(), binding);
             }
             case Type.HEADER: {
                 final RowGenericHeaderBinding binding = RowGenericHeaderBinding.inflate(inflater, parent, false);
@@ -67,16 +66,17 @@ public class TasksRecyclerAdapter extends BaseRecyclerAdapter {
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, @Type int position) {
-        final TasksBaseItem tasksBaseItem = mViewModel.getItemAtPosition(position);
+        final TasksItemModel tasksItemModel = mViewModel.getItemAtPosition(position);
         final int viewType = getItemViewType(position);
         switch (viewType) {
             case Type.TASK: {
                 final TaskRow taskRow = (TaskRow) viewHolder;
                 final RowTasksBinding binding = taskRow.getBinding();
 
-                final TaskItem taskItem = (TaskItem) tasksBaseItem;
-                taskItem.setView(taskRow);
-                binding.setItem(taskItem);
+                final TasksItem tasksItem = (TasksItem) tasksItemModel;
+                tasksItem.setView(taskRow);
+                binding.setItemModel(tasksItem);
+                binding.setViewModel(mViewModel);
                 binding.executePendingBindings();
 
                 break;
@@ -86,7 +86,7 @@ public class TasksRecyclerAdapter extends BaseRecyclerAdapter {
                         (BindingRow<RowGenericHeaderBinding>) viewHolder;
                 final RowGenericHeaderBinding binding = headerRow.getBinding();
 
-                binding.setViewModel((TasksHeaderItem) tasksBaseItem);
+                binding.setItemModel((TasksHeaderItem) tasksItemModel);
                 binding.executePendingBindings();
 
                 break;
@@ -105,38 +105,12 @@ public class TasksRecyclerAdapter extends BaseRecyclerAdapter {
     }
 
     /**
-     * Defines the actions to take when a user clicks on a task.
-     */
-    public interface AdapterInteractionListener {
-        /**
-         * Handles the click on the task row itself.
-         *
-         * @param position the adapter position of the task
-         */
-        void onTaskRowClicked(int position);
-
-        /**
-         * Handles the click on the mark task as done button.
-         *
-         * @param position the adapter position of the task
-         */
-        void onDoneButtonClicked(int position);
-
-        /**
-         * Handles the click on the remind user to finish a task button.
-         *
-         * @param position the adapter position of the task
-         */
-        void onRemindButtonClicked(int position);
-    }
-
-    /**
      * Provides a {@link RecyclerView} row that displays a task with all its information.
      * <p/>
      * Subclass of {@link RecyclerView.ViewHolder}.
      */
     private static class TaskRow extends BindingRow<RowTasksBinding>
-            implements TaskItem.ViewListener {
+            implements TasksItem.ViewListener {
 
         private final Context mContext;
 
@@ -145,29 +119,10 @@ public class TasksRecyclerAdapter extends BaseRecyclerAdapter {
          *
          * @param binding the binding for the view
          */
-        public TaskRow(@NonNull Context context, @NonNull RowTasksBinding binding,
-                       @NonNull final TasksViewModel viewModel) {
+        public TaskRow(@NonNull Context context, @NonNull RowTasksBinding binding) {
             super(binding);
 
             mContext = context;
-            binding.getRoot().setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    viewModel.onTaskRowClicked(getAdapterPosition());
-                }
-            });
-            binding.btTaskDone.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    viewModel.onDoneButtonClicked(getAdapterPosition());
-                }
-            });
-            binding.btTaskRemind.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    viewModel.onRemindButtonClicked(getAdapterPosition());
-                }
-            });
         }
 
         @Override

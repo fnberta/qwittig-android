@@ -14,15 +14,21 @@
         <import type="android.R"/>
 
         <variable
+            name="itemModel"
+            type="ch.giantific.qwittig.presentation.purchases.list.purchases.itemmodels.PurchasesItemModel"
+            />
+
+        <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.purchases.list.purchases.PurchaseRowViewModel"
+            type="ch.giantific.qwittig.presentation.purchases.list.purchases.PurchasesViewModel"
             />
     </data>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/list_avatar_with_two_line_text"
-        app:purchaseBackground="@{viewModel.purchaseRead}"
+        android:onClick="@{() -> viewModel.onPurchaseRowItemClick(itemModel.purchase)}"
+        app:purchaseBackground="@{itemModel.purchaseRead}"
         >
 
         <ImageView
@@ -34,7 +40,7 @@
             android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_avatar_size"
             android:layout_marginStart="@dimen/key_line_1"
             android:contentDescription="@string/user_avatar"
-            app:avatar="@{viewModel.purchaseBuyerAvatar}"
+            app:avatar="@{itemModel.purchaseBuyerAvatar}"
             app:fallback="@{@drawable/ic_account_circle_black_40dp}"
             tools:src="@drawable/ic_account_circle_black_40dp"
             />
@@ -56,7 +62,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top"
-                android:text="@{viewModel.purchaseStore}"
+                android:text="@{itemModel.purchaseStore}"
                 tools:text="Denner"
                 />
 
@@ -65,7 +71,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:text="@{viewModel.purchaseBuyerAndDate}"
+                android:text="@{itemModel.purchaseBuyerAndDate}"
                 android:textColor="?android:textColorSecondary"
                 tools:text="Vera, 24.02.2015"
                 />
@@ -87,7 +93,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end|top"
-                android:text="@{viewModel.purchaseTotalPrice}"
+                android:text="@{itemModel.purchaseTotalPrice}"
                 tools:text="56.20"/>
 
             <TextView
@@ -95,7 +101,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end|bottom"
-                android:text="@{viewModel.purchaseMyShare}"
+                android:text="@{itemModel.purchaseMyShare}"
                 android:textColor="?android:textColorSecondary"
                 tools:text="2.30"/>
         </LinearLayout>

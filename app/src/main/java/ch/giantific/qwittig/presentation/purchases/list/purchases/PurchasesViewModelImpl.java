@@ -141,8 +141,7 @@ public class PurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purchase
     }
 
     @Override
-    public void onPurchaseRowItemClick(int position) {
-        final Purchase purchase = getItemAtPosition(position);
+    public void onPurchaseRowItemClick(@NonNull Purchase purchase) {
         mNavigator.startPurchaseDetails(purchase);
     }
 

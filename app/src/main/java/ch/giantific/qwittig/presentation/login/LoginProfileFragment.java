@@ -54,6 +54,7 @@ public class LoginProfileFragment extends BaseFragment<LoginComponent, LoginProf
 
         final boolean withInvitation = getArguments().getBoolean(KEY_WITH_INVITATION, false);
         mViewModel.setWithInvitation(withInvitation);
+        mViewModel.attachView(this);
         mBinding.setViewModel(mViewModel);
     }
 

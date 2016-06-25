@@ -12,16 +12,23 @@
     <data>
 
         <variable
+            name="itemModel"
+            type="ch.giantific.qwittig.presentation.purchases.list.drafts.itemmodels.DraftsItemModel"
+            />
+
+        <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.purchases.list.drafts.DraftsRowViewModel"
+            type="ch.giantific.qwittig.presentation.purchases.list.drafts.DraftsViewModel"
             />
     </data>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/list_avatar_with_text"
+        android:activated="@{itemModel.draftSelected}"
         android:background="@drawable/selectable_item_background"
-        android:activated="@{viewModel.draftSelected}"
+        android:onClick="@{() -> viewModel.onDraftRowClick(itemModel.draft)}"
+        android:onLongClick="@{() -> viewModel.onDraftRowLongClick(itemModel.draft)}"
         >
 
         <TextView
@@ -38,8 +45,8 @@
             android:lines="2"
             android:paddingEnd="@dimen/min_space"
             android:paddingStart="@dimen/min_space"
+            android:text="@{itemModel.draftDate}"
             android:textAllCaps="true"
-            android:text="@{viewModel.draftDate}"
             tools:text="FEB\n24"/>
 
         <TextView
@@ -50,7 +57,7 @@
             android:layout_toEndOf="@id/tv_date"
             android:layout_toStartOf="@+id/tv_total_value"
             android:gravity="center_vertical"
-            android:text="@{viewModel.draftStore}"
+            android:text="@{itemModel.draftStore}"
             tools:text="Denner"/>
 
         <TextView
@@ -62,7 +69,7 @@
             android:layout_marginEnd="@dimen/key_line_1"
             android:layout_marginStart="@dimen/normal_space"
             android:gravity="center"
-            android:text="@{viewModel.draftTotalPrice}"
+            android:text="@{itemModel.draftTotalPrice}"
             tools:text="-50"/>
 
     </RelativeLayout>

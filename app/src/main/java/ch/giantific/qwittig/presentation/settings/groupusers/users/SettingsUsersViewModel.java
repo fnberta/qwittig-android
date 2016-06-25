@@ -10,12 +10,12 @@ import android.support.annotation.StringRes;
 import android.view.View;
 
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
-import ch.giantific.qwittig.presentation.settings.groupusers.users.models.SettingsUsersUserRowViewModel;
+import ch.giantific.qwittig.presentation.settings.groupusers.users.itemmodels.SettingsUsersUserRowItemModel;
 
 /**
  * Defines an observable view model for the manage users settings screen.
  */
-public interface SettingsUsersViewModel extends ListViewModel<SettingsUsersUserRowViewModel, SettingsUsersViewModel.ViewListener>, AddUserWorkerListener,
+public interface SettingsUsersViewModel extends ListViewModel<SettingsUsersUserRowItemModel, SettingsUsersViewModel.ViewListener>, AddUserWorkerListener,
         SettingsUsersRecyclerAdapter.AdapterInteractionListener, NicknamePromptDialogFragment.DialogInteractionListener {
 
     @Bindable

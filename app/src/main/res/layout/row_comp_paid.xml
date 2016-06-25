@@ -13,14 +13,15 @@
     <data>
 
         <variable
-            name="viewModel"
-            type="ch.giantific.qwittig.presentation.finance.paid.CompPaidRowViewModel"
+            name="itemModel"
+            type="ch.giantific.qwittig.presentation.finance.paid.itemmodels.CompPaidItemModel"
             />
     </data>
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/list_avatar_with_two_line_text">
+        android:layout_height="@dimen/list_avatar_with_two_line_text"
+        >
 
         <ImageView
             android:id="@+id/iv_avatar"
@@ -31,7 +32,7 @@
             android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_avatar_size"
             android:layout_marginStart="@dimen/key_line_1"
             android:contentDescription="@string/user_avatar"
-            app:avatar="@{viewModel.compUserAvatar}"
+            app:avatar="@{itemModel.compUserAvatar}"
             app:fallback="@{@drawable/ic_account_circle_black_40dp}"
             tools:src="@drawable/ic_account_circle_black_40dp"
             />
@@ -53,7 +54,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top"
-                android:text="@{viewModel.compUsername}"
+                android:text="@{itemModel.compUsername}"
                 tools:text="Vera"/>
 
             <TextView
@@ -62,7 +63,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:text="@{viewModel.compDate}"
+                android:text="@{itemModel.compDate}"
                 tools:text="23.02.2015"/>
 
         </LinearLayout>
@@ -77,10 +78,11 @@
             android:layout_marginEnd="@dimen/key_line_1"
             android:layout_marginStart="@dimen/normal_space"
             android:gravity="center"
-            android:text="@{viewModel.compAmount}"
-            android:textColor="@{viewModel.compAmountPos ? @color/green_500 : @color/red_500}"
+            android:text="@{itemModel.compAmount}"
+            android:textColor="@{itemModel.compAmountPos ? @color/green_500 : @color/red_500}"
             tools:text="-50"
-            tools:textColor="@color/green_500"/>
+            tools:textColor="@color/green_500"
+            />
 
     </RelativeLayout>
 

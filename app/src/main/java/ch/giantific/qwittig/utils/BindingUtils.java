@@ -35,7 +35,7 @@ import ch.berta.fabio.fabspeeddial.FabMenu;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.common.viewmodels.LoadingViewModel;
 import ch.giantific.qwittig.presentation.navdrawer.BlurTransformation;
-import ch.giantific.qwittig.presentation.purchases.addedit.items.PurchaseAddEditItemUsersUser;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemUsersUser;
 import ch.giantific.qwittig.presentation.purchases.details.widgets.CircleDisplay;
 import ch.giantific.qwittig.presentation.settings.profile.AvatarLoadListener;
 import ch.giantific.qwittig.presentation.stats.widgets.BarChart;

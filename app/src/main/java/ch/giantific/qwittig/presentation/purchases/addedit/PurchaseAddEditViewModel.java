@@ -17,20 +17,20 @@ import java.util.List;
 
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
-import ch.giantific.qwittig.presentation.purchases.addedit.items.BasePurchaseAddEditItem;
-import ch.giantific.qwittig.presentation.purchases.addedit.items.PurchaseAddEditDateRowViewModel;
-import ch.giantific.qwittig.presentation.purchases.addedit.items.PurchaseAddEditItem;
-import ch.giantific.qwittig.presentation.purchases.addedit.items.PurchaseAddEditStoreRowViewModel;
-import ch.giantific.qwittig.presentation.purchases.addedit.items.PurchaseAddEditTotalRowViewModel;
 import ch.giantific.qwittig.presentation.common.viewmodels.PurchaseReceiptViewModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditDateItemModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItem;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditStoreItemModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditTotalItemModel;
 
 /**
  * Defines an observable view model for the add or edit purchase screen.
  */
-public interface PurchaseAddEditViewModel extends ListViewModel<BasePurchaseAddEditItem, PurchaseAddEditViewModel.ViewListener>,
-        PurchaseAddEditRecyclerAdapter.AdapterListener, PurchaseAddEditItem.PriceChangedListener,
-        PurchaseAddEditDateRowViewModel, PurchaseAddEditStoreRowViewModel,
-        PurchaseAddEditTotalRowViewModel, PurchaseAddEditItemUsersClickListener,
+public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditItemModel, PurchaseAddEditViewModel.ViewListener>,
+        PurchaseAddEditItem.PriceChangedListener,
+        PurchaseAddEditDateItemModel, PurchaseAddEditStoreItemModel,
+        PurchaseAddEditTotalItemModel, PurchaseAddEditItemUsersClickListener,
         NoteDialogFragment.DialogInteractionListener,
         DiscardChangesDialogFragment.DialogInteractionListener,
         ExchangeRateDialogFragment.DialogInteractionListener, RatesWorkerListener,
@@ -68,6 +68,10 @@ public interface PurchaseAddEditViewModel extends ListViewModel<BasePurchaseAddE
     void onEditNoteMenuClick();
 
     void onDeleteNoteMenuClick();
+
+    void onToggleUsersClick(@NonNull PurchaseAddEditItem itemModel);
+
+    void onAddRowClick(@NonNull PurchaseAddEditItemModel itemModel);
 
     void onItemDismiss(int position);
 

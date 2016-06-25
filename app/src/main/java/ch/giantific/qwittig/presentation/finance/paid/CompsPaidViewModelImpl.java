@@ -19,7 +19,6 @@ import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.presentation.common.ListInteraction;
 import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModelBaseImpl;
 import ch.giantific.qwittig.utils.MessageAction;
 import rx.Observable;

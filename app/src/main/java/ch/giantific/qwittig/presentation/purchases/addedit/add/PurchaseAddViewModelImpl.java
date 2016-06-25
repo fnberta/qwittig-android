@@ -38,13 +38,13 @@ import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel.ViewListener;
-import ch.giantific.qwittig.presentation.purchases.addedit.items.BasePurchaseAddEditItem;
-import ch.giantific.qwittig.presentation.purchases.addedit.items.BasePurchaseAddEditItem.Type;
-import ch.giantific.qwittig.presentation.purchases.addedit.items.PurchaseAddEditGenericItem;
-import ch.giantific.qwittig.presentation.purchases.addedit.items.PurchaseAddEditHeaderItem;
-import ch.giantific.qwittig.presentation.purchases.addedit.items.PurchaseAddEditItem;
-import ch.giantific.qwittig.presentation.purchases.addedit.items.PurchaseAddEditItemUsers;
-import ch.giantific.qwittig.presentation.purchases.addedit.items.PurchaseAddEditItemUsersUser;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditGenericItem;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditHeaderItem;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItem;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemModel.Type;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemUsers;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemUsersUser;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.utils.MoneyUtils;
@@ -55,7 +55,7 @@ import timber.log.Timber;
 /**
  * Provides an implementation of the {@link PurchaseAddEditViewModel} for the add purchase screen.
  */
-public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<BasePurchaseAddEditItem, ViewListener>
+public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<PurchaseAddEditItemModel, ViewListener>
         implements PurchaseAddEditViewModel {
 
     private static final String STATE_ROW_ITEMS = "STATE_ROW_ITEMS";
@@ -285,7 +285,7 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<BasePurchase
 
     private void updateItemsPriceFormatting() {
         for (int i = 0, size = mItems.size(); i < size; i++) {
-            final BasePurchaseAddEditItem addEditItem = mItems.get(i);
+            final PurchaseAddEditItemModel addEditItem = mItems.get(i);
             if (addEditItem.getType() == Type.ITEM) {
                 final PurchaseAddEditItem purchaseAddEditItem = (PurchaseAddEditItem) addEditItem;
                 purchaseAddEditItem.updatePriceFormat(mMoneyFormatter);
@@ -396,7 +396,7 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<BasePurchase
         double totalPrice = 0;
         double myShare = 0;
         final String currentIdentityId = mCurrentIdentity.getObjectId();
-        for (BasePurchaseAddEditItem addEditItem : mItems) {
+        for (PurchaseAddEditItemModel addEditItem : mItems) {
             if (addEditItem.getType() != Type.ITEM) {
                 continue;
             }
@@ -458,7 +458,7 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<BasePurchase
     protected final void updateRows() {
         boolean hasItems = false;
         for (int i = 0, size = mItems.size(); i < size; i++) {
-            final BasePurchaseAddEditItem addEditItem = mItems.get(i);
+            final PurchaseAddEditItemModel addEditItem = mItems.get(i);
 
             if (addEditItem.getType() == Type.ITEM) {
                 hasItems = true;
@@ -523,7 +523,7 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<BasePurchase
     @Override
     public void onItemRowUserClick(int position) {
         for (int i = 0, mItemsSize = mItems.size(); i < mItemsSize; i++) {
-            final BasePurchaseAddEditItem item = mItems.get(i);
+            final PurchaseAddEditItemModel item = mItems.get(i);
             if (item.getType() != Type.USERS) {
                 continue;
             }
@@ -536,15 +536,14 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<BasePurchase
     }
 
     @Override
-    public void onToggleUsersClick(int position) {
-        final BasePurchaseAddEditItem addEditItem = mItems.get(position);
-        final int insertPos = position + 1;
+    public void onToggleUsersClick(@NonNull PurchaseAddEditItem itemModel) {
+        final int insertPos = mItems.indexOf(itemModel) + 1;
         if (mItems.size() < insertPos) {
-            expandItemRow(insertPos, addEditItem);
+            expandItemRow(insertPos, itemModel);
         } else if (getItemViewType(insertPos) == Type.USERS) {
             collapseItemRow(insertPos);
         } else {
-            expandItemRow(insertPos, addEditItem);
+            expandItemRow(insertPos, itemModel);
         }
     }
 
@@ -553,7 +552,7 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<BasePurchase
         mListInteraction.notifyItemRemoved(pos);
     }
 
-    private void expandItemRow(int pos, BasePurchaseAddEditItem parent) {
+    private void expandItemRow(int pos, PurchaseAddEditItemModel parent) {
         final PurchaseAddEditItem purchaseAddEditItem = (PurchaseAddEditItem) parent;
         mItems.add(pos, new PurchaseAddEditItemUsers(purchaseAddEditItem.getUsers()));
         mListInteraction.notifyItemInserted(pos);
@@ -563,7 +562,7 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<BasePurchase
 
     private void collapseOtherItemRows(int insertPos) {
         int pos = 0;
-        for (Iterator<BasePurchaseAddEditItem> iterator = mItems.iterator(); iterator.hasNext(); ) {
+        for (Iterator<PurchaseAddEditItemModel> iterator = mItems.iterator(); iterator.hasNext(); ) {
             final int type = iterator.next().getType();
             if (type == Type.USERS && pos != insertPos) {
                 iterator.remove();
@@ -575,7 +574,9 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<BasePurchase
     }
 
     @Override
-    public void onAddRowClick(int position) {
+    public void onAddRowClick(@NonNull PurchaseAddEditItemModel itemModel) {
+        final int position = mItems.indexOf(itemModel);
+
         final PurchaseAddEditItem purchaseAddEditItem = new PurchaseAddEditItem(getItemUsers(mIdentities));
         purchaseAddEditItem.setMoneyFormatter(mMoneyFormatter);
         purchaseAddEditItem.setPriceChangedListener(this);
@@ -697,7 +698,7 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<BasePurchase
     private boolean validateItems() {
         boolean hasItem = false;
         boolean allValid = true;
-        for (BasePurchaseAddEditItem addEditItem : mItems) {
+        for (PurchaseAddEditItemModel addEditItem : mItems) {
             if (addEditItem.getType() != Type.ITEM) {
                 continue;
             }
@@ -722,7 +723,7 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<BasePurchase
         final List<Item> purchaseItems = new ArrayList<>();
         final int fractionDigits = MoneyUtils.getFractionDigits(mCurrency);
 
-        for (BasePurchaseAddEditItem addEditItem : mItems) {
+        for (PurchaseAddEditItemModel addEditItem : mItems) {
             if (addEditItem.getType() != Type.ITEM) {
                 continue;
             }
@@ -761,7 +762,7 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<BasePurchase
 
     @NonNull
     protected Purchase createPurchase(@NonNull List<Identity> purchaseIdentities,
-                            @NonNull List<Item> purchaseItems, int fractionDigits) {
+                                      @NonNull List<Item> purchaseItems, int fractionDigits) {
         final BigDecimal totalPriceRounded =
                 new BigDecimal(mTotalPrice).setScale(fractionDigits, BigDecimal.ROUND_HALF_UP);
         final Purchase purchase = new Purchase(mCurrentIdentity, mCurrentGroup, mDate,

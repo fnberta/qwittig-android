@@ -26,9 +26,9 @@ import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddViewModelImpl;
-import ch.giantific.qwittig.presentation.purchases.addedit.items.BasePurchaseAddEditItem;
-import ch.giantific.qwittig.presentation.purchases.addedit.items.BasePurchaseAddEditItem.Type;
-import ch.giantific.qwittig.presentation.purchases.addedit.items.PurchaseAddEditItem;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemModel.Type;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItem;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Single;
 import rx.SingleSubscriber;
@@ -212,7 +212,7 @@ public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
 
         final List<Item> oldItems = mEditPurchase.getItems();
         for (int i = 0, size = mItems.size(), skipCount = 0; i < size; i++) {
-            final BasePurchaseAddEditItem addEditItem = mItems.get(i);
+            final PurchaseAddEditItemModel addEditItem = mItems.get(i);
             if (addEditItem.getType() != Type.ITEM) {
                 skipCount++;
                 continue;

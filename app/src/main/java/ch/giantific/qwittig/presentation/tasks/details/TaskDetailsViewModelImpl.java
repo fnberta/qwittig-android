@@ -28,9 +28,9 @@ import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
-import ch.giantific.qwittig.presentation.tasks.details.items.TaskDetailsBaseItem;
-import ch.giantific.qwittig.presentation.tasks.details.items.TaskDetailsHeaderItem;
-import ch.giantific.qwittig.presentation.tasks.details.items.TaskDetailsHistoryItem;
+import ch.giantific.qwittig.presentation.tasks.details.itemmodels.TaskDetailsItemModel;
+import ch.giantific.qwittig.presentation.tasks.details.itemmodels.TaskDetailsHeaderItem;
+import ch.giantific.qwittig.presentation.tasks.details.itemmodels.TaskDetailsHistoryItem;
 import rx.Observable;
 import rx.SingleSubscriber;
 import rx.Subscriber;
@@ -39,7 +39,7 @@ import rx.functions.Func1;
 /**
  * Provides an implementation of the {@link TaskDetailsViewModel} interface.
  */
-public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsBaseItem, TaskDetailsViewModel.ViewListener>
+public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsItemModel, TaskDetailsViewModel.ViewListener>
         implements TaskDetailsViewModel {
 
     private final String mTaskId;
@@ -231,8 +231,8 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsB
 
     @Override
     public boolean isEmpty() {
-        for (TaskDetailsBaseItem item : mItems) {
-            if (item.getType() == TaskDetailsBaseItem.Type.HISTORY) {
+        for (TaskDetailsItemModel item : mItems) {
+            if (item.getType() == TaskDetailsItemModel.Type.HISTORY) {
                 return false;
             }
         }

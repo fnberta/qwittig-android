@@ -16,8 +16,13 @@
         <import type="android.view.View"/>
 
         <variable
-            name="item"
-            type="ch.giantific.qwittig.presentation.tasks.list.items.TaskItem"
+            name="itemModel"
+            type="ch.giantific.qwittig.presentation.tasks.list.itemmodels.TasksItem"
+            />
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.tasks.list.TasksViewModel"
             />
     </data>
 
@@ -28,6 +33,7 @@
         android:layout_marginEnd="@dimen/small_space"
         android:layout_marginStart="@dimen/small_space"
         android:layout_marginTop="@dimen/min_space"
+        android:onClick="@{() -> viewModel.onTaskRowClick(itemModel)}"
         card_view:cardCornerRadius="@dimen/card_corner_radius"
         card_view:cardElevation="@dimen/card_elevation"
         >
@@ -44,7 +50,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
-                app:viewModel="@{item}"
+                app:viewModel="@{itemModel}"
                 />
 
             <ImageView
@@ -57,7 +63,7 @@
                 android:layout_marginStart="@dimen/key_line_1"
                 android:layout_marginTop="@dimen/normal_space"
                 android:contentDescription="@string/user_avatar"
-                app:avatar="@{item.taskUserResponsibleAvatar}"
+                app:avatar="@{itemModel.taskUserResponsibleAvatar}"
                 app:fallback="@{@drawable/ic_account_circle_black_40dp}"
                 tools:src="@drawable/ic_account_circle_black_40dp"
                 />
@@ -70,7 +76,7 @@
                 android:layout_marginTop="@dimen/normal_space"
                 android:layout_toEndOf="@id/iv_avatar"
                 android:layout_toStartOf="@+id/tv_task_deadline"
-                android:text="@{item.currentUserResponsible ? @string/nickname_me : item.taskUserResponsibleNickname}"
+                android:text="@{itemModel.currentUserResponsible ? @string/nickname_me : itemModel.taskUserResponsibleNickname}"
                 tools:text="Vera"
                 />
 
@@ -81,7 +87,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tv_task_user_responsible"
                 android:layout_toEndOf="@id/iv_avatar"
-                android:text="@{item.taskTitle}"
+                android:text="@{itemModel.taskTitle}"
                 tools:text="Küche putzen"
                 />
 
@@ -93,7 +99,7 @@
                 android:layout_below="@id/tv_task_title"
                 android:layout_marginTop="@dimen/small_space"
                 android:layout_toEndOf="@id/iv_avatar"
-                android:text="@{item.taskTimeFrame}"
+                android:text="@{itemModel.taskTimeFrame}"
                 tools:text="Wöchentlich"
                 />
 
@@ -105,7 +111,7 @@
                 android:layout_below="@id/tv_task_time_frame"
                 android:layout_marginBottom="@dimen/normal_space"
                 android:layout_toEndOf="@id/iv_avatar"
-                android:text="@{item.taskIdentities}"
+                android:text="@{itemModel.taskIdentities}"
                 tools:text="vera - lexli - sturzi"
                 />
 
@@ -117,8 +123,8 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginEnd="@dimen/normal_space"
                 android:layout_marginTop="@dimen/normal_space"
-                android:text="@{item.taskDeadline}"
-                android:textColor="@{item.isTaskDeadlinePast ? @color/red_500 : @color/green_500}"
+                android:text="@{itemModel.taskDeadline}"
+                android:textColor="@{itemModel.isTaskDeadlinePast ? @color/red_500 : @color/green_500}"
                 tools:text="In 2 Tagen"
                 tools:textColor="@color/green_500"
                 />
@@ -138,9 +144,10 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@id/divider"
-                android:text="@{item.taskDoneText}"
+                android:onClick="@{() -> viewModel.onDoneButtonClick(itemModel)}"
+                android:text="@{itemModel.taskDoneText}"
                 android:textColor="?attr/colorAccent"
-                android:visibility="@{item.currentUserResponsible ? View.VISIBLE : View.GONE}"
+                android:visibility="@{itemModel.currentUserResponsible ? View.VISIBLE : View.GONE}"
                 tools:text="Done for this week"
                 />
 
@@ -151,9 +158,10 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@id/divider"
-                android:text="@{@string/task_remind_user(item.taskUserResponsibleNickname)}"
+                android:onClick="@{() -> viewModel.onRemindButtonClick(itemModel)}"
+                android:text="@{@string/task_remind_user(itemModel.taskUserResponsibleNickname)}"
                 android:textColor="?attr/colorAccent"
-                android:visibility="@{item.currentUserResponsible ? View.GONE : View.VISIBLE}"
+                android:visibility="@{itemModel.currentUserResponsible ? View.GONE : View.VISIBLE}"
                 tools:text="Remind sturzi"
                 />
 

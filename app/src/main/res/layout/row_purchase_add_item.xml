@@ -14,8 +14,13 @@
         <import type="android.view.View"/>
 
         <variable
-            name="itemRow"
-            type="ch.giantific.qwittig.presentation.purchases.addedit.items.PurchaseAddEditItem"
+            name="itemModel"
+            type="ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItem"
+            />
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel"
             />
     </data>
 
@@ -23,9 +28,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/small_space"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
         android:weightSum="10"
-        android:gravity="center_vertical"
         >
 
         <ImageView
@@ -36,7 +41,8 @@
             android:layout_marginStart="@dimen/key_line_1"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/header_users"
-            app:itemUsers="@{itemRow.users}"
+            android:onClick="@{() -> viewModel.onToggleUsersClick(itemModel)}"
+            app:itemUsers="@{itemModel.users}"
             />
 
         <LinearLayout
@@ -51,7 +57,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="7"
-                android:error="@{!itemRow.validate ? null : itemRow.nameComplete ? null : @string/error_item_name}"
+                android:error="@{!itemModel.validate ? null : itemModel.nameComplete ? null : @string/error_item_name}"
                 >
 
                 <EditText
@@ -61,8 +67,8 @@
                     android:hint="@string/hint_item_name"
                     android:imeOptions="actionNext"
                     android:inputType="text|textCapSentences"
-                    android:onTextChanged="@{itemRow::onNameChanged}"
-                    android:text="@{itemRow.name}"
+                    android:onTextChanged="@{itemModel::onNameChanged}"
+                    android:text="@{itemModel.name}"
                     />
 
             </android.support.design.widget.TextInputLayout>
@@ -72,7 +78,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/normal_space"
                 android:layout_weight="3"
-                android:error="@{!itemRow.validate ? null : itemRow.priceComplete ? null : @string/error_item_price}"
+                android:error="@{!itemModel.validate ? null : itemModel.priceComplete ? null : @string/error_item_price}"
                 >
 
                 <EditText
@@ -83,10 +89,10 @@
                     android:hint="@string/hint_item_price"
                     android:inputType="numberDecimal"
                     android:maxLength="9"
-                    android:onFocusChange="@{itemRow::onPriceFocusChange}"
-                    android:onTextChanged="@{itemRow::onPriceChanged}"
+                    android:onFocusChange="@{itemModel::onPriceFocusChange}"
+                    android:onTextChanged="@{itemModel::onPriceChanged}"
                     android:selectAllOnFocus="true"
-                    android:text="@{itemRow.price}"
+                    android:text="@{itemModel.price}"
                     />
 
             </android.support.design.widget.TextInputLayout>

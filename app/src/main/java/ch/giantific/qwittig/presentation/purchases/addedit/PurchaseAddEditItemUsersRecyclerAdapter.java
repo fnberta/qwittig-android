@@ -15,7 +15,7 @@ import java.util.List;
 import ch.giantific.qwittig.databinding.RowPurchaseAddItemUsersUserBinding;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.purchases.addedit.items.PurchaseAddEditItemUsersUser;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemUsersUser;
 
 /**
  * Provides an adapter for a {@link RecyclerView} showing a list of users.

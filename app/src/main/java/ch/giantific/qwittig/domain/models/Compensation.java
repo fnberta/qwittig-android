@@ -21,7 +21,7 @@ import ch.giantific.qwittig.utils.parse.ParseUtils;
 /**
  * Defines a compensation, a payment from one {@link User} to another. It includes the payer and
  * beneficiary, the corresponding group, the amount and whether it is paid or not.
- * <p/>
+ * <p>
  * Subclass of {@link ParseObject}.
  */
 @ParseClassName("Compensation")
@@ -35,7 +35,6 @@ public class Compensation extends ParseObject {
     public static final String PAID = "paid";
     public static final String PIN_LABEL_PAID = "compensationPinLabelPaid";
     public static final String PIN_LABEL_UNPAID = "compensationPinLabelUnpaid";
-    private boolean mLoading;
 
     public Compensation() {
         // A default constructor is required.
@@ -90,14 +89,6 @@ public class Compensation extends ParseObject {
 
     public void setPaid(boolean isPaid) {
         put(PAID, isPaid);
-    }
-
-    public boolean isLoading() {
-        return mLoading;
-    }
-
-    public void setLoading(boolean loading) {
-        mLoading = loading;
     }
 
     private void setAccessRights(@NonNull Group group) {

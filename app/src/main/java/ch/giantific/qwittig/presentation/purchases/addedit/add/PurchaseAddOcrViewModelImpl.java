@@ -21,7 +21,7 @@ import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
-import ch.giantific.qwittig.presentation.purchases.addedit.items.PurchaseAddEditItem;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItem;
 import rx.Single;
 import rx.SingleSubscriber;
 import rx.functions.Action1;

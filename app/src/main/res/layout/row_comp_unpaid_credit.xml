@@ -15,8 +15,13 @@
         <import type="android.view.View"/>
 
         <variable
-            name="item"
-            type="ch.giantific.qwittig.presentation.finance.unpaid.items.CompsUnpaidCreditItem"
+            name="itemModel"
+            type="ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidCompCreditItemModel"
+            />
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.finance.unpaid.CompsUnpaidViewModel"
             />
     </data>
 
@@ -43,12 +48,12 @@
                 android:layout_height="143dp"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
-                app:item="@{item}"
+                app:itemModel="@{itemModel}"
                 />
 
             <include
                 layout="@layout/include_card_top_progress"
-                app:viewModel="@{item}"
+                app:viewModel="@{itemModel}"
                 />
 
             <include
@@ -56,7 +61,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/iv_avatar"
-                app:item="@{item}"
+                app:itemModel="@{itemModel}"
                 />
 
             <Button
@@ -66,6 +71,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/ll_header"
                 android:layout_toEndOf="@id/iv_avatar"
+                android:onClick="@{() -> viewModel.onConfirmButtonClick(itemModel)}"
                 android:text="@string/comp_unpaid_button_confirm"
                 android:textColor="?attr/colorAccent"
                 />
@@ -77,8 +83,9 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/ll_header"
                 android:layout_toEndOf="@id/bt_comp_unpaid_confirm"
-                android:text="@{@string/button_remind(item.compUsername)}"
-                android:visibility="@{item.userPending ? View.GONE : View.VISIBLE}"
+                android:onClick="@{() -> viewModel.onRemindButtonClick(itemModel)}"
+                android:text="@{@string/button_remind(itemModel.compUsername)}"
+                android:visibility="@{itemModel.userPending ? View.GONE : View.VISIBLE}"
                 tools:text="Remind Lexli to pay"
                 />
 

@@ -16,7 +16,7 @@ import ch.giantific.qwittig.databinding.RowTaskAddEditUserBinding;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.tasks.addedit.models.TaskAddEditIdentityViewModel;
+import ch.giantific.qwittig.presentation.tasks.addedit.itemmodels.TaskAddEditIdentityItemModel;
 
 
 /**
@@ -49,14 +49,14 @@ public class TaskAddEditUsersRecyclerAdapter extends BaseRecyclerAdapter<TaskAdd
     @Override
     public void onBindViewHolder(TaskUserInvolvedRow holder, int position) {
         final RowTaskAddEditUserBinding binding = holder.getBinding();
-        final TaskAddEditIdentityViewModel viewModel = binding.getViewModel();
+        final TaskAddEditIdentityItemModel itemModel = binding.getItemModel();
 
         final Identity identity = mViewModel.getItemAtPosition(position);
         final float userAlpha = mViewModel.getIdentityAlpha(position);
-        if (viewModel == null) {
-            binding.setViewModel(new TaskAddEditIdentityViewModel(identity, userAlpha));
+        if (itemModel == null) {
+            binding.setItemModel(new TaskAddEditIdentityItemModel(identity, userAlpha));
         } else {
-            viewModel.updateIdentity(identity, userAlpha);
+            itemModel.updateIdentity(identity, userAlpha);
         }
 
         binding.executePendingBindings();

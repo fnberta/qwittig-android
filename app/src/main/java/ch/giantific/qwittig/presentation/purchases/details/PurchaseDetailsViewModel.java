@@ -13,12 +13,12 @@ import java.lang.annotation.RetentionPolicy;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
 import ch.giantific.qwittig.presentation.common.viewmodels.PurchaseReceiptViewModel;
-import ch.giantific.qwittig.presentation.purchases.details.items.PurchaseDetailsBaseItem;
+import ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDetailsItemModel;
 
 /**
  * Defines an observable view model for the purchase details screen.
  */
-public interface PurchaseDetailsViewModel extends ListViewModel<PurchaseDetailsBaseItem, PurchaseDetailsViewModel.ViewListener>, PurchaseReceiptViewModel {
+public interface PurchaseDetailsViewModel extends ListViewModel<PurchaseDetailsItemModel, PurchaseDetailsViewModel.ViewListener>, PurchaseReceiptViewModel {
 
     void setReceiptShown(boolean receiptShown);
 

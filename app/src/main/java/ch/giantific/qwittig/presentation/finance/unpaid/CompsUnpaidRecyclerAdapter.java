@@ -7,7 +7,6 @@ package ch.giantific.qwittig.presentation.finance.unpaid;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.RowCompUnpaidCreditBinding;
@@ -15,11 +14,11 @@ import ch.giantific.qwittig.databinding.RowCompUnpaidDebtBinding;
 import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.finance.unpaid.items.CompsUnpaidBaseItem;
-import ch.giantific.qwittig.presentation.finance.unpaid.items.CompsUnpaidBaseItem.Type;
-import ch.giantific.qwittig.presentation.finance.unpaid.items.CompsUnpaidCreditItem;
-import ch.giantific.qwittig.presentation.finance.unpaid.items.CompsUnpaidDebtItem;
-import ch.giantific.qwittig.presentation.finance.unpaid.items.CompsUnpaidHeaderItem;
+import ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidCompCreditItemModel;
+import ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidCompDebtItemModel;
+import ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidHeaderItemModel;
+import ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidItemModel;
+import ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidItemModel.Type;
 
 
 /**
@@ -55,7 +54,7 @@ public class CompsUnpaidRecyclerAdapter extends BaseRecyclerAdapter {
             case Type.CREDIT: {
                 final RowCompUnpaidCreditBinding binding =
                         RowCompUnpaidCreditBinding.inflate(inflater, parent, false);
-                return new CompensationCreditRow(binding, mViewModel);
+                return new BindingRow<>(binding);
             }
             case Type.DEBT: {
                 final RowCompUnpaidDebtBinding binding =
@@ -70,22 +69,23 @@ public class CompsUnpaidRecyclerAdapter extends BaseRecyclerAdapter {
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        final CompsUnpaidBaseItem unpaidItem = mViewModel.getItemAtPosition(position);
+        final CompsUnpaidItemModel itemModel = mViewModel.getItemAtPosition(position);
         final int viewType = getItemViewType(position);
         switch (viewType) {
             case Type.HEADER: {
                 final BindingRow<RowGenericHeaderBinding> row = (BindingRow<RowGenericHeaderBinding>) holder;
                 final RowGenericHeaderBinding binding = row.getBinding();
 
-                binding.setViewModel((CompsUnpaidHeaderItem) unpaidItem);
+                binding.setItemModel((CompsUnpaidHeaderItemModel) itemModel);
                 binding.executePendingBindings();
                 break;
             }
             case Type.CREDIT: {
-                final CompensationCreditRow row = (CompensationCreditRow) holder;
+                final BindingRow<RowCompUnpaidCreditBinding> row = (BindingRow<RowCompUnpaidCreditBinding>) holder;
                 final RowCompUnpaidCreditBinding binding = row.getBinding();
 
-                binding.setItem((CompsUnpaidCreditItem) unpaidItem);
+                binding.setItemModel((CompsUnpaidCompCreditItemModel) itemModel);
+                binding.setViewModel(mViewModel);
                 binding.executePendingBindings();
                 break;
             }
@@ -94,7 +94,7 @@ public class CompsUnpaidRecyclerAdapter extends BaseRecyclerAdapter {
                         (BindingRow<RowCompUnpaidDebtBinding>) holder;
                 final RowCompUnpaidDebtBinding binding = row.getBinding();
 
-                binding.setItem((CompsUnpaidDebtItem) unpaidItem);
+                binding.setItemModel((CompsUnpaidCompDebtItemModel) itemModel);
                 binding.executePendingBindings();
                 break;
             }
@@ -109,51 +109,5 @@ public class CompsUnpaidRecyclerAdapter extends BaseRecyclerAdapter {
     @Override
     public int getItemCount() {
         return mViewModel.getItemCount();
-    }
-
-    /**
-     * Defines the actions to take when user clicks on the compensations.
-     */
-    public interface AdapterInteractionListener {
-
-        /**
-         * Handles the click on the done button of a compensation.
-         *
-         * @param position the adapter position of the compensation
-         */
-        void onConfirmButtonClick(int position);
-
-        /**
-         * Handles the click on the remind to pay button of a compensation.
-         *
-         * @param position the adapter position of the compensation
-         */
-        void onRemindButtonClick(int position);
-    }
-
-    /**
-     * Provides a {@link RecyclerView} row that displays unpaid compensations.
-     * <p/>
-     * Subclass of {@link BindingRow}.
-     */
-    private static class CompensationCreditRow extends BindingRow<RowCompUnpaidCreditBinding> {
-
-        public CompensationCreditRow(@NonNull RowCompUnpaidCreditBinding binding,
-                                     @NonNull final AdapterInteractionListener listener) {
-            super(binding);
-
-            binding.btCompUnpaidConfirm.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    listener.onConfirmButtonClick(getAdapterPosition());
-                }
-            });
-            binding.btCompUnpaidRemind.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    listener.onRemindButtonClick(getAdapterPosition());
-                }
-            });
-        }
     }
 }

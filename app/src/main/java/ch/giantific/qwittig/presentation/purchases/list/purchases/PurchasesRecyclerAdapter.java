@@ -15,6 +15,7 @@ import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
 import ch.giantific.qwittig.presentation.common.adapters.rows.ProgressRow;
+import ch.giantific.qwittig.presentation.purchases.list.purchases.itemmodels.PurchasesItemModel;
 
 /**
  * Handles the display of recent purchases.
@@ -43,7 +44,7 @@ public class PurchasesRecyclerAdapter extends BaseRecyclerAdapter {
         switch (viewType) {
             case PurchasesViewModel.TYPE_ITEM: {
                 final RowPurchasesBinding binding = RowPurchasesBinding.inflate(inflater, parent, false);
-                return new PurchaseRow(binding, mViewModel);
+                return new BindingRow<>(binding);
             }
             case PurchasesViewModel.TYPE_PROGRESS: {
                 View view = inflater
@@ -55,21 +56,24 @@ public class PurchasesRecyclerAdapter extends BaseRecyclerAdapter {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         int viewType = getItemViewType(position);
         switch (viewType) {
             case PurchasesViewModel.TYPE_ITEM: {
-                final PurchaseRow purchaseRow = (PurchaseRow) viewHolder;
-                final RowPurchasesBinding binding = purchaseRow.getBinding();
+                final BindingRow<RowPurchasesBinding> row =
+                        (BindingRow<RowPurchasesBinding>) viewHolder;
+                final RowPurchasesBinding binding = row.getBinding();
                 final Purchase purchase = mViewModel.getItemAtPosition(position);
 
-                PurchaseRowViewModel viewModel = binding.getViewModel();
-                if (viewModel == null) {
-                    viewModel = new PurchaseRowViewModel(purchase, mViewModel.getCurrentIdentity());
-                    binding.setViewModel(viewModel);
+                PurchasesItemModel itemModel = binding.getItemModel();
+                if (itemModel == null) {
+                    itemModel = new PurchasesItemModel(purchase, mViewModel.getCurrentIdentity());
+                    binding.setItemModel(itemModel);
+                    binding.setViewModel(mViewModel);
                 } else {
-                    viewModel.updatePurchaseInfo(purchase);
+                    itemModel.updatePurchaseInfo(purchase);
                 }
 
                 binding.executePendingBindings();
@@ -89,43 +93,5 @@ public class PurchasesRecyclerAdapter extends BaseRecyclerAdapter {
     @Override
     public int getItemCount() {
         return mViewModel.getItemCount();
-    }
-
-    /**
-     * Defines the actions to take when a user clicks on a purchase.
-     */
-    public interface AdapterInteractionListener {
-        /**
-         * Handles the click on a purchase.
-         *
-         * @param position the adapter position of the purchase
-         */
-        void onPurchaseRowItemClick(int position);
-    }
-
-    /**
-     * Provides a {@link RecyclerView} row that displays a purchase.
-     * <p/>
-     * Subclass of {@link BindingRow}.
-     */
-    private static class PurchaseRow extends BindingRow<RowPurchasesBinding> {
-
-        /**
-         * Constructs a new {@link PurchaseRow} and sets the click listener.
-         *
-         * @param binding  the binding of the view
-         * @param listener the callback for user clicks on the purchase
-         */
-        public PurchaseRow(@NonNull RowPurchasesBinding binding,
-                           @NonNull final AdapterInteractionListener listener) {
-            super(binding);
-
-            binding.getRoot().setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    listener.onPurchaseRowItemClick(getAdapterPosition());
-                }
-            });
-        }
     }
 }

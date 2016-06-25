@@ -9,14 +9,20 @@ import android.view.View;
 import android.widget.AdapterView;
 
 import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModel;
-import ch.giantific.qwittig.presentation.tasks.list.items.TasksBaseItem;
+import ch.giantific.qwittig.presentation.tasks.list.itemmodels.TasksItem;
+import ch.giantific.qwittig.presentation.tasks.list.itemmodels.TasksItemModel;
 
 /**
  * Defines an observable view model for the task list screen.
  */
-public interface TasksViewModel extends OnlineListViewModel<TasksBaseItem, TasksViewModel.ViewListener>,
-        TasksRecyclerAdapter.AdapterInteractionListener,
+public interface TasksViewModel extends OnlineListViewModel<TasksItemModel, TasksViewModel.ViewListener>,
         TaskRemindWorkerListener {
+
+    void onTaskRowClick(@NonNull TasksItem itemModel);
+
+    void onDoneButtonClick(@NonNull TasksItem itemModel);
+
+    void onRemindButtonClick(@NonNull TasksItem itemModel);
 
     void onAddTaskFabClick(View view);
 

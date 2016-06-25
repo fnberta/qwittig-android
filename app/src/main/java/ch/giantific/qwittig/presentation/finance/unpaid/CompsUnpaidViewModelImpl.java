@@ -26,12 +26,12 @@ import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModelBaseImpl;
-import ch.giantific.qwittig.presentation.finance.unpaid.items.CompsUnpaidBaseItem;
-import ch.giantific.qwittig.presentation.finance.unpaid.items.CompsUnpaidBaseItem.Type;
-import ch.giantific.qwittig.presentation.finance.unpaid.items.CompsUnpaidCreditItem;
-import ch.giantific.qwittig.presentation.finance.unpaid.items.CompsUnpaidDebtItem;
-import ch.giantific.qwittig.presentation.finance.unpaid.items.CompsUnpaidHeaderItem;
-import ch.giantific.qwittig.presentation.finance.unpaid.items.CompsUnpaidItem;
+import ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidCompCreditItemModel;
+import ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidCompDebtItemModel;
+import ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidCompItemModel;
+import ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidHeaderItemModel;
+import ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidItemModel;
+import ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidItemModel.Type;
 import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Observable;
@@ -44,7 +44,7 @@ import rx.functions.Func1;
  * Provides an implementation of the {@link CompsUnpaidViewModel}.
  */
 public class CompsUnpaidViewModelImpl
-        extends OnlineListViewModelBaseImpl<CompsUnpaidBaseItem, CompsUnpaidViewModel.ViewListener>
+        extends OnlineListViewModelBaseImpl<CompsUnpaidItemModel, CompsUnpaidViewModel.ViewListener>
         implements CompsUnpaidViewModel {
 
     private static final String STATE_COMPS_LOADING = "STATE_COMPS_LOADING";
@@ -106,16 +106,18 @@ public class CompsUnpaidViewModelImpl
                     @Override
                     public void onCompleted() {
                         if (!credits.isEmpty()) {
-                            mItems.add(new CompsUnpaidHeaderItem(R.string.header_comps_credits));
+                            mItems.add(new CompsUnpaidHeaderItemModel(R.string.header_comps_credits));
                             for (Compensation comp : credits) {
-                                mItems.add(new CompsUnpaidCreditItem(comp, mMoneyFormatter));
+                                final boolean loading = mLoadingComps.contains(comp.getObjectId());
+                                mItems.add(new CompsUnpaidCompCreditItemModel(comp, mMoneyFormatter, loading));
                             }
                         }
 
                         if (!debts.isEmpty()) {
-                            mItems.add(new CompsUnpaidHeaderItem(R.string.header_comps_debts));
+                            mItems.add(new CompsUnpaidHeaderItemModel(R.string.header_comps_debts));
                             for (Compensation comp : debts) {
-                                mItems.add(new CompsUnpaidDebtItem(comp, mMoneyFormatter));
+                                final boolean loading = mLoadingComps.contains(comp.getObjectId());
+                                mItems.add(new CompsUnpaidCompDebtItemModel(comp, mMoneyFormatter, loading));
                             }
                         }
 
@@ -136,7 +138,6 @@ public class CompsUnpaidViewModelImpl
                         } else {
                             credits.add(compensation);
                         }
-                        compensation.setLoading(mLoadingComps.contains(compensation.getObjectId()));
                     }
                 })
         );
@@ -159,7 +160,7 @@ public class CompsUnpaidViewModelImpl
 
     @Override
     public boolean isEmpty() {
-        for (CompsUnpaidBaseItem item : mItems) {
+        for (CompsUnpaidItemModel item : mItems) {
             final int type = item.getType();
             if (type == Type.CREDIT || type == Type.DEBT) {
                 return false;
@@ -191,29 +192,28 @@ public class CompsUnpaidViewModelImpl
     }
 
     @Override
-    public void onConfirmButtonClick(int position) {
-        final CompsUnpaidItem unpaidItem = (CompsUnpaidItem) mItems.get(position);
-        final Compensation comp = unpaidItem.getCompensation();
-        final BigFraction amount = comp.getAmountFraction();
+    public void onConfirmButtonClick(@NonNull CompsUnpaidCompCreditItemModel itemModel) {
+        final BigFraction amount = itemModel.getCompAmountRaw();
         final String currency = mCurrentIdentity.getGroup().getCurrency();
 
-        mCompConfirmingId = comp.getObjectId();
-        mView.showCompensationAmountConfirmDialog(amount, comp.getDebtor().getNickname(), currency);
+        mCompConfirmingId = itemModel.getId();
+        mView.showCompensationAmountConfirmDialog(amount, itemModel.getCompUsername(), currency);
     }
 
     @Override
     public void onAmountConfirmed(double amount) {
         for (int i = 0, size = mItems.size(); i < size; i++) {
-            final CompsUnpaidBaseItem item = mItems.get(i);
-            if (item.getType() != Type.CREDIT) {
+            final CompsUnpaidItemModel itemModel = mItems.get(i);
+            if (itemModel.getType() != Type.CREDIT) {
                 continue;
             }
 
-            final Compensation compensation = ((CompsUnpaidItem) item).getCompensation();
-            if (Objects.equals(compensation.getObjectId(), mCompConfirmingId)) {
+            final CompsUnpaidCompItemModel compsUnpaidItemModel = (CompsUnpaidCompItemModel) itemModel;
+            if (Objects.equals(compsUnpaidItemModel.getId(), mCompConfirmingId)) {
                 boolean amountChanged = false;
-                final BigFraction originalAmount = compensation.getAmountFraction();
+                final BigFraction originalAmount = compsUnpaidItemModel.getCompAmountRaw();
                 final double diff = originalAmount.doubleValue() - amount;
+                final Compensation compensation = compsUnpaidItemModel.getCompensation();
                 if (Math.abs(diff) >= MoneyUtils.MIN_DIFF) {
                     compensation.setAmountFraction(new BigFraction(amount));
                     amountChanged = true;
@@ -252,29 +252,28 @@ public class CompsUnpaidViewModelImpl
     }
 
     @Override
-    public void onRemindButtonClick(int position) {
+    public void onRemindButtonClick(@NonNull CompsUnpaidCompCreditItemModel itemModel) {
         if (!mView.isNetworkAvailable()) {
             mView.showMessage(R.string.toast_no_connection);
             return;
         }
 
-        final CompsUnpaidItem unpaidItem = (CompsUnpaidItem) mItems.get(position);
-        final Compensation compensation = unpaidItem.getCompensation();
-        final String compensationId = compensation.getObjectId();
-        if (mLoadingComps.contains(compensationId)) {
+        final String objectId = itemModel.getId();
+        if (mLoadingComps.contains(objectId)) {
             return;
         }
 
-        setCompensationLoading(compensation, compensationId, position, true);
-        mView.loadCompensationRemindWorker(compensationId);
+        final int pos = mItems.indexOf(itemModel);
+        setCompensationLoading(itemModel, objectId, pos, true);
+        mView.loadCompensationRemindWorker(objectId);
     }
 
-    private void setCompensationLoading(@NonNull Compensation compensation,
-                                        @NonNull String objectId, int position, boolean isLoading) {
-        compensation.setLoading(isLoading);
+    private void setCompensationLoading(@NonNull CompsUnpaidCompItemModel compsUnpaidItem,
+                                        @NonNull String objectId, int position, boolean itemLoading) {
+        compsUnpaidItem.setItemLoading(itemLoading);
         mListInteraction.notifyItemChanged(position);
 
-        if (isLoading) {
+        if (itemLoading) {
             mLoadingComps.add(objectId);
         } else {
             mLoadingComps.remove(objectId);
@@ -288,11 +287,9 @@ public class CompsUnpaidViewModelImpl
         getSubscriptions().add(single.subscribe(new SingleSubscriber<String>() {
             @Override
             public void onSuccess(String value) {
-                final Compensation compensation = stopCompensationLoading(compensationId);
-                if (compensation != null) {
-                    final Identity debtor = compensation.getDebtor();
-                    final String nickname = debtor.getNickname();
-                    mView.showMessage(R.string.toast_compensation_reminded_user, nickname);
+                final CompsUnpaidCompCreditItemModel itemModel = stopCompensationLoading(compensationId);
+                if (itemModel != null) {
+                    mView.showMessage(R.string.toast_compensation_reminded_user, itemModel.getCompUsername());
                 }
             }
 
@@ -306,18 +303,17 @@ public class CompsUnpaidViewModelImpl
     }
 
     @Nullable
-    private Compensation stopCompensationLoading(@NonNull String compId) {
+    private CompsUnpaidCompCreditItemModel stopCompensationLoading(@NonNull String compId) {
         for (int i = 0, size = mItems.size(); i < size; i++) {
-            final CompsUnpaidBaseItem item = mItems.get(i);
+            final CompsUnpaidItemModel item = mItems.get(i);
             if (item.getType() == Type.HEADER) {
                 continue;
             }
 
-            final CompsUnpaidItem unpaidItem = (CompsUnpaidItem) item;
-            final Compensation compensation = unpaidItem.getCompensation();
-            if (Objects.equals(compId, compensation.getObjectId())) {
-                setCompensationLoading(compensation, compId, i, false);
-                return compensation;
+            final CompsUnpaidCompItemModel unpaidItem = (CompsUnpaidCompItemModel) item;
+            if (Objects.equals(compId, unpaidItem.getId())) {
+                setCompensationLoading(unpaidItem, compId, i, false);
+                return (CompsUnpaidCompCreditItemModel) unpaidItem;
             }
         }
 

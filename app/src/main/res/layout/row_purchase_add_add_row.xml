@@ -3,9 +3,20 @@
   ~ Copyright (c) 2016 Fabio Berta
   -->
 
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    >
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <variable
+            name="itemModel"
+            type="ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemModel"
+            />
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel"
+            />
+    </data>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,6 +32,7 @@
             android:layout_marginBottom="@dimen/small_space"
             android:layout_marginEnd="@dimen/key_line_1"
             android:layout_marginStart="@dimen/key_line_2"
+            android:onClick="@{() -> viewModel.onAddRowClick(itemModel)}"
             android:text="@string/button_add_item"
             />
 

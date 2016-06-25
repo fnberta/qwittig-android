@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 import ch.giantific.qwittig.databinding.FragmentPurchaseAddEditBinding;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
-import ch.giantific.qwittig.presentation.purchases.addedit.items.BasePurchaseAddEditItem.Type;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemModel.Type;
 
 /**
  * Displays the interface where the user can add a new purchase by setting store, date, users

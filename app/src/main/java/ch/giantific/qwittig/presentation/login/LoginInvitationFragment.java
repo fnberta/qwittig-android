@@ -54,6 +54,7 @@ public class LoginInvitationFragment extends BaseFragment<LoginComponent, LoginI
         final Bundle args = getArguments();
         mViewModel.setGroupName(args.getString(KEY_GROUP_NAME, ""));
         mViewModel.setInviterNickname(args.getString(KEY_INVITER_NICKNAME, ""));
+        mViewModel.attachView(this);
         mBinding.setViewModel(mViewModel);
     }
 

@@ -62,6 +62,7 @@ import timber.log.Timber;
  */
 public class LoginActivity extends BaseActivity<LoginComponent> implements
         LoginAccountsFragment.ActivityListener,
+        LoginEmailFragment.ActivityListener,
         LoginInvitationFragment.ActivityListener,
         LoginProfileFragment.ActivityListener,
         EmailPromptDialogFragment.DialogInteractionListener,

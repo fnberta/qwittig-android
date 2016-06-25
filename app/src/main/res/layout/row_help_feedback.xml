@@ -12,8 +12,13 @@
     <data>
 
         <variable
-            name="item"
-            type="ch.giantific.qwittig.presentation.helpfeedback.items.HelpFeedbackItem"
+            name="itemModel"
+            type="ch.giantific.qwittig.presentation.helpfeedback.itemmodels.HelpFeedbackItem"
+            />
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.helpfeedback.HelpFeedbackViewModel"
             />
     </data>
 
@@ -24,10 +29,11 @@
         android:background="?selectableItemBackground"
         android:drawablePadding="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
         android:gravity="center_vertical"
+        android:onClick="@{() -> viewModel.onHelpFeedbackItemClicked(itemModel)}"
         android:paddingEnd="@dimen/key_line_1"
         android:paddingStart="@dimen/key_line_1"
-        android:text="@{item.title}"
-        app:drawableStartBounds="@{item.icon}"
+        android:text="@{itemModel.title}"
+        app:drawableStartBounds="@{itemModel.icon}"
         tools:text="Send Feedback"
         />
 

@@ -4,23 +4,29 @@
 
 package ch.giantific.qwittig.presentation.purchases.list.drafts;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
 import ch.giantific.qwittig.presentation.common.viewmodels.SelectionModeViewModel;
+import ch.giantific.qwittig.presentation.purchases.list.drafts.itemmodels.DraftsItemModel;
 
 /**
  * Defines an observable view model for the list of drafts screen.
  */
 public interface DraftsViewModel extends ListViewModel<Purchase, DraftsViewModel.ViewListener>,
-        SelectionModeViewModel<Purchase>, DraftsRecyclerAdapter.AdapterInteractionListener {
+        SelectionModeViewModel<Purchase> {
 
     void onReadyForSelectionMode();
 
     void onDeleteSelectedDraftsClick();
 
     void onSelectionModeEnded();
+
+    void onDraftRowClick(@NonNull Purchase draft);
+
+    boolean onDraftRowLongClick(@NonNull Purchase draft);
 
     /**
      * Defines the interaction with the attached view.

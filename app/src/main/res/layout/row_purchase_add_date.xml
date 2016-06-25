@@ -13,7 +13,7 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.purchases.addedit.items.PurchaseAddEditDateRowViewModel"
+            type="ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditDateItemModel"
             />
     </data>
 

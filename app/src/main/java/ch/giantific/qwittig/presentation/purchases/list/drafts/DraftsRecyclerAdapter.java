@@ -7,20 +7,20 @@ package ch.giantific.qwittig.presentation.purchases.list.drafts;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.RowDraftsBinding;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
+import ch.giantific.qwittig.presentation.purchases.list.drafts.itemmodels.DraftsItemModel;
 
 /**
  * Handles the display of the user's drafts.
  * <p/>
  * Subclass of {@link android.support.v7.widget.RecyclerView.Adapter}.
  */
-public class DraftsRecyclerAdapter extends BaseRecyclerAdapter<DraftsRecyclerAdapter.DraftRow> {
+public class DraftsRecyclerAdapter extends BaseRecyclerAdapter {
 
     private final DraftsViewModel mViewModel;
 
@@ -37,24 +37,27 @@ public class DraftsRecyclerAdapter extends BaseRecyclerAdapter<DraftsRecyclerAda
 
     @NonNull
     @Override
-    public DraftRow onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         final RowDraftsBinding binding = RowDraftsBinding.inflate(inflater, parent, false);
-        return new DraftRow(binding, mViewModel);
+        return new BindingRow<>(binding);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void onBindViewHolder(DraftRow draftRow, int position) {
-        final RowDraftsBinding binding = draftRow.getBinding();
+    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
+        final BindingRow<RowDraftsBinding> row = (BindingRow<RowDraftsBinding>) viewHolder;
+        final RowDraftsBinding binding = row.getBinding();
         final Purchase draft = mViewModel.getItemAtPosition(position);
 
-        DraftsRowViewModel viewModel = binding.getViewModel();
-        if (viewModel == null) {
+        DraftsItemModel itemModel = binding.getItemModel();
+        if (itemModel == null) {
             final String currency = mViewModel.getCurrentIdentity().getGroup().getCurrency();
-            viewModel = new DraftsRowViewModel(draft, mViewModel.isSelected(draft), currency);
-            binding.setViewModel(viewModel);
+            itemModel = new DraftsItemModel(draft, mViewModel.isSelected(draft), currency);
+            binding.setItemModel(itemModel);
+            binding.setViewModel(mViewModel);
         } else {
-            viewModel.updateDraftInfo(draft, mViewModel.isSelected(draft));
+            itemModel.updateDraftInfo(draft, mViewModel.isSelected(draft));
         }
 
         binding.executePendingBindings();
@@ -69,64 +72,10 @@ public class DraftsRecyclerAdapter extends BaseRecyclerAdapter<DraftsRecyclerAda
                 mRecyclerView.scrollToPosition(position);
             }
         });
-
     }
 
     @Override
     public int getItemCount() {
         return mViewModel.getItemCount();
-    }
-
-    /**
-     * Defines the actions to take when a user clicks on a purchase.
-     */
-    public interface AdapterInteractionListener {
-        /**
-         * Handles the click on a draft.
-         *
-         * @param position the adapter position of the draft
-         */
-        void onDraftRowClick(int position);
-
-        /**
-         * Handles the long click on a draft.
-         *
-         * @param position the adapter position of the draft
-         */
-        void onDraftRowLongClick(int position);
-    }
-
-    /**
-     * Provides a {@link RecyclerView} row that displays a draft.
-     * <p/>
-     * Subclass of {@link BindingRow}.
-     */
-    public static class DraftRow extends BindingRow<RowDraftsBinding> {
-
-        /**
-         * Constructs a new {@link DraftRow} and sets the click listener.
-         *
-         * @param binding  the view's binding
-         * @param listener the callback for user clicks on the draft
-         */
-        public DraftRow(@NonNull RowDraftsBinding binding,
-                        @NonNull final AdapterInteractionListener listener) {
-            super(binding);
-
-            final View root = binding.getRoot();
-            root.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    listener.onDraftRowClick(getAdapterPosition());
-                }
-            });
-            root.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    listener.onDraftRowLongClick(getAdapterPosition());
-                    return true;
-                }
-            });
-        }
     }
 }

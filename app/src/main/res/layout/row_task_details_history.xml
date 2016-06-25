@@ -13,8 +13,8 @@
     <data>
 
         <variable
-            name="item"
-            type="ch.giantific.qwittig.presentation.tasks.details.items.TaskDetailsHistoryItem"
+            name="itemModel"
+            type="ch.giantific.qwittig.presentation.tasks.details.itemmodels.TaskDetailsHistoryItem"
             />
     </data>
 
@@ -33,7 +33,7 @@
             android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_avatar_size"
             android:layout_marginStart="@dimen/key_line_1"
             android:contentDescription="@string/user_avatar"
-            app:avatar="@{item.taskEventIdentityAvatar}"
+            app:avatar="@{itemModel.taskEventIdentityAvatar}"
             app:fallback="@{@drawable/ic_account_circle_black_40dp}"
             tools:src="@drawable/ic_account_circle_black_40dp"
             />
@@ -45,7 +45,7 @@
             android:layout_toEndOf="@id/user_avatar"
             android:layout_toStartOf="@+id/tv_task_details_history_date"
             android:gravity="center_vertical"
-            android:text="@{item.taskEventIdentityNickname}"
+            android:text="@{itemModel.taskEventIdentityNickname}"
             tools:text="Vera"
             />
 
@@ -57,7 +57,7 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/key_line_1"
-            android:text="@{item.taskEventDate}"
+            android:text="@{itemModel.taskEventDate}"
             tools:text="27.02.2015"
             />
 

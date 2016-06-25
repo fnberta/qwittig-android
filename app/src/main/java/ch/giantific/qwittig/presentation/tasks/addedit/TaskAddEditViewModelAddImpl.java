@@ -282,7 +282,7 @@ public class TaskAddEditViewModelAddImpl extends ListViewModelBaseImpl<Identity,
         final List<Identity> identities = new ArrayList<>();
 
         for (int i = 0, usersInvolvedSize = mTaskIdentities.size(); i < usersInvolvedSize; i++) {
-            TaskUser taskUser = mTaskIdentities.get(i);
+            final TaskUser taskUser = mTaskIdentities.get(i);
             if (taskUser.isInvolved()) {
                 identities.add(mItems.get(i));
             }
@@ -306,7 +306,7 @@ public class TaskAddEditViewModelAddImpl extends ListViewModelBaseImpl<Identity,
 
     @Override
     public void onUsersRowItemClick(int position) {
-        TaskUser taskUser = mTaskIdentities.get(position);
+        final TaskUser taskUser = mTaskIdentities.get(position);
         if (taskUser.isInvolved()) {
             if (!userIsLastOneChecked()) {
                 taskUser.setIsInvolved(false);

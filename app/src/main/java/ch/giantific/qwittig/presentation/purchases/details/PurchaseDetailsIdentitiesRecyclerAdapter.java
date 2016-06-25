@@ -16,7 +16,7 @@ import ch.giantific.qwittig.databinding.RowPurchaseDetailsIdentitiesIdentityBind
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.purchases.details.items.PurchaseDetailsIdentitiesItemIdentity;
+import ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDetailsIdentitiesItemIdentity;
 
 /**
  * Provides a {@link RecyclerView} adapter that manages the list of identities involved in a

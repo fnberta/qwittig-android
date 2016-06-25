@@ -17,12 +17,12 @@ import java.util.List;
 
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
-import ch.giantific.qwittig.presentation.tasks.details.items.TaskDetailsBaseItem;
+import ch.giantific.qwittig.presentation.tasks.details.itemmodels.TaskDetailsItemModel;
 
 /**
  * Defines an observable view model for the task details screen.
  */
-public interface TaskDetailsViewModel extends ListViewModel<TaskDetailsBaseItem, TaskDetailsViewModel.ViewListener> {
+public interface TaskDetailsViewModel extends ListViewModel<TaskDetailsItemModel, TaskDetailsViewModel.ViewListener> {
 
     @Bindable
     String getTaskTitle();

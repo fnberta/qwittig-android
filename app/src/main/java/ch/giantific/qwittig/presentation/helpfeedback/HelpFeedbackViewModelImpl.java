@@ -12,9 +12,9 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
-import ch.giantific.qwittig.presentation.helpfeedback.items.HelpFeedbackBaseItem;
-import ch.giantific.qwittig.presentation.helpfeedback.items.HelpFeedbackHeaderItem;
-import ch.giantific.qwittig.presentation.helpfeedback.items.HelpFeedbackItem;
+import ch.giantific.qwittig.presentation.helpfeedback.itemmodels.HelpFeedbackHeader;
+import ch.giantific.qwittig.presentation.helpfeedback.itemmodels.HelpFeedbackItem;
+import ch.giantific.qwittig.presentation.helpfeedback.itemmodels.HelpFeedbackItemModel;
 
 /**
  * Provides an implementation of the {@link HelpFeedbackViewModel}.
@@ -22,24 +22,17 @@ import ch.giantific.qwittig.presentation.helpfeedback.items.HelpFeedbackItem;
 public class HelpFeedbackViewModelImpl extends ViewModelBaseImpl<HelpFeedbackViewModel.ViewListener>
         implements HelpFeedbackViewModel {
 
-    private static final HelpFeedbackBaseItem[] HELP_ITEMS = new HelpFeedbackBaseItem[]{
-            new HelpFeedbackHeaderItem(R.string.header_help),
+    private static final HelpFeedbackItemModel[] HELP_ITEMS = new HelpFeedbackItemModel[]{
+            new HelpFeedbackHeader(R.string.header_help),
             new HelpFeedbackItem(R.string.help_faq, R.drawable.ic_help_black_24dp),
             new HelpFeedbackItem(R.string.help_contact_support, R.drawable.ic_email_black_24dp),
             new HelpFeedbackItem(R.string.help_facebook, R.drawable.ic_facebook_box_black_24dp),
             new HelpFeedbackItem(R.string.help_twitter, R.drawable.ic_twitter_box_black_24dp),
-            new HelpFeedbackHeaderItem(R.string.header_feedback),
+            new HelpFeedbackHeader(R.string.header_feedback),
             new HelpFeedbackItem(R.string.help_feedback, R.drawable.ic_bug_report_black_24dp),
             new HelpFeedbackItem(R.string.help_rate, R.drawable.ic_star_rate_black_24dp),
             new HelpFeedbackItem(R.string.help_recommend, R.drawable.ic_favorite_black_24dp)
     };
-    private static final int HELP_TIPS = 1;
-    private static final int HELP_CONTACT_SUPPORT = 2;
-    private static final int HELP_FACEBOOK = 3;
-    private static final int HELP_TWITTER = 4;
-    private static final int HELP_GIVE_FEEDBACK = 6;
-    private static final int HELP_RATE = 7;
-    private static final int HELP_RECOMMEND = 8;
     private static final String EMAIL_SUPPORT = "support@qwittig.ch";
     private static final String EMAIL_FEEDBACK = "feedback@qwittig.ch";
     private static final String WEBSITE_URL = "http://www.qwittig.ch/faq";
@@ -53,7 +46,7 @@ public class HelpFeedbackViewModelImpl extends ViewModelBaseImpl<HelpFeedbackVie
     }
 
     @Override
-    public HelpFeedbackBaseItem getItemAtPosition(int position) {
+    public HelpFeedbackItemModel getItemAtPosition(int position) {
         return HELP_ITEMS[position];
     }
 
@@ -63,27 +56,28 @@ public class HelpFeedbackViewModelImpl extends ViewModelBaseImpl<HelpFeedbackVie
     }
 
     @Override
-    public void onHelpFeedbackItemClicked(int position) {
-        switch (position) {
-            case HELP_TIPS:
+    public void onHelpFeedbackItemClicked(@NonNull HelpFeedbackItem itemModel) {
+        final int titleId = itemModel.getTitle();
+        switch (titleId) {
+            case R.string.help_faq:
                 mView.openWebsite(WEBSITE_URL);
                 break;
-            case HELP_CONTACT_SUPPORT:
+            case R.string.help_contact_support:
                 mView.sendEmail(EMAIL_SUPPORT, R.string.email_support_subject, R.string.email_support_message);
                 break;
-            case HELP_FACEBOOK:
+            case R.string.help_facebook:
                 mView.openWebsite(FACEBOOK_URL);
                 break;
-            case HELP_TWITTER:
+            case R.string.help_twitter:
                 mView.openWebsite(TWITTER_URL);
                 break;
-            case HELP_GIVE_FEEDBACK:
+            case R.string.help_feedback:
                 mView.sendEmail(EMAIL_FEEDBACK, R.string.email_feedback_subject);
                 break;
-            case HELP_RATE:
+            case R.string.help_rate:
                 mView.openAppInPlayStore();
                 break;
-            case HELP_RECOMMEND:
+            case R.string.help_recommend:
                 mView.startAppInvite();
                 break;
         }
