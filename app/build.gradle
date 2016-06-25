@@ -6,8 +6,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion '23.0.3'
+    compileSdkVersion 24
+    buildToolsVersion '24.0.0'
 
     dexOptions {
         javaMaxHeapSize "3g"
@@ -16,7 +16,7 @@ android {
     defaultConfig {
         applicationId 'ch.giantific.qwittig'
         minSdkVersion 19
-        targetSdkVersion 23
+        targetSdkVersion 24
         versionCode 1
         versionName '1.0'
     }
@@ -37,7 +37,7 @@ android {
 }
 
 ext {
-    supportLibVersion = '23.4.0'
+    supportLibVersion = '24.0.0'
     playServicesVersion = '9.0.2'
     retrofitVersion = '2.0.2'
     leakCanaryVersion = '1.4-beta2'
