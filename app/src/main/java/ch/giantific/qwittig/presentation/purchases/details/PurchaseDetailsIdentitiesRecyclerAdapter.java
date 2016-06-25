@@ -47,14 +47,14 @@ public class PurchaseDetailsIdentitiesRecyclerAdapter extends BaseRecyclerAdapte
     public void onBindViewHolder(BindingRow<RowPurchaseDetailsIdentitiesIdentityBinding> holder, int position) {
         final Identity identity = mIdentities.get(position);
         final RowPurchaseDetailsIdentitiesIdentityBinding binding = holder.getBinding();
-        PurchaseDetailsIdentitiesItemIdentity item = binding.getItem();
+        PurchaseDetailsIdentitiesItemIdentity itemModel = binding.getItemModel();
 
         final boolean boldName = Objects.equals(mViewModel.getPurchaseBuyer().getObjectId(), identity.getObjectId());
-        if (item == null) {
-            item = new PurchaseDetailsIdentitiesItemIdentity(identity, boldName);
-            binding.setItem(item);
+        if (itemModel == null) {
+            itemModel = new PurchaseDetailsIdentitiesItemIdentity(identity, boldName);
+            binding.setItemModel(itemModel);
         } else {
-            item.updateIdentity(identity, boldName);
+            itemModel.updateIdentity(identity, boldName);
         }
 
         binding.executePendingBindings();

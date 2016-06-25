@@ -7,14 +7,14 @@ package ch.giantific.qwittig.presentation.purchases.addedit.itemmodels;
 import android.os.Parcel;
 import android.support.annotation.StringRes;
 
-import ch.giantific.qwittig.presentation.common.viewmodels.HeaderRowItemModelBaseImpl;
+import ch.giantific.qwittig.presentation.common.itemmodels.HeaderItemModelBaseImpl;
 
 /**
  * Provides a header row in the add or edit purchase screen.
  * <p/>
- * Subclass of {@link HeaderRowItemModelBaseImpl}.
+ * Subclass of {@link HeaderItemModelBaseImpl}.
  */
-public class PurchaseAddEditHeaderItem extends HeaderRowItemModelBaseImpl implements PurchaseAddEditItemModel {
+public class PurchaseAddEditHeaderItem extends HeaderItemModelBaseImpl implements PurchaseAddEditItemModel {
 
     public static final Creator<PurchaseAddEditHeaderItem> CREATOR = new Creator<PurchaseAddEditHeaderItem>() {
         @Override

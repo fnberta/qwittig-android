@@ -91,7 +91,7 @@ public class PurchaseDetailsRecyclerAdapter extends BaseRecyclerAdapter<Recycler
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        final PurchaseDetailsItemModel detailsItem = mViewModel.getItemAtPosition(position);
+        final PurchaseDetailsItemModel itemModel = mViewModel.getItemAtPosition(position);
 
         @Type final int viewType = getItemViewType(position);
         switch (viewType) {
@@ -99,7 +99,7 @@ public class PurchaseDetailsRecyclerAdapter extends BaseRecyclerAdapter<Recycler
                 final BindingRow<RowGenericHeaderBinding> row = (BindingRow<RowGenericHeaderBinding>) holder;
                 final RowGenericHeaderBinding binding = row.getBinding();
 
-                binding.setItemModel((PurchaseDetailsHeaderItem) detailsItem);
+                binding.setItemModel((PurchaseDetailsHeaderItem) itemModel);
                 binding.executePendingBindings();
                 break;
             }
@@ -108,7 +108,7 @@ public class PurchaseDetailsRecyclerAdapter extends BaseRecyclerAdapter<Recycler
                         (BindingRow<RowPurchaseDetailsItemBinding>) holder;
                 final RowPurchaseDetailsItemBinding binding = row.getBinding();
 
-                binding.setItem((PurchaseDetailsItem) detailsItem);
+                binding.setItemModel((PurchaseDetailsItem) itemModel);
                 binding.executePendingBindings();
                 break;
             }
@@ -117,7 +117,7 @@ public class PurchaseDetailsRecyclerAdapter extends BaseRecyclerAdapter<Recycler
                         (BindingRow<RowPurchaseDetailsMyShareBinding>) holder;
                 final RowPurchaseDetailsMyShareBinding binding = row.getBinding();
 
-                binding.setItem((PurchaseDetailsMyShareItem) detailsItem);
+                binding.setItemModel((PurchaseDetailsMyShareItem) itemModel);
                 binding.executePendingBindings();
                 break;
             }
@@ -126,7 +126,7 @@ public class PurchaseDetailsRecyclerAdapter extends BaseRecyclerAdapter<Recycler
                         (BindingRow<RowPurchaseDetailsNoteBinding>) holder;
                 final RowPurchaseDetailsNoteBinding binding = row.getBinding();
 
-                binding.setItem((PurchaseDetailsNoteItem) detailsItem);
+                binding.setItemModel((PurchaseDetailsNoteItem) itemModel);
                 binding.executePendingBindings();
                 break;
             }
@@ -135,13 +135,13 @@ public class PurchaseDetailsRecyclerAdapter extends BaseRecyclerAdapter<Recycler
                         (BindingRow<RowPurchaseDetailsTotalBinding>) holder;
                 final RowPurchaseDetailsTotalBinding binding = row.getBinding();
 
-                binding.setItem((PurchaseDetailsTotalItem) detailsItem);
+                binding.setItemModel((PurchaseDetailsTotalItem) itemModel);
                 binding.executePendingBindings();
                 break;
             }
             case Type.IDENTITIES: {
                 final UsersRow row = (UsersRow) holder;
-                final PurchaseDetailsIdentitiesItem identitiesItem = (PurchaseDetailsIdentitiesItem) detailsItem;
+                final PurchaseDetailsIdentitiesItem identitiesItem = (PurchaseDetailsIdentitiesItem) itemModel;
                 row.setIdentities(identitiesItem.getIdentities());
                 break;
             }

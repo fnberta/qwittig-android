@@ -46,7 +46,7 @@ public class PurchaseAddEditItemUsersRecyclerAdapter extends BaseRecyclerAdapter
     public void onBindViewHolder(ItemUserRow holder, int position) {
         final RowPurchaseAddItemUsersUserBinding binding = holder.getBinding();
         final PurchaseAddEditItemUsersUser addEditPurchaseItemUsersUser = mUsers.get(position);
-        binding.setItem(addEditPurchaseItemUsersUser);
+        binding.setItemModel(addEditPurchaseItemUsersUser);
         binding.executePendingBindings();
     }
 

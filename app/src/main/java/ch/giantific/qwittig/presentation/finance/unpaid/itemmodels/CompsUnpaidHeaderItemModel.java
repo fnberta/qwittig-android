@@ -7,15 +7,15 @@ package ch.giantific.qwittig.presentation.finance.unpaid.itemmodels;
 import android.annotation.SuppressLint;
 import android.support.annotation.StringRes;
 
-import ch.giantific.qwittig.presentation.common.viewmodels.HeaderRowItemModelBaseImpl;
+import ch.giantific.qwittig.presentation.common.itemmodels.HeaderItemModelBaseImpl;
 
 /**
  * Provides an implementation of the {@link CompsUnpaidItemModel} for a header item.
  * <p/>
- * Subclass of {@link HeaderRowItemModelBaseImpl}.
+ * Subclass of {@link HeaderItemModelBaseImpl}.
  */
 @SuppressLint("ParcelCreator")
-public class CompsUnpaidHeaderItemModel extends HeaderRowItemModelBaseImpl implements CompsUnpaidItemModel {
+public class CompsUnpaidHeaderItemModel extends HeaderItemModelBaseImpl implements CompsUnpaidItemModel {
 
     public CompsUnpaidHeaderItemModel(@StringRes int header) {
         super(header);

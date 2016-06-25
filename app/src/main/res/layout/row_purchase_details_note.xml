@@ -11,7 +11,7 @@
     <data>
 
         <variable
-            name="item"
+            name="itemModel"
             type="ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDetailsNoteItem"
             />
     </data>
@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/key_line_1"
         android:layout_marginStart="@dimen/key_line_1"
-        android:text="@{item.purchaseNote}"
+        android:text="@{itemModel.purchaseNote}"
         tools:text="Dies ist eine Notiz"
         />
 </layout>

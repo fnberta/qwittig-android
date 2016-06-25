@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.common.viewmodels;
+package ch.giantific.qwittig.presentation.common.itemmodels;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
@@ -13,19 +13,19 @@ import android.support.annotation.StringRes;
 import ch.giantific.qwittig.BR;
 
 /**
- * Defines an abstract base implementation of the {@link HeaderRowItemModel}.
+ * Defines an abstract base implementation of the {@link HeaderItemModel}.
  */
-public abstract class HeaderRowItemModelBaseImpl extends BaseObservable
-        implements HeaderRowItemModel, Parcelable {
+public abstract class HeaderItemModelBaseImpl extends BaseObservable
+        implements HeaderItemModel, Parcelable {
 
     @StringRes
     private int mHeader;
 
-    public HeaderRowItemModelBaseImpl(@StringRes int header) {
+    public HeaderItemModelBaseImpl(@StringRes int header) {
         mHeader = header;
     }
 
-    protected HeaderRowItemModelBaseImpl(Parcel in) {
+    protected HeaderItemModelBaseImpl(Parcel in) {
         mHeader = in.readInt();
     }
 

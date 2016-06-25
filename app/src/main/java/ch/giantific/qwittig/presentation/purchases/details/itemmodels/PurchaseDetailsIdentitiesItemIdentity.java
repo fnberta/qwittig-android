@@ -8,15 +8,15 @@ import android.databinding.Bindable;
 import android.support.annotation.NonNull;
 
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.presentation.common.viewmodels.BaseIdentityAvatarRowViewModel;
+import ch.giantific.qwittig.presentation.common.itemmodels.BaseIdentityAvatarItemModel;
 
 /**
  * Provides a row showing an identity with the avatar and the nickname (bold for the buyer of the
  * purchase).
  * <p/>
- * Subclass of {@link BaseIdentityAvatarRowViewModel}.
+ * Subclass of {@link BaseIdentityAvatarItemModel}.
  */
-public class PurchaseDetailsIdentitiesItemIdentity extends BaseIdentityAvatarRowViewModel {
+public class PurchaseDetailsIdentitiesItemIdentity extends BaseIdentityAvatarItemModel {
 
     private boolean mNicknameBold;
 

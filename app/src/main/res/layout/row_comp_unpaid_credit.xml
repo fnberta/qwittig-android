@@ -53,7 +53,7 @@
 
             <include
                 layout="@layout/include_card_top_progress"
-                app:viewModel="@{itemModel}"
+                app:itemModel="@{itemModel}"
                 />
 
             <include

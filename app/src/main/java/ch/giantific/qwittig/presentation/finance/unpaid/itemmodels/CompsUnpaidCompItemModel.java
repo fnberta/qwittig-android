@@ -5,12 +5,12 @@ import android.databinding.Bindable;
 import org.apache.commons.math3.fraction.BigFraction;
 
 import ch.giantific.qwittig.domain.models.Compensation;
-import ch.giantific.qwittig.presentation.common.viewmodels.CardTopProgressViewModel;
+import ch.giantific.qwittig.presentation.common.itemmodels.CardTopProgressItemModel;
 
 /**
  * Created by fabio on 25.06.16.
  */
-public interface CompsUnpaidCompItemModel extends CompsUnpaidItemModel, CardTopProgressViewModel {
+public interface CompsUnpaidCompItemModel extends CompsUnpaidItemModel, CardTopProgressItemModel {
 
     Compensation getCompensation();
 

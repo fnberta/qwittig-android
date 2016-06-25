@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.presentation.common.viewmodels;
+package ch.giantific.qwittig.presentation.common.itemmodels;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
@@ -15,11 +15,11 @@ import ch.giantific.qwittig.domain.models.Identity;
  * Provides an abstract base class for a list row representing an identity with the avatar and the
  * nickname.
  */
-public abstract class BaseIdentityAvatarRowViewModel extends BaseObservable {
+public abstract class BaseIdentityAvatarItemModel extends BaseObservable {
 
     private Identity mIdentity;
 
-    public BaseIdentityAvatarRowViewModel(@NonNull Identity identity) {
+    public BaseIdentityAvatarItemModel(@NonNull Identity identity) {
         setIdentity(identity);
     }
 

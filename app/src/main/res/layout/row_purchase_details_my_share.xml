@@ -14,7 +14,7 @@
         <import type="android.text.TextUtils"/>
 
         <variable
-            name="item"
+            name="itemModel"
             type="ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDetailsMyShareItem"
             />
     </data>
@@ -44,7 +44,7 @@
             android:layout_alignParentEnd="true"
             android:layout_below="@id/divider"
             android:layout_marginEnd="@dimen/key_line_1"
-            android:text="@{item.purchaseMyShare}"
+            android:text="@{itemModel.purchaseMyShare}"
             android:textColor="?android:textColorSecondary"
             tools:text="124.50 CHF"
             />
@@ -57,9 +57,9 @@
             android:layout_below="@id/tv_my_share_value"
             android:layout_marginEnd="@dimen/key_line_1"
             android:layout_marginTop="2dp"
-            android:text="@{item.purchaseMyShareForeign}"
+            android:text="@{itemModel.purchaseMyShareForeign}"
             android:textColor="?android:textColorSecondary"
-            android:visibility="@{item.purchaseMyShareForeign.equals(item.purchaseMyShare) ? View.GONE : View.VISIBLE}"
+            android:visibility="@{itemModel.purchaseMyShareForeign.equals(itemModel.purchaseMyShare) ? View.GONE : View.VISIBLE}"
             tools:text="1.34 GBP"
             tools:visibility="visible"
             />

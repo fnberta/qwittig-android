@@ -12,7 +12,7 @@
     <data>
 
         <variable
-            name="item"
+            name="itemModel"
             type="ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemUsersUser"
             />
     </data>
@@ -30,9 +30,9 @@
             android:layout_width="@dimen/avatar_size"
             android:layout_height="@dimen/avatar_size"
             android:layout_marginBottom="@dimen/min_space"
-            android:alpha="@{item.alpha}"
+            android:alpha="@{itemModel.alpha}"
             android:contentDescription="@string/user_avatar"
-            app:avatar="@{item.avatar}"
+            app:avatar="@{itemModel.avatar}"
             app:fallback="@{@drawable/ic_account_circle_black_40dp}"
             tools:src="@drawable/ic_account_circle_black_40dp"
             />
@@ -41,11 +41,11 @@
             style="@style/TextAppearance.AppCompat.Caption"
             android:layout_width="@dimen/avatar_size"
             android:layout_height="wrap_content"
-            android:alpha="@{item.alpha}"
+            android:alpha="@{itemModel.alpha}"
             android:ellipsize="marquee"
             android:gravity="center_horizontal"
             android:lines="1"
-            android:text="@{item.nickname}"
+            android:text="@{itemModel.nickname}"
             tools:text="Vera"
             />
 

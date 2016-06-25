@@ -18,14 +18,14 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.domain.models.Task.TimeFrame;
-import ch.giantific.qwittig.presentation.common.viewmodels.CardTopProgressViewModel;
+import ch.giantific.qwittig.presentation.common.itemmodels.CardTopProgressItemModel;
 import ch.giantific.qwittig.presentation.tasks.details.itemmodels.TaskDetailsItemModel;
 import ch.giantific.qwittig.utils.DateUtils;
 
 /**
  * Provides an implementation of the {@link TaskDetailsItemModel} interface for a task item.
  */
-public class TasksItem extends BaseObservable implements TasksItemModel, CardTopProgressViewModel {
+public class TasksItem extends BaseObservable implements TasksItemModel, CardTopProgressItemModel {
 
     private boolean mCurrentUserResponsible;
     private ViewListener mView;

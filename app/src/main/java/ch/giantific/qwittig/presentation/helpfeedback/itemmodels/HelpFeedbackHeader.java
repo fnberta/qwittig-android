@@ -7,14 +7,14 @@ package ch.giantific.qwittig.presentation.helpfeedback.itemmodels;
 import android.os.Parcel;
 import android.support.annotation.StringRes;
 
-import ch.giantific.qwittig.presentation.common.viewmodels.HeaderRowItemModelBaseImpl;
+import ch.giantific.qwittig.presentation.common.itemmodels.HeaderItemModelBaseImpl;
 
 /**
  * Provides a header row in the help and feedback screen.
  * <p/>
- * Subclass of {@link HeaderRowItemModelBaseImpl}.
+ * Subclass of {@link HeaderItemModelBaseImpl}.
  */
-public class HelpFeedbackHeader extends HeaderRowItemModelBaseImpl implements HelpFeedbackItemModel {
+public class HelpFeedbackHeader extends HeaderItemModelBaseImpl implements HelpFeedbackItemModel {
 
     public static final Creator<HelpFeedbackHeader> CREATOR = new Creator<HelpFeedbackHeader>() {
         @Override
