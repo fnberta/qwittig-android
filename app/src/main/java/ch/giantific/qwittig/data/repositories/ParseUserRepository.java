@@ -82,7 +82,7 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
     private static final String PARAM_IDENTITY_ID = "identityId";
     private static final String CALCULATE_BALANCES = "calculateBalances";
     private static final String ADD_NEW_GROUP = "addGroup";
-    private static final String FIRST_GROUP_NAME = "Qwittig";
+    private static final String FIRST_GROUP_NAME = "Meine WG";
     private static final String FIRST_GROUP_CURRENCY = "CHF";
     private final GcmNetworkManager mGcmNetworkManager;
 
@@ -229,7 +229,9 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
     }
 
     private Single<Identity> addFirstGroup(@NonNull final User user, @NonNull String identityId) {
-        final Single<String> addGroup = TextUtils.isEmpty(identityId) ? addGroup(FIRST_GROUP_NAME, FIRST_GROUP_CURRENCY) : addIdentityToUser(identityId);
+        final Single<String> addGroup = TextUtils.isEmpty(identityId)
+                ? addGroup(FIRST_GROUP_NAME, FIRST_GROUP_CURRENCY)
+                : addIdentityToUser(identityId);
         return addGroup
                 .flatMap(new Func1<String, Single<? extends User>>() {
                     @Override
