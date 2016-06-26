@@ -28,8 +28,8 @@
     <dimen name="icon_size">24dp</dimen>
     <dimen name="icon_padding">12dp</dimen>
     <dimen name="icon_compound_drawable_padding_end">32dp</dimen>
-
-    <!-- Checkbox special margins -->
+    <dimen name="compensation_avatar_width">100dp</dimen>
+    <dimen name="compensation_avatar_height">143dp</dimen>
 
     <!-- Toolbar -->
     <dimen name="toolbar_height_x2">112dp</dimen>

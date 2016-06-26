@@ -22,8 +22,8 @@
         android:contentDescription="@string/user_avatar"
         android:scaleType="centerCrop"
         app:avatarSquare="@{itemModel.compUserAvatar}"
-        app:fallback="@{@drawable/ic_account_circle_black_80dp}"
-        tools:src="@drawable/ic_account_circle_black_80dp"
+        app:fallback="@{@drawable/ic_account_box_black_80dp}"
+        tools:src="@drawable/ic_account_box_black_80dp"
         />
 
 </layout>
