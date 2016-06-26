@@ -68,7 +68,7 @@ public class SettingsAddGroupFragment extends BaseFragment<SettingsGroupUsersCom
 
     @Override
     protected View getSnackbarView() {
-        return mBinding.tvSettingsGroupAddHeader;
+        return mBinding.etSettingsGroupAddNewName;
     }
 
     @Override

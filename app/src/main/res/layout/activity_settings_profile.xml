@@ -102,7 +102,7 @@
             android:progressFinalAnimationListener="@{viewModel.progressFinalAnimationListener}"
             app:progress="@{viewModel.saving}"
             app:animStop="@{viewModel.animStop}"
-            app:fp_arcColor="@color/green_500"
+            app:fp_arcColor="@color/green"
             app:fp_finalIcon="@drawable/ic_done_black_24dp"
             app:layout_anchor="@id/appbar"
             app:layout_anchorGravity="bottom|end"

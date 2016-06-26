@@ -73,7 +73,7 @@
                 android:layout_toEndOf="@id/iv_avatar"
                 android:onClick="@{() -> viewModel.onConfirmButtonClick(itemModel)}"
                 android:text="@string/comp_unpaid_button_confirm"
-                android:textColor="?attr/colorAccent"
+                android:textColor="?attr/colorPrimary"
                 />
 
             <Button

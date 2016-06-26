@@ -87,16 +87,16 @@ public class CircleDisplay extends View {
 
         mArcPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mArcPaint.setStyle(Style.FILL);
-        mArcPaint.setColor(fetchAccentColor(context));
+        mArcPaint.setColor(getColor(context));
 
         mDrawAnimator = ObjectAnimator.ofFloat(this, "phase", mPhase, 1.0f).setDuration(1000);
         mDrawAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
     }
 
     @ColorInt
-    private int fetchAccentColor(Context context) {
+    private int getColor(Context context) {
         final TypedValue typedValue = new TypedValue();
-        final TypedArray a = context.obtainStyledAttributes(typedValue.data, new int[] { R.attr.colorAccent });
+        final TypedArray a = context.obtainStyledAttributes(typedValue.data, new int[] { R.attr.colorPrimary });
         final int color = a.getColor(0, 0);
         a.recycle();
 

@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import ch.giantific.qwittig.presentation.helpfeedback.itemmodels.HelpFeedbackHeader;
 import ch.giantific.qwittig.presentation.helpfeedback.itemmodels.HelpFeedbackItem;
@@ -28,6 +29,7 @@ public class HelpFeedbackViewModelImpl extends ViewModelBaseImpl<HelpFeedbackVie
             new HelpFeedbackItem(R.string.help_contact_support, R.drawable.ic_email_black_24dp),
             new HelpFeedbackItem(R.string.help_facebook, R.drawable.ic_facebook_box_black_24dp),
             new HelpFeedbackItem(R.string.help_twitter, R.drawable.ic_twitter_box_black_24dp),
+            new HelpFeedbackItem(R.string.help_tutorial, R.drawable.ic_school_black_24dp),
             new HelpFeedbackHeader(R.string.header_feedback),
             new HelpFeedbackItem(R.string.help_feedback, R.drawable.ic_bug_report_black_24dp),
             new HelpFeedbackItem(R.string.help_rate, R.drawable.ic_star_rate_black_24dp),
@@ -38,11 +40,15 @@ public class HelpFeedbackViewModelImpl extends ViewModelBaseImpl<HelpFeedbackVie
     private static final String WEBSITE_URL = "http://www.qwittig.ch/faq";
     private static final String FACEBOOK_URL = "http://facebook.com/qwittig";
     private static final String TWITTER_URL = "http://twitter.com/qwittig";
+    private Navigator mNavigator;
 
     public HelpFeedbackViewModelImpl(@Nullable Bundle savedState,
+                                     @NonNull Navigator navigator,
                                      @NonNull RxBus<Object> eventBus,
                                      @NonNull UserRepository userRepository) {
         super(savedState, eventBus, userRepository);
+
+        mNavigator = navigator;
     }
 
     @Override
@@ -70,6 +76,9 @@ public class HelpFeedbackViewModelImpl extends ViewModelBaseImpl<HelpFeedbackVie
                 break;
             case R.string.help_twitter:
                 mView.openWebsite(TWITTER_URL);
+                break;
+            case R.string.help_tutorial:
+                mNavigator.startFirstRun();
                 break;
             case R.string.help_feedback:
                 mView.sendEmail(EMAIL_FEEDBACK, R.string.email_feedback_subject);

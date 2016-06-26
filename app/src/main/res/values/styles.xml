@@ -39,6 +39,10 @@
 
     <style name="AppTheme.SlideEnd" parent="AppTheme"/>
 
+    <style name="AppTheme.PrimaryAsAccent" parent="AppTheme">
+        <item name="colorAccent">@color/blue</item>
+    </style>
+
     <style name="AppTheme.DrawStatusBar" parent="AppTheme"/>
 
     <style name="AppTheme.DrawStatusBar.Explode" parent="AppTheme.DrawStatusBar"/>
@@ -53,7 +57,7 @@
         <item name="colorPrimaryDark">@color/red_dark</item>
     </style>
 
-    <style name="AppTheme.DrawStatusBar.Launcher" parent="AppTheme.DrawStatusBar">
+    <style name="AppTheme.Launcher" parent="AppTheme">
         <item name="android:windowBackground">@drawable/launch_screen</item>
     </style>
 
@@ -72,4 +76,5 @@
     <style name="HomeToolbarTitle">
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.Display1</item>
     </style>
+
 </resources>

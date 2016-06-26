@@ -15,6 +15,7 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
+import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.helpfeedback.di.DaggerHelpFeedbackComponent;
 import ch.giantific.qwittig.presentation.helpfeedback.di.HelpFeedbackComponent;
@@ -46,6 +47,7 @@ public class HelpFeedbackActivity extends BaseActivity<HelpFeedbackComponent> {
     protected void injectDependencies(@Nullable Bundle savedInstanceState) {
         mComponent = DaggerHelpFeedbackComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
+                .navigatorModule(new NavigatorModule(this))
                 .helpFeedbackViewModelModule(new HelpFeedbackViewModelModule(savedInstanceState))
                 .build();
         mComponent.inject(this);

@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.helpfeedback.HelpFeedbackViewModel;
 import ch.giantific.qwittig.presentation.helpfeedback.HelpFeedbackViewModelImpl;
@@ -29,8 +30,9 @@ public class HelpFeedbackViewModelModule extends BaseViewModelModule {
 
     @PerActivity
     @Provides
-    HelpFeedbackViewModel providesHelpFeedbackViewModel(@NonNull RxBus<Object> eventBus,
+    HelpFeedbackViewModel providesHelpFeedbackViewModel(@NonNull Navigator navigator,
+                                                        @NonNull RxBus<Object> eventBus,
                                                         @NonNull UserRepository userRepository) {
-        return new HelpFeedbackViewModelImpl(mSavedState, eventBus, userRepository);
+        return new HelpFeedbackViewModelImpl(mSavedState, navigator, eventBus, userRepository);
     }
 }

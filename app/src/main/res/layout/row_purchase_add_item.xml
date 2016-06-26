@@ -58,6 +58,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="7"
                 android:error="@{!itemModel.validate ? null : itemModel.nameComplete ? null : @string/error_item_name}"
+                android:theme="@style/AppTheme.PrimaryAsAccent"
                 >
 
                 <EditText
@@ -79,6 +80,7 @@
                 android:layout_marginEnd="@dimen/normal_space"
                 android:layout_weight="3"
                 android:error="@{!itemModel.validate ? null : itemModel.priceComplete ? null : @string/error_item_price}"
+                android:theme="@style/AppTheme.PrimaryAsAccent"
                 >
 
                 <EditText

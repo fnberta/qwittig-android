@@ -346,5 +346,6 @@
     <string name="toast_ocr_rating_details">Please tick every question</string>
     <string name="tut_camera_guidance">Keep the receipt straight and make sure the relevant parts are included.</string>
     <string name="tut_camera_header">The better picture you take, the better the result will be!</string>
+    <string name="help_tutorial">Watch intro tutorial</string>
 
 </resources>

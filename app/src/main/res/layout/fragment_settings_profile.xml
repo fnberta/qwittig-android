@@ -54,8 +54,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/key_line_1"
-                    android:transitionGroup="true"
                     android:error="@{!viewModel.validate ? null : viewModel.nicknameComplete ? null : @string/error_nickname}"
+                    android:theme="@style/AppTheme.PrimaryAsAccent"
+                    android:transitionGroup="true"
                     >
 
                     <EditText
@@ -64,8 +65,8 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/hint_nickname"
                         android:inputType="textPersonName"
-                        android:text="@{viewModel.nickname}"
                         android:onTextChanged="@{viewModel::onNicknameChanged}"
+                        android:text="@{viewModel.nickname}"
                         />
 
                 </android.support.design.widget.TextInputLayout>
@@ -94,8 +95,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/key_line_1"
-                    android:transitionGroup="true"
                     android:error="@{!viewModel.validate ? null : viewModel.emailValid ? null : @string/error_email}"
+                    android:theme="@style/AppTheme.PrimaryAsAccent"
+                    android:transitionGroup="true"
                     >
 
                     <EditText
@@ -104,8 +106,8 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/hint_email"
                         android:inputType="textEmailAddress"
-                        android:text="@{viewModel.email}"
                         android:onTextChanged="@{viewModel::onEmailChanged}"
+                        android:text="@{viewModel.email}"
                         />
 
                 </android.support.design.widget.TextInputLayout>
@@ -134,8 +136,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/key_line_1"
-                    android:transitionGroup="true"
                     android:error="@{!viewModel.validate ? null : viewModel.passwordValid ? null : @string/error_password}"
+                    android:theme="@style/AppTheme.PrimaryAsAccent"
+                    android:transitionGroup="true"
                     >
 
                     <EditText
@@ -157,9 +160,10 @@
                 android:layout_marginEnd="@dimen/key_line_1"
                 android:layout_marginStart="@dimen/key_line_2"
                 android:layout_marginTop="@dimen/small_space"
+                android:error="@{!viewModel.validate ? null : viewModel.passwordEqual ? null : @string/error_password_match}"
+                android:theme="@style/AppTheme.PrimaryAsAccent"
                 android:transitionGroup="true"
                 android:visibility="@{viewModel.emailAndPasswordVisible ? View.VISIBLE : View.GONE}"
-                android:error="@{!viewModel.validate ? null : viewModel.passwordEqual ? null : @string/error_password_match}"
                 >
 
                 <EditText

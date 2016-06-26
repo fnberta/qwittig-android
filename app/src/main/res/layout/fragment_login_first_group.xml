@@ -31,19 +31,8 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:orientation="vertical"
+            android:layout_marginTop="@dimen/normal_space"
             >
-
-            <TextView
-                android:id="@+id/tv_login_first_group_header"
-                style="@style/SubHeader"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/subheader_height"
-                android:clickable="false"
-                android:gravity="center_vertical"
-                android:paddingEnd="@dimen/key_line_1"
-                android:paddingStart="@dimen/key_line_1"
-                android:text="@string/header_login_first_group"
-                />
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/til_login_group_name"

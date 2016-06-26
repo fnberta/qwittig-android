@@ -80,7 +80,7 @@ dependencies {
     compile 'com.facebook.android:facebook-android-sdk:4.10.0'
     compile 'com.github.PhilJay:MPAndroidChart:v2.2.5'
     compile 'com.vinaysshenoy:mugen:1.0.3'
-    compile 'com.heinrichreimersoftware:material-intro:1.5.4'
+    compile 'com.heinrichreimersoftware:material-intro:1.5.5'
     compile 'com.github.fnberta:FabProgress:0.1'
     compile project(':fabMenu')
 //    debugCompile "com.squareup.leakcanary:leakcanary-android:${leakCanaryVersion}"

@@ -55,6 +55,7 @@
                     android:id="@+id/til_task_add_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:theme="@style/AppTheme.PrimaryAsAccent"
                     android:transitionGroup="true"
                     app:errorEnabled="false"
                     >
@@ -67,8 +68,8 @@
                         android:hint="@string/hint_new_task"
                         android:imeOptions="actionDone"
                         android:inputType="text|textCapSentences"
-                        android:text="@{viewModel.taskTitle}"
                         android:onTextChanged="@{viewModel::onTitleChanged}"
+                        android:text="@{viewModel.taskTitle}"
                         />
 
                 </android.support.design.widget.TextInputLayout>

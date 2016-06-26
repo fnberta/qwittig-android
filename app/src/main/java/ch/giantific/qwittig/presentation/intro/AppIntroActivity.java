@@ -20,24 +20,24 @@ public class AppIntroActivity extends IntroActivity {
                 .title("some title")
                 .description("some description")
                 .image(R.drawable.ic_shopping_cart_black_144dp)
-                .background(R.color.indigo_500)
-                .backgroundDark(R.color.indigo_700)
+                .background(R.color.blue)
+                .backgroundDark(R.color.blue_dark)
                 .build());
 
         addSlide(new SimpleSlide.Builder()
                 .title("some other title")
                 .description("some other description")
                 .image(R.drawable.ic_attach_money_black_144dp)
-                .background(R.color.red_500)
-                .backgroundDark(R.color.red_700)
+                .background(R.color.red)
+                .backgroundDark(R.color.red_dark)
                 .build());
 
         addSlide(new SimpleSlide.Builder()
                 .title("some other title again")
                 .description("some other description agin")
                 .image(R.drawable.ic_account_box_black_144dp)
-                .background(R.color.green_500)
-                .backgroundDark(R.color.green_700)
+                .background(R.color.green)
+                .backgroundDark(R.color.green_dark)
                 .build());
     }
 }

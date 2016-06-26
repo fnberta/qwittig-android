@@ -30,11 +30,13 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        >
         <activity
             android:name=".presentation.purchases.list.HomeActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.DrawStatusBar.Launcher">
+            android:theme="@style/AppTheme.Launcher"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -43,7 +45,8 @@
             <intent-filter>
                 <data
                     android:host="open"
-                    android:scheme="qwittig"/>
+                    android:scheme="qwittig"
+                    />
 
                 <action android:name="android.intent.action.VIEW"/>
 
@@ -84,86 +87,104 @@
         <activity
             android:name=".presentation.settings.general.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".presentation.purchases.list.HomeActivity"/>
+            android:parentActivityName=".presentation.purchases.list.HomeActivity"
+            android:theme="@style/AppTheme.PrimaryAsAccent"
+            />
         <activity
             android:name=".presentation.purchases.details.PurchaseDetailsActivity"
             android:label="@string/title_activity_purchase_details"
             android:parentActivityName=".presentation.purchases.list.HomeActivity"
-            android:theme="@style/AppTheme.DrawStatusBar.Explode"/>
+            android:theme="@style/AppTheme.DrawStatusBar.Explode"
+            />
         <activity
             android:name=".presentation.purchases.addedit.add.PurchaseAddActivity"
             android:label="@string/title_activity_add_purchase"
             android:parentActivityName=".presentation.purchases.list.HomeActivity"
             android:theme="@style/AppTheme.SlideBottom"
-            android:windowSoftInputMode="stateUnchanged"/>
+            android:windowSoftInputMode="stateUnchanged"
+            />
         <activity
             android:name=".presentation.purchases.addedit.edit.PurchaseEditActivity"
             android:label="@string/title_activity_edit_purchase"
             android:parentActivityName=".presentation.purchases.details.PurchaseDetailsActivity"
             android:theme="@style/AppTheme.SlideEnd"
-            android:windowSoftInputMode="stateUnchanged"/>
+            android:windowSoftInputMode="stateUnchanged"
+            />
         <activity
             android:name=".presentation.login.LoginActivity"
             android:label="@string/title_activity_login"
             android:theme="@style/AppThemeDark.Login"
-            android:windowSoftInputMode="stateUnchanged|adjustPan"/>
+            android:windowSoftInputMode="stateUnchanged|adjustPan"
+            />
         <activity
             android:name=".presentation.settings.groupusers.addgroup.SettingsAddGroupActivity"
             android:label="@string/title_activity_settings_group_new"
             android:parentActivityName=".presentation.settings.general.SettingsActivity"
             android:theme="@style/AppTheme.Explode"
-            android:windowSoftInputMode="stateUnchanged"/>
+            android:windowSoftInputMode="stateUnchanged"
+            />
         <activity
             android:name=".presentation.settings.groupusers.users.SettingsUsersActivity"
             android:label="@string/title_activity_settings_users"
             android:parentActivityName=".presentation.settings.general.SettingsActivity"
             android:theme="@style/AppTheme.Explode"
-            android:windowSoftInputMode="stateUnchanged"/>
+            android:windowSoftInputMode="stateUnchanged"
+            />
         <activity
             android:name=".presentation.settings.profile.SettingsProfileActivity"
             android:label="@string/title_activity_settings_profile"
             android:parentActivityName=".presentation.settings.general.SettingsActivity"
             android:theme="@style/AppTheme.DrawStatusBar.Explode"
-            android:windowSoftInputMode="stateUnchanged"/>
+            android:windowSoftInputMode="stateUnchanged"
+            />
         <activity
             android:name=".presentation.finance.FinanceActivity"
             android:label="@string/title_activity_finance"
             android:parentActivityName=".presentation.purchases.list.HomeActivity"
-            android:theme="@style/AppTheme.DrawStatusBar"/>
+            android:theme="@style/AppTheme.DrawStatusBar"
+            />
         <activity
             android:name=".presentation.helpfeedback.HelpFeedbackActivity"
             android:label="@string/title_activity_help_feedback"
-            android:parentActivityName=".presentation.purchases.list.HomeActivity"/>
+            android:parentActivityName=".presentation.purchases.list.HomeActivity"
+            />
         <activity
             android:name=".presentation.stats.StatsActivity"
             android:label="@string/title_activity_stats"
-            android:theme="@style/AppTheme.DrawStatusBar"/>
+            android:theme="@style/AppTheme.DrawStatusBar"
+            />
         <activity
             android:name=".presentation.tasks.list.TasksActivity"
             android:label="@string/title_activity_tasks"
-            android:theme="@style/AppTheme.DrawStatusBar"/>
+            android:theme="@style/AppTheme.DrawStatusBar"
+            />
         <activity
             android:name=".presentation.tasks.details.TaskDetailsActivity"
             android:label="@string/title_activity_task_detail"
             android:parentActivityName=".presentation.tasks.list.TasksActivity"
-            android:theme="@style/AppTheme.DrawStatusBar.Explode"/>
+            android:theme="@style/AppTheme.DrawStatusBar.Explode"
+            />
         <activity
             android:name=".presentation.tasks.addedit.TaskAddActivity"
             android:label="@string/title_activity_task_add"
             android:parentActivityName=".presentation.tasks.list.TasksActivity"
-            android:theme="@style/AppTheme.SlideBottom"/>
+            android:theme="@style/AppTheme.SlideBottom"
+            />
         <activity
             android:name=".presentation.tasks.addedit.TaskEditActivity"
             android:label="@string/title_activity_task_edit"
             android:parentActivityName=".presentation.tasks.details.TaskDetailsActivity"
-            android:theme="@style/AppTheme.SlideEnd"/>
+            android:theme="@style/AppTheme.SlideEnd"
+            />
         <activity
             android:name=".presentation.camera.CameraActivity"
             android:label="@string/title_activity_camera"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            />
         <activity
             android:name=".presentation.intro.AppIntroActivity"
-            android:theme="@style/Theme.Intro"/>
+            android:theme="@style/Theme.Intro"
+            />
         <activity
             android:name=".presentation.purchases.ocrrating.OcrRatingActivity"
             android:label="@string/title_activity_ocr_rating"
@@ -173,16 +194,19 @@
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            />
 
         <service android:name="com.parse.PushService"/>
         <service
             android:name=".data.services.ParseQueryService"
-            android:exported="false"/>
+            android:exported="false"
+            />
         <service
             android:name=".data.services.SavePurchaseTaskService"
             android:exported="true"
-            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE">
+            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"
+            >
             <intent-filter>
                 <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY"/>
             </intent-filter>
@@ -190,7 +214,8 @@
         <service
             android:name=".data.services.SaveIdentityTaskService"
             android:exported="true"
-            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE">
+            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"
+            >
             <intent-filter>
                 <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY"/>
             </intent-filter>
@@ -208,7 +233,8 @@
         </receiver>
         <receiver
             android:name=".data.push.PushBroadcastReceiver"
-            android:exported="false">
+            android:exported="false"
+            >
             <intent-filter>
                 <action android:name="com.parse.push.intent.RECEIVE"/>
                 <action android:name="com.parse.push.intent.DELETE"/>
@@ -219,7 +245,8 @@
         </receiver>
         <receiver
             android:name="io.branch.referral.InstallListener"
-            android:exported="true">
+            android:exported="true"
+            >
             <intent-filter>
                 <action android:name="com.android.vending.INSTALL_REFERRER"/>
             </intent-filter>
@@ -227,16 +254,20 @@
 
         <meta-data
             android:name="com.parse.push.notification_icon"
-            android:resource="@drawable/ic_shopping_cart_white_24dp"/>
+            android:resource="@drawable/ic_shopping_cart_white_24dp"
+            />
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id"/>
+            android:value="@string/facebook_app_id"
+            />
         <meta-data
             android:name="com.parse.push.gcm_sender_id"
-            android:value="id:1027430235430"/>
+            android:value="id:1027430235430"
+            />
         <meta-data
             android:name="io.branch.sdk.BranchKey"
-            android:value="key_live_acnS5GHRD6gburgxVhUKEfjoFycGimNB"/>
+            android:value="key_live_acnS5GHRD6gburgxVhUKEfjoFycGimNB"
+            />
 
     </application>
 

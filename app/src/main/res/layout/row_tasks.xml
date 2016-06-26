@@ -124,9 +124,9 @@
                 android:layout_marginEnd="@dimen/normal_space"
                 android:layout_marginTop="@dimen/normal_space"
                 android:text="@{itemModel.taskDeadline}"
-                android:textColor="@{itemModel.isTaskDeadlinePast ? @color/red_500 : @color/green_500}"
+                android:textColor="@{itemModel.isTaskDeadlinePast ? @color/red : @color/green}"
                 tools:text="In 2 Tagen"
-                tools:textColor="@color/green_500"
+                tools:textColor="@color/green"
                 />
 
             <View
