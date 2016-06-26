@@ -46,7 +46,6 @@ public class HelpFeedbackFragment extends BaseRecyclerViewFragment<HelpFeedbackC
         super.onActivityCreated(savedInstanceState);
 
         mViewModel.attachView(this);
-        mBinding.setViewModel(mViewModel);
     }
 
     @Override
@@ -78,12 +77,6 @@ public class HelpFeedbackFragment extends BaseRecyclerViewFragment<HelpFeedbackC
 //                }
 //                break;
 //        }
-    }
-
-    @Override
-    public void openWebsite(@NonNull String url) {
-        final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        startActivity(intent);
     }
 
     @Override

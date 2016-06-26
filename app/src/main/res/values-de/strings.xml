@@ -134,8 +134,8 @@
     <string name="error_valid_amount">Bitte gib einen gültigen Betrag an</string>
     <string name="tab_compensations_archive">Archiv</string>
     <string name="tab_compensations_new">Abrechnung</string>
-    <string name="header_settings_users_new">Neuer Nutzer/-in</string>
-    <string name="header_settings_users_existing">Bestehende Nutzer/-innen</string>
+    <string name="header_settings_users_new">Neuer Nutzer</string>
+    <string name="header_settings_users_existing">Bestehende Nutzer</string>
     <string name="header_purchase">Details</string>
     <string name="action_purchase_edit_save_changes_draft">Speichere Änderungen im Entwurf</string>
     <string name="toast_changes_saved_as_draft">Änderungen im Entwurf gespeichert</string>
@@ -149,8 +149,8 @@
     <string name="action_purchase_add_edit_receipt_delete">Quittung löschen</string>
     <string name="action_purchase_add_edit_receipt_add">Quittung hinzufügen</string>
     <string name="toast_receipt_deleted">Quittung gelöscht</string>
-    <string name="help_facebook">Finde Qwittig auf Facebook</string>
-    <string name="help_twitter">Finde Qwittig auf Twitter</string>
+    <string name="about_facebook">Finde Qwittig auf Facebook</string>
+    <string name="about_twitter">Finde Qwittig auf Twitter</string>
     <string name="push_action_confirm">Bestätigen</string>
     <string name="push_purchase_new_multiple_title">%1$d neue Einkäufe</string>
     <string name="push_purchase_new_multiple_more">weitere</string>
@@ -341,5 +341,11 @@
     <string name="tut_camera_guidance">Beachte, dass die Quittung gerade ist und alle relevanten Teil auf dem Bild ersichtlich sind.</string>
     <string name="tut_camera_header">Je besser das Bild, desto besser wird das Resultat sein!</string>
     <string name="help_tutorial">Intro Tutorial ansehen</string>
+    <string name="title_activity_about">Über Qwittig</string>
+    <string name="header_social">Social</string>
+    <string name="header_legal">Rechtliches</string>
+    <string name="about_usage">Nutzungsbedingungen</string>
+    <string name="about_privacy">Datenschutzbestimmungen</string>
+    <string name="about_website">Website besuchen</string>
 
 </resources>

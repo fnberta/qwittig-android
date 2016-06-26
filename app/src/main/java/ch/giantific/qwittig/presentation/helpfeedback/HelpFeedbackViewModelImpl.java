@@ -27,8 +27,6 @@ public class HelpFeedbackViewModelImpl extends ViewModelBaseImpl<HelpFeedbackVie
             new HelpFeedbackHeader(R.string.header_help),
             new HelpFeedbackItem(R.string.help_faq, R.drawable.ic_help_black_24dp),
             new HelpFeedbackItem(R.string.help_contact_support, R.drawable.ic_email_black_24dp),
-            new HelpFeedbackItem(R.string.help_facebook, R.drawable.ic_facebook_box_black_24dp),
-            new HelpFeedbackItem(R.string.help_twitter, R.drawable.ic_twitter_box_black_24dp),
             new HelpFeedbackItem(R.string.help_tutorial, R.drawable.ic_school_black_24dp),
             new HelpFeedbackHeader(R.string.header_feedback),
             new HelpFeedbackItem(R.string.help_feedback, R.drawable.ic_bug_report_black_24dp),
@@ -37,9 +35,8 @@ public class HelpFeedbackViewModelImpl extends ViewModelBaseImpl<HelpFeedbackVie
     };
     private static final String EMAIL_SUPPORT = "support@qwittig.ch";
     private static final String EMAIL_FEEDBACK = "feedback@qwittig.ch";
-    private static final String WEBSITE_URL = "http://www.qwittig.ch/faq";
-    private static final String FACEBOOK_URL = "http://facebook.com/qwittig";
-    private static final String TWITTER_URL = "http://twitter.com/qwittig";
+    private static final String FAQ_URL = "http://www.qwittig.ch/faq";
+
     private Navigator mNavigator;
 
     public HelpFeedbackViewModelImpl(@Nullable Bundle savedState,
@@ -66,16 +63,10 @@ public class HelpFeedbackViewModelImpl extends ViewModelBaseImpl<HelpFeedbackVie
         final int titleId = itemModel.getTitle();
         switch (titleId) {
             case R.string.help_faq:
-                mView.openWebsite(WEBSITE_URL);
+                mNavigator.openWebsite(FAQ_URL);
                 break;
             case R.string.help_contact_support:
                 mView.sendEmail(EMAIL_SUPPORT, R.string.email_support_subject, R.string.email_support_message);
-                break;
-            case R.string.help_facebook:
-                mView.openWebsite(FACEBOOK_URL);
-                break;
-            case R.string.help_twitter:
-                mView.openWebsite(TWITTER_URL);
                 break;
             case R.string.help_tutorial:
                 mNavigator.startFirstRun();

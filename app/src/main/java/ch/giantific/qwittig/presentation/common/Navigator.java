@@ -12,16 +12,17 @@ import android.text.TextUtils;
 import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.models.Task;
+import ch.giantific.qwittig.presentation.about.AboutActivity;
+import ch.giantific.qwittig.presentation.camera.CameraActivity;
 import ch.giantific.qwittig.presentation.finance.FinanceActivity;
 import ch.giantific.qwittig.presentation.helpfeedback.HelpFeedbackActivity;
 import ch.giantific.qwittig.presentation.intro.AppIntroActivity;
 import ch.giantific.qwittig.presentation.login.LoginActivity;
 import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddActivity;
 import ch.giantific.qwittig.presentation.purchases.addedit.edit.PurchaseEditActivity;
-import ch.giantific.qwittig.presentation.purchases.ocrrating.OcrRatingActivity;
 import ch.giantific.qwittig.presentation.purchases.details.PurchaseDetailsActivity;
-import ch.giantific.qwittig.presentation.camera.CameraActivity;
 import ch.giantific.qwittig.presentation.purchases.list.HomeActivity;
+import ch.giantific.qwittig.presentation.purchases.ocrrating.OcrRatingActivity;
 import ch.giantific.qwittig.presentation.settings.general.SettingsActivity;
 import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileActivity;
 import ch.giantific.qwittig.presentation.stats.StatsActivity;
@@ -201,5 +202,15 @@ public class Navigator {
     public void startCamera() {
         final Intent intent = new Intent(mActivity, CameraActivity.class);
         mActivity.startActivityForResult(intent, INTENT_REQUEST_IMAGE_CAPTURE);
+    }
+
+    public void openWebsite(@NonNull String url) {
+        final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        mActivity.startActivity(intent);
+    }
+
+    public void startAbout() {
+        final Intent intent = new Intent(mActivity, AboutActivity.class);
+        mActivity.startActivity(intent);
     }
 }

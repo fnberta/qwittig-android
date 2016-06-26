@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <variable
+            name="itemModel"
+            type="ch.giantific.qwittig.presentation.about.itemmodels.AboutItem"
+            />
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.about.AboutViewModel"
+            />
+    </data>
+
+    <TextView
+        style="@style/TextAppearance.AppCompat.Subhead.List"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/list_icon_with_text"
+        android:background="?selectableItemBackground"
+        android:drawablePadding="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
+        android:gravity="center_vertical"
+        android:onClick="@{() -> viewModel.onAboutItemClick(itemModel)}"
+        android:paddingEnd="@dimen/key_line_1"
+        android:paddingStart="@dimen/key_line_1"
+        android:text="@{itemModel.title}"
+        app:drawableStartBounds="@{itemModel.icon}"
+        tools:text="Send Feedback"
+        />
+
+</layout>

@@ -37,8 +37,6 @@ public interface HelpFeedbackViewModel extends ViewModel<HelpFeedbackViewModel.V
      * Defines the interaction with attached view.
      */
     interface ViewListener extends ViewModel.ViewListener {
-        void openWebsite(@NonNull String url);
-
         void sendEmail(@NonNull String recipient, @StringRes int subject);
 
         void sendEmail(@NonNull String recipient, @StringRes int subject, @StringRes int body);

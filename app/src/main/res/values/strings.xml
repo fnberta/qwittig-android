@@ -149,8 +149,8 @@
     <string name="action_purchase_add_edit_receipt_delete">Delete receipt</string>
     <string name="action_purchase_add_edit_receipt_add">Add receipt</string>
     <string name="toast_receipt_deleted">Deleted receipt</string>
-    <string name="help_facebook">Find Qwittig on Facebook</string>
-    <string name="help_twitter">Find Qwittig on Twitter</string>
+    <string name="about_facebook">Find Qwittig on Facebook</string>
+    <string name="about_twitter">Find Qwittig on Twitter</string>
     <string name="push_action_confirm">Confirm</string>
     <string name="push_purchase_new_multiple_title">%1$d new items</string>
     <string name="push_purchase_new_multiple_more">more</string>
@@ -347,5 +347,11 @@
     <string name="tut_camera_guidance">Keep the receipt straight and make sure the relevant parts are included.</string>
     <string name="tut_camera_header">The better picture you take, the better the result will be!</string>
     <string name="help_tutorial">Watch intro tutorial</string>
+    <string name="title_activity_about">About Qwittig</string>
+    <string name="header_social">Social</string>
+    <string name="header_legal">Legal</string>
+    <string name="about_usage">Usage</string>
+    <string name="about_privacy">Privacy</string>
+    <string name="about_website">Visit website</string>
 
 </resources>

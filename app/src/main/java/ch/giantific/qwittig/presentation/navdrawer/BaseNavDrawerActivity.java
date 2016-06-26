@@ -167,6 +167,9 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
             case R.id.nav_help_feedback:
                 mNavigator.startHelpFeedback();
                 break;
+            case R.id.nav_about:
+                mNavigator.startAbout();
+                break;
         }
     }
 

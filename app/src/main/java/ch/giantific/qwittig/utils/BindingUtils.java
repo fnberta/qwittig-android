@@ -233,9 +233,11 @@ public class BindingUtils {
 
     @BindingAdapter({"drawableStartBounds"})
     public static void setDrawableStartWithIntrinsicBounds(TextView view, int drawableRes) {
-        final Drawable[] drawables = view.getCompoundDrawablesRelative();
-        final Drawable drawable = ContextCompat.getDrawable(view.getContext(), drawableRes);
-        view.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, drawables[1], drawables[2], drawables[3]);
+        if (drawableRes != 0) {
+            final Drawable[] drawables = view.getCompoundDrawablesRelative();
+            final Drawable drawable = ContextCompat.getDrawable(view.getContext(), drawableRes);
+            view.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, drawables[1], drawables[2], drawables[3]);
+        }
     }
 
     @BindingAdapter({"purchaseBackground"})

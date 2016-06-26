@@ -48,6 +48,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.0.56-beta'
+    compile "com.android.support:support-v4:${supportLibVersion}"
     compile "com.android.support:design:${supportLibVersion}"
     compile "com.android.support:appcompat-v7:${supportLibVersion}"
     compile "com.android.support:cardview-v7:${supportLibVersion}"
@@ -60,15 +61,15 @@ dependencies {
 //    compile "com.google.firebase:firebase-core:${playServicesVersion}"
 //    compile "com.google.firebase:firebase-invites:${playServicesVersion}"
 //    compile "com.google.firebase:firebase-crash:${playServicesVersion}"
-    compile 'com.jakewharton.timber:timber:4.1.2'
     compile "com.google.dagger:dagger:${daggerVersion}"
     apt "com.google.dagger:dagger-compiler:${daggerVersion}"
     provided 'javax.annotation:jsr250-api:1.0'
-    compile 'io.reactivex:rxjava:1.1.5'
-    compile 'io.reactivex:rxandroid:1.2.0'
     compile "com.squareup.retrofit2:retrofit:${retrofitVersion}"
     compile "com.squareup.retrofit2:converter-gson:${retrofitVersion}"
     compile "com.squareup.retrofit2:adapter-rxjava:${retrofitVersion}"
+    compile 'com.jakewharton.timber:timber:4.1.2'
+    compile 'io.reactivex:rxjava:1.1.5'
+    compile 'io.reactivex:rxandroid:1.2.0'
     compile 'com.google.code.gson:gson:2.6.2'
     compile 'org.apache.commons:commons-math3:3.5'
     compile 'commons-io:commons-io:2.5'
