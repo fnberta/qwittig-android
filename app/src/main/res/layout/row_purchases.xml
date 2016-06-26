@@ -92,18 +92,18 @@
                 style="@style/TextAppearance.AppCompat.Subhead.List"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end|top"
-                android:text="@{itemModel.purchaseTotalPrice}"
-                tools:text="56.20"/>
+                android:layout_gravity="end|bottom"
+                android:text="@{itemModel.purchaseMyShare}"
+                tools:text="2.30"/>
 
             <TextView
                 style="@style/TextAppearance.AppCompat.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end|bottom"
-                android:text="@{itemModel.purchaseMyShare}"
+                android:layout_gravity="end|top"
+                android:text="@{itemModel.purchaseTotalPrice}"
                 android:textColor="?android:textColorSecondary"
-                tools:text="2.30"/>
+                tools:text="56.20"/>
         </LinearLayout>
 
     </RelativeLayout>
