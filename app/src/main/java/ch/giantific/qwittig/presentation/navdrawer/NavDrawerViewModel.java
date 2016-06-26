@@ -12,12 +12,15 @@ import android.widget.AdapterView;
 import java.util.List;
 
 import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.presentation.common.SpinnerInteraction;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 
 /**
  * Defines an observable view model for the navigation drawer.
  */
 public interface NavDrawerViewModel extends ViewModel<NavDrawerViewModel.ViewListener> {
+
+    void setSpinnerInteraction(@NonNull SpinnerInteraction spinnerInteraction);
 
     @Bindable
     String getIdentityNickname();
@@ -47,7 +50,7 @@ public interface NavDrawerViewModel extends ViewModel<NavDrawerViewModel.ViewLis
      * Sets the group quick switch to the appropriate new selection. Called when the user changes
      * his group in the settings screen.
      */
-    void onIdentityChanged();
+    void onIdentitySwitched();
 
     void onIdentitySelected(@NonNull AdapterView<?> parent, View view, int position, long id);
 
@@ -58,6 +61,8 @@ public interface NavDrawerViewModel extends ViewModel<NavDrawerViewModel.ViewLis
      */
     interface ViewListener extends ViewModel.ViewListener {
 
-        void notifyHeaderIdentitiesChanged();
+        void startQueryAllService();
+
+        void setupScreenAfterLogin();
     }
 }

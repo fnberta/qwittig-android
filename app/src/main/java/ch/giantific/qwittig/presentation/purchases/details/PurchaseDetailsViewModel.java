@@ -38,11 +38,10 @@ public interface PurchaseDetailsViewModel extends ListViewModel<PurchaseDetailsI
 
     void onShowReceiptImageClick();
 
-    @IntDef({PurchaseDetailsResult.PURCHASE_DELETED, PurchaseDetailsResult.GROUP_CHANGED})
+    @IntDef({PurchaseDetailsResult.PURCHASE_DELETED})
     @Retention(RetentionPolicy.SOURCE)
     @interface PurchaseDetailsResult {
         int PURCHASE_DELETED = 2;
-        int GROUP_CHANGED = 3;
     }
 
     /**

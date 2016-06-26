@@ -158,15 +158,15 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceSubcomponent> 
     }
 
     @Override
-    protected void onLoginSuccessful() {
-        super.onLoginSuccessful();
-
-        setupTabs();
+    protected int getSelfNavDrawerItem() {
+        return R.id.nav_finance;
     }
 
     @Override
-    protected int getSelfNavDrawerItem() {
-        return R.id.nav_finance;
+    public void setupScreenAfterLogin() {
+        super.setupScreenAfterLogin();
+
+        setupTabs();
     }
 
     @Override

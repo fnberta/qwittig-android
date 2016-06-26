@@ -127,8 +127,8 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity<TaskDetailsSubcom
     }
 
     @Override
-    protected void onLoginSuccessful() {
-        super.onLoginSuccessful();
+    public void setupScreenAfterLogin() {
+        super.setupScreenAfterLogin();
 
         addDetailsFragment();
     }

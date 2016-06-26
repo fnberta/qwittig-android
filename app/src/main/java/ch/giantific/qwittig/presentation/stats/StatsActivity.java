@@ -34,7 +34,6 @@ import ch.giantific.qwittig.presentation.stats.di.StatsStoresViewModelModule;
 import ch.giantific.qwittig.presentation.stats.di.StatsSubcomponent;
 import ch.giantific.qwittig.presentation.stats.models.Month;
 import ch.giantific.qwittig.presentation.stats.models.StatsPage;
-import ch.giantific.qwittig.presentation.stats.pie.StatsPieViewModel;
 import ch.giantific.qwittig.presentation.stats.pie.currencies.StatsCurrenciesFragment;
 import ch.giantific.qwittig.presentation.stats.pie.currencies.StatsCurrenciesViewModel;
 import ch.giantific.qwittig.presentation.stats.pie.stores.StatsStoresFragment;
@@ -166,8 +165,8 @@ public class StatsActivity extends BaseNavDrawerActivity<StatsSubcomponent> impl
     }
 
     @Override
-    protected void onLoginSuccessful() {
-        super.onLoginSuccessful();
+    public void setupScreenAfterLogin() {
+        super.setupScreenAfterLogin();
 
         addFirstFragment();
     }

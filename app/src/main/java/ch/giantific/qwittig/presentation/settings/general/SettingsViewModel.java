@@ -36,12 +36,12 @@ public interface SettingsViewModel extends ViewModel<SettingsViewModel.ViewListe
 
     void onDeleteAccountMenuClick();
 
-    @IntDef({Result.LOGOUT, Result.GROUP_CHANGED})
+    @IntDef({Result.LOGOUT, Result.GROUP_SELECTED, Result.GROUPS_CHANGED})
     @Retention(RetentionPolicy.SOURCE)
     @interface Result {
         int LOGOUT = 2;
         int GROUP_SELECTED = 3;
-        int GROUP_CHANGED = 4;
+        int GROUPS_CHANGED = 4;
     }
 
     /**

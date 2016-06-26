@@ -18,7 +18,7 @@ public interface HomeViewModel extends ViewModel<HomeViewModel.ViewListener>,
         JoinGroupDialogFragment.DialogInteractionListener,
         JoinGroupWorkerListener, OcrWorkerListener {
 
-    void onLoginSuccessful();
+    void afterLogin();
 
     @Bindable
     boolean isOcrProcessing();
@@ -66,7 +66,7 @@ public interface HomeViewModel extends ViewModel<HomeViewModel.ViewListener>,
 
         void hideProgressDialog();
 
-        void onGroupJoined();
+        void startQueryAllService();
 
         void captureImage();
 

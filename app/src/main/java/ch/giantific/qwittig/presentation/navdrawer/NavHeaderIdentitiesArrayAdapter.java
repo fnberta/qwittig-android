@@ -16,6 +16,7 @@ import android.widget.TextView;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.presentation.common.SpinnerInteraction;
 
 
 /**
@@ -23,7 +24,7 @@ import ch.giantific.qwittig.domain.models.Identity;
  * <p/>
  * Subclass of {@link ArrayAdapter}.
  */
-public class NavHeaderIdentitiesArrayAdapter extends ArrayAdapter<Identity> {
+public class NavHeaderIdentitiesArrayAdapter extends ArrayAdapter<Identity> implements SpinnerInteraction {
 
     private static final int VIEW_RESOURCE = R.layout.spinner_item_nav;
     private static final int VIEW_RESOURCE_DROPDOWN = android.R.layout.simple_spinner_dropdown_item;

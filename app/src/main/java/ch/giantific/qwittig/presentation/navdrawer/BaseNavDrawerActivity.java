@@ -17,7 +17,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 
 import javax.inject.Inject;
 
@@ -53,7 +52,7 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
     private Menu mNavigationViewMenu;
-    private ArrayAdapter mHeaderIdentitiesAdapter;
+    private NavHeaderIdentitiesArrayAdapter mHeaderIdentitiesAdapter;
     private int mSelectedNavDrawerItem;
 
     @Override
@@ -83,7 +82,9 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
                 .navDrawerViewModelModule(new NavDrawerViewModelModule(savedInstanceState))
                 .build();
         injectDependencies(navComp, savedInstanceState);
+        mHeaderIdentitiesAdapter = new NavHeaderIdentitiesArrayAdapter(this, mNavDrawerViewModel);
         mNavDrawerViewModel.attachView(this);
+        mNavDrawerViewModel.setSpinnerInteraction(mHeaderIdentitiesAdapter);
     }
 
     protected abstract void injectDependencies(@NonNull NavDrawerComponent navComp,
@@ -112,8 +113,6 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
         final View navigationViewHeader = navigationView.getHeaderView(0);
         final NavDrawerHeaderBinding headerBinding = NavDrawerHeaderBinding.bind(navigationViewHeader);
         headerBinding.setViewModel(mNavDrawerViewModel);
-
-        mHeaderIdentitiesAdapter = new NavHeaderIdentitiesArrayAdapter(this, mNavDrawerViewModel);
         headerBinding.spDrawerGroup.setAdapter(mHeaderIdentitiesAdapter);
 
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar,
@@ -211,7 +210,7 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
             case Navigator.INTENT_REQUEST_LOGIN:
                 if (resultCode == RESULT_OK) {
                     mNavDrawerViewModel.onLoginSuccessful();
-                    onLoginSuccessful();
+                    mUserLoggedIn = mNavDrawerViewModel.isUserLoggedIn();
                 } else {
                     finish();
                 }
@@ -222,9 +221,9 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
                         mNavDrawerViewModel.onLogout();
                         break;
                     case SettingsViewModel.Result.GROUP_SELECTED:
-                        mNavDrawerViewModel.onIdentityChanged();
+                        mNavDrawerViewModel.onIdentitySwitched();
                         break;
-                    case SettingsViewModel.Result.GROUP_CHANGED:
+                    case SettingsViewModel.Result.GROUPS_CHANGED:
                         mNavDrawerViewModel.onIdentitiesChanged();
                         break;
                 }
@@ -240,11 +239,6 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
                 }
                 break;
         }
-    }
-
-    @CallSuper
-    protected void onLoginSuccessful() {
-        ParseQueryService.startUpdateAll(this);
     }
 
     protected final void setStatusBarBackgroundColor(int color) {
@@ -265,7 +259,13 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
     }
 
     @Override
-    public void notifyHeaderIdentitiesChanged() {
-        mHeaderIdentitiesAdapter.notifyDataSetChanged();
+    public void startQueryAllService() {
+        ParseQueryService.startUpdateAll(this);
+    }
+
+    @Override
+    @CallSuper
+    public void setupScreenAfterLogin() {
+        // empty default implementation
     }
 }

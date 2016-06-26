@@ -166,8 +166,8 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksListSubcomponent>
     }
 
     @Override
-    protected void onLoginSuccessful() {
-        super.onLoginSuccessful();
+    public void setupScreenAfterLogin() {
+        super.setupScreenAfterLogin();
 
         addTasksFragment();
     }

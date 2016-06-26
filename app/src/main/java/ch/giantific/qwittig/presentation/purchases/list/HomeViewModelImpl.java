@@ -16,6 +16,7 @@ import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.data.bus.events.EventDraftDeleted;
+import ch.giantific.qwittig.data.bus.events.EventIdentityAdded;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
@@ -48,9 +49,10 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
                              @NonNull UserRepository userRepository,
                              @NonNull PurchaseRepository purchaseRepo) {
         super(savedState, eventBus, userRepository);
-        mNavigator = navigator;
 
+        mNavigator = navigator;
         mPurchaseRepo = purchaseRepo;
+
         if (savedState != null) {
             mInvitationIdentityId = savedState.getString(STATE_INVITATION_ID, "");
             mOcrPurchaseId = savedState.getString(STATE_OCR_PURCHASE_ID, "");
@@ -86,7 +88,7 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
     }
 
     @Override
-    public void onLoginSuccessful() {
+    public void afterLogin() {
         setCurrentUserAndIdentity();
         mDraftsAvailable = mPurchaseRepo.isDraftsAvailable(mCurrentIdentity);
     }
@@ -177,7 +179,8 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
                 mView.hideProgressDialog();
 
                 mView.showMessage(R.string.toast_group_joined);
-                mView.onGroupJoined();
+                mView.startQueryAllService();
+                mEventBus.post(new EventIdentityAdded(identity));
             }
 
             @Override
@@ -260,11 +263,4 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
             }
         };
     }
-
-//    @Override
-//    public void onViewGone() {
-//        super.onViewGone();
-//
-//        stopProgress(false);
-//    }
 }

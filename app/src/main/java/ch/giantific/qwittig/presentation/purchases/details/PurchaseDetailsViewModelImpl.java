@@ -235,6 +235,6 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<Purchase
     @SuppressLint("MissingSuperCall")
     @Override
     protected void onIdentitySelected(@NonNull Identity identitySelected) {
-        mNavigator.finish(PurchaseDetailsResult.GROUP_CHANGED);
+        mNavigator.finish();
     }
 }

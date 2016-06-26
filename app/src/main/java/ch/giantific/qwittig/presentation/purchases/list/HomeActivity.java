@@ -38,7 +38,6 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.LocalBroadcast;
-import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.ActivityHomeBinding;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
@@ -144,7 +143,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
         }
 
         if (mUserLoggedIn) {
-            mHomeViewModel.onLoginSuccessful();
+            mHomeViewModel.updateDraftsAvailable();
 
             if (savedInstanceState == null) {
                 addFragments();
@@ -297,9 +296,6 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
                     case PurchaseDetailsResult.PURCHASE_DELETED:
                         showMessage(R.string.toast_purchase_deleted);
                         break;
-                    case PurchaseDetailsResult.GROUP_CHANGED:
-                        mNavDrawerViewModel.onIdentityChanged();
-                        break;
                 }
                 break;
             case Navigator.INTENT_REQUEST_IMAGE_CAPTURE:
@@ -362,17 +358,16 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
     }
 
     @Override
-    protected void onLoginSuccessful() {
-        super.onLoginSuccessful();
-
-        mHomeViewModel.onLoginSuccessful();
-        mHomeViewModel.checkDrafts();
-        addFragments();
+    protected int getSelfNavDrawerItem() {
+        return R.id.nav_home;
     }
 
     @Override
-    protected int getSelfNavDrawerItem() {
-        return R.id.nav_home;
+    public void setupScreenAfterLogin() {
+        super.setupScreenAfterLogin();
+
+        mHomeViewModel.afterLogin();
+        addFragments();
     }
 
     @Override
@@ -427,12 +422,6 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
         if (mProgressDialog != null) {
             mProgressDialog.hide();
         }
-    }
-
-    @Override
-    public void onGroupJoined() {
-        ParseQueryService.startUpdateAll(this);
-        mNavDrawerViewModel.onIdentitiesChanged();
     }
 
     @Override

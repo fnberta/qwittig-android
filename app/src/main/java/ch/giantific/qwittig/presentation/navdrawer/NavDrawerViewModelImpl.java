@@ -18,12 +18,15 @@ import java.util.Objects;
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.bus.events.EventIdentityAdded;
 import ch.giantific.qwittig.data.bus.events.EventIdentitySelected;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
+import ch.giantific.qwittig.presentation.common.SpinnerInteraction;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.Subscriber;
+import rx.functions.Action1;
 
 /**
  * Provides an implementation of the {@link NavDrawerViewModel}.
@@ -33,6 +36,7 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
 
     private final List<Identity> mIdentities = new ArrayList<>();
     private final Navigator mNavigator;
+    private SpinnerInteraction mSpinnerInteraction;
 
     public NavDrawerViewModelImpl(@Nullable Bundle savedState,
                                   @NonNull Navigator navigator,
@@ -44,12 +48,26 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
     }
 
     @Override
+    public void setSpinnerInteraction(@NonNull SpinnerInteraction spinnerInteraction) {
+        mSpinnerInteraction = spinnerInteraction;
+    }
+
+    @Override
     public void onViewVisible() {
         super.onViewVisible();
 
         if (mCurrentUser != null) {
             loadIdentities();
         }
+
+        getSubscriptions().add(mEventBus.observeEvents(EventIdentityAdded.class)
+                .subscribe(new Action1<EventIdentityAdded>() {
+                    @Override
+                    public void call(EventIdentityAdded eventIdentityAdded) {
+                        onIdentitiesChanged();
+                    }
+                })
+        );
     }
 
     private void loadIdentities() {
@@ -65,7 +83,7 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
                     @Override
                     public void onCompleted() {
                         notifyPropertyChanged(BR.identityNickname);
-                        mView.notifyHeaderIdentitiesChanged();
+                        mSpinnerInteraction.notifyDataSetChanged();
                         notifyPropertyChanged(BR.selectedIdentity);
                     }
 
@@ -121,6 +139,9 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
         if (mCurrentUser != null) {
             mCurrentIdentity = mCurrentUser.getCurrentIdentity();
         }
+
+        mView.startQueryAllService();
+        mView.setupScreenAfterLogin();
     }
 
     @Override
@@ -145,12 +166,12 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
                 mIdentities.add(identity);
             }
         }
-        mView.notifyHeaderIdentitiesChanged();
-        onIdentityChanged();
+        mSpinnerInteraction.notifyDataSetChanged();
+        onIdentitySwitched();
     }
 
     @Override
-    public void onIdentityChanged() {
+    public void onIdentitySwitched() {
         notifyPropertyChanged(BR.selectedIdentity);
     }
 

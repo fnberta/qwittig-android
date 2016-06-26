@@ -75,7 +75,6 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
         mView.setupGroupSelection(entries, values, selectedValue);
     }
 
-
     @Override
     public void onGroupSelected(@NonNull String identityId) {
         if (TextUtils.isEmpty(identityId)) {
@@ -104,7 +103,7 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
             loadIdentitySelection();
 
             // NavDrawer group setting needs to be updated
-            mView.setScreenResult(Result.GROUP_CHANGED);
+            mView.setScreenResult(Result.GROUPS_CHANGED);
         }
     }
 
@@ -150,7 +149,7 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
         loadIdentitySelection();
 
         // NavDrawer group setting needs to be updated
-        mView.setScreenResult(Result.GROUP_CHANGED);
+        mView.setScreenResult(Result.GROUPS_CHANGED);
     }
 
     @Override
@@ -160,7 +159,7 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
         loadIdentitySelection();
 
         // NavDrawer group setting needs to be updated
-        mView.setScreenResult(Result.GROUP_CHANGED);
+        mView.setScreenResult(Result.GROUPS_CHANGED);
     }
 
     @Override

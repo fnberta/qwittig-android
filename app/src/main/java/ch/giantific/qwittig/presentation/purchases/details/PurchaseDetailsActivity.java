@@ -96,12 +96,16 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
         });
 
 
-        if (savedInstanceState == null) {
-            final PurchaseDetailsFragment fragment = new PurchaseDetailsFragment();
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, fragment, PURCHASE_DETAILS_FRAGMENT)
-                    .commit();
+        if (mUserLoggedIn && savedInstanceState == null) {
+            addDetailsFragment();
         }
+    }
+
+    private void addDetailsFragment() {
+        final PurchaseDetailsFragment fragment = new PurchaseDetailsFragment();
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.container, fragment, PURCHASE_DETAILS_FRAGMENT)
+                .commit();
     }
 
     @Override
@@ -147,6 +151,13 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
                     break;
             }
         }
+    }
+
+    @Override
+    public void setupScreenAfterLogin() {
+        super.setupScreenAfterLogin();
+
+        addDetailsFragment();
     }
 
     @Override
