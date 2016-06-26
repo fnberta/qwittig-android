@@ -25,12 +25,11 @@
         tools:targetApi="lollipop"
         >
 
-        <FrameLayout
-            android:id="@+id/container"
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewpager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="@dimen/toolbar_height_x2"
-            tools:ignore="MergeRootFrame"
             />
 
         <include layout="@layout/include_appbar_x2"/>

@@ -98,7 +98,7 @@ public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
                     public void onSuccess(Purchase purchase) {
                         mEditPurchase = purchase;
 
-                        if (!mReceiptOrNoteShown) {
+                        if (!mNoteShown) {
                             if (mOldValuesSet) {
                                 updateRows();
                             } else {
@@ -122,10 +122,8 @@ public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
     }
 
     private void setOldPurchaseValues() {
-        mView.toggleReceiptMenuOption(mEditPurchase.hasReceipt());
-
         mNote = mEditPurchase.getNoteOrEmpty();
-        mView.toggleNoteMenuOption(!TextUtils.isEmpty(mNote));
+        mView.reloadOptionsMenu();
 
         setStore(mEditPurchase.getStore());
         setDate(mEditPurchase.getDate());

@@ -54,14 +54,14 @@ public abstract class BasePurchaseAddEditNoteFragment<T, S extends PurchaseAddEd
     public void onStart() {
         super.onStart();
 
-        mViewModel.setReceiptOrNoteShown(true);
+        mViewModel.setNoteShown(true);
     }
 
     @Override
     public void onStop() {
         super.onStop();
 
-        mViewModel.setReceiptOrNoteShown(false);
+        mViewModel.setNoteShown(false);
     }
 
     @Override
@@ -75,7 +75,7 @@ public abstract class BasePurchaseAddEditNoteFragment<T, S extends PurchaseAddEd
         int id = item.getItemId();
         switch (id) {
             case R.id.action_purchase_edit_note_edit:
-                mViewModel.onEditNoteMenuClick();
+                mViewModel.onAddEditNoteMenuClick();
                 return true;
             case R.id.action_purchase_edit_note_delete:
                 mViewModel.onDeleteNoteMenuClick();

@@ -82,7 +82,7 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<PurchaseAddE
     protected double mExchangeRate;
     protected NumberFormat mMoneyFormatter;
     protected List<Identity> mIdentities = new ArrayList<>();
-    protected boolean mReceiptOrNoteShown;
+    protected boolean mNoteShown;
     private double mMyShare = 0;
     private boolean mFetchingExchangeRates;
 
@@ -106,7 +106,7 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<PurchaseAddE
             mNote = savedState.getString(STATE_NOTE);
             mReceiptImagePath = savedState.getString(STATE_RECEIPT_IMAGE_PATH);
             mFetchingExchangeRates = savedState.getBoolean(STATE_FETCHING_RATES);
-            mReceiptOrNoteShown = savedState.getBoolean(STATE_RECEIPT_OR_NOTE_SHOWN);
+            mNoteShown = savedState.getBoolean(STATE_RECEIPT_OR_NOTE_SHOWN);
         } else {
             initFixedRows();
             mLoading = false;
@@ -141,12 +141,11 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<PurchaseAddE
         outState.putString(STATE_NOTE, mNote);
         outState.putString(STATE_RECEIPT_IMAGE_PATH, mReceiptImagePath);
         outState.putBoolean(STATE_FETCHING_RATES, mFetchingExchangeRates);
-        outState.putBoolean(STATE_RECEIPT_OR_NOTE_SHOWN, mReceiptOrNoteShown);
+        outState.putBoolean(STATE_RECEIPT_OR_NOTE_SHOWN, mNoteShown);
     }
 
-    @Override
-    public void setReceiptOrNoteShown(boolean receiptOrNoteShown) {
-        mReceiptOrNoteShown = receiptOrNoteShown;
+    public void setNoteShown(boolean noteShown) {
+        mNoteShown = noteShown;
     }
 
     @Override
@@ -159,6 +158,7 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<PurchaseAddE
     public void setReceiptImage(@NonNull String receiptImagePath) {
         mReceiptImagePath = receiptImagePath;
         notifyPropertyChanged(BR.receiptImage);
+        notifyPropertyChanged(BR.receiptImageAvailable);
     }
 
     @Override
@@ -177,6 +177,11 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<PurchaseAddE
     public void setNote(@NonNull String note) {
         mNote = note;
         notifyPropertyChanged(BR.note);
+    }
+
+    @Override
+    public boolean isNoteAvailable() {
+        return !TextUtils.isEmpty(mNote);
     }
 
     @Override
@@ -360,7 +365,7 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<PurchaseAddE
     }
 
     @Override
-    public void onAddNoteMenuClick() {
+    public void onAddEditNoteMenuClick() {
         mView.showAddEditNoteDialog(mNote);
     }
 
@@ -370,27 +375,16 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<PurchaseAddE
     }
 
     @Override
-    public void onEditNoteMenuClick() {
-        mView.showAddEditNoteDialog(mNote);
-    }
-
-    @Override
     public void onDeleteNoteMenuClick() {
         onNoteSet("");
-        mView.showPurchaseScreen();
+        mView.showPurchaseItems();
     }
 
     @Override
     public void onNoteSet(@NonNull String note) {
         setNote(note);
-        final boolean noteEmpty = TextUtils.isEmpty(note);
-        mView.toggleNoteMenuOption(!noteEmpty);
-        mView.showMessage(noteEmpty ? R.string.toast_note_deleted : R.string.toast_note_added);
-    }
-
-    @Override
-    public void onShowReceiptImageMenuClick() {
-        mView.showReceiptImage(mReceiptImagePath);
+        mView.showMessage(TextUtils.isEmpty(note) ? R.string.toast_note_deleted : R.string.toast_note_added);
+        mView.reloadOptionsMenu();
     }
 
     @Override
@@ -448,7 +442,7 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<PurchaseAddE
                         identities.add(0, mCurrentIdentity);
                         mIdentities = identities;
 
-                        if (!mReceiptOrNoteShown) {
+                        if (!mNoteShown) {
                             updateRows();
                         }
                     }
@@ -592,20 +586,15 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<PurchaseAddE
     }
 
     @Override
-    public void onAddReceiptImageMenuClick() {
-        mView.captureImage();
-    }
-
-    @Override
-    public void onEditReceiptMenuClick() {
+    public void onAddEditReceiptImageMenuClick() {
         mView.captureImage();
     }
 
     @Override
     public void onReceiptImageTaken(@NonNull String receiptImagePath) {
-        mView.showMessage(TextUtils.isEmpty(mReceiptImagePath) ? R.string.toast_receipt_added : R.string.toast_receipt_changed);
         setReceiptImage(receiptImagePath);
-        mView.toggleReceiptMenuOption(true);
+        mView.reloadOptionsMenu();
+        mView.showMessage(TextUtils.isEmpty(mReceiptImagePath) ? R.string.toast_receipt_added : R.string.toast_receipt_changed);
     }
 
     @Override
@@ -615,12 +604,11 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<PurchaseAddE
 
     @Override
     public void onDeleteReceiptMenuClick() {
-        mView.showPurchaseScreen();
-
-        mView.toggleReceiptMenuOption(false);
-        mView.showMessage(R.string.toast_receipt_deleted);
         deleteReceiptImage();
-        mReceiptImagePath = "";
+        setReceiptImage("");
+
+        mView.showMessage(R.string.toast_receipt_deleted);
+        mView.reloadOptionsMenu();
     }
 
     private void deleteReceiptImage() {
