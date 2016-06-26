@@ -6,6 +6,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".presentation.purchases.details.PurchaseDetailsReceiptFragment"
     >
 
     <data>
@@ -22,13 +23,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
-        tools:context=".presentation.purchases.details.PurchaseDetailsReceiptFragment"
         >
 
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
+            android:fillViewport="true"
             android:paddingBottom="@dimen/small_space"
             >
 
@@ -57,12 +58,26 @@
                     android:layout_marginEnd="@dimen/key_line_1"
                     android:layout_marginStart="@dimen/key_line_1"
                     android:contentDescription="@string/purchase_receipt"
-                    app:receiptImage="@{viewModel.receiptImage}"
+                    android:visibility="@{!viewModel.receiptImageAvailable ? View.GONE : viewModel.loading ? View.GONE : View.VISIBLE}"
                     app:loadListener="@{viewModel}"
+                    app:receiptImage="@{viewModel.receiptImage}"
                     />
             </LinearLayout>
 
         </ScrollView>
+
+        <TextView
+            style="@style/TextAppearance.AppCompat.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:drawablePadding="@dimen/small_space"
+            android:drawableTop="@drawable/ic_receipt_black_144dp"
+            android:gravity="center_horizontal"
+            android:text="@string/no_receipt_image"
+            android:visibility="@{viewModel.receiptImageAvailable ? View.GONE : viewModel.loading ? View.GONE : View.VISIBLE}"
+            tools:visibility="visible"
+            />
 
         <include
             layout="@layout/include_progress"

@@ -17,4 +17,7 @@ public interface PurchaseReceiptViewModel extends LoadingViewModel {
 
     @Bindable
     String getReceiptImage();
+
+    @Bindable
+    boolean isReceiptImageAvailable();
 }

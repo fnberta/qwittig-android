@@ -44,13 +44,11 @@ import rx.SingleSubscriber;
 public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<PurchaseDetailsItemModel, PurchaseDetailsViewModel.ViewListener>
         implements PurchaseDetailsViewModel {
 
-    private static final String STATE_RECEIPT_SHOWN = "STATE_RECEIPT_SHOWN";
     private final Navigator mNavigator;
     private final PurchaseRepository mPurchaseRepo;
     private final String mPurchaseId;
     private final DateFormat mDateFormatter;
     private Purchase mPurchase;
-    private boolean mReceiptShown;
 
     public PurchaseDetailsViewModelImpl(@Nullable Bundle savedState,
                                         @NonNull Navigator navigator,
@@ -67,20 +65,7 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<Purchase
 
         if (savedState != null) {
             mItems = new ArrayList<>();
-            mReceiptShown = savedState.getBoolean(STATE_RECEIPT_SHOWN);
         }
-    }
-
-    @Override
-    public void saveState(@NonNull Bundle outState) {
-        super.saveState(outState);
-
-        outState.putBoolean(STATE_RECEIPT_SHOWN, mReceiptShown);
-    }
-
-    @Override
-    public void setReceiptShown(boolean receiptShown) {
-        mReceiptShown = receiptShown;
     }
 
     @Override
@@ -107,24 +92,28 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<Purchase
     }
 
     @Override
+    @Bindable
+    public boolean isReceiptImageAvailable() {
+        return mPurchase != null && !TextUtils.isEmpty(mPurchase.getReceiptUrl());
+    }
+
+    @Override
     public void loadData() {
         getSubscriptions().add(mPurchaseRepo.getPurchase(mPurchaseId)
                 .subscribe(new SingleSubscriber<Purchase>() {
                     @Override
                     public void onSuccess(Purchase purchase) {
                         mPurchase = purchase;
-                        if (mReceiptShown) {
-                            updateActionBarMenu();
-                            notifyPropertyChanged(BR.receiptImage);
-                        } else {
-                            updateActionBarMenu();
-                            updateItemList();
-                            updateReadBy();
-                            setLoading(false);
-                        }
+
+                        updateActionBarMenu();
+                        updateItemList();
+                        updateReadBy();
+                        setLoading(false);
 
                         notifyPropertyChanged(BR.purchaseStore);
                         notifyPropertyChanged(BR.purchaseDate);
+                        notifyPropertyChanged(BR.receiptImage);
+                        notifyPropertyChanged(BR.receiptImageAvailable);
 
                         mView.startEnterTransition();
                     }
@@ -191,8 +180,7 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<Purchase
             showEdit = Objects.equals(buyerId, mCurrentIdentity.getObjectId());
         }
         final boolean foreignCurrency = !Objects.equals(mCurrentIdentity.getGroup().getCurrency(), mPurchase.getCurrency());
-        final boolean receiptImage = !TextUtils.isEmpty(mPurchase.getReceiptUrl());
-        mView.toggleMenuOptions(showEdit, receiptImage, foreignCurrency);
+        mView.toggleMenuOptions(showEdit, foreignCurrency);
     }
 
     private void updateReadBy() {
@@ -200,12 +188,6 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<Purchase
             mPurchase.addUserToReadBy(mCurrentIdentity);
             mPurchase.saveEventually();
         }
-    }
-
-    @Override
-    public void onShowReceiptImageClick() {
-        setLoading(true);
-        mView.showPurchaseDetailsReceipt();
     }
 
     @Override
@@ -228,8 +210,7 @@ public class PurchaseDetailsViewModelImpl extends ListViewModelBaseImpl<Purchase
 
     @Override
     public int getItemViewType(int position) {
-        final PurchaseDetailsItemModel detailsItem = mItems.get(position);
-        return detailsItem.getType();
+        return getItemAtPosition(position).getType();
     }
 
     @SuppressLint("MissingSuperCall")

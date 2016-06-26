@@ -163,6 +163,12 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<PurchaseAddE
 
     @Override
     @Bindable
+    public boolean isReceiptImageAvailable() {
+        return !TextUtils.isEmpty(mReceiptImagePath);
+    }
+
+    @Override
+    @Bindable
     public String getNote() {
         return mNote;
     }

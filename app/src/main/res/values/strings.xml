@@ -353,5 +353,8 @@
     <string name="about_usage">Usage</string>
     <string name="about_privacy">Privacy</string>
     <string name="about_website">Visit website</string>
+    <string name="no_receipt_image">No receipt</string>
+    <string name="tab_details_purchase">Purchase</string>
+    <string name="tab_details_receipt">Receipt</string>
 
 </resources>
