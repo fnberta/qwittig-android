@@ -329,7 +329,7 @@
     <string name="title_activity_ocr_rating">Feedback</string>
     <string name="title_activity_camera">Kamera</string>
     <string name="toast_ocr_rating_satisfaction">Bitte wähle einen Zufriedenheitswert aus</string>
-    <string name="tut_camera_guidance">Beachte, dass die Quittung gerade ist und alle relevanten Teil auf dem Bild ersichtlich sind.</string>
+    <string name="tut_camera_guidance">Beachte, dass die Quittung gerade ist und alle relevanten Teile auf dem Bild ersichtlich sind.</string>
     <string name="tut_camera_header">Je besser das Bild, desto besser wird das Resultat sein!</string>
     <string name="help_tutorial">Intro Tutorial ansehen</string>
     <string name="title_activity_about">Über Qwittig</string>
