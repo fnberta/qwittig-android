@@ -19,24 +19,26 @@ import ch.giantific.qwittig.utils.MoneyUtils;
  */
 public class DraftsItemModel extends BaseObservable {
 
-    private final NumberFormat mMoneyFormatter;
+    private NumberFormat mMoneyFormatter;
     private Purchase mDraft;
     private boolean mDraftSelected;
 
     public DraftsItemModel(@NonNull Purchase draft, boolean draftSelected,
                            @NonNull String groupCurrency) {
-        mMoneyFormatter = MoneyUtils.getMoneyFormatter(groupCurrency, false, true);
-        setDraftInfo(draft, draftSelected);
+        setDraftInfo(draft, draftSelected, groupCurrency);
     }
 
-    public void updateDraftInfo(@NonNull Purchase draft, boolean draftSelected) {
-        setDraftInfo(draft, draftSelected);
+    public void updateDraftInfo(@NonNull Purchase draft, boolean draftSelected,
+                                @NonNull String groupCurrency) {
+        setDraftInfo(draft, draftSelected, groupCurrency);
         notifyChange();
     }
 
-    private void setDraftInfo(@NonNull Purchase draft, boolean draftSelected) {
+    private void setDraftInfo(@NonNull Purchase draft, boolean draftSelected,
+                              @NonNull String groupCurrency) {
         mDraft = draft;
         mDraftSelected = draftSelected;
+        mMoneyFormatter = MoneyUtils.getMoneyFormatter(groupCurrency, false, true);
     }
 
     @Bindable

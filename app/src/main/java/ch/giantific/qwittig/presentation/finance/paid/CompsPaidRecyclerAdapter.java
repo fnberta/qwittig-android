@@ -73,7 +73,7 @@ public class CompsPaidRecyclerAdapter extends BaseRecyclerAdapter {
                     itemModel = new CompPaidItemModel(compensation, mViewModel.getCurrentIdentity());
                     binding.setItemModel(itemModel);
                 } else {
-                    itemModel.updateCompensation(compensation);
+                    itemModel.updateCompensation(compensation, mViewModel.getCurrentIdentity());
                 }
 
                 binding.executePendingBindings();

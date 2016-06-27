@@ -39,8 +39,10 @@ public class CompPaidItemModel extends BaseObservable {
         mDateFormatter = DateUtils.getDateFormatter(true);
     }
 
-    public void updateCompensation(@NonNull Compensation compensation) {
+    public void updateCompensation(@NonNull Compensation compensation,
+                                   @NonNull Identity currentIdentity) {
         mCompensation = compensation;
+        mCompAmountPos = Objects.equals(compensation.getCreditor().getObjectId(), currentIdentity.getObjectId());
         notifyChange();
     }
 

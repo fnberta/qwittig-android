@@ -51,13 +51,14 @@ public class DraftsRecyclerAdapter extends BaseRecyclerAdapter {
         final Purchase draft = mViewModel.getItemAtPosition(position);
 
         DraftsItemModel itemModel = binding.getItemModel();
+        final boolean selected = mViewModel.isSelected(draft);
+        final String currency = mViewModel.getCurrentIdentity().getGroup().getCurrency();
         if (itemModel == null) {
-            final String currency = mViewModel.getCurrentIdentity().getGroup().getCurrency();
-            itemModel = new DraftsItemModel(draft, mViewModel.isSelected(draft), currency);
+            itemModel = new DraftsItemModel(draft, selected, currency);
             binding.setItemModel(itemModel);
             binding.setViewModel(mViewModel);
         } else {
-            itemModel.updateDraftInfo(draft, mViewModel.isSelected(draft));
+            itemModel.updateDraftInfo(draft, selected, currency);
         }
 
         binding.executePendingBindings();

@@ -73,7 +73,7 @@ public class PurchasesRecyclerAdapter extends BaseRecyclerAdapter {
                     binding.setItemModel(itemModel);
                     binding.setViewModel(mViewModel);
                 } else {
-                    itemModel.updatePurchaseInfo(purchase);
+                    itemModel.updatePurchaseInfo(purchase, mViewModel.getCurrentIdentity());
                 }
 
                 binding.executePendingBindings();

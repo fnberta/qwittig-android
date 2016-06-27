@@ -21,21 +21,22 @@ import ch.giantific.qwittig.utils.MoneyUtils;
  */
 public class PurchasesItemModel extends BaseObservable {
 
-    private final Identity mCurrentIdentity;
     private final NumberFormat mMoneyFormatter;
     private final DateFormat mDateFormatter;
     private Purchase mPurchase;
+    private Identity mCurrentIdentity;
 
     public PurchasesItemModel(@NonNull Purchase purchase, @NonNull Identity currentIdentity) {
+        mPurchase = purchase;
         mCurrentIdentity = currentIdentity;
         final String currency = currentIdentity.getGroup().getCurrency();
         mMoneyFormatter = MoneyUtils.getMoneyFormatter(currency, false, true);
         mDateFormatter = DateUtils.getDateFormatter(true);
-        mPurchase = purchase;
     }
 
-    public void updatePurchaseInfo(@NonNull Purchase purchase) {
+    public void updatePurchaseInfo(@NonNull Purchase purchase, @NonNull Identity currentIdentity) {
         mPurchase = purchase;
+        mCurrentIdentity = currentIdentity;
         notifyChange();
     }
 
