@@ -239,7 +239,7 @@ public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
             }
         }
 
-        if (mDeleteOldReceipt || !TextUtils.isEmpty(mReceiptImagePath)) {
+        if (mDeleteOldReceipt || !Objects.equals(mReceiptImagePath, mEditPurchase.getReceiptUrl())) {
             return true;
         }
 
