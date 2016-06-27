@@ -35,5 +35,6 @@
     <color name="green_light">#F6FBFB</color>
     <color name="purple">#9E7DAA</color>
     <color name="yellow">#FDF590</color>
+    <color name="black_grey">#89000000</color>
 
 </resources>

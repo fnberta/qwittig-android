@@ -15,6 +15,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import ch.giantific.qwittig.BR;
 
@@ -116,6 +117,15 @@ public class PurchaseAddEditItem extends BaseObservable implements PurchaseAddEd
 
     public void setUsers(@NonNull PurchaseAddEditItemUsersUser[] users) {
         mUsers = users;
+    }
+
+    public void toggleUser(@NonNull PurchaseAddEditItemUsersUser userClicked) {
+        final boolean isSelected = userClicked.isSelected();
+        for (PurchaseAddEditItemUsersUser user : mUsers) {
+            if (Objects.equals(user.getObjectId(), userClicked.getObjectId())) {
+                user.setSelected(isSelected);
+            }
+        }
     }
 
     @Bindable

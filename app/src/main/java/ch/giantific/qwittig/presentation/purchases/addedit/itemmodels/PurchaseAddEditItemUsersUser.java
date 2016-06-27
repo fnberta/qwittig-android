@@ -90,11 +90,6 @@ public class PurchaseAddEditItemUsersUser extends BaseObservable implements Parc
         mSelected = selected;
     }
 
-    public void toggleSelected() {
-        mSelected = !mSelected;
-        notifyPropertyChanged(BR.alpha);
-    }
-
     @Override
     public int describeContents() {
         return 0;

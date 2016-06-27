@@ -505,19 +505,29 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<PurchaseAddE
     }
 
     @Override
-    public void onTooFewUsersSelected() {
-        mView.showMessage(R.string.toast_min_one_user);
-    }
-
-    @Override
-    public void onItemRowUserClick(int position) {
+    public void onItemRowUserClick() {
         for (int i = 0, mItemsSize = mItems.size(); i < mItemsSize; i++) {
-            final PurchaseAddEditItemModel item = mItems.get(i);
-            if (item.getType() != Type.USERS) {
+            final PurchaseAddEditItemModel itemModel = mItems.get(i);
+            if (itemModel.getType() != Type.USERS) {
                 continue;
             }
 
             final PurchaseAddEditItem addEditItem = (PurchaseAddEditItem) getItemAtPosition(i - 1);
+            addEditItem.notifyPropertyChanged(BR.users);
+        }
+
+        updateTotalAndMyShare();
+    }
+
+    @Override
+    public void onItemRowUserLongClick(@NonNull PurchaseAddEditItemUsersUser userClicked) {
+        for (PurchaseAddEditItemModel itemModel : mItems) {
+            if (itemModel.getType() != Type.ITEM) {
+                continue;
+            }
+
+            final PurchaseAddEditItem addEditItem = (PurchaseAddEditItem) itemModel;
+            addEditItem.toggleUser(userClicked);
             addEditItem.notifyPropertyChanged(BR.users);
         }
 

@@ -153,15 +153,15 @@ public class BindingUtils {
     @BindingAdapter({"itemUsers"})
     public static void loadItemUsers(ImageView view, PurchaseAddEditItemUsersUser[] users) {
         final Context context = view.getContext();
+        final int padding = context.getResources().getDimensionPixelSize(R.dimen.small_space);
         final Drawable fallback = ContextCompat.getDrawable(view.getContext(), R.drawable.ic_group_black_24dp);
         int selected = 0;
-        PurchaseAddEditItemUsersUser selectedUser = users[0];
+        PurchaseAddEditItemUsersUser selectedUser = null;
         for (PurchaseAddEditItemUsersUser user : users) {
             if (user.isSelected()) {
                 selectedUser = user;
                 selected++;
                 if (selected > 1) {
-                    final int padding = context.getResources().getDimensionPixelSize(R.dimen.small_space);
                     view.setPadding(0, padding, padding, padding);
                     view.setImageDrawable(fallback);
                     return;
@@ -169,25 +169,29 @@ public class BindingUtils {
             }
         }
 
-        Glide.with(context)
-                .load(selectedUser.getAvatar())
-                .asBitmap()
-                .error(fallback)
-                .into(new BitmapImageViewTarget(view) {
-                    @Override
-                    public void onResourceReady(@NonNull Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                        view.setPadding(0, 0, 0, 0);
-                        view.setImageDrawable(AvatarUtils.getRoundedDrawable(context, resource, true));
-                    }
+        if (selectedUser == null) {
+            view.setPadding(0, 0, 0, 0);
+            view.setImageResource(R.drawable.empty_circle);
+        } else {
+            Glide.with(context)
+                    .load(selectedUser.getAvatar())
+                    .asBitmap()
+                    .error(fallback)
+                    .into(new BitmapImageViewTarget(view) {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                            view.setPadding(0, 0, 0, 0);
+                            view.setImageDrawable(AvatarUtils.getRoundedDrawable(context, resource, true));
+                        }
 
-                    @Override
-                    public void onLoadFailed(Exception e, Drawable errorDrawable) {
-                        super.onLoadFailed(e, errorDrawable);
+                        @Override
+                        public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                            super.onLoadFailed(e, errorDrawable);
 
-                        final int padding = context.getResources().getDimensionPixelSize(R.dimen.small_space);
-                        view.setPadding(0, padding, padding, padding);
-                    }
-                });
+                            view.setPadding(0, padding, padding, padding);
+                        }
+                    });
+        }
     }
 
     @BindingAdapter({"percentage"})

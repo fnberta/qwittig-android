@@ -21,6 +21,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.PurchaseReceiptViewMo
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditDateItemModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItem;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemModel;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemUsersUser;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditStoreItemModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditTotalItemModel;
 
@@ -30,7 +31,7 @@ import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAd
 public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditItemModel, PurchaseAddEditViewModel.ViewListener>,
         PurchaseAddEditItem.PriceChangedListener,
         PurchaseAddEditDateItemModel, PurchaseAddEditStoreItemModel,
-        PurchaseAddEditTotalItemModel, PurchaseAddEditItemUsersClickListener,
+        PurchaseAddEditTotalItemModel,
         NoteDialogFragment.DialogInteractionListener,
         DiscardChangesDialogFragment.DialogInteractionListener,
         ExchangeRateDialogFragment.DialogInteractionListener, RatesWorkerListener,
@@ -64,6 +65,10 @@ public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditI
     void onAddRowClick(@NonNull PurchaseAddEditItemModel itemModel);
 
     void onItemDismiss(int position);
+
+    void onItemRowUserClick();
+
+    void onItemRowUserLongClick(@NonNull PurchaseAddEditItemUsersUser userClicked);
 
     void onExitClick();
 

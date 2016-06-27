@@ -9,7 +9,7 @@ package ch.giantific.qwittig.presentation.purchases.addedit;
  */
 public interface PurchaseAddEditItemUsersClickListener {
 
-    void onTooFewUsersSelected();
-
     void onItemRowUserClick(int position);
+
+    void onItemRowUserLongClick(int position);
 }

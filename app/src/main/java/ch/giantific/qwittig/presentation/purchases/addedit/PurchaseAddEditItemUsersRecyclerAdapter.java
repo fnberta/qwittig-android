@@ -58,33 +58,20 @@ public class PurchaseAddEditItemUsersRecyclerAdapter extends BaseRecyclerAdapter
     @Override
     public void onItemRowUserClick(int position) {
         final PurchaseAddEditItemUsersUser user = mUsers.get(position);
-        if (user.isSelected()) {
-            boolean anotherUserSelected = false;
-            for (PurchaseAddEditItemUsersUser addEditPurchaseItemUsersUser : mUsers) {
-                if (addEditPurchaseItemUsersUser != user && addEditPurchaseItemUsersUser.isSelected()) {
-                    anotherUserSelected = true;
-                    break;
-                }
-            }
-
-            if (anotherUserSelected) {
-                user.setSelected(false);
-                notifyItemChanged(position);
-            } else {
-                mViewModel.onTooFewUsersSelected();
-            }
-        } else {
-            user.setSelected(true);
-            notifyItemChanged(position);
-        }
+        user.setSelected(!user.isSelected());
+        notifyItemChanged(position);
 
         // notify main view model because total and my share values need to be updated
-        mViewModel.onItemRowUserClick(position);
+        mViewModel.onItemRowUserClick();
     }
 
     @Override
-    public void onTooFewUsersSelected() {
-        // nothing to do here
+    public void onItemRowUserLongClick(int position) {
+        final PurchaseAddEditItemUsersUser user = mUsers.get(position);
+        user.setSelected(!user.isSelected());
+        notifyItemChanged(position);
+
+        mViewModel.onItemRowUserLongClick(user);
     }
 
     /**
@@ -98,10 +85,18 @@ public class PurchaseAddEditItemUsersRecyclerAdapter extends BaseRecyclerAdapter
                            @NonNull final PurchaseAddEditItemUsersClickListener listener) {
             super(binding);
 
-            binding.getRoot().setOnClickListener(new View.OnClickListener() {
+            final View root = binding.getRoot();
+            root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     listener.onItemRowUserClick(getAdapterPosition());
+                }
+            });
+            root.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    listener.onItemRowUserLongClick(getAdapterPosition());
+                    return true;
                 }
             });
         }
