@@ -110,13 +110,8 @@ public class HelpFeedbackFragment extends BaseRecyclerViewFragment<HelpFeedbackC
     }
 
     private String getDeviceInfo() {
-        final String release = Build.VERSION.RELEASE;
-        final String device = Build.DEVICE;
-        final String model = Build.MODEL;
-        final String product = Build.PRODUCT;
-        final int versionCode = BuildConfig.VERSION_CODE;
-        final String versionName = BuildConfig.VERSION_NAME;
-        return getString(R.string.email_device_build_info, release, device, model, product, versionCode, versionName);
+        return getString(R.string.email_device_build_info, Build.VERSION.RELEASE, Build.DEVICE,
+                Build.MODEL, Build.PRODUCT, BuildConfig.VERSION_CODE, BuildConfig.VERSION_NAME);
     }
 
     @Override
