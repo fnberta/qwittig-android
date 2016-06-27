@@ -17,25 +17,25 @@ public class AppIntroActivity extends IntroActivity {
         setButtonCtaVisible(true);
 
         addSlide(new SimpleSlide.Builder()
-                .title("some title")
-                .description("some description")
+                .title("Scan")
+                .description("Take a picture of your receipt and Qwittig will digitalize it for you.")
                 .image(R.drawable.ic_shopping_cart_black_144dp)
-                .background(R.color.blue)
-                .backgroundDark(R.color.blue_dark)
-                .build());
-
-        addSlide(new SimpleSlide.Builder()
-                .title("some other title")
-                .description("some other description")
-                .image(R.drawable.ic_attach_money_black_144dp)
                 .background(R.color.red)
                 .backgroundDark(R.color.red_dark)
                 .build());
 
         addSlide(new SimpleSlide.Builder()
-                .title("some other title again")
-                .description("some other description agin")
+                .title("Split")
+                .description("Choose which items belong to whom and let Qwittig do the math.")
                 .image(R.drawable.ic_account_box_black_144dp)
+                .background(R.color.blue)
+                .backgroundDark(R.color.blue_dark)
+                .build());
+
+        addSlide(new SimpleSlide.Builder()
+                .title("Settle")
+                .description("Lean back, Qwittig will remind everybody to pay their debts.")
+                .image(R.drawable.ic_attach_money_black_144dp)
                 .background(R.color.green)
                 .backgroundDark(R.color.green_dark)
                 .build());
