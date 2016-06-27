@@ -1,12 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.0"
 
     defaultConfig {
         minSdkVersion 17
-        targetSdkVersion 23
+        targetSdkVersion 24
         vectorDrawables.useSupportLibrary = true
         versionCode 2
         versionName "0.2"
@@ -20,7 +20,7 @@ android {
 }
 
 ext {
-    supportLibVersion = '23.2.1'
+    supportLibVersion = '24.0.0'
 }
 
 dependencies {
