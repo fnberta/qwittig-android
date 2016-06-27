@@ -343,5 +343,6 @@
     <string name="tab_details_receipt">Quittung</string>
     <string name="action_add">Hinzufügen</string>
     <string name="action_delete">Löschen</string>
+    <string name="no_purchases_add_one">Füge einen hinzu, indem du auf das + klickst.</string>
 
 </resources>

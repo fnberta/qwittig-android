@@ -349,5 +349,6 @@
     <string name="tab_details_receipt">Receipt</string>
     <string name="action_add">Add</string>
     <string name="action_delete">Delete</string>
+    <string name="no_purchases_add_one">Add one by pressing on the + button.</string>
 
 </resources>
