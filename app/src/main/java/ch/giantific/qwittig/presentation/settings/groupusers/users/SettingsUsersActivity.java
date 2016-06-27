@@ -4,6 +4,9 @@
 
 package ch.giantific.qwittig.presentation.settings.groupusers.users;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,18 +23,20 @@ import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.settings.groupusers.di.DaggerSettingsGroupUsersComponent;
 import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsAddGroupViewModelModule;
 import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsGroupUsersComponent;
 import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsUsersViewModelModule;
+import ch.giantific.qwittig.utils.AvatarUtils;
 import rx.Single;
 
 /**
  * Hosts {@link SettingsUsersFragment} that allows the user to add users to his/her current
  * group.
- * <p/>
+ * <p>
  * Subclass of {@link BaseActivity}.
  */
 public class SettingsUsersActivity extends BaseActivity<SettingsGroupUsersComponent>
@@ -86,6 +91,23 @@ public class SettingsUsersActivity extends BaseActivity<SettingsGroupUsersCompon
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case Navigator.INTENT_REQUEST_IMAGE_PICK:
+                if (resultCode == Activity.RESULT_OK) {
+                    final Uri imageUri = data.getData();
+                    AvatarUtils.saveImageLocal(this, imageUri, new AvatarUtils.AvatarLocalSaveListener() {
+                        @Override
+                        public void onAvatarSaved(@NonNull String path) {
+                            mUsersViewModel.onNewAvatarTaken(path);
+                        }
+                    });
+                }
+        }
+    }
 
     @Override
     public void setAddUserStream(@NonNull Single<Identity> single, @NonNull String workerTag) {
