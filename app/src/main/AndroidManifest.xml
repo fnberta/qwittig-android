@@ -52,36 +52,24 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
             </intent-filter>
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.VIEW"/> -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
 
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
 
-            <!-- <category android:name="android.intent.category.DEFAULT"/> -->
-            <!-- <category android:name="android.intent.category.BROWSABLE"/> -->
+                <data
+                    android:host="bnc.lt"
+                    android:pathPrefix="/64Mh"
+                    android:scheme="https"
+                    />
+                <data
+                    android:host="invitation.qwittig.com"
+                    android:pathPrefix="/64Mh"
+                    android:scheme="https"
+                    />
 
-
-            <!-- <data -->
-            <!-- android:host="qwittig.ch" -->
-            <!-- android:pathPrefix="/invitation" -->
-            <!-- android:scheme="https" -->
-            <!-- /> -->
-            <!-- <data -->
-            <!-- android:host="www.qwittig.ch" -->
-            <!-- android:pathPrefix="/invitation" -->
-            <!-- android:scheme="https" -->
-            <!-- /> -->
-            <!-- <data -->
-            <!-- android:host="qwittig.com" -->
-            <!-- android:pathPrefix="/invitation" -->
-            <!-- android:scheme="https" -->
-            <!-- /> -->
-            <!-- <data -->
-            <!-- android:host="www.qwittig.com" -->
-            <!-- android:pathPrefix="/invitation" -->
-            <!-- android:scheme="https" -->
-            <!-- /> -->
-            <!-- <data android:scheme="qwittig"/> -->
-            <!-- </intent-filter> -->
+            </intent-filter>
         </activity>
         <activity
             android:name=".presentation.settings.general.SettingsActivity"
