@@ -16,7 +16,6 @@ import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditActivity;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditFragment;
-import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditNoteFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditReceiptFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddActivity;
 import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddFragment;
@@ -73,11 +72,6 @@ public class PurchaseEditActivity extends BasePurchaseAddEditActivity<PurchaseEd
     @Override
     protected BasePurchaseAddEditReceiptFragment getReceiptFragment() {
         return isDraft() ? new PurchaseEditDraftReceiptFragment() : new PurchaseEditReceiptFragment();
-    }
-
-    @Override
-    protected BasePurchaseAddEditNoteFragment getNoteFragment() {
-        return isDraft() ? new PurchaseEditDraftNoteFragment() : new PurchaseEditNoteFragment();
     }
 
     @Override

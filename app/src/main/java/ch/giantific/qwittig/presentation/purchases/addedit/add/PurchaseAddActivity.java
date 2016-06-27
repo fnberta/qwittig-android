@@ -18,7 +18,6 @@ import ch.giantific.qwittig.data.push.PushBroadcastReceiver;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditActivity;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditFragment;
-import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditNoteFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditReceiptFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.DaggerPurchaseAddComponent;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseAddComponent;
@@ -95,10 +94,5 @@ public class PurchaseAddActivity extends BasePurchaseAddEditActivity<PurchaseAdd
     @Override
     protected BasePurchaseAddEditReceiptFragment getReceiptFragment() {
         return TextUtils.isEmpty(getOcrDataId()) ? new PurchaseAddReceiptFragment() : new PurchaseAddOcrReceiptFragment();
-    }
-
-    @Override
-    protected BasePurchaseAddEditNoteFragment getNoteFragment() {
-        return TextUtils.isEmpty(getOcrDataId()) ? new PurchaseAddNoteFragment() : new PurchaseAddOcrNoteFragment();
     }
 }

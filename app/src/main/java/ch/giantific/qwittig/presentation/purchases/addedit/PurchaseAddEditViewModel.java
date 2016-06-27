@@ -36,14 +36,14 @@ public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditI
         ExchangeRateDialogFragment.DialogInteractionListener, RatesWorkerListener,
         PurchaseReceiptViewModel {
 
-    void setReceiptOrNoteShown(boolean receiptOrNoteShown);
-
     void setReceiptImage(@NonNull String receiptImagePath);
 
     @Bindable
     String getNote();
 
     void setNote(@NonNull String note);
+
+    boolean isNoteAvailable();
 
     List<String> getSupportedCurrencies();
 
@@ -53,21 +53,11 @@ public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditI
 
     void onReceiptImageTakeFailed();
 
-    void onAddReceiptImageMenuClick();
-
-    void onShowReceiptImageMenuClick();
-
-    void onEditReceiptMenuClick();
+    void onAddEditReceiptImageMenuClick();
 
     void onDeleteReceiptMenuClick();
 
-    void onAddNoteMenuClick();
-
-    void onShowNoteMenuClick();
-
-    void onEditNoteMenuClick();
-
-    void onDeleteNoteMenuClick();
+    void onAddEditNoteMenuClick();
 
     void onToggleUsersClick(@NonNull PurchaseAddEditItem itemModel);
 
@@ -109,18 +99,12 @@ public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditI
 
         void showDiscardEditChangesDialog();
 
-        void toggleReceiptMenuOption(boolean show);
-
-        void toggleNoteMenuOption(boolean show);
-
-        void showReceiptImage(@NonNull String receiptImageUri);
-
-        void showNote(@NonNull String note);
-
         void showAddEditNoteDialog(@NonNull String note);
 
         void captureImage();
 
-        void showPurchaseScreen();
+        void showPurchaseItems();
+
+        void reloadOptionsMenu();
     }
 }

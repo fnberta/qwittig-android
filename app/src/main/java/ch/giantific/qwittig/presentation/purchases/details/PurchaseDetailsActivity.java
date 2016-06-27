@@ -10,12 +10,12 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import org.json.JSONException;
@@ -31,6 +31,7 @@ import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.data.push.PushBroadcastReceiver;
 import ch.giantific.qwittig.databinding.ActivityPurchaseDetailsBinding;
 import ch.giantific.qwittig.presentation.common.Navigator;
+import ch.giantific.qwittig.presentation.common.adapters.TabsAdapter;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
@@ -47,16 +48,13 @@ import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsVie
  * Subclass of {@link BaseNavDrawerActivity}.
  */
 public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetailsSubcomponent>
-        implements PurchaseDetailsFragment.ActivityListener, PurchaseDetailsViewModel.ViewListener,
-        PurchaseDetailsReceiptFragment.ActivityListener {
+        implements PurchaseDetailsViewModel.ViewListener {
 
-    public static final String PURCHASE_DETAILS_FRAGMENT = "PURCHASE_DETAILS_FRAGMENT";
-    public static final String PURCHASE_RECEIPT_FRAGMENT = "PURCHASE_RECEIPT_FRAGMENT";
     @Inject
     PurchaseDetailsViewModel mPurchaseDetailsViewModel;
     private boolean mShowEditOptions;
     private boolean mShowExchangeRate;
-    private boolean mShowReceipt;
+    private ActivityPurchaseDetailsBinding mBinding;
 
     @Override
     protected void handleLocalBroadcast(Intent intent, int dataType) {
@@ -73,9 +71,8 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final ActivityPurchaseDetailsBinding binding =
-                DataBindingUtil.setContentView(this, R.layout.activity_purchase_details);
-        binding.setViewModel(mPurchaseDetailsViewModel);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_purchase_details);
+        mBinding.setViewModel(mPurchaseDetailsViewModel);
 
         // disable default actionBar title
         final ActionBar actionBar = getSupportActionBar();
@@ -96,16 +93,9 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
         });
 
 
-        if (mUserLoggedIn && savedInstanceState == null) {
-            addDetailsFragment();
+        if (mUserLoggedIn) {
+            setupTabs();
         }
-    }
-
-    private void addDetailsFragment() {
-        final PurchaseDetailsFragment fragment = new PurchaseDetailsFragment();
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.container, fragment, PURCHASE_DETAILS_FRAGMENT)
-                .commit();
     }
 
     @Override
@@ -137,6 +127,46 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
         return Arrays.asList(new ViewModel[]{mPurchaseDetailsViewModel});
     }
 
+    private void setupTabs() {
+        final TabsAdapter tabsAdapter = new TabsAdapter(getSupportFragmentManager());
+        tabsAdapter.addInitialFragment(new PurchaseDetailsFragment(), getString(R.string.tab_details_purchase));
+        tabsAdapter.addInitialFragment(new PurchaseDetailsReceiptFragment(), getString(R.string.tab_details_receipt));
+        mBinding.viewpager.setAdapter(tabsAdapter);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_purchase_details, menu);
+
+        if (mShowEditOptions) {
+            menu.findItem(R.id.action_purchase_edit).setVisible(true);
+            menu.findItem(R.id.action_purchase_delete).setVisible(true);
+        }
+        if (mShowExchangeRate) {
+            menu.findItem(R.id.action_purchase_show_exchange_rate).setVisible(true);
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.action_purchase_edit:
+                mPurchaseDetailsViewModel.onEditPurchaseClick();
+                return true;
+            case R.id.action_purchase_delete:
+                mPurchaseDetailsViewModel.onDeletePurchaseClick();
+                return true;
+            case R.id.action_purchase_show_exchange_rate:
+                mPurchaseDetailsViewModel.onShowExchangeRateClick();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -157,22 +187,7 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
     public void setupScreenAfterLogin() {
         super.setupScreenAfterLogin();
 
-        addDetailsFragment();
-    }
-
-    @Override
-    public boolean isShowEditOptions() {
-        return mShowEditOptions;
-    }
-
-    @Override
-    public boolean isShowExchangeRate() {
-        return mShowExchangeRate;
-    }
-
-    @Override
-    public boolean isShowReceipt() {
-        return mShowReceipt;
+        setupTabs();
     }
 
     @Override
@@ -181,21 +196,9 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
     }
 
     @Override
-    public void showPurchaseDetailsReceipt() {
-        final Fragment fragment = new PurchaseDetailsReceiptFragment();
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, fragment, PURCHASE_RECEIPT_FRAGMENT)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .addToBackStack(null)
-                .commit();
-    }
-
-    @Override
-    public void toggleMenuOptions(boolean showEditOptions, boolean hasReceiptImage,
-                                  boolean hasForeignCurrency) {
+    public void toggleMenuOptions(boolean showEditOptions, boolean hasForeignCurrency) {
         mShowEditOptions = showEditOptions;
         mShowExchangeRate = hasForeignCurrency;
-        mShowReceipt = hasReceiptImage;
         invalidateOptionsMenu();
     }
 }

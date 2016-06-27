@@ -69,10 +69,10 @@
                 android:id="@+id/fab_menu"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="bottom|end"
                 android:fabMenuClickListener="@{viewModel.fabMenuClickListener}"
-                app:progress="@{viewModel.ocrProcessing}"
+                android:gravity="bottom|end"
                 app:animStop="@{viewModel.animStop}"
+                app:progress="@{viewModel.ocrProcessing}"
                 />
 
         </android.support.design.widget.CoordinatorLayout>

@@ -15,8 +15,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.transition.Transition;
@@ -34,14 +32,15 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.databinding.ActivityPurchaseAddEditBinding;
+import ch.giantific.qwittig.presentation.camera.CameraActivity;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.TransitionListenerAdapter;
+import ch.giantific.qwittig.presentation.common.adapters.TabsAdapter;
 import ch.giantific.qwittig.presentation.common.fragments.DatePickerDialogFragment;
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddFragment;
-import ch.giantific.qwittig.presentation.camera.CameraActivity;
 import ch.giantific.qwittig.utils.CameraUtils;
 import ch.giantific.qwittig.utils.DateUtils;
 import ch.giantific.qwittig.utils.MessageAction;
@@ -63,16 +62,11 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
 
     public static final String INTENT_OCR_PURCHASE_ID = "INTENT_OCR_PURCHASE_ID";
     public static final String PURCHASE_NOTE_FRAGMENT = "PURCHASE_NOTE_FRAGMENT";
-    public static final String PURCHASE_RECEIPT_FRAGMENT = "PURCHASE_RECEIPT_FRAGMENT";
-    private static final String STATE_HAS_RECEIPT_FILE = "STATE_HAS_RECEIPT_FILE";
-    private static final String STATE_HAS_NOTE = "STATE_HAS_NOTE";
     private static final int PERMISSIONS_REQUEST_CAPTURE_IMAGES = 12;
     protected PurchaseAddEditViewModel mAddEditPurchaseViewModel;
     @Inject
     protected Navigator mNavigator;
     private ActivityPurchaseAddEditBinding mBinding;
-    private boolean mHasReceiptFile;
-    private boolean mHasNote;
 
     @Override
     protected void handleLocalBroadcast(Intent intent, int dataType) {
@@ -95,35 +89,23 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_purchase_add_edit);
         mBinding.setViewModel(mAddEditPurchaseViewModel);
 
+        setupTabs();
+
         if (savedInstanceState == null) {
             if (Utils.isRunningLollipopAndHigher()) {
                 addActivityTransitionListener();
             } else {
                 showFab();
             }
-
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, getPurchaseAddEditFragment())
-                    .commit();
         } else {
             showFab();
-
-            mHasReceiptFile = savedInstanceState.getBoolean(STATE_HAS_RECEIPT_FILE);
-            mHasNote = savedInstanceState.getBoolean(STATE_HAS_NOTE);
         }
+
     }
 
     @Override
     protected List<ViewModel> getViewModels() {
         return Arrays.asList(new ViewModel[]{mAddEditPurchaseViewModel});
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putBoolean(STATE_HAS_RECEIPT_FILE, mHasReceiptFile);
-        outState.putBoolean(STATE_HAS_NOTE, mHasNote);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -154,6 +136,13 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
         }
     }
 
+    private void setupTabs() {
+        final TabsAdapter tabsAdapter = new TabsAdapter(getSupportFragmentManager());
+        tabsAdapter.addInitialFragment(getPurchaseAddEditFragment(), getString(R.string.tab_details_purchase));
+        tabsAdapter.addInitialFragment(getReceiptFragment(), getString(R.string.tab_details_receipt));
+        mBinding.viewpager.setAdapter(tabsAdapter);
+    }
+
     @NonNull
     protected abstract BasePurchaseAddEditFragment getPurchaseAddEditFragment();
 
@@ -161,13 +150,8 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
     public boolean onCreateOptionsMenu(@NonNull Menu menu) {
         getMenuInflater().inflate(R.menu.menu_purchase_add_edit, menu);
 
-        if (mHasReceiptFile) {
-            menu.findItem(R.id.action_purchase_add_edit_receipt_show).setVisible(true);
-            menu.findItem(R.id.action_purchase_add_edit_receipt_add).setVisible(false);
-        }
-
-        if (mHasNote) {
-            menu.findItem(R.id.action_purchase_add_edit_note_show).setVisible(true);
+        if (mAddEditPurchaseViewModel.isNoteAvailable()) {
+            menu.findItem(R.id.action_purchase_add_edit_note_edit).setVisible(true);
             menu.findItem(R.id.action_purchase_add_edit_note_add).setVisible(false);
         }
 
@@ -181,17 +165,10 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
             case android.R.id.home:
                 mAddEditPurchaseViewModel.onExitClick();
                 return true;
-            case R.id.action_purchase_add_edit_receipt_show:
-                mAddEditPurchaseViewModel.onShowReceiptImageMenuClick();
-                return true;
-            case R.id.action_purchase_add_edit_receipt_add:
-                mAddEditPurchaseViewModel.onAddReceiptImageMenuClick();
-                return true;
-            case R.id.action_purchase_add_edit_note_show:
-                mAddEditPurchaseViewModel.onShowNoteMenuClick();
-                return true;
+            case R.id.action_purchase_add_edit_note_edit:
+                // fall through
             case R.id.action_purchase_add_edit_note_add:
-                mAddEditPurchaseViewModel.onAddNoteMenuClick();
+                mAddEditPurchaseViewModel.onAddEditNoteMenuClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -247,18 +224,6 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
     }
 
     @Override
-    public void toggleReceiptMenuOption(boolean show) {
-        mHasReceiptFile = show;
-        invalidateOptionsMenu();
-    }
-
-    @Override
-    public void toggleNoteMenuOption(boolean show) {
-        mHasNote = show;
-        invalidateOptionsMenu();
-    }
-
-    @Override
     public void onDiscardPurchaseSelected() {
         mAddEditPurchaseViewModel.onDiscardChangesSelected();
     }
@@ -304,31 +269,7 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
         DiscardChangesDialogFragment.display(getSupportFragmentManager());
     }
 
-    @Override
-    public void showReceiptImage(@NonNull String receiptImageUri) {
-        final Fragment fragment = getReceiptFragment();
-
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, fragment, PURCHASE_RECEIPT_FRAGMENT)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .addToBackStack(null)
-                .commit();
-    }
-
     protected abstract BasePurchaseAddEditReceiptFragment getReceiptFragment();
-
-    @Override
-    public void showNote(@NonNull String note) {
-        final Fragment noteFragment = getNoteFragment();
-
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, noteFragment, PURCHASE_NOTE_FRAGMENT)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .addToBackStack(null)
-                .commit();
-    }
-
-    protected abstract BasePurchaseAddEditNoteFragment getNoteFragment();
 
     @Override
     public void showAddEditNoteDialog(@NonNull String note) {
@@ -338,6 +279,11 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
     @Override
     public void onNoteSet(@NonNull String note) {
         mAddEditPurchaseViewModel.onNoteSet(note);
+    }
+
+    @Override
+    public void onDeleteNote() {
+        mAddEditPurchaseViewModel.onDeleteNote();
     }
 
     @Override
@@ -364,8 +310,13 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
     }
 
     @Override
-    public void showPurchaseScreen() {
+    public void showPurchaseItems() {
         getSupportFragmentManager().popBackStack();
+    }
+
+    @Override
+    public void reloadOptionsMenu() {
+        invalidateOptionsMenu();
     }
 
     @Override

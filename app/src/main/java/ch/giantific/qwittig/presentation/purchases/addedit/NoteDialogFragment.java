@@ -69,13 +69,30 @@ public class NoteDialogFragment extends BaseDialogFragment<NoteDialogFragment.Di
                         final String note = binding.etDialogPurchaseNote.getText().toString();
                         mActivity.onNoteSet(note);
                     }
-                })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dismiss();
-                    }
                 });
+
+        if (TextUtils.isEmpty(note)) {
+            dialogBuilder.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dismiss();
+                }
+            });
+        } else {
+            dialogBuilder
+                    .setNeutralButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dismiss();
+                        }
+                    })
+                    .setNegativeButton(R.string.action_delete, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            mActivity.onDeleteNote();
+                        }
+                    });
+        }
 
         return dialogBuilder.create();
     }
@@ -90,5 +107,10 @@ public class NoteDialogFragment extends BaseDialogFragment<NoteDialogFragment.Di
          * @param note the note to set in the purchase
          */
         void onNoteSet(@NonNull String note);
+
+        /**
+         * Defines the click on the delete note button.
+         */
+        void onDeleteNote();
     }
 }

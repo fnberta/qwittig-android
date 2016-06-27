@@ -20,8 +20,6 @@ import ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDe
  */
 public interface PurchaseDetailsViewModel extends ListViewModel<PurchaseDetailsItemModel, PurchaseDetailsViewModel.ViewListener>, PurchaseReceiptViewModel {
 
-    void setReceiptShown(boolean receiptShown);
-
     @Bindable
     String getPurchaseStore();
 
@@ -36,8 +34,6 @@ public interface PurchaseDetailsViewModel extends ListViewModel<PurchaseDetailsI
 
     void onShowExchangeRateClick();
 
-    void onShowReceiptImageClick();
-
     @IntDef({PurchaseDetailsResult.PURCHASE_DELETED})
     @Retention(RetentionPolicy.SOURCE)
     @interface PurchaseDetailsResult {
@@ -51,9 +47,6 @@ public interface PurchaseDetailsViewModel extends ListViewModel<PurchaseDetailsI
 
         void startEnterTransition();
 
-        void showPurchaseDetailsReceipt();
-
-        void toggleMenuOptions(boolean showEditOptions, boolean hasReceiptImage,
-                               boolean hasForeignCurrency);
+        void toggleMenuOptions(boolean showEditOptions, boolean hasForeignCurrency);
     }
 }

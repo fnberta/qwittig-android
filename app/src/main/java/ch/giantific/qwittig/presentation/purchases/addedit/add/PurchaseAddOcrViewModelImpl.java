@@ -91,13 +91,11 @@ public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implem
                     public void onSuccess(OcrData ocrData) {
                         mOcrData = ocrData;
 
-                        if (!mReceiptOrNoteShown) {
-                            if (mOcrValuesSet) {
-                                updateRows();
-                            } else {
-                                setOcrData(ocrData);
-                                mOcrValuesSet = true;
-                            }
+                        if (mOcrValuesSet) {
+                            updateRows();
+                        } else {
+                            setOcrData(ocrData);
+                            mOcrValuesSet = true;
                         }
                     }
 
@@ -111,8 +109,6 @@ public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implem
 
     @SuppressWarnings("unchecked")
     private void setOcrData(@NonNull OcrData ocrData) {
-        mView.toggleReceiptMenuOption(true);
-
         final Map<String, Object> data = ocrData.getData();
 //        setDate(data.get("date"));
         final List<String> stores = (List<String>) data.get("store");

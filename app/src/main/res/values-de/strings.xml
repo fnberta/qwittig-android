@@ -148,7 +148,7 @@
     <string name="progress_logout">Abmelden…</string>
     <string name="action_purchase_add_edit_receipt_delete">Quittung löschen</string>
     <string name="action_purchase_add_edit_receipt_add">Quittung hinzufügen</string>
-    <string name="toast_receipt_deleted">Quittung gelöscht</string>
+    <string name="toast_receipt_deleted">Quittung entfernt</string>
     <string name="about_facebook">Finde Qwittig auf Facebook</string>
     <string name="about_twitter">Finde Qwittig auf Twitter</string>
     <string name="push_action_confirm">Bestätigen</string>
@@ -347,5 +347,10 @@
     <string name="about_usage">Nutzungsbedingungen</string>
     <string name="about_privacy">Datenschutzbestimmungen</string>
     <string name="about_website">Website besuchen</string>
+    <string name="no_receipt_image">Keine Quittung</string>
+    <string name="tab_details_purchase">Einkauf</string>
+    <string name="tab_details_receipt">Quittung</string>
+    <string name="action_add">Hinzufügen</string>
+    <string name="action_delete">Löschen</string>
 
 </resources>
