@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.bus.events.EventIdentityAdded;
 import ch.giantific.qwittig.data.bus.events.EventIdentitySelected;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
@@ -77,6 +78,14 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
                     @Override
                     public void call(EventIdentitySelected eventIdentitySelected) {
                         onIdentitySelected(eventIdentitySelected.getIdentity());
+                    }
+                })
+        );
+        getSubscriptions().add(mEventBus.observeEvents(EventIdentityAdded.class)
+                .subscribe(new Action1<EventIdentityAdded>() {
+                    @Override
+                    public void call(EventIdentityAdded eventIdentityAdded) {
+                        onIdentitySelected(eventIdentityAdded.getIdentity());
                     }
                 })
         );
