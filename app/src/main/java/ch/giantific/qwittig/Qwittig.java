@@ -7,7 +7,6 @@ package ch.giantific.qwittig;
 import android.app.Application;
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.multidex.MultiDex;
 
 import com.parse.Parse;
 import com.parse.ParseACL;
@@ -47,15 +46,6 @@ public class Qwittig extends Application {
 
     private ApplicationComponent getAppComponent() {
         return mAppComponent;
-    }
-
-    @Override
-    protected void attachBaseContext(Context base) {
-        super.attachBaseContext(base);
-
-        if (BuildConfig.DEBUG) {
-            MultiDex.install(this);
-        }
     }
 
     @Override

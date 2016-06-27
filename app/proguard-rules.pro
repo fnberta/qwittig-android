@@ -21,6 +21,7 @@
 
 ## MPAndroidChart
 -keep class com.github.mikephil.charting.** { *; }
+-dontwarn io.realm.**
 
 ## Glide
 -keep public class * implements com.bumptech.glide.module.GlideModule
@@ -42,4 +43,13 @@
 -keep class ch.giantific.qwittig.data.rest.CurrencyRates { *; }
 -keep class ch.giantific.qwittig.presentation.stats.models.** { *; }
 
+## Parse
+-keepattributes *Annotation*
+-keepattributes Signature
+-dontwarn android.net.SSLCertificateSocketFactory
+-dontwarn android.app.Notification
+-dontwarn com.squareup.**
+-dontwarn okio.**
 
+## Apache Commons Math
+-dontwarn org.apache.commons.math3.geometry.**
