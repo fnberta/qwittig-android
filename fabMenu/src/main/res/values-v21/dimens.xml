@@ -3,7 +3,6 @@
     <dimen name="normal_space">16dp</dimen>
     <dimen name="small_space">8dp</dimen>
 
-    <dimen name="menu_margin_start">16dp</dimen>
     <dimen name="menu_margin_end">16dp</dimen>
     <dimen name="menu_margin_top">16dp</dimen>
     <dimen name="menu_margin_bottom">16dp</dimen>

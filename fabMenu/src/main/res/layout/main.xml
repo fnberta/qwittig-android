@@ -10,8 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginBottom="@dimen/menu_margin_bottom"
-        android:layout_marginEnd="@dimen/normal_space"
-        android:layout_marginStart="@dimen/normal_space"
+        android:layout_marginEnd="@dimen/menu_margin_end"
         android:clipChildren="false"
         android:orientation="vertical"
         >
@@ -67,7 +66,7 @@
                     android:id="@+id/fab_main"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/fab_selection"
+                    android:src="@drawable/fab_selection"
                     />
 
                 <ch.berta.fabio.fabspeeddial.ProgressArc

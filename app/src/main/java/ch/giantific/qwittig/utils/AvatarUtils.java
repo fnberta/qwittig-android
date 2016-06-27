@@ -81,8 +81,8 @@ public class AvatarUtils {
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @NonNull
-    private static RippleDrawable createRippleDrawable(@NonNull Context context,
-                                                       @NonNull Drawable drawable) {
+    private static Drawable createRippleDrawable(@NonNull Context context,
+                                                 @NonNull Drawable drawable) {
         final int[] attrs = new int[]{R.attr.colorControlHighlight};
         final TypedArray typedArray = context.obtainStyledAttributes(attrs);
         final int rippleColor = typedArray.getResourceId(0, 0);
