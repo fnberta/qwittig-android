@@ -40,7 +40,7 @@ import timber.log.Timber;
  */
 public abstract class ParseBaseRepository implements BaseRepository {
 
-    static final int QUERY_ITEMS_PER_PAGE = 15;
+    static final int QUERY_ITEMS_PER_PAGE = 100;
 
     ParseBaseRepository() {
     }
