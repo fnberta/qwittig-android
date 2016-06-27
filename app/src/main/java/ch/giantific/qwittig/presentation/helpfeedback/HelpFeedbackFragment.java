@@ -7,6 +7,7 @@ package ch.giantific.qwittig.presentation.helpfeedback;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
@@ -15,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentHelpFeedbackBinding;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
@@ -84,6 +86,7 @@ public class HelpFeedbackFragment extends BaseRecyclerViewFragment<HelpFeedbackC
         final Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"));
         intent.putExtra(Intent.EXTRA_EMAIL, new String[]{recipient});
         intent.putExtra(Intent.EXTRA_SUBJECT, getString(subject));
+        intent.putExtra(Intent.EXTRA_TEXT, getDeviceInfo());
         try {
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
@@ -98,12 +101,22 @@ public class HelpFeedbackFragment extends BaseRecyclerViewFragment<HelpFeedbackC
         final Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"));
         intent.putExtra(Intent.EXTRA_EMAIL, new String[]{recipient});
         intent.putExtra(Intent.EXTRA_SUBJECT, getString(subject));
-        intent.putExtra(Intent.EXTRA_TEXT, getString(body));
+        intent.putExtra(Intent.EXTRA_TEXT, String.format("%s%n%n%s", getDeviceInfo(), getString(body)));
         try {
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
             showMessage(R.string.toast_error_not_supported);
         }
+    }
+
+    private String getDeviceInfo() {
+        final String release = Build.VERSION.RELEASE;
+        final String device = Build.DEVICE;
+        final String model = Build.MODEL;
+        final String product = Build.PRODUCT;
+        final int versionCode = BuildConfig.VERSION_CODE;
+        final String versionName = BuildConfig.VERSION_NAME;
+        return getString(R.string.email_device_build_info, release, device, model, product, versionCode, versionName);
     }
 
     @Override

@@ -112,6 +112,7 @@
     <string name="help_recommend">Empfehle Qwittig weiter</string>
     <string name="help_rate">Bewerte uns im Play Store</string>
     <string name="email_support_message">Bitte beschreibe das Problem. Wir helfen dir so schnell wie möglich.</string>
+    <string name="email_device_build_info">----\nDie folgenden Angaben helfen uns, dein Problem so schnell wie möglich zu lösen.\nDevice: %1$s, %2$s, %3$s, %3$s\nBuild: %5$s, %6$s\n----</string>
     <string name="title_activity_help_feedback">Hilfe und Feedback</string>
     <string name="toast_purchase_added_draft">Einkauf als Entwurf gespeichert</string>
     <string name="title_activity_purchase_drafts">Entwürfe</string>

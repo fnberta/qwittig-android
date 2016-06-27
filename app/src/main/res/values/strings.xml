@@ -112,6 +112,7 @@
     <string name="help_rate">Rate us in the Play Store</string>
     <string name="email_support_subject" translatable="false">Qwittig Support</string>
     <string name="email_support_message">Please describe your problem. We will get back to you as soon as possible.</string>
+    <string name="email_device_build_info">----\nThe following information helps us to faster identity your problem.\nDevice: %1$s, %2$s, %3$s, %3$s\nBuild:%5$s, %6$s\n----</string>
     <string name="email_feedback_subject" translatable="false">Qwittig Feedback</string>
     <string name="toast_purchase_added_draft">Purchase saved as a draft</string>
     <string name="title_activity_purchase_drafts">Drafts</string>
