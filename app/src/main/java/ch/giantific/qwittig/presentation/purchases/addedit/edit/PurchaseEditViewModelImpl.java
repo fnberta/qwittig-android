@@ -26,9 +26,9 @@ import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddViewModelImpl;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItem;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemModel.Type;
-import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItem;
 import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Single;
 import rx.SingleSubscriber;
@@ -98,14 +98,12 @@ public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
                     public void onSuccess(Purchase purchase) {
                         mEditPurchase = purchase;
 
-                        if (!mNoteShown) {
-                            if (mOldValuesSet) {
-                                updateRows();
-                            } else {
-                                setOldPurchaseValues();
-                                setOldItemValues();
-                                mOldValuesSet = true;
-                            }
+                        if (mOldValuesSet) {
+                            updateRows();
+                        } else {
+                            setOldPurchaseValues();
+                            setOldItemValues();
+                            mOldValuesSet = true;
                         }
                     }
 

@@ -36,8 +36,6 @@ public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditI
         ExchangeRateDialogFragment.DialogInteractionListener, RatesWorkerListener,
         PurchaseReceiptViewModel {
 
-    void setNoteShown(boolean noteShown);
-
     void setReceiptImage(@NonNull String receiptImagePath);
 
     @Bindable
@@ -60,10 +58,6 @@ public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditI
     void onDeleteReceiptMenuClick();
 
     void onAddEditNoteMenuClick();
-
-    void onShowNoteMenuClick();
-
-    void onDeleteNoteMenuClick();
 
     void onToggleUsersClick(@NonNull PurchaseAddEditItem itemModel);
 
@@ -104,8 +98,6 @@ public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditI
         void showPurchaseDiscardDialog();
 
         void showDiscardEditChangesDialog();
-
-        void showNote(@NonNull String note);
 
         void showAddEditNoteDialog(@NonNull String note);
 

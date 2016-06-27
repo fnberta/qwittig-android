@@ -91,13 +91,11 @@ public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implem
                     public void onSuccess(OcrData ocrData) {
                         mOcrData = ocrData;
 
-                        if (!mNoteShown) {
-                            if (mOcrValuesSet) {
-                                updateRows();
-                            } else {
-                                setOcrData(ocrData);
-                                mOcrValuesSet = true;
-                            }
+                        if (mOcrValuesSet) {
+                            updateRows();
+                        } else {
+                            setOcrData(ocrData);
+                            mOcrValuesSet = true;
                         }
                     }
 

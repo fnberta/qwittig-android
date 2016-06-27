@@ -15,8 +15,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.transition.Transition;
@@ -153,7 +151,7 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
         getMenuInflater().inflate(R.menu.menu_purchase_add_edit, menu);
 
         if (mAddEditPurchaseViewModel.isNoteAvailable()) {
-            menu.findItem(R.id.action_purchase_add_edit_note_show).setVisible(true);
+            menu.findItem(R.id.action_purchase_add_edit_note_edit).setVisible(true);
             menu.findItem(R.id.action_purchase_add_edit_note_add).setVisible(false);
         }
 
@@ -167,9 +165,8 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
             case android.R.id.home:
                 mAddEditPurchaseViewModel.onExitClick();
                 return true;
-            case R.id.action_purchase_add_edit_note_show:
-                mAddEditPurchaseViewModel.onShowNoteMenuClick();
-                return true;
+            case R.id.action_purchase_add_edit_note_edit:
+                // fall through
             case R.id.action_purchase_add_edit_note_add:
                 mAddEditPurchaseViewModel.onAddEditNoteMenuClick();
                 return true;
@@ -275,19 +272,6 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
     protected abstract BasePurchaseAddEditReceiptFragment getReceiptFragment();
 
     @Override
-    public void showNote(@NonNull String note) {
-        final Fragment noteFragment = getNoteFragment();
-
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, noteFragment, PURCHASE_NOTE_FRAGMENT)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .addToBackStack(null)
-                .commit();
-    }
-
-    protected abstract BasePurchaseAddEditNoteFragment getNoteFragment();
-
-    @Override
     public void showAddEditNoteDialog(@NonNull String note) {
         NoteDialogFragment.display(getSupportFragmentManager(), note);
     }
@@ -295,6 +279,11 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
     @Override
     public void onNoteSet(@NonNull String note) {
         mAddEditPurchaseViewModel.onNoteSet(note);
+    }
+
+    @Override
+    public void onDeleteNote() {
+        mAddEditPurchaseViewModel.onDeleteNote();
     }
 
     @Override
