@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-selector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+
+    <item
+        android:id="@+id/selected_state"
+        android:drawable="@drawable/ic_photo_camera_black_24dp"
+        android:state_selected="true"
+        />
+
+    <item
+        android:id="@+id/default_state"
+        android:drawable="@drawable/ic_add_black_24dp"
+        />
+
+    <transition
+        android:drawable="@drawable/animated_to_selected"
+        android:fromId="@+id/default_state"
+        android:toId="@+id/selected_state"
+        />
+
+    <transition
+        android:drawable="@drawable/animated_to_default"
+        android:fromId="@+id/selected_state"
+        android:toId="@+id/default_state"
+        />
+
+</animated-selector>

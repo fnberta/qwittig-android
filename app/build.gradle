@@ -1,31 +1,90 @@
+/*
+ * Copyright (c) 2015 Fabio Berta
+ */
+
 apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
 
 android {
-    compileSdkVersion 'android-L'
-    buildToolsVersion '20.0.0'
-    defaultConfig {
-        applicationId 'ch.berta.fabio.qwittig'
-        minSdkVersion 'L'
-        targetSdkVersion 'L'
-        versionCode 1
-        versionName '1.0'
+    compileSdkVersion 24
+    buildToolsVersion '24.0.0'
+
+    dexOptions {
+        javaMaxHeapSize "3g"
     }
+
+    defaultConfig {
+        applicationId 'ch.giantific.qwittig'
+        minSdkVersion 19
+        targetSdkVersion 24
+        versionCode 1
+        versionName '0.1.0'
+    }
+
     buildTypes {
         release {
-            runProguard false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+
+    dataBinding {
+        enabled = true
     }
-    productFlavors {
-    }
+}
+
+ext {
+    supportLibVersion = '24.0.0'
+    playServicesVersion = '9.0.2'
+    retrofitVersion = '2.0.2'
+    leakCanaryVersion = '1.4-beta2'
+    daggerVersion = '2.5'
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:support-v4:20.0.0'
-    compile 'com.android.support:cardview-v7:21.+'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:2.0.56-beta'
+    compile "com.android.support:support-v4:${supportLibVersion}"
+    compile "com.android.support:design:${supportLibVersion}"
+    compile "com.android.support:appcompat-v7:${supportLibVersion}"
+    compile "com.android.support:cardview-v7:${supportLibVersion}"
+    compile "com.android.support:recyclerview-v7:${supportLibVersion}"
+    compile "com.android.support:preference-v7:${supportLibVersion}"
+    compile "com.android.support:preference-v14:${supportLibVersion}"
+    compile "com.android.support:support-annotations:${supportLibVersion}"
+    compile "com.google.android.gms:play-services-auth:${playServicesVersion}"
+    compile "com.google.android.gms:play-services-gcm:${playServicesVersion}"
+//    compile "com.google.firebase:firebase-core:${playServicesVersion}"
+//    compile "com.google.firebase:firebase-invites:${playServicesVersion}"
+//    compile "com.google.firebase:firebase-crash:${playServicesVersion}"
+    compile "com.google.dagger:dagger:${daggerVersion}"
+    apt "com.google.dagger:dagger-compiler:${daggerVersion}"
+    provided 'javax.annotation:jsr250-api:1.0'
+    compile "com.squareup.retrofit2:retrofit:${retrofitVersion}"
+    compile "com.squareup.retrofit2:converter-gson:${retrofitVersion}"
+    compile "com.squareup.retrofit2:adapter-rxjava:${retrofitVersion}"
+    compile 'com.jakewharton.timber:timber:4.1.2'
+    compile 'io.reactivex:rxjava:1.1.5'
+    compile 'io.reactivex:rxandroid:1.2.0'
+    compile 'com.artemzin.rxjava:proguard-rules:1.1.5.0'
+    compile 'com.google.code.gson:gson:2.6.2'
+    compile 'org.apache.commons:commons-math3:3.5'
+    compile 'commons-io:commons-io:2.5'
+    compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'io.branch.sdk.android:library:1.13.0'
+    compile 'com.parse:parse-android:1.13.1'
+    compile 'com.parse.bolts:bolts-android:1.4.0'
+    compile 'com.parse:parsefacebookutils-v4-android:1.10.4@aar'
+    compile 'com.facebook.android:facebook-android-sdk:4.10.0'
+    compile 'com.github.PhilJay:MPAndroidChart:v2.2.5'
+    compile 'com.vinaysshenoy:mugen:1.0.3'
+    compile 'com.heinrichreimersoftware:material-intro:1.5.5'
+    compile 'com.github.fnberta:FabProgress:0.1'
+    compile project(':fabMenu')
+//    debugCompile "com.squareup.leakcanary:leakcanary-android:${leakCanaryVersion}"
+//    releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
+//    testCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
 }
+
+apply plugin: 'com.google.gms.google-services'

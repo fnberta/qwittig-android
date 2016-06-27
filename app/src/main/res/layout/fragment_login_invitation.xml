@@ -1,0 +1,81 @@
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.login.LoginInvitationViewModel"
+            />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/normal_space"
+        android:layout_marginEnd="@dimen/key_line_1"
+        android:layout_marginStart="@dimen/key_line_1"
+        android:layout_marginTop="@dimen/normal_space"
+        android:orientation="vertical"
+        android:transitionGroup="true"
+        tools:context=".presentation.login.LoginInvitationFragment"
+        tools:targetApi="lollipop"
+        >
+
+        <TextView
+            android:id="@+id/tv_login_invitation_header"
+            style="@style/TextAppearance.AppCompat.Display1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="@dimen/normal_space"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:text="@{@string/invite_group(viewModel.inviterNickname, viewModel.groupName)}"
+            />
+
+        <TextView
+            android:id="@+id/tv_login_invitation_accept"
+            style="@style/TextAppearance.AppCompat.Headline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/normal_space"
+            android:gravity="center"
+            android:text="@string/invite_accept"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            >
+
+            <Button
+                android:id="@+id/bt_login_invitation_decline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="@{viewModel::onDeclineClick}"
+                android:text="@string/invite_accept_no"
+                />
+
+            <Button
+                android:id="@+id/bt_login_invitation_accept"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="@{viewModel::onAcceptClick}"
+                android:text="@string/invite_accept_yes"
+                />
+        </LinearLayout>
+
+    </LinearLayout>
+</layout>
+
+

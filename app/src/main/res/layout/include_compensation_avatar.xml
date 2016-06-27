@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <variable
+            name="itemModel"
+            type="ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidCompItemModel"
+            />
+    </data>
+
+    <ImageView
+        android:id="@id/iv_avatar"
+        android:contentDescription="@string/user_avatar"
+        android:scaleType="centerCrop"
+        app:avatarSquare="@{itemModel.compUserAvatar}"
+        app:fallback="@{@drawable/ic_account_box_black_80dp}"
+        tools:src="@drawable/ic_account_box_black_80dp"
+        />
+
+</layout>
+

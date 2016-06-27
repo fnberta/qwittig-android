@@ -1,0 +1,67 @@
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.stats.pie.StatsPieViewModel"
+            />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        tools:context=".presentation.stats.pie.stores.StatsStoresFragment"
+        >
+
+        <ch.giantific.qwittig.presentation.stats.widgets.PieChart
+            android:id="@+id/pc_stores"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="@dimen/small_space"
+            android:layout_marginEnd="@dimen/key_line_1"
+            android:layout_marginStart="@dimen/key_line_1"
+            android:layout_marginTop="@dimen/small_space"
+            android:centerText="@{viewModel.centerText}"
+            android:visibility="@{viewModel.loading ? View.GONE : viewModel.dataEmpty ? View.GONE : !viewModel.sortUsers ? View.VISIBLE : View.GONE}"
+            app:pieData="@{viewModel.pieData}"
+            app:dataEmpty="@{viewModel.dataEmpty}"
+            />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_stats_pie"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingTop="@dimen/small_space"
+            android:scrollbars="vertical"
+            android:visibility="@{viewModel.loading ? View.GONE : viewModel.dataEmpty ? View.GONE : viewModel.sortUsers ? View.VISIBLE : View.GONE}"
+            />
+
+        <include
+            android:id="@+id/stats_empty_view"
+            layout="@layout/include_stats_empty_view"
+            app:viewModel="@{viewModel}"
+            />
+
+        <include
+            android:id="@+id/stats_loading"
+            layout="@layout/include_progress"
+            app:viewModel="@{viewModel}"
+            />
+
+    </FrameLayout>
+
+</layout>
+

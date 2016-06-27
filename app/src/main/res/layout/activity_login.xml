@@ -1,0 +1,55 @@
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:fillViewport="true"
+    android:paddingBottom="@dimen/small_space"
+    android:paddingTop="@dimen/small_space"
+    >
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:transitionGroup="true"
+        tools:context=".presentation.login.LoginActivity"
+        tools:targetApi="lollipop"
+        >
+
+        <TextView
+            style="@style/TextAppearance.AppCompat.Display3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/normal_space"
+            android:text="@string/app_name"
+            />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:layout_marginBottom="@dimen/big_space"
+            android:layout_marginEnd="@dimen/key_line_1"
+            android:layout_marginStart="@dimen/key_line_1"
+            android:layout_marginTop="@dimen/normal_space"
+            android:background="?android:attr/listDivider"
+            />
+
+        <FrameLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:ignore="MergeRootFrame"
+            />
+
+    </LinearLayout>
+</ScrollView>

@@ -1,9 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <CheckBoxPreference
-        android:key="PREF_EXAMPLE"
-        android:title="Example Title"
-        android:summary="Example summary"
-        android:defaultValue="false" />
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:key="PREF_CATEGORY_ME"
+        android:title="@string/pref_category_me"
+        >
+        <Preference
+            android:key="PREF_PROFILE"
+            android:title="@string/pref_profile"
+            />
+        <ListPreference
+            android:key="PREF_GROUP_CURRENT"
+            android:title="@string/pref_group_current"
+            />
+        <Preference
+            android:key="PREF_GROUP_ADD_NEW"
+            android:title="@string/pref_group_add_new"
+            />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="PREF_CATEGORY_CURRENT_GROUP"
+        android:title="@string/pref_category_current_group"
+        >
+        <Preference
+            android:key="PREF_GROUP_USERS"
+            android:title="@string/pref_group_users"
+            />
+        <EditTextPreference
+            android:hint="@string/pref_group_name_hint"
+            android:key="PREF_GROUP_NAME"
+            android:title="@string/pref_group_name"
+            />
+        <Preference
+            android:key="PREF_GROUP_LEAVE"
+            android:title="@string/pref_group_leave_group"
+            >
+        </Preference>
+    </PreferenceCategory>
+
 </PreferenceScreen>

@@ -1,0 +1,24 @@
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".presentation.helpfeedback.HelpFeedbackActivity"
+    tools:ignore="MergeRootFrame"
+    >
+
+    <include layout="@layout/include_appbar"/>
+
+    <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:ignore="MergeRootFrame"
+        />
+
+</LinearLayout>

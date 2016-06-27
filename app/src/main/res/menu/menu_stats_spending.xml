@@ -1,0 +1,24 @@
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".presentation.stats.spending.StatsSpendingFragment">
+
+    <item android:id="@+id/action_show_group"
+          android:title="@string/action_show_group"
+          android:orderInCategory="1"
+          android:checkable="true"
+          android:checked="false"
+          app:showAsAction="never"/>
+
+    <item android:id="@+id/action_show_average"
+          android:title="@string/action_show_average"
+          android:orderInCategory="2"
+          android:checkable="true"
+          android:checked="false"
+          app:showAsAction="never"/>
+</menu>

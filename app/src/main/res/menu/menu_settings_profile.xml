@@ -1,0 +1,42 @@
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".presentation.settings.profile.SettingsProfileFragment"
+    >
+
+    <item
+        android:id="@+id/action_settings_profile_avatar_edit"
+        android:orderInCategory="1"
+        android:title="@string/action_settings_profile_avatar_edit"
+        app:showAsAction="never"
+        />
+
+    <item
+        android:id="@+id/action_settings_profile_avatar_delete"
+        android:orderInCategory="2"
+        android:title="@string/action_settings_profile_avatar_delete"
+        app:showAsAction="never"
+        />
+
+    <item
+        android:id="@+id/action_settings_profile_unlink_facebook"
+        android:orderInCategory="3"
+        android:title="@string/action_settings_profile_unlink_facebook"
+        android:visible="false"
+        app:showAsAction="never"
+        />
+
+    <item
+        android:id="@+id/action_settings_profile_unlink_google"
+        android:orderInCategory="3"
+        android:title="@string/action_settings_profile_unlink_google"
+        android:visible="false"
+        app:showAsAction="never"
+        />
+
+</menu>

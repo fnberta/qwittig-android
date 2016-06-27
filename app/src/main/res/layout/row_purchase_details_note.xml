@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <variable
+            name="itemModel"
+            type="ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDetailsNoteItem"
+            />
+    </data>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/key_line_1"
+        android:layout_marginStart="@dimen/key_line_1"
+        android:text="@{itemModel.purchaseNote}"
+        tools:text="Dies ist eine Notiz"
+        />
+</layout>

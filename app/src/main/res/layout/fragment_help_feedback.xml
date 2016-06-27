@@ -1,0 +1,18 @@
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_help_feedback"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/small_space"
+        />
+
+</layout>
+

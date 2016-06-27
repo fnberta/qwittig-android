@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <variable
+            name="itemModel"
+            type="ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidCompItemModel"
+            />
+    </data>
+
+    <LinearLayout
+        android:id="@+id/ll_header"
+        android:orientation="vertical"
+        >
+
+        <TextView
+            style="@style/TextAppearance.AppCompat.Headline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/small_space"
+            android:layout_marginEnd="@dimen/normal_space"
+            android:layout_marginStart="@dimen/normal_space"
+            android:layout_marginTop="@dimen/normal_space"
+            android:text="@{itemModel.compUsername}"
+            tools:text="veriberi"
+            />
+
+        <TextView
+            android:id="@+id/tv_amount"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/normal_space"
+            android:layout_marginEnd="@dimen/normal_space"
+            android:layout_marginStart="@dimen/normal_space"
+            android:text="@{itemModel.credit ? @string/balance_owe_you(itemModel.compAmount) : @string/balance_gets_from_you(itemModel.compAmount)}"
+            tools:text="schuldet dir 33.45"
+            />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            />
+
+    </LinearLayout>
+</layout>

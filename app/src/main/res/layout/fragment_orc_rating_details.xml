@@ -1,0 +1,252 @@
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.purchases.ocrrating.OcrRatingViewModel"
+            />
+    </data>
+
+    <ScrollView
+        android:id="@+id/sv_ocr_rating_details_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:paddingBottom="@dimen/small_space"
+        android:paddingTop="@dimen/normal_space"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                >
+
+                <TextView
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/small_space"
+                    android:layout_marginEnd="@dimen/key_line_1"
+                    android:layout_marginStart="@dimen/key_line_1"
+                    android:gravity="center"
+                    android:text="@string/rating_names"
+                    />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/normal_space"
+                    android:layout_marginEnd="@dimen/key_line_1"
+                    android:layout_marginStart="@dimen/key_line_1"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    >
+
+                    <TextView
+                        style="@style/TextAppearance.AppCompat.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/rating_no_hurry"
+                        />
+
+                    <RatingBar
+                        android:id="@+id/rb_ocr_rating_details_names"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/small_space"
+                        android:layout_marginStart="@dimen/small_space"
+                        android:numStars="4"
+                        android:stepSize="1"
+                        android:onRatingChanged="@{viewModel::onRatingNamesChanged}"
+                        />
+
+                    <TextView
+                        style="@style/TextAppearance.AppCompat.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/rating_urgent"
+                        />
+
+                </LinearLayout>
+
+                <TextView
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/small_space"
+                    android:layout_marginEnd="@dimen/key_line_1"
+                    android:layout_marginStart="@dimen/key_line_1"
+                    android:gravity="center"
+                    android:text="@string/rating_prices"
+                    />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/normal_space"
+                    android:layout_marginEnd="@dimen/key_line_1"
+                    android:layout_marginStart="@dimen/key_line_1"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    >
+
+                    <TextView
+                        style="@style/TextAppearance.AppCompat.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/rating_no_hurry"
+                        />
+
+                    <RatingBar
+                        android:id="@+id/rb_ocr_rating_details_prices"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/small_space"
+                        android:layout_marginStart="@dimen/small_space"
+                        android:numStars="4"
+                        android:stepSize="1"
+                        android:onRatingChanged="@{viewModel::onRatingPricesChanged}"
+                        />
+
+                    <TextView
+                        style="@style/TextAppearance.AppCompat.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/rating_urgent"
+                        />
+
+                </LinearLayout>
+
+                <TextView
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/small_space"
+                    android:layout_marginEnd="@dimen/key_line_1"
+                    android:layout_marginStart="@dimen/key_line_1"
+                    android:gravity="center"
+                    android:text="@string/rating_missing"
+                    />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/normal_space"
+                    android:layout_marginEnd="@dimen/key_line_1"
+                    android:layout_marginStart="@dimen/key_line_1"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    >
+
+                    <TextView
+                        style="@style/TextAppearance.AppCompat.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/rating_no_hurry"
+                        />
+
+                    <RatingBar
+                        android:id="@+id/rb_ocr_rating_details_missing"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/small_space"
+                        android:layout_marginStart="@dimen/small_space"
+                        android:numStars="4"
+                        android:stepSize="1"
+                        android:onRatingChanged="@{viewModel::onRatingMissingChanged}"
+                        />
+
+                    <TextView
+                        style="@style/TextAppearance.AppCompat.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/rating_urgent"
+                        />
+
+                </LinearLayout>
+
+                <TextView
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/small_space"
+                    android:layout_marginEnd="@dimen/key_line_1"
+                    android:layout_marginStart="@dimen/key_line_1"
+                    android:gravity="center"
+                    android:text="@string/rating_speed"
+                    />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/normal_space"
+                    android:layout_marginEnd="@dimen/key_line_1"
+                    android:layout_marginStart="@dimen/key_line_1"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    >
+
+                    <TextView
+                        style="@style/TextAppearance.AppCompat.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/rating_no_hurry"
+                        />
+
+                    <RatingBar
+                        android:id="@+id/rb_ocr_rating_details_speed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/small_space"
+                        android:layout_marginStart="@dimen/small_space"
+                        android:numStars="4"
+                        android:stepSize="1"
+                        android:onRatingChanged="@{viewModel::onRatingSpeedChanged}"
+                        />
+
+                    <TextView
+                        style="@style/TextAppearance.AppCompat.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/rating_urgent"
+                        />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab_ocr_rating_done"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/normal_space"
+                android:layout_marginBottom="@dimen/normal_space"
+                android:onClick="@{viewModel::onFabDetailsDoneClick}"
+                android:src="@drawable/ic_done_black_24dp"
+                />
+
+        </LinearLayout>
+
+    </ScrollView>
+</layout>
+
+

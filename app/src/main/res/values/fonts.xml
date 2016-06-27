@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="font_fontFamily_regular" translatable="false">sans-serif</string>
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="font_fontFamily_regular" translatable="false" tools:ignore="UnusedResources">sans-serif</string>
     <string name="font_fontFamily_medium" translatable="false">sans-serif-medium</string>
-    <string name="font_fontFamily_light" translatable="false">sans-serif-light</string>
+    <string name="font_fontFamily_light" translatable="false" tools:ignore="UnusedResources">sans-serif-light</string>
 
 </resources>

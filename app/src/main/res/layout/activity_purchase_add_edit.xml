@@ -1,0 +1,54 @@
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel"
+            />
+    </data>
+
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/main_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:transitionGroup="true"
+        tools:context=".presentation.purchases.addedit.add.PurchaseAddActivity"
+        tools:targetApi="lollipop"
+        >
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewpager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/toolbar_height_x2"
+            />
+
+        <include layout="@layout/include_appbar_x2"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_purchase_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
+            android:layout_marginEnd="@dimen/key_line_1"
+            android:layout_marginTop="@dimen/fab_margin_toolbar_x2"
+            android:onClick="@{viewModel::onFabSavePurchaseClick}"
+            android:src="@drawable/ic_save_black_24dp"
+            android:visibility="gone"
+            tools:visibility="visible"
+            />
+
+    </android.support.design.widget.CoordinatorLayout>
+
+</layout>
+
+

@@ -1,41 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
 <resources>
 
-    <!--Text sizes-->
-    <dimen name="text_size_display_4">112sp</dimen>
-    <dimen name="text_size_display_3">56sp</dimen>
-    <dimen name="text_size_display_2">45sp</dimen>
-    <dimen name="text_size_display_1">34sp</dimen>
-    <dimen name="text_size_headline">24sp</dimen>
-    <dimen name="text_size_title">20sp</dimen>
-    <dimen name="text_size_body">14sp</dimen>
-    <dimen name="text_size_caption">12sp</dimen>
-    <dimen name="text_size_avatar_with_text">16sp</dimen>
-    <dimen name="text_size_sub_head">14sp</dimen>
-    <dimen name="text_size_edit_text">16sp</dimen>
+    <!-- Text sizes -->
+    <dimen name="text_size_subheader">14sp</dimen>
 
-    <!--Various standard stuff-->
+    <!-- Spacing -->
     <dimen name="key_line_1">16dp</dimen>
     <dimen name="key_line_2">72dp</dimen>
+    <dimen name="key_line_2_minus_key_line_1_minus_avatar_size">16dp</dimen>
+    <dimen name="key_line_2_minus_key_line_1_minus_icon_size">32dp</dimen>
+    <dimen name="min_space">4dp</dimen>
+    <dimen name="small_space">8dp</dimen>
+    <dimen name="normal_space">16dp</dimen>
+    <dimen name="big_space">32dp</dimen>
+
+    <!-- System -->
     <dimen name="touch_target_min">48dp</dimen>
-    <dimen name="element_spacing_normal">8dp</dimen>
-    <dimen name="content_padding_normal">16dp</dimen>
+
+    <!-- Avatar and Icons-->
     <dimen name="avatar_size">40dp</dimen>
+    <dimen name="avatar_size_2x">80dp</dimen>
+    <dimen name="avatar_size_3x">120dp</dimen>
+    <dimen name="icon_size">24dp</dimen>
+    <dimen name="icon_padding">12dp</dimen>
+    <dimen name="icon_compound_drawable_padding_end">32dp</dimen>
+    <dimen name="compensation_avatar_width">100dp</dimen>
+    <dimen name="compensation_avatar_height">143dp</dimen>
 
-    <!--List tile heights-->
+    <!-- Toolbar -->
+    <dimen name="toolbar_height_x2">112dp</dimen>
+    <dimen name="toolbar_task_add">168dp</dimen>
+    <dimen name="toolbar_height_x4">224dp</dimen>
+    <dimen name="toolbar_height_x5">280dp</dimen>
+
+    <!-- NavDrawer -->
+    <dimen name="navdrawer_status_bar_plus_normal_space">40dp</dimen>
+    <dimen name="navdrawer_chosen_account_height">164dp</dimen>
+    <dimen name="navdrawer_profile_avatar_size">64dp</dimen>
+
+    <!-- List tile heights -->
+    <dimen name="list_with_text">48dp</dimen>
+    <dimen name="list_icon_with_text">56dp</dimen>
     <dimen name="list_avatar_with_text">56dp</dimen>
-    <dimen name="list_avatar_with_text_double">112dp</dimen>
     <dimen name="list_avatar_with_two_line_text">72dp</dimen>
-    <dimen name="list_avatar_with_three_line_text">88dp</dimen>
-    <dimen name="sub_header_height">48dp</dimen>
+    <dimen name="avatar_plus_caption_plus_padding">72dp</dimen>
+    <dimen name="subheader_height">48dp</dimen>
 
-    <!--FAB-->
-    <dimen name="fab_size">56dp</dimen>
-    <dimen name="button_elevation">2dp</dimen>
-    <dimen name="button_press_elevation">4dp</dimen>
+    <!-- Dialog -->
+    <dimen name="dialog_padding">24dp</dimen>
 
-    <!--Holo stuff-->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
+    <!-- FAB -->
+    <dimen name="fab_margin_toolbar_x4">196dp</dimen>
+    <dimen name="fab_margin_toolbar_x2">84dp</dimen>
+
+    <!-- CardView -->
+    <dimen name="card_elevation">2dp</dimen>
+    <dimen name="card_corner_radius">2dp</dimen>
+
+    <!-- ProgressBar -->
+    <dimen name="pb_top_negative_margin">-7dp</dimen>
+
+    <!-- Charts -->
+    <dimen name="pc_multiple_size">345dp</dimen>
+
+    <!-- add/edit -->
+    <dimen name="my_share_neg_margin">-8dp</dimen>
+    <dimen name="camera_bottom_height">88dp</dimen>
+    <dimen name="tut_camera_receipt_height">300dp</dimen>
 
 </resources>

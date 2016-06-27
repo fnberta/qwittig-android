@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="itemModel"
+            type="ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidCompCreditItemModel"
+            />
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.finance.unpaid.CompsUnpaidViewModel"
+            />
+    </data>
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/min_space"
+        android:layout_marginEnd="@dimen/small_space"
+        android:layout_marginStart="@dimen/small_space"
+        android:layout_marginTop="@dimen/min_space"
+        card_view:cardBackgroundColor="@color/green_light"
+        card_view:cardCornerRadius="@dimen/card_corner_radius"
+        card_view:cardElevation="@dimen/card_elevation"
+        >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+
+            <include
+                layout="@layout/include_compensation_avatar"
+                android:layout_width="@dimen/compensation_avatar_width"
+                android:layout_height="@dimen/compensation_avatar_height"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                app:itemModel="@{itemModel}"
+                />
+
+            <include
+                layout="@layout/include_card_top_progress"
+                app:itemModel="@{itemModel}"
+                />
+
+            <include
+                layout="@layout/include_compensation_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/iv_avatar"
+                app:itemModel="@{itemModel}"
+                />
+
+            <Button
+                android:id="@+id/bt_comp_unpaid_confirm"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/ll_header"
+                android:layout_toEndOf="@id/iv_avatar"
+                android:onClick="@{() -> viewModel.onConfirmButtonClick(itemModel)}"
+                android:text="@string/comp_unpaid_button_confirm"
+                android:textColor="?attr/colorPrimary"
+                />
+
+            <Button
+                android:id="@+id/bt_comp_unpaid_remind"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/ll_header"
+                android:layout_toEndOf="@id/bt_comp_unpaid_confirm"
+                android:onClick="@{() -> viewModel.onRemindButtonClick(itemModel)}"
+                android:text="@{@string/button_remind(itemModel.compUsername)}"
+                android:visibility="@{itemModel.userPending ? View.GONE : View.VISIBLE}"
+                tools:text="Remind Lexli to pay"
+                />
+
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+</layout>

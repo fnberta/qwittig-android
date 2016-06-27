@@ -33,14 +33,11 @@ local.properties
 *.ipr
 *.iws
 
-# Local IDEA workspace
-.idea/workspace.xml
-
 # Gradle cache
 .gradle
 
 # Sandbox stuff
 _sandbox
 
-# old src stuff
-app/src_old
+# other
+.navigation

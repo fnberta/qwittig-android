@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
 <resources>
-    <string-array name="stores">
-        <item>Aldi</item>
-        <item>Coop</item>
-        <item>Denner</item>
-        <item>Lidl</item>
-        <item>Migros</item>
-        <item>Volg</item>
-    </string-array>
+    <integer-array name="stats_colors">
+        <item>@color/red_500</item>
+        <item>@color/indigo_500</item>
+        <item>@color/cyan_700</item>
+        <item>@color/purple_500</item>
+        <item>@color/green_700</item>
+        <item>@color/brown_500</item>
+        <item>@color/deep_orange_500</item>
+        <item>@color/light_blue_700</item>
+        <item>@color/deep_purple_500</item>
+        <item>@color/teal_700</item>
+        <item>@color/blue_500</item>
+        <item>@color/blue_grey_500</item>
+    </integer-array>
+
+    <integer-array
+        name="srl_color_scheme">
+        <item>@color/blue</item>
+        <item>@color/yellow</item>
+        <item>@color/green</item>
+        <item>@color/red</item>
+    </integer-array>
 </resources>

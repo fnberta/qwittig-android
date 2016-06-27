@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.purchases.details.PurchaseDetailsViewModel"
+            />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:transitionGroup="true"
+        tools:targetApi="lollipop"
+        >
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_purchase_details"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="@dimen/small_space"
+            android:visibility="@{viewModel.loading ? View.GONE : View.VISIBLE}"
+            />
+
+        <include
+            layout="@layout/include_progress"
+            app:viewModel="@{viewModel}"
+            />
+
+    </FrameLayout>
+
+</layout>
+
+

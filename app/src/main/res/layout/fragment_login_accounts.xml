@@ -1,0 +1,101 @@
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.login.LoginAccountsViewModel"/>
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        android:transitionGroup="true"
+        tools:context=".presentation.login.LoginEmailFragment"
+        tools:targetApi="lollipop"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="@dimen/small_space"
+            android:layout_marginEnd="@dimen/key_line_1"
+            android:layout_marginStart="@dimen/key_line_1"
+            android:orientation="vertical"
+            android:visibility="@{viewModel.loading ? View.GONE : View.VISIBLE}"
+            >
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/com_facebook_button_background"
+                android:drawablePadding="@dimen/com_facebook_share_button_compound_drawable_padding"
+                android:drawableStart="@drawable/com_facebook_button_icon"
+                android:onClick="@{viewModel::onLoginFacebookClick}"
+                android:paddingBottom="@dimen/com_facebook_share_button_padding_bottom"
+                android:paddingEnd="@dimen/com_facebook_share_button_padding_right"
+                android:paddingStart="@dimen/com_facebook_share_button_padding_left"
+                android:paddingTop="@dimen/com_facebook_share_button_padding_top"
+                android:text="@string/com_facebook_loginview_log_in_button_long"
+                android:textColor="@color/com_facebook_share_button_text_color"
+                android:textSize="@dimen/com_facebook_share_button_text_size"
+                android:textStyle="bold"
+                />
+
+            <com.google.android.gms.common.SignInButton
+                android:id="@+id/bt_login_accounts_google"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/small_space"
+                android:onClickListener="@{viewModel.loginGoogleClickListener}"
+                app:buttonSize="wide"
+                app:colorScheme="auto"
+                />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="@dimen/normal_space"
+                android:layout_marginTop="@dimen/normal_space"
+                android:background="?android:attr/listDivider"
+                />
+
+            <Button
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="@{viewModel::onUseEmailClick}"
+                android:text="@string/login_button_email"
+                />
+
+            <TextView
+                android:id="@+id/tv_login_accounts_disclaimer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/normal_space"
+                android:gravity="center_horizontal"
+                android:text="@string/login_disclaimer"
+                />
+
+        </LinearLayout>
+
+        <include
+            layout="@layout/include_progress_login"
+            app:viewModel="@{viewModel}"
+            />
+    </FrameLayout>
+
+</layout>
+
+

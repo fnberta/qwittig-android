@@ -1,35 +1,80 @@
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
 <resources>
 
-    <style name="AppTheme" parent="android:Theme.Material.Light">
-        <!-- Main theme colors -->
-        <!--   your app's branding color (for the app bar) -->
-        <item name="android:colorPrimary">@color/primary</item>
-        <!--   darker variant of colorPrimary (for status bar, contextual app bars) -->
-        <item name="android:colorPrimaryDark">@color/primary_dark</item>
-        <!--   theme UI controls like checkboxes and text fields -->
-        <item name="android:colorAccent">@color/accent</item>
+    <style name="BaseThemeDark" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/blue</item>
+        <item name="colorPrimaryDark">@color/blue_dark</item>
+        <item name="colorAccent">@color/yellow</item>
+
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+        <item name="windowActionModeOverlay">true</item>
     </style>
 
-    <style name="ListAvatarItem">
-        <item name="android:layout_width">@dimen/key_line_2</item>
-        <item name="android:layout_height">@dimen/avatar_size</item>
-        <item name="android:layout_gravity">center_vertical</item>
+    <style name="AppThemeDark" parent="BaseThemeDark"/>
+
+    <style name="AppThemeDark.Login" parent="AppThemeDark">
+        <item name="android:windowBackground">?attr/colorPrimary</item>
     </style>
 
-    <style name="ListRowItem">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">match_parent</item>
-        <item name="android:gravity">center_vertical</item>
-        <item name="android:fontFamily">@string/font_fontFamily_regular</item>
-        <item name="android:textSize">@dimen/text_size_avatar_with_text</item>
+    <style name="AppThemeDark.DrawStatusBar" parent="AppThemeDark"/>
+
+    <style name="BaseTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/blue</item>
+        <item name="colorPrimaryDark">@color/blue_dark</item>
+        <item name="colorAccent">@color/yellow</item>
+        <item name="colorButtonNormal">@android:color/white</item>
+
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+        <item name="windowActionModeOverlay">true</item>
     </style>
 
-    <style name="ListSectionHeader">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">@dimen/sub_header_height</item>
-        <item name="android:gravity">center_vertical</item>
+    <style name="AppTheme" parent="BaseTheme"/>
+
+    <style name="AppTheme.Explode" parent="AppTheme"/>
+
+    <style name="AppTheme.SlideBottom" parent="AppTheme"/>
+
+    <style name="AppTheme.SlideEnd" parent="AppTheme"/>
+
+    <style name="AppTheme.PrimaryAsAccent" parent="AppTheme">
+        <item name="colorAccent">@color/blue</item>
+    </style>
+
+    <style name="AppTheme.DrawStatusBar" parent="AppTheme"/>
+
+    <style name="AppTheme.DrawStatusBar.Explode" parent="AppTheme.DrawStatusBar"/>
+
+    <style name="AppTheme.DrawStatusBar.Green" parent="AppTheme.DrawStatusBar">
+        <item name="colorPrimary">@color/green</item>
+        <item name="colorPrimaryDark">@color/green_dark</item>
+    </style>
+
+    <style name="AppTheme.DrawStatusBar.Red" parent="AppTheme.DrawStatusBar">
+        <item name="colorPrimary">@color/red</item>
+        <item name="colorPrimaryDark">@color/red_dark</item>
+    </style>
+
+    <style name="AppTheme.Launcher" parent="AppTheme">
+        <item name="android:windowBackground">@drawable/launch_screen</item>
+    </style>
+
+    <style name="TextAppearance.AppCompat.Subhead.List" parent="TextAppearance.AppCompat.Subhead">
+        <item name="android:lines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">?android:textColorPrimary</item>
+    </style>
+
+    <style name="SubHeader">
         <item name="android:fontFamily">@string/font_fontFamily_medium</item>
-        <item name="android:textSize">@dimen/text_size_sub_head</item>
+        <item name="android:textSize">@dimen/text_size_subheader</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+
+    <style name="HomeToolbarTitle">
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Display1</item>
     </style>
 
 </resources>

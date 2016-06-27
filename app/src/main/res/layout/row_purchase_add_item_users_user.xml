@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2016 Fabio Berta
+  -->
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <variable
+            name="itemModel"
+            type="ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemUsersUser"
+            />
+    </data>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="@dimen/normal_space"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:gravity="center"
+        android:orientation="vertical"
+        >
+
+        <ImageView
+            android:layout_width="@dimen/avatar_size"
+            android:layout_height="@dimen/avatar_size"
+            android:layout_marginBottom="@dimen/min_space"
+            android:alpha="@{itemModel.alpha}"
+            android:contentDescription="@string/user_avatar"
+            app:avatar="@{itemModel.avatar}"
+            app:fallback="@{@drawable/ic_account_circle_black_40dp}"
+            tools:src="@drawable/ic_account_circle_black_40dp"
+            />
+
+        <TextView
+            style="@style/TextAppearance.AppCompat.Caption"
+            android:layout_width="@dimen/avatar_size"
+            android:layout_height="wrap_content"
+            android:alpha="@{itemModel.alpha}"
+            android:ellipsize="marquee"
+            android:gravity="center_horizontal"
+            android:lines="1"
+            android:text="@{itemModel.nickname}"
+            tools:text="Vera"
+            />
+
+    </LinearLayout>
+
+</layout>
