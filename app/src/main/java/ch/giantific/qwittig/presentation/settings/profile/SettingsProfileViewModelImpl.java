@@ -295,9 +295,9 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     }
 
     private boolean changesWereMade() {
-        // TODO: check for avatar changes
         return !Objects.equals(mEmail, mCurrentUser.getUsername())
                 || !Objects.equals(mNickname, mCurrentIdentity.getNickname())
+                || !Objects.equals(mAvatar, mCurrentIdentity.getAvatarUrl())
                 || !TextUtils.isEmpty(mPassword);
     }
 
