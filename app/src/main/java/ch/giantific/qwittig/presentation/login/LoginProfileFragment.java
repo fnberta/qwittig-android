@@ -6,17 +6,13 @@ package ch.giantific.qwittig.presentation.login;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.transition.Slide;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentLoginProfileBinding;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.login.di.LoginComponent;
-import ch.giantific.qwittig.utils.Utils;
 
 /**
  * Displays the login screen asking the user for the username and password.

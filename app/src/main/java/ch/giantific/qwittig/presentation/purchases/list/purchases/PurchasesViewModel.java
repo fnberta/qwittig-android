@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.viewmodels.LoadMoreViewModel;
 import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModel;
-import ch.giantific.qwittig.presentation.purchases.list.purchases.itemmodels.PurchasesItemModel;
 
 /**
  * Defines an observable view model for list of purchases screen.

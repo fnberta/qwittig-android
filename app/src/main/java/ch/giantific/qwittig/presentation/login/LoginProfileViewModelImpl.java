@@ -11,6 +11,7 @@ import android.view.View;
 import java.util.Objects;
 
 import ch.giantific.qwittig.BR;
+import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
@@ -138,7 +139,7 @@ public class LoginProfileViewModelImpl extends ViewModelBaseImpl<LoginProfileVie
 
                         @Override
                         public void onError(Throwable e) {
-                            // TODO: handle error
+                            mView.showMessage(R.string.toast_error_profile);
                         }
 
                         @Override

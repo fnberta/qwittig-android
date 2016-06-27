@@ -11,8 +11,6 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import ch.giantific.qwittig.BR;
-
 import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;
 
 /**

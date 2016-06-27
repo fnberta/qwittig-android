@@ -4,8 +4,7 @@
 
 package ch.giantific.qwittig.presentation.common.fragments;
 
-import android.app.Activity;
-import android.support.annotation.NonNull;
+import android.content.Context;
 import android.support.v4.app.DialogFragment;
 
 /**
@@ -17,13 +16,13 @@ public abstract class BaseDialogFragment<T> extends DialogFragment {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void onAttach(@NonNull Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
 
         try {
-            mActivity = (T) activity;
+            mActivity = (T) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
+            throw new ClassCastException(context.toString()
                     + " must implement DialogInteractionListener");
         }
     }

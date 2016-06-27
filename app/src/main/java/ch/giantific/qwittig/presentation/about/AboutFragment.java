@@ -55,9 +55,4 @@ public class AboutFragment extends BaseRecyclerViewFragment<AboutComponent, Abou
     protected BaseRecyclerAdapter getRecyclerAdapter() {
         return new AboutRecyclerAdapter(mViewModel);
     }
-
-    @Override
-    public void openWebsite(@NonNull String url) {
-
-    }
 }

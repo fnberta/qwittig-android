@@ -20,7 +20,7 @@ import ch.giantific.qwittig.presentation.common.adapters.TabsAdapter;
  */
 public class HomeTabsAdapter extends TabsAdapter {
 
-    private FragmentManager mFragmentManager;
+    private final FragmentManager mFragmentManager;
 
     /**
      * Constructs a new {@link HomeTabsAdapter}.

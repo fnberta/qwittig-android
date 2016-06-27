@@ -48,10 +48,6 @@ public class TaskDetailsFragment extends BaseRecyclerViewFragment<TaskDetailsSub
     public TaskDetailsFragment() {
     }
 
-    public void setShowEditOptions(boolean showEditOptions) {
-        mShowEditOptions = showEditOptions;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

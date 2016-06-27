@@ -24,7 +24,6 @@
     <string name="login_button_log_in">Log in</string>
     <string name="login_button_sign_up">Sign up</string>
     <string name="no_purchases">No purchases</string>
-    <string name="no_users">No users</string>
     <string name="action_purchase_delete">Delete purchase</string>
     <string name="toast_purchase_deleted">Purchase deleted</string>
     <string name="title_activity_settings_group_new">Add new group</string>
@@ -47,7 +46,6 @@
     <string name="dialog_group_leave_message">Do you really want to leave this group?</string>
     <string name="title_activity_edit_purchase">Edit purchase</string>
     <string name="toast_changes_saved">Changes saved</string>
-    <string name="action_purchase_show_receipt">Show receipt</string>
     <string name="toast_changes_discarded">Changes discarded</string>
     <string name="login_text_forgot_credentials">Forgot your password?</string>
     <string name="hint_nickname">Nickname</string>
@@ -112,7 +110,7 @@
     <string name="help_rate">Rate us in the Play Store</string>
     <string name="email_support_subject" translatable="false">Qwittig Support</string>
     <string name="email_support_message">Please describe your problem. We will get back to you as soon as possible.</string>
-    <string name="email_device_build_info">----\nThe following information helps us to faster identity your problem.\nDevice: %1$s, %2$s, %3$s, %3$s\nBuild:%5$s, %6$s\n----</string>
+    <string name="email_device_build_info">----\nThe following information helps us to faster identity your problem.\nDevice: %1$s, %2$s, %3$s, %4$s\nBuild:%5$s, %6$s\n----</string>
     <string name="email_feedback_subject" translatable="false">Qwittig Feedback</string>
     <string name="toast_purchase_added_draft">Purchase saved as a draft</string>
     <string name="title_activity_purchase_drafts">Drafts</string>
@@ -148,7 +146,6 @@
     <string name="no_compensations_history">No previous payments</string>
     <string name="progress_logout">Logging out…</string>
     <string name="action_purchase_add_edit_receipt_delete">Delete receipt</string>
-    <string name="action_purchase_add_edit_receipt_add">Add receipt</string>
     <string name="toast_receipt_deleted">Removed receipt</string>
     <string name="about_facebook">Find Qwittig on Facebook</string>
     <string name="about_twitter">Find Qwittig on Twitter</string>
@@ -168,7 +165,6 @@
     <string name="action_show_average">Show average numbers</string>
     <string name="action_show_group">Show group numbers</string>
     <string name="action_show_percent">Show percent Values</string>
-    <string name="progress_purchase_auto">Uploading and processing image…</string>
     <string name="dialog_compensation_confirm_amount_message">%1$s ows you %2$s, please confirm the payment. You can change the amount if needed.</string>
     <string name="toast_exchange_no_data">No exchange rate data, please try again later</string>
     <string name="toast_exchange_rate_fetching">Still fetching exchange rate</string>
@@ -241,9 +237,7 @@
     <string name="toast_no_camera">Your device has no camera</string>
     <string name="hint_image_taken">Taken image</string>
     <string name="header_note">Note</string>
-    <string name="action_purchase_show_note">Show note</string>
     <string name="action_purchase_add_edit_note_add">Add note</string>
-    <string name="action_purchase_add_edit_note_delete">Delete note</string>
     <string name="action_purchase_add_edit_note_edit">Edit note</string>
     <string name="toast_note_deleted">Deleted note</string>
     <string name="toast_note_added">Added note</string>
@@ -311,7 +305,6 @@
     <string name="toast_error_task_done">Failed to mark task as done</string>
     <string name="push_task_finished_title">%1$s finished</string>
     <string name="push_task_finished_alert">%1$s finished the task</string>
-    <string name="login_lets_go">Let\'s go!</string>
     <string name="login_group_currency_info">Choose a name and currency for your group. Purchases made in other currencies will be converted to this currency.</string>
     <string name="invite_group">%1$s invited you to join %2$s.</string>
     <string name="invite_accept">Accept the invitation?</string>
@@ -330,8 +323,6 @@
     <string name="toast_error_purchase_ocr_process">Failed to process the purchase. Please try again.</string>
     <string name="toast_purchase_ocr_started">Processing purchase… You will be notified when it is ready.</string>
     <string name="toast_error_join_group">Failed to join the new group. Please try again.</string>
-    <string name="header_settings_group_add">New group</string>
-    <string name="header_login_first_group">First group</string>
     <string name="push_purchase_ocr_failed_title">Processing failed</string>
     <string name="toast_del_identity_balance_not_zero">Clear all outstanding debts and credits before deleting this user</string>
     <string name="camera_pick_image">Pick Image</string>
@@ -344,7 +335,6 @@
     <string name="rating_urgent">urgent</string>
     <string name="title_activity_ocr_rating">Feedback</string>
     <string name="toast_ocr_rating_satisfaction">Please select a satisfaction rate</string>
-    <string name="toast_ocr_rating_details">Please tick every question</string>
     <string name="tut_camera_guidance">Keep the receipt straight and make sure the relevant parts are included.</string>
     <string name="tut_camera_header">The better picture you take, the better the result will be!</string>
     <string name="help_tutorial">Watch intro tutorial</string>

@@ -7,8 +7,6 @@ package ch.giantific.qwittig.presentation.purchases.addedit.itemmodels;
 import android.os.Parcel;
 import android.support.annotation.NonNull;
 
-import java.util.Objects;
-
 /**
  * Provides a row filled with users that belong to a list item in the add or edit purchase screen.
  */

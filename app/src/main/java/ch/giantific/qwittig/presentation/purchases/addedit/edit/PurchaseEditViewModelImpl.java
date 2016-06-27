@@ -46,7 +46,7 @@ public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
     final String mEditPurchaseId;
     final Navigator mNavigator;
     Purchase mEditPurchase;
-    boolean mDeleteOldReceipt;
+    private boolean mDeleteOldReceipt;
     private boolean mOldValuesSet;
 
     public PurchaseEditViewModelImpl(@Nullable Bundle savedState,

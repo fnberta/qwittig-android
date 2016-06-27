@@ -7,7 +7,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.transition.Transition;
 import android.view.MenuItem;
@@ -22,7 +21,6 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivityTaskAddEditBinding;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.TransitionListenerAdapter;
-import ch.giantific.qwittig.presentation.common.fragments.DatePickerDialogFragment;
 import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.utils.Utils;
@@ -34,9 +32,9 @@ public abstract class BaseTaskAddEditActivity<T> extends BaseActivity<T>
         implements DatePickerDialog.OnDateSetListener,
         DiscardChangesDialogFragment.DialogInteractionListener {
 
-    private ActivityTaskAddEditBinding mBinding;
     @Inject
     TaskAddEditViewModel mAddEditViewModel;
+    private ActivityTaskAddEditBinding mBinding;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

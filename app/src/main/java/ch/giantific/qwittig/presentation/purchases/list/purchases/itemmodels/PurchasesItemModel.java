@@ -74,7 +74,6 @@ public class PurchasesItemModel extends BaseObservable {
 
     @Bindable
     public boolean isPurchaseRead() {
-        // TODO: implement ripple for <21 (just show white color)
         return mPurchase.isRead(mCurrentIdentity);
     }
 }

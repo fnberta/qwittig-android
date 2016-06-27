@@ -205,11 +205,11 @@ public interface UserRepository extends BaseRepository {
      * Creates a new identity and generates an invitation link for it. Allows the user to interact
      * with the identity even if no one has yet accepted the invitation.
      *
-     * @param context
+     * @param context         the context to use for the operation
      * @param nickname        the nickname to use in the new identity
      * @param groupId         the object id of the group
      * @param groupName       the name of the group the new identity is created for, user for the link
-     * @param inviterNickname
+     * @param inviterNickname the nickname of the inviter
      * @return a {@link Single} emitting the result
      */
     Single<Identity> addIdentity(@NonNull Context context, @NonNull String nickname,
@@ -227,10 +227,10 @@ public interface UserRepository extends BaseRepository {
     /**
      * Returns the invitation url for the invited identity
      *
-     * @param context
+     * @param context         the context to use for the operation
      * @param identity        the identity that is invited
      * @param groupName       the name of the group
-     * @param inviterNickname
+     * @param inviterNickname the nickname of the inviter
      * @return the invitation url
      */
     Single<String> getInvitationUrl(@NonNull Context context, @NonNull Identity identity,

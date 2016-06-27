@@ -27,9 +27,9 @@ import ch.giantific.qwittig.utils.DateUtils;
  */
 public class TasksItem extends BaseObservable implements TasksItemModel, CardTopProgressItemModel {
 
-    private boolean mCurrentUserResponsible;
+    private final boolean mCurrentUserResponsible;
+    private final Task mTask;
     private ViewListener mView;
-    private Task mTask;
 
     public TasksItem(@NonNull Task task, @NonNull Identity currentIdentity) {
         mCurrentUserResponsible = Objects.equals(currentIdentity.getObjectId(), task.getIdentityResponsible().getObjectId());

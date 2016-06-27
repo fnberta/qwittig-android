@@ -24,7 +24,7 @@ import dagger.Provides;
 @Module
 public class OcrRatingViewModelModule extends BaseViewModelModule {
 
-    private String mOcrDataId;
+    private final String mOcrDataId;
 
     public OcrRatingViewModelModule(@Nullable Bundle savedState, @NonNull String ocrDataId) {
         super(savedState);

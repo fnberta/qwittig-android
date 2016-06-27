@@ -24,7 +24,6 @@
     <string name="login_button_log_in">Anmelden</string>
     <string name="login_button_sign_up">Registrieren</string>
     <string name="no_purchases">Keine Einkäufe</string>
-    <string name="no_users">Keine Nutzer vorhanden</string>
     <string name="pref_group_current">Aktive Gruppe</string>
     <string name="pref_group_add_new">Neue Gruppe erstellen</string>
     <string name="pref_group_name">Gruppennamen ändern</string>
@@ -51,7 +50,6 @@
     <string name="dialog_group_leave_message">Willst du diese Gruppe wirklich verlassen?</string>
     <string name="title_activity_edit_purchase">Einkauf bearbeiten</string>
     <string name="toast_changes_saved">Änderungen gespeichert</string>
-    <string name="action_purchase_show_receipt">Quittung anzeigen</string>
     <string name="toast_changes_discarded">Änderungen verworfen</string>
     <string name="login_text_forgot_credentials">Passwort vergessen?</string>
     <string name="hint_nickname">Spitzname</string>
@@ -112,7 +110,7 @@
     <string name="help_recommend">Empfehle Qwittig weiter</string>
     <string name="help_rate">Bewerte uns im Play Store</string>
     <string name="email_support_message">Bitte beschreibe das Problem. Wir helfen dir so schnell wie möglich.</string>
-    <string name="email_device_build_info">----\nDie folgenden Angaben helfen uns, dein Problem so schnell wie möglich zu lösen.\nDevice: %1$s, %2$s, %3$s, %3$s\nBuild: %5$s, %6$s\n----</string>
+    <string name="email_device_build_info">----\nDie folgenden Angaben helfen uns, dein Problem so schnell wie möglich zu lösen.\nDevice: %1$s, %2$s, %3$s, %4$s\nBuild: %5$s, %6$s\n----</string>
     <string name="title_activity_help_feedback">Hilfe und Feedback</string>
     <string name="toast_purchase_added_draft">Einkauf als Entwurf gespeichert</string>
     <string name="title_activity_purchase_drafts">Entwürfe</string>
@@ -148,7 +146,6 @@
     <string name="no_compensations_history">Keine vergangenen Zahlungen</string>
     <string name="progress_logout">Abmelden…</string>
     <string name="action_purchase_add_edit_receipt_delete">Quittung löschen</string>
-    <string name="action_purchase_add_edit_receipt_add">Quittung hinzufügen</string>
     <string name="toast_receipt_deleted">Quittung entfernt</string>
     <string name="about_facebook">Finde Qwittig auf Facebook</string>
     <string name="about_twitter">Finde Qwittig auf Twitter</string>
@@ -168,7 +165,6 @@
     <string name="action_show_average">Zeige Durchschnittswerte</string>
     <string name="action_show_group">Zeige Gruppenwerte</string>
     <string name="action_show_percent">Zeige Prozentwerte</string>
-    <string name="progress_purchase_auto">Hochladen und verarbeiten….</string>
     <string name="dialog_compensation_confirm_amount_message">%1$s schuldet dir %2$s, bitte bestätige die Zahlung. Falls nötig, kannst du den Betrag ändern.</string>
     <string name="toast_exchange_no_data">Keine Wechselkursdaten, bitte versuche es später noch einmal</string>
     <string name="toast_exchange_rate_fetching">Wechselkurs noch nicht abgerufen</string>
@@ -236,9 +232,7 @@
     <string name="toast_no_camera">Dein Gerät hat keine Kamera</string>
     <string name="hint_image_taken">Aufgenommenes Photo</string>
     <string name="header_note">Notiz</string>
-    <string name="action_purchase_show_note">Notiz zeigen</string>
     <string name="action_purchase_add_edit_note_add">Notiz hinzufügen</string>
-    <string name="action_purchase_add_edit_note_delete">Notiz löschen</string>
     <string name="action_purchase_add_edit_note_edit">Notiz ändern</string>
     <string name="toast_note_deleted">Notiz gelöscht</string>
     <string name="toast_note_added">Notiz hinzugefügt</string>
@@ -304,7 +298,6 @@
     <string name="toast_error_task_done">Aufgabe abhaken fehlgeschlagen</string>
     <string name="push_task_finished_title">%1$s erledigt</string>
     <string name="push_task_finished_alert">%1$s hat die Aufgabe erledigt</string>
-    <string name="login_lets_go">Los gehts!</string>
     <string name="login_group_currency_info">Wähle einen Nahmen und eine Währung für deine Gruppe. Einkäufe in einer Fremdwährung werden in diese Währung konvertiert.</string>
     <string name="invite_group">%1$s hat dich eingeladen, %2$s beizutreten.</string>
     <string name="invite_accept">Einladung aktzeptieren?</string>
@@ -323,8 +316,6 @@
     <string name="toast_error_purchase_ocr_process">Verarbeitung des Einkaufs fehlgeschalgen. Bitte versuche es noch einmal.</string>
     <string name="toast_purchase_ocr_started">Verarbeite Einkauf… Du wirst benachrichtigt, sobald er bereit ist.</string>
     <string name="toast_error_join_group">Beitreten der Gruppe fehlgeschlagen. Bitte versuche es noch einmal.</string>
-    <string name="header_settings_group_add">Neue Gruppe</string>
-    <string name="header_login_first_group">Erste Gruppe</string>
     <string name="push_purchase_ocr_failed_title">Processing failed</string>
     <string name="toast_del_identity_balance_not_zero">Fordere Guthaben ein und begleiche Schulden bevor du diesen Nutzer löschst</string>
     <string name="camera_pick_image">Bild auswählen</string>
@@ -338,7 +329,6 @@
     <string name="title_activity_ocr_rating">Feedback</string>
     <string name="title_activity_camera">Kamera</string>
     <string name="toast_ocr_rating_satisfaction">Bitte wähle einen Zufriedenheitswert aus</string>
-    <string name="toast_ocr_rating_details">Gib bitte eine Antwort auf alle fragen</string>
     <string name="tut_camera_guidance">Beachte, dass die Quittung gerade ist und alle relevanten Teil auf dem Bild ersichtlich sind.</string>
     <string name="tut_camera_header">Je besser das Bild, desto besser wird das Resultat sein!</string>
     <string name="help_tutorial">Intro Tutorial ansehen</string>

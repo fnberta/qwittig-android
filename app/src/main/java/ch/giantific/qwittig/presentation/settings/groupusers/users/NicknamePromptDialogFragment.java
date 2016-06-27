@@ -123,7 +123,7 @@ public class NicknamePromptDialogFragment extends BaseDialogFragment<NicknamePro
          * Defines the action to take after the user entered a valid nickname and hit enter.
          *
          * @param nickname the nickname address entered
-         * @param position
+         * @param position position of the field
          */
         void onValidNicknameEntered(@NonNull String nickname, int position);
     }

@@ -7,7 +7,6 @@ package ch.giantific.qwittig.presentation.tasks.list;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
 import android.view.View;
 import android.widget.AdapterView;
 
@@ -25,10 +24,10 @@ import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModelBaseImpl;
+import ch.giantific.qwittig.presentation.tasks.list.itemmodels.TasksHeaderItem;
 import ch.giantific.qwittig.presentation.tasks.list.itemmodels.TasksItem;
 import ch.giantific.qwittig.presentation.tasks.list.itemmodels.TasksItemModel;
 import ch.giantific.qwittig.presentation.tasks.list.itemmodels.TasksItemModel.Type;
-import ch.giantific.qwittig.presentation.tasks.list.itemmodels.TasksHeaderItem;
 import ch.giantific.qwittig.presentation.tasks.list.models.TaskDeadline;
 import ch.giantific.qwittig.utils.MessageAction;
 import rx.Completable;
@@ -48,7 +47,7 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<TasksItemMod
     private static final String STATE_DEADLINE = "STATE_DEADLINE";
     private final Navigator mNavigator;
     private final TaskRepository mTaskRepo;
-    private ArrayList<String> mLoadingTasks;
+    private final ArrayList<String> mLoadingTasks;
     private TaskDeadline mDeadline;
 
     public TasksViewModelImpl(@Nullable Bundle savedState,

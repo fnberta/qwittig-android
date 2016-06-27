@@ -52,7 +52,7 @@ public class Navigator {
     public static final int INTENT_REQUEST_TASK_MODIFY = 9;
     public static final int INTENT_REQUEST_TASK_DETAILS = 10;
     public static final int INTENT_REQUEST_IMAGE_PICK = 11;
-    private FragmentActivity mActivity;
+    private final FragmentActivity mActivity;
 
     public Navigator(@NonNull FragmentActivity activity) {
         mActivity = activity;

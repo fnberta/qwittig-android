@@ -14,7 +14,7 @@ import dagger.Provides;
 @Module
 public class NavigatorModule {
 
-    private FragmentActivity mActivity;
+    private final FragmentActivity mActivity;
 
     public NavigatorModule(@NonNull FragmentActivity activity) {
         mActivity = activity;

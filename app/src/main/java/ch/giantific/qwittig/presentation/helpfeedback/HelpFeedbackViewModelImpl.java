@@ -37,7 +37,7 @@ public class HelpFeedbackViewModelImpl extends ViewModelBaseImpl<HelpFeedbackVie
     private static final String EMAIL_FEEDBACK = "feedback@qwittig.ch";
     private static final String FAQ_URL = "http://www.qwittig.ch/faq";
 
-    private Navigator mNavigator;
+    private final Navigator mNavigator;
 
     public HelpFeedbackViewModelImpl(@Nullable Bundle savedState,
                                      @NonNull Navigator navigator,

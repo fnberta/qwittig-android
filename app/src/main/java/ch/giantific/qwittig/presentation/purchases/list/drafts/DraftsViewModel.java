@@ -10,7 +10,6 @@ import android.support.annotation.StringRes;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
 import ch.giantific.qwittig.presentation.common.viewmodels.SelectionModeViewModel;
-import ch.giantific.qwittig.presentation.purchases.list.drafts.itemmodels.DraftsItemModel;
 
 /**
  * Defines an observable view model for the list of drafts screen.

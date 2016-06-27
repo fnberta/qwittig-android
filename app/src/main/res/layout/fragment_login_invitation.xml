@@ -4,7 +4,6 @@
 
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     >
 
@@ -25,8 +24,8 @@
         android:layout_marginEnd="@dimen/key_line_1"
         android:layout_marginStart="@dimen/key_line_1"
         android:layout_marginTop="@dimen/normal_space"
-        android:transitionGroup="true"
         android:orientation="vertical"
+        android:transitionGroup="true"
         tools:context=".presentation.login.LoginInvitationFragment"
         tools:targetApi="lollipop"
         >
@@ -36,9 +35,9 @@
             style="@style/TextAppearance.AppCompat.Display1"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginBottom="@dimen/normal_space"
             android:layout_weight="1"
             android:gravity="center_horizontal"
-            android:layout_marginBottom="@dimen/normal_space"
             android:text="@{@string/invite_group(viewModel.inviterNickname, viewModel.groupName)}"
             />
 
@@ -47,32 +46,32 @@
             style="@style/TextAppearance.AppCompat.Headline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:layout_marginBottom="@dimen/normal_space"
+            android:gravity="center"
             android:text="@string/invite_accept"
             />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:gravity="center_horizontal"
+            android:orientation="horizontal"
             >
 
             <Button
                 android:id="@+id/bt_login_invitation_decline"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/invite_accept_no"
                 android:onClick="@{viewModel::onDeclineClick}"
+                android:text="@string/invite_accept_no"
                 />
 
             <Button
                 android:id="@+id/bt_login_invitation_accept"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/invite_accept_yes"
                 android:onClick="@{viewModel::onAcceptClick}"
+                android:text="@string/invite_accept_yes"
                 />
         </LinearLayout>
 

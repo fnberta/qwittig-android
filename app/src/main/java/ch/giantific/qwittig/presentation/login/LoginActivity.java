@@ -68,15 +68,15 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
         EmailPromptDialogFragment.DialogInteractionListener,
         LoginWorkerListener {
 
-    public static final String FRAGMENT_LOGIN = "FRAGMENT_LOGIN";
+    private static final String FRAGMENT_LOGIN = "FRAGMENT_LOGIN";
     private static final String GOOGLE_SERVER_ID = "1027430235430-ut0u3v7uh443akc3q6s3rhhvu3pfrsgi.apps.googleusercontent.com";
     private static final String PREF_FIRST_RUN = "PREF_FIRST_RUN";
     private static final int RC_SIGN_IN = 9001;
-    LoginAccountsViewModel mAccountsViewModel;
-    LoginEmailViewModel mEmailViewModel;
-    LoginInvitationViewModel mInvitationViewModel;
-    LoginProfileViewModel mProfileViewModel;
-    LoginFirstGroupViewModel mFirstGroupViewModel;
+    private LoginAccountsViewModel mAccountsViewModel;
+    private LoginEmailViewModel mEmailViewModel;
+    private LoginInvitationViewModel mInvitationViewModel;
+    private LoginProfileViewModel mProfileViewModel;
+    private LoginFirstGroupViewModel mFirstGroupViewModel;
     @Inject
     Navigator mNavigator;
     private GoogleApiClient mGoogleApiClient;

@@ -61,7 +61,6 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
         DiscardPurchaseDialogFragment.DialogInteractionListener {
 
     public static final String INTENT_OCR_PURCHASE_ID = "INTENT_OCR_PURCHASE_ID";
-    public static final String PURCHASE_NOTE_FRAGMENT = "PURCHASE_NOTE_FRAGMENT";
     private static final int PERMISSIONS_REQUEST_CAPTURE_IMAGES = 12;
     protected PurchaseAddEditViewModel mAddEditPurchaseViewModel;
     @Inject

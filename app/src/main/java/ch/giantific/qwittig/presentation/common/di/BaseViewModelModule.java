@@ -5,10 +5,7 @@
 package ch.giantific.qwittig.presentation.common.di;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
-import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 
 /**
  * Provides an abstract base class for modules defining the instantiation of view models.

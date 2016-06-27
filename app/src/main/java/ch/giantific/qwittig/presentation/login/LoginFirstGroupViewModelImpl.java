@@ -31,10 +31,10 @@ public class LoginFirstGroupViewModelImpl extends ViewModelBaseImpl<LoginFirstGr
     private static final String STATE_GROUP_NAME = "STATE_GROUP_NAME";
     private static final String STATE_GROUP_CURRENCY = "STATE_GROUP_CURRENCY";
     private final Navigator mNavigator;
+    private final List<Currency> mCurrencies;
     private boolean mValidate;
     private String mGroupName;
     private String mGroupCurrency;
-    private List<Currency> mCurrencies;
 
     public LoginFirstGroupViewModelImpl(@Nullable Bundle savedState,
                                         @NonNull Navigator navigator,

@@ -13,7 +13,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 /**
  * Defines an observable view model for a screen showing information about Qwittig.
  */
-public interface AboutViewModel extends ViewModel<AboutViewModel.ViewListener> {
+public interface AboutViewModel extends ViewModel<ViewModel.ViewListener> {
 
     /**
      * Returns the total number of items in the data set hold by the view model.
@@ -31,11 +31,4 @@ public interface AboutViewModel extends ViewModel<AboutViewModel.ViewListener> {
     AboutItemModel getItemAtPosition(int position);
 
     void onAboutItemClick(@NonNull AboutItem itemModel);
-
-    /**
-     * Defines the interaction with attached view.
-     */
-    interface ViewListener extends ViewModel.ViewListener {
-        void openWebsite(@NonNull String url);
-    }
 }

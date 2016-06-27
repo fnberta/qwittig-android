@@ -40,6 +40,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/tut_camera_receipt_height"
                     android:layout_marginBottom="@dimen/big_space"
+                    android:contentDescription="@string/purchase_receipt"
                     android:src="@drawable/receipt"
                     />
 

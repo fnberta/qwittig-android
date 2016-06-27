@@ -8,9 +8,7 @@ import android.databinding.Bindable;
 import android.support.annotation.NonNull;
 import android.view.View;
 
-import ch.giantific.qwittig.presentation.common.viewmodels.LoadingViewModel;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
-import rx.Single;
 
 /**
  * Defines an observable view model for the login/sign-up with email screen.

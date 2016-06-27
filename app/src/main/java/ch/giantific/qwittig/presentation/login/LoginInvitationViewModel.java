@@ -5,7 +5,6 @@
 package ch.giantific.qwittig.presentation.login;
 
 import android.databinding.Bindable;
-import android.databinding.BindingAdapter;
 import android.support.annotation.NonNull;
 import android.view.View;
 

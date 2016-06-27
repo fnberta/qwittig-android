@@ -22,8 +22,8 @@ import ch.giantific.qwittig.presentation.login.di.LoginComponent;
 public class LoginInvitationFragment extends BaseFragment<LoginComponent, LoginInvitationViewModel, LoginInvitationFragment.ActivityListener>
         implements LoginInvitationViewModel.ViewListener {
 
-    public static final String KEY_GROUP_NAME = "GROUP_NAME";
-    public static final String KEY_INVITER_NICKNAME = "INVITER_NICKNAME";
+    private static final String KEY_GROUP_NAME = "GROUP_NAME";
+    private static final String KEY_INVITER_NICKNAME = "INVITER_NICKNAME";
     private FragmentLoginInvitationBinding mBinding;
 
     public LoginInvitationFragment() {

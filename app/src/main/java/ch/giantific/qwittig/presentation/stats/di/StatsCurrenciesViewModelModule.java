@@ -12,8 +12,6 @@ import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
-import ch.giantific.qwittig.presentation.stats.models.Month;
-import ch.giantific.qwittig.presentation.stats.pie.StatsPieViewModel;
 import ch.giantific.qwittig.presentation.stats.pie.currencies.StatsCurrenciesViewModel;
 import ch.giantific.qwittig.presentation.stats.pie.currencies.StatsCurrenciesViewModelImpl;
 import dagger.Module;
