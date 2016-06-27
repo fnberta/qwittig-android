@@ -42,8 +42,7 @@ public abstract class BasePurchaseAddEditFragment<U, T extends PurchaseAddEditVi
         mViewModel.setListInteraction(mRecyclerAdapter);
         mBinding.setViewModel(mViewModel);
         final ItemTouchHelper touchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
-                0,
-                ItemTouchHelper.START | ItemTouchHelper.END) {
+                0, ItemTouchHelper.END) {
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
                                   RecyclerView.ViewHolder target) {
