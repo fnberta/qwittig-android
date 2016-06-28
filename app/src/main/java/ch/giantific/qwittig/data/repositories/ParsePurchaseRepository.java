@@ -389,7 +389,8 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
                 purchase.removeReceiptLocal();
                 purchase.setReceipt(receipt);
             } catch (ParseException | ExecutionException | InterruptedException e) {
-                e.printStackTrace();
+                purchase.setReceiptLocal(localReceiptPath);
+                return false;
             }
 
             deleteLocalReceipt(localReceiptPath);
@@ -470,7 +471,8 @@ public class ParsePurchaseRepository extends ParseBaseRepository implements
                 purchase.removeReceiptLocal();
                 purchase.setReceipt(receipt);
             } catch (ParseException | ExecutionException | InterruptedException e) {
-                e.printStackTrace();
+                purchase.setReceiptLocal(localReceiptPath);
+                return false;
             }
 
             deleteLocalReceipt(localReceiptPath);
