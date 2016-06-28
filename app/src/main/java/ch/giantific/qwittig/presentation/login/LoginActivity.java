@@ -69,7 +69,7 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
         LoginWorkerListener {
 
     private static final String FRAGMENT_LOGIN = "FRAGMENT_LOGIN";
-    private static final String GOOGLE_SERVER_ID = "1027430235430-ut0u3v7uh443akc3q6s3rhhvu3pfrsgi.apps.googleusercontent.com";
+    private static final String GOOGLE_SERVER_ID = "1032365366003-7rsbsnqc5b0504mmdt6j1n61m39lgllp.apps.googleusercontent.com";
     private static final String PREF_FIRST_RUN = "PREF_FIRST_RUN";
     private static final int RC_SIGN_IN = 9001;
     private LoginAccountsViewModel mAccountsViewModel;
