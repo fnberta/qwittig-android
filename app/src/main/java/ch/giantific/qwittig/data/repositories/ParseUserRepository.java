@@ -48,6 +48,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ch.giantific.qwittig.BuildConfig;
 import ch.giantific.qwittig.data.push.PushBroadcastReceiver;
 import ch.giantific.qwittig.data.services.SaveIdentityTaskService;
 import ch.giantific.qwittig.domain.models.Group;
@@ -83,6 +84,8 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
     private static final String ADD_NEW_GROUP = "addGroup";
     private static final String FIRST_GROUP_NAME = "Meine WG";
     private static final String FIRST_GROUP_CURRENCY = "CHF";
+    private static final String FIREBASE_APP_CODE = "u4fa2";
+    private static final String INVITE_BASE_LINK = "qwittig.com/invitation";
     private final GcmNetworkManager mGcmNetworkManager;
 
     public ParseUserRepository(@NonNull GcmNetworkManager gcmNetworkManager) {
@@ -797,11 +800,10 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
     }
 
     @NonNull
-    @Override
-    public Single<String> getInvitationUrl(@NonNull final Context context,
-                                           @NonNull final Identity identity,
-                                           @NonNull String groupName,
-                                           @NonNull String inviterNickname) {
+    private Single<String> getInvitationUrl(@NonNull final Context context,
+                                            @NonNull final Identity identity,
+                                            @NonNull String groupName,
+                                            @NonNull String inviterNickname) {
         final BranchUniversalObject universalObject = new BranchUniversalObject()
                 .setCanonicalIdentifier("invitation")
                 .setTitle(String.format("You are invited to join %s", groupName))
@@ -834,6 +836,25 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                         });
                     }
                 });
+    }
+
+    private String getInvitationLink(@NonNull final Identity identity,
+                                     @NonNull String groupName,
+                                     @NonNull String inviterNickname) {
+        final String deepLink = INVITE_BASE_LINK
+                + "/" + identity.getObjectId()
+                + "/" + groupName
+                + "/" + inviterNickname;
+        final Uri.Builder builder = new Uri.Builder()
+                .scheme("https")
+                .authority(FIREBASE_APP_CODE + ".app.goo.gl")
+                .path("/")
+                .appendQueryParameter("link", deepLink)
+                .appendQueryParameter("apn", BuildConfig.APPLICATION_ID)
+                .appendQueryParameter("ibi", BuildConfig.APPLICATION_ID);
+
+        // TODO: shorten
+        return builder.build().toString();
     }
 
     @Override

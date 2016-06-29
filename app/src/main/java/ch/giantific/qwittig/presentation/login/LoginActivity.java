@@ -17,12 +17,16 @@ import android.support.v7.preference.PreferenceManager;
 import android.transition.Slide;
 import android.view.Gravity;
 
+import com.google.android.gms.appinvite.AppInvite;
+import com.google.android.gms.appinvite.AppInviteInvitationResult;
+import com.google.android.gms.appinvite.AppInviteReferral;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
 import com.parse.ParseFacebookUtils;
 
 import org.json.JSONObject;
@@ -69,16 +73,16 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
         LoginWorkerListener {
 
     private static final String FRAGMENT_LOGIN = "FRAGMENT_LOGIN";
-    private static final String GOOGLE_SERVER_ID = "1027430235430-ut0u3v7uh443akc3q6s3rhhvu3pfrsgi.apps.googleusercontent.com";
+    private static final String GOOGLE_SERVER_ID = "1032365366003-7rsbsnqc5b0504mmdt6j1n61m39lgllp.apps.googleusercontent.com";
     private static final String PREF_FIRST_RUN = "PREF_FIRST_RUN";
     private static final int RC_SIGN_IN = 9001;
+    @Inject
+    Navigator mNavigator;
     private LoginAccountsViewModel mAccountsViewModel;
     private LoginEmailViewModel mEmailViewModel;
     private LoginInvitationViewModel mInvitationViewModel;
     private LoginProfileViewModel mProfileViewModel;
     private LoginFirstGroupViewModel mFirstGroupViewModel;
-    @Inject
-    Navigator mNavigator;
     private GoogleApiClient mGoogleApiClient;
 
     @Override
@@ -91,7 +95,8 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
             addAccountsFragment();
         }
 
-        setupGoogleLogin();
+        setupGoogleApiClient();
+//        checkForInvitation();
     }
 
     @Override
@@ -130,7 +135,7 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
                 .commit();
     }
 
-    private void setupGoogleLogin() {
+    private void setupGoogleApiClient() {
         final GoogleSignInOptions gso =
                 new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                         .requestIdToken(GOOGLE_SERVER_ID)
@@ -141,11 +146,28 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
                 .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
                     @Override
                     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        mAccountsViewModel.onGoogleLoginFailed();
+                        Timber.w("GoogleApiClient onConnectionFailed: %s", connectionResult);
                     }
                 })
+//                .addApi(AppInvite.API)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
+    }
+
+    private void checkForInvitation() {
+        AppInvite.AppInviteApi.getInvitation(mGoogleApiClient, this, false)
+                .setResultCallback(new ResultCallback<AppInviteInvitationResult>() {
+                    @Override
+                    public void onResult(@NonNull AppInviteInvitationResult result) {
+                        if (result.getStatus().isSuccess()) {
+                            final Intent intent = result.getInvitationIntent();
+                            final String deepLink = AppInviteReferral.getDeepLink(intent);
+                            Timber.d("deepLink %s", deepLink);
+                        } else {
+                            Timber.i("getInvitation: no deep link found.");
+                        }
+                    }
+                });
     }
 
     @Override
