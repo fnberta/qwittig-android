@@ -35,7 +35,7 @@ android {
 
 ext {
     supportLibVersion = '24.0.0'
-    playServicesVersion = '9.0.2'
+    playServicesVersion = '9.2.0'
     retrofitVersion = '2.0.2'
     leakCanaryVersion = '1.4-beta2'
     daggerVersion = '2.5'
