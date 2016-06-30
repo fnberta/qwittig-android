@@ -18,6 +18,7 @@ import ch.giantific.qwittig.domain.models.Item;
 import ch.giantific.qwittig.domain.models.OcrData;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
+import ch.giantific.qwittig.domain.repositories.RemoteConfigRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
@@ -35,8 +36,8 @@ import rx.functions.Func1;
  */
 public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implements PurchaseAddOcrViewModel {
 
-    private static final boolean SHOW_OCR_RATING_SCREEN = true;
     private static final String STATE_OCR_VALUES_SET = "STATE_OCR_VALUES_SET";
+    private final RemoteConfigRepository mConfigRepo;
     private String mOcrDataId;
     private OcrData mOcrData;
     private boolean mOcrValuesSet;
@@ -45,8 +46,11 @@ public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implem
                                        @NonNull Navigator navigator,
                                        @NonNull RxBus<Object> eventBus,
                                        @NonNull UserRepository userRepository,
-                                       @NonNull PurchaseRepository purchaseRepo) {
+                                       @NonNull PurchaseRepository purchaseRepo,
+                                       @NonNull RemoteConfigRepository configRepo) {
         super(savedState, navigator, eventBus, userRepository, purchaseRepo);
+
+        mConfigRepo = configRepo;
 
         if (savedState != null) {
             mOcrValuesSet = savedState.getBoolean(STATE_OCR_VALUES_SET, false);
@@ -145,7 +149,7 @@ public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implem
 
     @Override
     protected void onPurchaseSaved(boolean asDraft) {
-        if (SHOW_OCR_RATING_SCREEN) {
+        if (mConfigRepo.isShowOcrRating()) {
             mNavigator.startOcrRating(mOcrDataId);
         }
 

@@ -21,8 +21,11 @@ import android.support.v7.widget.Toolbar;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.LocalBroadcast;
+import ch.giantific.qwittig.domain.repositories.RemoteConfigRepository;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorkerListener;
@@ -32,7 +35,7 @@ import ch.giantific.qwittig.utils.WorkerUtils;
 
 /**
  * Provides an abstract base class that sets up the {@link Toolbar} and commonly used methods.
- * <p/>
+ * <p>
  * Subclass of {@link AppCompatActivity}.
  */
 public abstract class BaseActivity<T> extends AppCompatActivity
@@ -48,6 +51,8 @@ public abstract class BaseActivity<T> extends AppCompatActivity
     };
     protected Toolbar mToolbar;
     protected T mComponent;
+    @Inject
+    RemoteConfigRepository mConfigRepo;
     private List<ViewModel> mViewModels;
 
     @CallSuper
@@ -61,6 +66,8 @@ public abstract class BaseActivity<T> extends AppCompatActivity
 
         injectDependencies(savedInstanceState);
         mViewModels = getViewModels();
+
+        mConfigRepo.fetchAndActivate();
     }
 
     protected abstract void injectDependencies(@Nullable Bundle savedInstanceState);

@@ -11,9 +11,11 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.preference.PreferenceManager;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 import javax.inject.Singleton;
 
+import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
 import dagger.Module;
 import dagger.Provides;
@@ -58,5 +60,13 @@ public class ApplicationModule {
     @Singleton
     RxBus<Object> providesEventBus() {
         return new RxBus<>();
+    }
+
+    @Provides
+    @Singleton
+    FirebaseRemoteConfig providesFirebaseRemoteConfig() {
+        final FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
+        remoteConfig.setDefaults(R.xml.remote_config_defaults);
+        return remoteConfig;
     }
 }

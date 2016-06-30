@@ -18,6 +18,7 @@ import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.domain.repositories.RemoteConfigRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.Single;
@@ -30,14 +31,18 @@ public class SettingsAddGroupViewModelImpl extends ViewModelBaseImpl<SettingsAdd
         implements SettingsAddGroupViewModel {
 
     private static final String STATE_VALIDATE = "STATE_VALIDATE";
+    private final RemoteConfigRepository mConfigRepo;
     private String mName;
     private String mCurrency;
     private boolean mValidate;
 
     public SettingsAddGroupViewModelImpl(@Nullable Bundle savedState,
                                          @NonNull RxBus<Object> eventBus,
-                                         @NonNull UserRepository userRepository) {
+                                         @NonNull UserRepository userRepository,
+                                         @NonNull RemoteConfigRepository configRepo) {
         super(savedState, eventBus, userRepository);
+
+        mConfigRepo = configRepo;
 
         if (savedState != null) {
             mValidate = savedState.getBoolean(STATE_VALIDATE);
@@ -74,6 +79,11 @@ public class SettingsAddGroupViewModelImpl extends ViewModelBaseImpl<SettingsAdd
         if (mValidate) {
             notifyPropertyChanged(BR.validate);
         }
+    }
+
+    @Override
+    public List<Currency> getSupportedCurrencies() {
+        return mConfigRepo.getSupportedCurrencies();
     }
 
     @Override

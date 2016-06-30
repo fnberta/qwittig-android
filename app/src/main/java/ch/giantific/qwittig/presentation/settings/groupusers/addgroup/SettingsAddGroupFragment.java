@@ -23,7 +23,6 @@ import ch.giantific.qwittig.databinding.FragmentSettingsAddGroupBinding;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsGroupUsersComponent;
 import ch.giantific.qwittig.presentation.settings.groupusers.users.SettingsUsersFragment;
-import ch.giantific.qwittig.utils.MoneyUtils;
 import ch.giantific.qwittig.utils.Utils;
 
 /**
@@ -56,7 +55,7 @@ public class SettingsAddGroupFragment extends BaseFragment<SettingsGroupUsersCom
         mViewModel.attachView(this);
         mBinding.setViewModel(mViewModel);
         final ArrayAdapter<Currency> spinnerCurrencyAdapter = new ArrayAdapter<>(getActivity(),
-                R.layout.spinner_item, MoneyUtils.getSupportedCurrencies());
+                R.layout.spinner_item, mViewModel.getSupportedCurrencies());
         spinnerCurrencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mBinding.spSettingsGroupAddNewCurrency.setAdapter(spinnerCurrencyAdapter);
     }

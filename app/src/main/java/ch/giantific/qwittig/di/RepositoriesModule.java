@@ -8,8 +8,10 @@ import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.gson.Gson;
 
+import ch.giantific.qwittig.data.repositories.FirebaseRemoteConfigRepository;
 import ch.giantific.qwittig.data.repositories.ParseCompensationRepository;
 import ch.giantific.qwittig.data.repositories.ParseGroupRepository;
 import ch.giantific.qwittig.data.repositories.ParsePurchaseRepository;
@@ -21,6 +23,7 @@ import ch.giantific.qwittig.data.rest.ReceiptOcr;
 import ch.giantific.qwittig.domain.repositories.CompensationRepository;
 import ch.giantific.qwittig.domain.repositories.GroupRepository;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
+import ch.giantific.qwittig.domain.repositories.RemoteConfigRepository;
 import ch.giantific.qwittig.domain.repositories.StatsRepository;
 import ch.giantific.qwittig.domain.repositories.TaskRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
@@ -51,7 +54,8 @@ public class RepositoriesModule {
                                                   @NonNull ExchangeRates exchangeRates,
                                                   @NonNull ReceiptOcr receiptOcr,
                                                   @NonNull GcmNetworkManager networkManager) {
-        return new ParsePurchaseRepository(sharedPreferences, exchangeRates, receiptOcr, networkManager);
+        return new ParsePurchaseRepository(sharedPreferences, exchangeRates, receiptOcr,
+                networkManager);
     }
 
     @Provides
@@ -72,5 +76,10 @@ public class RepositoriesModule {
     @Provides
     StatsRepository providesStatsRepository(@NonNull Gson gson) {
         return new ParseStatsRepository(gson);
+    }
+
+    @Provides
+    RemoteConfigRepository providesRemoteConfigRepository(@NonNull FirebaseRemoteConfig remoteConfig) {
+        return new FirebaseRemoteConfigRepository(remoteConfig);
     }
 }

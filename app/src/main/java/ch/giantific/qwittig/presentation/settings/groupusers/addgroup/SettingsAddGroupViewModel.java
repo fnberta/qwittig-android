@@ -10,6 +10,8 @@ import android.support.annotation.StringRes;
 import android.view.View;
 import android.widget.AdapterView;
 
+import java.util.List;
+
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 
 /**
@@ -26,6 +28,8 @@ public interface SettingsAddGroupViewModel extends ViewModel<SettingsAddGroupVie
     boolean isNameComplete();
 
     void onNameChanged(CharSequence s, int start, int before, int count);
+
+    List<Currency> getSupportedCurrencies();
 
     void onCurrencySelected(@NonNull AdapterView<?> parent, View view, int position, long id);
 

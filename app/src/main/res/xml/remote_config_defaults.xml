@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<defaultsMap>
+    <entry>
+        <key>show_ocr_rating</key>
+        <value>false</value>
+    </entry>
+    <entry>
+        <key>supported_currencies</key>
+        <value>CHF,EUR,USD,GBP</value>
+    </entry>
+</defaultsMap>
