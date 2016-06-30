@@ -38,6 +38,7 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.Navigator;
@@ -51,7 +52,6 @@ import ch.giantific.qwittig.presentation.login.di.LoginEmailViewModelModule;
 import ch.giantific.qwittig.presentation.login.di.LoginFirstGroupViewModelModule;
 import ch.giantific.qwittig.presentation.login.di.LoginInvitationViewModelModule;
 import ch.giantific.qwittig.presentation.login.di.LoginProfileViewModelModule;
-import ch.giantific.qwittig.presentation.purchases.list.HomeActivity;
 import ch.giantific.qwittig.utils.AvatarUtils;
 import ch.giantific.qwittig.utils.Utils;
 import io.branch.referral.Branch;
@@ -227,11 +227,11 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
                     return;
                 }
 
-                final boolean openedWithInvite = referringParams.optBoolean(HomeActivity.BRANCH_IS_INVITE, false);
+                final boolean openedWithInvite = referringParams.optBoolean(ParseUserRepository.BRANCH_IS_INVITE, false);
                 if (openedWithInvite) {
-                    final String identityId = referringParams.optString(HomeActivity.BRANCH_IDENTITY_ID);
-                    final String groupName = referringParams.optString(HomeActivity.BRANCH_GROUP_NAME);
-                    final String inviterNickname = referringParams.optString(HomeActivity.BRANCH_INVITER_NICKNAME);
+                    final String identityId = referringParams.optString(ParseUserRepository.BRANCH_IDENTITY_ID);
+                    final String groupName = referringParams.optString(ParseUserRepository.BRANCH_GROUP_NAME);
+                    final String inviterNickname = referringParams.optString(ParseUserRepository.BRANCH_INVITER_NICKNAME);
 
                     mAccountsViewModel.setInvitationIdentityId(identityId);
                     showInvitationFragment(groupName, inviterNickname);

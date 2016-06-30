@@ -44,6 +44,7 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.LocalBroadcast;
+import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.databinding.ActivityHomeBinding;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
@@ -91,10 +92,6 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
         JoinGroupWorkerListener,
         OcrWorkerListener {
 
-    public static final String BRANCH_IS_INVITE = "+clicked_branch_link";
-    public static final String BRANCH_IDENTITY_ID = "identityId";
-    public static final String BRANCH_GROUP_NAME = "groupName";
-    public static final String BRANCH_INVITER_NICKNAME = "inviterNickname";
     private static final String STATE_DRAFTS_FRAGMENT = "STATE_DRAFTS_FRAGMENT";
     private static final String STATE_PURCHASES_FRAGMENT = "STATE_PURCHASES_FRAGMENT";
     private static final int PERMISSIONS_REQUEST_CAPTURE_IMAGES = 1;
@@ -276,11 +273,11 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
                     return;
                 }
 
-                final boolean openedWithInvite = referringParams.optBoolean(BRANCH_IS_INVITE, false);
+                final boolean openedWithInvite = referringParams.optBoolean(ParseUserRepository.BRANCH_IS_INVITE, false);
                 if (openedWithInvite) {
-                    final String identityId = referringParams.optString(BRANCH_IDENTITY_ID);
-                    final String groupName = referringParams.optString(BRANCH_GROUP_NAME);
-                    final String inviterNickname = referringParams.optString(BRANCH_INVITER_NICKNAME);
+                    final String identityId = referringParams.optString(ParseUserRepository.BRANCH_IDENTITY_ID);
+                    final String groupName = referringParams.optString(ParseUserRepository.BRANCH_GROUP_NAME);
+                    final String inviterNickname = referringParams.optString(ParseUserRepository.BRANCH_INVITER_NICKNAME);
                     mHomeViewModel.handleInvitation(identityId, groupName, inviterNickname);
                 }
             }
