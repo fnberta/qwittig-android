@@ -45,7 +45,8 @@
             <intent-filter>
                 <data
                     android:host="open"
-                    android:scheme="qwittig"/>
+                    android:scheme="qwittig"
+                    />
 
                 <action android:name="android.intent.action.VIEW"/>
 
@@ -59,13 +60,13 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                    android:host="bnc.lt"
-                    android:pathPrefix="/64Mh"
+                    android:host="qwittig.app.link"
                     android:scheme="https"
                     />
+
                 <data
                     android:host="invitation.qwittig.com"
-                    android:pathPrefix="/64Mh"
+                    android:pathPrefix="/rNpq"
                     android:scheme="https"
                     />
 
@@ -231,7 +232,7 @@
             android:value="id:1027430235430"/>
         <meta-data
             android:name="io.branch.sdk.BranchKey"
-            android:value="key_live_acnS5GHRD6gburgxVhUKEfjoFycGimNB"/>
+            android:value="key_live_fpe71rsvQX7Yg96js7ZZHomjyEd8Rv3Z"/>
     </application>
 
 </manifest>

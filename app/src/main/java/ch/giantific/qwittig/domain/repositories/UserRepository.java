@@ -225,18 +225,6 @@ public interface UserRepository extends BaseRepository {
     Single<Identity> saveIdentityLocal(@NonNull Identity identity);
 
     /**
-     * Returns the invitation url for the invited identity
-     *
-     * @param context         the context to use for the operation
-     * @param identity        the identity that is invited
-     * @param groupName       the name of the group
-     * @param inviterNickname the nickname of the inviter
-     * @return the invitation url
-     */
-    Single<String> getInvitationUrl(@NonNull Context context, @NonNull Identity identity,
-                                    @NonNull String groupName, @NonNull String inviterNickname);
-
-    /**
      * Fetches the data of a {@link Identity} object from the local data store. If there is no data
      * available in the local data store it will try to fetch the data online.
      *

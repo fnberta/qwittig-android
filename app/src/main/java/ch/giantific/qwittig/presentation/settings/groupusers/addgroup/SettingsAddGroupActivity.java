@@ -24,6 +24,7 @@ import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.settings.groupusers.di.DaggerSettingsGroupUsersComponent;
@@ -50,7 +51,6 @@ public class SettingsAddGroupActivity extends BaseActivity<SettingsGroupUsersCom
 
     public static final String ADD_USERS_FRAGMENT = "ADD_USERS_FRAGMENT";
     public static final String ADD_GROUP_FRAGMENT = "ADD_GROUP_FRAGMENT";
-    private static final int INTENT_REQUEST_IMAGE = 1;
     @Inject
     SettingsAddGroupViewModel mAddGroupViewModel;
     @Inject
@@ -101,7 +101,7 @@ public class SettingsAddGroupActivity extends BaseActivity<SettingsGroupUsersCom
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case INTENT_REQUEST_IMAGE:
+            case Navigator.INTENT_REQUEST_IMAGE_PICK:
                 if (resultCode == Activity.RESULT_OK) {
                     final Uri imageUri = data.getData();
                     AvatarUtils.saveImageLocal(this, imageUri, new AvatarUtils.AvatarLocalSaveListener() {
