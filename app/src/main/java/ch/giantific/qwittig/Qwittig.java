@@ -84,7 +84,7 @@ public class Qwittig extends Application {
 
         // initialise Parse
         final String serverUrl = BuildConfig.DEBUG
-                ? "http://10.0.2.2/api/data/"
+                ? "http://10.0.2.2:3000/api/data/"
                 : "https://qwittig.com/api/data/";
         Parse.initialize(new Parse.Configuration.Builder(this)
                 .applicationId("yLuL6xJB2dUD2hjfh4W2EcZizcPsJZKDgDzbrPji")
