@@ -35,7 +35,7 @@ import ch.giantific.qwittig.utils.WorkerUtils;
 
 /**
  * Provides an abstract base class that sets up the {@link Toolbar} and commonly used methods.
- * <p>
+ * <p/>
  * Subclass of {@link AppCompatActivity}.
  */
 public abstract class BaseActivity<T> extends AppCompatActivity
@@ -154,7 +154,9 @@ public abstract class BaseActivity<T> extends AppCompatActivity
     @Override
     public void onWorkerError(@NonNull String workerTag) {
         for (ViewModel viewModel : mViewModels) {
-            viewModel.onWorkerError(workerTag);
+            if (viewModel != null) {
+                viewModel.onWorkerError(workerTag);
+            }
         }
     }
 }

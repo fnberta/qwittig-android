@@ -33,6 +33,7 @@ import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Item;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
+import ch.giantific.qwittig.domain.repositories.RemoteConfigRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
@@ -66,11 +67,12 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<PurchaseAddE
     private static final String STATE_NOTE = "STATE_NOTE";
     private static final String STATE_RECEIPT_IMAGE_PATH = "STATE_RECEIPT_IMAGE_PATH";
     private static final String STATE_FETCHING_RATES = "STATE_FETCHING_RATES";
+    protected final RemoteConfigRepository mConfigRepo;
     protected final PurchaseRepository mPurchaseRepo;
     protected final Group mCurrentGroup;
     protected final Navigator mNavigator;
     private final NumberFormat mExchangeRateFormatter;
-    private final List<String> mSupportedCurrencies = Arrays.asList(MoneyUtils.SUPPORTED_CURRENCIES);
+    private final List<String> mSupportedCurrencies;
     private final DateFormat mDateFormatter;
     protected String mCurrency;
     protected String mReceiptImagePath;
@@ -88,12 +90,15 @@ public class PurchaseAddViewModelImpl extends ListViewModelBaseImpl<PurchaseAddE
                                     @NonNull Navigator navigator,
                                     @NonNull RxBus<Object> eventBus,
                                     @NonNull UserRepository userRepository,
+                                    @NonNull RemoteConfigRepository configRepo,
                                     @NonNull PurchaseRepository purchaseRepo) {
         super(savedState, eventBus, userRepository);
 
         mNavigator = navigator;
+        mConfigRepo = configRepo;
         mPurchaseRepo = purchaseRepo;
         mCurrentGroup = mCurrentIdentity.getGroup();
+        mSupportedCurrencies = Arrays.asList(mConfigRepo.getSupportedCurrencyCodes());
 
         if (savedState != null) {
             mItems = savedState.getParcelableArrayList(STATE_ROW_ITEMS);

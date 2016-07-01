@@ -37,7 +37,6 @@ import rx.functions.Func1;
 public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implements PurchaseAddOcrViewModel {
 
     private static final String STATE_OCR_VALUES_SET = "STATE_OCR_VALUES_SET";
-    private final RemoteConfigRepository mConfigRepo;
     private String mOcrDataId;
     private OcrData mOcrData;
     private boolean mOcrValuesSet;
@@ -46,11 +45,9 @@ public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implem
                                        @NonNull Navigator navigator,
                                        @NonNull RxBus<Object> eventBus,
                                        @NonNull UserRepository userRepository,
-                                       @NonNull PurchaseRepository purchaseRepo,
-                                       @NonNull RemoteConfigRepository configRepo) {
-        super(savedState, navigator, eventBus, userRepository, purchaseRepo);
-
-        mConfigRepo = configRepo;
+                                       @NonNull RemoteConfigRepository configRepo,
+                                       @NonNull PurchaseRepository purchaseRepo) {
+        super(savedState, navigator, eventBus, userRepository, configRepo, purchaseRepo);
 
         if (savedState != null) {
             mOcrValuesSet = savedState.getBoolean(STATE_OCR_VALUES_SET, false);

@@ -44,16 +44,21 @@ public class FirebaseRemoteConfigRepository implements RemoteConfigRepository {
     }
 
     @Override
+    public String[] getSupportedCurrencyCodes() {
+        return mRemoteConfig.getString(SUPPORTED_CURRENCIES).split(",");
+    }
+
+    @Override
     public List<Currency> getSupportedCurrencies() {
-        final String[] countryCodes = mRemoteConfig.getString(SUPPORTED_CURRENCIES).split(",");
-        final List<String> displayNames = new ArrayList<>(countryCodes.length);
-        for (String countryCode : countryCodes) {
-            displayNames.add(getCurrencyDisplayName(countryCode));
+        final String[] currencyCodes = getSupportedCurrencyCodes();
+        final List<String> displayNames = new ArrayList<>(currencyCodes.length);
+        for (String currencyCode : currencyCodes) {
+            displayNames.add(getCurrencyDisplayName(currencyCode));
         }
 
-        final List<Currency> currencies = new ArrayList<>(countryCodes.length);
-        for (int i = 0; i < countryCodes.length; i++) {
-            currencies.add(new Currency(displayNames.get(i), countryCodes[i]));
+        final List<Currency> currencies = new ArrayList<>(currencyCodes.length);
+        for (int i = 0; i < currencyCodes.length; i++) {
+            currencies.add(new Currency(displayNames.get(i), currencyCodes[i]));
         }
 
         return currencies;

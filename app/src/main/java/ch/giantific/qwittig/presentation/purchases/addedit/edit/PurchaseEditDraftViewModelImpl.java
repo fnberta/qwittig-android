@@ -12,6 +12,7 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
+import ch.giantific.qwittig.domain.repositories.RemoteConfigRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
@@ -30,9 +31,10 @@ public class PurchaseEditDraftViewModelImpl extends PurchaseEditViewModelImpl
                                           @NonNull Navigator navigator,
                                           @NonNull RxBus<Object> eventBus,
                                           @NonNull UserRepository userRepository,
+                                          @NonNull RemoteConfigRepository configRepo,
                                           @NonNull PurchaseRepository purchaseRepo,
                                           @NonNull String editPurchaseId) {
-        super(savedState, navigator, eventBus, userRepository, purchaseRepo, editPurchaseId);
+        super(savedState, navigator, eventBus, userRepository, configRepo, purchaseRepo, editPurchaseId);
     }
 
     @Override

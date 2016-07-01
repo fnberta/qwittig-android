@@ -15,11 +15,11 @@ import java.util.Objects;
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.domain.models.Group;
+import ch.giantific.qwittig.domain.repositories.RemoteConfigRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.Currency;
-import ch.giantific.qwittig.utils.MoneyUtils;
 
 /**
  * Created by fabio on 13.05.16.
@@ -31,6 +31,7 @@ public class LoginFirstGroupViewModelImpl extends ViewModelBaseImpl<LoginFirstGr
     private static final String STATE_GROUP_NAME = "STATE_GROUP_NAME";
     private static final String STATE_GROUP_CURRENCY = "STATE_GROUP_CURRENCY";
     private final Navigator mNavigator;
+    private final RemoteConfigRepository mConfigRepo;
     private final List<Currency> mCurrencies;
     private boolean mValidate;
     private String mGroupName;
@@ -39,11 +40,13 @@ public class LoginFirstGroupViewModelImpl extends ViewModelBaseImpl<LoginFirstGr
     public LoginFirstGroupViewModelImpl(@Nullable Bundle savedState,
                                         @NonNull Navigator navigator,
                                         @NonNull RxBus<Object> eventBus,
-                                        @NonNull UserRepository userRepository) {
+                                        @NonNull UserRepository userRepository,
+                                        @NonNull RemoteConfigRepository configRepository) {
         super(savedState, eventBus, userRepository);
 
         mNavigator = navigator;
-        mCurrencies = MoneyUtils.getSupportedCurrencies();
+        mConfigRepo = configRepository;
+        mCurrencies = mConfigRepo.getSupportedCurrencies();
 
         if (savedState != null) {
             mValidate = savedState.getBoolean(STATE_VALIDATE);

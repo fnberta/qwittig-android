@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.di.scopes.PerActivity;
+import ch.giantific.qwittig.domain.repositories.RemoteConfigRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
@@ -33,7 +34,8 @@ public class LoginFirstGroupViewModelModule extends BaseViewModelModule {
     @Provides
     LoginFirstGroupViewModel providesLoginFirstGroupViewModel(@NonNull Navigator navigator,
                                                               @NonNull RxBus<Object> eventBus,
-                                                              @NonNull UserRepository userRepository) {
-        return new LoginFirstGroupViewModelImpl(mSavedState, navigator, eventBus, userRepository);
+                                                              @NonNull UserRepository userRepository,
+                                                              @NonNull RemoteConfigRepository configRepository) {
+        return new LoginFirstGroupViewModelImpl(mSavedState, navigator, eventBus, userRepository, configRepository);
     }
 }

@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.di.scopes.PerActivity;
+import ch.giantific.qwittig.domain.repositories.RemoteConfigRepository;
 import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.SettingsAddGroupViewModel;
@@ -31,7 +32,8 @@ public class SettingsAddGroupViewModelModule extends BaseViewModelModule {
     @PerActivity
     @Provides
     SettingsAddGroupViewModel providesSettingsAddGroupViewModel(@NonNull RxBus<Object> eventBus,
-                                                                @NonNull UserRepository userRepository) {
-        return new SettingsAddGroupViewModelImpl(mSavedState, eventBus, userRepository);
+                                                                @NonNull UserRepository userRepository,
+                                                                @NonNull RemoteConfigRepository configRepository) {
+        return new SettingsAddGroupViewModelImpl(mSavedState, eventBus, userRepository, configRepository);
     }
 }

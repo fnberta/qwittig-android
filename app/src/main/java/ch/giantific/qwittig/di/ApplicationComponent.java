@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 import javax.inject.Singleton;
 
@@ -40,4 +41,6 @@ public interface ApplicationComponent {
     GcmNetworkManager getGcmNetworkManager();
 
     RxBus<Object> getEventBus();
+
+    FirebaseRemoteConfig getFirebaseRemoteConfig();
 }

@@ -4,9 +4,6 @@
 
 package ch.giantific.qwittig.domain.repositories;
 
-import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
-
 import java.util.List;
 
 import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.Currency;
@@ -22,6 +19,8 @@ public interface RemoteConfigRepository extends BaseRepository {
     void fetchAndActivate();
 
     boolean isShowOcrRating();
+
+    String[] getSupportedCurrencyCodes();
 
     /**
      * Returns the currently supported currencies as
