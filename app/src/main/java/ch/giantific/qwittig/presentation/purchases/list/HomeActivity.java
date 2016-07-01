@@ -26,12 +26,7 @@ import android.view.View;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
-import com.google.android.gms.appinvite.AppInvite;
-import com.google.android.gms.appinvite.AppInviteInvitationResult;
-import com.google.android.gms.appinvite.AppInviteReferral;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 
 import org.json.JSONObject;
 
@@ -212,33 +207,33 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
                 : 0);
     }
 
-    private void setupGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        Timber.w("GoogleApiClient onConnectionFailed: %s", connectionResult);
-                    }
-                })
-                .addApi(AppInvite.API)
-                .build();
-    }
-
-    private void checkForInvitation() {
-        AppInvite.AppInviteApi.getInvitation(mGoogleApiClient, this, false)
-                .setResultCallback(new ResultCallback<AppInviteInvitationResult>() {
-                    @Override
-                    public void onResult(@NonNull AppInviteInvitationResult result) {
-                        if (result.getStatus().isSuccess()) {
-                            final Intent intent = result.getInvitationIntent();
-                            final String deepLink = AppInviteReferral.getDeepLink(intent);
-                            Timber.d("deepLink %s", deepLink);
-                        } else {
-                            Timber.i("getInvitation: no deep link found.");
-                        }
-                    }
-                });
-    }
+//    private void setupGoogleApiClient() {
+//        mGoogleApiClient = new GoogleApiClient.Builder(this)
+//                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
+//                    @Override
+//                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+//                        Timber.w("GoogleApiClient onConnectionFailed: %s", connectionResult);
+//                    }
+//                })
+//                .addApi(AppInvite.API)
+//                .build();
+//    }
+//
+//    private void checkForInvitation() {
+//        AppInvite.AppInviteApi.getInvitation(mGoogleApiClient, this, false)
+//                .setResultCallback(new ResultCallback<AppInviteInvitationResult>() {
+//                    @Override
+//                    public void onResult(@NonNull AppInviteInvitationResult result) {
+//                        if (result.getStatus().isSuccess()) {
+//                            final Intent intent = result.getInvitationIntent();
+//                            final String deepLink = AppInviteReferral.getDeepLink(intent);
+//                            Timber.d("deepLink %s", deepLink);
+//                        } else {
+//                            Timber.i("getInvitation: no deep link found.");
+//                        }
+//                    }
+//                });
+//    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
