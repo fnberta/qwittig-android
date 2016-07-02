@@ -76,6 +76,10 @@ import timber.log.Timber;
  */
 public class ParseUserRepository extends ParseBaseRepository implements UserRepository {
 
+    public static final String BRANCH_IS_INVITE = "+clicked_branch_link";
+    public static final String BRANCH_IDENTITY_ID = "identityId";
+    public static final String BRANCH_GROUP_NAME = "groupName";
+    public static final String BRANCH_INVITER_NICKNAME = "inviterNickname";
     private static final String VERIFY_GOOGLE_LOGIN = "loginWithGoogle";
     private static final String ADD_IDENTITY_TO_USER = "addIdentityToUser";
     private static final String PARAM_ID_TOKEN = "idToken";
@@ -808,9 +812,9 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                 .setCanonicalIdentifier("invitation")
                 .setTitle(String.format("You are invited to join %s", groupName))
                 .setContentDescription("Click on this link to open or install Qwittig and accept the invitation.")
-                .addContentMetadata("identityId", identity.getObjectId())
-                .addContentMetadata("groupName", groupName)
-                .addContentMetadata("inviterNickname", inviterNickname);
+                .addContentMetadata(BRANCH_IDENTITY_ID, identity.getObjectId())
+                .addContentMetadata(BRANCH_GROUP_NAME, groupName)
+                .addContentMetadata(BRANCH_INVITER_NICKNAME, inviterNickname);
 
         final LinkProperties properties = new LinkProperties()
                 .setFeature("invitation")

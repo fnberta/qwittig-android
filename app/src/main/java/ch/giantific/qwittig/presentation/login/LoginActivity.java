@@ -17,16 +17,12 @@ import android.support.v7.preference.PreferenceManager;
 import android.transition.Slide;
 import android.view.Gravity;
 
-import com.google.android.gms.appinvite.AppInvite;
-import com.google.android.gms.appinvite.AppInviteInvitationResult;
-import com.google.android.gms.appinvite.AppInviteReferral;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 import com.parse.ParseFacebookUtils;
 
 import org.json.JSONObject;
@@ -38,6 +34,7 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.repositories.ParseUserRepository;
 import ch.giantific.qwittig.domain.models.User;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.Navigator;
@@ -51,7 +48,6 @@ import ch.giantific.qwittig.presentation.login.di.LoginEmailViewModelModule;
 import ch.giantific.qwittig.presentation.login.di.LoginFirstGroupViewModelModule;
 import ch.giantific.qwittig.presentation.login.di.LoginInvitationViewModelModule;
 import ch.giantific.qwittig.presentation.login.di.LoginProfileViewModelModule;
-import ch.giantific.qwittig.presentation.purchases.list.HomeActivity;
 import ch.giantific.qwittig.utils.AvatarUtils;
 import ch.giantific.qwittig.utils.Utils;
 import io.branch.referral.Branch;
@@ -154,21 +150,21 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
                 .build();
     }
 
-    private void checkForInvitation() {
-        AppInvite.AppInviteApi.getInvitation(mGoogleApiClient, this, false)
-                .setResultCallback(new ResultCallback<AppInviteInvitationResult>() {
-                    @Override
-                    public void onResult(@NonNull AppInviteInvitationResult result) {
-                        if (result.getStatus().isSuccess()) {
-                            final Intent intent = result.getInvitationIntent();
-                            final String deepLink = AppInviteReferral.getDeepLink(intent);
-                            Timber.d("deepLink %s", deepLink);
-                        } else {
-                            Timber.i("getInvitation: no deep link found.");
-                        }
-                    }
-                });
-    }
+//    private void checkForInvitation() {
+//        AppInvite.AppInviteApi.getInvitation(mGoogleApiClient, this, false)
+//                .setResultCallback(new ResultCallback<AppInviteInvitationResult>() {
+//                    @Override
+//                    public void onResult(@NonNull AppInviteInvitationResult result) {
+//                        if (result.getStatus().isSuccess()) {
+//                            final Intent intent = result.getInvitationIntent();
+//                            final String deepLink = AppInviteReferral.getDeepLink(intent);
+//                            Timber.d("deepLink %s", deepLink);
+//                        } else {
+//                            Timber.i("getInvitation: no deep link found.");
+//                        }
+//                    }
+//                });
+//    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -227,11 +223,11 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
                     return;
                 }
 
-                final boolean openedWithInvite = referringParams.optBoolean(HomeActivity.BRANCH_IS_INVITE, false);
+                final boolean openedWithInvite = referringParams.optBoolean(ParseUserRepository.BRANCH_IS_INVITE, false);
                 if (openedWithInvite) {
-                    final String identityId = referringParams.optString(HomeActivity.BRANCH_IDENTITY_ID);
-                    final String groupName = referringParams.optString(HomeActivity.BRANCH_GROUP_NAME);
-                    final String inviterNickname = referringParams.optString(HomeActivity.BRANCH_INVITER_NICKNAME);
+                    final String identityId = referringParams.optString(ParseUserRepository.BRANCH_IDENTITY_ID);
+                    final String groupName = referringParams.optString(ParseUserRepository.BRANCH_GROUP_NAME);
+                    final String inviterNickname = referringParams.optString(ParseUserRepository.BRANCH_INVITER_NICKNAME);
 
                     mAccountsViewModel.setInvitationIdentityId(identityId);
                     showInvitationFragment(groupName, inviterNickname);

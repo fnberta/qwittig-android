@@ -83,9 +83,12 @@ public class Qwittig extends Application {
         ParseObject.registerSubclass(TaskHistoryEvent.class);
 
         // initialise Parse
+        final String serverUrl = BuildConfig.DEBUG
+                ? "http://10.0.2.2:3000/api/data/"
+                : "https://qwittig.com/api/data/";
         Parse.initialize(new Parse.Configuration.Builder(this)
                 .applicationId("yLuL6xJB2dUD2hjfh4W2EcZizcPsJZKDgDzbrPji")
-                .server("https://qwittig.com/api/data/")
+                .server(serverUrl)
                 .clientKey(null)
                 .enableLocalDataStore()
                 .build()

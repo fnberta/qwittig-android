@@ -207,12 +207,6 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceSubcomponent> 
         mCompsUnpaidViewModel.setCompensationRemindStream(single, compensationId, workerTag);
     }
 
-    @Override
-    public void onWorkerError(@NonNull String workerTag) {
-        mCompsPaidViewModel.onWorkerError(workerTag);
-        mCompsUnpaidViewModel.onWorkerError(workerTag);
-    }
-
     @IntDef({FragmentTabs.NONE, FragmentTabs.COMPS_UNPAID, FragmentTabs.COMPS_PAID})
     @Retention(RetentionPolicy.SOURCE)
     public @interface FragmentTabs {

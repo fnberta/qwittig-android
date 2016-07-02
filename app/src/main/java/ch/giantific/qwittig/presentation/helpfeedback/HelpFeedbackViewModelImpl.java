@@ -30,8 +30,8 @@ public class HelpFeedbackViewModelImpl extends ViewModelBaseImpl<HelpFeedbackVie
             new HelpFeedbackItem(R.string.help_tutorial, R.drawable.ic_school_black_24dp),
             new HelpFeedbackHeader(R.string.header_feedback),
             new HelpFeedbackItem(R.string.help_feedback, R.drawable.ic_bug_report_black_24dp),
-            new HelpFeedbackItem(R.string.help_rate, R.drawable.ic_star_rate_black_24dp),
-            new HelpFeedbackItem(R.string.help_recommend, R.drawable.ic_favorite_black_24dp)
+            new HelpFeedbackItem(R.string.help_rate, R.drawable.ic_star_rate_black_24dp)
+//            new HelpFeedbackItem(R.string.help_recommend, R.drawable.ic_favorite_black_24dp)
     };
     private static final String EMAIL_SUPPORT = "support@qwittig.ch";
     private static final String EMAIL_FEEDBACK = "feedback@qwittig.ch";
