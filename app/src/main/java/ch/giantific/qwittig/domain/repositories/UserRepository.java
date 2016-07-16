@@ -262,13 +262,13 @@ public interface UserRepository extends BaseRepository {
     Observable<Identity> saveCurrentUserIdentitiesWithAvatar(@Nullable String newNickname,
                                                              @NonNull String localAvatarPath);
 
-    boolean uploadIdentities(@NonNull Context context, @NonNull List<Identity> identities);
+    boolean uploadIdentities(@NonNull List<Identity> identities);
 
     Single<Identity> saveIdentityWithAvatar(@NonNull Identity identity,
                                             @Nullable String newNickname,
                                             @NonNull String localAvatarPath);
 
-    boolean uploadIdentityId(@NonNull Context context, @NonNull String identityId);
+    boolean uploadIdentityId(@NonNull String identityId);
 
     Single<Identity> removePendingIdentity(@NonNull Identity identity);
 }

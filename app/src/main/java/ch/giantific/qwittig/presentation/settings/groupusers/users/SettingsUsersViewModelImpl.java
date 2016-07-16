@@ -42,7 +42,7 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
     private final Navigator mNavigator;
     private String mNickname;
     private boolean mValidate;
-    private int mAvatarIdentityPos;
+    private String mAvatarIdentityId;
 
     public SettingsUsersViewModelImpl(@Nullable Bundle savedState,
                                       @NonNull Navigator navigator,
@@ -56,7 +56,7 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
             mItems = new ArrayList<>();
             mNickname = savedState.getString(STATE_NICKNAME, "");
             mValidate = savedState.getBoolean(STATE_VALIDATE, false);
-            mAvatarIdentityPos = savedState.getInt(STATE_AVATAR_IDENTITY_ID);
+            mAvatarIdentityId = savedState.getString(STATE_AVATAR_IDENTITY_ID);
         }
     }
 
@@ -66,8 +66,8 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
 
         outState.putString(STATE_NICKNAME, mNickname);
         outState.putBoolean(STATE_VALIDATE, mValidate);
-        if (mAvatarIdentityPos > 0) {
-            outState.putInt(STATE_AVATAR_IDENTITY_ID, mAvatarIdentityPos);
+        if (!TextUtils.isEmpty(mAvatarIdentityId)) {
+            outState.putString(STATE_AVATAR_IDENTITY_ID, mAvatarIdentityId);
         }
     }
 
@@ -173,27 +173,33 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
 
     @Override
     public void onEditAvatarClick(int position) {
-        mAvatarIdentityPos = position;
+        final SettingsUsersUserRowItemModel userItem = getItemAtPosition(position);
+        mAvatarIdentityId = userItem.getIdentity().getObjectId();
         mNavigator.startImagePicker();
     }
 
     @Override
     public void onNewAvatarTaken(@NonNull String avatarPath) {
-        final SettingsUsersUserRowItemModel userItem = getItemAtPosition(mAvatarIdentityPos);
-        final Identity identity = userItem.getIdentity();
-        getSubscriptions().add(mUserRepo.saveIdentityWithAvatar(identity, null, avatarPath)
-                .subscribe(new SingleSubscriber<Identity>() {
-                    @Override
-                    public void onSuccess(Identity value) {
-                        mListInteraction.notifyItemChanged(mAvatarIdentityPos);
-                    }
+        for (int i = 0, itemsSize = mItems.size(); i < itemsSize; i++) {
+            final SettingsUsersUserRowItemModel itemModel = mItems.get(i);
+            final Identity identity = itemModel.getIdentity();
+            if (Objects.equals(identity.getObjectId(), mAvatarIdentityId)) {
+                final int pos = i;
+                getSubscriptions().add(mUserRepo.saveIdentityWithAvatar(identity, null, avatarPath)
+                        .subscribe(new SingleSubscriber<Identity>() {
+                            @Override
+                            public void onSuccess(Identity value) {
+                                mListInteraction.notifyItemChanged(pos);
+                            }
 
-                    @Override
-                    public void onError(Throwable error) {
-                        mView.showMessage(R.string.toast_error_profile);
-                    }
-                })
-        );
+                            @Override
+                            public void onError(Throwable error) {
+                                mView.showMessage(R.string.toast_error_profile);
+                            }
+                        })
+                );
+            }
+        }
     }
 
     @Override
