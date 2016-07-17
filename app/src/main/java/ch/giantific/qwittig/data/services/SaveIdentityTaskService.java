@@ -76,12 +76,12 @@ public class SaveIdentityTaskService extends GcmTaskService {
             }
 
             final List<Identity> identities = currentUser.getIdentities();
-            return mUserRepo.uploadIdentities(this, identities)
+            return mUserRepo.uploadIdentities(identities)
                     ? GcmNetworkManager.RESULT_SUCCESS
                     : GcmNetworkManager.RESULT_RESCHEDULE;
         }
 
-        return mUserRepo.uploadIdentityId(this, identityId)
+        return mUserRepo.uploadIdentityId(identityId)
                 ? GcmNetworkManager.RESULT_SUCCESS
                 : GcmNetworkManager.RESULT_RESCHEDULE;
     }

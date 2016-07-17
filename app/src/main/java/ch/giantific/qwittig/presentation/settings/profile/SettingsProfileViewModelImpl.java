@@ -358,7 +358,9 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
         }
 
         mCurrentUser.setUsername(mEmail);
-        mCurrentUser.setPassword(mPassword);
+        if (!TextUtils.isEmpty(mPassword)) {
+            mCurrentUser.setPassword(mPassword);
+        }
 
         final List<Identity> identities = mCurrentUser.getIdentities();
         final boolean emptyAvatar = TextUtils.isEmpty(mAvatar);

@@ -227,6 +227,19 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
                                 .flatMap(new Func1<Identity, Single<User>>() {
                                     @Override
                                     public Single<User> call(Identity identity) {
+                                        if (TextUtils.isEmpty(identity.getNickname())) {
+                                            final String email = user.getUsername();
+                                            final String nickname = email.substring(0, email.indexOf("@"));
+                                            identity.setNickname(nickname);
+                                            return save(user);
+                                        }
+
+                                        return Single.just(user);
+                                    }
+                                })
+                                .flatMap(new Func1<User, Single<User>>() {
+                                    @Override
+                                    public Single<User> call(User user) {
                                         return setupInstallation(user);
                                     }
                                 });
@@ -980,9 +993,10 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
     }
 
     @Override
-    public boolean uploadIdentities(@NonNull Context context, @NonNull List<Identity> identities) {
+    public boolean uploadIdentities(@NonNull List<Identity> identities) {
         final String localAvatarPath = identities.get(0).getAvatarLocal();
-        final ParseFile avatar = new ParseFile(new File(localAvatarPath));
+        final String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("jpg");
+        final ParseFile avatar = new ParseFile(new File(localAvatarPath), mimeType);
         try {
             avatar.save();
         } catch (ParseException e) {
@@ -1029,7 +1043,14 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
             identity.setNickname(newNickname);
         }
         identity.setAvatarLocal(localAvatarPath);
-        return pin(identity, Identity.PIN_LABEL_TEMP)
+        return unpin(identity, Identity.PIN_LABEL)
+                .flatMap(new Func1<Identity, Single<? extends Identity>>() {
+                    @Override
+                    public Single<? extends Identity> call(Identity identity) {
+                        return pin(identity, Identity.PIN_LABEL_TEMP);
+
+                    }
+                })
                 .doOnSuccess(new Action1<Identity>() {
                     @Override
                     public void call(Identity identity) {
@@ -1039,7 +1060,7 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
     }
 
     @Override
-    public boolean uploadIdentityId(@NonNull Context context, @NonNull String identityId) {
+    public boolean uploadIdentityId(@NonNull String identityId) {
         final Identity identity = (Identity) ParseObject.createWithoutData(Identity.CLASS, identityId);
         try {
             identity.fetchFromLocalDatastore();
@@ -1048,7 +1069,8 @@ public class ParseUserRepository extends ParseBaseRepository implements UserRepo
         }
 
         final String localAvatarPath = identity.getAvatarLocal();
-        final ParseFile avatar = new ParseFile(new File(localAvatarPath));
+        final String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("jpg");
+        final ParseFile avatar = new ParseFile(new File(localAvatarPath), mimeType);
         try {
             avatar.save();
         } catch (ParseException e) {
