@@ -8,14 +8,14 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.AdapterView;
 
-import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModel;
+import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
 import ch.giantific.qwittig.presentation.tasks.list.itemmodels.TasksItem;
 import ch.giantific.qwittig.presentation.tasks.list.itemmodels.TasksItemModel;
 
 /**
  * Defines an observable view model for the task list screen.
  */
-public interface TasksViewModel extends OnlineListViewModel<TasksItemModel, TasksViewModel.ViewListener>,
+public interface TasksViewModel extends ListViewModel<TasksItemModel, TasksViewModel.ViewListener>,
         TaskRemindWorkerListener {
 
     void onTaskRowClick(@NonNull TasksItem itemModel);
@@ -31,9 +31,7 @@ public interface TasksViewModel extends OnlineListViewModel<TasksItemModel, Task
     /**
      * Defines the interaction with the attached view.
      */
-    interface ViewListener extends OnlineListViewModel.ViewListener {
-        void startUpdateTasksService();
-
+    interface ViewListener extends ListViewModel.ViewListener {
         void loadRemindUserWorker(@NonNull String taskId);
     }
 }

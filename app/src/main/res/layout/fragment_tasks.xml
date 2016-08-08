@@ -25,7 +25,7 @@
 
         <include
             android:id="@+id/srl_rv"
-            layout="@layout/include_srl_recycler_view"
+            layout="@layout/include_rv_progress"
             app:viewModel="@{viewModel}"
             />
 

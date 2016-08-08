@@ -130,6 +130,7 @@ public class StringResSpinnerAdapter extends BaseAdapter implements ThemedSpinne
      * its id.
      */
     private static class TypeRow {
+
         private final TextView mTextViewTitle;
 
         /**

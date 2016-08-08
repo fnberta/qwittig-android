@@ -30,20 +30,19 @@ import java.util.List;
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.databinding.ActivityPurchaseAddEditBinding;
 import ch.giantific.qwittig.presentation.camera.CameraActivity;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.TransitionListenerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.TabsAdapter;
-import ch.giantific.qwittig.presentation.common.fragments.DatePickerDialogFragment;
-import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
+import ch.giantific.qwittig.presentation.common.fragments.dialogs.DatePickerDialogFragment;
+import ch.giantific.qwittig.presentation.common.fragments.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddFragment;
 import ch.giantific.qwittig.utils.CameraUtils;
 import ch.giantific.qwittig.utils.DateUtils;
-import ch.giantific.qwittig.utils.MessageAction;
+import ch.giantific.qwittig.presentation.common.MessageAction;
 import ch.giantific.qwittig.utils.Utils;
 import rx.Single;
 
@@ -60,27 +59,11 @@ public abstract class BasePurchaseAddEditActivity<T> extends BaseActivity<T> imp
         ExchangeRateDialogFragment.DialogInteractionListener,
         DiscardPurchaseDialogFragment.DialogInteractionListener {
 
-    public static final String INTENT_OCR_PURCHASE_ID = "INTENT_OCR_PURCHASE_ID";
     private static final int PERMISSIONS_REQUEST_CAPTURE_IMAGES = 12;
     protected PurchaseAddEditViewModel mAddEditPurchaseViewModel;
     @Inject
     protected Navigator mNavigator;
     private ActivityPurchaseAddEditBinding mBinding;
-
-    @Override
-    protected void handleLocalBroadcast(Intent intent, int dataType) {
-        super.handleLocalBroadcast(intent, dataType);
-
-        switch (dataType) {
-            case LocalBroadcast.DataType.OCR_PURCHASE_UPDATED: {
-                final boolean successful = intent.getBooleanExtra(LocalBroadcast.INTENT_EXTRA_SUCCESSFUL, false);
-                if (successful) {
-                    mAddEditPurchaseViewModel.loadData();
-                }
-                break;
-            }
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -11,13 +11,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.view.ActionMode;
@@ -26,9 +26,12 @@ import android.view.View;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.google.android.gms.appinvite.AppInvite;
+import com.google.android.gms.appinvite.AppInviteInvitationResult;
+import com.google.android.gms.appinvite.AppInviteReferral;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-
-import org.json.JSONObject;
+import com.google.android.gms.common.api.ResultCallback;
 
 import java.io.File;
 import java.util.Arrays;
@@ -39,12 +42,11 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.LocalBroadcast;
-import ch.giantific.qwittig.data.repositories.ParseUserRepository;
+import ch.giantific.qwittig.data.repositories.GroupRepository;
+import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.databinding.ActivityHomeBinding;
-import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.models.Purchase;
-import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.presentation.camera.CameraActivity;
+import ch.giantific.qwittig.presentation.common.MessageAction;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
@@ -58,14 +60,9 @@ import ch.giantific.qwittig.presentation.purchases.list.di.PurchasesListViewMode
 import ch.giantific.qwittig.presentation.purchases.list.drafts.DraftsFragment;
 import ch.giantific.qwittig.presentation.purchases.list.drafts.DraftsViewModel;
 import ch.giantific.qwittig.presentation.purchases.list.purchases.PurchasesFragment;
-import ch.giantific.qwittig.presentation.purchases.list.purchases.PurchasesQueryMoreWorkerListener;
 import ch.giantific.qwittig.presentation.purchases.list.purchases.PurchasesViewModel;
 import ch.giantific.qwittig.utils.CameraUtils;
-import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.utils.Utils;
-import io.branch.referral.Branch;
-import io.branch.referral.BranchError;
-import rx.Observable;
 import rx.Single;
 import timber.log.Timber;
 
@@ -82,13 +79,10 @@ import timber.log.Timber;
 public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implements
         DraftsFragment.ActivityListener,
         HomeViewModel.ViewListener,
-        PurchasesQueryMoreWorkerListener,
         JoinGroupDialogFragment.DialogInteractionListener,
-        JoinGroupWorkerListener,
         OcrWorkerListener {
 
     private static final String STATE_DRAFTS_FRAGMENT = "STATE_DRAFTS_FRAGMENT";
-    private static final String STATE_PURCHASES_FRAGMENT = "STATE_PURCHASES_FRAGMENT";
     private static final int PERMISSIONS_REQUEST_CAPTURE_IMAGES = 1;
     @Inject
     HomeViewModel mHomeViewModel;
@@ -96,9 +90,8 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
     PurchasesViewModel mPurchasesViewModel;
     @Inject
     DraftsViewModel mDraftsViewModel;
-    private ActivityHomeBinding mBinding;
-    private PurchasesFragment mPurchasesFragment;
     private DraftsFragment mDraftsFragment;
+    private ActivityHomeBinding mBinding;
     private ProgressDialog mProgressDialog;
     private HomeTabsAdapter mTabsAdapter;
     private GoogleApiClient mGoogleApiClient;
@@ -108,11 +101,6 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
         super.handleLocalBroadcast(intent, dataType);
 
         switch (dataType) {
-            case LocalBroadcast.DataType.PURCHASES_UPDATED: {
-                final boolean successful = intent.getBooleanExtra(LocalBroadcast.INTENT_EXTRA_SUCCESSFUL, false);
-                mPurchasesViewModel.onDataUpdated(successful);
-                break;
-            }
             case LocalBroadcast.DataType.OCR_PURCHASE_UPDATED: {
                 final boolean successful = intent.getBooleanExtra(LocalBroadcast.INTENT_EXTRA_SUCCESSFUL, false);
                 if (successful) {
@@ -141,25 +129,19 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
             actionBar.setTitle(R.string.title_activity_home);
         }
 
-//        setupGoogleApiClient();
+        setupGoogleApiClient();
 
         if (mUserLoggedIn) {
-            mHomeViewModel.updateDraftsAvailable();
-
-            if (savedInstanceState == null) {
-                addFragments();
+            if (mHomeViewModel.isDraftsAvailable()) {
+                final DraftsFragment draftsFragment = savedInstanceState != null
+                        ? (DraftsFragment) getSupportFragmentManager().getFragment(savedInstanceState, STATE_DRAFTS_FRAGMENT)
+                        : new DraftsFragment();
+                setupTabs(draftsFragment);
             } else {
-                final FragmentManager fragmentManager = getSupportFragmentManager();
-                mPurchasesFragment = (PurchasesFragment)
-                        fragmentManager.getFragment(savedInstanceState, STATE_PURCHASES_FRAGMENT);
-                if (mHomeViewModel.isDraftsAvailable()) {
-                    mDraftsFragment = (DraftsFragment)
-                            fragmentManager.getFragment(savedInstanceState, STATE_DRAFTS_FRAGMENT);
-                }
-                setupTabs();
+                setupTabs(null);
             }
 
-//            checkForInvitation();
+            checkForInvitation();
         }
     }
 
@@ -178,20 +160,21 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
         return Arrays.asList(new ViewModel[]{mHomeViewModel, mPurchasesViewModel, mDraftsViewModel});
     }
 
-    private void addFragments() {
-        mPurchasesFragment = new PurchasesFragment();
-        if (mHomeViewModel.isDraftsAvailable()) {
-            mDraftsFragment = new DraftsFragment();
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        if (mUserLoggedIn && mHomeViewModel.isDraftsAvailable()) {
+            getSupportFragmentManager().putFragment(outState, STATE_DRAFTS_FRAGMENT, mDraftsFragment);
         }
-        setupTabs();
     }
 
-    private void setupTabs() {
+    private void setupTabs(@Nullable DraftsFragment draftsFragment) {
         mTabsAdapter = new HomeTabsAdapter(getSupportFragmentManager());
-        mTabsAdapter.addInitialFragment(mPurchasesFragment, getString(R.string.tab_purchases));
-        if (mHomeViewModel.isDraftsAvailable()) {
-            toggleToolbarScrollFlags(true);
-            mTabsAdapter.addInitialFragment(mDraftsFragment, getString(R.string.title_activity_purchase_drafts));
+        mTabsAdapter.addInitialFragment(new PurchasesFragment(), getString(R.string.tab_purchases));
+        if (draftsFragment != null) {
+            mDraftsFragment = draftsFragment;
+            mTabsAdapter.addInitialFragment(mDraftsFragment, getString(R.string.tab_drafts));
         }
         mBinding.viewpager.setAdapter(mTabsAdapter);
         mBinding.tabs.setupWithViewPager(mBinding.viewpager);
@@ -207,45 +190,38 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
                 : 0);
     }
 
-//    private void setupGoogleApiClient() {
-//        mGoogleApiClient = new GoogleApiClient.Builder(this)
-//                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
-//                    @Override
-//                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-//                        Timber.w("GoogleApiClient onConnectionFailed: %s", connectionResult);
-//                    }
-//                })
-//                .addApi(AppInvite.API)
-//                .build();
-//    }
-//
-//    private void checkForInvitation() {
-//        AppInvite.AppInviteApi.getInvitation(mGoogleApiClient, this, false)
-//                .setResultCallback(new ResultCallback<AppInviteInvitationResult>() {
-//                    @Override
-//                    public void onResult(@NonNull AppInviteInvitationResult result) {
-//                        if (result.getStatus().isSuccess()) {
-//                            final Intent intent = result.getInvitationIntent();
-//                            final String deepLink = AppInviteReferral.getDeepLink(intent);
-//                            Timber.d("deepLink %s", deepLink);
-//                        } else {
-//                            Timber.i("getInvitation: no deep link found.");
-//                        }
-//                    }
-//                });
-//    }
+    private void setupGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+                        Timber.w("GoogleApiClient onConnectionFailed: %s", connectionResult);
+                    }
+                })
+                .addApi(AppInvite.API)
+                .build();
+    }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
+    private void checkForInvitation() {
+        AppInvite.AppInviteApi.getInvitation(mGoogleApiClient, this, false)
+                .setResultCallback(new ResultCallback<AppInviteInvitationResult>() {
+                    @Override
+                    public void onResult(@NonNull AppInviteInvitationResult result) {
+                        if (result.getStatus().isSuccess()) {
+                            final Intent intent = result.getInvitationIntent();
+                            final String deepLink = AppInviteReferral.getDeepLink(intent);
+                            Timber.d("deepLink %s", deepLink);
+                            final Uri uri = Uri.parse(deepLink);
 
-        if (mUserLoggedIn) {
-            final FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.putFragment(outState, STATE_PURCHASES_FRAGMENT, mPurchasesFragment);
-            if (mHomeViewModel.isDraftsAvailable()) {
-                fragmentManager.putFragment(outState, STATE_DRAFTS_FRAGMENT, mDraftsFragment);
-            }
-        }
+                            final String identityId = uri.getQueryParameter(GroupRepository.INVITATION_IDENTITY);
+                            final String groupName = uri.getQueryParameter(GroupRepository.INVITATION_GROUP);
+                            final String inviterNickname = uri.getQueryParameter(GroupRepository.INVITATION_INVITER);
+                            mHomeViewModel.handleInvitation(identityId, groupName, inviterNickname);
+                        } else {
+                            Timber.i("getInvitation: no deep link found.");
+                        }
+                    }
+                });
     }
 
     @Override
@@ -253,39 +229,6 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
         super.onStart();
 
         mHomeViewModel.onViewVisible();
-        if (mUserLoggedIn) {
-            checkBranchLink();
-        }
-    }
-
-    private void checkBranchLink() {
-        final Branch branch = Branch.getInstance();
-        branch.initSession(new Branch.BranchReferralInitListener() {
-            @Override
-            public void onInitFinished(JSONObject referringParams, BranchError error) {
-                if (error != null) {
-                    Timber.e("deep link error, %s", error);
-                    return;
-                }
-
-                final boolean openedWithInvite = referringParams.optBoolean(ParseUserRepository.BRANCH_IS_INVITE, false);
-                if (openedWithInvite) {
-                    final String identityId = referringParams.optString(ParseUserRepository.BRANCH_IDENTITY_ID);
-                    final String groupName = referringParams.optString(ParseUserRepository.BRANCH_GROUP_NAME);
-                    final String inviterNickname = referringParams.optString(ParseUserRepository.BRANCH_INVITER_NICKNAME);
-                    mHomeViewModel.handleInvitation(identityId, groupName, inviterNickname);
-                }
-            }
-        }, getIntent().getData(), this);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        if (mUserLoggedIn) {
-            mHomeViewModel.checkDrafts();
-        }
     }
 
     @Override
@@ -315,7 +258,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
                         showMessage(R.string.toast_changes_saved_as_draft);
                         break;
                     case PurchaseAddEditViewModel.PurchaseResult.PURCHASE_DRAFT_DELETED:
-                        showMessage(R.string.toast_draft_deleted);
+                        mDraftsViewModel.onDraftDeleted(data.getStringExtra(Navigator.INTENT_OBJECT_ID));
                         break;
                     case PurchaseAddEditViewModel.PurchaseResult.PURCHASE_DISCARDED:
                         showMessage(R.string.toast_purchase_discarded);
@@ -325,7 +268,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
             case Navigator.INTENT_REQUEST_PURCHASE_DETAILS:
                 switch (resultCode) {
                     case PurchaseDetailsResult.PURCHASE_DELETED:
-                        showMessage(R.string.toast_purchase_deleted);
+                        mPurchasesViewModel.onPurchaseDeleted(data.getStringExtra(Navigator.INTENT_OBJECT_ID));
                         break;
                 }
                 break;
@@ -397,8 +340,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
     public void setupScreenAfterLogin() {
         super.setupScreenAfterLogin();
 
-        mHomeViewModel.afterLogin();
-        addFragments();
+        setupTabs(mHomeViewModel.isDraftsAvailable() ? new DraftsFragment() : null);
     }
 
     @Override
@@ -409,18 +351,21 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
     @Override
     public void toggleDraftTab(boolean draftsAvailable) {
         if (draftsAvailable) {
-            toggleToolbarScrollFlags(true);
-            mDraftsFragment = new DraftsFragment();
-            mTabsAdapter.addFragment(mDraftsFragment, getString(R.string.title_activity_purchase_drafts));
-        } else {
+            if (mDraftsFragment == null) {
+                toggleToolbarScrollFlags(true);
+                mDraftsFragment = new DraftsFragment();
+                mTabsAdapter.addFragment(mDraftsFragment, getString(R.string.tab_drafts));
+            }
+        } else if (mDraftsFragment != null) {
             toggleToolbarScrollFlags(false);
             mTabsAdapter.removeFragment(mDraftsFragment);
+            mDraftsFragment = null;
         }
     }
 
     @Override
-    public void onJoinInvitedGroupSelected() {
-        mHomeViewModel.onJoinInvitedGroupSelected();
+    public void onJoinInvitedGroupSelected(@NonNull String identityId) {
+        mHomeViewModel.onJoinInvitedGroupSelected(identityId);
     }
 
     @Override
@@ -429,18 +374,10 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
     }
 
     @Override
-    public void setJoinGroupStream(@NonNull Single<Identity> single, @NonNull String workerTag) {
-        mHomeViewModel.setJoinGroupStream(single, workerTag);
-    }
-
-    @Override
-    public void showGroupJoinDialog(@NonNull String groupName, @NonNull String inviterNickname) {
-        JoinGroupDialogFragment.display(getSupportFragmentManager(), groupName, inviterNickname);
-    }
-
-    @Override
-    public void loadJoinGroupWorker(@NonNull String identityId) {
-        JoinGroupWorker.attach(getSupportFragmentManager(), identityId);
+    public void showGroupJoinDialog(@NonNull String identityId,
+                                    @NonNull String groupName,
+                                    @NonNull String inviterNickname) {
+        JoinGroupDialogFragment.display(getSupportFragmentManager(), identityId, groupName, inviterNickname);
     }
 
     @Override
@@ -486,12 +423,6 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
     @Override
     public void setOcrStream(@NonNull Single<Void> single, @NonNull String workerTag) {
         mHomeViewModel.setOcrStream(single, workerTag);
-    }
-
-    @Override
-    public void setPurchasesQueryMoreStream(@NonNull Observable<Purchase> observable,
-                                            @NonNull String workerTag) {
-        mPurchasesViewModel.setPurchasesQueryMoreStream(observable, workerTag);
     }
 }
 

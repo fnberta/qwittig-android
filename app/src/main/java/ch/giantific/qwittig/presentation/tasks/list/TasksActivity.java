@@ -22,7 +22,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.databinding.ActivityTasksBinding;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
@@ -51,16 +50,6 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksListSubcomponent>
     TasksViewModel mTasksViewModel;
     private ActivityTasksBinding mBinding;
     private TaskDeadline[] mDeadlines;
-
-    @Override
-    protected void handleLocalBroadcast(Intent intent, int dataType) {
-        super.handleLocalBroadcast(intent, dataType);
-
-        if (dataType == LocalBroadcast.DataType.TASKS_UPDATED) {
-            final boolean successful = intent.getBooleanExtra(LocalBroadcast.INTENT_EXTRA_SUCCESSFUL, false);
-            mTasksViewModel.onDataUpdated(successful);
-        }
-    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

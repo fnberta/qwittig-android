@@ -17,15 +17,8 @@ import android.support.v7.preference.PreferenceManager;
 import android.transition.Slide;
 import android.view.Gravity;
 
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.parse.ParseFacebookUtils;
-
-import org.json.JSONObject;
+import com.google.android.gms.appinvite.AppInvite;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,13 +27,14 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.repositories.ParseUserRepository;
-import ch.giantific.qwittig.domain.models.User;
+import ch.giantific.qwittig.data.repositories.GroupRepository;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
+import ch.giantific.qwittig.presentation.common.GoogleApiClientDelegate;
 import ch.giantific.qwittig.presentation.common.Navigator;
+import ch.giantific.qwittig.presentation.common.di.GoogleApiClientDelegateModule;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
-import ch.giantific.qwittig.presentation.common.fragments.EmailPromptDialogFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.common.workers.EmailUserWorkerListener;
 import ch.giantific.qwittig.presentation.login.di.DaggerLoginComponent;
 import ch.giantific.qwittig.presentation.login.di.LoginAccountsViewModelModule;
 import ch.giantific.qwittig.presentation.login.di.LoginComponent;
@@ -50,14 +44,11 @@ import ch.giantific.qwittig.presentation.login.di.LoginInvitationViewModelModule
 import ch.giantific.qwittig.presentation.login.di.LoginProfileViewModelModule;
 import ch.giantific.qwittig.utils.AvatarUtils;
 import ch.giantific.qwittig.utils.Utils;
-import io.branch.referral.Branch;
-import io.branch.referral.BranchError;
 import rx.Single;
-import timber.log.Timber;
 
 /**
  * Hosts fragments that handle the user login and account creation processes.
- * <p/>
+ * <p>
  * Subclass of {@link BaseActivity}.
  */
 public class LoginActivity extends BaseActivity<LoginComponent> implements
@@ -66,20 +57,20 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
         LoginInvitationFragment.ActivityListener,
         LoginProfileFragment.ActivityListener,
         EmailPromptDialogFragment.DialogInteractionListener,
-        LoginWorkerListener {
+        LoginWorkerListener, EmailUserWorkerListener,
+        GoogleApiClientDelegate.GoogleLoginCallback, GoogleApiClientDelegate.GoogleInvitationCallback {
 
     private static final String FRAGMENT_LOGIN = "FRAGMENT_LOGIN";
-    private static final String GOOGLE_SERVER_ID = "1032365366003-7rsbsnqc5b0504mmdt6j1n61m39lgllp.apps.googleusercontent.com";
     private static final String PREF_FIRST_RUN = "PREF_FIRST_RUN";
-    private static final int RC_SIGN_IN = 9001;
     @Inject
     Navigator mNavigator;
+    @Inject
+    GoogleApiClientDelegate mGoogleApiDelegate;
     private LoginAccountsViewModel mAccountsViewModel;
     private LoginEmailViewModel mEmailViewModel;
     private LoginInvitationViewModel mInvitationViewModel;
     private LoginProfileViewModel mProfileViewModel;
     private LoginFirstGroupViewModel mFirstGroupViewModel;
-    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,8 +82,8 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
             addAccountsFragment();
         }
 
-        setupGoogleApiClient();
-//        checkForInvitation();
+        mGoogleApiDelegate.createGoogleApiClient(AppInvite.API);
+        mGoogleApiDelegate.checkForInvitation();
     }
 
     @Override
@@ -100,6 +91,7 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
         mComponent = DaggerLoginComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
+                .googleApiClientDelegateModule(new GoogleApiClientDelegateModule(this, this, this))
                 .loginAccountsViewModelModule(new LoginAccountsViewModelModule(savedInstanceState))
                 .loginEmailViewModelModule(new LoginEmailViewModelModule(savedInstanceState))
                 .loginInvitationViewModelModule(new LoginInvitationViewModelModule(savedInstanceState))
@@ -131,111 +123,6 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
                 .commit();
     }
 
-    private void setupGoogleApiClient() {
-        final GoogleSignInOptions gso =
-                new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestIdToken(GOOGLE_SERVER_ID)
-                        .requestEmail()
-                        .build();
-
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        Timber.w("GoogleApiClient onConnectionFailed: %s", connectionResult);
-                    }
-                })
-//                .addApi(AppInvite.API)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-    }
-
-//    private void checkForInvitation() {
-//        AppInvite.AppInviteApi.getInvitation(mGoogleApiClient, this, false)
-//                .setResultCallback(new ResultCallback<AppInviteInvitationResult>() {
-//                    @Override
-//                    public void onResult(@NonNull AppInviteInvitationResult result) {
-//                        if (result.getStatus().isSuccess()) {
-//                            final Intent intent = result.getInvitationIntent();
-//                            final String deepLink = AppInviteReferral.getDeepLink(intent);
-//                            Timber.d("deepLink %s", deepLink);
-//                        } else {
-//                            Timber.i("getInvitation: no deep link found.");
-//                        }
-//                    }
-//                });
-//    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
-
-        switch (requestCode) {
-            case RC_SIGN_IN:
-                final GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-                handleGoogleSignInResult(result);
-                break;
-            case Navigator.INTENT_REQUEST_IMAGE_PICK:
-                if (resultCode == Activity.RESULT_OK) {
-                    final Uri imageUri = data.getData();
-                    AvatarUtils.saveImageLocal(this, imageUri, new AvatarUtils.AvatarLocalSaveListener() {
-                        @Override
-                        public void onAvatarSaved(@NonNull String path) {
-                            mProfileViewModel.onNewAvatarTaken(path);
-                        }
-                    });
-                }
-        }
-    }
-
-    private void handleGoogleSignInResult(@NonNull GoogleSignInResult result) {
-        if (result.isSuccess()) {
-            final GoogleSignInAccount acct = result.getSignInAccount();
-            if (acct != null) {
-                final String idToken = acct.getIdToken();
-                final String displayName = acct.getDisplayName();
-                final String email = acct.getEmail();
-                final Uri photoUrl = acct.getPhotoUrl();
-                mAccountsViewModel.onGoogleSignedIn(idToken, displayName, photoUrl);
-            } else {
-                mAccountsViewModel.onGoogleLoginFailed();
-            }
-        } else {
-            mAccountsViewModel.onGoogleLoginFailed();
-        }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        checkBranchLink();
-    }
-
-    private void checkBranchLink() {
-        final Branch branch = Branch.getInstance();
-        branch.initSession(new Branch.BranchReferralInitListener() {
-            @Override
-            public void onInitFinished(JSONObject referringParams, BranchError error) {
-                if (error != null) {
-                    Timber.e("deep link error, %s", error);
-                    return;
-                }
-
-                final boolean openedWithInvite = referringParams.optBoolean(ParseUserRepository.BRANCH_IS_INVITE, false);
-                if (openedWithInvite) {
-                    final String identityId = referringParams.optString(ParseUserRepository.BRANCH_IDENTITY_ID);
-                    final String groupName = referringParams.optString(ParseUserRepository.BRANCH_GROUP_NAME);
-                    final String inviterNickname = referringParams.optString(ParseUserRepository.BRANCH_INVITER_NICKNAME);
-
-                    mAccountsViewModel.setInvitationIdentityId(identityId);
-                    showInvitationFragment(groupName, inviterNickname);
-                }
-            }
-        }, getIntent().getData(), this);
-    }
-
     private void showInvitationFragment(@NonNull String groupName,
                                         @NonNull String inviterNickname) {
         mInvitationViewModel = mComponent.getLoginInvitationViewModel();
@@ -251,9 +138,46 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mGoogleApiDelegate.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case Navigator.INTENT_REQUEST_IMAGE_PICK:
+                if (resultCode == Activity.RESULT_OK) {
+                    final Uri imageUri = data.getData();
+                    AvatarUtils.saveImageLocal(this, imageUri, new AvatarUtils.AvatarLocalSaveListener() {
+                        @Override
+                        public void onAvatarSaved(@NonNull String path) {
+                            mProfileViewModel.onNewAvatarTaken(path);
+                        }
+                    });
+                }
+        }
+    }
+
+    @Override
+    public void onDeepLinkFound(@NonNull Uri deepLink) {
+        final String identityId = deepLink.getQueryParameter(GroupRepository.INVITATION_IDENTITY);
+        final String groupName = deepLink.getQueryParameter(GroupRepository.INVITATION_GROUP);
+        final String inviterNickname = deepLink.getQueryParameter(GroupRepository.INVITATION_INVITER);
+        mAccountsViewModel.setInvitationIdentityId(identityId);
+        showInvitationFragment(groupName, inviterNickname);
+    }
+
+    @Override
+    public void onGoogleLoginSuccessful(@NonNull String idToken) {
+        mAccountsViewModel.onGoogleLoginSuccessful(idToken);
+    }
+
+    @Override
+    public void onGoogleLoginFailed() {
+        mAccountsViewModel.onGoogleLoginFailed();
+    }
+
+    @Override
     public void loginWithGoogle() {
-        final Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        mGoogleApiDelegate.loginWithGoogle();
     }
 
     @Override
@@ -320,12 +244,10 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
     }
 
     @Override
-    public void setUserLoginStream(@NonNull Single<User> single, @NonNull String workerTag,
+    public void setUserLoginStream(@NonNull Single<FirebaseUser> single, @NonNull String workerTag,
                                    @LoginWorker.Type int type) {
         switch (type) {
             case LoginWorker.Type.LOGIN_EMAIL:
-                // fall through
-            case LoginWorker.Type.RESET_PASSWORD:
                 // fall through
             case LoginWorker.Type.SIGN_UP_EMAIL:
                 mEmailViewModel.setUserLoginStream(single, workerTag, type);
@@ -336,6 +258,11 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
                 mAccountsViewModel.setUserLoginStream(single, workerTag, type);
                 break;
         }
+    }
+
+    @Override
+    public void setEmailUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
+        mEmailViewModel.setEmailUserStream(single, workerTag);
     }
 
     @Override

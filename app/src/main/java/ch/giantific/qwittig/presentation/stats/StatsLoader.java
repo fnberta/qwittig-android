@@ -7,12 +7,9 @@ package ch.giantific.qwittig.presentation.stats;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
-import ch.giantific.qwittig.domain.models.Group;
-import ch.giantific.qwittig.domain.models.User;
-import ch.giantific.qwittig.domain.repositories.StatsRepository;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.data.repositories.StatsRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.BaseRxLoader;
 import ch.giantific.qwittig.presentation.stats.StatsViewModel.StatsType;
 import ch.giantific.qwittig.presentation.stats.models.Stats;
@@ -46,21 +43,21 @@ public class StatsLoader extends BaseRxLoader<Stats> {
     @Nullable
     @Override
     protected Observable<Stats> getObservable() {
-        final User currentUser = mUserRepo.getCurrentUser();
-        if (TextUtils.isEmpty(mYear) || currentUser == null) {
-            return null;
-        }
-
-        final Group currentGroup = currentUser.getCurrentIdentity().getGroup();
-        final String groupId = currentGroup.getObjectId();
-        switch (mStatsType) {
-            case StatsType.SPENDING:
-                return mStatsRepo.calcStatsSpending(groupId, mYear, mMonthNumber).toObservable();
-            case StatsType.STORES:
-                return mStatsRepo.calcStatsStores(groupId, mYear, mMonthNumber).toObservable();
-            case StatsType.CURRENCIES:
-                return mStatsRepo.calcStatsCurrencies(groupId, mYear, mMonthNumber).toObservable();
-        }
+//        final User currentUser = mUserRepo.getCurrentUser();
+//        if (TextUtils.isEmpty(mYear) || currentUser == null) {
+//            return null;
+//        }
+//
+//        final Group currentGroup = currentUser.getCurrentIdentity().getGroup();
+//        final String groupId = currentGroup.getObjectId();
+//        switch (mStatsType) {
+//            case StatsType.SPENDING:
+//                return mStatsRepo.calcStatsSpending(groupId, mYear, mMonthNumber).toObservable();
+//            case StatsType.STORES:
+//                return mStatsRepo.calcStatsStores(groupId, mYear, mMonthNumber).toObservable();
+//            case StatsType.CURRENCIES:
+//                return mStatsRepo.calcStatsCurrencies(groupId, mYear, mMonthNumber).toObservable();
+//        }
 
         return null;
     }

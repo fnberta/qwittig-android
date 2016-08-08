@@ -69,7 +69,7 @@
                         android:imeOptions="actionDone"
                         android:inputType="text|textCapSentences"
                         android:onTextChanged="@{viewModel::onTitleChanged}"
-                        android:text="@{viewModel.taskTitle}"
+                        android:text="@{viewModel.title}"
                         />
 
                 </android.support.design.widget.TextInputLayout>

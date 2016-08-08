@@ -54,7 +54,6 @@ public class DraftsFragment extends BaseRecyclerViewFragment<HomeSubcomponent, D
 
         mViewModel.attachView(this);
         mViewModel.setListInteraction(mRecyclerAdapter);
-        mViewModel.onReadyForSelectionMode();
         mBinding.setViewModel(mViewModel);
     }
 

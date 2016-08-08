@@ -16,9 +16,9 @@ import android.widget.AdapterView;
 public interface PurchaseAddEditTotalItemModel extends Observable {
 
     @Bindable
-    String getTotalPrice();
+    String getTotal();
 
-    void setTotalPrice(double totalPrice);
+    void setTotal(double totalPrice);
 
     @Bindable
     String getMyShare();

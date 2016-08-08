@@ -8,4 +8,12 @@
         <key>supported_currencies</key>
         <value>CHF,EUR,USD,GBP</value>
     </entry>
+    <entry>
+        <key>default_group_name</key>
+        <value>Meine WG</value>
+    </entry>
+    <entry>
+        <key>default_group_currency</key>
+        <value>CHF</value>
+    </entry>
 </defaultsMap>

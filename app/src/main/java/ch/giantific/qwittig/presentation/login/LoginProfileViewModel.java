@@ -30,6 +30,8 @@ public interface LoginProfileViewModel extends ViewModel<LoginProfileViewModel.V
     @Bindable
     String getNickname();
 
+    void setNickname(@NonNull String nickname);
+
     @Bindable
     boolean isNicknameComplete();
 

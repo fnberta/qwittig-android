@@ -12,7 +12,8 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 
 import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.stats.StatsViewModel;
 import ch.giantific.qwittig.presentation.stats.pie.StatsPieViewModel;
 import ch.giantific.qwittig.presentation.stats.pie.StatsPieViewModelBaseImpl;
@@ -24,9 +25,10 @@ public class StatsCurrenciesViewModelImpl extends StatsPieViewModelBaseImpl<Stat
         implements StatsCurrenciesViewModel {
 
     public StatsCurrenciesViewModelImpl(@Nullable Bundle savedState,
+                                        @NonNull Navigator navigator,
                                         @NonNull RxBus<Object> eventBus,
                                         @NonNull UserRepository userRepository) {
-        super(savedState, eventBus, userRepository);
+        super(savedState, navigator, eventBus, userRepository);
     }
 
     @Override

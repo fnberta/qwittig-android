@@ -13,7 +13,7 @@
 
         <variable
             name="itemModel"
-            type="ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidCompItemModel"
+            type="ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidItemModel"
             />
     </data>
 
@@ -21,7 +21,7 @@
         android:id="@id/iv_avatar"
         android:contentDescription="@string/user_avatar"
         android:scaleType="centerCrop"
-        app:avatarSquare="@{itemModel.compUserAvatar}"
+        app:avatarSquare="@{itemModel.avatar}"
         app:fallback="@{@drawable/ic_account_box_black_80dp}"
         tools:src="@drawable/ic_account_box_black_80dp"
         />

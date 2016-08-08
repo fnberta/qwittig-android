@@ -9,16 +9,17 @@ import android.support.annotation.NonNull;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
-import ch.giantific.qwittig.presentation.common.viewmodels.DataRefreshViewModel;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 
 /**
  * Defines a view model for header that show a user's current identity balance.
  */
-public interface BalanceHeaderViewModel extends ViewModel<BalanceHeaderViewModel.ViewListener>, DataRefreshViewModel {
+public interface BalanceHeaderViewModel extends ViewModel<BalanceHeaderViewModel.ViewListener> {
 
     @Bindable
-    String getCurrentIdentityBalance();
+    String getBalance();
+
+    void setBalance(@NonNull BigFraction balance);
 
     interface ViewListener extends ViewModel.ViewListener {
 

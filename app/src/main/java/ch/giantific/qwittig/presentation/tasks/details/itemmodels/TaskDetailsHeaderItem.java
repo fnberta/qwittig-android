@@ -5,6 +5,7 @@
 package ch.giantific.qwittig.presentation.tasks.details.itemmodels;
 
 import android.annotation.SuppressLint;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 
 import ch.giantific.qwittig.presentation.common.itemmodels.HeaderItemModelBaseImpl;
@@ -20,7 +21,17 @@ public class TaskDetailsHeaderItem extends HeaderItemModelBaseImpl implements Ta
     }
 
     @Override
-    public int getType() {
+    public int getViewType() {
         return Type.HEADER;
+    }
+
+    @Override
+    public int getEventType() {
+        return 0;
+    }
+
+    @Override
+    public String getId() {
+        return null;
     }
 }

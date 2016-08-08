@@ -16,9 +16,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
  */
 public interface HomeViewModel extends ViewModel<HomeViewModel.ViewListener>,
         JoinGroupDialogFragment.DialogInteractionListener,
-        JoinGroupWorkerListener, OcrWorkerListener {
-
-    void afterLogin();
+        OcrWorkerListener {
 
     @Bindable
     boolean isOcrProcessing();
@@ -34,10 +32,6 @@ public interface HomeViewModel extends ViewModel<HomeViewModel.ViewListener>,
     boolean isDraftsAvailable();
 
     void setDraftsAvailable(boolean available);
-
-    void checkDrafts();
-
-    boolean updateDraftsAvailable();
 
     void handleInvitation(@NonNull String identityId, @NonNull String groupName,
                           @NonNull String inviterNickname);
@@ -58,15 +52,13 @@ public interface HomeViewModel extends ViewModel<HomeViewModel.ViewListener>,
      * Defines the interaction with the attached view.
      */
     interface ViewListener extends ViewModel.ViewListener {
-        void showGroupJoinDialog(@NonNull String groupName, @NonNull String inviterNickname);
-
-        void loadJoinGroupWorker(@NonNull String identityId);
+        void showGroupJoinDialog(@NonNull String identityId,
+                                 @NonNull String groupName,
+                                 @NonNull String inviterNickname);
 
         void showProgressDialog(@StringRes int message);
 
         void hideProgressDialog();
-
-        void startQueryAllService();
 
         void captureImage();
 

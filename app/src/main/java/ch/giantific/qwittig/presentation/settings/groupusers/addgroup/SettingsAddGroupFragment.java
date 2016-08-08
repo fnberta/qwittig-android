@@ -10,7 +10,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
 import android.transition.Slide;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -68,21 +67,6 @@ public class SettingsAddGroupFragment extends BaseFragment<SettingsGroupUsersCom
     @Override
     protected View getSnackbarView() {
         return mBinding.etSettingsGroupAddNewName;
-    }
-
-    @Override
-    public void showProgressDialog(@StringRes int message) {
-        mProgressDialog = ProgressDialog.show(getActivity(), null, getString(message), true, false);
-    }
-
-    @Override
-    public void hideProgressDialog() {
-        mProgressDialog.hide();
-    }
-
-    @Override
-    public void loadAddGroupWorker(@NonNull String name, @NonNull String currency) {
-        AddGroupWorker.attach(getFragmentManager(), name, currency);
     }
 
     @Override

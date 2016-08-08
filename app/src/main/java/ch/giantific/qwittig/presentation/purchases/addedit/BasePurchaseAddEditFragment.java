@@ -40,7 +40,6 @@ public abstract class BasePurchaseAddEditFragment<U, T extends PurchaseAddEditVi
         super.onActivityCreated(savedInstanceState);
 
         mViewModel.setListInteraction(mRecyclerAdapter);
-        mBinding.setViewModel(mViewModel);
         final ItemTouchHelper touchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
                 0, ItemTouchHelper.END) {
             @Override

@@ -28,10 +28,10 @@ import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditHeaderItem;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItem;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemIdentity;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemModel.Type;
-import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemUsers;
-import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemUsersUser;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemIdentities;
 
 
 /**
@@ -139,7 +139,7 @@ public class PurchaseAddEditRecyclerAdapter extends BaseRecyclerAdapter {
             case Type.USERS: {
                 final ItemUsersRow row = (ItemUsersRow) holder;
 
-                final PurchaseAddEditItemUsers itemUsersRow = (PurchaseAddEditItemUsers) itemModel;
+                final PurchaseAddEditItemIdentities itemUsersRow = (PurchaseAddEditItemIdentities) itemModel;
                 row.setUsers(itemUsersRow.getUsers());
                 break;
             }
@@ -177,7 +177,7 @@ public class PurchaseAddEditRecyclerAdapter extends BaseRecyclerAdapter {
     private static class ItemUsersRow extends BindingRow<RowPurchaseAddItemUsersBinding> {
 
         private final PurchaseAddEditItemUsersRecyclerAdapter mRecyclerAdapter;
-        private final List<PurchaseAddEditItemUsersUser> mUsers = new ArrayList<>();
+        private final List<PurchaseAddEditItemIdentity> mUsers = new ArrayList<>();
 
         public ItemUsersRow(@NonNull Context context,
                             @NonNull RowPurchaseAddItemUsersBinding binding,
@@ -191,7 +191,7 @@ public class PurchaseAddEditRecyclerAdapter extends BaseRecyclerAdapter {
             binding.rvPurchaseAddItemUsers.setAdapter(mRecyclerAdapter);
         }
 
-        public void setUsers(@NonNull PurchaseAddEditItemUsersUser[] users) {
+        public void setUsers(@NonNull PurchaseAddEditItemIdentity[] users) {
             mUsers.clear();
             mUsers.addAll(Arrays.asList(users));
             mRecyclerAdapter.notifyDataSetChanged();

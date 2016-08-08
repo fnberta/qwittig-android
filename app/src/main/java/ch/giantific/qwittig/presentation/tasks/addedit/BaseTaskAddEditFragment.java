@@ -16,17 +16,16 @@ import android.view.ViewGroup;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentTaskAddEditBinding;
-import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.presentation.common.ListDragInteraction;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.StringResSpinnerAdapter;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
-import ch.giantific.qwittig.presentation.common.fragments.DatePickerDialogFragment;
-import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
+import ch.giantific.qwittig.presentation.common.fragments.dialogs.DatePickerDialogFragment;
+import ch.giantific.qwittig.presentation.common.fragments.dialogs.DiscardChangesDialogFragment;
 
 /**
- * Provides an interface for the user to add a new {@link Task}. Allows the selection of the time
+ * Provides an interface for the user to add a new task. Allows the selection of the time
  * frame, the deadline and the users involved. The title of the task is set in the {@link Toolbar}
  * of the hosting {@link Activity}.
  * <p/>

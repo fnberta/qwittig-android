@@ -6,7 +6,6 @@ package ch.giantific.qwittig.presentation.settings.groupusers.addgroup;
 
 import android.databinding.Bindable;
 import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
 import android.view.View;
 import android.widget.AdapterView;
 
@@ -17,7 +16,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 /**
  * Defines an observable view model for the add new group settings screen.
  */
-public interface SettingsAddGroupViewModel extends ViewModel<SettingsAddGroupViewModel.ViewListener>, AddGroupWorkerListener {
+public interface SettingsAddGroupViewModel extends ViewModel<SettingsAddGroupViewModel.ViewListener> {
 
     @Bindable
     boolean isValidate();
@@ -39,12 +38,6 @@ public interface SettingsAddGroupViewModel extends ViewModel<SettingsAddGroupVie
      * Defines the interaction with the attached view.
      */
     interface ViewListener extends ViewModel.ViewListener {
-
-        void loadAddGroupWorker(@NonNull String name, @NonNull String currency);
-
-        void showProgressDialog(@StringRes int message);
-
-        void hideProgressDialog();
 
         void setScreenResult(@NonNull String name);
 

@@ -14,7 +14,6 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.SpinnerInteraction;
 
@@ -67,8 +66,7 @@ public class NavHeaderIdentitiesArrayAdapter extends ArrayAdapter<Identity> impl
             groupRow = (GroupRow) convertView.getTag();
         }
 
-        final Group group = getItem(position).getGroup();
-        groupRow.setGroup(group.getName());
+        groupRow.setGroup(getItem(position).getGroupName());
 
         return convertView;
     }

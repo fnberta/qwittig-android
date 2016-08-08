@@ -29,14 +29,16 @@ import android.view.MenuItem;
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.presentation.common.MessageAction;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
-import ch.giantific.qwittig.presentation.common.fragments.LeaveGroupDialogFragment;
+import ch.giantific.qwittig.presentation.common.fragments.dialogs.EmailReAuthenticateDialogFragment;
+import ch.giantific.qwittig.presentation.common.workers.EmailUserWorker;
+import ch.giantific.qwittig.presentation.common.workers.GoogleUserWorker;
 import ch.giantific.qwittig.presentation.settings.general.di.SettingsComponent;
 import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.SettingsAddGroupActivity;
 import ch.giantific.qwittig.presentation.settings.groupusers.users.SettingsUsersActivity;
 import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileActivity;
-import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.WorkerUtils;
 
@@ -63,7 +65,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
     SettingsViewModel mViewModel;
     @Inject
     SharedPreferences mSharedPrefs;
-    private BaseFragment.ActivityListener<SettingsComponent> mActivity;
+    private ActivityListener mActivity;
     private PreferenceCategory mCategoryCurrentGroup;
     private ListPreference mListPreferenceGroupCurrent;
     private EditTextPreference mEditTextPreferenceGroupName;
@@ -79,7 +81,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
         super.onAttach(context);
 
         try {
-            mActivity = (BaseFragment.ActivityListener<SettingsComponent>) context;
+            mActivity = (ActivityListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
                     + " must implement ActivityListener");
@@ -287,8 +289,19 @@ public class SettingsFragment extends PreferenceFragmentCompat
     }
 
     @Override
-    public void loadLogoutWorker(boolean deleteAccount) {
-        LogoutWorker.attach(getFragmentManager(), deleteAccount);
+    public void loadGoogleUserWorker() {
+        GoogleUserWorker.attachSignOut(getFragmentManager());
+    }
+
+    @Override
+    public void loadDeleteGoogleUserWorker(@NonNull String idToken) {
+        GoogleUserWorker.attachDelete(getFragmentManager(), idToken);
+    }
+
+    @Override
+    public void loadDeleteEmailUserWorker(@NonNull String currentEmail,
+                                          @NonNull String currentPassword) {
+        EmailUserWorker.attachDelete(getFragmentManager(), currentEmail, currentPassword);
     }
 
     @Override
@@ -314,8 +327,14 @@ public class SettingsFragment extends PreferenceFragmentCompat
     }
 
     @Override
-    public void setScreenResult(int result) {
-        getActivity().setResult(result);
+    public void reAuthenticateGoogle() {
+        mActivity.loginWithGoogle();
+    }
+
+    @Override
+    public void showEmailReAuthenticateDialog(@Nullable String email) {
+        EmailReAuthenticateDialogFragment.display(getFragmentManager(),
+                R.string.dialog_account_delete_message_email, email);
     }
 
     @Override
@@ -346,5 +365,9 @@ public class SettingsFragment extends PreferenceFragmentCompat
     @Override
     public void removeWorker(@NonNull String workerTag) {
         WorkerUtils.removeWorker(getFragmentManager(), workerTag);
+    }
+
+    public interface ActivityListener extends BaseFragment.ActivityListener<SettingsComponent> {
+        void loginWithGoogle();
     }
 }

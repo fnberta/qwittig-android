@@ -6,7 +6,7 @@ import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.about.itemmodels.AboutHeader;
 import ch.giantific.qwittig.presentation.about.itemmodels.AboutItem;
 import ch.giantific.qwittig.presentation.about.itemmodels.AboutItemModel;
@@ -31,14 +31,12 @@ public class AboutViewModelImpl extends ViewModelBaseImpl<AboutViewModel.ViewLis
     private static final String FACEBOOK_URL = "http://facebook.com/qwittig";
     private static final String TWITTER_URL = "http://twitter.com/qwittig";
     private static final String WEBSITE_URL = "http://www.qwittig.ch";
-    private final Navigator mNavigator;
 
     public AboutViewModelImpl(@Nullable Bundle savedState,
                               @NonNull Navigator navigator,
                               @NonNull RxBus<Object> eventBus,
                               @NonNull UserRepository userRepository) {
-        super(savedState, eventBus, userRepository);
-        mNavigator = navigator;
+        super(savedState, navigator, eventBus, userRepository);
     }
 
     @Override

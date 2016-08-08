@@ -9,8 +9,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.di.scopes.PerActivity;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.login.LoginProfileViewModel;

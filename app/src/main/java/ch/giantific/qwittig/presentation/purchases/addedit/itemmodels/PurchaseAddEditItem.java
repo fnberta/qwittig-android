@@ -40,14 +40,14 @@ public class PurchaseAddEditItem extends BaseObservable implements PurchaseAddEd
     private boolean mValidate;
     private String mName;
     private String mPrice;
-    private PurchaseAddEditItemUsersUser[] mUsers;
+    private PurchaseAddEditItemIdentity[] mUsers;
 
-    public PurchaseAddEditItem(@NonNull PurchaseAddEditItemUsersUser[] users) {
+    public PurchaseAddEditItem(@NonNull PurchaseAddEditItemIdentity[] users) {
         this("", "", users);
     }
 
     public PurchaseAddEditItem(@NonNull String name, @NonNull String price,
-                               @NonNull PurchaseAddEditItemUsersUser[] users) {
+                               @NonNull PurchaseAddEditItemIdentity[] users) {
         mName = name;
         mPrice = price;
         mUsers = users;
@@ -57,7 +57,7 @@ public class PurchaseAddEditItem extends BaseObservable implements PurchaseAddEd
         mValidate = in.readByte() != 0;
         mName = in.readString();
         mPrice = in.readString();
-        mUsers = in.createTypedArray(PurchaseAddEditItemUsersUser.CREATOR);
+        mUsers = in.createTypedArray(PurchaseAddEditItemIdentity.CREATOR);
     }
 
     public void setPriceChangedListener(@NonNull PriceChangedListener priceChangedListener) {
@@ -111,18 +111,18 @@ public class PurchaseAddEditItem extends BaseObservable implements PurchaseAddEd
     }
 
     @Bindable
-    public PurchaseAddEditItemUsersUser[] getUsers() {
+    public PurchaseAddEditItemIdentity[] getUsers() {
         return mUsers;
     }
 
-    public void setUsers(@NonNull PurchaseAddEditItemUsersUser[] users) {
+    public void setUsers(@NonNull PurchaseAddEditItemIdentity[] users) {
         mUsers = users;
     }
 
-    public void toggleUser(@NonNull PurchaseAddEditItemUsersUser userClicked) {
+    public void toggleUser(@NonNull PurchaseAddEditItemIdentity userClicked) {
         final boolean isSelected = userClicked.isSelected();
-        for (PurchaseAddEditItemUsersUser user : mUsers) {
-            if (Objects.equals(user.getObjectId(), userClicked.getObjectId())) {
+        for (PurchaseAddEditItemIdentity user : mUsers) {
+            if (Objects.equals(user.getIdentityId(), userClicked.getIdentityId())) {
                 user.setSelected(isSelected);
             }
         }
@@ -174,9 +174,9 @@ public class PurchaseAddEditItem extends BaseObservable implements PurchaseAddEd
 
     public List<String> getSelectedIdentitiesIds() {
         final List<String> userIds = new ArrayList<>();
-        for (PurchaseAddEditItemUsersUser user : mUsers) {
+        for (PurchaseAddEditItemIdentity user : mUsers) {
             if (user.isSelected()) {
-                userIds.add(user.getObjectId());
+                userIds.add(user.getIdentityId());
             }
         }
         return userIds;

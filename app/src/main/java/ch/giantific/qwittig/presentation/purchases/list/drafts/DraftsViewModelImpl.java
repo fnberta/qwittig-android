@@ -8,53 +8,71 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.google.firebase.auth.FirebaseUser;
+
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.data.bus.events.EventDraftDeleted;
+import ch.giantific.qwittig.data.repositories.PurchaseRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
+import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
-import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.domain.models.User;
+import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
+import ch.giantific.qwittig.presentation.common.ListInteraction;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
+import ch.giantific.qwittig.presentation.purchases.list.drafts.itemmodels.DraftsItemModel;
+import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Observable;
-import rx.SingleSubscriber;
 import rx.Subscriber;
 import rx.functions.Func1;
 
 /**
  * Provides an implementation of the {@link DraftsViewModel}.
  */
-public class DraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, DraftsViewModel.ViewListener>
+public class DraftsViewModelImpl extends ListViewModelBaseImpl<DraftsItemModel, DraftsViewModel.ViewListener>
         implements DraftsViewModel {
 
     private static final String STATE_DRAFTS_SELECTED = "STATE_DRAFTS_SELECTED";
     private static final String STATE_SELECTION_MODE = "STATE_SELECTION_MODE";
-    private final Navigator mNavigator;
     private final PurchaseRepository mPurchaseRepo;
     private final ArrayList<String> mDraftsSelected;
     private boolean mSelectionModeEnabled;
     private boolean mDeleteSelectedItems;
+    private NumberFormat mMoneyFormatter;
+    private String mCurrentGroupId;
 
     public DraftsViewModelImpl(@Nullable Bundle savedState,
                                @NonNull Navigator navigator,
                                @NonNull RxBus<Object> eventBus,
                                @NonNull UserRepository userRepository,
                                @NonNull PurchaseRepository purchaseRepo) {
-        super(savedState, eventBus, userRepository);
+        super(savedState, navigator, eventBus, userRepository);
 
-        mNavigator = navigator;
         mPurchaseRepo = purchaseRepo;
+
         if (savedState != null) {
-            mItems = new ArrayList<>();
             mDraftsSelected = savedState.getStringArrayList(STATE_DRAFTS_SELECTED);
             mSelectionModeEnabled = savedState.getBoolean(STATE_SELECTION_MODE, false);
         } else {
             mDraftsSelected = new ArrayList<>();
         }
+    }
+
+    @Override
+    protected Class<DraftsItemModel> getItemModelClass() {
+        return DraftsItemModel.class;
+    }
+
+    @Override
+    protected int compareItemModels(DraftsItemModel o1, DraftsItemModel o2) {
+        return o1.compareTo(o2);
     }
 
     @Override
@@ -66,62 +84,117 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, DraftsV
     }
 
     @Override
-    public void loadData() {
-        getSubscriptions().add(mUserRepo.fetchIdentityData(mCurrentIdentity)
-                .flatMapObservable(new Func1<Identity, Observable<Purchase>>() {
+    public void setListInteraction(@NonNull ListInteraction listInteraction) {
+        super.setListInteraction(listInteraction);
+
+        if (mSelectionModeEnabled) {
+            mView.startSelectionMode();
+        }
+    }
+
+    @Override
+    protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
+        super.onUserLoggedIn(currentUser);
+
+        getSubscriptions().add(mUserRepo.observeUser(currentUser.getUid())
+                .flatMap(new Func1<User, Observable<Identity>>() {
                     @Override
-                    public Observable<Purchase> call(Identity identity) {
-                        return mPurchaseRepo.getPurchases(identity, true);
+                    public Observable<Identity> call(User user) {
+                        return mUserRepo.getIdentity(user.getCurrentIdentity()).toObservable();
                     }
                 })
-                .subscribe(new Subscriber<Purchase>() {
+                .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override
-                    public void onStart() {
-                        super.onStart();
-                        mItems.clear();
-                    }
+                    public void onNext(Identity identity) {
+                        mMoneyFormatter = MoneyUtils.getMoneyFormatter(identity.getGroupCurrency(),
+                                false, true);
 
-                    @Override
-                    public void onCompleted() {
-                        setLoading(false);
-                        mListInteraction.notifyDataSetChanged();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        mView.showMessage(R.string.toast_error_drafts_load);
-                    }
-
-                    @Override
-                    public void onNext(Purchase purchase) {
-                        mItems.add(purchase);
+                        mInitialDataLoaded = false;
+                        final String identityId = identity.getId();
+                        final String groupId = identity.getGroup();
+                        if (!Objects.equals(mCurrentGroupId, groupId)) {
+                            mItems.clear();
+                        }
+                        mCurrentGroupId = groupId;
+                        addDataListener(identityId);
+                        loadInitialData(identityId);
                     }
                 })
         );
     }
 
-    @Override
-    public void onReadyForSelectionMode() {
-        if (!mSelectionModeEnabled) {
-            return;
-        }
+    private void addDataListener(@NonNull String identityId) {
+        setDataListenerSub(mPurchaseRepo.observePurchaseChildren(mCurrentGroupId, identityId, true)
+                .filter(new Func1<RxChildEvent<Purchase>, Boolean>() {
+                    @Override
+                    public Boolean call(RxChildEvent<Purchase> purchaseRxChildEvent) {
+                        return mInitialDataLoaded;
+                    }
+                })
+                .map(new Func1<RxChildEvent<Purchase>, DraftsItemModel>() {
+                    @Override
+                    public DraftsItemModel call(RxChildEvent<Purchase> event) {
+                        final Purchase draft = event.getValue();
+                        return getItemModels(event.getValue(), event.getEventType(),
+                                mDraftsSelected.contains(draft.getId()));
+                    }
+                })
+                .subscribe(this)
+        );
+    }
 
-        mView.startSelectionMode();
-        if (!mDraftsSelected.isEmpty()) {
-            // scroll to the first selected item
-            final String firstSelected = mDraftsSelected.get(0);
-            int firstPos = 0;
+    private void loadInitialData(@NonNull String identityId) {
+        setInitialDataSub(mPurchaseRepo.getPurchases(mCurrentGroupId, identityId, true)
+                .map(new Func1<Purchase, DraftsItemModel>() {
+                    @Override
+                    public DraftsItemModel call(Purchase draft) {
+                        return getItemModels(draft, -1, mDraftsSelected.contains(draft.getId()));
+                    }
+                })
+                .toList()
+                .subscribe(new Subscriber<List<DraftsItemModel>>() {
+                    @Override
+                    public void onCompleted() {
+                        mInitialDataLoaded = true;
+                        setLoading(false);
+                        scrollToFirstSelectedItem();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        onDataError(e);
+                    }
+
+                    @Override
+                    public void onNext(List<DraftsItemModel> draftsItemModels) {
+                        mItems.addAll(draftsItemModels);
+                    }
+                })
+        );
+    }
+
+    @NonNull
+    private DraftsItemModel getItemModels(@NonNull Purchase draft, int eventType, boolean isSelected) {
+        return new DraftsItemModel(eventType, draft, isSelected, mMoneyFormatter);
+    }
+
+    private void scrollToFirstSelectedItem() {
+        if (mSelectionModeEnabled) {
             for (int i = 0, size = mItems.size(); i < size; i++) {
-                final Purchase draft = mItems.get(i);
-                if (Objects.equals(firstSelected, draft.getTempId())) {
-                    firstPos = i;
+                final DraftsItemModel itemModel = mItems.get(i);
+                if (itemModel.isSelected()) {
+                    mListInteraction.scrollToPosition(i);
                     break;
                 }
             }
-
-            final int position = firstPos;
-            mListInteraction.scrollToPosition(position);
         }
+    }
+
+    @Override
+    protected void onDataError(@NonNull Throwable e) {
+        super.onDataError(e);
+
+        mView.showMessage(R.string.toast_error_drafts_load);
     }
 
     @Override
@@ -138,19 +211,25 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, DraftsV
     }
 
     @Override
-    public void onDraftRowClick(@NonNull Purchase draft) {
+    public void onDraftDeleted(@NonNull String draftId) {
+        mView.showMessage(R.string.toast_draft_deleted);
+        mItems.removeItemAt(getPositionForId(draftId));
+    }
+
+    @Override
+    public void onDraftRowClick(@NonNull DraftsItemModel itemModel) {
         if (!mSelectionModeEnabled) {
-            mNavigator.startPurchaseEdit(draft);
+            mNavigator.startPurchaseEdit(itemModel.getId(), true);
         } else {
-            toggleSelection(mItems.indexOf(draft));
+            toggleSelection(mItems.indexOf(itemModel));
             mView.setSelectionModeTitle(R.string.cab_title_selected, mDraftsSelected.size());
         }
     }
 
     @Override
-    public boolean onDraftRowLongClick(@NonNull Purchase draft) {
+    public boolean onDraftRowLongClick(@NonNull DraftsItemModel itemModel) {
         if (!mSelectionModeEnabled) {
-            toggleSelection(mItems.indexOf(draft));
+            toggleSelection(mItems.indexOf(itemModel));
             mView.startSelectionMode();
             mView.setSelectionModeTitle(R.string.cab_title_selected, mDraftsSelected.size());
             mSelectionModeEnabled = true;
@@ -161,12 +240,14 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, DraftsV
 
     @Override
     public void toggleSelection(int position) {
-        final Purchase draft = mItems.get(position);
-        final String draftId = draft.getTempId();
-        if (mDraftsSelected.contains(draftId)) {
-            mDraftsSelected.remove(draftId);
+        final DraftsItemModel itemModel = getItemAtPosition(position);
+        final String id = itemModel.getId();
+        if (itemModel.isSelected()) {
+            itemModel.setSelected(false);
+            mDraftsSelected.remove(id);
         } else {
-            mDraftsSelected.add(draftId);
+            itemModel.setSelected(true);
+            mDraftsSelected.add(id);
         }
 
         mListInteraction.notifyItemChanged(position);
@@ -175,12 +256,13 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, DraftsV
     @Override
     public void clearSelection() {
         for (int i = mItems.size() - 1; i >= 0; i--) {
-            final Purchase draft = mItems.get(i);
-            if (isSelected(draft)) {
-                mDraftsSelected.remove(draft.getTempId());
+            final DraftsItemModel itemModel = mItems.get(i);
+            if (itemModel.isSelected()) {
+                itemModel.setSelected(false);
+                mDraftsSelected.remove(itemModel.getId());
 
                 if (mDeleteSelectedItems) {
-                    deleteDraft(draft, i);
+                    deleteDraft(itemModel);
                 } else {
                     mListInteraction.notifyItemChanged(i);
                 }
@@ -188,26 +270,7 @@ public class DraftsViewModelImpl extends ListViewModelBaseImpl<Purchase, DraftsV
         }
     }
 
-    private void deleteDraft(@NonNull Purchase draft, final int pos) {
-        getSubscriptions().add(mPurchaseRepo.deleteDraft(draft)
-                .subscribe(new SingleSubscriber<Purchase>() {
-                    @Override
-                    public void onSuccess(Purchase value) {
-                        mItems.remove(pos);
-                        mListInteraction.notifyItemRemoved(pos);
-                        mEventBus.post(new EventDraftDeleted());
-                    }
-
-                    @Override
-                    public void onError(Throwable error) {
-                        mView.showMessage(R.string.toast_error_draft_delete);
-                    }
-                })
-        );
-    }
-
-    @Override
-    public boolean isSelected(@NonNull Purchase draft) {
-        return mDraftsSelected.contains(draft.getTempId());
+    private void deleteDraft(@NonNull DraftsItemModel itemModel) {
+        mPurchaseRepo.deletePurchase(itemModel.getId(), true);
     }
 }

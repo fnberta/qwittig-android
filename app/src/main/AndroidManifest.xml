@@ -5,18 +5,9 @@
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
-    <uses-permission android:name="com.android.vending.BILLING"/>
-
-    <permission
-        android:name="ch.giantific.qwittig.permission.C2D_MESSAGE"
-        android:protectionLevel="signature"/>
-
-    <uses-permission android:name="ch.giantific.qwittig.permission.C2D_MESSAGE"/>
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -31,8 +22,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".presentation.purchases.list.HomeActivity"
             android:label="@string/app_name"
@@ -43,33 +33,27 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
             <intent-filter>
-                <data
-                    android:host="open"
-                    android:scheme="qwittig"
-                    />
-
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-            </intent-filter>
-            <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW"/>
 
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                    android:host="qwittig.app.link"
-                    android:scheme="https"
-                    />
-
+                    android:host="qwittig.com"
+                    android:pathPrefix="/invitation"
+                    android:scheme="http"/>
                 <data
-                    android:host="invitation.qwittig.com"
-                    android:pathPrefix="/rNpq"
-                    android:scheme="https"
-                    />
-
+                    android:host="qwittig.com"
+                    android:pathPrefix="/invitation"
+                    android:scheme="https"/>
+                <data
+                    android:host="qwittig.ch"
+                    android:pathPrefix="/invitation"
+                    android:scheme="http"/>
+                <data
+                    android:host="qwittig.ch"
+                    android:pathPrefix="/invitation"
+                    android:scheme="https"/>
             </intent-filter>
         </activity>
         <activity
@@ -81,13 +65,23 @@
             android:name=".presentation.purchases.details.PurchaseDetailsActivity"
             android:label="@string/title_activity_purchase_details"
             android:parentActivityName=".presentation.purchases.list.HomeActivity"
-            android:theme="@style/AppTheme.DrawStatusBar.Explode"/>
+            android:theme="@style/AppTheme.DrawStatusBar.Explode">
+            <intent-filter>
+                <action android:name="OPEN_PURCHASE_DETAILS"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
         <activity
             android:name=".presentation.purchases.addedit.add.PurchaseAddActivity"
             android:label="@string/title_activity_add_purchase"
             android:parentActivityName=".presentation.purchases.list.HomeActivity"
             android:theme="@style/AppTheme.SlideBottom"
-            android:windowSoftInputMode="stateUnchanged"/>
+            android:windowSoftInputMode="stateUnchanged">
+            <intent-filter>
+                <action android:name="OPEN_PURCHASE_ADD"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
         <activity
             android:name=".presentation.purchases.addedit.edit.PurchaseEditActivity"
             android:label="@string/title_activity_edit_purchase"
@@ -121,7 +115,12 @@
             android:name=".presentation.finance.FinanceActivity"
             android:label="@string/title_activity_finance"
             android:parentActivityName=".presentation.purchases.list.HomeActivity"
-            android:theme="@style/AppTheme.DrawStatusBar"/>
+            android:theme="@style/AppTheme.DrawStatusBar">
+            <intent-filter>
+                <action android:name="OPEN_FINANCE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
         <activity
             android:name=".presentation.helpfeedback.HelpFeedbackActivity"
             android:label="@string/title_activity_help_feedback"
@@ -163,76 +162,48 @@
         <activity
             android:name=".presentation.about.AboutActivity"
             android:label="@string/title_activity_about"
-            android:parentActivityName=".presentation.purchases.list.HomeActivity"
-            />
+            android:parentActivityName=".presentation.purchases.list.HomeActivity"/>
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
 
-        <service android:name="com.parse.PushService"/>
         <service
-            android:name=".data.services.ParseQueryService"
-            android:exported="false"/>
-        <service
-            android:name=".data.services.SavePurchaseTaskService"
-            android:exported="true"
-            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE">
+            android:name=".data.push.FcmMessagingService">
             <intent-filter>
-                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY"/>
-            </intent-filter>
-        </service>
-        <service
-            android:name=".data.services.SaveIdentityTaskService"
-            android:exported="true"
-            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE">
-            <intent-filter>
-                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
 
-        <receiver
-            android:name="com.parse.GcmBroadcastReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND">
+        <service
+            android:name=".data.push.FcmInstanceIdService">
             <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
-                <action android:name="com.google.android.c2dm.intent.REGISTRATION"/>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
 
-                <category android:name="ch.giantific.qwittig"/>
-            </intent-filter>
-        </receiver>
-        <receiver
-            android:name=".data.push.PushBroadcastReceiver"
-            android:exported="false">
+        <service
+            android:name=".data.jobs.UploadReceiptJob"
+            android:exported="false"
+            >
             <intent-filter>
-                <action android:name="com.parse.push.intent.RECEIVE"/>
-                <action android:name="com.parse.push.intent.DELETE"/>
-                <action android:name="com.parse.push.intent.OPEN"/>
-                <action android:name="ch.giantific.qwittig.push.intent.ACCEPT"/>
-                <action android:name="ch.giantific.qwittig.push.intent.DISCARD"/>
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
             </intent-filter>
-        </receiver>
-        <receiver
-            android:name="io.branch.referral.InstallListener"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.android.vending.INSTALL_REFERRER"/>
-            </intent-filter>
-        </receiver>
+        </service>
 
-        <meta-data
-            android:name="com.parse.push.notification_icon"
-            android:resource="@drawable/ic_shopping_cart_white_24dp"/>
+        <service
+            android:name=".data.jobs.UploadAvatarJob"
+            android:exported="false"
+            >
+            <intent-filter>
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
+            </intent-filter>
+        </service>
+
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id"/>
-        <meta-data
-            android:name="com.parse.push.gcm_sender_id"
-            android:value="id:1027430235430"/>
-        <meta-data
-            android:name="io.branch.sdk.BranchKey"
-            android:value="key_live_fpe71rsvQX7Yg96js7ZZHomjyEd8Rv3Z"/>
     </application>
 
 </manifest>

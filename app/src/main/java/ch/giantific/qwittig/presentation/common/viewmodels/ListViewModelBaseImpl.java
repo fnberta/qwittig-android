@@ -6,97 +6,81 @@ package ch.giantific.qwittig.presentation.common.viewmodels;
 
 import android.databinding.Bindable;
 import android.os.Bundle;
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
+import android.support.v7.util.SortedList;
 
-import java.util.ArrayList;
+import java.util.Objects;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
+import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.presentation.common.ListInteraction;
+import ch.giantific.qwittig.presentation.common.Navigator;
+import ch.giantific.qwittig.presentation.common.SortedListCallback;
+import ch.giantific.qwittig.presentation.common.itemmodels.ChildItemModel;
+import rx.Observer;
+import rx.Subscription;
+import timber.log.Timber;
 
 /**
  * Provides an abstract base implementation of the {@link ListViewModel}.
  */
-public abstract class ListViewModelBaseImpl<T, S extends ListViewModel.ViewListener>
-        extends ViewModelBaseImpl<S> implements ListViewModel<T, S> {
+public abstract class ListViewModelBaseImpl<T extends ChildItemModel, S extends ListViewModel.ViewListener>
+        extends ViewModelBaseImpl<S> implements ListViewModel<T, S>, Observer<T> {
 
-    private static final String STATE_LOADING = "STATE_LOADING";
-    protected ArrayList<T> mItems;
+    protected final SortedList<T> mItems;
+    private final SortedListCallback<T> mListCallback;
     protected ListInteraction mListInteraction;
-    protected boolean mLoading;
+    protected boolean mInitialDataLoaded;
+    private Subscription mInitialDataSub;
+    private Subscription mDataListenerSub;
 
     public ListViewModelBaseImpl(@Nullable Bundle savedState,
+                                 @NonNull Navigator navigator,
                                  @NonNull RxBus<Object> eventBus,
                                  @NonNull UserRepository userRepository) {
-        super(savedState, eventBus, userRepository);
+        super(savedState, navigator, eventBus, userRepository);
 
-        if (savedState != null) {
-            mLoading = savedState.getBoolean(STATE_LOADING, false);
-        } else {
+        mListCallback = new SortedListCallback<T>() {
+            @Override
+            public int compare(T o1, T o2) {
+                return compareItemModels(o1, o2);
+            }
+        };
+        mItems = new SortedList<>(getItemModelClass(), mListCallback);
+
+        if (savedState == null) {
             mLoading = true;
-            mItems = new ArrayList<>();
         }
     }
 
-    @VisibleForTesting
-    public void setItems(ArrayList<T> items) {
-        mItems = items;
-    }
+    protected abstract Class<T> getItemModelClass();
+
+    protected abstract int compareItemModels(T o1, T o2);
 
     @Override
-    public void saveState(@NonNull Bundle outState) {
-        super.saveState(outState);
-
-        outState.putBoolean(STATE_LOADING, mLoading);
-    }
-
-    @Override
-    public void onViewVisible() {
-        super.onViewVisible();
-
-        loadData();
+    public void setListInteraction(@NonNull ListInteraction listInteraction) {
+        mListInteraction = listInteraction;
+        mListCallback.setListInteraction(listInteraction);
     }
 
     @Override
     @Bindable
     public boolean isEmpty() {
-        return mItems.isEmpty();
+        return mItems.size() == 0;
     }
 
     @Override
-    public void setListInteraction(@NonNull ListInteraction listInteraction) {
-        mListInteraction = listInteraction;
-    }
-
-    @Override
-    @Bindable
-    public boolean isLoading() {
-        return mLoading;
-    }
-
-    @Override
-    public void setLoading(boolean loading) {
-        mLoading = loading;
-        notifyPropertyChanged(BR.loading);
-    }
-
-    @Override
-    public Identity getCurrentIdentity() {
-        return mCurrentIdentity;
-    }
-
-    @Override
-    public T getItemAtPosition(int position) {
+    public final T getItemAtPosition(int position) {
         return mItems.get(position);
     }
 
     @Override
-    public int getItemViewType(int position) {
-        throw new UnsupportedOperationException("Only one view type for this list!");
+    public final int getItemViewType(int position) {
+        return mItems.get(position).getViewType();
     }
 
     @Override
@@ -105,14 +89,71 @@ public abstract class ListViewModelBaseImpl<T, S extends ListViewModel.ViewListe
     }
 
     @Override
-    public int getLastPosition() {
-        return getItemCount() - 1;
+    public final void onCompleted() {
+        // never gets called, do nothing
     }
 
     @Override
-    protected void onIdentitySelected(@NonNull Identity identitySelected) {
-        super.onIdentitySelected(identitySelected);
+    public final void onNext(T itemModel) {
+        @EventType
+        final int type = itemModel.getEventType();
+        switch (type) {
+            case EventType.ADDED: {
+                mItems.add(itemModel);
+                notifyPropertyChanged(BR.empty);
+                break;
+            }
+            case EventType.CHANGED:
+                // fall through
+            case EventType.MOVED: {
+                final int pos = getPositionForId(itemModel.getId());
+                mItems.updateItemAt(pos, itemModel);
+                break;
+            }
+            case EventType.REMOVED: {
+                mItems.remove(itemModel);
+                notifyPropertyChanged(BR.empty);
+                break;
+            }
+        }
+    }
 
-        loadData();
+    @Override
+    public final void onError(Throwable e) {
+        onDataError(e);
+    }
+
+    @CallSuper
+    protected void onDataError(@NonNull Throwable e) {
+        Timber.e(e, "subscription failed with error:");
+    }
+
+    protected final int getPositionForId(@NonNull String id) {
+        for (int i = 0, itemsSize = mItems.size(); i < itemsSize; i++) {
+            final T itemModel = mItems.get(i);
+            if (Objects.equals(itemModel.getId(), id)) {
+                return i;
+            }
+        }
+
+        throw new IllegalArgumentException("id not found");
+    }
+
+    protected final void setDataListenerSub(@NonNull Subscription sub) {
+        if (mInitialDataSub != null && !mInitialDataSub.isUnsubscribed()) {
+            mInitialDataSub.unsubscribe();
+        }
+
+        mInitialDataSub = sub;
+        getSubscriptions().add(sub);
+    }
+
+    protected final void setInitialDataSub(@NonNull Subscription sub) {
+        if (mDataListenerSub != null && !mDataListenerSub.isUnsubscribed()) {
+            mDataListenerSub.unsubscribe();
+        }
+
+        mDataListenerSub = sub;
+        getSubscriptions().add(sub);
     }
 }

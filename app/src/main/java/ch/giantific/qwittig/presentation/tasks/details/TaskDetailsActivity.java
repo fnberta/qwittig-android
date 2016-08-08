@@ -23,7 +23,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.bus.LocalBroadcast;
 import ch.giantific.qwittig.data.push.PushBroadcastReceiver;
 import ch.giantific.qwittig.databinding.ActivityTaskDetailsBinding;
 import ch.giantific.qwittig.presentation.common.Navigator;
@@ -46,18 +45,6 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity<TaskDetailsSubcom
     private static final String FRAGMENT_TASK_DETAILS = "FRAGMENT_TASK_DETAILS";
     @Inject
     TaskDetailsViewModel mTaskDetailsViewModel;
-
-    @Override
-    protected void handleLocalBroadcast(Intent intent, int dataType) {
-        super.handleLocalBroadcast(intent, dataType);
-
-        if (dataType == LocalBroadcast.DataType.TASKS_UPDATED) {
-            final boolean successful = intent.getBooleanExtra(LocalBroadcast.INTENT_EXTRA_SUCCESSFUL, false);
-            if (successful) {
-                mTaskDetailsViewModel.loadData();
-            }
-        }
-    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

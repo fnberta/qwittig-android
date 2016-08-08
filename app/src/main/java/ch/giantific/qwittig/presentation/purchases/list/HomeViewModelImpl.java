@@ -11,20 +11,27 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.MenuItem;
 
+import com.google.firebase.auth.FirebaseUser;
+
 import ch.berta.fabio.fabspeeddial.FabMenuClickListener;
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.data.bus.events.EventDraftDeleted;
-import ch.giantific.qwittig.data.bus.events.EventIdentityAdded;
+import ch.giantific.qwittig.data.repositories.GroupRepository;
+import ch.giantific.qwittig.data.repositories.PurchaseRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.domain.models.User;
+import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
+import rx.Observable;
 import rx.Single;
 import rx.SingleSubscriber;
+import rx.Subscriber;
 import rx.functions.Action1;
+import rx.functions.Func1;
+import timber.log.Timber;
 
 /**
  * Provides an implementation of the {@link HomeViewModel}.
@@ -32,31 +39,32 @@ import rx.functions.Action1;
 public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListener>
         implements HomeViewModel {
 
-    private static final String STATE_INVITATION_ID = "STATE_INVITATION_ID";
     private static final String STATE_OCR_PURCHASE_ID = "OCR_PURCHASE_ID";
     private static final String STATE_OCR_PROCESSING = "STATE_OCR_PROCESSING";
-    private final Navigator mNavigator;
+    private static final String STATE_DRAFTS_AVAILABLE = "STATE_DRAFTS_AVAILABLE";
+    private final GroupRepository mGroupRepo;
     private final PurchaseRepository mPurchaseRepo;
+    private String mCurrentUserId;
     private boolean mOcrProcessing;
     private boolean mAnimStop;
     private boolean mDraftsAvailable;
-    private String mInvitationIdentityId;
     private String mOcrPurchaseId;
 
     public HomeViewModelImpl(@Nullable Bundle savedState,
                              @NonNull Navigator navigator,
                              @NonNull RxBus<Object> eventBus,
                              @NonNull UserRepository userRepository,
-                             @NonNull PurchaseRepository purchaseRepo) {
-        super(savedState, eventBus, userRepository);
+                             @NonNull GroupRepository groupRepository,
+                             @NonNull PurchaseRepository purchaseRepository) {
+        super(savedState, navigator, eventBus, userRepository);
 
-        mNavigator = navigator;
-        mPurchaseRepo = purchaseRepo;
+        mGroupRepo = groupRepository;
+        mPurchaseRepo = purchaseRepository;
 
         if (savedState != null) {
-            mInvitationIdentityId = savedState.getString(STATE_INVITATION_ID, "");
             mOcrPurchaseId = savedState.getString(STATE_OCR_PURCHASE_ID, "");
             mOcrProcessing = savedState.getBoolean(STATE_OCR_PROCESSING);
+            mDraftsAvailable = savedState.getBoolean(STATE_DRAFTS_AVAILABLE);
         }
     }
 
@@ -64,40 +72,55 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
     public void saveState(@NonNull Bundle outState) {
         super.saveState(outState);
 
-        if (!TextUtils.isEmpty(mInvitationIdentityId)) {
-            outState.putString(STATE_INVITATION_ID, mInvitationIdentityId);
-        }
         if (!TextUtils.isEmpty(mOcrPurchaseId)) {
             outState.putString(STATE_OCR_PURCHASE_ID, mOcrPurchaseId);
         }
         outState.putBoolean(STATE_OCR_PROCESSING, mOcrProcessing);
+        outState.putBoolean(STATE_DRAFTS_AVAILABLE, mDraftsAvailable);
     }
 
     @Override
-    public void onViewVisible() {
-        super.onViewVisible();
+    protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
+        super.onUserLoggedIn(currentUser);
 
-        getSubscriptions().add(mEventBus.observeEvents(EventDraftDeleted.class)
-                .subscribe(new Action1<EventDraftDeleted>() {
+        mCurrentUserId = currentUser.getUid();
+        getSubscriptions().add(mUserRepo.observeUser(mCurrentUserId)
+                .flatMap(new Func1<User, Observable<Identity>>() {
                     @Override
-                    public void call(EventDraftDeleted eventDraftDeleted) {
-                        checkDrafts();
+                    public Observable<Identity> call(User user) {
+                        return mUserRepo.getIdentity(user.getCurrentIdentity()).toObservable();
+                    }
+                })
+                .doOnNext(new Action1<Identity>() {
+                    @Override
+                    public void call(Identity identity) {
+                        // listen to group identities, otherwise we wouldn't catch newly added users
+                        observeGroupIdentities(identity.getGroup());
+                    }
+                })
+                .flatMap(new Func1<Identity, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> call(Identity identity) {
+                        return mPurchaseRepo.isDraftsAvailable(identity.getGroup(), identity.getId());
+                    }
+                })
+                .doOnNext(new Action1<Boolean>() {
+                    @Override
+                    public void call(Boolean draftsAvailable) {
+                        setDraftsAvailable(draftsAvailable);
+                    }
+                })
+                .subscribe(new IndefiniteSubscriber<Boolean>() {
+                    @Override
+                    public void onNext(Boolean draftsAvailable) {
+                        mView.toggleDraftTab(draftsAvailable);
                     }
                 })
         );
     }
 
-    @Override
-    public void afterLogin() {
-        setCurrentUserAndIdentity();
-        mDraftsAvailable = mPurchaseRepo.isDraftsAvailable(mCurrentIdentity);
-    }
-
-    @Override
-    protected void onIdentitySelected(@NonNull Identity identitySelected) {
-        super.onIdentitySelected(identitySelected);
-
-        checkDrafts();
+    private void observeGroupIdentities(@NonNull String groupId) {
+        getSubscriptions().add(mUserRepo.observeGroupIdentityChildren(groupId).subscribe());
     }
 
     @Override
@@ -138,59 +161,33 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
     }
 
     @Override
-    public void checkDrafts() {
-        if (mDraftsAvailable != updateDraftsAvailable()) {
-            mView.toggleDraftTab(mDraftsAvailable);
-        }
-    }
-
-    @Override
-    public boolean updateDraftsAvailable() {
-        final boolean draftsAvailable = mPurchaseRepo.isDraftsAvailable(mCurrentIdentity);
-        setDraftsAvailable(draftsAvailable);
-
-        return draftsAvailable;
-    }
-
-    @Override
-    public void handleInvitation(@NonNull String identityId, @NonNull String groupName,
+    public void handleInvitation(@NonNull String identityId,
+                                 @NonNull String groupName,
                                  @NonNull String inviterNickname) {
-        mInvitationIdentityId = identityId;
-        mView.showGroupJoinDialog(groupName, inviterNickname);
+        mView.showGroupJoinDialog(identityId, groupName, inviterNickname);
     }
 
     @Override
-    public void onJoinInvitedGroupSelected() {
-        mView.showProgressDialog(R.string.progress_joining_group);
-        mView.loadJoinGroupWorker(mInvitationIdentityId);
+    public void onJoinInvitedGroupSelected(@NonNull final String identityId) {
+        getSubscriptions().add(mUserRepo.getIdentity(identityId)
+                .subscribe(new SingleSubscriber<Identity>() {
+                    @Override
+                    public void onSuccess(Identity identity) {
+                        mGroupRepo.joinGroup(mCurrentUserId, identity.getGroup(), identityId);
+                    }
+
+                    @Override
+                    public void onError(Throwable error) {
+                        mView.showMessage(R.string.toast_error_join_group);
+                        Timber.e(error, "Failed to join invited group with error:");
+                    }
+                })
+        );
     }
 
     @Override
     public void onDiscardInvitationSelected() {
         // do nothing
-    }
-
-    @Override
-    public void setJoinGroupStream(@NonNull Single<Identity> single, @NonNull final String workerTag) {
-        getSubscriptions().add(single.subscribe(new SingleSubscriber<Identity>() {
-            @Override
-            public void onSuccess(Identity identity) {
-                mView.removeWorker(workerTag);
-                mView.hideProgressDialog();
-
-                mView.showMessage(R.string.toast_group_joined);
-                mView.startQueryAllService();
-                mEventBus.post(new EventIdentityAdded(identity));
-            }
-
-            @Override
-            public void onError(Throwable error) {
-                mView.removeWorker(workerTag);
-                mView.hideProgressDialog();
-
-                mView.showMessage(R.string.toast_error_join_group);
-            }
-        }));
     }
 
     @Override
@@ -222,7 +219,7 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
                     public void onError(Throwable error) {
                         mView.removeWorker(workerTag);
 
-                        mView.showMessage(R.string.toast_error_purchase_ocr_process);
+                        mView.showMessage(R.string.push_purchase_ocr_failed_alert);
                         stopProgress(false);
                     }
                 })
@@ -238,7 +235,7 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
     @Override
     public void onOcrPurchaseFailed() {
 //        stopProgress(false);
-        mView.showMessage(R.string.toast_error_purchase_ocr_process);
+        mView.showMessage(R.string.push_purchase_ocr_failed_alert);
     }
 
     @Override

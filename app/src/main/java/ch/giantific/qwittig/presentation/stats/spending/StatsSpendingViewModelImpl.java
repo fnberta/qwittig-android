@@ -13,6 +13,7 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +21,10 @@ import java.util.List;
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.domain.models.User;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.stats.StatsViewModel;
 import ch.giantific.qwittig.presentation.stats.StatsViewModelBaseImpl;
 import ch.giantific.qwittig.presentation.stats.models.Stats;
@@ -41,13 +44,15 @@ public class StatsSpendingViewModelImpl extends StatsViewModelBaseImpl<StatsSpen
     private static final String STATE_SHOW_GROUP = "STATE_SHOW_GROUP";
     private static final String STATE_SHOW_AVERAGE = "STATE_SHOW_AVERAGE";
     private BarData mBarData;
+    private String mGroupName;
     private boolean mShowGroup;
     private boolean mShowAverage;
 
     public StatsSpendingViewModelImpl(@Nullable Bundle savedState,
+                                      @NonNull Navigator navigator,
                                       @NonNull RxBus<Object> eventBus,
                                       @NonNull UserRepository userRepository) {
-        super(savedState, eventBus, userRepository);
+        super(savedState, navigator, eventBus, userRepository);
 
         if (savedState != null) {
             mShowGroup = savedState.getBoolean(STATE_SHOW_GROUP, false);
@@ -87,17 +92,25 @@ public class StatsSpendingViewModelImpl extends StatsViewModelBaseImpl<StatsSpen
 
     @Override
     public void onDataLoaded(@Nullable final Observable<Stats> data) {
-        if (data == null) {
+        final FirebaseUser currentUser = mUserRepo.getCurrentUser();
+        if (data == null || currentUser == null) {
             setLoading(false);
             setDataEmpty(true);
             return;
         }
 
-        getSubscriptions().add(mUserRepo.fetchIdentityData(mCurrentIdentity)
+        getSubscriptions().add(mUserRepo.getUser(currentUser.getUid())
+                .flatMap(new Func1<User, Single<Identity>>() {
+                    @Override
+                    public Single<Identity> call(User user) {
+                        return mUserRepo.getIdentity(user.getCurrentIdentity());
+                    }
+                })
                 .doOnSuccess(new Action1<Identity>() {
                     @Override
                     public void call(Identity identity) {
-                        mView.setYAxisFormatter(identity.getGroup().getCurrency());
+                        mGroupName = identity.getGroupName();
+                        mView.setYAxisFormatter(identity.getGroupCurrency());
                     }
                 })
                 .flatMap(new Func1<Identity, Single<Stats>>() {
@@ -106,18 +119,28 @@ public class StatsSpendingViewModelImpl extends StatsViewModelBaseImpl<StatsSpen
                         return data.toSingle();
                     }
                 })
+                .doOnSuccess(new Action1<Stats>() {
+                    @Override
+                    public void call(Stats stats) {
+                        mStatsData = stats;
+                    }
+                })
+                .doOnError(new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        setDataEmpty(true);
+                        setLoading(false);
+                    }
+                })
                 .subscribe(new SingleSubscriber<Stats>() {
                     @Override
                     public void onSuccess(Stats stats) {
-                        mStatsData = stats;
                         setChartData();
                     }
 
                     @Override
                     public void onError(Throwable error) {
                         mView.showMessageWithAction(R.string.toast_error_stats_load, getRetryAction());
-                        setDataEmpty(true);
-                        setLoading(false);
                     }
                 })
         );
@@ -193,7 +216,7 @@ public class StatsSpendingViewModelImpl extends StatsViewModelBaseImpl<StatsSpen
     private BarData getGroupBarData(@NonNull Stats.Group groupData, List<String> xVals) {
         final List<Stats.Unit> units = groupData.getUnits();
         final List<BarEntry> barEntries = getBarEntries(units);
-        final BarDataSet barDataSet = new BarDataSet(barEntries, mCurrentIdentity.getGroup().getName());
+        final BarDataSet barDataSet = new BarDataSet(barEntries, mGroupName);
         barDataSet.setColors(getColors());
 
         return new BarData(xVals, barDataSet);

@@ -1,175 +1,167 @@
-/*
- * Copyright (c) 2016 Fabio Berta
- */
-
 package ch.giantific.qwittig.domain.models;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import com.parse.ParseACL;
-import com.parse.ParseClassName;
-import com.parse.ParseFile;
-import com.parse.ParseObject;
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
+import com.google.firebase.database.PropertyName;
+import com.google.firebase.database.ServerValue;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
-import java.math.BigInteger;
-import java.util.List;
-
-import ch.giantific.qwittig.utils.parse.ParseUtils;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Represents a user identity. Every user has one identity for every group he is in, containing
- * his nickname, his avatar and the current balance.
- * <p/>
- * Subclass of {@link ParseObject}.
+ * Created by fabio on 02.07.16.
  */
-@ParseClassName("Identity")
-public class Identity extends ParseObject implements Comparable<Identity> {
+@IgnoreExtraProperties
+public class Identity implements FirebaseModel, Comparable<Identity> {
 
-    public static final String CLASS = "Identity";
-    public static final String GROUP = "group";
-    public static final String ACTIVE = "active";
-    public static final String PENDING = "pending";
-    public static final String NICKNAME = "nickname";
-    public static final String AVATAR = "avatar";
-    public static final String AVATAR_LOCAL = "avatarLocal";
-    public static final String BALANCE = "balance";
-    public static final String INVITATION_LINK = "invitationLink";
-    public static final String PIN_LABEL = "identitiesPinLabel";
-    public static final String PIN_LABEL_TEMP = "identitiesTempPinLabel";
+    public static final String PATH = "identities";
+    public static final String PATH_ACTIVE = "active";
+    public static final String PATH_GROUP = "group";
+    public static final String PATH_GROUP_NAME = "groupName";
+    public static final String PATH_GROUP_CURRENCY = "groupCurrency";
+    public static final String PATH_USER = "user";
+    public static final String PATH_NICKNAME = "nickname";
+    public static final String PATH_AVATAR = "avatar";
+    public static final String PATH_BALANCE = "balance";
+    public static final String PATH_INVITATION_LINK = "invitationLink";
+    public static final String NUMERATOR = "num";
+    public static final String DENOMINATOR = "den";
+    private String mId;
+    @PropertyName(PATH_CREATED_AT)
+    private long mCreatedAt;
+    @PropertyName(PATH_ACTIVE)
+    private boolean mActive;
+    @PropertyName(PATH_GROUP)
+    private String mGroup;
+    @PropertyName(PATH_GROUP_NAME)
+    private String mGroupName;
+    @PropertyName(PATH_GROUP_CURRENCY)
+    private String mGroupCurrency;
+    @PropertyName(PATH_USER)
+    private String mUser;
+    @PropertyName(PATH_NICKNAME)
+    private String mNickname;
+    @PropertyName(PATH_AVATAR)
+    private String mAvatar;
+    @PropertyName(PATH_BALANCE)
+    private Map<String, Long> mBalance;
+    @PropertyName(PATH_INVITATION_LINK)
+    private String mInvitationLink;
 
     public Identity() {
-        // A default constructor is required.
+        // required for firebase de-/serialization
     }
 
-    public Identity(@NonNull Group group, @NonNull String nickname, @NonNull ParseFile avatar) {
-        this(group, nickname, false);
-        setAvatar(avatar);
+    public Identity(boolean active, @NonNull String group, @NonNull String groupName,
+                    @NonNull String groupCurrency, @Nullable String user,
+                    @NonNull String nickname, @Nullable String avatar,
+                    @NonNull Map<String, Long> balance, @Nullable String invitationLink) {
+        mActive = active;
+        mGroup = group;
+        mGroupName = groupName;
+        mGroupCurrency = groupCurrency;
+        mUser = user;
+        mNickname = nickname;
+        mAvatar = avatar;
+        mBalance = balance;
+        mInvitationLink = invitationLink;
     }
 
-    public Identity(@NonNull Group group, @NonNull String nickname, boolean pending) {
-        setGroup(group);
-        setActive(true);
-        setPending(pending);
-        setNickname(nickname);
-        setAccessRights(group);
+    @Exclude
+    public String getId() {
+        return mId;
     }
 
-    private void setAccessRights(@NonNull Group group) {
-        final ParseACL acl = ParseUtils.getDefaultAcl(group, true);
-        setACL(acl);
+    @Override
+    public void setId(@NonNull String id) {
+        mId = id;
     }
 
-    public Group getGroup() {
-        return (Group) getParseObject(GROUP);
+    @Override
+    public Map<String, String> getCreatedAt() {
+        return ServerValue.TIMESTAMP;
     }
 
-    public void setGroup(@NonNull Group group) {
-        put(GROUP, group);
+    @Exclude
+    public Date getCreatedAtDate() {
+        return new Date(mCreatedAt);
     }
 
     public boolean isActive() {
-        return getBoolean(ACTIVE);
+        return mActive;
     }
 
-    public void setActive(boolean active) {
-        put(ACTIVE, active);
+    public String getGroup() {
+        return mGroup;
     }
 
-    public boolean isPending() {
-        return getBoolean(PENDING);
+    public String getGroupName() {
+        return mGroupName;
     }
 
-    public void setPending(boolean pending) {
-        put(PENDING, pending);
+    public String getGroupCurrency() {
+        return mGroupCurrency;
+    }
+
+    public String getUser() {
+        return mUser;
     }
 
     public String getNickname() {
-        return getString(NICKNAME);
+        return mNickname;
     }
 
-    public void setNickname(@NonNull String nickname) {
-        put(NICKNAME, nickname);
+    public String getAvatar() {
+        return mAvatar;
     }
 
-    public String getAvatarUrl() {
-        final String localPath = getAvatarLocal();
-        if (!TextUtils.isEmpty(localPath)) {
-            return localPath;
-        }
-
-        final ParseFile avatar = getAvatar();
-        return avatar != null ? avatar.getUrl() : "";
+    public Map<String, Long> getBalance() {
+        return mBalance;
     }
 
-    public ParseFile getAvatar() {
-        return getParseFile(AVATAR);
-    }
-
-    public void setAvatar(@NonNull ParseFile avatar) {
-        put(AVATAR, avatar);
-    }
-
-    public void removeAvatar() {
-        remove(AVATAR);
-    }
-
-    public String getAvatarLocal() {
-        return getString(AVATAR_LOCAL);
-    }
-
-    public void setAvatarLocal(@NonNull String avatarPath) {
-        put(AVATAR_LOCAL, avatarPath);
-    }
-
-    public void removeAvatarLocal() {
-        remove(AVATAR_LOCAL);
-    }
-
-    @NonNull
-    public BigFraction getBalance() {
-        final List<Number> numbers = getList(BALANCE);
-        if (numbers == null) {
-            return BigFraction.ZERO;
-        }
-
-        final long numerator = numbers.get(0).longValue();
-        final long denominator = numbers.get(1).longValue();
-
-        return new BigFraction(numerator, denominator);
-    }
-
-    public void setBalance(@NonNull BigFraction balance) {
-        final BigInteger num = balance.getNumerator();
-        final BigInteger den = balance.getDenominator();
-
-        final long[] numbers = new long[]{num.longValue(), den.longValue()};
-        put(BALANCE, numbers);
+    @Exclude
+    public BigFraction getBalanceFraction() {
+        return new BigFraction(mBalance.get(NUMERATOR), mBalance.get(DENOMINATOR));
     }
 
     public String getInvitationLink() {
-        return getString(INVITATION_LINK);
+        return mInvitationLink;
     }
 
-    public void setInvitationLink(@NonNull String link) {
-        put(INVITATION_LINK, link);
+    @Exclude
+    public boolean isPending() {
+        return !TextUtils.isEmpty(mInvitationLink);
+    }
+
+    @Exclude
+    public Map<String, Object> toMap() {
+        final Map<String, Object> result = new HashMap<>();
+        result.put(PATH_CREATED_AT, ServerValue.TIMESTAMP);
+        result.put(PATH_ACTIVE, mActive);
+        result.put(PATH_GROUP, mGroup);
+        result.put(PATH_GROUP_NAME, mGroupName);
+        result.put(PATH_GROUP_CURRENCY, mGroupCurrency);
+        result.put(PATH_USER, mUser);
+        result.put(PATH_NICKNAME, mNickname);
+        result.put(PATH_AVATAR, mAvatar);
+        result.put(PATH_BALANCE, mBalance);
+        result.put(PATH_INVITATION_LINK, mInvitationLink);
+
+        return result;
     }
 
     @Override
     public int compareTo(@NonNull Identity another) {
-        final String nicknameLhs = getNickname();
-        final String nicknameRhs = another.getNickname();
-        String compareLhs = "n/a";
-        String compareRhs = "n/a";
-        if (!TextUtils.isEmpty(nicknameLhs)) {
-            compareLhs = nicknameLhs;
-        }
-        if (!TextUtils.isEmpty(nicknameRhs)) {
-            compareRhs = nicknameRhs;
-        }
+        final String nickname = !TextUtils.isEmpty(mNickname) ? mNickname : "n/a";
+        final String nicknameAnother = !TextUtils.isEmpty(another.getNickname()) ? another.getNickname() : "n/a";
 
-        return compareLhs.compareToIgnoreCase(compareRhs);
+        return nickname.compareToIgnoreCase(nicknameAnother);
     }
 }

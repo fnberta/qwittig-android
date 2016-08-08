@@ -13,7 +13,7 @@ import android.support.v4.app.Fragment;
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.Qwittig;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.di.DaggerWorkerComponent;
 import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import rx.Observable;
@@ -79,7 +79,6 @@ public abstract class BaseWorker<T, S extends BaseWorkerListener> extends Fragme
 
         setStream(mSubject.asObservable());
     }
-
 
     @Override
     public void onDetach() {

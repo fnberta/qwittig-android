@@ -9,9 +9,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.repositories.PurchaseRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.di.scopes.PerActivity;
-import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.purchases.list.purchases.PurchasesViewModel;
@@ -36,6 +36,7 @@ public class PurchasesListViewModelModule extends BaseViewModelModule {
                                                       @NonNull RxBus<Object> eventBus,
                                                       @NonNull UserRepository userRepository,
                                                       @NonNull PurchaseRepository purchaseRepository) {
-        return new PurchasesViewModelImpl(mSavedState, navigator, eventBus, userRepository, purchaseRepository);
+        return new PurchasesViewModelImpl(mSavedState, navigator, eventBus, userRepository,
+                purchaseRepository);
     }
 }

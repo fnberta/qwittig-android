@@ -1,66 +1,60 @@
-/*
- * Copyright (c) 2016 Fabio Berta
- */
-
 package ch.giantific.qwittig.domain.models;
 
 import android.support.annotation.NonNull;
 
-import com.parse.ParseACL;
-import com.parse.ParseClassName;
-import com.parse.ParseObject;
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
+import com.google.firebase.database.PropertyName;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
-import ch.giantific.qwittig.utils.MoneyUtils;
-import ch.giantific.qwittig.utils.parse.ParseUtils;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * Represents an item of a purchase with a name, a price and the identities involved in the item.
- * <p/>
- * Subclass of {@link ParseObject}.
+ * Created by fabio on 02.07.16.
  */
-@ParseClassName("Item")
-public class Item extends ParseObject {
+@IgnoreExtraProperties
+public class Item {
 
-    public static final String CLASS = "Item";
-    public static final String NAME = "name";
-    public static final String PRICE = "price";
-    public static final String IDENTITIES = "identities";
+    public static final String PATH_NAME = "name";
+    public static final String PATH_PRICE = "price";
+    public static final String PATH_IDENTITIES = "identities";
+    @PropertyName(PATH_NAME)
+    private String mName;
+    @PropertyName(PATH_PRICE)
+    private double mPrice;
+    @PropertyName(PATH_IDENTITIES)
+    private Map<String, Boolean> mIdentities;
 
     public Item() {
-        // A default constructor is required.
+        // required for firebase de-/serialization
     }
 
-    public Item(@NonNull String name, @NonNull BigDecimal price,
-                @NonNull List<Identity> identities, @NonNull Group group) {
-        setName(name);
-        setPrice(price);
-        setIdentities(identities);
-        setAccessRights(group);
-    }
-
-    private void setAccessRights(@NonNull Group group) {
-        final ParseACL acl = ParseUtils.getDefaultAcl(group, true);
-        setACL(acl);
+    public Item(@NonNull String name, double price, @NonNull List<String> identities) {
+        mName = name;
+        mPrice = price;
+        mIdentities = new HashMap<>();
+        for (String id : identities) {
+            mIdentities.put(id, true);
+        }
     }
 
     public String getName() {
-        return getString(NAME);
-    }
-
-    public void setName(@NonNull String name) {
-        put(NAME, name);
+        return mName;
     }
 
     public double getPrice() {
-        return getDouble(PRICE);
+        return mPrice;
     }
 
-    public void setPrice(@NonNull Number finalPrice) {
-        put(PRICE, finalPrice);
+    public Map<String, Boolean> getIdentities() {
+        return mIdentities;
+    }
+
+    @Exclude
+    public Set<String> getIdentitiesIds() {
+        return mIdentities.keySet();
     }
 
     /**
@@ -69,48 +63,12 @@ public class Item extends ParseObject {
      * @param exchangeRate the exchange rate to convert the price
      * @return the price in foreign currency
      */
+    @Exclude
     public double getPriceForeign(double exchangeRate) {
-        final double price = getPrice();
         if (exchangeRate == 1) {
-            return price;
+            return mPrice;
         }
 
-        return price / exchangeRate;
-    }
-
-    /**
-     * Converts the item's price either to the group's currency or the foreign currency using the
-     * exchange rate provided.
-     *
-     * @param exchangeRate    the exchange rate to be used to convert the price
-     * @param toGroupCurrency whether to convert to the group's currency or to a foreign one
-     */
-    public void convertPrice(double exchangeRate, boolean toGroupCurrency) {
-        final double price = getPrice();
-        final double priceConverted = toGroupCurrency ? price * exchangeRate : price / exchangeRate;
-        setPrice(MoneyUtils.roundConvertedPrice(priceConverted));
-    }
-
-    public List<Identity> getIdentities() {
-        return getList(IDENTITIES);
-    }
-
-    public void setIdentities(@NonNull List<Identity> identities) {
-        put(IDENTITIES, identities);
-    }
-
-    /**
-     * Returns the object ids of the item's involved users.
-     *
-     * @return the object ids of the involved users
-     */
-    @NonNull
-    public List<String> getIdentitiesIds() {
-        final List<String> ids = new ArrayList<>();
-        final List<Identity> identities = getIdentities();
-        for (Identity identity : identities) {
-            ids.add(identity.getObjectId());
-        }
-        return ids;
+        return mPrice / exchangeRate;
     }
 }

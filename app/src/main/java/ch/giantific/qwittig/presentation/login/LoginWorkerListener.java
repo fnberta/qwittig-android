@@ -6,7 +6,8 @@ package ch.giantific.qwittig.presentation.login;
 
 import android.support.annotation.NonNull;
 
-import ch.giantific.qwittig.domain.models.User;
+import com.google.firebase.auth.FirebaseUser;
+
 import ch.giantific.qwittig.presentation.common.workers.BaseWorkerListener;
 import rx.Single;
 
@@ -23,5 +24,5 @@ public interface LoginWorkerListener extends BaseWorkerListener {
      * @param workerTag the tag of the worker fragment
      * @param type      the action type taken
      */
-    void setUserLoginStream(@NonNull Single<User> single, @NonNull String workerTag, @LoginWorker.Type int type);
+    void setUserLoginStream(@NonNull Single<FirebaseUser> single, @NonNull String workerTag, @LoginWorker.Type int type);
 }

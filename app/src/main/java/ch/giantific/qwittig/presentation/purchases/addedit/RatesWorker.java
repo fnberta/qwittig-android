@@ -12,8 +12,8 @@ import android.text.TextUtils;
 
 import javax.inject.Inject;
 
+import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.data.rest.ExchangeRates;
-import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;

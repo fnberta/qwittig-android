@@ -4,27 +4,25 @@
 
 package ch.giantific.qwittig.presentation.login;
 
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 
+import ch.giantific.qwittig.presentation.common.GoogleApiClientDelegate;
 import ch.giantific.qwittig.presentation.common.viewmodels.LoadingViewModel;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 
 /**
  * Defines an observable view model for the login accounts screen.
  */
-public interface LoginAccountsViewModel extends ViewModel<LoginAccountsViewModel.ViewListener>, LoadingViewModel, LoginWorkerListener {
+public interface LoginAccountsViewModel extends ViewModel<LoginAccountsViewModel.ViewListener>,
+        LoadingViewModel, LoginWorkerListener, GoogleApiClientDelegate.GoogleLoginCallback {
 
     void setInvitationIdentityId(@NonNull String identityId);
 
-    void onGoogleSignedIn(@Nullable String tokenId, @Nullable String displayName,
-                          @Nullable Uri photoUrl);
+    void onFacebookSignedIn(@NonNull String idToken);
 
-    void onGoogleLoginFailed();
-
-    void onLoginFacebookClick(View view);
+    void onFacebookLoginFailed();
 
     View.OnClickListener getLoginGoogleClickListener();
 
@@ -35,12 +33,11 @@ public interface LoginAccountsViewModel extends ViewModel<LoginAccountsViewModel
      */
     interface ViewListener extends ViewModel.ViewListener {
 
-        void loadFacebookLoginWorker(@NonNull String identityId);
+        void loadFacebookLoginWorker(@NonNull String idToken);
 
         void loginWithGoogle();
 
-        void loadGoogleTokenVerifyWorker(@Nullable String tokenId, @Nullable String displayName,
-                                         @Nullable Uri photoUrl, @NonNull String identityId);
+        void loadGoogleLoginWorker(@Nullable String tokenId);
 
         void showEmailFragment(@NonNull String identityId);
 

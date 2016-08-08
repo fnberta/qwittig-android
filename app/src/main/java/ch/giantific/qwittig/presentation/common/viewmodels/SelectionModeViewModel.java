@@ -4,8 +4,6 @@
 
 package ch.giantific.qwittig.presentation.common.viewmodels;
 
-import android.support.annotation.NonNull;
-
 /**
  * Defines the needed methods for a view model with a list that supports state selection.
  */
@@ -22,12 +20,4 @@ public interface SelectionModeViewModel<T> {
      * Clears the selected items and if needed deletes them also from the local data store.
      */
     void clearSelection();
-
-    /**
-     * Returns whether the item is currently selected or not.
-     *
-     * @param item the item in question
-     * @return whether the item is currently selected or not
-     */
-    boolean isSelected(@NonNull T item);
 }

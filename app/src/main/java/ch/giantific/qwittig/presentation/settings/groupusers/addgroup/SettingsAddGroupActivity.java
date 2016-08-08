@@ -22,7 +22,6 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
@@ -31,10 +30,8 @@ import ch.giantific.qwittig.presentation.settings.groupusers.di.DaggerSettingsGr
 import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsAddGroupViewModelModule;
 import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsGroupUsersComponent;
 import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsUsersViewModelModule;
-import ch.giantific.qwittig.presentation.settings.groupusers.users.AddUserWorkerListener;
 import ch.giantific.qwittig.presentation.settings.groupusers.users.SettingsUsersViewModel;
 import ch.giantific.qwittig.utils.AvatarUtils;
-import rx.Single;
 
 /**
  * Hosts {@link SettingsAddGroupFragment} that allows to user to create a new group.
@@ -45,9 +42,7 @@ import rx.Single;
  * Subclass of {@link BaseActivity}.
  */
 public class SettingsAddGroupActivity extends BaseActivity<SettingsGroupUsersComponent> implements
-        SettingsAddGroupFragment.ActivityListener,
-        AddGroupWorkerListener,
-        AddUserWorkerListener {
+        SettingsAddGroupFragment.ActivityListener {
 
     public static final String ADD_USERS_FRAGMENT = "ADD_USERS_FRAGMENT";
     public static final String ADD_GROUP_FRAGMENT = "ADD_GROUP_FRAGMENT";
@@ -120,15 +115,5 @@ public class SettingsAddGroupActivity extends BaseActivity<SettingsGroupUsersCom
         if (actionBar != null) {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_done_white_24dp);
         }
-    }
-
-    @Override
-    public void setCreateGroupStream(@NonNull Single<Identity> single, @NonNull String workerTag) {
-        mAddGroupViewModel.setCreateGroupStream(single, workerTag);
-    }
-
-    @Override
-    public void setAddUserStream(@NonNull Single<Identity> single, @NonNull String workerTag) {
-        mAddUsersViewModel.setAddUserStream(single, workerTag);
     }
 }

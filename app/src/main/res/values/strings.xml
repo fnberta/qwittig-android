@@ -117,6 +117,7 @@
     <string name="action_purchase_save_draft">Save as draft</string>
     <string name="action_drafts_delete_selected">Delete selected Drafts</string>
     <string name="dialog_account_delete_message">Do you really want to delete your account? You cannot undo this!</string>
+    <string name="dialog_account_delete_message_email">If you really want to delete your account, please re-authenticate yourself. Note that you cannot undo this!</string>
     <string name="nickname_me">Me</string>
     <string name="progress_account_delete">Deleting account…</string>
     <string name="push_user_deleted_alert">Outstanding debts or credits have automatically been cleared</string>
@@ -252,7 +253,7 @@
     <string name="toast_unlink_password_required">Set a password to unlink your account</string>
     <string name="toast_saving_profile">Saving profile…</string>
     <string name="toast_invalid_session">Your session is no longer valid</string>
-    <string name="toast_login_failed_google">Login with Google failed</string>
+    <string name="toast_error_login_google">Login with Google failed</string>
     <string name="toast_error_tasks_load">Failed to load tasks</string>
     <string name="toast_error_task_save">Failed to save task</string>
     <string name="toast_error_users_load">Failed to load users</string>
@@ -281,7 +282,7 @@
     <string name="toast_error_purchase_save_draft">Failed to save purchase as draft</string>
     <string name="toast_error_purchase_save">Failed to save purchase</string>
     <string name="toast_error_purchase_edit_load">Failed to load purchase</string>
-    <string name="toast_error_drawer_load_groups">Failed to load group selection</string>
+    <string name="toast_error_load_groups">Failed to load group selection</string>
     <string name="toast_error_settings_group_add">Failed to create group</string>
     <string name="toast_error_settings_users_add">Failed to add user</string>
     <string name="toast_password_reset">An email with a link to rest your password was sent</string>
@@ -320,7 +321,7 @@
     <string name="desc_user_invite_existing">Invite users anytime by sharing the generated link.</string>
     <string name="dialog_change_nickname_message">Enter new nickname</string>
     <string name="toast_error_purchase_ocr_load">Failed to load purchase. Please try again.</string>
-    <string name="toast_error_purchase_ocr_process">Failed to process the purchase. Please try again.</string>
+    <string name="push_purchase_ocr_failed_alert">Failed to process the purchase. Please try again.</string>
     <string name="toast_purchase_ocr_started">Processing purchase… You will be notified when it is ready.</string>
     <string name="toast_error_join_group">Failed to join the new group. Please try again.</string>
     <string name="push_purchase_ocr_failed_title">Processing failed</string>
@@ -350,5 +351,25 @@
     <string name="action_add">Add</string>
     <string name="action_delete">Delete</string>
     <string name="no_purchases_add_one">Add one by pressing on the + button.</string>
+    <string name="toast_error_remind_failed">Remind failed</string>
+    <string name="toast_error_login">Login failed</string>
+    <string name="toast_error_logout">Logout failed</string>
+    <string name="toast_login_failed_facebook">Login with Facebook failed</string>
+    <string name="progress_profile_unlink">Un-linking account and updating profile…</string>
+    <string name="toast_error_settings_groups">Failed to load groups</string>
+    <string name="toast_error_settings">Failed to load settings</string>
+    <string name="toast_group_name_changed">Group name changed to %1$s</string>
+    <string name="toast_purchase_edit_identities_inactive">Editing not possible. At lease one user affected by the purchase is no longer part of the group.</string>
+    <string name="tab_drafts">Drafts</string>
+    <string name="toast_error_settings_group_name_change">Failed to change the group\'s name</string>
+    <string name="push_purchase_delete_title">Purchase deleted by %1$s</string>
+    <string name="push_purchase_delete_alert">%1$s for %2$s</string>
+    <string name="push_purchase_edit_title">Purchase edited by %1$s</string>
+    <string name="push_purchase_edit_alert">%1$s for %2$s</string>
+    <string name="dialog_reauthenticate_message">Please re-authenticate to perform this action</string>
+    <string name="dialog_positive_authenticate">Authenticate</string>
+    <string name="progress_profile_change_email_pw">Updating profile…</string>
+    <string name="toast_error_leave_group">Failed to leave group. Please try again.</string>
+    <string name="toast_group_left">You left the group</string>
 
 </resources>

@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
-import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.FragmentFinanceCompensationsUnpaidBinding;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
@@ -28,7 +27,7 @@ import ch.giantific.qwittig.presentation.finance.di.FinanceSubcomponent;
  * Subclass of {@link BaseRecyclerViewFragment}.
  */
 public class CompsUnpaidFragment extends BaseRecyclerViewFragment<FinanceSubcomponent, CompsUnpaidViewModel, BaseRecyclerViewFragment.ActivityListener<FinanceSubcomponent>>
-    implements CompsUnpaidViewModel.ViewListener {
+        implements CompsUnpaidViewModel.ViewListener {
 
     private FragmentFinanceCompensationsUnpaidBinding mBinding;
 
@@ -65,17 +64,6 @@ public class CompsUnpaidFragment extends BaseRecyclerViewFragment<FinanceSubcomp
     @Override
     protected BaseRecyclerAdapter getRecyclerAdapter() {
         return new CompsUnpaidRecyclerAdapter(mViewModel);
-    }
-
-    @Override
-    public void startUpdateCompensationsUnpaidService() {
-        ParseQueryService.startUpdateIdentities(getActivity());
-        ParseQueryService.startUpdateCompensationsUnpaid(getActivity());
-    }
-
-    @Override
-    public void loadCompensationRemindWorker(@NonNull String compensationId) {
-        CompRemindWorker.attach(getFragmentManager(), compensationId);
     }
 
     @Override

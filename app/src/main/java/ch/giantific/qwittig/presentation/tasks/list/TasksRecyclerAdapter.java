@@ -126,14 +126,14 @@ public class TasksRecyclerAdapter extends BaseRecyclerAdapter {
         }
 
         @Override
-        public String buildTaskIdentitiesString(@NonNull List<Identity> identities) {
+        public String buildIdentitiesString(@NonNull List<Identity> identities) {
             final Identity identityResponsible = identities.get(0);
             String identitiesFormatted = "";
             if (identities.size() > 1) {
                 final StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.append(mContext.getString(R.string.task_users_involved_next)).append(" ");
                 for (Identity identity : identities) {
-                    if (!Objects.equals(identity.getObjectId(), identityResponsible.getObjectId())) {
+                    if (!Objects.equals(identity, identityResponsible)) {
                         stringBuilder.append(identity.getNickname()).append(" - ");
                     }
                 }
@@ -147,7 +147,7 @@ public class TasksRecyclerAdapter extends BaseRecyclerAdapter {
         }
 
         @Override
-        public String buildTaskDeadlineString(@StringRes int deadline, Object... args) {
+        public String buildDeadlineString(@StringRes int deadline, Object... args) {
             return mContext.getString(deadline, args);
         }
     }

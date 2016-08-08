@@ -9,13 +9,15 @@ import android.support.annotation.IntDef;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+import ch.giantific.qwittig.presentation.common.itemmodels.ChildItemModel;
+
 /**
  * Defines the view model for a row item on the task details screen.
  */
-public interface TaskDetailsItemModel {
+public interface TaskDetailsItemModel extends ChildItemModel {
 
     @Type
-    int getType();
+    int getViewType();
 
     @IntDef({Type.HEADER, Type.HISTORY})
     @Retention(RetentionPolicy.SOURCE)

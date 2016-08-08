@@ -21,7 +21,7 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.ActivityTaskAddEditBinding;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.TransitionListenerAdapter;
-import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
+import ch.giantific.qwittig.presentation.common.fragments.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.utils.Utils;
 

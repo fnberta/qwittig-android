@@ -9,8 +9,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.di.scopes.PerActivity;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.stats.pie.currencies.StatsCurrenciesViewModel;
 import ch.giantific.qwittig.presentation.stats.pie.currencies.StatsCurrenciesViewModelImpl;
@@ -30,8 +31,9 @@ public class StatsCurrenciesViewModelModule extends BaseViewModelModule {
 
     @PerActivity
     @Provides
-    StatsCurrenciesViewModel providesStatsPieViewModel(@NonNull RxBus<Object> eventBus,
+    StatsCurrenciesViewModel providesStatsPieViewModel(@NonNull Navigator navigator,
+                                                       @NonNull RxBus<Object> eventBus,
                                                        @NonNull UserRepository userRepository) {
-        return new StatsCurrenciesViewModelImpl(mSavedState, eventBus, userRepository);
+        return new StatsCurrenciesViewModelImpl(mSavedState, navigator, eventBus, userRepository);
     }
 }

@@ -18,17 +18,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.bus.LocalBroadcast;
-import ch.giantific.qwittig.data.push.PushBroadcastReceiver;
+import ch.giantific.qwittig.data.push.FcmMessagingService;
 import ch.giantific.qwittig.databinding.ActivityPurchaseDetailsBinding;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.adapters.TabsAdapter;
@@ -57,18 +53,6 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
     private ActivityPurchaseDetailsBinding mBinding;
 
     @Override
-    protected void handleLocalBroadcast(Intent intent, int dataType) {
-        super.handleLocalBroadcast(intent, dataType);
-
-        if (dataType == LocalBroadcast.DataType.PURCHASES_UPDATED) {
-            final boolean successful = intent.getBooleanExtra(LocalBroadcast.INTENT_EXTRA_SUCCESSFUL, false);
-            if (successful) {
-                mPurchaseDetailsViewModel.loadData();
-            }
-        }
-    }
-
-    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_purchase_details);
@@ -92,7 +76,6 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
             }
         });
 
-
         if (mUserLoggedIn) {
             setupTabs();
         }
@@ -101,22 +84,19 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
     @Override
     protected void injectDependencies(@NonNull NavDrawerComponent navComp,
                                       @Nullable Bundle savedInstanceState) {
-        mComponent = navComp.plus(new PurchaseDetailsViewModelModule(savedInstanceState, getPurchaseId()));
+        mComponent = navComp.plus(new PurchaseDetailsViewModelModule(savedInstanceState,
+                getPurchaseId(), getIntent().getStringExtra(FcmMessagingService.PUSH_GROUP_ID)));
         mComponent.inject(this);
         mPurchaseDetailsViewModel.attachView(this);
     }
 
     private String getPurchaseId() {
         final Intent intent = getIntent();
-        String purchaseId = intent.getStringExtra(Navigator.INTENT_PURCHASE_ID); // started from HomeActivity
-
-        if (TextUtils.isEmpty(purchaseId)) { // started via push notification
-            try {
-                JSONObject jsonExtras = PushBroadcastReceiver.getData(intent);
-                purchaseId = jsonExtras.optString(PushBroadcastReceiver.PUSH_PARAM_PURCHASE_ID);
-            } catch (JSONException e) {
-                showMessage(R.string.toast_error_purchase_details_load);
-            }
+        // started from HomeActivity
+        String purchaseId = intent.getStringExtra(Navigator.INTENT_PURCHASE_ID);
+        if (TextUtils.isEmpty(purchaseId)) {
+            // started via push notification
+            purchaseId = intent.getStringExtra(FcmMessagingService.PUSH_PURCHASE_ID);
         }
 
         return purchaseId;
@@ -196,9 +176,9 @@ public class PurchaseDetailsActivity extends BaseNavDrawerActivity<PurchaseDetai
     }
 
     @Override
-    public void toggleMenuOptions(boolean showEditOptions, boolean hasForeignCurrency) {
+    public void toggleMenuOptions(boolean showEditOptions, boolean showExchangeRateOption) {
         mShowEditOptions = showEditOptions;
-        mShowExchangeRate = hasForeignCurrency;
+        mShowExchangeRate = showExchangeRateOption;
         invalidateOptionsMenu();
     }
 }

@@ -25,27 +25,29 @@ import ch.giantific.qwittig.presentation.tasks.details.itemmodels.TaskDetailsIte
 public interface TaskDetailsViewModel extends ListViewModel<TaskDetailsItemModel, TaskDetailsViewModel.ViewListener> {
 
     @Bindable
-    String getTaskTitle();
+    String getTitle();
+
+    void setTitle(@NonNull String title);
 
     @Bindable
     @StringRes
-    int getTaskTimeFrame();
+    int getTimeFrame();
 
-    void setTaskTimeFrame(@StringRes int taskTimeFrame);
+    void setTimeFrame(@StringRes int taskTimeFrame);
 
     @Bindable
-    SpannableStringBuilder getTaskIdentities();
+    SpannableStringBuilder getIdentitiesText();
 
-    void setTaskIdentities(@NonNull SpannableStringBuilder taskUsersInvolved);
+    void setIdentitiesText(@NonNull SpannableStringBuilder taskUsersInvolved);
 
     @Bindable
     boolean isCurrentUserResponsible();
 
     void setCurrentUserResponsible(boolean currentUserResponsible);
 
-    void deleteTask();
+    void onDeleteTaskMenuClick();
 
-    void editTask();
+    void onEditTaskMenuClick();
 
     void onFabDoneClick(View view);
 
@@ -82,6 +84,6 @@ public interface TaskDetailsViewModel extends ListViewModel<TaskDetailsItemModel
          * @return a {@link SpannableStringBuilder} with the appropriate string
          */
         SpannableStringBuilder buildTaskIdentitiesString(@NonNull List<Identity> identities,
-                                                         @NonNull Identity identityResponsible);
+                                                         @NonNull String identityResponsible);
     }
 }

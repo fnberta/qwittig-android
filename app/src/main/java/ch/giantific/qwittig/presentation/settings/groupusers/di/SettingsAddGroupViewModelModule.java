@@ -9,9 +9,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.helper.RemoteConfigHelper;
+import ch.giantific.qwittig.data.repositories.GroupRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.di.scopes.PerActivity;
-import ch.giantific.qwittig.domain.repositories.RemoteConfigRepository;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.SettingsAddGroupViewModel;
 import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.SettingsAddGroupViewModelImpl;
@@ -31,9 +33,12 @@ public class SettingsAddGroupViewModelModule extends BaseViewModelModule {
 
     @PerActivity
     @Provides
-    SettingsAddGroupViewModel providesSettingsAddGroupViewModel(@NonNull RxBus<Object> eventBus,
+    SettingsAddGroupViewModel providesSettingsAddGroupViewModel(@NonNull Navigator navigator,
+                                                                @NonNull RxBus<Object> eventBus,
+                                                                @NonNull RemoteConfigHelper configHelper,
                                                                 @NonNull UserRepository userRepository,
-                                                                @NonNull RemoteConfigRepository configRepository) {
-        return new SettingsAddGroupViewModelImpl(mSavedState, eventBus, userRepository, configRepository);
+                                                                @NonNull GroupRepository groupRepository) {
+        return new SettingsAddGroupViewModelImpl(mSavedState, navigator, eventBus, configHelper,
+                userRepository, groupRepository);
     }
 }

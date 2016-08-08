@@ -7,14 +7,13 @@ package ch.giantific.qwittig.presentation.common.viewmodels;
 import android.databinding.Bindable;
 import android.support.annotation.NonNull;
 
-import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.ListInteraction;
 
 /**
  * Defines an observable view model for a screen filled with a scrollable list.
  */
 public interface ListViewModel<T, S extends ViewModel.ViewListener>
-        extends ViewModel<S>, LoadingViewModel {
+        extends ViewModel<S> {
 
     void setListInteraction(@NonNull ListInteraction listInteraction);
 
@@ -25,18 +24,6 @@ public interface ListViewModel<T, S extends ViewModel.ViewListener>
      */
     @Bindable
     boolean isEmpty();
-
-    /**
-     * Loads the data from the repository and propagates the ui.
-     */
-    void loadData();
-
-    /**
-     * Returns the current selected identity.
-     *
-     * @return the current selected identity
-     */
-    Identity getCurrentIdentity();
 
     /**
      * Returns the item at the position.
@@ -62,11 +49,4 @@ public interface ListViewModel<T, S extends ViewModel.ViewListener>
      * @return the total number of items in this view model.
      */
     int getItemCount();
-
-    /**
-     * Returns the position of the last item in the list.
-     *
-     * @return the last position
-     */
-    int getLastPosition();
 }

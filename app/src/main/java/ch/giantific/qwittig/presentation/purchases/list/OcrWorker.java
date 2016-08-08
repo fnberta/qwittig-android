@@ -11,8 +11,8 @@ import android.support.v4.app.FragmentManager;
 
 import javax.inject.Inject;
 
+import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.data.rest.ReceiptOcr;
-import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
 import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;
@@ -68,11 +68,11 @@ public class OcrWorker extends BaseWorker<Void, OcrWorkerListener> {
     protected Observable<Void> getObservable(@NonNull Bundle args) {
         final byte[] receipt = args.getByteArray(KEY_RECEIPT_BYTES);
         if (receipt != null) {
-            return mUserRepo.getUserSessionToken()
-                    .flatMapObservable(new Func1<String, Observable<Void>>() {
+            return mUserRepo.getAuthToken()
+                    .flatMapObservable(new Func1<String, Observable<? extends Void>>() {
                         @Override
-                        public Observable<Void> call(String sessionToken) {
-                            return mPurchaseRepo.uploadReceipt(sessionToken, receipt);
+                        public Observable<? extends Void> call(String token) {
+                            return mPurchaseRepo.uploadReceiptForOcr(receipt, token);
                         }
                     });
         }

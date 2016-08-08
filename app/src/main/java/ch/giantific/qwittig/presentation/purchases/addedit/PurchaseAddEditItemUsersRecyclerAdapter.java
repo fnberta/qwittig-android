@@ -15,7 +15,7 @@ import java.util.List;
 import ch.giantific.qwittig.databinding.RowPurchaseAddItemUsersUserBinding;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemUsersUser;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemIdentity;
 
 /**
  * Provides an adapter for a {@link RecyclerView} showing a list of users.
@@ -26,10 +26,10 @@ public class PurchaseAddEditItemUsersRecyclerAdapter extends BaseRecyclerAdapter
         implements PurchaseAddEditItemUsersClickListener {
 
     private final PurchaseAddEditViewModel mViewModel;
-    private final List<PurchaseAddEditItemUsersUser> mUsers;
+    private final List<PurchaseAddEditItemIdentity> mUsers;
 
     public PurchaseAddEditItemUsersRecyclerAdapter(@NonNull PurchaseAddEditViewModel viewModel,
-                                                   @NonNull List<PurchaseAddEditItemUsersUser> users) {
+                                                   @NonNull List<PurchaseAddEditItemIdentity> users) {
         mViewModel = viewModel;
         mUsers = users;
     }
@@ -45,7 +45,7 @@ public class PurchaseAddEditItemUsersRecyclerAdapter extends BaseRecyclerAdapter
     @Override
     public void onBindViewHolder(ItemUserRow holder, int position) {
         final RowPurchaseAddItemUsersUserBinding binding = holder.getBinding();
-        final PurchaseAddEditItemUsersUser addEditPurchaseItemUsersUser = mUsers.get(position);
+        final PurchaseAddEditItemIdentity addEditPurchaseItemUsersUser = mUsers.get(position);
         binding.setItemModel(addEditPurchaseItemUsersUser);
         binding.executePendingBindings();
     }
@@ -57,7 +57,7 @@ public class PurchaseAddEditItemUsersRecyclerAdapter extends BaseRecyclerAdapter
 
     @Override
     public void onItemRowUserClick(int position) {
-        final PurchaseAddEditItemUsersUser user = mUsers.get(position);
+        final PurchaseAddEditItemIdentity user = mUsers.get(position);
         user.setSelected(!user.isSelected());
         notifyItemChanged(position);
 
@@ -67,7 +67,7 @@ public class PurchaseAddEditItemUsersRecyclerAdapter extends BaseRecyclerAdapter
 
     @Override
     public void onItemRowUserLongClick(int position) {
-        final PurchaseAddEditItemUsersUser user = mUsers.get(position);
+        final PurchaseAddEditItemIdentity user = mUsers.get(position);
         user.setSelected(!user.isSelected());
         notifyItemChanged(position);
 

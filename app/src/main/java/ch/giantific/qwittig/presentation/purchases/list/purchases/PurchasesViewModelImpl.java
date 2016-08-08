@@ -7,204 +7,174 @@ package ch.giantific.qwittig.presentation.purchases.list.purchases;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.view.View;
 
-import java.util.ArrayList;
+import com.google.firebase.auth.FirebaseUser;
+
+import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Objects;
 
+import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.repositories.PurchaseRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
+import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Purchase;
-import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.domain.models.User;
+import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.common.Navigator;
-import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModelBaseImpl;
-import ch.giantific.qwittig.utils.MessageAction;
+import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
+import ch.giantific.qwittig.presentation.purchases.list.purchases.itemmodels.PurchasesItemModel;
+import ch.giantific.qwittig.utils.DateUtils;
+import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Observable;
-import rx.SingleSubscriber;
 import rx.Subscriber;
 import rx.functions.Func1;
 
 /**
  * Provides an implementation of the {@link PurchasesViewModel}.
  */
-public class PurchasesViewModelImpl extends OnlineListViewModelBaseImpl<Purchase, PurchasesViewModel.ViewListener>
+public class PurchasesViewModelImpl extends ListViewModelBaseImpl<PurchasesItemModel, PurchasesViewModel.ViewListener>
         implements PurchasesViewModel {
 
-    private static final String STATE_LOADING_MORE = "STATE_LOADING_MORE";
-    private final Navigator mNavigator;
     private final PurchaseRepository mPurchaseRepo;
-    private boolean mLoadingMore;
+    private NumberFormat mMoneyFormatter;
+    private DateFormat mDateFormatter;
+    private String mCurrentGroupId;
 
     public PurchasesViewModelImpl(@Nullable Bundle savedState,
                                   @NonNull Navigator navigator,
                                   @NonNull RxBus<Object> eventBus,
                                   @NonNull UserRepository userRepository,
                                   @NonNull PurchaseRepository purchaseRepo) {
-        super(savedState, eventBus, userRepository);
+        super(savedState, navigator, eventBus, userRepository);
 
-        mNavigator = navigator;
         mPurchaseRepo = purchaseRepo;
-
-        if (savedState != null) {
-            mItems = new ArrayList<>();
-            mLoadingMore = savedState.getBoolean(STATE_LOADING_MORE, false);
-        }
     }
 
     @Override
-    public void saveState(@NonNull Bundle outState) {
-        super.saveState(outState);
-
-        outState.putBoolean(STATE_LOADING_MORE, mLoadingMore);
+    protected Class<PurchasesItemModel> getItemModelClass() {
+        return PurchasesItemModel.class;
     }
 
     @Override
-    public void loadData() {
-        getSubscriptions().add(
-                mUserRepo.fetchIdentityData(mCurrentIdentity)
-                        .flatMapObservable(new Func1<Identity, Observable<Purchase>>() {
-                            @Override
-                            public Observable<Purchase> call(Identity identity) {
-                                return mPurchaseRepo.getPurchases(identity, false);
-                            }
-                        })
-                        .subscribe(new Subscriber<Purchase>() {
-                            @Override
-                            public void onStart() {
-                                super.onStart();
-                                mItems.clear();
-                            }
-
-                            @Override
-                            public void onCompleted() {
-                                setLoading(false);
-                                mListInteraction.notifyDataSetChanged();
-
-                                if (mLoadingMore) {
-                                    addLoadMore();
-                                    mListInteraction.scrollToPosition(getLastPosition());
-                                }
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                setLoading(false);
-                                mView.showMessage(R.string.toast_error_purchases_load);
-                            }
-
-                            @Override
-                            public void onNext(Purchase purchase) {
-                                mItems.add(purchase);
-                            }
-                        })
-        );
-    }
-
-    private void addLoadMore() {
-        mItems.add(null);
-        final int lastPosition = getLastPosition();
-        mListInteraction.notifyItemInserted(lastPosition);
+    protected int compareItemModels(PurchasesItemModel o1, PurchasesItemModel o2) {
+        return o1.compareTo(o2);
     }
 
     @Override
-    protected void refreshItems() {
-        if (!mView.isNetworkAvailable()) {
-            setRefreshing(false);
-            mView.showMessageWithAction(R.string.toast_no_connection, getRefreshAction());
-            return;
-        }
+    protected void onUserLoggedIn(@NonNull final FirebaseUser currentUser) {
+        super.onUserLoggedIn(currentUser);
 
-        mView.startUpdatePurchasesService();
-    }
-
-    @NonNull
-    private MessageAction getRefreshAction() {
-        return new MessageAction(R.string.action_retry) {
-            @Override
-            public void onClick(View v) {
-                setRefreshing(true);
-                refreshItems();
-            }
-        };
-    }
-
-    @Override
-    public void onDataUpdated(boolean successful) {
-        setRefreshing(false);
-        if (successful) {
-            loadData();
-        } else {
-            mView.showMessageWithAction(R.string.toast_error_purchases_update, getRefreshAction());
-        }
-    }
-
-    @Override
-    public void onPurchaseRowItemClick(@NonNull Purchase purchase) {
-        mNavigator.startPurchaseDetails(purchase);
-    }
-
-    @Override
-    public void setPurchasesQueryMoreStream(@NonNull Observable<Purchase> observable,
-                                            @NonNull final String workerTag) {
-        getSubscriptions().add(observable
-                .toList()
-                .toSingle()
-                .subscribe(new SingleSubscriber<List<Purchase>>() {
+        getSubscriptions().add(mUserRepo.observeUser(currentUser.getUid())
+                .flatMap(new Func1<User, Observable<Identity>>() {
                     @Override
-                    public void onSuccess(List<Purchase> purchases) {
-                        mView.removeWorker(workerTag);
-                        mLoadingMore = false;
-
-                        removeLoadMore();
-                        mItems.addAll(purchases);
-                        mListInteraction.notifyItemRangeInserted(getItemCount(), purchases.size());
+                    public Observable<Identity> call(User user) {
+                        return mUserRepo.getIdentity(user.getCurrentIdentity()).toObservable();
                     }
-
+                })
+                .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override
-                    public void onError(Throwable error) {
-                        mView.removeWorker(workerTag);
-                        mView.showMessageWithAction(mPurchaseRepo.getErrorMessage(error),
-                                new MessageAction(R.string.action_retry) {
-                                    @Override
-                                    public void onClick(View v) {
-                                        onLoadMore();
-                                    }
-                                });
-                        mLoadingMore = false;
+                    public void onNext(Identity identity) {
+                        final String currency = identity.getGroupCurrency();
+                        mMoneyFormatter = MoneyUtils.getMoneyFormatter(currency, false, true);
+                        mDateFormatter = DateUtils.getDateFormatter(true);
 
-                        removeLoadMore();
+                        mInitialDataLoaded = false;
+                        final String identityId = identity.getId();
+                        final String groupId = identity.getGroup();
+                        if (!Objects.equals(mCurrentGroupId, groupId)) {
+                            mItems.clear();
+                        }
+                        mCurrentGroupId = groupId;
+                        addDataListener(identityId);
+                        loadInitialData(identityId);
                     }
                 })
         );
     }
 
-    private void removeLoadMore() {
-        final int finalPosition = getLastPosition();
-        mItems.remove(finalPosition);
-        mListInteraction.notifyItemRemoved(finalPosition);
+    private void addDataListener(@NonNull final String identityId) {
+        setDataListenerSub(mPurchaseRepo.observePurchaseChildren(mCurrentGroupId, identityId, false)
+                .filter(new Func1<RxChildEvent<Purchase>, Boolean>() {
+                    @Override
+                    public Boolean call(RxChildEvent<Purchase> purchaseRxChildEvent) {
+                        return mInitialDataLoaded;
+                    }
+                })
+                .flatMap(new Func1<RxChildEvent<Purchase>, Observable<PurchasesItemModel>>() {
+                    @Override
+                    public Observable<PurchasesItemModel> call(final RxChildEvent<Purchase> event) {
+                        return getItemModels(event.getValue(), event.getEventType(), identityId);
+                    }
+                })
+                .subscribe(this)
+        );
+    }
+
+    private void loadInitialData(@NonNull final String identityId) {
+        setInitialDataSub(mPurchaseRepo.getPurchases(mCurrentGroupId, identityId, false)
+                .flatMap(new Func1<Purchase, Observable<PurchasesItemModel>>() {
+                    @Override
+                    public Observable<PurchasesItemModel> call(final Purchase purchase) {
+                        return getItemModels(purchase, -1, identityId);
+                    }
+                })
+                .toList()
+                .subscribe(new Subscriber<List<PurchasesItemModel>>() {
+                    @Override
+                    public void onCompleted() {
+                        mInitialDataLoaded = true;
+                        setLoading(false);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        onDataError(e);
+                    }
+
+                    @Override
+                    public void onNext(List<PurchasesItemModel> purchasesItemModels) {
+                        mItems.addAll(purchasesItemModels);
+                    }
+                })
+        );
+    }
+
+    @NonNull
+    private Observable<PurchasesItemModel> getItemModels(@NonNull final Purchase purchase,
+                                                         final int eventType,
+                                                         @NonNull final String currentIdentityId) {
+        return mUserRepo.getIdentity(purchase.getBuyer())
+                .map(new Func1<Identity, PurchasesItemModel>() {
+                    @Override
+                    public PurchasesItemModel call(Identity buyer) {
+                        return new PurchasesItemModel(eventType, purchase, buyer, currentIdentityId,
+                                mMoneyFormatter, mDateFormatter);
+                    }
+                })
+                .toObservable();
     }
 
     @Override
-    public void onLoadMore() {
-        mLoadingMore = true;
+    protected void onDataError(@NonNull Throwable e) {
+        super.onDataError(e);
 
-        addLoadMore();
-        mView.loadQueryMorePurchasesWorker(mItems.size());
+        mView.showMessage(R.string.toast_error_purchases_load);
     }
 
     @Override
-    public boolean isLoadingMore() {
-        return !mView.isNetworkAvailable() || mLoadingMore || isRefreshing();
+    public void onPurchaseRowItemClick(@NonNull PurchasesItemModel itemModel) {
+        mNavigator.startPurchaseDetails(itemModel.getId());
     }
 
     @Override
-    public int getItemViewType(int position) {
-        if (mItems.get(position) == null) {
-            return TYPE_PROGRESS;
-        }
-
-        return TYPE_ITEM;
+    public void onPurchaseDeleted(@NonNull String purchaseId) {
+        mView.showMessage(R.string.toast_purchase_deleted);
+        mItems.removeItemAt(getPositionForId(purchaseId));
+        notifyPropertyChanged(BR.empty);
     }
 }

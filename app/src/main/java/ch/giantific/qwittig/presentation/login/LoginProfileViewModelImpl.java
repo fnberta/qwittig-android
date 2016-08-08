@@ -8,16 +8,22 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 
-import java.util.Objects;
+import com.google.firebase.auth.FirebaseUser;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.domain.models.User;
+import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
+import rx.Observable;
+import rx.SingleSubscriber;
 import rx.Subscriber;
+import rx.functions.Func1;
+import timber.log.Timber;
 
 /**
  * Created by fabio on 01.05.16.
@@ -28,7 +34,6 @@ public class LoginProfileViewModelImpl extends ViewModelBaseImpl<LoginProfileVie
     private static final String STATE_VALIDATE = "STATE_VALIDATE";
     private static final String STATE_AVATAR = "STATE_AVATAR";
     private static final String STATE_NICKNAME = "STATE_NICKNAME";
-    private final Navigator mNavigator;
     private boolean mWithInvitation;
     private String mAvatar;
     private String mNickname;
@@ -38,17 +43,12 @@ public class LoginProfileViewModelImpl extends ViewModelBaseImpl<LoginProfileVie
                                      @NonNull Navigator navigator,
                                      @NonNull RxBus<Object> eventBus,
                                      @NonNull UserRepository userRepository) {
-        super(savedState, eventBus, userRepository);
-
-        mNavigator = navigator;
+        super(savedState, navigator, eventBus, userRepository);
 
         if (savedState != null) {
             mValidate = savedState.getBoolean(STATE_VALIDATE);
             mAvatar = savedState.getString(STATE_AVATAR);
             mNickname = savedState.getString(STATE_NICKNAME);
-        } else {
-            mAvatar = mCurrentIdentity.getAvatarUrl();
-            mNickname = mCurrentIdentity.getNickname();
         }
     }
 
@@ -97,6 +97,12 @@ public class LoginProfileViewModelImpl extends ViewModelBaseImpl<LoginProfileVie
     }
 
     @Override
+    public void setNickname(@NonNull String nickname) {
+        mNickname = nickname;
+        notifyPropertyChanged(BR.nickname);
+    }
+
+    @Override
     public void onNicknameChanged(CharSequence s, int start, int before, int count) {
         mNickname = s.toString();
         if (mValidate) {
@@ -105,8 +111,35 @@ public class LoginProfileViewModelImpl extends ViewModelBaseImpl<LoginProfileVie
     }
 
     @Override
+    @Bindable
     public boolean isNicknameComplete() {
         return !TextUtils.isEmpty(mNickname);
+    }
+
+    @Override
+    protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
+        super.onUserLoggedIn(currentUser);
+
+        getSubscriptions().add(mUserRepo.observeUser(currentUser.getUid())
+                .flatMap(new Func1<User, Observable<Identity>>() {
+                    @Override
+                    public Observable<Identity> call(User user) {
+                        return mUserRepo.getIdentity(user.getCurrentIdentity()).toObservable();
+                    }
+                })
+                .subscribe(new IndefiniteSubscriber<Identity>() {
+                    @Override
+                    public void onNext(Identity identity) {
+                        if (TextUtils.isEmpty(mNickname)) {
+                            setNickname(identity.getNickname());
+                        }
+
+                        if (TextUtils.isEmpty(mAvatar)) {
+                            setAvatar(identity.getAvatar());
+                        }
+                    }
+                })
+        );
     }
 
     @Override
@@ -125,38 +158,24 @@ public class LoginProfileViewModelImpl extends ViewModelBaseImpl<LoginProfileVie
             return;
         }
 
-        if (!TextUtils.isEmpty(mAvatar) && !Objects.equals(mAvatar, mCurrentIdentity.getAvatarUrl())) {
-            getSubscriptions().add(mUserRepo.saveCurrentUserIdentitiesWithAvatar(mNickname, mAvatar)
-                    .subscribe(new Subscriber<Identity>() {
-                        @Override
-                        public void onCompleted() {
-                            if (mWithInvitation) {
-                                mNavigator.finish(Activity.RESULT_OK);
-                            } else {
-                                mView.showFirstGroupScreen();
-                            }
+        getSubscriptions().add(mUserRepo.updateProfile(mNickname, mAvatar, true)
+                .subscribe(new SingleSubscriber<User>() {
+                    @Override
+                    public void onSuccess(User user) {
+                        if (mWithInvitation) {
+                            mNavigator.finish(Activity.RESULT_OK);
+                        } else {
+                            mView.showFirstGroupScreen();
                         }
+                    }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            mView.showMessage(R.string.toast_error_profile);
-                        }
-
-                        @Override
-                        public void onNext(Identity identity) {
-                            // do nothing
-                        }
-                    })
-            );
-        } else {
-            mCurrentIdentity.setNickname(mNickname);
-            mCurrentIdentity.saveEventually();
-            if (mWithInvitation) {
-                mNavigator.finish(Activity.RESULT_OK);
-            } else {
-                mView.showFirstGroupScreen();
-            }
-        }
+                    @Override
+                    public void onError(Throwable error) {
+                        Timber.e(error, "failed to save profile with error:");
+                        mView.showMessage(R.string.toast_error_profile);
+                    }
+                })
+        );
     }
 
     private boolean validate() {

@@ -17,7 +17,8 @@ import com.github.mikephil.charting.utils.ViewPortHandler;
 import java.text.NumberFormat;
 
 import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.stats.StatsViewModel;
 import ch.giantific.qwittig.presentation.stats.models.Stats;
 import ch.giantific.qwittig.presentation.stats.pie.StatsPieViewModelBaseImpl;
@@ -33,9 +34,10 @@ public class StatsStoresViewModelImpl extends StatsPieViewModelBaseImpl<StatsSto
     private boolean mShowAverage;
 
     public StatsStoresViewModelImpl(@Nullable Bundle savedState,
+                                    @NonNull Navigator navigator,
                                     @NonNull RxBus<Object> eventBus,
                                     @NonNull UserRepository userRepository) {
-        super(savedState, eventBus, userRepository);
+        super(savedState, navigator, eventBus, userRepository);
 
         if (savedState != null) {
             mShowAverage = savedState.getBoolean(STATE_SHOW_AVERAGE, false);
@@ -76,8 +78,7 @@ public class StatsStoresViewModelImpl extends StatsPieViewModelBaseImpl<StatsSto
         if (mShowPercent) {
             pieDataSet.setValueFormatter(new PercentFormatter());
         } else {
-            final String currency = mCurrentIdentity.getGroup().getCurrency();
-            final NumberFormat numberFormatter = MoneyUtils.getMoneyFormatter(currency, true, false);
+            final NumberFormat numberFormatter = MoneyUtils.getMoneyFormatter(mGroupCurrency, true, false);
             pieDataSet.setValueFormatter(new ValueFormatter() {
                 @Override
                 public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {

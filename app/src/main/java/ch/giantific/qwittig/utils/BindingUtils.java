@@ -29,12 +29,11 @@ import com.bumptech.glide.request.target.Target;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.PieData;
 
-import ch.berta.fabio.fabprogress.FabProgress;
 import ch.berta.fabio.fabspeeddial.FabMenu;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.common.viewmodels.LoadingViewModel;
 import ch.giantific.qwittig.presentation.navdrawer.BlurTransformation;
-import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemUsersUser;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemIdentity;
 import ch.giantific.qwittig.presentation.purchases.details.widgets.CircleDisplay;
 import ch.giantific.qwittig.presentation.settings.profile.AvatarLoadListener;
 import ch.giantific.qwittig.presentation.stats.widgets.BarChart;
@@ -151,13 +150,13 @@ public class BindingUtils {
     }
 
     @BindingAdapter({"itemUsers"})
-    public static void loadItemUsers(ImageView view, PurchaseAddEditItemUsersUser[] users) {
+    public static void loadItemUsers(ImageView view, PurchaseAddEditItemIdentity[] users) {
         final Context context = view.getContext();
         final int padding = context.getResources().getDimensionPixelSize(R.dimen.small_space);
         final Drawable fallback = ContextCompat.getDrawable(view.getContext(), R.drawable.ic_group_black_24dp);
         int selected = 0;
-        PurchaseAddEditItemUsersUser selectedUser = null;
-        for (PurchaseAddEditItemUsersUser user : users) {
+        PurchaseAddEditItemIdentity selectedUser = null;
+        for (PurchaseAddEditItemIdentity user : users) {
             if (user.isSelected()) {
                 selectedUser = user;
                 selected++;
@@ -262,17 +261,6 @@ public class BindingUtils {
     }
 
     @BindingAdapter({"progress", "animStop"})
-    public static void setFabProgressAnim(FabProgress view, boolean start, boolean animStop) {
-        if (start) {
-            view.startProgress();
-        } else if (animStop) {
-            view.startProgressFinalAnimation();
-        } else {
-            view.stopProgress();
-        }
-    }
-
-    @BindingAdapter({"progress", "animStop"})
     public static void setFabMenuProgressAnim(FabMenu view, boolean start, boolean animStop) {
         if (start) {
             view.startProgress();
@@ -323,7 +311,7 @@ public class BindingUtils {
         }
     }
 
-    @BindingAdapter({"taskTimeFrame"})
+    @BindingAdapter({"timeFrame"})
     public static void setTaskTimeFrame(TextView view, int timeFrameRes) {
         if (timeFrameRes > 0) {
             view.setText(timeFrameRes);

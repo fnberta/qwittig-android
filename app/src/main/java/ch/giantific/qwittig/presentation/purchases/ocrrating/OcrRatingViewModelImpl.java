@@ -6,13 +6,10 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.RatingBar;
 
-import com.parse.ParseObject;
-
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.domain.models.OcrData;
-import ch.giantific.qwittig.domain.models.OcrRating;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.data.repositories.PurchaseRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel.PurchaseResult;
@@ -28,7 +25,7 @@ public class OcrRatingViewModelImpl extends ViewModelBaseImpl<OcrRatingViewModel
     private static final String STATE_RATING_PRICES = "STATE_RATING_PRICES";
     private static final String STATE_RATING_MISSING = "STATE_RATING_MISSING";
     private static final String STATE_RATING_SPEED = "STATE_RATING_SPEED";
-    private final Navigator mNavigator;
+    private final PurchaseRepository mPurchaseRepo;
     private final String mOcrDataId;
     private int mSatisfaction;
     private int mRatingNames;
@@ -40,12 +37,13 @@ public class OcrRatingViewModelImpl extends ViewModelBaseImpl<OcrRatingViewModel
                                   @NonNull Navigator navigator,
                                   @NonNull RxBus<Object> eventBus,
                                   @NonNull UserRepository userRepository,
+                                  @NonNull PurchaseRepository purchaseRepository,
                                   @NonNull String ocrDataId) {
-        super(savedState, eventBus, userRepository);
+        super(savedState, navigator, eventBus, userRepository);
 
-        mNavigator = navigator;
+        mPurchaseRepo = purchaseRepository;
         mOcrDataId = ocrDataId;
-        
+
         if (savedState != null) {
             mSatisfaction = savedState.getInt(STATE_SATISFACTION);
             mRatingNames = savedState.getInt(STATE_RATING_NAMES);
@@ -78,10 +76,8 @@ public class OcrRatingViewModelImpl extends ViewModelBaseImpl<OcrRatingViewModel
 
     @Override
     public void onFabDetailsDoneClick(View view) {
-        final OcrData ocrData = (OcrData) ParseObject.createWithoutData(OcrData.CLASS, mOcrDataId);
-        final OcrRating ocrRating = new OcrRating(mSatisfaction, mRatingNames, mRatingPrices,
-                mRatingMissing, mRatingSpeed, ocrData);
-        ocrRating.saveEventually();
+        mPurchaseRepo.saveOcrRating(mSatisfaction, mRatingNames, mRatingPrices, mRatingMissing,
+                mRatingSpeed, mOcrDataId);
         mNavigator.finish(PurchaseResult.PURCHASE_SAVED);
     }
 

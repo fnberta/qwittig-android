@@ -24,6 +24,6 @@ public interface ReceiptOcr {
      */
     @Multipart
     @POST("receipt")
-    Observable<Void> uploadReceipt(@Part("sessionToken") RequestBody sessionToken,
+    Observable<Void> uploadReceipt(@Part("idToken") RequestBody sessionToken,
                                    @Part MultipartBody.Part receipt);
 }

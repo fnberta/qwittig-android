@@ -4,8 +4,10 @@
 
 package ch.giantific.qwittig.presentation.settings.profile;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -20,19 +22,24 @@ import android.view.ViewGroup;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentSettingsProfileBinding;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
-import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
+import ch.giantific.qwittig.presentation.common.fragments.dialogs.DiscardChangesDialogFragment;
+import ch.giantific.qwittig.presentation.common.fragments.dialogs.EmailReAuthenticateDialogFragment;
+import ch.giantific.qwittig.presentation.common.workers.EmailUserWorker;
+import ch.giantific.qwittig.presentation.common.workers.GoogleUserWorker;
 import ch.giantific.qwittig.presentation.settings.profile.di.SettingsProfileComponent;
 
 /**
  * Displays the profile details of the current user, allowing him/her to edit them.
- * <p/>
+ * <p>
  * Subclass of {@link BaseFragment}.
  */
-public class SettingsProfileFragment extends BaseFragment<SettingsProfileComponent, SettingsProfileViewModel, BaseFragment.ActivityListener<SettingsProfileComponent>> implements
-        SettingsProfileViewModel.ViewListener {
+public class SettingsProfileFragment extends BaseFragment<SettingsProfileComponent, SettingsProfileViewModel, SettingsProfileFragment.ActivityListener> implements
+        SettingsProfileViewModel.ViewListener,
+        EmailReAuthenticateDialogFragment.DialogInteractionListener {
 
     private FragmentSettingsProfileBinding mBinding;
     private Snackbar mSnackbarSetPassword;
+    private ProgressDialog mProgressDialog;
 
     public SettingsProfileFragment() {
         // required empty constructor
@@ -110,8 +117,26 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
     }
 
     @Override
-    public void loadUnlinkThirdPartyWorker(@UnlinkThirdPartyWorker.ProfileAction int unlinkAction) {
-        UnlinkThirdPartyWorker.attachUnlink(getFragmentManager(), unlinkAction);
+    public void showProgressDialog(@StringRes int message) {
+        mProgressDialog = ProgressDialog.show(getActivity(), null, getString(message), true);
+    }
+
+    @Override
+    public void hideProgressDialog() {
+        if (mProgressDialog != null) {
+            mProgressDialog.dismiss();
+        }
+    }
+
+    @Override
+    public void loadUnlinkGoogleWorker(@NonNull String email, @NonNull String password,
+                                       @NonNull String idToken) {
+        GoogleUserWorker.attachUnlink(getFragmentManager(), email, password, idToken);
+    }
+
+    @Override
+    public void loadUnlinkFacebookWorker() {
+        // TODO: implement facebook un-linking
     }
 
     @Override
@@ -133,5 +158,34 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
     @Override
     public void reloadOptionsMenu() {
         getActivity().invalidateOptionsMenu();
+    }
+
+    @Override
+    public void showReAuthenticateDialog(@NonNull String currentEmail) {
+        EmailReAuthenticateDialogFragment.display(getFragmentManager(),
+                R.string.dialog_reauthenticate_message, currentEmail);
+    }
+
+    @Override
+    public void onValidEmailAndPasswordEntered(@NonNull String email, @NonNull String password) {
+        mViewModel.onValidEmailAndPasswordEntered(email, password);
+    }
+
+    @Override
+    public void loadChangeEmailPasswordWorker(@NonNull String currentEmail,
+                                              @NonNull String currentPassword,
+                                              @Nullable String newEmail,
+                                              @Nullable String newPassword) {
+        EmailUserWorker.attachChangeEmailPasswordInstance(getFragmentManager(),
+                currentEmail, currentPassword, newEmail, newPassword);
+    }
+
+    @Override
+    public void reAuthenticateGoogle() {
+        mActivity.loginWithGoogle();
+    }
+
+    public interface ActivityListener extends BaseFragment.ActivityListener<SettingsProfileComponent> {
+        void loginWithGoogle();
     }
 }

@@ -7,6 +7,7 @@ package ch.giantific.qwittig.presentation.login.di;
 import ch.giantific.qwittig.di.ApplicationComponent;
 import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerActivity;
+import ch.giantific.qwittig.presentation.common.di.GoogleApiClientDelegateModule;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
 import ch.giantific.qwittig.presentation.login.LoginAccountsFragment;
 import ch.giantific.qwittig.presentation.login.LoginAccountsViewModel;
@@ -26,7 +27,8 @@ import dagger.Component;
  */
 @PerActivity
 @Component(dependencies = {ApplicationComponent.class},
-        modules = {NavigatorModule.class, RepositoriesModule.class, LoginAccountsViewModelModule.class,
+        modules = {NavigatorModule.class, GoogleApiClientDelegateModule.class,
+                RepositoriesModule.class, LoginAccountsViewModelModule.class,
                 LoginEmailViewModelModule.class, LoginInvitationViewModelModule.class,
                 LoginProfileViewModelModule.class, LoginFirstGroupViewModelModule.class})
 public interface LoginComponent {

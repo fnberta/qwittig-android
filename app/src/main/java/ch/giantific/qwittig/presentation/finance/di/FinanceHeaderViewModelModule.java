@@ -9,8 +9,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.di.scopes.PerActivity;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.finance.BalanceHeaderViewModel;
 import ch.giantific.qwittig.presentation.finance.BalanceHeaderViewModelImpl;
@@ -29,8 +30,9 @@ public class FinanceHeaderViewModelModule extends BaseViewModelModule {
 
     @PerActivity
     @Provides
-    BalanceHeaderViewModel providesBalanceHeaderViewModel(@NonNull RxBus<Object> eventBus,
+    BalanceHeaderViewModel providesBalanceHeaderViewModel(@NonNull Navigator navigator,
+                                                          @NonNull RxBus<Object> eventBus,
                                                           @NonNull UserRepository userRepository) {
-        return new BalanceHeaderViewModelImpl(mSavedState, eventBus, userRepository);
+        return new BalanceHeaderViewModelImpl(mSavedState, navigator, eventBus, userRepository);
     }
 }

@@ -12,7 +12,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.presentation.common.fragments.BaseDialogFragment;
+import ch.giantific.qwittig.presentation.common.fragments.dialogs.BaseDialogFragment;
 
 /**
  * Provides a dialog that asks the user if he really wants to delete his/her account.

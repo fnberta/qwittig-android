@@ -47,7 +47,7 @@
             android:layout_marginTop="@dimen/normal_space"
             android:layout_toStartOf="@+id/sp_currency"
             android:gravity="center_vertical"
-            android:text="@{viewModel.totalPrice}"
+            android:text="@{viewModel.total}"
             tools:text="124.50"
             />
 

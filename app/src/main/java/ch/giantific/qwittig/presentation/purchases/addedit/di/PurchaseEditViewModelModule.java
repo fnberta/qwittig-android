@@ -9,10 +9,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.helper.RemoteConfigHelper;
+import ch.giantific.qwittig.data.repositories.PurchaseRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.di.scopes.PerActivity;
-import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
-import ch.giantific.qwittig.domain.repositories.RemoteConfigRepository;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
@@ -41,21 +41,21 @@ public class PurchaseEditViewModelModule extends BaseViewModelModule {
     @Provides
     PurchaseAddEditViewModel providesPurchaseEditViewModel(@NonNull Navigator navigator,
                                                            @NonNull RxBus<Object> eventBus,
+                                                           @NonNull RemoteConfigHelper configHelper,
                                                            @NonNull UserRepository userRepository,
-                                                           @NonNull RemoteConfigRepository configRepository,
                                                            @NonNull PurchaseRepository purchaseRepository) {
-        return new PurchaseEditViewModelImpl(mSavedState, navigator, eventBus, userRepository,
-                configRepository, purchaseRepository, mEditPurchaseId);
+        return new PurchaseEditViewModelImpl(mSavedState, navigator, eventBus, configHelper,
+                userRepository, purchaseRepository, mEditPurchaseId);
     }
 
     @PerActivity
     @Provides
     PurchaseEditDraftViewModel providesPurchaseEditDraftViewModel(@NonNull Navigator navigator,
                                                                   @NonNull RxBus<Object> eventBus,
+                                                                  @NonNull RemoteConfigHelper configHelper,
                                                                   @NonNull UserRepository userRepository,
-                                                                  @NonNull RemoteConfigRepository configRepository,
                                                                   @NonNull PurchaseRepository purchaseRepository) {
-        return new PurchaseEditDraftViewModelImpl(mSavedState, navigator, eventBus, userRepository,
-                configRepository, purchaseRepository, mEditPurchaseId);
+        return new PurchaseEditDraftViewModelImpl(mSavedState, navigator, eventBus, configHelper,
+                userRepository, purchaseRepository, mEditPurchaseId);
     }
 }

@@ -6,21 +6,27 @@ package ch.giantific.qwittig.presentation.settings.general;
 
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import ch.giantific.qwittig.presentation.common.fragments.LeaveGroupDialogFragment;
+import ch.giantific.qwittig.presentation.common.GoogleApiClientDelegate;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.common.workers.EmailUserWorkerListener;
+import ch.giantific.qwittig.presentation.common.workers.GoogleUserWorkerListener;
+import ch.giantific.qwittig.presentation.common.fragments.dialogs.EmailReAuthenticateDialogFragment;
 
 /**
  * Defines an observable view model for the main settings screen.
  */
 public interface SettingsViewModel extends ViewModel<SettingsViewModel.ViewListener>,
         LeaveGroupDialogFragment.DialogInteractionListener,
-        LogoutWorkerListener,
-        DeleteAccountDialogFragment.DialogInteractionListener {
+        EmailUserWorkerListener, GoogleUserWorkerListener,
+        DeleteAccountDialogFragment.DialogInteractionListener,
+        EmailReAuthenticateDialogFragment.DialogInteractionListener,
+        GoogleApiClientDelegate.GoogleLoginCallback {
 
     void onPreferencesLoaded();
 
@@ -29,8 +35,6 @@ public interface SettingsViewModel extends ViewModel<SettingsViewModel.ViewListe
     void onGroupNameChanged(@NonNull String newName);
 
     void onLeaveGroupClick();
-
-    void onGroupAdded(@NonNull String groupName);
 
     void onLogoutMenuClick();
 
@@ -58,7 +62,12 @@ public interface SettingsViewModel extends ViewModel<SettingsViewModel.ViewListe
 
         void setLeaveGroupTitle(@StringRes int message, @NonNull String groupName);
 
-        void loadLogoutWorker(boolean deleteAccount);
+        void loadGoogleUserWorker();
+
+        void loadDeleteGoogleUserWorker(@NonNull String idToken);
+
+        void loadDeleteEmailUserWorker(@NonNull String currentEmail,
+                                       @NonNull String currentPassword);
 
         void showLeaveGroupDialog(@StringRes int message);
 
@@ -68,6 +77,8 @@ public interface SettingsViewModel extends ViewModel<SettingsViewModel.ViewListe
 
         void hideProgressDialog();
 
-        void setScreenResult(int result);
+        void reAuthenticateGoogle();
+
+        void showEmailReAuthenticateDialog(@Nullable String email);
     }
 }

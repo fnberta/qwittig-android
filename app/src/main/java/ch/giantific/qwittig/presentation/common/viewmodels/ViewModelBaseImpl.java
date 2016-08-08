@@ -5,19 +5,20 @@
 package ch.giantific.qwittig.presentation.common.viewmodels;
 
 import android.databinding.BaseObservable;
+import android.databinding.Bindable;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.google.firebase.auth.FirebaseUser;
+
+import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.data.bus.events.EventIdentityAdded;
-import ch.giantific.qwittig.data.bus.events.EventIdentitySelected;
-import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.models.User;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
-import rx.functions.Action1;
+import ch.giantific.qwittig.data.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import rx.subscriptions.CompositeSubscription;
 
 /**
@@ -28,25 +29,27 @@ import rx.subscriptions.CompositeSubscription;
 public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
         extends BaseObservable implements ViewModel<T> {
 
+    private static final String STATE_LOADING = "STATE_LOADING";
     protected final UserRepository mUserRepo;
+    protected final Navigator mNavigator;
     protected final RxBus<Object> mEventBus;
     protected T mView;
-    protected User mCurrentUser;
-    protected Identity mCurrentIdentity;
+    protected boolean mLoading;
     private CompositeSubscription mSubscriptions = new CompositeSubscription();
+    private int mAuthStateCounter = 0;
 
     public ViewModelBaseImpl(@Nullable Bundle savedState,
+                             @NonNull Navigator navigator,
                              @NonNull RxBus<Object> eventBus,
                              @NonNull UserRepository userRepository) {
+        mNavigator = navigator;
         mEventBus = eventBus;
         mUserRepo = userRepository;
-        setCurrentUserAndIdentity();
-    }
 
-    protected void setCurrentUserAndIdentity() {
-        mCurrentUser = mUserRepo.getCurrentUser();
-        if (mCurrentUser != null) {
-            mCurrentIdentity = mCurrentUser.getCurrentIdentity();
+        if (savedState != null) {
+            mLoading = savedState.getBoolean(STATE_LOADING, false);
+        } else {
+            mLoading = false;
         }
     }
 
@@ -58,10 +61,22 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
     @Override
     @CallSuper
     public void saveState(@NonNull Bundle outState) {
-        // Empty default implementation
+        outState.putBoolean(STATE_LOADING, mLoading);
     }
 
-    protected CompositeSubscription getSubscriptions() {
+    @Override
+    @Bindable
+    public boolean isLoading() {
+        return mLoading;
+    }
+
+    @Override
+    public void setLoading(boolean loading) {
+        mLoading = loading;
+        notifyPropertyChanged(BR.loading);
+    }
+
+    protected final CompositeSubscription getSubscriptions() {
         if (mSubscriptions == null || mSubscriptions.isUnsubscribed()) {
             mSubscriptions = new CompositeSubscription();
         }
@@ -70,42 +85,45 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
     }
 
     @Override
-    @CallSuper
-    public void onViewVisible() {
-        setCurrentUserAndIdentity();
-        getSubscriptions().add(mEventBus.observeEvents(EventIdentitySelected.class)
-                .subscribe(new Action1<EventIdentitySelected>() {
+    public final void onViewVisible() {
+        mAuthStateCounter = 0;
+        getSubscriptions().add(mUserRepo.observeAuthStatus()
+                .subscribe(new IndefiniteSubscriber<FirebaseUser>() {
                     @Override
-                    public void call(EventIdentitySelected eventIdentitySelected) {
-                        onIdentitySelected(eventIdentitySelected.getIdentity());
-                    }
-                })
-        );
-        getSubscriptions().add(mEventBus.observeEvents(EventIdentityAdded.class)
-                .subscribe(new Action1<EventIdentityAdded>() {
-                    @Override
-                    public void call(EventIdentityAdded eventIdentityAdded) {
-                        onIdentitySelected(eventIdentityAdded.getIdentity());
+                    public void onNext(FirebaseUser currentUser) {
+                        if (currentUser != null) {
+                            if (mAuthStateCounter == 0) {
+                                onUserLoggedIn(currentUser);
+                                mAuthStateCounter++;
+                            }
+                        } else {
+                            mAuthStateCounter = 0;
+                            onUserNotLoggedIn();
+                        }
                     }
                 })
         );
     }
 
     @CallSuper
-    protected void onIdentitySelected(@NonNull Identity identitySelected) {
-        mCurrentIdentity = identitySelected;
+    protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
+        // empty default implementation
+    }
+
+    @CallSuper
+    protected void onUserNotLoggedIn() {
+        // empty default implementation
     }
 
     @Override
-    public void onViewGone() {
+    public final void onViewGone() {
         if (mSubscriptions.hasSubscriptions()) {
             mSubscriptions.unsubscribe();
         }
     }
 
     @Override
-    @CallSuper
-    public void onWorkerError(@NonNull String workerTag) {
+    public final void onWorkerError(@NonNull String workerTag) {
         mView.removeWorker(workerTag);
         mView.showMessage(R.string.toast_error_unknown);
     }

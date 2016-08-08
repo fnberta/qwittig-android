@@ -8,12 +8,11 @@ import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
 
-import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.tasks.addedit.di.TaskAddComponent;
 
 /**
- * Provides an interface for the user to add a new {@link Task}. Allows the selection of the time
+ * Provides an interface for the user to add a new task. Allows the selection of the time
  * frame, the deadline and the users involved. The title of the task is set in the {@link Toolbar}
  * of the hosting {@link Activity}.
  * <p/>

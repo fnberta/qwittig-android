@@ -22,8 +22,6 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.data.bus.LocalBroadcast;
-import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.NavDrawerHeaderBinding;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.Navigator;
@@ -54,18 +52,6 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
     private Menu mNavigationViewMenu;
     private NavHeaderIdentitiesArrayAdapter mHeaderIdentitiesAdapter;
     private int mSelectedNavDrawerItem;
-
-    @Override
-    @CallSuper
-    protected void handleLocalBroadcast(Intent intent, int dataType) {
-        super.handleLocalBroadcast(intent, dataType);
-
-        switch (dataType) {
-            case LocalBroadcast.DataType.GROUP_UPDATED:
-                mNavDrawerViewModel.onIdentitiesChanged();
-                break;
-        }
-    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -212,7 +198,7 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
         switch (requestCode) {
             case Navigator.INTENT_REQUEST_LOGIN:
                 if (resultCode == RESULT_OK) {
-                    mNavDrawerViewModel.onLoginSuccessful();
+                    setupScreenAfterLogin();
                     mUserLoggedIn = mNavDrawerViewModel.isUserLoggedIn();
                 } else {
                     finish();
@@ -221,20 +207,14 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
             case Navigator.INTENT_REQUEST_SETTINGS:
                 switch (resultCode) {
                     case SettingsViewModel.Result.LOGOUT:
-                        mNavDrawerViewModel.onLogout();
-                        break;
-                    case SettingsViewModel.Result.GROUP_SELECTED:
-                        mNavDrawerViewModel.onIdentitySwitched();
-                        break;
-                    case SettingsViewModel.Result.GROUPS_CHANGED:
-                        mNavDrawerViewModel.onIdentitiesChanged();
+                        mNavDrawerViewModel.afterLogout();
                         break;
                 }
                 break;
             case Navigator.INTENT_REQUEST_SETTINGS_PROFILE:
                 switch (resultCode) {
                     case RESULT_OK:
-                        mNavDrawerViewModel.onProfileUpdated();
+                        showMessage(R.string.toast_profile_update);
                         break;
                     case SettingsProfileViewModel.Result.CHANGES_DISCARDED:
                         showMessage(R.string.toast_changes_discarded);
@@ -242,6 +222,11 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
                 }
                 break;
         }
+    }
+
+    @CallSuper
+    protected void setupScreenAfterLogin() {
+        // empty default implementation
     }
 
     protected final void setStatusBarBackgroundColor(int color) {
@@ -259,16 +244,5 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
     protected final void checkNavDrawerItem(int itemId) {
         final MenuItem item = mNavigationViewMenu.findItem(itemId);
         item.setChecked(true);
-    }
-
-    @Override
-    public void startQueryAllService() {
-        ParseQueryService.startUpdateAll(this);
-    }
-
-    @Override
-    @CallSuper
-    public void setupScreenAfterLogin() {
-        // empty default implementation
     }
 }

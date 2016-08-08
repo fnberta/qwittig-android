@@ -7,11 +7,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentActivity;
-import android.text.TextUtils;
 
 import ch.giantific.qwittig.BuildConfig;
-import ch.giantific.qwittig.domain.models.Purchase;
-import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.presentation.about.AboutActivity;
 import ch.giantific.qwittig.presentation.camera.CameraActivity;
 import ch.giantific.qwittig.presentation.finance.FinanceActivity;
@@ -41,6 +38,8 @@ public class Navigator {
     public static final String INTENT_PURCHASE_EDIT_DRAFT = BuildConfig.APPLICATION_ID + ".intents.INTENT_PURCHASE_EDIT_DRAFT";
     public static final String INTENT_TASK_ID = BuildConfig.APPLICATION_ID + ".intents.INTENT_TASK_ID";
     public static final String INTENT_OCR_DATA_ID = BuildConfig.APPLICATION_ID + ".intents.INTENT_OCR_DATA_ID";
+    public static final String INTENT_OCR_PURCHASE_ID = BuildConfig.APPLICATION_ID + ".intents.INTENT_OCR_PURCHASE_ID";
+    public static final String INTENT_OBJECT_ID = BuildConfig.APPLICATION_ID + ".intents.INTENT_OBJECT_ID";
     public static final int INTENT_REQUEST_LOGIN = 1;
     public static final int INTENT_REQUEST_SETTINGS = 2;
     public static final int INTENT_REQUEST_PURCHASE_MODIFY = 3;
@@ -56,6 +55,13 @@ public class Navigator {
 
     public Navigator(@NonNull FragmentActivity activity) {
         mActivity = activity;
+    }
+
+    public void finish(int result, @NonNull String objectId) {
+        final Intent data = new Intent();
+        data.putExtra(INTENT_OBJECT_ID, objectId);
+        mActivity.setResult(result, data);
+        ActivityCompat.finishAfterTransition(mActivity);
     }
 
     public void finish(int result) {
@@ -92,36 +98,26 @@ public class Navigator {
 
     public void startPurchaseAdd(@Nullable String ocrPurchaseId) {
         final Intent intent = new Intent(mActivity, PurchaseAddActivity.class);
-        intent.putExtra(PurchaseAddActivity.INTENT_OCR_PURCHASE_ID, ocrPurchaseId);
+        intent.putExtra(INTENT_OCR_PURCHASE_ID, ocrPurchaseId);
         final ActivityOptionsCompat activityOptionsCompat =
                 ActivityOptionsCompat.makeSceneTransitionAnimation(mActivity);
         mActivity.startActivityForResult(intent, INTENT_REQUEST_PURCHASE_MODIFY,
                 activityOptionsCompat.toBundle());
     }
 
-    public void startPurchaseEdit(@NonNull String purchaseId) {
+    public void startPurchaseEdit(@NonNull String purchaseId, boolean isDraft) {
         final Intent intent = new Intent(mActivity, PurchaseEditActivity.class);
         intent.putExtra(INTENT_PURCHASE_ID, purchaseId);
+        intent.putExtra(INTENT_PURCHASE_EDIT_DRAFT, isDraft);
         final ActivityOptionsCompat activityOptionsCompat =
                 ActivityOptionsCompat.makeSceneTransitionAnimation(mActivity);
         mActivity.startActivityForResult(intent, INTENT_REQUEST_PURCHASE_MODIFY,
                 activityOptionsCompat.toBundle());
     }
 
-    public void startPurchaseEdit(@NonNull Purchase draft) {
-        final Intent intent = new Intent(mActivity, PurchaseEditActivity.class);
-        intent.putExtra(INTENT_PURCHASE_ID, draft.getTempId());
-        intent.putExtra(INTENT_PURCHASE_EDIT_DRAFT, true);
-        final ActivityOptionsCompat activityOptionsCompat =
-                ActivityOptionsCompat.makeSceneTransitionAnimation(mActivity);
-        mActivity.startActivityForResult(intent, INTENT_REQUEST_PURCHASE_MODIFY,
-                activityOptionsCompat.toBundle());
-    }
-
-    public void startPurchaseDetails(@NonNull Purchase purchase) {
+    public void startPurchaseDetails(@NonNull String purchaseId) {
         final Intent intent = new Intent(mActivity, PurchaseDetailsActivity.class);
-        final String objectId = purchase.getObjectId();
-        intent.putExtra(INTENT_PURCHASE_ID, TextUtils.isEmpty(objectId) ? purchase.getTempId() : objectId);
+        intent.putExtra(INTENT_PURCHASE_ID, purchaseId);
         final ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(mActivity);
         mActivity.startActivityForResult(intent, INTENT_REQUEST_PURCHASE_DETAILS,
                 options.toBundle());
@@ -152,9 +148,9 @@ public class Navigator {
                 options.toBundle());
     }
 
-    public void startTaskDetails(@NonNull Task task) {
+    public void startTaskDetails(@NonNull String taskId) {
         final Intent intent = new Intent(mActivity, TaskDetailsActivity.class);
-        intent.putExtra(INTENT_TASK_ID, task.getObjectId());
+        intent.putExtra(INTENT_TASK_ID, taskId);
         final ActivityOptionsCompat options =
                 ActivityOptionsCompat.makeSceneTransitionAnimation(mActivity);
         mActivity.startActivityForResult(intent, INTENT_REQUEST_TASK_DETAILS, options.toBundle());

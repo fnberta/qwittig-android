@@ -25,11 +25,10 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.LocalBroadcast;
-import ch.giantific.qwittig.domain.repositories.RemoteConfigRepository;
+import ch.giantific.qwittig.data.helper.RemoteConfigHelper;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorkerListener;
-import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.WorkerUtils;
 
@@ -52,7 +51,7 @@ public abstract class BaseActivity<T> extends AppCompatActivity
     protected Toolbar mToolbar;
     protected T mComponent;
     @Inject
-    RemoteConfigRepository mConfigRepo;
+    RemoteConfigHelper mConfigHelper;
     private List<ViewModel> mViewModels;
 
     @CallSuper
@@ -67,7 +66,7 @@ public abstract class BaseActivity<T> extends AppCompatActivity
         injectDependencies(savedInstanceState);
         mViewModels = getViewModels();
 
-        mConfigRepo.fetchAndActivate();
+        mConfigHelper.fetchAndActivate();
     }
 
     protected abstract void injectDependencies(@Nullable Bundle savedInstanceState);

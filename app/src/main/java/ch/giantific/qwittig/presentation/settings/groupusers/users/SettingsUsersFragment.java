@@ -81,13 +81,6 @@ public class SettingsUsersFragment extends BaseRecyclerViewFragment<SettingsGrou
         mProgressDialog.hide();
     }
 
-
-    @Override
-    public void loadAddUserWorker(@NonNull String nickname, @NonNull String groupId,
-                                  @NonNull String groupName) {
-        AddUserWorker.attach(getFragmentManager(), nickname, groupId, groupName);
-    }
-
     @Override
     public void loadLinkShareOptions(@NonNull String link) {
         mShareLink.putExtra(Intent.EXTRA_TEXT, link);

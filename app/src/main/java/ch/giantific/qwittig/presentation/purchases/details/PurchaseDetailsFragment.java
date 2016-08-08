@@ -6,6 +6,7 @@ package ch.giantific.qwittig.presentation.purchases.details;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,6 +46,7 @@ public class PurchaseDetailsFragment extends BaseRecyclerViewFragment<PurchaseDe
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        setupIdentitiesList();
         mViewModel.setListInteraction(mRecyclerAdapter);
         mBinding.setViewModel(mViewModel);
     }
@@ -52,6 +54,16 @@ public class PurchaseDetailsFragment extends BaseRecyclerViewFragment<PurchaseDe
     @Override
     protected void injectDependencies(@NonNull PurchaseDetailsSubcomponent component) {
         component.inject(this);
+    }
+
+    private void setupIdentitiesList() {
+        mBinding.rvPurchaseDetailsIdentities.setHasFixedSize(true);
+        mBinding.rvPurchaseDetailsIdentities.setLayoutManager(new LinearLayoutManager(getActivity(),
+                LinearLayoutManager.HORIZONTAL, false));
+        final PurchaseDetailsIdentitiesRecyclerAdapter adapter =
+                new PurchaseDetailsIdentitiesRecyclerAdapter(mViewModel);
+        mBinding.rvPurchaseDetailsIdentities.setAdapter(adapter);
+        mViewModel.setIdentitiesListInteraction(adapter);
     }
 
     @Override

@@ -4,27 +4,60 @@
 
 package ch.giantific.qwittig.presentation.purchases.details.itemmodels;
 
-import android.support.annotation.IntDef;
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
+import android.support.annotation.NonNull;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import java.text.NumberFormat;
+import java.util.Set;
+
+import ch.giantific.qwittig.domain.models.Item;
+
+import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;
 
 /**
- * Defines a list item in the purchase details screen.
+ * Provides an implementation of the {@link PurchaseDetailsItemModel} for a purchase item.
  */
-public interface PurchaseDetailsItemModel {
+public class PurchaseDetailsItemModel extends BaseObservable {
 
-    @Type
-    int getType();
+    private final String mName;
+    private final String mPrice;
+    private final float mAlpha;
+    private final float mUserPercentage;
 
-    @IntDef({Type.ITEM, Type.HEADER, Type.IDENTITIES, Type.TOTAL, Type.MY_SHARE, Type.NOTE})
-    @Retention(RetentionPolicy.SOURCE)
-    @interface Type {
-        int HEADER = 0;
-        int IDENTITIES = 1;
-        int ITEM = 2;
-        int TOTAL = 3;
-        int MY_SHARE = 4;
-        int NOTE = 5;
+    public PurchaseDetailsItemModel(@NonNull Item item,
+                                    @NonNull String currentIdentityId,
+                                    @NonNull NumberFormat numberFormat) {
+        mName = item.getName();
+        mPrice = numberFormat.format(item.getPrice());
+
+        final Set<String> identities = item.getIdentitiesIds();
+        if (identities.contains(currentIdentityId)) {
+            mAlpha = 1f;
+            mUserPercentage = (1f / identities.size()) * 100;
+        } else {
+            mAlpha = DISABLED_ALPHA;
+            mUserPercentage = 0;
+        }
+    }
+
+    @Bindable
+    public String getName() {
+        return mName;
+    }
+
+    @Bindable
+    public String getPrice() {
+        return mPrice;
+    }
+
+    @Bindable
+    public float getAlpha() {
+        return mAlpha;
+    }
+
+    @Bindable
+    public float getUserPercentage() {
+        return mUserPercentage;
     }
 }

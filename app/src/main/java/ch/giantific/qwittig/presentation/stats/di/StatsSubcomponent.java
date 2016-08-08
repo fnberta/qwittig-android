@@ -4,9 +4,9 @@
 
 package ch.giantific.qwittig.presentation.stats.di;
 
+import ch.giantific.qwittig.data.repositories.StatsRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.di.scopes.PerActivity;
-import ch.giantific.qwittig.domain.repositories.StatsRepository;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.stats.StatsActivity;
 import ch.giantific.qwittig.presentation.stats.pie.currencies.StatsCurrenciesFragment;
 import ch.giantific.qwittig.presentation.stats.pie.stores.StatsStoresFragment;

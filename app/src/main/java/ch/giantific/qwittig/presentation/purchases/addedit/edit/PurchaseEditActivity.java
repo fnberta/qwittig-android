@@ -13,7 +13,7 @@ import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
-import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
+import ch.giantific.qwittig.presentation.common.fragments.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditActivity;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditReceiptFragment;

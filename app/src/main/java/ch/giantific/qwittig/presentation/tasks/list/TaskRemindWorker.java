@@ -8,11 +8,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
-import android.text.TextUtils;
 
 import javax.inject.Inject;
 
-import ch.giantific.qwittig.domain.repositories.TaskRepository;
+import ch.giantific.qwittig.data.repositories.TaskRepository;
 import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import ch.giantific.qwittig.presentation.common.workers.BaseWorker;
 import rx.Observable;
@@ -66,11 +65,12 @@ public class TaskRemindWorker extends BaseWorker<String, TaskRemindWorkerListene
     @Nullable
     @Override
     protected Observable<String> getObservable(@NonNull Bundle args) {
-        mTaskId = args.getString(KEY_TASK_ID, "");
-        if (!TextUtils.isEmpty(mTaskId)) {
-            return mTaskRepo.pushTaskReminder(mTaskId).toObservable();
-        }
+//        mTaskId = args.getString(KEY_TASK_ID, "");
+//        if (!TextUtils.isEmpty(mTaskId)) {
+//            return mTaskRepo.pushTaskReminder(mTaskId).toObservable();
+//        }
 
+        // TODO: remind user
         return null;
     }
 

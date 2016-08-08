@@ -8,33 +8,30 @@ import android.app.Activity;
 import android.databinding.Bindable;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.view.View;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
-import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
+import ch.giantific.qwittig.presentation.common.GoogleApiClientDelegate;
+import ch.giantific.qwittig.presentation.common.fragments.dialogs.DiscardChangesDialogFragment;
+import ch.giantific.qwittig.presentation.common.fragments.dialogs.EmailReAuthenticateDialogFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
-import ch.giantific.qwittig.presentation.settings.profile.UnlinkThirdPartyWorker.ProfileAction;
+import ch.giantific.qwittig.presentation.common.workers.EmailUserWorkerListener;
+import ch.giantific.qwittig.presentation.common.workers.GoogleUserWorkerListener;
 
 /**
  * Defines a observable view model for profile settings screen.
  */
-public interface SettingsProfileViewModel extends ViewModel<SettingsProfileViewModel.ViewListener>, UnlinkThirdPartyWorkerListener,
+public interface SettingsProfileViewModel extends ViewModel<SettingsProfileViewModel.ViewListener>,
+        GoogleUserWorkerListener,
+        EmailUserWorkerListener,
         AvatarLoadListener,
-        DiscardChangesDialogFragment.DialogInteractionListener {
-
-    @Bindable
-    boolean isSaving();
-
-    @Bindable
-    boolean isAnimStop();
-
-    void startSaving();
-
-    void stopSaving(boolean anim);
+        DiscardChangesDialogFragment.DialogInteractionListener,
+        EmailReAuthenticateDialogFragment.DialogInteractionListener,
+        GoogleApiClientDelegate.GoogleLoginCallback {
 
     @Bindable
     boolean isValidate();
@@ -95,8 +92,6 @@ public interface SettingsProfileViewModel extends ViewModel<SettingsProfileViewM
 
     void onFabSaveProfileClick(View view);
 
-    ProgressFinalAnimationListener getProgressFinalAnimationListener();
-
     @IntDef({Activity.RESULT_OK, Activity.RESULT_CANCELED, Result.CHANGES_DISCARDED})
     @Retention(RetentionPolicy.SOURCE)
     @interface Result {
@@ -110,7 +105,10 @@ public interface SettingsProfileViewModel extends ViewModel<SettingsProfileViewM
 
         void startPostponedEnterTransition();
 
-        void loadUnlinkThirdPartyWorker(@ProfileAction int unlinkAction);
+        void loadUnlinkGoogleWorker(@NonNull String email, @NonNull String password,
+                                    @NonNull String idToken);
+
+        void loadUnlinkFacebookWorker();
 
         void showDiscardChangesDialog();
 
@@ -119,5 +117,18 @@ public interface SettingsProfileViewModel extends ViewModel<SettingsProfileViewM
         void dismissSetPasswordMessage();
 
         void reloadOptionsMenu();
+
+        void showProgressDialog(@StringRes int message);
+
+        void hideProgressDialog();
+
+        void showReAuthenticateDialog(@NonNull String currentEmail);
+
+        void loadChangeEmailPasswordWorker(@NonNull String currentEmail,
+                                           @NonNull String currentPassword,
+                                           @Nullable String newEmail,
+                                           @Nullable String newPassword);
+
+        void reAuthenticateGoogle();
     }
 }

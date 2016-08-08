@@ -21,7 +21,6 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
@@ -31,17 +30,15 @@ import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsAddGroup
 import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsGroupUsersComponent;
 import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsUsersViewModelModule;
 import ch.giantific.qwittig.utils.AvatarUtils;
-import rx.Single;
 
 /**
  * Hosts {@link SettingsUsersFragment} that allows the user to add users to his/her current
  * group.
- * <p>
+ * <p/>
  * Subclass of {@link BaseActivity}.
  */
 public class SettingsUsersActivity extends BaseActivity<SettingsGroupUsersComponent>
-        implements AddUserWorkerListener,
-        NicknamePromptDialogFragment.DialogInteractionListener {
+        implements NicknamePromptDialogFragment.DialogInteractionListener {
 
     @Inject
     SettingsUsersViewModel mUsersViewModel;
@@ -107,11 +104,6 @@ public class SettingsUsersActivity extends BaseActivity<SettingsGroupUsersCompon
                     });
                 }
         }
-    }
-
-    @Override
-    public void setAddUserStream(@NonNull Single<Identity> single, @NonNull String workerTag) {
-        mUsersViewModel.setAddUserStream(single, workerTag);
     }
 
     @Override

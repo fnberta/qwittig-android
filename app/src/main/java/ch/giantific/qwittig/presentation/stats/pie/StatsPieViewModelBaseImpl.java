@@ -14,6 +14,7 @@ import android.support.annotation.Nullable;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,13 +22,16 @@ import java.util.List;
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.domain.models.User;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.stats.StatsViewModelBaseImpl;
 import ch.giantific.qwittig.presentation.stats.models.Stats;
 import rx.Observable;
 import rx.Single;
 import rx.SingleSubscriber;
+import rx.functions.Action1;
 import rx.functions.Func1;
 
 /**
@@ -43,13 +47,16 @@ public abstract class StatsPieViewModelBaseImpl<T extends StatsPieViewModel.View
     private final List<String> mUserNicknames = new ArrayList<>();
     protected boolean mSortUsers;
     protected boolean mShowPercent;
+    protected String mGroupCurrency;
+    private String mGroupName;
     private PieData mPieData;
     private String mCenterText;
 
     public StatsPieViewModelBaseImpl(@Nullable Bundle savedState,
+                                     @NonNull Navigator navigator,
                                      @NonNull RxBus<Object> eventBus,
                                      @NonNull UserRepository userRepository) {
-        super(savedState, eventBus, userRepository);
+        super(savedState, navigator, eventBus, userRepository);
 
         if (savedState != null) {
             mSortUsers = savedState.getBoolean(STATE_SORT_USERS, false);
@@ -110,31 +117,55 @@ public abstract class StatsPieViewModelBaseImpl<T extends StatsPieViewModel.View
 
     @Override
     public void onDataLoaded(@Nullable final Observable<Stats> data) {
-        if (data == null) {
+        final FirebaseUser currentUser = mUserRepo.getCurrentUser();
+        if (data == null || currentUser == null) {
             setLoading(false);
             setDataEmpty(true);
             return;
         }
 
-        getSubscriptions().add(mUserRepo.fetchIdentityData(mCurrentIdentity)
+        getSubscriptions().add(mUserRepo.getUser(currentUser.getUid())
+                .flatMap(new Func1<User, Single<Identity>>() {
+                    @Override
+                    public Single<Identity> call(User user) {
+                        return mUserRepo.getIdentity(user.getCurrentIdentity());
+                    }
+                })
+                .doOnSuccess(new Action1<Identity>() {
+                    @Override
+                    public void call(Identity identity) {
+                        mGroupName = identity.getGroupName();
+                        mGroupCurrency = identity.getGroupCurrency();
+                    }
+                })
                 .flatMap(new Func1<Identity, Single<Stats>>() {
                     @Override
                     public Single<Stats> call(Identity identity) {
                         return data.toSingle();
                     }
                 })
+                .doOnSuccess(new Action1<Stats>() {
+                    @Override
+                    public void call(Stats stats) {
+                        mStatsData = stats;
+                    }
+                })
+                .doOnError(new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        setDataEmpty(true);
+                        setLoading(false);
+                    }
+                })
                 .subscribe(new SingleSubscriber<Stats>() {
                     @Override
                     public void onSuccess(Stats stats) {
-                        mStatsData = stats;
                         setChartData();
                     }
 
                     @Override
                     public void onError(Throwable error) {
                         mView.showMessageWithAction(R.string.toast_error_stats_load, getRetryAction());
-                        setDataEmpty(true);
-                        setLoading(false);
                     }
                 })
         );
@@ -214,7 +245,7 @@ public abstract class StatsPieViewModelBaseImpl<T extends StatsPieViewModel.View
         final PieData pieData = new PieData(xVals, pieDataSet);
         setDataOptions(pieData);
 
-        setCenterText(mCurrentIdentity.getGroup().getName());
+        setCenterText(mGroupName);
         setPieData(pieData);
         setLoading(false);
     }

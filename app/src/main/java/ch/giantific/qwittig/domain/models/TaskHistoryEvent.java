@@ -6,65 +6,73 @@ package ch.giantific.qwittig.domain.models;
 
 import android.support.annotation.NonNull;
 
-import com.parse.ParseACL;
-import com.parse.ParseClassName;
-import com.parse.ParseObject;
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
+import com.google.firebase.database.PropertyName;
+import com.google.firebase.database.ServerValue;
 
 import java.util.Date;
-
-import ch.giantific.qwittig.utils.parse.ParseUtils;
+import java.util.Map;
 
 /**
  * Represents an event when a user finished a task.
- * <p/>
- * Subclass of {@link ParseObject}.
  */
-@ParseClassName("TaskHistoryEvent")
-public class TaskHistoryEvent extends ParseObject {
+@IgnoreExtraProperties
+public class TaskHistoryEvent implements FirebaseModel {
 
-    public static final String CLASS = "TaskHistoryEvent";
-    public static final String TASK = "task";
-    public static final String IDENTITY = "identity";
-    public static final String DATE = "date";
-    public static final String PIN_LABEL = "taskHistoryEventPinLabel";
+    public static final String PATH = "taskHistoryEvents";
+    public static final String PATH_TASK = "task";
+    public static final String PATH_IDENTITY = "identity";
+    public static final String PATH_DATE = "date";
+    private String mId;
+    @PropertyName(PATH_CREATED_AT)
+    private long mCreatedAt;
+    @PropertyName(PATH_TASK)
+    private String mTask;
+    @PropertyName(PATH_IDENTITY)
+    private String mIdentity;
+    @PropertyName(PATH_DATE)
+    private Date mDate;
 
     public TaskHistoryEvent() {
-        // A default constructor is required.
+        // required for firebase de-/serialization
     }
 
-    public TaskHistoryEvent(@NonNull Task task, @NonNull Identity identity, @NonNull Date date) {
-        setTask(task);
-        setIdentity(identity);
-        setDate(date);
-        setAccessRights(task.getGroup());
+    public TaskHistoryEvent(@NonNull String task, @NonNull String identity, @NonNull Date date) {
+        mTask = task;
+        mIdentity = identity;
+        mDate = date;
     }
 
-    private void setAccessRights(@NonNull Group group) {
-        final ParseACL acl = ParseUtils.getDefaultAcl(group, false);
-        setACL(acl);
+    @Exclude
+    public String getId() {
+        return mId;
     }
 
-    public Task getTask() {
-        return (Task) getParseObject(TASK);
+    @Override
+    public void setId(@NonNull String id) {
+        mId = id;
     }
 
-    public void setTask(@NonNull Task task) {
-        put(TASK, task);
+    @Override
+    public Map<String, String> getCreatedAt() {
+        return ServerValue.TIMESTAMP;
     }
 
-    public Identity getIdentity() {
-        return (Identity) getParseObject(IDENTITY);
+    @Exclude
+    public Date getCreatedAtDate() {
+        return new Date(mCreatedAt);
     }
 
-    public void setIdentity(@NonNull Identity identity) {
-        put(IDENTITY, identity);
+    public String getTask() {
+        return mTask;
+    }
+
+    public String getIdentity() {
+        return mIdentity;
     }
 
     public Date getDate() {
-        return getDate(DATE);
-    }
-
-    public void setDate(@NonNull Date date) {
-        put(DATE, date);
+        return mDate;
     }
 }

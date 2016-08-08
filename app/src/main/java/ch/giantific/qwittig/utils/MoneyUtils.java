@@ -6,16 +6,11 @@ package ch.giantific.qwittig.utils;
 
 import android.support.annotation.NonNull;
 
-import com.parse.ParseConfig;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Currency;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * Provides useful static utility methods related to the handling of money.
@@ -24,8 +19,8 @@ public class MoneyUtils {
 
     // TODO: replace with currency dependent value
     public static final double MIN_DIFF = 0.01;
-    private static final int EXCHANGE_RATE_FRACTION_DIGITS = 6;
-    private static final int CONVERTED_PRICE_FRACTION_DIGITS = 4;
+    public static final int EXCHANGE_RATE_FRACTION_DIGITS = 6;
+    public static final int CONVERTED_PRICE_FRACTION_DIGITS = 4;
 
     private MoneyUtils() {
         // class cannot be instantiated

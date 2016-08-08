@@ -10,7 +10,7 @@ import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import ch.giantific.qwittig.presentation.helpfeedback.itemmodels.HelpFeedbackHeader;
@@ -37,15 +37,11 @@ public class HelpFeedbackViewModelImpl extends ViewModelBaseImpl<HelpFeedbackVie
     private static final String EMAIL_FEEDBACK = "feedback@qwittig.ch";
     private static final String FAQ_URL = "http://www.qwittig.ch/faq";
 
-    private final Navigator mNavigator;
-
     public HelpFeedbackViewModelImpl(@Nullable Bundle savedState,
                                      @NonNull Navigator navigator,
                                      @NonNull RxBus<Object> eventBus,
                                      @NonNull UserRepository userRepository) {
-        super(savedState, eventBus, userRepository);
-
-        mNavigator = navigator;
+        super(savedState, navigator, eventBus, userRepository);
     }
 
     @Override

@@ -8,7 +8,8 @@ import android.view.View;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 
 /**
@@ -21,9 +22,10 @@ public class LoginInvitationViewModelImpl extends ViewModelBaseImpl<LoginInvitat
     private String mInviterNickname;
 
     public LoginInvitationViewModelImpl(@Nullable Bundle savedState,
+                                        @NonNull Navigator navigator,
                                         @NonNull RxBus<Object> eventBus,
                                         @NonNull UserRepository userRepository) {
-        super(savedState, eventBus, userRepository);
+        super(savedState, navigator, eventBus, userRepository);
     }
 
     @Override

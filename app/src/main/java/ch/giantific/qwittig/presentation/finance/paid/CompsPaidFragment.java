@@ -11,10 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.mugen.Mugen;
-import com.mugen.MugenCallbacks;
-
-import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.FragmentFinanceCompensationsPaidBinding;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
@@ -48,22 +44,6 @@ public class CompsPaidFragment extends BaseRecyclerViewFragment<FinanceSubcompon
         mViewModel.attachView(this);
         mViewModel.setListInteraction(mRecyclerAdapter);
         mBinding.setViewModel(mViewModel);
-        Mugen.with(mRecyclerView, new MugenCallbacks() {
-            @Override
-            public void onLoadMore() {
-                mViewModel.onLoadMore();
-            }
-
-            @Override
-            public boolean isLoading() {
-                return mViewModel.isLoadingMore();
-            }
-
-            @Override
-            public boolean hasLoadedAllItems() {
-                return false;
-            }
-        }).start();
     }
 
     @Override
@@ -79,16 +59,5 @@ public class CompsPaidFragment extends BaseRecyclerViewFragment<FinanceSubcompon
     @Override
     protected BaseRecyclerAdapter getRecyclerAdapter() {
         return new CompsPaidRecyclerAdapter(mViewModel);
-    }
-
-    @Override
-    public void startUpdateCompensationsPaidService() {
-        ParseQueryService.startUpdateIdentities(getActivity());
-        ParseQueryService.startUpdateCompensationsPaid(getActivity());
-    }
-
-    @Override
-    public void loadQueryMoreCompensationsPaidWorker(int skip) {
-        CompsQueryMoreWorker.attach(getFragmentManager(), skip);
     }
 }

@@ -19,12 +19,13 @@ import java.util.Objects;
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import ch.giantific.qwittig.presentation.stats.models.Month;
 import ch.giantific.qwittig.presentation.stats.models.Stats;
 import ch.giantific.qwittig.presentation.stats.models.StatsPage;
-import ch.giantific.qwittig.utils.MessageAction;
+import ch.giantific.qwittig.presentation.common.MessageAction;
 
 /**
  * Provides an abstract base implementation of the {@link StatsViewModel} interface.
@@ -35,11 +36,9 @@ public abstract class StatsViewModelBaseImpl<T extends StatsViewModel.ViewListen
     protected static final int PERIOD_YEAR = 0;
     protected static final int PERIOD_MONTH = 1;
     private static final String STATE_PERIOD_TYPE = "STATE_PERIOD_TYPE";
-    private static final String STATE_LOADING = "STATE_LOADING";
     private static final String STATE_EMPTY = "STATE_EMPTY";
     private static final String STATE_YEAR = "STATE_YEAR";
     private static final String STATE_MONTH = "STATE_MONTH";
-    protected boolean mLoading;
     protected boolean mDataEmpty;
     protected String mYear;
     protected Month mMonth;
@@ -47,18 +46,17 @@ public abstract class StatsViewModelBaseImpl<T extends StatsViewModel.ViewListen
     protected int mPeriodType;
 
     public StatsViewModelBaseImpl(@Nullable Bundle savedState,
+                                  @NonNull Navigator navigator,
                                   @NonNull RxBus<Object> eventBus,
                                   @NonNull UserRepository userRepository) {
-        super(savedState, eventBus, userRepository);
+        super(savedState, navigator, eventBus, userRepository);
 
         if (savedState != null) {
             mYear = savedState.getString(STATE_YEAR);
             mMonth = savedState.getParcelable(STATE_MONTH);
             mPeriodType = savedState.getInt(STATE_PERIOD_TYPE);
-            mLoading = savedState.getBoolean(STATE_LOADING);
             mDataEmpty = savedState.getBoolean(STATE_EMPTY);
         } else {
-            mLoading = true;
             mDataEmpty = true;
         }
     }
@@ -70,20 +68,7 @@ public abstract class StatsViewModelBaseImpl<T extends StatsViewModel.ViewListen
         outState.putString(STATE_YEAR, mYear);
         outState.putParcelable(STATE_MONTH, mMonth);
         outState.putInt(STATE_PERIOD_TYPE, mPeriodType);
-        outState.putBoolean(STATE_LOADING, mLoading);
         outState.putBoolean(STATE_EMPTY, mDataEmpty);
-    }
-
-    @Override
-    @Bindable
-    public boolean isLoading() {
-        return mLoading;
-    }
-
-    @Override
-    public void setLoading(boolean loading) {
-        mLoading = loading;
-        notifyPropertyChanged(BR.loading);
     }
 
     @Override

@@ -11,10 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.mugen.Mugen;
-import com.mugen.MugenCallbacks;
-
-import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.FragmentHomePurchasesBinding;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
@@ -49,22 +45,6 @@ public class PurchasesFragment extends BaseRecyclerViewFragment<HomeSubcomponent
         mViewModel.attachView(this);
         mViewModel.setListInteraction(mRecyclerAdapter);
         mBinding.setViewModel(mViewModel);
-        Mugen.with(mRecyclerView, new MugenCallbacks() {
-            @Override
-            public void onLoadMore() {
-                mViewModel.onLoadMore();
-            }
-
-            @Override
-            public boolean isLoading() {
-                return mViewModel.isLoadingMore();
-            }
-
-            @Override
-            public boolean hasLoadedAllItems() {
-                return false;
-            }
-        }).start();
     }
 
     @Override
@@ -80,15 +60,5 @@ public class PurchasesFragment extends BaseRecyclerViewFragment<HomeSubcomponent
     @Override
     protected BaseRecyclerAdapter getRecyclerAdapter() {
         return new PurchasesRecyclerAdapter(mViewModel);
-    }
-
-    @Override
-    public void startUpdatePurchasesService() {
-        ParseQueryService.startUpdatePurchases(getActivity());
-    }
-
-    @Override
-    public void loadQueryMorePurchasesWorker(int skip) {
-        PurchasesQueryMoreWorker.attach(getFragmentManager(), skip);
     }
 }

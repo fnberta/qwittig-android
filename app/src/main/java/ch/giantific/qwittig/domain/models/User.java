@@ -1,195 +1,110 @@
-/*
- * Copyright (c) 2016 Fabio Berta
- */
-
 package ch.giantific.qwittig.domain.models;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
-import com.parse.ParseFacebookUtils;
-import com.parse.ParseUser;
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
+import com.google.firebase.database.PropertyName;
+import com.google.firebase.database.ServerValue;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
-
+import java.util.Map;
+import java.util.Set;
 
 /**
- * Represents a user in a group that shares their purchases and tasks and wishes to balance
- * everything.
+ * Created by fabio on 02.07.16.
  */
-public class User extends ParseUser {
+@IgnoreExtraProperties
+public class User implements FirebaseModel {
 
-    public static final String CLASS = "_User";
-    public static final String NAME = "username";
-    public static final String PASSWORD = "password";
-    public static final String IDENTITIES = "identities";
-    public static final String ARCHIVED_IDENTITIES = "archivedIdentities";
-    public static final String CURRENT_IDENTITY = "currentIdentity";
-    public static final String GOOGLE_ID = "googleId";
+    public static final String PATH = "users";
+    public static final String PATH_CURRENT_IDENTITY = "currentIdentity";
+    public static final String PATH_IDENTITIES = "identities";
+    public static final String PATH_ARCHIVED_IDENTITIES = "archivedIdentities";
+    public static final String PATH_TOKENS = "tokens";
+    private String mId;
+    @PropertyName(PATH_CREATED_AT)
+    private long mCreatedAt;
+    @PropertyName(PATH_CURRENT_IDENTITY)
+    private String mCurrentIdentity;
+    @PropertyName(PATH_IDENTITIES)
+    private Map<String, Boolean> mIdentities = new HashMap<>();
+    @PropertyName(PATH_ARCHIVED_IDENTITIES)
+    private Map<String, Boolean> mArchivedIdentities = new HashMap<>();
+    @PropertyName(PATH_TOKENS)
+    private Map<String, Boolean> mTokens;
 
     public User() {
-        // A default constructor is required.
+        // required for firebase de-/serialization
     }
 
-    public User(@NonNull String email, @NonNull String password) {
-        setUsername(email);
-        setPassword(password);
-    }
+    public User(@NonNull String currentIdentity, @NonNull List<String> identities,
+                @NonNull List<String> archivedIdentities) {
+        this(currentIdentity, identities);
 
-    @NonNull
-    public List<Identity> getIdentities() {
-        final List<Identity> identities = getList(IDENTITIES);
-        if (identities == null) {
-            return Collections.emptyList();
+        for (String archivedId : archivedIdentities) {
+            mArchivedIdentities.put(archivedId, true);
         }
-
-        return identities;
     }
 
-    public void setIdentities(@NonNull List<Identity> identities) {
-        put(IDENTITIES, identities);
-    }
-
-    @NonNull
-    public List<Identity> getArchivedIdentities() {
-        final List<Identity> identities = getList(ARCHIVED_IDENTITIES);
-        if (identities == null) {
-            return Collections.emptyList();
+    public User(@NonNull String currentIdentity,
+                @NonNull List<String> identities) {
+        mCurrentIdentity = currentIdentity;
+        for (String id : identities) {
+            mIdentities.put(id, true);
         }
-
-        return identities;
     }
 
-    public void setArchivedIdentities(@NonNull List<Identity> identities) {
-        put(ARCHIVED_IDENTITIES, identities);
+    @Exclude
+    public String getId() {
+        return mId;
     }
 
-    public void addArchivedIdentity(@NonNull Identity identity) {
-        addUnique(ARCHIVED_IDENTITIES, identity);
+    @Override
+    public void setId(@NonNull String id) {
+        mId = id;
     }
 
-    public Identity getCurrentIdentity() {
-        return (Identity) getParseObject(CURRENT_IDENTITY);
+    @Override
+    public Map<String, String> getCreatedAt() {
+        return ServerValue.TIMESTAMP;
     }
 
-    public void setCurrentIdentity(@NonNull Identity currentIdentity) {
-        put(CURRENT_IDENTITY, currentIdentity);
+    @Exclude
+    public Date getCreatedAtDate() {
+        return new Date(mCreatedAt);
     }
 
-    /**
-     * Archives the current identity and sets the first in the list as the user's new current
-     * identity.
-     *
-     * @return the new current identity.
-     */
-    public Identity archiveCurrentIdentity() {
-        final Identity currentIdentity = getCurrentIdentity();
-
-        // remove from active list
-        final List<Identity> identities = new ArrayList<>();
-        identities.add(currentIdentity);
-        removeAll(IDENTITIES, identities);
-
-        // add to archived list
-        currentIdentity.setActive(false);
-        addArchivedIdentity(currentIdentity);
-
-        // set new current identity and return it
-        final Identity newCurrent = getIdentities().get(0);
-        setCurrentIdentity(newCurrent);
-        return newCurrent;
+    public String getCurrentIdentity() {
+        return mCurrentIdentity;
     }
 
-    public String getGoogleId() {
-        return getString(GOOGLE_ID);
+    public Map<String, Boolean> getIdentities() {
+        return mIdentities;
     }
 
-    public void removeGoogleId() {
-        remove(GOOGLE_ID);
+    @Exclude
+    public Set<String> getIdentitiesIds() {
+        return mIdentities.keySet();
     }
 
-    public boolean isGoogleUser() {
-        return !TextUtils.isEmpty(getGoogleId());
+    public Map<String, Boolean> getArchivedIdentities() {
+        return mArchivedIdentities;
     }
 
-    public boolean isFacebookUser() {
-        return ParseFacebookUtils.isLinked(this);
+    @Exclude
+    public Set<String> getArchivedIdentitiesIds() {
+        return mArchivedIdentities.keySet();
     }
 
-    /**
-     * Returns whether one of the identity ids provided belongs to the user.
-     *
-     * @param identityIds the ids of the identities to check
-     * @return whether one of the identity ids provided belongs to the user
-     */
-    public boolean hasIdentity(@NonNull List<String> identityIds) {
-        final List<Identity> userIdentities = getIdentities();
-        for (Identity identity : userIdentities) {
-            if (identityIds.contains(identity.getObjectId())) {
-                return true;
-            }
-        }
-
-        return false;
+    public Map<String, Boolean> getTokens() {
+        return mTokens;
     }
 
-    /**
-     * Return whether the identity id provided belongs to the user
-     *
-     * @param identityId the id of the identity to check
-     * @return whether the identity id provided belongs to the user
-     */
-    public boolean hasIdentity(@NonNull String identityId) {
-        final List<Identity> userIdentities = getIdentities();
-        for (Identity identity : userIdentities) {
-            if (Objects.equals(identity.getObjectId(), identityId)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns whether the user is part of the group
-     *
-     * @param groupId the id of the group to check
-     * @return whether the user is part of the group
-     */
-    public boolean isInGroup(@NonNull String groupId) {
-        final List<String> groupIds = new ArrayList<>();
-        final List<Identity> identities = getIdentities();
-        for (Identity identity : identities) {
-            groupIds.add(identity.getGroup().getObjectId());
-        }
-
-        return groupIds.contains(groupId);
-    }
-
-    /**
-     * Returns the identity for the group or null if the user is not part of the group.
-     *
-     * @param groupId the id of the group to return the identity for
-     * @return the identity for the group or null if the user is not part of the group
-     */
-    @Nullable
-    public Identity getIdentityForGroup(@NonNull String groupId) {
-        final List<Identity> identities = getIdentities();
-        for (Identity identity : identities) {
-            if (Objects.equals(identity.getGroup().getObjectId(), groupId)) {
-                return identity;
-            }
-        }
-
-        return null;
-    }
-
-    public boolean isVanilla() {
-        return getIdentities().isEmpty();
+    @Exclude
+    public Set<String> getTokenIds() {
+        return mTokens.keySet();
     }
 }
-

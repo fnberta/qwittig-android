@@ -12,17 +12,23 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.Objects;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.domain.models.User;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.data.helper.RemoteConfigHelper;
+import ch.giantific.qwittig.data.repositories.GroupRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
+import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.Single;
 import rx.SingleSubscriber;
+import rx.functions.Action1;
+import rx.functions.Func1;
 
 /**
  * Provides an implementation of the {@link LoginEmailViewModel}.
@@ -30,11 +36,10 @@ import rx.SingleSubscriber;
 public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewModel.ViewListener>
         implements LoginEmailViewModel {
 
-    private static final String STATE_LOADING = "STATE_LOADING";
     private static final String STATE_SIGN_UP = "STATE_SIGN_UP";
-    private final Navigator mNavigator;
+    private final RemoteConfigHelper mConfigHelper;
+    private final GroupRepository mGroupRepo;
     private String mIdentityId;
-    private boolean mLoading;
     private boolean mSignUp;
     private String mEmail;
     private String mPassword;
@@ -44,16 +49,17 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
     public LoginEmailViewModelImpl(@Nullable Bundle savedState,
                                    @NonNull Navigator navigator,
                                    @NonNull RxBus<Object> eventBus,
-                                   @NonNull UserRepository userRepository) {
-        super(savedState, eventBus, userRepository);
+                                   @NonNull RemoteConfigHelper configHelper,
+                                   @NonNull UserRepository userRepository,
+                                   @NonNull GroupRepository groupRepository) {
+        super(savedState, navigator, eventBus, userRepository);
+        mConfigHelper = configHelper;
 
-        mNavigator = navigator;
+        mGroupRepo = groupRepository;
 
         if (savedState != null) {
-            mLoading = savedState.getBoolean(STATE_LOADING);
             mSignUp = savedState.getBoolean(STATE_SIGN_UP);
         } else {
-            mLoading = false;
             mSignUp = false;
         }
     }
@@ -62,7 +68,6 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
     public void saveState(@NonNull Bundle outState) {
         super.saveState(outState);
 
-        outState.putBoolean(STATE_LOADING, mLoading);
         outState.putBoolean(STATE_SIGN_UP, mSignUp);
     }
 
@@ -72,15 +77,9 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
     }
 
     @Override
-    @Bindable
-    public boolean isLoading() {
-        return mLoading;
-    }
-
-    @Override
     public void setLoading(boolean loading) {
-        mLoading = loading;
-        notifyPropertyChanged(BR.loading);
+        super.setLoading(loading);
+
         if (loading) {
             mView.hideKeyboard();
         }
@@ -126,17 +125,56 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
     }
 
     @Override
-    public void setUserLoginStream(@NonNull Single<User> single, @NonNull final String workerTag,
+    public void setUserLoginStream(@NonNull Single<FirebaseUser> single,
+                                   @NonNull final String workerTag,
                                    @LoginWorker.Type final int type) {
         getSubscriptions().add(single
-                .subscribe(new SingleSubscriber<User>() {
+                .flatMap(new Func1<FirebaseUser, Single<Boolean>>() {
                     @Override
-                    public void onSuccess(User user) {
+                    public Single<Boolean> call(final FirebaseUser firebaseUser) {
+                        final String userId = firebaseUser.getUid();
+                        if (!TextUtils.isEmpty(mIdentityId)) {
+                            return mUserRepo.getIdentity(mIdentityId)
+                                    .doOnSuccess(new Action1<Identity>() {
+                                        @Override
+                                        public void call(Identity identity) {
+                                            mGroupRepo.joinGroup(userId, mIdentityId, identity.getGroup());
+                                        }
+                                    })
+                                    .map(new Func1<Identity, Boolean>() {
+                                        @Override
+                                        public Boolean call(Identity identity) {
+                                            return type == LoginWorker.Type.SIGN_UP_EMAIL;
+                                        }
+                                    });
+                        }
+
+                        if (type == LoginWorker.Type.SIGN_UP_EMAIL) {
+                            return Single.just(true)
+                                    .doOnSuccess(new Action1<Boolean>() {
+                                        @Override
+                                        public void call(Boolean isUserNew) {
+                                            final String email = firebaseUser.getEmail();
+                                            final String defaultNickname = !TextUtils.isEmpty(email)
+                                                    ? email.substring(0, email.indexOf("@"))
+                                                    : "";
+                                            mGroupRepo.createGroup(userId,
+                                                    mConfigHelper.getDefaultGroupName(),
+                                                    mConfigHelper.getDefaultGroupCurrency(),
+                                                    defaultNickname, null);
+                                        }
+                                    });
+                        }
+
+                        return Single.just(false);
+                    }
+                })
+                .subscribe(new SingleSubscriber<Boolean>() {
+                    @Override
+                    public void onSuccess(Boolean isUserNew) {
                         mView.removeWorker(workerTag);
 
-                        if (type == LoginWorker.Type.RESET_PASSWORD) {
-                            mView.showMessage(R.string.toast_password_reset);
-                        } else if (user.isNew()) {
+                        if (isUserNew) {
                             mView.showProfileScreen(!TextUtils.isEmpty(mIdentityId));
                         } else {
                             mNavigator.finish(Activity.RESULT_OK);
@@ -148,7 +186,29 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
                         mView.removeWorker(workerTag);
                         setLoading(false);
 
-                        mView.showMessage(mUserRepo.getErrorMessage(error));
+                        mView.showMessage(R.string.toast_error_login);
+                    }
+                })
+        );
+    }
+
+    @Override
+    public void setEmailUserStream(@NonNull Single<Void> single, @NonNull final String workerTag) {
+        getSubscriptions().add(single.subscribe(new SingleSubscriber<Void>() {
+                    @Override
+                    public void onSuccess(Void value) {
+                        mView.removeWorker(workerTag);
+                        setLoading(false);
+
+                        mView.showMessage(R.string.toast_password_reset);
+                    }
+
+                    @Override
+                    public void onError(Throwable error) {
+                        mView.removeWorker(workerTag);
+                        setLoading(false);
+
+                        mView.showMessage(R.string.toast_error_login);
                     }
                 })
         );
@@ -185,7 +245,7 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
     public void onLoginClick(View view) {
         if (validate()) {
             setLoading(true);
-            mView.loadEmailLoginWorker(mEmail, mPassword, mIdentityId);
+            mView.loadEmailLoginWorker(mEmail, mPassword);
         }
     }
 
@@ -198,7 +258,7 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
 
         if (validate()) {
             setLoading(true);
-            mView.loadEmailSignUpWorker(mEmail, mPassword, mIdentityId);
+            mView.loadEmailSignUpWorker(mEmail, mPassword);
         }
     }
 

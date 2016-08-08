@@ -63,7 +63,7 @@
                 android:layout_marginStart="@dimen/key_line_1"
                 android:layout_marginTop="@dimen/normal_space"
                 android:contentDescription="@string/user_avatar"
-                app:avatar="@{itemModel.taskUserResponsibleAvatar}"
+                app:avatar="@{itemModel.avatar}"
                 app:fallback="@{@drawable/ic_account_circle_black_40dp}"
                 tools:src="@drawable/ic_account_circle_black_40dp"
                 />
@@ -76,7 +76,7 @@
                 android:layout_marginTop="@dimen/normal_space"
                 android:layout_toEndOf="@id/iv_avatar"
                 android:layout_toStartOf="@+id/tv_task_deadline"
-                android:text="@{itemModel.currentUserResponsible ? @string/nickname_me : itemModel.taskUserResponsibleNickname}"
+                android:text="@{itemModel.currentUserResponsible ? @string/nickname_me : itemModel.nickname}"
                 tools:text="Vera"
                 />
 
@@ -87,7 +87,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tv_task_user_responsible"
                 android:layout_toEndOf="@id/iv_avatar"
-                android:text="@{itemModel.taskTitle}"
+                android:text="@{itemModel.title}"
                 tools:text="Küche putzen"
                 />
 
@@ -99,7 +99,7 @@
                 android:layout_below="@id/tv_task_title"
                 android:layout_marginTop="@dimen/small_space"
                 android:layout_toEndOf="@id/iv_avatar"
-                android:text="@{itemModel.taskTimeFrame}"
+                android:text="@{itemModel.timeFrame}"
                 tools:text="Wöchentlich"
                 />
 
@@ -111,7 +111,7 @@
                 android:layout_below="@id/tv_task_time_frame"
                 android:layout_marginBottom="@dimen/normal_space"
                 android:layout_toEndOf="@id/iv_avatar"
-                android:text="@{itemModel.taskIdentities}"
+                android:text="@{itemModel.identitiesText}"
                 tools:text="vera - lexli - sturzi"
                 />
 
@@ -123,8 +123,8 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginEnd="@dimen/normal_space"
                 android:layout_marginTop="@dimen/normal_space"
-                android:text="@{itemModel.taskDeadline}"
-                android:textColor="@{itemModel.isTaskDeadlinePast ? @color/red : @color/green}"
+                android:text="@{itemModel.deadlineText}"
+                android:textColor="@{itemModel.isDeadlinePast ? @color/red : @color/green}"
                 tools:text="In 2 Tagen"
                 tools:textColor="@color/green"
                 />
@@ -145,7 +145,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_below="@id/divider"
                 android:onClick="@{() -> viewModel.onDoneButtonClick(itemModel)}"
-                android:text="@{itemModel.taskDoneText}"
+                android:text="@{itemModel.doneText}"
                 android:textColor="?attr/colorAccent"
                 android:visibility="@{itemModel.currentUserResponsible ? View.VISIBLE : View.GONE}"
                 tools:text="Done for this week"
@@ -159,7 +159,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_below="@id/divider"
                 android:onClick="@{() -> viewModel.onRemindButtonClick(itemModel)}"
-                android:text="@{@string/task_remind_user(itemModel.taskUserResponsibleNickname)}"
+                android:text="@{@string/task_remind_user(itemModel.nickname)}"
                 android:textColor="?attr/colorAccent"
                 android:visibility="@{itemModel.currentUserResponsible ? View.GONE : View.VISIBLE}"
                 tools:text="Remind sturzi"

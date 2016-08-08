@@ -7,209 +7,194 @@ package ch.giantific.qwittig.presentation.finance.paid;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.view.View;
+import android.text.TextUtils;
 
-import java.util.ArrayList;
+import com.google.firebase.auth.FirebaseUser;
+
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Objects;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.data.bus.events.EventCompensationConfirmed;
+import ch.giantific.qwittig.data.repositories.CompensationRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
+import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent;
 import ch.giantific.qwittig.domain.models.Compensation;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.repositories.CompensationRepository;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
-import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModelBaseImpl;
-import ch.giantific.qwittig.utils.MessageAction;
+import ch.giantific.qwittig.domain.models.User;
+import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
+import ch.giantific.qwittig.presentation.common.Navigator;
+import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
+import ch.giantific.qwittig.presentation.finance.paid.itemmodels.CompsPaidItemModel;
+import ch.giantific.qwittig.utils.MoneyUtils;
 import rx.Observable;
-import rx.SingleSubscriber;
 import rx.Subscriber;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import timber.log.Timber;
 
 /**
  * Provides an implementation of the {@link CompsPaidViewModel}.
  */
-public class CompsPaidViewModelImpl
-        extends OnlineListViewModelBaseImpl<Compensation, CompsPaidViewModel.ViewListener>
+public class CompsPaidViewModelImpl extends ListViewModelBaseImpl<CompsPaidItemModel, CompsPaidViewModel.ViewListener>
         implements CompsPaidViewModel {
 
-    private static final String STATE_IS_LOADING_MORE = "STATE_IS_LOADING_MORE";
     private final CompensationRepository mCompsRepo;
-    private boolean mLoadingMore;
+    private String mCompGroupId;
+    private NumberFormat mMoneyFormatter;
+    private String mCurrentGroupId;
 
     public CompsPaidViewModelImpl(@Nullable Bundle savedState,
+                                  @NonNull Navigator navigator,
                                   @NonNull RxBus<Object> eventBus,
                                   @NonNull UserRepository userRepository,
-                                  @NonNull CompensationRepository compsRepo) {
-        super(savedState, eventBus, userRepository);
+                                  @NonNull CompensationRepository compsRepo,
+                                  @Nullable String compGroupId) {
+        super(savedState, navigator, eventBus, userRepository);
 
         mCompsRepo = compsRepo;
-        if (savedState != null) {
-            mItems = new ArrayList<>();
-            mLoadingMore = savedState.getBoolean(STATE_IS_LOADING_MORE, false);
-        }
+        mCompGroupId = compGroupId;
     }
 
     @Override
-    public void saveState(@NonNull Bundle outState) {
-        super.saveState(outState);
-
-        outState.putBoolean(STATE_IS_LOADING_MORE, mLoadingMore);
+    protected Class<CompsPaidItemModel> getItemModelClass() {
+        return CompsPaidItemModel.class;
     }
 
     @Override
-    public void onViewVisible() {
-        super.onViewVisible();
+    protected int compareItemModels(CompsPaidItemModel o1, CompsPaidItemModel o2) {
+        return o1.compareTo(o2);
+    }
 
-        getSubscriptions().add(mEventBus.observeEvents(EventCompensationConfirmed.class)
-                .subscribe(new Action1<EventCompensationConfirmed>() {
+    @Override
+    protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
+        super.onUserLoggedIn(currentUser);
+
+        getSubscriptions().add(mUserRepo.observeUser(currentUser.getUid())
+                .flatMap(new Func1<User, Observable<Identity>>() {
                     @Override
-                    public void call(EventCompensationConfirmed eventCompensationConfirmed) {
-                        loadData();
+                    public Observable<Identity> call(final User user) {
+                        return getMatchingIdentity(user);
+                    }
+                })
+                .subscribe(new IndefiniteSubscriber<Identity>() {
+                    @Override
+                    public void onNext(Identity identity) {
+                        mMoneyFormatter = MoneyUtils.getMoneyFormatter(identity.getGroupCurrency(),
+                                true, true);
+
+                        mInitialDataLoaded = false;
+                        final String identityId = identity.getId();
+                        final String groupId = identity.getGroup();
+                        if (!Objects.equals(mCurrentGroupId, groupId)) {
+                            mItems.clear();
+                        }
+                        mCurrentGroupId = groupId;
+                        addDataListener(identityId);
+                        loadInitialData(identityId);
                     }
                 })
         );
     }
 
-    @Override
-    public void loadData() {
-        getSubscriptions().add(mUserRepo.fetchIdentityData(mCurrentIdentity)
-                .flatMapObservable(new Func1<Identity, Observable<Compensation>>() {
+    private Observable<Identity> getMatchingIdentity(final User user) {
+        return mUserRepo.getIdentity(user.getCurrentIdentity())
+                .flatMapObservable(new Func1<Identity, Observable<Identity>>() {
                     @Override
-                    public Observable<Compensation> call(Identity identity) {
-                        return mCompsRepo.getCompensationsPaid(identity);
-                    }
-                }).subscribe(new Subscriber<Compensation>() {
-                    @Override
-                    public void onStart() {
-                        super.onStart();
-                        mItems.clear();
-                    }
+                    public Observable<Identity> call(Identity identity) {
+                        if (TextUtils.isEmpty(mCompGroupId)
+                                || Objects.equals(mCompGroupId, identity.getGroup())) {
+                            return Observable.just(identity);
+                        }
 
+                        return mUserRepo.switchGroup(user, mCompGroupId)
+                                .doOnNext(new Action1<Identity>() {
+                                    @Override
+                                    public void call(Identity identity) {
+                                        mCompGroupId = identity.getGroup();
+                                    }
+                                })
+                                .flatMap(new Func1<Identity, Observable<Identity>>() {
+                                    @Override
+                                    public Observable<Identity> call(Identity identity) {
+                                        return Observable.never();
+                                    }
+                                });
+                    }
+                });
+    }
+
+    private void addDataListener(@NonNull final String identityId) {
+        setDataListenerSub(mCompsRepo.observeCompensationChildren(mCurrentGroupId, identityId, true)
+                .filter(new Func1<RxChildEvent<Compensation>, Boolean>() {
+                    @Override
+                    public Boolean call(RxChildEvent<Compensation> compensationRxChildEvent) {
+                        return mInitialDataLoaded;
+                    }
+                })
+                .flatMap(new Func1<RxChildEvent<Compensation>, Observable<CompsPaidItemModel>>() {
+                    @Override
+                    public Observable<CompsPaidItemModel> call(final RxChildEvent<Compensation> event) {
+                        return getItemModels(event.getValue(), event.getEventType(),
+                                identityId);
+                    }
+                })
+                .subscribe(this)
+        );
+    }
+
+    private void loadInitialData(@NonNull final String identityId) {
+        setInitialDataSub(mCompsRepo.getCompensations(mCurrentGroupId, identityId, true)
+                .flatMap(new Func1<Compensation, Observable<CompsPaidItemModel>>() {
+                    @Override
+                    public Observable<CompsPaidItemModel> call(Compensation compensation) {
+                        return getItemModels(compensation, -1, identityId);
+                    }
+                })
+                .toList()
+                .subscribe(new Subscriber<List<CompsPaidItemModel>>() {
                     @Override
                     public void onCompleted() {
+                        mInitialDataLoaded = true;
                         setLoading(false);
-                        mListInteraction.notifyDataSetChanged();
-
-                        if (mLoadingMore) {
-                            addLoadMore();
-                            mListInteraction.scrollToPosition(getLastPosition());
-                        }
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        setLoading(false);
-                        mView.showMessage(R.string.toast_error_comps_load);
+                        onDataError(e);
                     }
 
                     @Override
-                    public void onNext(Compensation compensation) {
-                        mItems.add(compensation);
+                    public void onNext(List<CompsPaidItemModel> compsPaidItemModels) {
+                        mItems.addAll(compsPaidItemModels);
                     }
                 })
         );
-    }
-
-    private void addLoadMore() {
-        mItems.add(null);
-        final int lastPosition = getLastPosition();
-        mListInteraction.notifyItemInserted(lastPosition);
-    }
-
-    @Override
-    public void onDataUpdated(boolean successful) {
-        setRefreshing(false);
-        if (successful) {
-            loadData();
-        } else {
-            mView.showMessageWithAction(R.string.toast_error_comps_update, getRefreshAction());
-        }
-    }
-
-    @Override
-    protected void refreshItems() {
-        if (!mView.isNetworkAvailable()) {
-            setRefreshing(false);
-            mView.showMessageWithAction(R.string.toast_no_connection, getRefreshAction());
-            return;
-        }
-
-        mView.startUpdateCompensationsPaidService();
     }
 
     @NonNull
-    private MessageAction getRefreshAction() {
-        return new MessageAction(R.string.action_retry) {
-            @Override
-            public void onClick(View v) {
-                refreshItems();
-            }
-        };
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        if (mItems.get(position) == null) {
-            return TYPE_PROGRESS;
-        }
-
-        return TYPE_ITEM;
-    }
-
-    @Override
-    public void setCompensationsQueryMoreStream(@NonNull Observable<Compensation> observable,
-                                                @NonNull final String workerTag) {
-        getSubscriptions().add(observable
-                .toList()
-                .toSingle()
-                .subscribe(new SingleSubscriber<List<Compensation>>() {
+    private Observable<CompsPaidItemModel> getItemModels(@NonNull final Compensation compensation,
+                                                         final int eventType,
+                                                         @NonNull String identityId) {
+        final String creditorId = compensation.getCreditor();
+        final boolean isCredit = Objects.equals(creditorId, identityId);
+        return mUserRepo.getIdentity(isCredit ? compensation.getDebtor() : creditorId)
+                .map(new Func1<Identity, CompsPaidItemModel>() {
                     @Override
-                    public void onSuccess(List<Compensation> compensations) {
-                        mView.removeWorker(workerTag);
-                        mLoadingMore = false;
-
-                        removeLoadMore();
-                        mItems.addAll(compensations);
-                        mListInteraction.notifyItemRangeInserted(getItemCount(), compensations.size());
-                    }
-
-                    @Override
-                    public void onError(Throwable error) {
-                        mView.removeWorker(workerTag);
-                        mView.showMessageWithAction(mCompsRepo.getErrorMessage(error),
-                                new MessageAction(R.string.action_retry) {
-                                    @Override
-                                    public void onClick(View v) {
-                                        onLoadMore();
-                                    }
-                                });
-                        mLoadingMore = false;
-
-                        removeLoadMore();
+                    public CompsPaidItemModel call(Identity identity) {
+                        return new CompsPaidItemModel(eventType, compensation, identity, isCredit,
+                                mMoneyFormatter
+                        );
                     }
                 })
-        );
-    }
-
-    private void removeLoadMore() {
-        final int finalPosition = getLastPosition();
-        mItems.remove(finalPosition);
-        mListInteraction.notifyItemRemoved(finalPosition);
+                .toObservable();
     }
 
     @Override
-    public void onLoadMore() {
-        mLoadingMore = true;
+    protected void onDataError(@NonNull Throwable e) {
+        super.onDataError(e);
 
-        addLoadMore();
-        final int skip = mItems.size();
-        mView.loadQueryMoreCompensationsPaidWorker(skip);
-    }
-
-    @Override
-    public boolean isLoadingMore() {
-        return !mView.isNetworkAvailable() || mLoadingMore || isRefreshing();
+        mView.showMessage(R.string.toast_error_comps_load);
     }
 }

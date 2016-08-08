@@ -56,7 +56,7 @@ public abstract class BasePurchaseAddEditReceiptFragment<T, S extends PurchaseAd
         menu.clear();
         inflater.inflate(R.menu.menu_purchase_edit_receipt_fragment, menu);
 
-        if (mViewModel.isReceiptImageAvailable()) {
+        if (mViewModel.isReceiptAvailable()) {
             menu.findItem(R.id.action_purchase_edit_receipt_edit).setVisible(true);
             menu.findItem(R.id.action_purchase_edit_receipt_delete).setVisible(true);
         } else {

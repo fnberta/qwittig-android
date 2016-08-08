@@ -15,7 +15,7 @@ import android.text.TextUtils;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.DialogPurchaseNoteBinding;
-import ch.giantific.qwittig.presentation.common.fragments.BaseDialogFragment;
+import ch.giantific.qwittig.presentation.common.fragments.dialogs.BaseDialogFragment;
 
 /**
  * Provides a dialog that allows the user to enter his/her email address in order to request a

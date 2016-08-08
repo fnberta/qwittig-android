@@ -5,15 +5,12 @@
 package ch.giantific.qwittig.presentation.tasks.details;
 
 import android.app.Activity;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,14 +23,13 @@ import java.util.List;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentTaskDetailsBinding;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
 import ch.giantific.qwittig.presentation.tasks.details.di.TaskDetailsSubcomponent;
 
 /**
- * Shows the details of a {@link Task}. Most of the information gets displayed in the
+ * Shows the details of a task. Most of the information gets displayed in the
  * {@link Toolbar} of the hosting {@link Activity}. The fragment itself shows a list of users that
  * have previously finished the task.
  * <p/>
@@ -102,10 +98,10 @@ public class TaskDetailsFragment extends BaseRecyclerViewFragment<TaskDetailsSub
         final int id = item.getItemId();
         switch (id) {
             case R.id.action_task_delete:
-                mViewModel.deleteTask();
+                mViewModel.onDeleteTaskMenuClick();
                 return true;
             case R.id.action_task_edit:
-                mViewModel.editTask();
+                mViewModel.onEditTaskMenuClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -126,21 +122,21 @@ public class TaskDetailsFragment extends BaseRecyclerViewFragment<TaskDetailsSub
     @NonNull
     @Override
     public SpannableStringBuilder buildTaskIdentitiesString(@NonNull List<Identity> identities,
-                                                            @NonNull Identity identityResponsible) {
+                                                            @NonNull String identityResponsible) {
         final SpannableStringBuilder stringBuilder = new SpannableStringBuilder();
-        final int usersInvolvedSize = identities.size();
-        stringBuilder.append(identityResponsible.getNickname());
-
-        if (usersInvolvedSize > 1) {
-            final int spanEnd = stringBuilder.length();
-            stringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, spanEnd,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            for (int i = 1; i < usersInvolvedSize; i++) {
-                final Identity identity = identities.get(i);
-                stringBuilder.append(" - ").append(identity.getNickname());
-            }
-        }
-
+//        final int usersInvolvedSize = identities.size();
+//        stringBuilder.append(identityResponsible.getNickname());
+//
+//        if (usersInvolvedSize > 1) {
+//            final int spanEnd = stringBuilder.length();
+//            stringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, spanEnd,
+//                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//            for (int i = 1; i < usersInvolvedSize; i++) {
+//                final Identity identity = identities.get(i);
+//                stringBuilder.append(" - ").append(identity.getNickname());
+//            }
+//        }
+//
         return stringBuilder;
     }
 }

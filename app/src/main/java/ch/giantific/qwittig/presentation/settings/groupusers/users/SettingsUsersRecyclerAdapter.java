@@ -16,7 +16,7 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.RowSettingsUsersUserBinding;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.settings.groupusers.users.itemmodels.SettingsUsersUserRowItemModel;
+import ch.giantific.qwittig.presentation.settings.groupusers.users.itemmodels.SettingsUsersUserItemModel;
 
 /**
  * Provides a {@link RecyclerView} adapter that manages the list of items on the manage users
@@ -43,7 +43,7 @@ public class SettingsUsersRecyclerAdapter extends BaseRecyclerAdapter<SettingsUs
     @Override
     public void onBindViewHolder(GroupUserRow holder, int position) {
         final RowSettingsUsersUserBinding binding = holder.getBinding();
-        final SettingsUsersUserRowItemModel viewModel = mViewModel.getItemAtPosition(position);
+        final SettingsUsersUserItemModel viewModel = mViewModel.getItemAtPosition(position);
 
         holder.setMenuVisibility(viewModel.isPending());
         binding.setViewModel(viewModel);
