@@ -20,14 +20,14 @@ import ch.giantific.qwittig.presentation.common.fragments.dialogs.DiscardChanges
 import ch.giantific.qwittig.presentation.common.fragments.dialogs.EmailReAuthenticateDialogFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.common.workers.EmailUserWorkerListener;
+import ch.giantific.qwittig.presentation.common.workers.FacebookUserWorkerListener;
 import ch.giantific.qwittig.presentation.common.workers.GoogleUserWorkerListener;
 
 /**
  * Defines a observable view model for profile settings screen.
  */
 public interface SettingsProfileViewModel extends ViewModel<SettingsProfileViewModel.ViewListener>,
-        GoogleUserWorkerListener,
-        EmailUserWorkerListener,
+        GoogleUserWorkerListener, EmailUserWorkerListener, FacebookUserWorkerListener,
         AvatarLoadListener,
         DiscardChangesDialogFragment.DialogInteractionListener,
         EmailReAuthenticateDialogFragment.DialogInteractionListener,
@@ -80,6 +80,10 @@ public interface SettingsProfileViewModel extends ViewModel<SettingsProfileViewM
 
     void onUnlinkThirdPartyLoginMenuClick();
 
+    void onFacebookSignedIn(@NonNull String token);
+
+    void onFacebookLoginFailed();
+
     void onExitClick();
 
     void onEmailChanged(CharSequence s, int start, int before, int count);
@@ -108,7 +112,8 @@ public interface SettingsProfileViewModel extends ViewModel<SettingsProfileViewM
         void loadUnlinkGoogleWorker(@NonNull String email, @NonNull String password,
                                     @NonNull String idToken);
 
-        void loadUnlinkFacebookWorker();
+        void loadUnlinkFacebookWorker(@NonNull String email, @NonNull String password,
+                                      @NonNull String idToken);
 
         void showDiscardChangesDialog();
 
@@ -130,5 +135,7 @@ public interface SettingsProfileViewModel extends ViewModel<SettingsProfileViewM
                                            @Nullable String newPassword);
 
         void reAuthenticateGoogle();
+
+        void reAuthenticateFacebook();
     }
 }

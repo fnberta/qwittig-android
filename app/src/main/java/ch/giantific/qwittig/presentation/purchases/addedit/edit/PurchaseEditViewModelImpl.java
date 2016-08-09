@@ -18,6 +18,7 @@ import java.util.Set;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.data.helper.RemoteConfigHelper;
+import ch.giantific.qwittig.data.repositories.GroupRepository;
 import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Identity;
@@ -37,7 +38,7 @@ import rx.functions.Func1;
 
 /**
  * Provides an implementation of the {@link PurchaseAddEditViewModel} for the edit purchase screen.
- * <p/>
+ * <p>
  * Subclass of {@link PurchaseAddViewModelImpl}.
  */
 public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
@@ -54,9 +55,11 @@ public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
                                      @NonNull RxBus<Object> eventBus,
                                      @NonNull RemoteConfigHelper configHelper,
                                      @NonNull UserRepository userRepository,
+                                     @NonNull GroupRepository groupRepository,
                                      @NonNull PurchaseRepository purchaseRepository,
                                      @NonNull String editPurchaseId) {
-        super(savedState, navigator, eventBus, userRepository, purchaseRepository, configHelper);
+        super(savedState, navigator, eventBus, userRepository, groupRepository,
+                purchaseRepository, configHelper);
 
         mEditPurchaseId = editPurchaseId;
 

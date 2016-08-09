@@ -20,6 +20,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
+import android.util.Base64;
 import android.view.ActionMode;
 import android.view.View;
 
@@ -63,24 +64,22 @@ import ch.giantific.qwittig.presentation.purchases.list.purchases.PurchasesFragm
 import ch.giantific.qwittig.presentation.purchases.list.purchases.PurchasesViewModel;
 import ch.giantific.qwittig.utils.CameraUtils;
 import ch.giantific.qwittig.utils.Utils;
-import rx.Single;
 import timber.log.Timber;
 
 /**
  * Provides the launcher activity for {@link Qwittig}, hosts a viewpager with
  * {@link PurchasesFragment} and {@link DraftsFragment} that display lists of recent
  * purchases and open drafts. Only loads the fragments if the  user is logged in.
- * <p/>
+ * <p>
  * Handles the case when a user is invited to a group and he/she wants to join it or declines the
  * invitation.
- * <p/>
+ * <p>
  * Subclass of {@link BaseNavDrawerActivity}.
  */
 public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implements
         DraftsFragment.ActivityListener,
         HomeViewModel.ViewListener,
-        JoinGroupDialogFragment.DialogInteractionListener,
-        OcrWorkerListener {
+        JoinGroupDialogFragment.DialogInteractionListener {
 
     private static final String STATE_DRAFTS_FRAGMENT = "STATE_DRAFTS_FRAGMENT";
     private static final int PERMISSIONS_REQUEST_CAPTURE_IMAGES = 1;
@@ -296,7 +295,8 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
                 .into(new SimpleTarget<byte[]>(PurchaseRepository.WIDTH, PurchaseRepository.HEIGHT) {
                     @Override
                     public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
-                        mHomeViewModel.onReceiptImageTaken(resource);
+                        final String base64 = Base64.encodeToString(resource, Base64.DEFAULT);
+                        mHomeViewModel.onReceiptImageTaken(base64);
                         deleteReceiptFile(receiptImagePath);
                     }
                 });
@@ -414,15 +414,4 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
 
         return true;
     }
-
-    @Override
-    public void loadOcrWorker(@NonNull byte[] receipt) {
-        OcrWorker.attach(getSupportFragmentManager(), receipt);
-    }
-
-    @Override
-    public void setOcrStream(@NonNull Single<Void> single, @NonNull String workerTag) {
-        mHomeViewModel.setOcrStream(single, workerTag);
-    }
 }
-

@@ -2,7 +2,6 @@ package ch.giantific.qwittig.data.rxwrapper.firebase;
 
 import android.support.annotation.NonNull;
 
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
@@ -11,7 +10,6 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.List;
 
 import ch.giantific.qwittig.data.rxwrapper.firebase.subscribers.ListenToChildEventsOnSubscribe;
-import ch.giantific.qwittig.data.rxwrapper.firebase.subscribers.ListenToTaskOnCompleteOnSubscribe;
 import ch.giantific.qwittig.data.rxwrapper.firebase.subscribers.ListenToValueOnSubscribe;
 import ch.giantific.qwittig.data.rxwrapper.firebase.subscribers.ListenToValueOnceOnSubscribe;
 import ch.giantific.qwittig.data.rxwrapper.firebase.subscribers.ListenToValuesOnSubscribe;

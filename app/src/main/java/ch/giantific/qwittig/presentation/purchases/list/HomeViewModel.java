@@ -15,8 +15,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
  * Defines an observable view model for the home screen.
  */
 public interface HomeViewModel extends ViewModel<HomeViewModel.ViewListener>,
-        JoinGroupDialogFragment.DialogInteractionListener,
-        OcrWorkerListener {
+        JoinGroupDialogFragment.DialogInteractionListener {
 
     @Bindable
     boolean isOcrProcessing();
@@ -36,7 +35,7 @@ public interface HomeViewModel extends ViewModel<HomeViewModel.ViewListener>,
     void handleInvitation(@NonNull String identityId, @NonNull String groupName,
                           @NonNull String inviterNickname);
 
-    void onReceiptImageTaken(@NonNull byte[] receipt);
+    void onReceiptImageTaken(@NonNull String receipt);
 
     void onReceiptImageDiscarded();
 
@@ -61,8 +60,6 @@ public interface HomeViewModel extends ViewModel<HomeViewModel.ViewListener>,
         void hideProgressDialog();
 
         void captureImage();
-
-        void loadOcrWorker(@NonNull byte[] receipt);
 
         void toggleDraftTab(boolean draftsAvailable);
     }

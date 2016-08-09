@@ -354,7 +354,7 @@
     <string name="toast_error_remind_failed">Remind failed</string>
     <string name="toast_error_login">Login failed</string>
     <string name="toast_error_logout">Logout failed</string>
-    <string name="toast_login_failed_facebook">Login with Facebook failed</string>
+    <string name="toast_error_login_facebook">Login with Facebook failed</string>
     <string name="progress_profile_unlink">Un-linking account and updating profile…</string>
     <string name="toast_error_settings_groups">Failed to load groups</string>
     <string name="toast_error_settings">Failed to load settings</string>
@@ -371,5 +371,6 @@
     <string name="progress_profile_change_email_pw">Updating profile…</string>
     <string name="toast_error_leave_group">Failed to leave group. Please try again.</string>
     <string name="toast_group_left">You left the group</string>
+    <string name="facebook_protocol_scheme" translatable="false">fb483474338502548</string>
 
 </resources>

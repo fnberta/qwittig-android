@@ -26,9 +26,7 @@ import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.Observable;
-import rx.Single;
 import rx.SingleSubscriber;
-import rx.Subscriber;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import timber.log.Timber;
@@ -120,7 +118,7 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
     }
 
     private void observeGroupIdentities(@NonNull String groupId) {
-        getSubscriptions().add(mUserRepo.observeGroupIdentityChildren(groupId).subscribe());
+        getSubscriptions().add(mGroupRepo.observeGroupIdentityChildren(groupId).subscribe());
     }
 
     @Override
@@ -178,8 +176,8 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
 
                     @Override
                     public void onError(Throwable error) {
-                        mView.showMessage(R.string.toast_error_join_group);
                         Timber.e(error, "Failed to join invited group with error:");
+                        mView.showMessage(R.string.toast_error_join_group);
                     }
                 })
         );
@@ -191,10 +189,10 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
     }
 
     @Override
-    public void onReceiptImageTaken(@NonNull byte[] receipt) {
+    public void onReceiptImageTaken(@NonNull String receipt) {
 //        startProgress();
         mView.showMessage(R.string.toast_purchase_ocr_started);
-        mView.loadOcrWorker(receipt);
+        mPurchaseRepo.uploadReceiptForOcr(receipt, mCurrentUserId);
     }
 
     @Override
@@ -205,25 +203,6 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
     @Override
     public void onReceiptImageFailed() {
         mView.showMessage(R.string.toast_create_image_file_failed);
-    }
-
-    @Override
-    public void setOcrStream(@NonNull Single<Void> single, @NonNull final String workerTag) {
-        getSubscriptions().add(single.subscribe(new SingleSubscriber<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        mView.removeWorker(workerTag);
-                    }
-
-                    @Override
-                    public void onError(Throwable error) {
-                        mView.removeWorker(workerTag);
-
-                        mView.showMessage(R.string.push_purchase_ocr_failed_alert);
-                        stopProgress(false);
-                    }
-                })
-        );
     }
 
     @Override

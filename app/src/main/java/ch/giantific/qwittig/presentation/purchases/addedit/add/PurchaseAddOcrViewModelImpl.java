@@ -16,6 +16,7 @@ import java.util.Map;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.data.helper.RemoteConfigHelper;
+import ch.giantific.qwittig.data.repositories.GroupRepository;
 import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Identity;
@@ -32,7 +33,7 @@ import rx.functions.Func1;
 /**
  * Provides an implementation of the {@link PurchaseAddEditViewModel} for the screen where the
  * purchase items get automatically filled in via an image of the receipt.
- * <p/>
+ * <p>
  * Subclass of {@link PurchaseAddViewModelImpl}.
  */
 public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implements PurchaseAddOcrViewModel {
@@ -45,9 +46,11 @@ public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implem
                                        @NonNull Navigator navigator,
                                        @NonNull RxBus<Object> eventBus,
                                        @NonNull UserRepository userRepository,
+                                       @NonNull GroupRepository groupRepository,
                                        @NonNull PurchaseRepository purchaseRepo,
                                        @NonNull RemoteConfigHelper configHelper) {
-        super(savedState, navigator, eventBus, userRepository, purchaseRepo, configHelper);
+        super(savedState, navigator, eventBus, userRepository, groupRepository, purchaseRepo,
+                configHelper);
 
         if (savedState != null) {
             mOcrValuesSet = savedState.getBoolean(STATE_OCR_VALUES_SET, false);

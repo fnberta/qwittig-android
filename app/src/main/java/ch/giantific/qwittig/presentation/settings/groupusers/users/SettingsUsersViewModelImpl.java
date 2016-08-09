@@ -148,7 +148,7 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
                 .flatMap(new Func1<Identity, Observable<RxChildEvent<Identity>>>() {
                     @Override
                     public Observable<RxChildEvent<Identity>> call(Identity identity) {
-                        return mUserRepo.observeGroupIdentityChildren(identity.getGroup());
+                        return mGroupRepo.observeGroupIdentityChildren(identity.getGroup());
                     }
                 })
                 .map(new Func1<RxChildEvent<Identity>, SettingsUsersUserItemModel>() {
@@ -207,7 +207,7 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
             return;
         }
 
-        mUserRepo.removePendingIdentity(itemModel.getId());
+        mGroupRepo.removePendingIdentity(itemModel.getId(), itemModel.getGroupId());
         mView.showMessage(R.string.toast_settings_users_removed);
     }
 
@@ -222,7 +222,7 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
     @Override
     public void onAddUserClick(View view) {
         if (validate()) {
-            mGroupRepo.addIdentityToGroup(mCurrentIdentity, mNickname);
+            mGroupRepo.addPendingIdentity(mCurrentIdentity, mNickname);
             setValidate(false);
             setNickname("");
         }

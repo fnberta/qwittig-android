@@ -31,6 +31,7 @@ import ch.giantific.qwittig.presentation.common.fragments.dialogs.DiscardChanges
 import ch.giantific.qwittig.presentation.common.fragments.dialogs.EmailReAuthenticateDialogFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.common.workers.EmailUserWorkerListener;
+import ch.giantific.qwittig.presentation.common.workers.FacebookUserWorkerListener;
 import ch.giantific.qwittig.presentation.common.workers.GoogleUserWorkerListener;
 import ch.giantific.qwittig.presentation.settings.profile.di.DaggerSettingsProfileComponent;
 import ch.giantific.qwittig.presentation.settings.profile.di.SettingsProfileComponent;
@@ -40,19 +41,19 @@ import rx.Single;
 
 /**
  * Hosts {@link SettingsProfileFragment} that allows to user to change his profile information.
- * <p>
+ * <p/>
  * Shows the user's avatar as backdrop image in the toolbar with a parallax collapse animation on
  * scroll.
- * <p>
+ * <p/>
  * Subclass of {@link BaseActivity}.
- * <p>
+ * <p/>
  *
  * @see android.support.design.widget.CollapsingToolbarLayout
  */
 public class SettingsProfileActivity extends BaseActivity<SettingsProfileComponent> implements
         SettingsProfileFragment.ActivityListener,
         DiscardChangesDialogFragment.DialogInteractionListener,
-        GoogleUserWorkerListener, EmailUserWorkerListener,
+        GoogleUserWorkerListener, EmailUserWorkerListener, FacebookUserWorkerListener,
         EmailReAuthenticateDialogFragment.DialogInteractionListener,
         GoogleApiClientDelegate.GoogleLoginCallback {
 
@@ -159,6 +160,11 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileCompone
     @Override
     public void setGoogleUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
         mProfileViewModel.setGoogleUserStream(single, workerTag);
+    }
+
+    @Override
+    public void setFacebookUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
+        mProfileViewModel.setFacebookUserStream(single, workerTag);
     }
 
     @Override

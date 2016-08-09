@@ -14,8 +14,8 @@ import android.support.v4.app.FragmentManager;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.EmailAuthProvider;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GoogleAuthProvider;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -25,7 +25,6 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import rx.Observable;
 import rx.Single;
-import rx.functions.Action1;
 import rx.functions.Func1;
 
 /**
@@ -33,56 +32,34 @@ import rx.functions.Func1;
  * <p/>
  * Subclass of {@link BaseWorker}.
  */
-public class GoogleUserWorker extends BaseWorker<Void, GoogleUserWorkerListener> {
+public class FacebookUserWorker extends BaseWorker<Void, GoogleUserWorkerListener> {
 
-    private static final String WORKER_TAG = GoogleUserWorker.class.getCanonicalName();
+    private static final String WORKER_TAG = FacebookUserWorker.class.getCanonicalName();
     private static final String KEY_TYPE = "TYPE";
     private static final String KEY_EMAIL = "EMAIL";
     private static final String KEY_PASSWORD = "PASSWORD";
-    private static final String KEY_ID_TOKEN = "ID_TOKEN";
+    private static final String KEY_TOKEN = "TOKEN";
     @Inject
     Application mAppContext;
 
-    public GoogleUserWorker() {
+    public FacebookUserWorker() {
         // empty default constructor
     }
 
     /**
-     * Attaches a new instance of {@link GoogleUserWorker} that signs out from the user's google
-     * account.
-     *
-     * @return a new instance of {@link GoogleUserWorker}
-     */
-    public static GoogleUserWorker attachSignOut(@NonNull FragmentManager fm) {
-        GoogleUserWorker worker = (GoogleUserWorker) fm.findFragmentByTag(WORKER_TAG);
-        if (worker == null) {
-            worker = new GoogleUserWorker();
-            final Bundle args = new Bundle();
-            args.putInt(KEY_TYPE, GoogleUserAction.SIGN_OUT);
-            worker.setArguments(args);
-
-            fm.beginTransaction()
-                    .add(worker, WORKER_TAG)
-                    .commit();
-        }
-
-        return worker;
-    }
-
-    /**
-     * Attaches a new instance of {@link GoogleUserWorker} that un-links the user from his google
+     * Attaches a new instance of {@link FacebookUserWorker} that un-links the user from his google
      * accounts and optionally deletes the user as well.
      *
-     * @return a new instance of {@link GoogleUserWorker}
+     * @return a new instance of {@link FacebookUserWorker}
      */
-    public static GoogleUserWorker attachDelete(@NonNull FragmentManager fm,
-                                                @NonNull String idToken) {
-        GoogleUserWorker worker = (GoogleUserWorker) fm.findFragmentByTag(WORKER_TAG);
+    public static FacebookUserWorker attachDelete(@NonNull FragmentManager fm,
+                                                  @NonNull String token) {
+        FacebookUserWorker worker = (FacebookUserWorker) fm.findFragmentByTag(WORKER_TAG);
         if (worker == null) {
-            worker = new GoogleUserWorker();
+            worker = new FacebookUserWorker();
             final Bundle args = new Bundle();
-            args.putInt(KEY_TYPE, GoogleUserAction.DELETE);
-            args.putString(KEY_ID_TOKEN, idToken);
+            args.putInt(KEY_TYPE, FacebookUserAction.DELETE);
+            args.putString(KEY_TOKEN, token);
             worker.setArguments(args);
 
             fm.beginTransaction()
@@ -93,18 +70,18 @@ public class GoogleUserWorker extends BaseWorker<Void, GoogleUserWorkerListener>
         return worker;
     }
 
-    public static GoogleUserWorker attachUnlink(@NonNull FragmentManager fm,
-                                                @NonNull String email,
-                                                @NonNull String password,
-                                                @NonNull String idToken) {
-        GoogleUserWorker worker = (GoogleUserWorker) fm.findFragmentByTag(WORKER_TAG);
+    public static FacebookUserWorker attachUnlink(@NonNull FragmentManager fm,
+                                                  @NonNull String email,
+                                                  @NonNull String password,
+                                                  @NonNull String token) {
+        FacebookUserWorker worker = (FacebookUserWorker) fm.findFragmentByTag(WORKER_TAG);
         if (worker == null) {
-            worker = new GoogleUserWorker();
+            worker = new FacebookUserWorker();
             final Bundle args = new Bundle();
-            args.putInt(KEY_TYPE, GoogleUserAction.UNLINK);
+            args.putInt(KEY_TYPE, FacebookUserAction.UNLINK);
             args.putString(KEY_EMAIL, email);
             args.putString(KEY_PASSWORD, password);
-            args.putString(KEY_ID_TOKEN, idToken);
+            args.putString(KEY_TOKEN, token);
             worker.setArguments(args);
 
             fm.beginTransaction()
@@ -123,7 +100,7 @@ public class GoogleUserWorker extends BaseWorker<Void, GoogleUserWorkerListener>
     @Nullable
     @Override
     protected Observable<Void> getObservable(@NonNull Bundle args) {
-        @GoogleUserAction
+        @FacebookUserAction
         final int type = args.getInt(KEY_TYPE);
         final FirebaseUser firebaseUser = mUserRepo.getCurrentUser();
         if (firebaseUser == null) {
@@ -131,20 +108,10 @@ public class GoogleUserWorker extends BaseWorker<Void, GoogleUserWorkerListener>
         }
 
         switch (type) {
-            case GoogleUserAction.SIGN_OUT: {
-                return mUserRepo.signOutGoogle(mAppContext)
-                        .doOnSuccess(new Action1<Void>() {
-                            @Override
-                            public void call(Void aVoid) {
-                                mUserRepo.signOut(firebaseUser);
-                            }
-                        })
-                        .toObservable();
-            }
-            case GoogleUserAction.DELETE: {
-                final String idToken = args.getString(KEY_ID_TOKEN, "");
-                final AuthCredential authCredential= GoogleAuthProvider.getCredential(idToken, null);
-                return mUserRepo.unlinkGoogle(mAppContext, firebaseUser, authCredential)
+            case FacebookUserAction.DELETE: {
+                final String token = args.getString(KEY_TOKEN, "");
+                final AuthCredential authCredential = FacebookAuthProvider.getCredential(token);
+                return mUserRepo.unlinkFacebook()
                         .flatMap(new Func1<Void, Single<Void>>() {
                             @Override
                             public Single<Void> call(Void aVoid) {
@@ -153,17 +120,17 @@ public class GoogleUserWorker extends BaseWorker<Void, GoogleUserWorkerListener>
                         })
                         .toObservable();
             }
-            case GoogleUserAction.UNLINK: {
+            case FacebookUserAction.UNLINK: {
                 final String email = args.getString(KEY_EMAIL, "");
                 final String password = args.getString(KEY_PASSWORD, "");
-                final String idToken = args.getString(KEY_ID_TOKEN, "");
-                final AuthCredential oldCredential = GoogleAuthProvider.getCredential(idToken, null);
+                final String token = args.getString(KEY_TOKEN, "");
+                final AuthCredential oldCredential = FacebookAuthProvider.getCredential(token);
                 final AuthCredential newCredential = EmailAuthProvider.getCredential(email, password);
                 return mUserRepo.linkUserWithCredential(firebaseUser, oldCredential, newCredential)
                         .flatMap(new Func1<AuthResult, Single<Void>>() {
                             @Override
                             public Single<Void> call(AuthResult authResult) {
-                                return mUserRepo.unlinkGoogle(mAppContext, firebaseUser, oldCredential);
+                                return mUserRepo.unlinkFacebook();
                             }
                         })
                         .toObservable();
@@ -183,11 +150,10 @@ public class GoogleUserWorker extends BaseWorker<Void, GoogleUserWorkerListener>
         mActivity.setGoogleUserStream(observable.toSingle(), WORKER_TAG);
     }
 
-    @IntDef({GoogleUserAction.SIGN_OUT, GoogleUserAction.UNLINK, GoogleUserAction.DELETE})
+    @IntDef({FacebookUserAction.UNLINK, FacebookUserAction.DELETE})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface GoogleUserAction {
-        int SIGN_OUT = 1;
-        int UNLINK = 2;
-        int DELETE = 3;
+    public @interface FacebookUserAction {
+        int UNLINK = 1;
+        int DELETE = 2;
     }
 }

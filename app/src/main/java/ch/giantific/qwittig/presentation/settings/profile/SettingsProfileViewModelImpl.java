@@ -21,6 +21,7 @@ import java.util.Objects;
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.repositories.GroupRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
@@ -49,6 +50,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     private static final String STATE_PASSWORD = "STATE_PASSWORD";
     private static final String STATE_PASSWORD_REPEAT = "STATE_PASSWORD_REPEAT";
     private final List<String> mGroupNicknames;
+    private final GroupRepository mGroupRepo;
     private boolean mFacebookUser;
     private boolean mGoogleUser;
     private boolean mValidate;
@@ -65,9 +67,11 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     public SettingsProfileViewModelImpl(@Nullable Bundle savedState,
                                         @NonNull Navigator navigator,
                                         @NonNull RxBus<Object> eventBus,
-                                        @NonNull UserRepository userRepository) {
+                                        @NonNull UserRepository userRepository,
+                                        @NonNull GroupRepository groupRepository) {
         super(savedState, navigator, eventBus, userRepository);
 
+        mGroupRepo = groupRepository;
         mGroupNicknames = new ArrayList<>();
 
         if (savedState != null) {
@@ -229,7 +233,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
                 .flatMapObservable(new Func1<Identity, Observable<Identity>>() {
                     @Override
                     public Observable<Identity> call(Identity identity) {
-                        return mUserRepo.getGroupIdentities(identity.getGroup(), true);
+                        return mGroupRepo.getGroupIdentities(identity.getGroup(), true);
                     }
                 })
                 .subscribe(new IndefiniteSubscriber<Identity>() {
@@ -367,7 +371,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
         if (mGoogleUser) {
             mView.reAuthenticateGoogle();
         } else if (mFacebookUser) {
-            // TODO: implement facebook re-authentication
+            mView.reAuthenticateFacebook();
         }
     }
 
@@ -384,6 +388,30 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
 
     @Override
     public void setGoogleUserStream(@NonNull Single<Void> single, @NonNull final String workerTag) {
+        getSubscriptions().add(single
+                .flatMap(new Func1<Void, Single<User>>() {
+                    @Override
+                    public Single<User> call(Void aVoid) {
+                        return mUserRepo.updateProfile(mNickname, mAvatar, isAvatarChanged());
+                    }
+                })
+                .subscribe(profileSubscriber(workerTag))
+        );
+    }
+
+    @Override
+    public void onFacebookSignedIn(@NonNull String token) {
+        mView.showProgressDialog(R.string.progress_profile_unlink);
+        mView.loadUnlinkFacebookWorker(mEmail, mPassword, token);
+    }
+
+    @Override
+    public void onFacebookLoginFailed() {
+        mView.showMessage(R.string.toast_error_login_facebook);
+    }
+
+    @Override
+    public void setFacebookUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
         getSubscriptions().add(single
                 .flatMap(new Func1<Void, Single<User>>() {
                     @Override

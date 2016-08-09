@@ -26,6 +26,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+
+import java.util.Arrays;
+
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
@@ -34,6 +42,7 @@ import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.fragments.dialogs.EmailReAuthenticateDialogFragment;
 import ch.giantific.qwittig.presentation.common.workers.EmailUserWorker;
+import ch.giantific.qwittig.presentation.common.workers.FacebookUserWorker;
 import ch.giantific.qwittig.presentation.common.workers.GoogleUserWorker;
 import ch.giantific.qwittig.presentation.settings.general.di.SettingsComponent;
 import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.SettingsAddGroupActivity;
@@ -71,6 +80,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
     private EditTextPreference mEditTextPreferenceGroupName;
     private Preference mPreferenceGroupLeave;
     private ProgressDialog mProgressDialog;
+    private CallbackManager mFacebookCallbackManager;
 
     public SettingsFragment() {
         // required empty constructor
@@ -93,6 +103,23 @@ public class SettingsFragment extends PreferenceFragmentCompat
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
+        mFacebookCallbackManager = CallbackManager.Factory.create();
+        LoginManager.getInstance().registerCallback(mFacebookCallbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                mViewModel.onFacebookSignedIn(loginResult.getAccessToken().getToken());
+            }
+
+            @Override
+            public void onCancel() {
+                mViewModel.onFacebookLoginFailed();
+            }
+
+            @Override
+            public void onError(FacebookException exception) {
+                mViewModel.onFacebookLoginFailed();
+            }
+        });
     }
 
     @SuppressWarnings("unchecked")
@@ -239,6 +266,13 @@ public class SettingsFragment extends PreferenceFragmentCompat
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        mFacebookCallbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
     public void setupGroupSelection(@NonNull CharSequence[] entries, @NonNull CharSequence[] values,
                                     @NonNull String selectedValue) {
         mListPreferenceGroupCurrent.setEntries(entries);
@@ -299,6 +333,11 @@ public class SettingsFragment extends PreferenceFragmentCompat
     }
 
     @Override
+    public void loadDeleteFacebookUserWorker(@NonNull String token) {
+        FacebookUserWorker.attachDelete(getFragmentManager(), token);
+    }
+
+    @Override
     public void loadDeleteEmailUserWorker(@NonNull String currentEmail,
                                           @NonNull String currentPassword) {
         EmailUserWorker.attachDelete(getFragmentManager(), currentEmail, currentPassword);
@@ -329,6 +368,12 @@ public class SettingsFragment extends PreferenceFragmentCompat
     @Override
     public void reAuthenticateGoogle() {
         mActivity.loginWithGoogle();
+    }
+
+    @Override
+    public void reAuthenticateFacebook() {
+        LoginManager.getInstance().logInWithReadPermissions(this,
+                Arrays.asList("email", "public_profile"));
     }
 
     @Override

@@ -348,7 +348,7 @@
     <string name="toast_error_remind_failed">Erinnern fehlgeschlagen</string>
     <string name="toast_error_login">Anmelden fehlgeschlagen</string>
     <string name="toast_error_logout">Abmelden fehlgeschlagen</string>
-    <string name="toast_login_failed_facebook">Login mit Facebook ist fehlgeschlagen</string>
+    <string name="toast_error_login_facebook">Login mit Facebook ist fehlgeschlagen</string>
     <string name="progress_profile_unlink">Hebe Verbindung auf und aktualisiere Profil…</string>
     <string name="toast_error_settings_groups">Laden deiner Gruppen fehlgeschlagen</string>
     <string name="toast_error_settings">Laden der Einstellungen fehlgeschlagen</string>

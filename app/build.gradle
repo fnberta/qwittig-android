@@ -43,7 +43,7 @@ android {
 
 ext {
     supportLibVersion = '24.1.1'
-    playServicesVersion = '9.2.1'
+    playServicesVersion = '9.4.0'
     retrofitVersion = '2.0.2'
     leakCanaryVersion = '1.4-beta2'
     daggerVersion = '2.5'
@@ -83,8 +83,8 @@ dependencies {
     compile "com.squareup.retrofit2:converter-gson:${retrofitVersion}"
     compile "com.squareup.retrofit2:adapter-rxjava:${retrofitVersion}"
     compile 'com.jakewharton.timber:timber:4.1.2'
-    compile 'io.reactivex:rxjava:1.1.5'
-    compile 'io.reactivex:rxandroid:1.2.0'
+    compile 'io.reactivex:rxjava:1.1.8'
+    compile 'io.reactivex:rxandroid:1.2.1'
     compile 'com.artemzin.rxjava:proguard-rules:1.1.5.0'
     compile 'com.facebook.android:facebook-android-sdk:4.11.0'
     compile 'com.google.code.gson:gson:2.6.2'

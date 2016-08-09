@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.data.helper.RemoteConfigHelper;
+import ch.giantific.qwittig.data.repositories.GroupRepository;
 import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
@@ -17,7 +18,7 @@ import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewMo
 
 /**
  * Provides an implementation of the {@link PurchaseEditDraftViewModel}.
- * <p/>
+ * <p>
  * Subclass of {@link PurchaseEditViewModelImpl}.
  */
 public class PurchaseEditDraftViewModelImpl extends PurchaseEditViewModelImpl
@@ -28,10 +29,11 @@ public class PurchaseEditDraftViewModelImpl extends PurchaseEditViewModelImpl
                                           @NonNull RxBus<Object> eventBus,
                                           @NonNull RemoteConfigHelper configHelper,
                                           @NonNull UserRepository userRepository,
+                                          @NonNull GroupRepository groupRepository,
                                           @NonNull PurchaseRepository purchaseRepository,
                                           @NonNull String editPurchaseId) {
-        super(savedState, navigator, eventBus, configHelper, userRepository, purchaseRepository,
-                editPurchaseId);
+        super(savedState, navigator, eventBus, configHelper, userRepository,
+                groupRepository, purchaseRepository, editPurchaseId);
     }
 
     @Override

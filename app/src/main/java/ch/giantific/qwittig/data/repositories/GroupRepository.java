@@ -19,6 +19,7 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.BuildConfig;
+import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxFirebaseDatabase;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
@@ -57,6 +58,29 @@ public class GroupRepository {
     public Single<Group> getGroup(@NonNull String groupId) {
         final Query query = mDatabaseRef.child(Group.PATH).child(groupId);
         return RxFirebaseDatabase.observeValueOnce(query, Group.class);
+    }
+
+    public Observable<RxChildEvent<Identity>> observeGroupIdentityChildren(@NonNull String groupId) {
+        final Query query = mDatabaseRef.child(Identity.PATH).orderByChild(Identity.PATH_GROUP).equalTo(groupId);
+        return RxFirebaseDatabase.observeChildren(query, Identity.class)
+                .filter(new Func1<RxChildEvent<Identity>, Boolean>() {
+                    @Override
+                    public Boolean call(RxChildEvent<Identity> event) {
+                        return event.getValue().isActive();
+                    }
+                });
+    }
+
+    public Observable<Identity> getGroupIdentities(@NonNull String groupId,
+                                                   final boolean includePending) {
+        final Query query = mDatabaseRef.child(Identity.PATH).orderByChild(Identity.PATH_GROUP).equalTo(groupId);
+        return RxFirebaseDatabase.observeValuesOnce(query, Identity.class)
+                .filter(new Func1<Identity, Boolean>() {
+                    @Override
+                    public Boolean call(Identity identity) {
+                        return identity.isActive() && (includePending || !identity.isPending());
+                    }
+                });
     }
 
     public Single<Group> updateGroupDetails(@NonNull final String groupId,
@@ -163,7 +187,7 @@ public class GroupRepository {
                 });
     }
 
-    public void addIdentityToGroup(@NonNull Identity currentIdentity,
+    public void addPendingIdentity(@NonNull Identity currentIdentity,
                                    @NonNull String nickname) {
         final String identityId = mDatabaseRef.child(Identity.PATH).push().getKey();
         final String groupId = currentIdentity.getGroup();
@@ -203,5 +227,14 @@ public class GroupRepository {
 
         // TODO: shorten
         return uri.toString();
+    }
+
+    public void removePendingIdentity(@NonNull String identityId,
+                                      @NonNull String groupId) {
+        final Map<String, Object> childUpdates = new HashMap<>(3);
+        childUpdates.put(Identity.PATH + "/" + identityId + "/" + Identity.PATH_ACTIVE, false);
+        childUpdates.put(Identity.PATH + "/" + identityId + "/" + Identity.PATH_INVITATION_LINK, null);
+        childUpdates.put(Group.PATH + "/" + groupId + "/" + Group.PATH_IDENTITIES + "/" + identityId, null);
+        mDatabaseRef.updateChildren(childUpdates);
     }
 }

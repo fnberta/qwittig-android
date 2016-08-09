@@ -36,7 +36,6 @@ import ch.giantific.qwittig.Constants;
 import ch.giantific.qwittig.data.jobs.UploadAvatarJob;
 import ch.giantific.qwittig.data.rest.DeleteUserData;
 import ch.giantific.qwittig.data.rest.UserIdToken;
-import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxFirebaseAuth;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxFirebaseDatabase;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxFirebaseStorage;
@@ -112,29 +111,6 @@ public class UserRepository {
     public Single<User> getUser(@NonNull String userId) {
         final Query query = mDatabaseRef.child(User.PATH).child(userId);
         return RxFirebaseDatabase.observeValueOnce(query, User.class);
-    }
-
-    public Observable<RxChildEvent<Identity>> observeGroupIdentityChildren(@NonNull String groupId) {
-        final Query query = mDatabaseRef.child(Identity.PATH).orderByChild(Identity.PATH_GROUP).equalTo(groupId);
-        return RxFirebaseDatabase.observeChildren(query, Identity.class)
-                .filter(new Func1<RxChildEvent<Identity>, Boolean>() {
-                    @Override
-                    public Boolean call(RxChildEvent<Identity> event) {
-                        return event.getValue().isActive();
-                    }
-                });
-    }
-
-    public Observable<Identity> getGroupIdentities(@NonNull String groupId,
-                                                   final boolean includePending) {
-        final Query query = mDatabaseRef.child(Identity.PATH).orderByChild(Identity.PATH_GROUP).equalTo(groupId);
-        return RxFirebaseDatabase.observeValuesOnce(query, Identity.class)
-                .filter(new Func1<Identity, Boolean>() {
-                    @Override
-                    public Boolean call(Identity identity) {
-                        return identity.isActive() && (includePending || !identity.isPending());
-                    }
-                });
     }
 
     public Observable<Identity> observeIdentity(@NonNull String identityId) {
@@ -218,11 +194,9 @@ public class UserRepository {
                         for (String identityId : identities) {
                             childUpdates.put(Identity.PATH + "/" + identityId + "/" + Identity.PATH_NICKNAME, nickname);
                             if (avatarChanged) {
-                                if (!TextUtils.isEmpty(avatar)) {
-                                    childUpdates.put(Identity.PATH + "/" + identityId + "/" + Identity.PATH_AVATAR, avatar);
-                                } else {
-                                    childUpdates.put(Identity.PATH + "/" + identityId + "/" + Identity.PATH_AVATAR, null);
-                                }
+                                childUpdates.put(Identity.PATH + "/" + identityId + "/" +
+                                        Identity.PATH_AVATAR, !TextUtils.isEmpty(avatar)
+                                        ? avatar : null);
                             }
                         }
                         mDatabaseRef.updateChildren(childUpdates);
@@ -294,13 +268,6 @@ public class UserRepository {
                                             @NonNull String avatar) {
         mDatabaseRef.child(Identity.PATH).child(identityId).child(Identity.PATH_AVATAR).setValue(avatar);
         UploadAvatarJob.schedule(mJobDispatcher, avatar, identityId);
-    }
-
-    public void removePendingIdentity(@NonNull String identityId) {
-        final Map<String, Object> childUpdates = new HashMap<>(2);
-        childUpdates.put(Identity.PATH + "/" + identityId + "/" + Identity.PATH_ACTIVE, false);
-        childUpdates.put(Identity.PATH + "/" + identityId + "/" + Identity.PATH_INVITATION_LINK, null);
-        mDatabaseRef.updateChildren(childUpdates);
     }
 
     public Single<FirebaseUser> loginEmail(@NonNull final String username,
@@ -464,9 +431,11 @@ public class UserRepository {
     }
 
     public void signOut(@NonNull FirebaseUser firebaseUser) {
-        final String providerId = firebaseUser.getProviderId();
-        if (Objects.equals(providerId, FacebookAuthProvider.PROVIDER_ID)) {
-            LoginManager.getInstance().logOut();
+        for (UserInfo userInfo : firebaseUser.getProviderData()) {
+            if (Objects.equals(userInfo.getProviderId(), FacebookAuthProvider.PROVIDER_ID)) {
+                LoginManager.getInstance().logOut();
+                break;
+            }
         }
 
         mDatabaseRef.child(User.PATH).child(firebaseUser.getUid()).child(User.PATH_TOKENS).removeValue();

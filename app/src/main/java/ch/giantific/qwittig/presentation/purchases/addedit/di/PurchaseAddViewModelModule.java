@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.data.helper.RemoteConfigHelper;
+import ch.giantific.qwittig.data.repositories.GroupRepository;
 import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.di.scopes.PerActivity;
@@ -37,10 +38,11 @@ public class PurchaseAddViewModelModule extends BaseViewModelModule {
     PurchaseAddEditViewModel providesPurchaseAddViewModel(@NonNull Navigator navigator,
                                                           @NonNull RxBus<Object> eventBus,
                                                           @NonNull UserRepository userRepository,
+                                                          @NonNull GroupRepository groupRepository,
                                                           @NonNull PurchaseRepository purchaseRepository,
                                                           @NonNull RemoteConfigHelper configHelper) {
         return new PurchaseAddViewModelImpl(mSavedState, navigator, eventBus, userRepository,
-                purchaseRepository, configHelper);
+                groupRepository, purchaseRepository, configHelper);
     }
 
     @PerActivity
@@ -48,9 +50,10 @@ public class PurchaseAddViewModelModule extends BaseViewModelModule {
     PurchaseAddOcrViewModel providesPurchaseAddOcrViewModel(@NonNull Navigator navigator,
                                                             @NonNull RxBus<Object> eventBus,
                                                             @NonNull UserRepository userRepository,
+                                                            @NonNull GroupRepository groupRepository,
                                                             @NonNull PurchaseRepository purchaseRepository,
                                                             @NonNull RemoteConfigHelper configHelper) {
         return new PurchaseAddOcrViewModelImpl(mSavedState, navigator, eventBus, userRepository,
-                purchaseRepository, configHelper);
+                groupRepository, purchaseRepository, configHelper);
     }
 }

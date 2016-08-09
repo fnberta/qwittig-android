@@ -26,6 +26,7 @@ public class SettingsUsersUserItemModel extends BaseChildItemModel
     private final String mAvatar;
     private final BigFraction mBalance;
     private final String mInvitationLink;
+    private final String mGroupId;
 
     public SettingsUsersUserItemModel(@EventType int eventType,
                                       @NonNull Identity identity) {
@@ -35,6 +36,7 @@ public class SettingsUsersUserItemModel extends BaseChildItemModel
         mAvatar = identity.getAvatar();
         mBalance = identity.getBalanceFraction();
         mInvitationLink = identity.getInvitationLink();
+        mGroupId = identity.getGroup();
     }
 
     @Bindable
@@ -53,6 +55,10 @@ public class SettingsUsersUserItemModel extends BaseChildItemModel
 
     public String getInvitationLink() {
         return mInvitationLink;
+    }
+
+    public String getGroupId() {
+        return mGroupId;
     }
 
     @Bindable

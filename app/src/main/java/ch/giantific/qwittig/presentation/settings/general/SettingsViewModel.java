@@ -15,6 +15,8 @@ import java.lang.annotation.RetentionPolicy;
 import ch.giantific.qwittig.presentation.common.GoogleApiClientDelegate;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.common.workers.EmailUserWorkerListener;
+import ch.giantific.qwittig.presentation.common.workers.FacebookUserWorker;
+import ch.giantific.qwittig.presentation.common.workers.FacebookUserWorkerListener;
 import ch.giantific.qwittig.presentation.common.workers.GoogleUserWorkerListener;
 import ch.giantific.qwittig.presentation.common.fragments.dialogs.EmailReAuthenticateDialogFragment;
 
@@ -23,7 +25,7 @@ import ch.giantific.qwittig.presentation.common.fragments.dialogs.EmailReAuthent
  */
 public interface SettingsViewModel extends ViewModel<SettingsViewModel.ViewListener>,
         LeaveGroupDialogFragment.DialogInteractionListener,
-        EmailUserWorkerListener, GoogleUserWorkerListener,
+        EmailUserWorkerListener, GoogleUserWorkerListener, FacebookUserWorkerListener,
         DeleteAccountDialogFragment.DialogInteractionListener,
         EmailReAuthenticateDialogFragment.DialogInteractionListener,
         GoogleApiClientDelegate.GoogleLoginCallback {
@@ -39,6 +41,10 @@ public interface SettingsViewModel extends ViewModel<SettingsViewModel.ViewListe
     void onLogoutMenuClick();
 
     void onDeleteAccountMenuClick();
+
+    void onFacebookSignedIn(@NonNull String token);
+
+    void onFacebookLoginFailed();
 
     @IntDef({Result.LOGOUT, Result.GROUP_SELECTED, Result.GROUPS_CHANGED})
     @Retention(RetentionPolicy.SOURCE)
@@ -66,6 +72,8 @@ public interface SettingsViewModel extends ViewModel<SettingsViewModel.ViewListe
 
         void loadDeleteGoogleUserWorker(@NonNull String idToken);
 
+        void loadDeleteFacebookUserWorker(@NonNull String token);
+
         void loadDeleteEmailUserWorker(@NonNull String currentEmail,
                                        @NonNull String currentPassword);
 
@@ -80,5 +88,7 @@ public interface SettingsViewModel extends ViewModel<SettingsViewModel.ViewListe
         void reAuthenticateGoogle();
 
         void showEmailReAuthenticateDialog(@Nullable String email);
+
+        void reAuthenticateFacebook();
     }
 }

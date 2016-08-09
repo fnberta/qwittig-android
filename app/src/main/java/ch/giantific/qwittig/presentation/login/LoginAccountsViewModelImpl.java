@@ -145,10 +145,9 @@ public class LoginAccountsViewModelImpl extends ViewModelBaseImpl<LoginAccountsV
                     ? email.substring(0, email.indexOf("@"))
                     : "";
         }
-        mGroupRepo.createGroup(userId,
-                mConfigHelper.getDefaultGroupName(),
-                mConfigHelper.getDefaultGroupCurrency(),
-                nickname, avatar);
+
+        mGroupRepo.createGroup(userId, mConfigHelper.getDefaultGroupName(),
+                mConfigHelper.getDefaultGroupCurrency(), nickname, avatar);
     }
 
     @Override
@@ -176,7 +175,7 @@ public class LoginAccountsViewModelImpl extends ViewModelBaseImpl<LoginAccountsV
     @Override
     public void onFacebookLoginFailed() {
         setLoading(false);
-        mView.showMessage(R.string.toast_login_failed_facebook);
+        mView.showMessage(R.string.toast_error_login_facebook);
     }
 
     @Override

@@ -23,9 +23,9 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.Constants;
 import ch.giantific.qwittig.data.helper.SharedPrefsHelper;
 import ch.giantific.qwittig.data.jobs.UploadReceiptJob;
+import ch.giantific.qwittig.data.queues.OcrPurchase;
 import ch.giantific.qwittig.data.rest.CurrencyRates;
 import ch.giantific.qwittig.data.rest.ExchangeRates;
-import ch.giantific.qwittig.data.rest.ReceiptOcr;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxFirebaseDatabase;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxFirebaseStorage;
@@ -33,9 +33,6 @@ import ch.giantific.qwittig.domain.models.OcrData;
 import ch.giantific.qwittig.domain.models.OcrRating;
 import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.utils.Utils;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 import rx.Observable;
 import rx.Single;
 import rx.android.schedulers.AndroidSchedulers;
@@ -51,10 +48,10 @@ public class PurchaseRepository {
     public static final int JPEG_COMPRESSION_RATE = 100;
     public static final int HEIGHT = 2048;
     public static final int WIDTH = 1024;
+    public static final String PATH_OCR_QUEUE = "queue/ocr/tasks";
     private final DatabaseReference mDatabaseRef;
     private final StorageReference mStorageRef;
     private final FirebaseJobDispatcher mJobDispatcher;
-    private final ReceiptOcr mReceiptOcr;
     private final ExchangeRates mExchangeRates;
     private final SharedPrefsHelper mSharedPrefsHelper;
 
@@ -62,11 +59,9 @@ public class PurchaseRepository {
     public PurchaseRepository(@NonNull FirebaseDatabase database,
                               @NonNull FirebaseStorage firebaseStorage,
                               @NonNull FirebaseJobDispatcher jobDispatcher,
-                              @NonNull ReceiptOcr receiptOcr,
                               @NonNull ExchangeRates exchangeRates,
                               @NonNull SharedPrefsHelper sharedPrefsHelper) {
         mJobDispatcher = jobDispatcher;
-        mReceiptOcr = receiptOcr;
         mDatabaseRef = database.getReference();
         mStorageRef = firebaseStorage.getReferenceFromUrl(Constants.STORAGE_URL).child("receipts");
         mExchangeRates = exchangeRates;
@@ -135,18 +130,10 @@ public class PurchaseRepository {
                 });
     }
 
-    public Observable<Void> uploadReceiptForOcr(@NonNull byte[] receipt,
-                                                @NonNull String idToken) {
-        final RequestBody tokenPart =
-                RequestBody.create(MediaType.parse("text/plain"), idToken);
-
-        final RequestBody receiptPart = RequestBody.create(MediaType.parse("image/jpeg"), receipt);
-        final MultipartBody.Part body =
-                MultipartBody.Part.createFormData("receipt", "receipt.jpg", receiptPart);
-
-        return mReceiptOcr.uploadReceipt(tokenPart, body)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+    public void uploadReceiptForOcr(@NonNull String receiptBase64, @NonNull String userId) {
+        final String purchaseId = mDatabaseRef.child(Purchase.PATH_PURCHASES).push().getKey();
+        final OcrPurchase ocrPurchase = new OcrPurchase(receiptBase64, purchaseId, userId);
+        mDatabaseRef.child(PATH_OCR_QUEUE).push().setValue(ocrPurchase);
     }
 
     public void saveDraft(@NonNull Purchase purchase, @Nullable String purchaseId) {

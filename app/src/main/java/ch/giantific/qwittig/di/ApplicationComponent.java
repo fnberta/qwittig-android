@@ -21,7 +21,6 @@ import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.data.rest.DeleteUserData;
 import ch.giantific.qwittig.data.rest.ExchangeRates;
-import ch.giantific.qwittig.data.rest.ReceiptOcr;
 import dagger.Component;
 
 /**
@@ -38,8 +37,6 @@ public interface ApplicationComponent {
     SharedPreferences getSharedPreferences();
 
     LocalBroadcastManager getLocalBroadcastManager();
-
-    ReceiptOcr getReceiptOcr();
 
     ExchangeRates getExchangeRates();
 

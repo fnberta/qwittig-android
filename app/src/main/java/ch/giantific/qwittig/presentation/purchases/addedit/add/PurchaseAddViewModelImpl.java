@@ -33,6 +33,7 @@ import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
 import ch.giantific.qwittig.data.helper.RemoteConfigHelper;
+import ch.giantific.qwittig.data.repositories.GroupRepository;
 import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Identity;
@@ -75,6 +76,7 @@ public class PurchaseAddViewModelImpl extends ViewModelBaseImpl<ViewListener>
     private static final String STATE_NOTE = "STATE_NOTE";
     private static final String STATE_RECEIPT_IMAGE_PATH = "STATE_RECEIPT_IMAGE_PATH";
     private static final String STATE_FETCHING_RATES = "STATE_FETCHING_RATES";
+    private final GroupRepository mGroupRepo;
     protected final RemoteConfigHelper mConfigHelper;
     protected final PurchaseRepository mPurchaseRepo;
     protected final ArrayList<PurchaseAddEditItemModel> mItems;
@@ -100,11 +102,13 @@ public class PurchaseAddViewModelImpl extends ViewModelBaseImpl<ViewListener>
                                     @NonNull Navigator navigator,
                                     @NonNull RxBus<Object> eventBus,
                                     @NonNull UserRepository userRepository,
+                                    @NonNull GroupRepository groupRepository,
                                     @NonNull PurchaseRepository purchaseRepo,
                                     @NonNull RemoteConfigHelper configHelper) {
         super(savedState, navigator, eventBus, userRepository);
 
         mConfigHelper = configHelper;
+        mGroupRepo = groupRepository;
         mPurchaseRepo = purchaseRepo;
         mSupportedCurrencies = Arrays.asList(mConfigHelper.getSupportedCurrencyCodes());
         mIdentities = new ArrayList<>();
@@ -501,7 +505,7 @@ public class PurchaseAddViewModelImpl extends ViewModelBaseImpl<ViewListener>
                 .flatMapObservable(new Func1<Identity, Observable<Identity>>() {
                     @Override
                     public Observable<Identity> call(Identity identity) {
-                        return mUserRepo.getGroupIdentities(identity.getGroup(), true);
+                        return mGroupRepo.getGroupIdentities(identity.getGroup(), true);
                     }
                 })
                 .toSortedList()

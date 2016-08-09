@@ -5,6 +5,7 @@
 package ch.giantific.qwittig.presentation.settings.profile;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -19,18 +20,27 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+
+import java.util.Arrays;
+
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentSettingsProfileBinding;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
 import ch.giantific.qwittig.presentation.common.fragments.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.fragments.dialogs.EmailReAuthenticateDialogFragment;
 import ch.giantific.qwittig.presentation.common.workers.EmailUserWorker;
+import ch.giantific.qwittig.presentation.common.workers.FacebookUserWorker;
 import ch.giantific.qwittig.presentation.common.workers.GoogleUserWorker;
 import ch.giantific.qwittig.presentation.settings.profile.di.SettingsProfileComponent;
 
 /**
  * Displays the profile details of the current user, allowing him/her to edit them.
- * <p>
+ * <p/>
  * Subclass of {@link BaseFragment}.
  */
 public class SettingsProfileFragment extends BaseFragment<SettingsProfileComponent, SettingsProfileViewModel, SettingsProfileFragment.ActivityListener> implements
@@ -40,6 +50,7 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
     private FragmentSettingsProfileBinding mBinding;
     private Snackbar mSnackbarSetPassword;
     private ProgressDialog mProgressDialog;
+    private CallbackManager mFacebookCallbackManager;
 
     public SettingsProfileFragment() {
         // required empty constructor
@@ -50,6 +61,23 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
+        mFacebookCallbackManager = CallbackManager.Factory.create();
+        LoginManager.getInstance().registerCallback(mFacebookCallbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                mViewModel.onFacebookSignedIn(loginResult.getAccessToken().getToken());
+            }
+
+            @Override
+            public void onCancel() {
+                mViewModel.onFacebookLoginFailed();
+            }
+
+            @Override
+            public void onError(FacebookException exception) {
+                mViewModel.onFacebookLoginFailed();
+            }
+        });
     }
 
     @Override
@@ -107,6 +135,13 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        mFacebookCallbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
     protected View getSnackbarView() {
         return mBinding.etSettingsProfileNickname;
     }
@@ -135,8 +170,9 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
     }
 
     @Override
-    public void loadUnlinkFacebookWorker() {
-        // TODO: implement facebook un-linking
+    public void loadUnlinkFacebookWorker(@NonNull String email, @NonNull String password,
+                                         @NonNull String token) {
+        FacebookUserWorker.attachUnlink(getFragmentManager(), email, password, token);
     }
 
     @Override
@@ -183,6 +219,12 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
     @Override
     public void reAuthenticateGoogle() {
         mActivity.loginWithGoogle();
+    }
+
+    @Override
+    public void reAuthenticateFacebook() {
+        LoginManager.getInstance().logInWithReadPermissions(this,
+                Arrays.asList("email", "public_profile"));
     }
 
     public interface ActivityListener extends BaseFragment.ActivityListener<SettingsProfileComponent> {

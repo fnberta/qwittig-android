@@ -210,7 +210,7 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
             return;
         }
 
-        getSubscriptions().add(mUserRepo.getGroupIdentities(mCurrentIdentity.getGroup(), false)
+        getSubscriptions().add(mGroupRepo.getGroupIdentities(mCurrentIdentity.getGroup(), false)
                 .toList()
                 .toSingle()
                 .subscribe(new SingleSubscriber<List<Identity>>() {
@@ -283,13 +283,8 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
         if (mUserRepo.isGoogleUser(mFirebaseUser)) {
             mView.reAuthenticateGoogle();
         } else if (mUserRepo.isFacebookUser(mFirebaseUser)) {
-            // TODO: handle facebook
+            mView.reAuthenticateFacebook();
         }
-    }
-
-    @Override
-    public void onValidEmailAndPasswordEntered(@NonNull String email, @NonNull String password) {
-        mView.loadDeleteEmailUserWorker(email, password);
     }
 
     @Override
@@ -303,12 +298,32 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
     }
 
     @Override
-    public void setEmailUserStream(@NonNull Single<Void> single, @NonNull final String workerTag) {
+    public void setGoogleUserStream(@NonNull Single<Void> single, @NonNull final String workerTag) {
         getSubscriptions().add(single.subscribe(signOutSubscriber(workerTag)));
     }
 
     @Override
-    public void setGoogleUserStream(@NonNull Single<Void> single, @NonNull final String workerTag) {
+    public void onFacebookSignedIn(@NonNull String token) {
+        mView.loadDeleteFacebookUserWorker(token);
+    }
+
+    @Override
+    public void onFacebookLoginFailed() {
+        mView.showMessage(R.string.toast_error_login_facebook);
+    }
+
+    @Override
+    public void setFacebookUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
+        getSubscriptions().add(single.subscribe(signOutSubscriber(workerTag)));
+    }
+
+    @Override
+    public void onValidEmailAndPasswordEntered(@NonNull String email, @NonNull String password) {
+        mView.loadDeleteEmailUserWorker(email, password);
+    }
+
+    @Override
+    public void setEmailUserStream(@NonNull Single<Void> single, @NonNull final String workerTag) {
         getSubscriptions().add(single.subscribe(signOutSubscriber(workerTag)));
     }
 

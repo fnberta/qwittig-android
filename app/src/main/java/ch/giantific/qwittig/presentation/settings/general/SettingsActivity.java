@@ -24,6 +24,8 @@ import ch.giantific.qwittig.presentation.common.di.GoogleApiClientDelegateModule
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.common.workers.EmailUserWorkerListener;
+import ch.giantific.qwittig.presentation.common.workers.FacebookUserWorker;
+import ch.giantific.qwittig.presentation.common.workers.FacebookUserWorkerListener;
 import ch.giantific.qwittig.presentation.common.workers.GoogleUserWorkerListener;
 import ch.giantific.qwittig.presentation.settings.general.di.DaggerSettingsComponent;
 import ch.giantific.qwittig.presentation.settings.general.di.SettingsComponent;
@@ -42,7 +44,7 @@ public class SettingsActivity extends BaseActivity<SettingsComponent> implements
         SettingsFragment.ActivityListener,
         LeaveGroupDialogFragment.DialogInteractionListener,
         DeleteAccountDialogFragment.DialogInteractionListener,
-        EmailUserWorkerListener, GoogleUserWorkerListener,
+        EmailUserWorkerListener, GoogleUserWorkerListener, FacebookUserWorkerListener,
         EmailReAuthenticateDialogFragment.DialogInteractionListener,
         GoogleApiClientDelegate.GoogleLoginCallback {
 
@@ -146,6 +148,11 @@ public class SettingsActivity extends BaseActivity<SettingsComponent> implements
     @Override
     public void setGoogleUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
         mSettingsViewModel.setGoogleUserStream(single, workerTag);
+    }
+
+    @Override
+    public void setFacebookUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
+        mSettingsViewModel.setFacebookUserStream(single, workerTag);
     }
 
     @Override
