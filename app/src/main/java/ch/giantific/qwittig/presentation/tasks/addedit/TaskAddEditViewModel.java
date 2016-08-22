@@ -16,16 +16,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Date;
 
-import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.presentation.common.ListDragInteraction;
-import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
+import ch.giantific.qwittig.presentation.common.fragments.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
+import ch.giantific.qwittig.presentation.tasks.addedit.itemmodels.TaskAddEditIdentityItemModel;
 
 /**
  * Defines an observable view model for the add or edit task screen.
  */
-public interface TaskAddEditViewModel extends ListViewModel<Identity, TaskAddEditViewModel.ViewListener>,
+public interface TaskAddEditViewModel extends ListViewModel<TaskAddEditIdentityItemModel, TaskAddEditViewModel.ViewListener>,
         DiscardChangesDialogFragment.DialogInteractionListener,
         DatePickerDialog.OnDateSetListener,
         TaskAddEditUsersRecyclerAdapter.AdapterInteractionListener {
@@ -33,14 +32,14 @@ public interface TaskAddEditViewModel extends ListViewModel<Identity, TaskAddEdi
     void setListDragInteraction(@NonNull ListDragInteraction listDragInteraction);
 
     @Bindable
-    String getTaskTitle();
+    String getTitle();
 
-    void setTaskTitle(@NonNull String taskTitle);
+    void setTitle(@NonNull String taskTitle);
 
     @Bindable
-    String getTaskDeadline();
+    String getDeadline();
 
-    void setTaskDeadline(@NonNull Date deadline);
+    void setDeadline(@NonNull Date deadline);
 
     @Bindable
     boolean isAsNeededTask();
@@ -48,7 +47,7 @@ public interface TaskAddEditViewModel extends ListViewModel<Identity, TaskAddEdi
     @Bindable
     int getSelectedTimeFrame();
 
-    void setTaskTimeFrame(int taskTimeFrame);
+    void setTimeFrame(int taskTimeFrame);
 
     int[] getTimeFrames();
 
@@ -57,8 +56,6 @@ public interface TaskAddEditViewModel extends ListViewModel<Identity, TaskAddEdi
      * dialog that asks if the changes should be discarded. If no, finishes.
      */
     void onUpOrBackClick();
-
-    float getIdentityAlpha(int position);
 
     /**
      * Called when an item has been dragged far enough to trigger a move. This is called every time
@@ -82,12 +79,14 @@ public interface TaskAddEditViewModel extends ListViewModel<Identity, TaskAddEdi
     void onTitleChanged(CharSequence s, int start, int before, int count);
 
     /**
-     * Saves the new {@link Task} object if the title is not empty. If it is a one-time
+     * Saves the new task object if the title is not empty. If it is a one-time
      * task, checks if there is exactly one user involved selected.
      */
     void onFabSaveTaskClick(View view);
 
     void onTimeFrameSelected(@NonNull AdapterView<?> parent, View view, int position, long id);
+
+    void onUsersRowItemClick(@NonNull TaskAddEditIdentityItemModel itemModel);
 
     @IntDef({TaskAddEditViewModel.TaskResult.TASK_SAVED,
             TaskAddEditViewModel.TaskResult.TASK_DISCARDED, Activity.RESULT_CANCELED})

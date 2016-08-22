@@ -36,21 +36,12 @@
             android:visibility="@{viewModel.loading ? View.GONE : View.VISIBLE}"
             >
 
-            <Button
+            <com.facebook.login.widget.LoginButton
+                android:id="@+id/bt_login_accounts_facebook"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/com_facebook_button_background"
-                android:drawablePadding="@dimen/com_facebook_share_button_compound_drawable_padding"
-                android:drawableStart="@drawable/com_facebook_button_icon"
-                android:onClick="@{viewModel::onLoginFacebookClick}"
-                android:paddingBottom="@dimen/com_facebook_share_button_padding_bottom"
-                android:paddingEnd="@dimen/com_facebook_share_button_padding_right"
-                android:paddingStart="@dimen/com_facebook_share_button_padding_left"
-                android:paddingTop="@dimen/com_facebook_share_button_padding_top"
-                android:text="@string/com_facebook_loginview_log_in_button_long"
-                android:textColor="@color/com_facebook_share_button_text_color"
-                android:textSize="@dimen/com_facebook_share_button_text_size"
-                android:textStyle="bold"
+                android:paddingBottom="@dimen/fb_login_top_bottom_padding"
+                android:paddingTop="@dimen/fb_login_top_bottom_padding"
                 />
 
             <com.google.android.gms.common.SignInButton

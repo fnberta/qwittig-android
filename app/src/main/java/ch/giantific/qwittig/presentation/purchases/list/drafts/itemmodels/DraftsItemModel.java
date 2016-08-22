@@ -4,65 +4,101 @@
 
 package ch.giantific.qwittig.presentation.purchases.list.drafts.itemmodels;
 
-import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.support.annotation.NonNull;
 
 import java.text.NumberFormat;
+import java.util.Date;
 
+import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.domain.models.Purchase;
+import ch.giantific.qwittig.presentation.common.itemmodels.BaseChildItemModel;
 import ch.giantific.qwittig.utils.DateUtils;
-import ch.giantific.qwittig.utils.MoneyUtils;
 
 /**
- * Provides a view model for a draft in the list of drafts screen.
+ * Provides a view model for a purchase in the list of purchases screen.
  */
-public class DraftsItemModel extends BaseObservable {
+public class DraftsItemModel extends BaseChildItemModel
+        implements Comparable<DraftsItemModel> {
 
-    private NumberFormat mMoneyFormatter;
-    private Purchase mDraft;
-    private boolean mDraftSelected;
+    private final Date date;
+    private final String dateMonthDay;
+    private final String store;
+    private final String total;
+    private final String buyer;
+    private boolean selected;
 
-    public DraftsItemModel(@NonNull Purchase draft, boolean draftSelected,
-                           @NonNull String groupCurrency) {
-        setDraftInfo(draft, draftSelected, groupCurrency);
+    public DraftsItemModel(@EventType int eventType,
+                           @NonNull Purchase draft,
+                           boolean selected,
+                           @NonNull NumberFormat numberFormat) {
+        super(eventType, draft.getId());
+
+        date = draft.getDateDate();
+        dateMonthDay = DateUtils.formatMonthDayLineSeparated(date);
+        store = draft.getStore();
+        total = numberFormat.format(draft.getTotal());
+        buyer = draft.getBuyer();
+        this.selected = selected;
     }
 
-    public void updateDraftInfo(@NonNull Purchase draft, boolean draftSelected,
-                                @NonNull String groupCurrency) {
-        setDraftInfo(draft, draftSelected, groupCurrency);
-        notifyChange();
-    }
-
-    private void setDraftInfo(@NonNull Purchase draft, boolean draftSelected,
-                              @NonNull String groupCurrency) {
-        mDraft = draft;
-        mDraftSelected = draftSelected;
-        mMoneyFormatter = MoneyUtils.getMoneyFormatter(groupCurrency, false, true);
-    }
-
-    @Bindable
-    public Purchase getDraft() {
-        return mDraft;
-    }
-
-    @Bindable
-    public String getDraftDate() {
-        return DateUtils.formatMonthDayLineSeparated(mDraft.getDate());
+    public Date getDate() {
+        return date;
     }
 
     @Bindable
-    public String getDraftStore() {
-        return mDraft.getStore();
+    public String getDateMonthDay() {
+        return dateMonthDay;
     }
 
     @Bindable
-    public String getDraftTotalPrice() {
-        return mMoneyFormatter.format(mDraft.getTotalPrice());
+    public String getStore() {
+        return store;
     }
 
     @Bindable
-    public boolean isDraftSelected() {
-        return mDraftSelected;
+    public String getTotal() {
+        return total;
+    }
+
+    public String getBuyer() {
+        return buyer;
+    }
+
+    @Bindable
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    @Override
+    public int compareTo(@NonNull DraftsItemModel itemModel) {
+        return date.compareTo(itemModel.getDate());
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        final DraftsItemModel that = (DraftsItemModel) o;
+
+        if (date != null ? !date.equals(that.getDate()) : that.getDate() != null) return false;
+        if (store != null ? !store.equals(that.getStore()) : that.getStore() != null)
+            return false;
+        return total != null ? total.equals(that.getTotal()) : that.getTotal() == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = date != null ? date.hashCode() : 0;
+        result = 31 * result + (store != null ? store.hashCode() : 0);
+        result = 31 * result + (total != null ? total.hashCode() : 0);
+        return result;
     }
 }

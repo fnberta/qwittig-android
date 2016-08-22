@@ -2,82 +2,90 @@ package ch.giantific.qwittig.domain.models;
 
 import android.support.annotation.NonNull;
 
-import com.parse.ParseClassName;
-import com.parse.ParseObject;
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.ServerValue;
+
+import java.util.Date;
+import java.util.Map;
 
 /**
  * Created by fabio on 02.06.16.
  */
-@ParseClassName("OcrRating")
-public class OcrRating extends ParseObject {
+public class OcrRating implements FirebaseModel {
 
-    public static final String CLASS = "OcrRating";
-    public static final String SATISFACTION = "satisfaction";
-    public static final String NAMES = "names";
-    public static final String PRICES = "prices";
-    public static final String MISSING_ARTICLES = "missingArticles";
-    public static final String SPEED = "speed";
-    public static final String OCR_DATA = "ocrData";
+    public static final String BASE_PATH = "ocrRatings";
+
+    public static final String PATH_SATISFACTION = "satisfaction";
+    public static final String PATH_NAMES = "names";
+    public static final String PATH_PRICES = "prices";
+    public static final String PATH_MISSING_ARTICLES = "missingArticles";
+    public static final String PATH_SPEED = "speed";
+    public static final String PATH_OCR_DATA = "ocrData";
+
+    private String id;
+    private long createdAt;
+    private int satisfaction;
+    private int names;
+    private int prices;
+    private int missingArticles;
+    private int speed;
+    private String ocrData;
 
     public OcrRating() {
-        // a default constructor is required.
+        // required for firebase de-/serialization
     }
 
     public OcrRating(int satisfaction, int names, int prices, int missingArticles, int speed,
-                     @NonNull OcrData ocrData) {
-        setSatisfaction(satisfaction);
-        setNames(names);
-        setPrices(prices);
-        setMissingArticles(missingArticles);
-        setSpeed(speed);
-        setOcrData(ocrData);
+                     @NonNull String ocrData) {
+        this.satisfaction = satisfaction;
+        this.names = names;
+        this.prices = prices;
+        this.missingArticles = missingArticles;
+        this.speed = speed;
+        this.ocrData = ocrData;
+    }
+
+    @Exclude
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(@NonNull String id) {
+        this.id = id;
+    }
+
+    @Override
+    public Map<String, String> getCreatedAt() {
+        return ServerValue.TIMESTAMP;
+    }
+
+    @Exclude
+    public Date getCreatedAtDate() {
+        return new Date(createdAt);
     }
 
     public int getSatisfaction() {
-        return getInt(SATISFACTION);
-    }
-
-    public void setSatisfaction(int satisfaction) {
-        put(SATISFACTION, satisfaction);
+        return satisfaction;
     }
 
     public int getNames() {
-        return getInt(NAMES);
-    }
-
-    public void setNames(int names) {
-        put(NAMES, names);
+        return names;
     }
 
     public int getPrices() {
-        return getInt(PRICES);
-    }
-
-    public void setPrices(int prices) {
-        put(PRICES, prices);
+        return prices;
     }
 
     public int getMissingArticles() {
-        return getInt(MISSING_ARTICLES);
-    }
-
-    public void setMissingArticles(int missingArticles) {
-        put(MISSING_ARTICLES, missingArticles);
+        return missingArticles;
     }
 
     public int getSpeed() {
-        return getInt(SPEED);
+        return speed;
     }
 
-    public void setSpeed(int speed) {
-        put(SPEED, speed);
-    }
-
-    public OcrData getOcrData() {
-        return (OcrData) getParseObject(OCR_DATA);
-    }
-
-    public void setOcrData(@NonNull OcrData ocrData) {
-        put(OCR_DATA, ocrData);
+    public String getOcrData() {
+        return ocrData;
     }
 }

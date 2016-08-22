@@ -48,10 +48,10 @@ public class PurchaseEditDraftFragment extends BasePurchaseAddEditFragment<Purch
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_purchase_edit_save_changes_draft:
-                mViewModel.onSaveAsDraftMenuClick();
+                viewModel.onSaveAsDraftMenuClick();
                 return true;
             case R.id.action_purchase_edit_draft_delete:
-                mViewModel.onDeleteDraftMenuClick();
+                viewModel.onDeleteDraftMenuClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

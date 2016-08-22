@@ -92,18 +92,13 @@
             tools:ignore="MergeRootFrame"
             />
 
-        <ch.berta.fabio.fabprogress.FabProgress
+        <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_save"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/normal_space"
-            android:src="@drawable/ic_save_black_24dp"
             android:onClick="@{viewModel::onFabSaveProfileClick}"
-            android:progressFinalAnimationListener="@{viewModel.progressFinalAnimationListener}"
-            app:progress="@{viewModel.saving}"
-            app:animStop="@{viewModel.animStop}"
-            app:fp_arcColor="@color/green"
-            app:fp_finalIcon="@drawable/ic_done_black_24dp"
+            android:src="@drawable/ic_save_black_24dp"
             app:layout_anchor="@id/appbar"
             app:layout_anchorGravity="bottom|end"
             />

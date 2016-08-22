@@ -13,10 +13,10 @@ import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
 import ch.giantific.qwittig.databinding.RowTaskDetailsHistoryBinding;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.tasks.details.itemmodels.TaskDetailsItemModel;
-import ch.giantific.qwittig.presentation.tasks.details.itemmodels.TaskDetailsItemModel.Type;
 import ch.giantific.qwittig.presentation.tasks.details.itemmodels.TaskDetailsHeaderItem;
 import ch.giantific.qwittig.presentation.tasks.details.itemmodels.TaskDetailsHistoryItem;
+import ch.giantific.qwittig.presentation.tasks.details.itemmodels.TaskDetailsItemModel;
+import ch.giantific.qwittig.presentation.tasks.details.itemmodels.TaskDetailsItemModel.Type;
 
 
 /**
@@ -27,7 +27,7 @@ import ch.giantific.qwittig.presentation.tasks.details.itemmodels.TaskDetailsHis
  */
 public class TaskHistoryRecyclerAdapter extends BaseRecyclerAdapter<RecyclerView.ViewHolder> {
 
-    private final TaskDetailsViewModel mViewModel;
+    private final TaskDetailsViewModel viewModel;
 
     /**
      * Constructs a new {@link TaskHistoryRecyclerAdapter}.
@@ -37,7 +37,7 @@ public class TaskHistoryRecyclerAdapter extends BaseRecyclerAdapter<RecyclerView
     public TaskHistoryRecyclerAdapter(@NonNull TaskDetailsViewModel viewModel) {
         super();
 
-        mViewModel = viewModel;
+        this.viewModel = viewModel;
     }
 
     @NonNull
@@ -64,18 +64,18 @@ public class TaskHistoryRecyclerAdapter extends BaseRecyclerAdapter<RecyclerView
 
     @Override
     public int getItemCount() {
-        return mViewModel.getItemCount();
+        return viewModel.getItemCount();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return mViewModel.getItemViewType(position);
+        return viewModel.getItemViewType(position);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        final TaskDetailsItemModel detailsItem = mViewModel.getItemAtPosition(position);
+        final TaskDetailsItemModel detailsItem = viewModel.getItemAtPosition(position);
         final int viewType = getItemViewType(position);
         switch (viewType) {
             case Type.HISTORY: {

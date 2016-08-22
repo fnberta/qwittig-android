@@ -24,7 +24,7 @@ import timber.log.Timber;
 @SuppressWarnings("deprecation")
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
 
-    private Camera mCamera;
+    private Camera camera;
 
     /**
      * Constructs a new {@link CameraPreview} and sets the holders callback to it.
@@ -35,21 +35,21 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public CameraPreview(Context context, Camera camera) {
         super(context);
 
-        mCamera = camera;
+        this.camera = camera;
         final SurfaceHolder holder = getHolder();
         holder.addCallback(this);
     }
 
     public void setCamera(@NonNull Camera camera) {
-        mCamera = camera;
+        this.camera = camera;
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         try {
-            mCamera.setPreviewDisplay(holder);
-            mCamera.setDisplayOrientation(90);
-            mCamera.startPreview();
+            camera.setPreviewDisplay(holder);
+            camera.setDisplayOrientation(90);
+            camera.startPreview();
         } catch (IOException e) {
             Timber.e(e, "Error setting camera preview:");
             // TODO: tell user
@@ -63,7 +63,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        mCamera = null;
+        camera = null;
         // TODO: do we need to do something else here?
     }
 }

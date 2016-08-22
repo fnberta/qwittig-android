@@ -72,4 +72,7 @@
     <dimen name="camera_bottom_height">88dp</dimen>
     <dimen name="tut_camera_receipt_height">300dp</dimen>
 
+    <!-- facebook -->
+    <dimen name="fb_login_top_bottom_padding">12dp</dimen>
+
 </resources>

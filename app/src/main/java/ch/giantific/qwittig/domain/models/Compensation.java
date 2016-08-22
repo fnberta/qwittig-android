@@ -1,127 +1,132 @@
-/*
- * Copyright (c) 2016 Fabio Berta
- */
-
 package ch.giantific.qwittig.domain.models;
 
 import android.support.annotation.NonNull;
 
-import com.parse.ParseACL;
-import com.parse.ParseClassName;
-import com.parse.ParseObject;
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
+import com.google.firebase.database.ServerValue;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-
-import ch.giantific.qwittig.utils.parse.ParseUtils;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Defines a compensation, a payment from one {@link User} to another. It includes the payer and
- * beneficiary, the corresponding group, the amount and whether it is paid or not.
- * <p>
- * Subclass of {@link ParseObject}.
+ * Created by fabio on 02.07.16.
  */
-@ParseClassName("Compensation")
-public class Compensation extends ParseObject {
+@IgnoreExtraProperties
+public class Compensation implements FirebaseModel {
 
-    public static final String CLASS = "Compensation";
-    public static final String GROUP = "group";
-    public static final String DEBTOR = "debtor";
-    public static final String CREDITOR = "creditor";
-    public static final String AMOUNT = "amount";
-    public static final String PAID = "paid";
-    public static final String PIN_LABEL_PAID = "compensationPinLabelPaid";
-    public static final String PIN_LABEL_UNPAID = "compensationPinLabelUnpaid";
+    public static final String BASE_PATH = "compensations";
+    public static final String BASE_PATH_PAID = "paid";
+    public static final String BASE_PATH_UNPAID = "unpaid";
+
+    public static final String PATH_PAID = "paid";
+    public static final String PATH_GROUP = "group";
+    public static final String PATH_PAID_AT = "paidAt";
+    public static final String PATH_AMOUNT = "amount";
+    public static final String PATH_AMOUNT_CHANGED = "amountChanged";
+    public static final String PATH_DEBTOR = "debtor";
+    public static final String PATH_CREDITOR = "creditor";
+    public static final String NUMERATOR = "num";
+    public static final String DENOMINATOR = "den";
+
+    private String id;
+    private long createdAt;
+    private String group;
+    private boolean paid;
+    private long paidAt;
+    private String debtor;
+    private String creditor;
+    private Map<String, Long> amount;
+    private boolean amountChanged;
 
     public Compensation() {
-        // A default constructor is required.
+        // required for firebase de-/serialization
     }
 
-    public Compensation(@NonNull Group group, @NonNull Identity debtor,
-                        @NonNull Identity creditor, @NonNull BigFraction amount,
-                        boolean isPaid) {
-        setGroup(group);
-        setDebtor(debtor);
-        setCreditor(creditor);
-        setAmountFraction(amount);
-        setPaid(isPaid);
-        setAccessRights(group);
+    public Compensation(@NonNull String group, boolean paid, @NonNull String debtor,
+                        @NonNull String creditor, @NonNull Map<String, Long> amount) {
+        this.group = group;
+        this.paid = paid;
+        this.debtor = debtor;
+        this.creditor = creditor;
+        this.amount = amount;
     }
 
-    public Group getGroup() {
-        return (Group) getParseObject(GROUP);
+    @Exclude
+    @Override
+    public String getId() {
+        return id;
     }
 
-    public void setGroup(@NonNull ParseObject group) {
-        put(GROUP, group);
+    @Override
+    public void setId(@NonNull String id) {
+        this.id = id;
     }
 
-    public Identity getDebtor() {
-        return (Identity) getParseObject(DEBTOR);
+    @Override
+    public Map<String, String> getCreatedAt() {
+        return ServerValue.TIMESTAMP;
     }
 
-    public void setDebtor(@NonNull Identity debtor) {
-        put(DEBTOR, debtor);
+    @Exclude
+    public Date getCreatedAtDate() {
+        return new Date(createdAt);
     }
 
-    public Identity getCreditor() {
-        return (Identity) getParseObject(CREDITOR);
-    }
-
-    public void setCreditor(@NonNull Identity creditor) {
-        put(CREDITOR, creditor);
-    }
-
-    public List<Number> getAmount() {
-        return getList(AMOUNT);
-    }
-
-    public void setAmount(@NonNull List<Long> amount) {
-        put(AMOUNT, amount);
+    public String getGroup() {
+        return group;
     }
 
     public boolean isPaid() {
-        return getBoolean(PAID);
+        return paid;
     }
 
-    public void setPaid(boolean isPaid) {
-        put(PAID, isPaid);
+    public long getPaidAt() {
+        return paidAt;
     }
 
-    private void setAccessRights(@NonNull Group group) {
-        ParseACL acl = ParseUtils.getDefaultAcl(group, true);
-        setACL(acl);
+    @Exclude
+    public Date getPaidAtDate() {
+        return new Date(paidAt);
     }
 
-    /**
-     * Returns the amount of the compensation as a {@link BigFraction}.
-     *
-     * @return the amount of the compensation
-     */
+    public String getDebtor() {
+        return debtor;
+    }
+
+    public String getCreditor() {
+        return creditor;
+    }
+
+    public Map<String, Long> getAmount() {
+        return amount;
+    }
+
+    @Exclude
     public BigFraction getAmountFraction() {
-        final List<Number> amountList = getAmount();
-        long numerator = amountList.get(0).longValue();
-        long denominator = amountList.get(1).longValue();
+        final long numerator = amount.get(NUMERATOR);
+        final long denominator = amount.get(DENOMINATOR);
         return new BigFraction(numerator, denominator);
     }
 
-    /**
-     * Sets the amount of the compensation by putting the numerator and denominator of the passed
-     * in {@link BigFraction} into a list and storing it.
-     *
-     * @param amount the amount to store
-     */
-    public void setAmountFraction(@NonNull BigFraction amount) {
-        BigInteger num = amount.getNumerator();
-        BigInteger den = amount.getDenominator();
+    public boolean isAmountChanged() {
+        return amountChanged;
+    }
 
-        List<Long> amountList = new ArrayList<>();
-        amountList.add(num.longValue());
-        amountList.add(den.longValue());
+    @Exclude
+    public Map<String, Object> toMap() {
+        final Map<String, Object> result = new HashMap<>();
+        result.put(PATH_CREATED_AT, ServerValue.TIMESTAMP);
+        result.put(PATH_GROUP, group);
+        result.put(PATH_PAID, paid);
+        result.put(PATH_PAID_AT, paidAt);
+        result.put(PATH_DEBTOR, debtor);
+        result.put(PATH_CREDITOR, creditor);
+        result.put(PATH_AMOUNT, amount);
 
-        setAmount(amountList);
+        return result;
     }
 }

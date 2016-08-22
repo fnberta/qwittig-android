@@ -15,7 +15,7 @@ import java.util.List;
 import ch.giantific.qwittig.databinding.RowPurchaseAddItemUsersUserBinding;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemUsersUser;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemIdentity;
 
 /**
  * Provides an adapter for a {@link RecyclerView} showing a list of users.
@@ -25,13 +25,13 @@ import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAd
 public class PurchaseAddEditItemUsersRecyclerAdapter extends BaseRecyclerAdapter<PurchaseAddEditItemUsersRecyclerAdapter.ItemUserRow>
         implements PurchaseAddEditItemUsersClickListener {
 
-    private final PurchaseAddEditViewModel mViewModel;
-    private final List<PurchaseAddEditItemUsersUser> mUsers;
+    private final PurchaseAddEditViewModel viewModel;
+    private final List<PurchaseAddEditItemIdentity> identities;
 
     public PurchaseAddEditItemUsersRecyclerAdapter(@NonNull PurchaseAddEditViewModel viewModel,
-                                                   @NonNull List<PurchaseAddEditItemUsersUser> users) {
-        mViewModel = viewModel;
-        mUsers = users;
+                                                   @NonNull List<PurchaseAddEditItemIdentity> identities) {
+        this.viewModel = viewModel;
+        this.identities = identities;
     }
 
     @Override
@@ -45,33 +45,33 @@ public class PurchaseAddEditItemUsersRecyclerAdapter extends BaseRecyclerAdapter
     @Override
     public void onBindViewHolder(ItemUserRow holder, int position) {
         final RowPurchaseAddItemUsersUserBinding binding = holder.getBinding();
-        final PurchaseAddEditItemUsersUser addEditPurchaseItemUsersUser = mUsers.get(position);
+        final PurchaseAddEditItemIdentity addEditPurchaseItemUsersUser = identities.get(position);
         binding.setItemModel(addEditPurchaseItemUsersUser);
         binding.executePendingBindings();
     }
 
     @Override
     public int getItemCount() {
-        return mUsers.size();
+        return identities.size();
     }
 
     @Override
-    public void onItemRowUserClick(int position) {
-        final PurchaseAddEditItemUsersUser user = mUsers.get(position);
+    public void onItemRowIdentityClick(int position) {
+        final PurchaseAddEditItemIdentity user = identities.get(position);
         user.setSelected(!user.isSelected());
         notifyItemChanged(position);
 
         // notify main view model because total and my share values need to be updated
-        mViewModel.onItemRowUserClick();
+        viewModel.onItemRowUserClick();
     }
 
     @Override
-    public void onItemRowUserLongClick(int position) {
-        final PurchaseAddEditItemUsersUser user = mUsers.get(position);
-        user.setSelected(!user.isSelected());
+    public void onItemRowIdentityLongClick(int position) {
+        final PurchaseAddEditItemIdentity identity = identities.get(position);
+        identity.setSelected(!identity.isSelected());
         notifyItemChanged(position);
 
-        mViewModel.onItemRowUserLongClick(user);
+        viewModel.onItemRowUserLongClick(identity);
     }
 
     /**
@@ -89,13 +89,13 @@ public class PurchaseAddEditItemUsersRecyclerAdapter extends BaseRecyclerAdapter
             root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    listener.onItemRowUserClick(getAdapterPosition());
+                    listener.onItemRowIdentityClick(getAdapterPosition());
                 }
             });
             root.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
-                    listener.onItemRowUserLongClick(getAdapterPosition());
+                    listener.onItemRowIdentityLongClick(getAdapterPosition());
                     return true;
                 }
             });

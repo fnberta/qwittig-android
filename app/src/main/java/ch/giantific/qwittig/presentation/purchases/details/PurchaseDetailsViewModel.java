@@ -6,13 +6,16 @@ package ch.giantific.qwittig.presentation.purchases.details;
 
 import android.databinding.Bindable;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Date;
 
-import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.presentation.common.ListInteraction;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
 import ch.giantific.qwittig.presentation.common.viewmodels.PurchaseReceiptViewModel;
+import ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDetailsIdentityItemModel;
 import ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDetailsItemModel;
 
 /**
@@ -20,13 +23,49 @@ import ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDe
  */
 public interface PurchaseDetailsViewModel extends ListViewModel<PurchaseDetailsItemModel, PurchaseDetailsViewModel.ViewListener>, PurchaseReceiptViewModel {
 
-    @Bindable
-    String getPurchaseStore();
+    void setIdentitiesListInteraction(@NonNull ListInteraction listInteraction);
 
     @Bindable
-    String getPurchaseDate();
+    String getStore();
 
-    Identity getPurchaseBuyer();
+    void setStore(@NonNull String store);
+
+    @Bindable
+    String getDate();
+
+    void setDate(@NonNull Date date);
+
+    @Bindable
+    String getTotal();
+
+    void setTotal(double total);
+
+    @Bindable
+    String getTotalForeign();
+
+    void setTotalForeign(double totalForeign);
+
+    @Bindable
+    String getMyShare();
+
+    void setMyShare(double myShare);
+
+    @Bindable
+    String getMyShareForeign();
+
+    void setMyShareForeign(double myShareForeign);
+
+    @Bindable
+    String getNote();
+
+    void setNote(@NonNull String note);
+
+    @Bindable
+    boolean isNoteAvailable();
+
+    PurchaseDetailsIdentityItemModel getIdentityAtPosition(int position);
+
+    int getIdentitiesCount();
 
     void onEditPurchaseClick();
 
@@ -47,6 +86,6 @@ public interface PurchaseDetailsViewModel extends ListViewModel<PurchaseDetailsI
 
         void startEnterTransition();
 
-        void toggleMenuOptions(boolean showEditOptions, boolean hasForeignCurrency);
+        void toggleMenuOptions(boolean showEditOptions, boolean showExchangeRateOption);
     }
 }

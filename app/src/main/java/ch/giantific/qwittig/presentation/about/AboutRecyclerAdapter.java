@@ -25,7 +25,7 @@ import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
  */
 public class AboutRecyclerAdapter extends BaseRecyclerAdapter {
 
-    private final AboutViewModel mViewModel;
+    private final AboutViewModel viewModel;
 
     /**
      * Constructs a new {@link AboutRecyclerAdapter}.
@@ -34,7 +34,7 @@ public class AboutRecyclerAdapter extends BaseRecyclerAdapter {
      */
     public AboutRecyclerAdapter(@NonNull AboutViewModel viewModel) {
 
-        mViewModel = viewModel;
+        this.viewModel = viewModel;
     }
 
     @NonNull
@@ -60,7 +60,7 @@ public class AboutRecyclerAdapter extends BaseRecyclerAdapter {
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        final AboutItemModel itemModel = mViewModel.getItemAtPosition(position);
+        final AboutItemModel itemModel = viewModel.getItemAtPosition(position);
 
         int viewType = getItemViewType(position);
         switch (viewType) {
@@ -69,7 +69,7 @@ public class AboutRecyclerAdapter extends BaseRecyclerAdapter {
                 final RowAboutBinding binding = row.getBinding();
 
                 binding.setItemModel((AboutItem) itemModel);
-                binding.setViewModel(mViewModel);
+                binding.setViewModel(viewModel);
                 binding.executePendingBindings();
                 break;
             }
@@ -87,11 +87,11 @@ public class AboutRecyclerAdapter extends BaseRecyclerAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        return mViewModel.getItemAtPosition(position).getType();
+        return viewModel.getItemAtPosition(position).getType();
     }
 
     @Override
     public int getItemCount() {
-        return mViewModel.getItemCount();
+        return viewModel.getItemCount();
     }
 }

@@ -18,7 +18,7 @@ import android.widget.Button;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.DialogPromptNicknameBinding;
-import ch.giantific.qwittig.presentation.common.fragments.BaseDialogFragment;
+import ch.giantific.qwittig.presentation.common.fragments.dialogs.BaseDialogFragment;
 
 /**
  * Provides a dialog that allows the user to enter his/her email address in order to request a
@@ -35,9 +35,10 @@ public class NicknamePromptDialogFragment extends BaseDialogFragment<NicknamePro
     private static final String DIALOG_TAG = NicknamePromptDialogFragment.class.getCanonicalName();
     private static final String KEY_NICKNAME = "NICKNAME";
     private static final String KEY_POSITION = "POSITION";
-    private String mNickname;
-    private int mPosition;
-    private DialogPromptNicknameBinding mBinding;
+
+    private String nickname;
+    private int position;
+    private DialogPromptNicknameBinding binding;
 
     /**
      * Shows a new instance of {@link NicknamePromptDialogFragment}.
@@ -60,8 +61,8 @@ public class NicknamePromptDialogFragment extends BaseDialogFragment<NicknamePro
 
         final Bundle args = getArguments();
         if (args != null) {
-            mNickname = args.getString(KEY_NICKNAME, "");
-            mPosition = args.getInt(KEY_POSITION);
+            nickname = args.getString(KEY_NICKNAME, "");
+            position = args.getInt(KEY_POSITION);
         }
     }
 
@@ -70,15 +71,15 @@ public class NicknamePromptDialogFragment extends BaseDialogFragment<NicknamePro
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final FragmentActivity activity = getActivity();
         final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity);
-        mBinding = DialogPromptNicknameBinding.inflate(activity.getLayoutInflater());
+        binding = DialogPromptNicknameBinding.inflate(activity.getLayoutInflater());
 
-        if (!TextUtils.isEmpty(mNickname)) {
-            mBinding.etDialogNickname.setText(mNickname);
+        if (!TextUtils.isEmpty(nickname)) {
+            binding.etDialogNickname.setText(nickname);
         }
 
         dialogBuilder
                 .setMessage(R.string.dialog_change_nickname_message)
-                .setView(mBinding.getRoot())
+                .setView(binding.getRoot())
                 .setPositiveButton(android.R.string.yes, null)
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                     @Override
@@ -102,13 +103,13 @@ public class NicknamePromptDialogFragment extends BaseDialogFragment<NicknamePro
             positiveButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mNickname = mBinding.etDialogNickname.getText().toString();
-                    if (!TextUtils.isEmpty(mNickname)) {
-                        mBinding.tilDialogNickname.setErrorEnabled(false);
-                        mActivity.onValidNicknameEntered(mNickname, mPosition);
+                    nickname = binding.etDialogNickname.getText().toString();
+                    if (!TextUtils.isEmpty(nickname)) {
+                        binding.tilDialogNickname.setErrorEnabled(false);
+                        activity.onValidNicknameEntered(nickname, position);
                         dismiss();
                     } else {
-                        mBinding.tilDialogNickname.setError(getString(R.string.error_nickname));
+                        binding.tilDialogNickname.setError(getString(R.string.error_nickname));
                     }
                 }
             });

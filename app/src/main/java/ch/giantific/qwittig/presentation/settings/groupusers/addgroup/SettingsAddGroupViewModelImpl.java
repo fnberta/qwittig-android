@@ -12,16 +12,25 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 
+import com.google.firebase.auth.FirebaseUser;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.helper.RemoteConfigHelper;
+import ch.giantific.qwittig.data.repositories.GroupRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.domain.models.User;
+import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
-import rx.Single;
-import rx.SingleSubscriber;
+import rx.Observable;
+import rx.functions.Action1;
+import rx.functions.Func1;
 
 /**
  * Provides an implementation of the {@link SettingsAddGroupViewModel}.
@@ -30,17 +39,29 @@ public class SettingsAddGroupViewModelImpl extends ViewModelBaseImpl<SettingsAdd
         implements SettingsAddGroupViewModel {
 
     private static final String STATE_VALIDATE = "STATE_VALIDATE";
-    private String mName;
-    private String mCurrency;
-    private boolean mValidate;
+
+    private final RemoteConfigHelper configHelper;
+    private final GroupRepository groupRepo;
+    private final List<String> groupNames;
+    private Identity currentIdentity;
+    private String name;
+    private String currency;
+    private boolean validate;
 
     public SettingsAddGroupViewModelImpl(@Nullable Bundle savedState,
+                                         @NonNull Navigator navigator,
                                          @NonNull RxBus<Object> eventBus,
-                                         @NonNull UserRepository userRepository) {
-        super(savedState, eventBus, userRepository);
+                                         @NonNull RemoteConfigHelper configHelper,
+                                         @NonNull UserRepository userRepo,
+                                         @NonNull GroupRepository groupRepo) {
+        super(savedState, navigator, eventBus, userRepo);
+
+        this.configHelper = configHelper;
+        this.groupRepo = groupRepo;
+        groupNames = new ArrayList<>();
 
         if (savedState != null) {
-            mValidate = savedState.getBoolean(STATE_VALIDATE);
+            validate = savedState.getBoolean(STATE_VALIDATE);
         }
     }
 
@@ -48,38 +69,81 @@ public class SettingsAddGroupViewModelImpl extends ViewModelBaseImpl<SettingsAdd
     public void saveState(@NonNull Bundle outState) {
         super.saveState(outState);
 
-        outState.putBoolean(STATE_VALIDATE, mValidate);
+        outState.putBoolean(STATE_VALIDATE, validate);
     }
 
     @Override
     @Bindable
     public boolean isValidate() {
-        return mValidate;
+        return validate;
     }
 
     @Override
     public void setValidate(boolean validate) {
-        mValidate = validate;
+        this.validate = validate;
         notifyPropertyChanged(BR.validate);
     }
 
     @Override
     public boolean isNameComplete() {
-        return !TextUtils.isEmpty(mName);
+        return !TextUtils.isEmpty(name);
     }
 
     @Override
     public void onNameChanged(CharSequence s, int start, int before, int count) {
-        mName = s.toString();
-        if (mValidate) {
+        name = s.toString();
+        if (validate) {
             notifyPropertyChanged(BR.validate);
         }
     }
 
     @Override
+    public List<Currency> getSupportedCurrencies() {
+        return configHelper.getSupportedCurrencies();
+    }
+
+    @Override
+    protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
+        super.onUserLoggedIn(currentUser);
+
+        getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
+                .flatMap(new Func1<User, Observable<String>>() {
+                    @Override
+                    public Observable<String> call(final User user) {
+                        return userRepo.getIdentity(user.getCurrentIdentity())
+                                .doOnSuccess(new Action1<Identity>() {
+                                    @Override
+                                    public void call(Identity identity) {
+                                        currentIdentity = identity;
+                                    }
+                                })
+                                .flatMapObservable(new Func1<Identity, Observable<String>>() {
+                                    @Override
+                                    public Observable<String> call(Identity identity) {
+                                        return Observable.from(user.getIdentitiesIds());
+                                    }
+                                });
+                    }
+                })
+                .flatMap(new Func1<String, Observable<Identity>>() {
+                    @Override
+                    public Observable<Identity> call(String identityId) {
+                        return userRepo.observeIdentity(identityId);
+                    }
+                })
+                .subscribe(new IndefiniteSubscriber<Identity>() {
+                    @Override
+                    public void onNext(Identity identity) {
+                        groupNames.add(identity.getGroupName());
+                    }
+                })
+        );
+    }
+
+    @Override
     public void onCurrencySelected(@NonNull AdapterView<?> parent, View view, int position, long id) {
         final Currency currency = (Currency) parent.getItemAtPosition(position);
-        mCurrency = currency.getCode();
+        this.currency = currency.getCode();
     }
 
     @Override
@@ -89,42 +153,19 @@ public class SettingsAddGroupViewModelImpl extends ViewModelBaseImpl<SettingsAdd
             return;
         }
 
-        final List<Identity> identities = mCurrentUser.getIdentities();
         boolean newGroup = true;
-        for (Identity identity : identities) {
-            if (mName.equalsIgnoreCase(identity.getGroup().getName())) {
+        for (String groupName : groupNames) {
+            if (name.equalsIgnoreCase(groupName)) {
                 newGroup = false;
             }
         }
         if (newGroup) {
-            mView.showProgressDialog(R.string.progress_add_group);
-            mView.loadAddGroupWorker(mName, mCurrency);
+            groupRepo.createGroup(currentIdentity.getUser(), name, currency,
+                    currentIdentity.getNickname(), currentIdentity.getAvatar());
+            this.view.setScreenResult(name);
+            this.view.showAddUsersFragment();
         } else {
-            mView.showMessage(R.string.toast_group_already_in_list);
+            this.view.showMessage(R.string.toast_group_already_in_list);
         }
-    }
-
-    @Override
-    public void setCreateGroupStream(@NonNull Single<Identity> single, @NonNull final String workerTag) {
-        getSubscriptions().add(single
-                .subscribe(new SingleSubscriber<Identity>() {
-                    @Override
-                    public void onSuccess(Identity identity) {
-                        mView.removeWorker(workerTag);
-                        mView.hideProgressDialog();
-
-                        mView.setScreenResult(mName);
-                        mView.showAddUsersFragment();
-                    }
-
-                    @Override
-                    public void onError(Throwable error) {
-                        mView.removeWorker(workerTag);
-                        mView.hideProgressDialog();
-
-                        mView.showMessage(R.string.toast_error_settings_group_add);
-                    }
-                })
-        );
     }
 }

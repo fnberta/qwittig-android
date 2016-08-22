@@ -72,7 +72,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="@dimen/normal_space"
                             android:maxLines="2"
-                            android:text="@{viewModel.taskTitle}"
+                            android:text="@{viewModel.title}"
                             tools:text="Abfall rausbringen"
                             />
 
@@ -81,7 +81,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:maxLines="1"
-                            app:taskTimeFrame="@{viewModel.taskTimeFrame}"
+                            app:timeFrame="@{viewModel.timeFrame}"
                             tools:text="Täglich"
                             />
 
@@ -90,7 +90,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:maxLines="2"
-                            android:text="@{viewModel.taskIdentities}"
+                            android:text="@{viewModel.identitiesText}"
                             tools:text="Ich - vera - lexli - sturzi"
                             />
 

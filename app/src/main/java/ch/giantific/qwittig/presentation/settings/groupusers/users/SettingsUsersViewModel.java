@@ -10,16 +10,19 @@ import android.support.annotation.StringRes;
 import android.view.View;
 
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
-import ch.giantific.qwittig.presentation.settings.groupusers.users.itemmodels.SettingsUsersUserRowItemModel;
+import ch.giantific.qwittig.presentation.settings.groupusers.users.itemmodels.SettingsUsersUserItemModel;
 
 /**
  * Defines an observable view model for the manage users settings screen.
  */
-public interface SettingsUsersViewModel extends ListViewModel<SettingsUsersUserRowItemModel, SettingsUsersViewModel.ViewListener>, AddUserWorkerListener,
-        SettingsUsersRecyclerAdapter.AdapterInteractionListener, NicknamePromptDialogFragment.DialogInteractionListener {
+public interface SettingsUsersViewModel extends ListViewModel<SettingsUsersUserItemModel, SettingsUsersViewModel.ViewListener>,
+        SettingsUsersRecyclerAdapter.AdapterInteractionListener,
+        NicknamePromptDialogFragment.DialogInteractionListener {
 
     @Bindable
     String getGroupName();
+
+    void setGroupName(@NonNull String groupName);
 
     @Bindable
     String getNickname();
@@ -34,9 +37,6 @@ public interface SettingsUsersViewModel extends ListViewModel<SettingsUsersUserR
 
     void setValidate(boolean validate);
 
-    @Bindable
-    boolean isGroupEmpty();
-
     void onNewAvatarTaken(@NonNull String avatarPath);
 
     void onNicknameChanged(CharSequence s, int start, int before, int count);
@@ -47,9 +47,6 @@ public interface SettingsUsersViewModel extends ListViewModel<SettingsUsersUserR
      * Defines the interaction with the attached view.
      */
     interface ViewListener extends ListViewModel.ViewListener {
-
-        void loadAddUserWorker(@NonNull String nickname, @NonNull String groupId,
-                               @NonNull String groupName);
 
         void loadLinkShareOptions(@NonNull String link);
 

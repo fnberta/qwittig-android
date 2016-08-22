@@ -10,249 +10,220 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.AdapterView;
 
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.repositories.TaskRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.models.Task;
+import ch.giantific.qwittig.domain.models.Task.TimeFrame;
 import ch.giantific.qwittig.domain.models.TaskHistoryEvent;
-import ch.giantific.qwittig.domain.repositories.TaskRepository;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
-import ch.giantific.qwittig.presentation.common.viewmodels.OnlineListViewModelBaseImpl;
-import ch.giantific.qwittig.presentation.tasks.list.itemmodels.TasksHeaderItem;
+import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModelBaseImpl;
 import ch.giantific.qwittig.presentation.tasks.list.itemmodels.TasksItem;
 import ch.giantific.qwittig.presentation.tasks.list.itemmodels.TasksItemModel;
 import ch.giantific.qwittig.presentation.tasks.list.itemmodels.TasksItemModel.Type;
 import ch.giantific.qwittig.presentation.tasks.list.models.TaskDeadline;
-import ch.giantific.qwittig.utils.MessageAction;
-import rx.Completable;
-import rx.Observable;
 import rx.Single;
 import rx.SingleSubscriber;
-import rx.Subscriber;
-import rx.functions.Func1;
 
 /**
  * Provides an implementation of the {@link TasksViewModel} interface.
  */
-public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<TasksItemModel, TasksViewModel.ViewListener>
+public class TasksViewModelImpl extends ListViewModelBaseImpl<TasksItemModel, TasksViewModel.ViewListener>
         implements TasksViewModel {
 
     private static final String STATE_LOADING_TASKS = "STATE_LOADING_TASKS";
     private static final String STATE_DEADLINE = "STATE_DEADLINE";
-    private final Navigator mNavigator;
-    private final TaskRepository mTaskRepo;
-    private final ArrayList<String> mLoadingTasks;
-    private TaskDeadline mDeadline;
+
+    private final TaskRepository taskRepo;
+    private final ArrayList<String> loadingTasks;
+    private TaskDeadline deadline;
+    private String currentIdentityId;
 
     public TasksViewModelImpl(@Nullable Bundle savedState,
                               @NonNull Navigator navigator,
                               @NonNull RxBus<Object> eventBus,
                               @NonNull UserRepository userRepository,
-                              @NonNull TaskRepository taskRepo,
+                              @NonNull TaskRepository taskRepository,
                               @NonNull TaskDeadline deadline) {
-        super(savedState, eventBus, userRepository);
+        super(savedState, navigator, eventBus, userRepository);
 
-        mNavigator = navigator;
-        mTaskRepo = taskRepo;
+        taskRepo = taskRepository;
+
         if (savedState != null) {
-            mItems = new ArrayList<>();
-            mDeadline = savedState.getParcelable(STATE_DEADLINE);
-            mLoadingTasks = savedState.getStringArrayList(STATE_LOADING_TASKS);
+            this.deadline = savedState.getParcelable(STATE_DEADLINE);
+            loadingTasks = savedState.getStringArrayList(STATE_LOADING_TASKS);
         } else {
-            mDeadline = deadline;
-            mLoadingTasks = new ArrayList<>();
+            this.deadline = deadline;
+            loadingTasks = new ArrayList<>();
         }
+    }
+
+    @Override
+    protected Class<TasksItemModel> getItemModelClass() {
+        return TasksItemModel.class;
+    }
+
+    @Override
+    protected int compareItemModels(TasksItemModel o1, TasksItemModel o2) {
+        if (o1 instanceof TasksItem) {
+            if (o2 instanceof TasksItem) {
+                return ((TasksItem) o1).compareTo((TasksItem) o2);
+            }
+        }
+
+        return 0;
     }
 
     @Override
     public void saveState(@NonNull Bundle outState) {
         super.saveState(outState);
 
-        outState.putParcelable(STATE_DEADLINE, mDeadline);
-        outState.putStringArrayList(STATE_LOADING_TASKS, mLoadingTasks);
+        outState.putParcelable(STATE_DEADLINE, deadline);
+        outState.putStringArrayList(STATE_LOADING_TASKS, loadingTasks);
     }
 
     @Override
-    public void loadData() {
-        getSubscriptions().add(mUserRepo.fetchIdentityData(mCurrentIdentity)
-                .flatMapObservable(new Func1<Identity, Observable<Task>>() {
-                    @Override
-                    public Observable<Task> call(Identity identity) {
-                        return mTaskRepo.getTasks(identity, mDeadline.getDate());
-                    }
-                })
-                .filter(new Func1<Task, Boolean>() {
-                    @Override
-                    public Boolean call(Task task) {
-                        final List<Identity> identities = task.getIdentities();
-                        return !identities.isEmpty() && identities.contains(mCurrentIdentity);
-                    }
-                })
-                .subscribe(new Subscriber<Task>() {
-                    List<TasksItemModel> tasksUser;
-                    List<TasksItemModel> tasksGroup;
+    protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
+        super.onUserLoggedIn(currentUser);
 
-                    @Override
-                    public void onStart() {
-                        super.onStart();
-                        mItems.clear();
-                        tasksUser = new ArrayList<>();
-                        tasksGroup = new ArrayList<>();
-                    }
-
-                    @Override
-                    public void onCompleted() {
-                        if (!tasksUser.isEmpty()) {
-                            mItems.add(new TasksHeaderItem(R.string.task_header_my));
-                            mItems.addAll(tasksUser);
-                        }
-                        if (!tasksGroup.isEmpty()) {
-                            mItems.add(new TasksHeaderItem(R.string.task_header_group));
-                            mItems.addAll(tasksGroup);
-                        }
-
-                        setLoading(false);
-                        mListInteraction.notifyDataSetChanged();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        mView.showMessage(R.string.toast_error_tasks_load);
-                    }
-
-                    @Override
-                    public void onNext(Task task) {
-                        final Identity identityResponsible = task.getIdentityResponsible();
-                        if (Objects.equals(mCurrentIdentity.getObjectId(), identityResponsible.getObjectId())) {
-                            tasksUser.add(new TasksItem(task, mCurrentIdentity));
-                        } else {
-                            tasksGroup.add(new TasksItem(task, mCurrentIdentity));
-                        }
-
-                        task.setLoading(mLoadingTasks.contains(task.getObjectId()));
-                    }
-                })
-        );
     }
 
-    @Override
-    public void onDataUpdated(boolean successful) {
-        setRefreshing(false);
-        if (successful) {
-            loadData();
-        } else {
-            mView.showMessageWithAction(R.string.toast_error_tasks_update, getRefreshAction());
-        }
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return mItems.get(position).getType();
-    }
+    //    @Override
+//    public void loadData() {
+//        getSubscriptions().add(userRepo.fetchIdentityData(currentIdentity)
+//                .flatMapObservable(new Func1<Identity, Observable<Task>>() {
+//                    @Override
+//                    public Observable<Task> call(Identity identity) {
+//                        return taskRepo.getTasks(identity, deadline.getDate());
+//                    }
+//                })
+//                .filter(new Func1<Task, Boolean>() {
+//                    @Override
+//                    public Boolean call(Task task) {
+//                        final List<Identity> identities = task.getIdentitiesText();
+//                        return !identities.isEmpty() && identities.contains(currentIdentity);
+//                    }
+//                })
+//                .subscribe(new Subscriber<Task>() {
+//                    List<TasksItemModel> tasksUser;
+//                    List<TasksItemModel> tasksGroup;
+//
+//                    @Override
+//                    public void onStart() {
+//                        super.onStart();
+//                        items.clear();
+//                        tasksUser = new ArrayList<>();
+//                        tasksGroup = new ArrayList<>();
+//                    }
+//
+//                    @Override
+//                    public void onCompleted() {
+//                        if (!tasksUser.isEmpty()) {
+//                            items.add(new TasksHeaderItem(R.string.task_header_my));
+//                            items.addAll(tasksUser);
+//                        }
+//                        if (!tasksGroup.isEmpty()) {
+//                            items.add(new TasksHeaderItem(R.string.task_header_group));
+//                            items.addAll(tasksGroup);
+//                        }
+//
+//                        setLoading(false);
+//                        listInteraction.notifyDataSetChanged();
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        view.showMessage(R.string.toast_error_tasks_load);
+//                    }
+//
+//                    @Override
+//                    public void onNext(Task task) {
+//                        final Identity identityResponsible = task.getIdentityResponsible();
+//                        if (Objects.equals(currentIdentity.getObjectId(), identityResponsible.getObjectId())) {
+//                            tasksUser.add(new TasksItem(task, currentIdentity));
+//                        } else {
+//                            tasksGroup.add(new TasksItem(task, currentIdentity));
+//                        }
+//
+//                        task.setLoading(loadingTasks.contains(task.getObjectId()));
+//                    }
+//                })
+//        );
+//    }
 
     @Override
     public void onAddTaskFabClick(View view) {
-        mNavigator.startTaskAdd();
+        navigator.startTaskAdd();
     }
 
     @Override
     public void onDeadlineSelected(@NonNull AdapterView<?> parent, View view, int position, long id) {
         final TaskDeadline deadline = (TaskDeadline) parent.getItemAtPosition(position);
-        if (!Objects.equals(deadline, mDeadline)) {
-            mDeadline = deadline;
-            loadData();
+        if (!Objects.equals(deadline, this.deadline)) {
+            this.deadline = deadline;
+            // TODO: reload data
         }
-    }
-
-    @Override
-    protected void refreshItems() {
-        if (!mView.isNetworkAvailable()) {
-            setRefreshing(false);
-            mView.showMessageWithAction(R.string.toast_no_connection, getRefreshAction());
-            return;
-        }
-
-        mView.startUpdateTasksService();
-    }
-
-    @NonNull
-    private MessageAction getRefreshAction() {
-        return new MessageAction(R.string.action_retry) {
-            @Override
-            public void onClick(View v) {
-                refreshItems();
-            }
-        };
     }
 
     @Override
     public void onTaskRowClick(@NonNull TasksItem itemModel) {
-        mNavigator.startTaskDetails(itemModel.getTask());
+        navigator.startTaskDetails(itemModel.getId());
     }
 
     @Override
     public void onDoneButtonClick(@NonNull TasksItem itemModel) {
-        final Task task = itemModel.getTask();
-        final String timeFrame = task.getTimeFrame();
-
-        if (Objects.equals(timeFrame, Task.TimeFrame.ONE_TIME)) {
-            task.deleteEventually();
-            final int pos = mItems.indexOf(itemModel);
-            mItems.remove(itemModel);
-            mListInteraction.notifyItemRemoved(pos);
+        final String timeFrame = itemModel.getTimeFrame();
+        if (Objects.equals(timeFrame, TimeFrame.ONE_TIME)) {
+            taskRepo.deleteTask(itemModel.getId());
             return;
         }
 
-        final TaskHistoryEvent newEvent = new TaskHistoryEvent(task, mCurrentIdentity, new Date());
-        getSubscriptions().add(Completable.fromSingle(mTaskRepo.saveTaskHistoryEvent(newEvent)).subscribe());
+        final TaskHistoryEvent newEvent = new TaskHistoryEvent(itemModel.getId(), currentIdentityId, new Date());
+        taskRepo.addHistoryEvent(newEvent);
 
-        final Identity identityResponsible = task.getIdentityResponsible();
-        final Identity identityResponsibleNew = task.handleHistoryEvent();
-        task.saveEventually();
+        // TODO: rotate identities and get new responsible
 
-        final String currentIdentityId = mCurrentIdentity.getObjectId();
-        if (identityResponsible != null && Objects.equals(identityResponsible.getObjectId(), currentIdentityId) ||
-                identityResponsibleNew != null && identityResponsibleNew.getObjectId().equals(currentIdentityId)) {
-            loadData();
-        } else {
-            final int pos = mItems.indexOf(itemModel);
-            mListInteraction.notifyItemChanged(pos);
-        }
+//        if (identityResponsible != null && Objects.equals(identityResponsible, currentIdentityId) ||
+//                identityResponsibleNew != null && Objects.equals(identityResponsibleNew, currentIdentityId)) {
+//            loadData();
+//        } else {
+//            final int pos = items.indexOf(itemModel);
+//            listInteraction.notifyItemChanged(pos);
+//        }
     }
 
     @Override
     public void onRemindButtonClick(@NonNull TasksItem itemModel) {
-        if (!mView.isNetworkAvailable()) {
-            mView.showMessage(R.string.toast_no_connection);
+        if (!view.isNetworkAvailable()) {
+            view.showMessage(R.string.toast_no_connection);
             return;
         }
 
-        final Task task = itemModel.getTask();
-        final String taskId = task.getObjectId();
-        if (mLoadingTasks.contains(taskId)) {
+        if (itemModel.isItemLoading()) {
             return;
         }
 
-        final int pos = mItems.indexOf(itemModel);
-        setTaskLoading(task, taskId, pos, true);
-        mView.loadRemindUserWorker(taskId);
+        final int pos = items.indexOf(itemModel);
+        setTaskLoading(itemModel, pos, true);
+        view.loadRemindUserWorker(itemModel.getId());
     }
 
-    private void setTaskLoading(@NonNull Task task, @NonNull String objectId, int position,
-                                boolean isLoading) {
-        task.setLoading(isLoading);
-        mListInteraction.notifyItemChanged(position);
+    private void setTaskLoading(@NonNull TasksItem itemModel, int position, boolean isLoading) {
+        itemModel.setItemLoading(isLoading);
+        listInteraction.notifyItemChanged(position);
 
+        final String id = itemModel.getId();
         if (isLoading) {
-            mLoadingTasks.add(objectId);
+            loadingTasks.add(id);
         } else {
-            mLoadingTasks.remove(objectId);
+            loadingTasks.remove(id);
         }
     }
 
@@ -263,19 +234,19 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<TasksItemMod
         getSubscriptions().add(single.subscribe(new SingleSubscriber<String>() {
                     @Override
                     public void onSuccess(String value) {
-                        mView.removeWorker(workerTag);
-                        final Task task = stopTaskLoading(taskId);
-                        if (task != null) {
-                            final Identity identityResponsible = task.getIdentities().get(0);
+                        view.removeWorker(workerTag);
+                        final TasksItem itemModel = stopTaskLoading(taskId);
+                        if (itemModel != null) {
+                            final Identity identityResponsible = itemModel.getIdentities().get(0);
                             final String nickname = identityResponsible.getNickname();
-                            mView.showMessage(R.string.toast_task_reminded_user, nickname);
+                            view.showMessage(R.string.toast_task_reminded_user, nickname);
                         }
                     }
 
                     @Override
                     public void onError(Throwable error) {
-                        mView.removeWorker(workerTag);
-                        mView.showMessage(mTaskRepo.getErrorMessage(error));
+                        view.removeWorker(workerTag);
+                        view.showMessage(R.string.toast_error_remind_failed);
                         stopTaskLoading(taskId);
                     }
                 })
@@ -283,18 +254,17 @@ public class TasksViewModelImpl extends OnlineListViewModelBaseImpl<TasksItemMod
     }
 
     @Nullable
-    private Task stopTaskLoading(@NonNull String taskId) {
-        for (int i = 0, tasksSize = mItems.size(); i < tasksSize; i++) {
-            final TasksItemModel taskListItem = mItems.get(i);
-            if (taskListItem.getType() != Type.TASK) {
+    private TasksItem stopTaskLoading(@NonNull String taskId) {
+        for (int i = 0, tasksSize = items.size(); i < tasksSize; i++) {
+            final TasksItemModel taskListItem = items.get(i);
+            if (taskListItem.getViewType() != Type.TASK) {
                 continue;
             }
 
-            final TasksItem tasksItem = (TasksItem) taskListItem;
-            final Task task = tasksItem.getTask();
-            if (Objects.equals(taskId, task.getObjectId())) {
-                setTaskLoading(task, taskId, i, false);
-                return task;
+            final TasksItem itemModel = (TasksItem) taskListItem;
+            if (Objects.equals(taskId, itemModel.getId())) {
+                setTaskLoading(itemModel, i, false);
+                return itemModel;
             }
         }
 

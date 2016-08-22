@@ -11,6 +11,8 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.AdapterView;
 
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -18,15 +20,16 @@ import java.util.Objects;
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.data.bus.events.EventIdentityAdded;
-import ch.giantific.qwittig.data.bus.events.EventIdentitySelected;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.domain.models.User;
+import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.SpinnerInteraction;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
-import rx.Subscriber;
+import rx.Observable;
 import rx.functions.Action1;
+import rx.functions.Func1;
 
 /**
  * Provides an implementation of the {@link NavDrawerViewModel}.
@@ -34,99 +37,129 @@ import rx.functions.Action1;
 public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel.ViewListener>
         implements NavDrawerViewModel {
 
-    private final List<Identity> mIdentities = new ArrayList<>();
-    private final Navigator mNavigator;
-    private SpinnerInteraction mSpinnerInteraction;
+    private final List<Identity> identities;
+    private SpinnerInteraction spinnerInteraction;
+    private Identity currentIdentity;
+    private String nickname;
+    private String avatar;
 
     public NavDrawerViewModelImpl(@Nullable Bundle savedState,
                                   @NonNull Navigator navigator,
                                   @NonNull RxBus<Object> eventBus,
                                   @NonNull UserRepository userRepository) {
-        super(savedState, eventBus, userRepository);
+        super(savedState, navigator, eventBus, userRepository);
 
-        mNavigator = navigator;
+        identities = new ArrayList<>();
     }
 
     @Override
     public void setSpinnerInteraction(@NonNull SpinnerInteraction spinnerInteraction) {
-        mSpinnerInteraction = spinnerInteraction;
-    }
-
-    @Override
-    public void onViewVisible() {
-        super.onViewVisible();
-
-        if (mCurrentUser != null) {
-            loadIdentities();
-        }
-
-        getSubscriptions().add(mEventBus.observeEvents(EventIdentityAdded.class)
-                .subscribe(new Action1<EventIdentityAdded>() {
-                    @Override
-                    public void call(EventIdentityAdded eventIdentityAdded) {
-                        onIdentitiesChanged();
-                    }
-                })
-        );
-    }
-
-    private void loadIdentities() {
-        getSubscriptions().add(mUserRepo.fetchIdentitiesData(mCurrentUser.getIdentities())
-                .subscribe(new Subscriber<Identity>() {
-                    @Override
-                    public void onStart() {
-                        super.onStart();
-
-                        mIdentities.clear();
-                    }
-
-                    @Override
-                    public void onCompleted() {
-                        notifyPropertyChanged(BR.identityNickname);
-                        mSpinnerInteraction.notifyDataSetChanged();
-                        notifyPropertyChanged(BR.selectedIdentity);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        mView.showMessage(R.string.toast_error_drawer_load_groups);
-                    }
-
-                    @Override
-                    public void onNext(Identity identity) {
-                        mIdentities.add(identity);
-                    }
-                })
-        );
+        this.spinnerInteraction = spinnerInteraction;
     }
 
     @Override
     @Bindable
-    public String getIdentityNickname() {
-        return mCurrentIdentity.isDataAvailable() ? mCurrentIdentity.getNickname() : "";
+    public String getNickname() {
+        return nickname;
+    }
+
+    @Override
+    public void setNickname(@NonNull String nickname) {
+        this.nickname = nickname;
+        notifyPropertyChanged(BR.nickname);
     }
 
     @Override
     @Bindable
-    public String getIdentityAvatar() {
-        return mCurrentIdentity.isDataAvailable() ? mCurrentIdentity.getAvatarUrl() : "";
+    public String getAvatar() {
+        return avatar;
+    }
+
+    @Override
+    public void setAvatar(@NonNull String avatar) {
+        this.avatar = avatar;
+        notifyPropertyChanged(BR.avatar);
     }
 
     @Override
     @Bindable
     public int getSelectedIdentity() {
-        return mIdentities.indexOf(mCurrentIdentity);
+        for (int i = 0, mIdentitiesSize = identities.size(); i < mIdentitiesSize; i++) {
+            final Identity identity = identities.get(i);
+            if (Objects.equals(currentIdentity.getId(), identity.getId())) {
+                return i;
+            }
+        }
+
+        return 0;
+    }
+
+    @Override
+    protected void onUserLoggedIn(@NonNull final FirebaseUser currentUser) {
+        super.onUserLoggedIn(currentUser);
+
+        getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
+                .flatMap(new Func1<User, Observable<User>>() {
+                    @Override
+                    public Observable<User> call(final User user) {
+                        return userRepo.observeIdentity(user.getCurrentIdentity())
+                                .doOnNext(new Action1<Identity>() {
+                                    @Override
+                                    public void call(Identity identity) {
+                                        currentIdentity = identity;
+                                        setNickname(identity.getNickname());
+                                        setAvatar(identity.getAvatar());
+                                    }
+                                })
+                                .map(new Func1<Identity, User>() {
+                                    @Override
+                                    public User call(Identity identity) {
+                                        return user;
+                                    }
+                                });
+                    }
+                })
+                .flatMap(new Func1<User, Observable<List<Identity>>>() {
+                    @Override
+                    public Observable<List<Identity>> call(User user) {
+                        return Observable.from(user.getIdentitiesIds())
+                                .flatMap(new Func1<String, Observable<Identity>>() {
+                                    @Override
+                                    public Observable<Identity> call(String identityId) {
+                                        return userRepo.getIdentity(identityId).toObservable();
+                                    }
+                                })
+                                .toList();
+                    }
+                })
+                .subscribe(new IndefiniteSubscriber<List<Identity>>() {
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+
+                        view.showMessage(R.string.toast_error_load_groups);
+                    }
+
+                    @Override
+                    public void onNext(List<Identity> identities) {
+                        NavDrawerViewModelImpl.this.identities.clear();
+                        NavDrawerViewModelImpl.this.identities.addAll(identities);
+                        spinnerInteraction.notifyDataSetChanged();
+                        notifyPropertyChanged(BR.selectedIdentity);
+                    }
+                })
+        );
     }
 
     @Override
     public List<Identity> getIdentities() {
-        return mIdentities;
+        return identities;
     }
 
     @Override
     public boolean isUserLoggedIn() {
-        if (mCurrentUser == null) {
-            mNavigator.startLogin();
+        if (userRepo.getCurrentUser() == null) {
+            navigator.startLogin();
             return false;
         }
 
@@ -134,62 +167,24 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
     }
 
     @Override
-    public void onLoginSuccessful() {
-        mCurrentUser = mUserRepo.getCurrentUser();
-        if (mCurrentUser != null) {
-            mCurrentIdentity = mCurrentUser.getCurrentIdentity();
-        }
-
-        mView.startQueryAllService();
-        mView.setupScreenAfterLogin();
-    }
-
-    @Override
-    public void onLogout() {
-        mNavigator.startHome();
-        mNavigator.finish();
-    }
-
-    @Override
-    public void onProfileUpdated() {
-        notifyPropertyChanged(BR.identityNickname);
-        notifyPropertyChanged(BR.identityAvatar);
-        mView.showMessage(R.string.toast_profile_update);
-    }
-
-    @Override
-    public void onIdentitiesChanged() {
-        mIdentities.clear();
-        final List<Identity> identities = mCurrentUser.getIdentities();
-        if (!identities.isEmpty()) {
-            for (Identity identity : identities) {
-                mIdentities.add(identity);
-            }
-        }
-        mSpinnerInteraction.notifyDataSetChanged();
-        onIdentitySwitched();
-    }
-
-    @Override
-    public void onIdentitySwitched() {
-        notifyPropertyChanged(BR.selectedIdentity);
+    public void afterLogout() {
+        navigator.startHome();
+        navigator.finish();
     }
 
     @Override
     public void onIdentitySelected(@NonNull AdapterView<?> parent, View view, int position, long id) {
         final Identity identity = (Identity) parent.getItemAtPosition(position);
-        if (Objects.equals(mCurrentIdentity.getObjectId(), identity.getObjectId())) {
+        final String identityId = identity.getId();
+        if (Objects.equals(currentIdentity.getId(), identityId)) {
             return;
         }
 
-        mCurrentUser.setCurrentIdentity(identity);
-        mCurrentUser.saveEventually();
-
-        mEventBus.post(new EventIdentitySelected(identity));
+        userRepo.updateCurrentIdentity(currentIdentity.getUser(), identityId);
     }
 
     @Override
     public void onAvatarClick(View view) {
-        mNavigator.startProfileSettings();
+        navigator.startProfileSettings();
     }
 }

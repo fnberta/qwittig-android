@@ -9,9 +9,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.repositories.TaskRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.di.scopes.PerActivity;
-import ch.giantific.qwittig.domain.repositories.TaskRepository;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.tasks.addedit.TaskAddEditViewModel;
@@ -25,13 +25,13 @@ import dagger.Provides;
 @Module
 public class TaskEditViewModelModule extends BaseViewModelModule {
 
-    private final String mEditTaskId;
+    private final String editTaskId;
 
     public TaskEditViewModelModule(@Nullable Bundle savedState,
                                    @NonNull String editTaskId) {
         super(savedState);
 
-        mEditTaskId = editTaskId;
+        this.editTaskId = editTaskId;
     }
 
     @PerActivity
@@ -40,8 +40,8 @@ public class TaskEditViewModelModule extends BaseViewModelModule {
                                                       @NonNull RxBus<Object> eventBus,
                                                       @NonNull UserRepository userRepository,
                                                       @NonNull TaskRepository taskRepository) {
-        return new TaskAddEditViewModelEditImpl(mSavedState, navigator, eventBus, userRepository,
-                taskRepository, mEditTaskId);
+        return new TaskAddEditViewModelEditImpl(savedState, navigator, eventBus, userRepository,
+                taskRepository, editTaskId);
     }
 
 }

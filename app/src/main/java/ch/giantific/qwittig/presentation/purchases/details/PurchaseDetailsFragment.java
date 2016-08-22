@@ -6,6 +6,7 @@ package ch.giantific.qwittig.presentation.purchases.details;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +29,7 @@ import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsSub
  */
 public class PurchaseDetailsFragment extends BaseRecyclerViewFragment<PurchaseDetailsSubcomponent, PurchaseDetailsViewModel, BaseFragment.ActivityListener<PurchaseDetailsSubcomponent>> {
 
-    private FragmentPurchaseDetailsBinding mBinding;
+    private FragmentPurchaseDetailsBinding binding;
 
     public PurchaseDetailsFragment() {
         // required empty constructor
@@ -37,16 +38,17 @@ public class PurchaseDetailsFragment extends BaseRecyclerViewFragment<PurchaseDe
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentPurchaseDetailsBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentPurchaseDetailsBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel.setListInteraction(mRecyclerAdapter);
-        mBinding.setViewModel(mViewModel);
+        setupIdentitiesList();
+        viewModel.setListInteraction(recyclerAdapter);
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -54,13 +56,23 @@ public class PurchaseDetailsFragment extends BaseRecyclerViewFragment<PurchaseDe
         component.inject(this);
     }
 
+    private void setupIdentitiesList() {
+        binding.rvPurchaseDetailsIdentities.setHasFixedSize(true);
+        binding.rvPurchaseDetailsIdentities.setLayoutManager(new LinearLayoutManager(getActivity(),
+                LinearLayoutManager.HORIZONTAL, false));
+        final PurchaseDetailsIdentitiesRecyclerAdapter adapter =
+                new PurchaseDetailsIdentitiesRecyclerAdapter(viewModel);
+        binding.rvPurchaseDetailsIdentities.setAdapter(adapter);
+        viewModel.setIdentitiesListInteraction(adapter);
+    }
+
     @Override
     protected RecyclerView getRecyclerView() {
-        return mBinding.rvPurchaseDetails;
+        return binding.rvPurchaseDetails;
     }
 
     @Override
     protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new PurchaseDetailsRecyclerAdapter(mViewModel);
+        return new PurchaseDetailsRecyclerAdapter(viewModel);
     }
 }

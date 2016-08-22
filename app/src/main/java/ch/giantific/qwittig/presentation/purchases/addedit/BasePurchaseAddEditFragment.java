@@ -26,21 +26,20 @@ import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAd
 public abstract class BasePurchaseAddEditFragment<U, T extends PurchaseAddEditViewModel, S extends BaseRecyclerViewFragment.ActivityListener<U>>
         extends BaseRecyclerViewFragment<U, T, S> {
 
-    private FragmentPurchaseAddEditBinding mBinding;
+    private FragmentPurchaseAddEditBinding binding;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mBinding = FragmentPurchaseAddEditBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentPurchaseAddEditBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel.setListInteraction(mRecyclerAdapter);
-        mBinding.setViewModel(mViewModel);
+        viewModel.setListInteraction(recyclerAdapter);
         final ItemTouchHelper touchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
                 0, ItemTouchHelper.END) {
             @Override
@@ -51,29 +50,29 @@ public abstract class BasePurchaseAddEditFragment<U, T extends PurchaseAddEditVi
 
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                mViewModel.onItemDismiss(viewHolder.getAdapterPosition());
+                viewModel.onItemDismiss(viewHolder.getAdapterPosition());
             }
 
             @Override
             public int getSwipeDirs(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
                 final int position = viewHolder.getAdapterPosition();
-                if (mViewModel.getItemViewType(position) != Type.ITEM) {
+                if (viewModel.getItemViewType(position) != Type.ITEM) {
                     return 0;
                 }
 
                 return super.getSwipeDirs(recyclerView, viewHolder);
             }
         });
-        touchHelper.attachToRecyclerView(mBinding.rvPurchaseAddEdit);
+        touchHelper.attachToRecyclerView(binding.rvPurchaseAddEdit);
     }
 
     @Override
     protected RecyclerView getRecyclerView() {
-        return mBinding.rvPurchaseAddEdit;
+        return binding.rvPurchaseAddEdit;
     }
 
     @Override
     protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new PurchaseAddEditRecyclerAdapter(mViewModel);
+        return new PurchaseAddEditRecyclerAdapter(viewModel);
     }
 }

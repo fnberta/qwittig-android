@@ -5,19 +5,20 @@
 package ch.giantific.qwittig.presentation.common.viewmodels;
 
 import android.databinding.BaseObservable;
+import android.databinding.Bindable;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.google.firebase.auth.FirebaseUser;
+
+import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.data.bus.events.EventIdentityAdded;
-import ch.giantific.qwittig.data.bus.events.EventIdentitySelected;
-import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.models.User;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
-import rx.functions.Action1;
+import ch.giantific.qwittig.data.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import rx.subscriptions.CompositeSubscription;
 
 /**
@@ -28,85 +29,102 @@ import rx.subscriptions.CompositeSubscription;
 public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
         extends BaseObservable implements ViewModel<T> {
 
-    protected final UserRepository mUserRepo;
-    protected final RxBus<Object> mEventBus;
-    protected T mView;
-    protected User mCurrentUser;
-    protected Identity mCurrentIdentity;
-    private CompositeSubscription mSubscriptions = new CompositeSubscription();
+    private static final String STATE_LOADING = "STATE_LOADING";
+    protected final UserRepository userRepo;
+    protected final Navigator navigator;
+    protected final RxBus<Object> eventBus;
+    protected T view;
+    protected boolean loading;
+    private CompositeSubscription subscriptions = new CompositeSubscription();
+    private int authStateCounter = 0;
 
     public ViewModelBaseImpl(@Nullable Bundle savedState,
+                             @NonNull Navigator navigator,
                              @NonNull RxBus<Object> eventBus,
-                             @NonNull UserRepository userRepository) {
-        mEventBus = eventBus;
-        mUserRepo = userRepository;
-        setCurrentUserAndIdentity();
-    }
+                             @NonNull UserRepository userRepo) {
+        this.navigator = navigator;
+        this.eventBus = eventBus;
+        this.userRepo = userRepo;
 
-    protected void setCurrentUserAndIdentity() {
-        mCurrentUser = mUserRepo.getCurrentUser();
-        if (mCurrentUser != null) {
-            mCurrentIdentity = mCurrentUser.getCurrentIdentity();
+        if (savedState != null) {
+            loading = savedState.getBoolean(STATE_LOADING, false);
+        } else {
+            loading = false;
         }
     }
 
     @Override
     public void attachView(@NonNull T view) {
-        mView = view;
+        this.view = view;
     }
 
     @Override
     @CallSuper
     public void saveState(@NonNull Bundle outState) {
-        // Empty default implementation
-    }
-
-    protected CompositeSubscription getSubscriptions() {
-        if (mSubscriptions == null || mSubscriptions.isUnsubscribed()) {
-            mSubscriptions = new CompositeSubscription();
-        }
-
-        return mSubscriptions;
+        outState.putBoolean(STATE_LOADING, loading);
     }
 
     @Override
-    @CallSuper
-    public void onViewVisible() {
-        setCurrentUserAndIdentity();
-        getSubscriptions().add(mEventBus.observeEvents(EventIdentitySelected.class)
-                .subscribe(new Action1<EventIdentitySelected>() {
+    @Bindable
+    public boolean isLoading() {
+        return loading;
+    }
+
+    @Override
+    public void setLoading(boolean loading) {
+        this.loading = loading;
+        notifyPropertyChanged(BR.loading);
+    }
+
+    protected final CompositeSubscription getSubscriptions() {
+        if (subscriptions == null || subscriptions.isUnsubscribed()) {
+            subscriptions = new CompositeSubscription();
+        }
+
+        return subscriptions;
+    }
+
+    @Override
+    public final void onViewVisible() {
+        authStateCounter = 0;
+        getSubscriptions().add(userRepo.observeAuthStatus()
+                .subscribe(new IndefiniteSubscriber<FirebaseUser>() {
                     @Override
-                    public void call(EventIdentitySelected eventIdentitySelected) {
-                        onIdentitySelected(eventIdentitySelected.getIdentity());
+                    public void onNext(FirebaseUser currentUser) {
+                        if (currentUser != null) {
+                            if (authStateCounter == 0) {
+                                onUserLoggedIn(currentUser);
+                                authStateCounter++;
+                            }
+                        } else {
+                            authStateCounter = 0;
+                            onUserNotLoggedIn();
+                        }
                     }
                 })
         );
-        getSubscriptions().add(mEventBus.observeEvents(EventIdentityAdded.class)
-                .subscribe(new Action1<EventIdentityAdded>() {
-                    @Override
-                    public void call(EventIdentityAdded eventIdentityAdded) {
-                        onIdentitySelected(eventIdentityAdded.getIdentity());
-                    }
-                })
-        );
     }
 
     @CallSuper
-    protected void onIdentitySelected(@NonNull Identity identitySelected) {
-        mCurrentIdentity = identitySelected;
+    protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
+        // empty default implementation
+    }
+
+    @CallSuper
+    protected void onUserNotLoggedIn() {
+        // empty default implementation
     }
 
     @Override
-    public void onViewGone() {
-        if (mSubscriptions.hasSubscriptions()) {
-            mSubscriptions.unsubscribe();
+    public final void onViewGone() {
+        if (subscriptions.hasSubscriptions()) {
+            subscriptions.unsubscribe();
         }
     }
 
     @Override
-    @CallSuper
-    public void onWorkerError(@NonNull String workerTag) {
-        mView.removeWorker(workerTag);
-        mView.showMessage(R.string.toast_error_unknown);
+    public final void onWorkerError(@NonNull String workerTag) {
+        view.removeWorker(workerTag);
+        view.showMessage(R.string.toast_error_unknown);
     }
 }

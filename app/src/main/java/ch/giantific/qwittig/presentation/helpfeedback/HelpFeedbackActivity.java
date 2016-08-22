@@ -29,7 +29,7 @@ import ch.giantific.qwittig.presentation.helpfeedback.di.HelpFeedbackViewModelMo
 public class HelpFeedbackActivity extends BaseActivity<HelpFeedbackComponent> {
 
     @Inject
-    HelpFeedbackViewModel mHelpFeedbackViewModel;
+    HelpFeedbackViewModel helpFeedbackViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,16 +45,16 @@ public class HelpFeedbackActivity extends BaseActivity<HelpFeedbackComponent> {
 
     @Override
     protected void injectDependencies(@Nullable Bundle savedInstanceState) {
-        mComponent = DaggerHelpFeedbackComponent.builder()
+        component = DaggerHelpFeedbackComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
                 .helpFeedbackViewModelModule(new HelpFeedbackViewModelModule(savedInstanceState))
                 .build();
-        mComponent.inject(this);
+        component.inject(this);
     }
 
     @Override
     protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{mHelpFeedbackViewModel});
+        return Arrays.asList(new ViewModel[]{helpFeedbackViewModel});
     }
 }

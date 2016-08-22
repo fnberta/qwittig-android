@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.RowTaskAddEditUserBinding;
-import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
 import ch.giantific.qwittig.presentation.tasks.addedit.itemmodels.TaskAddEditIdentityItemModel;
@@ -22,12 +21,12 @@ import ch.giantific.qwittig.presentation.tasks.addedit.itemmodels.TaskAddEditIde
 /**
  * Handles the display of the users involved in a task including the reordering of the different
  * users.
- * <p/>
+ * <p>
  * Subclass of {@link RecyclerView.Adapter}.
  */
 public class TaskAddEditUsersRecyclerAdapter extends BaseRecyclerAdapter<TaskAddEditUsersRecyclerAdapter.TaskUserInvolvedRow> {
 
-    private final TaskAddEditViewModel mViewModel;
+    private final TaskAddEditViewModel viewModel;
 
     /**
      * Constructs a new {@link TaskAddEditUsersRecyclerAdapter}.
@@ -35,7 +34,7 @@ public class TaskAddEditUsersRecyclerAdapter extends BaseRecyclerAdapter<TaskAdd
      * @param viewModel the view model for the view
      */
     public TaskAddEditUsersRecyclerAdapter(@NonNull TaskAddEditViewModel viewModel) {
-        mViewModel = viewModel;
+        this.viewModel = viewModel;
     }
 
     @NonNull
@@ -43,7 +42,7 @@ public class TaskAddEditUsersRecyclerAdapter extends BaseRecyclerAdapter<TaskAdd
     public TaskUserInvolvedRow onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         final RowTaskAddEditUserBinding binding = RowTaskAddEditUserBinding.inflate(inflater, parent, false);
-        return new TaskUserInvolvedRow(binding, mViewModel);
+        return new TaskUserInvolvedRow(binding, viewModel);
     }
 
     @Override
@@ -51,33 +50,19 @@ public class TaskAddEditUsersRecyclerAdapter extends BaseRecyclerAdapter<TaskAdd
         final RowTaskAddEditUserBinding binding = holder.getBinding();
         final TaskAddEditIdentityItemModel itemModel = binding.getItemModel();
 
-        final Identity identity = mViewModel.getItemAtPosition(position);
-        final float userAlpha = mViewModel.getIdentityAlpha(position);
-        if (itemModel == null) {
-            binding.setItemModel(new TaskAddEditIdentityItemModel(identity, userAlpha));
-        } else {
-            itemModel.updateIdentity(identity, userAlpha);
-        }
-
+        binding.setItemModel(itemModel);
         binding.executePendingBindings();
     }
 
     @Override
     public int getItemCount() {
-        return mViewModel.getItemCount();
+        return viewModel.getItemCount();
     }
 
     /**
      * Defines the actions to take when a user clicks on a user or drags it to change the order.
      */
     public interface AdapterInteractionListener {
-        /**
-         * Handles the click on the user row itself.
-         *
-         * @param position the adapter position of the user row
-         */
-        void onUsersRowItemClick(int position);
-
         /**
          * Handles the start of a user drag of the user row.
          *
@@ -101,13 +86,6 @@ public class TaskAddEditUsersRecyclerAdapter extends BaseRecyclerAdapter<TaskAdd
         public TaskUserInvolvedRow(@NonNull RowTaskAddEditUserBinding binding,
                                    @NonNull final AdapterInteractionListener listener) {
             super(binding);
-
-            binding.getRoot().setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    listener.onUsersRowItemClick(getAdapterPosition());
-                }
-            });
 
             final TaskUserInvolvedRow taskUserInvolvedRow = this;
             binding.ivReorder.setOnTouchListener(new View.OnTouchListener() {

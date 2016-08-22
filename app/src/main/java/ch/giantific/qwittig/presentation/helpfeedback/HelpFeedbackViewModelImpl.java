@@ -10,7 +10,7 @@ import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import ch.giantific.qwittig.presentation.helpfeedback.itemmodels.HelpFeedbackHeader;
@@ -37,15 +37,11 @@ public class HelpFeedbackViewModelImpl extends ViewModelBaseImpl<HelpFeedbackVie
     private static final String EMAIL_FEEDBACK = "feedback@qwittig.ch";
     private static final String FAQ_URL = "http://www.qwittig.ch/faq";
 
-    private final Navigator mNavigator;
-
     public HelpFeedbackViewModelImpl(@Nullable Bundle savedState,
                                      @NonNull Navigator navigator,
                                      @NonNull RxBus<Object> eventBus,
                                      @NonNull UserRepository userRepository) {
-        super(savedState, eventBus, userRepository);
-
-        mNavigator = navigator;
+        super(savedState, navigator, eventBus, userRepository);
     }
 
     @Override
@@ -63,22 +59,22 @@ public class HelpFeedbackViewModelImpl extends ViewModelBaseImpl<HelpFeedbackVie
         final int titleId = itemModel.getTitle();
         switch (titleId) {
             case R.string.help_faq:
-                mNavigator.openWebsite(FAQ_URL);
+                navigator.openWebsite(FAQ_URL);
                 break;
             case R.string.help_contact_support:
-                mView.sendEmail(EMAIL_SUPPORT, R.string.email_support_subject, R.string.email_support_message);
+                view.sendEmail(EMAIL_SUPPORT, R.string.email_support_subject, R.string.email_support_message);
                 break;
             case R.string.help_tutorial:
-                mNavigator.startFirstRun();
+                navigator.startFirstRun();
                 break;
             case R.string.help_feedback:
-                mView.sendEmail(EMAIL_FEEDBACK, R.string.email_feedback_subject);
+                view.sendEmail(EMAIL_FEEDBACK, R.string.email_feedback_subject);
                 break;
             case R.string.help_rate:
-                mView.openAppInPlayStore();
+                view.openAppInPlayStore();
                 break;
             case R.string.help_recommend:
-                mView.startAppInvite();
+                view.startAppInvite();
                 break;
         }
     }

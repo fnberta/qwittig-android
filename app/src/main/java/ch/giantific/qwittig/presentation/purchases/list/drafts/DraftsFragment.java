@@ -34,8 +34,8 @@ import ch.giantific.qwittig.presentation.purchases.list.di.HomeSubcomponent;
 public class DraftsFragment extends BaseRecyclerViewFragment<HomeSubcomponent, DraftsViewModel, DraftsFragment.ActivityListener>
         implements ActionMode.Callback, DraftsViewModel.ViewListener {
 
-    private FragmentHomeDraftsBinding mBinding;
-    private ActionMode mActionMode;
+    private FragmentHomeDraftsBinding binding;
+    private ActionMode actionMode;
 
     public DraftsFragment() {
         // required empty constructor
@@ -44,18 +44,17 @@ public class DraftsFragment extends BaseRecyclerViewFragment<HomeSubcomponent, D
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentHomeDraftsBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentHomeDraftsBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel.attachView(this);
-        mViewModel.setListInteraction(mRecyclerAdapter);
-        mViewModel.onReadyForSelectionMode();
-        mBinding.setViewModel(mViewModel);
+        viewModel.attachView(this);
+        viewModel.setListInteraction(recyclerAdapter);
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -65,12 +64,12 @@ public class DraftsFragment extends BaseRecyclerViewFragment<HomeSubcomponent, D
 
     @Override
     protected RecyclerView getRecyclerView() {
-        return mBinding.rvDrafts;
+        return binding.rvDrafts;
     }
 
     @Override
     protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new DraftsRecyclerAdapter(mViewModel);
+        return new DraftsRecyclerAdapter(viewModel);
     }
 
     @Override
@@ -89,7 +88,7 @@ public class DraftsFragment extends BaseRecyclerViewFragment<HomeSubcomponent, D
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_draft_delete:
-                mViewModel.onDeleteSelectedDraftsClick();
+                viewModel.onDeleteSelectedDraftsClick();
                 return true;
             default:
                 return false;
@@ -98,22 +97,22 @@ public class DraftsFragment extends BaseRecyclerViewFragment<HomeSubcomponent, D
 
     @Override
     public void onDestroyActionMode(ActionMode mode) {
-        mViewModel.onSelectionModeEnded();
+        viewModel.onSelectionModeEnded();
     }
 
     @Override
     public void startSelectionMode() {
-        mActionMode = mActivity.startActionMode();
+        actionMode = activity.startActionMode();
     }
 
     @Override
     public void stopSelectionMode() {
-        mActionMode.finish();
+        actionMode.finish();
     }
 
     @Override
     public void setSelectionModeTitle(@StringRes int title, int draftsSelected) {
-        mActionMode.setTitle(getString(title, draftsSelected));
+        actionMode.setTitle(getString(title, draftsSelected));
     }
 
     public interface ActivityListener extends BaseRecyclerViewFragment.ActivityListener<HomeSubcomponent> {

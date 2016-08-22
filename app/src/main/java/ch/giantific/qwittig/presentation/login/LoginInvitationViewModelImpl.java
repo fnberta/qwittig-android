@@ -8,7 +8,8 @@ import android.view.View;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 
 /**
@@ -17,46 +18,47 @@ import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 public class LoginInvitationViewModelImpl extends ViewModelBaseImpl<LoginInvitationViewModel.ViewListener>
         implements LoginInvitationViewModel {
 
-    private String mGroupName;
-    private String mInviterNickname;
+    private String groupName;
+    private String inviterNickname;
 
     public LoginInvitationViewModelImpl(@Nullable Bundle savedState,
+                                        @NonNull Navigator navigator,
                                         @NonNull RxBus<Object> eventBus,
                                         @NonNull UserRepository userRepository) {
-        super(savedState, eventBus, userRepository);
+        super(savedState, navigator, eventBus, userRepository);
     }
 
     @Override
     @Bindable
     public String getGroupName() {
-        return mGroupName;
+        return groupName;
     }
 
     @Override
     public void setGroupName(@NonNull String groupName) {
-        mGroupName = groupName;
+        this.groupName = groupName;
     }
 
     @Override
     @Bindable
     public String getInviterNickname() {
-        return mInviterNickname;
+        return inviterNickname;
     }
 
     @Override
     public void setInviterNickname(@NonNull String inviterNickname) {
-        mInviterNickname = inviterNickname;
+        this.inviterNickname = inviterNickname;
     }
 
     @Override
     public void onAcceptClick(View view) {
-        mView.showAccountsScreen(true);
-        mView.showMessage(R.string.toast_invitation_accept_login);
+        this.view.showAccountsScreen(true);
+        this.view.showMessage(R.string.toast_invitation_accept_login);
     }
 
     @Override
     public void onDeclineClick(View view) {
-        mView.showAccountsScreen(false);
-        mView.showMessage(R.string.toast_invitation_ignore);
+        this.view.showAccountsScreen(false);
+        this.view.showMessage(R.string.toast_invitation_ignore);
     }
 }

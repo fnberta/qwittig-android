@@ -59,9 +59,9 @@
                     android:layout_marginEnd="@dimen/key_line_1"
                     android:layout_marginStart="@dimen/key_line_1"
                     android:contentDescription="@string/purchase_receipt"
-                    android:visibility="@{!viewModel.receiptImageAvailable ? View.GONE : viewModel.loading ? View.GONE : View.VISIBLE}"
+                    android:visibility="@{!viewModel.receiptAvailable ? View.GONE : viewModel.loading ? View.GONE : View.VISIBLE}"
                     app:loadListener="@{viewModel}"
-                    app:receiptImage="@{viewModel.receiptImage}"
+                    app:receiptImage="@{viewModel.receipt}"
                     />
             </LinearLayout>
 
@@ -76,7 +76,7 @@
             android:drawableTop="@drawable/ic_receipt_black_144dp"
             android:gravity="center_horizontal"
             android:text="@string/no_receipt_image"
-            android:visibility="@{viewModel.receiptImageAvailable ? View.GONE : viewModel.loading ? View.GONE : View.VISIBLE}"
+            android:visibility="@{viewModel.receiptAvailable ? View.GONE : viewModel.loading ? View.GONE : View.VISIBLE}"
             tools:visibility="visible"
             />
 

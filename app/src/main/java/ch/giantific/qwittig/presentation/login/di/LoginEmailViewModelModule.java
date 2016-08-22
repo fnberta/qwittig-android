@@ -9,8 +9,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.helper.RemoteConfigHelper;
+import ch.giantific.qwittig.data.repositories.GroupRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.di.scopes.PerActivity;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.login.LoginEmailViewModel;
@@ -33,7 +35,10 @@ public class LoginEmailViewModelModule extends BaseViewModelModule {
     @Provides
     LoginEmailViewModel providesLoginEmailViewModel(@NonNull Navigator navigator,
                                                     @NonNull RxBus<Object> eventBus,
-                                                    @NonNull UserRepository userRepository) {
-        return new LoginEmailViewModelImpl(mSavedState, navigator, eventBus, userRepository);
+                                                    @NonNull RemoteConfigHelper configHelper,
+                                                    @NonNull UserRepository userRepository,
+                                                    @NonNull GroupRepository groupRepository) {
+        return new LoginEmailViewModelImpl(savedState, navigator, eventBus, configHelper,
+                userRepository, groupRepository);
     }
 }

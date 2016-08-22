@@ -8,21 +8,22 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
-import java.math.BigDecimal;
-import java.util.HashSet;
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.helper.RemoteConfigHelper;
+import ch.giantific.qwittig.data.repositories.GroupRepository;
+import ch.giantific.qwittig.data.repositories.PurchaseRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Item;
 import ch.giantific.qwittig.domain.models.Purchase;
-import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.add.PurchaseAddViewModelImpl;
@@ -37,33 +38,36 @@ import rx.functions.Func1;
 
 /**
  * Provides an implementation of the {@link PurchaseAddEditViewModel} for the edit purchase screen.
- * <p/>
+ * <p>
  * Subclass of {@link PurchaseAddViewModelImpl}.
  */
 public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
 
     private static final String STATE_ITEMS_SET = "STATE_ITEMS_SET";
-    final String mEditPurchaseId;
-    final Navigator mNavigator;
-    Purchase mEditPurchase;
-    private boolean mDeleteOldReceipt;
-    private boolean mOldValuesSet;
 
+    final String editPurchaseId;
+    Purchase editPurchase;
+    private boolean deleteOldReceipt;
+    private boolean oldValuesSet;
+
+    @SuppressWarnings("SimplifiableIfStatement")
     public PurchaseEditViewModelImpl(@Nullable Bundle savedState,
                                      @NonNull Navigator navigator,
                                      @NonNull RxBus<Object> eventBus,
+                                     @NonNull RemoteConfigHelper configHelper,
                                      @NonNull UserRepository userRepository,
-                                     @NonNull PurchaseRepository purchaseRepo,
+                                     @NonNull GroupRepository groupRepository,
+                                     @NonNull PurchaseRepository purchaseRepository,
                                      @NonNull String editPurchaseId) {
-        super(savedState, navigator, eventBus, userRepository, purchaseRepo);
+        super(savedState, navigator, eventBus, userRepository, groupRepository,
+                purchaseRepository, configHelper);
 
-        mNavigator = navigator;
-        mEditPurchaseId = editPurchaseId;
+        this.editPurchaseId = editPurchaseId;
 
         if (savedState != null) {
-            mOldValuesSet = savedState.getBoolean(STATE_ITEMS_SET, false);
+            oldValuesSet = savedState.getBoolean(STATE_ITEMS_SET, false);
         } else {
-            mOldValuesSet = false;
+            oldValuesSet = false;
         }
     }
 
@@ -71,144 +75,111 @@ public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
     public void saveState(@NonNull Bundle outState) {
         super.saveState(outState);
 
-        outState.putBoolean(STATE_ITEMS_SET, mOldValuesSet);
+        outState.putBoolean(STATE_ITEMS_SET, oldValuesSet);
     }
 
     @Override
-    public void loadData() {
-        getSubscriptions().add(mUserRepo.getIdentities(mCurrentGroup, true)
-                .toSortedList()
-                .toSingle()
-                .doOnSuccess(new Action1<List<Identity>>() {
-                    @Override
-                    public void call(List<Identity> identities) {
-                        identities.remove(mCurrentIdentity);
-                        identities.add(0, mCurrentIdentity);
-                        mIdentities = identities;
-                    }
-                })
+    protected void loadPurchase(@NonNull FirebaseUser currentUser) {
+        getSubscriptions().add(getInitialChain(currentUser)
                 .flatMap(new Func1<List<Identity>, Single<Purchase>>() {
                     @Override
                     public Single<Purchase> call(List<Identity> identities) {
-                        return fetchEditPurchase();
+                        return getPurchase();
+                    }
+                })
+                .doOnSuccess(new Action1<Purchase>() {
+                    @Override
+                    public void call(Purchase purchase) {
+                        editPurchase = purchase;
                     }
                 })
                 .subscribe(new SingleSubscriber<Purchase>() {
                     @Override
                     public void onSuccess(Purchase purchase) {
-                        mEditPurchase = purchase;
-
-                        if (mOldValuesSet) {
+                        if (oldValuesSet) {
                             updateRows();
                         } else {
-                            setOldPurchaseValues();
+                            setOldPurchaseValues(purchase);
                             setOldItemValues();
-                            mOldValuesSet = true;
+                            oldValuesSet = true;
                         }
                     }
 
                     @Override
                     public void onError(Throwable error) {
-                        mView.showMessage(R.string.toast_error_purchase_edit_load);
+                        view.showMessage(R.string.toast_error_purchase_edit_load);
                     }
                 })
         );
     }
 
-    Single<Purchase> fetchEditPurchase() {
-        return mPurchaseRepo.fetchPurchaseData(mEditPurchaseId);
+    protected Single<Purchase> getPurchase() {
+        return purchaseRepo.getPurchase(editPurchaseId);
     }
 
-    private void setOldPurchaseValues() {
-        mNote = mEditPurchase.getNoteOrEmpty();
-        mView.reloadOptionsMenu();
+    private void setOldPurchaseValues(@NonNull Purchase purchase) {
+        setNote(purchase.getNote());
+        view.reloadOptionsMenu();
 
-        setStore(mEditPurchase.getStore());
-        setDate(mEditPurchase.getDate());
-        setCurrency(mEditPurchase.getCurrency());
-        setExchangeRate(mEditPurchase.getExchangeRate());
-        setReceiptImage(mEditPurchase.getReceiptUrl());
+        setStore(purchase.getStore());
+        setDate(purchase.getDateDate());
+        setCurrency(purchase.getCurrency());
+        setExchangeRate(purchase.getExchangeRate());
+        setReceipt(purchase.getReceipt());
     }
 
     private void setOldItemValues() {
-        final List<Item> oldItems = mEditPurchase.getItems();
-        final Set<String> oldItemIds = new HashSet<>(oldItems.size());
+        final List<Item> oldItems = editPurchase.getItems();
         for (Item item : oldItems) {
-            final List<Identity> identities = item.getIdentities();
-            final String price = mMoneyFormatter.format(item.getPriceForeign(mExchangeRate));
+            final Set<String> identities = item.getIdentitiesIds();
+            final String price = moneyFormatter.format(item.getPriceForeign(exchangeRate));
             final PurchaseAddEditItem purchaseAddEditItem =
                     new PurchaseAddEditItem(item.getName(), price, getItemUsers(identities));
-            purchaseAddEditItem.setMoneyFormatter(mMoneyFormatter);
+            purchaseAddEditItem.setMoneyFormatter(moneyFormatter);
             purchaseAddEditItem.setPriceChangedListener(this);
-            mItems.add(getLastPosition() - 1, purchaseAddEditItem);
-            mListInteraction.notifyItemInserted(mItems.indexOf(purchaseAddEditItem));
-
-            oldItemIds.add(item.getObjectId());
+            final int pos = getItemCount() - 2;
+            items.add(pos, purchaseAddEditItem);
+            listInteraction.notifyItemInserted(pos);
         }
-
-        mPurchaseRepo.cacheOldEditItems(oldItemIds);
     }
 
-    @NonNull
     @Override
-    protected Purchase createPurchase(@NonNull List<Identity> purchaseIdentities,
-                                      @NonNull List<Item> purchaseItems, int fractionDigits) {
-        mEditPurchase.replaceItems(purchaseItems);
-        mEditPurchase.setIdentities(purchaseIdentities);
-        mEditPurchase.setDate(mDate);
-        mEditPurchase.setStore(mStore);
-        final BigDecimal totalPriceRounded =
-                new BigDecimal(mTotalPrice).setScale(fractionDigits, BigDecimal.ROUND_HALF_UP);
-        mEditPurchase.setTotalPrice(totalPriceRounded);
-        mEditPurchase.setCurrency(mCurrency);
-        mEditPurchase.setExchangeRate(mExchangeRate);
-        if (TextUtils.isEmpty(mNote)) {
-            mEditPurchase.removeNote();
+    protected void savePurchase(Purchase purchase, boolean asDraft) {
+        if (asDraft) {
+            purchaseRepo.saveDraft(purchase, editPurchaseId);
         } else {
-            mEditPurchase.setNote(mNote);
+            purchaseRepo.savePurchase(purchase, editPurchaseId, false);
         }
-        if (TextUtils.isEmpty(mReceiptImagePath)) {
-            mEditPurchase.removeReceipt();
-        } else if (!Objects.equals(mReceiptImagePath, mEditPurchase.getReceiptUrl())) {
-            mEditPurchase.setReceiptLocal(mReceiptImagePath);
-        }
-        mEditPurchase.resetReadBy(mCurrentIdentity);
-
-        return mEditPurchase;
     }
 
     @Override
     public void onDeleteReceiptMenuClick() {
         super.onDeleteReceiptMenuClick();
 
-        mDeleteOldReceipt = true;
-    }
-
-    @Override
-    protected Single<Purchase> getSavePurchaseAction(@NonNull Purchase purchase) {
-        return mPurchaseRepo.savePurchaseEdit(purchase, mDeleteOldReceipt);
+        deleteOldReceipt = true;
     }
 
     @Override
     public void onExitClick() {
         if (changesWereMade()) {
-            mView.showDiscardEditChangesDialog();
+            view.showDiscardEditChangesDialog();
         } else {
-            mNavigator.finish(Activity.RESULT_CANCELED);
+            navigator.finish(Activity.RESULT_CANCELED);
         }
     }
 
+    @SuppressWarnings("RedundantIfStatement")
     private boolean changesWereMade() {
-        if (mEditPurchase.getDate().compareTo(mDate) != 0
-                || !Objects.equals(mEditPurchase.getStore(), mStore)
-                || !Objects.equals(mEditPurchase.getCurrency(), mCurrency)
-                || !Objects.equals(mEditPurchase.getNoteOrEmpty(), mNote)) {
+        if (editPurchase.getDateDate().compareTo(date) != 0
+                || !Objects.equals(editPurchase.getStore(), store)
+                || !Objects.equals(editPurchase.getCurrency(), currency)
+                || !Objects.equals(editPurchase.getNote(), note)) {
             return true;
         }
 
-        final List<Item> oldItems = mEditPurchase.getItems();
-        for (int i = 0, size = mItems.size(), skipCount = 0; i < size; i++) {
-            final PurchaseAddEditItemModel addEditItem = mItems.get(i);
+        final List<Item> oldItems = editPurchase.getItems();
+        for (int i = 0, size = items.size(), skipCount = 0; i < size; i++) {
+            final PurchaseAddEditItemModel addEditItem = items.get(i);
             if (addEditItem.getType() != Type.ITEM) {
                 skipCount++;
                 continue;
@@ -225,13 +196,13 @@ public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
                 return true;
             }
 
-            final double oldPrice = itemOld.getPriceForeign(mEditPurchase.getExchangeRate());
+            final double oldPrice = itemOld.getPriceForeign(editPurchase.getExchangeRate());
             final double newPrice = purchaseAddEditItem.parsePrice();
             if (Math.abs(oldPrice - newPrice) >= MoneyUtils.MIN_DIFF) {
                 return true;
             }
 
-            final List<String> identitiesOld = itemOld.getIdentitiesIds();
+            final Set<String> identitiesOld = itemOld.getIdentitiesIds();
             final List<String> identitiesNew = purchaseAddEditItem.getSelectedIdentitiesIds();
             if (!identitiesNew.containsAll(identitiesOld) ||
                     !identitiesOld.containsAll(identitiesNew)) {
@@ -239,7 +210,7 @@ public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
             }
         }
 
-        if (mDeleteOldReceipt || !Objects.equals(mReceiptImagePath, mEditPurchase.getReceiptUrl())) {
+        if (deleteOldReceipt || !Objects.equals(receipt, editPurchase.getReceipt())) {
             return true;
         }
 

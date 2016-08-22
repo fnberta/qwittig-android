@@ -9,9 +9,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.repositories.PurchaseRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.di.scopes.PerActivity;
-import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.purchases.list.drafts.DraftsViewModel;
@@ -36,7 +36,7 @@ public class DraftsListViewModelModule extends BaseViewModelModule {
                                                 @NonNull RxBus<Object> eventBus,
                                                 @NonNull UserRepository userRepository,
                                                 @NonNull PurchaseRepository purchaseRepository) {
-        return new DraftsViewModelImpl(mSavedState, navigator, eventBus, userRepository,
+        return new DraftsViewModelImpl(savedState, navigator, eventBus, userRepository,
                 purchaseRepository);
     }
 }

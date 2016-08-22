@@ -7,6 +7,7 @@ package ch.giantific.qwittig.presentation.navdrawer.di;
 import ch.giantific.qwittig.di.ApplicationComponent;
 import ch.giantific.qwittig.di.RepositoriesModule;
 import ch.giantific.qwittig.di.scopes.PerActivity;
+import ch.giantific.qwittig.presentation.common.di.GoogleApiClientDelegateModule;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
 import ch.giantific.qwittig.presentation.finance.di.FinanceCompsPaidViewModelModule;
 import ch.giantific.qwittig.presentation.finance.di.FinanceCompsUnpaidViewModelModule;
@@ -18,10 +19,9 @@ import ch.giantific.qwittig.presentation.purchases.list.di.DraftsListViewModelMo
 import ch.giantific.qwittig.presentation.purchases.list.di.HomeSubcomponent;
 import ch.giantific.qwittig.presentation.purchases.list.di.HomeViewModelModule;
 import ch.giantific.qwittig.presentation.purchases.list.di.PurchasesListViewModelModule;
-import ch.giantific.qwittig.presentation.stats.di.StatsCurrenciesViewModelModule;
-import ch.giantific.qwittig.presentation.stats.di.StatsSpendingViewModelModule;
-import ch.giantific.qwittig.presentation.stats.di.StatsStoresViewModelModule;
+import ch.giantific.qwittig.presentation.stats.di.StatsLoaderModule;
 import ch.giantific.qwittig.presentation.stats.di.StatsSubcomponent;
+import ch.giantific.qwittig.presentation.stats.di.StatsViewModelModule;
 import ch.giantific.qwittig.presentation.tasks.details.di.TaskDetailsSubcomponent;
 import ch.giantific.qwittig.presentation.tasks.details.di.TaskDetailsViewModelModule;
 import ch.giantific.qwittig.presentation.tasks.list.di.TasksListSubcomponent;
@@ -37,6 +37,7 @@ import dagger.Component;
 public interface NavDrawerComponent {
 
     HomeSubcomponent plus(HomeViewModelModule homeViewModelModule,
+                          GoogleApiClientDelegateModule googleApiClientDelegateModule,
                           PurchasesListViewModelModule purchasesListViewModelModule,
                           DraftsListViewModelModule draftsListViewModelModule);
 
@@ -50,7 +51,6 @@ public interface NavDrawerComponent {
 
     TaskDetailsSubcomponent plus(TaskDetailsViewModelModule taskDetailsViewModelModule);
 
-    StatsSubcomponent plus(StatsSpendingViewModelModule statsSpendingViewModelModule,
-                           StatsCurrenciesViewModelModule statsCurrenciesViewModelModule,
-                           StatsStoresViewModelModule statsStoresViewModelModule);
+    StatsSubcomponent plus(StatsViewModelModule statsViewModelModule,
+                           StatsLoaderModule statsLoaderModule);
 }

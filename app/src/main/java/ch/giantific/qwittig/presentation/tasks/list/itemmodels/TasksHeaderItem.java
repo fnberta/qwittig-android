@@ -21,7 +21,17 @@ public class TasksHeaderItem extends HeaderItemModelBaseImpl implements TasksIte
     }
 
     @Override
-    public int getType() {
+    public int getEventType() {
+        return 0;
+    }
+
+    @Override
+    public String getId() {
+        return null;
+    }
+
+    @Override
+    public int getViewType() {
         return Type.HEADER;
     }
 }

@@ -13,7 +13,7 @@ import android.support.v4.app.Fragment;
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.Qwittig;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.di.DaggerWorkerComponent;
 import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import rx.Observable;
@@ -27,11 +27,11 @@ import rx.subjects.ReplaySubject;
  */
 public abstract class BaseWorker<T, S extends BaseWorkerListener> extends Fragment {
 
-    private final ReplaySubject<T> mSubject = ReplaySubject.create();
-    protected S mActivity;
+    private final ReplaySubject<T> subject = ReplaySubject.create();
+    protected S activity;
     @Inject
-    protected UserRepository mUserRepo;
-    private Subscription mSubscription;
+    protected UserRepository userRepo;
+    private Subscription subscription;
 
     public BaseWorker() {
         // empty default constructor
@@ -43,7 +43,7 @@ public abstract class BaseWorker<T, S extends BaseWorkerListener> extends Fragme
         super.onAttach(context);
 
         try {
-            mActivity = (S) context;
+            activity = (S) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
                     + " must implement BaseWorkerListener");
@@ -65,7 +65,7 @@ public abstract class BaseWorker<T, S extends BaseWorkerListener> extends Fragme
 
         final Observable<T> observable = getObservable(getArguments());
         if (observable != null) {
-            mSubscription = observable.subscribe(mSubject);
+            subscription = observable.subscribe(subject);
         } else {
             onError();
         }
@@ -77,23 +77,22 @@ public abstract class BaseWorker<T, S extends BaseWorkerListener> extends Fragme
     public void onStart() {
         super.onStart();
 
-        setStream(mSubject.asObservable());
+        setStream(subject.asObservable());
     }
-
 
     @Override
     public void onDetach() {
         super.onDetach();
 
-        mActivity = null;
+        activity = null;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
 
-        if (mSubscription != null && !mSubscription.isUnsubscribed()) {
-            mSubscription.unsubscribe();
+        if (subscription != null && !subscription.isUnsubscribed()) {
+            subscription.unsubscribe();
         }
     }
 

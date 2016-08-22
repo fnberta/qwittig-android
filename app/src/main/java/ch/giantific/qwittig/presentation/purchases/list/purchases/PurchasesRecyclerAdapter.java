@@ -7,14 +7,11 @@ package ch.giantific.qwittig.presentation.purchases.list.purchases;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import ch.giantific.qwittig.databinding.RowPurchasesBinding;
-import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.common.adapters.rows.ProgressRow;
 import ch.giantific.qwittig.presentation.purchases.list.purchases.itemmodels.PurchasesItemModel;
 
 /**
@@ -22,9 +19,9 @@ import ch.giantific.qwittig.presentation.purchases.list.purchases.itemmodels.Pur
  * <p/>
  * Subclass of {@link RecyclerView.Adapter}.
  */
-public class PurchasesRecyclerAdapter extends BaseRecyclerAdapter {
+public class PurchasesRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<RowPurchasesBinding>> {
 
-    private final PurchasesViewModel mViewModel;
+    private final PurchasesViewModel viewModel;
 
     /**
      * Constructs a new {@link PurchasesRecyclerAdapter}.
@@ -34,64 +31,33 @@ public class PurchasesRecyclerAdapter extends BaseRecyclerAdapter {
     public PurchasesRecyclerAdapter(@NonNull PurchasesViewModel viewModel) {
         super();
 
-        mViewModel = viewModel;
+        this.viewModel = viewModel;
     }
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public BindingRow<RowPurchasesBinding> onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        switch (viewType) {
-            case PurchasesViewModel.TYPE_ITEM: {
-                final RowPurchasesBinding binding = RowPurchasesBinding.inflate(inflater, parent, false);
-                return new BindingRow<>(binding);
-            }
-            case PurchasesViewModel.TYPE_PROGRESS: {
-                View view = inflater
-                        .inflate(ProgressRow.VIEW_RESOURCE, parent, false);
-                return new ProgressRow(view);
-            }
-            default:
-                return super.onCreateViewHolder(parent, viewType);
-        }
+        final RowPurchasesBinding binding = RowPurchasesBinding.inflate(inflater, parent, false);
+        return new BindingRow<>(binding);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        int viewType = getItemViewType(position);
-        switch (viewType) {
-            case PurchasesViewModel.TYPE_ITEM: {
-                final BindingRow<RowPurchasesBinding> row =
-                        (BindingRow<RowPurchasesBinding>) viewHolder;
-                final RowPurchasesBinding binding = row.getBinding();
-                final Purchase purchase = mViewModel.getItemAtPosition(position);
-
-                PurchasesItemModel itemModel = binding.getItemModel();
-                if (itemModel == null) {
-                    itemModel = new PurchasesItemModel(purchase, mViewModel.getCurrentIdentity());
-                    binding.setItemModel(itemModel);
-                    binding.setViewModel(mViewModel);
-                } else {
-                    itemModel.updatePurchaseInfo(purchase, mViewModel.getCurrentIdentity());
-                }
-
-                binding.executePendingBindings();
-                break;
-            }
-            case PurchasesViewModel.TYPE_PROGRESS:
-                // do nothing
-                break;
-        }
+    public void onBindViewHolder(BindingRow<RowPurchasesBinding> holder, int position) {
+        final RowPurchasesBinding binding = holder.getBinding();
+        final PurchasesItemModel itemModel = viewModel.getItemAtPosition(position);
+        binding.setItemModel(itemModel);
+        binding.setViewModel(viewModel);
+        binding.executePendingBindings();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return mViewModel.getItemViewType(position);
+        return viewModel.getItemViewType(position);
     }
 
     @Override
     public int getItemCount() {
-        return mViewModel.getItemCount();
+        return viewModel.getItemCount();
     }
 }

@@ -19,8 +19,8 @@ import rx.subjects.ReplaySubject;
  */
 public abstract class BaseRxLoader<T> extends Loader<Observable<T>> {
 
-    private Subscription mSubscription;
-    private ReplaySubject<T> mSubject = ReplaySubject.create();
+    private Subscription subscription;
+    private ReplaySubject<T> subject = ReplaySubject.create();
 
     public BaseRxLoader(@NonNull Context context) {
         super(context);
@@ -30,10 +30,10 @@ public abstract class BaseRxLoader<T> extends Loader<Observable<T>> {
     protected void onStartLoading() {
         super.onStartLoading();
 
-        if (takeContentChanged() || !mSubject.hasAnyValue()) {
+        if (takeContentChanged() || !subject.hasAnyValue()) {
             forceLoad();
         } else {
-            deliverResult(mSubject.asObservable());
+            deliverResult(subject.asObservable());
         }
     }
 
@@ -43,8 +43,8 @@ public abstract class BaseRxLoader<T> extends Loader<Observable<T>> {
 
         final Observable<T> observable = getObservable();
         if (observable != null) {
-            mSubscription = observable.subscribe(mSubject);
-            deliverResult(mSubject.asObservable());
+            subscription = observable.subscribe(subject);
+            deliverResult(subject.asObservable());
         } else {
             deliverResult(null);
         }
@@ -62,8 +62,8 @@ public abstract class BaseRxLoader<T> extends Loader<Observable<T>> {
 
     @Override
     protected boolean onCancelLoad() {
-        if (mSubscription != null) {
-            mSubscription.unsubscribe();
+        if (subscription != null) {
+            subscription.unsubscribe();
             return true;
         }
 
@@ -74,8 +74,8 @@ public abstract class BaseRxLoader<T> extends Loader<Observable<T>> {
     protected void onStopLoading() {
         super.onStopLoading();
 
-        if (mSubscription != null) {
-            mSubscription.unsubscribe();
+        if (subscription != null) {
+            subscription.unsubscribe();
         }
     }
 
@@ -85,8 +85,8 @@ public abstract class BaseRxLoader<T> extends Loader<Observable<T>> {
 
         onStopLoading();
 
-        if (mSubject != null) {
-            mSubject = ReplaySubject.create();
+        if (subject != null) {
+            subject = ReplaySubject.create();
         }
     }
 }

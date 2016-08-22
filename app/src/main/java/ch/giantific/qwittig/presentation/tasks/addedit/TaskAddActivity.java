@@ -26,12 +26,12 @@ public class TaskAddActivity extends BaseTaskAddEditActivity<TaskAddComponent> {
 
     @Override
     protected void injectDependencies(@Nullable Bundle savedInstanceState) {
-        mComponent = DaggerTaskAddComponent.builder()
+        component = DaggerTaskAddComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
                 .taskAddViewModelModule(new TaskAddViewModelModule(savedInstanceState))
                 .build();
-        mComponent.inject(this);
+        component.inject(this);
     }
 
     @Override

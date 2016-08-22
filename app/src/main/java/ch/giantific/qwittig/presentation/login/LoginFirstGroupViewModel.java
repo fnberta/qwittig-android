@@ -27,15 +27,19 @@ public interface LoginFirstGroupViewModel extends ViewModel<LoginFirstGroupViewM
     @Bindable
     String getGroupName();
 
-    void onGroupNameChanged(CharSequence s, int start, int before, int count);
+    void setGroupName(@NonNull String groupName);
 
     @Bindable
     boolean isGroupNameComplete();
 
-    List<Currency> getSupportedCurrencies();
+    void onGroupNameChanged(CharSequence s, int start, int before, int count);
 
     @Bindable
     int getSelectedGroupCurrency();
+
+    void setGroupCurrency(@NonNull String groupCurrency);
+
+    List<Currency> getSupportedCurrencies();
 
     void onGroupCurrencySelected(@NonNull AdapterView<?> parent, View view, int position, long id);
 

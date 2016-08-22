@@ -84,7 +84,7 @@
                 android:onClick="@{viewModel::onDeadlineClicked}"
                 android:paddingEnd="@dimen/key_line_1"
                 android:paddingStart="@dimen/key_line_1"
-                android:text="@{viewModel.taskDeadline}"
+                android:text="@{viewModel.deadline}"
                 android:visibility="@{viewModel.asNeededTask ? View.GONE : View.VISIBLE}"
                 tools:text="27. November 2014"
                 />

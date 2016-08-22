@@ -16,7 +16,7 @@
     <string name="toast_purchase_added">Added new purchase</string>
     <string name="toast_purchase_discarded">Purchase discarded</string>
     <string name="header_users">Users</string>
-    <string name="dialog_users_involved_title">Select users involved</string>
+    <string name="dialog_users_involved_title">Select identities involved</string>
     <string name="title_activity_login">Log in</string>
     <string name="hint_password">Password</string>
     <string name="hint_email">E-mail</string>
@@ -117,6 +117,7 @@
     <string name="action_purchase_save_draft">Save as draft</string>
     <string name="action_drafts_delete_selected">Delete selected Drafts</string>
     <string name="dialog_account_delete_message">Do you really want to delete your account? You cannot undo this!</string>
+    <string name="dialog_account_delete_message_email">If you really want to delete your account, please re-authenticate yourself. Note that you cannot undo this!</string>
     <string name="nickname_me">Me</string>
     <string name="progress_account_delete">Deleting account…</string>
     <string name="push_user_deleted_alert">Outstanding debts or credits have automatically been cleared</string>
@@ -132,7 +133,7 @@
     <string name="dialog_group_leave_delete_message">You are the last member of this group. Leaving it will delete the group and all its items!</string>
     <string name="error_valid_amount">Please enter a valid amount</string>
     <string name="header_settings_users_new">Add user</string>
-    <string name="header_settings_users_existing">Existing users</string>
+    <string name="header_settings_users_existing">Existing identities</string>
     <string name="tab_compensations_new">Settlement</string>
     <string name="tab_compensations_archive">Archive</string>
     <string name="header_purchase">Details</string>
@@ -141,8 +142,8 @@
     <string name="dialog_discard_changes_message">Discard changes?</string>
     <string name="push_user_joined_title">New member in %1$s</string>
     <string name="push_user_joined_alert">%1$s has joined</string>
-    <string name="push_user_left_title">%1$s left</string>
-    <string name="push_user_left_alert">%1$s has left %2$s</string>
+    <string name="push_user_left_group_title">%1$s left</string>
+    <string name="push_user_left_group_alert">%1$s has left %2$s</string>
     <string name="no_compensations_history">No previous payments</string>
     <string name="progress_logout">Logging out…</string>
     <string name="action_purchase_add_edit_receipt_delete">Delete receipt</string>
@@ -252,10 +253,10 @@
     <string name="toast_unlink_password_required">Set a password to unlink your account</string>
     <string name="toast_saving_profile">Saving profile…</string>
     <string name="toast_invalid_session">Your session is no longer valid</string>
-    <string name="toast_login_failed_google">Login with Google failed</string>
+    <string name="toast_error_login_google">Login with Google failed</string>
     <string name="toast_error_tasks_load">Failed to load tasks</string>
     <string name="toast_error_task_save">Failed to save task</string>
-    <string name="toast_error_users_load">Failed to load users</string>
+    <string name="toast_error_users_load">Failed to load identities</string>
     <string name="toast_error_comps_load">Failed to load compensations</string>
     <string name="toast_compensation_accepted">Payment accepted</string>
     <string name="header_comps_credits">Credits</string>
@@ -269,7 +270,7 @@
     <string name="dialog_compensation_confirm_amount_title">Confirm payment</string>
     <string name="dialog_positive_confirm">Confirm</string>
     <string name="error_valid_amount_too_big">Amount can be max. double the original one</string>
-    <string name="desc_group_add_new_create">Choose a name and currency for your group. Purchases made in other currencies will be converted to this currency. When you\'re ready, press the button to create the group and start adding users.</string>
+    <string name="desc_group_add_new_create">Choose a name and currency for your group. Purchases made in other currencies will be converted to this currency. When you\'re ready, press the button to create the group and start adding identities.</string>
     <string name="action_share">Share</string>
     <string name="toast_error_profile">Failed to save profile</string>
     <string name="progress_add_group">Creating group…</string>
@@ -277,11 +278,11 @@
     <string name="progress_joining_group">Joining group…</string>
     <string name="toast_group_joined">Joined and switched to the new group</string>
     <string name="toast_error_draft_delete">Failed to delete draft</string>
-    <string name="toast_error_purchase_add_edit_load">Failed to the group\'s users</string>
+    <string name="toast_error_purchase_add_edit_load">Failed to the group\'s identities</string>
     <string name="toast_error_purchase_save_draft">Failed to save purchase as draft</string>
     <string name="toast_error_purchase_save">Failed to save purchase</string>
     <string name="toast_error_purchase_edit_load">Failed to load purchase</string>
-    <string name="toast_error_drawer_load_groups">Failed to load group selection</string>
+    <string name="toast_error_load_groups">Failed to load group selection</string>
     <string name="toast_error_settings_group_add">Failed to create group</string>
     <string name="toast_error_settings_users_add">Failed to add user</string>
     <string name="toast_password_reset">An email with a link to rest your password was sent</string>
@@ -298,7 +299,7 @@
     <string name="toast_error_stats_load">Failed to load the stats data</string>
     <string name="toast_error_purchases_update">Failed to update purchases</string>
     <string name="toast_error_tasks_update">Failed to update tasks</string>
-    <string name="toast_error_users_update">Failed to update users</string>
+    <string name="toast_error_users_update">Failed to update identities</string>
     <string name="toast_error_comps_update">Failed to update compensations</string>
     <string name="toast_profile_nickname_taken">This nickname is already taken in this group</string>
     <string name="toast_error_balance_load">Failed to load your current balance</string>
@@ -317,10 +318,10 @@
     <string name="action_edit_nickname">Edit nickname</string>
     <string name="action_edit_avatar">Edit profile picture</string>
     <string name="action_remove">Remove</string>
-    <string name="desc_user_invite_existing">Invite users anytime by sharing the generated link.</string>
+    <string name="desc_user_invite_existing">Invite identities anytime by sharing the generated link.</string>
     <string name="dialog_change_nickname_message">Enter new nickname</string>
     <string name="toast_error_purchase_ocr_load">Failed to load purchase. Please try again.</string>
-    <string name="toast_error_purchase_ocr_process">Failed to process the purchase. Please try again.</string>
+    <string name="push_purchase_ocr_failed_alert">Failed to process the purchase. Please try again.</string>
     <string name="toast_purchase_ocr_started">Processing purchase… You will be notified when it is ready.</string>
     <string name="toast_error_join_group">Failed to join the new group. Please try again.</string>
     <string name="push_purchase_ocr_failed_title">Processing failed</string>
@@ -350,5 +351,38 @@
     <string name="action_add">Add</string>
     <string name="action_delete">Delete</string>
     <string name="no_purchases_add_one">Add one by pressing on the + button.</string>
+    <string name="toast_error_remind_failed">Remind failed</string>
+    <string name="toast_error_login">Login failed</string>
+    <string name="toast_error_logout">Logout failed</string>
+    <string name="toast_error_login_facebook">Login with Facebook failed</string>
+    <string name="progress_profile_unlink">Un-linking account and updating profile…</string>
+    <string name="toast_error_settings_groups">Failed to load groups</string>
+    <string name="toast_error_settings">Failed to load settings</string>
+    <string name="toast_group_name_changed">Group name changed to %1$s</string>
+    <string name="toast_purchase_edit_identities_inactive">Editing not possible. At lease one user affected by the purchase is no longer part of the group.</string>
+    <string name="tab_drafts">Drafts</string>
+    <string name="toast_error_settings_group_name_change">Failed to change the group\'s name</string>
+    <string name="push_purchase_delete_title">Purchase deleted by %1$s</string>
+    <string name="push_purchase_delete_alert">%1$s for %2$s</string>
+    <string name="push_purchase_edit_title">Purchase edited by %1$s</string>
+    <string name="push_purchase_edit_alert">%1$s for %2$s</string>
+    <string name="dialog_reauthenticate_message">Please re-authenticate to perform this action</string>
+    <string name="dialog_positive_authenticate">Authenticate</string>
+    <string name="progress_profile_change_email_pw">Updating profile…</string>
+    <string name="toast_error_leave_group">Failed to leave group. Please try again.</string>
+    <string name="toast_group_left">You left the group</string>
+    <string name="facebook_protocol_scheme" translatable="false">fb483474338502548</string>
+    <string name="tab_stats_group">Group spending</string>
+    <string name="tab_stats_user">Personal expenses</string>
+    <string name="stats_period_month_this">This moth</string>
+    <string name="stats_period_month_last">Last month</string>
+    <string name="stats_period_year_this">This year</string>
+    <string name="stats_period_custom">Custom</string>
+    <string name="tab_stats_pie">Pie charts</string>
+    <string name="tab_stats_bar">Bar charts</string>
+    <string name="stats_pie_total">Total: %1$s</string>
+    <string name="stats_bar_average">Average: %1$s</string>
+    <string name="header_stats_pie_stores">Divided by stores</string>
+    <string name="header_stats_pie_identities">Divided by buyers</string>
 
 </resources>

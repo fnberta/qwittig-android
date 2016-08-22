@@ -9,14 +9,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import java.util.List;
-import java.util.Objects;
-
-import ch.giantific.qwittig.databinding.RowPurchaseDetailsIdentitiesIdentityBinding;
-import ch.giantific.qwittig.domain.models.Identity;
+import ch.giantific.qwittig.databinding.RowPurchaseDetailsIdentityBinding;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDetailsIdentitiesItemIdentity;
+import ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDetailsIdentityItemModel;
 
 /**
  * Provides a {@link RecyclerView} adapter that manages the list of identities involved in a
@@ -24,44 +20,33 @@ import ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDe
  * <p/>
  * Subclass of {@link RecyclerView.Adapter}.
  */
-public class PurchaseDetailsIdentitiesRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<RowPurchaseDetailsIdentitiesIdentityBinding>> {
+public class PurchaseDetailsIdentitiesRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<RowPurchaseDetailsIdentityBinding>> {
 
-    private final PurchaseDetailsViewModel mViewModel;
-    private final List<Identity> mIdentities;
+    private final PurchaseDetailsViewModel viewModel;
 
-    public PurchaseDetailsIdentitiesRecyclerAdapter(@NonNull PurchaseDetailsViewModel viewModel,
-                                                    @NonNull List<Identity> identities) {
-        mViewModel = viewModel;
-        mIdentities = identities;
+    public PurchaseDetailsIdentitiesRecyclerAdapter(@NonNull PurchaseDetailsViewModel viewModel) {
+        this.viewModel = viewModel;
     }
 
     @Override
-    public BindingRow<RowPurchaseDetailsIdentitiesIdentityBinding> onCreateViewHolder(ViewGroup parent, int viewType) {
+    public BindingRow<RowPurchaseDetailsIdentityBinding> onCreateViewHolder(ViewGroup parent, int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        final RowPurchaseDetailsIdentitiesIdentityBinding binding =
-                RowPurchaseDetailsIdentitiesIdentityBinding.inflate(inflater, parent, false);
+        final RowPurchaseDetailsIdentityBinding binding =
+                RowPurchaseDetailsIdentityBinding.inflate(inflater, parent, false);
         return new BindingRow<>(binding);
     }
 
     @Override
-    public void onBindViewHolder(BindingRow<RowPurchaseDetailsIdentitiesIdentityBinding> holder, int position) {
-        final Identity identity = mIdentities.get(position);
-        final RowPurchaseDetailsIdentitiesIdentityBinding binding = holder.getBinding();
-        PurchaseDetailsIdentitiesItemIdentity itemModel = binding.getItemModel();
+    public void onBindViewHolder(BindingRow<RowPurchaseDetailsIdentityBinding> holder, int position) {
+        final RowPurchaseDetailsIdentityBinding binding = holder.getBinding();
+        final PurchaseDetailsIdentityItemModel itemModel = viewModel.getIdentityAtPosition(position);
 
-        final boolean boldName = Objects.equals(mViewModel.getPurchaseBuyer().getObjectId(), identity.getObjectId());
-        if (itemModel == null) {
-            itemModel = new PurchaseDetailsIdentitiesItemIdentity(identity, boldName);
-            binding.setItemModel(itemModel);
-        } else {
-            itemModel.updateIdentity(identity, boldName);
-        }
-
+        binding.setItemModel(itemModel);
         binding.executePendingBindings();
     }
 
     @Override
     public int getItemCount() {
-        return mIdentities.size();
+        return viewModel.getIdentitiesCount();
     }
 }

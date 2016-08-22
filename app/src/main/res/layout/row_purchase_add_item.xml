@@ -42,7 +42,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/header_users"
             android:onClick="@{() -> viewModel.onToggleUsersClick(itemModel)}"
-            app:itemUsers="@{itemModel.users}"
+            app:itemUsers="@{itemModel.identities}"
             />
 
         <LinearLayout

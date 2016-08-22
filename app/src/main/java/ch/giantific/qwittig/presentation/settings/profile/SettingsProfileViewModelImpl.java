@@ -12,25 +12,29 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import ch.berta.fabio.fabprogress.ProgressFinalAnimationListener;
 import ch.giantific.qwittig.BR;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.repositories.GroupRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
-import ch.giantific.qwittig.presentation.settings.profile.UnlinkThirdPartyWorker.ProfileAction;
 import ch.giantific.qwittig.utils.Utils;
+import rx.Observable;
 import rx.Single;
 import rx.SingleSubscriber;
-import rx.Subscriber;
+import rx.functions.Action1;
 import rx.functions.Func1;
+import timber.log.Timber;
 
 /**
  * Provides an implementation of the {@link SettingsProfileViewModel}.
@@ -39,52 +43,48 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
         implements SettingsProfileViewModel {
 
     private static final String STATE_VALIDATE = "STATE_VALIDATE";
-    private static final String STATE_IS_SAVING = "STATE_IS_SAVING";
     private static final String STATE_UNLINK_THIRD_PARTY = "STATE_UNLINK_THIRD_PARTY";
     private static final String STATE_AVATAR = "STATE_AVATAR";
     private static final String STATE_EMAIL = "STATE_EMAIL";
     private static final String STATE_NICKNAME = "STATE_NICKNAME";
     private static final String STATE_PASSWORD = "STATE_PASSWORD";
     private static final String STATE_PASSWORD_REPEAT = "STATE_PASSWORD_REPEAT";
-    private final boolean mFacebookUser;
-    private final boolean mGoogleUser;
-    private final List<String> mGroupNicknames = new ArrayList<>();
-    private final Navigator mNavigator;
+    private final List<String> mGroupNicknames;
+    private final GroupRepository mGroupRepo;
+    private boolean mFacebookUser;
+    private boolean mGoogleUser;
     private boolean mValidate;
-    private boolean mSaving;
-    private boolean mAnimStop;
-    private boolean mUnlinkThirdParty;
+    private boolean mUnlinkSocialLogin;
     private String mAvatar;
+    private String mAvatarOrig;
     private String mEmail;
+    private String mEmailOrig;
     private String mNickname;
+    private String mNicknameOrig;
     private String mPassword;
     private String mPasswordRepeat;
 
     public SettingsProfileViewModelImpl(@Nullable Bundle savedState,
                                         @NonNull Navigator navigator,
                                         @NonNull RxBus<Object> eventBus,
-                                        @NonNull UserRepository userRepository) {
-        super(savedState, eventBus, userRepository);
+                                        @NonNull UserRepository userRepository,
+                                        @NonNull GroupRepository groupRepository) {
+        super(savedState, navigator, eventBus, userRepository);
 
-        mNavigator = navigator;
-        mFacebookUser = mCurrentUser.isFacebookUser();
-        mGoogleUser = mCurrentUser.isGoogleUser();
+        mGroupRepo = groupRepository;
+        mGroupNicknames = new ArrayList<>();
 
         if (savedState != null) {
             mValidate = savedState.getBoolean(STATE_VALIDATE);
-            mSaving = savedState.getBoolean(STATE_IS_SAVING);
-            mUnlinkThirdParty = savedState.getBoolean(STATE_UNLINK_THIRD_PARTY);
+            mUnlinkSocialLogin = savedState.getBoolean(STATE_UNLINK_THIRD_PARTY);
             mEmail = savedState.getString(STATE_EMAIL);
             mPassword = savedState.getString(STATE_PASSWORD);
             mPasswordRepeat = savedState.getString(STATE_PASSWORD_REPEAT);
             mAvatar = savedState.getString(STATE_AVATAR);
             mNickname = savedState.getString(STATE_NICKNAME);
         } else {
-            mEmail = mCurrentUser.getUsername();
             mPassword = "";
             mPasswordRepeat = "";
-            mAvatar = mCurrentIdentity.getAvatarUrl();
-            mNickname = mCurrentIdentity.getNickname();
         }
     }
 
@@ -93,38 +93,12 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
         super.saveState(outState);
 
         outState.putBoolean(STATE_VALIDATE, mValidate);
-        outState.putBoolean(STATE_IS_SAVING, mSaving);
-        outState.putBoolean(STATE_UNLINK_THIRD_PARTY, mUnlinkThirdParty);
+        outState.putBoolean(STATE_UNLINK_THIRD_PARTY, mUnlinkSocialLogin);
         outState.putString(STATE_AVATAR, mAvatar);
         outState.putString(STATE_EMAIL, mEmail);
         outState.putString(STATE_NICKNAME, mNickname);
         outState.putString(STATE_PASSWORD, mPassword);
         outState.putString(STATE_PASSWORD_REPEAT, mPasswordRepeat);
-    }
-
-    @Override
-    @Bindable
-    public boolean isSaving() {
-        return mSaving;
-    }
-
-    @Override
-    @Bindable
-    public boolean isAnimStop() {
-        return mAnimStop;
-    }
-
-    @Override
-    public void startSaving() {
-        mSaving = true;
-        notifyPropertyChanged(BR.saving);
-    }
-
-    @Override
-    public void stopSaving(boolean anim) {
-        mSaving = false;
-        mAnimStop = anim;
-        notifyPropertyChanged(BR.saving);
     }
 
     @Override
@@ -152,7 +126,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
 
     @Override
     public void onAvatarLoaded() {
-        mView.startPostponedEnterTransition();
+        view.startPostponedEnterTransition();
     }
 
     @Override
@@ -206,50 +180,66 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     @Override
     @Bindable
     public boolean isEmailAndPasswordVisible() {
-        return !mFacebookUser && !mGoogleUser || mUnlinkThirdParty;
+        return !mFacebookUser && !mGoogleUser || mUnlinkSocialLogin;
     }
 
     @Override
     public boolean showUnlinkFacebook() {
-        return mFacebookUser && !mUnlinkThirdParty;
+        return mFacebookUser && !mUnlinkSocialLogin;
     }
 
     @Override
     public boolean showUnlinkGoogle() {
-        return mGoogleUser && !mUnlinkThirdParty;
+        return mGoogleUser && !mUnlinkSocialLogin;
     }
 
     @Override
-    public void onViewVisible() {
-        super.onViewVisible();
+    protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
+        super.onUserLoggedIn(currentUser);
 
-        getSubscriptions().add(mUserRepo.getIdentities(mCurrentIdentity.getGroup(), true)
-                .filter(new Func1<Identity, Boolean>() {
+        mGoogleUser = userRepo.isGoogleUser(currentUser);
+        mFacebookUser = userRepo.isFacebookUser(currentUser);
+        notifyPropertyChanged(BR.emailAndPasswordVisible);
+        view.reloadOptionsMenu();
+
+        mEmailOrig = currentUser.getEmail();
+        if (TextUtils.isEmpty(mEmail) && !TextUtils.isEmpty(mEmailOrig)) {
+            setEmail(mEmailOrig);
+        }
+
+        getSubscriptions().add(userRepo.getUser(currentUser.getUid())
+                .flatMap(new Func1<User, Single<Identity>>() {
                     @Override
-                    public Boolean call(Identity identity) {
-                        return !Objects.equals(mCurrentIdentity.getObjectId(), identity.getObjectId());
+                    public Single<Identity> call(User user) {
+                        return userRepo.getIdentity(user.getCurrentIdentity());
                     }
                 })
-                .map(new Func1<Identity, String>() {
+                .doOnSuccess(new Action1<Identity>() {
                     @Override
-                    public String call(Identity identity) {
-                        return identity.getNickname();
+                    public void call(Identity identity) {
+                        final String nickname = identity.getNickname();
+                        mNicknameOrig = nickname;
+                        if (TextUtils.isEmpty(mNickname)) {
+                            setNickname(nickname);
+                        }
+
+                        final String avatar = identity.getAvatar();
+                        mAvatarOrig = avatar;
+                        if (TextUtils.isEmpty(mAvatar)) {
+                            setAvatar(avatar);
+                        }
                     }
                 })
-                .subscribe(new Subscriber<String>() {
+                .flatMapObservable(new Func1<Identity, Observable<Identity>>() {
                     @Override
-                    public void onCompleted() {
-                        // do nothing
+                    public Observable<Identity> call(Identity identity) {
+                        return mGroupRepo.getGroupIdentities(identity.getGroup(), true);
                     }
-
+                })
+                .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override
-                    public void onError(Throwable e) {
-                        // do nothing
-                    }
-
-                    @Override
-                    public void onNext(String nickname) {
-                        mGroupNicknames.add(nickname);
+                    public void onNext(Identity identity) {
+                        mGroupNicknames.add(identity.getNickname());
                     }
                 })
         );
@@ -257,53 +247,52 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
 
     @Override
     public void onPickAvatarMenuClick() {
-        mNavigator.startImagePicker();
+        navigator.startImagePicker();
     }
 
     @Override
     public void onNewAvatarTaken(@NonNull String avatar) {
         setAvatar(avatar);
-        mView.reloadOptionsMenu();
+        view.reloadOptionsMenu();
     }
 
     @Override
     public void onDeleteAvatarMenuClick() {
         setAvatar("");
-        mView.reloadOptionsMenu();
+        view.reloadOptionsMenu();
     }
 
     @Override
     public void onUnlinkThirdPartyLoginMenuClick() {
-        mUnlinkThirdParty = true;
+        mUnlinkSocialLogin = true;
         notifyPropertyChanged(BR.emailAndPasswordVisible);
-        mView.reloadOptionsMenu();
-        mView.showSetPasswordMessage(R.string.toast_unlink_password_required);
+        view.reloadOptionsMenu();
+        view.showSetPasswordMessage(R.string.toast_unlink_password_required);
     }
 
     @Override
     public void onExitClick() {
-        if (mSaving) {
-            mView.showMessage(R.string.toast_saving_profile);
-            return;
-        }
-
         if (changesWereMade()) {
-            mView.showDiscardChangesDialog();
+            view.showDiscardChangesDialog();
         } else {
-            mNavigator.finish(Activity.RESULT_CANCELED);
+            navigator.finish(Activity.RESULT_CANCELED);
         }
     }
 
     private boolean changesWereMade() {
-        return !Objects.equals(mEmail, mCurrentUser.getUsername())
-                || !Objects.equals(mNickname, mCurrentIdentity.getNickname())
-                || !Objects.equals(mAvatar, mCurrentIdentity.getAvatarUrl())
+        return !Objects.equals(mEmail, mEmailOrig)
+                || !Objects.equals(mNickname, mNicknameOrig)
+                || isAvatarChanged()
                 || !TextUtils.isEmpty(mPassword);
+    }
+
+    private boolean isAvatarChanged() {
+        return !Objects.equals(mAvatar, mAvatarOrig);
     }
 
     @Override
     public void onDiscardChangesSelected() {
-        mNavigator.finish(Result.CHANGES_DISCARDED);
+        navigator.finish(Result.CHANGES_DISCARDED);
     }
 
     @Override
@@ -329,11 +318,11 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
             notifyPropertyChanged(BR.validate);
         }
 
-        if (mUnlinkThirdParty) {
+        if (mUnlinkSocialLogin) {
             if (TextUtils.isEmpty(mPassword)) {
-                mView.showSetPasswordMessage(R.string.toast_unlink_password_required);
+                view.showSetPasswordMessage(R.string.toast_unlink_password_required);
             } else {
-                mView.dismissSetPasswordMessage();
+                view.dismissSetPasswordMessage();
             }
         }
     }
@@ -348,71 +337,29 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
 
     @Override
     public void onFabSaveProfileClick(View view) {
-        if (mSaving || !validate()) {
+        if (!validate()) {
             return;
         }
 
-        if (mGroupNicknames.contains(mNickname)) {
-            mView.showMessage(R.string.toast_profile_nickname_taken);
+        if (!Objects.equals(mNickname, mNicknameOrig) && mGroupNicknames.contains(mNickname)) {
+            this.view.showMessage(R.string.toast_profile_nickname_taken);
             return;
         }
 
-        mCurrentUser.setUsername(mEmail);
-        if (!TextUtils.isEmpty(mPassword)) {
-            mCurrentUser.setPassword(mPassword);
+        if (mUnlinkSocialLogin) {
+            unlinkSocialLogin();
+            return;
         }
 
-        final List<Identity> identities = mCurrentUser.getIdentities();
-        final boolean emptyAvatar = TextUtils.isEmpty(mAvatar);
-        final boolean newAvatar = !emptyAvatar && !Objects.equals(mAvatar, mCurrentIdentity.getAvatarUrl());
-        if (newAvatar) {
-            getSubscriptions().add(mUserRepo.saveCurrentUserIdentitiesWithAvatar(mNickname, mAvatar)
-                    .subscribe(new Subscriber<Identity>() {
-                        @Override
-                        public void onCompleted() {
-                            if (!mUnlinkThirdParty) {
-                                mNavigator.finish(Activity.RESULT_OK);
-                            } else {
-                                handleThirdParty();
-                            }
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            mView.showMessage(R.string.toast_error_profile);
-                        }
-
-                        @Override
-                        public void onNext(Identity identity) {
-                            // do nothing
-                        }
-                    })
-            );
-        } else {
-            for (Identity identity : identities) {
-                identity.setNickname(mNickname);
-                if (emptyAvatar) {
-                    identity.removeAvatar();
-                }
-            }
-
-            if (!mUnlinkThirdParty) {
-                mCurrentUser.saveEventually();
-                mNavigator.finish(Activity.RESULT_OK);
-            } else {
-                handleThirdParty();
-            }
+        final String email = mGoogleUser || mFacebookUser || Objects.equals(mEmail, mEmailOrig) ? null : mEmail;
+        final String password = mGoogleUser || mFacebookUser ? null : mPassword;
+        if (!TextUtils.isEmpty(email) || !TextUtils.isEmpty(password)) {
+            this.view.showReAuthenticateDialog(mEmailOrig);
+            return;
         }
-    }
 
-    @Override
-    public ProgressFinalAnimationListener getProgressFinalAnimationListener() {
-        return new ProgressFinalAnimationListener() {
-            @Override
-            public void onProgressFinalAnimationComplete() {
-                mNavigator.finish(Activity.RESULT_OK);
-            }
-        };
+        // only nickname and/or avatar changed, proceed straight to saving profile
+        saveProfile();
     }
 
     private boolean validate() {
@@ -420,32 +367,115 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
         return isEmailValid() && isPasswordValid() && isPasswordEqual() && isNicknameComplete();
     }
 
-    private void handleThirdParty() {
+    private void unlinkSocialLogin() {
         if (mGoogleUser) {
-            startSaving();
-            mView.loadUnlinkThirdPartyWorker(ProfileAction.UNLINK_GOOGLE);
+            view.reAuthenticateGoogle();
         } else if (mFacebookUser) {
-            startSaving();
-            mView.loadUnlinkThirdPartyWorker(ProfileAction.UNLINK_FACEBOOK);
+            view.reAuthenticateFacebook();
         }
     }
 
     @Override
-    public void setUnlinkActionStream(@NonNull Single<User> single, @NonNull final String workerTag,
-                                      @ProfileAction int action) {
-        getSubscriptions().add(single.subscribe(new SingleSubscriber<User>() {
+    public void onGoogleLoginSuccessful(@NonNull String idToken) {
+        view.showProgressDialog(R.string.progress_profile_unlink);
+        view.loadUnlinkGoogleWorker(mEmail, mPassword, idToken);
+    }
+
+    @Override
+    public void onGoogleLoginFailed() {
+        view.showMessage(R.string.toast_error_login_google);
+    }
+
+    @Override
+    public void setGoogleUserStream(@NonNull Single<Void> single, @NonNull final String workerTag) {
+        getSubscriptions().add(single
+                .flatMap(new Func1<Void, Single<User>>() {
                     @Override
-                    public void onSuccess(User value) {
-                        mView.removeWorker(workerTag);
-                        stopSaving(true);
+                    public Single<User> call(Void aVoid) {
+                        return userRepo.updateProfile(mNickname, mAvatar, isAvatarChanged());
+                    }
+                })
+                .subscribe(profileSubscriber(workerTag))
+        );
+    }
+
+    @Override
+    public void onFacebookSignedIn(@NonNull String token) {
+        view.showProgressDialog(R.string.progress_profile_unlink);
+        view.loadUnlinkFacebookWorker(mEmail, mPassword, token);
+    }
+
+    @Override
+    public void onFacebookLoginFailed() {
+        view.showMessage(R.string.toast_error_login_facebook);
+    }
+
+    @Override
+    public void setFacebookUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
+        getSubscriptions().add(single
+                .flatMap(new Func1<Void, Single<User>>() {
+                    @Override
+                    public Single<User> call(Void aVoid) {
+                        return userRepo.updateProfile(mNickname, mAvatar, isAvatarChanged());
+                    }
+                })
+                .subscribe(profileSubscriber(workerTag))
+        );
+    }
+
+    @Override
+    public void onValidEmailAndPasswordEntered(@NonNull String email, @NonNull String password) {
+        view.showProgressDialog(R.string.progress_profile_change_email_pw);
+        view.loadChangeEmailPasswordWorker(email, password, mEmail, mPassword);
+    }
+
+    @Override
+    public void setEmailUserStream(@NonNull Single<Void> single, @NonNull final String workerTag) {
+        getSubscriptions().add(single
+                .flatMap(new Func1<Void, Single<User>>() {
+                    @Override
+                    public Single<User> call(Void aVoid) {
+                        return userRepo.updateProfile(mNickname, mAvatar, isAvatarChanged());
+                    }
+                })
+                .subscribe(profileSubscriber(workerTag))
+        );
+    }
+
+    @NonNull
+    private SingleSubscriber<User> profileSubscriber(@NonNull final String workerTag) {
+        return new SingleSubscriber<User>() {
+            @Override
+            public void onSuccess(User user) {
+                view.removeWorker(workerTag);
+                view.hideProgressDialog();
+
+                navigator.finish(Activity.RESULT_OK);
+            }
+
+            @Override
+            public void onError(Throwable error) {
+                view.removeWorker(workerTag);
+                view.hideProgressDialog();
+
+                Timber.e(error, "failed to unlink or change email/pw and save profile with error:");
+                view.showMessage(R.string.toast_error_profile);
+            }
+        };
+    }
+
+    private void saveProfile() {
+        getSubscriptions().add(userRepo.updateProfile(mNickname, mAvatar, isAvatarChanged())
+                .subscribe(new SingleSubscriber<User>() {
+                    @Override
+                    public void onSuccess(User user) {
+                        navigator.finish(Activity.RESULT_OK);
                     }
 
                     @Override
                     public void onError(Throwable error) {
-                        mView.removeWorker(workerTag);
-                        stopSaving(false);
-
-                        mView.showMessage(R.string.toast_error_unlink_failed);
+                        Timber.e(error, "failed to save profile with error:");
+                        view.showMessage(R.string.toast_error_profile);
                     }
                 })
         );

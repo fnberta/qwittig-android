@@ -35,61 +35,61 @@ public class PurchaseAddEditItem extends BaseObservable implements PurchaseAddEd
             return new PurchaseAddEditItem[size];
         }
     };
-    private PriceChangedListener mPriceChangedListener;
-    private NumberFormat mMoneyFormatter;
-    private boolean mValidate;
-    private String mName;
-    private String mPrice;
-    private PurchaseAddEditItemUsersUser[] mUsers;
+    private PriceChangedListener priceChangedListener;
+    private NumberFormat moneyFormatter;
+    private boolean validate;
+    private String name;
+    private String price;
+    private PurchaseAddEditItemIdentity[] identities;
 
-    public PurchaseAddEditItem(@NonNull PurchaseAddEditItemUsersUser[] users) {
-        this("", "", users);
+    public PurchaseAddEditItem(@NonNull PurchaseAddEditItemIdentity[] identities) {
+        this("", "", identities);
     }
 
     public PurchaseAddEditItem(@NonNull String name, @NonNull String price,
-                               @NonNull PurchaseAddEditItemUsersUser[] users) {
-        mName = name;
-        mPrice = price;
-        mUsers = users;
+                               @NonNull PurchaseAddEditItemIdentity[] identities) {
+        this.name = name;
+        this.price = price;
+        this.identities = identities;
     }
 
     private PurchaseAddEditItem(Parcel in) {
-        mValidate = in.readByte() != 0;
-        mName = in.readString();
-        mPrice = in.readString();
-        mUsers = in.createTypedArray(PurchaseAddEditItemUsersUser.CREATOR);
+        validate = in.readByte() != 0;
+        name = in.readString();
+        price = in.readString();
+        identities = in.createTypedArray(PurchaseAddEditItemIdentity.CREATOR);
     }
 
     public void setPriceChangedListener(@NonNull PriceChangedListener priceChangedListener) {
-        mPriceChangedListener = priceChangedListener;
+        this.priceChangedListener = priceChangedListener;
     }
 
     public void setMoneyFormatter(@NonNull NumberFormat moneyFormatter) {
-        mMoneyFormatter = moneyFormatter;
+        this.moneyFormatter = moneyFormatter;
     }
 
     public void updatePriceFormat(@NonNull NumberFormat moneyFormatter) {
         setMoneyFormatter(moneyFormatter);
-        setPrice(mMoneyFormatter.format(parsePrice()));
+        setPrice(this.moneyFormatter.format(parsePrice()));
     }
 
     @Bindable
     public String getName() {
-        return mName;
+        return name;
     }
 
     public void setName(@NonNull String name) {
-        mName = name;
+        this.name = name;
         notifyPropertyChanged(BR.name);
     }
 
     @Bindable
     public String getPrice() {
-        return mPrice;
+        return price;
     }
 
     public void setPrice(@NonNull String price) {
-        mPrice = price;
+        this.price = price;
         notifyPropertyChanged(BR.price);
     }
 
@@ -100,10 +100,10 @@ public class PurchaseAddEditItem extends BaseObservable implements PurchaseAddEd
      */
     public double parsePrice() {
         try {
-            return Double.parseDouble(mPrice);
+            return Double.parseDouble(price);
         } catch (NumberFormatException e) {
             try {
-                return mMoneyFormatter.parse(mPrice).doubleValue();
+                return moneyFormatter.parse(price).doubleValue();
             } catch (ParseException e1) {
                 return 0;
             }
@@ -111,18 +111,18 @@ public class PurchaseAddEditItem extends BaseObservable implements PurchaseAddEd
     }
 
     @Bindable
-    public PurchaseAddEditItemUsersUser[] getUsers() {
-        return mUsers;
+    public PurchaseAddEditItemIdentity[] getIdentities() {
+        return identities;
     }
 
-    public void setUsers(@NonNull PurchaseAddEditItemUsersUser[] users) {
-        mUsers = users;
+    public void setIdentities(@NonNull PurchaseAddEditItemIdentity[] identities) {
+        this.identities = identities;
     }
 
-    public void toggleUser(@NonNull PurchaseAddEditItemUsersUser userClicked) {
+    public void toggleUser(@NonNull PurchaseAddEditItemIdentity userClicked) {
         final boolean isSelected = userClicked.isSelected();
-        for (PurchaseAddEditItemUsersUser user : mUsers) {
-            if (Objects.equals(user.getObjectId(), userClicked.getObjectId())) {
+        for (PurchaseAddEditItemIdentity user : identities) {
+            if (Objects.equals(user.getIdentityId(), userClicked.getIdentityId())) {
                 user.setSelected(isSelected);
             }
         }
@@ -130,53 +130,53 @@ public class PurchaseAddEditItem extends BaseObservable implements PurchaseAddEd
 
     @Bindable
     public boolean isValidate() {
-        return mValidate;
+        return validate;
     }
 
     @Bindable
     public boolean isNameComplete() {
-        return !TextUtils.isEmpty(mName);
+        return !TextUtils.isEmpty(name);
     }
 
     @Bindable
     public boolean isPriceComplete() {
-        return !TextUtils.isEmpty(mPrice);
+        return !TextUtils.isEmpty(price);
     }
 
     public void onNameChanged(CharSequence s, int start, int before, int count) {
-        mName = s.toString();
+        name = s.toString();
 
-        if (mValidate) {
+        if (validate) {
             notifyPropertyChanged(BR.validate);
         }
     }
 
     public void onPriceChanged(CharSequence s, int start, int before, int count) {
-        mPrice = s.toString();
-        mPriceChangedListener.onRowPriceChanged();
+        price = s.toString();
+        priceChangedListener.onRowPriceChanged();
 
-        if (mValidate) {
+        if (validate) {
             notifyPropertyChanged(BR.validate);
         }
     }
 
     public void onPriceFocusChange(View v, boolean hasFocus) {
         if (!hasFocus) {
-            setPrice(mMoneyFormatter.format(parsePrice()));
+            setPrice(moneyFormatter.format(parsePrice()));
         }
     }
 
     public boolean validateFields() {
-        mValidate = true;
+        validate = true;
         notifyPropertyChanged(BR.validate);
         return isNameComplete() && isPriceComplete();
     }
 
     public List<String> getSelectedIdentitiesIds() {
         final List<String> userIds = new ArrayList<>();
-        for (PurchaseAddEditItemUsersUser user : mUsers) {
+        for (PurchaseAddEditItemIdentity user : identities) {
             if (user.isSelected()) {
-                userIds.add(user.getObjectId());
+                userIds.add(user.getIdentityId());
             }
         }
         return userIds;
@@ -194,10 +194,10 @@ public class PurchaseAddEditItem extends BaseObservable implements PurchaseAddEd
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeByte(mValidate ? (byte) 1 : (byte) 0);
-        dest.writeString(mName);
-        dest.writeString(mPrice);
-        dest.writeTypedArray(mUsers, 0);
+        dest.writeByte(validate ? (byte) 1 : (byte) 0);
+        dest.writeString(name);
+        dest.writeString(price);
+        dest.writeTypedArray(identities, 0);
     }
 
     /**

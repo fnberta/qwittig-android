@@ -10,23 +10,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.FragmentLoginEmailBinding;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
-import ch.giantific.qwittig.presentation.common.fragments.EmailPromptDialogFragment;
+import ch.giantific.qwittig.presentation.common.workers.EmailUserWorker;
 import ch.giantific.qwittig.presentation.login.di.LoginComponent;
 import ch.giantific.qwittig.utils.ViewUtils;
 
 /**
  * Displays the login screen asking the user for the username and password.
- * <p/>
+ * <p>
  * Subclass of {@link BaseFragment}.
  */
 public class LoginEmailFragment extends BaseFragment<LoginComponent, LoginEmailViewModel, LoginEmailFragment.ActivityListener>
         implements LoginEmailViewModel.ViewListener {
 
     private static final String KEY_IDENTITY_ID = "IDENTITY_ID";
-    private FragmentLoginEmailBinding mBinding;
+    private FragmentLoginEmailBinding binding;
 
     public LoginEmailFragment() {
         // required empty constructor
@@ -43,8 +42,8 @@ public class LoginEmailFragment extends BaseFragment<LoginComponent, LoginEmailV
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentLoginEmailBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentLoginEmailBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
@@ -52,9 +51,9 @@ public class LoginEmailFragment extends BaseFragment<LoginComponent, LoginEmailV
         super.onActivityCreated(savedInstanceState);
 
         final String identityId = getArguments().getString(KEY_IDENTITY_ID, "");
-        mViewModel.setIdentityId(identityId);
-        mViewModel.attachView(this);
-        mBinding.setViewModel(mViewModel);
+        viewModel.setIdentityId(identityId);
+        viewModel.attachView(this);
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -64,38 +63,32 @@ public class LoginEmailFragment extends BaseFragment<LoginComponent, LoginEmailV
 
     @Override
     protected View getSnackbarView() {
-        return mBinding.btLoginEmailLogin;
+        return binding.btLoginEmailLogin;
     }
 
     @Override
     public void showProfileScreen(boolean withInvitation) {
-        mActivity.showProfileFragment(withInvitation);
+        activity.showProfileFragment(withInvitation);
     }
 
     @Override
-    public void loadEmailLoginWorker(@NonNull String email, @NonNull String password,
-                                     @NonNull String identityId) {
-        LoginWorker.attachEmailLoginInstance(getFragmentManager(), email, password, identityId);
+    public void loadEmailLoginWorker(@NonNull String email, @NonNull String password) {
+        LoginWorker.attachEmailLoginInstance(getFragmentManager(), email, password);
     }
 
     @Override
-    public void loadEmailSignUpWorker(@NonNull String email, @NonNull String password,
-                                      @NonNull String identityId) {
-        LoginWorker.attachEmailSignUpInstance(getFragmentManager(), email, password, identityId);
+    public void loadEmailSignUpWorker(@NonNull String email, @NonNull String password) {
+        LoginWorker.attachEmailSignUpInstance(getFragmentManager(), email, password);
     }
 
     @Override
     public void loadResetPasswordWorker(@NonNull String email) {
-        LoginWorker.attachResetPasswordInstance(getFragmentManager(), email);
+        EmailUserWorker.attachResetPasswordInstance(getFragmentManager(), email);
     }
 
     @Override
     public void showResetPasswordDialog(@NonNull String email) {
-        EmailPromptDialogFragment.display(getFragmentManager(),
-                R.string.dialog_login_reset_password_title,
-                R.string.dialog_login_reset_password_message,
-                R.string.dialog_positive_reset,
-                email);
+        EmailPromptDialogFragment.display(getFragmentManager(), email);
     }
 
     @Override

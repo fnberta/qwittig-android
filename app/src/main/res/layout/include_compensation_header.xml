@@ -12,7 +12,7 @@
 
         <variable
             name="itemModel"
-            type="ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidCompItemModel"
+            type="ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidItemModel"
             />
     </data>
 
@@ -29,7 +29,7 @@
             android:layout_marginEnd="@dimen/normal_space"
             android:layout_marginStart="@dimen/normal_space"
             android:layout_marginTop="@dimen/normal_space"
-            android:text="@{itemModel.compUsername}"
+            android:text="@{itemModel.nickname}"
             tools:text="veriberi"
             />
 
@@ -41,7 +41,7 @@
             android:layout_marginBottom="@dimen/normal_space"
             android:layout_marginEnd="@dimen/normal_space"
             android:layout_marginStart="@dimen/normal_space"
-            android:text="@{itemModel.credit ? @string/balance_owe_you(itemModel.compAmount) : @string/balance_gets_from_you(itemModel.compAmount)}"
+            android:text="@{itemModel.credit ? @string/balance_owe_you(itemModel.amount) : @string/balance_gets_from_you(itemModel.amount)}"
             tools:text="schuldet dir 33.45"
             />
 

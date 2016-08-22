@@ -4,57 +4,61 @@
 
 package ch.giantific.qwittig.presentation.tasks.details.itemmodels;
 
-import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.support.annotation.NonNull;
 
 import java.text.DateFormat;
-import java.util.Date;
 
+import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.domain.models.Identity;
-import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.domain.models.TaskHistoryEvent;
-import ch.giantific.qwittig.domain.models.User;
+import ch.giantific.qwittig.presentation.common.itemmodels.BaseChildItemModel;
 import ch.giantific.qwittig.utils.DateUtils;
 
 /**
- * Represents a history entry of a {@link Task} including a {@link User} and the {@link Date}
+ * Represents a history entry of a task including a user and the date
  * he/she completed the task.
  */
-public class TaskDetailsHistoryItem extends BaseObservable
+public class TaskDetailsHistoryItem extends BaseChildItemModel
         implements TaskDetailsItemModel, Comparable<TaskDetailsHistoryItem> {
 
-    private final String mTaskEventDate;
-    private final Identity mTaskEventIdentity;
+    private final String eventDate;
+    private String nickname;
+    private String avatar;
 
-    public TaskDetailsHistoryItem(@NonNull TaskHistoryEvent taskHistoryEvent) {
-        mTaskEventIdentity = taskHistoryEvent.getIdentity();
+    public TaskDetailsHistoryItem(@EventType int eventType,
+                                  @NonNull TaskHistoryEvent taskHistoryEvent,
+                                  @NonNull Identity identity) {
+        super(eventType, taskHistoryEvent.getId());
+
         final DateFormat dateFormatter = DateUtils.getDateFormatter(false);
-        mTaskEventDate = dateFormatter.format(taskHistoryEvent.getDate());
+        eventDate = dateFormatter.format(taskHistoryEvent.getDate());
+        nickname = identity.getNickname();
+        avatar = identity.getAvatar();
     }
 
     @Bindable
-    public String getTaskEventIdentityNickname() {
-        return mTaskEventIdentity.getNickname();
+    public String getNickname() {
+        return nickname;
     }
 
     @Bindable
-    public String getTaskEventIdentityAvatar() {
-        return mTaskEventIdentity.getAvatarUrl();
+    public String getAvatar() {
+        return avatar;
     }
 
     @Bindable
-    public String getTaskEventDate() {
-        return mTaskEventDate;
+    public String getEventDate() {
+        return eventDate;
     }
 
     @Override
-    public int getType() {
+    public int getViewType() {
         return Type.HISTORY;
     }
 
     @Override
     public int compareTo(@NonNull TaskDetailsHistoryItem another) {
-        return this.getTaskEventDate().compareTo(another.getTaskEventDate());
+        return this.getEventDate().compareTo(another.getEventDate());
     }
 }

@@ -40,15 +40,15 @@ public class HomeTabsAdapter extends TabsAdapter {
      * @param title    the title of the fragment to be displayed in the tab
      */
     public void addFragment(@NonNull Fragment fragment, @NonNull String title) {
-        mFragments.add(fragment);
-        mFragmentTitles.add(title);
+        fragments.add(fragment);
+        fragmentTitles.add(title);
         notifyDataSetChanged();
     }
 
     public void removeFragment(@NonNull Fragment fragment) {
-        final int pos = mFragments.indexOf(fragment);
-        mFragments.remove(pos);
-        mFragmentTitles.remove(pos);
+        final int pos = fragments.indexOf(fragment);
+        fragments.remove(pos);
+        fragmentTitles.remove(pos);
         notifyDataSetChanged();
     }
 
@@ -60,7 +60,7 @@ public class HomeTabsAdapter extends TabsAdapter {
     @SuppressWarnings("SuspiciousMethodCalls")
     @Override
     public int getItemPosition(Object object) {
-        if (!mFragments.contains(object)) {
+        if (!fragments.contains(object)) {
             return POSITION_NONE;
         }
 

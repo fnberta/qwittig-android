@@ -8,50 +8,55 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.List;
 import java.util.Map;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.helper.RemoteConfigHelper;
+import ch.giantific.qwittig.data.repositories.GroupRepository;
+import ch.giantific.qwittig.data.repositories.PurchaseRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Item;
 import ch.giantific.qwittig.domain.models.OcrData;
 import ch.giantific.qwittig.domain.models.Purchase;
-import ch.giantific.qwittig.domain.repositories.PurchaseRepository;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItem;
 import rx.Single;
 import rx.SingleSubscriber;
-import rx.functions.Action1;
 import rx.functions.Func1;
 
 /**
  * Provides an implementation of the {@link PurchaseAddEditViewModel} for the screen where the
  * purchase items get automatically filled in via an image of the receipt.
- * <p/>
+ * <p>
  * Subclass of {@link PurchaseAddViewModelImpl}.
  */
 public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implements PurchaseAddOcrViewModel {
 
-    private static final boolean SHOW_OCR_RATING_SCREEN = true;
     private static final String STATE_OCR_VALUES_SET = "STATE_OCR_VALUES_SET";
-    private String mOcrDataId;
-    private OcrData mOcrData;
-    private boolean mOcrValuesSet;
+
+    private String ocrDataId;
+    private boolean ocrValuesSet;
 
     public PurchaseAddOcrViewModelImpl(@Nullable Bundle savedState,
                                        @NonNull Navigator navigator,
                                        @NonNull RxBus<Object> eventBus,
                                        @NonNull UserRepository userRepository,
-                                       @NonNull PurchaseRepository purchaseRepo) {
-        super(savedState, navigator, eventBus, userRepository, purchaseRepo);
+                                       @NonNull GroupRepository groupRepository,
+                                       @NonNull PurchaseRepository purchaseRepo,
+                                       @NonNull RemoteConfigHelper configHelper) {
+        super(savedState, navigator, eventBus, userRepository, groupRepository, purchaseRepo,
+                configHelper);
 
         if (savedState != null) {
-            mOcrValuesSet = savedState.getBoolean(STATE_OCR_VALUES_SET, false);
+            ocrValuesSet = savedState.getBoolean(STATE_OCR_VALUES_SET, false);
         } else {
-            mOcrValuesSet = false;
+            ocrValuesSet = false;
         }
     }
 
@@ -59,49 +64,37 @@ public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implem
     public void saveState(@NonNull Bundle outState) {
         super.saveState(outState);
 
-        outState.putBoolean(STATE_OCR_VALUES_SET, mOcrValuesSet);
+        outState.putBoolean(STATE_OCR_VALUES_SET, ocrValuesSet);
     }
 
     @Override
     public void setOcrDataId(@NonNull String ocrDataId) {
-        mOcrDataId = ocrDataId;
+        this.ocrDataId = ocrDataId;
     }
 
     @Override
-    public void loadData() {
-        getSubscriptions().add(mUserRepo.getIdentities(mCurrentGroup, true)
-                .toSortedList()
-                .toSingle()
-                .doOnSuccess(new Action1<List<Identity>>() {
-                    @Override
-                    public void call(List<Identity> identities) {
-                        identities.remove(mCurrentIdentity);
-                        identities.add(0, mCurrentIdentity);
-                        mIdentities = identities;
-                    }
-                })
+    protected void loadPurchase(@NonNull FirebaseUser currentUser) {
+        getSubscriptions().add(getInitialChain(currentUser)
                 .flatMap(new Func1<List<Identity>, Single<OcrData>>() {
                     @Override
                     public Single<OcrData> call(List<Identity> identities) {
-                        return mPurchaseRepo.fetchOcrData(mOcrDataId);
+                        return purchaseRepo.getOcrData(ocrDataId);
                     }
                 })
                 .subscribe(new SingleSubscriber<OcrData>() {
                     @Override
                     public void onSuccess(OcrData ocrData) {
-                        mOcrData = ocrData;
-
-                        if (mOcrValuesSet) {
+                        if (ocrValuesSet) {
                             updateRows();
                         } else {
                             setOcrData(ocrData);
-                            mOcrValuesSet = true;
+                            ocrValuesSet = true;
                         }
                     }
 
                     @Override
                     public void onError(Throwable error) {
-                        mView.showMessage(R.string.toast_error_purchase_ocr_load);
+                        view.showMessage(R.string.toast_error_purchase_ocr_load);
                     }
                 })
         );
@@ -115,38 +108,39 @@ public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implem
         if (!stores.isEmpty()) {
             setStore(stores.get(0));
         }
-        setReceiptImage(ocrData.getReceipt().getUrl());
+        setReceipt(ocrData.getReceipt());
 
         final List<Map<String, Object>> items = (List<Map<String, Object>>) data.get("items");
         if (!items.isEmpty()) {
             for (Map<String, Object> item : items) {
-                final String price = mMoneyFormatter.format(item.get("price"));
+                final String price = moneyFormatter.format(item.get("price"));
                 final String name = (String) item.get("name");
                 final PurchaseAddEditItem purchaseAddEditItem =
-                        new PurchaseAddEditItem(name, price, getItemUsers(mIdentities));
-                purchaseAddEditItem.setMoneyFormatter(mMoneyFormatter);
+                        new PurchaseAddEditItem(name, price, getItemUsers());
+                purchaseAddEditItem.setMoneyFormatter(moneyFormatter);
                 purchaseAddEditItem.setPriceChangedListener(this);
-                mItems.add(getLastPosition() - 1, purchaseAddEditItem);
-                mListInteraction.notifyItemInserted(mItems.indexOf(purchaseAddEditItem));
+                final int pos = getItemCount() - 2;
+                this.items.add(pos, purchaseAddEditItem);
+                listInteraction.notifyItemInserted(this.items.indexOf(purchaseAddEditItem));
             }
         }
     }
 
     @NonNull
     @Override
-    protected Purchase createPurchase(@NonNull List<Identity> purchaseIdentities,
-                                      @NonNull List<Item> purchaseItems, int fractionDigits) {
-        final Purchase purchase = super.createPurchase(purchaseIdentities, purchaseItems, fractionDigits);
-        purchase.setReceipt(mOcrData.getReceipt());
-        purchase.setOcrData(mOcrData);
-
-        return purchase;
+    protected Purchase createPurchase(@NonNull List<String> purchaseIdentities,
+                                      @NonNull List<Item> purchaseItems, int fractionDigits,
+                                      boolean isDraft) {
+        final double total = convertRoundTotal(fractionDigits);
+        return new Purchase(currentIdentity.getGroup(), currentIdentity.getId(), date, store,
+                total, currency, exchangeRate, receipt, note, isDraft, ocrDataId,
+                purchaseIdentities, purchaseItems);
     }
 
     @Override
     protected void onPurchaseSaved(boolean asDraft) {
-        if (SHOW_OCR_RATING_SCREEN) {
-            mNavigator.startOcrRating(mOcrDataId);
+        if (configHelper.isShowOcrRating()) {
+            navigator.startOcrRating(ocrDataId);
         }
 
         super.onPurchaseSaved(asDraft);

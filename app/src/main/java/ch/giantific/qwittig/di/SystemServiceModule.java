@@ -17,14 +17,14 @@ import dagger.Provides;
 @Module
 public class SystemServiceModule {
 
-    private final Context mContext;
+    private final Context context;
 
     public SystemServiceModule(@NonNull Context context) {
-        mContext = context;
+        this.context = context;
     }
 
     @Provides
     NotificationManager providesNotificationManager() {
-        return (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        return (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
     }
 }

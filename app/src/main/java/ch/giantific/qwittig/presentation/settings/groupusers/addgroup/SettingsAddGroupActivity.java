@@ -22,7 +22,6 @@ import javax.inject.Inject;
 
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.BaseActivity;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
@@ -31,10 +30,8 @@ import ch.giantific.qwittig.presentation.settings.groupusers.di.DaggerSettingsGr
 import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsAddGroupViewModelModule;
 import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsGroupUsersComponent;
 import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsUsersViewModelModule;
-import ch.giantific.qwittig.presentation.settings.groupusers.users.AddUserWorkerListener;
 import ch.giantific.qwittig.presentation.settings.groupusers.users.SettingsUsersViewModel;
 import ch.giantific.qwittig.utils.AvatarUtils;
-import rx.Single;
 
 /**
  * Hosts {@link SettingsAddGroupFragment} that allows to user to create a new group.
@@ -45,16 +42,15 @@ import rx.Single;
  * Subclass of {@link BaseActivity}.
  */
 public class SettingsAddGroupActivity extends BaseActivity<SettingsGroupUsersComponent> implements
-        SettingsAddGroupFragment.ActivityListener,
-        AddGroupWorkerListener,
-        AddUserWorkerListener {
+        SettingsAddGroupFragment.ActivityListener {
 
     public static final String ADD_USERS_FRAGMENT = "ADD_USERS_FRAGMENT";
     public static final String ADD_GROUP_FRAGMENT = "ADD_GROUP_FRAGMENT";
+
     @Inject
-    SettingsAddGroupViewModel mAddGroupViewModel;
+    SettingsAddGroupViewModel addGroupViewModel;
     @Inject
-    SettingsUsersViewModel mAddUsersViewModel;
+    SettingsUsersViewModel usersViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -70,18 +66,18 @@ public class SettingsAddGroupActivity extends BaseActivity<SettingsGroupUsersCom
 
     @Override
     protected void injectDependencies(@Nullable Bundle savedInstanceState) {
-        mComponent = DaggerSettingsGroupUsersComponent.builder()
+        component = DaggerSettingsGroupUsersComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
                 .settingsAddGroupViewModelModule(new SettingsAddGroupViewModelModule(savedInstanceState))
                 .settingsUsersViewModelModule(new SettingsUsersViewModelModule(savedInstanceState))
                 .build();
-        mComponent.inject(this);
+        component.inject(this);
     }
 
     @Override
     protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{mAddGroupViewModel, mAddUsersViewModel});
+        return Arrays.asList(new ViewModel[]{addGroupViewModel, usersViewModel});
     }
 
     @Override
@@ -107,7 +103,7 @@ public class SettingsAddGroupActivity extends BaseActivity<SettingsGroupUsersCom
                     AvatarUtils.saveImageLocal(this, imageUri, new AvatarUtils.AvatarLocalSaveListener() {
                         @Override
                         public void onAvatarSaved(@NonNull String path) {
-                            mAddUsersViewModel.onNewAvatarTaken(path);
+                            usersViewModel.onNewAvatarTaken(path);
                         }
                     });
                 }
@@ -120,15 +116,5 @@ public class SettingsAddGroupActivity extends BaseActivity<SettingsGroupUsersCom
         if (actionBar != null) {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_done_white_24dp);
         }
-    }
-
-    @Override
-    public void setCreateGroupStream(@NonNull Single<Identity> single, @NonNull String workerTag) {
-        mAddGroupViewModel.setCreateGroupStream(single, workerTag);
-    }
-
-    @Override
-    public void setAddUserStream(@NonNull Single<Identity> single, @NonNull String workerTag) {
-        mAddUsersViewModel.setAddUserStream(single, workerTag);
     }
 }

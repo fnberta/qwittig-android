@@ -11,10 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.mugen.Mugen;
-import com.mugen.MugenCallbacks;
-
-import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.FragmentFinanceCompensationsPaidBinding;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
@@ -28,7 +24,7 @@ import ch.giantific.qwittig.presentation.finance.di.FinanceSubcomponent;
 public class CompsPaidFragment extends BaseRecyclerViewFragment<FinanceSubcomponent, CompsPaidViewModel, BaseRecyclerViewFragment.ActivityListener<FinanceSubcomponent>>
         implements CompsPaidViewModel.ViewListener {
 
-    private FragmentFinanceCompensationsPaidBinding mBinding;
+    private FragmentFinanceCompensationsPaidBinding binding;
 
     public CompsPaidFragment() {
         // Required empty public constructor
@@ -37,33 +33,17 @@ public class CompsPaidFragment extends BaseRecyclerViewFragment<FinanceSubcompon
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentFinanceCompensationsPaidBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentFinanceCompensationsPaidBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel.attachView(this);
-        mViewModel.setListInteraction(mRecyclerAdapter);
-        mBinding.setViewModel(mViewModel);
-        Mugen.with(mRecyclerView, new MugenCallbacks() {
-            @Override
-            public void onLoadMore() {
-                mViewModel.onLoadMore();
-            }
-
-            @Override
-            public boolean isLoading() {
-                return mViewModel.isLoadingMore();
-            }
-
-            @Override
-            public boolean hasLoadedAllItems() {
-                return false;
-            }
-        }).start();
+        viewModel.attachView(this);
+        viewModel.setListInteraction(recyclerAdapter);
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -73,22 +53,11 @@ public class CompsPaidFragment extends BaseRecyclerViewFragment<FinanceSubcompon
 
     @Override
     protected RecyclerView getRecyclerView() {
-        return mBinding.srlRv.rvBase;
+        return binding.srlRv.rvBase;
     }
 
     @Override
     protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new CompsPaidRecyclerAdapter(mViewModel);
-    }
-
-    @Override
-    public void startUpdateCompensationsPaidService() {
-        ParseQueryService.startUpdateIdentities(getActivity());
-        ParseQueryService.startUpdateCompensationsPaid(getActivity());
-    }
-
-    @Override
-    public void loadQueryMoreCompensationsPaidWorker(int skip) {
-        CompsQueryMoreWorker.attach(getFragmentManager(), skip);
+        return new CompsPaidRecyclerAdapter(viewModel);
     }
 }

@@ -23,10 +23,14 @@ public interface NavDrawerViewModel extends ViewModel<NavDrawerViewModel.ViewLis
     void setSpinnerInteraction(@NonNull SpinnerInteraction spinnerInteraction);
 
     @Bindable
-    String getIdentityNickname();
+    String getNickname();
+
+    void setNickname(@NonNull String nickname);
 
     @Bindable
-    String getIdentityAvatar();
+    String getAvatar();
+
+    void setAvatar(@NonNull String avatar);
 
     @Bindable
     int getSelectedIdentity();
@@ -35,22 +39,7 @@ public interface NavDrawerViewModel extends ViewModel<NavDrawerViewModel.ViewLis
 
     boolean isUserLoggedIn();
 
-    void onLoginSuccessful();
-
-    void onLogout();
-
-    void onProfileUpdated();
-
-    /**
-     * Updates the group quick switch with the most recent values.
-     */
-    void onIdentitiesChanged();
-
-    /**
-     * Sets the group quick switch to the appropriate new selection. Called when the user changes
-     * his group in the settings screen.
-     */
-    void onIdentitySwitched();
+    void afterLogout();
 
     void onIdentitySelected(@NonNull AdapterView<?> parent, View view, int position, long id);
 
@@ -61,8 +50,5 @@ public interface NavDrawerViewModel extends ViewModel<NavDrawerViewModel.ViewLis
      */
     interface ViewListener extends ViewModel.ViewListener {
 
-        void startQueryAllService();
-
-        void setupScreenAfterLogin();
     }
 }

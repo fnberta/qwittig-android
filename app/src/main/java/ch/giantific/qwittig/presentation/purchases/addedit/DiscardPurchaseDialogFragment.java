@@ -13,7 +13,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.presentation.common.fragments.BaseDialogFragment;
+import ch.giantific.qwittig.presentation.common.fragments.dialogs.BaseDialogFragment;
 
 /**
  * Provides a dialog that asks the user if he wants to discard a purchase or save it as a draft.
@@ -41,14 +41,14 @@ public class DiscardPurchaseDialogFragment extends BaseDialogFragment<DiscardPur
         dialogBuilder.setMessage(R.string.dialog_purchase_discard_message)
                 .setPositiveButton(R.string.dialog_positive_save_draft, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mActivity.onSaveAsDraftSelected();
+                        activity.onSaveAsDraftSelected();
                         dismiss();
                     }
                 })
                 .setNegativeButton(R.string.dialog_purchase_discard, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mActivity.onDiscardPurchaseSelected();
+                        activity.onDiscardPurchaseSelected();
                     }
                 });
         return dialogBuilder.create();

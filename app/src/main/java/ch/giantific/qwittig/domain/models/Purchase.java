@@ -1,268 +1,192 @@
-/*
- * Copyright (c) 2016 Fabio Berta
- */
-
 package ch.giantific.qwittig.domain.models;
 
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
+import android.support.annotation.Nullable;
 
-import com.parse.ParseACL;
-import com.parse.ParseClassName;
-import com.parse.ParseFile;
-import com.parse.ParseObject;
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
+import com.google.firebase.database.ServerValue;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
-
-import ch.giantific.qwittig.utils.MoneyUtils;
-import ch.giantific.qwittig.utils.parse.ParseUtils;
-
+import java.util.Set;
 
 /**
- * Represents a purchase a user makes in a store.
- * <p/>
- * Subclass of {@link ParseObject}.
+ * Created by fabio on 02.07.16.
  */
-@ParseClassName("Purchase")
-public class Purchase extends ParseObject {
+@IgnoreExtraProperties
+public class Purchase implements FirebaseModel {
 
-    public static final String CLASS = "Purchase";
-    public static final String BUYER = "buyer";
-    public static final String GROUP = "group";
-    public static final String DATE = "date";
-    public static final String STORE = "store";
-    public static final String ITEMS = "items";
-    public static final String TOTAL_PRICE = "totalPrice";
-    public static final String IDENTITIES = "identities";
-    public static final String CURRENCY = "currency";
-    public static final String EXCHANGE_RATE = "exchangeRate";
-    public static final String READ_BY = "readBy";
-    public static final String RECEIPT = "receipt";
-    public static final String RECEIPT_LOCAL = "receiptLocal";
-    public static final String NOTE = "note";
-    public static final String OCR_DATA = "ocrData";
-    public static final String TEMP_ID = "tempId";
-    public static final String DRAFT = "draft";
-    public static final String PIN_LABEL = "purchasesPinLabel";
-    public static final String PIN_LABEL_TEMP = "purchasesTempPinLabel";
+    public static final String BASE_PATH_PURCHASES = "purchases";
+    public static final String BASE_PATH_DRAFTS = "drafts";
+
+    public static final String PATH_GROUP = "group";
+    public static final String PATH_BUYER = "buyer";
+    public static final String PATH_DATE = "date";
+    public static final String PATH_STORE = "store";
+    public static final String PATH_TOTAL = "total";
+    public static final String PATH_CURRENCY = "currency";
+    public static final String PATH_EXCHANGE_RATE = "exchangeRate";
+    public static final String PATH_RECEIPT = "receipt";
+    public static final String PATH_NOTE = "note";
+    public static final String PATH_DRAFT = "draft";
+    public static final String PATH_OCR_DATA = "ocrData";
+    public static final String PATH_IDENTITIES = "identities";
+    public static final String PATH_ITEMS = "items";
+    public static final String PATH_READ_BY = "readBy";
+
+    private String id;
+    private long createdAt;
+    private String group;
+    private String buyer;
+    private long date;
+    private String store;
+    private double total;
+    private String currency;
+    private double exchangeRate;
+    private String receipt;
+    private String note;
+    private boolean draft;
+    private String ocrData;
+    private Map<String, Boolean> identities;
+    private List<Item> items;
+    private Map<String, Boolean> readBy;
 
     public Purchase() {
-        // A default constructor is required.
+        // required for firebase de-/serialization
     }
 
-    public Purchase(@NonNull Identity currentIdentity, @NonNull Group group, @NonNull Date date,
-                    @NonNull String store, @NonNull List<Item> items, @NonNull BigDecimal totalPrice,
-                    @NonNull List<Identity> identities, @NonNull String currency,
-                    double exchangeRate) {
-        setBuyer(currentIdentity);
-        setGroup(group);
-        setDate(date);
-        setStore(store);
-        setItems(items);
-        setTotalPrice(totalPrice);
-        setIdentities(identities);
-        setCurrency(currency);
-        setExchangeRate(exchangeRate);
-        addUserToReadBy(currentIdentity);
-        setAccessRights(group);
+    public Purchase(@NonNull String group, @NonNull String buyerId, @NonNull Date date,
+                    @Nullable String store, double total, @NonNull String currency,
+                    double exchangeRate, @Nullable String receipt, @Nullable String note,
+                    boolean isDraft, @Nullable String ocrData,
+                    @NonNull List<String> identities, @NonNull List<Item> items) {
+        this.group = group;
+        buyer = buyerId;
+        this.date = date.getTime();
+        this.store = store;
+        this.total = total;
+        this.currency = currency;
+        this.exchangeRate = exchangeRate;
+        this.receipt = receipt;
+        this.note = note;
+        draft = isDraft;
+        this.ocrData = ocrData;
+        this.identities = new HashMap<>();
+        for (String id : identities) {
+            this.identities.put(id, true);
+        }
+        this.items = items;
+        readBy = new HashMap<>();
+        readBy.put(buyerId, true);
     }
 
-    private void setAccessRights(@NonNull Group group) {
-        final ParseACL acl = ParseUtils.getDefaultAcl(group, true);
-        setACL(acl);
+    @Override
+    @Exclude
+    public String getId() {
+        return id;
     }
 
-    public Group getGroup() {
-        return (Group) getParseObject(GROUP);
+    @Override
+    public void setId(@NonNull String id) {
+        this.id = id;
     }
 
-    public void setGroup(@NonNull Group group) {
-        put(GROUP, group);
+    @Override
+    public Map<String, String> getCreatedAt() {
+        return ServerValue.TIMESTAMP;
     }
 
-    public Identity getBuyer() {
-        return (Identity) getParseObject(BUYER);
+    @Exclude
+    public Date getCreatedAtDate() {
+        return new Date(createdAt);
     }
 
-    public void setBuyer(@NonNull Identity buyer) {
-        put(BUYER, buyer);
+    public String getGroup() {
+        return group;
     }
 
-    public Date getDate() {
-        return getDate(DATE);
+    public String getBuyer() {
+        return buyer;
     }
 
-    public void setDate(@NonNull Date date) {
-        put(DATE, date);
+    public long getDate() {
+        return date;
+    }
+
+    @Exclude
+    public Date getDateDate() {
+        return new Date(date);
     }
 
     public String getStore() {
-        return getString(STORE);
+        return store;
     }
 
-    public void setStore(@NonNull String store) {
-        put(STORE, store);
-    }
-
-    public List<Item> getItems() {
-        return getList(ITEMS);
-    }
-
-    public void setItems(@NonNull List<Item> items) {
-        put(ITEMS, items);
-    }
-
-    public List<Identity> getIdentities() {
-        return getList(IDENTITIES);
-    }
-
-    public void setIdentities(@NonNull List<Identity> identities) {
-        put(IDENTITIES, identities);
-    }
-
-    public double getTotalPrice() {
-        return getDouble(TOTAL_PRICE);
-    }
-
-    public void setTotalPrice(@NonNull Number totalPrice) {
-        put(TOTAL_PRICE, totalPrice);
+    public double getTotal() {
+        return total;
     }
 
     public String getCurrency() {
-        return getString(CURRENCY);
-    }
-
-    public void setCurrency(@NonNull String currency) {
-        put(CURRENCY, currency);
+        return currency;
     }
 
     public double getExchangeRate() {
-        return getDouble(EXCHANGE_RATE);
+        return exchangeRate;
     }
 
-    public void setExchangeRate(double exchangeRate) {
-        put(EXCHANGE_RATE, exchangeRate);
-    }
-
-    public ParseFile getReceipt() {
-        return getParseFile(RECEIPT);
-    }
-
-    public void setReceipt(@NonNull ParseFile file) {
-        put(RECEIPT, file);
-    }
-
-    public String getReceiptUrl() {
-        final String localPath = getReceiptLocal();
-        if (!TextUtils.isEmpty(localPath)) {
-            return localPath;
-        }
-
-        final ParseFile receipt = getReceipt();
-        return receipt != null ? receipt.getUrl() : "";
-    }
-
-    public void removeReceipt() {
-        remove(RECEIPT);
-    }
-
-    public String getReceiptLocal() {
-        return getString(RECEIPT_LOCAL);
-    }
-
-    public void setReceiptLocal(@NonNull String localReceiptPath) {
-        put(RECEIPT_LOCAL, localReceiptPath);
-    }
-
-    public void removeReceiptLocal() {
-        remove(RECEIPT_LOCAL);
-    }
-
-    public boolean hasReceipt() {
-        return getReceipt() != null || !TextUtils.isEmpty(getReceiptLocal());
+    public String getReceipt() {
+        return receipt;
     }
 
     public String getNote() {
-        return getString(NOTE);
-    }
-
-    public void setNote(@NonNull String note) {
-        put(NOTE, note);
-    }
-
-    @NonNull
-    public String getNoteOrEmpty() {
-        final String note = getNote();
-        return note != null ? note : "";
-    }
-
-    public void removeNote() {
-        remove(NOTE);
-    }
-
-    public OcrData getOcrData() {
-        return (OcrData) getParseObject(OCR_DATA);
-    }
-
-    public void setOcrData(@NonNull OcrData ocrData) {
-        put(OCR_DATA, ocrData);
-    }
-
-    public String getTempId() {
-        return getString(TEMP_ID);
-    }
-
-    public void setTempId(@NonNull String tempId) {
-        put(TEMP_ID, tempId);
+        return note;
     }
 
     public boolean isDraft() {
-        return getBoolean(DRAFT);
+        return draft;
     }
 
-    public void setDraft(boolean draft) {
-        put(DRAFT, draft);
+    public String getOcrData() {
+        return ocrData;
     }
 
-    public void removeDraft() {
-        remove(DRAFT);
+    public Map<String, Boolean> getIdentities() {
+        return identities;
     }
 
-    @NonNull
-    public List<Identity> getReadBy() {
-        final List<Identity> readBy = getList(READ_BY);
-        if (readBy == null) {
-            return Collections.emptyList();
-        }
+    @Exclude
+    public Set<String> getIdentitiesIds() {
+        return identities.keySet();
+    }
 
+    public List<Item> getItems() {
+        return items;
+    }
+
+    public Map<String, Boolean> getReadBy() {
         return readBy;
     }
 
-    public void setReadBy(@NonNull List<Identity> identities) {
-        put(READ_BY, identities);
-    }
-
-    public void replaceItems(@NonNull List<Item> items) {
-        put(ITEMS, items);
+    @Exclude
+    public Set<String> getReadByIds() {
+        return readBy.keySet();
     }
 
     /**
      * Returns whether the identity has already read the purchase or not.
      *
-     * @param identity the identity to check the read status for
+     * @param identityId the identity id to check the read status for
      * @return whether the identity has read the purchase or not
      */
-    public boolean isRead(@NonNull Identity identity) {
-        final List<Identity> readBy = getReadBy();
-        final String identityId = identity.getObjectId();
-        for (Identity readByIdentity : readBy) {
-            if (Objects.equals(readByIdentity.getObjectId(), identityId)) {
+    @Exclude
+    public boolean isRead(@NonNull String identityId) {
+        for (String readById : getReadByIds()) {
+            if (Objects.equals(readById, identityId)) {
                 return true;
             }
         }
@@ -270,90 +194,63 @@ public class Purchase extends ParseObject {
         return false;
     }
 
-    public void addUserToReadBy(@NonNull Identity identity) {
-        addUnique(READ_BY, identity);
-    }
-
-    /**
-     * Resets the read by field to only the identity.
-     */
-    public void resetReadBy(@NonNull Identity identity) {
-        final List<Identity> readBy = new ArrayList<>();
-        readBy.add(identity);
-        put(READ_BY, readBy);
-    }
-
-    /**
-     * Returns and sets a random id for purchase, identifying it as draft or a not yet online
-     * saved purchase.
-     * <p/>
-     * This is needed because {@link ParseObject} and its subclasses only receive an object id when
-     * they are saved online in the database. Because we need to be able to reference drafts, which
-     * are only stored in the local datastore, we assign random draft id.
-     *
-     * @return a random id
-     */
-    public String setRandomTempId() {
-        String tempId = getTempId();
-
-        if (TextUtils.isEmpty(tempId)) {
-            tempId = UUID.randomUUID().toString();
-            put(TEMP_ID, tempId);
-        }
-
-        return tempId;
-    }
-
-    public void removeTempId() {
-        remove(TEMP_ID);
-    }
-
-    /**
-     * Converts the purchase's total price either to the group's currency or the foreign currency
-     * using the exchange rate of the purchase.
-     *
-     * @param toGroupCurrency whether to convert to the group's currency or to a foreign one
-     */
-    public void convertTotalPrice(boolean toGroupCurrency) {
-        final double totalPrice = getTotalPrice();
-        final double exchangeRate = getExchangeRate();
-        final double totalPriceConverted = toGroupCurrency ? totalPrice * exchangeRate : totalPrice / exchangeRate;
-        setTotalPrice(MoneyUtils.roundConvertedPrice(totalPriceConverted));
-    }
-
     /**
      * Returns the total price converted to foreign currency using the provided exchange rate.
      *
      * @return the total price in foreign currency
      */
-    public double getTotalPriceForeign() {
-        final double totalPrice = getTotalPrice();
-        final double exchangeRate = getExchangeRate();
+    @Exclude
+    public double getTotalForeign() {
         if (exchangeRate == 1) {
-            return totalPrice;
+            return total;
         }
 
-        return totalPrice / getExchangeRate();
+        return total / exchangeRate;
     }
 
     /**
      * Returns a identity's share from the purchase.
      *
-     * @param identity the identity to calculate the share for
+     * @param identityId the identity id to calculate the share for
      * @return the share of the identity
      */
-    public double calculateUserShare(@NonNull Identity identity) {
+    @Exclude
+    public double calculateUserShare(@NonNull String identityId) {
         double userShare = 0;
-        final double exchangeRate = getExchangeRate();
-        List<Item> items = getItems();
         for (Item item : items) {
-            List<Identity> identities = item.getIdentities();
-            if (identities.contains(identity)) {
-                userShare += (item.getPrice() * exchangeRate / identities.size());
+            final Set<String> identitiesIds = item.getIdentitiesIds();
+            if (identitiesIds.contains(identityId)) {
+                userShare += (item.getPrice() * exchangeRate / identitiesIds.size());
             }
         }
 
         return userShare;
+    }
+
+    @Exclude
+    public Map<String, Object> toMap() {
+        final Map<String, Object> result = new HashMap<>();
+        result.put(PATH_CREATED_AT, ServerValue.TIMESTAMP);
+        result.put(PATH_GROUP, group);
+        result.put(PATH_BUYER, buyer);
+        result.put(PATH_DATE, date);
+        result.put(PATH_STORE, store);
+        result.put(PATH_TOTAL, total);
+        result.put(PATH_CURRENCY, currency);
+        result.put(PATH_EXCHANGE_RATE, exchangeRate);
+        result.put(PATH_RECEIPT, receipt);
+        result.put(PATH_NOTE, note);
+        result.put(PATH_DRAFT, draft);
+        result.put(PATH_OCR_DATA, ocrData);
+        result.put(PATH_IDENTITIES, identities);
+        final List<Map<String, Object>> items = new ArrayList<>();
+        for (Item item : this.items) {
+            items.add(item.toMap());
+        }
+        result.put(PATH_ITEMS, items);
+        result.put(PATH_READ_BY, readBy);
+
+        return result;
     }
 }
 

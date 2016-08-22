@@ -10,13 +10,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 
 import ch.giantific.qwittig.presentation.common.workers.BaseWorkerListener;
-import ch.giantific.qwittig.utils.MessageAction;
+import ch.giantific.qwittig.presentation.common.MessageAction;
 
 /**
  * Defines an observable view model for a screen.
  */
 public interface ViewModel<T extends ViewModel.ViewListener>
-        extends Observable, BaseWorkerListener {
+        extends LoadingViewModel, Observable, BaseWorkerListener {
 
     void attachView(@NonNull T view);
 

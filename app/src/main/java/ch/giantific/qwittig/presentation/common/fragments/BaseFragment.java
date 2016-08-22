@@ -15,7 +15,7 @@ import android.view.View;
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
-import ch.giantific.qwittig.utils.MessageAction;
+import ch.giantific.qwittig.presentation.common.MessageAction;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.WorkerUtils;
 
@@ -29,9 +29,9 @@ import ch.giantific.qwittig.utils.WorkerUtils;
 public abstract class BaseFragment<U, T extends ViewModel, S extends BaseFragment.ActivityListener<U>>
         extends Fragment implements ViewModel.ViewListener {
 
-    protected S mActivity;
+    protected S activity;
     @Inject
-    protected T mViewModel;
+    protected T viewModel;
 
     public BaseFragment() {
         // required empty constructor
@@ -43,7 +43,7 @@ public abstract class BaseFragment<U, T extends ViewModel, S extends BaseFragmen
         super.onAttach(context);
 
         try {
-            mActivity = (S) context;
+            activity = (S) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
                     + " must implement ActivityListener");
@@ -54,7 +54,7 @@ public abstract class BaseFragment<U, T extends ViewModel, S extends BaseFragmen
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        injectDependencies(mActivity.getComponent());
+        injectDependencies(activity.getComponent());
     }
 
     protected abstract void injectDependencies(@NonNull U component);
@@ -63,21 +63,21 @@ public abstract class BaseFragment<U, T extends ViewModel, S extends BaseFragmen
     public void onStart() {
         super.onStart();
 
-        mViewModel.onViewVisible();
+        viewModel.onViewVisible();
     }
 
     @Override
     public void onStop() {
         super.onStop();
 
-        mViewModel.onViewGone();
+        viewModel.onViewGone();
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
 
-        mActivity = null;
+        activity = null;
     }
 
     @Override

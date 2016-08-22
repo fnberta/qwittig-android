@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import com.parse.ParseObject;
+import com.google.firebase.auth.FirebaseUser;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
@@ -19,14 +19,20 @@ import java.util.Objects;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.repositories.GroupRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Group;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.User;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.IndefiniteSubscriber;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
+import rx.Observable;
 import rx.Single;
 import rx.SingleSubscriber;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import timber.log.Timber;
 
 /**
  * Provides an implementation of the {@link SettingsViewModel}.
@@ -34,45 +40,135 @@ import rx.SingleSubscriber;
 public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.ViewListener>
         implements SettingsViewModel {
 
-    private final Navigator mNavigator;
+    private static final String STATE_IDENTITIES_IDS = "STATE_IDENTITIES_IDS";
+    private static final String STATE_GROUP_NAMES = "STATE_GROUP_NAMES";
+    private static final String STATE_CURRENT_IDENTITY_ID = "STATE_CURRENT_IDENTITY_ID";
+
+    private final GroupRepository groupRepo;
+    private FirebaseUser firebaseUser;
+    private Identity currentIdentity;
+    private ArrayList<String> identityIds;
+    private ArrayList<String> groupNames;
+    private String currentIdentityId;
 
     public SettingsViewModelImpl(@Nullable Bundle savedState,
                                  @NonNull Navigator navigator,
                                  @NonNull RxBus<Object> eventBus,
-                                 @NonNull UserRepository userRepository) {
-        super(savedState, eventBus, userRepository);
+                                 @NonNull UserRepository userRepo,
+                                 @NonNull GroupRepository groupRepo) {
+        super(savedState, navigator, eventBus, userRepo);
 
-        mNavigator = navigator;
+        this.groupRepo = groupRepo;
+
+        if (savedState != null) {
+            identityIds = savedState.getStringArrayList(STATE_IDENTITIES_IDS);
+            groupNames = savedState.getStringArrayList(STATE_GROUP_NAMES);
+            currentIdentityId = savedState.getString(STATE_CURRENT_IDENTITY_ID);
+        } else {
+            identityIds = new ArrayList<>();
+            groupNames = new ArrayList<>();
+        }
+    }
+
+    @Override
+    public void saveState(@NonNull Bundle outState) {
+        super.saveState(outState);
+
+        outState.putStringArrayList(STATE_IDENTITIES_IDS, identityIds);
+        outState.putStringArrayList(STATE_GROUP_NAMES, groupNames);
+        outState.putString(STATE_CURRENT_IDENTITY_ID, currentIdentityId);
+    }
+
+    @Override
+    protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
+        super.onUserLoggedIn(currentUser);
+
+        firebaseUser = currentUser;
+        getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
+                .flatMap(new Func1<User, Observable<User>>() {
+                    @Override
+                    public Observable<User> call(final User user) {
+                        return userRepo.observeIdentity(user.getCurrentIdentity())
+                                .doOnNext(new Action1<Identity>() {
+                                    @Override
+                                    public void call(Identity identity) {
+                                        currentIdentity = identity;
+                                        currentIdentityId = identity.getId();
+                                        setupCurrentGroupCategory();
+                                    }
+                                })
+                                .map(new Func1<Identity, User>() {
+                                    @Override
+                                    public User call(Identity identity) {
+                                        return user;
+                                    }
+                                });
+                    }
+                })
+                .flatMap(new Func1<User, Observable<List<Identity>>>() {
+                    @Override
+                    public Observable<List<Identity>> call(User user) {
+                        return Observable.from(user.getIdentitiesIds())
+                                .flatMap(new Func1<String, Observable<Identity>>() {
+                                    @Override
+                                    public Observable<Identity> call(final String identityId) {
+                                        return userRepo.getIdentity(identityId).toObservable();
+                                    }
+                                })
+                                .toList();
+                    }
+                })
+                .subscribe(new IndefiniteSubscriber<List<Identity>>() {
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+
+                        view.showMessage(R.string.toast_error_load_groups);
+                    }
+
+                    @Override
+                    public void onNext(List<Identity> identities) {
+                        identityIds.clear();
+                        groupNames.clear();
+                        for (Identity identity : identities) {
+                            final String identityId = identity.getId();
+                            identityIds.add(identityId);
+                            final String groupName = identity.getGroupName();
+                            groupNames.add(groupName);
+                        }
+                        setIdentitySelection();
+                    }
+                })
+        );
+    }
+
+    @Override
+    protected void onUserNotLoggedIn() {
+        super.onUserNotLoggedIn();
+
+        navigator.finish(Result.LOGOUT);
+    }
+
+    private void setupCurrentGroupCategory() {
+        final String groupName = currentIdentity.getGroupName();
+        view.setCurrentGroupTitle(groupName);
+        view.setChangeGroupNameText(groupName);
+        view.setLeaveGroupTitle(R.string.pref_group_leave_group, groupName);
     }
 
     @Override
     public void onPreferencesLoaded() {
-        setupCurrentGroupCategory();
-        loadIdentitySelection();
-    }
-
-    private void setupCurrentGroupCategory() {
-        final String groupName = mCurrentIdentity.getGroup().getName();
-        mView.setCurrentGroupTitle(groupName);
-        mView.setChangeGroupNameText(groupName);
-        mView.setLeaveGroupTitle(R.string.pref_group_leave_group, groupName);
-    }
-
-    private void loadIdentitySelection() {
-        final List<Identity> identities = mCurrentUser.getIdentities();
-        final List<String> identityEntries = new ArrayList<>();
-        final List<String> identityValues = new ArrayList<>();
-        for (Identity identity : identities) {
-            identityEntries.add(identity.getGroup().getName());
-            identityValues.add(identity.getObjectId());
+        if (!identityIds.isEmpty() && !groupNames.isEmpty()) {
+            setIdentitySelection();
         }
+    }
 
-        final int size = identityEntries.size();
-        final CharSequence[] entries = identityEntries.toArray(new CharSequence[size]);
-        final CharSequence[] values = identityValues.toArray(new CharSequence[size]);
-        final String selectedValue = mCurrentIdentity.getObjectId();
-
-        mView.setupGroupSelection(entries, values, selectedValue);
+    private void setIdentitySelection() {
+        final int size = groupNames.size();
+        final CharSequence[] entries = groupNames.toArray(new CharSequence[size]);
+        final CharSequence[] values = identityIds.toArray(new CharSequence[size]);
+        final String selectedValue = currentIdentityId;
+        view.setupGroupSelection(entries, values, selectedValue);
     }
 
     @Override
@@ -81,60 +177,56 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
             return;
         }
 
-        final Identity selectedIdentity = (Identity) ParseObject.createWithoutData(Identity.CLASS, identityId);
-        mCurrentUser.setCurrentIdentity(selectedIdentity);
-        mCurrentUser.saveEventually();
-        mCurrentIdentity = selectedIdentity;
-
-        setupCurrentGroupCategory();
-
-        // new group selected, tell calling activity to reload data
-        mView.setScreenResult(Result.GROUP_SELECTED);
+        userRepo.updateCurrentIdentity(currentIdentity.getUser(), identityId);
     }
 
     @Override
-    public void onGroupNameChanged(@NonNull String newName) {
-        final Group group = mCurrentIdentity.getGroup();
-        if (!TextUtils.isEmpty(newName) && !Objects.equals(group.getName(), newName)) {
-            group.setName(newName);
-            group.saveEventually();
+    public void onGroupNameChanged(@NonNull final String newName) {
+        if (!TextUtils.isEmpty(newName) && !Objects.equals(currentIdentity.getGroupName(), newName)) {
+            getSubscriptions().add(groupRepo.updateGroupDetails(currentIdentity.getGroup(), newName, null)
+                    .subscribe(new SingleSubscriber<Group>() {
+                        @Override
+                        public void onSuccess(Group group) {
+                            view.showMessage(R.string.toast_group_name_changed, newName);
+                        }
 
-            setupCurrentGroupCategory();
-            loadIdentitySelection();
-
-            // NavDrawer group setting needs to be updated
-            mView.setScreenResult(Result.GROUPS_CHANGED);
+                        @Override
+                        public void onError(Throwable error) {
+                            view.showMessage(R.string.toast_error_settings_group_name_change);
+                        }
+                    })
+            );
         }
     }
 
     @Override
     public void onLeaveGroupClick() {
-        if (!Objects.equals(BigFraction.ZERO, mCurrentIdentity.getBalance())) {
-            mView.showMessage(R.string.toast_leave_group_balance_not_zero);
+        if (!Objects.equals(BigFraction.ZERO, currentIdentity.getBalanceFraction())) {
+            view.showMessage(R.string.toast_leave_group_balance_not_zero);
             return;
         }
 
-        if (mCurrentUser.getIdentities().size() < 2) {
-            mView.showMessage(R.string.toast_settings_min_one_group);
+        if (identityIds.size() < 2) {
+            view.showMessage(R.string.toast_settings_min_one_group);
             return;
         }
 
-        getSubscriptions().add(mUserRepo.getIdentities(mCurrentIdentity.getGroup(), false)
+        getSubscriptions().add(groupRepo.getGroupIdentities(currentIdentity.getGroup(), false)
                 .toList()
                 .toSingle()
                 .subscribe(new SingleSubscriber<List<Identity>>() {
                     @Override
                     public void onSuccess(List<Identity> identities) {
                         final int message = identities.size() == 1 &&
-                                Objects.equals(identities.get(0).getObjectId(), mCurrentIdentity.getObjectId())
+                                Objects.equals(identities.get(0).getId(), currentIdentity.getId())
                                 ? R.string.dialog_group_leave_delete_message
                                 : R.string.dialog_group_leave_message;
-                        mView.showLeaveGroupDialog(message);
+                        view.showLeaveGroupDialog(message);
                     }
 
                     @Override
                     public void onError(Throwable error) {
-                        mView.showMessage(R.string.toast_error_unknown);
+                        view.showMessage(R.string.toast_error_unknown);
                     }
                 })
         );
@@ -142,71 +234,118 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
 
     @Override
     public void onLeaveGroupSelected() {
-        mUserRepo.unSubscribeGroup(mCurrentIdentity.getGroup());
-        mCurrentIdentity = mCurrentUser.archiveCurrentIdentity();
-        mCurrentUser.saveEventually();
+        getSubscriptions().add(groupRepo.leaveGroup(currentIdentity)
+                .subscribe(new SingleSubscriber<String>() {
+                    @Override
+                    public void onSuccess(String value) {
+                        view.showMessage(R.string.toast_group_left);
+                    }
 
-        loadIdentitySelection();
-
-        // NavDrawer group setting needs to be updated
-        mView.setScreenResult(Result.GROUPS_CHANGED);
-    }
-
-    @Override
-    public void onGroupAdded(@NonNull String groupName) {
-        mView.showMessage(R.string.toast_group_added, groupName);
-        setupCurrentGroupCategory();
-        loadIdentitySelection();
-
-        // NavDrawer group setting needs to be updated
-        mView.setScreenResult(Result.GROUPS_CHANGED);
+                    @Override
+                    public void onError(Throwable error) {
+                        Timber.e(error, "failed to leave group with error:");
+                        view.showMessage(R.string.toast_error_leave_group);
+                    }
+                }));
     }
 
     @Override
     public void onLogoutMenuClick() {
-        if (!mView.isNetworkAvailable()) {
-            mView.showMessage(R.string.toast_no_connection);
+        if (!view.isNetworkAvailable()) {
+            view.showMessage(R.string.toast_no_connection);
             return;
         }
 
-        mView.showProgressDialog(R.string.progress_logout);
-        mView.loadLogoutWorker(false);
+        if (userRepo.isGoogleUser(firebaseUser)) {
+            view.showProgressDialog(R.string.progress_logout);
+            view.loadGoogleUserWorker();
+        } else {
+            userRepo.signOut(firebaseUser);
+        }
     }
 
     @Override
     public void onDeleteAccountMenuClick() {
-        mView.showDeleteAccountDialog();
+        if (userRepo.isGoogleUser(firebaseUser) || userRepo.isFacebookUser(firebaseUser)) {
+            view.showDeleteAccountDialog();
+        } else {
+            view.showEmailReAuthenticateDialog(firebaseUser.getEmail());
+        }
     }
 
     @Override
     public void onDeleteAccountSelected() {
-        if (!mView.isNetworkAvailable()) {
-            mView.showMessage(R.string.toast_no_connection);
+        if (!view.isNetworkAvailable()) {
+            view.showMessage(R.string.toast_no_connection);
             return;
         }
 
-        mView.showProgressDialog(R.string.progress_account_delete);
-        mView.loadLogoutWorker(true);
+        view.showProgressDialog(R.string.progress_account_delete);
+        if (userRepo.isGoogleUser(firebaseUser)) {
+            view.reAuthenticateGoogle();
+        } else if (userRepo.isFacebookUser(firebaseUser)) {
+            view.reAuthenticateFacebook();
+        }
     }
 
     @Override
-    public void setLogoutStream(@NonNull Single<User> single, @NonNull final String workerTag) {
-        getSubscriptions().add(single.subscribe(new SingleSubscriber<User>() {
-            @Override
-            public void onSuccess(User value) {
-                mView.removeWorker(workerTag);
-                mView.hideProgressDialog();
+    public void onGoogleLoginSuccessful(@NonNull String idToken) {
+        view.loadDeleteGoogleUserWorker(idToken);
+    }
 
-                mView.setScreenResult(Result.LOGOUT);
-                mNavigator.finish();
+    @Override
+    public void onGoogleLoginFailed() {
+        view.showMessage(R.string.toast_error_login_google);
+    }
+
+    @Override
+    public void setGoogleUserStream(@NonNull Single<Void> single, @NonNull final String workerTag) {
+        getSubscriptions().add(single.subscribe(signOutSubscriber(workerTag)));
+    }
+
+    @Override
+    public void onFacebookSignedIn(@NonNull String token) {
+        view.loadDeleteFacebookUserWorker(token);
+    }
+
+    @Override
+    public void onFacebookLoginFailed() {
+        view.showMessage(R.string.toast_error_login_facebook);
+    }
+
+    @Override
+    public void setFacebookUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
+        getSubscriptions().add(single.subscribe(signOutSubscriber(workerTag)));
+    }
+
+    @Override
+    public void onValidEmailAndPasswordEntered(@NonNull String email, @NonNull String password) {
+        view.showProgressDialog(R.string.progress_account_delete);
+        view.loadDeleteEmailUserWorker(email, password);
+    }
+
+    @Override
+    public void setEmailUserStream(@NonNull Single<Void> single, @NonNull final String workerTag) {
+        getSubscriptions().add(single.subscribe(signOutSubscriber(workerTag)));
+    }
+
+    @NonNull
+    private SingleSubscriber<Void> signOutSubscriber(@NonNull final String workerTag) {
+        return new SingleSubscriber<Void>() {
+            @Override
+            public void onSuccess(Void value) {
+                view.removeWorker(workerTag);
+                view.hideProgressDialog();
             }
 
             @Override
             public void onError(Throwable error) {
-                mView.removeWorker(workerTag);
-                mView.hideProgressDialog();
-                mView.showMessage(mUserRepo.getErrorMessage(error));
+                Timber.e(error, "logout or delete failed with error:");
+                view.removeWorker(workerTag);
+                view.hideProgressDialog();
+
+                view.showMessage(R.string.toast_error_logout);
             }
-        }));
+        };
     }
 }

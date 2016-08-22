@@ -25,6 +25,7 @@
         android:paddingEnd="@dimen/key_line_1"
         android:paddingStart="@dimen/key_line_1"
         android:text="@{itemModel.header}"
-        tools:text="Items"/>
+        tools:text="Items"
+        />
 
 </layout>

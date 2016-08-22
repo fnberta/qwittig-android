@@ -7,11 +7,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentActivity;
-import android.text.TextUtils;
 
 import ch.giantific.qwittig.BuildConfig;
-import ch.giantific.qwittig.domain.models.Purchase;
-import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.presentation.about.AboutActivity;
 import ch.giantific.qwittig.presentation.camera.CameraActivity;
 import ch.giantific.qwittig.presentation.finance.FinanceActivity;
@@ -41,6 +38,8 @@ public class Navigator {
     public static final String INTENT_PURCHASE_EDIT_DRAFT = BuildConfig.APPLICATION_ID + ".intents.INTENT_PURCHASE_EDIT_DRAFT";
     public static final String INTENT_TASK_ID = BuildConfig.APPLICATION_ID + ".intents.INTENT_TASK_ID";
     public static final String INTENT_OCR_DATA_ID = BuildConfig.APPLICATION_ID + ".intents.INTENT_OCR_DATA_ID";
+    public static final String INTENT_OCR_PURCHASE_ID = BuildConfig.APPLICATION_ID + ".intents.INTENT_OCR_PURCHASE_ID";
+    public static final String INTENT_OBJECT_ID = BuildConfig.APPLICATION_ID + ".intents.INTENT_OBJECT_ID";
     public static final int INTENT_REQUEST_LOGIN = 1;
     public static final int INTENT_REQUEST_SETTINGS = 2;
     public static final int INTENT_REQUEST_PURCHASE_MODIFY = 3;
@@ -52,165 +51,163 @@ public class Navigator {
     public static final int INTENT_REQUEST_TASK_MODIFY = 9;
     public static final int INTENT_REQUEST_TASK_DETAILS = 10;
     public static final int INTENT_REQUEST_IMAGE_PICK = 11;
-    private final FragmentActivity mActivity;
+
+    private final FragmentActivity activity;
 
     public Navigator(@NonNull FragmentActivity activity) {
-        mActivity = activity;
+        this.activity = activity;
+    }
+
+    public void finish(int result, @NonNull String objectId) {
+        final Intent data = new Intent();
+        data.putExtra(INTENT_OBJECT_ID, objectId);
+        activity.setResult(result, data);
+        ActivityCompat.finishAfterTransition(activity);
     }
 
     public void finish(int result) {
-        mActivity.setResult(result);
-        ActivityCompat.finishAfterTransition(mActivity);
+        activity.setResult(result);
+        ActivityCompat.finishAfterTransition(activity);
     }
 
     public void finish() {
-        ActivityCompat.finishAfterTransition(mActivity);
+        ActivityCompat.finishAfterTransition(activity);
     }
 
     public void startProfileSettings() {
-        final Intent intent = new Intent(mActivity, SettingsProfileActivity.class);
+        final Intent intent = new Intent(activity, SettingsProfileActivity.class);
         final ActivityOptionsCompat options =
-                ActivityOptionsCompat.makeSceneTransitionAnimation(mActivity);
-        mActivity.startActivityForResult(intent, INTENT_REQUEST_SETTINGS_PROFILE,
+                ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
+        activity.startActivityForResult(intent, INTENT_REQUEST_SETTINGS_PROFILE,
                 options.toBundle());
     }
 
     public void startHome() {
-        final Intent intent = new Intent(mActivity, HomeActivity.class);
-        mActivity.startActivity(intent);
+        final Intent intent = new Intent(activity, HomeActivity.class);
+        activity.startActivity(intent);
     }
 
     public void startLogin() {
-        final Intent intentLogin = new Intent(mActivity, LoginActivity.class);
-        intentLogin.setData(mActivity.getIntent().getData());
+        final Intent intentLogin = new Intent(activity, LoginActivity.class);
+        intentLogin.setData(activity.getIntent().getData());
 //        Starting an activity with forResult and transitions during a lifecycle method results on
 //        onActivityResult not being called
 //        ActivityOptionsCompat activityOptionsCompat =
 //                ActivityOptionsCompat.makeSceneTransitionAnimation(this);
-        mActivity.startActivityForResult(intentLogin, INTENT_REQUEST_LOGIN);
+        activity.startActivityForResult(intentLogin, INTENT_REQUEST_LOGIN);
     }
 
     public void startPurchaseAdd(@Nullable String ocrPurchaseId) {
-        final Intent intent = new Intent(mActivity, PurchaseAddActivity.class);
-        intent.putExtra(PurchaseAddActivity.INTENT_OCR_PURCHASE_ID, ocrPurchaseId);
+        final Intent intent = new Intent(activity, PurchaseAddActivity.class);
+        intent.putExtra(INTENT_OCR_PURCHASE_ID, ocrPurchaseId);
         final ActivityOptionsCompat activityOptionsCompat =
-                ActivityOptionsCompat.makeSceneTransitionAnimation(mActivity);
-        mActivity.startActivityForResult(intent, INTENT_REQUEST_PURCHASE_MODIFY,
+                ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
+        activity.startActivityForResult(intent, INTENT_REQUEST_PURCHASE_MODIFY,
                 activityOptionsCompat.toBundle());
     }
 
-    public void startPurchaseEdit(@NonNull String purchaseId) {
-        final Intent intent = new Intent(mActivity, PurchaseEditActivity.class);
+    public void startPurchaseEdit(@NonNull String purchaseId, boolean isDraft) {
+        final Intent intent = new Intent(activity, PurchaseEditActivity.class);
         intent.putExtra(INTENT_PURCHASE_ID, purchaseId);
+        intent.putExtra(INTENT_PURCHASE_EDIT_DRAFT, isDraft);
         final ActivityOptionsCompat activityOptionsCompat =
-                ActivityOptionsCompat.makeSceneTransitionAnimation(mActivity);
-        mActivity.startActivityForResult(intent, INTENT_REQUEST_PURCHASE_MODIFY,
+                ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
+        activity.startActivityForResult(intent, INTENT_REQUEST_PURCHASE_MODIFY,
                 activityOptionsCompat.toBundle());
     }
 
-    public void startPurchaseEdit(@NonNull Purchase draft) {
-        final Intent intent = new Intent(mActivity, PurchaseEditActivity.class);
-        intent.putExtra(INTENT_PURCHASE_ID, draft.getTempId());
-        intent.putExtra(INTENT_PURCHASE_EDIT_DRAFT, true);
-        final ActivityOptionsCompat activityOptionsCompat =
-                ActivityOptionsCompat.makeSceneTransitionAnimation(mActivity);
-        mActivity.startActivityForResult(intent, INTENT_REQUEST_PURCHASE_MODIFY,
-                activityOptionsCompat.toBundle());
-    }
-
-    public void startPurchaseDetails(@NonNull Purchase purchase) {
-        final Intent intent = new Intent(mActivity, PurchaseDetailsActivity.class);
-        final String objectId = purchase.getObjectId();
-        intent.putExtra(INTENT_PURCHASE_ID, TextUtils.isEmpty(objectId) ? purchase.getTempId() : objectId);
-        final ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(mActivity);
-        mActivity.startActivityForResult(intent, INTENT_REQUEST_PURCHASE_DETAILS,
+    public void startPurchaseDetails(@NonNull String purchaseId) {
+        final Intent intent = new Intent(activity, PurchaseDetailsActivity.class);
+        intent.putExtra(INTENT_PURCHASE_ID, purchaseId);
+        final ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
+        activity.startActivityForResult(intent, INTENT_REQUEST_PURCHASE_DETAILS,
                 options.toBundle());
     }
 
     public void startOcrRating(@NonNull String ocrDataId) {
-        final Intent intent = new Intent(mActivity, OcrRatingActivity.class);
+        final Intent intent = new Intent(activity, OcrRatingActivity.class);
         intent.putExtra(INTENT_OCR_DATA_ID, ocrDataId);
-        mActivity.startActivity(intent);
+        activity.startActivity(intent);
     }
 
     public void startFinance() {
-        final Intent intent = new Intent(mActivity, FinanceActivity.class);
-        mActivity.startActivity(intent);
+        final Intent intent = new Intent(activity, FinanceActivity.class);
+        activity.startActivity(intent);
     }
 
     public void startTasks() {
-        final Intent intent = new Intent(mActivity, TasksActivity.class);
-        mActivity.startActivity(intent);
+        final Intent intent = new Intent(activity, TasksActivity.class);
+        activity.startActivity(intent);
     }
 
     public void startTaskEdit(@NonNull String taskId) {
-        final Intent intent = new Intent(mActivity, TaskEditActivity.class);
+        final Intent intent = new Intent(activity, TaskEditActivity.class);
         intent.putExtra(Navigator.INTENT_TASK_ID, taskId);
         final ActivityOptionsCompat options =
-                ActivityOptionsCompat.makeSceneTransitionAnimation(mActivity);
-        mActivity.startActivityForResult(intent, INTENT_REQUEST_TASK_MODIFY,
+                ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
+        activity.startActivityForResult(intent, INTENT_REQUEST_TASK_MODIFY,
                 options.toBundle());
     }
 
-    public void startTaskDetails(@NonNull Task task) {
-        final Intent intent = new Intent(mActivity, TaskDetailsActivity.class);
-        intent.putExtra(INTENT_TASK_ID, task.getObjectId());
+    public void startTaskDetails(@NonNull String taskId) {
+        final Intent intent = new Intent(activity, TaskDetailsActivity.class);
+        intent.putExtra(INTENT_TASK_ID, taskId);
         final ActivityOptionsCompat options =
-                ActivityOptionsCompat.makeSceneTransitionAnimation(mActivity);
-        mActivity.startActivityForResult(intent, INTENT_REQUEST_TASK_DETAILS, options.toBundle());
+                ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
+        activity.startActivityForResult(intent, INTENT_REQUEST_TASK_DETAILS, options.toBundle());
     }
 
     public void startTaskAdd() {
-        final Intent intent = new Intent(mActivity, TaskAddActivity.class);
+        final Intent intent = new Intent(activity, TaskAddActivity.class);
         final ActivityOptionsCompat options =
-                ActivityOptionsCompat.makeSceneTransitionAnimation(mActivity);
-        mActivity.startActivityForResult(intent, INTENT_REQUEST_TASK_NEW, options.toBundle());
+                ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
+        activity.startActivityForResult(intent, INTENT_REQUEST_TASK_NEW, options.toBundle());
     }
 
     public void startStats() {
-        final Intent intent = new Intent(mActivity, StatsActivity.class);
-        mActivity.startActivity(intent);
+        final Intent intent = new Intent(activity, StatsActivity.class);
+        activity.startActivity(intent);
     }
 
     public void startSettings() {
-        final Intent intent = new Intent(mActivity, SettingsActivity.class);
-        mActivity.startActivityForResult(intent, INTENT_REQUEST_SETTINGS);
+        final Intent intent = new Intent(activity, SettingsActivity.class);
+        activity.startActivityForResult(intent, INTENT_REQUEST_SETTINGS);
     }
 
     public void startHelpFeedback() {
-        final Intent intent = new Intent(mActivity, HelpFeedbackActivity.class);
-        mActivity.startActivity(intent);
+        final Intent intent = new Intent(activity, HelpFeedbackActivity.class);
+        activity.startActivity(intent);
     }
 
     public void startFirstRun() {
-        final Intent intent = new Intent(mActivity, AppIntroActivity.class);
-        mActivity.startActivity(intent);
+        final Intent intent = new Intent(activity, AppIntroActivity.class);
+        activity.startActivity(intent);
     }
 
     public void startSystemSettings() {
         final Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        intent.setData(Uri.parse("package:" + mActivity.getPackageName()));
-        mActivity.startActivity(intent);
+        intent.setData(Uri.parse("package:" + activity.getPackageName()));
+        activity.startActivity(intent);
     }
 
     public void startImagePicker() {
         final Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
-        mActivity.startActivityForResult(intent, INTENT_REQUEST_IMAGE_PICK);
+        activity.startActivityForResult(intent, INTENT_REQUEST_IMAGE_PICK);
     }
 
     public void startCamera() {
-        final Intent intent = new Intent(mActivity, CameraActivity.class);
-        mActivity.startActivityForResult(intent, INTENT_REQUEST_IMAGE_CAPTURE);
+        final Intent intent = new Intent(activity, CameraActivity.class);
+        activity.startActivityForResult(intent, INTENT_REQUEST_IMAGE_CAPTURE);
     }
 
     public void openWebsite(@NonNull String url) {
         final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        mActivity.startActivity(intent);
+        activity.startActivity(intent);
     }
 
     public void startAbout() {
-        final Intent intent = new Intent(mActivity, AboutActivity.class);
-        mActivity.startActivity(intent);
+        final Intent intent = new Intent(activity, AboutActivity.class);
+        activity.startActivity(intent);
     }
 }

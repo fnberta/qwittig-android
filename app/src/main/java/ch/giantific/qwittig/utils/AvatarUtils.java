@@ -33,7 +33,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import ch.giantific.qwittig.R;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import timber.log.Timber;
 
 /**

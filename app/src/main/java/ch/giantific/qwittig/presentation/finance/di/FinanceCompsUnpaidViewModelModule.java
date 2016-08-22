@@ -9,9 +9,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ch.giantific.qwittig.data.bus.RxBus;
+import ch.giantific.qwittig.data.repositories.CompensationRepository;
+import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.di.scopes.PerActivity;
-import ch.giantific.qwittig.domain.repositories.CompensationRepository;
-import ch.giantific.qwittig.domain.repositories.UserRepository;
+import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
 import ch.giantific.qwittig.presentation.finance.unpaid.CompsUnpaidViewModel;
 import ch.giantific.qwittig.presentation.finance.unpaid.CompsUnpaidViewModelImpl;
@@ -31,9 +32,11 @@ public class FinanceCompsUnpaidViewModelModule extends BaseViewModelModule {
 
     @PerActivity
     @Provides
-    CompsUnpaidViewModel providesFinanceCompsUnpaidViewModel(@NonNull RxBus<Object> eventBus,
+    CompsUnpaidViewModel providesFinanceCompsUnpaidViewModel(@NonNull Navigator navigator,
+                                                             @NonNull RxBus<Object> eventBus,
                                                              @NonNull UserRepository userRepository,
                                                              @NonNull CompensationRepository compsRepository) {
-        return new CompsUnpaidViewModelImpl(mSavedState, eventBus, userRepository, compsRepository);
+        return new CompsUnpaidViewModelImpl(savedState, navigator, eventBus, userRepository,
+                compsRepository);
     }
 }

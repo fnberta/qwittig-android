@@ -4,7 +4,6 @@
 
 package ch.giantific.qwittig.presentation.tasks.list.itemmodels;
 
-import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
@@ -15,9 +14,11 @@ import java.util.List;
 import java.util.Objects;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.domain.models.Task;
 import ch.giantific.qwittig.domain.models.Task.TimeFrame;
+import ch.giantific.qwittig.presentation.common.itemmodels.BaseChildItemModel;
 import ch.giantific.qwittig.presentation.common.itemmodels.CardTopProgressItemModel;
 import ch.giantific.qwittig.presentation.tasks.details.itemmodels.TaskDetailsItemModel;
 import ch.giantific.qwittig.utils.DateUtils;
@@ -25,34 +26,53 @@ import ch.giantific.qwittig.utils.DateUtils;
 /**
  * Provides an implementation of the {@link TaskDetailsItemModel} interface for a task item.
  */
-public class TasksItem extends BaseObservable implements TasksItemModel, CardTopProgressItemModel {
+public class TasksItem extends BaseChildItemModel
+        implements TasksItemModel, CardTopProgressItemModel, Comparable<TasksItem> {
 
-    private final boolean mCurrentUserResponsible;
-    private final Task mTask;
-    private ViewListener mView;
+    private final String title;
+    private final String timeFrame;
+    private final String nickname;
+    private final String avatar;
+    private final List<Identity> identities;
+    private final Date deadline;
+    private final boolean currentUserResponsible;
+    private boolean itemLoading;
+    private ViewListener view;
 
-    public TasksItem(@NonNull Task task, @NonNull Identity currentIdentity) {
-        mCurrentUserResponsible = Objects.equals(currentIdentity.getObjectId(), task.getIdentityResponsible().getObjectId());
-        mTask = task;
+    public TasksItem(@EventType int eventType,
+                     @NonNull Task task,
+                     @NonNull Identity identity,
+                     @NonNull List<Identity> identities,
+                     @NonNull String currentIdentityId,
+                     boolean itemLoading) {
+        super(eventType, task.getId());
+
+        title = task.getTitle();
+        timeFrame = task.getTimeFrame();
+        nickname = identity.getNickname();
+        avatar = identity.getAvatar();
+        this.identities = identities;
+        deadline = task.getDeadline();
+        currentUserResponsible = Objects.equals(identity.getId(), currentIdentityId);
+        this.itemLoading = itemLoading;
     }
 
     public void setView(@NonNull ViewListener view) {
-        mView = view;
-    }
-
-    public Task getTask() {
-        return mTask;
+        this.view = view;
     }
 
     @Bindable
-    public String getTaskTitle() {
-        return mTask.getTitle();
+    public String getTitle() {
+        return title;
+    }
+
+    public String getTimeFrame() {
+        return timeFrame;
     }
 
     @Bindable
     @StringRes
-    public int getTaskTimeFrame() {
-        final String timeFrame = mTask.getTimeFrame();
+    public int getTimeFrameText() {
         switch (timeFrame) {
             case TimeFrame.ONE_TIME:
                 return R.string.time_frame_one_time;
@@ -72,37 +92,45 @@ public class TasksItem extends BaseObservable implements TasksItemModel, CardTop
     }
 
     @Bindable
-    public String getTaskUserResponsibleNickname() {
-        return mTask.getIdentityResponsible().getNickname();
+    public String getNickname() {
+        return nickname;
     }
 
     @Bindable
-    public String getTaskUserResponsibleAvatar() {
-        return mTask.getIdentityResponsible().getAvatarUrl();
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public List<Identity> getIdentities() {
+        return identities;
     }
 
     @Bindable
-    public String getTaskIdentities() {
-        return mView.buildTaskIdentitiesString(mTask.getIdentities());
+    public String getIdentitiesText() {
+        return view.buildIdentitiesString(identities);
+    }
+
+    public Date getDeadline() {
+        return deadline;
     }
 
     @Bindable
-    public String getTaskDeadline() {
-        final int daysToDeadline = getDaysToTaskDeadline();
+    public String getDeadlineText() {
+        final int daysToDeadline = getDaysToDeadline();
         if (daysToDeadline == 0) {
-            return mView.buildTaskDeadlineString(R.string.deadline_today);
+            return view.buildDeadlineString(R.string.deadline_today);
         } else if (daysToDeadline == -1) {
-            return mView.buildTaskDeadlineString(R.string.yesterday);
+            return view.buildDeadlineString(R.string.yesterday);
         } else if (daysToDeadline < 0) {
-            return mView.buildTaskDeadlineString(R.string.deadline_text_neg, daysToDeadline * -1);
+            return view.buildDeadlineString(R.string.deadline_text_neg, daysToDeadline * -1);
         } else {
-            return mView.buildTaskDeadlineString(R.string.deadline_text_pos, daysToDeadline);
+            return view.buildDeadlineString(R.string.deadline_text_pos, daysToDeadline);
         }
     }
 
     @Bindable
-    public boolean isTaskDeadlinePast() {
-        final int daysToDeadline = getDaysToTaskDeadline();
+    public boolean isDeadlinePast() {
+        final int daysToDeadline = getDaysToDeadline();
         return daysToDeadline != 0 && (daysToDeadline == -1 || daysToDeadline < 0);
     }
 
@@ -111,12 +139,10 @@ public class TasksItem extends BaseObservable implements TasksItemModel, CardTop
      *
      * @return the number of days until the deadline is reached
      */
-    private int getDaysToTaskDeadline() {
-        final Date deadlineDate = mTask.getDeadline();
-
+    private int getDaysToDeadline() {
         final Calendar today = DateUtils.getCalendarInstanceUTC();
         final Calendar deadline = DateUtils.getCalendarInstanceUTC();
-        deadline.setTime(deadlineDate);
+        deadline.setTime(this.deadline);
 
         if (today.get(Calendar.YEAR) == deadline.get(Calendar.YEAR)) {
             return deadline.get(Calendar.DAY_OF_YEAR) - today.get(Calendar.DAY_OF_YEAR);
@@ -148,18 +174,21 @@ public class TasksItem extends BaseObservable implements TasksItemModel, CardTop
     @Override
     @Bindable
     public boolean isItemLoading() {
-        return mTask.isLoading();
+        return itemLoading;
+    }
+
+    public void setItemLoading(boolean itemLoading) {
+        this.itemLoading = itemLoading;
     }
 
     @Bindable
     public boolean isCurrentUserResponsible() {
-        return mCurrentUserResponsible;
+        return currentUserResponsible;
     }
 
     @Bindable
     @StringRes
-    public int getTaskDoneText() {
-        final String timeFrame = mTask.getTimeFrame();
+    public int getDoneText() {
         switch (timeFrame) {
             case TimeFrame.ONE_TIME:
                 return R.string.task_done_single;
@@ -179,13 +208,18 @@ public class TasksItem extends BaseObservable implements TasksItemModel, CardTop
     }
 
     @Override
-    public int getType() {
+    public int getViewType() {
         return Type.TASK;
     }
 
-    public interface ViewListener {
-        String buildTaskIdentitiesString(@NonNull List<Identity> identities);
+    @Override
+    public int compareTo(@NonNull TasksItem tasksItem) {
+        return deadline.compareTo(tasksItem.getDeadline());
+    }
 
-        String buildTaskDeadlineString(@StringRes int deadline, Object... args);
+    public interface ViewListener {
+        String buildIdentitiesString(@NonNull List<Identity> identities);
+
+        String buildDeadlineString(@StringRes int deadline, Object... args);
     }
 }

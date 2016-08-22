@@ -13,7 +13,7 @@ import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
-import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
+import ch.giantific.qwittig.presentation.common.fragments.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditActivity;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditFragment;
 import ch.giantific.qwittig.presentation.purchases.addedit.BasePurchaseAddEditReceiptFragment;
@@ -47,16 +47,16 @@ public class PurchaseEditActivity extends BasePurchaseAddEditActivity<PurchaseEd
     @Override
     protected void injectDependencies(@Nullable Bundle savedInstanceState) {
         final String editPurchaseId = getIntent().getStringExtra(Navigator.INTENT_PURCHASE_ID);
-        mComponent = DaggerPurchaseEditComponent.builder()
+        component = DaggerPurchaseEditComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
                 .purchaseEditViewModelModule(new PurchaseEditViewModelModule(savedInstanceState, editPurchaseId))
                 .build();
-        mComponent.inject(this);
+        component.inject(this);
 
         final boolean draft = isDraft();
-        mAddEditPurchaseViewModel = draft ? mComponent.getEditDraftViewModel() : mComponent.getEditViewModel();
-        mAddEditPurchaseViewModel.attachView(this);
+        addEditViewModel = draft ? component.getEditDraftViewModel() : component.getEditViewModel();
+        addEditViewModel.attachView(this);
     }
 
     private boolean isDraft() {
@@ -76,6 +76,6 @@ public class PurchaseEditActivity extends BasePurchaseAddEditActivity<PurchaseEd
 
     @Override
     public void onDiscardChangesSelected() {
-        mAddEditPurchaseViewModel.onDiscardChangesSelected();
+        addEditViewModel.onDiscardChangesSelected();
     }
 }

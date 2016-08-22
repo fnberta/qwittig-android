@@ -11,10 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.mugen.Mugen;
-import com.mugen.MugenCallbacks;
-
-import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.FragmentHomePurchasesBinding;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
@@ -29,7 +25,7 @@ import ch.giantific.qwittig.presentation.purchases.list.di.HomeSubcomponent;
 public class PurchasesFragment extends BaseRecyclerViewFragment<HomeSubcomponent, PurchasesViewModel, BaseFragment.ActivityListener<HomeSubcomponent>>
         implements PurchasesViewModel.ViewListener {
 
-    private FragmentHomePurchasesBinding mBinding;
+    private FragmentHomePurchasesBinding binding;
 
     public PurchasesFragment() {
         // required empty constructor
@@ -38,33 +34,17 @@ public class PurchasesFragment extends BaseRecyclerViewFragment<HomeSubcomponent
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentHomePurchasesBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentHomePurchasesBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel.attachView(this);
-        mViewModel.setListInteraction(mRecyclerAdapter);
-        mBinding.setViewModel(mViewModel);
-        Mugen.with(mRecyclerView, new MugenCallbacks() {
-            @Override
-            public void onLoadMore() {
-                mViewModel.onLoadMore();
-            }
-
-            @Override
-            public boolean isLoading() {
-                return mViewModel.isLoadingMore();
-            }
-
-            @Override
-            public boolean hasLoadedAllItems() {
-                return false;
-            }
-        }).start();
+        viewModel.attachView(this);
+        viewModel.setListInteraction(recyclerAdapter);
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -74,21 +54,11 @@ public class PurchasesFragment extends BaseRecyclerViewFragment<HomeSubcomponent
 
     @Override
     protected RecyclerView getRecyclerView() {
-        return mBinding.srlRv.rvBase;
+        return binding.srlRv.rvBase;
     }
 
     @Override
     protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new PurchasesRecyclerAdapter(mViewModel);
-    }
-
-    @Override
-    public void startUpdatePurchasesService() {
-        ParseQueryService.startUpdatePurchases(getActivity());
-    }
-
-    @Override
-    public void loadQueryMorePurchasesWorker(int skip) {
-        PurchasesQueryMoreWorker.attach(getFragmentManager(), skip);
+        return new PurchasesRecyclerAdapter(viewModel);
     }
 }

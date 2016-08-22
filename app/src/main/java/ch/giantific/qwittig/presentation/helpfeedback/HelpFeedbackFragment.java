@@ -30,7 +30,7 @@ public class HelpFeedbackFragment extends BaseRecyclerViewFragment<HelpFeedbackC
         implements HelpFeedbackViewModel.ViewListener {
 
     private static final int RC_INVITE = 0;
-    private FragmentHelpFeedbackBinding mBinding;
+    private FragmentHelpFeedbackBinding binding;
 
     public HelpFeedbackFragment() {
         // required empty constructor
@@ -39,15 +39,15 @@ public class HelpFeedbackFragment extends BaseRecyclerViewFragment<HelpFeedbackC
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentHelpFeedbackBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentHelpFeedbackBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel.attachView(this);
+        viewModel.attachView(this);
     }
 
     @Override
@@ -57,12 +57,12 @@ public class HelpFeedbackFragment extends BaseRecyclerViewFragment<HelpFeedbackC
 
     @Override
     protected RecyclerView getRecyclerView() {
-        return mBinding.rvHelpFeedback;
+        return binding.rvHelpFeedback;
     }
 
     @Override
     protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new HelpFeedbackRecyclerAdapter(mViewModel);
+        return new HelpFeedbackRecyclerAdapter(viewModel);
     }
 
     @Override

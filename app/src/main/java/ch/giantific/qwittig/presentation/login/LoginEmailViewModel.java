@@ -8,15 +8,15 @@ import android.databinding.Bindable;
 import android.support.annotation.NonNull;
 import android.view.View;
 
-import ch.giantific.qwittig.presentation.common.fragments.EmailPromptDialogFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.LoadingViewModel;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
+import ch.giantific.qwittig.presentation.common.workers.EmailUserWorkerListener;
 
 /**
  * Defines an observable view model for the login/sign-up with email screen.
  */
 public interface LoginEmailViewModel extends ViewModel<LoginEmailViewModel.ViewListener>, LoadingViewModel,
-        LoginWorkerListener, EmailPromptDialogFragment.DialogInteractionListener {
+        LoginWorkerListener, EmailUserWorkerListener, EmailPromptDialogFragment.DialogInteractionListener {
 
     void setIdentityId(@NonNull String identityId);
 
@@ -56,11 +56,9 @@ public interface LoginEmailViewModel extends ViewModel<LoginEmailViewModel.ViewL
      */
     interface ViewListener extends ViewModel.ViewListener {
 
-        void loadEmailLoginWorker(@NonNull final String email, @NonNull String password,
-                                  @NonNull String identityId);
+        void loadEmailLoginWorker(@NonNull final String email, @NonNull String password);
 
-        void loadEmailSignUpWorker(@NonNull final String email, @NonNull String password,
-                                   @NonNull String identityId);
+        void loadEmailSignUpWorker(@NonNull final String email, @NonNull String password);
 
         void loadResetPasswordWorker(@NonNull String email);
 

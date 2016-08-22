@@ -26,17 +26,28 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+
+import java.util.Arrays;
+
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.R;
+import ch.giantific.qwittig.presentation.common.MessageAction;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.fragments.BaseFragment;
-import ch.giantific.qwittig.presentation.common.fragments.LeaveGroupDialogFragment;
+import ch.giantific.qwittig.presentation.common.fragments.dialogs.EmailReAuthenticateDialogFragment;
+import ch.giantific.qwittig.presentation.common.workers.EmailUserWorker;
+import ch.giantific.qwittig.presentation.common.workers.FacebookUserWorker;
+import ch.giantific.qwittig.presentation.common.workers.GoogleUserWorker;
 import ch.giantific.qwittig.presentation.settings.general.di.SettingsComponent;
 import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.SettingsAddGroupActivity;
 import ch.giantific.qwittig.presentation.settings.groupusers.users.SettingsUsersActivity;
 import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileActivity;
-import ch.giantific.qwittig.utils.MessageAction;
 import ch.giantific.qwittig.utils.Utils;
 import ch.giantific.qwittig.utils.WorkerUtils;
 
@@ -59,16 +70,18 @@ public class SettingsFragment extends PreferenceFragmentCompat
     private static final String PREF_GROUP_NAME = "PREF_GROUP_NAME";
     private static final String PREF_GROUP_LEAVE = "PREF_GROUP_LEAVE";
     private static final String PREF_GROUP_USERS = "PREF_GROUP_USERS";
+
     @Inject
-    SettingsViewModel mViewModel;
+    SettingsViewModel settingsViewModel;
     @Inject
-    SharedPreferences mSharedPrefs;
-    private BaseFragment.ActivityListener<SettingsComponent> mActivity;
-    private PreferenceCategory mCategoryCurrentGroup;
-    private ListPreference mListPreferenceGroupCurrent;
-    private EditTextPreference mEditTextPreferenceGroupName;
-    private Preference mPreferenceGroupLeave;
-    private ProgressDialog mProgressDialog;
+    SharedPreferences sharedPrefs;
+    private ActivityListener activity;
+    private PreferenceCategory categoryCurrentGroup;
+    private ListPreference listPreferenceGroupCurrent;
+    private EditTextPreference etPreferenceGroupName;
+    private Preference preferenceGroupLeave;
+    private ProgressDialog progressDialog;
+    private CallbackManager facebookCallbackManager;
 
     public SettingsFragment() {
         // required empty constructor
@@ -79,7 +92,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
         super.onAttach(context);
 
         try {
-            mActivity = (BaseFragment.ActivityListener<SettingsComponent>) context;
+            activity = (ActivityListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
                     + " must implement ActivityListener");
@@ -91,6 +104,23 @@ public class SettingsFragment extends PreferenceFragmentCompat
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
+        facebookCallbackManager = CallbackManager.Factory.create();
+        LoginManager.getInstance().registerCallback(facebookCallbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                settingsViewModel.onFacebookSignedIn(loginResult.getAccessToken().getToken());
+            }
+
+            @Override
+            public void onCancel() {
+                settingsViewModel.onFacebookLoginFailed();
+            }
+
+            @Override
+            public void onError(FacebookException exception) {
+                settingsViewModel.onFacebookLoginFailed();
+            }
+        });
     }
 
     @SuppressWarnings("unchecked")
@@ -100,17 +130,17 @@ public class SettingsFragment extends PreferenceFragmentCompat
         PreferenceManager.setDefaultValues(activity, R.xml.preferences, false);
         addPreferencesFromResource(R.xml.preferences);
 
-        mCategoryCurrentGroup = (PreferenceCategory)
+        categoryCurrentGroup = (PreferenceCategory)
                 findPreference(PREF_CATEGORY_CURRENT_GROUP);
-        mListPreferenceGroupCurrent = (ListPreference)
+        listPreferenceGroupCurrent = (ListPreference)
                 findPreference(PREF_GROUP_CURRENT);
-        mEditTextPreferenceGroupName = (EditTextPreference)
+        etPreferenceGroupName = (EditTextPreference)
                 findPreference(PREF_GROUP_NAME);
-        mPreferenceGroupLeave = findPreference(PREF_GROUP_LEAVE);
-        mPreferenceGroupLeave.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        preferenceGroupLeave = findPreference(PREF_GROUP_LEAVE);
+        preferenceGroupLeave.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                mViewModel.onLeaveGroupClick();
+                settingsViewModel.onLeaveGroupClick();
                 return true;
             }
         });
@@ -156,42 +186,42 @@ public class SettingsFragment extends PreferenceFragmentCompat
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        mViewModel.saveState(outState);
+        settingsViewModel.saveState(outState);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mActivity.getComponent().inject(this);
-        mViewModel.attachView(this);
-        mViewModel.onPreferencesLoaded();
+        activity.getComponent().inject(this);
+        settingsViewModel.attachView(this);
+        settingsViewModel.onPreferencesLoaded();
     }
 
     @Override
     public void onStart() {
         super.onStart();
 
-        mViewModel.onViewVisible();
+        settingsViewModel.onViewVisible();
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
-        mSharedPrefs.registerOnSharedPreferenceChangeListener(this);
+        sharedPrefs.registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, @NonNull String key) {
         switch (key) {
             case PREF_GROUP_CURRENT:
-                final String groupId = mSharedPrefs.getString(key, "");
-                mViewModel.onGroupSelected(groupId);
+                final String groupId = sharedPrefs.getString(key, "");
+                settingsViewModel.onGroupSelected(groupId);
                 break;
             case PREF_GROUP_NAME:
-                final String name = mSharedPrefs.getString(key, "");
-                mViewModel.onGroupNameChanged(name);
+                final String name = sharedPrefs.getString(key, "");
+                settingsViewModel.onGroupNameChanged(name);
                 break;
         }
     }
@@ -205,10 +235,10 @@ public class SettingsFragment extends PreferenceFragmentCompat
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_logout:
-                mViewModel.onLogoutMenuClick();
+                settingsViewModel.onLogoutMenuClick();
                 return true;
             case R.id.action_account_delete:
-                mViewModel.onDeleteAccountMenuClick();
+                settingsViewModel.onDeleteAccountMenuClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -219,30 +249,37 @@ public class SettingsFragment extends PreferenceFragmentCompat
     public void onPause() {
         super.onPause();
 
-        mSharedPrefs.unregisterOnSharedPreferenceChangeListener(this);
+        sharedPrefs.unregisterOnSharedPreferenceChangeListener(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
 
-        mViewModel.onViewGone();
+        settingsViewModel.onViewGone();
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
 
-        mActivity = null;
+        activity = null;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        facebookCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
     public void setupGroupSelection(@NonNull CharSequence[] entries, @NonNull CharSequence[] values,
                                     @NonNull String selectedValue) {
-        mListPreferenceGroupCurrent.setEntries(entries);
-        mListPreferenceGroupCurrent.setEntryValues(values);
-        mListPreferenceGroupCurrent.setValue(selectedValue);
-        setupListPreference(mListPreferenceGroupCurrent, selectedValue);
+        listPreferenceGroupCurrent.setEntries(entries);
+        listPreferenceGroupCurrent.setEntryValues(values);
+        listPreferenceGroupCurrent.setValue(selectedValue);
+        setupListPreference(listPreferenceGroupCurrent, selectedValue);
     }
 
     private void setupListPreference(@NonNull final ListPreference pref,
@@ -273,22 +310,38 @@ public class SettingsFragment extends PreferenceFragmentCompat
 
     @Override
     public void setCurrentGroupTitle(@NonNull String title) {
-        mCategoryCurrentGroup.setTitle(title);
+        categoryCurrentGroup.setTitle(title);
     }
 
     @Override
     public void setChangeGroupNameText(@NonNull String text) {
-        mEditTextPreferenceGroupName.setText(text);
+        etPreferenceGroupName.setText(text);
     }
 
     @Override
     public void setLeaveGroupTitle(@StringRes int message, @NonNull String groupName) {
-        mPreferenceGroupLeave.setTitle(getString(message, groupName));
+        preferenceGroupLeave.setTitle(getString(message, groupName));
     }
 
     @Override
-    public void loadLogoutWorker(boolean deleteAccount) {
-        LogoutWorker.attach(getFragmentManager(), deleteAccount);
+    public void loadGoogleUserWorker() {
+        GoogleUserWorker.attachSignOut(getFragmentManager());
+    }
+
+    @Override
+    public void loadDeleteGoogleUserWorker(@NonNull String idToken) {
+        GoogleUserWorker.attachDelete(getFragmentManager(), idToken);
+    }
+
+    @Override
+    public void loadDeleteFacebookUserWorker(@NonNull String token) {
+        FacebookUserWorker.attachDelete(getFragmentManager(), token);
+    }
+
+    @Override
+    public void loadDeleteEmailUserWorker(@NonNull String currentEmail,
+                                          @NonNull String currentPassword) {
+        EmailUserWorker.attachDelete(getFragmentManager(), currentEmail, currentPassword);
     }
 
     @Override
@@ -303,19 +356,31 @@ public class SettingsFragment extends PreferenceFragmentCompat
 
     @Override
     public void showProgressDialog(@StringRes int message) {
-        mProgressDialog = ProgressDialog.show(getActivity(), null, getString(message), true);
+        progressDialog = ProgressDialog.show(getActivity(), null, getString(message), true);
     }
 
     @Override
     public void hideProgressDialog() {
-        if (mProgressDialog != null) {
-            mProgressDialog.dismiss();
+        if (progressDialog != null) {
+            progressDialog.dismiss();
         }
     }
 
     @Override
-    public void setScreenResult(int result) {
-        getActivity().setResult(result);
+    public void reAuthenticateGoogle() {
+        activity.loginWithGoogle();
+    }
+
+    @Override
+    public void reAuthenticateFacebook() {
+        LoginManager.getInstance().logInWithReadPermissions(this,
+                Arrays.asList("email", "public_profile"));
+    }
+
+    @Override
+    public void showEmailReAuthenticateDialog(@Nullable String email) {
+        EmailReAuthenticateDialogFragment.display(getFragmentManager(),
+                R.string.dialog_account_delete_message_email, email);
     }
 
     @Override
@@ -346,5 +411,9 @@ public class SettingsFragment extends PreferenceFragmentCompat
     @Override
     public void removeWorker(@NonNull String workerTag) {
         WorkerUtils.removeWorker(getFragmentManager(), workerTag);
+    }
+
+    public interface ActivityListener extends BaseFragment.ActivityListener<SettingsComponent> {
+        void loginWithGoogle();
     }
 }

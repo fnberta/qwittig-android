@@ -16,7 +16,7 @@ import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.RowSettingsUsersUserBinding;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.settings.groupusers.users.itemmodels.SettingsUsersUserRowItemModel;
+import ch.giantific.qwittig.presentation.settings.groupusers.users.itemmodels.SettingsUsersUserItemModel;
 
 /**
  * Provides a {@link RecyclerView} adapter that manages the list of items on the manage users
@@ -26,10 +26,10 @@ import ch.giantific.qwittig.presentation.settings.groupusers.users.itemmodels.Se
  */
 public class SettingsUsersRecyclerAdapter extends BaseRecyclerAdapter<SettingsUsersRecyclerAdapter.GroupUserRow> {
 
-    private final SettingsUsersViewModel mViewModel;
+    private final SettingsUsersViewModel viewModel;
 
     public SettingsUsersRecyclerAdapter(@NonNull SettingsUsersViewModel viewModel) {
-        mViewModel = viewModel;
+        this.viewModel = viewModel;
     }
 
     @Override
@@ -37,13 +37,13 @@ public class SettingsUsersRecyclerAdapter extends BaseRecyclerAdapter<SettingsUs
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         final RowSettingsUsersUserBinding binding =
                 RowSettingsUsersUserBinding.inflate(inflater, parent, false);
-        return new GroupUserRow(binding, mViewModel);
+        return new GroupUserRow(binding, viewModel);
     }
 
     @Override
     public void onBindViewHolder(GroupUserRow holder, int position) {
         final RowSettingsUsersUserBinding binding = holder.getBinding();
-        final SettingsUsersUserRowItemModel viewModel = mViewModel.getItemAtPosition(position);
+        final SettingsUsersUserItemModel viewModel = this.viewModel.getItemAtPosition(position);
 
         holder.setMenuVisibility(viewModel.isPending());
         binding.setViewModel(viewModel);
@@ -52,7 +52,7 @@ public class SettingsUsersRecyclerAdapter extends BaseRecyclerAdapter<SettingsUs
 
     @Override
     public int getItemCount() {
-        return mViewModel.getItemCount();
+        return viewModel.getItemCount();
     }
 
     public interface AdapterInteractionListener {

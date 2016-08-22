@@ -25,10 +25,10 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/list_avatar_with_text"
-        android:activated="@{itemModel.draftSelected}"
+        android:activated="@{itemModel.selected}"
         android:background="@drawable/selectable_item_background"
-        android:onClick="@{() -> viewModel.onDraftRowClick(itemModel.draft)}"
-        android:onLongClick="@{() -> viewModel.onDraftRowLongClick(itemModel.draft)}"
+        android:onClick="@{() -> viewModel.onDraftRowClick(itemModel)}"
+        android:onLongClick="@{() -> viewModel.onDraftRowLongClick(itemModel)}"
         >
 
         <TextView
@@ -45,7 +45,7 @@
             android:lines="2"
             android:paddingEnd="@dimen/min_space"
             android:paddingStart="@dimen/min_space"
-            android:text="@{itemModel.draftDate}"
+            android:text="@{itemModel.dateMonthDay}"
             android:textAllCaps="true"
             tools:text="FEB\n24"/>
 
@@ -57,7 +57,7 @@
             android:layout_toEndOf="@id/tv_date"
             android:layout_toStartOf="@+id/tv_total_value"
             android:gravity="center_vertical"
-            android:text="@{itemModel.draftStore}"
+            android:text="@{itemModel.store}"
             tools:text="Denner"/>
 
         <TextView
@@ -69,7 +69,7 @@
             android:layout_marginEnd="@dimen/key_line_1"
             android:layout_marginStart="@dimen/normal_space"
             android:gravity="center"
-            android:text="@{itemModel.draftTotalPrice}"
+            android:text="@{itemModel.total}"
             tools:text="-50"/>
 
     </RelativeLayout>

@@ -15,7 +15,7 @@ import android.text.TextUtils;
 
 import ch.giantific.qwittig.R;
 import ch.giantific.qwittig.databinding.DialogPurchaseNoteBinding;
-import ch.giantific.qwittig.presentation.common.fragments.BaseDialogFragment;
+import ch.giantific.qwittig.presentation.common.fragments.dialogs.BaseDialogFragment;
 
 /**
  * Provides a dialog that allows the user to enter his/her email address in order to request a
@@ -67,7 +67,7 @@ public class NoteDialogFragment extends BaseDialogFragment<NoteDialogFragment.Di
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         final String note = binding.etDialogPurchaseNote.getText().toString();
-                        mActivity.onNoteSet(note);
+                        NoteDialogFragment.this.activity.onNoteSet(note);
                     }
                 });
 
@@ -89,7 +89,7 @@ public class NoteDialogFragment extends BaseDialogFragment<NoteDialogFragment.Di
                     .setNegativeButton(R.string.action_delete, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            mActivity.onDeleteNote();
+                            NoteDialogFragment.this.activity.onDeleteNote();
                         }
                     });
         }

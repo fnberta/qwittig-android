@@ -21,7 +21,7 @@ import ch.giantific.qwittig.presentation.purchases.ocrrating.di.OcrRatingCompone
  */
 public class OcrRatingDetailsFragment extends BaseFragment<OcrRatingComponent, OcrRatingViewModel, BaseFragment.ActivityListener<OcrRatingComponent>> {
 
-    private FragmentOrcRatingDetailsBinding mBinding;
+    private FragmentOrcRatingDetailsBinding binding;
 
     public OcrRatingDetailsFragment() {
         // required empty constructor
@@ -30,15 +30,15 @@ public class OcrRatingDetailsFragment extends BaseFragment<OcrRatingComponent, O
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentOrcRatingDetailsBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentOrcRatingDetailsBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mBinding.setViewModel(mViewModel);
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -48,6 +48,6 @@ public class OcrRatingDetailsFragment extends BaseFragment<OcrRatingComponent, O
 
     @Override
     protected View getSnackbarView() {
-        return mBinding.svOcrRatingDetailsMain;
+        return binding.svOcrRatingDetailsMain;
     }
 }

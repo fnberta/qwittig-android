@@ -12,9 +12,9 @@ import android.support.annotation.Nullable;
  */
 public abstract class BaseViewModelModule {
 
-    protected final Bundle mSavedState;
+    protected final Bundle savedState;
 
     public BaseViewModelModule(@Nullable Bundle savedState) {
-        mSavedState = savedState;
+        this.savedState = savedState;
     }
 }

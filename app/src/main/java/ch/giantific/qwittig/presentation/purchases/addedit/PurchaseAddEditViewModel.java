@@ -15,13 +15,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.text.NumberFormat;
 import java.util.List;
 
-import ch.giantific.qwittig.presentation.common.fragments.DiscardChangesDialogFragment;
+import ch.giantific.qwittig.presentation.common.fragments.dialogs.DiscardChangesDialogFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ListViewModel;
 import ch.giantific.qwittig.presentation.common.viewmodels.PurchaseReceiptViewModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditDateItemModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItem;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemModel;
-import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemUsersUser;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemIdentity;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditStoreItemModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditTotalItemModel;
 
@@ -37,8 +37,6 @@ public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditI
         ExchangeRateDialogFragment.DialogInteractionListener, RatesWorkerListener,
         PurchaseReceiptViewModel {
 
-    void setReceiptImage(@NonNull String receiptImagePath);
-
     @Bindable
     String getNote();
 
@@ -47,8 +45,6 @@ public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditI
     boolean isNoteAvailable();
 
     List<String> getSupportedCurrencies();
-
-    NumberFormat getMoneyFormatter();
 
     void onReceiptImageTaken(@NonNull String receiptImagePath);
 
@@ -68,7 +64,7 @@ public interface PurchaseAddEditViewModel extends ListViewModel<PurchaseAddEditI
 
     void onItemRowUserClick();
 
-    void onItemRowUserLongClick(@NonNull PurchaseAddEditItemUsersUser userClicked);
+    void onItemRowUserLongClick(@NonNull PurchaseAddEditItemIdentity userClicked);
 
     void onExitClick();
 

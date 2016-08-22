@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import ch.giantific.qwittig.data.services.ParseQueryService;
 import ch.giantific.qwittig.databinding.FragmentTasksBinding;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragment;
@@ -25,7 +24,7 @@ import ch.giantific.qwittig.presentation.tasks.list.di.TasksListSubcomponent;
 public class TasksFragment extends BaseRecyclerViewFragment<TasksListSubcomponent, TasksViewModel, BaseRecyclerViewFragment.ActivityListener<TasksListSubcomponent>>
         implements TasksViewModel.ViewListener {
 
-    private FragmentTasksBinding mBinding;
+    private FragmentTasksBinding binding;
 
     public TasksFragment() {
     }
@@ -33,17 +32,17 @@ public class TasksFragment extends BaseRecyclerViewFragment<TasksListSubcomponen
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentTasksBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentTasksBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel.attachView(this);
-        mViewModel.setListInteraction(mRecyclerAdapter);
-        mBinding.setViewModel(mViewModel);
+        viewModel.attachView(this);
+        viewModel.setListInteraction(recyclerAdapter);
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -53,17 +52,12 @@ public class TasksFragment extends BaseRecyclerViewFragment<TasksListSubcomponen
 
     @Override
     protected RecyclerView getRecyclerView() {
-        return mBinding.srlRv.rvBase;
+        return binding.srlRv.rvBase;
     }
 
     @Override
     protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new TasksRecyclerAdapter(mViewModel);
-    }
-
-    @Override
-    public void startUpdateTasksService() {
-        ParseQueryService.startUpdateTasks(getActivity());
+        return new TasksRecyclerAdapter(viewModel);
     }
 
     @Override

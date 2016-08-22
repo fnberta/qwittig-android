@@ -10,11 +10,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.preference.PreferenceManager;
 
-import com.google.android.gms.gcm.GcmNetworkManager;
-
 import javax.inject.Singleton;
 
-import ch.giantific.qwittig.data.bus.RxBus;
 import dagger.Module;
 import dagger.Provides;
 
@@ -24,16 +21,16 @@ import dagger.Provides;
 @Module
 public class ApplicationModule {
 
-    private final Application mApplication;
+    private final Application application;
 
     public ApplicationModule(@NonNull Application application) {
-        mApplication = application;
+        this.application = application;
     }
 
     @Provides
     @Singleton
     Application providesApplication() {
-        return mApplication;
+        return application;
     }
 
     @Provides
@@ -46,17 +43,5 @@ public class ApplicationModule {
     @Singleton
     LocalBroadcastManager providesLocalBroadcastManager(Application application) {
         return LocalBroadcastManager.getInstance(application);
-    }
-
-    @Provides
-    @Singleton
-    GcmNetworkManager providesGcmNetworkManager(Application application) {
-        return GcmNetworkManager.getInstance(application);
-    }
-
-    @Provides
-    @Singleton
-    RxBus<Object> providesEventBus() {
-        return new RxBus<>();
     }
 }

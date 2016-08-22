@@ -19,25 +19,25 @@ public abstract class HeaderItemModelBaseImpl extends BaseObservable
         implements HeaderItemModel, Parcelable {
 
     @StringRes
-    private int mHeader;
+    private int headerRes;
 
-    public HeaderItemModelBaseImpl(@StringRes int header) {
-        mHeader = header;
+    public HeaderItemModelBaseImpl(@StringRes int headerRes) {
+        this.headerRes = headerRes;
     }
 
     protected HeaderItemModelBaseImpl(Parcel in) {
-        mHeader = in.readInt();
+        headerRes = in.readInt();
     }
 
     @Override
     @Bindable
     @StringRes
     public int getHeader() {
-        return mHeader;
+        return headerRes;
     }
 
-    public void setHeader(@StringRes int header) {
-        mHeader = header;
+    public void setHeader(@StringRes int headerRes) {
+        this.headerRes = headerRes;
         notifyPropertyChanged(BR.header);
     }
 
@@ -48,6 +48,6 @@ public abstract class HeaderItemModelBaseImpl extends BaseObservable
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(mHeader);
+        dest.writeInt(headerRes);
     }
 }
