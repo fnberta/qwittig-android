@@ -49,7 +49,7 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
     private String groupName;
     private String nickname;
     private boolean validate;
-    private int avatarIdentityPos;
+    private String avatarIdentityId;
 
     public SettingsUsersViewModelImpl(@Nullable Bundle savedState,
                                       @NonNull Navigator navigator,
@@ -63,7 +63,7 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
         if (savedState != null) {
             nickname = savedState.getString(STATE_NICKNAME, "");
             validate = savedState.getBoolean(STATE_VALIDATE, false);
-            avatarIdentityPos = savedState.getInt(STATE_AVATAR_IDENTITY_ID);
+            avatarIdentityId = savedState.getString(STATE_AVATAR_IDENTITY_ID);
         }
     }
 
@@ -83,8 +83,8 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
 
         outState.putString(STATE_NICKNAME, nickname);
         outState.putBoolean(STATE_VALIDATE, validate);
-        if (avatarIdentityPos > 0) {
-            outState.putInt(STATE_AVATAR_IDENTITY_ID, avatarIdentityPos);
+        if (!TextUtils.isEmpty(avatarIdentityId)) {
+            outState.putString(STATE_AVATAR_IDENTITY_ID, avatarIdentityId);
         }
     }
 
@@ -192,14 +192,20 @@ public class SettingsUsersViewModelImpl extends ListViewModelBaseImpl<SettingsUs
 
     @Override
     public void onEditAvatarClick(int position) {
-        avatarIdentityPos = position;
+        final SettingsUsersUserItemModel userItem = getItemAtPosition(position);
+        avatarIdentityId = userItem.getId();
         navigator.startImagePicker();
     }
 
     @Override
     public void onNewAvatarTaken(@NonNull String avatarPath) {
-        final SettingsUsersUserItemModel itemModel = getItemAtPosition(avatarIdentityPos);
-        userRepo.updatePendingIdentityAvatar(itemModel.getId(), avatarPath);
+        for (int i = 0, itemsSize = items.size(); i < itemsSize; i++) {
+            final SettingsUsersUserItemModel itemModel = getItemAtPosition(i);
+            if (Objects.equals(itemModel.getId(), avatarIdentityId)) {
+                userRepo.updatePendingIdentityAvatar(avatarIdentityId, avatarPath);
+                break;
+            }
+        }
     }
 
     @Override
