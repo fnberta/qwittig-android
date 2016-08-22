@@ -19,5 +19,5 @@ public interface ExchangeRates {
      * @return the result as an {@link Single}
      */
     @GET("latest")
-    Single<CurrencyRates> getRates(@Query("base") String baseCurrency);
+    Single<ExchangeRatesResult> getRates(@Query("base") String baseCurrency);
 }

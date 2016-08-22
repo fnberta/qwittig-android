@@ -40,7 +40,7 @@
 -keepattributes Signature
 -keep class sun.misc.Unsafe { *; }
 -keep class com.google.gson.stream.** { *; }
--keep class ch.giantific.qwittig.data.rest.CurrencyRates { *; }
+-keep class ch.giantific.qwittig.data.rest.ExchangeRatesResult { *; }
 -keep class ch.giantific.qwittig.presentation.stats.models.** { *; }
 
 ## Parse

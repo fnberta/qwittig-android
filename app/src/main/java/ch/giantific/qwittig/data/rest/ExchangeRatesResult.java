@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Represents a collection of currency rates stored in a {@link Map}.
  */
-public class CurrencyRates {
+public class ExchangeRatesResult {
 
     private String base;
     private String date;

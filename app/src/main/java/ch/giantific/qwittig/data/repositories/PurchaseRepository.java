@@ -25,7 +25,7 @@ import ch.giantific.qwittig.Constants;
 import ch.giantific.qwittig.data.helper.SharedPrefsHelper;
 import ch.giantific.qwittig.data.jobs.UploadReceiptJob;
 import ch.giantific.qwittig.data.queues.OcrQueue;
-import ch.giantific.qwittig.data.rest.CurrencyRates;
+import ch.giantific.qwittig.data.rest.ExchangeRatesResult;
 import ch.giantific.qwittig.data.rest.ExchangeRates;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxFirebaseDatabase;
@@ -255,10 +255,10 @@ public class PurchaseRepository {
         return exchangeRates.getRates(baseCurrency)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .map(new Func1<CurrencyRates, Map<String, Float>>() {
+                .map(new Func1<ExchangeRatesResult, Map<String, Float>>() {
                     @Override
-                    public Map<String, Float> call(CurrencyRates currencyRates) {
-                        return currencyRates.getRates();
+                    public Map<String, Float> call(ExchangeRatesResult exchangeRatesResult) {
+                        return exchangeRatesResult.getRates();
                     }
                 })
                 .doOnSuccess(new Action1<Map<String, Float>>() {
