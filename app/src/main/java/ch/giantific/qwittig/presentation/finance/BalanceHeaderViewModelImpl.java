@@ -35,8 +35,8 @@ import rx.functions.Func1;
 public class BalanceHeaderViewModelImpl extends ViewModelBaseImpl<BalanceHeaderViewModel.ViewListener>
         implements BalanceHeaderViewModel {
 
-    private String mBalance;
-    private NumberFormat mMoneyFormatter;
+    private String balance;
+    private NumberFormat moneyFormatter;
 
     public BalanceHeaderViewModelImpl(@Nullable Bundle savedState,
                                       @NonNull Navigator navigator,
@@ -48,12 +48,12 @@ public class BalanceHeaderViewModelImpl extends ViewModelBaseImpl<BalanceHeaderV
     @Override
     @Bindable
     public String getBalance() {
-        return mBalance;
+        return balance;
     }
 
     @Override
     public void setBalance(@NonNull BigFraction balance) {
-        mBalance = mMoneyFormatter.format(balance);
+        this.balance = moneyFormatter.format(balance);
         notifyPropertyChanged(BR.balance);
     }
 
@@ -61,18 +61,18 @@ public class BalanceHeaderViewModelImpl extends ViewModelBaseImpl<BalanceHeaderV
     protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
         super.onUserLoggedIn(currentUser);
 
-        getSubscriptions().add(mUserRepo.observeUser(currentUser.getUid())
+        getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
                 .flatMap(new Func1<User, Observable<Identity>>() {
                     @Override
                     public Observable<Identity> call(User user) {
-                        return mUserRepo.observeIdentity(user.getCurrentIdentity());
+                        return userRepo.observeIdentity(user.getCurrentIdentity());
 
                     }
                 })
                 .doOnNext(new Action1<Identity>() {
                     @Override
                     public void call(Identity identity) {
-                        mMoneyFormatter = MoneyUtils.getMoneyFormatter(identity.getGroupCurrency(), true, true);
+                        moneyFormatter = MoneyUtils.getMoneyFormatter(identity.getGroupCurrency(), true, true);
                     }
                 })
                 .subscribe(new IndefiniteSubscriber<Identity>() {
@@ -80,14 +80,14 @@ public class BalanceHeaderViewModelImpl extends ViewModelBaseImpl<BalanceHeaderV
                     public void onError(Throwable e) {
                         super.onError(e);
 
-                        mView.showMessage(R.string.toast_error_balance_load);
+                        view.showMessage(R.string.toast_error_balance_load);
                     }
 
                     @Override
                     public void onNext(Identity identity) {
                         final BigFraction balance = identity.getBalanceFraction();
                         setBalance(balance);
-                        mView.setColorTheme(balance);
+                        view.setColorTheme(balance);
                     }
                 })
         );

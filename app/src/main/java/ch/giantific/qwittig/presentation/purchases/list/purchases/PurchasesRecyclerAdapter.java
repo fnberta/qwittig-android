@@ -21,7 +21,7 @@ import ch.giantific.qwittig.presentation.purchases.list.purchases.itemmodels.Pur
  */
 public class PurchasesRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<RowPurchasesBinding>> {
 
-    private final PurchasesViewModel mViewModel;
+    private final PurchasesViewModel viewModel;
 
     /**
      * Constructs a new {@link PurchasesRecyclerAdapter}.
@@ -31,7 +31,7 @@ public class PurchasesRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<Row
     public PurchasesRecyclerAdapter(@NonNull PurchasesViewModel viewModel) {
         super();
 
-        mViewModel = viewModel;
+        this.viewModel = viewModel;
     }
 
     @NonNull
@@ -45,19 +45,19 @@ public class PurchasesRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<Row
     @Override
     public void onBindViewHolder(BindingRow<RowPurchasesBinding> holder, int position) {
         final RowPurchasesBinding binding = holder.getBinding();
-        final PurchasesItemModel itemModel = mViewModel.getItemAtPosition(position);
+        final PurchasesItemModel itemModel = viewModel.getItemAtPosition(position);
         binding.setItemModel(itemModel);
-        binding.setViewModel(mViewModel);
+        binding.setViewModel(viewModel);
         binding.executePendingBindings();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return mViewModel.getItemViewType(position);
+        return viewModel.getItemViewType(position);
     }
 
     @Override
     public int getItemCount() {
-        return mViewModel.getItemCount();
+        return viewModel.getItemCount();
     }
 }

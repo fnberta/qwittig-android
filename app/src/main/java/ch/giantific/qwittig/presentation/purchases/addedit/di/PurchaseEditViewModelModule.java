@@ -29,13 +29,13 @@ import dagger.Provides;
 @Module
 public class PurchaseEditViewModelModule extends BaseViewModelModule {
 
-    private final String mEditPurchaseId;
+    private final String editPurchaseId;
 
     public PurchaseEditViewModelModule(@Nullable Bundle savedState,
                                        @NonNull String editPurchaseId) {
         super(savedState);
 
-        mEditPurchaseId = editPurchaseId;
+        this.editPurchaseId = editPurchaseId;
     }
 
     @PerActivity
@@ -46,8 +46,8 @@ public class PurchaseEditViewModelModule extends BaseViewModelModule {
                                                            @NonNull UserRepository userRepository,
                                                            @NonNull GroupRepository groupRepository,
                                                            @NonNull PurchaseRepository purchaseRepository) {
-        return new PurchaseEditViewModelImpl(mSavedState, navigator, eventBus, configHelper,
-                userRepository, groupRepository, purchaseRepository, mEditPurchaseId);
+        return new PurchaseEditViewModelImpl(savedState, navigator, eventBus, configHelper,
+                userRepository, groupRepository, purchaseRepository, editPurchaseId);
     }
 
     @PerActivity
@@ -58,7 +58,7 @@ public class PurchaseEditViewModelModule extends BaseViewModelModule {
                                                                   @NonNull UserRepository userRepository,
                                                                   @NonNull GroupRepository groupRepository,
                                                                   @NonNull PurchaseRepository purchaseRepository) {
-        return new PurchaseEditDraftViewModelImpl(mSavedState, navigator, eventBus, configHelper,
-                userRepository, groupRepository, purchaseRepository, mEditPurchaseId);
+        return new PurchaseEditDraftViewModelImpl(savedState, navigator, eventBus, configHelper,
+                userRepository, groupRepository, purchaseRepository, editPurchaseId);
     }
 }

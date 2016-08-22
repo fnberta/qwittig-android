@@ -25,12 +25,12 @@ import dagger.Provides;
 @Module
 public class OcrRatingViewModelModule extends BaseViewModelModule {
 
-    private final String mOcrDataId;
+    private final String ocrDataId;
 
     public OcrRatingViewModelModule(@Nullable Bundle savedState, @NonNull String ocrDataId) {
         super(savedState);
 
-        mOcrDataId = ocrDataId;
+        this.ocrDataId = ocrDataId;
     }
 
     @PerActivity
@@ -39,7 +39,7 @@ public class OcrRatingViewModelModule extends BaseViewModelModule {
                                                   @NonNull RxBus<Object> eventBus,
                                                   @NonNull UserRepository userRepository,
                                                   @NonNull PurchaseRepository purchaseRepository) {
-        return new OcrRatingViewModelImpl(mSavedState, navigator, eventBus, userRepository,
-                purchaseRepository, mOcrDataId);
+        return new OcrRatingViewModelImpl(savedState, navigator, eventBus, userRepository,
+                purchaseRepository, ocrDataId);
     }
 }

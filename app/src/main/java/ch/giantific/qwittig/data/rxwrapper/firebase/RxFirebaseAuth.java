@@ -8,12 +8,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.ProviderQueryResult;
 
+import ch.giantific.qwittig.data.rxwrapper.firebase.emitters.AuthStateAsyncEmitter;
 import ch.giantific.qwittig.data.rxwrapper.firebase.subscribers.ListenToTaskOnCompleteOnSubscribe;
+import rx.AsyncEmitter;
 import rx.Observable;
 import rx.Single;
-import rx.Subscriber;
-import rx.functions.Action0;
-import rx.subscriptions.Subscriptions;
 
 /**
  * Created by Nick Moskalenko on 15/05/2016.
@@ -70,27 +69,7 @@ public class RxFirebaseAuth {
 
     @NonNull
     public static Observable<FirebaseUser> observeAuthState(@NonNull final FirebaseAuth firebaseAuth) {
-
-        return Observable.create(new Observable.OnSubscribe<FirebaseUser>() {
-            @Override
-            public void call(final Subscriber<? super FirebaseUser> subscriber) {
-                final FirebaseAuth.AuthStateListener authStateListener = new FirebaseAuth.AuthStateListener() {
-                    @Override
-                    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                        if (!subscriber.isUnsubscribed()) {
-                            subscriber.onNext(firebaseAuth.getCurrentUser());
-                        }
-                    }
-                };
-                firebaseAuth.addAuthStateListener(authStateListener);
-
-                subscriber.add(Subscriptions.create(new Action0() {
-                    @Override
-                    public void call() {
-                        firebaseAuth.removeAuthStateListener(authStateListener);
-                    }
-                }));
-            }
-        });
+        return Observable.fromAsync(new AuthStateAsyncEmitter(firebaseAuth), AsyncEmitter.BackpressureMode.LATEST);
     }
+
 }

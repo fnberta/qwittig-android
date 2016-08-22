@@ -34,6 +34,6 @@ public class NavDrawerViewModelModule extends BaseViewModelModule {
     NavDrawerViewModel providesNavDrawerViewModel(@NonNull Navigator navigator,
                                                   @NonNull RxBus<Object> eventBus,
                                                   @NonNull UserRepository userRepository) {
-        return new NavDrawerViewModelImpl(mSavedState, navigator, eventBus, userRepository);
+        return new NavDrawerViewModelImpl(savedState, navigator, eventBus, userRepository);
     }
 }

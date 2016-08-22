@@ -33,6 +33,6 @@ public class AboutViewModelModule extends BaseViewModelModule {
     AboutViewModel providesAboutViewModel(@NonNull Navigator navigator,
                                           @NonNull RxBus<Object> eventBus,
                                           @NonNull UserRepository userRepository) {
-        return new AboutViewModelImpl(mSavedState, navigator, eventBus, userRepository);
+        return new AboutViewModelImpl(savedState, navigator, eventBus, userRepository);
     }
 }

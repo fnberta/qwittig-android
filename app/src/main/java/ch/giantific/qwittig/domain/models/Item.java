@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
-import com.google.firebase.database.PropertyName;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,41 +19,39 @@ public class Item {
     public static final String PATH_NAME = "name";
     public static final String PATH_PRICE = "price";
     public static final String PATH_IDENTITIES = "identities";
-    @PropertyName(PATH_NAME)
-    private String mName;
-    @PropertyName(PATH_PRICE)
-    private double mPrice;
-    @PropertyName(PATH_IDENTITIES)
-    private Map<String, Boolean> mIdentities;
+    
+    private String name;
+    private double price;
+    private Map<String, Boolean> identities;
 
     public Item() {
         // required for firebase de-/serialization
     }
 
     public Item(@NonNull String name, double price, @NonNull List<String> identities) {
-        mName = name;
-        mPrice = price;
-        mIdentities = new HashMap<>();
+        this.name = name;
+        this.price = price;
+        this.identities = new HashMap<>();
         for (String id : identities) {
-            mIdentities.put(id, true);
+            this.identities.put(id, true);
         }
     }
 
     public String getName() {
-        return mName;
+        return name;
     }
 
     public double getPrice() {
-        return mPrice;
+        return price;
     }
 
     public Map<String, Boolean> getIdentities() {
-        return mIdentities;
+        return identities;
     }
 
     @Exclude
     public Set<String> getIdentitiesIds() {
-        return mIdentities.keySet();
+        return identities.keySet();
     }
 
     /**
@@ -66,9 +63,19 @@ public class Item {
     @Exclude
     public double getPriceForeign(double exchangeRate) {
         if (exchangeRate == 1) {
-            return mPrice;
+            return price;
         }
 
-        return mPrice / exchangeRate;
+        return price / exchangeRate;
+    }
+
+    @Exclude
+    public Map<String, Object> toMap() {
+        final Map<String, Object> result = new HashMap<>();
+        result.put(PATH_NAME, name);
+        result.put(PATH_PRICE, price);
+        result.put(PATH_IDENTITIES, identities);
+
+        return result;
     }
 }

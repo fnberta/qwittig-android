@@ -54,13 +54,13 @@ public class AboutViewModelImpl extends ViewModelBaseImpl<AboutViewModel.ViewLis
         final int titleId = itemModel.getTitle();
         switch (titleId) {
             case R.string.about_facebook:
-                mNavigator.openWebsite(FACEBOOK_URL);
+                navigator.openWebsite(FACEBOOK_URL);
                 break;
             case R.string.about_twitter:
-                mNavigator.openWebsite(TWITTER_URL);
+                navigator.openWebsite(TWITTER_URL);
                 break;
             case R.string.about_website:
-                mNavigator.openWebsite(WEBSITE_URL);
+                navigator.openWebsite(WEBSITE_URL);
                 break;
             case R.string.about_usage:
                 // TODO: show usage info

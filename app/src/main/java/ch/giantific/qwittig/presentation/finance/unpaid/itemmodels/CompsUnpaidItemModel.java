@@ -25,12 +25,12 @@ import ch.giantific.qwittig.presentation.common.itemmodels.BaseChildItemModel;
 public class CompsUnpaidItemModel extends BaseChildItemModel
         implements Comparable<CompsUnpaidItemModel> {
 
-    private final String mAmount;
-    private final BigFraction mAmountFraction;
-    private final String mNickname;
-    private final String mAvatar;
-    private final boolean mCredit;
-    private final boolean mIdentityPending;
+    private final String amount;
+    private final BigFraction amountFraction;
+    private final String nickname;
+    private final String avatar;
+    private final boolean credit;
+    private final boolean identityPending;
 
     public CompsUnpaidItemModel(@EventType int eventType,
                                 @NonNull Compensation compensation,
@@ -39,42 +39,42 @@ public class CompsUnpaidItemModel extends BaseChildItemModel
                                 boolean isCredit) {
         super(eventType, compensation.getId());
 
-        mAmountFraction = compensation.getAmountFraction();
-        mAmount = moneyFormatter.format(mAmountFraction);
-        mNickname = identity.getNickname();
-        mAvatar = identity.getAvatar();
-        mCredit = isCredit;
-        mIdentityPending = identity.isPending();
+        amountFraction = compensation.getAmountFraction();
+        amount = moneyFormatter.format(amountFraction);
+        nickname = identity.getNickname();
+        avatar = identity.getAvatar();
+        credit = isCredit;
+        identityPending = identity.isPending();
     }
 
 
     @Bindable
     public String getAmount() {
-        return mAmount;
+        return amount;
     }
 
     public BigFraction getAmountFraction() {
-        return mAmountFraction;
+        return amountFraction;
     }
 
     @Bindable
     public String getNickname() {
-        return mNickname;
+        return nickname;
     }
 
     @Bindable
     public String getAvatar() {
-        return mAvatar;
+        return avatar;
     }
 
     @Bindable
     public boolean isCredit() {
-        return mCredit;
+        return credit;
     }
 
     @Bindable
     public boolean isIdentityPending() {
-        return mIdentityPending;
+        return identityPending;
     }
 
     @Override
@@ -85,11 +85,11 @@ public class CompsUnpaidItemModel extends BaseChildItemModel
 
     @Override
     public int compareTo(@NonNull CompsUnpaidItemModel itemModel) {
-        if (mCredit && !itemModel.isCredit()) {
+        if (credit && !itemModel.isCredit()) {
             return 1;
         }
 
-        return mAmountFraction.compareTo(itemModel.getAmountFraction());
+        return amountFraction.compareTo(itemModel.getAmountFraction());
     }
 
     @Override
@@ -99,23 +99,23 @@ public class CompsUnpaidItemModel extends BaseChildItemModel
 
         final CompsUnpaidItemModel that = (CompsUnpaidItemModel) o;
 
-        if (mCredit != that.isCredit()) return false;
-        if (mIdentityPending != that.isIdentityPending()) return false;
-        if (!mAmount.equals(that.getAmount())) return false;
-        if (!mAmountFraction.equals(that.getAmountFraction())) return false;
-        if (!mNickname.equals(that.getNickname())) return false;
-        return mAvatar != null ? mAvatar.equals(that.getAvatar()) : that.getAvatar() == null;
+        if (credit != that.isCredit()) return false;
+        if (identityPending != that.isIdentityPending()) return false;
+        if (!amount.equals(that.getAmount())) return false;
+        if (!amountFraction.equals(that.getAmountFraction())) return false;
+        if (!nickname.equals(that.getNickname())) return false;
+        return avatar != null ? avatar.equals(that.getAvatar()) : that.getAvatar() == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = mAmount.hashCode();
-        result = 31 * result + mAmountFraction.hashCode();
-        result = 31 * result + mNickname.hashCode();
-        result = 31 * result + (mAvatar != null ? mAvatar.hashCode() : 0);
-        result = 31 * result + (mCredit ? 1 : 0);
-        result = 31 * result + (mIdentityPending ? 1 : 0);
+        int result = amount.hashCode();
+        result = 31 * result + amountFraction.hashCode();
+        result = 31 * result + nickname.hashCode();
+        result = 31 * result + (avatar != null ? avatar.hashCode() : 0);
+        result = 31 * result + (credit ? 1 : 0);
+        result = 31 * result + (identityPending ? 1 : 0);
         return result;
     }
 

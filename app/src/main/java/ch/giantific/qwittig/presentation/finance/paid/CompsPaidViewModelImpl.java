@@ -32,7 +32,6 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import timber.log.Timber;
 
 /**
  * Provides an implementation of the {@link CompsPaidViewModel}.
@@ -40,21 +39,21 @@ import timber.log.Timber;
 public class CompsPaidViewModelImpl extends ListViewModelBaseImpl<CompsPaidItemModel, CompsPaidViewModel.ViewListener>
         implements CompsPaidViewModel {
 
-    private final CompensationRepository mCompsRepo;
-    private String mCompGroupId;
-    private NumberFormat mMoneyFormatter;
-    private String mCurrentGroupId;
+    private final CompensationRepository compsRepo;
+    private String compGroupId;
+    private NumberFormat moneyFormatter;
+    private String currentGroupId;
 
     public CompsPaidViewModelImpl(@Nullable Bundle savedState,
                                   @NonNull Navigator navigator,
                                   @NonNull RxBus<Object> eventBus,
-                                  @NonNull UserRepository userRepository,
+                                  @NonNull UserRepository userRepo,
                                   @NonNull CompensationRepository compsRepo,
                                   @Nullable String compGroupId) {
-        super(savedState, navigator, eventBus, userRepository);
+        super(savedState, navigator, eventBus, userRepo);
 
-        mCompsRepo = compsRepo;
-        mCompGroupId = compGroupId;
+        this.compsRepo = compsRepo;
+        this.compGroupId = compGroupId;
     }
 
     @Override
@@ -71,7 +70,7 @@ public class CompsPaidViewModelImpl extends ListViewModelBaseImpl<CompsPaidItemM
     protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
         super.onUserLoggedIn(currentUser);
 
-        getSubscriptions().add(mUserRepo.observeUser(currentUser.getUid())
+        getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
                 .flatMap(new Func1<User, Observable<Identity>>() {
                     @Override
                     public Observable<Identity> call(final User user) {
@@ -81,16 +80,16 @@ public class CompsPaidViewModelImpl extends ListViewModelBaseImpl<CompsPaidItemM
                 .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override
                     public void onNext(Identity identity) {
-                        mMoneyFormatter = MoneyUtils.getMoneyFormatter(identity.getGroupCurrency(),
+                        moneyFormatter = MoneyUtils.getMoneyFormatter(identity.getGroupCurrency(),
                                 true, true);
 
-                        mInitialDataLoaded = false;
+                        initialDataLoaded = false;
                         final String identityId = identity.getId();
                         final String groupId = identity.getGroup();
-                        if (!Objects.equals(mCurrentGroupId, groupId)) {
-                            mItems.clear();
+                        if (!Objects.equals(currentGroupId, groupId)) {
+                            items.clear();
                         }
-                        mCurrentGroupId = groupId;
+                        currentGroupId = groupId;
                         addDataListener(identityId);
                         loadInitialData(identityId);
                     }
@@ -99,20 +98,20 @@ public class CompsPaidViewModelImpl extends ListViewModelBaseImpl<CompsPaidItemM
     }
 
     private Observable<Identity> getMatchingIdentity(final User user) {
-        return mUserRepo.getIdentity(user.getCurrentIdentity())
+        return userRepo.getIdentity(user.getCurrentIdentity())
                 .flatMapObservable(new Func1<Identity, Observable<Identity>>() {
                     @Override
                     public Observable<Identity> call(Identity identity) {
-                        if (TextUtils.isEmpty(mCompGroupId)
-                                || Objects.equals(mCompGroupId, identity.getGroup())) {
+                        if (TextUtils.isEmpty(compGroupId)
+                                || Objects.equals(compGroupId, identity.getGroup())) {
                             return Observable.just(identity);
                         }
 
-                        return mUserRepo.switchGroup(user, mCompGroupId)
+                        return userRepo.switchGroup(user, compGroupId)
                                 .doOnNext(new Action1<Identity>() {
                                     @Override
                                     public void call(Identity identity) {
-                                        mCompGroupId = identity.getGroup();
+                                        compGroupId = identity.getGroup();
                                     }
                                 })
                                 .flatMap(new Func1<Identity, Observable<Identity>>() {
@@ -126,17 +125,17 @@ public class CompsPaidViewModelImpl extends ListViewModelBaseImpl<CompsPaidItemM
     }
 
     private void addDataListener(@NonNull final String identityId) {
-        setDataListenerSub(mCompsRepo.observeCompensationChildren(mCurrentGroupId, identityId, true)
+        setDataListenerSub(compsRepo.observeCompensationChildren(currentGroupId, identityId, true)
                 .filter(new Func1<RxChildEvent<Compensation>, Boolean>() {
                     @Override
                     public Boolean call(RxChildEvent<Compensation> compensationRxChildEvent) {
-                        return mInitialDataLoaded;
+                        return initialDataLoaded;
                     }
                 })
                 .flatMap(new Func1<RxChildEvent<Compensation>, Observable<CompsPaidItemModel>>() {
                     @Override
                     public Observable<CompsPaidItemModel> call(final RxChildEvent<Compensation> event) {
-                        return getItemModels(event.getValue(), event.getEventType(),
+                        return getItemModel(event.getValue(), event.getEventType(),
                                 identityId);
                     }
                 })
@@ -145,18 +144,18 @@ public class CompsPaidViewModelImpl extends ListViewModelBaseImpl<CompsPaidItemM
     }
 
     private void loadInitialData(@NonNull final String identityId) {
-        setInitialDataSub(mCompsRepo.getCompensations(mCurrentGroupId, identityId, true)
+        setInitialDataSub(compsRepo.getCompensations(currentGroupId, identityId, true)
                 .flatMap(new Func1<Compensation, Observable<CompsPaidItemModel>>() {
                     @Override
                     public Observable<CompsPaidItemModel> call(Compensation compensation) {
-                        return getItemModels(compensation, -1, identityId);
+                        return getItemModel(compensation, -1, identityId);
                     }
                 })
                 .toList()
                 .subscribe(new Subscriber<List<CompsPaidItemModel>>() {
                     @Override
                     public void onCompleted() {
-                        mInitialDataLoaded = true;
+                        initialDataLoaded = true;
                         setLoading(false);
                     }
 
@@ -167,24 +166,24 @@ public class CompsPaidViewModelImpl extends ListViewModelBaseImpl<CompsPaidItemM
 
                     @Override
                     public void onNext(List<CompsPaidItemModel> compsPaidItemModels) {
-                        mItems.addAll(compsPaidItemModels);
+                        items.addAll(compsPaidItemModels);
                     }
                 })
         );
     }
 
     @NonNull
-    private Observable<CompsPaidItemModel> getItemModels(@NonNull final Compensation compensation,
-                                                         final int eventType,
-                                                         @NonNull String identityId) {
+    private Observable<CompsPaidItemModel> getItemModel(@NonNull final Compensation compensation,
+                                                        final int eventType,
+                                                        @NonNull String identityId) {
         final String creditorId = compensation.getCreditor();
         final boolean isCredit = Objects.equals(creditorId, identityId);
-        return mUserRepo.getIdentity(isCredit ? compensation.getDebtor() : creditorId)
+        return userRepo.getIdentity(isCredit ? compensation.getDebtor() : creditorId)
                 .map(new Func1<Identity, CompsPaidItemModel>() {
                     @Override
                     public CompsPaidItemModel call(Identity identity) {
                         return new CompsPaidItemModel(eventType, compensation, identity, isCredit,
-                                mMoneyFormatter
+                                moneyFormatter
                         );
                     }
                 })
@@ -195,6 +194,6 @@ public class CompsPaidViewModelImpl extends ListViewModelBaseImpl<CompsPaidItemM
     protected void onDataError(@NonNull Throwable e) {
         super.onDataError(e);
 
-        mView.showMessage(R.string.toast_error_comps_load);
+        view.showMessage(R.string.toast_error_comps_load);
     }
 }

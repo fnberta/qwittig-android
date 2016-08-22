@@ -62,15 +62,16 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
 
     private static final String FRAGMENT_LOGIN = "FRAGMENT_LOGIN";
     private static final String PREF_FIRST_RUN = "PREF_FIRST_RUN";
+
     @Inject
-    Navigator mNavigator;
+    Navigator navigator;
     @Inject
-    GoogleApiClientDelegate mGoogleApiDelegate;
-    private LoginAccountsViewModel mAccountsViewModel;
-    private LoginEmailViewModel mEmailViewModel;
-    private LoginInvitationViewModel mInvitationViewModel;
-    private LoginProfileViewModel mProfileViewModel;
-    private LoginFirstGroupViewModel mFirstGroupViewModel;
+    GoogleApiClientDelegate googleApiDelegate;
+    private LoginAccountsViewModel accountsViewModel;
+    private LoginEmailViewModel emailViewModel;
+    private LoginInvitationViewModel invitationViewModel;
+    private LoginProfileViewModel profileViewModel;
+    private LoginFirstGroupViewModel firstGroupViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,13 +83,13 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
             addAccountsFragment();
         }
 
-        mGoogleApiDelegate.createGoogleApiClient(AppInvite.API);
-        mGoogleApiDelegate.checkForInvitation();
+        googleApiDelegate.createGoogleApiClient(AppInvite.API);
+        googleApiDelegate.checkForInvitation();
     }
 
     @Override
     protected void injectDependencies(@Nullable Bundle savedInstanceState) {
-        mComponent = DaggerLoginComponent.builder()
+        component = DaggerLoginComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
                 .googleApiClientDelegateModule(new GoogleApiClientDelegateModule(this, this, this))
@@ -98,26 +99,26 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
                 .loginProfileViewModelModule(new LoginProfileViewModelModule(savedInstanceState))
                 .loginFirstGroupViewModelModule(new LoginFirstGroupViewModelModule(savedInstanceState))
                 .build();
-        mComponent.inject(this);
+        component.inject(this);
     }
 
     @Override
     protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{mAccountsViewModel, mEmailViewModel,
-                mInvitationViewModel, mProfileViewModel, mFirstGroupViewModel});
+        return Arrays.asList(new ViewModel[]{accountsViewModel, emailViewModel,
+                invitationViewModel, profileViewModel, firstGroupViewModel});
     }
 
     private void checkFirstRun() {
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         final boolean isFirstRun = prefs.getBoolean(PREF_FIRST_RUN, true);
         if (isFirstRun) {
-            mNavigator.startFirstRun();
+            navigator.startFirstRun();
             prefs.edit().putBoolean(PREF_FIRST_RUN, false).apply();
         }
     }
 
     private void addAccountsFragment() {
-        mAccountsViewModel = mComponent.getLoginAccountsViewModel();
+        accountsViewModel = component.getLoginAccountsViewModel();
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.container, new LoginAccountsFragment(), FRAGMENT_LOGIN)
                 .commit();
@@ -125,7 +126,7 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
 
     private void showInvitationFragment(@NonNull String groupName,
                                         @NonNull String inviterNickname) {
-        mInvitationViewModel = mComponent.getLoginInvitationViewModel();
+        invitationViewModel = component.getLoginInvitationViewModel();
         final Fragment fragment = LoginInvitationFragment.newInstance(groupName, inviterNickname);
         if (Utils.isRunningLollipopAndHigher()) {
             fragment.setEnterTransition(new Slide(Gravity.BOTTOM));
@@ -140,7 +141,7 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        mGoogleApiDelegate.onActivityResult(requestCode, resultCode, data);
+        googleApiDelegate.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
             case Navigator.INTENT_REQUEST_IMAGE_PICK:
@@ -149,7 +150,7 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
                     AvatarUtils.saveImageLocal(this, imageUri, new AvatarUtils.AvatarLocalSaveListener() {
                         @Override
                         public void onAvatarSaved(@NonNull String path) {
-                            mProfileViewModel.onNewAvatarTaken(path);
+                            profileViewModel.onNewAvatarTaken(path);
                         }
                     });
                 }
@@ -161,28 +162,28 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
         final String identityId = deepLink.getQueryParameter(GroupRepository.INVITATION_IDENTITY);
         final String groupName = deepLink.getQueryParameter(GroupRepository.INVITATION_GROUP);
         final String inviterNickname = deepLink.getQueryParameter(GroupRepository.INVITATION_INVITER);
-        mAccountsViewModel.setInvitationIdentityId(identityId);
+        accountsViewModel.setInvitationIdentityId(identityId);
         showInvitationFragment(groupName, inviterNickname);
     }
 
     @Override
     public void onGoogleLoginSuccessful(@NonNull String idToken) {
-        mAccountsViewModel.onGoogleLoginSuccessful(idToken);
+        accountsViewModel.onGoogleLoginSuccessful(idToken);
     }
 
     @Override
     public void onGoogleLoginFailed() {
-        mAccountsViewModel.onGoogleLoginFailed();
+        accountsViewModel.onGoogleLoginFailed();
     }
 
     @Override
     public void loginWithGoogle() {
-        mGoogleApiDelegate.loginWithGoogle();
+        googleApiDelegate.loginWithGoogle();
     }
 
     @Override
     public void showEmailFragment(@NonNull String identityId) {
-        mEmailViewModel = mComponent.getLoginEmailViewModel();
+        emailViewModel = component.getLoginEmailViewModel();
         final FragmentManager fm = getSupportFragmentManager();
         final LoginEmailFragment fragment = LoginEmailFragment.newInstance(identityId);
         if (Utils.isRunningLollipopAndHigher()) {
@@ -199,7 +200,7 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
 
     @Override
     public void showProfileFragment(boolean withInvitation) {
-        mProfileViewModel = mComponent.getLoginProfileViewModel();
+        profileViewModel = component.getLoginProfileViewModel();
         final FragmentManager fm = getSupportFragmentManager();
         final LoginProfileFragment fragment = LoginProfileFragment.newInstance(withInvitation);
         if (Utils.isRunningLollipopAndHigher()) {
@@ -218,7 +219,7 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
 
     @Override
     public void showFirstGroupFragment() {
-        mFirstGroupViewModel = mComponent.getLoginFirstGroupViewModel();
+        firstGroupViewModel = component.getLoginFirstGroupViewModel();
         final FragmentManager fm = getSupportFragmentManager();
         final LoginFirstGroupFragment fragment = new LoginFirstGroupFragment();
         if (Utils.isRunningLollipopAndHigher()) {
@@ -238,35 +239,35 @@ public class LoginActivity extends BaseActivity<LoginComponent> implements
     @Override
     public void popBackStack(boolean accepted) {
         if (!accepted) {
-            mAccountsViewModel.setInvitationIdentityId("");
+            accountsViewModel.setInvitationIdentityId("");
         }
         getSupportFragmentManager().popBackStack();
     }
 
     @Override
     public void setUserLoginStream(@NonNull Single<FirebaseUser> single, @NonNull String workerTag,
-                                   @LoginWorker.Type int type) {
+                                   @LoginWorker.LoginType int type) {
         switch (type) {
-            case LoginWorker.Type.LOGIN_EMAIL:
+            case LoginWorker.LoginType.LOGIN_EMAIL:
                 // fall through
-            case LoginWorker.Type.SIGN_UP_EMAIL:
-                mEmailViewModel.setUserLoginStream(single, workerTag, type);
+            case LoginWorker.LoginType.SIGN_UP_EMAIL:
+                emailViewModel.setUserLoginStream(single, workerTag, type);
                 break;
-            case LoginWorker.Type.LOGIN_FACEBOOK:
+            case LoginWorker.LoginType.LOGIN_FACEBOOK:
                 // fall through
-            case LoginWorker.Type.LOGIN_GOOGLE:
-                mAccountsViewModel.setUserLoginStream(single, workerTag, type);
+            case LoginWorker.LoginType.LOGIN_GOOGLE:
+                accountsViewModel.setUserLoginStream(single, workerTag, type);
                 break;
         }
     }
 
     @Override
     public void setEmailUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
-        mEmailViewModel.setEmailUserStream(single, workerTag);
+        emailViewModel.setEmailUserStream(single, workerTag);
     }
 
     @Override
     public void onValidEmailEntered(@NonNull String email) {
-        mEmailViewModel.onValidEmailEntered(email);
+        emailViewModel.onValidEmailEntered(email);
     }
 }

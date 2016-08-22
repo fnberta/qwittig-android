@@ -20,7 +20,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 public class AboutActivity extends BaseActivity<AboutComponent> {
 
     @Inject
-    AboutViewModel mAboutViewModel;
+    AboutViewModel aboutViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,16 +36,16 @@ public class AboutActivity extends BaseActivity<AboutComponent> {
 
     @Override
     protected void injectDependencies(@Nullable Bundle savedInstanceState) {
-        mComponent = DaggerAboutComponent.builder()
+        component = DaggerAboutComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
                 .aboutViewModelModule(new AboutViewModelModule(savedInstanceState))
                 .build();
-        mComponent.inject(this);
+        component.inject(this);
     }
 
     @Override
     protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{mAboutViewModel});
+        return Arrays.asList(new ViewModel[]{aboutViewModel});
     }
 }

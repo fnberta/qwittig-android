@@ -35,7 +35,7 @@ public class TaskAddViewModelModule extends BaseViewModelModule {
                                                       @NonNull RxBus<Object> eventBus,
                                                       @NonNull UserRepository userRepository,
                                                       @NonNull TaskRepository taskRepository) {
-        return new TaskAddEditViewModelAddImpl(mSavedState, navigator, eventBus, userRepository,
+        return new TaskAddEditViewModelAddImpl(savedState, navigator, eventBus, userRepository,
                 taskRepository);
     }
 

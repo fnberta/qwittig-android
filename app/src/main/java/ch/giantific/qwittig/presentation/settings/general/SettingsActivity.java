@@ -22,16 +22,15 @@ import ch.giantific.qwittig.presentation.common.GoogleApiClientDelegate;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.GoogleApiClientDelegateModule;
 import ch.giantific.qwittig.presentation.common.di.NavigatorModule;
+import ch.giantific.qwittig.presentation.common.fragments.dialogs.EmailReAuthenticateDialogFragment;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.common.workers.EmailUserWorkerListener;
-import ch.giantific.qwittig.presentation.common.workers.FacebookUserWorker;
 import ch.giantific.qwittig.presentation.common.workers.FacebookUserWorkerListener;
 import ch.giantific.qwittig.presentation.common.workers.GoogleUserWorkerListener;
 import ch.giantific.qwittig.presentation.settings.general.di.DaggerSettingsComponent;
 import ch.giantific.qwittig.presentation.settings.general.di.SettingsComponent;
 import ch.giantific.qwittig.presentation.settings.general.di.SettingsViewModelModule;
 import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.SettingsAddGroupFragment;
-import ch.giantific.qwittig.presentation.common.fragments.dialogs.EmailReAuthenticateDialogFragment;
 import ch.giantific.qwittig.presentation.settings.profile.SettingsProfileViewModel;
 import rx.Single;
 
@@ -49,9 +48,9 @@ public class SettingsActivity extends BaseActivity<SettingsComponent> implements
         GoogleApiClientDelegate.GoogleLoginCallback {
 
     @Inject
-    SettingsViewModel mSettingsViewModel;
+    SettingsViewModel settingsViewModel;
     @Inject
-    GoogleApiClientDelegate mGoogleApiDelegate;
+    GoogleApiClientDelegate googleApiDelegate;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,29 +67,29 @@ public class SettingsActivity extends BaseActivity<SettingsComponent> implements
                     .commit();
         }
 
-        mGoogleApiDelegate.createGoogleApiClient();
+        googleApiDelegate.createGoogleApiClient();
     }
 
     @Override
     protected void injectDependencies(@Nullable Bundle savedInstanceState) {
-        mComponent = DaggerSettingsComponent.builder()
+        component = DaggerSettingsComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
                 .googleApiClientDelegateModule(new GoogleApiClientDelegateModule(this, this, null))
                 .settingsViewModelModule(new SettingsViewModelModule(savedInstanceState))
                 .build();
-        mComponent.inject(this);
+        component.inject(this);
     }
 
     @Override
     protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{mSettingsViewModel});
+        return Arrays.asList(new ViewModel[]{settingsViewModel});
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        mGoogleApiDelegate.onActivityResult(requestCode, resultCode, data);
+        googleApiDelegate.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
             case Navigator.INTENT_REQUEST_SETTINGS_PROFILE:
@@ -117,46 +116,46 @@ public class SettingsActivity extends BaseActivity<SettingsComponent> implements
 
     @Override
     public void onValidEmailAndPasswordEntered(@NonNull String email, @NonNull String password) {
-        mSettingsViewModel.onValidEmailAndPasswordEntered(email, password);
+        settingsViewModel.onValidEmailAndPasswordEntered(email, password);
     }
 
     @Override
     public void onLeaveGroupSelected() {
-        mSettingsViewModel.onLeaveGroupSelected();
+        settingsViewModel.onLeaveGroupSelected();
     }
 
     @Override
     public void loginWithGoogle() {
-        mGoogleApiDelegate.loginWithGoogle();
+        googleApiDelegate.loginWithGoogle();
     }
 
     @Override
     public void onGoogleLoginSuccessful(@NonNull String idToken) {
-        mSettingsViewModel.onGoogleLoginSuccessful(idToken);
+        settingsViewModel.onGoogleLoginSuccessful(idToken);
     }
 
     @Override
     public void onGoogleLoginFailed() {
-        mSettingsViewModel.onGoogleLoginFailed();
+        settingsViewModel.onGoogleLoginFailed();
     }
 
     @Override
     public void setEmailUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
-        mSettingsViewModel.setEmailUserStream(single, workerTag);
+        settingsViewModel.setEmailUserStream(single, workerTag);
     }
 
     @Override
     public void setGoogleUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
-        mSettingsViewModel.setGoogleUserStream(single, workerTag);
+        settingsViewModel.setGoogleUserStream(single, workerTag);
     }
 
     @Override
     public void setFacebookUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
-        mSettingsViewModel.setFacebookUserStream(single, workerTag);
+        settingsViewModel.setFacebookUserStream(single, workerTag);
     }
 
     @Override
     public void onDeleteAccountSelected() {
-        mSettingsViewModel.onDeleteAccountSelected();
+        settingsViewModel.onDeleteAccountSelected();
     }
 }

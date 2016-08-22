@@ -49,47 +49,29 @@
                         android:id="@+id/sp_stats_type"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        android:layout_marginEnd="@dimen/normal_space"
                         android:onItemSelected="@{viewModel::onTypeSelected}"
                         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                         />
 
                 </android.support.v7.widget.Toolbar>
 
-                <LinearLayout
+                <Spinner
+                    android:id="@+id/sp_stats_period"
                     android:layout_width="wrap_content"
                     android:layout_height="?attr/actionBarSize"
-                    android:layout_marginEnd="@dimen/key_line_1"
                     android:layout_marginStart="@dimen/key_line_2"
-                    android:orientation="horizontal"
+                    android:onItemSelected="@{viewModel::onPeriodSelected}"
                     android:theme="@style/ThemeOverlay.AppCompat.Dark"
-                    >
-
-                    <Spinner
-                        android:id="@+id/sp_year"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginEnd="@dimen/normal_space"
-                        android:onItemSelected="@{viewModel::onYearSelected}"
-                        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                        />
-
-                    <Spinner
-                        android:id="@+id/sp_month"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:onItemSelected="@{viewModel::onMonthSelected}"
-                        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                        />
-
-                </LinearLayout>
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                    />
 
             </android.support.design.widget.AppBarLayout>
 
-            <FrameLayout
-                android:id="@+id/container"
+            <android.support.v4.view.ViewPager
+                android:id="@+id/viewpager"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:ignore="MergeRootFrame"
                 />
 
         </LinearLayout>

@@ -19,7 +19,6 @@ import java.lang.annotation.RetentionPolicy;
 
 import ch.giantific.qwittig.presentation.common.di.WorkerComponent;
 import rx.Observable;
-import rx.functions.Action1;
 
 /**
  * Handles the deletion of a user logged in via email and the reset of his password.
@@ -126,7 +125,7 @@ public class EmailUserWorker extends BaseWorker<Void, EmailUserWorkerListener> {
     @Nullable
     @Override
     protected Observable<Void> getObservable(@NonNull Bundle args) {
-        final FirebaseUser firebaseUser = mUserRepo.getCurrentUser();
+        final FirebaseUser firebaseUser = userRepo.getCurrentUser();
         if (firebaseUser == null) {
             return null;
         }
@@ -139,11 +138,11 @@ public class EmailUserWorker extends BaseWorker<Void, EmailUserWorkerListener> {
                 final String currentPassword = args.getString(KEY_PASSWORD_CURRENT, "");
                 final AuthCredential credential = EmailAuthProvider
                         .getCredential(currentEmail, currentPassword);
-                return mUserRepo.deleteUser(firebaseUser, credential).toObservable();
+                return userRepo.deleteUser(firebaseUser, credential).toObservable();
             }
             case EmailUserAction.REQUEST_RESET_PW: {
                 final String email = args.getString(KEY_EMAIL_ADDRESS_CURRENT, "");
-                return mUserRepo.requestPasswordReset(email).toObservable();
+                return userRepo.requestPasswordReset(email).toObservable();
             }
             case EmailUserAction.CHANGE_EMAIL_PW: {
                 final String currentEmail = args.getString(KEY_EMAIL_ADDRESS_CURRENT, "");
@@ -152,7 +151,7 @@ public class EmailUserWorker extends BaseWorker<Void, EmailUserWorkerListener> {
                 final String newPassword = args.getString(KEY_PASSWORD_NEW, "");
                 final AuthCredential credential = EmailAuthProvider
                         .getCredential(currentEmail, currentPassword);
-                return mUserRepo.updateEmailPassword(firebaseUser, credential,
+                return userRepo.updateEmailPassword(firebaseUser, credential,
                         newEmail, newPassword).toObservable();
             }
             default:
@@ -162,12 +161,12 @@ public class EmailUserWorker extends BaseWorker<Void, EmailUserWorkerListener> {
 
     @Override
     protected void onError() {
-        mActivity.onWorkerError(WORKER_TAG);
+        activity.onWorkerError(WORKER_TAG);
     }
 
     @Override
     protected void setStream(@NonNull Observable<Void> observable) {
-        mActivity.setEmailUserStream(observable.toSingle(), WORKER_TAG);
+        activity.setEmailUserStream(observable.toSingle(), WORKER_TAG);
     }
 
     @IntDef({EmailUserAction.DELETE, EmailUserAction.REQUEST_RESET_PW})

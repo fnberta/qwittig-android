@@ -65,17 +65,17 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
         LoginManager.getInstance().registerCallback(mFacebookCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                mViewModel.onFacebookSignedIn(loginResult.getAccessToken().getToken());
+                viewModel.onFacebookSignedIn(loginResult.getAccessToken().getToken());
             }
 
             @Override
             public void onCancel() {
-                mViewModel.onFacebookLoginFailed();
+                viewModel.onFacebookLoginFailed();
             }
 
             @Override
             public void onError(FacebookException exception) {
-                mViewModel.onFacebookLoginFailed();
+                viewModel.onFacebookLoginFailed();
             }
         });
     }
@@ -91,8 +91,8 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel.attachView(this);
-        mBinding.setViewModel(mViewModel);
+        viewModel.attachView(this);
+        mBinding.setViewModel(viewModel);
     }
 
     @Override
@@ -105,13 +105,13 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
         inflater.inflate(R.menu.menu_settings_profile, menu);
 
         final MenuItem deleteAvatar = menu.findItem(R.id.action_settings_profile_avatar_delete);
-        deleteAvatar.setVisible(!TextUtils.isEmpty(mViewModel.getAvatar()));
+        deleteAvatar.setVisible(!TextUtils.isEmpty(viewModel.getAvatar()));
 
         final MenuItem unlinkFacebook = menu.findItem(R.id.action_settings_profile_unlink_facebook);
-        unlinkFacebook.setVisible(mViewModel.showUnlinkFacebook());
+        unlinkFacebook.setVisible(viewModel.showUnlinkFacebook());
 
         final MenuItem unlinkGoogle = menu.findItem(R.id.action_settings_profile_unlink_google);
-        unlinkGoogle.setVisible(mViewModel.showUnlinkGoogle());
+        unlinkGoogle.setVisible(viewModel.showUnlinkGoogle());
     }
 
     @Override
@@ -119,15 +119,15 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
         int id = item.getItemId();
         switch (id) {
             case R.id.action_settings_profile_avatar_edit:
-                mViewModel.onPickAvatarMenuClick();
+                viewModel.onPickAvatarMenuClick();
                 return true;
             case R.id.action_settings_profile_avatar_delete:
-                mViewModel.onDeleteAvatarMenuClick();
+                viewModel.onDeleteAvatarMenuClick();
                 return true;
             case R.id.action_settings_profile_unlink_facebook:
                 // fall through
             case R.id.action_settings_profile_unlink_google:
-                mViewModel.onUnlinkThirdPartyLoginMenuClick();
+                viewModel.onUnlinkThirdPartyLoginMenuClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -204,7 +204,7 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
 
     @Override
     public void onValidEmailAndPasswordEntered(@NonNull String email, @NonNull String password) {
-        mViewModel.onValidEmailAndPasswordEntered(email, password);
+        viewModel.onValidEmailAndPasswordEntered(email, password);
     }
 
     @Override
@@ -218,7 +218,7 @@ public class SettingsProfileFragment extends BaseFragment<SettingsProfileCompone
 
     @Override
     public void reAuthenticateGoogle() {
-        mActivity.loginWithGoogle();
+        activity.loginWithGoogle();
     }
 
     @Override

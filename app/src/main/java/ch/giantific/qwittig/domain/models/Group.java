@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
-import com.google.firebase.database.PropertyName;
 import com.google.firebase.database.ServerValue;
 
 import java.util.Date;
@@ -19,19 +18,17 @@ import java.util.Set;
 @IgnoreExtraProperties
 public class Group implements FirebaseModel {
 
-    public static final String PATH = "groups";
+    public static final String BASE_PATH = "groups";
+
     public static final String PATH_NAME = "name";
     public static final String PATH_CURRENCY = "currency";
     public static final String PATH_IDENTITIES = "identities";
-    private String mId;
-    @PropertyName(PATH_CREATED_AT)
-    private long mCreatedAt;
-    @PropertyName(PATH_NAME)
-    private String mName;
-    @PropertyName(PATH_CURRENCY)
-    private String mCurrency;
-    @PropertyName(PATH_IDENTITIES)
-    private Map<String, Boolean> mIdentities;
+
+    private String id;
+    private long createdAt;
+    private String name;
+    private String currency;
+    private Map<String, Boolean> identities;
 
     public Group() {
         // required for firebase de-/serialization
@@ -41,25 +38,25 @@ public class Group implements FirebaseModel {
                  @NonNull List<String> identities) {
         this(name, currency);
 
-        mIdentities = new HashMap<>();
+        this.identities = new HashMap<>();
         for (String id : identities) {
-            mIdentities.put(id, true);
+            this.identities.put(id, true);
         }
     }
 
     public Group(@NonNull String name, @NonNull String currency) {
-        mName = name;
-        mCurrency = currency;
+        this.name = name;
+        this.currency = currency;
     }
 
     @Exclude
     public String getId() {
-        return mId;
+        return id;
     }
 
     @Override
     public void setId(@NonNull String id) {
-        mId = id;
+        this.id = id;
     }
 
     @Override
@@ -69,33 +66,33 @@ public class Group implements FirebaseModel {
 
     @Exclude
     public Date getCreatedAtDate() {
-        return new Date(mCreatedAt);
+        return new Date(createdAt);
     }
 
     public String getName() {
-        return mName;
+        return name;
     }
 
     public String getCurrency() {
-        return mCurrency;
+        return currency;
     }
 
     public Map<String, Boolean> getIdentities() {
-        return mIdentities;
+        return identities;
     }
 
     @Exclude
     public Set<String> getIdentitiesIds() {
-        return mIdentities.keySet();
+        return identities.keySet();
     }
 
     @Exclude
     public Map<String, Object> toMap() {
         final Map<String, Object> result = new HashMap<>();
         result.put(PATH_CREATED_AT, ServerValue.TIMESTAMP);
-        result.put(PATH_NAME, mName);
-        result.put(PATH_CURRENCY, mCurrency);
-        result.put(PATH_IDENTITIES, mIdentities);
+        result.put(PATH_NAME, name);
+        result.put(PATH_CURRENCY, currency);
+        result.put(PATH_IDENTITIES, identities);
 
         return result;
     }

@@ -12,18 +12,18 @@ public abstract class BaseRecyclerAdapter<T extends RecyclerView.ViewHolder>
         extends RecyclerView.Adapter<T>
         implements ListInteraction {
 
-    protected RecyclerView mRecyclerView;
+    protected RecyclerView recyclerView;
 
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
 
-        mRecyclerView = recyclerView;
+        this.recyclerView = recyclerView;
     }
 
     @Override
     public void scrollToPosition(int position) {
-        mRecyclerView.scrollToPosition(position);
+        recyclerView.scrollToPosition(position);
     }
 
     @Override

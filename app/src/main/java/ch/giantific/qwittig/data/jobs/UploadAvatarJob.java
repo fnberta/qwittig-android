@@ -36,9 +36,10 @@ public class UploadAvatarJob extends JobService {
     private static final String JOB_TAG = UploadAvatarJob.class.getCanonicalName();
     private static final String KEY_IDENTITY_ID = "IDENTITY_ID";
     private static final String KEY_AVATAR = "AVATAR";
+
     @Inject
-    UserRepository mUserRepo;
-    private Subscription mSubscription;
+    UserRepository userRepo;
+    private Subscription subscription;
 
     public static boolean schedule(@NonNull FirebaseJobDispatcher jobDispatcher,
                                    @NonNull String avatar,
@@ -79,7 +80,7 @@ public class UploadAvatarJob extends JobService {
         }
 
         final String identityId = extras.getString(KEY_IDENTITY_ID);
-        mSubscription = mUserRepo.uploadAvatar(avatar, identityId)
+        subscription = userRepo.uploadAvatar(avatar, identityId)
                 .subscribe(new SingleSubscriber<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot value) {
@@ -99,7 +100,7 @@ public class UploadAvatarJob extends JobService {
 
     @Override
     public boolean onStopJob(JobParameters jobParameters) {
-        mSubscription.unsubscribe();
+        subscription.unsubscribe();
         return true;
     }
 

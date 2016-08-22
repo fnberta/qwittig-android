@@ -29,7 +29,7 @@ import ch.giantific.qwittig.presentation.finance.di.FinanceSubcomponent;
 public class CompsUnpaidFragment extends BaseRecyclerViewFragment<FinanceSubcomponent, CompsUnpaidViewModel, BaseRecyclerViewFragment.ActivityListener<FinanceSubcomponent>>
         implements CompsUnpaidViewModel.ViewListener {
 
-    private FragmentFinanceCompensationsUnpaidBinding mBinding;
+    private FragmentFinanceCompensationsUnpaidBinding binding;
 
     public CompsUnpaidFragment() {
         // Required empty public constructor
@@ -38,17 +38,17 @@ public class CompsUnpaidFragment extends BaseRecyclerViewFragment<FinanceSubcomp
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentFinanceCompensationsUnpaidBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentFinanceCompensationsUnpaidBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel.attachView(this);
-        mViewModel.setListInteraction(mRecyclerAdapter);
-        mBinding.setViewModel(mViewModel);
+        viewModel.attachView(this);
+        viewModel.setListInteraction(recyclerAdapter);
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -58,12 +58,12 @@ public class CompsUnpaidFragment extends BaseRecyclerViewFragment<FinanceSubcomp
 
     @Override
     protected RecyclerView getRecyclerView() {
-        return mBinding.srlRv.rvBase;
+        return binding.srlRv.rvBase;
     }
 
     @Override
     protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new CompsUnpaidRecyclerAdapter(mViewModel);
+        return new CompsUnpaidRecyclerAdapter(viewModel);
     }
 
     @Override

@@ -26,7 +26,7 @@ import ch.giantific.qwittig.presentation.tasks.addedit.itemmodels.TaskAddEditIde
  */
 public class TaskAddEditUsersRecyclerAdapter extends BaseRecyclerAdapter<TaskAddEditUsersRecyclerAdapter.TaskUserInvolvedRow> {
 
-    private final TaskAddEditViewModel mViewModel;
+    private final TaskAddEditViewModel viewModel;
 
     /**
      * Constructs a new {@link TaskAddEditUsersRecyclerAdapter}.
@@ -34,7 +34,7 @@ public class TaskAddEditUsersRecyclerAdapter extends BaseRecyclerAdapter<TaskAdd
      * @param viewModel the view model for the view
      */
     public TaskAddEditUsersRecyclerAdapter(@NonNull TaskAddEditViewModel viewModel) {
-        mViewModel = viewModel;
+        this.viewModel = viewModel;
     }
 
     @NonNull
@@ -42,7 +42,7 @@ public class TaskAddEditUsersRecyclerAdapter extends BaseRecyclerAdapter<TaskAdd
     public TaskUserInvolvedRow onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         final RowTaskAddEditUserBinding binding = RowTaskAddEditUserBinding.inflate(inflater, parent, false);
-        return new TaskUserInvolvedRow(binding, mViewModel);
+        return new TaskUserInvolvedRow(binding, viewModel);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class TaskAddEditUsersRecyclerAdapter extends BaseRecyclerAdapter<TaskAdd
 
     @Override
     public int getItemCount() {
-        return mViewModel.getItemCount();
+        return viewModel.getItemCount();
     }
 
     /**

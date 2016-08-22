@@ -13,16 +13,16 @@ import com.google.android.gms.common.ConnectionResult;
  */
 public class GoogleApiConnectionException extends RuntimeException {
 
-    private final ConnectionResult mConnectionResult;
+    private final ConnectionResult connectionResult;
 
     public GoogleApiConnectionException(@NonNull String detailMessage,
                                         @NonNull ConnectionResult connectionResult) {
         super(detailMessage);
 
-        mConnectionResult = connectionResult;
+        this.connectionResult = connectionResult;
     }
 
     public ConnectionResult getConnectionResult() {
-        return mConnectionResult;
+        return connectionResult;
     }
 }

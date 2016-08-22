@@ -28,8 +28,9 @@ public class OcrRatingActivity extends BaseActivity<OcrRatingComponent>
         implements OcrRatingViewModel.ViewListener {
 
     private static final String FRAGMENT_RATING = "FRAGMENT_RATING";
+
     @Inject
-    OcrRatingViewModel mOcrRatingViewModel;
+    OcrRatingViewModel ocrRatingViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,18 +52,18 @@ public class OcrRatingActivity extends BaseActivity<OcrRatingComponent>
     @Override
     protected void injectDependencies(@Nullable Bundle savedInstanceState) {
         final String ocrDataId = getIntent().getStringExtra(Navigator.INTENT_OCR_DATA_ID);
-        mComponent = DaggerOcrRatingComponent.builder()
+        component = DaggerOcrRatingComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
                 .ocrRatingViewModelModule(new OcrRatingViewModelModule(savedInstanceState, ocrDataId))
                 .build();
-        mComponent.inject(this);
-        mOcrRatingViewModel.attachView(this);
+        component.inject(this);
+        ocrRatingViewModel.attachView(this);
     }
 
     @Override
     protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{mOcrRatingViewModel});
+        return Arrays.asList(new ViewModel[]{ocrRatingViewModel});
     }
 
     @Override

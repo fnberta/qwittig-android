@@ -65,7 +65,7 @@ public class PushBroadcastReceiver {
 //    @Inject
 //    SharedPreferences mSharedPrefs;
 //    @Inject
-//    UserRepository mUserRepo;
+//    UserRepository userRepo;
 //    @Inject
 //    NotificationManager mNotificationManager;
 //    @Inject
@@ -154,7 +154,7 @@ public class PushBroadcastReceiver {
 //    protected void onPushReceive(@NonNull Context context, @NonNull Intent intent) {
 //        Timber.d("onPushReceive");
 //
-//        final User currentUser = mUserRepo.getCurrentUser();
+//        final User currentUser = userRepo.getCurrentUser();
 //        // return immediately if no user is logged in
 //        if (currentUser == null) {
 //            Timber.w("currentUser is null");
@@ -650,7 +650,7 @@ public class PushBroadcastReceiver {
 //                return;
 //            }
 //
-//            final User currentUser = mUserRepo.getCurrentUser();
+//            final User currentUser = userRepo.getCurrentUser();
 //            if (currentUser != null) {
 //                final Group oldGroup = currentUser.getCurrentIdentity().getGroup();
 //                if (!Objects.equals(oldGroup.getObjectId(), groupId) && currentUser.isInGroup(groupId)) {
@@ -705,7 +705,7 @@ public class PushBroadcastReceiver {
 //                } else {
 //                    clearStoredPurchaseNotifications(groupId);
 //
-//                    final User currentUser = mUserRepo.getCurrentUser();
+//                    final User currentUser = userRepo.getCurrentUser();
 //                    if (currentUser != null && currentUser.isInGroup(groupId)) {
 //                        return PurchaseDetailsActivity.class;
 //                    }
@@ -730,7 +730,7 @@ public class PushBroadcastReceiver {
 //                    return TasksActivity.class;
 //                }
 //
-//                final User currentUser = mUserRepo.getCurrentUser();
+//                final User currentUser = userRepo.getCurrentUser();
 //                if (currentUser != null && currentUser.isInGroup(groupId)) {
 //                    return TaskDetailsActivity.class;
 //                }

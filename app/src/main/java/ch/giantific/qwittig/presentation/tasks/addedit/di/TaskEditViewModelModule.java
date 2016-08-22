@@ -25,13 +25,13 @@ import dagger.Provides;
 @Module
 public class TaskEditViewModelModule extends BaseViewModelModule {
 
-    private final String mEditTaskId;
+    private final String editTaskId;
 
     public TaskEditViewModelModule(@Nullable Bundle savedState,
                                    @NonNull String editTaskId) {
         super(savedState);
 
-        mEditTaskId = editTaskId;
+        this.editTaskId = editTaskId;
     }
 
     @PerActivity
@@ -40,8 +40,8 @@ public class TaskEditViewModelModule extends BaseViewModelModule {
                                                       @NonNull RxBus<Object> eventBus,
                                                       @NonNull UserRepository userRepository,
                                                       @NonNull TaskRepository taskRepository) {
-        return new TaskAddEditViewModelEditImpl(mSavedState, navigator, eventBus, userRepository,
-                taskRepository, mEditTaskId);
+        return new TaskAddEditViewModelEditImpl(savedState, navigator, eventBus, userRepository,
+                taskRepository, editTaskId);
     }
 
 }

@@ -37,23 +37,24 @@ public class LoginAccountsViewModelImpl extends ViewModelBaseImpl<LoginAccountsV
         implements LoginAccountsViewModel {
 
     private static final String STATE_IDENTITY_ID = "STATE_IDENTITY_ID";
-    private final RemoteConfigHelper mConfigHelper;
-    private final GroupRepository mGroupRepo;
-    private String mIdentityId;
+
+    private final RemoteConfigHelper configHelper;
+    private final GroupRepository groupRepo;
+    private String identityId;
 
     public LoginAccountsViewModelImpl(@Nullable Bundle savedState,
                                       @NonNull Navigator navigator,
                                       @NonNull RxBus<Object> eventBus,
                                       @NonNull RemoteConfigHelper configHelper,
-                                      @NonNull UserRepository userRepository,
-                                      @NonNull GroupRepository groupRepository) {
-        super(savedState, navigator, eventBus, userRepository);
+                                      @NonNull UserRepository userRepo,
+                                      @NonNull GroupRepository groupRepo) {
+        super(savedState, navigator, eventBus, userRepo);
 
-        mConfigHelper = configHelper;
-        mGroupRepo = groupRepository;
+        this.configHelper = configHelper;
+        this.groupRepo = groupRepo;
 
         if (savedState != null) {
-            mIdentityId = savedState.getString(STATE_IDENTITY_ID, "");
+            identityId = savedState.getString(STATE_IDENTITY_ID, "");
         }
     }
 
@@ -61,37 +62,37 @@ public class LoginAccountsViewModelImpl extends ViewModelBaseImpl<LoginAccountsV
     public void saveState(@NonNull Bundle outState) {
         super.saveState(outState);
 
-        if (!TextUtils.isEmpty(mIdentityId)) {
-            outState.putString(STATE_IDENTITY_ID, mIdentityId);
+        if (!TextUtils.isEmpty(identityId)) {
+            outState.putString(STATE_IDENTITY_ID, identityId);
         }
     }
 
     @Override
     public void setUserLoginStream(@NonNull Single<FirebaseUser> single,
                                    @NonNull final String workerTag,
-                                   @LoginWorker.Type int type) {
+                                   @LoginWorker.LoginType int type) {
         getSubscriptions().add(single
                 .flatMap(new Func1<FirebaseUser, Single<Boolean>>() {
                     @Override
                     public Single<Boolean> call(final FirebaseUser firebaseUser) {
                         final String userId = firebaseUser.getUid();
-                        if (!TextUtils.isEmpty(mIdentityId)) {
-                            return mUserRepo.getIdentity(mIdentityId)
+                        if (!TextUtils.isEmpty(identityId)) {
+                            return userRepo.getIdentity(identityId)
                                     .doOnSuccess(new Action1<Identity>() {
                                         @Override
                                         public void call(Identity identity) {
-                                            mGroupRepo.joinGroup(userId, mIdentityId, identity.getGroup());
+                                            groupRepo.joinGroup(userId, identityId, identity.getGroup());
                                         }
                                     })
                                     .flatMap(new Func1<Identity, Single<? extends Boolean>>() {
                                         @Override
                                         public Single<? extends Boolean> call(Identity identity) {
-                                            return mUserRepo.isUserNew(userId);
+                                            return userRepo.isUserNew(userId);
                                         }
                                     });
                         }
 
-                        return mUserRepo.isUserNew(userId)
+                        return userRepo.isUserNew(userId)
                                 .doOnSuccess(new Action1<Boolean>() {
                                     @Override
                                     public void call(Boolean isUserNew) {
@@ -105,21 +106,21 @@ public class LoginAccountsViewModelImpl extends ViewModelBaseImpl<LoginAccountsV
                 .subscribe(new SingleSubscriber<Boolean>() {
                     @Override
                     public void onSuccess(Boolean isUserNew) {
-                        mView.removeWorker(workerTag);
+                        view.removeWorker(workerTag);
 
                         if (isUserNew) {
-                            mView.showProfileFragment(!TextUtils.isEmpty(mIdentityId));
+                            view.showProfileFragment(!TextUtils.isEmpty(identityId));
                         } else {
-                            mNavigator.finish(Activity.RESULT_OK);
+                            navigator.finish(Activity.RESULT_OK);
                         }
                     }
 
                     @Override
                     public void onError(Throwable error) {
-                        mView.removeWorker(workerTag);
+                        view.removeWorker(workerTag);
                         setLoading(false);
 
-                        mView.showMessage(R.string.toast_error_login);
+                        view.showMessage(R.string.toast_error_login);
                     }
                 })
         );
@@ -146,36 +147,36 @@ public class LoginAccountsViewModelImpl extends ViewModelBaseImpl<LoginAccountsV
                     : "";
         }
 
-        mGroupRepo.createGroup(userId, mConfigHelper.getDefaultGroupName(),
-                mConfigHelper.getDefaultGroupCurrency(), nickname, avatar);
+        groupRepo.createGroup(userId, configHelper.getDefaultGroupName(),
+                configHelper.getDefaultGroupCurrency(), nickname, avatar);
     }
 
     @Override
     public void setInvitationIdentityId(@NonNull String identityId) {
-        mIdentityId = identityId;
+        this.identityId = identityId;
     }
 
     @Override
     public void onGoogleLoginSuccessful(@NonNull String idToken) {
-        mView.loadGoogleLoginWorker(idToken);
+        view.loadGoogleLoginWorker(idToken);
     }
 
     @Override
     public void onGoogleLoginFailed() {
         setLoading(false);
-        mView.showMessage(R.string.toast_error_login_google);
+        view.showMessage(R.string.toast_error_login_google);
     }
 
     @Override
     public void onFacebookSignedIn(@NonNull String idToken) {
         setLoading(true);
-        mView.loadFacebookLoginWorker(idToken);
+        view.loadFacebookLoginWorker(idToken);
     }
 
     @Override
     public void onFacebookLoginFailed() {
         setLoading(false);
-        mView.showMessage(R.string.toast_error_login_facebook);
+        view.showMessage(R.string.toast_error_login_facebook);
     }
 
     @Override
@@ -184,13 +185,13 @@ public class LoginAccountsViewModelImpl extends ViewModelBaseImpl<LoginAccountsV
             @Override
             public void onClick(View v) {
                 setLoading(true);
-                mView.loginWithGoogle();
+                view.loginWithGoogle();
             }
         };
     }
 
     @Override
     public void onUseEmailClick(View view) {
-        mView.showEmailFragment(mIdentityId);
+        this.view.showEmailFragment(identityId);
     }
 }

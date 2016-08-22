@@ -27,38 +27,38 @@ public class HelpFeedbackItem extends BaseObservable implements HelpFeedbackItem
         }
     };
     @StringRes
-    private int mTitle;
+    private int title;
     @DrawableRes
-    private int mIcon;
+    private int icon;
 
     public HelpFeedbackItem(@StringRes int title, @DrawableRes int icon) {
-        mTitle = title;
-        mIcon = icon;
+        this.title = title;
+        this.icon = icon;
     }
 
     private HelpFeedbackItem(Parcel in) {
-        mTitle = in.readInt();
-        mIcon = in.readInt();
+        title = in.readInt();
+        icon = in.readInt();
     }
 
     @Bindable
     @StringRes
     public int getTitle() {
-        return mTitle;
+        return title;
     }
 
     public void setTitle(@StringRes int title) {
-        mTitle = title;
+        this.title = title;
     }
 
     @Bindable
     @DrawableRes
     public int getIcon() {
-        return mIcon;
+        return icon;
     }
 
     public void setIcon(@DrawableRes int icon) {
-        mIcon = icon;
+        this.icon = icon;
     }
 
     @Override
@@ -73,7 +73,7 @@ public class HelpFeedbackItem extends BaseObservable implements HelpFeedbackItem
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(mTitle);
-        dest.writeInt(mIcon);
+        dest.writeInt(title);
+        dest.writeInt(icon);
     }
 }

@@ -28,11 +28,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.google.android.gms.appinvite.AppInvite;
-import com.google.android.gms.appinvite.AppInviteInvitationResult;
-import com.google.android.gms.appinvite.AppInviteReferral;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 
 import java.io.File;
 import java.util.Arrays;
@@ -47,8 +42,10 @@ import ch.giantific.qwittig.data.repositories.GroupRepository;
 import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.databinding.ActivityHomeBinding;
 import ch.giantific.qwittig.presentation.camera.CameraActivity;
+import ch.giantific.qwittig.presentation.common.GoogleApiClientDelegate;
 import ch.giantific.qwittig.presentation.common.MessageAction;
 import ch.giantific.qwittig.presentation.common.Navigator;
+import ch.giantific.qwittig.presentation.common.di.GoogleApiClientDelegateModule;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 import ch.giantific.qwittig.presentation.navdrawer.BaseNavDrawerActivity;
 import ch.giantific.qwittig.presentation.navdrawer.di.NavDrawerComponent;
@@ -79,21 +76,24 @@ import timber.log.Timber;
 public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implements
         DraftsFragment.ActivityListener,
         HomeViewModel.ViewListener,
-        JoinGroupDialogFragment.DialogInteractionListener {
+        JoinGroupDialogFragment.DialogInteractionListener,
+        GoogleApiClientDelegate.GoogleInvitationCallback {
 
     private static final String STATE_DRAFTS_FRAGMENT = "STATE_DRAFTS_FRAGMENT";
     private static final int PERMISSIONS_REQUEST_CAPTURE_IMAGES = 1;
+
     @Inject
-    HomeViewModel mHomeViewModel;
+    HomeViewModel homeViewModel;
     @Inject
-    PurchasesViewModel mPurchasesViewModel;
+    PurchasesViewModel purchasesViewModel;
     @Inject
-    DraftsViewModel mDraftsViewModel;
-    private DraftsFragment mDraftsFragment;
-    private ActivityHomeBinding mBinding;
-    private ProgressDialog mProgressDialog;
-    private HomeTabsAdapter mTabsAdapter;
-    private GoogleApiClient mGoogleApiClient;
+    DraftsViewModel draftsViewModel;
+    @Inject
+    GoogleApiClientDelegate googleApiDelegate;
+    private DraftsFragment draftsFragment;
+    private ActivityHomeBinding binding;
+    private ProgressDialog progressDialog;
+    private HomeTabsAdapter tabsAdapter;
 
     @Override
     protected void handleLocalBroadcast(Intent intent, int dataType) {
@@ -104,9 +104,9 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
                 final boolean successful = intent.getBooleanExtra(LocalBroadcast.INTENT_EXTRA_SUCCESSFUL, false);
                 if (successful) {
                     final String ocrPurchaseId = intent.getStringExtra(LocalBroadcast.INTENT_EXTRA_OCR_PURCHASE_ID);
-                    mHomeViewModel.onOcrPurchaseReady(ocrPurchaseId);
+                    homeViewModel.onOcrPurchaseReady(ocrPurchaseId);
                 } else {
-                    mHomeViewModel.onOcrPurchaseFailed();
+                    homeViewModel.onOcrPurchaseFailed();
                 }
                 break;
             }
@@ -117,8 +117,8 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppTheme_DrawStatusBar);
         super.onCreate(savedInstanceState);
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_home);
-        mBinding.setViewModel(mHomeViewModel);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_home);
+        binding.setViewModel(homeViewModel);
 
         // check item in NavDrawer
         checkNavDrawerItem(R.id.nav_home);
@@ -128,10 +128,10 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
             actionBar.setTitle(R.string.title_activity_home);
         }
 
-        setupGoogleApiClient();
+        googleApiDelegate.createGoogleApiClient(AppInvite.API);
 
-        if (mUserLoggedIn) {
-            if (mHomeViewModel.isDraftsAvailable()) {
+        if (userLoggedIn) {
+            if (homeViewModel.isDraftsAvailable()) {
                 final DraftsFragment draftsFragment = savedInstanceState != null
                         ? (DraftsFragment) getSupportFragmentManager().getFragment(savedInstanceState, STATE_DRAFTS_FRAGMENT)
                         : new DraftsFragment();
@@ -140,48 +140,49 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
                 setupTabs(null);
             }
 
-            checkForInvitation();
+            googleApiDelegate.checkForInvitation();
         }
     }
 
     @Override
     protected void injectDependencies(@NonNull NavDrawerComponent navComp,
                                       @Nullable Bundle savedInstanceState) {
-        mComponent = navComp.plus(new HomeViewModelModule(savedInstanceState),
+        component = navComp.plus(new HomeViewModelModule(savedInstanceState),
+                new GoogleApiClientDelegateModule(this, null, this),
                 new PurchasesListViewModelModule(savedInstanceState),
                 new DraftsListViewModelModule(savedInstanceState));
-        mComponent.inject(this);
-        mHomeViewModel.attachView(this);
+        component.inject(this);
+        homeViewModel.attachView(this);
     }
 
     @Override
     protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{mHomeViewModel, mPurchasesViewModel, mDraftsViewModel});
+        return Arrays.asList(new ViewModel[]{homeViewModel, purchasesViewModel, draftsViewModel});
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        if (mUserLoggedIn && mHomeViewModel.isDraftsAvailable()) {
-            getSupportFragmentManager().putFragment(outState, STATE_DRAFTS_FRAGMENT, mDraftsFragment);
+        if (userLoggedIn && homeViewModel.isDraftsAvailable()) {
+            getSupportFragmentManager().putFragment(outState, STATE_DRAFTS_FRAGMENT, draftsFragment);
         }
     }
 
     private void setupTabs(@Nullable DraftsFragment draftsFragment) {
-        mTabsAdapter = new HomeTabsAdapter(getSupportFragmentManager());
-        mTabsAdapter.addInitialFragment(new PurchasesFragment(), getString(R.string.tab_purchases));
+        tabsAdapter = new HomeTabsAdapter(getSupportFragmentManager());
+        tabsAdapter.addInitialFragment(new PurchasesFragment(), getString(R.string.tab_purchases));
         if (draftsFragment != null) {
-            mDraftsFragment = draftsFragment;
-            mTabsAdapter.addInitialFragment(mDraftsFragment, getString(R.string.tab_drafts));
+            this.draftsFragment = draftsFragment;
+            tabsAdapter.addInitialFragment(this.draftsFragment, getString(R.string.tab_drafts));
         }
-        mBinding.viewpager.setAdapter(mTabsAdapter);
-        mBinding.tabs.setupWithViewPager(mBinding.viewpager);
+        binding.viewpager.setAdapter(tabsAdapter);
+        binding.tabs.setupWithViewPager(binding.viewpager);
     }
 
     private void toggleToolbarScrollFlags(boolean scroll) {
         final AppBarLayout.LayoutParams params =
-                (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
+                (AppBarLayout.LayoutParams) toolbar.getLayoutParams();
         params.setScrollFlags(scroll
                 ? AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL |
                 AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS |
@@ -189,52 +190,26 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
                 : 0);
     }
 
-    private void setupGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        Timber.w("GoogleApiClient onConnectionFailed: %s", connectionResult);
-                    }
-                })
-                .addApi(AppInvite.API)
-                .build();
-    }
-
-    private void checkForInvitation() {
-        AppInvite.AppInviteApi.getInvitation(mGoogleApiClient, this, false)
-                .setResultCallback(new ResultCallback<AppInviteInvitationResult>() {
-                    @Override
-                    public void onResult(@NonNull AppInviteInvitationResult result) {
-                        if (result.getStatus().isSuccess()) {
-                            final Intent intent = result.getInvitationIntent();
-                            final String deepLink = AppInviteReferral.getDeepLink(intent);
-                            Timber.d("deepLink %s", deepLink);
-                            final Uri uri = Uri.parse(deepLink);
-
-                            final String identityId = uri.getQueryParameter(GroupRepository.INVITATION_IDENTITY);
-                            final String groupName = uri.getQueryParameter(GroupRepository.INVITATION_GROUP);
-                            final String inviterNickname = uri.getQueryParameter(GroupRepository.INVITATION_INVITER);
-                            mHomeViewModel.handleInvitation(identityId, groupName, inviterNickname);
-                        } else {
-                            Timber.i("getInvitation: no deep link found.");
-                        }
-                    }
-                });
+    @Override
+    public void onDeepLinkFound(@NonNull Uri deepLink) {
+        final String identityId = deepLink.getQueryParameter(GroupRepository.INVITATION_IDENTITY);
+        final String groupName = deepLink.getQueryParameter(GroupRepository.INVITATION_GROUP);
+        final String inviterNickname = deepLink.getQueryParameter(GroupRepository.INVITATION_INVITER);
+        homeViewModel.handleInvitation(identityId, groupName, inviterNickname);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        mHomeViewModel.onViewVisible();
+        homeViewModel.onViewVisible();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
 
-        mHomeViewModel.onViewGone();
+        homeViewModel.onViewGone();
     }
 
     @Override
@@ -257,7 +232,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
                         showMessage(R.string.toast_changes_saved_as_draft);
                         break;
                     case PurchaseAddEditViewModel.PurchaseResult.PURCHASE_DRAFT_DELETED:
-                        mDraftsViewModel.onDraftDeleted(data.getStringExtra(Navigator.INTENT_OBJECT_ID));
+                        draftsViewModel.onDraftDeleted(data.getStringExtra(Navigator.INTENT_OBJECT_ID));
                         break;
                     case PurchaseAddEditViewModel.PurchaseResult.PURCHASE_DISCARDED:
                         showMessage(R.string.toast_purchase_discarded);
@@ -267,7 +242,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
             case Navigator.INTENT_REQUEST_PURCHASE_DETAILS:
                 switch (resultCode) {
                     case PurchaseDetailsResult.PURCHASE_DELETED:
-                        mPurchasesViewModel.onPurchaseDeleted(data.getStringExtra(Navigator.INTENT_OBJECT_ID));
+                        purchasesViewModel.onPurchaseDeleted(data.getStringExtra(Navigator.INTENT_OBJECT_ID));
                         break;
                 }
                 break;
@@ -278,10 +253,10 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
                         encodeReceipt(imagePath);
                         break;
                     case Activity.RESULT_CANCELED:
-                        mHomeViewModel.onReceiptImageDiscarded();
+                        homeViewModel.onReceiptImageDiscarded();
                         break;
                     case CameraActivity.RESULT_ERROR:
-                        mHomeViewModel.onReceiptImageFailed();
+                        homeViewModel.onReceiptImageFailed();
                 }
                 break;
         }
@@ -296,7 +271,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
                     @Override
                     public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
                         final String base64 = Base64.encodeToString(resource, Base64.DEFAULT);
-                        mHomeViewModel.onReceiptImageTaken(base64);
+                        homeViewModel.onReceiptImageTaken(base64);
                         deleteReceiptFile(receiptImagePath);
                     }
                 });
@@ -316,13 +291,13 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
         switch (requestCode) {
             case PERMISSIONS_REQUEST_CAPTURE_IMAGES:
                 if (Utils.verifyPermissions(grantResults)) {
-                    mNavigator.startCamera();
+                    navigator.startCamera();
                 } else {
                     showMessageWithAction(R.string.snackbar_permission_storage_denied,
                             new MessageAction(R.string.snackbar_action_open_settings) {
                                 @Override
                                 public void onClick(View v) {
-                                    mNavigator.startSystemSettings();
+                                    navigator.startSystemSettings();
                                 }
                             });
                 }
@@ -340,37 +315,37 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
     public void setupScreenAfterLogin() {
         super.setupScreenAfterLogin();
 
-        setupTabs(mHomeViewModel.isDraftsAvailable() ? new DraftsFragment() : null);
+        setupTabs(homeViewModel.isDraftsAvailable() ? new DraftsFragment() : null);
     }
 
     @Override
     public ActionMode startActionMode() {
-        return mToolbar.startActionMode(mDraftsFragment);
+        return toolbar.startActionMode(draftsFragment);
     }
 
     @Override
     public void toggleDraftTab(boolean draftsAvailable) {
         if (draftsAvailable) {
-            if (mDraftsFragment == null) {
+            if (draftsFragment == null) {
                 toggleToolbarScrollFlags(true);
-                mDraftsFragment = new DraftsFragment();
-                mTabsAdapter.addFragment(mDraftsFragment, getString(R.string.tab_drafts));
+                draftsFragment = new DraftsFragment();
+                tabsAdapter.addFragment(draftsFragment, getString(R.string.tab_drafts));
             }
-        } else if (mDraftsFragment != null) {
+        } else if (draftsFragment != null) {
             toggleToolbarScrollFlags(false);
-            mTabsAdapter.removeFragment(mDraftsFragment);
-            mDraftsFragment = null;
+            tabsAdapter.removeFragment(draftsFragment);
+            draftsFragment = null;
         }
     }
 
     @Override
     public void onJoinInvitedGroupSelected(@NonNull String identityId) {
-        mHomeViewModel.onJoinInvitedGroupSelected(identityId);
+        homeViewModel.onJoinInvitedGroupSelected(identityId);
     }
 
     @Override
     public void onDiscardInvitationSelected() {
-        mHomeViewModel.onDiscardInvitationSelected();
+        homeViewModel.onDiscardInvitationSelected();
     }
 
     @Override
@@ -382,13 +357,13 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
 
     @Override
     public void showProgressDialog(@StringRes int message) {
-        mProgressDialog = ProgressDialog.show(this, null, getString(message), true);
+        progressDialog = ProgressDialog.show(this, null, getString(message), true);
     }
 
     @Override
     public void hideProgressDialog() {
-        if (mProgressDialog != null) {
-            mProgressDialog.hide();
+        if (progressDialog != null) {
+            progressDialog.dismiss();
         }
     }
 
@@ -400,7 +375,7 @@ public class HomeActivity extends BaseNavDrawerActivity<HomeSubcomponent> implem
         }
 
         if (permissionsAreGranted()) {
-            mNavigator.startCamera();
+            navigator.startCamera();
         }
     }
 

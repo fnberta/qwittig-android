@@ -6,7 +6,6 @@ package ch.giantific.qwittig.presentation.tasks.details.itemmodels;
 
 import android.databinding.Bindable;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.text.DateFormat;
 
@@ -23,9 +22,9 @@ import ch.giantific.qwittig.utils.DateUtils;
 public class TaskDetailsHistoryItem extends BaseChildItemModel
         implements TaskDetailsItemModel, Comparable<TaskDetailsHistoryItem> {
 
-    private final String mEventDate;
-    private String mNickname;
-    private String mAvatar;
+    private final String eventDate;
+    private String nickname;
+    private String avatar;
 
     public TaskDetailsHistoryItem(@EventType int eventType,
                                   @NonNull TaskHistoryEvent taskHistoryEvent,
@@ -33,24 +32,24 @@ public class TaskDetailsHistoryItem extends BaseChildItemModel
         super(eventType, taskHistoryEvent.getId());
 
         final DateFormat dateFormatter = DateUtils.getDateFormatter(false);
-        mEventDate = dateFormatter.format(taskHistoryEvent.getDate());
-        mNickname = identity.getNickname();
-        mAvatar = identity.getAvatar();
+        eventDate = dateFormatter.format(taskHistoryEvent.getDate());
+        nickname = identity.getNickname();
+        avatar = identity.getAvatar();
     }
 
     @Bindable
     public String getNickname() {
-        return mNickname;
+        return nickname;
     }
 
     @Bindable
     public String getAvatar() {
-        return mAvatar;
+        return avatar;
     }
 
     @Bindable
     public String getEventDate() {
-        return mEventDate;
+        return eventDate;
     }
 
     @Override

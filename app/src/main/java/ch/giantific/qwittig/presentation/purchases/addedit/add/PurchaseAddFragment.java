@@ -50,7 +50,7 @@ public class PurchaseAddFragment extends BasePurchaseAddEditFragment<PurchaseAdd
         int id = item.getItemId();
         switch (id) {
             case R.id.action_purchase_save_draft:
-                mViewModel.onSaveAsDraftMenuClick();
+                viewModel.onSaveAsDraftMenuClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

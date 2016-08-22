@@ -29,8 +29,8 @@ import ch.giantific.qwittig.presentation.login.di.LoginComponent;
 public class LoginAccountsFragment extends BaseFragment<LoginComponent, LoginAccountsViewModel, LoginAccountsFragment.ActivityListener>
         implements LoginAccountsViewModel.ViewListener {
 
-    private FragmentLoginAccountsBinding mBinding;
-    private CallbackManager mFacebookCallbackManager;
+    private FragmentLoginAccountsBinding binding;
+    private CallbackManager facebookCallbackManager;
 
     public LoginAccountsFragment() {
         // required empty constructor
@@ -40,36 +40,36 @@ public class LoginAccountsFragment extends BaseFragment<LoginComponent, LoginAcc
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mFacebookCallbackManager = CallbackManager.Factory.create();
+        facebookCallbackManager = CallbackManager.Factory.create();
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentLoginAccountsBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentLoginAccountsBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mBinding.btLoginAccountsFacebook.setFragment(this);
-        mBinding.btLoginAccountsFacebook.setReadPermissions("email", "public_profile");
-        mBinding.btLoginAccountsFacebook.registerCallback(mFacebookCallbackManager, new FacebookCallback<LoginResult>() {
+        binding.btLoginAccountsFacebook.setFragment(this);
+        binding.btLoginAccountsFacebook.setReadPermissions("email", "public_profile");
+        binding.btLoginAccountsFacebook.registerCallback(facebookCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                mViewModel.onFacebookSignedIn(loginResult.getAccessToken().getToken());
+                viewModel.onFacebookSignedIn(loginResult.getAccessToken().getToken());
             }
 
             @Override
             public void onCancel() {
-                mViewModel.onFacebookLoginFailed();
+                viewModel.onFacebookLoginFailed();
             }
 
             @Override
             public void onError(FacebookException exception) {
-                mViewModel.onFacebookLoginFailed();
+                viewModel.onFacebookLoginFailed();
             }
         });
     }
@@ -78,8 +78,8 @@ public class LoginAccountsFragment extends BaseFragment<LoginComponent, LoginAcc
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel.attachView(this);
-        mBinding.setViewModel(mViewModel);
+        viewModel.attachView(this);
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -89,14 +89,14 @@ public class LoginAccountsFragment extends BaseFragment<LoginComponent, LoginAcc
 
     @Override
     protected View getSnackbarView() {
-        return mBinding.btLoginAccountsGoogle;
+        return binding.btLoginAccountsGoogle;
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        mFacebookCallbackManager.onActivityResult(requestCode, resultCode, data);
+        facebookCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -106,7 +106,7 @@ public class LoginAccountsFragment extends BaseFragment<LoginComponent, LoginAcc
 
     @Override
     public void loginWithGoogle() {
-        mActivity.loginWithGoogle();
+        activity.loginWithGoogle();
     }
 
     @Override
@@ -116,12 +116,12 @@ public class LoginAccountsFragment extends BaseFragment<LoginComponent, LoginAcc
 
     @Override
     public void showEmailFragment(@NonNull String identityId) {
-        mActivity.showEmailFragment(identityId);
+        activity.showEmailFragment(identityId);
     }
 
     @Override
     public void showProfileFragment(boolean withInvitation) {
-        mActivity.showProfileFragment(withInvitation);
+        activity.showProfileFragment(withInvitation);
     }
 
     /**

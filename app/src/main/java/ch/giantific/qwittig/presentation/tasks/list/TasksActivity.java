@@ -47,15 +47,15 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksListSubcomponent>
         implements TaskRemindWorkerListener {
 
     @Inject
-    TasksViewModel mTasksViewModel;
-    private ActivityTasksBinding mBinding;
-    private TaskDeadline[] mDeadlines;
+    TasksViewModel tasksViewModel;
+    private ActivityTasksBinding binding;
+    private TaskDeadline[] deadlines;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_tasks);
-        mBinding.setViewModel(mTasksViewModel);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_tasks);
+        binding.setViewModel(tasksViewModel);
 
         // check item in NavDrawer
         checkNavDrawerItem(R.id.nav_tasks);
@@ -68,7 +68,7 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksListSubcomponent>
         showFab();
         setupDeadlineSpinner();
 
-        if (mUserLoggedIn && savedInstanceState == null) {
+        if (userLoggedIn && savedInstanceState == null) {
             addTasksFragment();
         }
     }
@@ -76,7 +76,7 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksListSubcomponent>
     @Override
     protected void injectDependencies(@NonNull NavDrawerComponent navComp,
                                       @Nullable Bundle savedInstanceState) {
-        mDeadlines = new TaskDeadline[]{
+        deadlines = new TaskDeadline[]{
                 TaskDeadline.newAllInstance(getString(R.string.deadline_all)),
                 TaskDeadline.newTodayInstance(getString(R.string.deadline_today)),
                 TaskDeadline.newWeekInstance(getString(R.string.deadline_week)),
@@ -84,24 +84,24 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksListSubcomponent>
                 TaskDeadline.newYearInstance(getString(R.string.deadline_year))
         };
 
-        mComponent = navComp.plus(new TasksListViewModelModule(savedInstanceState, mDeadlines[0]));
-        mComponent.inject(this);
+        component = navComp.plus(new TasksListViewModelModule(savedInstanceState, deadlines[0]));
+        component.inject(this);
     }
 
     @Override
     protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{mTasksViewModel});
+        return Arrays.asList(new ViewModel[]{tasksViewModel});
     }
 
     private void showFab() {
-        if (ViewCompat.isLaidOut(mBinding.fabTaskAdd)) {
-            mBinding.fabTaskAdd.show();
+        if (ViewCompat.isLaidOut(binding.fabTaskAdd)) {
+            binding.fabTaskAdd.show();
         } else {
-            mBinding.fabTaskAdd.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            binding.fabTaskAdd.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
                 @Override
                 public void onLayoutChange(@NonNull View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
                     v.removeOnLayoutChangeListener(this);
-                    mBinding.fabTaskAdd.show();
+                    binding.fabTaskAdd.show();
                 }
             });
         }
@@ -112,9 +112,9 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksListSubcomponent>
         final ActionBar actionBar = getSupportActionBar();
         final Context themedContext = actionBar.getThemedContext();
         final ArrayAdapter<TaskDeadline> adapter =
-                new ArrayAdapter<>(themedContext, R.layout.spinner_item_toolbar, mDeadlines);
+                new ArrayAdapter<>(themedContext, R.layout.spinner_item_toolbar, deadlines);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mBinding.spTasksDeadline.setAdapter(adapter);
+        binding.spTasksDeadline.setAdapter(adapter);
     }
 
     private void addTasksFragment() {
@@ -164,6 +164,6 @@ public class TasksActivity extends BaseNavDrawerActivity<TasksListSubcomponent>
     @Override
     public void setTaskReminderStream(@NonNull Single<String> single, @NonNull String taskId,
                                       @NonNull String workerTag) {
-        mTasksViewModel.setTaskReminderStream(single, taskId, workerTag);
+        tasksViewModel.setTaskReminderStream(single, taskId, workerTag);
     }
 }

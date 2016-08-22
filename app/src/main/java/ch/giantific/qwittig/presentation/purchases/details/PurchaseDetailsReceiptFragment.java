@@ -22,7 +22,7 @@ import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsSub
  */
 public class PurchaseDetailsReceiptFragment extends BaseFragment<PurchaseDetailsSubcomponent, PurchaseDetailsViewModel, BaseFragment.ActivityListener<PurchaseDetailsSubcomponent>> {
 
-    private FragmentPurchaseShowReceiptBinding mBinding;
+    private FragmentPurchaseShowReceiptBinding binding;
 
     public PurchaseDetailsReceiptFragment() {
         // required empty constructor
@@ -31,15 +31,15 @@ public class PurchaseDetailsReceiptFragment extends BaseFragment<PurchaseDetails
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentPurchaseShowReceiptBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentPurchaseShowReceiptBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mBinding.setViewModel(mViewModel);
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -49,6 +49,6 @@ public class PurchaseDetailsReceiptFragment extends BaseFragment<PurchaseDetails
 
     @Override
     protected View getSnackbarView() {
-        return mBinding.ivReceipt;
+        return binding.ivReceipt;
     }
 }

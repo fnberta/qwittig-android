@@ -27,15 +27,15 @@ public class PurchaseAddEditGenericItem extends BaseObservable
         }
     };
     @Type
-    private final int mType;
+    private final int type;
 
     private PurchaseAddEditGenericItem(@Type int type) {
-        mType = type;
+        this.type = type;
     }
 
     @SuppressWarnings("WrongConstant")
     private PurchaseAddEditGenericItem(Parcel in) {
-        mType = in.readInt();
+        type = in.readInt();
     }
 
     public static PurchaseAddEditGenericItem createNewDateInstance() {
@@ -55,7 +55,7 @@ public class PurchaseAddEditGenericItem extends BaseObservable
     }
 
     public int getType() {
-        return mType;
+        return type;
     }
 
     @Override
@@ -65,6 +65,6 @@ public class PurchaseAddEditGenericItem extends BaseObservable
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(mType);
+        dest.writeInt(type);
     }
 }

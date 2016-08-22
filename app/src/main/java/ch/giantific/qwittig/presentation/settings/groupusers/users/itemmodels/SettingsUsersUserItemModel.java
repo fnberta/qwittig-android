@@ -6,7 +6,6 @@ package ch.giantific.qwittig.presentation.settings.groupusers.users.itemmodels;
 
 import android.databinding.Bindable;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.apache.commons.math3.fraction.BigFraction;
@@ -14,7 +13,6 @@ import org.apache.commons.math3.fraction.BigFraction;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent.EventType;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.itemmodels.BaseChildItemModel;
-import timber.log.Timber;
 
 /**
  * Defines an observable view model for an invited user row.
@@ -22,48 +20,48 @@ import timber.log.Timber;
 public class SettingsUsersUserItemModel extends BaseChildItemModel
         implements Comparable<SettingsUsersUserItemModel> {
 
-    private final String mNickname;
-    private final String mAvatar;
-    private final BigFraction mBalance;
-    private final String mInvitationLink;
-    private final String mGroupId;
+    private final String nickname;
+    private final String avatar;
+    private final BigFraction balance;
+    private final String invitationLink;
+    private final String groupId;
 
     public SettingsUsersUserItemModel(@EventType int eventType,
                                       @NonNull Identity identity) {
         super(eventType, identity.getId());
 
-        mNickname = identity.getNickname();
-        mAvatar = identity.getAvatar();
-        mBalance = identity.getBalanceFraction();
-        mInvitationLink = identity.getInvitationLink();
-        mGroupId = identity.getGroup();
+        nickname = identity.getNickname();
+        avatar = identity.getAvatar();
+        balance = identity.getBalanceFraction();
+        invitationLink = identity.getInvitationLink();
+        groupId = identity.getGroup();
     }
 
     @Bindable
     public String getNickname() {
-        return mNickname;
+        return nickname;
     }
 
     @Bindable
     public String getAvatar() {
-        return mAvatar;
+        return avatar;
     }
 
     public BigFraction getBalance() {
-        return mBalance;
+        return balance;
     }
 
     public String getInvitationLink() {
-        return mInvitationLink;
+        return invitationLink;
     }
 
     public String getGroupId() {
-        return mGroupId;
+        return groupId;
     }
 
     @Bindable
     public boolean isPending() {
-        return !TextUtils.isEmpty(mInvitationLink);
+        return !TextUtils.isEmpty(invitationLink);
     }
 
     @Override
@@ -72,7 +70,7 @@ public class SettingsUsersUserItemModel extends BaseChildItemModel
             return -1;
         }
 
-        return mNickname.compareToIgnoreCase(another.getNickname());
+        return nickname.compareToIgnoreCase(another.getNickname());
     }
 
     @Override
@@ -82,19 +80,19 @@ public class SettingsUsersUserItemModel extends BaseChildItemModel
 
         final SettingsUsersUserItemModel that = (SettingsUsersUserItemModel) o;
 
-        if (!mNickname.equals(that.getNickname())) return false;
-        if (mAvatar != null ? !mAvatar.equals(that.getAvatar()) : that.getAvatar() != null)
+        if (!nickname.equals(that.getNickname())) return false;
+        if (avatar != null ? !avatar.equals(that.getAvatar()) : that.getAvatar() != null)
             return false;
-        if (!mBalance.equals(that.getBalance())) return false;
-        return mInvitationLink != null ? mInvitationLink.equals(that.getInvitationLink()) : that.getInvitationLink() == null;
+        if (!balance.equals(that.getBalance())) return false;
+        return invitationLink != null ? invitationLink.equals(that.getInvitationLink()) : that.getInvitationLink() == null;
     }
 
     @Override
     public int hashCode() {
-        int result = mNickname.hashCode();
-        result = 31 * result + (mAvatar != null ? mAvatar.hashCode() : 0);
-        result = 31 * result + mBalance.hashCode();
-        result = 31 * result + (mInvitationLink != null ? mInvitationLink.hashCode() : 0);
+        int result = nickname.hashCode();
+        result = 31 * result + (avatar != null ? avatar.hashCode() : 0);
+        result = 31 * result + balance.hashCode();
+        result = 31 * result + (invitationLink != null ? invitationLink.hashCode() : 0);
         return result;
     }
 }

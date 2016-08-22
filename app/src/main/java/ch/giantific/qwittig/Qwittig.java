@@ -7,6 +7,7 @@ package ch.giantific.qwittig;
 import android.app.Application;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.multidex.MultiDex;
 
 import com.facebook.FacebookSdk;
 
@@ -23,14 +24,21 @@ import timber.log.Timber;
  */
 public class Qwittig extends Application {
 
-    private ApplicationComponent mAppComponent;
+    private ApplicationComponent appComponent;
 
     public static ApplicationComponent getAppComponent(@NonNull Context context) {
         return ((Qwittig) context.getApplicationContext()).getAppComponent();
     }
 
     private ApplicationComponent getAppComponent() {
-        return mAppComponent;
+        return appComponent;
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+
+        MultiDex.install(this);
     }
 
     @Override
@@ -47,7 +55,7 @@ public class Qwittig extends Application {
     }
 
     private void buildAppComponent() {
-        mAppComponent = DaggerApplicationComponent.builder()
+        appComponent = DaggerApplicationComponent.builder()
                 .applicationModule(new ApplicationModule(this))
                 .restServiceModule(new RestServiceModule())
                 .build();

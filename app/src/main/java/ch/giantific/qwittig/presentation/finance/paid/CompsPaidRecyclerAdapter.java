@@ -22,7 +22,7 @@ import ch.giantific.qwittig.presentation.finance.paid.itemmodels.CompsPaidItemMo
  */
 public class CompsPaidRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<RowCompPaidBinding>> {
 
-    private final CompsPaidViewModel mViewModel;
+    private final CompsPaidViewModel viewModel;
 
     /**
      * Constructs a new {@link CompsPaidRecyclerAdapter}.
@@ -32,7 +32,7 @@ public class CompsPaidRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<Row
     public CompsPaidRecyclerAdapter(@NonNull CompsPaidViewModel viewModel) {
         super();
 
-        mViewModel = viewModel;
+        this.viewModel = viewModel;
     }
 
     @NonNull
@@ -47,7 +47,7 @@ public class CompsPaidRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<Row
     @Override
     public void onBindViewHolder(BindingRow<RowCompPaidBinding> holder, int position) {
         final RowCompPaidBinding binding = holder.getBinding();
-        final CompsPaidItemModel itemModel = mViewModel.getItemAtPosition(position);
+        final CompsPaidItemModel itemModel = viewModel.getItemAtPosition(position);
 
         binding.setItemModel(itemModel);
         binding.executePendingBindings();
@@ -55,11 +55,11 @@ public class CompsPaidRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<Row
 
     @Override
     public int getItemViewType(int position) {
-        return mViewModel.getItemViewType(position);
+        return viewModel.getItemViewType(position);
     }
 
     @Override
     public int getItemCount() {
-        return mViewModel.getItemCount();
+        return viewModel.getItemCount();
     }
 }

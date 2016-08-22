@@ -13,12 +13,14 @@ import ch.giantific.qwittig.data.helper.RemoteConfigHelper;
 import ch.giantific.qwittig.data.repositories.GroupRepository;
 import ch.giantific.qwittig.data.repositories.PurchaseRepository;
 import ch.giantific.qwittig.data.repositories.UserRepository;
+import ch.giantific.qwittig.domain.models.Purchase;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.purchases.addedit.PurchaseAddEditViewModel;
+import rx.Single;
 
 /**
  * Provides an implementation of the {@link PurchaseEditDraftViewModel}.
- * <p>
+ * <p/>
  * Subclass of {@link PurchaseEditViewModelImpl}.
  */
 public class PurchaseEditDraftViewModelImpl extends PurchaseEditViewModelImpl
@@ -28,27 +30,36 @@ public class PurchaseEditDraftViewModelImpl extends PurchaseEditViewModelImpl
                                           @NonNull Navigator navigator,
                                           @NonNull RxBus<Object> eventBus,
                                           @NonNull RemoteConfigHelper configHelper,
-                                          @NonNull UserRepository userRepository,
-                                          @NonNull GroupRepository groupRepository,
-                                          @NonNull PurchaseRepository purchaseRepository,
+                                          @NonNull UserRepository userRepo,
+                                          @NonNull GroupRepository groupRepo,
+                                          @NonNull PurchaseRepository purchaseRepo,
                                           @NonNull String editPurchaseId) {
-        super(savedState, navigator, eventBus, configHelper, userRepository,
-                groupRepository, purchaseRepository, editPurchaseId);
+        super(savedState, navigator, eventBus, configHelper, userRepo,
+                groupRepo, purchaseRepo, editPurchaseId);
     }
 
     @Override
-    protected boolean isDraft() {
-        return true;
+    protected Single<Purchase> getPurchase() {
+        return purchaseRepo.getDraft(editPurchaseId, currentIdentity.getId());
+    }
+
+    @Override
+    protected void savePurchase(Purchase purchase, boolean asDraft) {
+        if (asDraft) {
+            purchaseRepo.saveDraft(purchase, editPurchaseId);
+        } else {
+            purchaseRepo.savePurchase(purchase, editPurchaseId, true);
+        }
     }
 
     @Override
     protected void onPurchaseSaved(boolean asDraft) {
-        mNavigator.finish(PurchaseResult.PURCHASE_DRAFT_CHANGES);
+        navigator.finish(PurchaseResult.PURCHASE_DRAFT_CHANGES);
     }
 
     @Override
     public void onDeleteDraftMenuClick() {
-        mPurchaseRepo.deletePurchase(mEditPurchaseId, true);
-        mNavigator.finish(PurchaseAddEditViewModel.PurchaseResult.PURCHASE_DRAFT_DELETED, mEditPurchaseId);
+        purchaseRepo.deleteDraft(editPurchaseId, editPurchase.getBuyer());
+        navigator.finish(PurchaseAddEditViewModel.PurchaseResult.PURCHASE_DRAFT_DELETED, editPurchaseId);
     }
 }

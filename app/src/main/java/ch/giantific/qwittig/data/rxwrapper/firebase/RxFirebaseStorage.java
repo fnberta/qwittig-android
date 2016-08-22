@@ -12,10 +12,9 @@ import com.google.firebase.storage.UploadTask;
 import java.io.File;
 import java.io.InputStream;
 
+import ch.giantific.qwittig.data.rxwrapper.firebase.subscribers.ListenToTaskOnCompleteOnSubscribe;
 import ch.giantific.qwittig.data.rxwrapper.firebase.subscribers.ListenToTaskOnFailureSuccessOnSubscribe;
-import rx.Observable;
 import rx.Single;
-import rx.Subscriber;
 
 /**
  * Created by Nick Moskalenko on 24/05/2016.
@@ -23,107 +22,62 @@ import rx.Subscriber;
 public class RxFirebaseStorage {
 
     @NonNull
-    public static Observable<byte[]> getBytes(@NonNull final StorageReference storageRef,
-                                              final long maxDownloadSizeBytes) {
-        return Observable.create(new Observable.OnSubscribe<byte[]>() {
-            @Override
-            public void call(final Subscriber<? super byte[]> subscriber) {
-                RxHandler.assignOnTask(subscriber, storageRef.getBytes(maxDownloadSizeBytes));
-            }
-        });
+    public static Single<byte[]> getBytes(@NonNull final StorageReference storageRef,
+                                          final long maxDownloadSizeBytes) {
+        return Single.create(new ListenToTaskOnCompleteOnSubscribe<>(storageRef.getBytes(maxDownloadSizeBytes)));
     }
 
     @NonNull
-    public static Observable<Uri> getDownloadUrl(@NonNull final StorageReference storageRef) {
-        return Observable.create(new Observable.OnSubscribe<Uri>() {
-            @Override
-            public void call(final Subscriber<? super Uri> subscriber) {
-                RxHandler.assignOnTask(subscriber, storageRef.getDownloadUrl());
-            }
-        });
+    public static Single<Uri> getDownloadUrl(@NonNull final StorageReference storageRef) {
+        return Single.create(new ListenToTaskOnCompleteOnSubscribe<>(storageRef.getDownloadUrl()));
     }
 
     @NonNull
-    public static Observable<FileDownloadTask.TaskSnapshot> getFile(@NonNull final StorageReference storageRef,
-                                                                    @NonNull final File destinationFile) {
-        return Observable.create(new Observable.OnSubscribe<FileDownloadTask.TaskSnapshot>() {
-            @Override
-            public void call(final Subscriber<? super FileDownloadTask.TaskSnapshot> subscriber) {
-                RxHandler.assignOnTaskNotCompleted(subscriber, storageRef.getFile(destinationFile));
-            }
-        });
+    public static Single<FileDownloadTask.TaskSnapshot> getFile(@NonNull final StorageReference storageRef,
+                                                                @NonNull final File destinationFile) {
+        return Single.create(new ListenToTaskOnFailureSuccessOnSubscribe<>(storageRef.getFile(destinationFile)));
     }
 
     @NonNull
-    public static Observable<FileDownloadTask.TaskSnapshot> getFile(@NonNull final StorageReference storageRef,
-                                                                    @NonNull final Uri destinationUri) {
-        return Observable.create(new Observable.OnSubscribe<FileDownloadTask.TaskSnapshot>() {
-            @Override
-            public void call(final Subscriber<? super FileDownloadTask.TaskSnapshot> subscriber) {
-                RxHandler.assignOnTaskNotCompleted(subscriber, storageRef.getFile(destinationUri));
-            }
-        });
+    public static Single<FileDownloadTask.TaskSnapshot> getFile(@NonNull final StorageReference storageRef,
+                                                                @NonNull final Uri destinationUri) {
+        return Single.create(new ListenToTaskOnFailureSuccessOnSubscribe<>(storageRef.getFile(destinationUri)));
     }
 
     @NonNull
-    public static Observable<StorageMetadata> getMetadata(@NonNull final StorageReference storageRef) {
-        return Observable.create(new Observable.OnSubscribe<StorageMetadata>() {
-            @Override
-            public void call(final Subscriber<? super StorageMetadata> subscriber) {
-                RxHandler.assignOnTask(subscriber, storageRef.getMetadata());
-            }
-        });
+    public static Single<StorageMetadata> getMetadata(@NonNull final StorageReference storageRef) {
+        return Single.create(new ListenToTaskOnCompleteOnSubscribe<>(storageRef.getMetadata()));
     }
 
     @NonNull
-    public static Observable<StreamDownloadTask.TaskSnapshot> getStream(@NonNull final StorageReference storageRef) {
-        return Observable.create(new Observable.OnSubscribe<StreamDownloadTask.TaskSnapshot>() {
-            @Override
-            public void call(final Subscriber<? super StreamDownloadTask.TaskSnapshot> subscriber) {
-                RxHandler.assignOnTask(subscriber, storageRef.getStream());
-            }
-        });
+    public static Single<StreamDownloadTask.TaskSnapshot> getStream(@NonNull final StorageReference storageRef) {
+        return Single.create(new ListenToTaskOnCompleteOnSubscribe<>(storageRef.getStream()));
     }
 
     @NonNull
-    public static Observable<StreamDownloadTask.TaskSnapshot> getStream(@NonNull final StorageReference storageRef,
-                                                                        @NonNull final StreamDownloadTask.StreamProcessor processor) {
-        return Observable.create(new Observable.OnSubscribe<StreamDownloadTask.TaskSnapshot>() {
-            @Override
-            public void call(final Subscriber<? super StreamDownloadTask.TaskSnapshot> subscriber) {
-                RxHandler.assignOnTask(subscriber, storageRef.getStream(processor));
-            }
-        });
+    public static Single<StreamDownloadTask.TaskSnapshot> getStream(@NonNull final StorageReference storageRef,
+                                                                    @NonNull final StreamDownloadTask.StreamProcessor processor) {
+        return Single.create(new ListenToTaskOnCompleteOnSubscribe<>(storageRef.getStream(processor)));
     }
 
 
     @NonNull
-    public static Observable<UploadTask.TaskSnapshot> putBytes(@NonNull final StorageReference storageRef,
-                                                               @NonNull final byte[] bytes) {
-        return Observable.create(new Observable.OnSubscribe<UploadTask.TaskSnapshot>() {
-            @Override
-            public void call(final Subscriber<? super UploadTask.TaskSnapshot> subscriber) {
-                RxHandler.assignOnTask(subscriber, storageRef.putBytes(bytes));
-            }
-        });
+    public static Single<UploadTask.TaskSnapshot> putBytes(@NonNull final StorageReference storageRef,
+                                                           @NonNull final byte[] bytes) {
+        return Single.create(new ListenToTaskOnCompleteOnSubscribe<>(storageRef.putBytes(bytes)));
     }
 
     @NonNull
-    public static Observable<UploadTask.TaskSnapshot> putBytes(@NonNull final StorageReference storageRef,
-                                                               @NonNull final byte[] bytes,
-                                                               @NonNull final StorageMetadata metadata) {
-        return Observable.create(new Observable.OnSubscribe<UploadTask.TaskSnapshot>() {
-            @Override
-            public void call(final Subscriber<? super UploadTask.TaskSnapshot> subscriber) {
-                RxHandler.assignOnTask(subscriber, storageRef.putBytes(bytes, metadata));
-            }
-        });
+    public static Single<UploadTask.TaskSnapshot> putBytes(@NonNull final StorageReference storageRef,
+                                                           @NonNull final byte[] bytes,
+                                                           @NonNull final StorageMetadata metadata) {
+        return Single.create(new ListenToTaskOnCompleteOnSubscribe<>(storageRef.putBytes(bytes, metadata)));
     }
 
     @NonNull
     public static Single<UploadTask.TaskSnapshot> putFile(@NonNull final StorageReference storageRef,
                                                           @NonNull final Uri uri) {
-        return Single.create(new ListenToTaskOnFailureSuccessOnSubscribe<UploadTask.TaskSnapshot>(storageRef.putFile(uri)));
+        return Single.create(new ListenToTaskOnFailureSuccessOnSubscribe<>(storageRef.putFile(uri)));
     }
 
     @NonNull
@@ -144,46 +98,26 @@ public class RxFirebaseStorage {
     }
 
     @NonNull
-    public static Observable<UploadTask.TaskSnapshot> putStream(@NonNull final StorageReference storageRef,
-                                                                @NonNull final InputStream stream,
-                                                                @NonNull final StorageMetadata metadata) {
-        return Observable.create(new Observable.OnSubscribe<UploadTask.TaskSnapshot>() {
-            @Override
-            public void call(final Subscriber<? super UploadTask.TaskSnapshot> subscriber) {
-                RxHandler.assignOnTask(subscriber, storageRef.putStream(stream, metadata));
-            }
-        });
+    public static Single<UploadTask.TaskSnapshot> putStream(@NonNull final StorageReference storageRef,
+                                                            @NonNull final InputStream stream,
+                                                            @NonNull final StorageMetadata metadata) {
+        return Single.create(new ListenToTaskOnCompleteOnSubscribe<>(storageRef.putStream(stream, metadata)));
     }
 
     @NonNull
-    public static Observable<UploadTask.TaskSnapshot> putStream(@NonNull final StorageReference storageRef,
-                                                                @NonNull final InputStream stream) {
-        return Observable.create(new Observable.OnSubscribe<UploadTask.TaskSnapshot>() {
-            @Override
-            public void call(final Subscriber<? super UploadTask.TaskSnapshot> subscriber) {
-                RxHandler.assignOnTask(subscriber, storageRef.putStream(stream));
-            }
-        });
+    public static Single<UploadTask.TaskSnapshot> putStream(@NonNull final StorageReference storageRef,
+                                                            @NonNull final InputStream stream) {
+        return Single.create(new ListenToTaskOnCompleteOnSubscribe<>(storageRef.putStream(stream)));
     }
 
     @NonNull
-    public static Observable<StorageMetadata> updateMetadata(@NonNull final StorageReference storageRef,
-                                                             @NonNull final StorageMetadata metadata) {
-        return Observable.create(new Observable.OnSubscribe<StorageMetadata>() {
-            @Override
-            public void call(final Subscriber<? super StorageMetadata> subscriber) {
-                RxHandler.assignOnTask(subscriber, storageRef.updateMetadata(metadata));
-            }
-        });
+    public static Single<StorageMetadata> updateMetadata(@NonNull final StorageReference storageRef,
+                                                         @NonNull final StorageMetadata metadata) {
+        return Single.create(new ListenToTaskOnCompleteOnSubscribe<>(storageRef.updateMetadata(metadata)));
     }
 
     @NonNull
-    public static Observable<Void> delete(@NonNull final StorageReference storageRef) {
-        return Observable.create(new Observable.OnSubscribe<Void>() {
-            @Override
-            public void call(final Subscriber<? super Void> subscriber) {
-                RxHandler.assignOnTask(subscriber, storageRef.delete());
-            }
-        });
+    public static Single<Void> delete(@NonNull final StorageReference storageRef) {
+        return Single.create(new ListenToTaskOnCompleteOnSubscribe<>(storageRef.delete()));
     }
 }

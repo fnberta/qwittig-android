@@ -17,21 +17,21 @@ import dagger.Provides;
 @Module
 public class GoogleApiClientDelegateModule {
 
-    private final FragmentActivity mActivity;
-    private final GoogleLoginCallback mLoginCallback;
-    private final GoogleInvitationCallback mInvitationCallback;
+    private final FragmentActivity activity;
+    private final GoogleLoginCallback loginCallback;
+    private final GoogleInvitationCallback invitationCallback;
 
     public GoogleApiClientDelegateModule(@NonNull FragmentActivity activity,
-                                         @NonNull GoogleLoginCallback loginCallback,
+                                         @Nullable GoogleLoginCallback loginCallback,
                                          @Nullable GoogleInvitationCallback invitationCallback) {
-        mActivity = activity;
-        mLoginCallback = loginCallback;
-        mInvitationCallback = invitationCallback;
+        this.activity = activity;
+        this.loginCallback = loginCallback;
+        this.invitationCallback = invitationCallback;
     }
 
     @PerActivity
     @Provides
     GoogleApiClientDelegate providesGoogleApiClientDelegate() {
-        return new GoogleApiClientDelegate(mActivity, mLoginCallback, mInvitationCallback);
+        return new GoogleApiClientDelegate(activity, loginCallback, invitationCallback);
     }
 }

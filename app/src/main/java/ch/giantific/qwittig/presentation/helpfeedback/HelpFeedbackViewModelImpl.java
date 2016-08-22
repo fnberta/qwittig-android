@@ -59,22 +59,22 @@ public class HelpFeedbackViewModelImpl extends ViewModelBaseImpl<HelpFeedbackVie
         final int titleId = itemModel.getTitle();
         switch (titleId) {
             case R.string.help_faq:
-                mNavigator.openWebsite(FAQ_URL);
+                navigator.openWebsite(FAQ_URL);
                 break;
             case R.string.help_contact_support:
-                mView.sendEmail(EMAIL_SUPPORT, R.string.email_support_subject, R.string.email_support_message);
+                view.sendEmail(EMAIL_SUPPORT, R.string.email_support_subject, R.string.email_support_message);
                 break;
             case R.string.help_tutorial:
-                mNavigator.startFirstRun();
+                navigator.startFirstRun();
                 break;
             case R.string.help_feedback:
-                mView.sendEmail(EMAIL_FEEDBACK, R.string.email_feedback_subject);
+                view.sendEmail(EMAIL_FEEDBACK, R.string.email_feedback_subject);
                 break;
             case R.string.help_rate:
-                mView.openAppInPlayStore();
+                view.openAppInPlayStore();
                 break;
             case R.string.help_recommend:
-                mView.startAppInvite();
+                view.startAppInvite();
                 break;
         }
     }

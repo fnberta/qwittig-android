@@ -4,12 +4,12 @@ import android.support.annotation.NonNull;
 
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
-import com.google.firebase.database.PropertyName;
 import com.google.firebase.database.ServerValue;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -18,9 +18,10 @@ import java.util.Map;
 @IgnoreExtraProperties
 public class Compensation implements FirebaseModel {
 
-    public static final String PATH = "compensations";
-    public static final String PAID = "paid";
-    public static final String UNPAID = "unpaid";
+    public static final String BASE_PATH = "compensations";
+    public static final String BASE_PATH_PAID = "paid";
+    public static final String BASE_PATH_UNPAID = "unpaid";
+
     public static final String PATH_PAID = "paid";
     public static final String PATH_GROUP = "group";
     public static final String PATH_PAID_AT = "paidAt";
@@ -30,23 +31,16 @@ public class Compensation implements FirebaseModel {
     public static final String PATH_CREDITOR = "creditor";
     public static final String NUMERATOR = "num";
     public static final String DENOMINATOR = "den";
-    private String mId;
-    @PropertyName(PATH_CREATED_AT)
-    private long mCreatedAt;
-    @PropertyName(PATH_GROUP)
-    private String mGroup;
-    @PropertyName(PATH_PAID)
-    private boolean mPaid;
-    @PropertyName(PATH_PAID_AT)
-    private long mPaidAt;
-    @PropertyName(PATH_DEBTOR)
-    private String mDebtor;
-    @PropertyName(PATH_CREDITOR)
-    private String mCreditor;
-    @PropertyName(PATH_AMOUNT)
-    private Map<String, Long> mAmount;
-    @PropertyName(PATH_AMOUNT_CHANGED)
-    private boolean mAmountChanged;
+
+    private String id;
+    private long createdAt;
+    private String group;
+    private boolean paid;
+    private long paidAt;
+    private String debtor;
+    private String creditor;
+    private Map<String, Long> amount;
+    private boolean amountChanged;
 
     public Compensation() {
         // required for firebase de-/serialization
@@ -54,22 +48,22 @@ public class Compensation implements FirebaseModel {
 
     public Compensation(@NonNull String group, boolean paid, @NonNull String debtor,
                         @NonNull String creditor, @NonNull Map<String, Long> amount) {
-        mGroup = group;
-        mPaid = paid;
-        mDebtor = debtor;
-        mCreditor = creditor;
-        mAmount = amount;
+        this.group = group;
+        this.paid = paid;
+        this.debtor = debtor;
+        this.creditor = creditor;
+        this.amount = amount;
     }
 
     @Exclude
     @Override
     public String getId() {
-        return mId;
+        return id;
     }
 
     @Override
     public void setId(@NonNull String id) {
-        mId = id;
+        this.id = id;
     }
 
     @Override
@@ -79,46 +73,60 @@ public class Compensation implements FirebaseModel {
 
     @Exclude
     public Date getCreatedAtDate() {
-        return new Date(mCreatedAt);
+        return new Date(createdAt);
     }
 
     public String getGroup() {
-        return mGroup;
+        return group;
     }
 
     public boolean isPaid() {
-        return mPaid;
+        return paid;
     }
 
     public long getPaidAt() {
-        return mPaidAt;
+        return paidAt;
     }
 
     @Exclude
     public Date getPaidAtDate() {
-        return new Date(mPaidAt);
+        return new Date(paidAt);
     }
 
     public String getDebtor() {
-        return mDebtor;
+        return debtor;
     }
 
     public String getCreditor() {
-        return mCreditor;
+        return creditor;
     }
 
     public Map<String, Long> getAmount() {
-        return mAmount;
+        return amount;
     }
 
     @Exclude
     public BigFraction getAmountFraction() {
-        final long numerator = mAmount.get(NUMERATOR);
-        final long denominator = mAmount.get(DENOMINATOR);
+        final long numerator = amount.get(NUMERATOR);
+        final long denominator = amount.get(DENOMINATOR);
         return new BigFraction(numerator, denominator);
     }
 
     public boolean isAmountChanged() {
-        return mAmountChanged;
+        return amountChanged;
+    }
+
+    @Exclude
+    public Map<String, Object> toMap() {
+        final Map<String, Object> result = new HashMap<>();
+        result.put(PATH_CREATED_AT, ServerValue.TIMESTAMP);
+        result.put(PATH_GROUP, group);
+        result.put(PATH_PAID, paid);
+        result.put(PATH_PAID_AT, paidAt);
+        result.put(PATH_DEBTOR, debtor);
+        result.put(PATH_CREDITOR, creditor);
+        result.put(PATH_AMOUNT, amount);
+
+        return result;
     }
 }

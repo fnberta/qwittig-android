@@ -6,7 +6,6 @@ import android.text.TextUtils;
 
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
-import com.google.firebase.database.PropertyName;
 import com.google.firebase.database.ServerValue;
 
 import org.apache.commons.math3.fraction.BigFraction;
@@ -21,7 +20,10 @@ import java.util.Map;
 @IgnoreExtraProperties
 public class Identity implements FirebaseModel, Comparable<Identity> {
 
-    public static final String PATH = "identities";
+    public static final String BASE_PATH = "identities";
+    public static final String BASE_PATH_ACTIVE = "active";
+    public static final String BASE_PATH_INACTIVE = "inactive";
+
     public static final String PATH_ACTIVE = "active";
     public static final String PATH_GROUP = "group";
     public static final String PATH_GROUP_NAME = "groupName";
@@ -33,27 +35,18 @@ public class Identity implements FirebaseModel, Comparable<Identity> {
     public static final String PATH_INVITATION_LINK = "invitationLink";
     public static final String NUMERATOR = "num";
     public static final String DENOMINATOR = "den";
-    private String mId;
-    @PropertyName(PATH_CREATED_AT)
-    private long mCreatedAt;
-    @PropertyName(PATH_ACTIVE)
-    private boolean mActive;
-    @PropertyName(PATH_GROUP)
-    private String mGroup;
-    @PropertyName(PATH_GROUP_NAME)
-    private String mGroupName;
-    @PropertyName(PATH_GROUP_CURRENCY)
-    private String mGroupCurrency;
-    @PropertyName(PATH_USER)
-    private String mUser;
-    @PropertyName(PATH_NICKNAME)
-    private String mNickname;
-    @PropertyName(PATH_AVATAR)
-    private String mAvatar;
-    @PropertyName(PATH_BALANCE)
-    private Map<String, Long> mBalance;
-    @PropertyName(PATH_INVITATION_LINK)
-    private String mInvitationLink;
+
+    private String id;
+    private long createdAt;
+    private boolean active;
+    private String group;
+    private String groupName;
+    private String groupCurrency;
+    private String user;
+    private String nickname;
+    private String avatar;
+    private Map<String, Long> balance;
+    private String invitationLink;
 
     public Identity() {
         // required for firebase de-/serialization
@@ -63,25 +56,25 @@ public class Identity implements FirebaseModel, Comparable<Identity> {
                     @NonNull String groupCurrency, @Nullable String user,
                     @NonNull String nickname, @Nullable String avatar,
                     @NonNull Map<String, Long> balance, @Nullable String invitationLink) {
-        mActive = active;
-        mGroup = group;
-        mGroupName = groupName;
-        mGroupCurrency = groupCurrency;
-        mUser = user;
-        mNickname = nickname;
-        mAvatar = avatar;
-        mBalance = balance;
-        mInvitationLink = invitationLink;
+        this.active = active;
+        this.group = group;
+        this.groupName = groupName;
+        this.groupCurrency = groupCurrency;
+        this.user = user;
+        this.nickname = nickname;
+        this.avatar = avatar;
+        this.balance = balance;
+        this.invitationLink = invitationLink;
     }
 
     @Exclude
     public String getId() {
-        return mId;
+        return id;
     }
 
     @Override
     public void setId(@NonNull String id) {
-        mId = id;
+        this.id = id;
     }
 
     @Override
@@ -91,75 +84,75 @@ public class Identity implements FirebaseModel, Comparable<Identity> {
 
     @Exclude
     public Date getCreatedAtDate() {
-        return new Date(mCreatedAt);
+        return new Date(createdAt);
     }
 
     public boolean isActive() {
-        return mActive;
+        return active;
     }
 
     public String getGroup() {
-        return mGroup;
+        return group;
     }
 
     public String getGroupName() {
-        return mGroupName;
+        return groupName;
     }
 
     public String getGroupCurrency() {
-        return mGroupCurrency;
+        return groupCurrency;
     }
 
     public String getUser() {
-        return mUser;
+        return user;
     }
 
     public String getNickname() {
-        return mNickname;
+        return nickname;
     }
 
     public String getAvatar() {
-        return mAvatar;
+        return avatar;
     }
 
     public Map<String, Long> getBalance() {
-        return mBalance;
+        return balance;
     }
 
     @Exclude
     public BigFraction getBalanceFraction() {
-        return new BigFraction(mBalance.get(NUMERATOR), mBalance.get(DENOMINATOR));
+        return new BigFraction(balance.get(NUMERATOR), balance.get(DENOMINATOR));
     }
 
     public String getInvitationLink() {
-        return mInvitationLink;
+        return invitationLink;
     }
 
     @Exclude
     public boolean isPending() {
-        return !TextUtils.isEmpty(mInvitationLink);
+        return !TextUtils.isEmpty(invitationLink);
     }
 
     @Exclude
     public Map<String, Object> toMap() {
         final Map<String, Object> result = new HashMap<>();
         result.put(PATH_CREATED_AT, ServerValue.TIMESTAMP);
-        result.put(PATH_ACTIVE, mActive);
-        result.put(PATH_GROUP, mGroup);
-        result.put(PATH_GROUP_NAME, mGroupName);
-        result.put(PATH_GROUP_CURRENCY, mGroupCurrency);
-        result.put(PATH_USER, mUser);
-        result.put(PATH_NICKNAME, mNickname);
-        result.put(PATH_AVATAR, mAvatar);
-        result.put(PATH_BALANCE, mBalance);
-        result.put(PATH_INVITATION_LINK, mInvitationLink);
+        result.put(PATH_ACTIVE, active);
+        result.put(PATH_GROUP, group);
+        result.put(PATH_GROUP_NAME, groupName);
+        result.put(PATH_GROUP_CURRENCY, groupCurrency);
+        result.put(PATH_USER, user);
+        result.put(PATH_NICKNAME, nickname);
+        result.put(PATH_AVATAR, avatar);
+        result.put(PATH_BALANCE, balance);
+        result.put(PATH_INVITATION_LINK, invitationLink);
 
         return result;
     }
 
     @Override
     public int compareTo(@NonNull Identity another) {
-        final String nickname = !TextUtils.isEmpty(mNickname) ? mNickname : "n/a";
+        final String nickname = !TextUtils.isEmpty(this.nickname) ? this.nickname : "n/a";
         final String nicknameAnother = !TextUtils.isEmpty(another.getNickname()) ? another.getNickname() : "n/a";
 
         return nickname.compareToIgnoreCase(nicknameAnother);

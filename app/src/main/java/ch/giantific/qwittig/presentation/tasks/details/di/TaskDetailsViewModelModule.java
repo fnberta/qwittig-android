@@ -26,13 +26,13 @@ import dagger.Provides;
 @Module
 public class TaskDetailsViewModelModule extends BaseViewModelModule {
 
-    private final String mTaskId;
+    private final String taskId;
 
     public TaskDetailsViewModelModule(@Nullable Bundle savedState,
                                       @NonNull String taskId) {
         super(savedState);
 
-        mTaskId = taskId;
+        this.taskId = taskId;
     }
 
     @PerActivity
@@ -41,8 +41,8 @@ public class TaskDetailsViewModelModule extends BaseViewModelModule {
                                                       @NonNull RxBus<Object> eventBus,
                                                       @NonNull UserRepository userRepository,
                                                       @NonNull TaskRepository taskRepository) {
-        return new TaskDetailsViewModelImpl(mSavedState, navigator, eventBus, userRepository,
-                taskRepository, mTaskId);
+        return new TaskDetailsViewModelImpl(savedState, navigator, eventBus, userRepository,
+                taskRepository, taskId);
     }
 
 }

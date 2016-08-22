@@ -21,7 +21,7 @@ import ch.giantific.qwittig.presentation.common.fragments.BaseRecyclerViewFragme
 public class AboutFragment extends BaseRecyclerViewFragment<AboutComponent, AboutViewModel, BaseFragment.ActivityListener<AboutComponent>>
         implements AboutViewModel.ViewListener {
 
-    private FragmentAboutBinding mBinding;
+    private FragmentAboutBinding binding;
 
     public AboutFragment() {
         // Required empty public constructor
@@ -30,15 +30,15 @@ public class AboutFragment extends BaseRecyclerViewFragment<AboutComponent, Abou
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentAboutBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentAboutBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel.attachView(this);
+        viewModel.attachView(this);
     }
 
     @Override
@@ -48,11 +48,11 @@ public class AboutFragment extends BaseRecyclerViewFragment<AboutComponent, Abou
 
     @Override
     protected RecyclerView getRecyclerView() {
-        return mBinding.rvAbout;
+        return binding.rvAbout;
     }
 
     @Override
     protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new AboutRecyclerAdapter(mViewModel);
+        return new AboutRecyclerAdapter(viewModel);
     }
 }

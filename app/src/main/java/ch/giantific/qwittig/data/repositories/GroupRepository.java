@@ -19,6 +19,8 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import ch.giantific.qwittig.BuildConfig;
+import ch.giantific.qwittig.Constants;
+import ch.giantific.qwittig.data.queues.GroupJoinQueue;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxFirebaseDatabase;
 import ch.giantific.qwittig.domain.models.Group;
@@ -40,45 +42,40 @@ public class GroupRepository {
     public static final String INVITATION_INVITER = "iin";
     private static final String FIREBASE_APP_CODE = "u4fa2";
     private static final String QWITTIG_AUTHORITY = "qwittig.com";
-    private final DatabaseReference mDatabaseRef;
-    private final FirebaseMessaging mMessaging;
+
+    private final DatabaseReference databaseRef;
+    private final FirebaseMessaging messaging;
 
     @Inject
     public GroupRepository(@NonNull FirebaseDatabase firebaseDatabase,
                            @NonNull FirebaseMessaging messaging) {
-        mDatabaseRef = firebaseDatabase.getReference();
-        mMessaging = messaging;
+        databaseRef = firebaseDatabase.getReference();
+        this.messaging = messaging;
     }
 
     public Observable<Group> observeGroup(@NonNull String groupId) {
-        final Query query = mDatabaseRef.child(Group.PATH).child(groupId);
+        final Query query = databaseRef.child(Group.BASE_PATH).child(groupId);
         return RxFirebaseDatabase.observeValue(query, Group.class);
     }
 
     public Single<Group> getGroup(@NonNull String groupId) {
-        final Query query = mDatabaseRef.child(Group.PATH).child(groupId);
+        final Query query = databaseRef.child(Group.BASE_PATH).child(groupId);
         return RxFirebaseDatabase.observeValueOnce(query, Group.class);
     }
 
     public Observable<RxChildEvent<Identity>> observeGroupIdentityChildren(@NonNull String groupId) {
-        final Query query = mDatabaseRef.child(Identity.PATH).orderByChild(Identity.PATH_GROUP).equalTo(groupId);
-        return RxFirebaseDatabase.observeChildren(query, Identity.class)
-                .filter(new Func1<RxChildEvent<Identity>, Boolean>() {
-                    @Override
-                    public Boolean call(RxChildEvent<Identity> event) {
-                        return event.getValue().isActive();
-                    }
-                });
+        final Query query = databaseRef.child(Identity.BASE_PATH).child(Identity.BASE_PATH_ACTIVE).orderByChild(Identity.PATH_GROUP).equalTo(groupId);
+        return RxFirebaseDatabase.observeChildren(query, Identity.class);
     }
 
     public Observable<Identity> getGroupIdentities(@NonNull String groupId,
                                                    final boolean includePending) {
-        final Query query = mDatabaseRef.child(Identity.PATH).orderByChild(Identity.PATH_GROUP).equalTo(groupId);
+        final Query query = databaseRef.child(Identity.BASE_PATH).child(Identity.BASE_PATH_ACTIVE).orderByChild(Identity.PATH_GROUP).equalTo(groupId);
         return RxFirebaseDatabase.observeValuesOnce(query, Identity.class)
                 .filter(new Func1<Identity, Boolean>() {
                     @Override
                     public Boolean call(Identity identity) {
-                        return identity.isActive() && (includePending || !identity.isPending());
+                        return includePending || !identity.isPending();
                     }
                 });
     }
@@ -86,26 +83,26 @@ public class GroupRepository {
     public Single<Group> updateGroupDetails(@NonNull final String groupId,
                                             @NonNull final String name,
                                             @Nullable final String currency) {
-        final Query query = mDatabaseRef.child(Group.PATH).child(groupId);
+        final Query query = databaseRef.child(Group.BASE_PATH).child(groupId);
         return RxFirebaseDatabase.observeValueOnce(query, Group.class)
                 .doOnSuccess(new Action1<Group>() {
                     @Override
                     public void call(Group group) {
                         final Map<String, Object> childUpdates = new HashMap<>();
-                        childUpdates.put(Group.PATH + "/" + groupId + "/" + Group.PATH_NAME, name);
+                        childUpdates.put(Group.BASE_PATH + "/" + groupId + "/" + Group.PATH_NAME, name);
                         if (!TextUtils.isEmpty(currency)) {
-                            childUpdates.put(Group.PATH + "/" + groupId + "/" + Group.PATH_CURRENCY, currency);
+                            childUpdates.put(Group.BASE_PATH + "/" + groupId + "/" + Group.PATH_CURRENCY, currency);
                         }
 
                         final Set<String> identitiesIds = group.getIdentitiesIds();
                         for (String identityId : identitiesIds) {
-                            childUpdates.put(Identity.PATH + "/" + identityId + "/" + Identity.PATH_GROUP_NAME, name);
+                            childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + identityId + "/" + Identity.PATH_GROUP_NAME, name);
                             if (!TextUtils.isEmpty(currency)) {
-                                childUpdates.put(Identity.PATH + "/" + identityId + "/" + Identity.PATH_GROUP_CURRENCY, currency);
+                                childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + identityId + "/" + Identity.PATH_GROUP_CURRENCY, currency);
                             }
                         }
 
-                        mDatabaseRef.updateChildren(childUpdates);
+                        databaseRef.updateChildren(childUpdates);
                     }
                 });
     }
@@ -118,12 +115,12 @@ public class GroupRepository {
         final Map<String, Object> childUpdates = new HashMap<>();
 
         // get identity id
-        final String identityId = mDatabaseRef.child(Identity.PATH).push().getKey();
+        final String identityId = databaseRef.child(Identity.BASE_PATH).child(Identity.BASE_PATH_ACTIVE).push().getKey();
 
         // create group
-        final String groupId = mDatabaseRef.child(Group.PATH).push().getKey();
+        final String groupId = databaseRef.child(Group.BASE_PATH).push().getKey();
         final Group group = new Group(name, currency, Collections.singletonList(identityId));
-        childUpdates.put(Group.PATH + "/" + groupId, group.toMap());
+        childUpdates.put(Group.BASE_PATH + "/" + groupId, group.toMap());
 
         // create identity
         final Map<String, Long> balance = new HashMap<>(2);
@@ -131,34 +128,36 @@ public class GroupRepository {
         balance.put(Identity.DENOMINATOR, 1L);
         final Identity identity = new Identity(true, groupId, name, currency, userId,
                 identityNickname, identityAvatar, balance, null);
-        childUpdates.put(Identity.PATH + "/" + identityId, identity.toMap());
+        childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + identityId, identity.toMap());
 
         // add to user
-        childUpdates.put(User.PATH + "/" + userId + "/" + User.PATH_IDENTITIES + "/" + identityId, true);
-        childUpdates.put(User.PATH + "/" + userId + "/" + User.PATH_CURRENT_IDENTITY, identityId);
+        childUpdates.put(User.BASE_PATH + "/" + userId + "/" + User.PATH_IDENTITIES + "/" + identityId, true);
+        childUpdates.put(User.BASE_PATH + "/" + userId + "/" + User.PATH_CURRENT_IDENTITY, identityId);
 
-        mDatabaseRef.updateChildren(childUpdates);
-        mMessaging.subscribeToTopic(groupId);
+        databaseRef.updateChildren(childUpdates);
+        messaging.subscribeToTopic(groupId);
     }
 
     public void joinGroup(@NonNull final String userId,
                           @NonNull String identityId,
                           @NonNull String groupId) {
+        final String queueKey = databaseRef.child(Constants.PATH_PUSH_QUEUE).push().getKey();
         final Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put(User.PATH + "/" + userId + "/" + User.PATH_IDENTITIES + "/" + identityId, true);
-        childUpdates.put(User.PATH + "/" + userId + "/" + User.PATH_CURRENT_IDENTITY, identityId);
-        childUpdates.put(Identity.PATH + "/" + identityId + "/" + Identity.PATH_USER, userId);
-        childUpdates.put(Identity.PATH + "/" + identityId + "/" + Identity.PATH_INVITATION_LINK, null);
+        childUpdates.put(User.BASE_PATH + "/" + userId + "/" + User.PATH_IDENTITIES + "/" + identityId, true);
+        childUpdates.put(User.BASE_PATH + "/" + userId + "/" + User.PATH_CURRENT_IDENTITY, identityId);
+        childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + identityId + "/" + Identity.PATH_USER, userId);
+        childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + identityId + "/" + Identity.PATH_INVITATION_LINK, null);
+        childUpdates.put(Constants.PATH_PUSH_QUEUE + "/" + queueKey, new GroupJoinQueue(groupId, identityId).toMap());
 
-        mDatabaseRef.updateChildren(childUpdates);
-        mMessaging.subscribeToTopic(groupId);
+        databaseRef.updateChildren(childUpdates);
+        messaging.subscribeToTopic(groupId);
     }
 
     public Single<String> leaveGroup(@NonNull final Identity identity) {
         final String identityId = identity.getId();
         final String userId = identity.getUser();
         final String groupId = identity.getGroup();
-        return RxFirebaseDatabase.observeValueOnce(mDatabaseRef.child(User.PATH).child(userId), User.class)
+        return RxFirebaseDatabase.observeValueOnce(databaseRef.child(User.BASE_PATH).child(userId), User.class)
                 .flatMapObservable(new Func1<User, Observable<String>>() {
                     @Override
                     public Observable<String> call(User user) {
@@ -176,20 +175,23 @@ public class GroupRepository {
                     @Override
                     public void call(String newCurrentIdentity) {
                         final Map<String, Object> childUpdates = new HashMap<>();
-                        childUpdates.put(Identity.PATH + "/" + identityId + "/" + Identity.PATH_ACTIVE, false);
-                        childUpdates.put(Group.PATH + "/" + groupId + "/" + Group.PATH_IDENTITIES + "/" + identityId, null);
-                        childUpdates.put(User.PATH + "/" + userId + "/" + User.PATH_IDENTITIES + "/" + identityId, null);
-                        childUpdates.put(User.PATH + "/" + userId + "/" + User.PATH_ARCHIVED_IDENTITIES + "/" + identityId, true);
-                        childUpdates.put(User.PATH + "/" + userId + "/" + User.PATH_CURRENT_IDENTITY, newCurrentIdentity);
-                        mDatabaseRef.updateChildren(childUpdates);
-                        mMessaging.unsubscribeFromTopic(identity.getGroup());
+                        childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + identityId, null);
+                        final Map<String, Object> identityMap = identity.toMap();
+                        identityMap.put(Identity.PATH_ACTIVE, false);
+                        childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_INACTIVE + "/" + identityId, identityMap);
+                        childUpdates.put(Group.BASE_PATH + "/" + groupId + "/" + Group.PATH_IDENTITIES + "/" + identityId, null);
+                        childUpdates.put(User.BASE_PATH + "/" + userId + "/" + User.PATH_IDENTITIES + "/" + identityId, null);
+                        childUpdates.put(User.BASE_PATH + "/" + userId + "/" + User.PATH_ARCHIVED_IDENTITIES + "/" + identityId, true);
+                        childUpdates.put(User.BASE_PATH + "/" + userId + "/" + User.PATH_CURRENT_IDENTITY, newCurrentIdentity);
+                        databaseRef.updateChildren(childUpdates);
+                        messaging.unsubscribeFromTopic(identity.getGroup());
                     }
                 });
     }
 
     public void addPendingIdentity(@NonNull Identity currentIdentity,
                                    @NonNull String nickname) {
-        final String identityId = mDatabaseRef.child(Identity.PATH).push().getKey();
+        final String identityId = databaseRef.child(Identity.BASE_PATH).child(Identity.BASE_PATH_ACTIVE).push().getKey();
         final String groupId = currentIdentity.getGroup();
         final String groupName = currentIdentity.getGroupName();
         final String invitationLink = getInvitationLink(identityId, groupName, currentIdentity.getNickname());
@@ -200,9 +202,9 @@ public class GroupRepository {
                 currentIdentity.getGroupCurrency(), null, nickname, null, balance, invitationLink);
 
         final Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put(Identity.PATH + "/" + identityId, identity.toMap());
-        childUpdates.put(Group.PATH + "/" + groupId + "/" + Group.PATH_IDENTITIES + "/" + identityId, true);
-        mDatabaseRef.updateChildren(childUpdates);
+        childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + identityId, identity.toMap());
+        childUpdates.put(Group.BASE_PATH + "/" + groupId + "/" + Group.PATH_IDENTITIES + "/" + identityId, true);
+        databaseRef.updateChildren(childUpdates);
     }
 
     private String getInvitationLink(@NonNull final String identityId,
@@ -229,12 +231,22 @@ public class GroupRepository {
         return uri.toString();
     }
 
-    public void removePendingIdentity(@NonNull String identityId,
-                                      @NonNull String groupId) {
-        final Map<String, Object> childUpdates = new HashMap<>(3);
-        childUpdates.put(Identity.PATH + "/" + identityId + "/" + Identity.PATH_ACTIVE, false);
-        childUpdates.put(Identity.PATH + "/" + identityId + "/" + Identity.PATH_INVITATION_LINK, null);
-        childUpdates.put(Group.PATH + "/" + groupId + "/" + Group.PATH_IDENTITIES + "/" + identityId, null);
-        mDatabaseRef.updateChildren(childUpdates);
+    public Single<Identity> removePendingIdentity(@NonNull final String identityId,
+                                                  @NonNull final String groupId) {
+        final Query query = databaseRef.child(Identity.BASE_PATH).child(Identity.BASE_PATH_ACTIVE).child(identityId);
+        return RxFirebaseDatabase.observeValueOnce(query, Identity.class)
+                .doOnSuccess(new Action1<Identity>() {
+                    @Override
+                    public void call(Identity identity) {
+                        final Map<String, Object> childUpdates = new HashMap<>();
+                        childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + identityId, null);
+                        final Map<String, Object> identityMap = identity.toMap();
+                        identityMap.put(Identity.PATH_ACTIVE, false);
+                        identityMap.put(Identity.PATH_INVITATION_LINK, null);
+                        childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_INACTIVE + "/" + identityId, identityMap);
+                        childUpdates.put(Group.BASE_PATH + "/" + groupId + "/" + Group.PATH_IDENTITIES + "/" + identityId, null);
+                        databaseRef.updateChildren(childUpdates);
+                    }
+                });
     }
 }

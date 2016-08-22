@@ -29,7 +29,7 @@ public class RatesWorker extends BaseWorker<Float, RatesWorkerListener> {
     private static final String KEY_BASE_CURRENCY = "BASE_CURRENCY";
     private static final String KEY_CURRENCY = "CURRENCY";
     @Inject
-    PurchaseRepository mPurchaseRepo;
+    PurchaseRepository purchaseRepo;
 
     public RatesWorker() {
         // empty default constructor
@@ -71,7 +71,7 @@ public class RatesWorker extends BaseWorker<Float, RatesWorkerListener> {
         final String baseCurrency = args.getString(KEY_BASE_CURRENCY, "");
         final String currency = args.getString(KEY_CURRENCY, "");
         if (!TextUtils.isEmpty(baseCurrency) && !TextUtils.isEmpty(currency)) {
-            return mPurchaseRepo.getExchangeRate(baseCurrency, currency).toObservable();
+            return purchaseRepo.getExchangeRate(baseCurrency, currency).toObservable();
         }
 
         return null;
@@ -79,11 +79,11 @@ public class RatesWorker extends BaseWorker<Float, RatesWorkerListener> {
 
     @Override
     protected void onError() {
-        mActivity.onWorkerError(WORKER_TAG);
+        activity.onWorkerError(WORKER_TAG);
     }
 
     @Override
     protected void setStream(@NonNull Observable<Float> observable) {
-        mActivity.setRateFetchStream(observable.toSingle(), WORKER_TAG);
+        activity.setRateFetchStream(observable.toSingle(), WORKER_TAG);
     }
 }

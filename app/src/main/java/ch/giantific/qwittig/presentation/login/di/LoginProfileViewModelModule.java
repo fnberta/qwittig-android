@@ -34,6 +34,6 @@ public class LoginProfileViewModelModule extends BaseViewModelModule {
     LoginProfileViewModel providesLoginProfileViewModel(@NonNull Navigator navigator,
                                                         @NonNull RxBus<Object> eventBus,
                                                         @NonNull UserRepository userRepository) {
-        return new LoginProfileViewModelImpl(mSavedState, navigator, eventBus, userRepository);
+        return new LoginProfileViewModelImpl(savedState, navigator, eventBus, userRepository);
     }
 }

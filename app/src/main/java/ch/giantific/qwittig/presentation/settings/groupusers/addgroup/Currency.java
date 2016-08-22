@@ -11,21 +11,21 @@ import android.support.annotation.NonNull;
  */
 public class Currency {
 
-    private final String mName;
-    private final String mCode;
-
-    public String getCode() {
-        return mCode;
-    }
+    private final String name;
+    private final String code;
 
     public Currency(@NonNull String name, @NonNull String code) {
-        mName = name;
-        mCode = code;
+        this.name = name;
+        this.code = code;
+    }
+
+    public String getCode() {
+        return code;
     }
 
     @NonNull
     @Override
     public String toString() {
-        return mName + " (" + mCode + ")";
+        return name + " (" + code + ")";
     }
 }

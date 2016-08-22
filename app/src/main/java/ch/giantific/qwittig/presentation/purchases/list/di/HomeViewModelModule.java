@@ -37,7 +37,7 @@ public class HomeViewModelModule extends BaseViewModelModule {
                                         @NonNull UserRepository userRepository,
                                         @NonNull GroupRepository groupRepository,
                                         @NonNull PurchaseRepository purchaseRepository) {
-        return new HomeViewModelImpl(mSavedState, navigator, eventBus, userRepository,
+        return new HomeViewModelImpl(savedState, navigator, eventBus, userRepository,
                 groupRepository, purchaseRepository);
     }
 }

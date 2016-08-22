@@ -8,45 +8,43 @@ import com.google.android.gms.tasks.Task;
 
 import rx.Single;
 import rx.SingleSubscriber;
-import rx.functions.Action0;
-import rx.subscriptions.BooleanSubscription;
 
 /**
  * Created by fabio on 10.07.16.
  */
 public class ListenToTaskOnFailureSuccessOnSubscribe<T> implements Single.OnSubscribe<T> {
 
-    private final Task<T> mTask;
+    private final Task<T> task;
 
     public ListenToTaskOnFailureSuccessOnSubscribe(@NonNull Task<T> task) {
-        mTask = task;
+        this.task = task;
     }
 
     @Override
     public void call(SingleSubscriber<? super T> singleSubscriber) {
         final RxTaskOnFailureSuccessListener<T> listener = new RxTaskOnFailureSuccessListener<>(singleSubscriber);
-        mTask.addOnFailureListener(listener).addOnSuccessListener(listener);
+        task.addOnFailureListener(listener).addOnSuccessListener(listener);
     }
 
     private static class RxTaskOnFailureSuccessListener<T> implements OnSuccessListener<T>, OnFailureListener {
 
-        private final SingleSubscriber<? super T> mSubscriber;
+        private final SingleSubscriber<? super T> subscriber;
 
-        public RxTaskOnFailureSuccessListener(@NonNull SingleSubscriber<? super T> subscriber) {
-            mSubscriber = subscriber;
+        RxTaskOnFailureSuccessListener(@NonNull SingleSubscriber<? super T> subscriber) {
+            this.subscriber = subscriber;
         }
 
         @Override
         public void onFailure(@NonNull Exception e) {
-            if (!mSubscriber.isUnsubscribed()) {
-                mSubscriber.onError(e);
+            if (!subscriber.isUnsubscribed()) {
+                subscriber.onError(e);
             }
         }
 
         @Override
         public void onSuccess(T t) {
-            if (!mSubscriber.isUnsubscribed()) {
-                mSubscriber.onSuccess(t);
+            if (!subscriber.isUnsubscribed()) {
+                subscriber.onSuccess(t);
             }
         }
     }

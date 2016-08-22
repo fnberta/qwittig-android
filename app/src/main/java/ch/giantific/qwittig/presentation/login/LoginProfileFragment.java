@@ -23,7 +23,8 @@ public class LoginProfileFragment extends BaseFragment<LoginComponent, LoginProf
         implements LoginProfileViewModel.ViewListener {
 
     private static final String KEY_WITH_INVITATION = "WITH_INVITATION";
-    private FragmentLoginProfileBinding mBinding;
+
+    private FragmentLoginProfileBinding binding;
 
     public LoginProfileFragment() {
         // required empty constructor
@@ -40,8 +41,8 @@ public class LoginProfileFragment extends BaseFragment<LoginComponent, LoginProf
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentLoginProfileBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentLoginProfileBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
@@ -49,9 +50,9 @@ public class LoginProfileFragment extends BaseFragment<LoginComponent, LoginProf
         super.onActivityCreated(savedInstanceState);
 
         final boolean withInvitation = getArguments().getBoolean(KEY_WITH_INVITATION, false);
-        mViewModel.setWithInvitation(withInvitation);
-        mViewModel.attachView(this);
-        mBinding.setViewModel(mViewModel);
+        viewModel.setWithInvitation(withInvitation);
+        viewModel.attachView(this);
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -61,12 +62,12 @@ public class LoginProfileFragment extends BaseFragment<LoginComponent, LoginProf
 
     @Override
     protected View getSnackbarView() {
-        return mBinding.ivLoginProfileAvatar;
+        return binding.ivLoginProfileAvatar;
     }
 
     @Override
     public void showFirstGroupScreen() {
-        mActivity.showFirstGroupFragment();
+        activity.showFirstGroupFragment();
     }
 
     /**

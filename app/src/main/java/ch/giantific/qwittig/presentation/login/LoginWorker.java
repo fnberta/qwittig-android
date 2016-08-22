@@ -35,8 +35,8 @@ public class LoginWorker extends BaseWorker<FirebaseUser, LoginWorkerListener> {
     private static final String KEY_USERNAME = "USERNAME";
     private static final String KEY_PASSWORD = "PASSWORD";
     private static final String KEY_ID_TOKEN = "ID_TOKEN";
-    @Type
-    private int mType;
+    @LoginType
+    private int type;
 
     public LoginWorker() {
         // empty default constructor
@@ -59,7 +59,7 @@ public class LoginWorker extends BaseWorker<FirebaseUser, LoginWorkerListener> {
             worker = new LoginWorker();
 
             final Bundle args = new Bundle();
-            args.putInt(KEY_TYPE, Type.LOGIN_EMAIL);
+            args.putInt(KEY_TYPE, LoginType.LOGIN_EMAIL);
             args.putString(KEY_USERNAME, username);
             args.putString(KEY_PASSWORD, password);
             worker.setArguments(args);
@@ -92,7 +92,7 @@ public class LoginWorker extends BaseWorker<FirebaseUser, LoginWorkerListener> {
             worker = new LoginWorker();
 
             final Bundle args = new Bundle();
-            args.putInt(KEY_TYPE, Type.SIGN_UP_EMAIL);
+            args.putInt(KEY_TYPE, LoginType.SIGN_UP_EMAIL);
             args.putString(KEY_USERNAME, username);
             args.putString(KEY_PASSWORD, password);
             worker.setArguments(args);
@@ -120,7 +120,7 @@ public class LoginWorker extends BaseWorker<FirebaseUser, LoginWorkerListener> {
             worker = new LoginWorker();
 
             final Bundle args = new Bundle();
-            args.putInt(KEY_TYPE, Type.LOGIN_FACEBOOK);
+            args.putInt(KEY_TYPE, LoginType.LOGIN_FACEBOOK);
             args.putString(KEY_ID_TOKEN, idToken);
             worker.setArguments(args);
 
@@ -147,7 +147,7 @@ public class LoginWorker extends BaseWorker<FirebaseUser, LoginWorkerListener> {
             worker = new LoginWorker();
 
             final Bundle args = new Bundle();
-            args.putInt(KEY_TYPE, Type.LOGIN_GOOGLE);
+            args.putInt(KEY_TYPE, LoginType.LOGIN_GOOGLE);
             args.putString(KEY_ID_TOKEN, idToken);
             worker.setArguments(args);
 
@@ -168,25 +168,25 @@ public class LoginWorker extends BaseWorker<FirebaseUser, LoginWorkerListener> {
     @Nullable
     @Override
     protected Observable<FirebaseUser> getObservable(@NonNull Bundle args) {
-        mType = args.getInt(KEY_TYPE, 0);
-        switch (mType) {
-            case Type.LOGIN_EMAIL: {
+        type = args.getInt(KEY_TYPE, 0);
+        switch (type) {
+            case LoginType.LOGIN_EMAIL: {
                 final String username = args.getString(KEY_USERNAME, "");
                 final String password = args.getString(KEY_PASSWORD, "");
-                return mUserRepo.loginEmail(username, password).toObservable();
+                return userRepo.loginEmail(username, password).toObservable();
             }
-            case Type.SIGN_UP_EMAIL: {
+            case LoginType.SIGN_UP_EMAIL: {
                 final String username = args.getString(KEY_USERNAME, "");
                 final String password = args.getString(KEY_PASSWORD, "");
-                return mUserRepo.signUpEmail(username, password).toObservable();
+                return userRepo.signUpEmail(username, password).toObservable();
             }
-            case Type.LOGIN_FACEBOOK: {
+            case LoginType.LOGIN_FACEBOOK: {
                 final String idToken = args.getString(KEY_ID_TOKEN, "");
-                return mUserRepo.loginFacebook(idToken).toObservable();
+                return userRepo.loginFacebook(idToken).toObservable();
             }
-            case Type.LOGIN_GOOGLE: {
+            case LoginType.LOGIN_GOOGLE: {
                 final String idToken = args.getString(KEY_ID_TOKEN, "");
-                return mUserRepo.loginGoogle(idToken).toObservable();
+                return userRepo.loginGoogle(idToken).toObservable();
             }
         }
 
@@ -195,17 +195,17 @@ public class LoginWorker extends BaseWorker<FirebaseUser, LoginWorkerListener> {
 
     @Override
     protected void onError() {
-        mActivity.onWorkerError(WORKER_TAG);
+        activity.onWorkerError(WORKER_TAG);
     }
 
     @Override
     protected void setStream(@NonNull Observable<FirebaseUser> observable) {
-        mActivity.setUserLoginStream(observable.toSingle(), WORKER_TAG, mType);
+        activity.setUserLoginStream(observable.toSingle(), WORKER_TAG, type);
     }
 
-    @IntDef({Type.LOGIN_EMAIL, Type.LOGIN_FACEBOOK, Type.LOGIN_GOOGLE, Type.SIGN_UP_EMAIL})
+    @IntDef({LoginType.LOGIN_EMAIL, LoginType.LOGIN_FACEBOOK, LoginType.LOGIN_GOOGLE, LoginType.SIGN_UP_EMAIL})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Type {
+    public @interface LoginType {
         int LOGIN_EMAIL = 1;
         int LOGIN_FACEBOOK = 2;
         int LOGIN_GOOGLE = 3;

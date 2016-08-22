@@ -41,14 +41,14 @@ public class DiscardPurchaseDialogFragment extends BaseDialogFragment<DiscardPur
         dialogBuilder.setMessage(R.string.dialog_purchase_discard_message)
                 .setPositiveButton(R.string.dialog_positive_save_draft, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mActivity.onSaveAsDraftSelected();
+                        activity.onSaveAsDraftSelected();
                         dismiss();
                     }
                 })
                 .setNegativeButton(R.string.dialog_purchase_discard, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mActivity.onDiscardPurchaseSelected();
+                        activity.onDiscardPurchaseSelected();
                     }
                 });
         return dialogBuilder.create();

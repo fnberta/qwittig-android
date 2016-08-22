@@ -126,7 +126,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
 
     @Override
     public void onAvatarLoaded() {
-        mView.startPostponedEnterTransition();
+        view.startPostponedEnterTransition();
     }
 
     @Override
@@ -197,21 +197,21 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
     protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
         super.onUserLoggedIn(currentUser);
 
-        mGoogleUser = mUserRepo.isGoogleUser(currentUser);
-        mFacebookUser = mUserRepo.isFacebookUser(currentUser);
+        mGoogleUser = userRepo.isGoogleUser(currentUser);
+        mFacebookUser = userRepo.isFacebookUser(currentUser);
         notifyPropertyChanged(BR.emailAndPasswordVisible);
-        mView.reloadOptionsMenu();
+        view.reloadOptionsMenu();
 
         mEmailOrig = currentUser.getEmail();
         if (TextUtils.isEmpty(mEmail) && !TextUtils.isEmpty(mEmailOrig)) {
             setEmail(mEmailOrig);
         }
 
-        getSubscriptions().add(mUserRepo.getUser(currentUser.getUid())
+        getSubscriptions().add(userRepo.getUser(currentUser.getUid())
                 .flatMap(new Func1<User, Single<Identity>>() {
                     @Override
                     public Single<Identity> call(User user) {
-                        return mUserRepo.getIdentity(user.getCurrentIdentity());
+                        return userRepo.getIdentity(user.getCurrentIdentity());
                     }
                 })
                 .doOnSuccess(new Action1<Identity>() {
@@ -247,35 +247,35 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
 
     @Override
     public void onPickAvatarMenuClick() {
-        mNavigator.startImagePicker();
+        navigator.startImagePicker();
     }
 
     @Override
     public void onNewAvatarTaken(@NonNull String avatar) {
         setAvatar(avatar);
-        mView.reloadOptionsMenu();
+        view.reloadOptionsMenu();
     }
 
     @Override
     public void onDeleteAvatarMenuClick() {
         setAvatar("");
-        mView.reloadOptionsMenu();
+        view.reloadOptionsMenu();
     }
 
     @Override
     public void onUnlinkThirdPartyLoginMenuClick() {
         mUnlinkSocialLogin = true;
         notifyPropertyChanged(BR.emailAndPasswordVisible);
-        mView.reloadOptionsMenu();
-        mView.showSetPasswordMessage(R.string.toast_unlink_password_required);
+        view.reloadOptionsMenu();
+        view.showSetPasswordMessage(R.string.toast_unlink_password_required);
     }
 
     @Override
     public void onExitClick() {
         if (changesWereMade()) {
-            mView.showDiscardChangesDialog();
+            view.showDiscardChangesDialog();
         } else {
-            mNavigator.finish(Activity.RESULT_CANCELED);
+            navigator.finish(Activity.RESULT_CANCELED);
         }
     }
 
@@ -292,7 +292,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
 
     @Override
     public void onDiscardChangesSelected() {
-        mNavigator.finish(Result.CHANGES_DISCARDED);
+        navigator.finish(Result.CHANGES_DISCARDED);
     }
 
     @Override
@@ -320,9 +320,9 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
 
         if (mUnlinkSocialLogin) {
             if (TextUtils.isEmpty(mPassword)) {
-                mView.showSetPasswordMessage(R.string.toast_unlink_password_required);
+                view.showSetPasswordMessage(R.string.toast_unlink_password_required);
             } else {
-                mView.dismissSetPasswordMessage();
+                view.dismissSetPasswordMessage();
             }
         }
     }
@@ -342,7 +342,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
         }
 
         if (!Objects.equals(mNickname, mNicknameOrig) && mGroupNicknames.contains(mNickname)) {
-            mView.showMessage(R.string.toast_profile_nickname_taken);
+            this.view.showMessage(R.string.toast_profile_nickname_taken);
             return;
         }
 
@@ -354,7 +354,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
         final String email = mGoogleUser || mFacebookUser || Objects.equals(mEmail, mEmailOrig) ? null : mEmail;
         final String password = mGoogleUser || mFacebookUser ? null : mPassword;
         if (!TextUtils.isEmpty(email) || !TextUtils.isEmpty(password)) {
-            mView.showReAuthenticateDialog(mEmailOrig);
+            this.view.showReAuthenticateDialog(mEmailOrig);
             return;
         }
 
@@ -369,21 +369,21 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
 
     private void unlinkSocialLogin() {
         if (mGoogleUser) {
-            mView.reAuthenticateGoogle();
+            view.reAuthenticateGoogle();
         } else if (mFacebookUser) {
-            mView.reAuthenticateFacebook();
+            view.reAuthenticateFacebook();
         }
     }
 
     @Override
     public void onGoogleLoginSuccessful(@NonNull String idToken) {
-        mView.showProgressDialog(R.string.progress_profile_unlink);
-        mView.loadUnlinkGoogleWorker(mEmail, mPassword, idToken);
+        view.showProgressDialog(R.string.progress_profile_unlink);
+        view.loadUnlinkGoogleWorker(mEmail, mPassword, idToken);
     }
 
     @Override
     public void onGoogleLoginFailed() {
-        mView.showMessage(R.string.toast_error_login_google);
+        view.showMessage(R.string.toast_error_login_google);
     }
 
     @Override
@@ -392,7 +392,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
                 .flatMap(new Func1<Void, Single<User>>() {
                     @Override
                     public Single<User> call(Void aVoid) {
-                        return mUserRepo.updateProfile(mNickname, mAvatar, isAvatarChanged());
+                        return userRepo.updateProfile(mNickname, mAvatar, isAvatarChanged());
                     }
                 })
                 .subscribe(profileSubscriber(workerTag))
@@ -401,13 +401,13 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
 
     @Override
     public void onFacebookSignedIn(@NonNull String token) {
-        mView.showProgressDialog(R.string.progress_profile_unlink);
-        mView.loadUnlinkFacebookWorker(mEmail, mPassword, token);
+        view.showProgressDialog(R.string.progress_profile_unlink);
+        view.loadUnlinkFacebookWorker(mEmail, mPassword, token);
     }
 
     @Override
     public void onFacebookLoginFailed() {
-        mView.showMessage(R.string.toast_error_login_facebook);
+        view.showMessage(R.string.toast_error_login_facebook);
     }
 
     @Override
@@ -416,7 +416,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
                 .flatMap(new Func1<Void, Single<User>>() {
                     @Override
                     public Single<User> call(Void aVoid) {
-                        return mUserRepo.updateProfile(mNickname, mAvatar, isAvatarChanged());
+                        return userRepo.updateProfile(mNickname, mAvatar, isAvatarChanged());
                     }
                 })
                 .subscribe(profileSubscriber(workerTag))
@@ -425,8 +425,8 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
 
     @Override
     public void onValidEmailAndPasswordEntered(@NonNull String email, @NonNull String password) {
-        mView.showProgressDialog(R.string.progress_profile_change_email_pw);
-        mView.loadChangeEmailPasswordWorker(email, password, mEmail, mPassword);
+        view.showProgressDialog(R.string.progress_profile_change_email_pw);
+        view.loadChangeEmailPasswordWorker(email, password, mEmail, mPassword);
     }
 
     @Override
@@ -435,7 +435,7 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
                 .flatMap(new Func1<Void, Single<User>>() {
                     @Override
                     public Single<User> call(Void aVoid) {
-                        return mUserRepo.updateProfile(mNickname, mAvatar, isAvatarChanged());
+                        return userRepo.updateProfile(mNickname, mAvatar, isAvatarChanged());
                     }
                 })
                 .subscribe(profileSubscriber(workerTag))
@@ -447,35 +447,35 @@ public class SettingsProfileViewModelImpl extends ViewModelBaseImpl<SettingsProf
         return new SingleSubscriber<User>() {
             @Override
             public void onSuccess(User user) {
-                mView.removeWorker(workerTag);
-                mView.hideProgressDialog();
+                view.removeWorker(workerTag);
+                view.hideProgressDialog();
 
-                mNavigator.finish(Activity.RESULT_OK);
+                navigator.finish(Activity.RESULT_OK);
             }
 
             @Override
             public void onError(Throwable error) {
-                mView.removeWorker(workerTag);
-                mView.hideProgressDialog();
+                view.removeWorker(workerTag);
+                view.hideProgressDialog();
 
                 Timber.e(error, "failed to unlink or change email/pw and save profile with error:");
-                mView.showMessage(R.string.toast_error_profile);
+                view.showMessage(R.string.toast_error_profile);
             }
         };
     }
 
     private void saveProfile() {
-        getSubscriptions().add(mUserRepo.updateProfile(mNickname, mAvatar, isAvatarChanged())
+        getSubscriptions().add(userRepo.updateProfile(mNickname, mAvatar, isAvatarChanged())
                 .subscribe(new SingleSubscriber<User>() {
                     @Override
                     public void onSuccess(User user) {
-                        mNavigator.finish(Activity.RESULT_OK);
+                        navigator.finish(Activity.RESULT_OK);
                     }
 
                     @Override
                     public void onError(Throwable error) {
                         Timber.e(error, "failed to save profile with error:");
-                        mView.showMessage(R.string.toast_error_profile);
+                        view.showMessage(R.string.toast_error_profile);
                     }
                 })
         );

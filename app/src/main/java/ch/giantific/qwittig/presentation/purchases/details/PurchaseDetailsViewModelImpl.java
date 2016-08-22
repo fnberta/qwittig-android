@@ -46,136 +46,136 @@ import rx.functions.Func1;
 public class PurchaseDetailsViewModelImpl extends ViewModelBaseImpl<PurchaseDetailsViewModel.ViewListener>
         implements PurchaseDetailsViewModel {
 
-    private final PurchaseRepository mPurchaseRepo;
-    private final String mPurchaseId;
-    private final String mPurchaseGroupId;
-    private final List<PurchaseDetailsItemModel> mItems;
-    private final List<PurchaseDetailsIdentityItemModel> mIdentityItems;
-    private final DateFormat mDateFormatter;
-    private ListInteraction mItemsListInteraction;
-    private ListInteraction mIdentitiesListInteraction;
-    private String mCurrentIdentityId;
-    private NumberFormat mMoneyFormatter;
-    private NumberFormat mForeignMoneyFormatter;
-    private String mStore;
-    private String mDate;
-    private String mReceipt;
-    private String mTotal;
-    private String mTotalForeign;
-    private String mMyShare;
-    private String mMyShareForeign;
-    private String mNote;
-    private double mExchangeRate;
-    private boolean mIdentitiesActive = true;
+    private final PurchaseRepository purchaseRepo;
+    private final String purchaseId;
+    private final String purchaseGroupId;
+    private final List<PurchaseDetailsItemModel> items;
+    private final List<PurchaseDetailsIdentityItemModel> identityItems;
+    private final DateFormat dateFormatter;
+    private ListInteraction itemsListInteraction;
+    private ListInteraction identitiesListInteraction;
+    private String currentIdentityId;
+    private NumberFormat moneyFormatter;
+    private NumberFormat foreignMoneyFormatter;
+    private String store;
+    private String date;
+    private String receipt;
+    private String total;
+    private String totalForeign;
+    private String myShare;
+    private String myShareForeign;
+    private String note;
+    private double exchangeRate;
+    private boolean identitiesActive = true;
 
     public PurchaseDetailsViewModelImpl(@Nullable Bundle savedState,
                                         @NonNull Navigator navigator,
                                         @NonNull RxBus<Object> eventBus,
-                                        @NonNull UserRepository userRepository,
+                                        @NonNull UserRepository userRepo,
                                         @NonNull PurchaseRepository purchaseRepo,
                                         @NonNull String purchaseId,
                                         @Nullable String purchaseGroupId) {
-        super(savedState, navigator, eventBus, userRepository);
+        super(savedState, navigator, eventBus, userRepo);
 
-        mPurchaseRepo = purchaseRepo;
-        mPurchaseId = purchaseId;
-        mPurchaseGroupId = purchaseGroupId;
-        mItems = new ArrayList<>();
-        mIdentityItems = new ArrayList<>();
-        mDateFormatter = DateUtils.getDateFormatter(false);
+        this.purchaseRepo = purchaseRepo;
+        this.purchaseId = purchaseId;
+        this.purchaseGroupId = purchaseGroupId;
+        items = new ArrayList<>();
+        identityItems = new ArrayList<>();
+        dateFormatter = DateUtils.getDateFormatter(false);
     }
 
     @Override
     public void setListInteraction(@NonNull ListInteraction listInteraction) {
-        mItemsListInteraction = listInteraction;
+        itemsListInteraction = listInteraction;
     }
 
     @Override
     public void setIdentitiesListInteraction(@NonNull ListInteraction listInteraction) {
-        mIdentitiesListInteraction = listInteraction;
+        identitiesListInteraction = listInteraction;
     }
 
     @Override
     @Bindable
     public String getStore() {
-        return mStore;
+        return store;
     }
 
     @Override
     public void setStore(@NonNull String store) {
-        mStore = store;
+        this.store = store;
         notifyPropertyChanged(BR.store);
     }
 
     @Override
     @Bindable
     public String getDate() {
-        return mDate;
+        return date;
     }
 
     @Override
     public void setDate(@NonNull Date date) {
-        mDate = mDateFormatter.format(date);
+        this.date = dateFormatter.format(date);
         notifyPropertyChanged(BR.date);
     }
 
     @Override
     @Bindable
     public String getTotal() {
-        return mTotal;
+        return total;
     }
 
     @Override
     public void setTotal(double total) {
-        mTotal = mMoneyFormatter.format(total);
+        this.total = moneyFormatter.format(total);
         notifyPropertyChanged(BR.total);
     }
 
     @Override
     @Bindable
     public String getTotalForeign() {
-        return mTotalForeign;
+        return totalForeign;
     }
 
     @Override
     public void setTotalForeign(double totalForeign) {
-        mTotalForeign = mForeignMoneyFormatter.format(totalForeign);
+        this.totalForeign = foreignMoneyFormatter.format(totalForeign);
         notifyPropertyChanged(BR.totalForeign);
     }
 
     @Override
     @Bindable
     public String getMyShare() {
-        return mMyShare;
+        return myShare;
     }
 
     @Override
     public void setMyShare(double myShare) {
-        mMyShare = mMoneyFormatter.format(myShare);
+        this.myShare = moneyFormatter.format(myShare);
         notifyPropertyChanged(BR.myShare);
     }
 
     @Override
     @Bindable
     public String getMyShareForeign() {
-        return mMyShareForeign;
+        return myShareForeign;
     }
 
     @Override
     public void setMyShareForeign(double myShareForeign) {
-        mMyShareForeign = mForeignMoneyFormatter.format(myShareForeign);
+        this.myShareForeign = foreignMoneyFormatter.format(myShareForeign);
         notifyPropertyChanged(BR.myShareForeign);
     }
 
     @Override
     @Bindable
     public String getNote() {
-        return mNote;
+        return note;
     }
 
     @Override
     public void setNote(@NonNull String note) {
-        mNote = note;
+        this.note = note;
         notifyPropertyChanged(BR.note);
         notifyPropertyChanged(BR.noteAvailable);
     }
@@ -183,18 +183,18 @@ public class PurchaseDetailsViewModelImpl extends ViewModelBaseImpl<PurchaseDeta
     @Override
     @Bindable
     public boolean isNoteAvailable() {
-        return !TextUtils.isEmpty(mNote);
+        return !TextUtils.isEmpty(note);
     }
 
     @Override
     @Bindable
     public String getReceipt() {
-        return mReceipt;
+        return receipt;
     }
 
     @Override
     public void setReceipt(@NonNull String receiptUrl) {
-        mReceipt = receiptUrl;
+        receipt = receiptUrl;
         notifyPropertyChanged(BR.receipt);
         notifyPropertyChanged(BR.receiptAvailable);
     }
@@ -202,39 +202,39 @@ public class PurchaseDetailsViewModelImpl extends ViewModelBaseImpl<PurchaseDeta
     @Override
     @Bindable
     public boolean isReceiptAvailable() {
-        return !TextUtils.isEmpty(mReceipt);
+        return !TextUtils.isEmpty(receipt);
     }
 
     @Override
     protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
         super.onUserLoggedIn(currentUser);
 
-        getSubscriptions().add(mUserRepo.observeUser(currentUser.getUid())
+        getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
                 .doOnNext(new Action1<User>() {
                     @Override
                     public void call(User user) {
                         final String currentIdentityId = user.getCurrentIdentity();
-                        if (!TextUtils.isEmpty(mCurrentIdentityId)
-                                && !Objects.equals(mCurrentIdentityId, currentIdentityId)) {
-                            mNavigator.finish();
+                        if (!TextUtils.isEmpty(PurchaseDetailsViewModelImpl.this.currentIdentityId)
+                                && !Objects.equals(PurchaseDetailsViewModelImpl.this.currentIdentityId, currentIdentityId)) {
+                            navigator.finish();
                         }
 
-                        mCurrentIdentityId = currentIdentityId;
+                        PurchaseDetailsViewModelImpl.this.currentIdentityId = currentIdentityId;
                     }
                 })
                 .flatMap(new Func1<User, Observable<Identity>>() {
                     @Override
                     public Observable<Identity> call(final User user) {
-                        return mUserRepo.getIdentity(user.getCurrentIdentity()).toObservable()
+                        return userRepo.getIdentity(user.getCurrentIdentity()).toObservable()
                                 .flatMap(new Func1<Identity, Observable<Identity>>() {
                                     @Override
                                     public Observable<Identity> call(final Identity identity) {
-                                        if (TextUtils.isEmpty(mPurchaseGroupId)
-                                                || Objects.equals(mPurchaseGroupId, identity.getGroup())) {
+                                        if (TextUtils.isEmpty(purchaseGroupId)
+                                                || Objects.equals(purchaseGroupId, identity.getGroup())) {
                                             return Observable.just(identity);
                                         }
 
-                                        return mUserRepo.switchGroup(user, mPurchaseGroupId)
+                                        return userRepo.switchGroup(user, purchaseGroupId)
                                                 .flatMap(new Func1<Identity, Observable<Identity>>() {
                                                     @Override
                                                     public Observable<Identity> call(Identity identity) {
@@ -249,17 +249,17 @@ public class PurchaseDetailsViewModelImpl extends ViewModelBaseImpl<PurchaseDeta
                     @Override
                     public void call(Identity identity) {
                         final String currency = identity.getGroupCurrency();
-                        mMoneyFormatter = MoneyUtils.getMoneyFormatter(currency, true, true);
+                        moneyFormatter = MoneyUtils.getMoneyFormatter(currency, true, true);
                     }
                 })
                 .flatMap(new Func1<Identity, Observable<Purchase>>() {
                     @Override
                     public Observable<Purchase> call(final Identity identity) {
-                        return mPurchaseRepo.observePurchase(mPurchaseId, false)
+                        return purchaseRepo.observePurchase(purchaseId)
                                 .doOnNext(new Action1<Purchase>() {
                                     @Override
                                     public void call(Purchase purchase) {
-                                        mForeignMoneyFormatter = MoneyUtils.getMoneyFormatter(purchase.getCurrency(), true, true);
+                                        foreignMoneyFormatter = MoneyUtils.getMoneyFormatter(purchase.getCurrency(), true, true);
                                         final String currentIdentityId = identity.getId();
                                         updateReadBy(purchase, currentIdentityId);
                                         updateActionBarMenu(purchase, identity.getGroupCurrency(), currentIdentityId);
@@ -275,7 +275,7 @@ public class PurchaseDetailsViewModelImpl extends ViewModelBaseImpl<PurchaseDeta
                                 .flatMap(new Func1<String, Observable<Identity>>() {
                                     @Override
                                     public Observable<Identity> call(String identityId) {
-                                        return mUserRepo.getIdentity(identityId).toObservable();
+                                        return userRepo.getIdentity(identityId).toObservable();
                                     }
                                 })
                                 .map(new Func1<Identity, PurchaseDetailsIdentityItemModel>() {
@@ -291,9 +291,9 @@ public class PurchaseDetailsViewModelImpl extends ViewModelBaseImpl<PurchaseDeta
                 .doOnNext(new Action1<List<PurchaseDetailsIdentityItemModel>>() {
                     @Override
                     public void call(List<PurchaseDetailsIdentityItemModel> itemModels) {
-                        mIdentityItems.clear();
-                        mIdentityItems.addAll(itemModels);
-                        mIdentitiesListInteraction.notifyDataSetChanged();
+                        identityItems.clear();
+                        identityItems.addAll(itemModels);
+                        identitiesListInteraction.notifyDataSetChanged();
 
                         checkIdentitiesActive(itemModels);
                     }
@@ -303,13 +303,13 @@ public class PurchaseDetailsViewModelImpl extends ViewModelBaseImpl<PurchaseDeta
                     public void onError(Throwable e) {
                         super.onError(e);
 
-                        mView.showMessage(R.string.toast_error_purchase_details_load);
+                        view.showMessage(R.string.toast_error_purchase_details_load);
                     }
 
                     @Override
                     public void onNext(List<PurchaseDetailsIdentityItemModel> itemModels) {
                         setLoading(false);
-                        mView.startEnterTransition();
+                        view.startEnterTransition();
                     }
                 })
         );
@@ -322,27 +322,27 @@ public class PurchaseDetailsViewModelImpl extends ViewModelBaseImpl<PurchaseDeta
         setTotalForeign(purchase.getTotalForeign());
         final double myShare = purchase.calculateUserShare(identityId);
         setMyShare(myShare);
-        mExchangeRate = purchase.getExchangeRate();
-        setMyShareForeign(myShare / mExchangeRate);
+        exchangeRate = purchase.getExchangeRate();
+        setMyShareForeign(myShare / exchangeRate);
         setNote(purchase.getNote());
         setReceipt(purchase.getReceipt());
         setItems(purchase.getItems(), identityId);
     }
 
     private void setItems(@NonNull List<Item> items, @NonNull String identityId) {
-        mItems.clear();
+        this.items.clear();
         for (Item item : items) {
             final PurchaseDetailsItemModel itemModel =
-                    new PurchaseDetailsItemModel(item, identityId, mMoneyFormatter);
-            mItems.add(itemModel);
+                    new PurchaseDetailsItemModel(item, identityId, moneyFormatter);
+            this.items.add(itemModel);
         }
-        mItemsListInteraction.notifyDataSetChanged();
+        itemsListInteraction.notifyDataSetChanged();
     }
 
     private void checkIdentitiesActive(@NonNull List<PurchaseDetailsIdentityItemModel> itemModels) {
         for (PurchaseDetailsIdentityItemModel itemModel : itemModels) {
             if (!itemModel.isActive()) {
-                mIdentitiesActive = false;
+                identitiesActive = false;
                 break;
             }
         }
@@ -353,49 +353,49 @@ public class PurchaseDetailsViewModelImpl extends ViewModelBaseImpl<PurchaseDeta
                                      @NonNull String currentIdentity) {
         final boolean showEdit = Objects.equals(purchase.getBuyer(), currentIdentity);
         final boolean showExchangeRate = !Objects.equals(groupCurrency, purchase.getCurrency());
-        mView.toggleMenuOptions(showEdit, showExchangeRate);
+        view.toggleMenuOptions(showEdit, showExchangeRate);
     }
 
     private void updateReadBy(@NonNull Purchase purchase, @NonNull String currentIdentity) {
         if (!purchase.isRead(currentIdentity)) {
-            mPurchaseRepo.updateReadBy(mPurchaseId, currentIdentity);
+            purchaseRepo.updateReadBy(purchaseId, currentIdentity);
         }
     }
 
     @Override
     public void onEditPurchaseClick() {
-        if (mIdentitiesActive) {
-            mNavigator.startPurchaseEdit(mPurchaseId, false);
+        if (identitiesActive) {
+            navigator.startPurchaseEdit(purchaseId, false);
         } else {
-            mView.showMessage(R.string.toast_purchase_edit_identities_inactive);
+            view.showMessage(R.string.toast_purchase_edit_identities_inactive);
         }
     }
 
     @Override
     public void onDeletePurchaseClick() {
-        if (mIdentitiesActive) {
-            mPurchaseRepo.deletePurchase(mPurchaseId, false);
-            mNavigator.finish(PurchaseDetailsResult.PURCHASE_DELETED, mPurchaseId);
+        if (identitiesActive) {
+            purchaseRepo.deletePurchase(purchaseId);
+            navigator.finish(PurchaseDetailsResult.PURCHASE_DELETED, purchaseId);
         } else {
-            mView.showMessage(R.string.toast_purchase_edit_identities_inactive);
+            view.showMessage(R.string.toast_purchase_edit_identities_inactive);
         }
     }
 
     @Override
     public void onShowExchangeRateClick() {
         final NumberFormat formatter = MoneyUtils.getExchangeRateFormatter();
-        mView.showMessage(R.string.toast_exchange_rate_value, formatter.format(mExchangeRate));
+        view.showMessage(R.string.toast_exchange_rate_value, formatter.format(exchangeRate));
     }
 
     @Override
     @Bindable
     public boolean isEmpty() {
-        return mItems.isEmpty();
+        return items.isEmpty();
     }
 
     @Override
     public PurchaseDetailsItemModel getItemAtPosition(int position) {
-        return mItems.get(position);
+        return items.get(position);
     }
 
     @Override
@@ -405,16 +405,16 @@ public class PurchaseDetailsViewModelImpl extends ViewModelBaseImpl<PurchaseDeta
 
     @Override
     public int getItemCount() {
-        return mItems.size();
+        return items.size();
     }
 
     @Override
     public PurchaseDetailsIdentityItemModel getIdentityAtPosition(int position) {
-        return mIdentityItems.get(position);
+        return identityItems.get(position);
     }
 
     @Override
     public int getIdentitiesCount() {
-        return mIdentityItems.size();
+        return identityItems.size();
     }
 }

@@ -1,0 +1,82 @@
+<!--
+  ~ Copyright (c) 2015 Fabio Berta
+  -->
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="viewModel"
+            type="ch.giantific.qwittig.presentation.stats.StatsViewModel"
+            />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        tools:context=".presentation.stats.StatsBarFragment"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="@dimen/small_space"
+            android:layout_marginEnd="@dimen/key_line_1"
+            android:layout_marginStart="@dimen/key_line_1"
+            android:layout_marginTop="@dimen/normal_space"
+            android:orientation="vertical"
+            android:visibility="@{viewModel.loading ? View.GONE : viewModel.empty ? View.GONE : View.VISIBLE}"
+            >
+
+            <TextView
+                style="@style/TextAppearance.AppCompat.Headline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@{@string/stats_bar_average(viewModel.barAverage)}"
+                />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="@dimen/normal_space"
+                android:layout_marginTop="@dimen/normal_space"
+                android:background="?android:attr/listDivider"
+                />
+
+            <ch.giantific.qwittig.presentation.stats.widgets.BarChart
+                android:id="@+id/bc_spending"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                app:barData="@{viewModel.timeData}"
+                app:xAxisFormatter="@{viewModel.barXAxisFormatter}"
+                app:yAxisFormatter="@{viewModel.chartCurrencyFormatter}"
+                />
+
+        </LinearLayout>
+
+        <include
+            android:id="@+id/stats_empty_view"
+            layout="@layout/include_stats_empty_view"
+            app:viewModel="@{viewModel}"
+            />
+
+        <include
+            android:id="@+id/stats_loading"
+            layout="@layout/include_progress"
+            app:viewModel="@{viewModel}"
+            />
+
+    </FrameLayout>
+
+</layout>
+

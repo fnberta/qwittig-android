@@ -26,10 +26,10 @@ import rx.subscriptions.Subscriptions;
  */
 public abstract class BaseGoogleApiClientSingle<T> implements Single.OnSubscribe<T> {
 
-    private final Context mContext;
+    private final Context context;
 
     public BaseGoogleApiClientSingle(@NonNull Context context) {
-        mContext = context;
+        this.context = context;
     }
 
     @Override
@@ -53,7 +53,7 @@ public abstract class BaseGoogleApiClientSingle<T> implements Single.OnSubscribe
     }
 
     private GoogleApiClient createApiClient(@NonNull SingleSubscriber<? super T> subscriber) {
-        final GoogleApiClient.Builder apiClientBuilder = new GoogleApiClient.Builder(mContext);
+        final GoogleApiClient.Builder apiClientBuilder = new GoogleApiClient.Builder(context);
         final GoogleSignInOptions gso =
                 new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                         .requestEmail()

@@ -29,9 +29,9 @@ import ch.giantific.qwittig.presentation.settings.groupusers.di.SettingsGroupUse
 public class SettingsUsersFragment extends BaseRecyclerViewFragment<SettingsGroupUsersComponent, SettingsUsersViewModel, BaseRecyclerViewFragment.ActivityListener<SettingsGroupUsersComponent>>
         implements SettingsUsersViewModel.ViewListener {
 
-    private FragmentSettingsUsersBinding mBinding;
-    private ProgressDialog mProgressDialog;
-    private Intent mShareLink;
+    private FragmentSettingsUsersBinding binding;
+    private ProgressDialog progressDialog;
+    private Intent shareLink;
 
     public SettingsUsersFragment() {
         // Required empty public constructor
@@ -40,20 +40,20 @@ public class SettingsUsersFragment extends BaseRecyclerViewFragment<SettingsGrou
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentSettingsUsersBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentSettingsUsersBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel.attachView(this);
-        mViewModel.setListInteraction(mRecyclerAdapter);
-        mBinding.setViewModel(mViewModel);
+        viewModel.attachView(this);
+        viewModel.setListInteraction(recyclerAdapter);
+        binding.setViewModel(viewModel);
 
-        mShareLink = new Intent(Intent.ACTION_SEND);
-        mShareLink.setType("text/plain");
+        shareLink = new Intent(Intent.ACTION_SEND);
+        shareLink.setType("text/plain");
     }
 
     @Override
@@ -63,28 +63,28 @@ public class SettingsUsersFragment extends BaseRecyclerViewFragment<SettingsGrou
 
     @Override
     protected RecyclerView getRecyclerView() {
-        return mBinding.rvSettingsUsers;
+        return binding.rvSettingsUsers;
     }
 
     @Override
     protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new SettingsUsersRecyclerAdapter(mViewModel);
+        return new SettingsUsersRecyclerAdapter(viewModel);
     }
 
     @Override
     public void showProgressDialog(@StringRes int message) {
-        mProgressDialog = ProgressDialog.show(getActivity(), null, getString(message), true, false);
+        progressDialog = ProgressDialog.show(getActivity(), null, getString(message), true, false);
     }
 
     @Override
     public void hideProgressDialog() {
-        mProgressDialog.hide();
+        progressDialog.dismiss();
     }
 
     @Override
     public void loadLinkShareOptions(@NonNull String link) {
-        mShareLink.putExtra(Intent.EXTRA_TEXT, link);
-        startActivity(Intent.createChooser(mShareLink, getString(R.string.action_share)));
+        shareLink.putExtra(Intent.EXTRA_TEXT, link);
+        startActivity(Intent.createChooser(shareLink, getString(R.string.action_share)));
     }
 
     @Override

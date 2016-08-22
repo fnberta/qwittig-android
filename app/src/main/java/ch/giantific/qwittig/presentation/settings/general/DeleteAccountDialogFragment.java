@@ -40,7 +40,7 @@ public class DeleteAccountDialogFragment extends BaseDialogFragment<DeleteAccoun
         dialogBuilder.setMessage(R.string.dialog_account_delete_message)
                 .setPositiveButton(R.string.dialog_positive_delete, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mActivity.onDeleteAccountSelected();
+                        activity.onDeleteAccountSelected();
                         dismiss();
                     }
                 })

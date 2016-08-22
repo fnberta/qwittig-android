@@ -25,7 +25,7 @@ import ch.giantific.qwittig.presentation.purchases.list.di.HomeSubcomponent;
 public class PurchasesFragment extends BaseRecyclerViewFragment<HomeSubcomponent, PurchasesViewModel, BaseFragment.ActivityListener<HomeSubcomponent>>
         implements PurchasesViewModel.ViewListener {
 
-    private FragmentHomePurchasesBinding mBinding;
+    private FragmentHomePurchasesBinding binding;
 
     public PurchasesFragment() {
         // required empty constructor
@@ -34,17 +34,17 @@ public class PurchasesFragment extends BaseRecyclerViewFragment<HomeSubcomponent
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentHomePurchasesBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentHomePurchasesBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel.attachView(this);
-        mViewModel.setListInteraction(mRecyclerAdapter);
-        mBinding.setViewModel(mViewModel);
+        viewModel.attachView(this);
+        viewModel.setListInteraction(recyclerAdapter);
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -54,11 +54,11 @@ public class PurchasesFragment extends BaseRecyclerViewFragment<HomeSubcomponent
 
     @Override
     protected RecyclerView getRecyclerView() {
-        return mBinding.srlRv.rvBase;
+        return binding.srlRv.rvBase;
     }
 
     @Override
     protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new PurchasesRecyclerAdapter(mViewModel);
+        return new PurchasesRecyclerAdapter(viewModel);
     }
 }

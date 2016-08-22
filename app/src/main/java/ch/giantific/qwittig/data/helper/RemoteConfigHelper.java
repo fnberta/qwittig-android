@@ -21,24 +21,25 @@ public class RemoteConfigHelper {
     private static final String SUPPORTED_CURRENCIES = "supported_currencies";
     private static final String DEFAULT_GROUP_NAME = "default_group_name";
     private static final String DEFAULT_GROUP_CURRENCY = "default_group_currency";
-    private final FirebaseRemoteConfig mRemoteConfig;
+
+    private final FirebaseRemoteConfig remoteConfig;
 
     @Inject
     public RemoteConfigHelper(@NonNull FirebaseRemoteConfig remoteConfig) {
-        mRemoteConfig = remoteConfig;
+        this.remoteConfig = remoteConfig;
     }
 
     public void fetchAndActivate() {
-        mRemoteConfig.fetch();
-        mRemoteConfig.activateFetched();
+        remoteConfig.fetch();
+        remoteConfig.activateFetched();
     }
 
     public boolean isShowOcrRating() {
-        return mRemoteConfig.getBoolean(SHOW_OCR_RATING);
+        return remoteConfig.getBoolean(SHOW_OCR_RATING);
     }
 
     public String[] getSupportedCurrencyCodes() {
-        return mRemoteConfig.getString(SUPPORTED_CURRENCIES).split(",");
+        return remoteConfig.getString(SUPPORTED_CURRENCIES).split(",");
     }
 
     /**
@@ -68,10 +69,10 @@ public class RemoteConfigHelper {
     }
 
     public String getDefaultGroupName() {
-        return mRemoteConfig.getString(DEFAULT_GROUP_NAME);
+        return remoteConfig.getString(DEFAULT_GROUP_NAME);
     }
 
     public String getDefaultGroupCurrency() {
-        return mRemoteConfig.getString(DEFAULT_GROUP_CURRENCY);
+        return remoteConfig.getString(DEFAULT_GROUP_CURRENCY);
     }
 }

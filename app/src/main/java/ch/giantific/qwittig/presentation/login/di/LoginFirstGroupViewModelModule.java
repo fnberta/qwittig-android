@@ -38,7 +38,7 @@ public class LoginFirstGroupViewModelModule extends BaseViewModelModule {
                                                               @NonNull RemoteConfigHelper configHelper,
                                                               @NonNull UserRepository userRepository,
                                                               @NonNull GroupRepository groupRepository) {
-        return new LoginFirstGroupViewModelImpl(mSavedState, navigator, eventBus, configHelper,
+        return new LoginFirstGroupViewModelImpl(savedState, navigator, eventBus, configHelper,
                 userRepository, groupRepository);
     }
 }

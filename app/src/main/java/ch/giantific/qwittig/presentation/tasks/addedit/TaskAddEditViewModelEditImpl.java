@@ -29,22 +29,23 @@ import ch.giantific.qwittig.presentation.tasks.addedit.itemmodels.TaskAddEditIde
 public class TaskAddEditViewModelEditImpl extends TaskAddEditViewModelAddImpl {
 
     private static final String STATE_ITEMS_SET = "STATE_ITEMS_SET";
-    private final String mEditTaskId;
-    private boolean mOldValuesSet;
-    private Task mEditTask;
+
+    private final String editTaskId;
+    private boolean oldValuesSet;
+    private Task editTask;
 
     public TaskAddEditViewModelEditImpl(@Nullable Bundle savedState,
                                         @NonNull Navigator navigator,
                                         @NonNull RxBus<Object> eventBus,
-                                        @NonNull UserRepository userRepository,
-                                        @NonNull TaskRepository taskRepository,
+                                        @NonNull UserRepository userRepos,
+                                        @NonNull TaskRepository taskRepo,
                                         @NonNull String editTaskId) {
-        super(savedState, navigator, eventBus, userRepository, taskRepository);
+        super(savedState, navigator, eventBus, userRepos, taskRepo);
 
-        mEditTaskId = editTaskId;
+        this.editTaskId = editTaskId;
 
         if (savedState != null) {
-            mOldValuesSet = savedState.getBoolean(STATE_ITEMS_SET, false);
+            oldValuesSet = savedState.getBoolean(STATE_ITEMS_SET, false);
         }
     }
 
@@ -52,7 +53,7 @@ public class TaskAddEditViewModelEditImpl extends TaskAddEditViewModelAddImpl {
     public void saveState(@NonNull Bundle outState) {
         super.saveState(outState);
 
-        outState.putBoolean(STATE_ITEMS_SET, mOldValuesSet);
+        outState.putBoolean(STATE_ITEMS_SET, oldValuesSet);
     }
 
     @Override
@@ -63,13 +64,13 @@ public class TaskAddEditViewModelEditImpl extends TaskAddEditViewModelAddImpl {
     }
 
 //    public void loadData() {
-//        getSubscriptions().add(mTaskRepo.fetchTaskData(mEditTaskId)
+//        getSubscriptions().add(taskRepo.fetchTaskData(editTaskId)
 //                .subscribe(new SingleSubscriber<Task>() {
 //                    @Override
 //                    public void onSuccess(Task task) {
-//                        mEditTask = task;
+//                        editTask = task;
 //
-//                        if (!mOldValuesSet) {
+//                        if (!oldValuesSet) {
 //                            restoreOldValues();
 //                        }
 //
@@ -89,24 +90,24 @@ public class TaskAddEditViewModelEditImpl extends TaskAddEditViewModelAddImpl {
 //    }
 
     private void restoreOldValues() {
-        setTitle(mEditTask.getTitle());
-        final String timeFrame = mEditTask.getTimeFrame();
+        setTitle(editTask.getTitle());
+        final String timeFrame = editTask.getTimeFrame();
         handleTimeFrame(timeFrame);
         if (!Objects.equals(timeFrame, TimeFrame.AS_NEEDED)) {
-            setDeadline(mEditTask.getDeadline());
+            setDeadline(editTask.getDeadline());
         }
 
-        final Set<String> identities = mEditTask.getIdentitiesIds();
+        final Set<String> identities = editTask.getIdentitiesIds();
         for (String identityId : identities) {
-            for (TaskAddEditIdentityItemModel itemModel : mItems) {
+            for (TaskAddEditIdentityItemModel itemModel : items) {
                 if (Objects.equals(itemModel.getIdentityId(), identityId)) {
                     itemModel.setInvolved(true);
                 }
             }
         }
 
-        mOldValuesSet = true;
-        mListInteraction.notifyDataSetChanged();
+        oldValuesSet = true;
+        listInteraction.notifyDataSetChanged();
     }
 
     private void handleTimeFrame(@NonNull @TimeFrame String timeFrame) {
@@ -141,13 +142,13 @@ public class TaskAddEditViewModelEditImpl extends TaskAddEditViewModelAddImpl {
 
     @Override
     boolean changesWereMade() {
-        if (!Objects.equals(mEditTask.getTitle(), mTitle) ||
-                !Objects.equals(mEditTask.getTimeFrame(), getTimeFrameSelected()) ||
-                mEditTask.getDeadline().compareTo(mDeadline) != 0) {
+        if (!Objects.equals(editTask.getTitle(), title) ||
+                !Objects.equals(editTask.getTimeFrame(), getTimeFrameSelected()) ||
+                editTask.getDeadline().compareTo(deadline) != 0) {
             return true;
         }
 
-        final Set<String> oldIdentities = mEditTask.getIdentitiesIds();
+        final Set<String> oldIdentities = editTask.getIdentitiesIds();
         final int oldIdentitiesSize = oldIdentities.size();
         final List<String> newIdentities = getIdentitiesAvailable();
         if (oldIdentitiesSize != newIdentities.size()) {
@@ -171,8 +172,8 @@ public class TaskAddEditViewModelEditImpl extends TaskAddEditViewModelAddImpl {
 //    Task2 getTask(@NonNull String taskTitle, @NonNull String timeFrame, @NonNull List<String> identities) {
 //        mEditsetTitle(title);
 //        mEditsetTimeFrame(timeFrame);
-//        mEditsetDeadlineResetMidnight(mDeadline);
+//        mEditsetDeadlineResetMidnight(deadline);
 //        mEditsetIdentities(identities);
-//        return mEditTask;
+//        return editTask;
 //    }
 }

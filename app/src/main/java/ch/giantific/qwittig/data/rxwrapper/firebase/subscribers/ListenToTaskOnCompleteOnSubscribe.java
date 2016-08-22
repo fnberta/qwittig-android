@@ -13,35 +13,35 @@ import rx.SingleSubscriber;
  */
 public class ListenToTaskOnCompleteOnSubscribe<T> implements Single.OnSubscribe<T> {
 
-    private final Task<T> mTask;
+    private final Task<T> task;
 
     public ListenToTaskOnCompleteOnSubscribe(@NonNull Task<T> task) {
-        mTask = task;
+        this.task = task;
     }
 
     @Override
     public void call(SingleSubscriber<? super T> singleSubscriber) {
-        mTask.addOnCompleteListener(new RxTaskOnCompleteListener<>(singleSubscriber));
+        task.addOnCompleteListener(new RxTaskOnCompleteListener<>(singleSubscriber));
     }
 
     private static class RxTaskOnCompleteListener<T> implements OnCompleteListener<T> {
 
-        private final SingleSubscriber<? super T> mSubscriber;
+        private final SingleSubscriber<? super T> subscriber;
 
-        public RxTaskOnCompleteListener(@NonNull SingleSubscriber<? super T> subscriber) {
-            mSubscriber = subscriber;
+        RxTaskOnCompleteListener(@NonNull SingleSubscriber<? super T> subscriber) {
+            this.subscriber = subscriber;
         }
 
         @Override
         public void onComplete(@NonNull Task<T> task) {
-            if (mSubscriber.isUnsubscribed()) {
+            if (subscriber.isUnsubscribed()) {
                 return;
             }
 
             if (task.isSuccessful()) {
-                mSubscriber.onSuccess(task.getResult());
+                subscriber.onSuccess(task.getResult());
             } else {
-                mSubscriber.onError(task.getException());
+                subscriber.onError(task.getException());
             }
         }
     }

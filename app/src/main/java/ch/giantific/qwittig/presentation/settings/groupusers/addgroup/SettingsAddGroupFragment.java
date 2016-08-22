@@ -6,7 +6,6 @@ package ch.giantific.qwittig.presentation.settings.groupusers.addgroup;
 
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -33,8 +32,8 @@ public class SettingsAddGroupFragment extends BaseFragment<SettingsGroupUsersCom
         implements SettingsAddGroupViewModel.ViewListener {
 
     public static final String RESULT_DATA_GROUP = "RESULT_DATA_GROUP";
-    private FragmentSettingsAddGroupBinding mBinding;
-    private ProgressDialog mProgressDialog;
+
+    private FragmentSettingsAddGroupBinding binding;
 
     public SettingsAddGroupFragment() {
         // Required empty public constructor
@@ -43,20 +42,20 @@ public class SettingsAddGroupFragment extends BaseFragment<SettingsGroupUsersCom
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentSettingsAddGroupBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentSettingsAddGroupBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel.attachView(this);
-        mBinding.setViewModel(mViewModel);
+        viewModel.attachView(this);
+        binding.setViewModel(viewModel);
         final ArrayAdapter<Currency> spinnerCurrencyAdapter = new ArrayAdapter<>(getActivity(),
-                R.layout.spinner_item, mViewModel.getSupportedCurrencies());
+                R.layout.spinner_item, viewModel.getSupportedCurrencies());
         spinnerCurrencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mBinding.spSettingsGroupAddNewCurrency.setAdapter(spinnerCurrencyAdapter);
+        binding.spSettingsGroupAddNewCurrency.setAdapter(spinnerCurrencyAdapter);
     }
 
     @Override
@@ -66,7 +65,7 @@ public class SettingsAddGroupFragment extends BaseFragment<SettingsGroupUsersCom
 
     @Override
     protected View getSnackbarView() {
-        return mBinding.etSettingsGroupAddNewName;
+        return binding.etSettingsGroupAddNewName;
     }
 
     @Override
@@ -90,7 +89,7 @@ public class SettingsAddGroupFragment extends BaseFragment<SettingsGroupUsersCom
                 .replace(R.id.container, fragment, SettingsAddGroupActivity.ADD_USERS_FRAGMENT)
                 .commit();
 
-        mActivity.setUpIconAsDone();
+        activity.setUpIconAsDone();
     }
 
     public interface ActivityListener extends BaseFragment.ActivityListener<SettingsGroupUsersComponent> {

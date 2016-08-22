@@ -142,8 +142,8 @@
     <string name="dialog_discard_changes_message">Änderungen verwerfen?</string>
     <string name="push_user_joined_title">Neues Mitglied in %1$s</string>
     <string name="push_user_joined_alert">%1$s ist beigetreten</string>
-    <string name="push_user_left_title">%1$s ist weg</string>
-    <string name="push_user_left_alert">%1$s hat %2$s verlassen</string>
+    <string name="push_user_left_group_title">%1$s ist weg</string>
+    <string name="push_user_left_group_alert">%1$s hat %2$s verlassen</string>
     <string name="no_compensations_history">Keine vergangenen Zahlungen</string>
     <string name="progress_logout">Abmelden…</string>
     <string name="action_purchase_add_edit_receipt_delete">Quittung löschen</string>
@@ -365,5 +365,17 @@
     <string name="progress_profile_change_email_pw">Aktualisiere Profil…</string>
     <string name="toast_error_leave_group">Verlassen der Gruppe fehlgeschlagen. Bitte versuche es noch einmal.</string>
     <string name="toast_group_left">Du hast die Gruppe verlassen</string>
+    <string name="tab_stats_group">Gruppenübersicht</string>
+    <string name="tab_stats_user">Persönliche Ausgaben</string>
+    <string name="stats_period_month_this">Diesen Monat</string>
+    <string name="stats_period_month_last">Letzter Monat</string>
+    <string name="stats_period_year_this">Dieses Jahr</string>
+    <string name="stats_period_custom">Benutzerdefiniert</string>
+    <string name="tab_stats_pie">Kuchendiagramme</string>
+    <string name="tab_stats_bar">Balkendiagramme</string>
+    <string name="stats_pie_total">Total: %1$s</string>
+    <string name="stats_bar_average">Durchschnitt: %1$s</string>
+    <string name="header_stats_pie_stores">Aufgeteilt nach Geschäften</string>
+    <string name="header_stats_pie_identities">Aufgeteilt nach Käufern</string>
 
 </resources>

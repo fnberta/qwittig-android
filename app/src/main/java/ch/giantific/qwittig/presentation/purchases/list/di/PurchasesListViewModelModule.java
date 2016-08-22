@@ -36,7 +36,7 @@ public class PurchasesListViewModelModule extends BaseViewModelModule {
                                                       @NonNull RxBus<Object> eventBus,
                                                       @NonNull UserRepository userRepository,
                                                       @NonNull PurchaseRepository purchaseRepository) {
-        return new PurchasesViewModelImpl(mSavedState, navigator, eventBus, userRepository,
+        return new PurchasesViewModelImpl(savedState, navigator, eventBus, userRepository,
                 purchaseRepository);
     }
 }

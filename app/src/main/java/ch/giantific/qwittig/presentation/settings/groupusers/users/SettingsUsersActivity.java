@@ -41,7 +41,7 @@ public class SettingsUsersActivity extends BaseActivity<SettingsGroupUsersCompon
         implements NicknamePromptDialogFragment.DialogInteractionListener {
 
     @Inject
-    SettingsUsersViewModel mUsersViewModel;
+    SettingsUsersViewModel usersViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -62,18 +62,18 @@ public class SettingsUsersActivity extends BaseActivity<SettingsGroupUsersCompon
 
     @Override
     protected void injectDependencies(@Nullable Bundle savedInstanceState) {
-        mComponent = DaggerSettingsGroupUsersComponent.builder()
+        component = DaggerSettingsGroupUsersComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
                 .settingsAddGroupViewModelModule(new SettingsAddGroupViewModelModule(savedInstanceState))
                 .settingsUsersViewModelModule(new SettingsUsersViewModelModule(savedInstanceState))
                 .build();
-        mComponent.inject(this);
+        component.inject(this);
     }
 
     @Override
     protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{mUsersViewModel});
+        return Arrays.asList(new ViewModel[]{usersViewModel});
     }
 
     @Override
@@ -99,7 +99,7 @@ public class SettingsUsersActivity extends BaseActivity<SettingsGroupUsersCompon
                     AvatarUtils.saveImageLocal(this, imageUri, new AvatarUtils.AvatarLocalSaveListener() {
                         @Override
                         public void onAvatarSaved(@NonNull String path) {
-                            mUsersViewModel.onNewAvatarTaken(path);
+                            usersViewModel.onNewAvatarTaken(path);
                         }
                     });
                 }
@@ -108,6 +108,6 @@ public class SettingsUsersActivity extends BaseActivity<SettingsGroupUsersCompon
 
     @Override
     public void onValidNicknameEntered(@NonNull String nickname, int position) {
-        mUsersViewModel.onValidNicknameEntered(nickname, position);
+        usersViewModel.onValidNicknameEntered(nickname, position);
     }
 }

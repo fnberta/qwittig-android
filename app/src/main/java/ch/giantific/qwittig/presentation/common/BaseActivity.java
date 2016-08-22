@@ -41,18 +41,18 @@ public abstract class BaseActivity<T> extends AppCompatActivity
         implements BaseFragment.ActivityListener<T>, BaseWorkerListener, ViewModel.ViewListener {
 
     @NonNull
-    private final BroadcastReceiver mLocalBroadcastReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver localBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, @NonNull Intent intent) {
             final int dataType = intent.getIntExtra(LocalBroadcast.INTENT_DATA_TYPE, 0);
             handleLocalBroadcast(intent, dataType);
         }
     };
-    protected Toolbar mToolbar;
-    protected T mComponent;
+    protected Toolbar toolbar;
+    protected T component;
     @Inject
-    RemoteConfigHelper mConfigHelper;
-    private List<ViewModel> mViewModels;
+    RemoteConfigHelper configHelper;
+    private List<ViewModel> viewModels;
 
     @CallSuper
     protected void handleLocalBroadcast(Intent intent, int dataType) {
@@ -64,16 +64,16 @@ public abstract class BaseActivity<T> extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         injectDependencies(savedInstanceState);
-        mViewModels = getViewModels();
+        viewModels = getViewModels();
 
-        mConfigHelper.fetchAndActivate();
+        configHelper.fetchAndActivate();
     }
 
     protected abstract void injectDependencies(@Nullable Bundle savedInstanceState);
 
     @Override
     public T getComponent() {
-        return mComponent;
+        return component;
     }
 
     protected abstract List<ViewModel> getViewModels();
@@ -82,7 +82,7 @@ public abstract class BaseActivity<T> extends AppCompatActivity
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        for (ViewModel viewModel : mViewModels) {
+        for (ViewModel viewModel : viewModels) {
             if (viewModel != null) {
                 viewModel.saveState(outState);
             }
@@ -97,9 +97,9 @@ public abstract class BaseActivity<T> extends AppCompatActivity
     }
 
     private void setupToolbar() {
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        if (mToolbar != null) {
-            setSupportActionBar(mToolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
             final ActionBar actionBar = getSupportActionBar();
             if (actionBar != null) {
                 actionBar.setDisplayHomeAsUpEnabled(true);
@@ -112,7 +112,7 @@ public abstract class BaseActivity<T> extends AppCompatActivity
     protected void onStart() {
         super.onStart();
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(mLocalBroadcastReceiver,
+        LocalBroadcastManager.getInstance(this).registerReceiver(localBroadcastReceiver,
                 new IntentFilter(LocalBroadcast.INTENT_FILTER_DATA_NEW));
     }
 
@@ -120,7 +120,7 @@ public abstract class BaseActivity<T> extends AppCompatActivity
     protected void onStop() {
         super.onStop();
 
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mLocalBroadcastReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(localBroadcastReceiver);
     }
 
     @Override
@@ -130,17 +130,17 @@ public abstract class BaseActivity<T> extends AppCompatActivity
 
     @Override
     public void showMessage(@StringRes int resId) {
-        Snackbar.make(mToolbar, resId, Snackbar.LENGTH_LONG).show();
+        Snackbar.make(toolbar, resId, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
     public void showMessage(@StringRes int resId, @NonNull Object... args) {
-        Snackbar.make(mToolbar, getString(resId, args), Snackbar.LENGTH_LONG).show();
+        Snackbar.make(toolbar, getString(resId, args), Snackbar.LENGTH_LONG).show();
     }
 
     @Override
     public void showMessageWithAction(@StringRes int resId, @NonNull MessageAction action) {
-        Snackbar.make(mToolbar, resId, Snackbar.LENGTH_LONG)
+        Snackbar.make(toolbar, resId, Snackbar.LENGTH_LONG)
                 .setAction(action.getActionText(), action)
                 .show();
     }
@@ -152,7 +152,7 @@ public abstract class BaseActivity<T> extends AppCompatActivity
 
     @Override
     public void onWorkerError(@NonNull String workerTag) {
-        for (ViewModel viewModel : mViewModels) {
+        for (ViewModel viewModel : viewModels) {
             if (viewModel != null) {
                 viewModel.onWorkerError(workerTag);
             }

@@ -37,11 +37,11 @@ import rx.functions.Func1;
 public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel.ViewListener>
         implements NavDrawerViewModel {
 
-    private final List<Identity> mIdentities;
-    private SpinnerInteraction mSpinnerInteraction;
-    private Identity mCurrentIdentity;
-    private String mNickname;
-    private String mAvatar;
+    private final List<Identity> identities;
+    private SpinnerInteraction spinnerInteraction;
+    private Identity currentIdentity;
+    private String nickname;
+    private String avatar;
 
     public NavDrawerViewModelImpl(@Nullable Bundle savedState,
                                   @NonNull Navigator navigator,
@@ -49,44 +49,44 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
                                   @NonNull UserRepository userRepository) {
         super(savedState, navigator, eventBus, userRepository);
 
-        mIdentities = new ArrayList<>();
+        identities = new ArrayList<>();
     }
 
     @Override
     public void setSpinnerInteraction(@NonNull SpinnerInteraction spinnerInteraction) {
-        mSpinnerInteraction = spinnerInteraction;
+        this.spinnerInteraction = spinnerInteraction;
     }
 
     @Override
     @Bindable
     public String getNickname() {
-        return mNickname;
+        return nickname;
     }
 
     @Override
     public void setNickname(@NonNull String nickname) {
-        mNickname = nickname;
+        this.nickname = nickname;
         notifyPropertyChanged(BR.nickname);
     }
 
     @Override
     @Bindable
     public String getAvatar() {
-        return mAvatar;
+        return avatar;
     }
 
     @Override
     public void setAvatar(@NonNull String avatar) {
-        mAvatar = avatar;
+        this.avatar = avatar;
         notifyPropertyChanged(BR.avatar);
     }
 
     @Override
     @Bindable
     public int getSelectedIdentity() {
-        for (int i = 0, mIdentitiesSize = mIdentities.size(); i < mIdentitiesSize; i++) {
-            final Identity identity = mIdentities.get(i);
-            if (Objects.equals(mCurrentIdentity.getId(), identity.getId())) {
+        for (int i = 0, mIdentitiesSize = identities.size(); i < mIdentitiesSize; i++) {
+            final Identity identity = identities.get(i);
+            if (Objects.equals(currentIdentity.getId(), identity.getId())) {
                 return i;
             }
         }
@@ -98,15 +98,15 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
     protected void onUserLoggedIn(@NonNull final FirebaseUser currentUser) {
         super.onUserLoggedIn(currentUser);
 
-        getSubscriptions().add(mUserRepo.observeUser(currentUser.getUid())
+        getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
                 .flatMap(new Func1<User, Observable<User>>() {
                     @Override
                     public Observable<User> call(final User user) {
-                        return mUserRepo.observeIdentity(user.getCurrentIdentity())
+                        return userRepo.observeIdentity(user.getCurrentIdentity())
                                 .doOnNext(new Action1<Identity>() {
                                     @Override
                                     public void call(Identity identity) {
-                                        mCurrentIdentity = identity;
+                                        currentIdentity = identity;
                                         setNickname(identity.getNickname());
                                         setAvatar(identity.getAvatar());
                                     }
@@ -126,7 +126,7 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
                                 .flatMap(new Func1<String, Observable<Identity>>() {
                                     @Override
                                     public Observable<Identity> call(String identityId) {
-                                        return mUserRepo.getIdentity(identityId).toObservable();
+                                        return userRepo.getIdentity(identityId).toObservable();
                                     }
                                 })
                                 .toList();
@@ -137,14 +137,14 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
                     public void onError(Throwable e) {
                         super.onError(e);
 
-                        mView.showMessage(R.string.toast_error_load_groups);
+                        view.showMessage(R.string.toast_error_load_groups);
                     }
 
                     @Override
                     public void onNext(List<Identity> identities) {
-                        mIdentities.clear();
-                        mIdentities.addAll(identities);
-                        mSpinnerInteraction.notifyDataSetChanged();
+                        NavDrawerViewModelImpl.this.identities.clear();
+                        NavDrawerViewModelImpl.this.identities.addAll(identities);
+                        spinnerInteraction.notifyDataSetChanged();
                         notifyPropertyChanged(BR.selectedIdentity);
                     }
                 })
@@ -153,13 +153,13 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
 
     @Override
     public List<Identity> getIdentities() {
-        return mIdentities;
+        return identities;
     }
 
     @Override
     public boolean isUserLoggedIn() {
-        if (mUserRepo.getCurrentUser() == null) {
-            mNavigator.startLogin();
+        if (userRepo.getCurrentUser() == null) {
+            navigator.startLogin();
             return false;
         }
 
@@ -168,23 +168,23 @@ public class NavDrawerViewModelImpl extends ViewModelBaseImpl<NavDrawerViewModel
 
     @Override
     public void afterLogout() {
-        mNavigator.startHome();
-        mNavigator.finish();
+        navigator.startHome();
+        navigator.finish();
     }
 
     @Override
     public void onIdentitySelected(@NonNull AdapterView<?> parent, View view, int position, long id) {
         final Identity identity = (Identity) parent.getItemAtPosition(position);
         final String identityId = identity.getId();
-        if (Objects.equals(mCurrentIdentity.getId(), identityId)) {
+        if (Objects.equals(currentIdentity.getId(), identityId)) {
             return;
         }
 
-        mUserRepo.updateCurrentIdentity(mCurrentIdentity.getUser(), identityId);
+        userRepo.updateCurrentIdentity(currentIdentity.getUser(), identityId);
     }
 
     @Override
     public void onAvatarClick(View view) {
-        mNavigator.startProfileSettings();
+        navigator.startProfileSettings();
     }
 }

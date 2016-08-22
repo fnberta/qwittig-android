@@ -38,7 +38,7 @@ public class SettingsAddGroupViewModelModule extends BaseViewModelModule {
                                                                 @NonNull RemoteConfigHelper configHelper,
                                                                 @NonNull UserRepository userRepository,
                                                                 @NonNull GroupRepository groupRepository) {
-        return new SettingsAddGroupViewModelImpl(mSavedState, navigator, eventBus, configHelper,
+        return new SettingsAddGroupViewModelImpl(savedState, navigator, eventBus, configHelper,
                 userRepository, groupRepository);
     }
 }

@@ -22,13 +22,13 @@ import ch.giantific.qwittig.presentation.common.itemmodels.BaseChildItemModel;
 public class PurchasesItemModel extends BaseChildItemModel
         implements Comparable<PurchasesItemModel> {
 
-    private final Date mDate;
-    private final String mBuyerNicknameAndDate;
-    private final String mBuyerAvatar;
-    private final String mStore;
-    private final String mTotal;
-    private final String mUserShare;
-    private final boolean mRead;
+    private final Date date;
+    private final String buyerNicknameAndDate;
+    private final String buyerAvatar;
+    private final String store;
+    private final String total;
+    private final String userShare;
+    private final boolean read;
 
     public PurchasesItemModel(@EventType int eventType,
                               @NonNull Purchase purchase,
@@ -38,52 +38,52 @@ public class PurchasesItemModel extends BaseChildItemModel
                               @NonNull DateFormat dateFormatter) {
         super(eventType, purchase.getId());
 
-        mDate = purchase.getDateDate();
-        mBuyerNicknameAndDate = String.format("%s, %s", buyer.getNickname(), dateFormatter.format(mDate));
-        mBuyerAvatar = buyer.getAvatar();
-        mStore = purchase.getStore();
-        mTotal = moneyFormatter.format(purchase.getTotal());
-        mUserShare = moneyFormatter.format(purchase.calculateUserShare(currentIdentityId));
-        mRead = purchase.isRead(currentIdentityId);
+        date = purchase.getDateDate();
+        buyerNicknameAndDate = String.format("%s, %s", buyer.getNickname(), dateFormatter.format(date));
+        buyerAvatar = buyer.getAvatar();
+        store = purchase.getStore();
+        total = moneyFormatter.format(purchase.getTotal());
+        userShare = moneyFormatter.format(purchase.calculateUserShare(currentIdentityId));
+        read = purchase.isRead(currentIdentityId);
     }
 
     public Date getDate() {
-        return mDate;
+        return date;
     }
 
     @Bindable
     public String getBuyerNicknameAndDate() {
-        return mBuyerNicknameAndDate;
+        return buyerNicknameAndDate;
     }
 
     @Bindable
     public String getBuyerAvatar() {
-        return mBuyerAvatar;
+        return buyerAvatar;
     }
 
     @Bindable
     public String getStore() {
-        return mStore;
+        return store;
     }
 
     @Bindable
     public String getTotal() {
-        return mTotal;
+        return total;
     }
 
     @Bindable
     public String getUserShare() {
-        return mUserShare;
+        return userShare;
     }
 
     @Bindable
     public boolean isRead() {
-        return mRead;
+        return read;
     }
 
     @Override
     public int compareTo(@NonNull PurchasesItemModel itemModel) {
-        return itemModel.getDate().compareTo(mDate);
+        return itemModel.getDate().compareTo(date);
     }
 
     @Override
@@ -93,24 +93,24 @@ public class PurchasesItemModel extends BaseChildItemModel
 
         final PurchasesItemModel that = (PurchasesItemModel) o;
 
-        if (mRead != that.isRead()) return false;
-        if (!mBuyerNicknameAndDate.equals(that.getBuyerNicknameAndDate())) return false;
-        if (mBuyerAvatar != null ? !mBuyerAvatar.equals(that.getBuyerAvatar()) : that.getBuyerAvatar() != null)
+        if (read != that.isRead()) return false;
+        if (!buyerNicknameAndDate.equals(that.getBuyerNicknameAndDate())) return false;
+        if (buyerAvatar != null ? !buyerAvatar.equals(that.getBuyerAvatar()) : that.getBuyerAvatar() != null)
             return false;
-        if (!mStore.equals(that.getStore())) return false;
-        if (!mTotal.equals(that.getTotal())) return false;
-        return mUserShare.equals(that.getUserShare());
+        if (!store.equals(that.getStore())) return false;
+        if (!total.equals(that.getTotal())) return false;
+        return userShare.equals(that.getUserShare());
 
     }
 
     @Override
     public int hashCode() {
-        int result = mBuyerNicknameAndDate.hashCode();
-        result = 31 * result + (mBuyerAvatar != null ? mBuyerAvatar.hashCode() : 0);
-        result = 31 * result + mStore.hashCode();
-        result = 31 * result + mTotal.hashCode();
-        result = 31 * result + mUserShare.hashCode();
-        result = 31 * result + (mRead ? 1 : 0);
+        int result = buyerNicknameAndDate.hashCode();
+        result = 31 * result + (buyerAvatar != null ? buyerAvatar.hashCode() : 0);
+        result = 31 * result + store.hashCode();
+        result = 31 * result + total.hashCode();
+        result = 31 * result + userShare.hashCode();
+        result = 31 * result + (read ? 1 : 0);
         return result;
     }
 }

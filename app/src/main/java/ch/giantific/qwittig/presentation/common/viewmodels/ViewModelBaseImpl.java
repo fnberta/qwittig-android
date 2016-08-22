@@ -30,74 +30,74 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
         extends BaseObservable implements ViewModel<T> {
 
     private static final String STATE_LOADING = "STATE_LOADING";
-    protected final UserRepository mUserRepo;
-    protected final Navigator mNavigator;
-    protected final RxBus<Object> mEventBus;
-    protected T mView;
-    protected boolean mLoading;
-    private CompositeSubscription mSubscriptions = new CompositeSubscription();
-    private int mAuthStateCounter = 0;
+    protected final UserRepository userRepo;
+    protected final Navigator navigator;
+    protected final RxBus<Object> eventBus;
+    protected T view;
+    protected boolean loading;
+    private CompositeSubscription subscriptions = new CompositeSubscription();
+    private int authStateCounter = 0;
 
     public ViewModelBaseImpl(@Nullable Bundle savedState,
                              @NonNull Navigator navigator,
                              @NonNull RxBus<Object> eventBus,
-                             @NonNull UserRepository userRepository) {
-        mNavigator = navigator;
-        mEventBus = eventBus;
-        mUserRepo = userRepository;
+                             @NonNull UserRepository userRepo) {
+        this.navigator = navigator;
+        this.eventBus = eventBus;
+        this.userRepo = userRepo;
 
         if (savedState != null) {
-            mLoading = savedState.getBoolean(STATE_LOADING, false);
+            loading = savedState.getBoolean(STATE_LOADING, false);
         } else {
-            mLoading = false;
+            loading = false;
         }
     }
 
     @Override
     public void attachView(@NonNull T view) {
-        mView = view;
+        this.view = view;
     }
 
     @Override
     @CallSuper
     public void saveState(@NonNull Bundle outState) {
-        outState.putBoolean(STATE_LOADING, mLoading);
+        outState.putBoolean(STATE_LOADING, loading);
     }
 
     @Override
     @Bindable
     public boolean isLoading() {
-        return mLoading;
+        return loading;
     }
 
     @Override
     public void setLoading(boolean loading) {
-        mLoading = loading;
+        this.loading = loading;
         notifyPropertyChanged(BR.loading);
     }
 
     protected final CompositeSubscription getSubscriptions() {
-        if (mSubscriptions == null || mSubscriptions.isUnsubscribed()) {
-            mSubscriptions = new CompositeSubscription();
+        if (subscriptions == null || subscriptions.isUnsubscribed()) {
+            subscriptions = new CompositeSubscription();
         }
 
-        return mSubscriptions;
+        return subscriptions;
     }
 
     @Override
     public final void onViewVisible() {
-        mAuthStateCounter = 0;
-        getSubscriptions().add(mUserRepo.observeAuthStatus()
+        authStateCounter = 0;
+        getSubscriptions().add(userRepo.observeAuthStatus()
                 .subscribe(new IndefiniteSubscriber<FirebaseUser>() {
                     @Override
                     public void onNext(FirebaseUser currentUser) {
                         if (currentUser != null) {
-                            if (mAuthStateCounter == 0) {
+                            if (authStateCounter == 0) {
                                 onUserLoggedIn(currentUser);
-                                mAuthStateCounter++;
+                                authStateCounter++;
                             }
                         } else {
-                            mAuthStateCounter = 0;
+                            authStateCounter = 0;
                             onUserNotLoggedIn();
                         }
                     }
@@ -117,14 +117,14 @@ public abstract class ViewModelBaseImpl<T extends ViewModel.ViewListener>
 
     @Override
     public final void onViewGone() {
-        if (mSubscriptions.hasSubscriptions()) {
-            mSubscriptions.unsubscribe();
+        if (subscriptions.hasSubscriptions()) {
+            subscriptions.unsubscribe();
         }
     }
 
     @Override
     public final void onWorkerError(@NonNull String workerTag) {
-        mView.removeWorker(workerTag);
-        mView.showMessage(R.string.toast_error_unknown);
+        view.removeWorker(workerTag);
+        view.showMessage(R.string.toast_error_unknown);
     }
 }

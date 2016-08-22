@@ -36,7 +36,7 @@ public class SettingsProfileViewModelModule extends BaseViewModelModule {
                                                               @NonNull RxBus<Object> eventBus,
                                                               @NonNull UserRepository userRepository,
                                                               @NonNull GroupRepository groupRepository) {
-        return new SettingsProfileViewModelImpl(mSavedState, navigator, eventBus, userRepository,
+        return new SettingsProfileViewModelImpl(savedState, navigator, eventBus, userRepository,
                 groupRepository);
     }
 }

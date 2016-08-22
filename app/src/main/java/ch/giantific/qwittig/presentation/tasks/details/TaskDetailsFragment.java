@@ -38,8 +38,8 @@ import ch.giantific.qwittig.presentation.tasks.details.di.TaskDetailsSubcomponen
 public class TaskDetailsFragment extends BaseRecyclerViewFragment<TaskDetailsSubcomponent, TaskDetailsViewModel, BaseFragment.ActivityListener<TaskDetailsSubcomponent>>
         implements TaskDetailsViewModel.ViewListener {
 
-    private FragmentTaskDetailsBinding mBinding;
-    private boolean mShowEditOptions;
+    private FragmentTaskDetailsBinding binding;
+    private boolean showEditOptions;
 
     public TaskDetailsFragment() {
     }
@@ -54,17 +54,17 @@ public class TaskDetailsFragment extends BaseRecyclerViewFragment<TaskDetailsSub
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentTaskDetailsBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentTaskDetailsBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel.attachView(this);
-        mViewModel.setListInteraction(mRecyclerAdapter);
-        mBinding.setViewModel(mViewModel);
+        viewModel.attachView(this);
+        viewModel.setListInteraction(recyclerAdapter);
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -74,12 +74,12 @@ public class TaskDetailsFragment extends BaseRecyclerViewFragment<TaskDetailsSub
 
     @Override
     protected RecyclerView getRecyclerView() {
-        return mBinding.rvTaskDetailsHistory;
+        return binding.rvTaskDetailsHistory;
     }
 
     @Override
     protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new TaskHistoryRecyclerAdapter(mViewModel);
+        return new TaskHistoryRecyclerAdapter(viewModel);
     }
 
     @Override
@@ -87,7 +87,7 @@ public class TaskDetailsFragment extends BaseRecyclerViewFragment<TaskDetailsSub
         super.onCreateOptionsMenu(menu, inflater);
 
         inflater.inflate(R.menu.menu_task_details, menu);
-        if (mShowEditOptions) {
+        if (showEditOptions) {
             menu.findItem(R.id.action_task_edit).setVisible(true);
             menu.findItem(R.id.action_task_delete).setVisible(true);
         }
@@ -98,10 +98,10 @@ public class TaskDetailsFragment extends BaseRecyclerViewFragment<TaskDetailsSub
         final int id = item.getItemId();
         switch (id) {
             case R.id.action_task_delete:
-                mViewModel.onDeleteTaskMenuClick();
+                viewModel.onDeleteTaskMenuClick();
                 return true;
             case R.id.action_task_edit:
-                mViewModel.onEditTaskMenuClick();
+                viewModel.onEditTaskMenuClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -115,7 +115,7 @@ public class TaskDetailsFragment extends BaseRecyclerViewFragment<TaskDetailsSub
 
     @Override
     public void toggleEditOptions(boolean showOptions) {
-        mShowEditOptions = showOptions;
+        showEditOptions = showOptions;
         getActivity().invalidateOptionsMenu();
     }
 

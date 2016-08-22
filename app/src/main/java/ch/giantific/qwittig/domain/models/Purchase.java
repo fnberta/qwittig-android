@@ -5,9 +5,9 @@ import android.support.annotation.Nullable;
 
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
-import com.google.firebase.database.PropertyName;
 import com.google.firebase.database.ServerValue;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -21,8 +21,9 @@ import java.util.Set;
 @IgnoreExtraProperties
 public class Purchase implements FirebaseModel {
 
-    public static final String PATH_PURCHASES = "purchases";
-    public static final String PATH_DRAFTS = "drafts";
+    public static final String BASE_PATH_PURCHASES = "purchases";
+    public static final String BASE_PATH_DRAFTS = "drafts";
+
     public static final String PATH_GROUP = "group";
     public static final String PATH_BUYER = "buyer";
     public static final String PATH_DATE = "date";
@@ -37,76 +38,62 @@ public class Purchase implements FirebaseModel {
     public static final String PATH_IDENTITIES = "identities";
     public static final String PATH_ITEMS = "items";
     public static final String PATH_READ_BY = "readBy";
-    private String mId;
-    @PropertyName(PATH_CREATED_AT)
-    private long mCreatedAt;
-    @PropertyName(PATH_GROUP)
-    private String mGroup;
-    @PropertyName(PATH_BUYER)
-    private String mBuyer;
-    @PropertyName(PATH_DATE)
-    private long mDate;
-    @PropertyName(PATH_STORE)
-    private String mStore;
-    @PropertyName(PATH_TOTAL)
-    private double mTotal;
-    @PropertyName(PATH_CURRENCY)
-    private String mCurrency;
-    @PropertyName(PATH_EXCHANGE_RATE)
-    private double mExchangeRate;
-    @PropertyName(PATH_RECEIPT)
-    private String mReceipt;
-    @PropertyName(PATH_NOTE)
-    private String mNote;
-    @PropertyName(PATH_DRAFT)
-    private boolean mDraft;
-    @PropertyName(PATH_OCR_DATA)
-    private String mOcrData;
-    @PropertyName(PATH_IDENTITIES)
-    private Map<String, Boolean> mIdentities;
-    @PropertyName(PATH_ITEMS)
-    private List<Item> mItems;
-    @PropertyName(PATH_READ_BY)
-    private Map<String, Boolean> mReadBy;
+
+    private String id;
+    private long createdAt;
+    private String group;
+    private String buyer;
+    private long date;
+    private String store;
+    private double total;
+    private String currency;
+    private double exchangeRate;
+    private String receipt;
+    private String note;
+    private boolean draft;
+    private String ocrData;
+    private Map<String, Boolean> identities;
+    private List<Item> items;
+    private Map<String, Boolean> readBy;
 
     public Purchase() {
         // required for firebase de-/serialization
     }
 
     public Purchase(@NonNull String group, @NonNull String buyerId, @NonNull Date date,
-                    @NonNull String store, double total, @NonNull String currency,
+                    @Nullable String store, double total, @NonNull String currency,
                     double exchangeRate, @Nullable String receipt, @Nullable String note,
                     boolean isDraft, @Nullable String ocrData,
                     @NonNull List<String> identities, @NonNull List<Item> items) {
-        mGroup = group;
-        mBuyer = buyerId;
-        mDate = date.getTime();
-        mStore = store;
-        mTotal = total;
-        mCurrency = currency;
-        mExchangeRate = exchangeRate;
-        mReceipt = receipt;
-        mNote = note;
-        mDraft = isDraft;
-        mOcrData = ocrData;
-        mIdentities = new HashMap<>();
+        this.group = group;
+        buyer = buyerId;
+        this.date = date.getTime();
+        this.store = store;
+        this.total = total;
+        this.currency = currency;
+        this.exchangeRate = exchangeRate;
+        this.receipt = receipt;
+        this.note = note;
+        draft = isDraft;
+        this.ocrData = ocrData;
+        this.identities = new HashMap<>();
         for (String id : identities) {
-            mIdentities.put(id, true);
+            this.identities.put(id, true);
         }
-        mItems = items;
-        mReadBy = new HashMap<>();
-        mReadBy.put(buyerId, true);
+        this.items = items;
+        readBy = new HashMap<>();
+        readBy.put(buyerId, true);
     }
 
     @Override
     @Exclude
     public String getId() {
-        return mId;
+        return id;
     }
 
     @Override
     public void setId(@NonNull String id) {
-        mId = id;
+        this.id = id;
     }
 
     @Override
@@ -116,78 +103,78 @@ public class Purchase implements FirebaseModel {
 
     @Exclude
     public Date getCreatedAtDate() {
-        return new Date(mCreatedAt);
+        return new Date(createdAt);
     }
 
     public String getGroup() {
-        return mGroup;
+        return group;
     }
 
     public String getBuyer() {
-        return mBuyer;
+        return buyer;
     }
 
     public long getDate() {
-        return mDate;
+        return date;
     }
 
     @Exclude
     public Date getDateDate() {
-        return new Date(mDate);
+        return new Date(date);
     }
 
     public String getStore() {
-        return mStore;
+        return store;
     }
 
     public double getTotal() {
-        return mTotal;
+        return total;
     }
 
     public String getCurrency() {
-        return mCurrency;
+        return currency;
     }
 
     public double getExchangeRate() {
-        return mExchangeRate;
+        return exchangeRate;
     }
 
     public String getReceipt() {
-        return mReceipt;
+        return receipt;
     }
 
     public String getNote() {
-        return mNote;
+        return note;
     }
 
     public boolean isDraft() {
-        return mDraft;
+        return draft;
     }
 
     public String getOcrData() {
-        return mOcrData;
+        return ocrData;
     }
 
     public Map<String, Boolean> getIdentities() {
-        return mIdentities;
+        return identities;
     }
 
     @Exclude
     public Set<String> getIdentitiesIds() {
-        return mIdentities.keySet();
+        return identities.keySet();
     }
 
     public List<Item> getItems() {
-        return mItems;
+        return items;
     }
 
     public Map<String, Boolean> getReadBy() {
-        return mReadBy;
+        return readBy;
     }
 
     @Exclude
     public Set<String> getReadByIds() {
-        return mReadBy.keySet();
+        return readBy.keySet();
     }
 
     /**
@@ -214,11 +201,11 @@ public class Purchase implements FirebaseModel {
      */
     @Exclude
     public double getTotalForeign() {
-        if (mExchangeRate == 1) {
-            return mTotal;
+        if (exchangeRate == 1) {
+            return total;
         }
 
-        return mTotal / mExchangeRate;
+        return total / exchangeRate;
     }
 
     /**
@@ -230,14 +217,40 @@ public class Purchase implements FirebaseModel {
     @Exclude
     public double calculateUserShare(@NonNull String identityId) {
         double userShare = 0;
-        for (Item item : mItems) {
+        for (Item item : items) {
             final Set<String> identitiesIds = item.getIdentitiesIds();
             if (identitiesIds.contains(identityId)) {
-                userShare += (item.getPrice() * mExchangeRate / identitiesIds.size());
+                userShare += (item.getPrice() * exchangeRate / identitiesIds.size());
             }
         }
 
         return userShare;
+    }
+
+    @Exclude
+    public Map<String, Object> toMap() {
+        final Map<String, Object> result = new HashMap<>();
+        result.put(PATH_CREATED_AT, ServerValue.TIMESTAMP);
+        result.put(PATH_GROUP, group);
+        result.put(PATH_BUYER, buyer);
+        result.put(PATH_DATE, date);
+        result.put(PATH_STORE, store);
+        result.put(PATH_TOTAL, total);
+        result.put(PATH_CURRENCY, currency);
+        result.put(PATH_EXCHANGE_RATE, exchangeRate);
+        result.put(PATH_RECEIPT, receipt);
+        result.put(PATH_NOTE, note);
+        result.put(PATH_DRAFT, draft);
+        result.put(PATH_OCR_DATA, ocrData);
+        result.put(PATH_IDENTITIES, identities);
+        final List<Map<String, Object>> items = new ArrayList<>();
+        for (Item item : this.items) {
+            items.add(item.toMap());
+        }
+        result.put(PATH_ITEMS, items);
+        result.put(PATH_READ_BY, readBy);
+
+        return result;
     }
 }
 

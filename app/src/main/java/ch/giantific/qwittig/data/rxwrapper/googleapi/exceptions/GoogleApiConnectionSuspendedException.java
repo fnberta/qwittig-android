@@ -9,13 +9,13 @@ package ch.giantific.qwittig.data.rxwrapper.googleapi.exceptions;
  */
 public class GoogleApiConnectionSuspendedException extends RuntimeException {
 
-    private final int mCause;
+    private final int cause;
 
     public GoogleApiConnectionSuspendedException(int cause) {
-        mCause = cause;
+        this.cause = cause;
     }
 
     public int getErrorCause() {
-        return mCause;
+        return cause;
     }
 }

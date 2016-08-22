@@ -58,16 +58,16 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileCompone
         GoogleApiClientDelegate.GoogleLoginCallback {
 
     @Inject
-    SettingsProfileViewModel mProfileViewModel;
+    SettingsProfileViewModel profileViewModel;
     @Inject
-    GoogleApiClientDelegate mGoogleApiDelegate;
+    GoogleApiClientDelegate googleApiDelegate;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final ActivitySettingsProfileBinding binding =
                 DataBindingUtil.setContentView(this, R.layout.activity_settings_profile);
-        binding.setViewModel(mProfileViewModel);
+        binding.setViewModel(profileViewModel);
 
         supportPostponeEnterTransition();
 
@@ -82,23 +82,23 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileCompone
                     .commit();
         }
 
-        mGoogleApiDelegate.createGoogleApiClient();
+        googleApiDelegate.createGoogleApiClient();
     }
 
     @Override
     protected void injectDependencies(@Nullable Bundle savedInstanceState) {
-        mComponent = DaggerSettingsProfileComponent.builder()
+        component = DaggerSettingsProfileComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
                 .googleApiClientDelegateModule(new GoogleApiClientDelegateModule(this, this, null))
                 .settingsProfileViewModelModule(new SettingsProfileViewModelModule(savedInstanceState))
                 .build();
-        mComponent.inject(this);
+        component.inject(this);
     }
 
     @Override
     protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{mProfileViewModel});
+        return Arrays.asList(new ViewModel[]{profileViewModel});
     }
 
     @Override
@@ -106,7 +106,7 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileCompone
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home:
-                mProfileViewModel.onExitClick();
+                profileViewModel.onExitClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -115,13 +115,13 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileCompone
 
     @Override
     public void onBackPressed() {
-        mProfileViewModel.onExitClick();
+        profileViewModel.onExitClick();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        mGoogleApiDelegate.onActivityResult(requestCode, resultCode, data);
+        googleApiDelegate.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
             case Navigator.INTENT_REQUEST_IMAGE_PICK:
@@ -130,7 +130,7 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileCompone
                     AvatarUtils.saveImageLocal(this, imageUri, new AvatarUtils.AvatarLocalSaveListener() {
                         @Override
                         public void onAvatarSaved(@NonNull String path) {
-                            mProfileViewModel.onNewAvatarTaken(path);
+                            profileViewModel.onNewAvatarTaken(path);
                         }
                     });
                 }
@@ -139,41 +139,41 @@ public class SettingsProfileActivity extends BaseActivity<SettingsProfileCompone
 
     @Override
     public void onValidEmailAndPasswordEntered(@NonNull String email, @NonNull String password) {
-        mProfileViewModel.onValidEmailAndPasswordEntered(email, password);
+        profileViewModel.onValidEmailAndPasswordEntered(email, password);
     }
 
     @Override
     public void loginWithGoogle() {
-        mGoogleApiDelegate.loginWithGoogle();
+        googleApiDelegate.loginWithGoogle();
     }
 
     @Override
     public void onGoogleLoginSuccessful(@NonNull String idToken) {
-        mProfileViewModel.onGoogleLoginSuccessful(idToken);
+        profileViewModel.onGoogleLoginSuccessful(idToken);
     }
 
     @Override
     public void onGoogleLoginFailed() {
-        mProfileViewModel.onGoogleLoginFailed();
+        profileViewModel.onGoogleLoginFailed();
     }
 
     @Override
     public void setGoogleUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
-        mProfileViewModel.setGoogleUserStream(single, workerTag);
+        profileViewModel.setGoogleUserStream(single, workerTag);
     }
 
     @Override
     public void setFacebookUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
-        mProfileViewModel.setFacebookUserStream(single, workerTag);
+        profileViewModel.setFacebookUserStream(single, workerTag);
     }
 
     @Override
     public void setEmailUserStream(@NonNull Single<Void> single, @NonNull String workerTag) {
-        mProfileViewModel.setEmailUserStream(single, workerTag);
+        profileViewModel.setEmailUserStream(single, workerTag);
     }
 
     @Override
     public void onDiscardChangesSelected() {
-        mProfileViewModel.onDiscardChangesSelected();
+        profileViewModel.onDiscardChangesSelected();
     }
 }

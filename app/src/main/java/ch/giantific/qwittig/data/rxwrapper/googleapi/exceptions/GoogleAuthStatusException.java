@@ -13,13 +13,13 @@ import com.google.android.gms.common.api.Status;
  */
 public class GoogleAuthStatusException extends RuntimeException {
 
-    private final Status mStatus;
+    private final Status status;
 
     public GoogleAuthStatusException(@NonNull Status status) {
-        mStatus = status;
+        this.status = status;
     }
 
     public Status getStatus() {
-        return mStatus;
+        return status;
     }
 }

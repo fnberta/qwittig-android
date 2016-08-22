@@ -49,8 +49,9 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     public static final int RESULT_ERROR = 2;
     private static final int INTENT_REQUEST_IMAGE = 1;
     private static final String PREF_FIRST_CAMERA_RUN = "PREF_FIRST_CAMERA_RUN";
-    private ActivityCameraBinding mBinding;
-    private File mFile;
+
+    private ActivityCameraBinding binding;
+    private File file;
     @NonNull
     private final Camera.PictureCallback mPicture = new Camera.PictureCallback() {
         @Override
@@ -66,7 +67,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                 return;
             }
 
-            mFile = imageFile;
+            file = imageFile;
             toggleDoneVisibility();
         }
     };
@@ -83,21 +84,21 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void toggleDoneVisibility() {
-        if (mBinding.fabCameraCapture.getVisibility() == View.VISIBLE) {
-            mBinding.fabCameraCapture.setVisibility(View.GONE);
-            mBinding.ivCameraBottomRedo.setVisibility(View.VISIBLE);
-            mBinding.ivCameraBottomDone.setVisibility(View.VISIBLE);
+        if (binding.fabCameraCapture.getVisibility() == View.VISIBLE) {
+            binding.fabCameraCapture.setVisibility(View.GONE);
+            binding.ivCameraBottomRedo.setVisibility(View.VISIBLE);
+            binding.ivCameraBottomDone.setVisibility(View.VISIBLE);
         } else {
-            mBinding.fabCameraCapture.setVisibility(View.VISIBLE);
-            mBinding.ivCameraBottomRedo.setVisibility(View.GONE);
-            mBinding.ivCameraBottomDone.setVisibility(View.GONE);
+            binding.fabCameraCapture.setVisibility(View.VISIBLE);
+            binding.ivCameraBottomRedo.setVisibility(View.GONE);
+            binding.ivCameraBottomDone.setVisibility(View.GONE);
         }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_camera);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_camera);
 
         try {
             loadCamera();
@@ -109,21 +110,21 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
         // Create our Preview view and set it as the content of our activity.
         mPreview = new CameraPreview(this, mCamera);
-        mBinding.flCameraPreview.addView(mPreview);
+        binding.flCameraPreview.addView(mPreview);
 
-        mBinding.fabCameraCapture.setOnClickListener(this);
-        mBinding.ivCameraBottomDone.setOnClickListener(this);
-        mBinding.ivCameraBottomRedo.setOnClickListener(this);
-        mBinding.tvCameraPickImage.setOnClickListener(this);
+        binding.fabCameraCapture.setOnClickListener(this);
+        binding.ivCameraBottomDone.setOnClickListener(this);
+        binding.ivCameraBottomRedo.setOnClickListener(this);
+        binding.tvCameraPickImage.setOnClickListener(this);
 
         if (isFirstRun()) {
             final TutorialOverlayCameraBinding tutBinding =
-                    TutorialOverlayCameraBinding.inflate(getLayoutInflater(), mBinding.flCameraMain, false);
-            mBinding.flCameraMain.addView(tutBinding.svTutCamera);
+                    TutorialOverlayCameraBinding.inflate(getLayoutInflater(), binding.flCameraMain, false);
+            binding.flCameraMain.addView(tutBinding.svTutCamera);
             tutBinding.fabTutCameraDone.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mBinding.flCameraMain.removeView(tutBinding.svTutCamera);
+                    binding.flCameraMain.removeView(tutBinding.svTutCamera);
                 }
             });
         }
@@ -215,10 +216,10 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                 });
                 break;
             case R.id.iv_camera_bottom_redo:
-                if (!mFile.delete()) {
+                if (!file.delete()) {
                     Timber.w("failed to delete file");
                 }
-                mFile = null;
+                file = null;
                 showPreview();
                 break;
             case R.id.iv_camera_bottom_done:
@@ -237,14 +238,14 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void finishCapture() {
-        if (mFile == null) {
+        if (file == null) {
             setResult(RESULT_CANCELED);
             finish();
             return;
         }
 
         final Intent intent = new Intent();
-        intent.putExtra(INTENT_EXTRA_IMAGE_PATH, mFile.getAbsolutePath());
+        intent.putExtra(INTENT_EXTRA_IMAGE_PATH, file.getAbsolutePath());
         setResult(RESULT_OK, intent);
         finish();
     }

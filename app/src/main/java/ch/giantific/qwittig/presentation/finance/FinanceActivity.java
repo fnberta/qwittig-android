@@ -54,18 +54,18 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceSubcomponent> 
         CompConfirmAmountDialogFragment.DialogInteractionListener {
 
     @Inject
-    BalanceHeaderViewModel mHeaderViewModel;
+    BalanceHeaderViewModel headerViewModel;
     @Inject
-    CompsPaidViewModel mCompsPaidViewModel;
+    CompsPaidViewModel compsPaidViewModel;
     @Inject
-    CompsUnpaidViewModel mCompsUnpaidViewModel;
-    private ActivityFinanceBinding mBinding;
+    CompsUnpaidViewModel compsUnpaidViewModel;
+    private ActivityFinanceBinding binding;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_finance);
-        mBinding.setViewModel(mHeaderViewModel);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_finance);
+        binding.setViewModel(headerViewModel);
 
         // check item in NavDrawer
         checkNavDrawerItem(R.id.nav_finance);
@@ -75,7 +75,7 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceSubcomponent> 
             actionBar.setTitle(null);
         }
 
-        if (mUserLoggedIn) {
+        if (userLoggedIn) {
             setupTabs();
         }
     }
@@ -84,47 +84,47 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceSubcomponent> 
     protected void injectDependencies(@NonNull NavDrawerComponent navComp,
                                       @Nullable Bundle savedInstanceState) {
         final String groupId = getIntent().getStringExtra(FcmMessagingService.PUSH_GROUP_ID);
-        mComponent = navComp.plus(new FinanceHeaderViewModelModule(savedInstanceState),
+        component = navComp.plus(new FinanceHeaderViewModelModule(savedInstanceState),
                 new FinanceCompsUnpaidViewModelModule(savedInstanceState),
                 new FinanceCompsPaidViewModelModule(savedInstanceState, groupId));
-        mComponent.inject(this);
-        mHeaderViewModel.attachView(this);
+        component.inject(this);
+        headerViewModel.attachView(this);
     }
 
     @Override
     protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{mHeaderViewModel, mCompsUnpaidViewModel,
-                mCompsPaidViewModel});
+        return Arrays.asList(new ViewModel[]{headerViewModel, compsUnpaidViewModel,
+                compsPaidViewModel});
     }
 
     private void setupTabs() {
         final TabsAdapter tabsAdapter = new TabsAdapter(getSupportFragmentManager());
         tabsAdapter.addInitialFragment(new CompsUnpaidFragment(), getString(R.string.tab_compensations_new));
         tabsAdapter.addInitialFragment(new CompsPaidFragment(), getString(R.string.tab_compensations_archive));
-        mBinding.viewpager.setAdapter(tabsAdapter);
+        binding.viewpager.setAdapter(tabsAdapter);
 
         @FragmentTabs
         final String tabToSelect = getIntent().getStringExtra(FcmMessagingService.PUSH_FINANCE_TAB);
         if (!TextUtils.isEmpty(tabToSelect)) {
             final int tab = Objects.equals(tabToSelect, FragmentTabs.COMPS_UNPAID) ? 0 : 1;
-            mBinding.viewpager.setCurrentItem(tab);
+            binding.viewpager.setCurrentItem(tab);
         }
 
-        mBinding.tabs.setupWithViewPager(mBinding.viewpager);
+        binding.tabs.setupWithViewPager(binding.viewpager);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        mHeaderViewModel.onViewVisible();
+        headerViewModel.onViewVisible();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
 
-        mHeaderViewModel.onViewGone();
+        headerViewModel.onViewGone();
     }
 
     @Override
@@ -154,14 +154,14 @@ public class FinanceActivity extends BaseNavDrawerActivity<FinanceSubcomponent> 
             style = R.style.AppTheme_DrawStatusBar_Red;
         }
         setTheme(style);
-        mToolbar.setBackgroundColor(color);
-        mBinding.tabs.setBackgroundColor(color);
+        toolbar.setBackgroundColor(color);
+        binding.tabs.setBackgroundColor(color);
         setStatusBarBackgroundColor(colorDark);
     }
 
     @Override
     public void onAmountConfirmed(double amount) {
-        mCompsUnpaidViewModel.onAmountConfirmed(amount);
+        compsUnpaidViewModel.onAmountConfirmed(amount);
     }
 
     @StringDef({FragmentTabs.COMPS_UNPAID, FragmentTabs.COMPS_PAID})

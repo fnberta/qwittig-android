@@ -29,15 +29,15 @@ import ch.giantific.qwittig.utils.DateUtils;
 public class TasksItem extends BaseChildItemModel
         implements TasksItemModel, CardTopProgressItemModel, Comparable<TasksItem> {
 
-    private final String mTitle;
-    private final String mTimeFrame;
-    private final String mNickname;
-    private final String mAvatar;
-    private final List<Identity> mIdentities;
-    private final Date mDeadline;
-    private final boolean mCurrentUserResponsible;
-    private boolean mItemLoading;
-    private ViewListener mView;
+    private final String title;
+    private final String timeFrame;
+    private final String nickname;
+    private final String avatar;
+    private final List<Identity> identities;
+    private final Date deadline;
+    private final boolean currentUserResponsible;
+    private boolean itemLoading;
+    private ViewListener view;
 
     public TasksItem(@EventType int eventType,
                      @NonNull Task task,
@@ -47,33 +47,33 @@ public class TasksItem extends BaseChildItemModel
                      boolean itemLoading) {
         super(eventType, task.getId());
 
-        mTitle = task.getTitle();
-        mTimeFrame = task.getTimeFrame();
-        mNickname = identity.getNickname();
-        mAvatar = identity.getAvatar();
-        mIdentities = identities;
-        mDeadline = task.getDeadline();
-        mCurrentUserResponsible = Objects.equals(identity.getId(), currentIdentityId);
-        mItemLoading = itemLoading;
+        title = task.getTitle();
+        timeFrame = task.getTimeFrame();
+        nickname = identity.getNickname();
+        avatar = identity.getAvatar();
+        this.identities = identities;
+        deadline = task.getDeadline();
+        currentUserResponsible = Objects.equals(identity.getId(), currentIdentityId);
+        this.itemLoading = itemLoading;
     }
 
     public void setView(@NonNull ViewListener view) {
-        mView = view;
+        this.view = view;
     }
 
     @Bindable
     public String getTitle() {
-        return mTitle;
+        return title;
     }
 
     public String getTimeFrame() {
-        return mTimeFrame;
+        return timeFrame;
     }
 
     @Bindable
     @StringRes
     public int getTimeFrameText() {
-        switch (mTimeFrame) {
+        switch (timeFrame) {
             case TimeFrame.ONE_TIME:
                 return R.string.time_frame_one_time;
             case TimeFrame.AS_NEEDED:
@@ -87,44 +87,44 @@ public class TasksItem extends BaseChildItemModel
             case TimeFrame.YEARLY:
                 return R.string.time_frame_yearly;
             default:
-                throw new RuntimeException("Unsupported time frame " + mTimeFrame);
+                throw new RuntimeException("Unsupported time frame " + timeFrame);
         }
     }
 
     @Bindable
     public String getNickname() {
-        return mNickname;
+        return nickname;
     }
 
     @Bindable
     public String getAvatar() {
-        return mAvatar;
+        return avatar;
     }
 
     public List<Identity> getIdentities() {
-        return mIdentities;
+        return identities;
     }
 
     @Bindable
     public String getIdentitiesText() {
-        return mView.buildIdentitiesString(mIdentities);
+        return view.buildIdentitiesString(identities);
     }
 
     public Date getDeadline() {
-        return mDeadline;
+        return deadline;
     }
 
     @Bindable
     public String getDeadlineText() {
         final int daysToDeadline = getDaysToDeadline();
         if (daysToDeadline == 0) {
-            return mView.buildDeadlineString(R.string.deadline_today);
+            return view.buildDeadlineString(R.string.deadline_today);
         } else if (daysToDeadline == -1) {
-            return mView.buildDeadlineString(R.string.yesterday);
+            return view.buildDeadlineString(R.string.yesterday);
         } else if (daysToDeadline < 0) {
-            return mView.buildDeadlineString(R.string.deadline_text_neg, daysToDeadline * -1);
+            return view.buildDeadlineString(R.string.deadline_text_neg, daysToDeadline * -1);
         } else {
-            return mView.buildDeadlineString(R.string.deadline_text_pos, daysToDeadline);
+            return view.buildDeadlineString(R.string.deadline_text_pos, daysToDeadline);
         }
     }
 
@@ -142,7 +142,7 @@ public class TasksItem extends BaseChildItemModel
     private int getDaysToDeadline() {
         final Calendar today = DateUtils.getCalendarInstanceUTC();
         final Calendar deadline = DateUtils.getCalendarInstanceUTC();
-        deadline.setTime(mDeadline);
+        deadline.setTime(this.deadline);
 
         if (today.get(Calendar.YEAR) == deadline.get(Calendar.YEAR)) {
             return deadline.get(Calendar.DAY_OF_YEAR) - today.get(Calendar.DAY_OF_YEAR);
@@ -174,22 +174,22 @@ public class TasksItem extends BaseChildItemModel
     @Override
     @Bindable
     public boolean isItemLoading() {
-        return mItemLoading;
+        return itemLoading;
     }
 
     public void setItemLoading(boolean itemLoading) {
-        mItemLoading = itemLoading;
+        this.itemLoading = itemLoading;
     }
 
     @Bindable
     public boolean isCurrentUserResponsible() {
-        return mCurrentUserResponsible;
+        return currentUserResponsible;
     }
 
     @Bindable
     @StringRes
     public int getDoneText() {
-        switch (mTimeFrame) {
+        switch (timeFrame) {
             case TimeFrame.ONE_TIME:
                 return R.string.task_done_single;
             case TimeFrame.AS_NEEDED:
@@ -214,7 +214,7 @@ public class TasksItem extends BaseChildItemModel
 
     @Override
     public int compareTo(@NonNull TasksItem tasksItem) {
-        return mDeadline.compareTo(tasksItem.getDeadline());
+        return deadline.compareTo(tasksItem.getDeadline());
     }
 
     public interface ViewListener {

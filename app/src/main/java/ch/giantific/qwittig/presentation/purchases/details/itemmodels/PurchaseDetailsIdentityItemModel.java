@@ -16,37 +16,37 @@ import ch.giantific.qwittig.domain.models.Identity;
  */
 public class PurchaseDetailsIdentityItemModel extends BaseObservable {
 
-    private final String mNickname;
-    private final String mAvatar;
-    private final boolean mNicknameBold;
-    private final boolean mActive;
+    private final String nickname;
+    private final String avatar;
+    private final boolean nicknameBold;
+    private final boolean active;
 
     public PurchaseDetailsIdentityItemModel(@NonNull Identity identity, boolean nicknameBold) {
         super();
 
-        mNickname = identity.getNickname();
-        mAvatar = identity.getAvatar();
-        mNicknameBold = nicknameBold;
-        mActive = identity.isActive();
+        nickname = identity.getNickname();
+        avatar = identity.getAvatar();
+        this.nicknameBold = nicknameBold;
+        active = identity.isActive();
     }
 
     @Bindable
     public String getNickname() {
-        return mNickname;
+        return nickname;
     }
 
     @Bindable
     public String getAvatar() {
-        return mAvatar;
+        return avatar;
     }
 
     @Bindable
     public boolean isNicknameBold() {
-        return mNicknameBold;
+        return nicknameBold;
     }
 
     public boolean isActive() {
-        return mActive;
+        return active;
     }
 
     @Override
@@ -56,19 +56,19 @@ public class PurchaseDetailsIdentityItemModel extends BaseObservable {
 
         final PurchaseDetailsIdentityItemModel itemModel = (PurchaseDetailsIdentityItemModel) o;
 
-        if (mNicknameBold != itemModel.isNicknameBold()) return false;
-        if (mActive != itemModel.isActive()) return false;
-        if (!mNickname.equals(itemModel.getNickname())) return false;
-        return mAvatar != null ? mAvatar.equals(itemModel.getAvatar()) : itemModel.getAvatar() == null;
+        if (nicknameBold != itemModel.isNicknameBold()) return false;
+        if (active != itemModel.isActive()) return false;
+        if (!nickname.equals(itemModel.getNickname())) return false;
+        return avatar != null ? avatar.equals(itemModel.getAvatar()) : itemModel.getAvatar() == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = mNickname.hashCode();
-        result = 31 * result + (mAvatar != null ? mAvatar.hashCode() : 0);
-        result = 31 * result + (mNicknameBold ? 1 : 0);
-        result = 31 * result + (mActive ? 1 : 0);
+        int result = nickname.hashCode();
+        result = 31 * result + (avatar != null ? avatar.hashCode() : 0);
+        result = 31 * result + (nicknameBold ? 1 : 0);
+        result = 31 * result + (active ? 1 : 0);
         return result;
     }
 }

@@ -33,7 +33,7 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/key_line_2_minus_key_line_1_minus_icon_size"
             android:layout_marginStart="@dimen/key_line_1"
-            app:percentage="@{itemModel.userPercentage}"
+            app:percentage="@{itemModel.percentage}"
             />
 
         <TextView

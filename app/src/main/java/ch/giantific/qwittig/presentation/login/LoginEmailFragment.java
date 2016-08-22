@@ -25,7 +25,7 @@ public class LoginEmailFragment extends BaseFragment<LoginComponent, LoginEmailV
         implements LoginEmailViewModel.ViewListener {
 
     private static final String KEY_IDENTITY_ID = "IDENTITY_ID";
-    private FragmentLoginEmailBinding mBinding;
+    private FragmentLoginEmailBinding binding;
 
     public LoginEmailFragment() {
         // required empty constructor
@@ -42,8 +42,8 @@ public class LoginEmailFragment extends BaseFragment<LoginComponent, LoginEmailV
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentLoginEmailBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentLoginEmailBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
@@ -51,9 +51,9 @@ public class LoginEmailFragment extends BaseFragment<LoginComponent, LoginEmailV
         super.onActivityCreated(savedInstanceState);
 
         final String identityId = getArguments().getString(KEY_IDENTITY_ID, "");
-        mViewModel.setIdentityId(identityId);
-        mViewModel.attachView(this);
-        mBinding.setViewModel(mViewModel);
+        viewModel.setIdentityId(identityId);
+        viewModel.attachView(this);
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -63,12 +63,12 @@ public class LoginEmailFragment extends BaseFragment<LoginComponent, LoginEmailV
 
     @Override
     protected View getSnackbarView() {
-        return mBinding.btLoginEmailLogin;
+        return binding.btLoginEmailLogin;
     }
 
     @Override
     public void showProfileScreen(boolean withInvitation) {
-        mActivity.showProfileFragment(withInvitation);
+        activity.showProfileFragment(withInvitation);
     }
 
     @Override

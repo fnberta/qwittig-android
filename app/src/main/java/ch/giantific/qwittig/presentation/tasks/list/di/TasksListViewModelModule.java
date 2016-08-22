@@ -27,13 +27,13 @@ import dagger.Provides;
 @Module
 public class TasksListViewModelModule extends BaseViewModelModule {
 
-    private final TaskDeadline mTaskDeadline;
+    private final TaskDeadline taskDeadline;
 
     public TasksListViewModelModule(@Nullable Bundle savedState,
                                     @NonNull TaskDeadline taskDeadline) {
         super(savedState);
 
-        mTaskDeadline = taskDeadline;
+        this.taskDeadline = taskDeadline;
     }
 
     @PerActivity
@@ -42,8 +42,8 @@ public class TasksListViewModelModule extends BaseViewModelModule {
                                               @NonNull RxBus<Object> eventBus,
                                               @NonNull UserRepository userRepository,
                                               @NonNull TaskRepository taskRepository) {
-        return new TasksViewModelImpl(mSavedState, navigator, eventBus, userRepository,
-                taskRepository, mTaskDeadline);
+        return new TasksViewModelImpl(savedState, navigator, eventBus, userRepository,
+                taskRepository, taskDeadline);
     }
 
 }

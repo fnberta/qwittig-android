@@ -13,8 +13,8 @@ import ch.giantific.qwittig.databinding.RowGenericHeaderBinding;
 import ch.giantific.qwittig.databinding.RowHelpFeedbackBinding;
 import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
-import ch.giantific.qwittig.presentation.helpfeedback.itemmodels.HelpFeedbackItem;
 import ch.giantific.qwittig.presentation.helpfeedback.itemmodels.HelpFeedbackHeader;
+import ch.giantific.qwittig.presentation.helpfeedback.itemmodels.HelpFeedbackItem;
 import ch.giantific.qwittig.presentation.helpfeedback.itemmodels.HelpFeedbackItemModel;
 import ch.giantific.qwittig.presentation.helpfeedback.itemmodels.HelpFeedbackItemModel.Type;
 
@@ -25,7 +25,7 @@ import ch.giantific.qwittig.presentation.helpfeedback.itemmodels.HelpFeedbackIte
  */
 public class HelpFeedbackRecyclerAdapter extends BaseRecyclerAdapter {
 
-    private final HelpFeedbackViewModel mViewModel;
+    private final HelpFeedbackViewModel viewModel;
 
     /**
      * Constructs a new {@link HelpFeedbackRecyclerAdapter}.
@@ -34,7 +34,7 @@ public class HelpFeedbackRecyclerAdapter extends BaseRecyclerAdapter {
      */
     public HelpFeedbackRecyclerAdapter(@NonNull HelpFeedbackViewModel viewModel) {
 
-        mViewModel = viewModel;
+        this.viewModel = viewModel;
     }
 
     @NonNull
@@ -60,7 +60,7 @@ public class HelpFeedbackRecyclerAdapter extends BaseRecyclerAdapter {
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        final HelpFeedbackItemModel item = mViewModel.getItemAtPosition(position);
+        final HelpFeedbackItemModel item = viewModel.getItemAtPosition(position);
 
         int viewType = getItemViewType(position);
         switch (viewType) {
@@ -69,7 +69,7 @@ public class HelpFeedbackRecyclerAdapter extends BaseRecyclerAdapter {
                 final RowHelpFeedbackBinding binding = row.getBinding();
 
                 binding.setItemModel((HelpFeedbackItem) item);
-                binding.setViewModel(mViewModel);
+                binding.setViewModel(viewModel);
                 binding.executePendingBindings();
                 break;
             }
@@ -87,11 +87,11 @@ public class HelpFeedbackRecyclerAdapter extends BaseRecyclerAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        return mViewModel.getItemAtPosition(position).getType();
+        return viewModel.getItemAtPosition(position).getType();
     }
 
     @Override
     public int getItemCount() {
-        return mViewModel.getItemCount();
+        return viewModel.getItemCount();
     }
 }

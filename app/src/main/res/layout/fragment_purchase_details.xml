@@ -119,7 +119,6 @@
                     android:background="?android:attr/listDivider"
                     />
 
-
                 <TextView
                     android:id="@+id/tv_total_text"
                     style="@style/TextAppearance.AppCompat.Title"

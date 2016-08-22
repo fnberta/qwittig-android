@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
-import com.google.firebase.database.PropertyName;
 import com.google.firebase.database.ServerValue;
 
 import java.util.Date;
@@ -19,22 +18,19 @@ import java.util.Set;
 @IgnoreExtraProperties
 public class User implements FirebaseModel {
 
-    public static final String PATH = "users";
+    public static final String BASE_PATH = "users";
+
     public static final String PATH_CURRENT_IDENTITY = "currentIdentity";
     public static final String PATH_IDENTITIES = "identities";
     public static final String PATH_ARCHIVED_IDENTITIES = "archivedIdentities";
     public static final String PATH_TOKENS = "tokens";
-    private String mId;
-    @PropertyName(PATH_CREATED_AT)
-    private long mCreatedAt;
-    @PropertyName(PATH_CURRENT_IDENTITY)
-    private String mCurrentIdentity;
-    @PropertyName(PATH_IDENTITIES)
-    private Map<String, Boolean> mIdentities = new HashMap<>();
-    @PropertyName(PATH_ARCHIVED_IDENTITIES)
-    private Map<String, Boolean> mArchivedIdentities = new HashMap<>();
-    @PropertyName(PATH_TOKENS)
-    private Map<String, Boolean> mTokens;
+
+    private String id;
+    private long createdAt;
+    private String currentIdentity;
+    private Map<String, Boolean> identities = new HashMap<>();
+    private Map<String, Boolean> archivedIdentities = new HashMap<>();
+    private Map<String, Boolean> tokens;
 
     public User() {
         // required for firebase de-/serialization
@@ -45,26 +41,26 @@ public class User implements FirebaseModel {
         this(currentIdentity, identities);
 
         for (String archivedId : archivedIdentities) {
-            mArchivedIdentities.put(archivedId, true);
+            this.archivedIdentities.put(archivedId, true);
         }
     }
 
     public User(@NonNull String currentIdentity,
                 @NonNull List<String> identities) {
-        mCurrentIdentity = currentIdentity;
+        this.currentIdentity = currentIdentity;
         for (String id : identities) {
-            mIdentities.put(id, true);
+            this.identities.put(id, true);
         }
     }
 
     @Exclude
     public String getId() {
-        return mId;
+        return id;
     }
 
     @Override
     public void setId(@NonNull String id) {
-        mId = id;
+        this.id = id;
     }
 
     @Override
@@ -74,37 +70,37 @@ public class User implements FirebaseModel {
 
     @Exclude
     public Date getCreatedAtDate() {
-        return new Date(mCreatedAt);
+        return new Date(createdAt);
     }
 
     public String getCurrentIdentity() {
-        return mCurrentIdentity;
+        return currentIdentity;
     }
 
     public Map<String, Boolean> getIdentities() {
-        return mIdentities;
+        return identities;
     }
 
     @Exclude
     public Set<String> getIdentitiesIds() {
-        return mIdentities.keySet();
+        return identities.keySet();
     }
 
     public Map<String, Boolean> getArchivedIdentities() {
-        return mArchivedIdentities;
+        return archivedIdentities;
     }
 
     @Exclude
     public Set<String> getArchivedIdentitiesIds() {
-        return mArchivedIdentities.keySet();
+        return archivedIdentities.keySet();
     }
 
     public Map<String, Boolean> getTokens() {
-        return mTokens;
+        return tokens;
     }
 
     @Exclude
     public Set<String> getTokenIds() {
-        return mTokens.keySet();
+        return tokens.keySet();
     }
 }

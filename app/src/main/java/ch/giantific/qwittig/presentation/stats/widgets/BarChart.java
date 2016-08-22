@@ -7,6 +7,7 @@ package ch.giantific.qwittig.presentation.stats.widgets;
 import android.content.Context;
 import android.util.AttributeSet;
 
+import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 
 /**
@@ -19,15 +20,11 @@ public class BarChart extends com.github.mikephil.charting.charts.BarChart {
     public static final int ANIMATION_Y_TIME = 1000;
 
     public BarChart(Context context) {
-        super(context);
-
-        setDefaultValues();
+        this(context, null);
     }
 
     public BarChart(Context context, AttributeSet attrs) {
-        super(context, attrs);
-
-        setDefaultValues();
+        this(context, attrs, 0);
     }
 
     public BarChart(Context context, AttributeSet attrs, int defStyle) {
@@ -39,12 +36,21 @@ public class BarChart extends com.github.mikephil.charting.charts.BarChart {
     private void setDefaultValues() {
         setNoDataText("");
         setDescription("");
+        setFitBars(true);
+
+        final XAxis xAxis = getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
 
         final YAxis yAxisRight = getAxisRight();
+        yAxisRight.setAxisMinValue(1f);
+        yAxisRight.setGranularity(1f);
         yAxisRight.setDrawLabels(false);
+        yAxisRight.setDrawGridLines(false);
 
         final YAxis yAxisLeft = getAxisLeft();
-        yAxisLeft.setAxisMinValue(0f);
+        yAxisLeft.setAxisMinValue(1f);
+        yAxisLeft.setGranularity(1f);
     }
 
 }

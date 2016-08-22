@@ -11,7 +11,6 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.Qwittig;
 import ch.giantific.qwittig.data.push.di.DaggerFcmServiceComponent;
 import ch.giantific.qwittig.data.repositories.UserRepository;
-import timber.log.Timber;
 
 /**
  * Created by fabio on 28.07.16.
@@ -19,7 +18,7 @@ import timber.log.Timber;
 public class FcmInstanceIdService extends FirebaseInstanceIdService {
 
     @Inject
-    UserRepository mUserRepo;
+    UserRepository userRepo;
 
     @Override
     public void onCreate() {
@@ -40,9 +39,9 @@ public class FcmInstanceIdService extends FirebaseInstanceIdService {
         super.onTokenRefresh();
 
         final String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-        final FirebaseUser firebaseUser = mUserRepo.getCurrentUser();
+        final FirebaseUser firebaseUser = userRepo.getCurrentUser();
         if (!TextUtils.isEmpty(refreshedToken) && firebaseUser != null) {
-            mUserRepo.updateToken(firebaseUser.getUid(), refreshedToken);
+            userRepo.updateToken(firebaseUser.getUid(), refreshedToken);
         }
     }
 }

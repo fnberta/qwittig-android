@@ -16,49 +16,49 @@ import rx.SingleSubscriber;
  */
 public class ListenToValueOnceOnSubscribe<T extends FirebaseModel> implements Single.OnSubscribe<T> {
 
-    private final Query mQuery;
-    private final Class<T> mType;
+    private final Query query;
+    private final Class<T> type;
 
     public ListenToValueOnceOnSubscribe(@NonNull Query query,
                                         @NonNull Class<T> type) {
-        mQuery = query;
-        mType = type;
+        this.query = query;
+        this.type = type;
     }
 
     @Override
     public void call(SingleSubscriber<? super T> singleSubscriber) {
-        mQuery.addListenerForSingleValueEvent(new RxSingleValueEventListener<>(singleSubscriber, mType));
+        query.addListenerForSingleValueEvent(new RxSingleValueEventListener<>(singleSubscriber, type));
     }
 
     private static class RxSingleValueEventListener<T extends FirebaseModel> implements ValueEventListener {
 
-        private final SingleSubscriber<? super T> mSubscriber;
-        private final Class<T> mType;
+        private final SingleSubscriber<? super T> subscriber;
+        private final Class<T> type;
 
-        public RxSingleValueEventListener(@NonNull SingleSubscriber<? super T> subscriber,
-                                          @NonNull Class<T> type) {
-            mSubscriber = subscriber;
-            mType = type;
+        RxSingleValueEventListener(@NonNull SingleSubscriber<? super T> subscriber,
+                                   @NonNull Class<T> type) {
+            this.subscriber = subscriber;
+            this.type = type;
         }
 
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            if (dataSnapshot.hasChildren() && !mSubscriber.isUnsubscribed()) {
-                final T value = dataSnapshot.getValue(mType);
+            if (dataSnapshot.hasChildren() && !subscriber.isUnsubscribed()) {
+                final T value = dataSnapshot.getValue(type);
                 if (value == null) {
-                    mSubscriber.onError(new Throwable("unable to cast firebase data response to " + mType.getSimpleName()));
+                    subscriber.onError(new Throwable("unable to cast firebase data response to " + type.getSimpleName()));
                     return;
                 }
 
                 value.setId(dataSnapshot.getKey());
-                mSubscriber.onSuccess(value);
+                subscriber.onSuccess(value);
             }
         }
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-            if (!mSubscriber.isUnsubscribed()) {
-                mSubscriber.onError(databaseError.toException());
+            if (!subscriber.isUnsubscribed()) {
+                subscriber.onError(databaseError.toException());
             }
         }
     }

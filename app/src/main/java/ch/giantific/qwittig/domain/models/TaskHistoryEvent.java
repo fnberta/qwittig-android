@@ -8,7 +8,6 @@ import android.support.annotation.NonNull;
 
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
-import com.google.firebase.database.PropertyName;
 import com.google.firebase.database.ServerValue;
 
 import java.util.Date;
@@ -20,38 +19,36 @@ import java.util.Map;
 @IgnoreExtraProperties
 public class TaskHistoryEvent implements FirebaseModel {
 
-    public static final String PATH = "taskHistoryEvents";
+    public static final String BASE_PATH = "taskHistoryEvents";
+
     public static final String PATH_TASK = "task";
     public static final String PATH_IDENTITY = "identity";
     public static final String PATH_DATE = "date";
-    private String mId;
-    @PropertyName(PATH_CREATED_AT)
-    private long mCreatedAt;
-    @PropertyName(PATH_TASK)
-    private String mTask;
-    @PropertyName(PATH_IDENTITY)
-    private String mIdentity;
-    @PropertyName(PATH_DATE)
-    private Date mDate;
+
+    private String id;
+    private long createdAt;
+    private String task;
+    private String identity;
+    private Date date;
 
     public TaskHistoryEvent() {
         // required for firebase de-/serialization
     }
 
     public TaskHistoryEvent(@NonNull String task, @NonNull String identity, @NonNull Date date) {
-        mTask = task;
-        mIdentity = identity;
-        mDate = date;
+        this.task = task;
+        this.identity = identity;
+        this.date = date;
     }
 
     @Exclude
     public String getId() {
-        return mId;
+        return id;
     }
 
     @Override
     public void setId(@NonNull String id) {
-        mId = id;
+        this.id = id;
     }
 
     @Override
@@ -61,18 +58,18 @@ public class TaskHistoryEvent implements FirebaseModel {
 
     @Exclude
     public Date getCreatedAtDate() {
-        return new Date(mCreatedAt);
+        return new Date(createdAt);
     }
 
     public String getTask() {
-        return mTask;
+        return task;
     }
 
     public String getIdentity() {
-        return mIdentity;
+        return identity;
     }
 
     public Date getDate() {
-        return mDate;
+        return date;
     }
 }

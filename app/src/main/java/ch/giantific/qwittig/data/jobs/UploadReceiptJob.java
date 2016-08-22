@@ -6,6 +6,7 @@ package ch.giantific.qwittig.data.jobs;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.firebase.jobdispatcher.Constraint;
@@ -35,18 +36,20 @@ public class UploadReceiptJob extends JobService {
     private static final String JOB_TAG = UploadReceiptJob.class.getCanonicalName();
     private static final String KEY_PURCHASE_ID = "PURCHASE_ID";
     private static final String KEY_RECEIPT = "RECEIPT";
-    private static final String KEY_DRAFT = "DRAFT";
+    private static final String KEY_BUYER_ID = "BUYER_ID";
+
     @Inject
-    PurchaseRepository mPurchaseRepo;
-    private Subscription mSubscription;
+    PurchaseRepository purchaseRepo;
+    private Subscription subscription;
 
     public static boolean schedule(@NonNull FirebaseJobDispatcher jobDispatcher,
-                                   @NonNull String purchaseId, boolean asDraft,
+                                   @NonNull String purchaseId,
+                                   @Nullable String buyerId,
                                    @NonNull String receipt) {
         final Bundle extras = new Bundle();
         extras.putString(KEY_PURCHASE_ID, purchaseId);
         extras.putString(KEY_RECEIPT, receipt);
-        extras.putBoolean(KEY_DRAFT, asDraft);
+        extras.putString(KEY_BUYER_ID, buyerId);
 
         final Job job = jobDispatcher.newJobBuilder()
                 .setService(UploadAvatarJob.class)
@@ -74,16 +77,16 @@ public class UploadReceiptJob extends JobService {
 
         final String purchaseId = extras.getString(KEY_PURCHASE_ID, "");
         final String receipt = extras.getString(KEY_RECEIPT, "");
-        final boolean asDraft = extras.getBoolean(KEY_DRAFT, false);
+        final String buyerId = extras.getString(KEY_BUYER_ID, "");
         if (TextUtils.isEmpty(purchaseId) || TextUtils.isEmpty(receipt)) {
             return false;
         }
 
-        mSubscription = mPurchaseRepo.uploadReceipt(purchaseId, asDraft, receipt)
+        subscription = purchaseRepo.uploadReceipt(purchaseId, buyerId, receipt)
                 .subscribe(new SingleSubscriber<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot value) {
-                        Timber.i("receipt uploaded");
+                        Timber.d("receipt uploaded");
                         jobFinished(jobParameters, false);
                     }
 
@@ -99,7 +102,7 @@ public class UploadReceiptJob extends JobService {
 
     @Override
     public boolean onStopJob(JobParameters jobParameters) {
-        mSubscription.unsubscribe();
+        subscription.unsubscribe();
         return true;
     }
 

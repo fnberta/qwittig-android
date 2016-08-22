@@ -42,22 +42,23 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
         implements NavDrawerViewModel.ViewListener {
 
     private static final int NAV_DRAWER_ITEM_INVALID = -1;
-    protected boolean mUserLoggedIn;
+
+    protected boolean userLoggedIn;
     @Inject
-    protected NavDrawerViewModel mNavDrawerViewModel;
+    protected NavDrawerViewModel navDrawerViewModel;
     @Inject
-    protected Navigator mNavigator;
-    private ActionBarDrawerToggle mDrawerToggle;
-    private DrawerLayout mDrawerLayout;
-    private Menu mNavigationViewMenu;
-    private NavHeaderIdentitiesArrayAdapter mHeaderIdentitiesAdapter;
-    private int mSelectedNavDrawerItem;
+    protected Navigator navigator;
+    private ActionBarDrawerToggle drawerToggle;
+    private DrawerLayout drawerLayout;
+    private Menu navigationViewMenu;
+    private NavHeaderIdentitiesArrayAdapter headerIdentitiesAdapter;
+    private int selectedNavDrawerItem;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mUserLoggedIn = mNavDrawerViewModel.isUserLoggedIn();
+        userLoggedIn = navDrawerViewModel.isUserLoggedIn();
     }
 
     @Override
@@ -68,9 +69,9 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
                 .navDrawerViewModelModule(new NavDrawerViewModelModule(savedInstanceState))
                 .build();
         injectDependencies(navComp, savedInstanceState);
-        mHeaderIdentitiesAdapter = new NavHeaderIdentitiesArrayAdapter(this, mNavDrawerViewModel);
-        mNavDrawerViewModel.attachView(this);
-        mNavDrawerViewModel.setSpinnerInteraction(mHeaderIdentitiesAdapter);
+        headerIdentitiesAdapter = new NavHeaderIdentitiesArrayAdapter(this, navDrawerViewModel);
+        navDrawerViewModel.attachView(this);
+        navDrawerViewModel.setSpinnerInteraction(headerIdentitiesAdapter);
     }
 
     protected abstract void injectDependencies(@NonNull NavDrawerComponent navComp,
@@ -84,24 +85,24 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
     }
 
     private void setupNavDrawer() {
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                mSelectedNavDrawerItem = menuItem.getItemId();
-                mDrawerLayout.closeDrawer(GravityCompat.START);
+                selectedNavDrawerItem = menuItem.getItemId();
+                drawerLayout.closeDrawer(GravityCompat.START);
                 return true;
             }
         });
-        mNavigationViewMenu = navigationView.getMenu();
+        navigationViewMenu = navigationView.getMenu();
 
         final View navigationViewHeader = navigationView.getHeaderView(0);
         final NavDrawerHeaderBinding headerBinding = NavDrawerHeaderBinding.bind(navigationViewHeader);
-        headerBinding.setViewModel(mNavDrawerViewModel);
-        headerBinding.spDrawerGroup.setAdapter(mHeaderIdentitiesAdapter);
+        headerBinding.setViewModel(navDrawerViewModel);
+        headerBinding.spDrawerGroup.setAdapter(headerIdentitiesAdapter);
 
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar,
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
                 R.string.drawer_open, R.string.drawer_close) {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
@@ -113,16 +114,16 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
 
-                if (mSelectedNavDrawerItem == getSelfNavDrawerItem()) {
+                if (selectedNavDrawerItem == getSelfNavDrawerItem()) {
                     return;
                 }
 
-                goToNavDrawerItem(mSelectedNavDrawerItem);
-                mSelectedNavDrawerItem = 0;
+                goToNavDrawerItem(selectedNavDrawerItem);
+                selectedNavDrawerItem = 0;
             }
         };
 
-        mDrawerLayout.addDrawerListener(mDrawerToggle);
+        drawerLayout.addDrawerListener(drawerToggle);
     }
 
     protected int getSelfNavDrawerItem() {
@@ -132,29 +133,29 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
     private void goToNavDrawerItem(int itemId) {
         switch (itemId) {
             case R.id.nav_home:
-                mNavigator.startHome();
+                navigator.startHome();
                 finish();
                 break;
             case R.id.nav_finance:
-                mNavigator.startFinance();
+                navigator.startFinance();
                 finish();
                 break;
             case R.id.nav_tasks:
-                mNavigator.startTasks();
+                navigator.startTasks();
                 finish();
                 break;
             case R.id.nav_stats:
-                mNavigator.startStats();
+                navigator.startStats();
                 finish();
                 break;
             case R.id.nav_settings:
-                mNavigator.startSettings();
+                navigator.startSettings();
                 break;
             case R.id.nav_help_feedback:
-                mNavigator.startHelpFeedback();
+                navigator.startHelpFeedback();
                 break;
             case R.id.nav_about:
-                mNavigator.startAbout();
+                navigator.startAbout();
                 break;
         }
     }
@@ -163,8 +164,8 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
-        if (mDrawerToggle != null) {
-            mDrawerToggle.syncState();
+        if (drawerToggle != null) {
+            drawerToggle.syncState();
         }
     }
 
@@ -172,8 +173,8 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
-        if (mDrawerToggle != null) {
-            mDrawerToggle.onConfigurationChanged(newConfig);
+        if (drawerToggle != null) {
+            drawerToggle.onConfigurationChanged(newConfig);
         }
     }
 
@@ -181,14 +182,14 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
     protected void onStart() {
         super.onStart();
 
-        mNavDrawerViewModel.onViewVisible();
+        navDrawerViewModel.onViewVisible();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
 
-        mNavDrawerViewModel.onViewGone();
+        navDrawerViewModel.onViewGone();
     }
 
     @Override
@@ -199,7 +200,7 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
             case Navigator.INTENT_REQUEST_LOGIN:
                 if (resultCode == RESULT_OK) {
                     setupScreenAfterLogin();
-                    mUserLoggedIn = mNavDrawerViewModel.isUserLoggedIn();
+                    userLoggedIn = navDrawerViewModel.isUserLoggedIn();
                 } else {
                     finish();
                 }
@@ -207,7 +208,7 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
             case Navigator.INTENT_REQUEST_SETTINGS:
                 switch (resultCode) {
                     case SettingsViewModel.Result.LOGOUT:
-                        mNavDrawerViewModel.afterLogout();
+                        navDrawerViewModel.afterLogout();
                         break;
                 }
                 break;
@@ -230,19 +231,19 @@ public abstract class BaseNavDrawerActivity<T> extends BaseActivity<T>
     }
 
     protected final void setStatusBarBackgroundColor(int color) {
-        mDrawerLayout.setStatusBarBackgroundColor(color);
+        drawerLayout.setStatusBarBackgroundColor(color);
     }
 
     protected final void replaceDrawerIndicatorWithUp() {
-        mDrawerToggle.setDrawerIndicatorEnabled(false);
+        drawerToggle.setDrawerIndicatorEnabled(false);
     }
 
     protected final void unCheckNavDrawerItems() {
-        mNavigationViewMenu.setGroupCheckable(R.id.nav_group_main, false, true);
+        navigationViewMenu.setGroupCheckable(R.id.nav_group_main, false, true);
     }
 
     protected final void checkNavDrawerItem(int itemId) {
-        final MenuItem item = mNavigationViewMenu.findItem(itemId);
+        final MenuItem item = navigationViewMenu.findItem(itemId);
         item.setChecked(true);
     }
 }

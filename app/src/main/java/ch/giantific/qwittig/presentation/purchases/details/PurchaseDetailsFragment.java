@@ -29,7 +29,7 @@ import ch.giantific.qwittig.presentation.purchases.details.di.PurchaseDetailsSub
  */
 public class PurchaseDetailsFragment extends BaseRecyclerViewFragment<PurchaseDetailsSubcomponent, PurchaseDetailsViewModel, BaseFragment.ActivityListener<PurchaseDetailsSubcomponent>> {
 
-    private FragmentPurchaseDetailsBinding mBinding;
+    private FragmentPurchaseDetailsBinding binding;
 
     public PurchaseDetailsFragment() {
         // required empty constructor
@@ -38,8 +38,8 @@ public class PurchaseDetailsFragment extends BaseRecyclerViewFragment<PurchaseDe
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentPurchaseDetailsBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentPurchaseDetailsBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
@@ -47,8 +47,8 @@ public class PurchaseDetailsFragment extends BaseRecyclerViewFragment<PurchaseDe
         super.onActivityCreated(savedInstanceState);
 
         setupIdentitiesList();
-        mViewModel.setListInteraction(mRecyclerAdapter);
-        mBinding.setViewModel(mViewModel);
+        viewModel.setListInteraction(recyclerAdapter);
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -57,22 +57,22 @@ public class PurchaseDetailsFragment extends BaseRecyclerViewFragment<PurchaseDe
     }
 
     private void setupIdentitiesList() {
-        mBinding.rvPurchaseDetailsIdentities.setHasFixedSize(true);
-        mBinding.rvPurchaseDetailsIdentities.setLayoutManager(new LinearLayoutManager(getActivity(),
+        binding.rvPurchaseDetailsIdentities.setHasFixedSize(true);
+        binding.rvPurchaseDetailsIdentities.setLayoutManager(new LinearLayoutManager(getActivity(),
                 LinearLayoutManager.HORIZONTAL, false));
         final PurchaseDetailsIdentitiesRecyclerAdapter adapter =
-                new PurchaseDetailsIdentitiesRecyclerAdapter(mViewModel);
-        mBinding.rvPurchaseDetailsIdentities.setAdapter(adapter);
-        mViewModel.setIdentitiesListInteraction(adapter);
+                new PurchaseDetailsIdentitiesRecyclerAdapter(viewModel);
+        binding.rvPurchaseDetailsIdentities.setAdapter(adapter);
+        viewModel.setIdentitiesListInteraction(adapter);
     }
 
     @Override
     protected RecyclerView getRecyclerView() {
-        return mBinding.rvPurchaseDetails;
+        return binding.rvPurchaseDetails;
     }
 
     @Override
     protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new PurchaseDetailsRecyclerAdapter(mViewModel);
+        return new PurchaseDetailsRecyclerAdapter(viewModel);
     }
 }

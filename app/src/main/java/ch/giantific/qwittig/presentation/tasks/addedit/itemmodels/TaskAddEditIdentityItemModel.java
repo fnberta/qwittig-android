@@ -32,49 +32,49 @@ public class TaskAddEditIdentityItemModel extends BaseObservable implements Parc
             return new TaskAddEditIdentityItemModel[size];
         }
     };
-    private final String mIdentityId;
-    private final String mNickname;
-    private final String mAvatar;
-    private boolean mInvolved;
+    private final String identityId;
+    private final String nickname;
+    private final String avatar;
+    private boolean involved;
 
     public TaskAddEditIdentityItemModel(@NonNull Identity identity) {
-        mIdentityId = identity.getId();
-        mNickname = identity.getNickname();
-        mAvatar = identity.getAvatar();
+        identityId = identity.getId();
+        nickname = identity.getNickname();
+        avatar = identity.getAvatar();
     }
 
     protected TaskAddEditIdentityItemModel(Parcel in) {
-        mIdentityId = in.readString();
-        mNickname = in.readString();
-        mAvatar = in.readString();
-        mInvolved = in.readByte() != 0;
+        identityId = in.readString();
+        nickname = in.readString();
+        avatar = in.readString();
+        involved = in.readByte() != 0;
     }
 
     public String getIdentityId() {
-        return mIdentityId;
+        return identityId;
     }
 
     @Bindable
     public String getNickname() {
-        return mNickname;
+        return nickname;
     }
 
     @Bindable
     public String getAvatar() {
-        return mAvatar;
+        return avatar;
     }
 
     @Bindable
     public float getAlpha() {
-        return mInvolved ? 1f : DISABLED_ALPHA;
+        return involved ? 1f : DISABLED_ALPHA;
     }
 
     public boolean isInvolved() {
-        return mInvolved;
+        return involved;
     }
 
     public void setInvolved(boolean involved) {
-        mInvolved = involved;
+        this.involved = involved;
     }
 
     @Override
@@ -84,9 +84,9 @@ public class TaskAddEditIdentityItemModel extends BaseObservable implements Parc
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(mIdentityId);
-        dest.writeString(mNickname);
-        dest.writeString(mAvatar);
-        dest.writeByte(mInvolved ? (byte) 1 : (byte) 0);
+        dest.writeString(identityId);
+        dest.writeString(nickname);
+        dest.writeString(avatar);
+        dest.writeByte(involved ? (byte) 1 : (byte) 0);
     }
 }

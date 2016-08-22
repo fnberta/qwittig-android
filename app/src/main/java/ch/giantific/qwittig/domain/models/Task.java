@@ -10,7 +10,6 @@ import android.support.annotation.StringDef;
 
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
-import com.google.firebase.database.PropertyName;
 import com.google.firebase.database.ServerValue;
 
 import java.lang.annotation.Retention;
@@ -27,29 +26,24 @@ import java.util.Set;
 @IgnoreExtraProperties
 public class Task implements FirebaseModel {
 
-    public static final String PATH = "tasks";
+    public static final String BASE_PATH = "tasks";
+
     public static final String PATH_INITIATOR = "initiator";
     public static final String PATH_TITLE = "title";
     public static final String PATH_GROUP = "group";
     public static final String PATH_TIME_FRAME = "timeFrame";
     public static final String PATH_DEADLINE = "deadline";
     public static final String PATH_IDENTITIES = "identities";
-    private String mId;
-    @PropertyName(PATH_CREATED_AT)
-    private long mCreatedAt;
-    @PropertyName(PATH_INITIATOR)
-    private String mInitiator;
-    @PropertyName(PATH_TITLE)
-    private String mTitle;
-    @PropertyName(PATH_GROUP)
-    private String mGroup;
+
+    private String id;
+    private long createdAt;
+    private String initiator;
+    private String title;
+    private String group;
     @TimeFrame
-    @PropertyName(PATH_TIME_FRAME)
-    private String mTimeFrame;
-    @PropertyName(PATH_DEADLINE)
-    private Date mDeadline;
-    @PropertyName(PATH_IDENTITIES)
-    private Map<String, Boolean> mIdentities;
+    private String timeFrame;
+    private Date deadline;
+    private Map<String, Boolean> identities;
 
     public Task() {
         // required for firebase de-/serialization
@@ -58,25 +52,25 @@ public class Task implements FirebaseModel {
     public Task(@NonNull String initiator, @NonNull String title, @NonNull String group,
                 @NonNull @TimeFrame String timeFrame, @Nullable Date deadline,
                 @NonNull List<String> identities) {
-        mInitiator = initiator;
-        mTitle = title;
-        mGroup = group;
-        mTimeFrame = timeFrame;
-        mDeadline = deadline;
-        mIdentities = new LinkedHashMap<>();
+        this.initiator = initiator;
+        this.title = title;
+        this.group = group;
+        this.timeFrame = timeFrame;
+        this.deadline = deadline;
+        this.identities = new LinkedHashMap<>();
         for (String identityId : identities) {
-            mIdentities.put(identityId, true);
+            this.identities.put(identityId, true);
         }
     }
 
     @Exclude
     public String getId() {
-        return mId;
+        return id;
     }
 
     @Override
     public void setId(@NonNull String id) {
-        mId = id;
+        this.id = id;
     }
 
     @Override
@@ -86,37 +80,37 @@ public class Task implements FirebaseModel {
 
     @Exclude
     public Date getCreatedAtDate() {
-        return new Date(mCreatedAt);
+        return new Date(createdAt);
     }
 
     public String getInitiator() {
-        return mInitiator;
+        return initiator;
     }
 
     public String getTitle() {
-        return mTitle;
+        return title;
     }
 
     public String getGroup() {
-        return mGroup;
+        return group;
     }
 
     @TimeFrame
     public String getTimeFrame() {
-        return mTimeFrame;
+        return timeFrame;
     }
 
     public Date getDeadline() {
-        return mDeadline;
+        return deadline;
     }
 
     public Map<String, Boolean> getIdentities() {
-        return mIdentities;
+        return identities;
     }
 
     @Exclude
     public Set<String> getIdentitiesIds() {
-        return mIdentities.keySet();
+        return identities.keySet();
     }
 
     @Exclude
@@ -212,11 +206,11 @@ public class Task implements FirebaseModel {
 //    }
 //
 //    public boolean isLoading() {
-//        return mLoading;
+//        return loading;
 //    }
 //
 //    public void setLoading(boolean isLoading) {
-//        mLoading = isLoading;
+//        loading = isLoading;
 //    }
 //
 //    /**

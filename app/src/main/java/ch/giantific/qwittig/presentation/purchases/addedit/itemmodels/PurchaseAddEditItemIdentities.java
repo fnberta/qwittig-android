@@ -8,7 +8,7 @@ import android.os.Parcel;
 import android.support.annotation.NonNull;
 
 /**
- * Provides a row filled with users that belong to a list item in the add or edit purchase screen.
+ * Provides a row filled with identities that belong to a list item in the add or edit purchase screen.
  */
 public class PurchaseAddEditItemIdentities implements PurchaseAddEditItemModel {
 
@@ -23,22 +23,22 @@ public class PurchaseAddEditItemIdentities implements PurchaseAddEditItemModel {
             return new PurchaseAddEditItemIdentities[size];
         }
     };
-    private PurchaseAddEditItemIdentity[] mUsers;
+    private PurchaseAddEditItemIdentity[] identities;
 
-    public PurchaseAddEditItemIdentities(@NonNull PurchaseAddEditItemIdentity[] users) {
-        mUsers = users;
+    public PurchaseAddEditItemIdentities(@NonNull PurchaseAddEditItemIdentity[] identities) {
+        this.identities = identities;
     }
 
     private PurchaseAddEditItemIdentities(Parcel in) {
-        mUsers = in.createTypedArray(PurchaseAddEditItemIdentity.CREATOR);
+        identities = in.createTypedArray(PurchaseAddEditItemIdentity.CREATOR);
     }
 
-    public PurchaseAddEditItemIdentity[] getUsers() {
-        return mUsers;
+    public PurchaseAddEditItemIdentity[] getIdentities() {
+        return identities;
     }
 
-    public void setUsers(@NonNull PurchaseAddEditItemIdentity[] users) {
-        mUsers = users;
+    public void setIdentities(@NonNull PurchaseAddEditItemIdentity[] identities) {
+        this.identities = identities;
     }
 
     @Override
@@ -53,6 +53,6 @@ public class PurchaseAddEditItemIdentities implements PurchaseAddEditItemModel {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeTypedArray(mUsers, 0);
+        dest.writeTypedArray(identities, 0);
     }
 }

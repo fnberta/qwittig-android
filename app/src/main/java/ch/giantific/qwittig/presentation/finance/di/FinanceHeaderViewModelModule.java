@@ -33,6 +33,6 @@ public class FinanceHeaderViewModelModule extends BaseViewModelModule {
     BalanceHeaderViewModel providesBalanceHeaderViewModel(@NonNull Navigator navigator,
                                                           @NonNull RxBus<Object> eventBus,
                                                           @NonNull UserRepository userRepository) {
-        return new BalanceHeaderViewModelImpl(mSavedState, navigator, eventBus, userRepository);
+        return new BalanceHeaderViewModelImpl(savedState, navigator, eventBus, userRepository);
     }
 }

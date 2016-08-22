@@ -20,8 +20,8 @@ import java.util.List;
  */
 public class TabsAdapter extends FragmentPagerAdapter {
 
-    protected final List<Fragment> mFragments = new ArrayList<>();
-    protected final List<String> mFragmentTitles = new ArrayList<>();
+    protected final List<Fragment> fragments = new ArrayList<>();
+    protected final List<String> fragmentTitles = new ArrayList<>();
 
     /**
      * Constructs a new {@link TabsAdapter}.
@@ -39,22 +39,22 @@ public class TabsAdapter extends FragmentPagerAdapter {
      * @param title    the title of the fragment to be displayed in the tab
      */
     public void addInitialFragment(@NonNull Fragment fragment, @NonNull String title) {
-        mFragments.add(fragment);
-        mFragmentTitles.add(title);
+        fragments.add(fragment);
+        fragmentTitles.add(title);
     }
 
     @Override
     public Fragment getItem(int position) {
-        return mFragments.get(position);
+        return fragments.get(position);
     }
 
     @Override
     public int getCount() {
-        return mFragments.size();
+        return fragments.size();
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return mFragmentTitles.get(position);
+        return fragmentTitles.get(position);
     }
 }

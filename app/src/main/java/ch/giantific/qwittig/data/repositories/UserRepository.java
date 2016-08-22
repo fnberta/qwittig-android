@@ -60,11 +60,12 @@ public class UserRepository {
     public static final int JPEG_COMPRESSION_RATE = 60;
     public static final int HEIGHT = 720;
     public static final int WIDTH = 720;
-    private final FirebaseAuth mAuth;
-    private final DatabaseReference mDatabaseRef;
-    private final StorageReference mStorageRef;
-    private final FirebaseJobDispatcher mJobDispatcher;
-    private final DeleteUserData mDeleteUserData;
+
+    private final FirebaseAuth auth;
+    private final DatabaseReference databaseRef;
+    private final StorageReference storageRef;
+    private final FirebaseJobDispatcher jobDispatcher;
+    private final DeleteUserData deleteUserData;
 
     @Inject
     public UserRepository(@NonNull FirebaseAuth auth,
@@ -72,16 +73,16 @@ public class UserRepository {
                           @NonNull FirebaseStorage firebaseStorage,
                           @NonNull FirebaseJobDispatcher jobDispatcher,
                           @NonNull DeleteUserData deleteUserData) {
-        mAuth = auth;
-        mDatabaseRef = firebaseDatabase.getReference();
-        mStorageRef = firebaseStorage.getReferenceFromUrl(Constants.STORAGE_URL).child("avatars");
-        mJobDispatcher = jobDispatcher;
-        mDeleteUserData = deleteUserData;
+        this.auth = auth;
+        databaseRef = firebaseDatabase.getReference();
+        storageRef = firebaseStorage.getReferenceFromUrl(Constants.STORAGE_URL).child("avatars");
+        this.jobDispatcher = jobDispatcher;
+        this.deleteUserData = deleteUserData;
     }
 
     @Nullable
     public FirebaseUser getCurrentUser() {
-        return mAuth.getCurrentUser();
+        return auth.getCurrentUser();
     }
 
     public Single<String> getAuthToken() {
@@ -100,31 +101,31 @@ public class UserRepository {
     }
 
     public Observable<FirebaseUser> observeAuthStatus() {
-        return RxFirebaseAuth.observeAuthState(mAuth);
+        return RxFirebaseAuth.observeAuthState(auth);
     }
 
     public Observable<User> observeUser(@NonNull String userId) {
-        final Query query = mDatabaseRef.child(User.PATH).child(userId);
+        final Query query = databaseRef.child(User.BASE_PATH).child(userId);
         return RxFirebaseDatabase.observeValue(query, User.class);
     }
 
     public Single<User> getUser(@NonNull String userId) {
-        final Query query = mDatabaseRef.child(User.PATH).child(userId);
+        final Query query = databaseRef.child(User.BASE_PATH).child(userId);
         return RxFirebaseDatabase.observeValueOnce(query, User.class);
     }
 
     public Observable<Identity> observeIdentity(@NonNull String identityId) {
-        final Query query = mDatabaseRef.child(Identity.PATH).child(identityId);
+        final Query query = databaseRef.child(Identity.BASE_PATH).child(Identity.BASE_PATH_ACTIVE).child(identityId);
         return RxFirebaseDatabase.observeValue(query, Identity.class);
     }
 
     public Single<Identity> getIdentity(@NonNull String identityId) {
-        final Query query = mDatabaseRef.child(Identity.PATH).child(identityId);
+        final Query query = databaseRef.child(Identity.BASE_PATH).child(Identity.BASE_PATH_ACTIVE).child(identityId);
         return RxFirebaseDatabase.observeValueOnce(query, Identity.class);
     }
 
     public void updateCurrentIdentity(@NonNull String userId, @NonNull String newCurrentIdentityId) {
-        mDatabaseRef.child(User.PATH).child(userId).child(User.PATH_CURRENT_IDENTITY).setValue(newCurrentIdentityId);
+        databaseRef.child(User.BASE_PATH).child(userId).child(User.PATH_CURRENT_IDENTITY).setValue(newCurrentIdentityId);
     }
 
     public Observable<Identity> switchGroup(@NonNull final User user,
@@ -192,17 +193,18 @@ public class UserRepository {
                         final Map<String, Object> childUpdates = new HashMap<>();
                         final Set<String> identities = user.getIdentitiesIds();
                         for (String identityId : identities) {
-                            childUpdates.put(Identity.PATH + "/" + identityId + "/" + Identity.PATH_NICKNAME, nickname);
+                            childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE + "/" + identityId + "/" + Identity.PATH_NICKNAME, nickname);
                             if (avatarChanged) {
-                                childUpdates.put(Identity.PATH + "/" + identityId + "/" +
-                                        Identity.PATH_AVATAR, !TextUtils.isEmpty(avatar)
-                                        ? avatar : null);
+                                childUpdates.put(Identity.BASE_PATH + "/" + Identity.BASE_PATH_ACTIVE
+                                                + "/" + identityId + "/" + Identity.PATH_AVATAR,
+                                        !TextUtils.isEmpty(avatar)
+                                                ? avatar : null);
                             }
                         }
-                        mDatabaseRef.updateChildren(childUpdates);
+                        databaseRef.updateChildren(childUpdates);
 
                         if (avatarChanged && !TextUtils.isEmpty(avatar) && !Utils.isHttpsUrl(avatar)) {
-                            UploadAvatarJob.schedule(mJobDispatcher, avatar, null);
+                            UploadAvatarJob.schedule(jobDispatcher, avatar, null);
                         }
                     }
                 });
@@ -212,14 +214,15 @@ public class UserRepository {
                                                         @Nullable final String identityId) {
         if (!TextUtils.isEmpty(identityId)) {
             final File file = new File(avatar);
-            final StorageReference avatarRef = mStorageRef.child(identityId);
+            final StorageReference avatarRef = storageRef.child(identityId);
             return RxFirebaseStorage.putFile(avatarRef, Uri.fromFile(file))
                     .doOnSuccess(new Action1<UploadTask.TaskSnapshot>() {
                         @Override
                         public void call(UploadTask.TaskSnapshot taskSnapshot) {
                             final Uri url = taskSnapshot.getDownloadUrl();
                             if (url != null) {
-                                mDatabaseRef.child(Identity.PATH)
+                                databaseRef.child(Identity.BASE_PATH)
+                                        .child(Identity.BASE_PATH_ACTIVE)
                                         .child(identityId)
                                         .child(Identity.PATH_AVATAR)
                                         .setValue(url.toString());
@@ -238,7 +241,7 @@ public class UserRepository {
                     @Override
                     public Single<? extends UploadTask.TaskSnapshot> call(final User user) {
                         final File file = new File(avatar);
-                        final StorageReference avatarRef = mStorageRef.child(user.getId());
+                        final StorageReference avatarRef = storageRef.child(user.getId());
                         return RxFirebaseStorage.putFile(avatarRef, Uri.fromFile(file))
                                 .doOnSuccess(new Action1<UploadTask.TaskSnapshot>() {
                                     @Override
@@ -248,11 +251,12 @@ public class UserRepository {
                                             final Set<String> identities = user.getIdentitiesIds();
                                             final Map<String, Object> childUpdates = new HashMap<>();
                                             for (String identityId : identities) {
-                                                childUpdates.put(Identity.PATH + "/"
+                                                childUpdates.put(Identity.BASE_PATH + "/"
+                                                        + Identity.BASE_PATH_ACTIVE + "/"
                                                         + identityId + "/"
                                                         + Identity.PATH_AVATAR, url.toString());
                                             }
-                                            mDatabaseRef.updateChildren(childUpdates);
+                                            databaseRef.updateChildren(childUpdates);
                                         }
                                     }
                                 });
@@ -261,18 +265,18 @@ public class UserRepository {
     }
 
     public void updatePendingIdentityNickname(@NonNull String identityId, @NonNull String nickname) {
-        mDatabaseRef.child(Identity.PATH).child(identityId).child(Identity.PATH_NICKNAME).setValue(nickname);
+        databaseRef.child(Identity.BASE_PATH).child(Identity.BASE_PATH_ACTIVE).child(identityId).child(Identity.PATH_NICKNAME).setValue(nickname);
     }
 
     public void updatePendingIdentityAvatar(@NonNull final String identityId,
                                             @NonNull String avatar) {
-        mDatabaseRef.child(Identity.PATH).child(identityId).child(Identity.PATH_AVATAR).setValue(avatar);
-        UploadAvatarJob.schedule(mJobDispatcher, avatar, identityId);
+        databaseRef.child(Identity.BASE_PATH).child(Identity.BASE_PATH_ACTIVE).child(identityId).child(Identity.PATH_AVATAR).setValue(avatar);
+        UploadAvatarJob.schedule(jobDispatcher, avatar, identityId);
     }
 
     public Single<FirebaseUser> loginEmail(@NonNull final String username,
                                            @NonNull final String password) {
-        return RxFirebaseAuth.signInWithEmailAndPassword(mAuth, username, password)
+        return RxFirebaseAuth.signInWithEmailAndPassword(auth, username, password)
                 .map(new Func1<AuthResult, FirebaseUser>() {
                     @Override
                     public FirebaseUser call(AuthResult authResult) {
@@ -292,7 +296,7 @@ public class UserRepository {
 
     public Single<FirebaseUser> signUpEmail(@NonNull final String username,
                                             @NonNull final String password) {
-        return RxFirebaseAuth.createUserWithEmailAndPassword(mAuth, username, password)
+        return RxFirebaseAuth.createUserWithEmailAndPassword(auth, username, password)
                 .map(new Func1<AuthResult, FirebaseUser>() {
                     @Override
                     public FirebaseUser call(AuthResult authResult) {
@@ -311,12 +315,12 @@ public class UserRepository {
     }
 
     public Single<Void> requestPasswordReset(@NonNull String email) {
-        return RxFirebaseAuth.sendPasswordResetEmail(mAuth, email);
+        return RxFirebaseAuth.sendPasswordResetEmail(auth, email);
     }
 
     public Single<FirebaseUser> loginGoogle(@NonNull String idToken) {
         final AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
-        return RxFirebaseAuth.signInWithCredential(mAuth, credential)
+        return RxFirebaseAuth.signInWithCredential(auth, credential)
                 .map(new Func1<AuthResult, FirebaseUser>() {
                     @Override
                     public FirebaseUser call(AuthResult authResult) {
@@ -387,7 +391,7 @@ public class UserRepository {
 
     public Single<FirebaseUser> loginFacebook(@NonNull String idToken) {
         final AuthCredential credential = FacebookAuthProvider.getCredential(idToken);
-        return RxFirebaseAuth.signInWithCredential(mAuth, credential)
+        return RxFirebaseAuth.signInWithCredential(auth, credential)
                 .map(new Func1<AuthResult, FirebaseUser>() {
                     @Override
                     public FirebaseUser call(AuthResult authResult) {
@@ -421,7 +425,7 @@ public class UserRepository {
     }
 
     public Single<Boolean> isUserNew(@NonNull String userId) {
-        return RxFirebaseDatabase.checkForChild(mDatabaseRef.child(User.PATH).child(userId), User.PATH_IDENTITIES)
+        return RxFirebaseDatabase.checkForChild(databaseRef.child(User.BASE_PATH).child(userId), User.PATH_IDENTITIES)
                 .map(new Func1<Boolean, Boolean>() {
                     @Override
                     public Boolean call(Boolean hasChild) {
@@ -438,8 +442,8 @@ public class UserRepository {
             }
         }
 
-        mDatabaseRef.child(User.PATH).child(firebaseUser.getUid()).child(User.PATH_TOKENS).removeValue();
-        mAuth.signOut();
+        databaseRef.child(User.BASE_PATH).child(firebaseUser.getUid()).child(User.PATH_TOKENS).removeValue();
+        auth.signOut();
     }
 
     public Single<AuthResult> linkUserWithCredential(@NonNull final FirebaseUser firebaseUser,
@@ -471,7 +475,7 @@ public class UserRepository {
                             return Single.error(new Throwable("could not get id token!"));
                         }
 
-                        return mDeleteUserData.deleteUserData(new UserIdToken(idToken))
+                        return deleteUserData.deleteUserData(new UserIdToken(idToken))
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread());
                     }
@@ -485,12 +489,12 @@ public class UserRepository {
                 .doOnSuccess(new Action1<Void>() {
                     @Override
                     public void call(Void aVoid) {
-                        mAuth.signOut();
+                        auth.signOut();
                     }
                 });
     }
 
     public void updateToken(@NonNull String userId, @NonNull String token) {
-        mDatabaseRef.child(User.PATH).child(userId).child(User.PATH_TOKENS).child(token).setValue(true);
+        databaseRef.child(User.BASE_PATH).child(userId).child(User.PATH_TOKENS).child(token).setValue(true);
     }
 }

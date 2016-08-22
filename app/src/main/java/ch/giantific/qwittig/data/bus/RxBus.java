@@ -15,22 +15,22 @@ import rx.subjects.Subject;
 @Singleton
 public class RxBus<T> {
 
-    private final Subject<T, T> mSubject = PublishSubject.create();
+    private final Subject<T, T> subject = PublishSubject.create();
 
     @Inject
     public RxBus() {
     }
 
     public <E extends T> void post(@NonNull E event) {
-        mSubject.onNext(event);
+        subject.onNext(event);
     }
 
     public Observable<T> observe() {
-        return mSubject.asObservable();
+        return subject.asObservable();
     }
 
     public <E extends T> Observable<E> observeEvents(@NonNull Class<E> eventClass) {
-        return mSubject.asObservable().ofType(eventClass);
+        return subject.asObservable().ofType(eventClass);
     }
 
 }

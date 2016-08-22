@@ -13,18 +13,14 @@ import android.view.View;
 public abstract class MessageAction implements View.OnClickListener {
 
     @StringRes
-    private int mActionText;
+    private final int actionText;
 
     public MessageAction(int actionText) {
-        mActionText = actionText;
+        this.actionText = actionText;
     }
 
     @StringRes
     public int getActionText() {
-        return mActionText;
-    }
-
-    public void setActionText(@StringRes int actionText) {
-        mActionText = actionText;
+        return actionText;
     }
 }

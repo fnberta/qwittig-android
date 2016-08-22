@@ -21,7 +21,6 @@ import ch.giantific.qwittig.presentation.purchases.addedit.di.DaggerPurchaseAddC
 import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseAddComponent;
 import ch.giantific.qwittig.presentation.purchases.addedit.di.PurchaseAddViewModelModule;
 import ch.giantific.qwittig.utils.Utils;
-import timber.log.Timber;
 
 /**
  * Hosts {@link PurchaseAddFragment} that handles the creation of a new purchase.
@@ -47,20 +46,20 @@ public class PurchaseAddActivity extends BasePurchaseAddEditActivity<PurchaseAdd
 
     @Override
     protected void injectDependencies(@Nullable Bundle savedInstanceState) {
-        mComponent = DaggerPurchaseAddComponent.builder()
+        component = DaggerPurchaseAddComponent.builder()
                 .applicationComponent(Qwittig.getAppComponent(this))
                 .navigatorModule(new NavigatorModule(this))
                 .purchaseAddViewModelModule(new PurchaseAddViewModelModule(savedInstanceState))
                 .build();
-        mComponent.inject(this);
+        component.inject(this);
         final String ocrDataId = getOcrDataId();
         if (!TextUtils.isEmpty(ocrDataId)) {
-            mAddEditPurchaseViewModel = mComponent.getAddOcrViewModel();
-            ((PurchaseAddOcrViewModel) mAddEditPurchaseViewModel).setOcrDataId(ocrDataId);
+            addEditViewModel = component.getAddOcrViewModel();
+            ((PurchaseAddOcrViewModel) addEditViewModel).setOcrDataId(ocrDataId);
         } else {
-            mAddEditPurchaseViewModel = mComponent.getAddViewModel();
+            addEditViewModel = component.getAddViewModel();
         }
-        mAddEditPurchaseViewModel.attachView(this);
+        addEditViewModel.attachView(this);
     }
 
     @NonNull

@@ -24,7 +24,7 @@ import ch.giantific.qwittig.presentation.finance.unpaid.itemmodels.CompsUnpaidIt
  */
 public class CompsUnpaidRecyclerAdapter extends BaseRecyclerAdapter {
 
-    private final CompsUnpaidViewModel mViewModel;
+    private final CompsUnpaidViewModel viewModel;
 
     /**
      * Constructs a new {@link CompsUnpaidRecyclerAdapter}.
@@ -34,7 +34,7 @@ public class CompsUnpaidRecyclerAdapter extends BaseRecyclerAdapter {
     public CompsUnpaidRecyclerAdapter(@NonNull CompsUnpaidViewModel viewModel) {
         super();
 
-        mViewModel = viewModel;
+        this.viewModel = viewModel;
     }
 
     @NonNull
@@ -60,7 +60,7 @@ public class CompsUnpaidRecyclerAdapter extends BaseRecyclerAdapter {
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        final CompsUnpaidItemModel itemModel = mViewModel.getItemAtPosition(position);
+        final CompsUnpaidItemModel itemModel = viewModel.getItemAtPosition(position);
         final int viewType = getItemViewType(position);
         switch (viewType) {
             case ViewType.CREDIT: {
@@ -68,7 +68,7 @@ public class CompsUnpaidRecyclerAdapter extends BaseRecyclerAdapter {
                 final RowCompUnpaidCreditBinding binding = row.getBinding();
 
                 binding.setItemModel(itemModel);
-                binding.setViewModel(mViewModel);
+                binding.setViewModel(viewModel);
                 binding.executePendingBindings();
                 break;
             }
@@ -86,11 +86,11 @@ public class CompsUnpaidRecyclerAdapter extends BaseRecyclerAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        return mViewModel.getItemViewType(position);
+        return viewModel.getItemViewType(position);
     }
 
     @Override
     public int getItemCount() {
-        return mViewModel.getItemCount();
+        return viewModel.getItemCount();
     }
 }

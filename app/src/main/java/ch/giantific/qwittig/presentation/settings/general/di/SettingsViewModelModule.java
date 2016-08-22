@@ -36,7 +36,7 @@ public class SettingsViewModelModule extends BaseViewModelModule {
                                                 @NonNull RxBus<Object> eventBus,
                                                 @NonNull UserRepository userRepository,
                                                 @NonNull GroupRepository groupRepository) {
-        return new SettingsViewModelImpl(mSavedState, navigator, eventBus, userRepository,
+        return new SettingsViewModelImpl(savedState, navigator, eventBus, userRepository,
                 groupRepository);
     }
 }

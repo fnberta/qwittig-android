@@ -29,51 +29,51 @@ public class PurchaseAddEditItemIdentity extends BaseObservable implements Parce
             return new PurchaseAddEditItemIdentity[size];
         }
     };
-    private final String mIdentityId;
-    private final String mNickname;
-    private final String mAvatar;
-    private boolean mSelected;
+    private final String identityId;
+    private final String nickname;
+    private final String avatar;
+    private boolean selected;
 
     public PurchaseAddEditItemIdentity(@NonNull String identityId, @NonNull String nickname,
                                        @Nullable String avatar, boolean selected) {
-        mIdentityId = identityId;
-        mNickname = nickname;
-        mAvatar = avatar;
-        mSelected = selected;
+        this.identityId = identityId;
+        this.nickname = nickname;
+        this.avatar = avatar;
+        this.selected = selected;
     }
 
     private PurchaseAddEditItemIdentity(Parcel in) {
-        mIdentityId = in.readString();
-        mNickname = in.readString();
-        mAvatar = in.readString();
-        mSelected = in.readByte() != 0;
+        identityId = in.readString();
+        nickname = in.readString();
+        avatar = in.readString();
+        selected = in.readByte() != 0;
     }
 
     public String getIdentityId() {
-        return mIdentityId;
+        return identityId;
     }
 
     @Bindable
     public String getNickname() {
-        return mNickname;
+        return nickname;
     }
 
     @Bindable
     public String getAvatar() {
-        return mAvatar;
+        return avatar;
     }
 
     @Bindable
     public float getAlpha() {
-        return mSelected ? 1f : DISABLED_ALPHA;
+        return selected ? 1f : DISABLED_ALPHA;
     }
 
     public boolean isSelected() {
-        return mSelected;
+        return selected;
     }
 
     public void setSelected(boolean selected) {
-        mSelected = selected;
+        this.selected = selected;
     }
 
     @Override
@@ -83,9 +83,9 @@ public class PurchaseAddEditItemIdentity extends BaseObservable implements Parce
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(mIdentityId);
-        dest.writeString(mNickname);
-        dest.writeString(mAvatar);
-        dest.writeByte(mSelected ? (byte) 1 : (byte) 0);
+        dest.writeString(identityId);
+        dest.writeString(nickname);
+        dest.writeString(avatar);
+        dest.writeByte(selected ? (byte) 1 : (byte) 0);
     }
 }

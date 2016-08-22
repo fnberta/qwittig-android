@@ -34,23 +34,23 @@ import ch.giantific.qwittig.presentation.common.fragments.dialogs.DiscardChanges
 public abstract class BaseTaskAddEditFragment<T> extends BaseRecyclerViewFragment<T, TaskAddEditViewModel, BaseFragment.ActivityListener<T>>
         implements TaskAddEditViewModel.ViewListener {
 
-    private FragmentTaskAddEditBinding mBinding;
-    private ListDragInteraction mItemTouchHelper;
+    private FragmentTaskAddEditBinding binding;
+    private ListDragInteraction itemTouchHelper;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentTaskAddEditBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentTaskAddEditBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel.attachView(this);
-        mViewModel.setListDragInteraction(mItemTouchHelper);
-        mBinding.setViewModel(mViewModel);
+        viewModel.attachView(this);
+        viewModel.setListDragInteraction(itemTouchHelper);
+        binding.setViewModel(viewModel);
         setupTimeFrameSpinner();
         setupIdentitiesSwipeHelper();
     }
@@ -58,12 +58,12 @@ public abstract class BaseTaskAddEditFragment<T> extends BaseRecyclerViewFragmen
     private void setupTimeFrameSpinner() {
         final StringResSpinnerAdapter timeFrameAdapter =
                 new StringResSpinnerAdapter(getActivity(), R.layout.spinner_item,
-                        mViewModel.getTimeFrames());
-        mBinding.spTaskTimeFrame.setAdapter(timeFrameAdapter);
+                        viewModel.getTimeFrames());
+        binding.spTaskTimeFrame.setAdapter(timeFrameAdapter);
     }
 
     private void setupIdentitiesSwipeHelper() {
-        mItemTouchHelper = new ListDragHelper(new ItemTouchHelper.SimpleCallback(
+        itemTouchHelper = new ListDragHelper(new ItemTouchHelper.SimpleCallback(
                 ItemTouchHelper.UP | ItemTouchHelper.DOWN,
                 ItemTouchHelper.START | ItemTouchHelper.END) {
             @Override
@@ -73,13 +73,13 @@ public abstract class BaseTaskAddEditFragment<T> extends BaseRecyclerViewFragmen
                     return false;
                 }
 
-                mViewModel.onItemMove(source.getAdapterPosition(), target.getAdapterPosition());
+                viewModel.onItemMove(source.getAdapterPosition(), target.getAdapterPosition());
                 return true;
             }
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                mViewModel.onItemDismiss(viewHolder.getAdapterPosition());
+                viewModel.onItemDismiss(viewHolder.getAdapterPosition());
             }
 
             @Override
@@ -87,17 +87,17 @@ public abstract class BaseTaskAddEditFragment<T> extends BaseRecyclerViewFragmen
                 return false;
             }
         });
-        mItemTouchHelper.attachToRecyclerView(mBinding.rvTaskUsersInvolved);
+        itemTouchHelper.attachToRecyclerView(binding.rvTaskUsersInvolved);
     }
 
     @Override
     protected RecyclerView getRecyclerView() {
-        return mBinding.rvTaskUsersInvolved;
+        return binding.rvTaskUsersInvolved;
     }
 
     @Override
     protected BaseRecyclerAdapter getRecyclerAdapter() {
-        return new TaskAddEditUsersRecyclerAdapter(mViewModel);
+        return new TaskAddEditUsersRecyclerAdapter(viewModel);
     }
 
     @Override

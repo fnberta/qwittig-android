@@ -36,14 +36,14 @@ import ch.giantific.qwittig.presentation.tasks.details.itemmodels.TaskDetailsIte
 public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsItemModel, TaskDetailsViewModel.ViewListener>
         implements TaskDetailsViewModel {
 
-    private final String mTaskId;
-    private final TaskRepository mTaskRepo;
-    private String mTitle;
+    private final String taskId;
+    private final TaskRepository taskRepo;
+    private String title;
     @StringRes
-    private int mTimeFrame;
-    private SpannableStringBuilder mIdentitiesText;
-    private String mCurrentIdentityId;
-    private boolean mCurrentUserResponsible;
+    private int timeFrame;
+    private SpannableStringBuilder identitiesText;
+    private String currentIdentityId;
+    private boolean currentUserResponsible;
 
     public TaskDetailsViewModelImpl(@Nullable Bundle savedState,
                                     @NonNull Navigator navigator,
@@ -53,8 +53,8 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsI
                                     @NonNull String taskId) {
         super(savedState, navigator, eventBus, userRepository);
 
-        mTaskRepo = taskRepository;
-        mTaskId = taskId;
+        taskRepo = taskRepository;
+        this.taskId = taskId;
     }
 
     @Override
@@ -76,45 +76,45 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsI
     @Override
     @Bindable
     public String getTitle() {
-        return mTitle;
+        return title;
     }
 
     @Override
     public void setTitle(@NonNull String title) {
-        mTitle = title;
+        this.title = title;
         notifyPropertyChanged(BR.title);
     }
 
     @StringRes
     @Bindable
     public int getTimeFrame() {
-        return mTimeFrame;
+        return timeFrame;
     }
 
     public void setTimeFrame(@StringRes int timeFrame) {
-        mTimeFrame = timeFrame;
+        this.timeFrame = timeFrame;
         notifyPropertyChanged(BR.timeFrame);
     }
 
     @Bindable
     public SpannableStringBuilder getIdentitiesText() {
-        return mIdentitiesText;
+        return identitiesText;
     }
 
     public void setIdentitiesText(@NonNull SpannableStringBuilder identitiesText) {
-        mIdentitiesText = identitiesText;
+        this.identitiesText = identitiesText;
         notifyPropertyChanged(BR.identitiesText);
     }
 
     @Override
     @Bindable
     public boolean isCurrentUserResponsible() {
-        return mCurrentUserResponsible;
+        return currentUserResponsible;
     }
 
     @Override
     public void setCurrentUserResponsible(boolean currentUserResponsible) {
-        mCurrentUserResponsible = currentUserResponsible;
+        this.currentUserResponsible = currentUserResponsible;
         notifyPropertyChanged(BR.currentUserResponsible);
     }
 
@@ -128,13 +128,13 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsI
         super.onDataError(e);
 
         setLoading(false);
-        mView.startPostponedEnterTransition();
-        mView.showMessage(R.string.toast_error_task_details_load);
+        view.startPostponedEnterTransition();
+        view.showMessage(R.string.toast_error_task_details_load);
     }
 
     //    @Override
 //    public void loadData() {
-//        getSubscriptions().add(mTaskRepo.getTask(mTaskId)
+//        getSubscriptions().add(taskRepo.getTask(taskId)
 //                .flatMapObservable(new Func1<Task, Observable<TaskHistoryEvent>>() {
 //                    @Override
 //                    public Observable<TaskHistoryEvent
@@ -144,7 +144,7 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsI
 //                        updateToolbarHeader();
 //                        updateToolbarMenu();
 //
-//                        return mTaskRepo.getTaskHistoryEvents(task);
+//                        return taskRepo.getTaskHistoryEvents(task);
 //                    }
 //                })
 //                .map(new Func1<TaskHistoryEvent, TaskDetailsHistoryItem>() {
@@ -157,28 +157,28 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsI
 //                    @Override
 //                    public void onStart() {
 //                        super.onStart();
-//                        mItems.clear();
+//                        items.clear();
 //                    }
 //
 //                    @Override
 //                    public void onCompleted() {
-//                        Collections.sort(mItems, Collections.reverseOrder());
-//                        mItems.add(0, new TaskDetailsHeaderItem(R.string.header_task_history));
-//                        mListInteraction.notifyDataSetChanged();
+//                        Collections.sort(items, Collections.reverseOrder());
+//                        items.add(0, new TaskDetailsHeaderItem(R.string.header_task_history));
+//                        listInteraction.notifyDataSetChanged();
 //                        setLoading(false);
-//                        mView.startPostponedEnterTransition();
+//                        view.startPostponedEnterTransition();
 //                    }
 //
 //                    @Override
 //                    public void onError(Throwable e) {
 //                        setLoading(false);
-//                        mView.startPostponedEnterTransition();
-//                        mView.showMessage(R.string.toast_error_task_details_load);
+//                        view.startPostponedEnterTransition();
+//                        view.showMessage(R.string.toast_error_task_details_load);
 //                    }
 //
 //                    @Override
 //                    public void onNext(TaskDetailsHistoryItem taskHistoryItem) {
-//                        mItems.add(taskHistoryItem);
+//                        items.add(taskHistoryItem);
 //                    }
 //                })
 //        );
@@ -221,15 +221,15 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsI
 
     private void updateIdentities(@NonNull Task task, @NonNull List<Identity> identities) {
         final String identityResponsible = task.getIdentityIdResponsible();
-        setCurrentUserResponsible(Objects.equals(mCurrentIdentityId, identityResponsible));
+        setCurrentUserResponsible(Objects.equals(currentIdentityId, identityResponsible));
 
-        final SpannableStringBuilder stringBuilder = mView.buildTaskIdentitiesString(identities,
+        final SpannableStringBuilder stringBuilder = view.buildTaskIdentitiesString(identities,
                 identityResponsible);
         setIdentitiesText(stringBuilder);
     }
 
     private void updateToolbarMenu(@NonNull String taskInitiator) {
-        boolean showEditOptions = Objects.equals(taskInitiator, mCurrentIdentityId);
+        boolean showEditOptions = Objects.equals(taskInitiator, currentIdentityId);
 
 //        if (showEditOptions) {
 //            final List<Identity> identities = mTask.getIdentities();
@@ -241,13 +241,13 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsI
 //            }
 //        }
 
-        mView.toggleEditOptions(showEditOptions);
+        view.toggleEditOptions(showEditOptions);
     }
 
     @Override
     public boolean isEmpty() {
-        for (int i = 0, itemsSize = mItems.size(); i < itemsSize; i++) {
-            if (mItems.get(i).getViewType() == TaskDetailsItemModel.Type.HISTORY) {
+        for (int i = 0, itemsSize = items.size(); i < itemsSize; i++) {
+            if (items.get(i).getViewType() == TaskDetailsItemModel.Type.HISTORY) {
                 return false;
             }
         }
@@ -257,32 +257,32 @@ public class TaskDetailsViewModelImpl extends ListViewModelBaseImpl<TaskDetailsI
 
     @Override
     public void onDeleteTaskMenuClick() {
-        mTaskRepo.deleteTask(mTaskId);
-        mNavigator.finish(TaskDetailsResult.TASK_DELETED);
+        taskRepo.deleteTask(taskId);
+        navigator.finish(TaskDetailsResult.TASK_DELETED);
     }
 
     @Override
     public void onEditTaskMenuClick() {
-        mNavigator.startTaskEdit(mTaskId);
+        navigator.startTaskEdit(taskId);
     }
 
     @Override
     public void onFabDoneClick(View view) {
 //        final String timeFrame = mTask.getTimeFrame();
 //        if (Objects.equals(timeFrame, TimeFrame.ONE_TIME)) {
-//            mTaskRepo.deleteTask(mTaskId);
-//            mNavigator.finish(TaskDetailsResult.TASK_DELETED);
+//            taskRepo.deleteTask(taskId);
+//            navigator.finish(TaskDetailsResult.TASK_DELETED);
 //            return;
 //        }
 //
-//        final TaskHistoryEvent2 newEvent = new TaskHistoryEvent2(mTaskId, mCurrentIdentityId, new Date());
-//        mTaskRepo.addHistoryEvent(newEvent);
+//        final TaskHistoryEvent2 newEvent = new TaskHistoryEvent2(taskId, currentIdentityId, new Date());
+//        taskRepo.addHistoryEvent(newEvent);
 //        updateToolbarHeader();
     }
 
 //    @SuppressLint("MissingSuperCall")
 //    @Override
 //    protected void onIdentitySelected(@NonNull Identity identitySelected) {
-//        mNavigator.finish(TaskDetailsResult.GROUP_CHANGED);
+//        navigator.finish(TaskDetailsResult.GROUP_CHANGED);
 //    }
 }

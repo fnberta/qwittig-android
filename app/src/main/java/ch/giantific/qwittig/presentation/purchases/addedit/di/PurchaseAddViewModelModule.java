@@ -41,7 +41,7 @@ public class PurchaseAddViewModelModule extends BaseViewModelModule {
                                                           @NonNull GroupRepository groupRepository,
                                                           @NonNull PurchaseRepository purchaseRepository,
                                                           @NonNull RemoteConfigHelper configHelper) {
-        return new PurchaseAddViewModelImpl(mSavedState, navigator, eventBus, userRepository,
+        return new PurchaseAddViewModelImpl(savedState, navigator, eventBus, userRepository,
                 groupRepository, purchaseRepository, configHelper);
     }
 
@@ -53,7 +53,7 @@ public class PurchaseAddViewModelModule extends BaseViewModelModule {
                                                             @NonNull GroupRepository groupRepository,
                                                             @NonNull PurchaseRepository purchaseRepository,
                                                             @NonNull RemoteConfigHelper configHelper) {
-        return new PurchaseAddOcrViewModelImpl(mSavedState, navigator, eventBus, userRepository,
+        return new PurchaseAddOcrViewModelImpl(savedState, navigator, eventBus, userRepository,
                 groupRepository, purchaseRepository, configHelper);
     }
 }

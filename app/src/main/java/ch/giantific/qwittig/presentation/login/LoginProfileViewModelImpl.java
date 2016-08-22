@@ -21,7 +21,6 @@ import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import rx.Observable;
 import rx.SingleSubscriber;
-import rx.Subscriber;
 import rx.functions.Func1;
 import timber.log.Timber;
 
@@ -34,21 +33,22 @@ public class LoginProfileViewModelImpl extends ViewModelBaseImpl<LoginProfileVie
     private static final String STATE_VALIDATE = "STATE_VALIDATE";
     private static final String STATE_AVATAR = "STATE_AVATAR";
     private static final String STATE_NICKNAME = "STATE_NICKNAME";
-    private boolean mWithInvitation;
-    private String mAvatar;
-    private String mNickname;
-    private boolean mValidate;
+
+    private boolean withInvitation;
+    private String avatar;
+    private String nickname;
+    private boolean validate;
 
     public LoginProfileViewModelImpl(@Nullable Bundle savedState,
                                      @NonNull Navigator navigator,
                                      @NonNull RxBus<Object> eventBus,
-                                     @NonNull UserRepository userRepository) {
-        super(savedState, navigator, eventBus, userRepository);
+                                     @NonNull UserRepository userRepo) {
+        super(savedState, navigator, eventBus, userRepo);
 
         if (savedState != null) {
-            mValidate = savedState.getBoolean(STATE_VALIDATE);
-            mAvatar = savedState.getString(STATE_AVATAR);
-            mNickname = savedState.getString(STATE_NICKNAME);
+            validate = savedState.getBoolean(STATE_VALIDATE);
+            avatar = savedState.getString(STATE_AVATAR);
+            nickname = savedState.getString(STATE_NICKNAME);
         }
     }
 
@@ -56,56 +56,56 @@ public class LoginProfileViewModelImpl extends ViewModelBaseImpl<LoginProfileVie
     public void saveState(@NonNull Bundle outState) {
         super.saveState(outState);
 
-        outState.putBoolean(STATE_VALIDATE, mValidate);
-        outState.putString(STATE_AVATAR, mAvatar);
-        outState.putString(STATE_NICKNAME, mNickname);
+        outState.putBoolean(STATE_VALIDATE, validate);
+        outState.putString(STATE_AVATAR, avatar);
+        outState.putString(STATE_NICKNAME, nickname);
     }
 
     @Override
     public void setWithInvitation(boolean withInvitation) {
-        mWithInvitation = withInvitation;
+        this.withInvitation = withInvitation;
     }
 
     @Override
     @Bindable
     public boolean isValidate() {
-        return mValidate;
+        return validate;
     }
 
     @Override
     public void setValidate(boolean validate) {
-        mValidate = validate;
+        this.validate = validate;
         notifyPropertyChanged(BR.validate);
     }
 
     @Override
     @Bindable
     public String getAvatar() {
-        return mAvatar;
+        return avatar;
     }
 
     @Override
     public void setAvatar(@NonNull String avatar) {
-        mAvatar = avatar;
+        this.avatar = avatar;
         notifyPropertyChanged(BR.avatar);
     }
 
     @Override
     @Bindable
     public String getNickname() {
-        return mNickname;
+        return nickname;
     }
 
     @Override
     public void setNickname(@NonNull String nickname) {
-        mNickname = nickname;
+        this.nickname = nickname;
         notifyPropertyChanged(BR.nickname);
     }
 
     @Override
     public void onNicknameChanged(CharSequence s, int start, int before, int count) {
-        mNickname = s.toString();
-        if (mValidate) {
+        nickname = s.toString();
+        if (validate) {
             notifyPropertyChanged(BR.validate);
         }
     }
@@ -113,28 +113,28 @@ public class LoginProfileViewModelImpl extends ViewModelBaseImpl<LoginProfileVie
     @Override
     @Bindable
     public boolean isNicknameComplete() {
-        return !TextUtils.isEmpty(mNickname);
+        return !TextUtils.isEmpty(nickname);
     }
 
     @Override
     protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
         super.onUserLoggedIn(currentUser);
 
-        getSubscriptions().add(mUserRepo.observeUser(currentUser.getUid())
+        getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
                 .flatMap(new Func1<User, Observable<Identity>>() {
                     @Override
                     public Observable<Identity> call(User user) {
-                        return mUserRepo.getIdentity(user.getCurrentIdentity()).toObservable();
+                        return userRepo.getIdentity(user.getCurrentIdentity()).toObservable();
                     }
                 })
                 .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override
                     public void onNext(Identity identity) {
-                        if (TextUtils.isEmpty(mNickname)) {
+                        if (TextUtils.isEmpty(nickname)) {
                             setNickname(identity.getNickname());
                         }
 
-                        if (TextUtils.isEmpty(mAvatar)) {
+                        if (TextUtils.isEmpty(avatar)) {
                             setAvatar(identity.getAvatar());
                         }
                     }
@@ -144,7 +144,7 @@ public class LoginProfileViewModelImpl extends ViewModelBaseImpl<LoginProfileVie
 
     @Override
     public void onAvatarClick(View view) {
-        mNavigator.startImagePicker();
+        navigator.startImagePicker();
     }
 
     @Override
@@ -158,21 +158,21 @@ public class LoginProfileViewModelImpl extends ViewModelBaseImpl<LoginProfileVie
             return;
         }
 
-        getSubscriptions().add(mUserRepo.updateProfile(mNickname, mAvatar, true)
+        getSubscriptions().add(userRepo.updateProfile(nickname, avatar, true)
                 .subscribe(new SingleSubscriber<User>() {
                     @Override
                     public void onSuccess(User user) {
-                        if (mWithInvitation) {
-                            mNavigator.finish(Activity.RESULT_OK);
+                        if (withInvitation) {
+                            navigator.finish(Activity.RESULT_OK);
                         } else {
-                            mView.showFirstGroupScreen();
+                            LoginProfileViewModelImpl.this.view.showFirstGroupScreen();
                         }
                     }
 
                     @Override
                     public void onError(Throwable error) {
                         Timber.e(error, "failed to save profile with error:");
-                        mView.showMessage(R.string.toast_error_profile);
+                        LoginProfileViewModelImpl.this.view.showMessage(R.string.toast_error_profile);
                     }
                 })
         );

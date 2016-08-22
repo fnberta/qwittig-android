@@ -14,6 +14,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -23,7 +24,7 @@ import javax.inject.Inject;
 import ch.giantific.qwittig.Constants;
 import ch.giantific.qwittig.data.helper.SharedPrefsHelper;
 import ch.giantific.qwittig.data.jobs.UploadReceiptJob;
-import ch.giantific.qwittig.data.queues.OcrPurchase;
+import ch.giantific.qwittig.data.queues.OcrQueue;
 import ch.giantific.qwittig.data.rest.CurrencyRates;
 import ch.giantific.qwittig.data.rest.ExchangeRates;
 import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent;
@@ -49,11 +50,12 @@ public class PurchaseRepository {
     public static final int HEIGHT = 2048;
     public static final int WIDTH = 1024;
     public static final String PATH_OCR_QUEUE = "queue/ocr/tasks";
-    private final DatabaseReference mDatabaseRef;
-    private final StorageReference mStorageRef;
-    private final FirebaseJobDispatcher mJobDispatcher;
-    private final ExchangeRates mExchangeRates;
-    private final SharedPrefsHelper mSharedPrefsHelper;
+
+    private final DatabaseReference databaseRef;
+    private final StorageReference storageRef;
+    private final FirebaseJobDispatcher jobDispatcher;
+    private final ExchangeRates exchangeRates;
+    private final SharedPrefsHelper sharedPrefsHelper;
 
     @Inject
     public PurchaseRepository(@NonNull FirebaseDatabase database,
@@ -61,22 +63,27 @@ public class PurchaseRepository {
                               @NonNull FirebaseJobDispatcher jobDispatcher,
                               @NonNull ExchangeRates exchangeRates,
                               @NonNull SharedPrefsHelper sharedPrefsHelper) {
-        mJobDispatcher = jobDispatcher;
-        mDatabaseRef = database.getReference();
-        mStorageRef = firebaseStorage.getReferenceFromUrl(Constants.STORAGE_URL).child("receipts");
-        mExchangeRates = exchangeRates;
-        mSharedPrefsHelper = sharedPrefsHelper;
+        this.jobDispatcher = jobDispatcher;
+        databaseRef = database.getReference();
+        storageRef = firebaseStorage.getReferenceFromUrl(Constants.STORAGE_URL).child("receipts");
+        this.exchangeRates = exchangeRates;
+        this.sharedPrefsHelper = sharedPrefsHelper;
     }
 
     public Observable<RxChildEvent<Purchase>> observePurchaseChildren(@NonNull final String groupId,
                                                                       @NonNull final String currentIdentityId,
                                                                       final boolean getDrafts) {
-        final String path = getDrafts ? Purchase.PATH_DRAFTS : Purchase.PATH_PURCHASES;
-        final Query query = mDatabaseRef.child(path).orderByChild(Purchase.PATH_GROUP).equalTo(groupId);
+        final Query query = getDrafts
+                ? databaseRef.child(Purchase.BASE_PATH_DRAFTS).child(currentIdentityId).orderByChild(Purchase.PATH_GROUP).equalTo(groupId)
+                : databaseRef.child(Purchase.BASE_PATH_PURCHASES).orderByChild(Purchase.PATH_GROUP).equalTo(groupId);
         return RxFirebaseDatabase.observeChildren(query, Purchase.class)
                 .filter(new Func1<RxChildEvent<Purchase>, Boolean>() {
                     @Override
                     public Boolean call(RxChildEvent<Purchase> event) {
+                        if (getDrafts) {
+                            return true;
+                        }
+
                         final Purchase purchase = event.getValue();
                         return Objects.equals(purchase.getBuyer(), currentIdentityId)
                                 || purchase.getIdentitiesIds().contains(currentIdentityId);
@@ -84,124 +91,137 @@ public class PurchaseRepository {
                 });
     }
 
-    public Observable<Purchase> observePurchase(@NonNull String purchaseId, boolean isDraft) {
-        final String path = isDraft ? Purchase.PATH_DRAFTS : Purchase.PATH_PURCHASES;
-        final Query query = mDatabaseRef.child(path).child(purchaseId);
-        return RxFirebaseDatabase.observeValue(query, Purchase.class);
-    }
-
-
-    public Observable<Purchase> getPurchases(@NonNull String groupId,
+    public Observable<Purchase> getPurchases(@NonNull final String groupId,
                                              @NonNull final String currentIdentityId,
-                                             boolean getDrafts) {
-        final String path = getDrafts ? Purchase.PATH_DRAFTS : Purchase.PATH_PURCHASES;
-        final Query query = mDatabaseRef.child(path).orderByChild(Purchase.PATH_GROUP).equalTo(groupId);
+                                             final boolean getDrafts) {
+        final Query query = getDrafts
+                ? databaseRef.child(Purchase.BASE_PATH_DRAFTS).child(currentIdentityId).orderByChild(Purchase.PATH_GROUP).equalTo(groupId)
+                : databaseRef.child(Purchase.BASE_PATH_PURCHASES).orderByChild(Purchase.PATH_GROUP).equalTo(groupId);
         return RxFirebaseDatabase.observeValuesOnce(query, Purchase.class)
                 .filter(new Func1<Purchase, Boolean>() {
                     @Override
                     public Boolean call(Purchase purchase) {
-                        return Objects.equals(purchase.getBuyer(), currentIdentityId)
+                        return getDrafts
+                                || Objects.equals(purchase.getBuyer(), currentIdentityId)
                                 || purchase.getIdentitiesIds().contains(currentIdentityId);
                     }
                 });
     }
 
-    public Single<Purchase> getPurchase(@NonNull String purchaseId, boolean isDraft) {
-        final String path = isDraft ? Purchase.PATH_DRAFTS : Purchase.PATH_PURCHASES;
-        final Query query = mDatabaseRef.child(path).child(purchaseId);
+    public Observable<Purchase> observePurchase(@NonNull String purchaseId) {
+        final Query query = databaseRef.child(Purchase.BASE_PATH_PURCHASES).child(purchaseId);
+        return RxFirebaseDatabase.observeValue(query, Purchase.class);
+    }
+
+    public Single<Purchase> getPurchase(@NonNull String purchaseId) {
+        final Query query = databaseRef.child(Purchase.BASE_PATH_PURCHASES).child(purchaseId);
+        return RxFirebaseDatabase.observeValueOnce(query, Purchase.class);
+    }
+
+    public Single<Purchase> getDraft(@NonNull String draftId, @NonNull String buyerId) {
+        final Query query = databaseRef.child(Purchase.BASE_PATH_DRAFTS).child(buyerId).child(draftId);
         return RxFirebaseDatabase.observeValueOnce(query, Purchase.class);
     }
 
     public Observable<Boolean> isDraftsAvailable(@NonNull final String groupId,
                                                  @NonNull final String currentIdentityId) {
-        final Query query = mDatabaseRef.child(Purchase.PATH_DRAFTS).orderByChild(Purchase.PATH_GROUP).equalTo(groupId);
+        final Query query = databaseRef.child(Purchase.BASE_PATH_DRAFTS).child(currentIdentityId)
+                .orderByChild(Purchase.PATH_GROUP).equalTo(groupId);
         return RxFirebaseDatabase.observeValues(query, Purchase.class)
                 .map(new Func1<List<Purchase>, Boolean>() {
                     @Override
                     public Boolean call(List<Purchase> drafts) {
-                        for (Purchase draft : drafts) {
-                            if (Objects.equals(draft.getBuyer(), currentIdentityId)) {
-                                return true;
-                            }
-                        }
-
-                        return false;
+                        return !drafts.isEmpty();
                     }
                 });
     }
 
     public void uploadReceiptForOcr(@NonNull String receiptBase64, @NonNull String userId) {
-        final String purchaseId = mDatabaseRef.child(Purchase.PATH_PURCHASES).push().getKey();
-        final OcrPurchase ocrPurchase = new OcrPurchase(receiptBase64, purchaseId, userId);
-        mDatabaseRef.child(PATH_OCR_QUEUE).push().setValue(ocrPurchase);
+        final String purchaseId = databaseRef.child(Purchase.BASE_PATH_PURCHASES).push().getKey();
+        final OcrQueue ocrQueue = new OcrQueue(receiptBase64, purchaseId, userId);
+        databaseRef.child(PATH_OCR_QUEUE).push().setValue(ocrQueue);
     }
 
     public void saveDraft(@NonNull Purchase purchase, @Nullable String purchaseId) {
+        final String buyerId = purchase.getBuyer();
         final String key = TextUtils.isEmpty(purchaseId)
-                ? mDatabaseRef.child(Purchase.PATH_DRAFTS).push().getKey()
+                ? databaseRef.child(Purchase.BASE_PATH_DRAFTS).child(buyerId).push().getKey()
                 : purchaseId;
-        mDatabaseRef.child(Purchase.PATH_DRAFTS).child(key).setValue(purchase);
+        databaseRef.child(Purchase.BASE_PATH_DRAFTS).child(buyerId).child(key).setValue(purchase);
+
         final String receipt = purchase.getReceipt();
         if (!TextUtils.isEmpty(receipt) && !Utils.isHttpsUrl(receipt)) {
-            UploadReceiptJob.schedule(mJobDispatcher, purchase.getId(), true, receipt);
+            UploadReceiptJob.schedule(jobDispatcher, purchase.getId(), buyerId, receipt);
         }
     }
 
     public void savePurchase(@NonNull Purchase purchase, @Nullable String purchaseId,
                              boolean wasDraft) {
         final String key = TextUtils.isEmpty(purchaseId)
-                ? mDatabaseRef.child(Purchase.PATH_PURCHASES).push().getKey()
+                ? databaseRef.child(Purchase.BASE_PATH_PURCHASES).push().getKey()
                 : purchaseId;
 
+        final String buyerId = purchase.getBuyer();
         if (wasDraft) {
-            // TODO: use updateChildren
-//            final Map<String, Object> childUpdates = new HashMap<>();
-//            childUpdates.put(Purchase2.PATH_DRAFTS + "/" + key, null);
-//            childUpdates.put(Purchase2.PATH_PURCHASES + "/" + key, purchase.toMap());
-//            mDatabaseRef.updateChildren(childUpdates);
-            mDatabaseRef.child(Purchase.PATH_DRAFTS).child(key).removeValue();
+            final Map<String, Object> childUpdates = new HashMap<>();
+            childUpdates.put(Purchase.BASE_PATH_DRAFTS + "/" + buyerId + "/" + key, null);
+            final Map<String, Object> purchaseMap = purchase.toMap();
+            purchaseMap.put(Purchase.PATH_DRAFT, false);
+            childUpdates.put(Purchase.BASE_PATH_PURCHASES + "/" + key, purchaseMap);
+            databaseRef.updateChildren(childUpdates);
+        } else {
+            databaseRef.child(Purchase.BASE_PATH_PURCHASES).child(key).setValue(purchase);
         }
-        mDatabaseRef.child(Purchase.PATH_PURCHASES).child(key).setValue(purchase);
 
         final String receipt = purchase.getReceipt();
         if (!TextUtils.isEmpty(receipt) && !Utils.isHttpsUrl(receipt)) {
-            UploadReceiptJob.schedule(mJobDispatcher, key, false, receipt);
+            UploadReceiptJob.schedule(jobDispatcher, key, buyerId, receipt);
         }
     }
 
     public Single<UploadTask.TaskSnapshot> uploadReceipt(@NonNull final String purchaseId,
-                                                         final boolean isDraft,
+                                                         @Nullable final String buyerId,
                                                          @NonNull String receipt) {
         final File file = new File(receipt);
-        final StorageReference receiptRef = mStorageRef.child(purchaseId);
+        final StorageReference receiptRef = storageRef.child(purchaseId);
         return RxFirebaseStorage.putFile(receiptRef, Uri.fromFile(file))
                 .doOnSuccess(new Action1<UploadTask.TaskSnapshot>() {
                     @Override
                     public void call(UploadTask.TaskSnapshot taskSnapshot) {
                         final Uri url = taskSnapshot.getDownloadUrl();
                         if (url != null) {
-                            final String path = isDraft ? Purchase.PATH_DRAFTS : Purchase.PATH_PURCHASES;
-                            mDatabaseRef.child(path)
-                                    .child(purchaseId)
-                                    .child(Purchase.PATH_RECEIPT)
-                                    .setValue(url.toString());
+                            if (TextUtils.isEmpty(buyerId)) {
+                                databaseRef.child(Purchase.BASE_PATH_PURCHASES)
+                                        .child(purchaseId)
+                                        .child(Purchase.PATH_RECEIPT)
+                                        .setValue(url.toString());
+                            } else {
+                                databaseRef.child(Purchase.BASE_PATH_DRAFTS)
+                                        .child(buyerId)
+                                        .child(purchaseId)
+                                        .child(Purchase.PATH_RECEIPT)
+                                        .setValue(url.toString());
+                            }
                         }
                     }
                 });
     }
 
-    public void deletePurchase(@NonNull String purchaseId, boolean isDraft) {
-        final String path = isDraft ? Purchase.PATH_DRAFTS : Purchase.PATH_PURCHASES;
-        mDatabaseRef.child(path).child(purchaseId).removeValue();
+    public void deletePurchase(@NonNull String purchaseId) {
+        databaseRef.child(Purchase.BASE_PATH_PURCHASES).child(purchaseId).removeValue();
+    }
+
+    public void deleteDraft(@NonNull String draftId, @NonNull String buyerId) {
+        databaseRef.child(Purchase.BASE_PATH_DRAFTS).child(buyerId).child(draftId).removeValue();
     }
 
     public void updateReadBy(@NonNull String purchaseId, @NonNull String currentIdentityId) {
-        mDatabaseRef.child(Purchase.PATH_PURCHASES).child(purchaseId)
+        databaseRef.child(Purchase.BASE_PATH_PURCHASES).child(purchaseId)
                 .child(Purchase.PATH_READ_BY).child(currentIdentityId).setValue(true);
     }
 
     public Single<OcrData> getOcrData(@NonNull String ocrDataId) {
-        final Query query = mDatabaseRef.child(OcrData.PATH).child(ocrDataId);
+        final Query query = databaseRef.child(OcrData.BASE_PATH).child(ocrDataId);
         return RxFirebaseDatabase.observeValueOnce(query, OcrData.class);
     }
 
@@ -209,7 +229,7 @@ public class PurchaseRepository {
                               int ratingMissing, int ratingSpeed, @NonNull String ocrDataId) {
         final OcrRating ocrRating = new OcrRating(satisfaction, ratingNames, ratingPrices,
                 ratingMissing, ratingSpeed, ocrDataId);
-        mDatabaseRef.child(OcrRating.PATH).push().setValue(ocrRating);
+        databaseRef.child(OcrRating.BASE_PATH).push().setValue(ocrRating);
     }
 
     public Single<Float> getExchangeRate(@NonNull String baseCurrency, @NonNull String currency) {
@@ -217,11 +237,11 @@ public class PurchaseRepository {
             return Single.just(1f);
         }
 
-        final float rate = mSharedPrefsHelper.getExchangeRate(currency);
+        final float rate = sharedPrefsHelper.getExchangeRate(currency);
         if (rate == 1) {
             return loadExchangeRates(baseCurrency, currency);
         } else {
-            if (mSharedPrefsHelper.isExchangeRatesFetchNeeded()) {
+            if (sharedPrefsHelper.isExchangeRatesFetchNeeded()) {
                 return loadExchangeRates(baseCurrency, currency);
             } else {
                 return Single.just(rate);
@@ -232,7 +252,7 @@ public class PurchaseRepository {
     @NonNull
     private Single<Float> loadExchangeRates(@NonNull String baseCurrency,
                                             @NonNull final String currency) {
-        return mExchangeRates.getRates(baseCurrency)
+        return exchangeRates.getRates(baseCurrency)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .map(new Func1<CurrencyRates, Map<String, Float>>() {
@@ -244,7 +264,7 @@ public class PurchaseRepository {
                 .doOnSuccess(new Action1<Map<String, Float>>() {
                     @Override
                     public void call(Map<String, Float> exchangeRates) {
-                        mSharedPrefsHelper.saveExchangeRates(exchangeRates);
+                        sharedPrefsHelper.saveExchangeRates(exchangeRates);
                     }
                 })
                 .map(new Func1<Map<String, Float>, Float>() {

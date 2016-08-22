@@ -25,8 +25,8 @@ import ch.giantific.qwittig.presentation.common.viewmodels.ViewModel;
 public abstract class BaseRecyclerViewFragment<U, T extends ViewModel, S extends BaseFragment.ActivityListener<U>>
         extends BaseFragment<U, T, S> {
 
-    protected RecyclerView mRecyclerView;
-    protected BaseRecyclerAdapter mRecyclerAdapter;
+    protected RecyclerView recyclerView;
+    protected BaseRecyclerAdapter recyclerAdapter;
 
     public BaseRecyclerViewFragment() {
     }
@@ -35,11 +35,11 @@ public abstract class BaseRecyclerViewFragment<U, T extends ViewModel, S extends
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mRecyclerView = getRecyclerView();
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerView.setHasFixedSize(true);
-        mRecyclerAdapter = getRecyclerAdapter();
-        mRecyclerView.setAdapter(mRecyclerAdapter);
+        recyclerView = getRecyclerView();
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setHasFixedSize(true);
+        recyclerAdapter = getRecyclerAdapter();
+        recyclerView.setAdapter(recyclerAdapter);
     }
 
     protected abstract RecyclerView getRecyclerView();
@@ -48,6 +48,6 @@ public abstract class BaseRecyclerViewFragment<U, T extends ViewModel, S extends
 
     @Override
     protected View getSnackbarView() {
-        return mRecyclerView;
+        return recyclerView;
     }
 }

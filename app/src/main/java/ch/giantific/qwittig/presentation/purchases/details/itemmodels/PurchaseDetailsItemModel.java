@@ -20,44 +20,44 @@ import static ch.giantific.qwittig.utils.ViewUtils.DISABLED_ALPHA;
  */
 public class PurchaseDetailsItemModel extends BaseObservable {
 
-    private final String mName;
-    private final String mPrice;
-    private final float mAlpha;
-    private final float mUserPercentage;
+    private final String name;
+    private final String price;
+    private final float alpha;
+    private final float percentage;
 
     public PurchaseDetailsItemModel(@NonNull Item item,
                                     @NonNull String currentIdentityId,
                                     @NonNull NumberFormat numberFormat) {
-        mName = item.getName();
-        mPrice = numberFormat.format(item.getPrice());
+        name = item.getName();
+        price = numberFormat.format(item.getPrice());
 
         final Set<String> identities = item.getIdentitiesIds();
         if (identities.contains(currentIdentityId)) {
-            mAlpha = 1f;
-            mUserPercentage = (1f / identities.size()) * 100;
+            alpha = 1f;
+            percentage = (1f / identities.size()) * 100;
         } else {
-            mAlpha = DISABLED_ALPHA;
-            mUserPercentage = 0;
+            alpha = DISABLED_ALPHA;
+            percentage = 0;
         }
     }
 
     @Bindable
     public String getName() {
-        return mName;
+        return name;
     }
 
     @Bindable
     public String getPrice() {
-        return mPrice;
+        return price;
     }
 
     @Bindable
     public float getAlpha() {
-        return mAlpha;
+        return alpha;
     }
 
     @Bindable
-    public float getUserPercentage() {
-        return mUserPercentage;
+    public float getPercentage() {
+        return percentage;
     }
 }

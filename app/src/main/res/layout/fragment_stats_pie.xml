@@ -14,54 +14,84 @@
 
         <variable
             name="viewModel"
-            type="ch.giantific.qwittig.presentation.stats.pie.StatsPieViewModel"
+            type="ch.giantific.qwittig.presentation.stats.StatsViewModel"
             />
     </data>
 
-    <FrameLayout
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:animateLayoutChanges="true"
-        tools:context=".presentation.stats.pie.stores.StatsStoresFragment"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:paddingBottom="@dimen/small_space"
+        android:transitionGroup="true"
         >
 
-        <ch.giantific.qwittig.presentation.stats.widgets.PieChart
-            android:id="@+id/pc_stores"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="@dimen/small_space"
-            android:layout_marginEnd="@dimen/key_line_1"
-            android:layout_marginStart="@dimen/key_line_1"
-            android:layout_marginTop="@dimen/small_space"
-            android:centerText="@{viewModel.centerText}"
-            android:visibility="@{viewModel.loading ? View.GONE : viewModel.dataEmpty ? View.GONE : !viewModel.sortUsers ? View.VISIBLE : View.GONE}"
-            app:pieData="@{viewModel.pieData}"
-            app:dataEmpty="@{viewModel.dataEmpty}"
-            />
+            android:animateLayoutChanges="true"
+            tools:context=".presentation.stats.StatsPieFragment"
+            >
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_stats_pie"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:paddingTop="@dimen/small_space"
-            android:scrollbars="vertical"
-            android:visibility="@{viewModel.loading ? View.GONE : viewModel.dataEmpty ? View.GONE : viewModel.sortUsers ? View.VISIBLE : View.GONE}"
-            />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/key_line_1"
+                android:layout_marginStart="@dimen/key_line_1"
+                android:layout_marginTop="@dimen/normal_space"
+                android:orientation="vertical"
+                android:visibility="@{viewModel.loading ? View.GONE : viewModel.empty ? View.GONE : View.VISIBLE}"
+                >
 
-        <include
-            android:id="@+id/stats_empty_view"
-            layout="@layout/include_stats_empty_view"
-            app:viewModel="@{viewModel}"
-            />
+                <TextView
+                    style="@style/TextAppearance.AppCompat.Headline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@{@string/stats_pie_total(viewModel.pieTotal)}"
+                    />
 
-        <include
-            android:id="@+id/stats_loading"
-            layout="@layout/include_progress"
-            app:viewModel="@{viewModel}"
-            />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="@dimen/normal_space"
+                    android:layout_marginTop="@dimen/normal_space"
+                    android:background="?android:attr/listDivider"
+                    />
 
-    </FrameLayout>
+                <ch.giantific.qwittig.presentation.stats.widgets.PieChart
+                    android:id="@+id/pc_stores"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:layout_marginBottom="@dimen/normal_space"
+                    app:pieData="@{viewModel.storesData}"
+                    />
+
+                <ch.giantific.qwittig.presentation.stats.widgets.PieChart
+                    android:id="@+id/pc_identities"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:layout_marginTop="@dimen/normal_space"
+                    app:pieData="@{viewModel.identitiesData}"
+                    />
+            </LinearLayout>
+
+            <include
+                android:id="@+id/stats_empty_view"
+                layout="@layout/include_stats_empty_view"
+                app:viewModel="@{viewModel}"
+                />
+
+            <include
+                android:id="@+id/stats_loading"
+                layout="@layout/include_progress"
+                app:viewModel="@{viewModel}"
+                />
+
+        </FrameLayout>
+
+    </android.support.v4.widget.NestedScrollView>
 
 </layout>
 

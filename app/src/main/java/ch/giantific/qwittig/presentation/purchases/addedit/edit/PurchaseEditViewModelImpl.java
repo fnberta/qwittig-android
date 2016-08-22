@@ -44,10 +44,11 @@ import rx.functions.Func1;
 public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
 
     private static final String STATE_ITEMS_SET = "STATE_ITEMS_SET";
-    final String mEditPurchaseId;
-    Purchase mEditPurchase;
-    private boolean mDeleteOldReceipt;
-    private boolean mOldValuesSet;
+
+    final String editPurchaseId;
+    Purchase editPurchase;
+    private boolean deleteOldReceipt;
+    private boolean oldValuesSet;
 
     @SuppressWarnings("SimplifiableIfStatement")
     public PurchaseEditViewModelImpl(@Nullable Bundle savedState,
@@ -61,12 +62,12 @@ public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
         super(savedState, navigator, eventBus, userRepository, groupRepository,
                 purchaseRepository, configHelper);
 
-        mEditPurchaseId = editPurchaseId;
+        this.editPurchaseId = editPurchaseId;
 
         if (savedState != null) {
-            mOldValuesSet = savedState.getBoolean(STATE_ITEMS_SET, false);
+            oldValuesSet = savedState.getBoolean(STATE_ITEMS_SET, false);
         } else {
-            mOldValuesSet = false;
+            oldValuesSet = false;
         }
     }
 
@@ -74,7 +75,7 @@ public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
     public void saveState(@NonNull Bundle outState) {
         super.saveState(outState);
 
-        outState.putBoolean(STATE_ITEMS_SET, mOldValuesSet);
+        outState.putBoolean(STATE_ITEMS_SET, oldValuesSet);
     }
 
     @Override
@@ -83,42 +84,42 @@ public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
                 .flatMap(new Func1<List<Identity>, Single<Purchase>>() {
                     @Override
                     public Single<Purchase> call(List<Identity> identities) {
-                        return mPurchaseRepo.getPurchase(mEditPurchaseId, isDraft());
+                        return getPurchase();
                     }
                 })
                 .doOnSuccess(new Action1<Purchase>() {
                     @Override
                     public void call(Purchase purchase) {
-                        mEditPurchase = purchase;
+                        editPurchase = purchase;
                     }
                 })
                 .subscribe(new SingleSubscriber<Purchase>() {
                     @Override
                     public void onSuccess(Purchase purchase) {
-                        if (mOldValuesSet) {
+                        if (oldValuesSet) {
                             updateRows();
                         } else {
                             setOldPurchaseValues(purchase);
                             setOldItemValues();
-                            mOldValuesSet = true;
+                            oldValuesSet = true;
                         }
                     }
 
                     @Override
                     public void onError(Throwable error) {
-                        mView.showMessage(R.string.toast_error_purchase_edit_load);
+                        view.showMessage(R.string.toast_error_purchase_edit_load);
                     }
                 })
         );
     }
 
-    protected boolean isDraft() {
-        return false;
+    protected Single<Purchase> getPurchase() {
+        return purchaseRepo.getPurchase(editPurchaseId);
     }
 
     private void setOldPurchaseValues(@NonNull Purchase purchase) {
         setNote(purchase.getNote());
-        mView.reloadOptionsMenu();
+        view.reloadOptionsMenu();
 
         setStore(purchase.getStore());
         setDate(purchase.getDateDate());
@@ -128,26 +129,26 @@ public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
     }
 
     private void setOldItemValues() {
-        final List<Item> oldItems = mEditPurchase.getItems();
+        final List<Item> oldItems = editPurchase.getItems();
         for (Item item : oldItems) {
             final Set<String> identities = item.getIdentitiesIds();
-            final String price = mMoneyFormatter.format(item.getPriceForeign(mExchangeRate));
+            final String price = moneyFormatter.format(item.getPriceForeign(exchangeRate));
             final PurchaseAddEditItem purchaseAddEditItem =
                     new PurchaseAddEditItem(item.getName(), price, getItemUsers(identities));
-            purchaseAddEditItem.setMoneyFormatter(mMoneyFormatter);
+            purchaseAddEditItem.setMoneyFormatter(moneyFormatter);
             purchaseAddEditItem.setPriceChangedListener(this);
             final int pos = getItemCount() - 2;
-            mItems.add(pos, purchaseAddEditItem);
-            mListInteraction.notifyItemInserted(pos);
+            items.add(pos, purchaseAddEditItem);
+            listInteraction.notifyItemInserted(pos);
         }
     }
 
     @Override
     protected void savePurchase(Purchase purchase, boolean asDraft) {
         if (asDraft) {
-            mPurchaseRepo.saveDraft(purchase, mEditPurchaseId);
+            purchaseRepo.saveDraft(purchase, editPurchaseId);
         } else {
-            mPurchaseRepo.savePurchase(purchase, mEditPurchaseId, isDraft());
+            purchaseRepo.savePurchase(purchase, editPurchaseId, false);
         }
     }
 
@@ -155,30 +156,30 @@ public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
     public void onDeleteReceiptMenuClick() {
         super.onDeleteReceiptMenuClick();
 
-        mDeleteOldReceipt = true;
+        deleteOldReceipt = true;
     }
 
     @Override
     public void onExitClick() {
         if (changesWereMade()) {
-            mView.showDiscardEditChangesDialog();
+            view.showDiscardEditChangesDialog();
         } else {
-            mNavigator.finish(Activity.RESULT_CANCELED);
+            navigator.finish(Activity.RESULT_CANCELED);
         }
     }
 
     @SuppressWarnings("RedundantIfStatement")
     private boolean changesWereMade() {
-        if (mEditPurchase.getDateDate().compareTo(mDate) != 0
-                || !Objects.equals(mEditPurchase.getStore(), mStore)
-                || !Objects.equals(mEditPurchase.getCurrency(), mCurrency)
-                || !Objects.equals(mEditPurchase.getNote(), mNote)) {
+        if (editPurchase.getDateDate().compareTo(date) != 0
+                || !Objects.equals(editPurchase.getStore(), store)
+                || !Objects.equals(editPurchase.getCurrency(), currency)
+                || !Objects.equals(editPurchase.getNote(), note)) {
             return true;
         }
 
-        final List<Item> oldItems = mEditPurchase.getItems();
-        for (int i = 0, size = mItems.size(), skipCount = 0; i < size; i++) {
-            final PurchaseAddEditItemModel addEditItem = mItems.get(i);
+        final List<Item> oldItems = editPurchase.getItems();
+        for (int i = 0, size = items.size(), skipCount = 0; i < size; i++) {
+            final PurchaseAddEditItemModel addEditItem = items.get(i);
             if (addEditItem.getType() != Type.ITEM) {
                 skipCount++;
                 continue;
@@ -195,7 +196,7 @@ public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
                 return true;
             }
 
-            final double oldPrice = itemOld.getPriceForeign(mEditPurchase.getExchangeRate());
+            final double oldPrice = itemOld.getPriceForeign(editPurchase.getExchangeRate());
             final double newPrice = purchaseAddEditItem.parsePrice();
             if (Math.abs(oldPrice - newPrice) >= MoneyUtils.MIN_DIFF) {
                 return true;
@@ -209,7 +210,7 @@ public class PurchaseEditViewModelImpl extends PurchaseAddViewModelImpl {
             }
         }
 
-        if (mDeleteOldReceipt || !Objects.equals(mReceipt, mEditPurchase.getReceipt())) {
+        if (deleteOldReceipt || !Objects.equals(receipt, editPurchase.getReceipt())) {
             return true;
         }
 

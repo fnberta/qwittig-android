@@ -11,40 +11,40 @@ import ch.giantific.qwittig.presentation.common.itemmodels.ChildItemModel;
  */
 public abstract class SortedListCallback<T extends ChildItemModel> extends SortedList.Callback<T> {
 
-    private ListInteraction mListInteraction;
+    private ListInteraction listInteraction;
 
     public SortedListCallback() {
     }
 
     public void setListInteraction(ListInteraction listInteraction) {
-        mListInteraction = listInteraction;
+        this.listInteraction = listInteraction;
     }
 
     @Override
     public void onInserted(int position, int count) {
-        if (mListInteraction != null) {
-            mListInteraction.notifyItemRangeInserted(position, count);
+        if (listInteraction != null) {
+            listInteraction.notifyItemRangeInserted(position, count);
         }
     }
 
     @Override
     public void onRemoved(int position, int count) {
-        if (mListInteraction != null) {
-            mListInteraction.notifyItemRangeRemoved(position, count);
+        if (listInteraction != null) {
+            listInteraction.notifyItemRangeRemoved(position, count);
         }
     }
 
     @Override
     public void onMoved(int fromPosition, int toPosition) {
-        if (mListInteraction != null) {
-            mListInteraction.notifyItemMoved(fromPosition, toPosition);
+        if (listInteraction != null) {
+            listInteraction.notifyItemMoved(fromPosition, toPosition);
         }
     }
 
     @Override
     public void onChanged(int position, int count) {
-        if (mListInteraction != null) {
-            mListInteraction.notifyItemRangeChanged(position, count);
+        if (listInteraction != null) {
+            listInteraction.notifyItemRangeChanged(position, count);
         }
     }
 

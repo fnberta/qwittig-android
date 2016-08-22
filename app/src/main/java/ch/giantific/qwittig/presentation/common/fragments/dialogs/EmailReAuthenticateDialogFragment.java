@@ -37,9 +37,10 @@ public class EmailReAuthenticateDialogFragment extends BaseDialogFragment<EmailR
     private static final String DIALOG_TAG = EmailReAuthenticateDialogFragment.class.getCanonicalName();
     private static final String KEY_MESSAGE = "MESSAGE";
     private static final String KEY_EMAIL = "EMAIL";
-    private int mMessageRes;
-    private String mEmail;
-    private DialogPromptEmailPasswordBinding mBinding;
+    @StringRes
+    private int messageRes;
+    private String email;
+    private DialogPromptEmailPasswordBinding binding;
 
     /**
      * Shows a new instance of {@link EmailReAuthenticateDialogFragment}.
@@ -65,8 +66,8 @@ public class EmailReAuthenticateDialogFragment extends BaseDialogFragment<EmailR
 
         final Bundle args = getArguments();
         if (args != null) {
-            mMessageRes = args.getInt(KEY_MESSAGE);
-            mEmail = args.getString(KEY_EMAIL, "");
+            messageRes = args.getInt(KEY_MESSAGE);
+            email = args.getString(KEY_EMAIL, "");
         }
     }
 
@@ -75,14 +76,14 @@ public class EmailReAuthenticateDialogFragment extends BaseDialogFragment<EmailR
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final FragmentActivity activity = getActivity();
         final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity);
-        mBinding = DialogPromptEmailPasswordBinding.inflate(activity.getLayoutInflater());
+        binding = DialogPromptEmailPasswordBinding.inflate(activity.getLayoutInflater());
 
-        if (!TextUtils.isEmpty(mEmail)) {
-            mBinding.etDialogEmail.setText(mEmail);
+        if (!TextUtils.isEmpty(email)) {
+            binding.etDialogEmail.setText(email);
         }
 
-        dialogBuilder.setMessage(mMessageRes)
-                .setView(mBinding.getRoot())
+        dialogBuilder.setMessage(messageRes)
+                .setView(binding.getRoot())
                 .setPositiveButton(R.string.dialog_positive_authenticate, null)
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                     @Override
@@ -114,22 +115,22 @@ public class EmailReAuthenticateDialogFragment extends BaseDialogFragment<EmailR
 
     private void validateInput() {
         boolean valid = true;
-        final String email = mBinding.etDialogEmail.getText().toString();
+        final String email = binding.etDialogEmail.getText().toString();
         if (!Utils.isEmailValid(email)) {
-            mBinding.tilDialogEmail.setError(getString(R.string.error_email));
+            binding.tilDialogEmail.setError(getString(R.string.error_email));
             valid = false;
         }
 
-        final String password = mBinding.etDialogPassword.getText().toString();
+        final String password = binding.etDialogPassword.getText().toString();
         if (!Utils.isPasswordValid(password)) {
-            mBinding.tilDialogPassword.setError(getString(R.string.error_password));
+            binding.tilDialogPassword.setError(getString(R.string.error_password));
             valid = false;
         }
 
         if (valid) {
-            mBinding.tilDialogEmail.setErrorEnabled(false);
-            mBinding.tilDialogPassword.setErrorEnabled(false);
-            mActivity.onValidEmailAndPasswordEntered(email, password);
+            binding.tilDialogEmail.setErrorEnabled(false);
+            binding.tilDialogPassword.setErrorEnabled(false);
+            activity.onValidEmailAndPasswordEntered(email, password);
             dismiss();
         }
     }

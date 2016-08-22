@@ -36,7 +36,7 @@ public class FinanceCompsUnpaidViewModelModule extends BaseViewModelModule {
                                                              @NonNull RxBus<Object> eventBus,
                                                              @NonNull UserRepository userRepository,
                                                              @NonNull CompensationRepository compsRepository) {
-        return new CompsUnpaidViewModelImpl(mSavedState, navigator, eventBus, userRepository,
+        return new CompsUnpaidViewModelImpl(savedState, navigator, eventBus, userRepository,
                 compsRepository);
     }
 }

@@ -26,13 +26,13 @@ import dagger.Provides;
 @Module
 public class FinanceCompsPaidViewModelModule extends BaseViewModelModule {
 
-    private final String mCompGroupId;
+    private final String compGroupId;
 
     public FinanceCompsPaidViewModelModule(@Nullable Bundle savedState,
                                            @Nullable String compGroupId) {
         super(savedState);
 
-        mCompGroupId = compGroupId;
+        this.compGroupId = compGroupId;
     }
 
     @PerActivity
@@ -41,7 +41,7 @@ public class FinanceCompsPaidViewModelModule extends BaseViewModelModule {
                                                          @NonNull RxBus<Object> eventBus,
                                                          @NonNull UserRepository userRepository,
                                                          @NonNull CompensationRepository compsRepository) {
-        return new CompsPaidViewModelImpl(mSavedState, navigator, eventBus, userRepository,
-                compsRepository, mCompGroupId);
+        return new CompsPaidViewModelImpl(savedState, navigator, eventBus, userRepository,
+                compsRepository, compGroupId);
     }
 }

@@ -46,7 +46,7 @@ public class LeaveGroupDialogFragment extends BaseDialogFragment<LeaveGroupDialo
         dialogBuilder.setMessage(message)
                 .setPositiveButton(R.string.dialog_positive_leave, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mActivity.onLeaveGroupSelected();
+                        activity.onLeaveGroupSelected();
                         dismiss();
                     }
                 })

@@ -24,7 +24,8 @@ public class LoginInvitationFragment extends BaseFragment<LoginComponent, LoginI
 
     private static final String KEY_GROUP_NAME = "GROUP_NAME";
     private static final String KEY_INVITER_NICKNAME = "INVITER_NICKNAME";
-    private FragmentLoginInvitationBinding mBinding;
+
+    private FragmentLoginInvitationBinding binding;
 
     public LoginInvitationFragment() {
         // required empty constructor
@@ -43,8 +44,8 @@ public class LoginInvitationFragment extends BaseFragment<LoginComponent, LoginI
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentLoginInvitationBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentLoginInvitationBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
@@ -52,10 +53,10 @@ public class LoginInvitationFragment extends BaseFragment<LoginComponent, LoginI
         super.onActivityCreated(savedInstanceState);
 
         final Bundle args = getArguments();
-        mViewModel.setGroupName(args.getString(KEY_GROUP_NAME, ""));
-        mViewModel.setInviterNickname(args.getString(KEY_INVITER_NICKNAME, ""));
-        mViewModel.attachView(this);
-        mBinding.setViewModel(mViewModel);
+        viewModel.setGroupName(args.getString(KEY_GROUP_NAME, ""));
+        viewModel.setInviterNickname(args.getString(KEY_INVITER_NICKNAME, ""));
+        viewModel.attachView(this);
+        binding.setViewModel(viewModel);
     }
 
     @Override
@@ -65,12 +66,12 @@ public class LoginInvitationFragment extends BaseFragment<LoginComponent, LoginI
 
     @Override
     protected View getSnackbarView() {
-        return mBinding.tvLoginInvitationHeader;
+        return binding.tvLoginInvitationHeader;
     }
 
     @Override
     public void showAccountsScreen(boolean accept) {
-        mActivity.popBackStack(accept);
+        activity.popBackStack(accept);
     }
 
     /**

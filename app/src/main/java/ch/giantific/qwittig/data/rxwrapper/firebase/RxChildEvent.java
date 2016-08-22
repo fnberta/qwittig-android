@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import ch.giantific.qwittig.data.rxwrapper.firebase.subscribers.ListenToChildEventsOnSubscribe;
 import ch.giantific.qwittig.domain.models.FirebaseModel;
 
 /**
@@ -15,31 +14,31 @@ import ch.giantific.qwittig.domain.models.FirebaseModel;
  */
 public class RxChildEvent<T extends FirebaseModel> {
 
-    private final int mEventType;
-    private final T mValue;
-    private final String mPreviousChildKey;
+    private final int eventType;
+    private final T value;
+    private final String previousChildKey;
 
     public RxChildEvent(@EventType int eventType,
                         @NonNull T value,
                         @Nullable String previousChildKey) {
-        mEventType = eventType;
-        mValue = value;
-        mPreviousChildKey = previousChildKey;
+        this.eventType = eventType;
+        this.value = value;
+        this.previousChildKey = previousChildKey;
     }
 
     @EventType
     public int getEventType() {
-        return mEventType;
+        return eventType;
     }
 
     @NonNull
     public T getValue() {
-        return mValue;
+        return value;
     }
 
     @Nullable
     public String getPreviousChildKey() {
-        return mPreviousChildKey;
+        return previousChildKey;
     }
 
     @IntDef({EventType.ADDED, EventType.CHANGED, EventType.REMOVED, EventType.MOVED})

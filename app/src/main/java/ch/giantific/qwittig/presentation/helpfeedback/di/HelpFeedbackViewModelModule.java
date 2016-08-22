@@ -33,6 +33,6 @@ public class HelpFeedbackViewModelModule extends BaseViewModelModule {
     HelpFeedbackViewModel providesHelpFeedbackViewModel(@NonNull Navigator navigator,
                                                         @NonNull RxBus<Object> eventBus,
                                                         @NonNull UserRepository userRepository) {
-        return new HelpFeedbackViewModelImpl(mSavedState, navigator, eventBus, userRepository);
+        return new HelpFeedbackViewModelImpl(savedState, navigator, eventBus, userRepository);
     }
 }

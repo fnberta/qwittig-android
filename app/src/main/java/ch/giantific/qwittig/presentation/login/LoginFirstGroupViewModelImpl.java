@@ -29,9 +29,7 @@ import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
 import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.Currency;
 import rx.Observable;
 import rx.SingleSubscriber;
-import rx.Subscriber;
 import rx.functions.Func1;
-import timber.log.Timber;
 
 /**
  * Created by fabio on 13.05.16.
@@ -42,30 +40,31 @@ public class LoginFirstGroupViewModelImpl extends ViewModelBaseImpl<LoginFirstGr
     private static final String STATE_VALIDATE = "STATE_VALIDATE";
     private static final String STATE_GROUP_NAME = "STATE_GROUP_NAME";
     private static final String STATE_GROUP_CURRENCY = "STATE_GROUP_CURRENCY";
-    private final RemoteConfigHelper mConfigHelper;
-    private final GroupRepository mGroupRepo;
-    private final List<Currency> mCurrencies;
-    private Identity mIdentity;
-    private boolean mValidate;
-    private String mGroupName;
-    private String mGroupCurrency;
+
+    private final RemoteConfigHelper configHelper;
+    private final GroupRepository groupRepo;
+    private final List<Currency> currencies;
+    private Identity identity;
+    private boolean validate;
+    private String groupName;
+    private String groupCurrency;
 
     public LoginFirstGroupViewModelImpl(@Nullable Bundle savedState,
                                         @NonNull Navigator navigator,
                                         @NonNull RxBus<Object> eventBus,
                                         @NonNull RemoteConfigHelper configHelper,
-                                        @NonNull UserRepository userRepository,
-                                        @Nullable GroupRepository groupRepository) {
-        super(savedState, navigator, eventBus, userRepository);
+                                        @NonNull UserRepository userRepo,
+                                        @Nullable GroupRepository groupRepo) {
+        super(savedState, navigator, eventBus, userRepo);
 
-        mConfigHelper = configHelper;
-        mGroupRepo = groupRepository;
-        mCurrencies = mConfigHelper.getSupportedCurrencies();
+        this.configHelper = configHelper;
+        this.groupRepo = groupRepo;
+        currencies = configHelper.getSupportedCurrencies();
 
         if (savedState != null) {
-            mValidate = savedState.getBoolean(STATE_VALIDATE);
-            mGroupName = savedState.getString(STATE_GROUP_NAME);
-            mGroupCurrency = savedState.getString(STATE_GROUP_CURRENCY);
+            validate = savedState.getBoolean(STATE_VALIDATE);
+            groupName = savedState.getString(STATE_GROUP_NAME);
+            groupCurrency = savedState.getString(STATE_GROUP_CURRENCY);
         }
     }
 
@@ -73,44 +72,44 @@ public class LoginFirstGroupViewModelImpl extends ViewModelBaseImpl<LoginFirstGr
     public void saveState(@NonNull Bundle outState) {
         super.saveState(outState);
 
-        outState.putBoolean(STATE_VALIDATE, mValidate);
-        outState.putString(STATE_GROUP_NAME, mGroupName);
+        outState.putBoolean(STATE_VALIDATE, validate);
+        outState.putString(STATE_GROUP_NAME, groupName);
     }
 
     @Override
     @Bindable
     public boolean isValidate() {
-        return mValidate;
+        return validate;
     }
 
     @Override
     public void setValidate(boolean validate) {
-        mValidate = validate;
+        this.validate = validate;
         notifyPropertyChanged(BR.validate);
     }
 
     @Override
     @Bindable
     public String getGroupName() {
-        return mGroupName;
+        return groupName;
     }
 
     @Override
     public void setGroupName(@NonNull String groupName) {
-        mGroupName = groupName;
+        this.groupName = groupName;
         notifyPropertyChanged(BR.groupName);
     }
 
     @Override
     @Bindable
     public boolean isGroupNameComplete() {
-        return !TextUtils.isEmpty(mGroupName);
+        return !TextUtils.isEmpty(groupName);
     }
 
     @Override
     public void onGroupNameChanged(CharSequence s, int start, int before, int count) {
-        mGroupName = s.toString();
-        if (mValidate) {
+        groupName = s.toString();
+        if (validate) {
             notifyPropertyChanged(BR.validate);
         }
     }
@@ -118,9 +117,9 @@ public class LoginFirstGroupViewModelImpl extends ViewModelBaseImpl<LoginFirstGr
     @Override
     @Bindable
     public int getSelectedGroupCurrency() {
-        for (Currency currency : mCurrencies) {
-            if (Objects.equals(currency.getCode(), mGroupCurrency)) {
-                return mCurrencies.indexOf(currency);
+        for (Currency currency : currencies) {
+            if (Objects.equals(currency.getCode(), groupCurrency)) {
+                return currencies.indexOf(currency);
             }
         }
 
@@ -129,7 +128,7 @@ public class LoginFirstGroupViewModelImpl extends ViewModelBaseImpl<LoginFirstGr
 
     @Override
     public void setGroupCurrency(@NonNull String groupCurrency) {
-        mGroupCurrency = groupCurrency;
+        this.groupCurrency = groupCurrency;
         notifyPropertyChanged(BR.selectedGroupCurrency);
     }
 
@@ -137,23 +136,23 @@ public class LoginFirstGroupViewModelImpl extends ViewModelBaseImpl<LoginFirstGr
     protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
         super.onUserLoggedIn(currentUser);
 
-        getSubscriptions().add(mUserRepo.observeUser(currentUser.getUid())
+        getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
                 .flatMap(new Func1<User, Observable<Identity>>() {
                     @Override
                     public Observable<Identity> call(User user) {
-                        return mUserRepo.getIdentity(user.getCurrentIdentity()).toObservable();
+                        return userRepo.getIdentity(user.getCurrentIdentity()).toObservable();
                     }
                 })
                 .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override
                     public void onNext(Identity identity) {
-                        mIdentity = identity;
+                        LoginFirstGroupViewModelImpl.this.identity = identity;
 
-                        if (TextUtils.isEmpty(mGroupName)) {
+                        if (TextUtils.isEmpty(groupName)) {
                             setGroupName(identity.getGroupName());
                         }
 
-                        if (TextUtils.isEmpty(mGroupCurrency)) {
+                        if (TextUtils.isEmpty(groupCurrency)) {
                             setGroupCurrency(identity.getGroupCurrency());
                         }
                     }
@@ -163,34 +162,34 @@ public class LoginFirstGroupViewModelImpl extends ViewModelBaseImpl<LoginFirstGr
 
     @Override
     public List<Currency> getSupportedCurrencies() {
-        return mCurrencies;
+        return currencies;
     }
 
     @Override
     public void onGroupCurrencySelected(@NonNull AdapterView<?> parent, View view, int position, long id) {
         final Currency currency = (Currency) parent.getItemAtPosition(position);
-        mGroupCurrency = currency.getCode();
+        groupCurrency = currency.getCode();
     }
 
     @Override
     public void onFabDoneClick(View view) {
-        if (!Objects.equals(mGroupName, mIdentity.getGroupName()) ||
-                !Objects.equals(mGroupCurrency, mIdentity.getGroupCurrency())) {
-            getSubscriptions().add(mGroupRepo.updateGroupDetails(mIdentity.getGroup(), mGroupName, mGroupCurrency)
+        if (!Objects.equals(groupName, identity.getGroupName()) ||
+                !Objects.equals(groupCurrency, identity.getGroupCurrency())) {
+            getSubscriptions().add(groupRepo.updateGroupDetails(identity.getGroup(), groupName, groupCurrency)
                     .subscribe(new SingleSubscriber<Group>() {
                         @Override
                         public void onSuccess(Group value) {
-                            mNavigator.finish(Activity.RESULT_OK);
+                            navigator.finish(Activity.RESULT_OK);
                         }
 
                         @Override
                         public void onError(Throwable error) {
-                            mView.showMessage(R.string.toast_error_profile);
+                            LoginFirstGroupViewModelImpl.this.view.showMessage(R.string.toast_error_profile);
                         }
                     })
             );
         } else {
-            mNavigator.finish(Activity.RESULT_OK);
+            navigator.finish(Activity.RESULT_OK);
         }
     }
 }

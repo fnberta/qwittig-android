@@ -67,7 +67,7 @@ public class NoteDialogFragment extends BaseDialogFragment<NoteDialogFragment.Di
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         final String note = binding.etDialogPurchaseNote.getText().toString();
-                        mActivity.onNoteSet(note);
+                        NoteDialogFragment.this.activity.onNoteSet(note);
                     }
                 });
 
@@ -89,7 +89,7 @@ public class NoteDialogFragment extends BaseDialogFragment<NoteDialogFragment.Di
                     .setNegativeButton(R.string.action_delete, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            mActivity.onDeleteNote();
+                            NoteDialogFragment.this.activity.onDeleteNote();
                         }
                     });
         }

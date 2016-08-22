@@ -32,37 +32,37 @@ public class CircleDisplay extends View {
     /**
      * start angle of the view
      */
-    private float mStartAngle = 270f;
+    private float startAngle = 270f;
     /**
      * angle that represents the displayed value
      */
-    private float mAngle = 0f;
+    private float angle = 0f;
     /**
      * current state of the animation
      */
-    private float mPhase = 0f;
+    private float phase = 0f;
     /**
      * the currently displayed value, can be percent or actual value
      */
-    private float mValue = 0f;
+    private float value = 0f;
     /**
      * represents the alpha value used for the remainder bar
      */
-    private int mDimAlpha = DISABLED_ALPHA_RGB;
+    private int dimAlpha = DISABLED_ALPHA_RGB;
     /**
      * rect object that represents the bounds of the view, needed for drawing
      * the circle
      */
-    private RectF mCircleBox = new RectF();
-    private Paint mArcPaint;
+    private RectF circleBox = new RectF();
+    private Paint arcPaint;
     /**
      * object animator for doing the drawing animations
      */
-    private ObjectAnimator mDrawAnimator;
+    private ObjectAnimator drawAnimator;
     /**
      * boolean flag that indicates if the box has been setup
      */
-    private boolean mBoxSetup = false;
+    private boolean boxSetup = false;
 
     public CircleDisplay(Context context) {
         super(context);
@@ -83,20 +83,20 @@ public class CircleDisplay extends View {
     }
 
     private void init(Context context) {
-        mBoxSetup = false;
+        boxSetup = false;
 
-        mArcPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mArcPaint.setStyle(Style.FILL);
-        mArcPaint.setColor(getColor(context));
+        arcPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        arcPaint.setStyle(Style.FILL);
+        arcPaint.setColor(getColor(context));
 
-        mDrawAnimator = ObjectAnimator.ofFloat(this, "phase", mPhase, 1.0f).setDuration(1000);
-        mDrawAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+        drawAnimator = ObjectAnimator.ofFloat(this, "phase", phase, 1.0f).setDuration(1000);
+        drawAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
     }
 
     @ColorInt
     private int getColor(Context context) {
         final TypedValue typedValue = new TypedValue();
-        final TypedArray a = context.obtainStyledAttributes(typedValue.data, new int[] { R.attr.colorPrimary });
+        final TypedArray a = context.obtainStyledAttributes(typedValue.data, new int[]{R.attr.colorPrimary});
         final int color = a.getColor(0, 0);
         a.recycle();
 
@@ -107,8 +107,8 @@ public class CircleDisplay extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        if (!mBoxSetup) {
-            mBoxSetup = true;
+        if (!boxSetup) {
+            boxSetup = true;
             setupBox();
         }
 
@@ -122,11 +122,11 @@ public class CircleDisplay extends View {
      * @param c
      */
     private void drawWholeCircle(Canvas c) {
-        mArcPaint.setAlpha(mDimAlpha);
+        arcPaint.setAlpha(dimAlpha);
 
         float r = getRadius();
 
-        c.drawCircle(getWidth() / 2, getHeight() / 2, r, mArcPaint);
+        c.drawCircle(getWidth() / 2, getHeight() / 2, r, arcPaint);
     }
 
     /**
@@ -135,11 +135,11 @@ public class CircleDisplay extends View {
      * @param c
      */
     private void drawValue(Canvas c) {
-        mArcPaint.setAlpha(255);
+        arcPaint.setAlpha(255);
 
-        float angle = mAngle * mPhase;
+        float angle = this.angle * phase;
 
-        c.drawArc(mCircleBox, mStartAngle, angle, true, mArcPaint);
+        c.drawArc(circleBox, startAngle, angle, true, arcPaint);
     }
 
     /**
@@ -152,7 +152,7 @@ public class CircleDisplay extends View {
 
         float diameter = getDiameter();
 
-        mCircleBox = new RectF(width / 2 - diameter / 2, height / 2 - diameter / 2, width / 2
+        circleBox = new RectF(width / 2 - diameter / 2, height / 2 - diameter / 2, width / 2
                 + diameter / 2, height / 2 + diameter / 2);
     }
 
@@ -164,13 +164,13 @@ public class CircleDisplay extends View {
      * @param animated
      */
     public void showValue(float toShow, float total, boolean animated) {
-        mAngle = calcAngle(toShow / total * 100f);
-        mValue = toShow;
+        angle = calcAngle(toShow / total * 100f);
+        value = toShow;
 
         if (animated)
             startAnim();
         else {
-            mPhase = 1f;
+            phase = 1f;
             invalidate();
         }
     }
@@ -182,12 +182,12 @@ public class CircleDisplay extends View {
      * @return
      */
     public float getValue() {
-        return mValue;
+        return value;
     }
 
     public void startAnim() {
-        mPhase = 0f;
-        mDrawAnimator.start();
+        phase = 0f;
+        drawAnimator.start();
     }
 
     /**
@@ -196,7 +196,7 @@ public class CircleDisplay extends View {
      * @param durationmillis
      */
     public void setAnimDuration(int durationmillis) {
-        mDrawAnimator.setDuration(durationmillis);
+        drawAnimator.setDuration(durationmillis);
     }
 
     /**
@@ -233,7 +233,7 @@ public class CircleDisplay extends View {
      * @param angle
      */
     public void setStartAngle(float angle) {
-        mStartAngle = angle;
+        startAngle = angle;
     }
 
     /**
@@ -242,7 +242,7 @@ public class CircleDisplay extends View {
      * @param color
      */
     public void setColor(int color) {
-        mArcPaint.setColor(color);
+        arcPaint.setColor(color);
     }
 
     /**
@@ -252,6 +252,6 @@ public class CircleDisplay extends View {
      * @param alpha
      */
     public void setDimAlpha(int alpha) {
-        mDimAlpha = alpha;
+        dimAlpha = alpha;
     }
 }

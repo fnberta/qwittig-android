@@ -17,25 +17,26 @@ public class SharedPrefsHelper {
 
     private static final String EXCHANGE_RATE_LAST_FETCHED_TIME = "EXCHANGE_RATE_LAST_FETCHED_TIME";
     private static final long EXCHANGE_RATE_REFRESH_INTERVAL = 24 * 60 * 60 * 1000;
-    private SharedPreferences mSharedPrefs;
+
+    private SharedPreferences sharedPrefs;
 
     @Inject
     public SharedPrefsHelper(@NonNull SharedPreferences sharedPrefs) {
-        mSharedPrefs = sharedPrefs;
+        this.sharedPrefs = sharedPrefs;
     }
 
     public boolean isExchangeRatesFetchNeeded() {
-        long lastFetched = mSharedPrefs.getLong(EXCHANGE_RATE_LAST_FETCHED_TIME, 0);
+        long lastFetched = sharedPrefs.getLong(EXCHANGE_RATE_LAST_FETCHED_TIME, 0);
         long currentTime = System.currentTimeMillis();
         return (currentTime - lastFetched) > EXCHANGE_RATE_REFRESH_INTERVAL;
     }
 
     public float getExchangeRate(@NonNull String currencyCode) {
-        return mSharedPrefs.getFloat(currencyCode, 1);
+        return sharedPrefs.getFloat(currencyCode, 1);
     }
 
     public void saveExchangeRates(@NonNull Map<String, Float> exchangeRates) {
-        final SharedPreferences.Editor editor = mSharedPrefs.edit();
+        final SharedPreferences.Editor editor = sharedPrefs.edit();
         for (Map.Entry<String, Float> exchangeRate : exchangeRates.entrySet()) {
             final BigDecimal roundedExchangeRate =
                     MoneyUtils.roundExchangeRate(1 / exchangeRate.getValue());

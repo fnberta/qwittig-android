@@ -26,10 +26,10 @@ import ch.giantific.qwittig.presentation.settings.groupusers.users.itemmodels.Se
  */
 public class SettingsUsersRecyclerAdapter extends BaseRecyclerAdapter<SettingsUsersRecyclerAdapter.GroupUserRow> {
 
-    private final SettingsUsersViewModel mViewModel;
+    private final SettingsUsersViewModel viewModel;
 
     public SettingsUsersRecyclerAdapter(@NonNull SettingsUsersViewModel viewModel) {
-        mViewModel = viewModel;
+        this.viewModel = viewModel;
     }
 
     @Override
@@ -37,13 +37,13 @@ public class SettingsUsersRecyclerAdapter extends BaseRecyclerAdapter<SettingsUs
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         final RowSettingsUsersUserBinding binding =
                 RowSettingsUsersUserBinding.inflate(inflater, parent, false);
-        return new GroupUserRow(binding, mViewModel);
+        return new GroupUserRow(binding, viewModel);
     }
 
     @Override
     public void onBindViewHolder(GroupUserRow holder, int position) {
         final RowSettingsUsersUserBinding binding = holder.getBinding();
-        final SettingsUsersUserItemModel viewModel = mViewModel.getItemAtPosition(position);
+        final SettingsUsersUserItemModel viewModel = this.viewModel.getItemAtPosition(position);
 
         holder.setMenuVisibility(viewModel.isPending());
         binding.setViewModel(viewModel);
@@ -52,7 +52,7 @@ public class SettingsUsersRecyclerAdapter extends BaseRecyclerAdapter<SettingsUs
 
     @Override
     public int getItemCount() {
-        return mViewModel.getItemCount();
+        return viewModel.getItemCount();
     }
 
     public interface AdapterInteractionListener {

@@ -6,7 +6,6 @@ package ch.giantific.qwittig.presentation.purchases.list.drafts.itemmodels;
 
 import android.databinding.Bindable;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.text.NumberFormat;
 import java.util.Date;
@@ -22,56 +21,62 @@ import ch.giantific.qwittig.utils.DateUtils;
 public class DraftsItemModel extends BaseChildItemModel
         implements Comparable<DraftsItemModel> {
 
-    private final Date mDate;
-    private final String mDateMonthDay;
-    private final String mStore;
-    private final String mTotal;
-    private boolean mSelected;
+    private final Date date;
+    private final String dateMonthDay;
+    private final String store;
+    private final String total;
+    private final String buyer;
+    private boolean selected;
 
     public DraftsItemModel(@EventType int eventType,
                            @NonNull Purchase draft,
-                           boolean isSelected,
+                           boolean selected,
                            @NonNull NumberFormat numberFormat) {
         super(eventType, draft.getId());
 
-        mDate = draft.getDateDate();
-        mDateMonthDay = DateUtils.formatMonthDayLineSeparated(mDate);
-        mStore = draft.getStore();
-        mTotal = numberFormat.format(draft.getTotal());
-        mSelected = isSelected;
+        date = draft.getDateDate();
+        dateMonthDay = DateUtils.formatMonthDayLineSeparated(date);
+        store = draft.getStore();
+        total = numberFormat.format(draft.getTotal());
+        buyer = draft.getBuyer();
+        this.selected = selected;
     }
 
     public Date getDate() {
-        return mDate;
+        return date;
     }
 
     @Bindable
     public String getDateMonthDay() {
-        return mDateMonthDay;
+        return dateMonthDay;
     }
 
     @Bindable
     public String getStore() {
-        return mStore;
+        return store;
     }
 
     @Bindable
     public String getTotal() {
-        return mTotal;
+        return total;
+    }
+
+    public String getBuyer() {
+        return buyer;
     }
 
     @Bindable
     public boolean isSelected() {
-        return mSelected;
+        return selected;
     }
 
     public void setSelected(boolean selected) {
-        mSelected = selected;
+        this.selected = selected;
     }
 
     @Override
     public int compareTo(@NonNull DraftsItemModel itemModel) {
-        return mDate.compareTo(itemModel.getDate());
+        return date.compareTo(itemModel.getDate());
     }
 
 
@@ -82,18 +87,18 @@ public class DraftsItemModel extends BaseChildItemModel
 
         final DraftsItemModel that = (DraftsItemModel) o;
 
-        if (mDate != null ? !mDate.equals(that.getDate()) : that.getDate() != null) return false;
-        if (mStore != null ? !mStore.equals(that.getStore()) : that.getStore() != null)
+        if (date != null ? !date.equals(that.getDate()) : that.getDate() != null) return false;
+        if (store != null ? !store.equals(that.getStore()) : that.getStore() != null)
             return false;
-        return mTotal != null ? mTotal.equals(that.getTotal()) : that.getTotal() == null;
+        return total != null ? total.equals(that.getTotal()) : that.getTotal() == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = mDate != null ? mDate.hashCode() : 0;
-        result = 31 * result + (mStore != null ? mStore.hashCode() : 0);
-        result = 31 * result + (mTotal != null ? mTotal.hashCode() : 0);
+        int result = date != null ? date.hashCode() : 0;
+        result = 31 * result + (store != null ? store.hashCode() : 0);
+        result = 31 * result + (total != null ? total.hashCode() : 0);
         return result;
     }
 }

@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
-import com.google.firebase.database.PropertyName;
 import com.google.firebase.database.ServerValue;
 
 import java.util.Date;
@@ -16,31 +15,29 @@ import java.util.Map;
 @IgnoreExtraProperties
 public class OcrData implements FirebaseModel {
 
-    public static final String PATH = "ocrData";
+    public static final String BASE_PATH = "ocrData";
+
     public static final String PATH_USER = "user";
     public static final String PATH_DATA = "data";
     public static final String PATH_RECEIPT = "receipt";
-    private String mId;
-    @PropertyName(PATH_CREATED_AT)
-    private long mCreatedAt;
-    @PropertyName(PATH_USER)
-    private String mUser;
-    @PropertyName(PATH_DATA)
-    private Map<String, Object> mData;
-    @PropertyName(PATH_RECEIPT)
-    private String mReceipt;
+
+    private String id;
+    private long createdAt;
+    private String user;
+    private Map<String, Object> data;
+    private String receipt;
 
     public OcrData() {
         // required for firebase de-/serialization
     }
 
     public String getId() {
-        return mId;
+        return id;
     }
 
     @Override
     public void setId(@NonNull String id) {
-        mId = id;
+        this.id = id;
     }
 
     @Override
@@ -50,18 +47,18 @@ public class OcrData implements FirebaseModel {
 
     @Exclude
     public Date getCreatedAtDate() {
-        return new Date(mCreatedAt);
+        return new Date(createdAt);
     }
 
     public String getUser() {
-        return mUser;
+        return user;
     }
 
     public Map<String, Object> getData() {
-        return mData;
+        return data;
     }
 
     public String getReceipt() {
-        return mReceipt;
+        return receipt;
     }
 }

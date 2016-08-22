@@ -33,14 +33,14 @@ public abstract class BaseTaskAddEditActivity<T> extends BaseActivity<T>
         DiscardChangesDialogFragment.DialogInteractionListener {
 
     @Inject
-    TaskAddEditViewModel mAddEditViewModel;
-    private ActivityTaskAddEditBinding mBinding;
+    TaskAddEditViewModel addEditViewModel;
+    private ActivityTaskAddEditBinding binding;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_task_add_edit);
-        mBinding.setViewModel(mAddEditViewModel);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_task_add_edit);
+        binding.setViewModel(addEditViewModel);
 
         final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -52,18 +52,18 @@ public abstract class BaseTaskAddEditActivity<T> extends BaseActivity<T>
             if (Utils.isRunningLollipopAndHigher()) {
                 addActivityTransitionListener();
             } else {
-                mBinding.fabTaskSave.show();
+                binding.fabTaskSave.show();
             }
 
             addFragment();
         } else {
-            mBinding.fabTaskSave.show();
+            binding.fabTaskSave.show();
         }
     }
 
     @Override
     protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{mAddEditViewModel});
+        return Arrays.asList(new ViewModel[]{addEditViewModel});
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -75,7 +75,7 @@ public abstract class BaseTaskAddEditActivity<T> extends BaseActivity<T>
                 super.onTransitionEnd(transition);
                 transition.removeListener(this);
 
-                mBinding.fabTaskSave.show();
+                binding.fabTaskSave.show();
             }
         });
     }
@@ -93,7 +93,7 @@ public abstract class BaseTaskAddEditActivity<T> extends BaseActivity<T>
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home:
-                mAddEditViewModel.onUpOrBackClick();
+                addEditViewModel.onUpOrBackClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -102,16 +102,16 @@ public abstract class BaseTaskAddEditActivity<T> extends BaseActivity<T>
 
     @Override
     public void onDiscardChangesSelected() {
-        mAddEditViewModel.onDiscardChangesSelected();
+        addEditViewModel.onDiscardChangesSelected();
     }
 
     @Override
     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-        mAddEditViewModel.onDateSet(view, year, monthOfYear, dayOfMonth);
+        addEditViewModel.onDateSet(view, year, monthOfYear, dayOfMonth);
     }
 
     @Override
     public void onBackPressed() {
-        mAddEditViewModel.onUpOrBackClick();
+        addEditViewModel.onUpOrBackClick();
     }
 }

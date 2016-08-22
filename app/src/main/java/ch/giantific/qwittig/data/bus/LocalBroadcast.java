@@ -29,11 +29,12 @@ public class LocalBroadcast {
     public static final String INTENT_EXTRA_SUCCESSFUL = BuildConfig.APPLICATION_ID + ".intents.SUCCESSFUL";
     public static final String INTENT_EXTRA_COMPENSATION_PAID = BuildConfig.APPLICATION_ID + ".intents.COMPENSATION_PAID";
     public static final String INTENT_EXTRA_OCR_PURCHASE_ID = BuildConfig.APPLICATION_ID + ".intents.OCR_PURCHASE_ID";
-    private final LocalBroadcastManager mBroadcastManager;
+
+    private final LocalBroadcastManager broadcastManager;
 
     @Inject
     public LocalBroadcast(@NonNull LocalBroadcastManager broadcastManager) {
-        mBroadcastManager = broadcastManager;
+        this.broadcastManager = broadcastManager;
     }
 
     /**
@@ -106,7 +107,7 @@ public class LocalBroadcast {
     }
 
     private void send(@NonNull Intent intent) {
-        mBroadcastManager.sendBroadcast(intent);
+        broadcastManager.sendBroadcast(intent);
     }
 
     @IntDef({DataType.ALL, DataType.PURCHASES_UPDATED, DataType.IDENTITIES_UPDATED,

@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Fabio Berta
  */
 
-package ch.giantific.qwittig.utils;
+package ch.giantific.qwittig.presentation.common;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -28,6 +28,7 @@ import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.bumptech.glide.request.target.Target;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.formatter.AxisValueFormatter;
 
 import ch.berta.fabio.fabspeeddial.FabMenu;
 import ch.giantific.qwittig.R;
@@ -38,19 +39,16 @@ import ch.giantific.qwittig.presentation.purchases.details.widgets.CircleDisplay
 import ch.giantific.qwittig.presentation.settings.profile.AvatarLoadListener;
 import ch.giantific.qwittig.presentation.stats.widgets.BarChart;
 import ch.giantific.qwittig.presentation.stats.widgets.PieChart;
+import ch.giantific.qwittig.utils.AvatarUtils;
+import ch.giantific.qwittig.utils.Utils;
 
 /**
  * Contains generic binding adapters.
  */
-public class BindingUtils {
+public class BindingAdapters {
 
-    private BindingUtils() {
+    private BindingAdapters() {
         // class cannot be instantiated
-    }
-
-    @BindingAdapter({"colorScheme"})
-    public static void setColorScheme(SwipeRefreshLayout view, int[] colorScheme) {
-        view.setColorSchemeColors(colorScheme);
     }
 
     @BindingAdapter({"bold"})
@@ -281,33 +279,37 @@ public class BindingUtils {
         }
     }
 
-    @BindingAdapter({"barData", "dataEmpty"})
-    public static void setBarChartData(BarChart view, BarData barData, boolean dataEmpty) {
+    @BindingAdapter({"barData"})
+    public static void setBarChartData(BarChart view, BarData barData) {
         if (barData != null) {
             view.setData(barData);
-            if (!view.isEmpty() && !dataEmpty) {
+            if (!view.isEmpty()) {
                 view.animateY(BarChart.ANIMATION_Y_TIME);
             }
         }
     }
 
-    @BindingAdapter({"pieData", "dataEmpty"})
-    public static void setPieChartData(PieChart view, PieData pieData, boolean dataEmpty) {
-        if (pieData != null) {
-            view.setData(pieData);
-            if (!view.isEmpty() && !dataEmpty) {
-                view.animateY(PieChart.ANIMATION_Y_TIME);
-            }
-        }
-    }
-
     @BindingAdapter({"pieData"})
-    public static void setPieChartRowData(PieChart view, PieData pieData) {
+    public static void setPieChartData(PieChart view, PieData pieData) {
         if (pieData != null) {
             view.setData(pieData);
             if (!view.isEmpty()) {
                 view.animateY(PieChart.ANIMATION_Y_TIME);
             }
+        }
+    }
+
+    @BindingAdapter({"xAxisFormatter"})
+    public static void setBarChartXAxisFormatter(BarChart view, AxisValueFormatter formatter) {
+        if (formatter != null) {
+            view.getXAxis().setValueFormatter(formatter);
+        }
+    }
+
+    @BindingAdapter({"yAxisFormatter"})
+    public static void setBarChartYAxisFormatter(BarChart view, AxisValueFormatter formatter) {
+        if (formatter != null) {
+            view.getAxisLeft().setValueFormatter(formatter);
         }
     }
 

@@ -36,7 +36,7 @@ public class DraftsListViewModelModule extends BaseViewModelModule {
                                                 @NonNull RxBus<Object> eventBus,
                                                 @NonNull UserRepository userRepository,
                                                 @NonNull PurchaseRepository purchaseRepository) {
-        return new DraftsViewModelImpl(mSavedState, navigator, eventBus, userRepository,
+        return new DraftsViewModelImpl(savedState, navigator, eventBus, userRepository,
                 purchaseRepository);
     }
 }

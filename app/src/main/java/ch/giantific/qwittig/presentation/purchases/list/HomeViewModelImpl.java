@@ -40,29 +40,30 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
     private static final String STATE_OCR_PURCHASE_ID = "OCR_PURCHASE_ID";
     private static final String STATE_OCR_PROCESSING = "STATE_OCR_PROCESSING";
     private static final String STATE_DRAFTS_AVAILABLE = "STATE_DRAFTS_AVAILABLE";
-    private final GroupRepository mGroupRepo;
-    private final PurchaseRepository mPurchaseRepo;
-    private String mCurrentUserId;
-    private boolean mOcrProcessing;
-    private boolean mAnimStop;
-    private boolean mDraftsAvailable;
-    private String mOcrPurchaseId;
+
+    private final GroupRepository groupRepo;
+    private final PurchaseRepository purchaseRepo;
+    private String currentUserId;
+    private boolean ocrProcessing;
+    private boolean animStop;
+    private boolean draftsAvailable;
+    private String ocrPurchaseId;
 
     public HomeViewModelImpl(@Nullable Bundle savedState,
                              @NonNull Navigator navigator,
                              @NonNull RxBus<Object> eventBus,
-                             @NonNull UserRepository userRepository,
-                             @NonNull GroupRepository groupRepository,
-                             @NonNull PurchaseRepository purchaseRepository) {
-        super(savedState, navigator, eventBus, userRepository);
+                             @NonNull UserRepository userRepo,
+                             @NonNull GroupRepository groupRepo,
+                             @NonNull PurchaseRepository purchaseRepo) {
+        super(savedState, navigator, eventBus, userRepo);
 
-        mGroupRepo = groupRepository;
-        mPurchaseRepo = purchaseRepository;
+        this.groupRepo = groupRepo;
+        this.purchaseRepo = purchaseRepo;
 
         if (savedState != null) {
-            mOcrPurchaseId = savedState.getString(STATE_OCR_PURCHASE_ID, "");
-            mOcrProcessing = savedState.getBoolean(STATE_OCR_PROCESSING);
-            mDraftsAvailable = savedState.getBoolean(STATE_DRAFTS_AVAILABLE);
+            ocrPurchaseId = savedState.getString(STATE_OCR_PURCHASE_ID, "");
+            ocrProcessing = savedState.getBoolean(STATE_OCR_PROCESSING);
+            draftsAvailable = savedState.getBoolean(STATE_DRAFTS_AVAILABLE);
         }
     }
 
@@ -70,23 +71,23 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
     public void saveState(@NonNull Bundle outState) {
         super.saveState(outState);
 
-        if (!TextUtils.isEmpty(mOcrPurchaseId)) {
-            outState.putString(STATE_OCR_PURCHASE_ID, mOcrPurchaseId);
+        if (!TextUtils.isEmpty(ocrPurchaseId)) {
+            outState.putString(STATE_OCR_PURCHASE_ID, ocrPurchaseId);
         }
-        outState.putBoolean(STATE_OCR_PROCESSING, mOcrProcessing);
-        outState.putBoolean(STATE_DRAFTS_AVAILABLE, mDraftsAvailable);
+        outState.putBoolean(STATE_OCR_PROCESSING, ocrProcessing);
+        outState.putBoolean(STATE_DRAFTS_AVAILABLE, draftsAvailable);
     }
 
     @Override
     protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
         super.onUserLoggedIn(currentUser);
 
-        mCurrentUserId = currentUser.getUid();
-        getSubscriptions().add(mUserRepo.observeUser(mCurrentUserId)
+        currentUserId = currentUser.getUid();
+        getSubscriptions().add(userRepo.observeUser(currentUserId)
                 .flatMap(new Func1<User, Observable<Identity>>() {
                     @Override
                     public Observable<Identity> call(User user) {
-                        return mUserRepo.getIdentity(user.getCurrentIdentity()).toObservable();
+                        return userRepo.getIdentity(user.getCurrentIdentity()).toObservable();
                     }
                 })
                 .doOnNext(new Action1<Identity>() {
@@ -99,7 +100,7 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
                 .flatMap(new Func1<Identity, Observable<Boolean>>() {
                     @Override
                     public Observable<Boolean> call(Identity identity) {
-                        return mPurchaseRepo.isDraftsAvailable(identity.getGroup(), identity.getId());
+                        return purchaseRepo.isDraftsAvailable(identity.getGroup(), identity.getId());
                     }
                 })
                 .doOnNext(new Action1<Boolean>() {
@@ -111,50 +112,63 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
                 .subscribe(new IndefiniteSubscriber<Boolean>() {
                     @Override
                     public void onNext(Boolean draftsAvailable) {
-                        mView.toggleDraftTab(draftsAvailable);
+                        view.toggleDraftTab(draftsAvailable);
                     }
                 })
         );
+
+        userRepo.getAuthToken()
+                .subscribe(new SingleSubscriber<String>() {
+                    @Override
+                    public void onSuccess(String value) {
+                        Timber.d("auth token: %s", value);
+                    }
+
+                    @Override
+                    public void onError(Throwable error) {
+                        Timber.e(error, "failed to get auth token with error:");
+                    }
+                });
     }
 
     private void observeGroupIdentities(@NonNull String groupId) {
-        getSubscriptions().add(mGroupRepo.observeGroupIdentityChildren(groupId).subscribe());
+        getSubscriptions().add(groupRepo.observeGroupIdentityChildren(groupId).subscribe());
     }
 
     @Override
     @Bindable
     public boolean isOcrProcessing() {
-        return mOcrProcessing;
+        return ocrProcessing;
     }
 
     @Override
     @Bindable
     public boolean isAnimStop() {
-        return mAnimStop;
+        return animStop;
     }
 
     @Override
     public void startProgress() {
-        mOcrProcessing = true;
+        ocrProcessing = true;
         notifyPropertyChanged(BR.ocrProcessing);
     }
 
     @Override
     public void stopProgress(boolean animate) {
-        mOcrProcessing = false;
-        mAnimStop = animate;
+        ocrProcessing = false;
+        animStop = animate;
         notifyPropertyChanged(BR.ocrProcessing);
     }
 
     @Override
     @Bindable
     public boolean isDraftsAvailable() {
-        return mDraftsAvailable;
+        return draftsAvailable;
     }
 
     @Override
     public void setDraftsAvailable(boolean available) {
-        mDraftsAvailable = available;
+        draftsAvailable = available;
         notifyPropertyChanged(BR.draftsAvailable);
     }
 
@@ -162,22 +176,22 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
     public void handleInvitation(@NonNull String identityId,
                                  @NonNull String groupName,
                                  @NonNull String inviterNickname) {
-        mView.showGroupJoinDialog(identityId, groupName, inviterNickname);
+        view.showGroupJoinDialog(identityId, groupName, inviterNickname);
     }
 
     @Override
     public void onJoinInvitedGroupSelected(@NonNull final String identityId) {
-        getSubscriptions().add(mUserRepo.getIdentity(identityId)
+        getSubscriptions().add(userRepo.getIdentity(identityId)
                 .subscribe(new SingleSubscriber<Identity>() {
                     @Override
                     public void onSuccess(Identity identity) {
-                        mGroupRepo.joinGroup(mCurrentUserId, identity.getGroup(), identityId);
+                        groupRepo.joinGroup(currentUserId, identityId, identity.getGroup());
                     }
 
                     @Override
                     public void onError(Throwable error) {
                         Timber.e(error, "Failed to join invited group with error:");
-                        mView.showMessage(R.string.toast_error_join_group);
+                        view.showMessage(R.string.toast_error_join_group);
                     }
                 })
         );
@@ -191,30 +205,30 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
     @Override
     public void onReceiptImageTaken(@NonNull String receipt) {
 //        startProgress();
-        mView.showMessage(R.string.toast_purchase_ocr_started);
-        mPurchaseRepo.uploadReceiptForOcr(receipt, mCurrentUserId);
+        view.showMessage(R.string.toast_purchase_ocr_started);
+        purchaseRepo.uploadReceiptForOcr(receipt, currentUserId);
     }
 
     @Override
     public void onReceiptImageDiscarded() {
-        mView.showMessage(R.string.toast_purchase_discarded);
+        view.showMessage(R.string.toast_purchase_discarded);
     }
 
     @Override
     public void onReceiptImageFailed() {
-        mView.showMessage(R.string.toast_create_image_file_failed);
+        view.showMessage(R.string.toast_create_image_file_failed);
     }
 
     @Override
     public void onOcrPurchaseReady(@NonNull String ocrPurchaseId) {
-        mOcrPurchaseId = ocrPurchaseId;
+        this.ocrPurchaseId = ocrPurchaseId;
 //        stopProgress(true);
     }
 
     @Override
     public void onOcrPurchaseFailed() {
 //        stopProgress(false);
-        mView.showMessage(R.string.push_purchase_ocr_failed_alert);
+        view.showMessage(R.string.push_purchase_ocr_failed_alert);
     }
 
     @Override
@@ -225,17 +239,17 @@ public class HomeViewModelImpl extends ViewModelBaseImpl<HomeViewModel.ViewListe
                 final int id = menuItem.getItemId();
                 switch (id) {
                     case R.id.action_fab_home_auto:
-                        mView.captureImage();
+                        view.captureImage();
                         break;
                     case R.id.action_fab_home_manual:
-                        mNavigator.startPurchaseAdd(null);
+                        navigator.startPurchaseAdd(null);
                         break;
                 }
             }
 
             @Override
             public void onFabCompleteClicked() {
-                mNavigator.startPurchaseAdd(mOcrPurchaseId);
+                navigator.startPurchaseAdd(ocrPurchaseId);
             }
         };
     }

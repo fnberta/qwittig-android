@@ -13,8 +13,8 @@ import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.di.scopes.PerActivity;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.di.BaseViewModelModule;
-import ch.giantific.qwittig.presentation.stats.pie.stores.StatsStoresViewModel;
-import ch.giantific.qwittig.presentation.stats.pie.stores.StatsStoresViewModelImpl;
+import ch.giantific.qwittig.presentation.stats.StatsViewModel;
+import ch.giantific.qwittig.presentation.stats.StatsViewModelImpl;
 import dagger.Module;
 import dagger.Provides;
 
@@ -23,17 +23,17 @@ import dagger.Provides;
  * instantiate it.
  */
 @Module
-public class StatsStoresViewModelModule extends BaseViewModelModule {
+public class StatsViewModelModule extends BaseViewModelModule {
 
-    public StatsStoresViewModelModule(@Nullable Bundle savedState) {
+    public StatsViewModelModule(@Nullable Bundle savedState) {
         super(savedState);
     }
 
     @PerActivity
     @Provides
-    StatsStoresViewModel providesStatsStoresViewModel(@NonNull Navigator navigator,
-                                                      @NonNull RxBus<Object> eventBus,
-                                                      @NonNull UserRepository userRepository) {
-        return new StatsStoresViewModelImpl(mSavedState, navigator, eventBus, userRepository);
+    StatsViewModel providesStatsViewModelImpl(@NonNull Navigator navigator,
+                                              @NonNull RxBus<Object> eventBus,
+                                              @NonNull UserRepository userRepository) {
+        return new StatsViewModelImpl(savedState, navigator, eventBus, userRepository);
     }
 }

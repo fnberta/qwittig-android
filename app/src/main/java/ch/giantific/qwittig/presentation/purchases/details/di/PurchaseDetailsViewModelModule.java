@@ -26,15 +26,15 @@ import dagger.Provides;
 @Module
 public class PurchaseDetailsViewModelModule extends BaseViewModelModule {
 
-    private final String mPurchaseId;
-    private final String mPurchaseGroupId;
+    private final String purchaseId;
+    private final String purchaseGroupId;
 
     public PurchaseDetailsViewModelModule(@Nullable Bundle savedState, @NonNull String purchaseId,
                                           @Nullable String purchaseGroupId) {
         super(savedState);
 
-        mPurchaseId = purchaseId;
-        mPurchaseGroupId = purchaseGroupId;
+        this.purchaseId = purchaseId;
+        this.purchaseGroupId = purchaseGroupId;
     }
 
     @PerActivity
@@ -43,7 +43,7 @@ public class PurchaseDetailsViewModelModule extends BaseViewModelModule {
                                                               @NonNull RxBus<Object> eventBus,
                                                               @NonNull UserRepository userRepository,
                                                               @NonNull PurchaseRepository purchaseRepository) {
-        return new PurchaseDetailsViewModelImpl(mSavedState, navigator, eventBus, userRepository,
-                purchaseRepository, mPurchaseId, mPurchaseGroupId);
+        return new PurchaseDetailsViewModelImpl(savedState, navigator, eventBus, userRepository,
+                purchaseRepository, purchaseId, purchaseGroupId);
     }
 }

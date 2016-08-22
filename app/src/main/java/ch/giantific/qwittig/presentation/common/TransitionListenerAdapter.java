@@ -8,16 +8,17 @@ package ch.giantific.qwittig.presentation.common;
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.transition.Transition;
+import android.transition.Transition.TransitionListener;
 
 /**
  * Provides empty default implementations for
- * {@link android.transition.Transition.TransitionListener} to allow subclasses to only implement
+ * {@link TransitionListener} to allow subclasses to only implement
  * the specific method needed.
  * <p/>
- * Implements {@link android.transition.Transition.TransitionListener}.
+ * Implements {@link TransitionListener}.
  */
 @TargetApi(Build.VERSION_CODES.KITKAT)
-public class TransitionListenerAdapter implements Transition.TransitionListener {
+public class TransitionListenerAdapter implements TransitionListener {
     @Override
     public void onTransitionStart(Transition transition) {
     }

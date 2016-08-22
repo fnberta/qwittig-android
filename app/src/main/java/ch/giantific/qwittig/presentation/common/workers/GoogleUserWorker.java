@@ -41,7 +41,7 @@ public class GoogleUserWorker extends BaseWorker<Void, GoogleUserWorkerListener>
     private static final String KEY_PASSWORD = "PASSWORD";
     private static final String KEY_ID_TOKEN = "ID_TOKEN";
     @Inject
-    Application mAppContext;
+    Application appContext;
 
     public GoogleUserWorker() {
         // empty default constructor
@@ -125,30 +125,30 @@ public class GoogleUserWorker extends BaseWorker<Void, GoogleUserWorkerListener>
     protected Observable<Void> getObservable(@NonNull Bundle args) {
         @GoogleUserAction
         final int type = args.getInt(KEY_TYPE);
-        final FirebaseUser firebaseUser = mUserRepo.getCurrentUser();
+        final FirebaseUser firebaseUser = userRepo.getCurrentUser();
         if (firebaseUser == null) {
             return null;
         }
 
         switch (type) {
             case GoogleUserAction.SIGN_OUT: {
-                return mUserRepo.signOutGoogle(mAppContext)
+                return userRepo.signOutGoogle(appContext)
                         .doOnSuccess(new Action1<Void>() {
                             @Override
                             public void call(Void aVoid) {
-                                mUserRepo.signOut(firebaseUser);
+                                userRepo.signOut(firebaseUser);
                             }
                         })
                         .toObservable();
             }
             case GoogleUserAction.DELETE: {
                 final String idToken = args.getString(KEY_ID_TOKEN, "");
-                final AuthCredential authCredential= GoogleAuthProvider.getCredential(idToken, null);
-                return mUserRepo.unlinkGoogle(mAppContext, firebaseUser, authCredential)
+                final AuthCredential authCredential = GoogleAuthProvider.getCredential(idToken, null);
+                return userRepo.unlinkGoogle(appContext, firebaseUser, authCredential)
                         .flatMap(new Func1<Void, Single<Void>>() {
                             @Override
                             public Single<Void> call(Void aVoid) {
-                                return mUserRepo.deleteUser(firebaseUser, authCredential);
+                                return userRepo.deleteUser(firebaseUser, authCredential);
                             }
                         })
                         .toObservable();
@@ -159,11 +159,11 @@ public class GoogleUserWorker extends BaseWorker<Void, GoogleUserWorkerListener>
                 final String idToken = args.getString(KEY_ID_TOKEN, "");
                 final AuthCredential oldCredential = GoogleAuthProvider.getCredential(idToken, null);
                 final AuthCredential newCredential = EmailAuthProvider.getCredential(email, password);
-                return mUserRepo.linkUserWithCredential(firebaseUser, oldCredential, newCredential)
+                return userRepo.linkUserWithCredential(firebaseUser, oldCredential, newCredential)
                         .flatMap(new Func1<AuthResult, Single<Void>>() {
                             @Override
                             public Single<Void> call(AuthResult authResult) {
-                                return mUserRepo.unlinkGoogle(mAppContext, firebaseUser, oldCredential);
+                                return userRepo.unlinkGoogle(appContext, firebaseUser, oldCredential);
                             }
                         })
                         .toObservable();
@@ -175,12 +175,12 @@ public class GoogleUserWorker extends BaseWorker<Void, GoogleUserWorkerListener>
 
     @Override
     protected void onError() {
-        mActivity.onWorkerError(WORKER_TAG);
+        activity.onWorkerError(WORKER_TAG);
     }
 
     @Override
     protected void setStream(@NonNull Observable<Void> observable) {
-        mActivity.setGoogleUserStream(observable.toSingle(), WORKER_TAG);
+        activity.setGoogleUserStream(observable.toSingle(), WORKER_TAG);
     }
 
     @IntDef({GoogleUserAction.SIGN_OUT, GoogleUserAction.UNLINK, GoogleUserAction.DELETE})

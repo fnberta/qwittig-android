@@ -29,18 +29,20 @@ public class GoogleApiClientDelegate {
 
     private static final int INTENT_REQUEST_GOOGLE_SIGN_IN = 9001;
     private static final String GOOGLE_SERVER_ID = "1032365366003-7rsbsnqc5b0504mmdt6j1n61m39lgllp.apps.googleusercontent.com";
-    private GoogleLoginCallback mLoginCallback;
+
     @Nullable
-    private GoogleInvitationCallback mInviteCallback;
-    private FragmentActivity mActivity;
-    private GoogleApiClient mGoogleApiClient;
+    private GoogleLoginCallback loginCallback;
+    @Nullable
+    private GoogleInvitationCallback invitationCallback;
+    private FragmentActivity activity;
+    private GoogleApiClient googleApiClient;
 
     public GoogleApiClientDelegate(@NonNull FragmentActivity activity,
-                                   @NonNull GoogleLoginCallback loginCallback,
-                                   @Nullable GoogleInvitationCallback inviteCallback) {
-        mActivity = activity;
-        mLoginCallback = loginCallback;
-        mInviteCallback = inviteCallback;
+                                   @Nullable GoogleLoginCallback loginCallback,
+                                   @Nullable GoogleInvitationCallback invitationCallback) {
+        this.activity = activity;
+        this.loginCallback = loginCallback;
+        this.invitationCallback = invitationCallback;
     }
 
     @SafeVarargs
@@ -51,8 +53,8 @@ public class GoogleApiClientDelegate {
                         .requestEmail()
                         .build();
 
-        final GoogleApiClient.Builder builder = new GoogleApiClient.Builder(mActivity)
-                .enableAutoManage(mActivity, new GoogleApiClient.OnConnectionFailedListener() {
+        final GoogleApiClient.Builder builder = new GoogleApiClient.Builder(activity)
+                .enableAutoManage(activity, new GoogleApiClient.OnConnectionFailedListener() {
                     @Override
                     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
                         Timber.w("GoogleApiClient onConnectionFailed: %s", connectionResult);
@@ -65,12 +67,12 @@ public class GoogleApiClientDelegate {
             }
         }
 
-        mGoogleApiClient = builder.build();
+        googleApiClient = builder.build();
     }
 
     public void loginWithGoogle() {
-        final Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        mActivity.startActivityForResult(signInIntent, INTENT_REQUEST_GOOGLE_SIGN_IN);
+        final Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
+        activity.startActivityForResult(signInIntent, INTENT_REQUEST_GOOGLE_SIGN_IN);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -81,26 +83,30 @@ public class GoogleApiClientDelegate {
     }
 
     private void handleGoogleSignInResult(@NonNull GoogleSignInResult result) {
+        if (loginCallback == null) {
+            return;
+        }
+
         if (!result.isSuccess()) {
-            mLoginCallback.onGoogleLoginFailed();
+            loginCallback.onGoogleLoginFailed();
             return;
         }
 
         final GoogleSignInAccount acct = result.getSignInAccount();
         if (acct == null) {
-            mLoginCallback.onGoogleLoginFailed();
+            loginCallback.onGoogleLoginFailed();
         } else {
             final String idToken = acct.getIdToken();
             if (!TextUtils.isEmpty(idToken)) {
-                mLoginCallback.onGoogleLoginSuccessful(idToken);
+                loginCallback.onGoogleLoginSuccessful(idToken);
             } else {
-                mLoginCallback.onGoogleLoginFailed();
+                loginCallback.onGoogleLoginFailed();
             }
         }
     }
 
     public void checkForInvitation() {
-        AppInvite.AppInviteApi.getInvitation(mGoogleApiClient, mActivity, false)
+        AppInvite.AppInviteApi.getInvitation(googleApiClient, activity, false)
                 .setResultCallback(new ResultCallback<AppInviteInvitationResult>() {
                     @Override
                     public void onResult(@NonNull AppInviteInvitationResult result) {
@@ -109,8 +115,8 @@ public class GoogleApiClientDelegate {
                             final String deepLink = AppInviteReferral.getDeepLink(intent);
                             Timber.d("deepLink %s", deepLink);
                             final Uri uri = Uri.parse(deepLink);
-                            if (mInviteCallback != null) {
-                                mInviteCallback.onDeepLinkFound(uri);
+                            if (invitationCallback != null) {
+                                invitationCallback.onDeepLinkFound(uri);
                             }
                         } else {
                             Timber.i("getInvitation: no deep link found.");

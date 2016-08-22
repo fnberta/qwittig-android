@@ -32,21 +32,21 @@ public class TaskDeadline implements Parcelable {
             return new TaskDeadline[size];
         }
     };
-    private final String mTitle;
-    private final int mType;
-    private final Date mDate;
+    private final String title;
+    private final int type;
+    private final Date date;
 
     private TaskDeadline(@NonNull String title, @DeadlineType int type, @NonNull Date date) {
-        mTitle = title;
-        mType = type;
-        mDate = date;
+        this.title = title;
+        this.type = type;
+        this.date = date;
     }
 
     private TaskDeadline(Parcel in) {
-        mTitle = in.readString();
-        mType = in.readInt();
+        title = in.readString();
+        type = in.readInt();
         long tmpMDate = in.readLong();
-        mDate = tmpMDate == -1 ? null : new Date(tmpMDate);
+        date = tmpMDate == -1 ? null : new Date(tmpMDate);
     }
 
     public static TaskDeadline newAllInstance(@NonNull String title) {
@@ -87,16 +87,16 @@ public class TaskDeadline implements Parcelable {
 
     @DeadlineType
     public int getType() {
-        return mType;
+        return type;
     }
 
     public Date getDate() {
-        return mDate;
+        return date;
     }
 
     @Override
     public String toString() {
-        return mTitle;
+        return title;
     }
 
     @Override
@@ -109,12 +109,12 @@ public class TaskDeadline implements Parcelable {
         }
 
         final TaskDeadline that = (TaskDeadline) o;
-        return mType == that.getType();
+        return type == that.getType();
     }
 
     @Override
     public int hashCode() {
-        return mType;
+        return type;
     }
 
     @Override
@@ -124,9 +124,9 @@ public class TaskDeadline implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(mTitle);
-        dest.writeInt(mType);
-        dest.writeLong(mDate != null ? mDate.getTime() : -1);
+        dest.writeString(title);
+        dest.writeInt(type);
+        dest.writeLong(date != null ? date.getTime() : -1);
     }
 
     @IntDef({DeadlineType.ALL, DeadlineType.TODAY, DeadlineType.WEEK, DeadlineType.MONTH,

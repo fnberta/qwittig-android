@@ -20,7 +20,7 @@ import ch.giantific.qwittig.presentation.purchases.list.drafts.itemmodels.Drafts
  */
 public class DraftsRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<RowDraftsBinding>> {
 
-    private final DraftsViewModel mViewModel;
+    private final DraftsViewModel viewModel;
 
     /**
      * Constructs a new {@link DraftsRecyclerAdapter}.
@@ -30,7 +30,7 @@ public class DraftsRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<RowDra
     public DraftsRecyclerAdapter(@NonNull DraftsViewModel viewModel) {
         super();
 
-        mViewModel = viewModel;
+        this.viewModel = viewModel;
     }
 
     @NonNull
@@ -44,26 +44,26 @@ public class DraftsRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<RowDra
     @Override
     public void onBindViewHolder(BindingRow<RowDraftsBinding> holder, int position) {
         final RowDraftsBinding binding = holder.getBinding();
-        final DraftsItemModel itemModel = mViewModel.getItemAtPosition(position);
+        final DraftsItemModel itemModel = viewModel.getItemAtPosition(position);
 
         binding.setItemModel(itemModel);
-        binding.setViewModel(mViewModel);
+        binding.setViewModel(viewModel);
         binding.executePendingBindings();
     }
 
     @Override
     public void scrollToPosition(final int position) {
         // override to let RecyclerView layout its items first
-        mRecyclerView.post(new Runnable() {
+        recyclerView.post(new Runnable() {
             @Override
             public void run() {
-                mRecyclerView.scrollToPosition(position);
+                recyclerView.scrollToPosition(position);
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return mViewModel.getItemCount();
+        return viewModel.getItemCount();
     }
 }

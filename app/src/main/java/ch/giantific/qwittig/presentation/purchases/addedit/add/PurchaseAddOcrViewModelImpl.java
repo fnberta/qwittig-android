@@ -39,8 +39,9 @@ import rx.functions.Func1;
 public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implements PurchaseAddOcrViewModel {
 
     private static final String STATE_OCR_VALUES_SET = "STATE_OCR_VALUES_SET";
-    private String mOcrDataId;
-    private boolean mOcrValuesSet;
+
+    private String ocrDataId;
+    private boolean ocrValuesSet;
 
     public PurchaseAddOcrViewModelImpl(@Nullable Bundle savedState,
                                        @NonNull Navigator navigator,
@@ -53,9 +54,9 @@ public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implem
                 configHelper);
 
         if (savedState != null) {
-            mOcrValuesSet = savedState.getBoolean(STATE_OCR_VALUES_SET, false);
+            ocrValuesSet = savedState.getBoolean(STATE_OCR_VALUES_SET, false);
         } else {
-            mOcrValuesSet = false;
+            ocrValuesSet = false;
         }
     }
 
@@ -63,12 +64,12 @@ public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implem
     public void saveState(@NonNull Bundle outState) {
         super.saveState(outState);
 
-        outState.putBoolean(STATE_OCR_VALUES_SET, mOcrValuesSet);
+        outState.putBoolean(STATE_OCR_VALUES_SET, ocrValuesSet);
     }
 
     @Override
     public void setOcrDataId(@NonNull String ocrDataId) {
-        mOcrDataId = ocrDataId;
+        this.ocrDataId = ocrDataId;
     }
 
     @Override
@@ -77,23 +78,23 @@ public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implem
                 .flatMap(new Func1<List<Identity>, Single<OcrData>>() {
                     @Override
                     public Single<OcrData> call(List<Identity> identities) {
-                        return mPurchaseRepo.getOcrData(mOcrDataId);
+                        return purchaseRepo.getOcrData(ocrDataId);
                     }
                 })
                 .subscribe(new SingleSubscriber<OcrData>() {
                     @Override
                     public void onSuccess(OcrData ocrData) {
-                        if (mOcrValuesSet) {
+                        if (ocrValuesSet) {
                             updateRows();
                         } else {
                             setOcrData(ocrData);
-                            mOcrValuesSet = true;
+                            ocrValuesSet = true;
                         }
                     }
 
                     @Override
                     public void onError(Throwable error) {
-                        mView.showMessage(R.string.toast_error_purchase_ocr_load);
+                        view.showMessage(R.string.toast_error_purchase_ocr_load);
                     }
                 })
         );
@@ -112,15 +113,15 @@ public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implem
         final List<Map<String, Object>> items = (List<Map<String, Object>>) data.get("items");
         if (!items.isEmpty()) {
             for (Map<String, Object> item : items) {
-                final String price = mMoneyFormatter.format(item.get("price"));
+                final String price = moneyFormatter.format(item.get("price"));
                 final String name = (String) item.get("name");
                 final PurchaseAddEditItem purchaseAddEditItem =
                         new PurchaseAddEditItem(name, price, getItemUsers());
-                purchaseAddEditItem.setMoneyFormatter(mMoneyFormatter);
+                purchaseAddEditItem.setMoneyFormatter(moneyFormatter);
                 purchaseAddEditItem.setPriceChangedListener(this);
                 final int pos = getItemCount() - 2;
-                mItems.add(pos, purchaseAddEditItem);
-                mListInteraction.notifyItemInserted(mItems.indexOf(purchaseAddEditItem));
+                this.items.add(pos, purchaseAddEditItem);
+                listInteraction.notifyItemInserted(this.items.indexOf(purchaseAddEditItem));
             }
         }
     }
@@ -131,15 +132,15 @@ public class PurchaseAddOcrViewModelImpl extends PurchaseAddViewModelImpl implem
                                       @NonNull List<Item> purchaseItems, int fractionDigits,
                                       boolean isDraft) {
         final double total = convertRoundTotal(fractionDigits);
-        return new Purchase(mCurrentIdentity.getGroup(), mCurrentIdentity.getId(), mDate, mStore,
-                total, mCurrency, mExchangeRate, mReceipt, mNote, isDraft, mOcrDataId,
+        return new Purchase(currentIdentity.getGroup(), currentIdentity.getId(), date, store,
+                total, currency, exchangeRate, receipt, note, isDraft, ocrDataId,
                 purchaseIdentities, purchaseItems);
     }
 
     @Override
     protected void onPurchaseSaved(boolean asDraft) {
-        if (mConfigHelper.isShowOcrRating()) {
-            mNavigator.startOcrRating(mOcrDataId);
+        if (configHelper.isShowOcrRating()) {
+            navigator.startOcrRating(ocrDataId);
         }
 
         super.onPurchaseSaved(asDraft);

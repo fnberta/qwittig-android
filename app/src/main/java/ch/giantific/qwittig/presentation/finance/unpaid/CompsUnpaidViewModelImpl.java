@@ -44,23 +44,23 @@ public class CompsUnpaidViewModelImpl extends ListViewModelBaseImpl<CompsUnpaidI
         implements CompsUnpaidViewModel {
 
     private static final String STATE_COMP_CHANGE_AMOUNT = "STATE_COMP_CHANGE_AMOUNT";
-    private final CompensationRepository mCompsRepo;
-    private String mCurrentGroupId;
-    private String mCompConfirmingId;
-    private String mGroupCurrency;
-    private NumberFormat mMoneyFormatter;
+    private final CompensationRepository compsRepo;
+    private String currentGroupId;
+    private String compConfirmingId;
+    private String groupCurrency;
+    private NumberFormat moneyFormatter;
 
     public CompsUnpaidViewModelImpl(@Nullable Bundle savedState,
                                     @NonNull Navigator navigator,
                                     @NonNull RxBus<Object> eventBus,
-                                    @NonNull UserRepository userRepository,
-                                    @NonNull CompensationRepository compsRepository) {
-        super(savedState, navigator, eventBus, userRepository);
+                                    @NonNull UserRepository userRepos,
+                                    @NonNull CompensationRepository compsRepo) {
+        super(savedState, navigator, eventBus, userRepos);
 
-        mCompsRepo = compsRepository;
+        this.compsRepo = compsRepo;
 
         if (savedState != null) {
-            mCompConfirmingId = savedState.getString(STATE_COMP_CHANGE_AMOUNT);
+            compConfirmingId = savedState.getString(STATE_COMP_CHANGE_AMOUNT);
         }
     }
 
@@ -78,8 +78,8 @@ public class CompsUnpaidViewModelImpl extends ListViewModelBaseImpl<CompsUnpaidI
     public void saveState(@NonNull Bundle outState) {
         super.saveState(outState);
 
-        if (!TextUtils.isEmpty(mCompConfirmingId)) {
-            outState.putString(STATE_COMP_CHANGE_AMOUNT, mCompConfirmingId);
+        if (!TextUtils.isEmpty(compConfirmingId)) {
+            outState.putString(STATE_COMP_CHANGE_AMOUNT, compConfirmingId);
         }
     }
 
@@ -87,26 +87,26 @@ public class CompsUnpaidViewModelImpl extends ListViewModelBaseImpl<CompsUnpaidI
     protected void onUserLoggedIn(@NonNull final FirebaseUser currentUser) {
         super.onUserLoggedIn(currentUser);
 
-        getSubscriptions().add(mUserRepo.observeUser(currentUser.getUid())
+        getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
                 .flatMap(new Func1<User, Observable<Identity>>() {
                     @Override
                     public Observable<Identity> call(User user) {
-                        return mUserRepo.getIdentity(user.getCurrentIdentity()).toObservable();
+                        return userRepo.getIdentity(user.getCurrentIdentity()).toObservable();
                     }
                 })
                 .subscribe(new IndefiniteSubscriber<Identity>() {
                     @Override
                     public void onNext(Identity identity) {
-                        mGroupCurrency = identity.getGroupCurrency();
-                        mMoneyFormatter = MoneyUtils.getMoneyFormatter(mGroupCurrency, true, true);
+                        groupCurrency = identity.getGroupCurrency();
+                        moneyFormatter = MoneyUtils.getMoneyFormatter(groupCurrency, true, true);
 
-                        mInitialDataLoaded = false;
+                        initialDataLoaded = false;
                         final String identityId = identity.getId();
                         final String groupId = identity.getGroup();
-                        if (!Objects.equals(mCurrentGroupId, groupId)) {
-                            mItems.clear();
+                        if (!Objects.equals(currentGroupId, groupId)) {
+                            items.clear();
                         }
-                        mCurrentGroupId = groupId;
+                        currentGroupId = groupId;
                         addDataListener(identityId);
                         loadInitialData(identityId);
                     }
@@ -115,17 +115,17 @@ public class CompsUnpaidViewModelImpl extends ListViewModelBaseImpl<CompsUnpaidI
     }
 
     private void addDataListener(@NonNull final String identityId) {
-        setDataListenerSub(mCompsRepo.observeCompensationChildren(mCurrentGroupId, identityId, false)
+        setDataListenerSub(compsRepo.observeCompensationChildren(currentGroupId, identityId, false)
                 .filter(new Func1<RxChildEvent<Compensation>, Boolean>() {
                     @Override
                     public Boolean call(RxChildEvent<Compensation> compensationRxChildEvent) {
-                        return mInitialDataLoaded;
+                        return initialDataLoaded;
                     }
                 })
                 .flatMap(new Func1<RxChildEvent<Compensation>, Observable<CompsUnpaidItemModel>>() {
                     @Override
                     public Observable<CompsUnpaidItemModel> call(final RxChildEvent<Compensation> event) {
-                        return getItemModels(event.getValue(), event.getEventType(), identityId);
+                        return getItemModel(event.getValue(), event.getEventType(), identityId);
                     }
                 })
                 .subscribe(this)
@@ -133,18 +133,18 @@ public class CompsUnpaidViewModelImpl extends ListViewModelBaseImpl<CompsUnpaidI
     }
 
     private void loadInitialData(@NonNull final String identityId) {
-        getSubscriptions().add(mCompsRepo.getCompensations(mCurrentGroupId, identityId, false)
+        getSubscriptions().add(compsRepo.getCompensations(currentGroupId, identityId, false)
                 .flatMap(new Func1<Compensation, Observable<CompsUnpaidItemModel>>() {
                     @Override
                     public Observable<CompsUnpaidItemModel> call(Compensation compensation) {
-                        return getItemModels(compensation, -1, identityId);
+                        return getItemModel(compensation, -1, identityId);
                     }
                 })
                 .toList()
                 .subscribe(new Subscriber<List<CompsUnpaidItemModel>>() {
                     @Override
                     public void onCompleted() {
-                        mInitialDataLoaded = true;
+                        initialDataLoaded = true;
                         setLoading(false);
                     }
 
@@ -155,24 +155,24 @@ public class CompsUnpaidViewModelImpl extends ListViewModelBaseImpl<CompsUnpaidI
 
                     @Override
                     public void onNext(List<CompsUnpaidItemModel> compsUnpaidItemModels) {
-                        mItems.addAll(compsUnpaidItemModels);
+                        items.addAll(compsUnpaidItemModels);
                     }
                 })
         );
     }
 
     @NonNull
-    private Observable<CompsUnpaidItemModel> getItemModels(@NonNull final Compensation compensation,
-                                                           final int eventType,
-                                                           @NonNull String identityId) {
+    private Observable<CompsUnpaidItemModel> getItemModel(@NonNull final Compensation compensation,
+                                                          final int eventType,
+                                                          @NonNull String identityId) {
         final String creditorId = compensation.getCreditor();
         final boolean isCredit = Objects.equals(creditorId, identityId);
-        return mUserRepo.getIdentity(isCredit ? compensation.getDebtor() : creditorId)
+        return userRepo.getIdentity(isCredit ? compensation.getDebtor() : creditorId)
                 .map(new Func1<Identity, CompsUnpaidItemModel>() {
                     @Override
                     public CompsUnpaidItemModel call(Identity identity) {
                         return new CompsUnpaidItemModel(eventType, compensation, identity,
-                                mMoneyFormatter, isCredit);
+                                moneyFormatter, isCredit);
                     }
                 })
                 .toObservable();
@@ -182,21 +182,21 @@ public class CompsUnpaidViewModelImpl extends ListViewModelBaseImpl<CompsUnpaidI
     protected void onDataError(@NonNull Throwable e) {
         super.onDataError(e);
 
-        mView.showMessage(R.string.toast_error_comps_load);
+        view.showMessage(R.string.toast_error_comps_load);
     }
 
     @Override
     public void onConfirmButtonClick(@NonNull CompsUnpaidItemModel itemModel) {
         final BigFraction amount = itemModel.getAmountFraction();
-        mCompConfirmingId = itemModel.getId();
-        mView.showCompensationAmountConfirmDialog(amount, itemModel.getNickname(), mGroupCurrency);
+        compConfirmingId = itemModel.getId();
+        view.showCompensationAmountConfirmDialog(amount, itemModel.getNickname(), groupCurrency);
     }
 
     @Override
     public void onAmountConfirmed(double confirmedAmount) {
-        for (int i = 0, itemsSize = mItems.size(); i < itemsSize; i++) {
-            final CompsUnpaidItemModel itemModel = mItems.get(i);
-            if (itemModel.getViewType() != ViewType.CREDIT || !Objects.equals(itemModel.getId(), mCompConfirmingId)) {
+        for (int i = 0, itemsSize = items.size(); i < itemsSize; i++) {
+            final CompsUnpaidItemModel itemModel = items.get(i);
+            if (itemModel.getViewType() != ViewType.CREDIT || !Objects.equals(itemModel.getId(), compConfirmingId)) {
                 continue;
             }
 
@@ -213,11 +213,11 @@ public class CompsUnpaidViewModelImpl extends ListViewModelBaseImpl<CompsUnpaidI
 
     private void confirmCompensation(@NonNull CompsUnpaidItemModel itemModel,
                                      @NonNull BigFraction amount, final boolean amountChanged) {
-        getSubscriptions().add(mCompsRepo.confirmAmountAndAccept(itemModel.getId(), amount, amountChanged)
+        getSubscriptions().add(compsRepo.confirmAmountAndAccept(itemModel.getId(), amount, amountChanged)
                 .subscribe(new SingleSubscriber<Compensation>() {
                     @Override
                     public void onSuccess(Compensation compensation) {
-                        mView.showMessage(R.string.toast_compensation_accepted);
+                        view.showMessage(R.string.toast_compensation_accepted);
                         if (amountChanged) {
                             // new compensations are calculated on the server
                             setLoading(true);
@@ -227,7 +227,7 @@ public class CompsUnpaidViewModelImpl extends ListViewModelBaseImpl<CompsUnpaidI
                     @Override
                     public void onError(Throwable error) {
                         Timber.e(error, "failed to confirm compensation with error:");
-                        mView.showMessage(R.string.toast_error_comps_paid);
+                        view.showMessage(R.string.toast_error_comps_paid);
                     }
                 })
         );
@@ -235,7 +235,7 @@ public class CompsUnpaidViewModelImpl extends ListViewModelBaseImpl<CompsUnpaidI
 
     @Override
     public void onRemindButtonClick(@NonNull CompsUnpaidItemModel itemModel) {
-        mCompsRepo.remindDebtor(itemModel.getId());
-        mView.showMessage(R.string.toast_compensation_reminded_user, itemModel.getNickname());
+        compsRepo.remindDebtor(itemModel.getId());
+        view.showMessage(R.string.toast_compensation_reminded_user, itemModel.getNickname());
     }
 }

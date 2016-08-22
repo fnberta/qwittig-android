@@ -32,7 +32,7 @@ import ch.giantific.qwittig.presentation.tasks.list.itemmodels.TasksItemModel.Ty
  */
 public class TasksRecyclerAdapter extends BaseRecyclerAdapter {
 
-    private final TasksViewModel mViewModel;
+    private final TasksViewModel viewModel;
 
     /**
      * Constructs a new {@link TasksRecyclerAdapter}.
@@ -42,7 +42,7 @@ public class TasksRecyclerAdapter extends BaseRecyclerAdapter {
     public TasksRecyclerAdapter(@NonNull TasksViewModel viewModel) {
         super();
 
-        mViewModel = viewModel;
+        this.viewModel = viewModel;
     }
 
     @NonNull
@@ -66,7 +66,7 @@ public class TasksRecyclerAdapter extends BaseRecyclerAdapter {
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, @Type int position) {
-        final TasksItemModel tasksItemModel = mViewModel.getItemAtPosition(position);
+        final TasksItemModel tasksItemModel = viewModel.getItemAtPosition(position);
         final int viewType = getItemViewType(position);
         switch (viewType) {
             case Type.TASK: {
@@ -76,7 +76,7 @@ public class TasksRecyclerAdapter extends BaseRecyclerAdapter {
                 final TasksItem tasksItem = (TasksItem) tasksItemModel;
                 tasksItem.setView(taskRow);
                 binding.setItemModel(tasksItem);
-                binding.setViewModel(mViewModel);
+                binding.setViewModel(viewModel);
                 binding.executePendingBindings();
 
                 break;
@@ -96,12 +96,12 @@ public class TasksRecyclerAdapter extends BaseRecyclerAdapter {
 
     @Override
     public int getItemCount() {
-        return mViewModel.getItemCount();
+        return viewModel.getItemCount();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return mViewModel.getItemViewType(position);
+        return viewModel.getItemViewType(position);
     }
 
     /**

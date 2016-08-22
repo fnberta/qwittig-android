@@ -43,29 +43,30 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
     private static final String STATE_IDENTITIES_IDS = "STATE_IDENTITIES_IDS";
     private static final String STATE_GROUP_NAMES = "STATE_GROUP_NAMES";
     private static final String STATE_CURRENT_IDENTITY_ID = "STATE_CURRENT_IDENTITY_ID";
-    private final GroupRepository mGroupRepo;
-    private FirebaseUser mFirebaseUser;
-    private Identity mCurrentIdentity;
-    private ArrayList<String> mIdentitiesIds;
-    private ArrayList<String> mGroupNames;
-    private String mCurrentIdentityId;
+
+    private final GroupRepository groupRepo;
+    private FirebaseUser firebaseUser;
+    private Identity currentIdentity;
+    private ArrayList<String> identityIds;
+    private ArrayList<String> groupNames;
+    private String currentIdentityId;
 
     public SettingsViewModelImpl(@Nullable Bundle savedState,
                                  @NonNull Navigator navigator,
                                  @NonNull RxBus<Object> eventBus,
-                                 @NonNull UserRepository userRepository,
-                                 @NonNull GroupRepository groupRepository) {
-        super(savedState, navigator, eventBus, userRepository);
+                                 @NonNull UserRepository userRepo,
+                                 @NonNull GroupRepository groupRepo) {
+        super(savedState, navigator, eventBus, userRepo);
 
-        mGroupRepo = groupRepository;
+        this.groupRepo = groupRepo;
 
         if (savedState != null) {
-            mIdentitiesIds = savedState.getStringArrayList(STATE_IDENTITIES_IDS);
-            mGroupNames = savedState.getStringArrayList(STATE_GROUP_NAMES);
-            mCurrentIdentityId = savedState.getString(STATE_CURRENT_IDENTITY_ID);
+            identityIds = savedState.getStringArrayList(STATE_IDENTITIES_IDS);
+            groupNames = savedState.getStringArrayList(STATE_GROUP_NAMES);
+            currentIdentityId = savedState.getString(STATE_CURRENT_IDENTITY_ID);
         } else {
-            mIdentitiesIds = new ArrayList<>();
-            mGroupNames = new ArrayList<>();
+            identityIds = new ArrayList<>();
+            groupNames = new ArrayList<>();
         }
     }
 
@@ -73,26 +74,26 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
     public void saveState(@NonNull Bundle outState) {
         super.saveState(outState);
 
-        outState.putStringArrayList(STATE_IDENTITIES_IDS, mIdentitiesIds);
-        outState.putStringArrayList(STATE_GROUP_NAMES, mGroupNames);
-        outState.putString(STATE_CURRENT_IDENTITY_ID, mCurrentIdentityId);
+        outState.putStringArrayList(STATE_IDENTITIES_IDS, identityIds);
+        outState.putStringArrayList(STATE_GROUP_NAMES, groupNames);
+        outState.putString(STATE_CURRENT_IDENTITY_ID, currentIdentityId);
     }
 
     @Override
     protected void onUserLoggedIn(@NonNull FirebaseUser currentUser) {
         super.onUserLoggedIn(currentUser);
 
-        mFirebaseUser = currentUser;
-        getSubscriptions().add(mUserRepo.observeUser(currentUser.getUid())
+        firebaseUser = currentUser;
+        getSubscriptions().add(userRepo.observeUser(currentUser.getUid())
                 .flatMap(new Func1<User, Observable<User>>() {
                     @Override
                     public Observable<User> call(final User user) {
-                        return mUserRepo.observeIdentity(user.getCurrentIdentity())
+                        return userRepo.observeIdentity(user.getCurrentIdentity())
                                 .doOnNext(new Action1<Identity>() {
                                     @Override
                                     public void call(Identity identity) {
-                                        mCurrentIdentity = identity;
-                                        mCurrentIdentityId = identity.getId();
+                                        currentIdentity = identity;
+                                        currentIdentityId = identity.getId();
                                         setupCurrentGroupCategory();
                                     }
                                 })
@@ -111,7 +112,7 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
                                 .flatMap(new Func1<String, Observable<Identity>>() {
                                     @Override
                                     public Observable<Identity> call(final String identityId) {
-                                        return mUserRepo.getIdentity(identityId).toObservable();
+                                        return userRepo.getIdentity(identityId).toObservable();
                                     }
                                 })
                                 .toList();
@@ -122,18 +123,18 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
                     public void onError(Throwable e) {
                         super.onError(e);
 
-                        mView.showMessage(R.string.toast_error_load_groups);
+                        view.showMessage(R.string.toast_error_load_groups);
                     }
 
                     @Override
                     public void onNext(List<Identity> identities) {
-                        mIdentitiesIds.clear();
-                        mGroupNames.clear();
+                        identityIds.clear();
+                        groupNames.clear();
                         for (Identity identity : identities) {
                             final String identityId = identity.getId();
-                            mIdentitiesIds.add(identityId);
+                            identityIds.add(identityId);
                             final String groupName = identity.getGroupName();
-                            mGroupNames.add(groupName);
+                            groupNames.add(groupName);
                         }
                         setIdentitySelection();
                     }
@@ -145,29 +146,29 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
     protected void onUserNotLoggedIn() {
         super.onUserNotLoggedIn();
 
-        mNavigator.finish(Result.LOGOUT);
+        navigator.finish(Result.LOGOUT);
     }
 
     private void setupCurrentGroupCategory() {
-        final String groupName = mCurrentIdentity.getGroupName();
-        mView.setCurrentGroupTitle(groupName);
-        mView.setChangeGroupNameText(groupName);
-        mView.setLeaveGroupTitle(R.string.pref_group_leave_group, groupName);
+        final String groupName = currentIdentity.getGroupName();
+        view.setCurrentGroupTitle(groupName);
+        view.setChangeGroupNameText(groupName);
+        view.setLeaveGroupTitle(R.string.pref_group_leave_group, groupName);
     }
 
     @Override
     public void onPreferencesLoaded() {
-        if (!mIdentitiesIds.isEmpty() && !mGroupNames.isEmpty()) {
+        if (!identityIds.isEmpty() && !groupNames.isEmpty()) {
             setIdentitySelection();
         }
     }
 
     private void setIdentitySelection() {
-        final int size = mGroupNames.size();
-        final CharSequence[] entries = mGroupNames.toArray(new CharSequence[size]);
-        final CharSequence[] values = mIdentitiesIds.toArray(new CharSequence[size]);
-        final String selectedValue = mCurrentIdentityId;
-        mView.setupGroupSelection(entries, values, selectedValue);
+        final int size = groupNames.size();
+        final CharSequence[] entries = groupNames.toArray(new CharSequence[size]);
+        final CharSequence[] values = identityIds.toArray(new CharSequence[size]);
+        final String selectedValue = currentIdentityId;
+        view.setupGroupSelection(entries, values, selectedValue);
     }
 
     @Override
@@ -176,22 +177,22 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
             return;
         }
 
-        mUserRepo.updateCurrentIdentity(mCurrentIdentity.getUser(), identityId);
+        userRepo.updateCurrentIdentity(currentIdentity.getUser(), identityId);
     }
 
     @Override
     public void onGroupNameChanged(@NonNull final String newName) {
-        if (!TextUtils.isEmpty(newName) && !Objects.equals(mCurrentIdentity.getGroupName(), newName)) {
-            getSubscriptions().add(mGroupRepo.updateGroupDetails(mCurrentIdentity.getGroup(), newName, null)
+        if (!TextUtils.isEmpty(newName) && !Objects.equals(currentIdentity.getGroupName(), newName)) {
+            getSubscriptions().add(groupRepo.updateGroupDetails(currentIdentity.getGroup(), newName, null)
                     .subscribe(new SingleSubscriber<Group>() {
                         @Override
                         public void onSuccess(Group group) {
-                            mView.showMessage(R.string.toast_group_name_changed, newName);
+                            view.showMessage(R.string.toast_group_name_changed, newName);
                         }
 
                         @Override
                         public void onError(Throwable error) {
-                            mView.showMessage(R.string.toast_error_settings_group_name_change);
+                            view.showMessage(R.string.toast_error_settings_group_name_change);
                         }
                     })
             );
@@ -200,32 +201,32 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
 
     @Override
     public void onLeaveGroupClick() {
-        if (!Objects.equals(BigFraction.ZERO, mCurrentIdentity.getBalanceFraction())) {
-            mView.showMessage(R.string.toast_leave_group_balance_not_zero);
+        if (!Objects.equals(BigFraction.ZERO, currentIdentity.getBalanceFraction())) {
+            view.showMessage(R.string.toast_leave_group_balance_not_zero);
             return;
         }
 
-        if (mIdentitiesIds.size() < 2) {
-            mView.showMessage(R.string.toast_settings_min_one_group);
+        if (identityIds.size() < 2) {
+            view.showMessage(R.string.toast_settings_min_one_group);
             return;
         }
 
-        getSubscriptions().add(mGroupRepo.getGroupIdentities(mCurrentIdentity.getGroup(), false)
+        getSubscriptions().add(groupRepo.getGroupIdentities(currentIdentity.getGroup(), false)
                 .toList()
                 .toSingle()
                 .subscribe(new SingleSubscriber<List<Identity>>() {
                     @Override
                     public void onSuccess(List<Identity> identities) {
                         final int message = identities.size() == 1 &&
-                                Objects.equals(identities.get(0).getId(), mCurrentIdentity.getId())
+                                Objects.equals(identities.get(0).getId(), currentIdentity.getId())
                                 ? R.string.dialog_group_leave_delete_message
                                 : R.string.dialog_group_leave_message;
-                        mView.showLeaveGroupDialog(message);
+                        view.showLeaveGroupDialog(message);
                     }
 
                     @Override
                     public void onError(Throwable error) {
-                        mView.showMessage(R.string.toast_error_unknown);
+                        view.showMessage(R.string.toast_error_unknown);
                     }
                 })
         );
@@ -233,68 +234,68 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
 
     @Override
     public void onLeaveGroupSelected() {
-        getSubscriptions().add(mGroupRepo.leaveGroup(mCurrentIdentity)
+        getSubscriptions().add(groupRepo.leaveGroup(currentIdentity)
                 .subscribe(new SingleSubscriber<String>() {
                     @Override
                     public void onSuccess(String value) {
-                        mView.showMessage(R.string.toast_group_left);
+                        view.showMessage(R.string.toast_group_left);
                     }
 
                     @Override
                     public void onError(Throwable error) {
                         Timber.e(error, "failed to leave group with error:");
-                        mView.showMessage(R.string.toast_error_leave_group);
+                        view.showMessage(R.string.toast_error_leave_group);
                     }
                 }));
     }
 
     @Override
     public void onLogoutMenuClick() {
-        if (!mView.isNetworkAvailable()) {
-            mView.showMessage(R.string.toast_no_connection);
+        if (!view.isNetworkAvailable()) {
+            view.showMessage(R.string.toast_no_connection);
             return;
         }
 
-        if (mUserRepo.isGoogleUser(mFirebaseUser)) {
-            mView.showProgressDialog(R.string.progress_logout);
-            mView.loadGoogleUserWorker();
+        if (userRepo.isGoogleUser(firebaseUser)) {
+            view.showProgressDialog(R.string.progress_logout);
+            view.loadGoogleUserWorker();
         } else {
-            mUserRepo.signOut(mFirebaseUser);
+            userRepo.signOut(firebaseUser);
         }
     }
 
     @Override
     public void onDeleteAccountMenuClick() {
-        if (mUserRepo.isGoogleUser(mFirebaseUser) || mUserRepo.isFacebookUser(mFirebaseUser)) {
-            mView.showDeleteAccountDialog();
+        if (userRepo.isGoogleUser(firebaseUser) || userRepo.isFacebookUser(firebaseUser)) {
+            view.showDeleteAccountDialog();
         } else {
-            mView.showEmailReAuthenticateDialog(mFirebaseUser.getEmail());
+            view.showEmailReAuthenticateDialog(firebaseUser.getEmail());
         }
     }
 
     @Override
     public void onDeleteAccountSelected() {
-        if (!mView.isNetworkAvailable()) {
-            mView.showMessage(R.string.toast_no_connection);
+        if (!view.isNetworkAvailable()) {
+            view.showMessage(R.string.toast_no_connection);
             return;
         }
 
-        mView.showProgressDialog(R.string.progress_account_delete);
-        if (mUserRepo.isGoogleUser(mFirebaseUser)) {
-            mView.reAuthenticateGoogle();
-        } else if (mUserRepo.isFacebookUser(mFirebaseUser)) {
-            mView.reAuthenticateFacebook();
+        view.showProgressDialog(R.string.progress_account_delete);
+        if (userRepo.isGoogleUser(firebaseUser)) {
+            view.reAuthenticateGoogle();
+        } else if (userRepo.isFacebookUser(firebaseUser)) {
+            view.reAuthenticateFacebook();
         }
     }
 
     @Override
     public void onGoogleLoginSuccessful(@NonNull String idToken) {
-        mView.loadDeleteGoogleUserWorker(idToken);
+        view.loadDeleteGoogleUserWorker(idToken);
     }
 
     @Override
     public void onGoogleLoginFailed() {
-        mView.showMessage(R.string.toast_error_login_google);
+        view.showMessage(R.string.toast_error_login_google);
     }
 
     @Override
@@ -304,12 +305,12 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
 
     @Override
     public void onFacebookSignedIn(@NonNull String token) {
-        mView.loadDeleteFacebookUserWorker(token);
+        view.loadDeleteFacebookUserWorker(token);
     }
 
     @Override
     public void onFacebookLoginFailed() {
-        mView.showMessage(R.string.toast_error_login_facebook);
+        view.showMessage(R.string.toast_error_login_facebook);
     }
 
     @Override
@@ -319,7 +320,8 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
 
     @Override
     public void onValidEmailAndPasswordEntered(@NonNull String email, @NonNull String password) {
-        mView.loadDeleteEmailUserWorker(email, password);
+        view.showProgressDialog(R.string.progress_account_delete);
+        view.loadDeleteEmailUserWorker(email, password);
     }
 
     @Override
@@ -332,17 +334,17 @@ public class SettingsViewModelImpl extends ViewModelBaseImpl<SettingsViewModel.V
         return new SingleSubscriber<Void>() {
             @Override
             public void onSuccess(Void value) {
-                mView.removeWorker(workerTag);
-                mView.hideProgressDialog();
+                view.removeWorker(workerTag);
+                view.hideProgressDialog();
             }
 
             @Override
             public void onError(Throwable error) {
                 Timber.e(error, "logout or delete failed with error:");
-                mView.removeWorker(workerTag);
-                mView.hideProgressDialog();
+                view.removeWorker(workerTag);
+                view.hideProgressDialog();
 
-                mView.showMessage(R.string.toast_error_logout);
+                view.showMessage(R.string.toast_error_logout);
             }
         };
     }

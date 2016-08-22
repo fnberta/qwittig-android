@@ -34,6 +34,6 @@ public class LoginInvitationViewModelModule extends BaseViewModelModule {
     LoginInvitationViewModel providesLoginInvitationViewModel(@NonNull Navigator navigator,
                                                               @NonNull RxBus<Object> eventBus,
                                                               @NonNull UserRepository userRepository) {
-        return new LoginInvitationViewModelImpl(mSavedState, navigator, eventBus, userRepository);
+        return new LoginInvitationViewModelImpl(savedState, navigator, eventBus, userRepository);
     }
 }

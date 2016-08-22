@@ -36,7 +36,7 @@ public class DateUtils {
      */
     @NonNull
     public static Date parseDateFromPicker(int year, int month, int day) {
-        String dateString = String.valueOf(year) + "-" + (month + 1) + "-" + day;
+        final String dateString = String.valueOf(year) + "-" + (month + 1) + "-" + day;
         return parseStringToDate(dateString);
     }
 
@@ -93,8 +93,8 @@ public class DateUtils {
      * @param month the month number to get the name for
      * @return the short name of the month
      */
-    public static String getMonthNameShort(@IntRange(from = 1, to = 12) int month) {
-        return getMonthNames()[month - 1];
+    public static String getMonthNameShort(@IntRange(from = 0, to = 11) int month) {
+        return getMonthNames()[month];
     }
 
     /**

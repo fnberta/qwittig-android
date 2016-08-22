@@ -10,21 +10,21 @@ import ch.giantific.qwittig.data.rxwrapper.firebase.RxChildEvent.EventType;
  */
 public abstract class BaseChildItemModel extends BaseObservable implements ChildItemModel {
 
-    private final int mEventType;
-    private final String mId;
+    private final int eventType;
+    private final String id;
 
     public BaseChildItemModel(@EventType int eventType, @NonNull String id) {
-        mEventType = eventType;
-        mId = id;
+        this.eventType = eventType;
+        this.id = id;
     }
 
     @Override
     public int getEventType() {
-        return mEventType;
+        return eventType;
     }
 
     public String getId() {
-        return mId;
+        return id;
     }
 
     @Override

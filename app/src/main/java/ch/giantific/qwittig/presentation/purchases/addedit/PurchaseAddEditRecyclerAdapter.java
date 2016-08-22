@@ -28,10 +28,10 @@ import ch.giantific.qwittig.presentation.common.adapters.BaseRecyclerAdapter;
 import ch.giantific.qwittig.presentation.common.adapters.rows.BindingRow;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditHeaderItem;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItem;
+import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemIdentities;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemIdentity;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemModel;
 import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemModel.Type;
-import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAddEditItemIdentities;
 
 
 /**
@@ -42,10 +42,10 @@ import ch.giantific.qwittig.presentation.purchases.addedit.itemmodels.PurchaseAd
  */
 public class PurchaseAddEditRecyclerAdapter extends BaseRecyclerAdapter {
 
-    private final PurchaseAddEditViewModel mViewModel;
+    private final PurchaseAddEditViewModel viewModel;
 
     public PurchaseAddEditRecyclerAdapter(@NonNull PurchaseAddEditViewModel viewModel) {
-        mViewModel = viewModel;
+        this.viewModel = viewModel;
     }
 
     @Override
@@ -76,7 +76,7 @@ public class PurchaseAddEditRecyclerAdapter extends BaseRecyclerAdapter {
             case Type.USERS: {
                 final RowPurchaseAddItemUsersBinding binding =
                         RowPurchaseAddItemUsersBinding.inflate(inflater, parent, false);
-                return new ItemUsersRow(context, binding, mViewModel);
+                return new ItemIdentitiesRow(context, binding, viewModel);
             }
             case Type.ADD_ROW: {
                 final RowPurchaseAddAddRowBinding binding =
@@ -86,7 +86,7 @@ public class PurchaseAddEditRecyclerAdapter extends BaseRecyclerAdapter {
             case Type.TOTAL: {
                 final RowPurchaseAddTotalBinding binding =
                         RowPurchaseAddTotalBinding.inflate(inflater, parent, false);
-                return new TotalRow(context, binding, mViewModel);
+                return new TotalRow(context, binding, viewModel);
             }
             default:
                 return super.onCreateViewHolder(parent, viewType);
@@ -96,7 +96,7 @@ public class PurchaseAddEditRecyclerAdapter extends BaseRecyclerAdapter {
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        final PurchaseAddEditItemModel itemModel = mViewModel.getItemAtPosition(position);
+        final PurchaseAddEditItemModel itemModel = viewModel.getItemAtPosition(position);
         final int type = getItemViewType(position);
         switch (type) {
             case Type.HEADER: {
@@ -113,7 +113,7 @@ public class PurchaseAddEditRecyclerAdapter extends BaseRecyclerAdapter {
                         (BindingRow<RowPurchaseAddDateBinding>) holder;
                 final RowPurchaseAddDateBinding binding = row.getBinding();
 
-                binding.setViewModel(mViewModel);
+                binding.setViewModel(viewModel);
                 binding.executePendingBindings();
                 break;
             }
@@ -122,7 +122,7 @@ public class PurchaseAddEditRecyclerAdapter extends BaseRecyclerAdapter {
                         (BindingRow<RowPurchaseAddStoreBinding>) holder;
                 final RowPurchaseAddStoreBinding binding = row.getBinding();
 
-                binding.setViewModel(mViewModel);
+                binding.setViewModel(viewModel);
                 binding.executePendingBindings();
                 break;
             }
@@ -132,15 +132,15 @@ public class PurchaseAddEditRecyclerAdapter extends BaseRecyclerAdapter {
 
                 final PurchaseAddEditItem addEditItem = (PurchaseAddEditItem) itemModel;
                 binding.setItemModel(addEditItem);
-                binding.setViewModel(mViewModel);
+                binding.setViewModel(viewModel);
                 binding.executePendingBindings();
                 break;
             }
             case Type.USERS: {
-                final ItemUsersRow row = (ItemUsersRow) holder;
+                final ItemIdentitiesRow row = (ItemIdentitiesRow) holder;
 
                 final PurchaseAddEditItemIdentities itemUsersRow = (PurchaseAddEditItemIdentities) itemModel;
-                row.setUsers(itemUsersRow.getUsers());
+                row.setIdentities(itemUsersRow.getIdentities());
                 break;
             }
             case Type.ADD_ROW: {
@@ -149,7 +149,7 @@ public class PurchaseAddEditRecyclerAdapter extends BaseRecyclerAdapter {
                 final RowPurchaseAddAddRowBinding binding = row.getBinding();
 
                 binding.setItemModel(itemModel);
-                binding.setViewModel(mViewModel);
+                binding.setViewModel(viewModel);
                 binding.executePendingBindings();
                 break;
             }
@@ -157,7 +157,7 @@ public class PurchaseAddEditRecyclerAdapter extends BaseRecyclerAdapter {
                 final TotalRow row = (TotalRow) holder;
                 final RowPurchaseAddTotalBinding binding = row.getBinding();
 
-                binding.setViewModel(mViewModel);
+                binding.setViewModel(viewModel);
                 binding.executePendingBindings();
                 break;
             }
@@ -166,35 +166,35 @@ public class PurchaseAddEditRecyclerAdapter extends BaseRecyclerAdapter {
 
     @Override
     public int getItemCount() {
-        return mViewModel.getItemCount();
+        return viewModel.getItemCount();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return mViewModel.getItemViewType(position);
+        return viewModel.getItemViewType(position);
     }
 
-    private static class ItemUsersRow extends BindingRow<RowPurchaseAddItemUsersBinding> {
+    private static class ItemIdentitiesRow extends BindingRow<RowPurchaseAddItemUsersBinding> {
 
-        private final PurchaseAddEditItemUsersRecyclerAdapter mRecyclerAdapter;
-        private final List<PurchaseAddEditItemIdentity> mUsers = new ArrayList<>();
+        private final PurchaseAddEditItemUsersRecyclerAdapter recyclerAdapter;
+        private final List<PurchaseAddEditItemIdentity> identities = new ArrayList<>();
 
-        public ItemUsersRow(@NonNull Context context,
-                            @NonNull RowPurchaseAddItemUsersBinding binding,
-                            @NonNull PurchaseAddEditViewModel viewModel) {
+        public ItemIdentitiesRow(@NonNull Context context,
+                                 @NonNull RowPurchaseAddItemUsersBinding binding,
+                                 @NonNull PurchaseAddEditViewModel viewModel) {
             super(binding);
 
             binding.rvPurchaseAddItemUsers.setHasFixedSize(true);
             binding.rvPurchaseAddItemUsers.setLayoutManager(new LinearLayoutManager(context,
                     LinearLayoutManager.HORIZONTAL, false));
-            mRecyclerAdapter = new PurchaseAddEditItemUsersRecyclerAdapter(viewModel, mUsers);
-            binding.rvPurchaseAddItemUsers.setAdapter(mRecyclerAdapter);
+            recyclerAdapter = new PurchaseAddEditItemUsersRecyclerAdapter(viewModel, identities);
+            binding.rvPurchaseAddItemUsers.setAdapter(recyclerAdapter);
         }
 
-        public void setUsers(@NonNull PurchaseAddEditItemIdentity[] users) {
-            mUsers.clear();
-            mUsers.addAll(Arrays.asList(users));
-            mRecyclerAdapter.notifyDataSetChanged();
+        public void setIdentities(@NonNull PurchaseAddEditItemIdentity[] identities) {
+            this.identities.clear();
+            this.identities.addAll(Arrays.asList(identities));
+            recyclerAdapter.notifyDataSetChanged();
         }
     }
 

@@ -6,7 +6,6 @@ package ch.giantific.qwittig.presentation.finance.paid.itemmodels;
 
 import android.databinding.Bindable;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -24,12 +23,12 @@ import ch.giantific.qwittig.utils.DateUtils;
 public class CompsPaidItemModel extends BaseChildItemModel
         implements Comparable<CompsPaidItemModel> {
 
-    private final Date mDate;
-    private final String mAmount;
-    private final boolean mAmountPos;
-    private final String mPaidAt;
-    private final String mNickname;
-    private final String mAvatar;
+    private final Date date;
+    private final String amount;
+    private final boolean amountPos;
+    private final String paidAt;
+    private final String nickname;
+    private final String avatar;
 
     public CompsPaidItemModel(@EventType int eventType,
                               @NonNull Compensation compensation,
@@ -38,47 +37,47 @@ public class CompsPaidItemModel extends BaseChildItemModel
                               @NonNull NumberFormat numberFormat) {
         super(eventType, identity.getId());
 
-        mDate = compensation.getPaidAtDate();
-        mAmount = numberFormat.format(compensation.getAmountFraction());
-        mAmountPos = isPos;
+        date = compensation.getPaidAtDate();
+        amount = numberFormat.format(compensation.getAmountFraction());
+        amountPos = isPos;
         final DateFormat dateFormatter = DateUtils.getDateFormatter(true);
-        mPaidAt = dateFormatter.format(mDate);
-        mNickname = identity.getNickname();
-        mAvatar = identity.getAvatar();
+        paidAt = dateFormatter.format(date);
+        nickname = identity.getNickname();
+        avatar = identity.getAvatar();
     }
 
     public Date getDate() {
-        return mDate;
+        return date;
     }
 
     @Bindable
     public String getAmount() {
-        return mAmount;
+        return amount;
     }
 
     @Bindable
     public boolean isAmountPos() {
-        return mAmountPos;
+        return amountPos;
     }
 
     @Bindable
     public String getPaidAt() {
-        return mPaidAt;
+        return paidAt;
     }
 
     @Bindable
     public String getNickname() {
-        return mNickname;
+        return nickname;
     }
 
     @Bindable
     public String getAvatar() {
-        return mAvatar;
+        return avatar;
     }
 
     @Override
     public int compareTo(@NonNull CompsPaidItemModel compsPaidItemModel) {
-        return mDate.compareTo(compsPaidItemModel.getDate());
+        return date.compareTo(compsPaidItemModel.getDate());
     }
 
     @Override
@@ -88,21 +87,21 @@ public class CompsPaidItemModel extends BaseChildItemModel
 
         final CompsPaidItemModel that = (CompsPaidItemModel) o;
 
-        if (mAmountPos != that.isAmountPos()) return false;
-        if (!mDate.equals(that.getDate())) return false;
-        if (!mAmount.equals(that.getAmount())) return false;
-        if (!mNickname.equals(that.getNickname())) return false;
-        return mAvatar != null ? mAvatar.equals(that.getAvatar()) : that.getAvatar() == null;
+        if (amountPos != that.isAmountPos()) return false;
+        if (!date.equals(that.getDate())) return false;
+        if (!amount.equals(that.getAmount())) return false;
+        if (!nickname.equals(that.getNickname())) return false;
+        return avatar != null ? avatar.equals(that.getAvatar()) : that.getAvatar() == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = mDate.hashCode();
-        result = 31 * result + mAmount.hashCode();
-        result = 31 * result + (mAmountPos ? 1 : 0);
-        result = 31 * result + mNickname.hashCode();
-        result = 31 * result + (mAvatar != null ? mAvatar.hashCode() : 0);
+        int result = date.hashCode();
+        result = 31 * result + amount.hashCode();
+        result = 31 * result + (amountPos ? 1 : 0);
+        result = 31 * result + nickname.hashCode();
+        result = 31 * result + (avatar != null ? avatar.hashCode() : 0);
         return result;
     }
 }

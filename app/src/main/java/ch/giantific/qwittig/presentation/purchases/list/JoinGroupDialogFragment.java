@@ -62,14 +62,14 @@ public class JoinGroupDialogFragment extends BaseDialogFragment<JoinGroupDialogF
                 .setMessage(getString(R.string.dialog_group_join_message, inviterNickname, groupName))
                 .setPositiveButton(R.string.dialog_positive_join, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mActivity.onJoinInvitedGroupSelected(identityId);
+                        activity.onJoinInvitedGroupSelected(identityId);
                         dismiss();
                     }
                 })
                 .setNegativeButton(R.string.dialog_negative_discard, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mActivity.onDiscardInvitationSelected();
+                        activity.onDiscardInvitationSelected();
                         dismiss();
                     }
                 });

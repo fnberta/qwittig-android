@@ -22,10 +22,10 @@ import ch.giantific.qwittig.presentation.purchases.details.itemmodels.PurchaseDe
  */
 public class PurchaseDetailsIdentitiesRecyclerAdapter extends BaseRecyclerAdapter<BindingRow<RowPurchaseDetailsIdentityBinding>> {
 
-    private final PurchaseDetailsViewModel mViewModel;
+    private final PurchaseDetailsViewModel viewModel;
 
     public PurchaseDetailsIdentitiesRecyclerAdapter(@NonNull PurchaseDetailsViewModel viewModel) {
-        mViewModel = viewModel;
+        this.viewModel = viewModel;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class PurchaseDetailsIdentitiesRecyclerAdapter extends BaseRecyclerAdapte
     @Override
     public void onBindViewHolder(BindingRow<RowPurchaseDetailsIdentityBinding> holder, int position) {
         final RowPurchaseDetailsIdentityBinding binding = holder.getBinding();
-        final PurchaseDetailsIdentityItemModel itemModel = mViewModel.getIdentityAtPosition(position);
+        final PurchaseDetailsIdentityItemModel itemModel = viewModel.getIdentityAtPosition(position);
 
         binding.setItemModel(itemModel);
         binding.executePendingBindings();
@@ -47,6 +47,6 @@ public class PurchaseDetailsIdentitiesRecyclerAdapter extends BaseRecyclerAdapte
 
     @Override
     public int getItemCount() {
-        return mViewModel.getIdentitiesCount();
+        return viewModel.getIdentitiesCount();
     }
 }

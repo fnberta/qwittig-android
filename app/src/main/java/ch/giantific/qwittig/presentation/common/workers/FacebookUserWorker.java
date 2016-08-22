@@ -40,7 +40,7 @@ public class FacebookUserWorker extends BaseWorker<Void, GoogleUserWorkerListene
     private static final String KEY_PASSWORD = "PASSWORD";
     private static final String KEY_TOKEN = "TOKEN";
     @Inject
-    Application mAppContext;
+    Application appContext;
 
     public FacebookUserWorker() {
         // empty default constructor
@@ -102,7 +102,7 @@ public class FacebookUserWorker extends BaseWorker<Void, GoogleUserWorkerListene
     protected Observable<Void> getObservable(@NonNull Bundle args) {
         @FacebookUserAction
         final int type = args.getInt(KEY_TYPE);
-        final FirebaseUser firebaseUser = mUserRepo.getCurrentUser();
+        final FirebaseUser firebaseUser = userRepo.getCurrentUser();
         if (firebaseUser == null) {
             return null;
         }
@@ -111,11 +111,11 @@ public class FacebookUserWorker extends BaseWorker<Void, GoogleUserWorkerListene
             case FacebookUserAction.DELETE: {
                 final String token = args.getString(KEY_TOKEN, "");
                 final AuthCredential authCredential = FacebookAuthProvider.getCredential(token);
-                return mUserRepo.unlinkFacebook()
+                return userRepo.unlinkFacebook()
                         .flatMap(new Func1<Void, Single<Void>>() {
                             @Override
                             public Single<Void> call(Void aVoid) {
-                                return mUserRepo.deleteUser(firebaseUser, authCredential);
+                                return userRepo.deleteUser(firebaseUser, authCredential);
                             }
                         })
                         .toObservable();
@@ -126,11 +126,11 @@ public class FacebookUserWorker extends BaseWorker<Void, GoogleUserWorkerListene
                 final String token = args.getString(KEY_TOKEN, "");
                 final AuthCredential oldCredential = FacebookAuthProvider.getCredential(token);
                 final AuthCredential newCredential = EmailAuthProvider.getCredential(email, password);
-                return mUserRepo.linkUserWithCredential(firebaseUser, oldCredential, newCredential)
+                return userRepo.linkUserWithCredential(firebaseUser, oldCredential, newCredential)
                         .flatMap(new Func1<AuthResult, Single<Void>>() {
                             @Override
                             public Single<Void> call(AuthResult authResult) {
-                                return mUserRepo.unlinkFacebook();
+                                return userRepo.unlinkFacebook();
                             }
                         })
                         .toObservable();
@@ -142,12 +142,12 @@ public class FacebookUserWorker extends BaseWorker<Void, GoogleUserWorkerListene
 
     @Override
     protected void onError() {
-        mActivity.onWorkerError(WORKER_TAG);
+        activity.onWorkerError(WORKER_TAG);
     }
 
     @Override
     protected void setStream(@NonNull Observable<Void> observable) {
-        mActivity.setGoogleUserStream(observable.toSingle(), WORKER_TAG);
+        activity.setGoogleUserStream(observable.toSingle(), WORKER_TAG);
     }
 
     @IntDef({FacebookUserAction.UNLINK, FacebookUserAction.DELETE})

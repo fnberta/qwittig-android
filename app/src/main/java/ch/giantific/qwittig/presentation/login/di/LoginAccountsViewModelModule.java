@@ -38,7 +38,7 @@ public class LoginAccountsViewModelModule extends BaseViewModelModule {
                                                           @NonNull RemoteConfigHelper configHelper,
                                                           @NonNull UserRepository userRepository,
                                                           @NonNull GroupRepository groupRepository) {
-        return new LoginAccountsViewModelImpl(mSavedState, navigator, eventBus, configHelper,
+        return new LoginAccountsViewModelImpl(savedState, navigator, eventBus, configHelper,
                 userRepository, groupRepository);
     }
 }

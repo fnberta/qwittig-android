@@ -39,7 +39,7 @@ public class DiscardChangesDialogFragment extends BaseDialogFragment<DiscardChan
         dialogBuilder.setMessage(R.string.dialog_discard_changes_message)
                 .setPositiveButton(R.string.dialog_negative_discard, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mActivity.onDiscardChangesSelected();
+                        activity.onDiscardChangesSelected();
                         dismiss();
                     }
                 })

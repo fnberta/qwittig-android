@@ -31,12 +31,12 @@ import timber.log.Timber;
 public abstract class ListViewModelBaseImpl<T extends ChildItemModel, S extends ListViewModel.ViewListener>
         extends ViewModelBaseImpl<S> implements ListViewModel<T, S>, Observer<T> {
 
-    protected final SortedList<T> mItems;
-    private final SortedListCallback<T> mListCallback;
-    protected ListInteraction mListInteraction;
-    protected boolean mInitialDataLoaded;
-    private Subscription mInitialDataSub;
-    private Subscription mDataListenerSub;
+    protected final SortedList<T> items;
+    private final SortedListCallback<T> listCallback;
+    protected ListInteraction listInteraction;
+    protected boolean initialDataLoaded;
+    private Subscription initialDataSub;
+    private Subscription dataListenerSub;
 
     public ListViewModelBaseImpl(@Nullable Bundle savedState,
                                  @NonNull Navigator navigator,
@@ -44,16 +44,16 @@ public abstract class ListViewModelBaseImpl<T extends ChildItemModel, S extends 
                                  @NonNull UserRepository userRepository) {
         super(savedState, navigator, eventBus, userRepository);
 
-        mListCallback = new SortedListCallback<T>() {
+        listCallback = new SortedListCallback<T>() {
             @Override
             public int compare(T o1, T o2) {
                 return compareItemModels(o1, o2);
             }
         };
-        mItems = new SortedList<>(getItemModelClass(), mListCallback);
+        items = new SortedList<>(getItemModelClass(), listCallback);
 
         if (savedState == null) {
-            mLoading = true;
+            loading = true;
         }
     }
 
@@ -63,29 +63,29 @@ public abstract class ListViewModelBaseImpl<T extends ChildItemModel, S extends 
 
     @Override
     public void setListInteraction(@NonNull ListInteraction listInteraction) {
-        mListInteraction = listInteraction;
-        mListCallback.setListInteraction(listInteraction);
+        this.listInteraction = listInteraction;
+        listCallback.setListInteraction(listInteraction);
     }
 
     @Override
     @Bindable
     public boolean isEmpty() {
-        return mItems.size() == 0;
+        return items.size() == 0;
     }
 
     @Override
     public final T getItemAtPosition(int position) {
-        return mItems.get(position);
+        return items.get(position);
     }
 
     @Override
     public final int getItemViewType(int position) {
-        return mItems.get(position).getViewType();
+        return items.get(position).getViewType();
     }
 
     @Override
     public int getItemCount() {
-        return mItems.size();
+        return items.size();
     }
 
     @Override
@@ -99,7 +99,7 @@ public abstract class ListViewModelBaseImpl<T extends ChildItemModel, S extends 
         final int type = itemModel.getEventType();
         switch (type) {
             case EventType.ADDED: {
-                mItems.add(itemModel);
+                items.add(itemModel);
                 notifyPropertyChanged(BR.empty);
                 break;
             }
@@ -107,11 +107,11 @@ public abstract class ListViewModelBaseImpl<T extends ChildItemModel, S extends 
                 // fall through
             case EventType.MOVED: {
                 final int pos = getPositionForId(itemModel.getId());
-                mItems.updateItemAt(pos, itemModel);
+                items.updateItemAt(pos, itemModel);
                 break;
             }
             case EventType.REMOVED: {
-                mItems.remove(itemModel);
+                items.remove(itemModel);
                 notifyPropertyChanged(BR.empty);
                 break;
             }
@@ -129,8 +129,8 @@ public abstract class ListViewModelBaseImpl<T extends ChildItemModel, S extends 
     }
 
     protected final int getPositionForId(@NonNull String id) {
-        for (int i = 0, itemsSize = mItems.size(); i < itemsSize; i++) {
-            final T itemModel = mItems.get(i);
+        for (int i = 0, itemsSize = items.size(); i < itemsSize; i++) {
+            final T itemModel = items.get(i);
             if (Objects.equals(itemModel.getId(), id)) {
                 return i;
             }
@@ -140,20 +140,20 @@ public abstract class ListViewModelBaseImpl<T extends ChildItemModel, S extends 
     }
 
     protected final void setDataListenerSub(@NonNull Subscription sub) {
-        if (mInitialDataSub != null && !mInitialDataSub.isUnsubscribed()) {
-            mInitialDataSub.unsubscribe();
+        if (initialDataSub != null && !initialDataSub.isUnsubscribed()) {
+            initialDataSub.unsubscribe();
         }
 
-        mInitialDataSub = sub;
+        initialDataSub = sub;
         getSubscriptions().add(sub);
     }
 
     protected final void setInitialDataSub(@NonNull Subscription sub) {
-        if (mDataListenerSub != null && !mDataListenerSub.isUnsubscribed()) {
-            mDataListenerSub.unsubscribe();
+        if (dataListenerSub != null && !dataListenerSub.isUnsubscribed()) {
+            dataListenerSub.unsubscribe();
         }
 
-        mDataListenerSub = sub;
+        dataListenerSub = sub;
         getSubscriptions().add(sub);
     }
 }

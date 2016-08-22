@@ -25,6 +25,7 @@ import ch.giantific.qwittig.data.repositories.UserRepository;
 import ch.giantific.qwittig.domain.models.Identity;
 import ch.giantific.qwittig.presentation.common.Navigator;
 import ch.giantific.qwittig.presentation.common.viewmodels.ViewModelBaseImpl;
+import ch.giantific.qwittig.presentation.login.LoginWorker.LoginType;
 import rx.Single;
 import rx.SingleSubscriber;
 import rx.functions.Action1;
@@ -37,30 +38,31 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
         implements LoginEmailViewModel {
 
     private static final String STATE_SIGN_UP = "STATE_SIGN_UP";
-    private final RemoteConfigHelper mConfigHelper;
-    private final GroupRepository mGroupRepo;
-    private String mIdentityId;
-    private boolean mSignUp;
-    private String mEmail;
-    private String mPassword;
-    private String mPasswordRepeat;
-    private boolean mValidate;
+
+    private final RemoteConfigHelper configHelper;
+    private final GroupRepository groupRepo;
+    private String identityId;
+    private boolean signUp;
+    private String email;
+    private String password;
+    private String passwordRepeat;
+    private boolean validate;
 
     public LoginEmailViewModelImpl(@Nullable Bundle savedState,
                                    @NonNull Navigator navigator,
                                    @NonNull RxBus<Object> eventBus,
                                    @NonNull RemoteConfigHelper configHelper,
                                    @NonNull UserRepository userRepository,
-                                   @NonNull GroupRepository groupRepository) {
+                                   @NonNull GroupRepository groupRepo) {
         super(savedState, navigator, eventBus, userRepository);
-        mConfigHelper = configHelper;
+        this.configHelper = configHelper;
 
-        mGroupRepo = groupRepository;
+        this.groupRepo = groupRepo;
 
         if (savedState != null) {
-            mSignUp = savedState.getBoolean(STATE_SIGN_UP);
+            signUp = savedState.getBoolean(STATE_SIGN_UP);
         } else {
-            mSignUp = false;
+            signUp = false;
         }
     }
 
@@ -68,12 +70,12 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
     public void saveState(@NonNull Bundle outState) {
         super.saveState(outState);
 
-        outState.putBoolean(STATE_SIGN_UP, mSignUp);
+        outState.putBoolean(STATE_SIGN_UP, signUp);
     }
 
     @Override
     public void setIdentityId(@NonNull String identityId) {
-        mIdentityId = identityId;
+        this.identityId = identityId;
     }
 
     @Override
@@ -81,75 +83,75 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
         super.setLoading(loading);
 
         if (loading) {
-            mView.hideKeyboard();
+            view.hideKeyboard();
         }
     }
 
     @Override
     @Bindable
     public boolean isValidate() {
-        return mValidate;
+        return validate;
     }
 
     @Override
     public void setValidate(boolean validate) {
-        mValidate = validate;
+        this.validate = validate;
         notifyPropertyChanged(BR.validate);
     }
 
     @Override
     public boolean isEmailComplete() {
-        return !TextUtils.isEmpty(mEmail);
+        return !TextUtils.isEmpty(email);
     }
 
     @Override
     public boolean isPasswordComplete() {
-        return !TextUtils.isEmpty(mPassword);
+        return !TextUtils.isEmpty(password);
     }
 
     @Override
     public boolean isPasswordsMatch() {
-        return Objects.equals(mPassword, mPasswordRepeat);
+        return Objects.equals(password, passwordRepeat);
     }
 
     @Override
     @Bindable
     public boolean isSignUp() {
-        return mSignUp;
+        return signUp;
     }
 
     @Override
     public void setSignUp(boolean signUp) {
-        mSignUp = signUp;
+        this.signUp = signUp;
         notifyPropertyChanged(BR.signUp);
     }
 
     @Override
     public void setUserLoginStream(@NonNull Single<FirebaseUser> single,
                                    @NonNull final String workerTag,
-                                   @LoginWorker.Type final int type) {
+                                   @LoginType final int type) {
         getSubscriptions().add(single
                 .flatMap(new Func1<FirebaseUser, Single<Boolean>>() {
                     @Override
                     public Single<Boolean> call(final FirebaseUser firebaseUser) {
                         final String userId = firebaseUser.getUid();
-                        if (!TextUtils.isEmpty(mIdentityId)) {
-                            return mUserRepo.getIdentity(mIdentityId)
+                        if (!TextUtils.isEmpty(identityId)) {
+                            return userRepo.getIdentity(identityId)
                                     .doOnSuccess(new Action1<Identity>() {
                                         @Override
                                         public void call(Identity identity) {
-                                            mGroupRepo.joinGroup(userId, mIdentityId, identity.getGroup());
+                                            groupRepo.joinGroup(userId, identityId, identity.getGroup());
                                         }
                                     })
                                     .map(new Func1<Identity, Boolean>() {
                                         @Override
                                         public Boolean call(Identity identity) {
-                                            return type == LoginWorker.Type.SIGN_UP_EMAIL;
+                                            return type == LoginType.SIGN_UP_EMAIL;
                                         }
                                     });
                         }
 
-                        if (type == LoginWorker.Type.SIGN_UP_EMAIL) {
+                        if (type == LoginType.SIGN_UP_EMAIL) {
                             return Single.just(true)
                                     .doOnSuccess(new Action1<Boolean>() {
                                         @Override
@@ -158,9 +160,9 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
                                             final String defaultNickname = !TextUtils.isEmpty(email)
                                                     ? email.substring(0, email.indexOf("@"))
                                                     : "";
-                                            mGroupRepo.createGroup(userId,
-                                                    mConfigHelper.getDefaultGroupName(),
-                                                    mConfigHelper.getDefaultGroupCurrency(),
+                                            groupRepo.createGroup(userId,
+                                                    configHelper.getDefaultGroupName(),
+                                                    configHelper.getDefaultGroupCurrency(),
                                                     defaultNickname, null);
                                         }
                                     });
@@ -172,21 +174,21 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
                 .subscribe(new SingleSubscriber<Boolean>() {
                     @Override
                     public void onSuccess(Boolean isUserNew) {
-                        mView.removeWorker(workerTag);
+                        view.removeWorker(workerTag);
 
                         if (isUserNew) {
-                            mView.showProfileScreen(!TextUtils.isEmpty(mIdentityId));
+                            view.showProfileScreen(!TextUtils.isEmpty(identityId));
                         } else {
-                            mNavigator.finish(Activity.RESULT_OK);
+                            navigator.finish(Activity.RESULT_OK);
                         }
                     }
 
                     @Override
                     public void onError(Throwable error) {
-                        mView.removeWorker(workerTag);
+                        view.removeWorker(workerTag);
                         setLoading(false);
 
-                        mView.showMessage(R.string.toast_error_login);
+                        view.showMessage(R.string.toast_error_login);
                     }
                 })
         );
@@ -197,18 +199,18 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
         getSubscriptions().add(single.subscribe(new SingleSubscriber<Void>() {
                     @Override
                     public void onSuccess(Void value) {
-                        mView.removeWorker(workerTag);
+                        view.removeWorker(workerTag);
                         setLoading(false);
 
-                        mView.showMessage(R.string.toast_password_reset);
+                        view.showMessage(R.string.toast_password_reset);
                     }
 
                     @Override
                     public void onError(Throwable error) {
-                        mView.removeWorker(workerTag);
+                        view.removeWorker(workerTag);
                         setLoading(false);
 
-                        mView.showMessage(R.string.toast_error_login);
+                        view.showMessage(R.string.toast_error_login);
                     }
                 })
         );
@@ -216,27 +218,27 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
 
     @Override
     public void onEmailChanged(CharSequence s, int start, int before, int count) {
-        mEmail = s.toString();
+        email = s.toString();
 
-        if (mValidate) {
+        if (validate) {
             notifyPropertyChanged(BR.validate);
         }
     }
 
     @Override
     public void onPasswordChanged(CharSequence s, int start, int before, int count) {
-        mPassword = s.toString();
+        password = s.toString();
 
-        if (mValidate) {
+        if (validate) {
             notifyPropertyChanged(BR.validate);
         }
     }
 
     @Override
     public void onPasswordRepeatChanged(CharSequence s, int start, int before, int count) {
-        mPasswordRepeat = s.toString();
+        passwordRepeat = s.toString();
 
-        if (mValidate) {
+        if (validate) {
             notifyPropertyChanged(BR.validate);
         }
     }
@@ -245,37 +247,37 @@ public class LoginEmailViewModelImpl extends ViewModelBaseImpl<LoginEmailViewMod
     public void onLoginClick(View view) {
         if (validate()) {
             setLoading(true);
-            mView.loadEmailLoginWorker(mEmail, mPassword);
+            this.view.loadEmailLoginWorker(email, password);
         }
     }
 
     @Override
     public void onSignUpClick(View view) {
-        if (!mSignUp) {
+        if (!signUp) {
             setSignUp(true);
             return;
         }
 
         if (validate()) {
             setLoading(true);
-            mView.loadEmailSignUpWorker(mEmail, mPassword);
+            this.view.loadEmailSignUpWorker(email, password);
         }
     }
 
     private boolean validate() {
         setValidate(true);
-        return mSignUp
+        return signUp
                 ? isEmailComplete() && isPasswordComplete() && isPasswordsMatch()
                 : isEmailComplete() && isPasswordComplete();
     }
 
     @Override
     public void onResetPasswordClick(View view) {
-        mView.showResetPasswordDialog(mEmail);
+        this.view.showResetPasswordDialog(email);
     }
 
     @Override
     public void onValidEmailEntered(@NonNull String email) {
-        mView.loadResetPasswordWorker(email);
+        view.loadResetPasswordWorker(email);
     }
 }

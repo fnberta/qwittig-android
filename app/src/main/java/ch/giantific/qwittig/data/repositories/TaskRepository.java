@@ -15,15 +15,15 @@ import ch.giantific.qwittig.domain.models.TaskHistoryEvent;
  */
 public class TaskRepository {
 
-    private final DatabaseReference mDatabaseRef;
+    private final DatabaseReference databaseRef;
 
     @Inject
     public TaskRepository(@NonNull FirebaseDatabase firebaseDatabase) {
-        mDatabaseRef = firebaseDatabase.getReference();
+        databaseRef = firebaseDatabase.getReference();
     }
 
     public void deleteTask(@NonNull String taskId) {
-        mDatabaseRef.child(Task.PATH).child(taskId).removeValue();
+        databaseRef.child(Task.BASE_PATH).child(taskId).removeValue();
     }
 
     public void addHistoryEvent(@NonNull TaskHistoryEvent historyEvent) {

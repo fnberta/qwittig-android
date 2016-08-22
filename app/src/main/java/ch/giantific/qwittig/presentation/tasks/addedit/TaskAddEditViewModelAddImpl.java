@@ -49,71 +49,72 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
     private static final String STATE_DEADLINE_SELECTED = "STATE_DEADLINE_SELECTED";
     private static final String STATE_ITEMS = "STATE_ITEMS";
     private static final String STATE_TITLE = "STATE_TITLE";
-    final ArrayList<TaskAddEditIdentityItemModel> mItems;
-    final TaskRepository mTaskRepo;
-    private final int[] mTimeFrames = new int[]{
+
+    final ArrayList<TaskAddEditIdentityItemModel> items;
+    final TaskRepository taskRepo;
+    private final int[] timeFrames = new int[]{
             R.string.time_frame_daily,
             R.string.time_frame_weekly,
             R.string.time_frame_monthly,
             R.string.time_frame_yearly,
             R.string.time_frame_as_needed,
             R.string.time_frame_one_time};
-    private final DateFormat mDateFormatter;
-    Date mDeadline;
-    String mTitle;
-    ListInteraction mListInteraction;
-    private Identity mCurrentIdentity;
-    private ListDragInteraction mListDragInteraction;
-    private int mTimeFrame;
+    private final DateFormat dateFormatter;
+    Date deadline;
+    String title;
+    ListInteraction listInteraction;
+    private Identity currentIdentity;
+    private ListDragInteraction listDragInteraction;
+    private int timeFrame;
 
     public TaskAddEditViewModelAddImpl(@Nullable Bundle savedState,
                                        @NonNull Navigator navigator,
                                        @NonNull RxBus<Object> eventBus,
-                                       @NonNull UserRepository userRepository,
-                                       @NonNull TaskRepository taskRepository) {
-        super(savedState, navigator, eventBus, userRepository);
+                                       @NonNull UserRepository userRepo,
+                                       @NonNull TaskRepository taskRepo) {
+        super(savedState, navigator, eventBus, userRepo);
 
-        mTaskRepo = taskRepository;
+        this.taskRepo = taskRepo;
 
         if (savedState != null) {
-            mTitle = savedState.getString(STATE_TITLE);
-            mDeadline = new Date(savedState.getLong(STATE_DEADLINE_SELECTED));
-            mItems = savedState.getParcelableArrayList(STATE_ITEMS);
+            title = savedState.getString(STATE_TITLE);
+            deadline = new Date(savedState.getLong(STATE_DEADLINE_SELECTED));
+            items = savedState.getParcelableArrayList(STATE_ITEMS);
         } else {
-            mItems = new ArrayList<>();
-            mDeadline = new Date();
+            items = new ArrayList<>();
+            deadline = new Date();
         }
 
-        mDateFormatter = DateUtils.getDateFormatter(false);
+        dateFormatter = DateUtils.getDateFormatter(false);
     }
 
     @Override
     public void saveState(@NonNull Bundle outState) {
         super.saveState(outState);
 
-        outState.putString(STATE_TITLE, mTitle);
-        outState.putLong(STATE_DEADLINE_SELECTED, mDeadline.getTime());
-        outState.putParcelableArrayList(STATE_ITEMS, mItems);
+        outState.putString(STATE_TITLE, title);
+        outState.putLong(STATE_DEADLINE_SELECTED, deadline.getTime());
+        outState.putParcelableArrayList(STATE_ITEMS, items);
     }
 
     @Override
     public void setListInteraction(@NonNull ListInteraction listInteraction) {
-        mListInteraction = listInteraction;
+        this.listInteraction = listInteraction;
     }
 
     @Override
     public void setListDragInteraction(@NonNull ListDragInteraction listDragInteraction) {
-        mListDragInteraction = listDragInteraction;
+        this.listDragInteraction = listDragInteraction;
     }
 
     @Override
     public boolean isEmpty() {
-        return mItems.isEmpty();
+        return items.isEmpty();
     }
 
     @Override
     public TaskAddEditIdentityItemModel getItemAtPosition(int position) {
-        return mItems.get(position);
+        return items.get(position);
     }
 
     @Override
@@ -123,12 +124,12 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
 
     @Override
     public int getItemCount() {
-        return mItems.size();
+        return items.size();
     }
 
     @Override
     public int[] getTimeFrames() {
-        return mTimeFrames;
+        return timeFrames;
     }
 
     @Override
@@ -140,19 +141,19 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
 
 //    @Override
 //    public void loadData() {
-//        getSubscriptions().add(mUserRepo.getGroupIdentities(mCurrentIdentity.getGroup(), true)
+//        getSubscriptions().add(userRepo.getGroupIdentities(currentIdentity.getGroup(), true)
 //                .toList()
 //                .toSingle()
 //                .subscribe(new SingleSubscriber<List<Identity>>() {
 //                    @Override
 //                    public void onSuccess(List<Identity> identities) {
-//                        mItems.clear();
+//                        items.clear();
 //
 //                        final int size = identities.size();
 //                        if (mTaskIdentities.isEmpty()) {
 //                            for (int i = 0; i < size; i++) {
 //                                final Identity identity = identities.get(i);
-//                                mItems.add(identity);
+//                                items.add(identity);
 //                                mTaskIdentities.add(new TaskUser(identity.getObjectId(), true));
 //                            }
 //                        } else {
@@ -174,14 +175,14 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
 //                                }
 //                            }
 //
-//                            Collections.addAll(mItems, userArray);
+//                            Collections.addAll(items, userArray);
 //                            for (Identity identity : identities) {
-//                                mItems.add(identity);
+//                                items.add(identity);
 //                                mTaskIdentities.add(new TaskUser(identity.getObjectId(), false));
 //                            }
 //                        }
 //
-//                        mListInteraction.notifyDataSetChanged();
+//                        listInteraction.notifyDataSetChanged();
 //                    }
 //
 //                    @Override
@@ -193,87 +194,87 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
 //    }
 
     public String getTitle() {
-        return mTitle;
+        return title;
     }
 
     public void setTitle(@NonNull String title) {
-        mTitle = title;
+        this.title = title;
         notifyPropertyChanged(BR.title);
     }
 
     @Bindable
     public String getDeadline() {
-        return mDateFormatter.format(mDeadline);
+        return dateFormatter.format(deadline);
     }
 
     public void setDeadline(@NonNull Date deadline) {
-        mDeadline = deadline;
+        this.deadline = deadline;
         notifyPropertyChanged(BR.deadline);
     }
 
     @Override
     @Bindable
     public boolean isAsNeededTask() {
-        return mTimeFrame == R.string.time_frame_as_needed;
+        return timeFrame == R.string.time_frame_as_needed;
     }
 
     @Override
     @Bindable
     public int getSelectedTimeFrame() {
-        return Arrays.asList(mTimeFrames).indexOf(mTimeFrame);
+        return Arrays.asList(timeFrames).indexOf(timeFrame);
     }
 
     @Override
     public void setTimeFrame(int timeFrame) {
-        mTimeFrame = timeFrame;
+        this.timeFrame = timeFrame;
         notifyPropertyChanged(BR.selectedTimeFrame);
     }
 
     @Override
     public void onUpOrBackClick() {
         if (changesWereMade()) {
-            mView.showDiscardChangesDialog();
+            view.showDiscardChangesDialog();
         } else {
-            mNavigator.finish(Activity.RESULT_CANCELED);
+            navigator.finish(Activity.RESULT_CANCELED);
         }
     }
 
     boolean changesWereMade() {
-        return !TextUtils.isEmpty(mTitle);
+        return !TextUtils.isEmpty(title);
     }
 
     @Override
     public void onTitleChanged(CharSequence s, int start, int before, int count) {
-        mTitle = s.toString();
+        title = s.toString();
     }
 
     @Override
     public void onDeadlineClicked(View view) {
-        mView.showDatePickerDialog();
+        this.view.showDatePickerDialog();
     }
 
     @Override
     public void onFabSaveTaskClick(View view) {
-        if (TextUtils.isEmpty(mTitle)) {
-            mView.showMessage(R.string.error_task_title);
+        if (TextUtils.isEmpty(title)) {
+            this.view.showMessage(R.string.error_task_title);
             return;
         }
 
         final String timeFrame = getTimeFrameSelected();
         final List<String> identities = getIdentitiesAvailable();
         if (Objects.equals(timeFrame, TimeFrame.ONE_TIME) && identities.size() > 1) {
-            mView.showMessage(R.string.toast_task_max_one_user_one_time);
+            this.view.showMessage(R.string.toast_task_max_one_user_one_time);
             return;
         }
 
-        final Task task = getTask(mTitle, timeFrame, identities);
-        mTaskRepo.saveTask(task);
-        mNavigator.finish(TaskAddEditViewModel.TaskResult.TASK_SAVED);
+        final Task task = getTask(title, timeFrame, identities);
+        taskRepo.saveTask(task);
+        navigator.finish(TaskAddEditViewModel.TaskResult.TASK_SAVED);
     }
 
     @TimeFrame
     final String getTimeFrameSelected() {
-        switch (mTimeFrame) {
+        switch (timeFrame) {
             case R.string.time_frame_daily:
                 return TimeFrame.DAILY;
             case R.string.time_frame_weekly:
@@ -285,7 +286,7 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
             case R.string.time_frame_one_time:
                 return TimeFrame.ONE_TIME;
             default:
-                mDeadline = null;
+                deadline = null;
                 return TimeFrame.AS_NEEDED;
         }
     }
@@ -294,7 +295,7 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
     final List<String> getIdentitiesAvailable() {
         final List<String> identities = new ArrayList<>();
 
-        for (TaskAddEditIdentityItemModel itemModel : mItems) {
+        for (TaskAddEditIdentityItemModel itemModel : items) {
             if (itemModel.isInvolved()) {
                 identities.add(itemModel.getIdentityId());
             }
@@ -306,35 +307,35 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
     @NonNull
     Task getTask(@NonNull String taskTitle, @NonNull String timeFrame,
                  @NonNull List<String> identities) {
-        return new Task(mCurrentIdentity.getId(), taskTitle, mCurrentIdentity.getGroup(), timeFrame,
-                mDeadline, identities);
+        return new Task(currentIdentity.getId(), taskTitle, currentIdentity.getGroup(), timeFrame,
+                deadline, identities);
     }
 
     @Override
     public void onTimeFrameSelected(@NonNull AdapterView<?> parent, View view, int position, long id) {
-        mTimeFrame = (int) parent.getItemAtPosition(position);
+        timeFrame = (int) parent.getItemAtPosition(position);
         notifyPropertyChanged(BR.asNeededTask);
     }
 
     @Override
     public void onUsersRowItemClick(@NonNull TaskAddEditIdentityItemModel itemModel) {
-        final int pos = mItems.indexOf(itemModel);
+        final int pos = items.indexOf(itemModel);
         if (itemModel.isInvolved()) {
             if (!userIsLastOneChecked()) {
                 itemModel.setInvolved(false);
-                mListInteraction.notifyItemChanged(pos);
+                listInteraction.notifyItemChanged(pos);
             } else {
-                mView.showMessage(R.string.toast_min_one_user);
+                view.showMessage(R.string.toast_min_one_user);
             }
         } else {
             itemModel.setInvolved(true);
-            mListInteraction.notifyItemChanged(pos);
+            listInteraction.notifyItemChanged(pos);
         }
     }
 
     private boolean userIsLastOneChecked() {
         int involvedCount = 0;
-        for (TaskAddEditIdentityItemModel itemModel : mItems) {
+        for (TaskAddEditIdentityItemModel itemModel : items) {
             if (itemModel.isInvolved()) {
                 involvedCount++;
             }
@@ -349,24 +350,24 @@ public class TaskAddEditViewModelAddImpl extends ViewModelBaseImpl<TaskAddEditVi
 
     @Override
     public void onStartDrag(@NonNull RecyclerView.ViewHolder viewHolder) {
-        mListDragInteraction.startDrag(viewHolder);
+        listDragInteraction.startDrag(viewHolder);
     }
 
     @Override
     public void onDiscardChangesSelected() {
-        mNavigator.finish(TaskAddEditViewModel.TaskResult.TASK_DISCARDED);
+        navigator.finish(TaskAddEditViewModel.TaskResult.TASK_DISCARDED);
     }
 
     @Override
     public void onItemMove(int fromPosition, int toPosition) {
-        Collections.swap(mItems, fromPosition, toPosition);
-        mListInteraction.notifyItemMoved(fromPosition, toPosition);
+        Collections.swap(items, fromPosition, toPosition);
+        listInteraction.notifyItemMoved(fromPosition, toPosition);
     }
 
     @Override
     public void onItemDismiss(int position) {
-        mItems.remove(position);
-        mListInteraction.notifyItemRemoved(position);
+        items.remove(position);
+        listInteraction.notifyItemRemoved(position);
     }
 
     @Override

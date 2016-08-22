@@ -40,10 +40,11 @@ public class TasksViewModelImpl extends ListViewModelBaseImpl<TasksItemModel, Ta
 
     private static final String STATE_LOADING_TASKS = "STATE_LOADING_TASKS";
     private static final String STATE_DEADLINE = "STATE_DEADLINE";
-    private final TaskRepository mTaskRepo;
-    private final ArrayList<String> mLoadingTasks;
-    private TaskDeadline mDeadline;
-    private String mCurrentIdentityId;
+
+    private final TaskRepository taskRepo;
+    private final ArrayList<String> loadingTasks;
+    private TaskDeadline deadline;
+    private String currentIdentityId;
 
     public TasksViewModelImpl(@Nullable Bundle savedState,
                               @NonNull Navigator navigator,
@@ -53,14 +54,14 @@ public class TasksViewModelImpl extends ListViewModelBaseImpl<TasksItemModel, Ta
                               @NonNull TaskDeadline deadline) {
         super(savedState, navigator, eventBus, userRepository);
 
-        mTaskRepo = taskRepository;
+        taskRepo = taskRepository;
 
         if (savedState != null) {
-            mDeadline = savedState.getParcelable(STATE_DEADLINE);
-            mLoadingTasks = savedState.getStringArrayList(STATE_LOADING_TASKS);
+            this.deadline = savedState.getParcelable(STATE_DEADLINE);
+            loadingTasks = savedState.getStringArrayList(STATE_LOADING_TASKS);
         } else {
-            mDeadline = deadline;
-            mLoadingTasks = new ArrayList<>();
+            this.deadline = deadline;
+            loadingTasks = new ArrayList<>();
         }
     }
 
@@ -84,8 +85,8 @@ public class TasksViewModelImpl extends ListViewModelBaseImpl<TasksItemModel, Ta
     public void saveState(@NonNull Bundle outState) {
         super.saveState(outState);
 
-        outState.putParcelable(STATE_DEADLINE, mDeadline);
-        outState.putStringArrayList(STATE_LOADING_TASKS, mLoadingTasks);
+        outState.putParcelable(STATE_DEADLINE, deadline);
+        outState.putStringArrayList(STATE_LOADING_TASKS, loadingTasks);
     }
 
     @Override
@@ -96,18 +97,18 @@ public class TasksViewModelImpl extends ListViewModelBaseImpl<TasksItemModel, Ta
 
     //    @Override
 //    public void loadData() {
-//        getSubscriptions().add(mUserRepo.fetchIdentityData(mCurrentIdentity)
+//        getSubscriptions().add(userRepo.fetchIdentityData(currentIdentity)
 //                .flatMapObservable(new Func1<Identity, Observable<Task>>() {
 //                    @Override
 //                    public Observable<Task> call(Identity identity) {
-//                        return mTaskRepo.getTasks(identity, mDeadline.getDate());
+//                        return taskRepo.getTasks(identity, deadline.getDate());
 //                    }
 //                })
 //                .filter(new Func1<Task, Boolean>() {
 //                    @Override
 //                    public Boolean call(Task task) {
 //                        final List<Identity> identities = task.getIdentitiesText();
-//                        return !identities.isEmpty() && identities.contains(mCurrentIdentity);
+//                        return !identities.isEmpty() && identities.contains(currentIdentity);
 //                    }
 //                })
 //                .subscribe(new Subscriber<Task>() {
@@ -117,7 +118,7 @@ public class TasksViewModelImpl extends ListViewModelBaseImpl<TasksItemModel, Ta
 //                    @Override
 //                    public void onStart() {
 //                        super.onStart();
-//                        mItems.clear();
+//                        items.clear();
 //                        tasksUser = new ArrayList<>();
 //                        tasksGroup = new ArrayList<>();
 //                    }
@@ -125,33 +126,33 @@ public class TasksViewModelImpl extends ListViewModelBaseImpl<TasksItemModel, Ta
 //                    @Override
 //                    public void onCompleted() {
 //                        if (!tasksUser.isEmpty()) {
-//                            mItems.add(new TasksHeaderItem(R.string.task_header_my));
-//                            mItems.addAll(tasksUser);
+//                            items.add(new TasksHeaderItem(R.string.task_header_my));
+//                            items.addAll(tasksUser);
 //                        }
 //                        if (!tasksGroup.isEmpty()) {
-//                            mItems.add(new TasksHeaderItem(R.string.task_header_group));
-//                            mItems.addAll(tasksGroup);
+//                            items.add(new TasksHeaderItem(R.string.task_header_group));
+//                            items.addAll(tasksGroup);
 //                        }
 //
 //                        setLoading(false);
-//                        mListInteraction.notifyDataSetChanged();
+//                        listInteraction.notifyDataSetChanged();
 //                    }
 //
 //                    @Override
 //                    public void onError(Throwable e) {
-//                        mView.showMessage(R.string.toast_error_tasks_load);
+//                        view.showMessage(R.string.toast_error_tasks_load);
 //                    }
 //
 //                    @Override
 //                    public void onNext(Task task) {
 //                        final Identity identityResponsible = task.getIdentityResponsible();
-//                        if (Objects.equals(mCurrentIdentity.getObjectId(), identityResponsible.getObjectId())) {
-//                            tasksUser.add(new TasksItem(task, mCurrentIdentity));
+//                        if (Objects.equals(currentIdentity.getObjectId(), identityResponsible.getObjectId())) {
+//                            tasksUser.add(new TasksItem(task, currentIdentity));
 //                        } else {
-//                            tasksGroup.add(new TasksItem(task, mCurrentIdentity));
+//                            tasksGroup.add(new TasksItem(task, currentIdentity));
 //                        }
 //
-//                        task.setLoading(mLoadingTasks.contains(task.getObjectId()));
+//                        task.setLoading(loadingTasks.contains(task.getObjectId()));
 //                    }
 //                })
 //        );
@@ -159,49 +160,49 @@ public class TasksViewModelImpl extends ListViewModelBaseImpl<TasksItemModel, Ta
 
     @Override
     public void onAddTaskFabClick(View view) {
-        mNavigator.startTaskAdd();
+        navigator.startTaskAdd();
     }
 
     @Override
     public void onDeadlineSelected(@NonNull AdapterView<?> parent, View view, int position, long id) {
         final TaskDeadline deadline = (TaskDeadline) parent.getItemAtPosition(position);
-        if (!Objects.equals(deadline, mDeadline)) {
-            mDeadline = deadline;
+        if (!Objects.equals(deadline, this.deadline)) {
+            this.deadline = deadline;
             // TODO: reload data
         }
     }
 
     @Override
     public void onTaskRowClick(@NonNull TasksItem itemModel) {
-        mNavigator.startTaskDetails(itemModel.getId());
+        navigator.startTaskDetails(itemModel.getId());
     }
 
     @Override
     public void onDoneButtonClick(@NonNull TasksItem itemModel) {
         final String timeFrame = itemModel.getTimeFrame();
         if (Objects.equals(timeFrame, TimeFrame.ONE_TIME)) {
-            mTaskRepo.deleteTask(itemModel.getId());
+            taskRepo.deleteTask(itemModel.getId());
             return;
         }
 
-        final TaskHistoryEvent newEvent = new TaskHistoryEvent(itemModel.getId(), mCurrentIdentityId, new Date());
-        mTaskRepo.addHistoryEvent(newEvent);
+        final TaskHistoryEvent newEvent = new TaskHistoryEvent(itemModel.getId(), currentIdentityId, new Date());
+        taskRepo.addHistoryEvent(newEvent);
 
         // TODO: rotate identities and get new responsible
 
-//        if (identityResponsible != null && Objects.equals(identityResponsible, mCurrentIdentityId) ||
-//                identityResponsibleNew != null && Objects.equals(identityResponsibleNew, mCurrentIdentityId)) {
+//        if (identityResponsible != null && Objects.equals(identityResponsible, currentIdentityId) ||
+//                identityResponsibleNew != null && Objects.equals(identityResponsibleNew, currentIdentityId)) {
 //            loadData();
 //        } else {
-//            final int pos = mItems.indexOf(itemModel);
-//            mListInteraction.notifyItemChanged(pos);
+//            final int pos = items.indexOf(itemModel);
+//            listInteraction.notifyItemChanged(pos);
 //        }
     }
 
     @Override
     public void onRemindButtonClick(@NonNull TasksItem itemModel) {
-        if (!mView.isNetworkAvailable()) {
-            mView.showMessage(R.string.toast_no_connection);
+        if (!view.isNetworkAvailable()) {
+            view.showMessage(R.string.toast_no_connection);
             return;
         }
 
@@ -209,20 +210,20 @@ public class TasksViewModelImpl extends ListViewModelBaseImpl<TasksItemModel, Ta
             return;
         }
 
-        final int pos = mItems.indexOf(itemModel);
+        final int pos = items.indexOf(itemModel);
         setTaskLoading(itemModel, pos, true);
-        mView.loadRemindUserWorker(itemModel.getId());
+        view.loadRemindUserWorker(itemModel.getId());
     }
 
     private void setTaskLoading(@NonNull TasksItem itemModel, int position, boolean isLoading) {
         itemModel.setItemLoading(isLoading);
-        mListInteraction.notifyItemChanged(position);
+        listInteraction.notifyItemChanged(position);
 
         final String id = itemModel.getId();
         if (isLoading) {
-            mLoadingTasks.add(id);
+            loadingTasks.add(id);
         } else {
-            mLoadingTasks.remove(id);
+            loadingTasks.remove(id);
         }
     }
 
@@ -233,19 +234,19 @@ public class TasksViewModelImpl extends ListViewModelBaseImpl<TasksItemModel, Ta
         getSubscriptions().add(single.subscribe(new SingleSubscriber<String>() {
                     @Override
                     public void onSuccess(String value) {
-                        mView.removeWorker(workerTag);
+                        view.removeWorker(workerTag);
                         final TasksItem itemModel = stopTaskLoading(taskId);
                         if (itemModel != null) {
                             final Identity identityResponsible = itemModel.getIdentities().get(0);
                             final String nickname = identityResponsible.getNickname();
-                            mView.showMessage(R.string.toast_task_reminded_user, nickname);
+                            view.showMessage(R.string.toast_task_reminded_user, nickname);
                         }
                     }
 
                     @Override
                     public void onError(Throwable error) {
-                        mView.removeWorker(workerTag);
-                        mView.showMessage(R.string.toast_error_remind_failed);
+                        view.removeWorker(workerTag);
+                        view.showMessage(R.string.toast_error_remind_failed);
                         stopTaskLoading(taskId);
                     }
                 })
@@ -254,8 +255,8 @@ public class TasksViewModelImpl extends ListViewModelBaseImpl<TasksItemModel, Ta
 
     @Nullable
     private TasksItem stopTaskLoading(@NonNull String taskId) {
-        for (int i = 0, tasksSize = mItems.size(); i < tasksSize; i++) {
-            final TasksItemModel taskListItem = mItems.get(i);
+        for (int i = 0, tasksSize = items.size(); i < tasksSize; i++) {
+            final TasksItemModel taskListItem = items.get(i);
             if (taskListItem.getViewType() != Type.TASK) {
                 continue;
             }

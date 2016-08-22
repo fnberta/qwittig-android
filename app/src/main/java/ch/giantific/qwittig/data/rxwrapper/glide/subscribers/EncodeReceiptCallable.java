@@ -16,19 +16,19 @@ import ch.giantific.qwittig.data.repositories.PurchaseRepository;
  */
 public class EncodeReceiptCallable implements Callable<String> {
 
-    private final String mReceiptPath;
-    private final FragmentActivity mActivity;
+    private final String receiptPath;
+    private final FragmentActivity activity;
 
     public EncodeReceiptCallable(@NonNull String receiptPath,
                                  @NonNull FragmentActivity activity) {
-        mReceiptPath = receiptPath;
-        mActivity = activity;
+        this.receiptPath = receiptPath;
+        this.activity = activity;
     }
 
     @Override
     public String call() throws Exception {
-        final byte[] bytes = Glide.with(mActivity)
-                .load(mReceiptPath)
+        final byte[] bytes = Glide.with(activity)
+                .load(receiptPath)
                 .asBitmap()
                 .toBytes(Bitmap.CompressFormat.JPEG, PurchaseRepository.JPEG_COMPRESSION_RATE)
                 .into(PurchaseRepository.WIDTH, PurchaseRepository.HEIGHT)

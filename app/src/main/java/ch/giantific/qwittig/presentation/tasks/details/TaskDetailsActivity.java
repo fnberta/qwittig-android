@@ -43,15 +43,16 @@ import ch.giantific.qwittig.presentation.tasks.details.di.TaskDetailsViewModelMo
 public class TaskDetailsActivity extends BaseNavDrawerActivity<TaskDetailsSubcomponent> {
 
     private static final String FRAGMENT_TASK_DETAILS = "FRAGMENT_TASK_DETAILS";
+
     @Inject
-    TaskDetailsViewModel mTaskDetailsViewModel;
+    TaskDetailsViewModel detailsViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final ActivityTaskDetailsBinding binding =
                 DataBindingUtil.setContentView(this, R.layout.activity_task_details);
-        binding.setViewModel(mTaskDetailsViewModel);
+        binding.setViewModel(detailsViewModel);
 
         // disable default actionBar title
         ActionBar actionBar = getSupportActionBar();
@@ -64,15 +65,15 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity<TaskDetailsSubcom
         unCheckNavDrawerItems();
         supportPostponeEnterTransition();
 
-        if (mUserLoggedIn && savedInstanceState == null) {
+        if (userLoggedIn && savedInstanceState == null) {
             addDetailsFragment();
         }
     }
 
     @Override
     protected void injectDependencies(@NonNull NavDrawerComponent navComp, Bundle savedInstanceState) {
-        mComponent = navComp.plus(new TaskDetailsViewModelModule(savedInstanceState, getTaskObjectId()));
-        mComponent.inject(this);
+        component = navComp.plus(new TaskDetailsViewModelModule(savedInstanceState, getTaskObjectId()));
+        component.inject(this);
     }
 
     private String getTaskObjectId() {
@@ -93,12 +94,12 @@ public class TaskDetailsActivity extends BaseNavDrawerActivity<TaskDetailsSubcom
 
     @Override
     protected List<ViewModel> getViewModels() {
-        return Arrays.asList(new ViewModel[]{mTaskDetailsViewModel});
+        return Arrays.asList(new ViewModel[]{detailsViewModel});
     }
 
     private void setUpNavigation() {
         final TaskDetailsActivity activity = this;
-        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 NavUtils.navigateUpFromSameTask(activity);

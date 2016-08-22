@@ -25,7 +25,7 @@ import ch.giantific.qwittig.presentation.settings.groupusers.addgroup.Currency;
 public class LoginFirstGroupFragment extends BaseFragment<LoginComponent, LoginFirstGroupViewModel, BaseFragment.ActivityListener<LoginComponent>>
         implements LoginFirstGroupViewModel.ViewListener {
 
-    private FragmentLoginFirstGroupBinding mBinding;
+    private FragmentLoginFirstGroupBinding binding;
 
     public LoginFirstGroupFragment() {
         // required empty constructor
@@ -34,20 +34,20 @@ public class LoginFirstGroupFragment extends BaseFragment<LoginComponent, LoginF
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentLoginFirstGroupBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+        binding = FragmentLoginFirstGroupBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel.attachView(this);
-        mBinding.setViewModel(mViewModel);
+        viewModel.attachView(this);
+        binding.setViewModel(viewModel);
         final ArrayAdapter<Currency> spinnerCurrencyAdapter = new ArrayAdapter<>(getActivity(),
-                R.layout.spinner_item, mViewModel.getSupportedCurrencies());
+                R.layout.spinner_item, viewModel.getSupportedCurrencies());
         spinnerCurrencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mBinding.spLoginGroupCurrency.setAdapter(spinnerCurrencyAdapter);
+        binding.spLoginGroupCurrency.setAdapter(spinnerCurrencyAdapter);
     }
 
     @Override
@@ -57,6 +57,6 @@ public class LoginFirstGroupFragment extends BaseFragment<LoginComponent, LoginF
 
     @Override
     protected View getSnackbarView() {
-        return mBinding.tilLoginGroupName;
+        return binding.tilLoginGroupName;
     }
 }

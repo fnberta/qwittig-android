@@ -12,7 +12,7 @@ import android.support.v4.app.DialogFragment;
  */
 public abstract class BaseDialogFragment<T> extends DialogFragment {
 
-    protected T mActivity;
+    protected T activity;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -20,7 +20,7 @@ public abstract class BaseDialogFragment<T> extends DialogFragment {
         super.onAttach(context);
 
         try {
-            mActivity = (T) context;
+            activity = (T) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
                     + " must implement DialogInteractionListener");

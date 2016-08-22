@@ -26,36 +26,36 @@ import android.widget.TextView;
 public class StringResSpinnerAdapter extends BaseAdapter implements ThemedSpinnerAdapter {
 
     @NonNull
-    private final ThemedSpinnerAdapter.Helper mDropDownHelper;
-    private final Context mContext;
-    private final int mViewResource;
-    private final int[] mStringRes;
+    private final ThemedSpinnerAdapter.Helper dropDownHelper;
+    private final Context context;
+    private final int viewResource;
+    private final int[] stringRes;
 
     /**
      * Constructs a new {@link StringResSpinnerAdapter}.
      *
-     * @param context   the context to use in the adapter
-     * @param resource  the view resource layout to use to display the items
-     * @param stringRes the string resources to display
+     * @param context      the context to use in the adapter
+     * @param viewResource the view viewResource layout to use to display the items
+     * @param stringRes    the string resources to display
      */
-    public StringResSpinnerAdapter(@NonNull Context context, int resource,
+    public StringResSpinnerAdapter(@NonNull Context context, int viewResource,
                                    @NonNull int[] stringRes) {
         super();
 
-        mDropDownHelper = new ThemedSpinnerAdapter.Helper(context);
-        mContext = context;
-        mViewResource = resource;
-        mStringRes = stringRes;
+        this.dropDownHelper = new ThemedSpinnerAdapter.Helper(context);
+        this.context = context;
+        this.viewResource = viewResource;
+        this.stringRes = stringRes;
     }
 
     @Override
     public int getCount() {
-        return mStringRes.length;
+        return stringRes.length;
     }
 
     @Override
     public Object getItem(int position) {
-        return mStringRes[position];
+        return stringRes[position];
     }
 
     @Override
@@ -75,7 +75,7 @@ public class StringResSpinnerAdapter extends BaseAdapter implements ThemedSpinne
         final TypeRow typeRow;
         if (convertView == null) {
             convertView = LayoutInflater.from(parent.getContext()).inflate(
-                    isDropDown ? android.R.layout.simple_spinner_dropdown_item : mViewResource,
+                    isDropDown ? android.R.layout.simple_spinner_dropdown_item : viewResource,
                     parent, false);
             typeRow = new TypeRow(convertView);
             convertView.setTag(typeRow);
@@ -83,7 +83,7 @@ public class StringResSpinnerAdapter extends BaseAdapter implements ThemedSpinne
             typeRow = (TypeRow) convertView.getTag();
         }
 
-        String title = mContext.getString(mStringRes[position]);
+        String title = context.getString(stringRes[position]);
         typeRow.setTitle(title);
 
         return convertView;
@@ -103,8 +103,8 @@ public class StringResSpinnerAdapter extends BaseAdapter implements ThemedSpinne
      * @return the adapter position of the string resources or -1 if it does not exist
      */
     public int getPosition(int stringRes) {
-        for (int i = 0, stringResLength = mStringRes.length; i < stringResLength; i++) {
-            if (mStringRes[i] == stringRes) {
+        for (int i = 0, stringResLength = this.stringRes.length; i < stringResLength; i++) {
+            if (this.stringRes[i] == stringRes) {
                 return i;
             }
         }
@@ -115,12 +115,12 @@ public class StringResSpinnerAdapter extends BaseAdapter implements ThemedSpinne
     @Nullable
     @Override
     public Resources.Theme getDropDownViewTheme() {
-        return mDropDownHelper.getDropDownViewTheme();
+        return dropDownHelper.getDropDownViewTheme();
     }
 
     @Override
     public void setDropDownViewTheme(Resources.Theme theme) {
-        mDropDownHelper.setDropDownViewTheme(theme);
+        dropDownHelper.setDropDownViewTheme(theme);
     }
 
     /**
