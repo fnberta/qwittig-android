@@ -12,7 +12,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -185,13 +184,7 @@ public class Purchase implements FirebaseModel {
      */
     @Exclude
     public boolean isRead(@NonNull String identityId) {
-        for (String readById : getReadByIds()) {
-            if (Objects.equals(readById, identityId)) {
-                return true;
-            }
-        }
-
-        return false;
+        return getReadByIds().contains(identityId);
     }
 
     /**
